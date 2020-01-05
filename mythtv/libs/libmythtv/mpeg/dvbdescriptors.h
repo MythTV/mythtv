@@ -48,8 +48,8 @@ inline QString dvb_decode_text(const unsigned char *src, uint length)
 
 QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
 
-#define byteBCDH2int(i) (i >> 4)
-#define byteBCDL2int(i) (i & 0x0f)
+#define byteBCDH2int(i) ((i) >> 4)
+#define byteBCDL2int(i) ((i) & 0x0f)
 #define byteBCD2int(i) (byteBCDH2int(i) * 10 + byteBCDL2int(i))
 #define byte2BCD2int(i, j) \
   (byteBCDH2int(i) * 1000     + byteBCDL2int(i) * 100       + \

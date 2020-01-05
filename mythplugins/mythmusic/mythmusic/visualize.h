@@ -242,7 +242,7 @@ class Piano : public VisualBase
 
 #define PIANO_RMS_NEGLIGIBLE .001
 #define PIANO_SPECTRUM_SMOOTHING 0.95
-#define PIANO_MIN_VOL -10
+#define PIANO_MIN_VOL (-10)
 #define PIANO_KEYPRESS_TOO_LIGHT .2
 
 struct piano_key_data {

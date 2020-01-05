@@ -24,7 +24,7 @@
 #include "mythframe.h"
 #include "mythavutil.h"
 
-#define ITER    48*30
+#define ITER    (48*30)
 #define WIDTH   720
 #define HEIGHT  576
 

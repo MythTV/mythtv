@@ -100,7 +100,7 @@ enum PlayerFlags
     kMusicChoice          = 0x040000,
 };
 
-#define FlagIsSet(arg) (m_playerFlags & arg)
+#define FlagIsSet(arg) (m_playerFlags & (arg))
 
 class DecoderThread : public MThread
 {

@@ -68,7 +68,7 @@
 // Filesystem dir within tmp config dir where thumbnails reside
 #define THUMBNAIL_SUBDIR            "Images"
 
-#define DEVICE_INVALID -1
+#define DEVICE_INVALID (-1)
 
 class MythMediaDevice;
 class MythMediaEvent;

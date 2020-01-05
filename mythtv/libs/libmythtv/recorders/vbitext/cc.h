@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define CC_VBIBUFSIZE 65536*2
+#define CC_VBIBUFSIZE (65536*2)
 
 //cc is 32 columns per row, this allows for extra characters
 #define CC_BUFSIZE 256

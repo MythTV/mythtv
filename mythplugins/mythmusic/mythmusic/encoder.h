@@ -4,9 +4,9 @@
 #include <cstdio>
 #include <sys/types.h>
 
-#define EENCODEERROR -1
-#define EPARTIALSAMPLE -2
-#define ENOTIMPL -3
+#define EENCODEERROR (-1)
+#define EPARTIALSAMPLE (-2)
+#define ENOTIMPL (-3)
 
 class MusicMetadata;
 
