@@ -46,6 +46,10 @@ class MTV_PUBLIC Jitterometer
     Jitterometer(QString nname, int ncycles = 0);
    ~Jitterometer();
 
+    // Deleted functions should be public.
+    Jitterometer(const Jitterometer &) = delete;            // not copyable
+    Jitterometer &operator=(const Jitterometer &) = delete; // not copyable
+
     float GetLastFPS(void) const { return m_lastFps; }
     float GetLastSD(void) const { return m_lastSd;  }
     QString GetLastCPUStats(void) const { return m_lastCpuStats; }
@@ -56,9 +60,6 @@ class MTV_PUBLIC Jitterometer
     QString GetCPUStat(void);
 
  private:
-    Jitterometer(const Jitterometer &) = delete;            // not copyable
-    Jitterometer &operator=(const Jitterometer &) = delete; // not copyable
-
     int                 m_count           {0};
     int                 m_numCycles;
     struct timeval      m_starttime       {0,0};

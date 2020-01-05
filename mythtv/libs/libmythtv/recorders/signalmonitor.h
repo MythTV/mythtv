@@ -42,6 +42,9 @@ class SignalMonitor : protected MThread
                                bool release_stream);
     ~SignalMonitor() override;
 
+    // Prevent implicit conversion of wrongly ordered arguments
+    SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
+
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //
 
@@ -119,8 +122,6 @@ class SignalMonitor : protected MThread
   protected:
     SignalMonitor(int _inputid, ChannelBase *_channel,
                   bool _release_stream, uint64_t wait_for_mask);
-    // Prevent implicit conversion of wrongly ordered arguments
-    SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
     void run(void) override; // MThread
 

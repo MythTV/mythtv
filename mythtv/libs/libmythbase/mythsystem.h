@@ -109,6 +109,10 @@ class MBASE_PUBLIC MythSystem
 
     virtual ~MythSystem(void) = default;
 
+    // Deleted functions should be public.
+    MythSystem(const MythSystem&) = delete; // no-implementation
+    MythSystem& operator= (const MythSystem&) = delete; // no-implementation
+
     /// Returns the flags passed to the constructor
     virtual uint GetFlags(void) const = 0;
 
@@ -156,10 +160,6 @@ class MBASE_PUBLIC MythSystem
 
   protected:
     MythSystem() = default;
-
-  private:
-    MythSystem(const MythSystem&); // no-implementation
-    MythSystem& operator= (const MythSystem&); // no-implementation
 };
 
 #endif // MYTHSYSTEM_H_

@@ -38,11 +38,10 @@ class MTV_PUBLIC PESPacket
         m_pesDataSize = max(((int)Length())-1 + (PESPacket::HasCRC() ? 4 : 0), 0);
     }
 
-  private:
+    // Deleted functions should be public.
     //const PESPacket& operator=(const PESPacket& pkt);
-    PESPacket& operator=(const PESPacket& pkt);
+    PESPacket& operator=(const PESPacket& pkt) = delete;
 
-  public:
     // may be modified
     PESPacket(const PESPacket& pkt)
         : m_pesData(nullptr),

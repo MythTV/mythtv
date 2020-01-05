@@ -94,6 +94,10 @@ class AvFormatDecoder : public DecoderBase
                     PlayerFlags flags);
     ~AvFormatDecoder() override;
 
+    // Deleted functions should be public.
+    AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
+    AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
+
     void SetEof(bool eof) override; // DecoderBase
 
     void CloseCodecs();
@@ -181,10 +185,6 @@ class AvFormatDecoder : public DecoderBase
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
     static int GetMaxReferenceFrames(AVCodecContext *Context);
-
-  private:
-    AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
-    AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
 
   protected:
     int  AutoSelectTrack(uint type) override; // DecoderBase

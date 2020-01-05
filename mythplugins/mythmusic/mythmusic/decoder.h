@@ -56,7 +56,7 @@ class DecoderEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
-    DecoderEvent &operator=(const DecoderEvent&);
+    DecoderEvent &operator=(const DecoderEvent&) = delete;
 
   private:
     QString *m_errorMsg {nullptr};

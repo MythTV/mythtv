@@ -26,6 +26,10 @@ class VideoList
     VideoList();
     ~VideoList();
 
+    // Deleted functions should be public.
+    VideoList(const VideoList &) = delete;            // not copyable
+    VideoList &operator=(const VideoList &) = delete; // not copyable
+
     MythGenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                 int group_type,
                                 const ParentalLevel &parental_level,
@@ -54,9 +58,6 @@ class VideoList
     void InvalidateCache();
 
   private:
-    VideoList(const VideoList &) = delete;            // not copyable
-    VideoList &operator=(const VideoList &) = delete; // not copyable
-
     class VideoListImp *m_imp;
 };
 

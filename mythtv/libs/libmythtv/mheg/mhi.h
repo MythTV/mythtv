@@ -266,13 +266,13 @@ class MHIText : public MHTextDisplay
  */
 class MHIBitmap : public MHBitmapDisplay
 {
-  private:
-    MHIBitmap(const MHIBitmap &) = delete;            // not copyable
-    MHIBitmap &operator=(const MHIBitmap &) = delete; // not copyable
-
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
     ~MHIBitmap() override;
+
+    // Deleted functions should be public.
+    MHIBitmap(const MHIBitmap &) = delete;            // not copyable
+    MHIBitmap &operator=(const MHIBitmap &) = delete; // not copyable
 
     /// Create bitmap from PNG
     void CreateFromPNG(const unsigned char *data, int length) override; // MHBitmapDisplay

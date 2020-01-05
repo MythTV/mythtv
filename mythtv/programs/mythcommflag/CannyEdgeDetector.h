@@ -19,14 +19,14 @@ class CannyEdgeDetector : public EdgeDetector
 public:
     CannyEdgeDetector(void);
     ~CannyEdgeDetector(void) override;
+    CannyEdgeDetector(const CannyEdgeDetector &) = delete;            // not copyable
+    CannyEdgeDetector &operator=(const CannyEdgeDetector &) = delete; // not copyable
     int MythPlayerInited(const MythPlayer *player, int width, int height);
     int setExcludeArea(int row, int col, int width, int height) override; // EdgeDetector
     const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
             int percentile) override; // EdgeDetector
 
 private:
-    CannyEdgeDetector(const CannyEdgeDetector &) = delete;            // not copyable
-    CannyEdgeDetector &operator=(const CannyEdgeDetector &) = delete; // not copyable
     int resetBuffers(int newwidth, int newheight);
 
     double         *m_mask        {nullptr}; /* pre-computed Gaussian mask */
