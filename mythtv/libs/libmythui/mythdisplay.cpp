@@ -117,35 +117,48 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 QStringList MythDisplay::GetDescription(void)
 {
     QStringList result;
+    bool spanall = false;
     int screencount = MythDisplay::GetScreenCount();
     MythDisplay* display = MythDisplay::AcquireRelease();
 
     if (MythDisplay::SpanAllScreens() && screencount > 1)
     {
+        spanall = true;
         result.append(tr("Spanning %1 screens").arg(screencount));
         result.append(tr("Total bounds") + QString("\t: %1x%2")
                       .arg(display->GetScreenBounds().width())
                       .arg(display->GetScreenBounds().height()));
-        MythDisplay::AcquireRelease(false);
-        return result;
+        result.append("");
     }
 
-    QScreen *screen = display->GetCurrentScreen();
-    if (screen)
+    QScreen *current = display->GetCurrentScreen();
+    QList<QScreen*> screens = qGuiApp->screens();
+    bool first = true;
+    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
     {
-        result.append(tr("Screen %1 %2:").arg(screen->name())
+        if (!first)
+            result.append("");
+        first = false;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-                .arg(QString("(%1)").arg(screen->manufacturer())));
+        QString id = QString("(%1)").arg((*it)->manufacturer());
 #else
-                .arg(""));
+        QString id;
 #endif
+        if ((*it) == current && !spanall)
+            result.append(tr("Current screen %1 %2:").arg((*it)->name()).arg(id));
+        else
+            result.append(tr("Screen %1 %2:").arg((*it)->name()).arg(id));
+        result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
+                .arg((*it)->physicalSize().width()).arg((*it)->physicalSize().height()));
+        if ((*it) == current && !spanall)
+        {
+            result.append(tr("Aspect ratio") + QString("\t: %1")
+                    .arg(display->GetAspectRatio(), 0, 'f', 3));
+            result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
+                          .arg(display->GetResolution().width()).arg(display->GetResolution().height())
+                          .arg(display->GetRefreshRate(), 0, 'f', 2));
+        }
     }
-    result.append(tr("Size and aspect") + QString("\t: %1mmx%2mm %3")
-            .arg(display->GetPhysicalSize().width()).arg(display->GetPhysicalSize().height())
-            .arg(display->GetAspectRatio(), 0, 'f', 1));
-    result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
-                  .arg(display->GetResolution().width()).arg(display->GetResolution().height())
-                  .arg(display->GetRefreshRate(), 0, 'f', 2));
     MythDisplay::AcquireRelease(false);
     return result;
 }
