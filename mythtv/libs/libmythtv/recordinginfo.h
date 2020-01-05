@@ -94,7 +94,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &seriesid,
         const QString &programid,
         const QString &inetref,
-        const CategoryType catType,
+        CategoryType catType,
 
         int recpriority,
 

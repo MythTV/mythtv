@@ -79,7 +79,7 @@ class V4LChannel : public DTVChannel
 
   private:
     // Helper Sets
-    void SetFreqTable(const int index);
+    void SetFreqTable(int index);
     int  SetFreqTable(const QString &name) override; // ChannelBase
     bool SetInputAndFormat(int inputNum, const QString& newFmt);
 

@@ -201,7 +201,7 @@ class MPUBLIC ProgramInfo
 
                 QString seriesid,
                 QString programid,
-                const CategoryType catType,
+                CategoryType catType,
 
                 float stars,
                 uint year,
@@ -719,7 +719,7 @@ class MPUBLIC ProgramInfo
     QString CreateRecordBasename(const QString &ext) const;
 
     bool  LoadProgramFromRecorded(
-        const uint chanid, const QDateTime &recstartts);
+        uint chanid, const QDateTime &recstartts);
 
     bool FromStringList(QStringList::const_iterator &it,
                         const QStringList::const_iterator&  end);
@@ -848,7 +848,7 @@ MPUBLIC bool LoadFromProgram(
     uint               &count);
 
 MPUBLIC ProgramInfo*  LoadProgramFromProgram(
-        const uint chanid, const QDateTime &starttime);
+        uint chanid, const QDateTime &starttime);
 
 MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,

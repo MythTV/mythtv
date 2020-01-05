@@ -12,11 +12,11 @@ class MBASE_PUBLIC StorageGroup
 {
   public:
     explicit StorageGroup(QString group = "", QString hostname = "",
-                 const bool allowFallback = true);
+                 bool allowFallback = true);
 
     void    Init(const QString &group = "Default",
                  const QString &hostname = "",
-                 const bool allowFallback = true);
+                 bool allowFallback = true);
 
     QString getName(void) const { return m_groupname; }
 

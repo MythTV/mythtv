@@ -216,25 +216,25 @@ class MTV_PUBLIC CardUtil
                                           const QString &audiodevice,
                                           const QString &vbidevice,
                                           const QString &inputtype,
-                                          const uint audioratelimit,
+                                          uint audioratelimit,
                                           const QString &hostname,
-                                          const uint dvb_swfilter,
-                                          const uint dvb_sat_type,
+                                          uint dvb_swfilter,
+                                          uint dvb_sat_type,
                                           bool       dvb_wait_for_seqstart,
                                           bool       skipbtaudio,
                                           bool       dvb_on_demand,
-                                          const uint dvb_diseqc_type,
-                                          const uint firewire_speed,
+                                          uint dvb_diseqc_type,
+                                          uint firewire_speed,
                                           const QString &firewire_model,
-                                          const uint firewire_connection,
-                                          const uint signal_timeout,
-                                          const uint channel_timeout,
-                                          const uint dvb_tuning_delay,
-                                          const uint contrast,
-                                          const uint brightness,
-                                          const uint colour,
-                                          const uint hue,
-                                          const uint diseqcid,
+                                          uint firewire_connection,
+                                          uint signal_timeout,
+                                          uint channel_timeout,
+                                          uint dvb_tuning_delay,
+                                          uint contrast,
+                                          uint brightness,
+                                          uint colour,
+                                          uint hue,
+                                          uint diseqcid,
                                           bool       dvb_eitscan);
 
     static bool         DeleteInput(uint inputid);
@@ -295,8 +295,8 @@ class MTV_PUBLIC CardUtil
                                         const QString &channum);
 
     // Input creation and deletion
-    static int           CreateCardInput(const uint inputid,
-                                         const uint sourceid,
+    static int           CreateCardInput(uint inputid,
+                                         uint sourceid,
                                          const QString &inputname,
                                          const QString &externalcommand,
                                          const QString &changer_device,
@@ -306,10 +306,10 @@ class MTV_PUBLIC CardUtil
                                          const QString &startchan,
                                          const QString &displayname,
                                          bool  dishnet_eit,
-                                         const uint recpriority,
-                                         const uint quicktune,
-                                         const uint schedorder,
-                                         const uint livetvorder);
+                                         uint recpriority,
+                                         uint quicktune,
+                                         uint schedorder,
+                                         uint livetvorder);
 
     // Other input functions
 

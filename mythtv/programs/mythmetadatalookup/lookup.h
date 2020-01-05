@@ -17,7 +17,7 @@ class LookerUpper : public QObject
 
     bool StillWorking();
 
-    void HandleSingleRecording(const uint chanid,
+    void HandleSingleRecording(uint chanid,
                                const QDateTime &starttime,
                                bool updaterules = false);
     void HandleAllRecordings(bool updaterules = false);

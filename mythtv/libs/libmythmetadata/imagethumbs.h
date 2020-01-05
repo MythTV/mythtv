@@ -127,7 +127,7 @@ template <class DBFS>
 class META_PUBLIC ImageThumb
 {
 public:
-    explicit ImageThumb(DBFS *const dbfs);
+    explicit ImageThumb(DBFS *dbfs);
     ~ImageThumb();
 
     void    ClearThumbs(int devId, const QString &action);

@@ -133,8 +133,8 @@ class H264Parser {
     ~H264Parser(void) {delete [] m_rbspBuffer;}
 
     uint32_t addBytes(const uint8_t  *bytes,
-                      const uint32_t  byte_count,
-                      const uint64_t  stream_offset);
+                      uint32_t  byte_count,
+                      uint64_t  stream_offset);
     void Reset(void);
 
     static QString NAL_type_str(uint8_t type);

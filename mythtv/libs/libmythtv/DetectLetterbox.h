@@ -4,7 +4,7 @@
 class MTV_PUBLIC DetectLetterbox
 {
   public:
-    explicit DetectLetterbox(MythPlayer* const Player);
+    explicit DetectLetterbox(MythPlayer* Player);
     ~DetectLetterbox() = default;
     void SetDetectLetterbox(bool Detect);
     bool GetDetectLetterbox() const;

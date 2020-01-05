@@ -231,7 +231,7 @@ class cHlCiHandler : public cCiHandler {
 
 int tcp_listen(struct sockaddr_in *name,int sckt,unsigned long address=INADDR_ANY);
 int accept_tcp(int ip_sock,struct sockaddr_in *ip_name);
-int udp_listen(struct sockaddr_un *name,char const * const filename);
+int udp_listen(struct sockaddr_un *name,char const * filename);
 int accept_udp(int ip_sock,struct sockaddr_un *ip_name);
 
 #endif //__CI_H

@@ -150,7 +150,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void showProgFinder();
     void channelUpdate();
     void volumeUpdate(bool up);
-    void toggleMute(const bool muteIndividualChannels = false);
+    void toggleMute(bool muteIndividualChannels = false);
 
     void deleteRule();
 

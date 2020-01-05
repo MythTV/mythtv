@@ -13,7 +13,7 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 
   public:
     ImageSearchResultsDialog(MythScreenStack *lparent,
-            ArtworkList list, const VideoArtworkType type);
+            ArtworkList list, VideoArtworkType type);
 
     ~ImageSearchResultsDialog() override;
 

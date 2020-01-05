@@ -121,14 +121,14 @@ private:
 MUI_PUBLIC void ShowNotificationError(const QString &msg,
                                       const QString &from = QString(),
                                       const QString &detail = QString(),
-                                      const VNMask visibility = MythNotification::kAll,
-                                      const MythNotification::Priority priority = MythNotification::kDefault);
+                                      VNMask visibility = MythNotification::kAll,
+                                      MythNotification::Priority priority = MythNotification::kDefault);
 
 MUI_PUBLIC void ShowNotification(const QString &msg,
                                  const QString &from = QString(),
                                  const QString &detail = QString(),
-                                 const VNMask visibility = MythNotification::kAll,
-                                 const MythNotification::Priority priority = MythNotification::kDefault);
+                                 VNMask visibility = MythNotification::kAll,
+                                 MythNotification::Priority priority = MythNotification::kDefault);
 
 MUI_PUBLIC void ShowNotification(bool  error,
                                  const QString &msg,
@@ -140,8 +140,8 @@ MUI_PUBLIC void ShowNotification(bool  error,
                                  float progress = -1.0F,
                                  int   duration = -1,
                                  bool  fullscreen = false,
-                                 const VNMask visibility = MythNotification::kAll,
-                                 const MythNotification::Priority priority = MythNotification::kDefault,
+                                 VNMask visibility = MythNotification::kAll,
+                                 MythNotification::Priority priority = MythNotification::kDefault,
                                  const QString &style = QString());
 
 MUI_PUBLIC void ShowNotification(MythNotification::Type type,
@@ -154,8 +154,8 @@ MUI_PUBLIC void ShowNotification(MythNotification::Type type,
                                  float progress = -1.0F,
                                  int   duration = -1,
                                  bool  fullscreen = false,
-                                 const VNMask visibility = MythNotification::kAll,
-                                 const MythNotification::Priority priority = MythNotification::kDefault,
+                                 VNMask visibility = MythNotification::kAll,
+                                 MythNotification::Priority priority = MythNotification::kDefault,
                                  const QString &style = QString());
 
 #endif /* defined(__MythTV__mythnotifications__) */

@@ -124,7 +124,7 @@ class NetworkControl : public ServerPool, public QRunnable
 
     static QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     static QString listSchedule(const QString& chanID = "") ;
-    static QString listChannels(const uint start, const uint limit) ;
+    static QString listChannels(uint start, uint limit) ;
     static QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);

@@ -157,7 +157,7 @@ namespace DLNA
      */
     UPNP_PUBLIC QString DLNAProfileName( const QString &mimeType,
                                          const QSize &resolution = QSize(),
-                                         const double videoFrameRate = 0.0,
+                                         double videoFrameRate = 0.0,
                                          const QString &container = "",
                                          const QString &vidCodec = "",
                                          const QString &audioCodec = "");
@@ -177,7 +177,7 @@ namespace DLNA
     UPNP_PUBLIC QString DLNAFourthField( UPNPProtocol::TransferProtocol protocol,
                                          const QString &mimeType,
                                          const QSize &resolution,
-                                         const double videoFrameRate,
+                                         double videoFrameRate,
                                          const QString &container,
                                          const QString &vidCodec,
                                          const QString &audioCodec,
@@ -197,7 +197,7 @@ namespace DLNA
     UPNP_PUBLIC QString ProtocolInfoString( UPNPProtocol::TransferProtocol protocol,
                                             const QString &mimeType,
                                             const QSize &resolution = QSize(),
-                                            const double videoFrameRate = 0.0,
+                                            double videoFrameRate = 0.0,
                                             const QString &container = "",
                                             const QString &vidCodec = "",
                                             const QString &audioCodec = "",

@@ -408,7 +408,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
         { return false; }
     uint GetVoltage(const DiSEqCDevSettings &settings,
                     const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
-    uint32_t     GetIntermediateFrequency(const uint32_t frequency) const;
+    uint32_t     GetIntermediateFrequency(uint32_t frequency) const;
 
     // Non-const Gets
     DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings &/*settings*/) const override // DiSEqCDevDevice

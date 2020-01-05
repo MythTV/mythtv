@@ -41,7 +41,7 @@ class MBASE_PUBLIC DBUtil
 
     static MythDBBackupStatus BackupDB(QString &filename,
                                        bool disableRotation = false);
-    static bool CheckTables(const bool repair = false,
+    static bool CheckTables(bool repair = false,
                             const QString &options = "QUICK");
     static bool RepairTables(const QStringList &tables);
 

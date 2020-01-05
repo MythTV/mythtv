@@ -46,11 +46,11 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 
     /// Query user, to prevent silent, automatic database upgrades
     enum MythSchemaUpgrade PromptForUpgrade(const char *name,
-                                            const bool upgradeAllowed,
-                                            const bool upgradeIfNoUI,
-                                            const int  minDBMSmajor = 0,
-                                            const int  minDBMSminor = 0,
-                                            const int  minDBMSpoint = 0);
+                                            bool upgradeAllowed,
+                                            bool upgradeIfNoUI,
+                                            int  minDBMSmajor = 0,
+                                            int  minDBMSminor = 0,
+                                            int  minDBMSpoint = 0);
 
     QString m_DBver;               ///< Schema version in the database
     bool    m_emptyDB {false};     ///< Is the database currently empty?

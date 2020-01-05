@@ -177,7 +177,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     // Prevent compiler complaints about using 0 as a null pointer.
     inline void glVertexAttribPointerI(GLuint Index, GLint Size, GLenum Type,
                                        GLboolean Normalize, GLsizei Stride,
-                                       const GLuint Value);
+                                       GLuint Value);
     // Framebuffers
     QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
 

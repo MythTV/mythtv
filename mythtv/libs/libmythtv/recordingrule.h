@@ -65,7 +65,7 @@ class MTV_PUBLIC RecordingRule
 
     bool IsValid(QString &msg);
 
-    static QString SearchTypeToString(const RecSearchType searchType);
+    static QString SearchTypeToString(RecSearchType searchType);
     static QStringList GetTemplateNames(void);
 
     /// Unique Recording Rule ID

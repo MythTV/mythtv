@@ -41,9 +41,9 @@ class MythCECAdapter
     static void LogMessageCallback(void*, const cec_log_message*);
     static void KeyPressCallback  (void*, const cec_keypress*);
     static void CommandCallback   (void*, const cec_command*);
-    static void AlertCallback     (void*, const libcec_alert, const libcec_parameter);
+    static void AlertCallback     (void*, libcec_alert, libcec_parameter);
 #endif
-    static void SourceCallback    (void*, const cec_logical_address, const uint8_t);
+    static void SourceCallback    (void*, cec_logical_address, uint8_t);
     static QString AddressToString(int Address);
 
     MythCECAdapter() = default;
@@ -56,9 +56,9 @@ class MythCECAdapter
     void        HandleActions (MythCECActions Actions);
     static int  HandleCommand (const cec_command &Command);
     static int  HandleKeyPress(const cec_keypress &Key);
-    static void HandleSource  (const cec_logical_address Address, const uint8_t Activated);
+    static void HandleSource  (cec_logical_address Address, uint8_t Activated);
     static int  LogMessage    (const cec_log_message &Message);
-    static int  HandleAlert   (const libcec_alert Alert, const libcec_parameter &Data);
+    static int  HandleAlert   (libcec_alert Alert, const libcec_parameter &Data);
 
   protected:
     ICECAdapter   *m_adapter            { nullptr };
