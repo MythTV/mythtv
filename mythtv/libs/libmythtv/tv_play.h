@@ -931,8 +931,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool         m_isEmbedded {false};       ///< are we currently embedded
     bool         m_ignoreKeyPresses {false}; ///< should we ignore keypresses
     vector<bool> m_savedPause;      ///< saved pause state before embedding
-    bool         m_suspended {false};///< are we currently suspended
-    vector<bool> m_suspendedPause;  ///< saved pause state before suspending
 
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
