@@ -514,10 +514,12 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
         return;
     }
 
+#ifdef ANDROID
     // Ensure surface type is always OpenGL
     m_window->setSurfaceType(QWindow::OpenGLSurface);
     if (native && native->windowHandle())
         native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
+#endif
 
     if (!create())
         LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create OpenGLContext!");
