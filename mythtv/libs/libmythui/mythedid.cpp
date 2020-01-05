@@ -98,7 +98,7 @@ void MythEDID::Parse(void)
     }
 
     m_size = static_cast<uint>(m_data.size());
-    const quint8 *data = reinterpret_cast<const quint8 *>(m_data.constData());
+    const auto *data = reinterpret_cast<const quint8 *>(m_data.constData());
 
     // EDID data should be in 128 byte blocks
     if ((m_size % 0x80) || data[0] != 0x00 || data[1] != 0xff)

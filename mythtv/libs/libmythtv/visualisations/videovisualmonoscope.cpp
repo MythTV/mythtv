@@ -11,7 +11,7 @@ VideoVisualMonoScope::VideoVisualMonoScope(AudioPlayer *Audio, MythRender *Rende
 
 VideoVisualMonoScope::~VideoVisualMonoScope()
 {
-    MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return;
 
@@ -31,7 +31,7 @@ QString VideoVisualMonoScope::Name(void)
 
 MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
 {
-    MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return nullptr;
 

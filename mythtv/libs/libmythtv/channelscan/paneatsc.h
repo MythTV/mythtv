@@ -31,7 +31,7 @@ class PaneATSC : public GroupSetting
         connect(m_atsc_modulation, SIGNAL(valueChanged(     const QString&)),
                 this,            SLOT(  ModulationChanged(const QString&)));
 
-        GroupSetting *range = new GroupSetting();
+        auto *range = new GroupSetting();
         m_transport_start = new TransMythUIComboBoxSetting();
         m_transport_end   = new TransMythUIComboBoxSetting();
         m_transport_count = new TransTextEditSetting();
@@ -118,7 +118,7 @@ class PaneATSC : public GroupSetting
         bool first = true;
         for (auto it = m_tables.begin(); it != m_tables.end(); ++it)
         {
-            freq_table_list_t::iterator next = it;
+            auto next = it;
             ++next;
 
             const FrequencyTable &ft = **it;
