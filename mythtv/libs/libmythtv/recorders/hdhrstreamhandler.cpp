@@ -132,7 +132,7 @@ void HDHRStreamHandler::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     int remainder = 0;
-    QTime last_update;
+    QElapsedTimer last_update;
     while (m_runningDesired && !m_bError)
     {
         int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();

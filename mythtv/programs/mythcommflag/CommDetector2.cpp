@@ -524,7 +524,7 @@ bool CommDetector2::go(void)
 
     m_player->EnableSubtitles(false);
 
-    QTime totalFlagTime;
+    QElapsedTimer totalFlagTime;
     totalFlagTime.start();
 
     /* If still recording, estimate the eventual total number of frames. */
@@ -568,8 +568,8 @@ bool CommDetector2::go(void)
         long long nextFrame = -1;
         m_currentFrameNumber = 0;
         long long lastLoggedFrame = m_currentFrameNumber;
-        QTime passTime;
-        QTime clock;
+        QElapsedTimer passTime;
+        QElapsedTimer clock;
         struct timeval getframetime {};
 
         m_player->ResetTotalDuration();

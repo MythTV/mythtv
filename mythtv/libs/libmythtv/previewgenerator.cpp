@@ -125,6 +125,7 @@ bool PreviewGenerator::RunReal(void)
 {
     QString msg;
     QTime tm = QTime::currentTime();
+    QElapsedTimer te; te.start();
     bool ok = false;
     bool is_local = IsLocal();
 
@@ -146,7 +147,7 @@ bool PreviewGenerator::RunReal(void)
         ok = true;
         msg = QString("Generated on %1 in %2 seconds, starting at %3")
             .arg(gCoreContext->GetHostName())
-            .arg(tm.elapsed()*0.001)
+            .arg(te.elapsed()*0.001)
             .arg(tm.toString(Qt::ISODate));
     }
     else if (!!(m_mode & kRemote))
@@ -162,7 +163,7 @@ bool PreviewGenerator::RunReal(void)
         if (ok)
         {
             msg = QString("Generated remotely in %1 seconds, starting at %2")
-                .arg(tm.elapsed()*0.001)
+                .arg(te.elapsed()*0.001)
                 .arg(tm.toString(Qt::ISODate));
         }
         else
@@ -208,6 +209,7 @@ bool PreviewGenerator::Run(void)
 {
     QString msg;
     QTime tm = QTime::currentTime();
+    QElapsedTimer te; te.start();
     bool ok = false;
     QString command = GetAppBinDir() + "mythpreviewgen";
     bool local_ok = ((IsLocal() || ((m_mode & kForceLocal) != 0)) &&
@@ -222,7 +224,7 @@ bool PreviewGenerator::Run(void)
             {
                 msg =
                     QString("Generated remotely in %1 seconds, starting at %2")
-                    .arg(tm.elapsed()*0.001)
+                    .arg(te.elapsed()*0.001)
                     .arg(tm.toString(Qt::ISODate));
             }
         }
@@ -298,7 +300,7 @@ bool PreviewGenerator::Run(void)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preview process ran ok.");
                 msg = QString("Generated on %1 in %2 seconds, starting at %3")
                     .arg(gCoreContext->GetHostName())
-                    .arg(tm.elapsed()*0.001)
+                    .arg(te.elapsed()*0.001)
                     .arg(tm.toString(Qt::ISODate));
             }
             else

@@ -14,6 +14,7 @@ using std::getenv;
 #include <QAtomicInt>
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QFile>
 #include <QMetaType> // qRegisterMetaType
@@ -554,7 +555,7 @@ void NetStream::Abort()
 
 int NetStream::safe_read(void *data, unsigned sz, unsigned millisecs /* = 0 */)
 {
-    QTime t; t.start();
+    QElapsedTimer t; t.start();
     QMutexLocker locker(&m_mutex);
 
     if (m_size >= 0 && m_pos >= m_size)
@@ -627,7 +628,7 @@ bool NetStream::WaitTillReady(unsigned long milliseconds)
 {
     QMutexLocker locker(&m_mutex);
 
-    QTime t; t.start();
+    QElapsedTimer t; t.start();
     while (m_state < kReady)
     {
         unsigned elapsed = t.elapsed();
@@ -644,7 +645,7 @@ bool NetStream::WaitTillFinished(unsigned long milliseconds)
 {
     QMutexLocker locker(&m_mutex);
 
-    QTime t; t.start();
+    QElapsedTimer t; t.start();
     while (m_state < kFinished)
     {
         unsigned elapsed = t.elapsed();

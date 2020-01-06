@@ -831,7 +831,7 @@ class MTV_PUBLIC MythPlayer
     // Manual editing
     DeleteMap  m_deleteMap;
     bool       m_pausedBeforeEdit         {false};
-    QTime      m_editUpdateTimer;
+    QElapsedTimer m_editUpdateTimer;
     float      m_speedBeforeEdit          {1.0F};
 
     // Playback (output) speed control

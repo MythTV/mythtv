@@ -272,7 +272,7 @@ namespace
 
         if (!item) return;
 
-        QTime playing_time;
+        QElapsedTimer playing_time;
 
         do
         {
@@ -288,7 +288,7 @@ namespace
             else
                 break;
         }
-        while (item && playing_time.elapsed() > WATCHED_WATERMARK);
+        while (item && playing_time.hasExpired(WATCHED_WATERMARK));
     }
 
     class FanartLoader: public QObject
@@ -3111,7 +3111,7 @@ void VideoDialog::playFolder()
     const int WATCHED_WATERMARK = 10000; // Play less then this milisec and the chain of
                                          // videos will not be followed when
                                          // playing.
-    QTime playing_time;
+    QElapsedTimer playing_time;
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
@@ -3127,7 +3127,7 @@ void VideoDialog::playFolder()
         bool video_started = false;
         int i = 0;
         while (i < list_count &&
-               (!video_started || playing_time.elapsed() > WATCHED_WATERMARK))
+               (!video_started || playing_time.hasExpired(WATCHED_WATERMARK)))
         {
             MythGenericTree *subnode = node->getChildAt(i);
             if (subnode)

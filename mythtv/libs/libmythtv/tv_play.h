@@ -14,7 +14,6 @@ using namespace std;
 #include <QWaitCondition>
 #include <QStringList>
 #include <QDateTime>
-#include <QTime>
 #include <QObject>
 #include <QRegExp>
 #include <QString>
@@ -799,7 +798,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     uint              m_vbimode {VBIMode::None};
 
-    QTime             m_ctorTime;
+    QElapsedTimer     m_ctorTime;
     uint              m_switchToInputId {0};
 
     QMutex            m_initFromDBLock;
@@ -879,7 +878,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     QList<QKeyEvent> m_screenPressKeyMapLiveTV;
 
     // Channel changing timeout notification variables
-    QTime     m_lockTimer;
+    QElapsedTimer m_lockTimer;
     bool      m_lockTimerOn {false};
     QDateTime m_lastLockSeenTime;
 

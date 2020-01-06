@@ -308,11 +308,11 @@ void DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url)
     GetMythDownloadManager()->queueDownload(url.toString(), saveFilename, this);
 
     //TODO should find a better way to do this
-    QTime time;
+    QElapsedTimer time;
     time.start();
     while (m_state == LOADING)
     {
-        if (time.elapsed() > 30000)
+        if (time.hasExpired(30000))
         {
             doOperationStop();
             GetMythDownloadManager()->cancelDownload(url.toString());

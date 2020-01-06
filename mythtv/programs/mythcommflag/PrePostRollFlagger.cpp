@@ -75,7 +75,7 @@ bool PrePostRollFlagger::go()
     if (m_bStop)
         return false;
 
-    QTime flagTime;
+    QElapsedTimer flagTime;
     flagTime.start();
 
     if (m_recordingStopsAt < MythDate::current() )
@@ -214,7 +214,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                                                long long stopFrame,
                                                long long totalFrames,
                                                long long &framesProcessed,
-                                             QTime &flagTime, bool findLast)
+                                               QElapsedTimer&flagTime, bool findLast)
 {
     int requiredBuffer = 30;
     int prevpercent = -1;

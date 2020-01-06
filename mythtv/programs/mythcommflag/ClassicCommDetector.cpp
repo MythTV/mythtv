@@ -385,7 +385,7 @@ bool ClassicCommDetector::go()
     if (m_bStop)
         return false;
 
-    QTime flagTime;
+    QElapsedTimer flagTime;
     flagTime.start();
 
     long long myTotalFrames = 0;

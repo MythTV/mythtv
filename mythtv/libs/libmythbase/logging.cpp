@@ -515,9 +515,9 @@ void LoggerThread::stop(void)
 /// \return true if the queue is empty, false otherwise
 bool LoggerThread::flush(int timeoutMS)
 {
-    QTime t;
+    QElapsedTimer t;
     t.start();
-    while (!m_aborted && !logQueue.isEmpty() && t.elapsed() < timeoutMS)
+    while (!m_aborted && !logQueue.isEmpty() && !t.hasExpired(timeoutMS))
     {
         m_waitNotEmpty->wakeAll();
         int left = timeoutMS - t.elapsed();

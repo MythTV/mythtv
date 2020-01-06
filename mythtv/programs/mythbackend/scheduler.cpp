@@ -2093,7 +2093,7 @@ void Scheduler::run(void)
                     gCoreContext->GetNumSetting("idleWaitForRecordingTime",
                                                 15);
 
-                QTime t; t.start();
+                QElapsedTimer t; t.start();
                 if (HandleReschedule())
                 {
                     statuschanged = true;

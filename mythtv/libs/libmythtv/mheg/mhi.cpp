@@ -239,7 +239,6 @@ void MHIContext::run(void)
 {
     QMutexLocker locker(&m_runLock);
 
-    QTime t; t.start();
     while (!m_stop)
     {
         int toWait;
@@ -450,7 +449,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     // the result.
 
     bool bReported = false;
-    QTime t; t.start();
+    QElapsedTimer t; t.start();
     while (!m_stop)
     {
         if (isIC)
@@ -483,7 +482,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
             // arrive later.  Exiting can cause the inital app to not be found
         }
 
-        if (t.elapsed() > 60000) // TODO get this from carousel info
+        if (t.hasExpired(60000)) // TODO get this from carousel info
         {
             if (bReported)
                 LOG(VB_MHEG, LOG_INFO, QString("[mhi] timed out %1").arg(objectPath));

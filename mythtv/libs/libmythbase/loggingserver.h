@@ -5,7 +5,7 @@
 #include <QSocketNotifier>
 #include <QMutex>
 #include <QQueue>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <cstdint>
 #include <ctime>
@@ -118,9 +118,8 @@ class DatabaseLogger : public LoggerBase
     QString m_query;            ///< The database query to insert log messages
     bool m_opened             {true};  ///< The database is opened
     bool m_loggingTableExists {false}; ///< The desired logging table exists
-    bool m_disabled           {false}; ///< DB logging is temporarily disabled
-    QTime m_disabledTime;       ///< Time when the DB logging was disabled
-    QTime m_errorLoggingTime;   ///< Time when DB error logging was last done
+    QElapsedTimer m_disabledTime;       ///< Elapsed time since the DB logging was disabled
+    QElapsedTimer m_errorLoggingTime;   ///< Elapsed time since DB error logging was last done
     static const int kMinDisabledTime; ///< Minimum time to disable DB logging
                                        ///  (in ms)
 };

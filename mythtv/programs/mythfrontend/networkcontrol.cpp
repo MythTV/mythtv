@@ -461,9 +461,9 @@ QString NetworkControl::processJump(NetworkCommand *nc)
 
     // Fixme, should do some better checking here, but that would
     // depend on all Locations matching their jumppoints
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
-    while ((timer.elapsed() < FE_SHORT_TO) &&
+    while (!timer.hasExpired(FE_SHORT_TO) &&
            (GetMythUI()->GetCurrentLocation().toLower() != nc->getArg(1)))
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -586,9 +586,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         {
             GetMythMainWindow()->JumpTo(m_jumpMap["mainmenu"]);
 
-            QTime timer;
+            QElapsedTimer timer;
             timer.start();
-            while ((timer.elapsed() < FE_LONG_TO) &&
+            while (!timer.hasExpired(FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu"))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -615,9 +615,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             MythEvent me(msg);
             gCoreContext->dispatch(me);
 
-            QTime timer;
+            QElapsedTimer timer;
             timer.start();
-            while ((timer.elapsed() < FE_LONG_TO) &&
+            while (!timer.hasExpired(FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -626,14 +626,14 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         {
             GetMythMainWindow()->JumpTo(m_jumpMap["playbackbox"]);
 
-            QTime timer;
+            QElapsedTimer timer;
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while (!timer.hasExpired(10000) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             timer.start();
-            while ((timer.elapsed() < 10000) &&
+            while (!timer.hasExpired(10000) &&
                    (!MythUIHelper::IsTopScreenInitialized()))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -650,13 +650,13 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             result.clear();
             m_gotAnswer = false;
-            QTime timer;
+            QElapsedTimer timer;
             timer.start();
 
             MythEvent me(msg);
             gCoreContext->dispatch(me);
 
-            while (timer.elapsed() < FE_LONG_TO && !m_gotAnswer)
+            while (!timer.hasExpired(FE_LONG_TO) && !m_gotAnswer)
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             if (m_gotAnswer)
@@ -700,9 +700,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 MythEvent me(QString("MUSIC_COMMAND %1 GET_VOLUME").arg(hostname));
                 gCoreContext->dispatch(me);
 
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
-                while (timer.elapsed() < FE_SHORT_TO && !m_gotAnswer)
+                while (!timer.hasExpired(FE_SHORT_TO) && !m_gotAnswer)
                 {
                     qApp->processEvents();
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -720,9 +720,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 MythEvent me(QString("MUSIC_COMMAND %1 GET_METADATA").arg(hostname));
                 gCoreContext->dispatch(me);
 
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
-                while (timer.elapsed() < FE_SHORT_TO && !m_gotAnswer)
+                while (!timer.hasExpired(FE_SHORT_TO) && !m_gotAnswer)
                 {
                     qApp->processEvents();
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -740,9 +740,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 MythEvent me(QString("MUSIC_COMMAND %1 GET_STATUS").arg(hostname));
                 gCoreContext->dispatch(me);
 
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
-                while (timer.elapsed() < FE_SHORT_TO && !m_gotAnswer)
+                while (!timer.hasExpired(FE_SHORT_TO) && !m_gotAnswer)
                 {
                     qApp->processEvents();
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -942,9 +942,9 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
             MythEvent me(message);
             gCoreContext->dispatch(me);
 
-            QTime timer;
+            QElapsedTimer timer;
             timer.start();
-            while (timer.elapsed() < FE_SHORT_TO  && !m_gotAnswer)
+            while (!timer.hasExpired(FE_SHORT_TO) && !m_gotAnswer)
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             if (m_gotAnswer)
@@ -1037,9 +1037,9 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         MythEvent me(message);
         gCoreContext->dispatch(me);
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
-        while (timer.elapsed() < FE_SHORT_TO  && !m_gotAnswer)
+        while (!timer.hasExpired(FE_SHORT_TO) && !m_gotAnswer)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         if (m_gotAnswer)

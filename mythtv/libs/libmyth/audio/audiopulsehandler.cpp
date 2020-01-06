@@ -1,7 +1,7 @@
 #include <QMutexLocker>
 #include <QString>
 #include <QMutex>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <unistd.h> // for usleep
 
@@ -54,11 +54,11 @@ bool PulseHandler::Suspend(enum PulseAction action)
     }
 
     static int s_iPulseRunning = -1;
-    static QTime s_time;
+    static QElapsedTimer s_time;
     static auto s_ePulseAction = PulseAction(-1);
 
     // Use the last result of IsPulseAudioRunning if within time
-    if (!s_time.isNull() && s_time.elapsed() < 30000)
+    if (s_time.isValid() && !s_time.hasExpired(30000))
     {
         if (!s_iPulseRunning)
             return false;

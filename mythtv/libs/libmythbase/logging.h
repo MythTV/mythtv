@@ -4,7 +4,6 @@
 #include <QMutexLocker>
 #include <QMutex>
 #include <QQueue>
-#include <QTime>
 #include <QPointer>
 #include <QCoreApplication>
 

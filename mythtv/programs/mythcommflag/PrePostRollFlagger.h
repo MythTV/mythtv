@@ -29,7 +29,7 @@ private:
     long long findBreakInrange(long long start, long long stopFrame,
                                long long totalFrames,
                                long long &framesProcessed,
-                               QTime &flagTime, bool findLast);
+                               QElapsedTimer &flagTime, bool findLast);
 };
 
 #endif // PREPOSTROLLFLAGGER_H

@@ -147,9 +147,9 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         MythEvent me(message);
         gCoreContext->dispatch(me);
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
-        while ((timer.elapsed() < 10000) &&
+        while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -158,14 +158,14 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
     {
         GetMythMainWindow()->JumpTo("TV Recording Playback");
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
-        while ((timer.elapsed() < 10000) &&
+        while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         timer.start();
-        while ((timer.elapsed() < 10000) &&
+        while (!timer.hasExpired(10000) &&
                (!MythUIHelper::IsTopScreenInitialized()))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }

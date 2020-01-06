@@ -7,7 +7,7 @@
 #include "mythuiexp.h"
 
 #include <QString>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QColor>
 #include <QIcon>
 
@@ -228,7 +228,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     bool         m_active;
     bool         m_wasActive;
     bool         m_initialized;
-    QTime        m_lastUpdateTime;
+    QElapsedTimer m_lastUpdateTime;
     int          m_updateInterval;
 
     float        m_zoom;
@@ -241,7 +241,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     bool         m_inputToggled;
     QString      m_lastMouseAction;
     int          m_mouseKeyCount;
-    QTime        m_lastMouseActionTime;
+    QElapsedTimer m_lastMouseActionTime;
 
     MythUIScrollBar *m_horizontalScrollbar;
     MythUIScrollBar *m_verticalScrollbar;

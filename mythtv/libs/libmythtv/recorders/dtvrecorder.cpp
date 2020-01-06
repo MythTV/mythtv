@@ -705,7 +705,9 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
 
     static constexpr uint64_t kMsecPerDay = 24 * 60 * 60 * 1000ULL;
     const double frame_interval = (1000.0 / m_videoFrameRate);
-    uint64_t elapsed = (uint64_t) max(m_audioTimer.elapsed(), 0);
+    uint64_t elapsed = 0;
+    if (m_audioTimer.isValid())
+        elapsed = m_audioTimer.elapsed();
     auto expected_frame = (uint64_t) ((double)elapsed / frame_interval);
 
     while (m_framesSeenCount > expected_frame + 10000)

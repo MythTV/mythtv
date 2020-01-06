@@ -8249,7 +8249,7 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
     {
         QString input = ctx->m_recorder->GetInput();
         uint timeout  = ctx->m_recorder->GetSignalLockTimeout(input);
-        timed_out = m_lockTimerOn && ((uint)m_lockTimer.elapsed() > timeout);
+        timed_out = m_lockTimerOn && m_lockTimer.hasExpired(timeout);
     }
 
     OSD *osd = GetOSDLock(ctx);

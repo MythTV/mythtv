@@ -425,29 +425,27 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
 
     if (!m_thread->isRunning())
     {
-        m_disabled = true;
         m_disabledTime.start();
     }
 
-    if (!m_disabled && m_thread->queueFull())
+    if (!m_disabledTime.isValid() && m_thread->queueFull())
     {
-        m_disabled = true;
         m_disabledTime.start();
         LOG(VB_GENERAL, LOG_CRIT,
             "Disabling DB Logging: too many messages queued");
         return false;
     }
 
-    if (m_disabled && m_disabledTime.elapsed() > kMinDisabledTime)
+    if (m_disabledTime.isValid() && m_disabledTime.hasExpired(kMinDisabledTime))
     {
         if (isDatabaseReady() && !m_thread->queueFull())
         {
-            m_disabled = false;
+            m_disabledTime.invalidate();
             LOG(VB_GENERAL, LOG_CRIT, "Reenabling DB Logging");
         }
     }
 
-    if (m_disabled)
+    if (m_disabledTime.isValid())
         return false;
 
     m_thread->enqueue(item);
@@ -490,7 +488,7 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
              || !err.nativeErrorCode().isEmpty()
                 ) &&
             (!m_errorLoggingTime.isValid() ||
-             (m_errorLoggingTime.elapsed() > 1000)))
+             (m_errorLoggingTime.hasExpired(1000))))
         {
             MythDB::DBError("DBLogging", query);
             m_errorLoggingTime.start();

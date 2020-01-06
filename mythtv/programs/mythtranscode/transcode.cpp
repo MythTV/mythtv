@@ -1068,7 +1068,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         new VideoDecodeBuffer(GetPlayer(), videoOutput, honorCutList);
     MThreadPool::globalInstance()->start(videoBuffer, "VideoDecodeBuffer");
 
-    QTime flagTime;
+    QElapsedTimer flagTime;
     flagTime.start();
 
     if (cutter)

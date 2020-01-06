@@ -181,10 +181,10 @@ int BrowserApi::GetVolume(void)
                  .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
-    while (timer.elapsed() < 2000  && !m_gotAnswer)
+    while (!timer.hasExpired(2000) && !m_gotAnswer)
     {
         qApp->processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -225,10 +225,10 @@ QString BrowserApi::GetMetadata(void)
                  .arg(gCoreContext->GetHostName()));
     gCoreContext->dispatch(me);
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
-    while (timer.elapsed() < 2000  && !m_gotAnswer)
+    while (!timer.hasExpired(2000)  && !m_gotAnswer)
     {
         qApp->processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -839,7 +839,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_browser(nullptr),    m_browserArea(MythRect()),
       m_actualBrowserArea(MythRect()), m_image(nullptr),
       m_active(false),       m_wasActive(false),
-      m_initialized(false),  m_lastUpdateTime(QTime()),
+      m_initialized(false),
       m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
@@ -850,6 +850,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
 {
     SetCanTakeFocus(true);
     m_scrollAnimation.setDuration(0);
+    m_lastUpdateTime.start();
 }
 
 /**
@@ -1490,7 +1491,7 @@ void MythUIWebBrowser::Pulse(void)
         SetRedraw();
         UpdateBuffer();
     }
-    else if (m_updateInterval && m_lastUpdateTime.elapsed() > m_updateInterval)
+    else if (m_updateInterval && m_lastUpdateTime.hasExpired(m_updateInterval))
     {
         UpdateBuffer();
         m_lastUpdateTime.start();
@@ -1653,9 +1654,10 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
 
     // speed up mouse movement if the same key is held down
     if (action == m_lastMouseAction &&
-        m_lastMouseActionTime.msecsTo(QTime::currentTime()) < 500)
+        m_lastMouseActionTime.isValid() &&
+        !m_lastMouseActionTime.hasExpired(500))
     {
-        m_lastMouseActionTime = QTime::currentTime();
+        m_lastMouseActionTime.start();
         m_mouseKeyCount++;
 
         if (m_mouseKeyCount > 5)
@@ -1664,7 +1666,7 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
     else
     {
         m_lastMouseAction = action;
-        m_lastMouseActionTime = QTime::currentTime();
+        m_lastMouseActionTime.start();
         m_mouseKeyCount = 1;
     }
 

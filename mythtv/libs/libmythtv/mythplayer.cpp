@@ -2764,7 +2764,7 @@ void MythPlayer::EventLoop(void)
     // refresh the position map for an in-progress recording while editing
     if (m_hasFullPositionMap && IsWatchingInprogress() && m_deleteMap.IsEditing())
     {
-        if (m_editUpdateTimer.elapsed() > 2000)
+        if (m_editUpdateTimer.hasExpired(2000))
         {
             // N.B. the positionmap update and osd refresh are asynchronous
             m_forcePositionMapSync = true;

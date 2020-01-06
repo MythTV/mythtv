@@ -266,7 +266,7 @@ void AutoExpire::CalcParams()
  */
 void AutoExpire::RunExpirer(void)
 {
-    QTime timer;
+    QElapsedTimer timer;
     QDateTime curTime;
     QDateTime next_expire = MythDate::current().addSecs(60);
 
