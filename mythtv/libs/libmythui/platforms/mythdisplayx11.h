@@ -26,7 +26,7 @@ class MythDisplayX11 : public MythDisplay
     bool SwitchToVideoMode(QSize Size, double DesiredRate) override;
 
   private:
-    XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
+    static XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
                              QScreen* qScreen, RROutput* Output = nullptr);
 #endif
 

@@ -10,7 +10,6 @@
 #define LOC QString("DisplayX11: ")
 
 MythDisplayX11::MythDisplayX11()
-  : MythDisplay()
 {
     Initialise();
 }

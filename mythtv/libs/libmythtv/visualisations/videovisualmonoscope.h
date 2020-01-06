@@ -12,7 +12,7 @@ class VideoVisualMonoScope : public VideoVisual
   public:
     VideoVisualMonoScope(AudioPlayer *Audio, MythRender *Render, bool Fade);
     ~VideoVisualMonoScope() override;
-    void     Draw(const QRect &Area, MythPainter *Painter, QPaintDevice*) override;
+    void     Draw(const QRect &Area, MythPainter *Painter, QPaintDevice* /*device*/) override;
     QString  Name(void) override;
 
   private:

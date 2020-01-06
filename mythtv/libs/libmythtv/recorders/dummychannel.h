@@ -17,16 +17,15 @@ class DummyChannel : public ChannelBase
 {
   public:
     explicit DummyChannel(TVRec *parent): ChannelBase(parent)
-        { (void)parent; m_curChannelName.clear(); m_curInputName.clear(); return; }
-    ~DummyChannel(void) override { return; }
+        { (void)parent; m_curChannelName.clear(); m_curInputName.clear(); }
+    ~DummyChannel(void) override { }
 
     bool IsTunable(const QString &/*channum*/) const override // ChannelBase
         { return true; }
 
     bool Open(void) override // ChannelBase
         { return InitializeInput(); }
-    void Close(void) override // ChannelBase
-        { return; }
+    void Close(void) override { } // ChannelBase
 
     // Sets
     bool SetChannelByString(const QString &chan) override // ChannelBase

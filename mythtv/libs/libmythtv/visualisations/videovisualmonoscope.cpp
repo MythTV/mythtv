@@ -97,7 +97,7 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     return nullptr;
 }
 
-void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
+void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPaintDevice* /*device*/)
 {
     if (m_disabled)
         return;
@@ -186,7 +186,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
                                 static_cast<GLfloat>(color.blueF()), 1.0F);
     render->SetShaderProjection(m_shader);
     render->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    render->glLineWidth(static_cast<int>(m_area.height() * 0.004f));
+    render->glLineWidth(static_cast<int>(m_area.height() * 0.004F));
     render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
     render->glLineWidth(1);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);

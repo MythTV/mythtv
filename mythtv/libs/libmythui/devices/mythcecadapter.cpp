@@ -23,51 +23,51 @@
 
 #if CEC_LIB_VERSION_MAJOR <= 3
 // cppcheck-suppress passedByValue
-int MythCECAdapter::LogMessageCallback(void*, const cec_log_message Message)
+int MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message Message)
 {
     return MythCECAdapter::LogMessage(Message);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::KeyPressCallback(void*, const cec_keypress Keypress)
+int MythCECAdapter::KeyPressCallback(void* /*unused*/, const cec_keypress Keypress)
 {
     return MythCECAdapter::HandleKeyPress(Keypress);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::CommandCallback(void*, const cec_command Command)
+int MythCECAdapter::CommandCallback(void* /*unused*/, const cec_command Command)
 {
     return MythCECAdapter::HandleCommand(Command);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::AlertCallback(void*, const libcec_alert Alert, const libcec_parameter Data)
+int MythCECAdapter::AlertCallback(void* /*unused*/, const libcec_alert Alert, const libcec_parameter Data)
 {
     return MythCECAdapter::HandleAlert(Alert, Data);
 }
 #else
-void MythCECAdapter::LogMessageCallback(void*, const cec_log_message* Message)
+void MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message* Message)
 {
     MythCECAdapter::LogMessage(*Message);
 }
 
-void MythCECAdapter::KeyPressCallback(void*, const cec_keypress* Keypress)
+void MythCECAdapter::KeyPressCallback(void* /*unused*/, const cec_keypress* Keypress)
 {
     MythCECAdapter::HandleKeyPress(*Keypress);
 }
 
-void MythCECAdapter::CommandCallback(void*, const cec_command* Command)
+void MythCECAdapter::CommandCallback(void* /*unused*/, const cec_command* Command)
 {
     MythCECAdapter::HandleCommand(*Command);
 }
 
-void MythCECAdapter::AlertCallback(void*, const libcec_alert Alert, const libcec_parameter Data)
+void MythCECAdapter::AlertCallback(void* /*unused*/, const libcec_alert Alert, const libcec_parameter Data)
 {
     MythCECAdapter::HandleAlert(Alert, Data);
 }
 #endif
 
-void MythCECAdapter::SourceCallback(void*, const cec_logical_address Address, const uint8_t Activated)
+void MythCECAdapter::SourceCallback(void* /*unused*/, const cec_logical_address Address, const uint8_t Activated)
 {
     MythCECAdapter::HandleSource(Address, Activated);
 }

@@ -25,7 +25,7 @@ struct UIUtilDisp
 {
     template <typename ContainerType, typename UIType>
     static bool Assign(ContainerType *container, UIType *&item,
-                       const QString &name, bool *err = nullptr)
+                       const QString &name, bool *err = nullptr) // NOLINT(readability-non-const-parameter)
     {
         if (!container)
         {

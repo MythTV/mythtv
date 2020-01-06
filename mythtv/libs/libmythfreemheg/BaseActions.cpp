@@ -77,14 +77,14 @@ void MHActionIntInt::Perform(MHEngine *engine)
 void MHActionObjectRef::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_ResultVar.Initialise(p->GetArgN(1), engine);
+    m_resultVar.Initialise(p->GetArgN(1), engine);
 }
 
 void MHActionObjectRef2::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_ResultVar1.Initialise(p->GetArgN(1), engine);
-    m_ResultVar2.Initialise(p->GetArgN(2), engine);
+    m_resultVar1.Initialise(p->GetArgN(1), engine);
+    m_resultVar2.Initialise(p->GetArgN(2), engine);
 }
 
 void MHActionInt3::Initialise(MHParseNode *p, MHEngine *engine)
@@ -172,13 +172,13 @@ void MHActionGenericObjectRef::Perform(MHEngine *engine)
 
 void MHActionObjectRef::Perform(MHEngine *engine)
 {
-    CallAction(engine, Target(engine), engine->FindObject(m_ResultVar));
+    CallAction(engine, Target(engine), engine->FindObject(m_resultVar));
 }
 
 
 void MHActionObjectRef2::Perform(MHEngine *engine)
 {
-    CallAction(engine, Target(engine), engine->FindObject(m_ResultVar1), engine->FindObject(m_ResultVar2));
+    CallAction(engine, Target(engine), engine->FindObject(m_resultVar1), engine->FindObject(m_resultVar2));
 }
 
 void MHActionBool::Initialise(MHParseNode *p, MHEngine *engine)

@@ -31,7 +31,7 @@ class MHParseText: public MHParseBase
 {
   public:
     explicit MHParseText(QByteArray &program)
-        : m_String((unsigned char *)malloc(100)),
+        : m_string((unsigned char *)malloc(100)),
           m_data(program) {}
     ~MHParseText() override;
 
@@ -55,7 +55,7 @@ class MHParseText: public MHParseBase
     int            m_nTag          {0};
     int            m_nInt          {0};
     bool           m_fBool         {false};
-    unsigned char *m_String        {nullptr};
+    unsigned char *m_string        {nullptr};
     int            m_nStringLength {0};
 
     unsigned int   m_p             {0}; // Count of bytes read

@@ -125,8 +125,8 @@ class MHActionObjectRef: public MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) = 0;
   private:
     void PrintArgs(FILE *fd, int/* nTabs*/) const override // MHElemAction
-        { m_ResultVar.PrintMe(fd, 0); }
-    MHObjectRef m_ResultVar;
+        { m_resultVar.PrintMe(fd, 0); }
+    MHObjectRef m_resultVar;
 };
 
 // An action with two object references as an argument.
@@ -139,8 +139,8 @@ class MHActionObjectRef2: public MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) = 0;
   private:
     void PrintArgs(FILE *fd, int/* nTabs*/) const override // MHElemAction
-        { m_ResultVar1.PrintMe(fd, 0); m_ResultVar2.PrintMe(fd, 0);}
-    MHObjectRef m_ResultVar1, m_ResultVar2;
+        { m_resultVar1.PrintMe(fd, 0); m_resultVar2.PrintMe(fd, 0);}
+    MHObjectRef m_resultVar1, m_resultVar2;
 };
 
 class MHActionGenericObjectRef: public MHElemAction

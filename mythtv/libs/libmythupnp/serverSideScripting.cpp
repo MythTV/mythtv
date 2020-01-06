@@ -88,10 +88,7 @@ ServerSideScripting::~ServerSideScripting()
     Lock();
 
     foreach (auto & script, m_mapScripts)
-    {
-        if (script)
-            delete script;
-    }
+        delete script;
 
     m_mapScripts.clear();
     Unlock();

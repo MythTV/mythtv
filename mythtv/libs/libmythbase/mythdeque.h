@@ -83,7 +83,7 @@ class MythDeque : public deque<T>
         { if (!deque<T>::empty()) return deque<T>::front();
           T *dummy = nullptr; return myth_deque_init(dummy); }
     /// \brief Returns item at head of list. O(1).
-    const T head() const
+    T head() const
         { if (!deque<T>::empty()) return deque<T>::front();
           T *dummy = NULL; return myth_deque_init(dummy); }
 

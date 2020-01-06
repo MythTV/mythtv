@@ -569,7 +569,7 @@ std::vector<double> MythDisplay::GetRefreshRates(QSize Size)
     return modes[static_cast<size_t>(match)].RefreshRates();
 }
 
-bool MythDisplay::SwitchToVideoMode(QSize, double)
+bool MythDisplay::SwitchToVideoMode(QSize /*Size*/, double /*Framerate*/)
 {
     return false;
 }
