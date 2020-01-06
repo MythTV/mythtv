@@ -313,7 +313,7 @@ logfile="config.ep"
 
 cc="gcc"
 qmake="qmake"
-python="python"
+python="python3"
 
 targetos=`uname -s`
 
