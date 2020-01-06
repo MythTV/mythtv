@@ -128,7 +128,7 @@ private:
   int     m_infoLengthPos {0};
   uint8_t m_capmt[2048]   {0}; ///< XXX is there a specified maximum?
 public:
-  cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
+  explicit cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
   void AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
                        const uint8_t *data);

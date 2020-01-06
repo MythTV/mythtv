@@ -23,7 +23,7 @@ class QOpenGLFramebufferObject;
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
   public:
-    MythOpenGLPainter(MythRenderOpenGL *Render = nullptr, QWidget *Parent = nullptr);
+    explicit MythOpenGLPainter(MythRenderOpenGL *Render = nullptr, QWidget *Parent = nullptr);
    ~MythOpenGLPainter() override;
 
     void SetTarget(QOpenGLFramebufferObject* NewTarget) { m_target = NewTarget; }

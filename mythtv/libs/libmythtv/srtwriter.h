@@ -26,7 +26,7 @@ class OneSubtitle;
 class MTV_PUBLIC SRTWriter
 {
   public:
-    SRTWriter(const QString &fileName) :
+    explicit SRTWriter(const QString &fileName) :
         m_outFile(fileName), m_outStream(&m_outFile)
     {
         m_outStream.setCodec("UTF-8");

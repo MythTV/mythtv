@@ -14,7 +14,7 @@
 class DishEventMPAADescriptor : public MPEGDescriptor
 {
   public:
-    DishEventMPAADescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventMPAADescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_mpaa) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x89
@@ -43,7 +43,7 @@ class DishEventMPAADescriptor : public MPEGDescriptor
 class DishEventVCHIPDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventVCHIPDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventVCHIPDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_vchip) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x95
@@ -68,7 +68,7 @@ class DishEventVCHIPDescriptor : public MPEGDescriptor
 class DishEventNameDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventNameDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventNameDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_name) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x91
@@ -82,7 +82,7 @@ class DishEventNameDescriptor : public MPEGDescriptor
 class DishEventDescriptionDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventDescriptionDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventDescriptionDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(
             data, len, PrivateDescriptorID::dish_event_description) { }
     //       Name             bits  loc  expected value
@@ -99,7 +99,7 @@ class DishEventDescriptionDescriptor : public MPEGDescriptor
 class DishEventPropertiesDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventPropertiesDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventPropertiesDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(
             data, len, PrivateDescriptorID::dish_event_properties) { }
     //       Name             bits  loc  expected value
@@ -123,7 +123,7 @@ class DishEventPropertiesDescriptor : public MPEGDescriptor
 class DishEventTagsDescriptor : public MPEGDescriptor
 {
   public:
-    DishEventTagsDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishEventTagsDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::dish_event_tags) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x96
@@ -155,7 +155,7 @@ DishThemeType string_to_dish_theme_type(const QString &type);
 class DishContentDescriptor : public ContentDescriptor
 {
   public:
-    DishContentDescriptor(const unsigned char *data, int len = 300) :
+    explicit DishContentDescriptor(const unsigned char *data, int len = 300) :
         ContentDescriptor(data, len) { }
 
     DishThemeType GetTheme(void) const;

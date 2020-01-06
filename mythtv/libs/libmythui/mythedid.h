@@ -19,7 +19,7 @@ class MUI_PUBLIC MythEDID
     };
 
     MythEDID(void) = default;
-    MythEDID(QByteArray &Data);
+    explicit MythEDID(QByteArray &Data);
     MythEDID(const char* Data, int Length);
 
     bool        Valid             (void);

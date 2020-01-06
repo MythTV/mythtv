@@ -43,7 +43,7 @@
 class MTV_PUBLIC Jitterometer
 {
   public:
-    Jitterometer(QString nname, int ncycles = 0);
+    explicit Jitterometer(QString nname, int ncycles = 0);
    ~Jitterometer();
 
     // Deleted functions should be public.
