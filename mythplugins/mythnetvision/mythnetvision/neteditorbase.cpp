@@ -196,7 +196,7 @@ void NetEditorBase::FillGrabberButtonList()
         auto *item = new MythUIButtonListItem(m_grabbers, g->GetTitle());
         item->SetText(g->GetTitle(), "title");
         item->SetData(qVariantFromValue(g));
-        QString img = g->GetImage();
+        const QString& img = g->GetImage();
         QString thumb;
 
         if (!img.startsWith("/") && !img.isEmpty())

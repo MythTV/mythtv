@@ -505,7 +505,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         if (!qdir.exists())
             qdir.mkpath(group);
 
-        QString directory = group;
+        const QString& directory = group;
         if (filename.startsWith(directory))
         {
             result = filename;

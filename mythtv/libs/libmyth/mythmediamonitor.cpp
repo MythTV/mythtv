@@ -956,8 +956,8 @@ QString MediaMonitor::listDevices(void)
     {
         QString devStr;
         QString model = dev->getDeviceModel();
-        QString path  = dev->getDevicePath();
-        QString real  = dev->getRealDevice();
+        const QString& path  = dev->getDevicePath();
+        const QString& real  = dev->getRealDevice();
 
         if (path != real)
             devStr += path + "->";

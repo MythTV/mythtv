@@ -815,7 +815,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 vector<pair <int, QString> > genres =
                     data->GetGenres();
 
-                for (auto item : genres)
+                for (const auto& item : genres)
                     groups.push_back(item.second);
                 break;
             }
@@ -843,7 +843,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             {
                 vector<pair<int, QString> > cast = data->GetCast();
 
-                for (auto item : cast)
+                for (const auto& item : cast)
                     groups.push_back(item.second);
                 break;
             }
@@ -882,7 +882,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             group_node->addEntry(smart_meta_node(new meta_data_node(data)));
         }
 
-        for (auto item : groups)
+        for (const auto& item : groups)
         {
             meta_dir_node *group_node = gtnm[item];
 
