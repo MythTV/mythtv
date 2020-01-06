@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # From http://peerit.blogspot.com/2007/07/multipartposthandler-doesnt-work-for.html
 
 ####
