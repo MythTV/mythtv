@@ -119,7 +119,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
         int xstep = m_area.width() / NUM_SAMPLES + 1;
 
         double index = 0;
-        double const step = node->m_length / NUM_SAMPLES;
+        double const step = static_cast<double>(node->m_length) / NUM_SAMPLES;
         for ( int i = 0; i < NUM_SAMPLES; i++)
         {
             auto indexTo = static_cast<long>(index + step);

@@ -185,7 +185,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     m_sRGB = Data[FEATURES_OFFSET] & 0x04;
     static const unsigned char s_sRGB[10] =
         { 0xEE, 0x91, 0xA3, 0x54, 0x4C, 0x99, 0x26, 0x0F, 0x50, 0x54 };
-    bool srgb = !memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB));
+    bool srgb = memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB)) == 0;
 
     if (!m_sRGB && srgb)
         m_sRGB = true;
@@ -250,10 +250,10 @@ bool MythEDID::ParseCTABlock(const quint8 *Data, uint Offset)
     uint type  = (Data[Offset] & 0xE0) >> 5;
     switch (type)
     {
-        case 0x01: break; // Audio data block
+        case 0x01: break; // Audio data block // NOLINT(bugprone-suspicious-string-compare)
         case 0x02: break; // Video data block
         case 0x03: ParseVSDB(Data, Offset + 1, length); break; // Vendor Specific Data Block
-        case 0x04: break; // Speaker Allocation data block
+        case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-suspicious-string-compare)
         case 0x05: break; // VESA DTC data block
         case 0x07: break; // Extended tag. HDR metadata here
         default: break;
