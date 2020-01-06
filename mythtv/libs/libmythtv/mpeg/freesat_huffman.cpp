@@ -10,7 +10,7 @@ struct fsattab {
 #define STOP    '\0'
 #define ESCAPE  '\1'
 
-#include "freesat_tables.h"
+#include "freesat_tables.cpp"
 
 QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
 {
