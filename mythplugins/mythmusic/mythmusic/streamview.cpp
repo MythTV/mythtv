@@ -87,8 +87,8 @@ void StreamView::ShowMenu(void)
         menu->AddItem(tr("Remove Stream"));
     }
 
-    menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
-    menu->AddItem(MusicCommon::tr("Lyrics"), qVariantFromValue((int)MV_LYRICS));
+    menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), QVariant::fromValue((int)MV_VISUALIZER));
+    menu->AddItem(MusicCommon::tr("Lyrics"), QVariant::fromValue((int)MV_LYRICS));
 
     menu->AddItem(tr("More Options"), nullptr, createSubMenu());
 
@@ -117,7 +117,7 @@ void StreamView::customEvent(QEvent *event)
             MusicMetadata *mdata = gPlayer->getPlayedTracksList().last();
 
             auto *item = new MythUIButtonListItem(m_playedTracksList, "",
-                                                  qVariantFromValue(mdata), 0);
+                                                  QVariant::fromValue(mdata), 0);
 
             InfoMap metadataMap;
             mdata->toMap(metadataMap);
@@ -138,7 +138,7 @@ void StreamView::customEvent(QEvent *event)
 
         if (m_streamList)
         {
-            MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+            MythUIButtonListItem *item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
             if (item)
             {
                 item->SetFontState("normal");
@@ -151,7 +151,7 @@ void StreamView::customEvent(QEvent *event)
                 m_currStream = gPlayer->getCurrentMetadata();
             }
 
-            item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+            item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
             if (item)
             {
                 if (gPlayer->isPlaying())
@@ -180,7 +180,7 @@ void StreamView::customEvent(QEvent *event)
         {
             if (m_streamList)
             {
-                MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+                MythUIButtonListItem *item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
                 if (item)
                 {
                     item->SetFontState("running");
@@ -196,7 +196,7 @@ void StreamView::customEvent(QEvent *event)
     {
         if (m_streamList)
         {
-            MythUIButtonListItem *item = m_streamList->GetItemByData(qVariantFromValue(m_currStream));
+            MythUIButtonListItem *item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
             if (item)
             {
                 item->SetFontState("normal");
@@ -356,7 +356,7 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
         {
             if (m_lastStream && m_lastStream != m_currStream)
             {
-                m_streamList->SetValueByData(qVariantFromValue(m_lastStream));
+                m_streamList->SetValueByData(QVariant::fromValue(m_lastStream));
 
                 MythUIButtonListItem *item = m_streamList->GetItemCurrent();
                 if (item)
@@ -434,7 +434,7 @@ void StreamView::updateStreamList(void)
     {
         MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongAt(x);
         auto *item = new MythUIButtonListItem(m_streamList, "",
-                                              qVariantFromValue(mdata));
+                                              QVariant::fromValue(mdata));
         InfoMap metadataMap;
         if (mdata)
             mdata->toMap(metadataMap);
@@ -1121,7 +1121,7 @@ void SearchStream::doUpdateStreams(void)
         mdata.setLanguage(query.value(12).toString());
 
         auto *item = new MythUIButtonListItem(m_streamList, "",
-                                              qVariantFromValue(mdata));
+                                              QVariant::fromValue(mdata));
         InfoMap metadataMap;
         mdata.toMap(metadataMap);
 

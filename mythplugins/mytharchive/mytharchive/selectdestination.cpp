@@ -68,7 +68,7 @@ bool SelectDestination::Create(void)
     {
         auto *item = new
             MythUIButtonListItem(m_destinationSelector, tr(ArchiveDestinations[x].name));
-        item->SetData(qVariantFromValue(ArchiveDestinations[x].type));
+        item->SetData(QVariant::fromValue(ArchiveDestinations[x].type));
     }
     connect(m_findButton, SIGNAL(Clicked()), this, SLOT(handleFind()));
 

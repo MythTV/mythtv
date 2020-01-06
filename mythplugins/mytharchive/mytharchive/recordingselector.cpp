@@ -432,7 +432,7 @@ void RecordingSelector::updateRecordingList(void)
 
                 item->DisplayState(p->HasCutlist() ? "yes" : "no", "cutlist");
 
-                item->SetData(qVariantFromValue(p));
+                item->SetData(QVariant::fromValue(p));
             }
             qApp->processEvents();
         }

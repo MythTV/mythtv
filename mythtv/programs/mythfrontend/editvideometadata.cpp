@@ -673,7 +673,7 @@ void EditMetadataDialog::OnSearchListSelection(const ArtworkInfo& info, VideoArt
     lookup->SetSubtype(GuessLookupType(m_workingMetadata));
     lookup->SetHost(m_workingMetadata->GetHost());
     lookup->SetAutomatic(true);
-    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetData(QVariant::fromValue<VideoArtworkType>(type));
 
     ArtworkMap downloads;
     downloads.insert(type, info);
@@ -734,7 +734,7 @@ void EditMetadataDialog::FindNetArt(VideoArtworkType type)
         lookup->SetSubtype(kProbableMovie);
     else
         lookup->SetSubtype(kUnknownVideo);
-    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetData(QVariant::fromValue<VideoArtworkType>(type));
 
     lookup->SetTitle(m_workingMetadata->GetTitle());
     lookup->SetSubtitle(m_workingMetadata->GetSubtitle());

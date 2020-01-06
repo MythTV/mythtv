@@ -50,17 +50,17 @@ bool SearchView::Create(void)
     SetFocusWidget(m_criteriaEdit);
 
     new MythUIButtonListItem(m_fieldList, tr("All Fields"),
-                                qVariantFromValue(0));
+                                QVariant::fromValue(0));
     new MythUIButtonListItem(m_fieldList, tr("Artist"),
-                                qVariantFromValue(1));
+                                QVariant::fromValue(1));
     new MythUIButtonListItem(m_fieldList, tr("Album"),
-                                qVariantFromValue(2));
+                                QVariant::fromValue(2));
     new MythUIButtonListItem(m_fieldList, tr("Title"),
-                                qVariantFromValue(3));
+                                QVariant::fromValue(3));
     new MythUIButtonListItem(m_fieldList, tr("Genre"),
-                                qVariantFromValue(4));
+                                QVariant::fromValue(4));
     //new MythUIButtonListItem(m_fieldList, tr("Tags"),
-    //                            qVariantFromValue(5));
+    //                            QVariant::fromValue(5));
 
     connect(m_fieldList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(fieldSelected(MythUIButtonListItem*)));
@@ -410,7 +410,7 @@ void SearchView::updateTracksList(void)
         if (mdata)
         {
             auto *newitem = new MythUIButtonListItem(m_tracksList, "");
-            newitem->SetData(qVariantFromValue(mdata));
+            newitem->SetData(QVariant::fromValue(mdata));
             InfoMap metadataMap;
             mdata->toMap(metadataMap);
             newitem->SetTextFromMap(metadataMap);

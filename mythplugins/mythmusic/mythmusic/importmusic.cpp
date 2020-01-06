@@ -932,15 +932,15 @@ bool ImportCoverArtDialog::Create()
     if (m_typeList)
     {
         new MythUIButtonListItem(m_typeList, tr("Front Cover"),
-                                 qVariantFromValue((int)IT_FRONTCOVER));
+                                 QVariant::fromValue((int)IT_FRONTCOVER));
         new MythUIButtonListItem(m_typeList, tr("Back Cover"),
-                                 qVariantFromValue((int)IT_BACKCOVER));
+                                 QVariant::fromValue((int)IT_BACKCOVER));
         new MythUIButtonListItem(m_typeList, tr("CD"),
-                                 qVariantFromValue((int)IT_CD));
+                                 QVariant::fromValue((int)IT_CD));
         new MythUIButtonListItem(m_typeList, tr("Inlay"),
-                                 qVariantFromValue((int)IT_INLAY));
+                                 QVariant::fromValue((int)IT_INLAY));
         new MythUIButtonListItem(m_typeList, tr("<Unknown>"),
-                                 qVariantFromValue((int)IT_UNKNOWN));
+                                 QVariant::fromValue((int)IT_UNKNOWN));
 
         connect(m_typeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(selectorChanged()));

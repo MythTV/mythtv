@@ -279,7 +279,7 @@ void ScreenSetup::loadData()
             foreach (auto script, scriptList)
                 si->m_sources.append(script->name);
             auto *item = new MythUIButtonListItem(m_inactiveList, si->m_title);
-            item->SetData(qVariantFromValue(new ScreenListInfo(*si)));
+            item->SetData(QVariant::fromValue(new ScreenListInfo(*si)));
         }
 
         ++i;
@@ -335,7 +335,7 @@ void ScreenSetup::loadData()
                     si->m_types.insert(dataitem, ti);
             }
 
-            item->SetData(qVariantFromValue(si));
+            item->SetData(QVariant::fromValue(si));
             active_screens.insert(draworder, si);
         }
         else
@@ -471,13 +471,13 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
 
             menuPopup->SetReturnEvent(this, "options");
 
-            menuPopup->AddButton(tr("Move Up"), qVariantFromValue(selected));
-            menuPopup->AddButton(tr("Move Down"), qVariantFromValue(selected));
-            menuPopup->AddButton(tr("Remove"), qVariantFromValue(selected));
-            menuPopup->AddButton(tr("Change Location"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Move Up"), QVariant::fromValue(selected));
+            menuPopup->AddButton(tr("Move Down"), QVariant::fromValue(selected));
+            menuPopup->AddButton(tr("Remove"), QVariant::fromValue(selected));
+            menuPopup->AddButton(tr("Change Location"), QVariant::fromValue(selected));
             if (si->m_hasUnits)
-                menuPopup->AddButton(tr("Change Units"), qVariantFromValue(selected));
-            menuPopup->AddButton(tr("Cancel"), qVariantFromValue(selected));
+                menuPopup->AddButton(tr("Change Units"), QVariant::fromValue(selected));
+            menuPopup->AddButton(tr("Cancel"), QVariant::fromValue(selected));
         }
         else
         {
@@ -549,8 +549,8 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
 
         menuPopup->SetReturnEvent(this, "units");
 
-        menuPopup->AddButton(tr("English Units"), qVariantFromValue(si));
-        menuPopup->AddButton(tr("SI Units"), qVariantFromValue(si));
+        menuPopup->AddButton(tr("English Units"), QVariant::fromValue(si));
+        menuPopup->AddButton(tr("SI Units"), QVariant::fromValue(si));
     }
     else
     {
@@ -657,12 +657,12 @@ void ScreenSetup::customEvent(QEvent *event)
                 si->m_updating = false;
                 MythUIButtonListItem *item = m_activeList->GetItemCurrent();
                 if (item)
-                    item->SetData(qVariantFromValue(si));
+                    item->SetData(QVariant::fromValue(si));
             }
             else
             {
                 auto *item = new MythUIButtonListItem(m_activeList, si->m_title);
-                item->SetData(qVariantFromValue(si));
+                item->SetData(QVariant::fromValue(si));
             }
 
             if (m_activeList->GetCount())
@@ -772,7 +772,7 @@ bool SourceSetup::loadData()
         si->email = db.value(5).toString();
         si->version = db.value(6).toString();
 
-        new MythUIButtonListItem(m_sourceList, si->name, qVariantFromValue(si));
+        new MythUIButtonListItem(m_sourceList, si->name, QVariant::fromValue(si));
     }
 
     return true;
@@ -976,7 +976,7 @@ void LocationDialog::doSearch()
             auto *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;
-            item->SetData(qVariantFromValue(ri));
+            item->SetData(QVariant::fromValue(ri));
             qApp->processEvents();
         }
     }
@@ -1026,7 +1026,7 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
     }
 
     auto *dce = new DialogCompletionEvent("location", 0, "",
-                      qVariantFromValue(new ScreenListInfo(*m_screenListInfo)));
+                      QVariant::fromValue(new ScreenListInfo(*m_screenListInfo)));
     QApplication::postEvent(m_retScreen, dce);
 
     Close();

@@ -87,12 +87,12 @@ bool MetadataResultsDialog::Create()
             {
                 m_imageDownload->addThumb(m_results[i]->GetTitle(),
                                  coverartfile,
-                                 qVariantFromValue<uint>(pos));
+                                 QVariant::fromValue<uint>(pos));
             }
         }
 
         button->SetTextFromMap(metadataMap);
-        button->SetData(qVariantFromValue<uint>(i));
+        button->SetData(QVariant::fromValue<uint>(i));
     }
 
     connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),

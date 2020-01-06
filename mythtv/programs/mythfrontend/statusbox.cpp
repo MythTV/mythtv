@@ -104,31 +104,31 @@ bool StatusBox::Create()
 void StatusBox::Init()
 {
     auto *item = new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
-                            qVariantFromValue((void*)SLOT(doListingsStatus())));
+                            QVariant::fromValue((void*)SLOT(doListingsStatus())));
     item->DisplayState("listings", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Schedule Status"),
-                            qVariantFromValue((void*)SLOT(doScheduleStatus())));
+                            QVariant::fromValue((void*)SLOT(doScheduleStatus())));
     item->DisplayState("schedule", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Input Status"),
-                            qVariantFromValue((void*)SLOT(doTunerStatus())));
+                            QVariant::fromValue((void*)SLOT(doTunerStatus())));
     item->DisplayState("tuner", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
-                            qVariantFromValue((void*)SLOT(doJobQueueStatus())));
+                            QVariant::fromValue((void*)SLOT(doJobQueueStatus())));
     item->DisplayState("jobqueue", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Display"),
-                            qVariantFromValue((void*)SLOT(doDisplayStatus())));
+                            QVariant::fromValue((void*)SLOT(doDisplayStatus())));
     item->DisplayState("display", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Machine Status"),
-                            qVariantFromValue((void*)SLOT(doMachineStatus())));
+                            QVariant::fromValue((void*)SLOT(doMachineStatus())));
     item->DisplayState("machine", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("AutoExpire List"),
-                            qVariantFromValue((void*)SLOT(doAutoExpireList())));
+                            QVariant::fromValue((void*)SLOT(doAutoExpireList())));
     item->DisplayState("autoexpire", "icon");
 
     int itemCurrent = gCoreContext->GetNumSetting("StatusBoxItemCurrent", 0);
@@ -164,7 +164,7 @@ void StatusBox::AddLogLine(const QString & line,
     logline.m_data = data;
 
     auto *item = new MythUIButtonListItem(m_logList, line,
-                                          qVariantFromValue(logline));
+                                          QVariant::fromValue(logline));
     if (logline.m_state.isEmpty())
         logline.m_state = "normal";
 
@@ -315,7 +315,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
             menuPopup->SetReturnEvent(this, "JobModify");
 
-            QVariant data = qVariantFromValue(logline.m_data);
+            QVariant data = QVariant::fromValue(logline.m_data);
 
             if (jobStatus == JOB_PAUSED)
                 menuPopup->AddButton(tr("Resume"), data);
@@ -354,18 +354,18 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
             menuPopup->SetReturnEvent(this, "AutoExpireManage");
 
-            menuPopup->AddButton(tr("Delete Now"), qVariantFromValue(rec));
+            menuPopup->AddButton(tr("Delete Now"), QVariant::fromValue(rec));
             if ((rec)->GetRecordingGroup() == "LiveTV")
             {
                 menuPopup->AddButton(tr("Move to Default group"),
-                                                       qVariantFromValue(rec));
+                                                       QVariant::fromValue(rec));
             }
             else if ((rec)->GetRecordingGroup() == "Deleted")
-                menuPopup->AddButton(tr("Undelete"), qVariantFromValue(rec));
+                menuPopup->AddButton(tr("Undelete"), QVariant::fromValue(rec));
             else
                 menuPopup->AddButton(tr("Disable AutoExpire"),
-                                                        qVariantFromValue(rec));
-            menuPopup->AddButton(tr("No Change"), qVariantFromValue(rec));
+                                                        QVariant::fromValue(rec));
+            menuPopup->AddButton(tr("No Change"), QVariant::fromValue(rec));
 
         }
     }

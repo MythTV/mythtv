@@ -108,7 +108,7 @@ void CustomPriority::loadData()
     rule.priority = QString().setNum(1);
 
     new MythUIButtonListItem(m_ruleList, tr("<New priority rule>"),
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT priorityname, recpriority, selectclause "
@@ -127,7 +127,7 @@ void CustomPriority::loadData()
             rule.description = result.value(2).toString();
 
             item = new MythUIButtonListItem(m_ruleList, rule.title,
-                                            qVariantFromValue(rule));
+                                            QVariant::fromValue(rule));
 
             if (trimTitle == baseTitle)
                 m_ruleList->SetItemCurrent(item);
@@ -225,7 +225,7 @@ void CustomPriority::loadExampleRules()
     {
         it.next();
         new MythUIButtonListItem(m_clauseList, it.key(),
-                                 qVariantFromValue(it.value()));
+                                 QVariant::fromValue(it.value()));
     }
 }
 

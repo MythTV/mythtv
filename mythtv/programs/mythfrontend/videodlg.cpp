@@ -1201,7 +1201,7 @@ void VideoDialog::loadData()
                         new MythUIButtonListItem(m_videoButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
-                item->SetData(qVariantFromValue(*p));
+                item->SetData(QVariant::fromValue(*p));
 
                 UpdateItem(item);
 

@@ -395,7 +395,7 @@ void FileSelector::updateFileList()
                         MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->setCheckable(false);
                 item->SetImage("ma_folder.png");
-                item->SetData(qVariantFromValue(data));
+                item->SetData(QVariant::fromValue(data));
             }
         }
 
@@ -440,7 +440,7 @@ void FileSelector::updateFileList()
                 else
                     item->setCheckable(false);
 
-                item->SetData(qVariantFromValue(data));
+                item->SetData(QVariant::fromValue(data));
             }
         }
         m_locationEdit->SetText(m_curDirectory);

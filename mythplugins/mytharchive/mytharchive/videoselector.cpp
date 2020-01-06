@@ -344,7 +344,7 @@ void VideoSelector::updateVideoList(void)
                         item->setChecked(MythUIButtonListItem::NotChecked);
                     }
 
-                    item->SetData(qVariantFromValue(v));
+                    item->SetData(QVariant::fromValue(v));
                 }
             }
         }

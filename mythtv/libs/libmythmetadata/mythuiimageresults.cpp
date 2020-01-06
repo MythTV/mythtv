@@ -81,11 +81,11 @@ bool ImageSearchResultsDialog::Create()
                 {
                     m_imageDownload->addThumb(info.label,
                                      artfile,
-                                     qVariantFromValue<uint>(pos));
+                                     QVariant::fromValue<uint>(pos));
                 }
             }
 
-            button->SetData(qVariantFromValue<ArtworkInfo>(*i));
+            button->SetData(QVariant::fromValue<ArtworkInfo>(*i));
         }
 
     connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),

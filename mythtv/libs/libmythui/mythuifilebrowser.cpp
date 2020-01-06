@@ -495,7 +495,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         }
 
         auto *item = new MythUIButtonListItem(m_fileList, displayName,
-                                              qVariantFromValue(finfo));
+                                              QVariant::fromValue(finfo));
 
         item->SetText(QString("0"), "filesize");
         item->SetText(m_parentDir, "fullpath");
@@ -575,7 +575,7 @@ void MythUIFileBrowser::updateRemoteFileList()
         }
 
         auto *item = new MythUIButtonListItem(m_fileList, displayName,
-                                              qVariantFromValue(finfo));
+                                              QVariant::fromValue(finfo));
 
         if (finfo.size())
             item->SetText(FormatSize(finfo.size()), "filesize");
@@ -661,7 +661,7 @@ void MythUIFileBrowser::updateLocalFileList()
             }
 
             auto *item = new MythUIButtonListItem(m_fileList, displayName,
-                                                  qVariantFromValue(finfo));
+                                                  QVariant::fromValue(finfo));
 
             if (IsImage(finfo.suffix()))
             {

@@ -245,28 +245,28 @@ void ZMLivePlayer::ShowMenu()
 
     menuPopup->SetReturnEvent(this, "mainmenu");
 
-    menuPopup->AddButton(tr("Change View"),     qVariantFromValue(QString("VIEW")));
-    menuPopup->AddButton(tr("Change Camera 1"), qVariantFromValue(QString("CAMERA1")));
+    menuPopup->AddButton(tr("Change View"),     QVariant::fromValue(QString("VIEW")));
+    menuPopup->AddButton(tr("Change Camera 1"), QVariant::fromValue(QString("CAMERA1")));
 
     if (m_monitorLayout > 1)
-        menuPopup->AddButton(tr("Change Camera 2"), qVariantFromValue(QString("CAMERA2")));
+        menuPopup->AddButton(tr("Change Camera 2"), QVariant::fromValue(QString("CAMERA2")));
 
     if (m_monitorLayout > 2)
     {
-        menuPopup->AddButton(tr("Change Camera 3"), qVariantFromValue(QString("CAMERA3")));
-        menuPopup->AddButton(tr("Change Camera 4"), qVariantFromValue(QString("CAMERA4")));
+        menuPopup->AddButton(tr("Change Camera 3"), QVariant::fromValue(QString("CAMERA3")));
+        menuPopup->AddButton(tr("Change Camera 4"), QVariant::fromValue(QString("CAMERA4")));
     }
 
     if (m_monitorLayout > 3)
     {
-        menuPopup->AddButton(tr("Change Camera 5"), qVariantFromValue(QString("CAMERA5")));
-        menuPopup->AddButton(tr("Change Camera 6"), qVariantFromValue(QString("CAMERA6")));
+        menuPopup->AddButton(tr("Change Camera 5"), QVariant::fromValue(QString("CAMERA5")));
+        menuPopup->AddButton(tr("Change Camera 6"), QVariant::fromValue(QString("CAMERA6")));
     }
 
     if (m_monitorLayout > 4)
     {
-        menuPopup->AddButton(tr("Change Camera 7"), qVariantFromValue(QString("CAMERA7")));
-        menuPopup->AddButton(tr("Change Camera 8"), qVariantFromValue(QString("CAMERA8")));
+        menuPopup->AddButton(tr("Change Camera 7"), QVariant::fromValue(QString("CAMERA7")));
+        menuPopup->AddButton(tr("Change Camera 8"), QVariant::fromValue(QString("CAMERA8")));
     }
 }
 

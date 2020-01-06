@@ -341,27 +341,27 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
     {
         if (recinfo.GetRecordingEndTime() > now)
             menuPopup->AddButton(tr("Record this showing"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
         menuPopup->AddButton(tr("Record all showings"),
-                             qVariantFromValue(recinfo));
+                             QVariant::fromValue(recinfo));
         if (!recinfo.IsGeneric())
         {
             if (recinfo.GetCategoryType() == ProgramInfo::kCategoryMovie)
             {
                 menuPopup->AddButton(tr("Record one showing"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
             }
             else
             {
                 menuPopup->AddButton(tr("Record one showing (this episode)"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
             }
 
         }
         menuPopup->AddButton(tr("Record all showings (this channel)"),
-                             qVariantFromValue(recinfo));
+                             QVariant::fromValue(recinfo));
         menuPopup->AddButton(tr("Edit recording rule"),
-                             qVariantFromValue(recinfo));
+                             QVariant::fromValue(recinfo));
     }
     else if (recinfo.GetRecordingStatus() == RecStatus::Recording ||
              recinfo.GetRecordingStatus() == RecStatus::Tuning    ||
@@ -370,9 +370,9 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
     {
         if (recinfo.GetRecordingStatus() != RecStatus::Pending)
             menuPopup->AddButton(tr("Stop this recording"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
         menuPopup->AddButton(tr("Modify recording options"),
-                             qVariantFromValue(recinfo));
+                             QVariant::fromValue(recinfo));
     }
     else
     {
@@ -382,7 +382,7 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
             recinfo.GetRecordingStatus() != RecStatus::NotListed)
         {
             menuPopup->AddButton(tr("Restart this recording"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
         }
 
         if (recinfo.GetRecordingEndTime() > now &&
@@ -399,13 +399,13 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
              recinfo.GetRecordingStatus() == RecStatus::NeverRecord))
         {
             menuPopup->AddButton(tr("Record this showing"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
             if (recinfo.GetRecordingStartTime() > now &&
                 (recinfo.GetRecordingStatus() == RecStatus::PreviousRecording ||
                  recinfo.GetRecordingStatus() == RecStatus::NeverRecord))
             {
                 menuPopup->AddButton(tr("Forget previous recording"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
             }
         }
 
@@ -422,7 +422,7 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
             if (recinfo.GetRecordingStatus() == RecStatus::WillRecord ||
                 recinfo.GetRecordingStatus() == RecStatus::Conflict)
                 menuPopup->AddButton(tr("Don't record this showing"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
 
             const RecordingDupMethodType dupmethod =
                 recinfo.GetDuplicateCheckMethod();
@@ -444,7 +444,7 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
                    !recinfo.GetDescription().isEmpty())) ))
             {
                 menuPopup->AddButton(tr("Never record this episode"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
             }
         }
 
@@ -452,20 +452,20 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
             recinfo.GetRecordingRuleType() == kDontRecord)
         {
             menuPopup->AddButton(tr("Edit override rule"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
             menuPopup->AddButton(tr("Delete override rule"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
         }
         else
         {
             if (recinfo.GetRecordingRuleType() != kSingleRecord &&
                 recinfo.GetRecordingStatus() != RecStatus::NotListed)
                 menuPopup->AddButton(tr("Add override rule"),
-                                     qVariantFromValue(recinfo));
+                                     QVariant::fromValue(recinfo));
             menuPopup->AddButton(tr("Edit recording rule"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
             menuPopup->AddButton(tr("Delete recording rule"),
-                                 qVariantFromValue(recinfo));
+                                 QVariant::fromValue(recinfo));
         }
     }
 

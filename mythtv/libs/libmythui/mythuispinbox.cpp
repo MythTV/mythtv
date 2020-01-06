@@ -74,7 +74,7 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
         if (text.isEmpty())
             text = QString::number(value);
 
-        new MythUIButtonListItem(this, text, qVariantFromValue(value));
+        new MythUIButtonListItem(this, text, QVariant::fromValue(value));
 
         if (reverse)
             value = value - step;
@@ -117,7 +117,7 @@ void MythUISpinBox::AddSelection(int value, const QString &label)
     }
 
     new MythUIButtonListItem(this, label.isEmpty() ? QString(value) : label,
-                                    qVariantFromValue(value), insertPos);
+                                    QVariant::fromValue(value), insertPos);
 }
 
 /**

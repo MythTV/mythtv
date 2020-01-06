@@ -224,7 +224,7 @@ void BookmarkManager::UpdateURLList(void)
             item2->SetText(site->m_url, "url");
             if (site->m_isHomepage)
                 item2->DisplayState("yes", "homepage");
-            item2->SetData(qVariantFromValue(site));
+            item2->SetData(QVariant::fromValue(site));
             item2->setChecked(site->m_selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }

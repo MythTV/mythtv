@@ -234,7 +234,7 @@ void ExportNative::updateArchiveList(void)
         foreach (auto a, m_archiveList)
         {
             auto* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
-            item->SetData(qVariantFromValue(a));
+            item->SetData(QVariant::fromValue(a));
         }
 
         m_archiveButtonList->SetItemCurrent(m_archiveButtonList->GetItemFirst());

@@ -692,7 +692,7 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
         m_watermarkState->EnsureStateLoaded(type);
 
     auto *listbuttonitem = new MythUIButtonListItem(m_buttonList, text,
-                                                qVariantFromValue(newbutton));
+                                                QVariant::fromValue(newbutton));
 
     listbuttonitem->DisplayState(type, "icon");
     listbuttonitem->SetText(description, "description");

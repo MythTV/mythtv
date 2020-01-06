@@ -44,7 +44,7 @@
 #include "proglist.h"
 #include "viewschedulediff.h"
 
-#define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
+#define ENUM_TO_QVARIANT(a) QVariant::fromValue(static_cast<int>(a))
 
 //static const QString _Location = QObject::tr("Schedule Editor");
 
@@ -1414,7 +1414,7 @@ void MetadataOptions::OnImageSearchListSelection(const ArtworkInfo& info,
     lookup->SetType(kMetadataVideo);
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetAutomatic(true);
-    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetData(QVariant::fromValue<VideoArtworkType>(type));
 
     ArtworkMap downloads;
     downloads.insert(type, info);
@@ -1613,7 +1613,7 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     MetadataLookup *lookup = CreateLookup(kMetadataVideo);
 
     lookup->SetAutomatic(true);
-    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetData(QVariant::fromValue<VideoArtworkType>(type));
     m_imageLookup->addLookup(lookup);
 }
 
@@ -2055,7 +2055,7 @@ void SchedOptMixin::Load(void)
         {
             new MythUIButtonListItem(m_inputList,
                                      QObject::tr("Use any available input"),
-                                     qVariantFromValue(0));
+                                     QVariant::fromValue(0));
 
             vector<uint> inputids = CardUtil::GetSchedInputList();
             for (uint id : inputids)
@@ -2363,17 +2363,17 @@ void StoreOptMixin::Load(void)
 
             new MythUIButtonListItem(m_recprofileList,
                                         label.arg(QObject::tr("Default")),
-                                        qVariantFromValue(QString("Default")));
+                                        QVariant::fromValue(QString("Default")));
             // LiveTV profile - it's for LiveTV not scheduled recordings??
             new MythUIButtonListItem(m_recprofileList,
                                         label.arg(QObject::tr("LiveTV")),
-                                        qVariantFromValue(QString("LiveTV")));
+                                        QVariant::fromValue(QString("LiveTV")));
             new MythUIButtonListItem(m_recprofileList,
                                         label.arg(QObject::tr("High Quality")),
-                                        qVariantFromValue(QString("High Quality")));
+                                        QVariant::fromValue(QString("High Quality")));
             new MythUIButtonListItem(m_recprofileList,
                                         label.arg(QObject::tr("Low Quality")),
-                                        qVariantFromValue(QString("Low Quality")));
+                                        QVariant::fromValue(QString("Low Quality")));
         }
         m_recprofileList->SetValueByData(m_rule->m_recProfile);
     }
@@ -2386,7 +2386,7 @@ void StoreOptMixin::Load(void)
             label = QObject::tr("Include in the \"%1\" recording group");
             new MythUIButtonListItem(m_recgroupList,
                                   QObject::tr("Create a new recording group"),
-                                  qVariantFromValue(QString("__NEW_GROUP__")));
+                                  QVariant::fromValue(QString("__NEW_GROUP__")));
 
             query.prepare("SELECT recgroupid, recgroup FROM recgroups "
                           "WHERE recgroup <> 'Deleted' AND "
@@ -2402,7 +2402,7 @@ void StoreOptMixin::Load(void)
                     if (name == "Default")
                         name = QObject::tr("Default");
                     new MythUIButtonListItem(m_recgroupList, label.arg(name),
-                                             qVariantFromValue(id));
+                                             QVariant::fromValue(id));
                 }
             }
 
@@ -2418,14 +2418,14 @@ void StoreOptMixin::Load(void)
             label = QObject::tr("Store in the \"%1\" storage group");
             new MythUIButtonListItem(m_storagegroupList,
                                      label.arg(QObject::tr("Default")),
-                                     qVariantFromValue(QString("Default")));
+                                     QVariant::fromValue(QString("Default")));
 
             groups = StorageGroup::getRecordingsGroups();
             for (it = groups.begin(); it != groups.end(); ++it)
             {
                 if ((*it).compare("Default", Qt::CaseInsensitive) != 0)
                     new MythUIButtonListItem(m_storagegroupList,
-                                       label.arg(*it), qVariantFromValue(*it));
+                                       label.arg(*it), QVariant::fromValue(*it));
             }
         }
         m_storagegroupList->SetValueByData(m_rule->m_storageGroup);
@@ -2439,13 +2439,13 @@ void StoreOptMixin::Load(void)
             label = QObject::tr("Use \"%1\" playback group settings");
             new MythUIButtonListItem(m_playgroupList,
                                      label.arg(QObject::tr("Default")),
-                                     qVariantFromValue(QString("Default")));
+                                     QVariant::fromValue(QString("Default")));
 
             groups = PlayGroup::GetNames();
             for (it = groups.begin(); it != groups.end(); ++it)
             {
                 new MythUIButtonListItem(m_playgroupList, label.arg(*it),
-                                         qVariantFromValue(*it));
+                                         QVariant::fromValue(*it));
             }
         }
         m_playgroupList->SetValueByData(m_rule->m_playGroup);
@@ -2470,10 +2470,10 @@ void StoreOptMixin::Load(void)
         {
             new MythUIButtonListItem(m_maxbehaviourList,
                       QObject::tr("Don't record if this would exceed the max "
-                                  "episodes"), qVariantFromValue(false));
+                                  "episodes"), QVariant::fromValue(false));
             new MythUIButtonListItem(m_maxbehaviourList,
                       QObject::tr("Delete oldest if this would exceed the max "
-                                  "episodes"), qVariantFromValue(true));
+                                  "episodes"), QVariant::fromValue(true));
         }
         m_maxbehaviourList->SetValueByData(m_rule->m_maxNewest);
     }
@@ -2595,13 +2595,13 @@ void StoreOptMixin::SetRecGroup(int recgroupID, QString recgroup)
 
         QString label = QObject::tr("Include in the \"%1\" recording group");
         auto *item = new MythUIButtonListItem(m_recgroupList, label.arg(recgroup),
-                                              qVariantFromValue(recgroup));
+                                              QVariant::fromValue(recgroup));
         m_recgroupList->SetItemCurrent(item);
 
         if (m_other && m_other->m_recgroupList)
         {
             item = new MythUIButtonListItem(m_other->m_recgroupList,
-                             label.arg(recgroup), qVariantFromValue(recgroupID));
+                             label.arg(recgroup), QVariant::fromValue(recgroupID));
             m_other->m_recgroupList->SetItemCurrent(item);
         }
     }
@@ -2704,7 +2704,7 @@ void PostProcMixin::Load(void)
             for (it = profiles.begin(); it != profiles.end(); ++it)
             {
                 new MythUIButtonListItem(m_transcodeprofileList, it.value(),
-                                        qVariantFromValue(it.key()));
+                                        QVariant::fromValue(it.key()));
             }
         }
         m_transcodeprofileList->SetValueByData(m_rule->m_transcoder);

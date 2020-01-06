@@ -187,7 +187,7 @@ void NetTree::LoadData(void)
                         new MythUIButtonListItem(m_siteButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
-                item->SetData(qVariantFromValue(*p));
+                item->SetData(QVariant::fromValue(*p));
 
                 UpdateItem(item);
 
@@ -269,7 +269,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
             item->SetImage(dlfile);
         else if (video->GetThumbnail().startsWith("http"))
             m_imageDownload->addThumb(video->GetTitle(), video->GetThumbnail(),
-                                      qVariantFromValue<uint>(pos));
+                                      QVariant::fromValue<uint>(pos));
     }
     else
     {
@@ -289,7 +289,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                     item->SetImage(dlfile);
                 else
                     m_imageDownload->addThumb(node->GetText(), tpath,
-                                              qVariantFromValue<uint>(pos));
+                                              QVariant::fromValue<uint>(pos));
             }
             else if (tpath != "0")
             {
@@ -538,7 +538,7 @@ void NetTree::FillTree()
                                                           VIDEO_PODCAST);
             auto *ret =
                 new MythGenericTree(feed->GetTitle(), kSubFolder, false);
-            ret->SetData(qVariantFromValue(feed));
+            ret->SetData(QVariant::fromValue(feed));
             rssGeneric->addNode(ret);
 
             // Add an upfolder
@@ -566,7 +566,7 @@ void NetTree::FillTree()
         auto *ret = new MythGenericTree(g->GetTitle(), kSubFolder, false);
         QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
                             .arg(g->GetImage());
-        ret->SetData(qVariantFromValue(thumb));
+        ret->SetData(QVariant::fromValue(thumb));
 
         // Add an upfolder
         if (m_type != DLG_TREE)
@@ -630,7 +630,7 @@ void NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
     QString title = video->GetTitle();
     title.replace("&amp;", "&");
     MythGenericTree *sub_node = where_to_add->addNode(title, 0, true);
-    sub_node->SetData(qVariantFromValue(video));
+    sub_node->SetData(QVariant::fromValue(video));
 
     InfoMap textMap;
     video->toMap(textMap);
@@ -687,7 +687,7 @@ void NetTree::UpdateResultItem(ResultItem *item)
             {
                 m_imageDownload->addThumb(item->GetTitle(),
                                           item->GetThumbnail(),
-                                          qVariantFromValue<uint>(0));
+                                          QVariant::fromValue<uint>(0));
             }
         }
     }

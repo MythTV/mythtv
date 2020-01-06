@@ -429,7 +429,7 @@ void MythBurn::updateArchiveList(void)
             recalcItemSize(a);
 
             auto* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
-            item->SetData(qVariantFromValue(a));
+            item->SetData(QVariant::fromValue(a));
             item->SetText(a->subtitle, "subtitle");
             item->SetText(a->startDate + " " + a->startTime, "date");
             item->SetText(formatSize(a->newsize / 1024, 2), "size");
@@ -1030,7 +1030,7 @@ bool ProfileDialog::Create()
     {
         auto *item = new
                 MythUIButtonListItem(m_profileBtnList, x->name);
-        item->SetData(qVariantFromValue(x));
+        item->SetData(QVariant::fromValue(x));
     }
 
     connect(m_profileBtnList, SIGNAL(itemSelected(MythUIButtonListItem*)),

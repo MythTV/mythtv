@@ -162,7 +162,7 @@ void EditRomInfoDialog::SaveAndExit()
     {
         auto *romInfo = new RomInfo(*m_workingRomInfo);
         auto *dce = new DialogCompletionEvent(m_id, 0, "",
-                                              qVariantFromValue(romInfo));
+                                              QVariant::fromValue(romInfo));
 
         QApplication::postEvent(m_retObject, dce);
     }

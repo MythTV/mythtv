@@ -155,7 +155,7 @@ void BackendSelection::AddItem(DeviceLocation *dev)
         infomap["version"] = infomap["modelnumber"].section('.', 0, 1);
 
         auto item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
-                                             qVariantFromValue(dev));
+                                             QVariant::fromValue(dev));
         item->SetTextFromMap(infomap);
 
         bool protoMatch = (infomap["protocolversion"] == MYTH_PROTO_VERSION);

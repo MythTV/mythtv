@@ -111,7 +111,7 @@ void RawSettingsEditor::Init(void)
     while (it != settingsList.end())
     {
         auto *item = new MythUIButtonListItem(m_settingsList, "",
-                                              qVariantFromValue(*it));
+                                              QVariant::fromValue(*it));
 
         if (m_settings[*it].isEmpty())
             item->SetText(*it);

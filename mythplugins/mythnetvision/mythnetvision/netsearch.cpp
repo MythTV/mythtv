@@ -425,7 +425,7 @@ void NetSearch::PopulateResultList(const ResultItem::resultList& list)
     {
         QString title = result->GetTitle();
         auto *item = new MythUIButtonListItem(m_searchResultList, title,
-                                              qVariantFromValue(result));
+                                              QVariant::fromValue(result));
         InfoMap metadataMap;
         result->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
@@ -445,7 +445,7 @@ void NetSearch::PopulateResultList(const ResultItem::resultList& list)
 
                 m_imageDownload->addThumb(result->GetTitle(),
                                           result->GetThumbnail(),
-                                          qVariantFromValue<uint>(pos));
+                                          QVariant::fromValue<uint>(pos));
             }
         }
     }

@@ -613,7 +613,7 @@ void ProgLister::ShowDeleteRuleMenu(void)
         popupStack, message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(qVariantFromValue(record));
+    okPopup->SetData(QVariant::fromValue(record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);
@@ -1542,7 +1542,7 @@ void ProgLister::HandleVisible(MythUIButtonListItem *item)
 void ProgLister::UpdateButtonList(void)
 {
     for (auto it : m_itemList)
-        new MythUIButtonListItem(m_progList, "", qVariantFromValue(it));
+        new MythUIButtonListItem(m_progList, "", QVariant::fromValue(it));
     m_progList->LoadInBackground();
 
     if (m_positionText)

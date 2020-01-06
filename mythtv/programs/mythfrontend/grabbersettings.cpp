@@ -125,9 +125,9 @@ void GrabberSettings::Init(void)
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",
                                          "metadata/Game/giantbomb.py");
 
-    m_movieGrabberButtonList->SetValueByData(qVariantFromValue(currentMovieGrabber));
-    m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));
-    m_gameGrabberButtonList->SetValueByData(qVariantFromValue(currentGameGrabber));
+    m_movieGrabberButtonList->SetValueByData(QVariant::fromValue(currentMovieGrabber));
+    m_tvGrabberButtonList->SetValueByData(QVariant::fromValue(currentTVGrabber));
+    m_gameGrabberButtonList->SetValueByData(QVariant::fromValue(currentGameGrabber));
 
     int updates =
         gCoreContext->GetNumSetting("DailyArtworkUpdates", 0);

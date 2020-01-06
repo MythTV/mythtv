@@ -2562,7 +2562,7 @@ void GuideGrid::deleteRule()
     auto *okPopup = new MythConfirmationDialog(popupStack, message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(qVariantFromValue(record));
+    okPopup->SetData(QVariant::fromValue(record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);

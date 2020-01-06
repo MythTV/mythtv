@@ -278,7 +278,7 @@ void ViewScheduleDiff::updateUIList(void)
             pginfo = s.m_before;
 
         auto *item = new MythUIButtonListItem(m_conflictList, "",
-                                              qVariantFromValue(pginfo));
+                                              QVariant::fromValue(pginfo));
 
         InfoMap infoMap;
         pginfo->ToMap(infoMap);

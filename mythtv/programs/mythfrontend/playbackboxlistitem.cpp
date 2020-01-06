@@ -6,7 +6,7 @@
 #ifdef INCLUDE_UNFINISHED
 PlaybackBoxListItem::PlaybackBoxListItem(
     PlaybackBox *parent, MythUIButtonList *lbtype, ProgramInfo *pi) :
-    MythUIButtonListItem(lbtype, "", qVariantFromValue(pi)),
+    MythUIButtonListItem(lbtype, "", QVariant::fromValue(pi)),
     m_pbbox(parent)
 {
 }
@@ -24,7 +24,7 @@ void PlaybackBoxListItem::SetToRealButton(
 #else
 PlaybackBoxListItem::PlaybackBoxListItem(
     PlaybackBox *parent, MythUIButtonList *lbtype, ProgramInfo *pi) :
-    MythUIButtonListItem(lbtype, "", qVariantFromValue(pi))
+    MythUIButtonListItem(lbtype, "", QVariant::fromValue(pi))
 {
     (void) parent;
 }

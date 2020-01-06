@@ -92,7 +92,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(recrule));
-    lookup->SetData(qVariantFromValue(recrule));
+    lookup->SetData(QVariant::fromValue(recrule));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
     lookup->SetAllowGeneric(allowgeneric);
@@ -120,7 +120,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(pginfo));
-    lookup->SetData(qVariantFromValue(pginfo));
+    lookup->SetData(QVariant::fromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
     lookup->SetAllowGeneric(allowgeneric);
@@ -148,7 +148,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
     lookup->SetSubtype(GuessLookupType(metadata));
-    lookup->SetData(qVariantFromValue(metadata));
+    lookup->SetData(QVariant::fromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
     lookup->SetAllowGeneric(allowgeneric);

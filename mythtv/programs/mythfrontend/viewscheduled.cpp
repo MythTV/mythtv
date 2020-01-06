@@ -320,7 +320,7 @@ void ViewScheduled::LoadList(bool useExistingData)
                     dateit.key(), MythDate::kDateFull | MythDate::kSimplify);
 
             new MythUIButtonListItem(m_groupList, label,
-                                     qVariantFromValue(dateit.key()));
+                                     QVariant::fromValue(dateit.key()));
             ++dateit;
         }
 
@@ -330,7 +330,7 @@ void ViewScheduled::LoadList(bool useExistingData)
         else
             m_currentGroup = m_defaultGroup;
 
-        m_groupList->SetValueByData(qVariantFromValue(m_currentGroup));
+        m_groupList->SetValueByData(QVariant::fromValue(m_currentGroup));
     }
 
     FillList();
@@ -439,7 +439,7 @@ void ViewScheduled::FillList()
             state = "warning";
 
         auto *item = new MythUIButtonListItem(m_schedulesList,"",
-                                              qVariantFromValue(pginfo));
+                                              QVariant::fromValue(pginfo));
 
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
@@ -538,7 +538,7 @@ void ViewScheduled::deleteRule()
     auto *okPopup = new MythConfirmationDialog(popupStack, message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(qVariantFromValue(record));
+    okPopup->SetData(QVariant::fromValue(record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);

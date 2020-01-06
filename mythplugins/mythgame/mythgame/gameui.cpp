@@ -133,7 +133,7 @@ void GameUI::BuildTree()
     QString levels = gCoreContext->GetSetting("GameFavTreeLevels");
 
     auto *new_node = new MythGenericTree(tr("Favorites"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo(levels, systemFilter + " and favorite=1")));
     m_favouriteNode = m_gameTree->addNode(new_node);
 
@@ -147,27 +147,27 @@ void GameUI::BuildTree()
     }
 
     new_node = new MythGenericTree(tr("All Games"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo(levels, systemFilter)));
     m_gameTree->addNode(new_node);
 
     new_node = new MythGenericTree(tr("-   By Genre"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo("genre gamename", systemFilter)));
     m_gameTree->addNode(new_node);
 
     new_node = new MythGenericTree(tr("-   By Year"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo("year gamename", systemFilter)));
     m_gameTree->addNode(new_node);
 
     new_node = new MythGenericTree(tr("-   By Name"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo("gamename", systemFilter)));
     m_gameTree->addNode(new_node);
 
     new_node = new MythGenericTree(tr("-   By Publisher"), 1, true);
-    new_node->SetData(qVariantFromValue(
+    new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo("publisher gamename", systemFilter)));
     m_gameTree->addNode(new_node);
 
@@ -541,7 +541,7 @@ void GameUI::customEvent(QEvent *event)
             delete oldRomInfo;
 
             auto *romInfo = dce->GetData().value<RomInfo *>();
-            node->SetData(qVariantFromValue(romInfo));
+            node->SetData(QVariant::fromValue(romInfo));
             node->SetText(romInfo->Gamename());
 
             romInfo->SaveToDatabase();
@@ -828,7 +828,7 @@ void GameUI::fillNode(MythGenericTree *node)
                 temp->setYear(query.value(2).toString());
                 temp->setGenre(query.value(3).toString().trimmed());
                 temp->setGamename(query.value(4).toString().trimmed());
-                new_node->SetData(qVariantFromValue(temp));
+                new_node->SetData(QVariant::fromValue(temp));
                 node->addNode(new_node);
             }
             else
@@ -843,7 +843,7 @@ void GameUI::fillNode(MythGenericTree *node)
                 {
                     newRomInfo = new RomInfo();
                 }
-                new_node->SetData(qVariantFromValue(newRomInfo));
+                new_node->SetData(QVariant::fromValue(newRomInfo));
                 node->addNode(new_node);
                 if (getChildLevelString(node) != "hash")
                     newRomInfo->setField(getChildLevelString(node), current);
@@ -902,7 +902,7 @@ void GameUI::gameSearch(MythGenericTree *node,
     auto *lookup = new MetadataLookup();
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataGame);
-    lookup->SetData(qVariantFromValue(node));
+    lookup->SetData(QVariant::fromValue(node));
 
     if (automode)
     {
@@ -1046,7 +1046,7 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     lookup->SetInetref(metadata->Inetref());
     lookup->SetType(kMetadataGame);
     lookup->SetDownloads(map);
-    lookup->SetData(qVariantFromValue(node));
+    lookup->SetData(QVariant::fromValue(node));
 
     m_imageDownload->addDownloads(lookup);
 }

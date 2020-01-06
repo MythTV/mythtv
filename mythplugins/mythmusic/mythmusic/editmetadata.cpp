@@ -937,7 +937,7 @@ void EditAlbumartDialog::updateImageGrid(void)
     {
         auto *item = new MythUIButtonListItem(m_coverartList,
                                      AlbumArtImages::getTypeName(art->m_imageType),
-                                     qVariantFromValue(art));
+                                     QVariant::fromValue(art));
         item->SetImage(art->m_filename);
         QString state = art->m_embedded ? "tag" : "file";
         item->DisplayState(state, "locationstate");
@@ -1019,12 +1019,12 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
         imageType = AlbumArtImages::guessImageType(m_imageFilename);
     }
 
-    menu->AddButton(AlbumArtImages::getTypeName(IT_UNKNOWN),    qVariantFromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
-    menu->AddButton(AlbumArtImages::getTypeName(IT_FRONTCOVER), qVariantFromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
-    menu->AddButton(AlbumArtImages::getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
-    menu->AddButton(AlbumArtImages::getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
-    menu->AddButton(AlbumArtImages::getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
-    menu->AddButton(AlbumArtImages::getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_UNKNOWN),    QVariant::fromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_FRONTCOVER), QVariant::fromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_BACKCOVER),  QVariant::fromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_CD),         QVariant::fromValue((int)IT_CD),         false, (imageType == IT_CD));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_INLAY),      QVariant::fromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
+    menu->AddButton(AlbumArtImages::getTypeName(IT_ARTIST),     QVariant::fromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
 
     popupStack->AddScreen(menu);
 }

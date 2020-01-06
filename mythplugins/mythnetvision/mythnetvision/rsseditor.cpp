@@ -427,7 +427,7 @@ void RSSEditor::fillRSSButtonList()
         item->SetText(site->GetDescription(), "description");
         item->SetText(site->GetURL(), "url");
         item->SetText(site->GetAuthor(), "author");
-        item->SetData(qVariantFromValue(site));
+        item->SetData(QVariant::fromValue(site));
         item->SetImage(site->GetImage());
     }
 }

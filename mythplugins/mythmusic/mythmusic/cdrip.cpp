@@ -623,11 +623,11 @@ bool Ripper::Create(void)
     connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
 
     // Populate Quality List
-    new MythUIButtonListItem(m_qualityList, tr("Low"), qVariantFromValue(0));
-    new MythUIButtonListItem(m_qualityList, tr("Medium"), qVariantFromValue(1));
-    new MythUIButtonListItem(m_qualityList, tr("High"), qVariantFromValue(2));
-    new MythUIButtonListItem(m_qualityList, tr("Perfect"), qVariantFromValue(3));
-    m_qualityList->SetValueByData(qVariantFromValue(
+    new MythUIButtonListItem(m_qualityList, tr("Low"), QVariant::fromValue(0));
+    new MythUIButtonListItem(m_qualityList, tr("Medium"), QVariant::fromValue(1));
+    new MythUIButtonListItem(m_qualityList, tr("High"), QVariant::fromValue(2));
+    new MythUIButtonListItem(m_qualityList, tr("Perfect"), QVariant::fromValue(3));
+    m_qualityList->SetValueByData(QVariant::fromValue(
                         gCoreContext->GetNumSetting("DefaultRipQuality", 1)));
 
     QTimer::singleShot(500, this, SLOT(startScanCD()));
@@ -1205,7 +1205,7 @@ void Ripper::updateTrackList(void)
 
             item->setCheckable(true);
 
-            item->SetData(qVariantFromValue(track));
+            item->SetData(QVariant::fromValue(track));
 
             if (track->isNew)
                 item->DisplayState("new", "yes");

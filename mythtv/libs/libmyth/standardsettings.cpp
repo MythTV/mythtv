@@ -37,7 +37,7 @@ StandardSetting::~StandardSetting()
 MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
 {
     auto *item = new MythUIButtonListItemSetting(list, m_label);
-    item->SetData(qVariantFromValue(this));
+    item->SetData(QVariant::fromValue(this));
     connect(this, SIGNAL(ShouldRedraw(StandardSetting *)),
             item, SLOT(ShouldUpdate(StandardSetting *)));
     updateButton(item);

@@ -112,7 +112,7 @@ bool ChannelEditor::Create()
 
     // Source List
     new MythUIButtonListItem(m_sourceList,tr("All"),
-                             qVariantFromValue((int)FILTER_ALL));
+                             QVariant::fromValue((int)FILTER_ALL));
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name, sourceid FROM videosource");
     if (query.exec())
@@ -124,7 +124,7 @@ bool ChannelEditor::Create()
         }
     }
     new MythUIButtonListItem(m_sourceList,tr("(Unassigned)"),
-                             qVariantFromValue((int)FILTER_UNASSIGNED));
+                             QVariant::fromValue((int)FILTER_UNASSIGNED));
     connect(sortList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(setSortMode(MythUIButtonListItem *)));
 
@@ -335,7 +335,7 @@ void ChannelEditor::fillList(void)
             bool sel = (chanid == currentValue);
             selidx = (sel) ? idx : selidx;
             item = new MythUIButtonListItem(m_channelList, "",
-                                                     qVariantFromValue(chanid));
+                                                     QVariant::fromValue(chanid));
             item->SetText(compoundname, "compoundname");
             item->SetText(name, "name");
             item->SetText(channum, "channum");
@@ -411,7 +411,7 @@ void ChannelEditor::del()
 
     if (dialog->Create())
     {
-        dialog->SetData(qVariantFromValue(item));
+        dialog->SetData(QVariant::fromValue(item));
         dialog->SetReturnEvent(this, "delsingle");
         popupStack->AddScreen(dialog);
     }

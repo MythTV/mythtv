@@ -259,13 +259,13 @@ MythMenu* LyricsView::createFindLyricsMenu(void)
     QString label = tr("Find Lyrics");
 
     auto *menu = new MythMenu(label, this, "findlyricsmenu");
-    menu->AddItem(tr("Search All Grabbers"), qVariantFromValue(QString("ALL")));
+    menu->AddItem(tr("Search All Grabbers"), QVariant::fromValue(QString("ALL")));
 
     QStringList strList("MUSIC_LYRICS_GETGRABBERS");
     if (gCoreContext->SendReceiveStringList(strList))
     {
         for (int x = 1; x < strList.count(); x++)
-            menu->AddItem(tr("Search %1").arg(strList.at(x)), qVariantFromValue(strList.at(x)));
+            menu->AddItem(tr("Search %1").arg(strList.at(x)), QVariant::fromValue(strList.at(x)));
     }
 
     return menu;
@@ -453,7 +453,7 @@ void LyricsView::showLyrics(void)
     {
         LyricsLine *line = (*i);
         if (line)
-            new MythUIButtonListItem(m_lyricsList, line->m_lyric, qVariantFromValue(line));
+            new MythUIButtonListItem(m_lyricsList, line->m_lyric, QVariant::fromValue(line));
         ++i;
     }
 

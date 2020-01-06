@@ -298,7 +298,7 @@ void ChannelRecPriority::updateList()
         ChannelInfo *chanInfo = *it;
 
         auto *item = new MythUIButtonListItem(m_channelList, "",
-                                              qVariantFromValue(chanInfo));
+                                              QVariant::fromValue(chanInfo));
 
         QString fontState = "default";
 

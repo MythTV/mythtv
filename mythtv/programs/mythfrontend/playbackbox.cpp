@@ -742,7 +742,7 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo,
         return;
 
     MythUIButtonListItem *item =
-        m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+        m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
 
     if (item)
     {
@@ -1066,7 +1066,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
     MythUIButtonListItem *item = nullptr;
 
     if (info)
-        item = m_recordingList->GetItemByData(qVariantFromValue(info));
+        item = m_recordingList->GetItemByData(QVariant::fromValue(info));
 
     if (!item)
     {
@@ -1325,7 +1325,7 @@ void PlaybackBox::UpdateUIRecGroupList(void)
             continue;  // All and Default will be the same, so only show All
 
         auto *item = new MythUIButtonListItem(m_recgroupList, name,
-                                              qVariantFromValue(key));
+                                              QVariant::fromValue(key));
 
         if (idx == m_recGroupIdx)
             m_recgroupList->SetItemCurrent(item);
@@ -1347,7 +1347,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
             QString groupname = (*it);
 
             auto *item = new MythUIButtonListItem(m_groupList, "",
-                                         qVariantFromValue(groupname.toLower()));
+                                         QVariant::fromValue(groupname.toLower()));
 
             int pref = groupPreferences.indexOf(groupname.toLower());
             if ((pref >= 0) && (pref < best_pref))
@@ -2178,7 +2178,7 @@ bool PlaybackBox::UpdateUILists(void)
         if (!pginfo)
             continue;
         MythUIButtonListItem *item =
-            m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+            m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
         if (item)
             item->DisplayState("yes", "playlist");
     }
@@ -2577,7 +2577,7 @@ void PlaybackBox::RemoveProgram( uint recordingID, bool forgetHistory,
 
     // if the item is in the current recording list UI then delete it.
     MythUIButtonListItem *uiItem =
-        m_recordingList->GetItemByData(qVariantFromValue(delItem));
+        m_recordingList->GetItemByData(QVariant::fromValue(delItem));
     if (uiItem)
         m_recordingList->RemoveItem(uiItem);
 }
@@ -3157,8 +3157,8 @@ MythMenu* PlaybackBox::createTranscodingProfilesMenu()
 
     auto *menu = new MythMenu(label, this, "transcode");
 
-    menu->AddItem(tr("Default"), qVariantFromValue(-1));
-    menu->AddItem(tr("Autodetect"), qVariantFromValue(0));
+    menu->AddItem(tr("Default"), QVariant::fromValue(-1));
+    menu->AddItem(tr("Autodetect"), QVariant::fromValue(0));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT r.name, r.id "
@@ -3187,7 +3187,7 @@ MythMenu* PlaybackBox::createTranscodingProfilesMenu()
         else if (transcoder_name == "Low Quality")
             transcoder_name = tr("Low Quality");
 
-        menu->AddItem(transcoder_name, qVariantFromValue(transcoder_id));
+        menu->AddItem(transcoder_name, QVariant::fromValue(transcoder_id));
     }
 
     return menu;
@@ -3364,7 +3364,7 @@ void PlaybackBox::doClearPlaylist(void)
             continue;
 
         MythUIButtonListItem *item =
-            m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
+            m_recordingList->GetItemByData(QVariant::fromValue(tmpItem));
 
         if (item)
             item->DisplayState("no", "playlist");
@@ -3547,7 +3547,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
 
             // if the item is in the current recording list UI then delete it.
             MythUIButtonListItem *uiItem =
-                m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
+                m_recordingList->GetItemByData(QVariant::fromValue(tmpItem));
             if (uiItem)
                 m_recordingList->RemoveItem(uiItem);
         }
@@ -3596,12 +3596,12 @@ void PlaybackBox::ShowRecordedEpisodes()
     ProgramInfo *pginfo = GetCurrentProgram();
     if (pginfo) {
         QString title = pginfo->GetTitle().toLower();
-        MythUIButtonListItem* group = m_groupList->GetItemByData(qVariantFromValue(title));
+        MythUIButtonListItem* group = m_groupList->GetItemByData(QVariant::fromValue(title));
         if (group)
         {
             m_groupList->SetItemCurrent(group);
             // set focus back to previous item
-            MythUIButtonListItem *previousItem = m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+            MythUIButtonListItem *previousItem = m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
             m_recordingList->SetItemCurrent(previousItem);
         }
     }
@@ -3615,7 +3615,7 @@ void PlaybackBox::ShowAllRecordings(void)
     {
         // set focus back to previous item
         MythUIButtonListItem *previousitem =
-            m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+            m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
         m_recordingList->SetItemCurrent(previousitem);
     }
 }
@@ -3773,7 +3773,7 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
     uint recordingID = pginfo->GetRecordingID();
 
     MythUIButtonListItem *item =
-                    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+                    m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
 
     if (m_playList.contains(recordingID))
     {
@@ -4152,7 +4152,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 // if the item is in the current recording list UI
                 // then delete it.
                 MythUIButtonListItem *uiItem =
-                    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+                    m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
                 if (uiItem)
                     m_recordingList->RemoveItem(uiItem);
             }
@@ -4316,7 +4316,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetRecordingInfo(recordingID);
                 if (pginfo &&
-                    m_recordingList->GetItemByData(qVariantFromValue(pginfo)) ==
+                    m_recordingList->GetItemByData(QVariant::fromValue(pginfo)) ==
                     m_recordingList->GetItemCurrent() &&
                     m_artImage[(uint)type]->GetFilename() != fn)
                 {
@@ -4372,7 +4372,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
                 {
                     MythUIButtonListItem *item_by_data =
                         m_recordingList->GetItemByData(
-                            qVariantFromValue(*pit));
+                            QVariant::fromValue(*pit));
                     MythUIButtonListItem *item_cur =
                         m_recordingList->GetItemCurrent();
 
@@ -5098,11 +5098,11 @@ bool GroupSelector::Create()
     for (int i = 0; i < m_list.size(); ++i)
     {
         new MythUIButtonListItem(groupList, m_list.at(i),
-                                 qVariantFromValue(m_data.at(i)));
+                                 QVariant::fromValue(m_data.at(i)));
     }
 
     // Set the current position in the list
-    groupList->SetValueByData(qVariantFromValue(m_selected));
+    groupList->SetValueByData(QVariant::fromValue(m_selected));
 
     BuildFocusList();
 

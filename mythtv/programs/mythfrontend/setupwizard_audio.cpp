@@ -171,7 +171,7 @@ void AudioSetupWizard::Init(void)
     }
     if (found)
     {
-        m_audioDeviceButtonList->SetValueByData(qVariantFromValue(current));
+        m_audioDeviceButtonList->SetValueByData(QVariant::fromValue(current));
     }
 
     m_maxspeakers = gCoreContext->GetNumSetting("MaxChannels", 2);
@@ -292,7 +292,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
             }
         }
     }
-    m_speakerNumberButtonList->SetValueByData(qVariantFromValue(cur_speakers));
+    m_speakerNumberButtonList->SetValueByData(QVariant::fromValue(cur_speakers));
 
         // Return values is used by audio test
         // where we mainly are interested by the number of channels

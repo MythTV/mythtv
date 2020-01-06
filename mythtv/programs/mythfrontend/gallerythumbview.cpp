@@ -662,7 +662,7 @@ void GalleryThumbView::BuildImageList()
             // selected and must have data available for selection event, as
             // subsequent reselection of same item will always fail.
             auto *item = new MythUIButtonListItem(m_imageList, "",
-                                                  qVariantFromValue(im));
+                                                  QVariant::fromValue(im));
 
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);

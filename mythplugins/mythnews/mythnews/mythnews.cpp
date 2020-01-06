@@ -185,7 +185,7 @@ void MythNews::loadSites(void)
     for (auto & site : m_newsSites)
     {
         auto *item = new MythUIButtonListItem(m_sitesList, site->name());
-        item->SetData(qVariantFromValue(site));
+        item->SetData(QVariant::fromValue(site));
 
         connect(site, SIGNAL(finished(NewsSite*)),
                 this, SLOT(slotNewsRetrieved(NewsSite*)));

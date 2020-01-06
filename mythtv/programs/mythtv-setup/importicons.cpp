@@ -710,13 +710,13 @@ bool ImportIconsWizard::search(const QString& strParam)
                     QString newname = QString("%1 (%2)").arg(entry.strName)
                                                         .arg(namei);
                     item = new MythUIButtonListItem(m_iconsList, newname,
-                                             qVariantFromValue(entry));
+                                             QVariant::fromValue(entry));
                     namei++;
                 }
                 else
                 {
                     item = new MythUIButtonListItem(m_iconsList, entry.strName,
-                                             qVariantFromValue(entry));
+                                             QVariant::fromValue(entry));
                     namei=1;
                 }
 

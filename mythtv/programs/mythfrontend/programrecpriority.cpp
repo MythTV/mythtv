@@ -863,7 +863,7 @@ void ProgramRecPriority::newTemplate(QString category)
             category.compare(progInfo->GetCategory(),
                              Qt::CaseInsensitive) == 0)
         {
-            m_programList->SetValueByData(qVariantFromValue(progInfo));
+            m_programList->SetValueByData(QVariant::fromValue(progInfo));
             edit(m_programList->GetItemCurrent());
             return;
         }
@@ -992,7 +992,7 @@ void ProgramRecPriority::remove(void)
 
     auto *okPopup = new MythConfirmationDialog(popupStack, message, true);
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(qVariantFromValue(record));
+    okPopup->SetData(QVariant::fromValue(record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);
@@ -1294,7 +1294,7 @@ void ProgramRecPriority::UpdateList()
         ProgramRecPriorityInfo *progInfo = *it;
 
         auto *item = new MythUIButtonListItem(m_programList, "",
-                                              qVariantFromValue(progInfo));
+                                              QVariant::fromValue(progInfo));
 
         int progRecPriority = progInfo->GetRecordingPriority();
 

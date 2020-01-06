@@ -591,7 +591,7 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
 
     if (!error)
     {
-        confirmPopup->SetData(qVariantFromValue(key));
+        confirmPopup->SetData(QVariant::fromValue(key));
         confirmPopup->SetReturnEvent(this, "conflict");
     }
 

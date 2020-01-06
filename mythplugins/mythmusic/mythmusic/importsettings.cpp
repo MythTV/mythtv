@@ -31,8 +31,8 @@ bool ImportSettings::Create()
         return false;
     }
 
-    new MythUIButtonListItem(m_paranoiaLevel, tr("Full"), qVariantFromValue(QString("Full")));
-    new MythUIButtonListItem(m_paranoiaLevel, tr("Faster"), qVariantFromValue(QString("Faster")));
+    new MythUIButtonListItem(m_paranoiaLevel, tr("Full"), QVariant::fromValue(QString("Full")));
+    new MythUIButtonListItem(m_paranoiaLevel, tr("Faster"), QVariant::fromValue(QString("Faster")));
     m_paranoiaLevel->SetValueByData(gCoreContext->GetSetting("ParanoiaLevel"));
 
     m_filenameTemplate->SetText(gCoreContext->GetSetting("FilenameTemplate"));
@@ -47,14 +47,14 @@ bool ImportSettings::Create()
     if (loadEjectCD == 1)
         m_ejectCD->SetCheckState(MythUIStateType::Full);
 
-    new MythUIButtonListItem(m_encoderType, tr("Ogg Vorbis"), qVariantFromValue(QString("ogg")));
-    new MythUIButtonListItem(m_encoderType, tr("Lame (MP3)"), qVariantFromValue(QString("mp3")));
+    new MythUIButtonListItem(m_encoderType, tr("Ogg Vorbis"), QVariant::fromValue(QString("ogg")));
+    new MythUIButtonListItem(m_encoderType, tr("Lame (MP3)"), QVariant::fromValue(QString("mp3")));
     m_encoderType->SetValueByData(gCoreContext->GetSetting("EncoderType"));
 
-    new MythUIButtonListItem(m_defaultRipQuality, tr("Low"), qVariantFromValue(0));
-    new MythUIButtonListItem(m_defaultRipQuality, tr("Medium"), qVariantFromValue(1));
-    new MythUIButtonListItem(m_defaultRipQuality, tr("High"), qVariantFromValue(2));
-    new MythUIButtonListItem(m_defaultRipQuality, tr("Perfect"), qVariantFromValue(3));
+    new MythUIButtonListItem(m_defaultRipQuality, tr("Low"), QVariant::fromValue(0));
+    new MythUIButtonListItem(m_defaultRipQuality, tr("Medium"), QVariant::fromValue(1));
+    new MythUIButtonListItem(m_defaultRipQuality, tr("High"), QVariant::fromValue(2));
+    new MythUIButtonListItem(m_defaultRipQuality, tr("Perfect"), QVariant::fromValue(3));
     m_defaultRipQuality->SetValueByData(gCoreContext->GetSetting("DefaultRipQuality"));
 
     int loadMp3UseVBR = gCoreContext->GetNumSetting("Mp3UseVBR", 0);

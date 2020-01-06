@@ -197,7 +197,7 @@ void IdleScreen::UpdateScreen(void)
                 if (list != nullptr)
                 {
                     auto *item = new MythUIButtonListItem(list,"",
-                                                 qVariantFromValue(progInfo));
+                                                 QVariant::fromValue(progInfo));
 
                     InfoMap infoMap;
                     progInfo->ToMap(infoMap);

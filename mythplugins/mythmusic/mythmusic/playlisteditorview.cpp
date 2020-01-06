@@ -63,7 +63,7 @@ void MusicGenericTree::setCheck(MythUIButtonListItem::CheckState state)
 MythUIButtonListItem *MusicGenericTree::CreateListButton(MythUIButtonList *list)
 {
     auto *item = new MusicButtonItem(list, GetText());
-    item->SetData(qVariantFromValue((MythGenericTree*) this));
+    item->SetData(QVariant::fromValue((MythGenericTree*) this));
 
     if (visibleChildCount() > 0)
         item->setDrawArrow(true);
@@ -738,31 +738,31 @@ void PlaylistEditorView::createRootNode(void )
 
     auto *node = new MusicGenericTree(m_rootNode, tr("All Tracks"), "all tracks");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Albums"), "albums");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Artists"), "artists");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Genres"), "genres");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 #if 0
     node = new MusicGenericTree(m_rootNode, tr("Tags"), "tags");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->all_music->getAllMetadata()));
 #endif
     node = new MusicGenericTree(m_rootNode, tr("Ratings"), "ratings");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Years"), "years");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Compilations"), "compilations");
     node->setDrawArrow(true);
@@ -780,18 +780,18 @@ void PlaylistEditorView::createRootNode(void )
                 compTracks->append(mdata);
         }
     }
-    node->SetData(qVariantFromValue(compTracks));
+    node->SetData(QVariant::fromValue(compTracks));
 
     if (gMusicData->m_all_music->getCDTrackCount())
     {
         node = new MusicGenericTree(m_rootNode, tr("CD - %1").arg(gMusicData->m_all_music->getCDTitle()), "cd");
         node->setDrawArrow(true);
-        node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllCDMetadata()));
+        node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllCDMetadata()));
     }
 
     node = new MusicGenericTree(m_rootNode, tr("Directory"), "directory");
     node->setDrawArrow(true);
-    node->SetData(qVariantFromValue(gMusicData->m_all_music->getAllMetadata()));
+    node->SetData(QVariant::fromValue(gMusicData->m_all_music->getAllMetadata()));
 
     node = new MusicGenericTree(m_rootNode, tr("Playlists"), "playlists");
     node->setDrawArrow(true);
@@ -1051,7 +1051,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "artist");
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
 
@@ -1088,7 +1088,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "compartist");
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
 
@@ -1122,7 +1122,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "album");
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
 
@@ -1157,7 +1157,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "genre");
             newnode->SetSortText(i.key()); // No manipulation of prefixes on genres
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
 
@@ -1192,7 +1192,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "rating");
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
     }
@@ -1225,7 +1225,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "year");
-            newnode->SetData(qVariantFromValue(i.value()));
+            newnode->SetData(QVariant::fromValue(i.value()));
             ++i;
         }
     }
@@ -1282,7 +1282,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             if (!i.key().startsWith("[TRACK]"))
             {
                 auto *newnode = new MusicGenericTree(node, i.key(), "directory");
-                newnode->SetData(qVariantFromValue(i.value()));
+                newnode->SetData(QVariant::fromValue(i.value()));
             }
             ++i;
         }

@@ -668,18 +668,18 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_browseList, tr("All", "Browsable"),
                              kBrowseFilterAll);
     new MythUIButtonListItem(m_browseList,
-        QCoreApplication::translate("(Common)", "Yes"), qVariantFromValue(1));
+        QCoreApplication::translate("(Common)", "Yes"), QVariant::fromValue(1));
     new MythUIButtonListItem(m_browseList,
-        QCoreApplication::translate("(Common)", "No"),  qVariantFromValue(0));
+        QCoreApplication::translate("(Common)", "No"),  QVariant::fromValue(0));
     m_browseList->SetValueByData(m_settings.GetBrowse());
 
     // Watched
     new MythUIButtonListItem(m_watchedList, tr("All", "Watched"),
                              kWatchedFilterAll);
     new MythUIButtonListItem(m_watchedList,
-        QCoreApplication::translate("(Common)", "Yes"), qVariantFromValue(1));
+        QCoreApplication::translate("(Common)", "Yes"), QVariant::fromValue(1));
     new MythUIButtonListItem(m_watchedList,
-        QCoreApplication::translate("(Common)", "No"), qVariantFromValue(0));
+        QCoreApplication::translate("(Common)", "No"), QVariant::fromValue(0));
     m_watchedList->SetValueByData(m_settings.GetWatched());
 
     // Inet Reference

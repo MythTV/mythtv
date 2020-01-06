@@ -184,7 +184,7 @@ void ZMEvents::updateUIList()
     for (auto event : *m_eventList)
     {
         auto *item = new MythUIButtonListItem(m_eventGrid, "",
-                                              qVariantFromValue(event));
+                                              QVariant::fromValue(event));
 
         item->SetText(event->eventName());
         item->SetText(event->monitorName(), "camera" );

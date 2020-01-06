@@ -114,7 +114,7 @@ void CustomEdit::loadData(void)
     }
 
     new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, title, subtitle, description "
@@ -136,7 +136,7 @@ void CustomEdit::loadData(void)
             // No memory leak. MythUIButtonListItem adds the new item
             // into m_ruleList.
             auto *item = new MythUIButtonListItem(m_ruleList, rule.title,
-                                                  qVariantFromValue(rule));
+                                                  QVariant::fromValue(rule));
 
             if (trimTitle == m_baseTitle ||
                 result.value(0).toUInt() == m_pginfo->GetRecordingRuleID())
@@ -227,7 +227,7 @@ void CustomEdit::loadClauses()
     else
         rule.description = "program.title = 'Nova' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                              qVariantFromValue(rule));
+                              QVariant::fromValue(rule));
 
     if (!m_pginfo->GetSeriesID().isEmpty())
     {
@@ -235,7 +235,7 @@ void CustomEdit::loadClauses()
         rule.subtitle.clear();
         rule.description = QString("program.seriesid = '{SERIESID}' ");
         new MythUIButtonListItem(m_clauseList, rule.title,
-                                 qVariantFromValue(rule));
+                                 QVariant::fromValue(rule));
     }
 
     rule.title = tr("Match words in the title");
@@ -245,7 +245,7 @@ void CustomEdit::loadClauses()
     else
         rule.description = "program.title LIKE 'CSI: %' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Match words in the subtitle");
     rule.subtitle.clear();
@@ -254,7 +254,7 @@ void CustomEdit::loadClauses()
     else
         rule.description = "program.subtitle LIKE '%Las Vegas%' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     if (!m_pginfo->GetProgramID().isEmpty())
     {
@@ -277,7 +277,7 @@ void CustomEdit::loadClauses()
                                    "AND program.subtitle = 'The Soup' ");
     }
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Match in any descriptive field");
     rule.subtitle.clear();
@@ -285,52 +285,52 @@ void CustomEdit::loadClauses()
                                "     OR program.subtitle LIKE '%Japan%' \n"
                                "     OR program.description LIKE '%Japan%') ");
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("New episodes only");
     rule.subtitle.clear();
     rule.description =  "program.previouslyshown = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Exclude unidentified episodes");
     rule.subtitle.clear();
     rule.description =  "program.generic = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("First showing of each episode");
     rule.subtitle.clear();
     rule.description =  "program.first > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Last showing of each episode");
     rule.subtitle.clear();
     rule.description =  "program.last > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Anytime on a specific day of the week");
     rule.subtitle.clear();
     rule.description =
       "DAYNAME(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) = '{DAYNAME}' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only on weekdays (Monday through Friday)");
     rule.subtitle.clear();
     rule.description =
         "WEEKDAY(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) < 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only on weekends");
     rule.subtitle.clear();
     rule.description =
         "WEEKDAY(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) >= 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only in prime time");
     rule.subtitle.clear();
@@ -338,7 +338,7 @@ void CustomEdit::loadClauses()
         "HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) >= 19 "
         "AND HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) < 23 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Not in prime time");
     rule.subtitle.clear();
@@ -346,7 +346,7 @@ void CustomEdit::loadClauses()
         "(HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) < 19 "
         "    OR HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) >= 23) ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only on a specific station");
     rule.subtitle.clear();
@@ -355,19 +355,19 @@ void CustomEdit::loadClauses()
     else
         rule.description = "channel.callsign = 'ESPN' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Exclude one station");
     rule.subtitle.clear();
     rule.description = "channel.callsign != 'GOLF' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Match related callsigns");
     rule.subtitle.clear();
     rule.description = "channel.callsign LIKE 'HBO%' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only channels from the Favorites group");
     rule.subtitle = ", channelgroup cg, channelgroupnames cgn";
@@ -375,50 +375,50 @@ void CustomEdit::loadClauses()
                        "AND cg.grpid = cgn.grpid \n"
                        "AND program.chanid = cg.chanid ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only channels from a specific video source");
     rule.subtitle.clear();
     rule.description = "channel.sourceid = 2 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only channels marked as commercial free");
     rule.subtitle.clear();
     rule.description = QString("channel.commmethod = %1 ")
                                .arg(COMM_DETECT_COMMFREE);
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only shows marked as HDTV");
     rule.subtitle.clear();
     rule.description = "program.hdtv > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only shows marked as widescreen");
     rule.subtitle.clear();
     rule.description = "FIND_IN_SET('WIDESCREEN', program.videoprop) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Exclude H.264 encoded streams (EIT only)");
     rule.subtitle.clear();
     rule.description = "FIND_IN_SET('AVC', program.videoprop) = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only shows with in-vision signing");
     rule.subtitle.clear();
     rule.description = "FIND_IN_SET('SIGNED', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Only shows with in-vision subtitles");
     rule.subtitle.clear();
     rule.description = "FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Limit by category");
     rule.subtitle.clear();
@@ -427,7 +427,7 @@ void CustomEdit::loadClauses()
     else
         rule.description = "program.category = 'Reality' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("All matches for a genre (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programgenres ON "
@@ -438,7 +438,7 @@ void CustomEdit::loadClauses()
     else
         rule.description = "programgenres.genre = 'Reality' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Limit by MPAA or VCHIP rating (Schedules Direct)");
     rule.subtitle = "LEFT JOIN programrating ON "
@@ -447,27 +447,27 @@ void CustomEdit::loadClauses()
     rule.description = "(programrating.rating = 'G' OR programrating.rating "
                        "LIKE 'TV-Y%') ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Category type (%1)", "List of hardcoded category types")
                     .arg("'movie', 'series', 'sports', 'tvshow'");
     rule.subtitle.clear();
     rule.description = "program.category_type = 'sports' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Limit movies by the year of release");
     rule.subtitle.clear();
     rule.description = "program.category_type = 'movie' AND "
                        "program.airdate >= 2000 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Minimum star rating (0.0 to 1.0 for movies only)");
     rule.subtitle.clear();
     rule.description = "program.stars >= 0.75 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Person named in the credits (Schedules Direct)");
     rule.subtitle = ", people, credits";
@@ -476,7 +476,7 @@ void CustomEdit::loadClauses()
                        "AND program.chanid = credits.chanid \n"
                        "AND program.starttime = credits.starttime ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
 /*  This shows how to use oldprogram but is a bad idea in practice.
     This would match all future showings until the day after the first
@@ -487,7 +487,7 @@ void CustomEdit::loadClauses()
                     " ON oldprogram.oldtitle = program.title ";
     rule.description = "oldprogram.oldtitle IS NULL ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 */
 
     rule.title = tr("Re-record SDTV in HDTV (disable duplicate matching)");
@@ -498,7 +498,7 @@ void CustomEdit::loadClauses()
                        "AND program.hdtv = 1 \n"
                        "AND rp2.starttime IS NULL ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Multiple sports teams (complete example)");
     rule.subtitle.clear();
@@ -506,7 +506,7 @@ void CustomEdit::loadClauses()
                  "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' \n"
                  "AND program.first > 0 \n";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Sci-fi B-movies (complete example)");
     rule.subtitle.clear();
@@ -514,7 +514,7 @@ void CustomEdit::loadClauses()
                        "AND program.category='Science fiction' \n"
                        "AND program.stars <= 0.5 AND program.airdate < 1970 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title =
         tr("SportsCenter Overnight (complete example - use FindDaily)");
@@ -524,7 +524,7 @@ void CustomEdit::loadClauses()
         "AND HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) >= 2 \n"
         "AND HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) <= 6 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("Movie of the Week (complete example - use FindWeekly)");
     rule.subtitle.clear();
@@ -534,7 +534,7 @@ void CustomEdit::loadClauses()
         "AND DAYNAME(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) = 'Friday' \n"
         "AND HOUR(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) >= 12 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     rule.title = tr("First Episodes (complete example for Schedules Direct)");
     rule.subtitle.clear();
@@ -543,7 +543,7 @@ void CustomEdit::loadClauses()
                   "AND program.originalairdate = "
                   "DATE(CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM')) ";
     new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
+                             QVariant::fromValue(rule));
 
     m_maxex = m_clauseList->GetCount();
 
@@ -566,7 +566,7 @@ void CustomEdit::loadClauses()
             rule.subtitle = result.value(1).toString();
             rule.description = result.value(2).toString();
             new MythUIButtonListItem(m_clauseList, rule.title,
-                                     qVariantFromValue(rule));
+                                     QVariant::fromValue(rule));
         }
     }
 }
@@ -852,7 +852,7 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
     else if (is_new)
     {
         new MythUIButtonListItem(m_clauseList, rule.title,
-                                 qVariantFromValue(rule));
+                                 QVariant::fromValue(rule));
     }
     else
     {
@@ -866,7 +866,7 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
                                                 .remove(m_exSuffix);
             if (m_titleEdit->GetText() == removedStr)
             {
-                item->SetData(qVariantFromValue(rule));
+                item->SetData(QVariant::fromValue(rule));
                 clauseChanged(item);
                 break;
             }

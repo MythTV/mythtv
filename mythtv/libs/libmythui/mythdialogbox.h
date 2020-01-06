@@ -72,10 +72,10 @@ class MUI_PUBLIC MythMenuItem
         m_text(std::move(text)), m_data(std::move(data)),
         m_checked(checked), m_subMenu(subMenu), m_useSlot(false) { Init(); }
     MythMenuItem(QString text, const char *slot, bool checked = false, MythMenu *subMenu = nullptr) :
-        m_text(std::move(text)), m_data(qVariantFromValue(slot)),
+        m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
     MythMenuItem(QString text, const MythUIButtonCallback &slot, bool checked = false, MythMenu *subMenu = nullptr) :
-        m_text(std::move(text)), m_data(qVariantFromValue(slot)),
+        m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
 
     QString   m_text;

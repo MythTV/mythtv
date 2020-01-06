@@ -154,7 +154,7 @@ void MythNewsConfig::loadData(void)
     for (auto & category : m_priv->m_categoryList)
     {
         auto *item = new MythUIButtonListItem(m_categoriesList,category.m_name);
-        item->SetData(qVariantFromValue(&category));
+        item->SetData(QVariant::fromValue(&category));
         if (!category.m_siteList.empty())
             item->setDrawArrow(true);
     }
@@ -212,7 +212,7 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
                                      site.m_inDB ?
                                      MythUIButtonListItem::FullChecked :
                                      MythUIButtonListItem::NotChecked);
-        newitem->SetData(qVariantFromValue(&site));
+        newitem->SetData(QVariant::fromValue(&site));
     }
 }
 

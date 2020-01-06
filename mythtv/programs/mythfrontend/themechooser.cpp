@@ -447,7 +447,7 @@ void ThemeChooser::Init(void)
             InfoMap infomap;
             themeinfo->ToMap(infomap);
             item->SetTextFromMap(infomap);
-            item->SetData(qVariantFromValue(themeinfo));
+            item->SetData(QVariant::fromValue(themeinfo));
 
             QString thumbnail = themeinfo->GetPreviewPath();
             QFileInfo fInfo(thumbnail);
@@ -464,7 +464,7 @@ void ThemeChooser::Init(void)
     SetFocusWidget(m_themes);
 
     if (curThemeInfo)
-        m_themes->SetValueByData(qVariantFromValue(curThemeInfo));
+        m_themes->SetValueByData(QVariant::fromValue(curThemeInfo));
 
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
