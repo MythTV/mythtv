@@ -4,6 +4,7 @@
 #include <QDomDocument>
 
 // libmyth* headers
+#include "mythconfig.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
@@ -491,7 +492,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
     for (int x = 0; x < scripts.count(); x++)
     {
         QProcess p;
-        p.start(QString("python %1 -v").arg(scripts.at(x)));
+        p.start(QString("%1 %2 -v").arg(PYTHON_EXE).arg(scripts.at(x)));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 
@@ -535,8 +536,8 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
         gCoreContext->SendMessage(QString("MUSIC_LYRICS_STATUS %1 %2").arg(songID).arg(statusMessage));
 
         QProcess p;
-        p.start(QString("python %1 --artist=\"%2\" --album=\"%3\" --title=\"%4\" --filename=\"%5\"")
-                        .arg(grabber.m_filename).arg(artist).arg(album).arg(title).arg(filename));
+        p.start(QString("%1 %2 --artist=\"%3\" --album=\"%4\" --title=\"%5\" --filename=\"%6\"")
+                        .arg(PYTHON_EXE).arg(grabber.m_filename).arg(artist).arg(album).arg(title).arg(filename));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 

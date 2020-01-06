@@ -6948,7 +6948,7 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
     for (int x = 0; x < scripts.count(); x++)
     {
         QProcess p;
-        p.start(QString("python %1 -v").arg(scripts.at(x)));
+        p.start(QString("%1 %2 -v").arg(PYTHON_EXE).arg(scripts.at(x)));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 

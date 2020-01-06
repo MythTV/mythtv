@@ -7656,6 +7656,7 @@ cat > $TMPH <<EOF
 #define JDK_HOME "$JDK_HOME"
 #define JAVA_ARCH "$java_arch"
 #define IMAGE_ALIGN $image_align
+#define PYTHON_EXE "${python}"
 EOF
 
 # Code only checks whether HAVE_BDJ_J2ME is defined, not what value
