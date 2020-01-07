@@ -1660,9 +1660,9 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     desc_list.insert(desc_list.end(), desc_list2.begin(), desc_list2.end());
 
-    for (size_t j = 0; j < desc_list.size(); j++)
+    for (auto & desc : desc_list)
     {
-        const CaptionServiceDescriptor csd(desc_list[j]);
+        const CaptionServiceDescriptor csd(desc);
         if (!csd.IsValid())
             continue;
         for (uint k = 0; k < csd.ServicesCount(); k++)
@@ -1774,9 +1774,9 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::teletext);
 
-        for (size_t j = 0; j < desc_list.size(); j++)
+        for (auto desc : desc_list)
         {
-            const TeletextDescriptor td(desc_list[j]);
+            const TeletextDescriptor td(desc);
             if (!td.IsValid())
                 continue;
             for (uint k = 0; k < td.StreamCount(); k++)
@@ -1853,9 +1853,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
 
-        for (size_t j = 0; j < desc_list.size(); j++)
+        for (auto desc : desc_list)
         {
-            const unsigned char *desc = desc_list[j];
             desc++; // Skip tag
             uint length = *desc++;
             const unsigned char *endDesc = desc+length;
@@ -2488,11 +2487,11 @@ void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 ///Returns TeleText language
 int AvFormatDecoder::GetTeletextLanguage(uint lang_idx) const
 {
-    for (uint i = 0; i < (uint) m_tracks[kTrackTypeTeletextCaptions].size(); i++)
+    for (const auto & si : m_tracks[kTrackTypeTeletextCaptions])
     {
-        if (m_tracks[kTrackTypeTeletextCaptions][i].m_language_index == lang_idx)
+        if (si.m_language_index == lang_idx)
         {
-             return m_tracks[kTrackTypeTeletextCaptions][i].m_language;
+             return si.m_language;
         }
     }
 

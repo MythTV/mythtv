@@ -513,14 +513,14 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 
     ctm.start();
     frm_pos_map_t posMap;
-    for (size_t i = 0; i < m_positionMap.size(); i++)
+    for (auto & entry : m_positionMap)
     {
-        if (m_positionMap[i].index < first)
+        if (entry.index < first)
             continue;
-        if (m_positionMap[i].index > last)
+        if (entry.index > last)
             break;
 
-        posMap[m_positionMap[i].index] = m_positionMap[i].pos;
+        posMap[entry.index] = entry.pos;
         saved++;
     }
 
@@ -985,8 +985,8 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
     QMutexLocker locker(avcodeclock);
 
-    for (size_t i = 0; i < m_tracks[type].size(); i++)
-        if (info.m_stream_id == m_tracks[type][i].m_stream_id)
+    for (auto & i : m_tracks[type])
+        if (info.m_stream_id == i.m_stream_id)
             return false;
 
     m_tracks[type].push_back(info);
