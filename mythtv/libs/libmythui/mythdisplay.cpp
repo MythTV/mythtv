@@ -183,30 +183,49 @@ MythDisplay::~MythDisplay()
     LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting");
 }
 
+/*! \brief Set the QWidget and QWindow in use.
+ *
+ * Certain platform implementations need to know the QWidget and/or QWindow
+ * to access display information. We also connect to the QWindow::screenChanged
+ * signal so that we are informed when the window has been moved into a new screen.
+ *
+ * \note We typically call this twice; once before MythMainWindow is shown and
+ * once after. This is because we need to try and ensure we are using the correct
+ * screen before showing the window, and hence have the correct geometry etc, and
+ * once after because the QWindow is sometimes not created until after the widget
+ * is shown - and we cannot connect the screenChanged signal until we know the window
+ * handle.
+*/
 void MythDisplay::SetWidget(QWidget *MainWindow)
 {
-    QWidget* old = m_widget;
+    QWidget* oldwidget = m_widget;
     m_widget = MainWindow;
-
     if (!m_modeComplete)
         UpdateCurrentMode();
     if (!m_widget)
         return;
-    if (m_widget != old)
-        LOG(VB_GENERAL, LOG_INFO, LOC + "New main widget");
 
-    QWindow* window = m_widget->windowHandle();
-    if (window)
+    QWindow* oldwindow = m_window;
+    if (m_widget)
+        m_window = m_widget->windowHandle();
+
+    if (m_widget != oldwidget)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Have main widget");
+
+    if (m_window && (m_window != oldwindow))
     {
-        connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged, Qt::UniqueConnection);
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Have main window");
+
+        connect(m_window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged, Qt::UniqueConnection);
         QScreen *desired = GetDesiredScreen();
         // If we have changed the video mode for the old screen then reset
         // it to the default/desktop mode
         SwitchToDesktop();
         // Ensure we completely re-initialise when the new screen is set
         m_initialised = false;
-        DebugScreen(desired, "Moving to");
-        window->setScreen(desired);
+        if (desired != m_screen)
+            DebugScreen(desired, "Moving to");
+        m_window->setScreen(desired);
         // WaitForNewScreen doesn't work as intended. It successfully filters
         // out unwanted screenChanged signals after moving screens - but always
         //times out. This just delays startup by 500ms - so ignore on startup as it isn't needed.
@@ -216,8 +235,6 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
         InitScreenBounds();
         return;
     }
-
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window!");
 }
 
 int MythDisplay::GetScreenCount(void)

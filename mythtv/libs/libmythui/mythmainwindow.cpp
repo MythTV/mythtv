@@ -1044,6 +1044,9 @@ void MythMainWindow::Init(bool mayReInit)
         .arg(d->m_screenRect.width()).arg(d->m_screenRect.height()));
     MoveResize(d->m_screenRect);
     Show();
+    // The window is sometimes not created until Show has been called - so try
+    // MythDisplay::setWidget again to ensure we listen for QScreen changes
+    d->m_display->SetWidget(this);
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         setMouseTracking(true); // Required for mouse cursor auto-hide

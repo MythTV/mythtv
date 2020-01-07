@@ -83,6 +83,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QSize           m_physicalSize     { 0, 0 };
     MythEDID        m_edid             { };
     QWidget*        m_widget           { nullptr };
+    QWindow*        m_window           { nullptr };
     QScreen*        m_screen           { nullptr };
     vector<MythDisplayMode> m_videoModes { };
 
