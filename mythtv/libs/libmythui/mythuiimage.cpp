@@ -730,8 +730,8 @@ void MythUIImage::SetDelays(QVector<int> delays)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker imageLocker(&m_ImagesLock);
 
-    for (auto it = delays.begin(); it != delays.end(); ++it)
-        m_Delays[m_Delays.size()] = *it;
+    foreach (const int & delay, delays)
+        m_Delays[m_Delays.size()] = delay;
 
     if (m_Delay == -1)
         m_Delay = m_Delays[0];
@@ -815,10 +815,8 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_imageProperties.m_isThemeImage = false;
 
-    for (auto it = images->begin(); it != images->end(); ++it)
+    foreach (auto im, *images)
     {
-        MythImage *im = (*it);
-
         if (!im)
         {
             QMutexLocker locker(&m_ImagesLock);
@@ -879,10 +877,10 @@ void MythUIImage::SetAnimationFrames(AnimationFrames frames)
     QVector<int> delays;
     QVector<MythImage *> images;
 
-    for (auto it = frames.begin(); it != frames.end(); ++it)
+    foreach (auto & frame, frames)
     {
-        images.append((*it).first);
-        delays.append((*it).second);
+        images.append(frame.first);
+        delays.append(frame.second);
     }
 
     if (!images.empty())
@@ -1570,11 +1568,9 @@ void MythUIImage::customEvent(QEvent *event)
 
             if (animationFrames)
             {
-                for (auto it = animationFrames->begin();
-                     it != animationFrames->end();
-                     ++it)
+                foreach (auto & frame, *animationFrames)
                 {
-                    MythImage *im = (*it).first;
+                    MythImage *im = frame.first;
                     if (im)
                         im->DecrRef();
                 }

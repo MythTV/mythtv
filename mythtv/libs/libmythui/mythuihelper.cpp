@@ -698,10 +698,8 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     QDir dir(GetThemeCacheDir());
     QFileInfoList list = dir.entryInfoList();
 
-    for (int i = 0; i < list.size(); ++i)
+    for (const auto & fileInfo : list)
     {
-        const QFileInfo& fileInfo = list.at(i);
-
         if (fileInfo.fileName().contains(partialKey))
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
@@ -1274,11 +1272,8 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
 
     fileList.append(themeDirs.entryInfoList());
 
-    for (QFileInfoList::iterator it =  fileList.begin();
-         it != fileList.end(); ++it)
+    foreach (auto & theme, fileList)
     {
-        QFileInfo  &theme = *it;
-
         if (theme.baseName() == "default" ||
             theme.baseName() == "default-wide" ||
             theme.baseName() == "Slave")
@@ -1308,16 +1303,15 @@ bool MythUIHelper::FindThemeFile(QString &path)
     bool foundit = false;
     const QStringList searchpath = GetThemeSearchPath();
 
-    for (QStringList::const_iterator ii = searchpath.begin();
-         ii != searchpath.end(); ++ii)
+    foreach (const auto & ii, searchpath)
     {
         if (fi.isRelative())
         {
-            file = *ii + fi.filePath();
+            file = ii + fi.filePath();
         }
         else if (fi.isAbsolute() && !fi.isRoot())
         {
-            file = *ii + fi.fileName();
+            file = ii + fi.fileName();
         }
 
         if (QFile::exists(file))

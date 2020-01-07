@@ -309,9 +309,9 @@ QString MythDRMDevice::FindBestDevice(void)
         return QString();
     }
 
-    for (auto it = devices.cbegin(); it != devices.cend(); ++it)
+    foreach (const auto & dev, devices)
     {
-        QString device = root + *it;
+        QString device = root + dev;
         if (!ConfirmDevice(device))
         {
             LOG(VB_GENERAL, m_verbose, LOC + "Failed to confirm device");

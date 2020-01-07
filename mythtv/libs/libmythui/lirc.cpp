@@ -459,8 +459,8 @@ void LIRC::run(void)
             continue;
 
         QList<QByteArray> codes = GetCodes();
-        for (uint i = 0; i < (uint) codes.size(); i++)
-            Process(codes[i]);
+        foreach (auto & code, codes)
+            Process(code);
     }
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "run -- end");

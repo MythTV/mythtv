@@ -652,10 +652,10 @@ MythScreenStack *MythMainWindow::GetMainStack(void)
 
 MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
 {
-    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    foreach (auto & widget, d->m_stackList)
     {
-        if ((*it)->objectName() == stackname)
-            return *it;
+        if (widget->objectName() == stackname)
+            return widget;
     }
     return nullptr;
 }
@@ -680,20 +680,19 @@ void MythMainWindow::animate(void)
     if (!d->m_repaintRegion.isEmpty())
         redraw = true;
 
-    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    foreach (auto & widget, d->m_stackList)
     {
         QVector<MythScreenType *> drawList;
-        (*it)->GetDrawOrder(drawList);
+        widget->GetDrawOrder(drawList);
 
-        for (auto screenit = drawList.begin(); screenit != drawList.end();
-             ++screenit)
+        foreach (auto & screen, drawList)
         {
-            (*screenit)->Pulse();
+            screen->Pulse();
 
-            if ((*screenit)->NeedsRedraw())
+            if (screen->NeedsRedraw())
             {
-                QRegion topDirty = (*screenit)->GetDirtyArea();
-                (*screenit)->ResetNeedsRedraw();
+                QRegion topDirty = screen->GetDirtyArea();
+                screen->ResetNeedsRedraw();
                 d->m_repaintRegion = d->m_repaintRegion.united(topDirty);
                 redraw = true;
             }
@@ -703,8 +702,8 @@ void MythMainWindow::animate(void)
     if (redraw && !(d->m_render && d->m_render->IsShared()))
         d->m_paintwin->update(d->m_repaintRegion);
 
-    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
-        (*it)->ScheduleInitIfNeeded();
+    foreach (auto & widget, d->m_stackList)
+        widget->ScheduleInitIfNeeded();
 
     d->m_drawTimer->blockSignals(false);
 }
@@ -724,18 +723,17 @@ void MythMainWindow::drawScreen(void)
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
-        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        foreach (auto & widget, d->m_stackList)
         {
             QVector<MythScreenType *> redrawList;
-            (*it)->GetDrawOrder(redrawList);
+            widget->GetDrawOrder(redrawList);
 
-            for (auto screenit = redrawList.begin(); screenit != redrawList.end();
-                 ++screenit)
+            foreach (auto & screen, redrawList)
             {
-                if ((*screenit)->NeedsRedraw())
+                if (screen->NeedsRedraw())
                 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-                    QRegion topDirty = (*screenit)->GetDirtyArea();
+                    QRegion topDirty = screen->GetDirtyArea();
                     QVector<QRect> wrects = topDirty.rects();
                     for (int i = 0; i < wrects.size(); i++)
                     {
@@ -757,7 +755,7 @@ void MythMainWindow::drawScreen(void)
                             return;
                     }
 #else
-                    for (const QRect& wrect: (*screenit)->GetDirtyArea())
+                    for (const QRect& wrect: screen->GetDirtyArea())
                     {
                         bool foundThisRect = false;
                         for (const QRect& drect: d->m_repaintRegion)
@@ -815,15 +813,14 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
         if (r != d->m_uiScreenRect)
             painter->SetClipRect(r);
 
-        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        foreach (auto & widget, d->m_stackList)
         {
             QVector<MythScreenType *> redrawList;
-            (*it)->GetDrawOrder(redrawList);
+            widget->GetDrawOrder(redrawList);
 
-            for (auto screenit = redrawList.begin(); screenit != redrawList.end();
-                 ++screenit)
+            foreach (auto & screen, redrawList)
             {
-                (*screenit)->Draw(painter, 0, 0, 255, r);
+                screen->Draw(painter, 0, 0, 255, r);
             }
         }
     }
@@ -1452,12 +1449,12 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
 {
-    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    foreach (auto & widget, d->m_stackList)
     {
         if (enable)
-            (*it)->EnableEffects();
+            widget->EnableEffects();
         else
-            (*it)->DisableEffects();
+            widget->DisableEffects();
     }
 }
 
@@ -2471,13 +2468,12 @@ void MythMainWindow::customEvent(QEvent *ce)
         // actions which would not be appropriate when the screen doesn't have
         // focus. It is the programmers responsibility to ignore events when
         // necessary.
-        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        foreach (auto & widget, d->m_stackList)
         {
             QVector<MythScreenType *> screenList;
-            (*it)->GetScreenList(screenList);
-            for (auto sit = screenList.begin(); sit != screenList.end(); ++sit)
+            widget->GetScreenList(screenList);
+            foreach (auto screen, screenList)
             {
-                MythScreenType *screen = (*sit);
                 if (screen)
                     screen->mediaEvent(me);
             }

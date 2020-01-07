@@ -92,14 +92,14 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     if (!m_Children.isEmpty())
     {
-        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        foreach (auto & draw, m_DrawOrder)
         {
-            if (*it != screen && !(*it)->IsDeleting())
+            if (draw != screen && !draw->IsDeleting())
             {
-                m_topScreen = (*it);
-                (*it)->SetAlpha(255);
+                m_topScreen = draw;
+                draw->SetAlpha(255);
                 if (poppedFullscreen)
-                    (*it)->aboutToShow();
+                    draw->aboutToShow();
             }
         }
     }

@@ -388,8 +388,8 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
                        QString::number(dest.height()) +
                        font.GetHash();
 
-    for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
-        incoming += (*Ipara)->text();
+    foreach (auto layout, layouts)
+        incoming += layout->text();
 
     MythImage *im = nullptr;
     if (m_stringToImageMap.contains(incoming))
@@ -441,18 +441,18 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
             shadowRect.translate(shadow.x(), shadow.y());
 
             painter.setPen(shadowColor);
-            for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
-                (*Ipara)->draw(&painter, shadowRect.topLeft(), formats, clip);
+            foreach (auto layout, layouts)
+                layout->draw(&painter, shadowRect.topLeft(), formats, clip);
         }
 
         painter.setPen(QPen(font.GetBrush(), 0));
-        for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+        foreach (auto layout, layouts)
         {
 #if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
-            (*Ipara)->draw(&painter, canvas.topLeft(),
-                           (*Ipara)->formats(), clip);
+            layout->draw(&painter, canvas.topLeft(),
+                           layout->formats(), clip);
 #else
-            (*Ipara)->draw(&painter, canvas.topLeft(), formats, clip);
+            layout->draw(&painter, canvas.topLeft(), formats, clip);
 #endif
         }
         painter.end();
@@ -499,11 +499,11 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
                              ((0xfff & (uint64_t)gradient->finalStop().x()) << 24) +
                              ((0xfff & (uint64_t)gradient->finalStop().y()) << 36));
             QGradientStops stops = gradient->stops();
-            for (int i = 0; i < stops.size(); i++)
+            foreach (auto & stop, stops)
             {
                 incoming += QString::number(
-                             ((0xfff * (uint64_t)(stops[i].first * 100))) +
-                             ((uint64_t)stops[i].second.rgba() << 12));
+                             ((0xfff * (uint64_t)(stop.first * 100))) +
+                             ((uint64_t)stop.second.rgba() << 12));
             }
         }
     }

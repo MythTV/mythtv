@@ -857,14 +857,14 @@ bool MythThemedMenu::findDepends(const QString &fileList)
     QStringList files = fileList.split(" ");
     MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
-    for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
+    foreach (auto & file, files)
     {
-        QString filename = findMenuFile(*it);
+        QString filename = findMenuFile(file);
         if (!filename.isEmpty() && filename.endsWith(".xml"))
             return true;
 
         // Has plugin by this name been successfully loaded
-        MythPlugin *plugin = pluginManager->GetPlugin(*it);
+        MythPlugin *plugin = pluginManager->GetPlugin(file);
         if (plugin)
             return true;
     }

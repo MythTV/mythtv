@@ -162,15 +162,15 @@ int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
                 {
                     for (double precision : { 0.001, 0.01, 0.1 })
                     {
-                        for (size_t j = 0; j < rates.size(); ++j)
+                        for (double rate : rates)
                         {
                             // Multiple of target_rate will do
-                            if (CompareRates(videorate, rates[j], precision) ||
-                                (qAbs(videorate - fmod(rates[j], videorate))
+                            if (CompareRates(videorate, rate, precision) ||
+                                (qAbs(videorate - fmod(rate, videorate))
                                  <= precision) ||
-                                (fmod(rates[j],videorate) <= precision))
+                                (fmod(rate,videorate) <= precision))
                             {
-                                TargetRate = rates[j];
+                                TargetRate = rate;
                                 return static_cast<int>(i);
                             }
                         }
@@ -180,14 +180,14 @@ int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
                     for (double precision : { 0.01, 0.1, 1.0 })
                     {
                         double rounded = round(videorate);
-                        for (size_t j = 0; j < rates.size(); ++j)
+                        for (double rate : rates)
                         {
                             // Multiple of target_rate will do
-                            if (CompareRates(rounded, rates[j], precision) ||
-                                (qAbs(rounded - fmod(rates[j], rounded)) <= precision) ||
-                                (fmod(rates[j],rounded) <= precision))
+                            if (CompareRates(rounded, rate, precision) ||
+                                (qAbs(rounded - fmod(rate, rounded)) <= precision) ||
+                                (fmod(rate,rounded) <= precision))
                             {
-                                TargetRate = rates[j];
+                                TargetRate = rate;
                                 return static_cast<int>(i);
                             }
                         }

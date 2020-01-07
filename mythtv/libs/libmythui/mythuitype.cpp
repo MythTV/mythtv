@@ -100,10 +100,8 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                         && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
 
-    for (int i = 0; i < children.size(); ++i)
+    foreach (auto obj, children)
     {
-        QObject *obj = children.at(i);
-
         if (onlyWidgets)
         {
             if (obj->isWidgetType() && (!objName || obj->objectName() == oName))

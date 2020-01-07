@@ -363,9 +363,9 @@ bool MythRenderOpenGL::Init(void)
     // Other Tile Based Immediate Mode Rendering GPUS - ARM Mali, Qualcomm Adreno
     static const QByteArray kTiled[3] = { "videocore", "vc4", "v3d" };
     auto renderer = QByteArray(reinterpret_cast<const char*>(glGetString(GL_RENDERER))).toLower();
-    for (int i = 0 ; i < 3; ++i)
+    for (const auto & name : kTiled)
     {
-        if (renderer.contains(kTiled[i]))
+        if (renderer.contains(name))
         {
             m_extraFeatures |= kGLTiled;
             break;
@@ -1156,9 +1156,9 @@ QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
 {
     static const QString kExts[4] = { "", "ARB", "EXT", "OES" };
     QFunctionPointer result = nullptr;
-    for (int i = 0; i < 4; i++)
+    for (const auto & ext : kExts)
     {
-        result = getProcAddress((Proc + kExts[i]).toLocal8Bit().constData());
+        result = getProcAddress((Proc + ext).toLocal8Bit().constData());
         if (result)
             break;
     }
@@ -1574,10 +1574,10 @@ bool MythRenderOpenGL::CreateDefaultShaders(void)
 
 void MythRenderOpenGL::DeleteDefaultShaders(void)
 {
-    for (int i = 0; i < kShaderCount; i++)
+    for (auto & program : m_defaultPrograms)
     {
-        DeleteShaderProgram(m_defaultPrograms[i]);
-        m_defaultPrograms[i] = nullptr;
+        DeleteShaderProgram(program);
+        program = nullptr;
     }
 }
 

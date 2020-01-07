@@ -109,8 +109,8 @@ void MythEDID::Parse(void)
 
     // checksum
     qint8 sum = 0;
-    for (int i = 0; i < m_data.size(); ++i)
-        sum += m_data.at(i);
+    foreach (char i, m_data)
+        sum += i;
     if (sum != 0)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Checksum error");
@@ -219,8 +219,8 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     }
 
     // Set status
-    for (auto it = m_serialNumbers.cbegin(); it != m_serialNumbers.cend(); ++it)
-        if (!(*it).isEmpty())
+    foreach (const auto & sn, m_serialNumbers)
+        if (!sn.isEmpty())
             m_valid = true;
     if (!m_valid)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No serial number(s) in EDID");
