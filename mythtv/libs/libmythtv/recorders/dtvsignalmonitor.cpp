@@ -179,19 +179,19 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
     if (GetStreamData()->HasEITPIDChanges(m_eit_pids) &&
         GetStreamData()->GetEITPIDChanges(m_eit_pids, add_eit, del_eit))
     {
-        for (size_t i = 0; i < del_eit.size(); i++)
+        for (uint eit : del_eit)
         {
             uint_vec_t::iterator it;
-            it = find(m_eit_pids.begin(), m_eit_pids.end(), del_eit[i]);
+            it = find(m_eit_pids.begin(), m_eit_pids.end(), eit);
             if (it != m_eit_pids.end())
                 m_eit_pids.erase(it);
-            GetStreamData()->RemoveListeningPID(del_eit[i]);
+            GetStreamData()->RemoveListeningPID(eit);
         }
 
-        for (size_t i = 0; i < add_eit.size(); i++)
+        for (uint eit : add_eit)
         {
-            m_eit_pids.push_back(add_eit[i]);
-            GetStreamData()->AddListeningPID(add_eit[i]);
+            m_eit_pids.push_back(eit);
+            GetStreamData()->AddListeningPID(eit);
         }
     }
 }

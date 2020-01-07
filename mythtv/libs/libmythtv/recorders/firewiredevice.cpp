@@ -233,13 +233,13 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     if (is_mot && !alt_method)
     {
-        for (uint i = 0; i < 3 ;i++)
+        for (int d : digit)
         {
             cmd.clear();
             cmd.push_back(kAVCControlCommand);
             cmd.push_back(kAVCSubunitTypePanel | m_subunitid);
             cmd.push_back(kAVCPanelPassThrough);
-            cmd.push_back((kAVCPanelKey0 + digit[i]) | kAVCPanelKeyPress);
+            cmd.push_back((kAVCPanelKey0 + d) | kAVCPanelKeyPress);
             cmd.push_back(0x00);
             cmd.push_back(0x00);
             cmd.push_back(0x00);
@@ -403,15 +403,13 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x1947,    0x1ac3,    0x1bd7,    0x1cea,    0x1e6b,    0x21be,
         0x223a,    0x22ce,    0x23be,    0x252e,
     };
-    const uint sa_vendor_id_cnt =
-        sizeof(sa_vendor_ids) / sizeof(uint64_t);
 
-    for (uint i = 0; i < sa_vendor_id_cnt; i++)
+    for (uint64_t vendor_id : sa_vendor_ids)
     {
-        id_to_model[sa_vendor_ids[i] << 32 | 0x0be0] = "SA3250HD";
-        id_to_model[sa_vendor_ids[i] << 32 | 0x1072] = "SA4200HD";
-        id_to_model[sa_vendor_ids[i] << 32 | 0x10cc] = "SA4250HDC";
-        id_to_model[sa_vendor_ids[i] << 32 | 0x22ce] = "SA8300HD";
+        id_to_model[vendor_id << 32 | 0x0be0] = "SA3250HD";
+        id_to_model[vendor_id << 32 | 0x1072] = "SA4200HD";
+        id_to_model[vendor_id << 32 | 0x10cc] = "SA4250HDC";
+        id_to_model[vendor_id << 32 | 0x22ce] = "SA8300HD";
     }
 
     const uint64_t motorola_vendor_ids[] =
@@ -446,32 +444,30 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x23ee,    0x23a0,    0x23a1,
 
     };
-    const uint motorola_vendor_id_cnt =
-        sizeof(motorola_vendor_ids) / sizeof(uint64_t);
 
-    for (uint i = 0; i < motorola_vendor_id_cnt; i++)
+    for (uint64_t vendor_id : motorola_vendor_ids)
     {
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xf740] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xf804] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xfa03] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xfa05] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xfa07] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x24a1] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x2322] = "DCX-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xea05] = "DCX-3432";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xd330] = "DCH-3200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xb630] = "DCH-3416";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x34cb] = "DCT-3412";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x346b] = "DCT-3416";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0xb630] = "DCT-3416";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x6200] = "DCT-6200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x620a] = "DCT-6200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x64ca] = "DCT-6212";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x64cb] = "DCT-6212";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x8100] = "QIP-7100";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x7100] = "QIP-6200";
-        id_to_model[motorola_vendor_ids[i] << 32 | 0x0001] = "QIP-7100";
+        id_to_model[vendor_id << 32 | 0xf740] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0xf804] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0xfa03] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0xfa05] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0xfa07] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0x24a1] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0x2322] = "DCX-3200";
+        id_to_model[vendor_id << 32 | 0xea05] = "DCX-3432";
+        id_to_model[vendor_id << 32 | 0xd330] = "DCH-3200";
+        id_to_model[vendor_id << 32 | 0xb630] = "DCH-3416";
+        id_to_model[vendor_id << 32 | 0x34cb] = "DCT-3412";
+        id_to_model[vendor_id << 32 | 0x346b] = "DCT-3416";
+        id_to_model[vendor_id << 32 | 0xb630] = "DCT-3416";
+        id_to_model[vendor_id << 32 | 0x6200] = "DCT-6200";
+        id_to_model[vendor_id << 32 | 0x620a] = "DCT-6200";
+        id_to_model[vendor_id << 32 | 0x64ca] = "DCT-6212";
+        id_to_model[vendor_id << 32 | 0x64cb] = "DCT-6212";
+        id_to_model[vendor_id << 32 | 0x646b] = "DCT-6216";
+        id_to_model[vendor_id << 32 | 0x8100] = "QIP-7100";
+        id_to_model[vendor_id << 32 | 0x7100] = "QIP-6200";
+        id_to_model[vendor_id << 32 | 0x0001] = "QIP-7100";
     }
 
     const uint64_t pace_vendor_ids[] =
@@ -480,13 +476,10 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x1cc3, 0x5094,
     };
 
-    const uint pace_vendor_id_cnt =
-        sizeof(pace_vendor_ids) / sizeof(uint64_t);
-
-    for (uint i = 0; i < pace_vendor_id_cnt; i++)
+    for (uint64_t vendor_id : pace_vendor_ids)
     {
-        id_to_model[pace_vendor_ids[i] << 32 | 0x10551] = "PACE-550";
-        id_to_model[pace_vendor_ids[i] << 32 | 0x10755] = "PACE-779";
+        id_to_model[vendor_id << 32 | 0x10551] = "PACE-550";
+        id_to_model[vendor_id << 32 | 0x10755] = "PACE-779";
     }
 }
 

@@ -266,19 +266,19 @@ void StreamHandler::UpdateListeningForEIT(void)
         if (sd->HasEITPIDChanges(m_eitPids) &&
             sd->GetEITPIDChanges(m_eitPids, add_eit, del_eit))
         {
-            for (size_t i = 0; i < del_eit.size(); i++)
+            for (uint eit : del_eit)
             {
                 uint_vec_t::iterator it2;
-                it2 = find(m_eitPids.begin(), m_eitPids.end(), del_eit[i]);
+                it2 = find(m_eitPids.begin(), m_eitPids.end(), eit);
                 if (it2 != m_eitPids.end())
                     m_eitPids.erase(it2);
-                sd->RemoveListeningPID(del_eit[i]);
+                sd->RemoveListeningPID(eit);
             }
 
-            for (size_t i = 0; i < add_eit.size(); i++)
+            for (uint eit : add_eit)
             {
-                m_eitPids.push_back(add_eit[i]);
-                sd->AddListeningPID(add_eit[i]);
+                m_eitPids.push_back(eit);
+                sd->AddListeningPID(eit);
             }
         }
     }

@@ -373,9 +373,9 @@ void SignalMonitor::run(void)
 void SignalMonitor::AddListener(SignalMonitorListener *listener)
 {
     QMutexLocker locker(&m_listenerLock);
-    for (size_t i = 0; i < m_listeners.size(); i++)
+    for (auto & entry : m_listeners)
     {
-        if (m_listeners[i] == listener)
+        if (entry == listener)
             return;
     }
     m_listeners.push_back(listener);
@@ -386,10 +386,10 @@ void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
     QMutexLocker locker(&m_listenerLock);
 
     vector<SignalMonitorListener*> new_listeners;
-    for (size_t i = 0; i < m_listeners.size(); i++)
+    for (auto & entry : m_listeners)
     {
-        if (m_listeners[i] != listener)
-            new_listeners.push_back(m_listeners[i]);
+        if (entry != listener)
+            new_listeners.push_back(entry);
     }
 
     m_listeners = new_listeners;
@@ -403,9 +403,8 @@ void SignalMonitor::SendMessage(
     m_statusLock.unlock();
 
     QMutexLocker locker(&m_listenerLock);
-    for (size_t i = 0; i < m_listeners.size(); i++)
+    for (auto listener : m_listeners)
     {
-        SignalMonitorListener *listener = m_listeners[i];
         auto *dvblistener = dynamic_cast<DVBSignalMonitorListener*>(listener);
 
         switch (type)
@@ -454,8 +453,8 @@ void SignalMonitor::UpdateValues(void)
 void SignalMonitor::SendMessageAllGood(void)
 {
     QMutexLocker locker(&m_listenerLock);
-    for (size_t i = 0; i < m_listeners.size(); i++)
-        m_listeners[i]->AllGood();
+    for (auto & entry : m_listeners)
+        entry->AllGood();
 }
 
 void SignalMonitor::EmitStatus(void)

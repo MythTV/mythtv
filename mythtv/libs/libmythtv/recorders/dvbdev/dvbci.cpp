@@ -629,8 +629,8 @@ bool cCiTransportLayer::ModuleReady(int Slot)
 
 cCiTransportConnection *cCiTransportLayer::Process(int Slot)
 {
-  for (int i = 0; i < MAX_CI_CONNECT; i++) {
-      cCiTransportConnection *Tc = &m_tc[i];
+  for (auto & conn : m_tc) {
+      cCiTransportConnection *Tc = &conn;
       if (Tc->Slot() == Slot) {
          switch (Tc->State()) {
            case stCREATION:
@@ -1546,8 +1546,8 @@ cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
 cLlCiHandler::~cLlCiHandler()
 {
   cMutexLock MutexLock(&m_mutex);
-  for (int i = 0; i < MAX_CI_SESSION; i++)
-      delete m_sessions[i];
+  for (auto & session : m_sessions)
+      delete session;
   delete m_tpl;
   close(m_fdCa);
 }
@@ -1605,18 +1605,18 @@ bool cLlCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
 
 cCiSession *cLlCiHandler::GetSessionBySessionId(int SessionId)
 {
-  for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (m_sessions[i] && m_sessions[i]->SessionId() == SessionId)
-         return m_sessions[i];
+  for (auto & session : m_sessions) {
+      if (session && session->SessionId() == SessionId)
+         return session;
       }
   return nullptr;
 }
 
 cCiSession *cLlCiHandler::GetSessionByResourceId(int ResourceId, int Slot)
 {
-  for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (m_sessions[i] && m_sessions[i]->Tc()->Slot() == Slot && m_sessions[i]->ResourceId() == ResourceId)
-         return m_sessions[i];
+  for (auto & session : m_sessions) {
+      if (session && session->Tc()->Slot() == Slot && session->ResourceId() == ResourceId)
+         return session;
       }
   return nullptr;
 }
@@ -1690,9 +1690,9 @@ bool cLlCiHandler::CloseSession(int SessionId)
 int cLlCiHandler::CloseAllSessions(int Slot)
 {
   int result = 0;
-  for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (m_sessions[i] && m_sessions[i]->Tc()->Slot() == Slot) {
-         CloseSession(m_sessions[i]->SessionId());
+  for (auto & session : m_sessions) {
+      if (session && session->Tc()->Slot() == Slot) {
+         CloseSession(session->SessionId());
          result++;
          }
       }
@@ -1766,14 +1766,14 @@ bool cLlCiHandler::Process(void)
 
     bool UserIO = false;
     m_needCaPmt = false;
-    for (int i = 0; i < MAX_CI_SESSION; i++)
+    for (auto & session : m_sessions)
     {
-        if (m_sessions[i] && m_sessions[i]->Process())
+        if (session && session->Process())
         {
-            UserIO |= m_sessions[i]->HasUserIO();
-            if (m_sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
+            UserIO |= session->HasUserIO();
+            if (session->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
             {
-                auto cas = dynamic_cast<cCiConditionalAccessSupport *>(m_sessions[i]);
+                auto cas = dynamic_cast<cCiConditionalAccessSupport *>(session);
                 if (cas == nullptr)
                     continue;
                 m_needCaPmt |= cas->NeedCaPmt();
