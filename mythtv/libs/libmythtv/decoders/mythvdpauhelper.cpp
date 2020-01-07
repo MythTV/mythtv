@@ -21,7 +21,7 @@ bool ok = true;
 ok &= (status == VDP_STATUS_OK); \
 if (!ok) \
 { \
-  LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
+  LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
           .arg(__FILE__).arg( __LINE__).arg(status) \
           .arg(m_vdpGetErrorString(status))); \
 }
@@ -46,7 +46,7 @@ bool MythVDPAUHelper::HaveVDPAU(void)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU functionality checked failed");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is NOT available");
     }
     return gVDPAUAvailable;
 }
@@ -77,7 +77,7 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
         status = m_vdpPreemptionCallbackRegister(m_device, vdpau_preemption_callback, this);
         CHECK_ST
         if (!ok)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register preemption callback");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to register preemption callback");
     }
 }
 
@@ -102,7 +102,7 @@ MythVDPAUHelper::MythVDPAUHelper(void)
     CHECK_ST
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VDPAU device.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to create VDPAU device.");
         return;
     }
     m_valid = InitProcs();
