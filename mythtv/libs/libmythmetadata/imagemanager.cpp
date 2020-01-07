@@ -315,10 +315,10 @@ QStringList ImageAdapterBase::SupportedVideos()
     QStringList formats;
     const FileAssociations::association_list faList =
         FileAssociations::getFileAssociation().getList();
-    for (auto p = faList.cbegin(); p != faList.cend(); ++p)
+    for (const auto & fa : faList)
     {
-        if (!p->use_default && p->playcommand == "Internal")
-            formats << QString(p->extension);
+        if (!fa.use_default && fa.playcommand == "Internal")
+            formats << QString(fa.extension);
     }
     return formats;
 }

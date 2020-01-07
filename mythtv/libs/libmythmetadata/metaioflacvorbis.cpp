@@ -191,12 +191,12 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         // From what I can tell, FLAC::File maintains ownership of the Picture pointers, so no need to delete
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for (auto it = picList.begin(); it != picList.end(); it++)
+        for (auto entry : picList)
         {
-            if ((*it)->type() == artType)
+            if (entry->type() == artType)
             {
                 //found the type we were looking for
-                pic = *it;
+                pic = entry;
                 break;
             }
         }
@@ -251,9 +251,8 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
     {
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for(auto it = picList.begin(); it != picList.end(); it++)
+        for (auto pic : picList)
         {
-            Picture* pic = *it;
             // Assume a valid image would have at least
             // 100 bytes of data (1x1 indexed gif is 35 bytes)
             if (pic->data().size() < 100)

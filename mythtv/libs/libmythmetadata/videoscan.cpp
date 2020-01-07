@@ -41,11 +41,8 @@ namespace
                    const QStringList &image_extensions) :
             m_videoFiles(video_files)
         {
-            for (QStringList::const_iterator p = image_extensions.begin();
-                 p != image_extensions.end(); ++p)
-            {
-                m_imageExt.insert((*p).toLower());
-            }
+            foreach (const auto & ext, image_extensions)
+                m_imageExt.insert(ext.toLower());
         }
 
         DirectoryHandler *newDir(const QString &dir_name,
@@ -269,11 +266,10 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                           tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
-    for (auto p = m_dbMetadata->getList().cbegin();
-         p != m_dbMetadata->getList().cend(); ++p)
+    for (const auto & file : m_dbMetadata->getList())
     {
-        QString lname = (*p)->GetFilename();
-        QString lhost = (*p)->GetHost().toLower();
+        QString lname = file->GetFilename();
+        QString lhost = file->GetHost().toLower();
         if (!lname.isEmpty())
         {
             iter = files.find(lname);
@@ -283,7 +279,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 {
                     // file has changed hosts
                     // add to delete list for further processing
-                    remove.push_back(std::make_pair((*p)->GetID(), lname));
+                    remove.push_back(std::make_pair(file->GetID(), lname));
                 }
                 else
                 {
@@ -296,14 +292,14 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             {
                 // If it's only in the database, and not on a host we
                 // cannot reach, mark it as for removal later.
-                remove.push_back(std::make_pair((*p)->GetID(), lname));
+                remove.push_back(std::make_pair(file->GetID(), lname));
             }
             else if (m_liveSGHosts.contains(lhost))
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
                         .arg(lhost).arg(lname));
-                remove.push_back(std::make_pair((*p)->GetID(), lname));
+                remove.push_back(std::make_pair(file->GetID(), lname));
             }
             else
             {
@@ -386,12 +382,12 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
 
     // When prompting is restored, account for the answer here.
     ret += remove.size();
-    for (auto p = remove.cbegin(); p != remove.cend(); ++p)
+    for (const auto & item : remove)
     {
-        if (!m_movList.contains(p->first))
+        if (!m_movList.contains(item.first))
         {
-            removeOrphans(p->first, p->second);
-            m_delList << p->first;
+            removeOrphans(item.first, item.second);
+            m_delList << item.first;
         }
         if (m_hasGUI)
             SendProgressEvent(++counter);

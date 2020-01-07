@@ -440,9 +440,9 @@ bool meta_dir_node::has_entries() const
 
     if (!ret)
     {
-        for (auto p = m_subdirs.cbegin(); p != m_subdirs.cend(); ++p)
+        for (const auto & subdir : m_subdirs)
         {
-            ret = (*p)->has_entries();
+            ret = subdir->has_entries();
             if (ret) break;
         }
     }

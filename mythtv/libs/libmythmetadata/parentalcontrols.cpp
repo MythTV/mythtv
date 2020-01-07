@@ -328,19 +328,18 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     {
         m_passwordOK = false;
 
-        for (QStringList::iterator p = m_validPasswords.begin();
-                p != m_validPasswords.end(); ++p)
+        foreach (auto & valid_pwd, m_validPasswords)
         {
-            if (password == *p)
-            {
-                m_passwordOK = true;
-                QString time_stamp = MythDate::current_iso_string();
+            if (password != valid_pwd)
+                continue;
 
-                gCoreContext->SaveSetting("VideoPasswordTime", time_stamp);
-                gCoreContext->SaveSetting("VideoPasswordLevel", m_toLevel);
+            m_passwordOK = true;
+            QString time_stamp = MythDate::current_iso_string();
 
-                break;
-            }
+            gCoreContext->SaveSetting("VideoPasswordTime", time_stamp);
+            gCoreContext->SaveSetting("VideoPasswordLevel", m_toLevel);
+
+            return;
         }
     }
 

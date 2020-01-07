@@ -1190,11 +1190,11 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     if (!m_albumArt)
         m_albumArt = new AlbumArtImages(this, false);
 
-    for (int x = 0; x < albumart.size(); x++)
+    foreach (auto art, albumart)
     {
-        AlbumArtImage *image = albumart.at(x);
+        AlbumArtImage *image = art;
         image->m_filename = QString("%1-%2").arg(m_id).arg(image->m_filename);
-        m_albumArt->addImage(albumart.at(x));
+        m_albumArt->addImage(art);
     }
 
     m_changed = true;
@@ -1600,18 +1600,17 @@ void AllMusic::resync()
 
     // get a list of tracks in our cache that's now not in the database
     QList<MusicMetadata::IdType> deleteList;
-    for (int x = 0; x < m_allMusic.size(); x++)
+    foreach (auto track, m_allMusic)
     {
-        if (!idList.contains(m_allMusic.at(x)->ID()))
+        if (!idList.contains(track->ID()))
         {
-            deleteList.append(m_allMusic.at(x)->ID());
+            deleteList.append(track->ID());
         }
     }
 
     // remove the no longer available tracks
-    for (int x = 0; x < deleteList.size(); x++)
+    for (uint id : deleteList)
     {
-        MusicMetadata::IdType id = deleteList.at(x);
         MusicMetadata *mdata = m_musicMap[id];
         m_allMusic.removeAll(mdata);
         m_musicMap.remove(id);
