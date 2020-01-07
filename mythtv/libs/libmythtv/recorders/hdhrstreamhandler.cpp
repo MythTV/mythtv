@@ -424,7 +424,8 @@ QString HDHRStreamHandler::TunerGet(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
             &value, &error) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Get %1 request failed").arg(valname) + ENO);
         return QString();
     }
 
@@ -463,7 +464,9 @@ QString HDHRStreamHandler::TunerSet(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Set %1 to '%2' request failed").arg(valname).arg(val) +
+            ENO);
 
         return QString();
     }
