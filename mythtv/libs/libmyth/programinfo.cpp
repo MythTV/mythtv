@@ -4472,9 +4472,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (int i = 0; i < mapMark.size(); ++i)
+            foreach (const auto & entry, mapMark)
             {
-                const MarkupEntry &entry = mapMark[i];
                 if (entry.type == MARK_DURATION_MS)
                     continue;
                 if (entry.isDataNull)
@@ -4563,9 +4562,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            for (int i = 0; i < mapMark.size(); ++i)
+            foreach (const auto & entry, mapMark)
             {
-                const MarkupEntry &entry = mapMark[i];
                 if (entry.isDataNull)
                 {
                     query.prepare("INSERT INTO recordedmarkup"

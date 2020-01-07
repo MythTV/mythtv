@@ -237,20 +237,19 @@ bool MediaMonitorUnix::CheckMountable(void)
 
         // Parse the returned device array
         const QDBusObjectPathList& list(reply.value());
-        for (QDBusObjectPathList::const_iterator it = list.begin();
-            it != list.end(); ++it)
+        foreach (const auto & entry, list)
         {
-            if (!DeviceProperty(*it, "DeviceIsSystemInternal").toBool() &&
-                !DeviceProperty(*it, "DeviceIsPartitionTable").toBool() )
+            if (!DeviceProperty(entry, "DeviceIsSystemInternal").toBool() &&
+                !DeviceProperty(entry, "DeviceIsPartitionTable").toBool() )
             {
-                QString dev = DeviceProperty(*it, "DeviceFile").toString();
+                QString dev = DeviceProperty(entry, "DeviceFile").toString();
 
                 // ignore floppies, too slow
                 if (dev.startsWith("/dev/fd"))
                     continue;
 
                 MythMediaDevice* pDevice = nullptr;
-                if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
+                if (DeviceProperty(entry, "DeviceIsRemovable").toBool())
                     pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
                 else
                     pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
@@ -440,12 +439,11 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
         if (reply.isValid())
         {
             const QDBusObjectPathList& list(reply.value());
-            for (QDBusObjectPathList::const_iterator it = list.begin();
-                it != list.end(); ++it)
+            foreach (const auto & entry, list)
             {
-                if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
+                if (DeviceProperty(entry, "DeviceIsRemovable").toBool())
                 {
-                    QString dev = DeviceProperty(*it, "DeviceFile").toString();
+                    QString dev = DeviceProperty(entry, "DeviceFile").toString();
                     if (dev.startsWith("/dev/"))
                         dev.remove(0,5);
                     l.push_back(dev);

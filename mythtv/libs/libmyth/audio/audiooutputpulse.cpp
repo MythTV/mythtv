@@ -34,8 +34,8 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
     m_volumeControl.channels = 0;
-    for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
-        m_volumeControl.values[i] = PA_VOLUME_MUTED;
+    for (uint & value : m_volumeControl.values)
+        value = PA_VOLUME_MUTED;
 
     InitSettings(settings);
     if (settings.m_init)

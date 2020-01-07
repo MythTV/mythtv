@@ -42,10 +42,10 @@ using namespace std;
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
-    for (int i = 0; i < JACK_CHANNELS_MAX; i++)
-        m_ports[i] = nullptr;
-    for (int i = 0; i < JACK_CHANNELS_MAX; i++)
-        m_chanVolumes[i] = 100;
+    for (auto & port : m_ports)
+        port = nullptr;
+    for (int & volume : m_chanVolumes)
+        volume = 100;
 
     // Set everything up
     InitSettings(settings);
@@ -508,8 +508,8 @@ void AudioOutputJACK::VolumeInit(void)
         volume = gCoreContext->GetNumSetting(controlLabel, 80);
     }
 
-    for (int i=0; i<JACK_CHANNELS_MAX; i++)
-        m_chanVolumes[i] = volume;
+    for (int & cvolume : m_chanVolumes)
+        cvolume = volume;
 }
 
 int AudioOutputJACK::GetVolumeChannel(int channel) const

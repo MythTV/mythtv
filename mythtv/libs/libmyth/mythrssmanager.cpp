@@ -49,13 +49,12 @@ void RSSManager::doUpdate()
 {
     m_sites = findAllDBRSS();
 
-    for (RSSSite::rssList::iterator i = m_sites.begin();
-            i != m_sites.end(); ++i)
+    foreach (auto & site, m_sites)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Updating RSS Feed %1") .arg((*i)->GetTitle()));
+            QString("Updating RSS Feed %1") .arg(site->GetTitle()));
 
-        connect(*i, SIGNAL(finished(RSSSite*)),
+        connect(site, SIGNAL(finished(RSSSite*)),
                 this, SLOT(slotRSSRetrieved(RSSSite*)));
     }
 
@@ -231,27 +230,26 @@ void RSSSite::process(void)
         Parse parser;
         items = parser.parseRSS(domDoc);
 
-        for (ResultItem::resultList::iterator i = items.begin();
-                i != items.end(); ++i)
+        foreach (auto & item, items)
         {
             insertRSSArticle(new ResultItem(
-               (*i)->GetTitle(), (*i)->GetSortTitle(),
-               (*i)->GetSubtitle(), (*i)->GetSortSubtitle(),
-               (*i)->GetDescription(), (*i)->GetURL(),
-               (*i)->GetThumbnail(), (*i)->GetMediaURL(),
-               (*i)->GetAuthor(), (*i)->GetDate(),
-               (*i)->GetTime(), (*i)->GetRating(),
-               (*i)->GetFilesize(), (*i)->GetPlayer(),
-               (*i)->GetPlayerArguments(),
-               (*i)->GetDownloader(),
-               (*i)->GetDownloaderArguments(),
-               (*i)->GetWidth(),
-               (*i)->GetHeight(),
-               (*i)->GetLanguage(),
-               (*i)->GetDownloadable(),
-               (*i)->GetCountries(),
-               (*i)->GetSeason(),
-               (*i)->GetEpisode(), false));
+               item->GetTitle(), item->GetSortTitle(),
+               item->GetSubtitle(), item->GetSortSubtitle(),
+               item->GetDescription(), item->GetURL(),
+               item->GetThumbnail(), item->GetMediaURL(),
+               item->GetAuthor(), item->GetDate(),
+               item->GetTime(), item->GetRating(),
+               item->GetFilesize(), item->GetPlayer(),
+               item->GetPlayerArguments(),
+               item->GetDownloader(),
+               item->GetDownloaderArguments(),
+               item->GetWidth(),
+               item->GetHeight(),
+               item->GetLanguage(),
+               item->GetDownloadable(),
+               item->GetCountries(),
+               item->GetSeason(),
+               item->GetEpisode(), false));
         }
     }
     else

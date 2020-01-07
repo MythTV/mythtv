@@ -1486,15 +1486,14 @@ bool MythContextPrivate::saveSettingsCache(void)
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-    static constexpr int kArraySize = sizeof(kSettingsToSave)/sizeof(kSettingsToSave[0]);
-    for (int ix = 0; ix < kArraySize; ix++)
+    for (const auto & setting : kSettingsToSave)
     {
-        QString cacheValue = config.GetValue("Settings/"+kSettingsToSave[ix],QString());
-        gCoreContext->ClearOverrideSettingForSession(kSettingsToSave[ix]);
-        QString value = gCoreContext->GetSetting(kSettingsToSave[ix],QString());
+        QString cacheValue = config.GetValue("Settings/"+setting,QString());
+        gCoreContext->ClearOverrideSettingForSession(setting);
+        QString value = gCoreContext->GetSetting(setting,QString());
         if (value != cacheValue)
         {
-            config.SetValue("Settings/"+kSettingsToSave[ix],value);
+            config.SetValue("Settings/"+setting,value);
             m_settingsCacheDirty = true;
         }
     }
@@ -1507,14 +1506,13 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
     if (!m_gui)
         return;
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-    static constexpr int kArraySize = sizeof(kSettingsToSave)/sizeof(kSettingsToSave[0]);
-    for (int ix = 0; ix < kArraySize; ix++)
+    for (const auto & setting : kSettingsToSave)
     {
-        if (!gCoreContext->GetSetting(kSettingsToSave[ix],QString()).isEmpty())
+        if (!gCoreContext->GetSetting(setting,QString()).isEmpty())
             continue;
-        QString value = config.GetValue("Settings/"+kSettingsToSave[ix],QString());
+        QString value = config.GetValue("Settings/"+setting,QString());
         if (!value.isEmpty())
-            gCoreContext->OverrideSettingForSession(kSettingsToSave[ix], value);
+            gCoreContext->OverrideSettingForSession(setting, value);
     }
     // Prevent power off TV after temporary window
     gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", nullptr);
@@ -1526,11 +1524,8 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
 void MythContextPrivate::clearSettingsCacheOverride(void)
 {
     QString language = gCoreContext->GetSetting("Language",QString());
-    static constexpr int kArraySize = sizeof(kSettingsToSave)/sizeof(kSettingsToSave[0]);
-    for (int ix = 0; ix < kArraySize; ix++)
-    {
-        gCoreContext->ClearOverrideSettingForSession(kSettingsToSave[ix]);
-    }
+    for (const auto & setting : kSettingsToSave)
+        gCoreContext->ClearOverrideSettingForSession(setting);
     // Restore power off TV setting
     gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");
 
