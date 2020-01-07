@@ -197,14 +197,14 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     if (match_pri == UINT_MAX)
         return tmp;
 
-    for (size_t j = 0; j < parsed.size(); j++)
+    for (auto j : parsed)
     {
         if ((DescriptorID::extended_event == desc_tag) &&
-            (DescriptorID::extended_event == parsed[j][0]))
+            (DescriptorID::extended_event == j[0]))
         {
-            ExtendedEventDescriptor eed(parsed[j]);
+            ExtendedEventDescriptor eed(j);
             if (eed.IsValid() && (eed.LanguageKey() == match_key))
-                tmp.push_back(parsed[j]);
+                tmp.push_back(j);
         }
     }
 

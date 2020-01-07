@@ -247,15 +247,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 auto *nit = new NetworkInformationTable(psip);
                 CacheNIT(nit);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                    m_dvbMainListeners[i]->HandleNIT(nit);
+                for (auto & listener : m_dvbMainListeners)
+                    listener->HandleNIT(nit);
             }
             else
             {
                 NetworkInformationTable nit(psip);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                    m_dvbMainListeners[i]->HandleNIT(&nit);
+                for (auto & listener : m_dvbMainListeners)
+                    listener->HandleNIT(&nit);
             }
 
             return true;
@@ -287,8 +287,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             UpdateTimeOffset(tdt.UTCUnix());
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                m_dvbMainListeners[i]->HandleTDT(&tdt);
+            for (auto & listener : m_dvbMainListeners)
+                listener->HandleTDT(&tdt);
 
             return true;
         }
@@ -299,8 +299,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             NetworkInformationTable nit(psip);
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                m_dvbOtherListeners[i]->HandleNITo(&nit);
+            for (auto & listener : m_dvbOtherListeners)
+                listener->HandleNITo(&nit);
 
             return true;
         }
@@ -336,8 +336,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             }
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                m_dvbOtherListeners[i]->HandleSDTo(tsid, &sdt);
+            for (auto & listener : m_dvbOtherListeners)
+                listener->HandleSDTo(tsid, &sdt);
 
             return true;
         }
@@ -352,15 +352,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 auto *bat = new BouquetAssociationTable(psip);
                 CacheBAT(bat);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                    m_dvbOtherListeners[i]->HandleBAT(bat);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleBAT(bat);
             }
             else
             {
                 BouquetAssociationTable bat(psip);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                    m_dvbOtherListeners[i]->HandleBAT(&bat);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleBAT(&bat);
             }
 
             return true;
@@ -383,8 +383,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                                     psip.LastSection());
 
         DVBEventInformationTable eit(psip);
-        for (size_t i = 0; i < m_dvbEitListeners.size(); i++)
-            m_dvbEitListeners[i]->HandleEIT(&eit);
+        for (auto & listener : m_dvbEitListeners)
+            listener->HandleEIT(&eit);
 
         if (m_eitHelper)
             m_eitHelper->AddEIT(&eit);
@@ -403,8 +403,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         PremiereContentInformationTable cit(psip);
         m_citStatus.SetSectionSeen(cit.ContentID(), psip.Version(), psip.Section(), psip.LastSection());
 
-        for (size_t i = 0; i < m_dvbEitListeners.size(); i++)
-            m_dvbEitListeners[i]->HandleEIT(&cit);
+        for (auto & listener : m_dvbEitListeners)
+            listener->HandleEIT(&cit);
 
         if (m_eitHelper)
             m_eitHelper->AddEIT(&cit);
@@ -433,8 +433,8 @@ void DVBStreamData::ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt)
             m_dvbHasEit[sdt->ServiceID(i)] = true;
     }
 
-    for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-        m_dvbMainListeners[i]->HandleSDT(tsid, sdt);
+    for (auto & listener : m_dvbMainListeners)
+        listener->HandleSDT(tsid, sdt);
 }
 
 bool DVBStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
@@ -901,8 +901,8 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 
 void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
 {
-    for (auto it = sdts.begin(); it != sdts.end(); ++it)
-        ReturnCachedTable(*it);
+    for (auto & sdt : sdts)
+        ReturnCachedTable(sdt);
     sdts.clear();
 }
 

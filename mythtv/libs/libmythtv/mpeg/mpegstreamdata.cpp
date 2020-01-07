@@ -86,10 +86,10 @@ void MPEGStreamData::SetDesiredProgram(int p)
         m_desiredProgram = p;
         ProcessPAT(pat);
         pmt_vec_t pmts = GetCachedPMTs();
-        for (size_t i = 0; i < pmts.size(); i++)
+        for (auto & pmt : pmts)
         {
-            if (pmts[i]->ProgramNumber() == (uint)p)
-                ProcessPMT(pmts[i]);
+            if (pmt->ProgramNumber() == (uint)p)
+                ProcessPMT(pmt);
         }
         ReturnCachedPMTTables(pmts);
     }
@@ -421,11 +421,11 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
 
     vector<const VirtualChannelTable*> vct;
 
-    for (size_t i = 0; i < tvct.size(); i++)
-        vct.push_back(tvct[i]);
+    for (auto i : tvct)
+        vct.push_back(i);
 
-    for (size_t i = 0; i < cvct.size(); i++)
-        vct.push_back(cvct[i]);
+    for (auto i : cvct)
+        vct.push_back(i);
 
     for (size_t i = 0; i < tvct.size(); i++)
     {
@@ -587,24 +587,24 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     desc_list_t cdesc = MPEGDescriptor::ParseOnlyInclude(
         pmt.ProgramInfo(), pmt.ProgramInfoLength(),
         DescriptorID::conditional_access);
-    for (size_t i = 0; i < cdesc.size(); i++)
+    for (auto & i : cdesc)
     {
-        ConditionalAccessDescriptor cad(cdesc[i]);
+        ConditionalAccessDescriptor cad(i);
         if (cad.IsValid())
             AddListeningPID(cad.PID());
     }
 
     m_pidsAudio.clear();
-    for (size_t i = 0; i < audioPIDs.size(); i++)
-        AddAudioPID(audioPIDs[i]);
+    for (uint pid : audioPIDs)
+        AddAudioPID(pid);
 
     m_pidsWriting.clear();
     m_pidVideoSingleProgram = !videoPIDs.empty() ? videoPIDs[0] : 0xffffffff;
     for (size_t i = 1; i < videoPIDs.size(); i++)
         AddWritingPID(videoPIDs[i]);
 
-    for (size_t i = 0; i < dataPIDs.size(); i++)
-        AddWritingPID(dataPIDs[i]);
+    for (uint pid : dataPIDs)
+        AddWritingPID(pid);
 
     // Timebase
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
@@ -725,8 +725,8 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             sit.setSCTEPID(pid);
 
             m_listenerLock.lock();
-            for (size_t i = 0; i < m_mpegListeners.size(); i++)
-                m_mpegListeners[i]->HandleSplice(&sit);
+            for (auto & listener : m_mpegListeners)
+                listener->HandleSplice(&sit);
             m_listenerLock.unlock();
 
             return true;
@@ -740,8 +740,8 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     bool foundProgram = pat->FindPID(m_desiredProgram) != 0U;
 
     m_listenerLock.lock();
-    for (size_t i = 0; i < m_mpegListeners.size(); i++)
-        m_mpegListeners[i]->HandlePAT(pat);
+    for (auto & listener : m_mpegListeners)
+        listener->HandlePAT(pat);
     m_listenerLock.unlock();
 
     if (m_desiredProgram < 0)
@@ -781,24 +781,24 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     {
         QMutexLocker locker(&m_listenerLock);
         ProgramAssociationTable *pat_sp = PATSingleProgram();
-        for (size_t i = 0; i < m_mpegSpListeners.size(); i++)
-            m_mpegSpListeners[i]->HandleSingleProgramPAT(pat_sp, false);
+        for (auto & listener : m_mpegSpListeners)
+            listener->HandleSingleProgramPAT(pat_sp, false);
     }
 }
 
 void MPEGStreamData::ProcessCAT(const ConditionalAccessTable *cat)
 {
     m_listenerLock.lock();
-    for (size_t i = 0; i < m_mpegListeners.size(); i++)
-        m_mpegListeners[i]->HandleCAT(cat);
+    for (auto & listener : m_mpegListeners)
+        listener->HandleCAT(cat);
     m_listenerLock.unlock();
 
     desc_list_t cdesc = MPEGDescriptor::ParseOnlyInclude(
         cat->Descriptors(), cat->DescriptorsLength(),
         DescriptorID::conditional_access);
-    for (size_t i = 0; i < cdesc.size(); i++)
+    for (auto & i : cdesc)
     {
-        ConditionalAccessDescriptor cad(cdesc[i]);
+        ConditionalAccessDescriptor cad(i);
         if (cad.IsValid())
             AddListeningPID(cad.PID());
     }
@@ -807,8 +807,8 @@ void MPEGStreamData::ProcessCAT(const ConditionalAccessTable *cat)
 void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
 {
     m_listenerLock.lock();
-    for (size_t i = 0; i < m_mpegListeners.size(); i++)
-        m_mpegListeners[i]->HandlePMT(pmt->ProgramNumber(), pmt);
+    for (auto & listener : m_mpegListeners)
+        listener->HandlePMT(pmt->ProgramNumber(), pmt);
     m_listenerLock.unlock();
 
     bool desired = pmt->ProgramNumber() == (uint) m_desiredProgram;
@@ -816,8 +816,8 @@ void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
     {
         QMutexLocker locker(&m_listenerLock);
         ProgramMapTable *pmt_sp = PMTSingleProgram();
-        for (size_t i = 0; i < m_mpegSpListeners.size(); i++)
-            m_mpegSpListeners[i]->HandleSingleProgramPMT(pmt_sp, false);
+        for (auto & listener : m_mpegSpListeners)
+            listener->HandleSingleProgramPMT(pmt_sp, false);
     }
 }
 
@@ -927,16 +927,16 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         {
             QMutexLocker locker(&m_listenerLock);
             ProgramAssociationTable *pat_sp = PATSingleProgram();
-            for (size_t i = 0; i < m_mpegSpListeners.size(); i++)
-                m_mpegSpListeners[i]->HandleSingleProgramPAT(pat_sp, false);
+            for (auto & listener : m_mpegSpListeners)
+                listener->HandleSingleProgramPAT(pat_sp, false);
         }
         if (TableID::PMT == psip->TableID() &&
             tspacket->PID() == m_pidPmtSingleProgram)
         {
             QMutexLocker locker(&m_listenerLock);
             ProgramMapTable *pmt_sp = PMTSingleProgram();
-            for (size_t i = 0; i < m_mpegSpListeners.size(); i++)
-                m_mpegSpListeners[i]->HandleSingleProgramPMT(pmt_sp, false);
+            for (auto & listener : m_mpegSpListeners)
+                listener->HandleSingleProgramPMT(pmt_sp, false);
         }
         DONE_WITH_PSIP_PACKET(); // already parsed this table, toss it.
     }
@@ -955,8 +955,8 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
     if (!m_psListeners.empty())
     {
 
-        for (size_t j = 0; j < m_psListeners.size(); ++j)
-            m_psListeners[j]->FindPSKeyFrames(buffer, len);
+        for (auto & listener : m_psListeners)
+            listener->FindPSKeyFrames(buffer, len);
 
         return 0;
     }
@@ -1031,24 +1031,24 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 
     if (IsVideoPID(tspacket.PID()))
     {
-        for (size_t j = 0; j < m_tsAvListeners.size(); j++)
-            m_tsAvListeners[j]->ProcessVideoTSPacket(tspacket);
+        for (auto & listener : m_tsAvListeners)
+            listener->ProcessVideoTSPacket(tspacket);
 
         return true;
     }
 
     if (IsAudioPID(tspacket.PID()))
     {
-        for (size_t j = 0; j < m_tsAvListeners.size(); j++)
-            m_tsAvListeners[j]->ProcessAudioTSPacket(tspacket);
+        for (auto & listener : m_tsAvListeners)
+            listener->ProcessAudioTSPacket(tspacket);
 
         return true;
     }
 
     if (IsWritingPID(tspacket.PID()))
     {
-        for (size_t j = 0; j < m_tsWritingListeners.size(); j++)
-            m_tsWritingListeners[j]->ProcessTSPacket(tspacket);
+        for (auto & listener : m_tsWritingListeners)
+            listener->ProcessTSPacket(tspacket);
     }
 
     if (IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
@@ -1473,8 +1473,8 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
 
 void MPEGStreamData::ReturnCachedPATTables(pat_vec_t &pats) const
 {
-    for (auto it = pats.begin(); it != pats.end(); ++it)
-        ReturnCachedTable(*it);
+    for (auto & pat : pats)
+        ReturnCachedTable(pat);
     pats.clear();
 }
 
@@ -1487,8 +1487,8 @@ void MPEGStreamData::ReturnCachedPATTables(pat_map_t &pats) const
 
 void MPEGStreamData::ReturnCachedCATTables(cat_vec_t &cats) const
 {
-    for (auto it = cats.begin(); it != cats.end(); ++it)
-        ReturnCachedTable(*it);
+    for (auto & cat : cats)
+        ReturnCachedTable(cat);
     cats.clear();
 }
 
@@ -1501,8 +1501,8 @@ void MPEGStreamData::ReturnCachedCATTables(cat_map_t &cats) const
 
 void MPEGStreamData::ReturnCachedPMTTables(pmt_vec_t &pmts) const
 {
-    for (auto it = pmts.begin(); it != pmts.end(); ++it)
-        ReturnCachedTable(*it);
+    for (auto & pmt : pmts)
+        ReturnCachedTable(pmt);
     pmts.clear();
 }
 
@@ -1772,10 +1772,8 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
     uint_vec_t::iterator it;
 
     uint_vec_t pids = m_encryptionPnumToPids[pnum];
-    for (size_t i = 0; i < pids.size(); i++)
+    for (uint pid : pids)
     {
-        uint pid = pids[i];
-
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Removing 0x%1 PID Enc monitoring").arg(pid,0,16));
@@ -1906,23 +1904,23 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     uint_vec_t pnum_del_list;
     const uint_vec_t &pnums = m_encryptionPidToPnums[pid];
-    for (size_t i = 0; i < pnums.size(); i++)
+    for (uint pnum : pnums)
     {
-        status = m_encryptionPnumToStatus[pnums[i]];
+        status = m_encryptionPnumToStatus[pnum];
 
-        const uint_vec_t &pids = m_encryptionPnumToPids[pnums[i]];
+        const uint_vec_t &pids = m_encryptionPnumToPids[pnum];
         if (!pids.empty())
         {
             uint enc_cnt[3] = { 0, 0, 0 };
-            for (size_t j = 0; j < pids.size(); j++)
+            for (uint pid2 : pids)
             {
-                CryptStatus stat = m_encryptionPidToInfo[pids[j]].m_status;
+                CryptStatus stat = m_encryptionPidToInfo[pid2].m_status;
                 enc_cnt[stat]++;
 
 #if 0
                 LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("\tpnum %1 PID 0x%2 status: %3")
-                        .arg(pnums[i]).arg(pids[j],0,16) .arg(toString(stat)));
+                        .arg(pnum).arg(pid2,0,16) .arg(toString(stat)));
 #endif
             }
             status = kEncUnknown;
@@ -1933,22 +1931,22 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
                 status = kEncDecrypted;
         }
 
-        if (status == m_encryptionPnumToStatus[pnums[i]])
+        if (status == m_encryptionPnumToStatus[pnum])
             continue; // program encryption status unchanged
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Program %1 status: %2")
-                .arg(pnums[i]).arg(toString(status)));
+                .arg(pnum).arg(toString(status)));
 
-        m_encryptionPnumToStatus[pnums[i]] = status;
+        m_encryptionPnumToStatus[pnum] = status;
 
         bool encrypted = kEncUnknown == status || kEncEncrypted == status;
         m_listenerLock.lock();
-        for (size_t j = 0; j < m_mpegListeners.size(); j++)
-            m_mpegListeners[j]->HandleEncryptionStatus(pnums[i], encrypted);
+        for (auto & listener : m_mpegListeners)
+            listener->HandleEncryptionStatus(pnum, encrypted);
         m_listenerLock.unlock();
 
         if (kEncDecrypted == status)
-            pnum_del_list.push_back(pnums[i]);
+            pnum_del_list.push_back(pnum);
     }
 
     for (size_t i = 0; i < pnum_del_list.size(); i++)

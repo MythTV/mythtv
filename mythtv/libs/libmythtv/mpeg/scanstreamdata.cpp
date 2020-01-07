@@ -80,9 +80,9 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (size_t i = 0; i < descs.size(); i++)
+        for (auto & desc : descs)
         {
-            RegistrationDescriptor reg(descs[i]);
+            RegistrationDescriptor reg(desc);
             if (!reg.IsValid())
                 continue;
             if (reg.FormatIdentifierString() == "SCTE")

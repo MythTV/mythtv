@@ -440,21 +440,20 @@ ProgramMapTable* ProgramMapTable::Create(
     pmt->SetVersionNumber(version);
 
     vector<unsigned char> gdesc;
-    for (size_t i=0; i<global_desc.size(); i++)
+    for (auto gd : global_desc)
     {
-        uint len = global_desc[i][1] + 2;
-        gdesc.insert(gdesc.end(), global_desc[i], global_desc[i] + len);
+        uint len = gd[1] + 2;
+        gdesc.insert(gdesc.end(), gd, gd + len);
     }
     pmt->SetProgramInfo(gdesc.data(), gdesc.size());
 
     for (uint i = 0; i < count; i++)
     {
         vector<unsigned char> pdesc;
-        for (size_t j = 0; j < prog_desc[i].size(); j++)
+        for (auto pd : prog_desc[i])
         {
-            uint len = prog_desc[i][j][1] + 2;
-            pdesc.insert(pdesc.end(),
-                         prog_desc[i][j], prog_desc[i][j] + len);
+            uint len = pd[1] + 2;
+            pdesc.insert(pdesc.end(), pd, pd + len);
         }
 
         pmt->AppendStream(pids[i], types[i], pdesc.data(), pdesc.size());
@@ -572,9 +571,9 @@ bool ProgramMapTable::IsProgramEncrypted(void) const
 
     uint encrypted = 0;
     QMap<uint,uint> encryption_system;
-    for (size_t i = 0; i < descs.size(); i++)
+    for (auto & desc : descs)
     {
-        ConditionalAccessDescriptor cad(descs[i]);
+        ConditionalAccessDescriptor cad(desc);
         if (!cad.IsValid())
             continue;
         encryption_system[cad.PID()] = cad.SystemID();
@@ -600,9 +599,9 @@ bool ProgramMapTable::IsStreamEncrypted(uint pid) const
 
     uint encrypted = 0;
     QMap<uint,uint> encryption_system;
-    for (size_t j = 0; j < descs.size(); j++)
+    for (auto & desc : descs)
     {
-        ConditionalAccessDescriptor cad(descs[j]);
+        ConditionalAccessDescriptor cad(desc);
         if (!cad.IsValid())
             continue;
         encryption_system[cad.PID()] = cad.SystemID();
@@ -890,10 +889,10 @@ QString ProgramMapTable::toString(void) const
 
     vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-    for (size_t i = 0; i < desc.size(); i++)
+    for (auto & d : desc)
     {
         str.append(QString("  %1\n")
-                   .arg(MPEGDescriptor(desc[i], 300).toString()));
+                   .arg(MPEGDescriptor(d, 300).toString()));
     }
 
     for (uint i = 0; i < StreamCount(); i++)
@@ -903,10 +902,10 @@ QString ProgramMapTable::toString(void) const
                    .arg(StreamType(i), 2, 16, QChar('0'))
                    .arg(StreamTypeString(i)));
         desc = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-        for (size_t j = 0; j < desc.size(); j++)
+        for (auto & d : desc)
         {
             str.append(QString("    %1\n")
-                       .arg(MPEGDescriptor(desc[j], 300).toString()));
+                       .arg(MPEGDescriptor(d, 300).toString()));
         }
     }
     return str;
@@ -930,9 +929,9 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
-    for (size_t i = 0; i < gdesc.size(); i++)
+    for (auto & gd : gdesc)
     {
-        str += MPEGDescriptor(gdesc[i], 300)
+        str += MPEGDescriptor(gd, 300)
             .toStringXML(indent_level + 1) + "\n";
     }
 
@@ -948,9 +947,9 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
         vector<const unsigned char*> ldesc =
             MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
         str += (ldesc.empty()) ? " />\n" : ">\n";
-        for (size_t j = 0; j < ldesc.size(); j++)
+        for (auto & ld : ldesc)
         {
-            str += MPEGDescriptor(ldesc[j], 300)
+            str += MPEGDescriptor(ld, 300)
                 .toStringXML(indent_level + 2) + "\n";
         }
         if (!ldesc.empty())
@@ -1181,8 +1180,8 @@ QString ConditionalAccessTable::toString(void) const
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    for (size_t i = 0; i < gdesc.size(); i++)
-        str += "  " + MPEGDescriptor(gdesc[i], 300).toString() + "\n";
+    for (auto & gd : gdesc)
+        str += "  " + MPEGDescriptor(gd, 300).toString() + "\n";
 
     str += "\n";
 
@@ -1201,9 +1200,9 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     str += (gdesc.empty()) ? " />\n" : ">\n";
-    for (size_t i = 0; i < gdesc.size(); i++)
+    for (auto & gd : gdesc)
     {
-        str += MPEGDescriptor(gdesc[i], 300)
+        str += MPEGDescriptor(gd, 300)
             .toStringXML(indent_level + 1) + "\n";
     }
     if (!gdesc.empty())
