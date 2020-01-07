@@ -232,9 +232,9 @@ class APHTTPRequest
 
     QByteArray GetQueryValue(const QByteArray& key)
     {
-        for (int i = 0; i < m_queries.size(); i++)
-            if (m_queries[i].first == key)
-                return m_queries[i].second;
+        foreach (auto & query, m_queries)
+            if (query.first == key)
+                return query.second;
         return "";
     }
 
