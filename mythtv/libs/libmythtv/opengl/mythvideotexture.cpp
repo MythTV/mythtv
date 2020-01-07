@@ -32,8 +32,8 @@ void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, vector<MythVide
 {
     if (!Context || Textures.empty())
         return;
-    for (uint i = 0; i < Textures.size(); ++i)
-        DeleteTexture(Context, Textures[i]);
+    for (auto & Texture : Textures)
+        DeleteTexture(Context, Texture);
     Textures.clear();
 }
 

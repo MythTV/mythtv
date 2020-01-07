@@ -68,8 +68,8 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
         vector<MythVideoTexture*> textures =
                 MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
                                                  GL_TEXTURE_EXTERNAL_OES);
-        for (uint j = 0; j < textures.size(); ++j)
-            textures[j]->m_allowGLSLDeint = false;
+        for (auto & texture : textures)
+            texture->m_allowGLSLDeint = false;
 
         EGLint colourspace = EGL_ITU_REC709_EXT;
         switch (Frame->colorspace)
@@ -173,8 +173,8 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
                                              QOpenGLTexture::Target2D);
-    for (uint i = 0; i < result.size(); ++i)
-        result[i]->m_allowGLSLDeint = true;
+    for (auto & texture : result)
+        texture->m_allowGLSLDeint = true;
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {

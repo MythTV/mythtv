@@ -67,12 +67,12 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
         for (auto it = m_openglTextures.constBegin() ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            for (auto it2 = textures.begin() ; it2 != textures.end(); ++it2)
+            for (auto & texture : textures)
             {
-                if ((*it2)->m_data)
+                if (texture->m_data)
                 {
-                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it2)->m_data);
-                    (*it2)->m_data = nullptr;
+                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
+                    texture->m_data = nullptr;
                     count++;
                 }
             }

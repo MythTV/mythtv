@@ -467,9 +467,9 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
 
 void MythOpenGLVideo::ResetFrameFormat(void)
 {
-    for (int i = 0; i < ShaderCount; ++i)
-        if (m_shaders[i])
-            m_render->DeleteShaderProgram(m_shaders[i]);
+    for (auto & shader : m_shaders)
+        if (shader)
+            m_render->DeleteShaderProgram(shader);
     memset(m_shaders, 0, sizeof(m_shaders));
     memset(m_shaderCost, 1, sizeof(m_shaderCost));
     MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
@@ -841,12 +841,12 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 /// \brief Clear reference frames after a seek as they will contain old images.
 void MythOpenGLVideo::ResetTextures(void)
 {
-    for (uint i = 0; i < m_inputTextures.size(); ++i)
-        m_inputTextures[i]->m_valid = false;
-    for (uint i = 0; i < m_prevTextures.size(); ++i)
-        m_prevTextures[i]->m_valid = false;
-    for (uint i = 0; i < m_nextTextures.size(); ++i)
-        m_nextTextures[i]->m_valid = false;
+    for (auto & texture : m_inputTextures)
+        texture->m_valid = false;
+    for (auto & texture : m_prevTextures)
+        texture->m_valid = false;
+    for (auto & texture : m_nextTextures)
+        texture->m_valid = false;
 }
 
 void MythOpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
@@ -878,8 +878,8 @@ void MythOpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*>
     }
 
     if (usecurrent)
-        for (uint i = 0; i < Current.size(); ++i)
-            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[i]);
+        for (auto & texture : Current)
+            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(texture);
 }
 
 QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
