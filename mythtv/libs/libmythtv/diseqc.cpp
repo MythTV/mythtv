@@ -1345,10 +1345,10 @@ bool DiSEqCDevSwitch::Store(void) const
 
     // chain to children
     bool success = true;
-    for (size_t ch = 0; ch < m_children.size(); ch++)
+    for (auto child : m_children)
     {
-        if (m_children[ch])
-            success &= m_children[ch]->Store();
+        if (child)
+            success &= child->Store();
     }
 
     return success;

@@ -785,9 +785,9 @@ void FormattedTextSubtitle::Layout(void)
     // Calculate dimensions of bounding rectangle
     int anchor_width = 0;
     int anchor_height = 0;
-    for (int i = 0; i < m_lines.size(); i++)
+    foreach (auto & line, m_lines)
     {
-        QSize sz = m_lines[i].CalcSize(LINE_SPACING);
+        QSize sz = line.CalcSize(LINE_SPACING);
         anchor_width = max(anchor_width, sz.width());
         anchor_height += sz.height();
     }
@@ -874,11 +874,11 @@ void FormattedTextSubtitle::Draw(void)
 {
     QList<MythUIType *> textList;
     QList<MythUIType *> shapeList;
-    for (int i = 0; i < m_lines.size(); i++)
+    for (auto & line : m_lines)
     {
         QList<FormattedTextChunk>::const_iterator chunk;
-        for (chunk = m_lines[i].chunks.constBegin();
-             chunk != m_lines[i].chunks.constEnd();
+        for (chunk = line.chunks.constBegin();
+             chunk != line.chunks.constEnd();
              ++chunk)
         {
             MythFontProperties *mythfont =
@@ -923,14 +923,14 @@ void FormattedTextSubtitle::Draw(void)
 QStringList FormattedTextSubtitle::ToSRT(void) const
 {
     QStringList result;
-    for (int i = 0; i < m_lines.size(); i++)
+    foreach (const auto & ftl, m_lines)
     {
         QString line;
-        if (m_lines[i].m_origX > 0)
-            line.fill(' ', m_lines[i].m_origX);
+        if (ftl.m_origX > 0)
+            line.fill(' ', ftl.m_origX);
         QList<FormattedTextChunk>::const_iterator chunk;
-        for (chunk = m_lines[i].chunks.constBegin();
-             chunk != m_lines[i].chunks.constEnd();
+        for (chunk = ftl.chunks.constBegin();
+             chunk != ftl.chunks.constEnd();
              ++chunk)
         {
             const QString &text = (*chunk).m_text;
@@ -1348,14 +1348,14 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
     m_xAnchor = anchor_x;
     m_yAnchor = anchor_y;
 
-    for (size_t i = 0; i < list.size(); i++)
+    for (auto str708 : list)
     {
-        if (list[i]->m_y >= (uint)m_lines.size())
-            m_lines.resize(list[i]->m_y + 1);
-        FormattedTextChunk chunk(list[i]->m_str, list[i]->m_attr, m_subScreen);
-        m_lines[list[i]->m_y].chunks += chunk;
+        if (str708->m_y >= (uint)m_lines.size())
+            m_lines.resize(str708->m_y + 1);
+        FormattedTextChunk chunk(str708->m_str, str708->m_attr, m_subScreen);
+        m_lines[str708->m_y].chunks += chunk;
         LOG(VB_VBI, LOG_INFO, QString("Adding cc708 chunk: win %1 row %2: %3")
-            .arg(m_num).arg(list[i]->m_y).arg(chunk.ToLogString()));
+            .arg(m_num).arg(str708->m_y).arg(chunk.ToLogString()));
     }
 }
 
@@ -2250,8 +2250,8 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
     bool changed = (oldsafe != m_safeArea || m_textFontZoom != m_textFontZoomPrev);
     if (changed)
     {
-        for (int i = 0; i < k708MaxWindows; i++)
-            cc708service->m_windows[i].SetChanged();
+        for (auto & window : cc708service->m_windows)
+            window.SetChanged();
     }
 
     uint64_t clearMask = 0;

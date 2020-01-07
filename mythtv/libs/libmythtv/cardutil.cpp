@@ -1508,10 +1508,10 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     // copy input group linkages
     vector<uint> src_grps = CardUtil::GetInputGroups(src_inputid);
     vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
-    for (size_t j = 0; j < dst_grps.size(); j++)
-        CardUtil::UnlinkInputGroup(dst_inputid, dst_grps[j]);
-    for (size_t j = 0; j < src_grps.size(); j++)
-        CardUtil::LinkInputGroup(dst_inputid, src_grps[j]);
+    for (uint dst_grp : dst_grps)
+        CardUtil::UnlinkInputGroup(dst_inputid, dst_grp);
+    for (uint src_grp : src_grps)
+        CardUtil::LinkInputGroup(dst_inputid, src_grp);
 
     // clone diseqc_config (just points to the same diseqc_tree row)
     DiSEqCDevSettings diseqc;
@@ -2569,13 +2569,13 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
 bool CardUtil::DeleteInput(uint inputid)
 {
     vector<uint> childids = GetChildInputIDs(inputid);
-    for (size_t i = 0; i < childids.size(); ++i)
+    for (uint childid : childids)
     {
-        if (!DeleteInput(childids[i]))
+        if (!DeleteInput(childid))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("CardUtil: Failed to delete child input %1")
-                .arg(childids[i]));
+                .arg(childid));
             return false;
         }
     }

@@ -290,11 +290,11 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
 
 void DTVConfParser::AddChannel(const DTVMultiplex &mux, DTVChannelInfo &chan)
 {
-    for (size_t i = 0; i < m_channels.size(); i++)
+    for (auto & channel : m_channels)
     {
-        if (m_channels[i] == mux)
+        if (channel == mux)
         {
-            m_channels[i].channels.push_back(chan);
+            channel.channels.push_back(chan);
 
             LOG(VB_GENERAL, LOG_INFO, "Imported channel: " + chan.toString() +
                     " on " + mux.toString());

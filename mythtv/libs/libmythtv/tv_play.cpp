@@ -1672,10 +1672,10 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
     }
     else if (!selection.empty())
     {
-        for (size_t i = 0; i < selection.size(); i++)
+        for (const auto & ci : selection)
         {
-            uint    chanid  = selection[i].m_chanId;
-            QString channum = selection[i].m_chanNum;
+            uint    chanid  = ci.m_chanId;
+            QString channum = ci.m_chanNum;
             if (!chanid || channum.isEmpty())
                 continue;
             QSet<uint> cards = IsTunableOn(ctx, chanid);
@@ -1841,10 +1841,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             vector<uint> input_grps =
                 CardUtil::GetInputGroups((*it).m_info->GetInputID());
 
-            for (size_t i = 0; i < input_grps.size(); i++)
+            for (uint grp : input_grps)
             {
                 if (find(busy_input_grps.begin(), busy_input_grps.end(),
-                         input_grps[i]) !=  busy_input_grps.end())
+                         grp) !=  busy_input_grps.end())
                 {
                     (*it).m_isInSameInputGroup = true;
                     break;
@@ -7096,14 +7096,14 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     uint sourceid = info["sourceid"].toUInt();
 
     vector<InputInfo> inputs = RemoteRequestFreeInputInfo(cardid);
-    for (size_t i = 0; i < inputs.size(); i++)
+    for (auto & input : inputs)
     {
         // prefer the current card's input in sources list
-        if ((sources.find(inputs[i].m_sourceId) == sources.end()) ||
-            ((cardid == inputs[i].m_inputId) &&
-             (cardid != sources[inputs[i].m_sourceId].m_inputId)))
+        if ((sources.find(input.m_sourceId) == sources.end()) ||
+            ((cardid == input.m_inputId) &&
+             (cardid != sources[input.m_sourceId].m_inputId)))
         {
-            sources[inputs[i].m_sourceId] = inputs[i];
+            sources[input.m_sourceId] = input;
         }
     }
 
@@ -7805,10 +7805,10 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
 void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
-    for (size_t i = 0; i < options.size(); i++)
+    for (const auto & option : options)
     {
-        uint    chanid  = options[i].m_chanId;
-        QString channum = options[i].m_chanNum;
+        uint    chanid  = option.m_chanId;
+        QString channum = option.m_chanNum;
 
         if (chanid && !channum.isEmpty() && IsTunable(ctx, chanid))
         {
@@ -8429,8 +8429,8 @@ bool TV::IsTunable(uint chanid)
 static QString toCommaList(const QSet<uint> &list)
 {
     QString ret = "";
-    for (auto it = list.cbegin(); it != list.cend(); ++it)
-        ret += QString("%1,").arg(*it);
+    foreach (uint i, list)
+        ret += QString("%1,").arg(i);
 
     if (ret.length())
         return ret.left(ret.length()-1);
@@ -8462,20 +8462,20 @@ QSet<uint> TV::IsTunableOn(
 
     vector<InputInfo> inputs = RemoteRequestFreeInputInfo(excluded_input);
 
-    for (size_t j = 0; j < inputs.size(); j++)
+    for (auto & input : inputs)
     {
-        if (inputs[j].m_sourceId != sourceid)
+        if (input.m_sourceId != sourceid)
             continue;
 
-        if (inputs[j].m_mplexId &&
-            inputs[j].m_mplexId != mplexid)
+        if (input.m_mplexId &&
+            input.m_mplexId != mplexid)
             continue;
 
-        if (!inputs[j].m_mplexId && inputs[j].m_chanId &&
-            inputs[j].m_chanId != chanid)
+        if (!input.m_mplexId && input.m_chanId &&
+            input.m_chanId != chanid)
             continue;
 
-        tunable_cards.insert(inputs[j].m_inputId);
+        tunable_cards.insert(input.m_inputId);
     }
 
     if (tunable_cards.empty())
@@ -10393,25 +10393,25 @@ void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap)
     modifiable["channame"] = infoMap["channame"].isEmpty();
 
     const QString xds_keys[2] = { "callsign", "channame", };
-    for (uint i = 0; i < 2; i++)
+    for (const auto & key : xds_keys)
     {
-        if (!modifiable[xds_keys[i]])
+        if (!modifiable[key])
             continue;
 
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        QString tmp = ctx->m_player->GetXDS(xds_keys[i]).toUpper();
+        QString tmp = ctx->m_player->GetXDS(key).toUpper();
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         if (tmp.isEmpty())
             continue;
 
-        if ((xds_keys[i] == "callsign") &&
+        if ((key == "callsign") &&
             ((tmp.length() > 5) || (tmp.indexOf(" ") >= 0)))
         {
             continue;
         }
 
-        infoMap[xds_keys[i]] = tmp;
+        infoMap[key] = tmp;
     }
 }
 
@@ -11407,11 +11407,11 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {140, "1.4", tr("1.4x")},
             {150, "1.5", tr("1.5x")},
         };
-        for (size_t i = 0; i < sizeof(s_speeds) / sizeof(*s_speeds); ++i)
+        for (auto & speed : s_speeds)
         {
-            QString action = prefix + s_speeds[i].m_suffix;
-            active = (m_tvmSpeedX100 == s_speeds[i].m_speedX100);
-            BUTTON(action, s_speeds[i].m_trans);
+            QString action = prefix + speed.m_suffix;
+            active = (m_tvmSpeedX100 == speed.m_speedX100);
+            BUTTON(action, speed.m_trans);
         }
     }
     else if (matchesGroup(actionName, "TOGGLESLEEP", category, prefix))
@@ -11445,12 +11445,12 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
             static constexpr uint kCasOrd[] = { 0, 2, 1 };
-            for (size_t i = 0; i < sizeof(kCasOrd)/sizeof(kCasOrd[0]); i++)
+            for (uint csm : kCasOrd)
             {
-                const auto mode = (CommSkipMode) kCasOrd[i];
-                QString action = prefix + QString::number(kCasOrd[i]);
+                const auto mode = (CommSkipMode) csm;
+                QString action = prefix + QString::number(csm);
                 active = (mode == m_tvmCurSkip);
-                BUTTON(action, toString((CommSkipMode) kCasOrd[i]));
+                BUTTON(action, toString((CommSkipMode) csm));
             }
         }
     }
@@ -12265,9 +12265,8 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
                         titles_seen.push_back(p->GetTitle());
 
                         int j = -1;
-                        for (auto pit2 = plist.begin(); pit2 != plist.end(); ++pit2)
+                        for (auto q : plist)
                         {
-                            const ProgramInfo *q = *pit2;
                             j++;
 
                             if (q->GetTitle() != p->GetTitle())

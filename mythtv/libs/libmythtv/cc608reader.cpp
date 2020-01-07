@@ -462,8 +462,8 @@ void CC608Reader::ClearBuffers(bool input, bool output, int outputStreamIdx)
 
     if (output && outputStreamIdx < 0)
     {
-        for (int i = 0; i < MAXOUTBUFFERS; ++i)
-            m_state[i].Clear();
+        for (auto & state : m_state)
+            state.Clear();
     }
 
     if (output && outputStreamIdx >= 0)

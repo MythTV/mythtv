@@ -458,10 +458,9 @@ void MythCCExtractorPlayer::Ingest708Caption(
     for (; ccIt != cc708win.end() ; ++ccIt)
     {
         uint idx = (*ccIt).row * 1000 + (*ccIt).column;
-        for (QStringList::const_iterator sit = (*ccIt).text.begin();
-             sit != (*ccIt).text.end(); ++sit)
+        foreach (const auto & str, (*ccIt).text)
         {
-            orderedContent[idx] += (*sit);
+            orderedContent[idx] += str;
         }
     }
 

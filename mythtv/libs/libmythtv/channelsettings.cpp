@@ -383,8 +383,8 @@ class CommMethod : public MythUIComboBoxSetting
         tmp.push_front(COMM_DETECT_UNINIT);
         tmp.push_back(COMM_DETECT_COMMFREE);
 
-        for (size_t i = 0; i < tmp.size(); i++)
-            addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
+        for (int pref : tmp)
+            addSelection(SkipTypeToString(pref), QString::number(pref));
     }
 };
 

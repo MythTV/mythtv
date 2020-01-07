@@ -284,15 +284,15 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
             list, DescriptorID::extended_event, languagePreferences);
 
     description = "";
-    for (size_t j = 0; j < bestExtendedEvents.size(); j++)
+    for (auto & best_event : bestExtendedEvents)
     {
-        if (!bestExtendedEvents[j])
+        if (!best_event)
         {
             description = "";
             break;
         }
 
-        ExtendedEventDescriptor eed(bestExtendedEvents[j]);
+        ExtendedEventDescriptor eed(best_event);
         if (eed.IsValid())
         {
             if (enc)
@@ -312,9 +312,9 @@ static inline void parse_dvb_component_descriptors(const desc_list_t& list,
 {
     desc_list_t components =
         MPEGDescriptor::FindAll(list, DescriptorID::component);
-    for (size_t j = 0; j < components.size(); j++)
+    for (auto & comp : components)
     {
-        ComponentDescriptor component(components[j]);
+        ComponentDescriptor component(comp);
         if (!component.IsValid())
             continue;
         video_properties |= component.VideoProperties();
@@ -553,9 +553,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
         desc_list_t contentIds =
             MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
-        for (size_t j = 0; j < contentIds.size(); j++)
+        for (auto & id : contentIds)
         {
-            DVBContentIdentifierDescriptor desc(contentIds[j]);
+            DVBContentIdentifierDescriptor desc(id);
             if (!desc.IsValid())
                 continue;
             for (size_t k = 0; k < desc.CRIDCount(); k++)
@@ -590,8 +590,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             bool isUPC = false;
             /* is this event carrying UPC private data? */
             desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
-            for (size_t j = 0; j < private_data_specifiers.size(); j++) {
-                PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
+            for (auto & specifier : private_data_specifiers) {
+                PrivateDataSpecifierDescriptor desc(specifier);
                 if (!desc.IsValid())
                     continue;
                 if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
@@ -601,8 +601,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
             if (isUPC) {
                 desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
-                for (size_t j = 0; j < subtitles.size(); j++) {
-                    PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
+                for (auto & st : subtitles) {
+                    PrivateUPCCablecomEpisodeTitleDescriptor desc(st);
                     if (!desc.IsValid())
                         continue;
                     subtitle = desc.Text();
@@ -703,9 +703,9 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     desc_list_t transmissions =
         MPEGDescriptor::FindAll(
             list, PrivateDescriptorID::premiere_content_transmission);
-    for(size_t j=0; j< transmissions.size(); j++)
+    for (auto & trans : transmissions)
     {
-        PremiereContentTransmissionDescriptor transmission(transmissions[j]);
+        PremiereContentTransmissionDescriptor transmission(trans);
         if (!transmission.IsValid())
             continue;
         uint networkid = transmission.OriginalNetworkID();

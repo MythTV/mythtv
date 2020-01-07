@@ -233,8 +233,8 @@ vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (size_t j = 0; j < inputs.size(); j++)
-        inputids.push_back(inputs[j].m_inputId);
+    for (auto & input : inputs)
+        inputids.push_back(input.m_inputId);
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestFreeRecorderList got inputs"));
@@ -251,8 +251,8 @@ vector<uint> RemoteRequestFreeInputList(uint excluded_input)
         RemoteRequestFreeInputInfo(excluded_input);
 
     vector<uint> inputids;
-    for (size_t j = 0; j < inputs.size(); j++)
-        inputids.push_back(inputs[j].m_inputId);
+    for (auto & input : inputs)
+        inputids.push_back(input.m_inputId);
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestFreeInputList got inputs"));
@@ -269,13 +269,12 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
     vector<InputInfo> inputs =
         RemoteRequestFreeInputInfo(excluded_input);
 
-    for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
-         recIter != qualifiedRecorders.end(); ++recIter)
+    foreach (const auto & recorder, qualifiedRecorders)
     {
-        uint inputid = (*recIter).toUInt();
-        for (size_t i = 0; i < inputs.size(); ++i)
+        uint inputid = recorder.toUInt();
+        for (auto & input : inputs)
         {
-            if (inputs[i].m_inputId == inputid)
+            if (input.m_inputId == inputid)
             {
                 LOG(VB_CHANNEL, LOG_INFO,
                     QString("RemoteRequestFreeRecorderFromList got input %1")
@@ -408,10 +407,9 @@ bool RemoteGetRecordingStatus(
     if (tunerList)
         tunerList->clear();
 
-    for (size_t i = 0; i < inputlist.size(); i++)
+    for (uint inputid : inputlist)
     {
         QString     status      = "";
-        uint        inputid     = inputlist[i];
         int         state       = kState_ChangingState;
         QString     channelName = "";
         QString     title       = "";

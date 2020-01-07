@@ -757,16 +757,16 @@ QStringList LiveTVChain::entriesToStringList() const
     QMutexLocker lock(&m_lock);
     QStringList ret;
     ret << QString::number(m_maxPos);
-    for (int i = 0; i < m_chain.size(); i++)
+    foreach (const auto & entry, m_chain)
     {
-        ret << QString::number(m_chain[i].chanid);
-        ret << m_chain[i].starttime.toString(Qt::ISODate);
-        ret << m_chain[i].endtime.toString(Qt::ISODate);
-        ret << QString::number(m_chain[i].discontinuity);
-        ret << m_chain[i].hostprefix;
-        ret << m_chain[i].inputtype;
-        ret << m_chain[i].channum;
-        ret << m_chain[i].inputname;
+        ret << QString::number(entry.chanid);
+        ret << entry.starttime.toString(Qt::ISODate);
+        ret << entry.endtime.toString(Qt::ISODate);
+        ret << QString::number(entry.discontinuity);
+        ret << entry.hostprefix;
+        ret << entry.inputtype;
+        ret << entry.channum;
+        ret << entry.inputname;
     }
     return ret;
 }

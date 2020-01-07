@@ -298,9 +298,8 @@ void OSD::LoadWindows(void)
         "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
         "osd_program_editor", "osd_debug"};
 
-    for (int i = 0; i < 7; i++)
+    for (auto window : s_defaultWindows)
     {
-        const char* window = s_defaultWindows[i];
         auto *win = new MythOSDWindow(nullptr, window, true);
 
         win->SetPainter(m_currentPainter);

@@ -813,8 +813,8 @@ uint DBEvent::UpdateDB(
 
     if (m_credits)
     {
-        for (size_t i = 0; i < m_credits->size(); i++)
-            (*m_credits)[i].InsertDB(query, chanid, m_starttime);
+        for (auto & credit : *m_credits)
+            credit.InsertDB(query, chanid, m_starttime);
     }
 
     QList<EventRating>::const_iterator j = m_ratings.begin();
@@ -1138,8 +1138,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (size_t i = 0; i < m_credits->size(); i++)
-            (*m_credits)[i].InsertDB(query, chanid, m_starttime);
+        for (auto & credit : *m_credits)
+            credit.InsertDB(query, chanid, m_starttime);
     }
 
     add_genres(query, m_genres, chanid, m_starttime);
@@ -1307,8 +1307,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (m_credits)
     {
-        for (size_t i = 0; i < m_credits->size(); ++i)
-            (*m_credits)[i].InsertDB(query, chanid, m_starttime);
+        for (auto & credit : *m_credits)
+            credit.InsertDB(query, chanid, m_starttime);
     }
 
     add_genres(query, m_genres, chanid, m_starttime);
@@ -1370,8 +1370,8 @@ bool ProgramData::ClearDataBySource(
     vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
     bool ok = true;
-    for (size_t i = 0; i < chanids.size(); i++)
-        ok &= ClearDataByChannel(chanids[i], from, to, use_channel_time_offset);
+    for (uint chanid : chanids)
+        ok &= ClearDataByChannel(chanid, from, to, use_channel_time_offset);
 
     return ok;
 }
@@ -1509,10 +1509,8 @@ void ProgramData::HandlePrograms(
 
         FixProgramList(sortlist);
 
-        for (size_t i = 0; i < chanids.size(); ++i)
-        {
-            HandlePrograms(query, chanids[i], sortlist, unchanged, updated);
-        }
+        for (uint chanid : chanids)
+            HandlePrograms(query, chanid, sortlist, unchanged, updated);
     }
 
     LOG(VB_GENERAL, LOG_INFO,

@@ -521,11 +521,11 @@ void TVBrowseHelper::run()
             {
                 if (!chanids.empty())
                 {
-                    for (size_t i = 0; i < chanids.size(); i++)
+                    for (uint chanid : chanids)
                     {
-                        if (TV::IsTunable(ctx, chanids[i]))
+                        if (TV::IsTunable(ctx, chanid))
                         {
-                            infoMap["chanid"] = QString::number(chanids[i]);
+                            infoMap["chanid"] = QString::number(chanid);
                             GetNextProgramDB(direction, infoMap);
                             break;
                         }

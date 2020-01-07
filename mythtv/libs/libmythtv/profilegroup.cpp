@@ -33,9 +33,8 @@ void ProfileGroup::HostName::fillSelections()
 {
     QStringList hostnames;
     ProfileGroup::getHostNames(&hostnames);
-    for(QStringList::Iterator it = hostnames.begin();
-                 it != hostnames.end(); it++)
-        this->addSelection(*it);
+    foreach (auto & hostname, hostnames)
+        this->addSelection(hostname);
 }
 
 ProfileGroup::ProfileGroup()
@@ -102,12 +101,12 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
             // get the id of the new profile group
             int groupid = query.lastInsertId().toInt();
 
-            for (uint idx = 0 ; idx < num_profiles; ++idx)
+            for (const auto & name : profile_names)
             {
                 // insert the recording profiles
                 query.prepare("INSERT INTO recordingprofiles SET name = "
                               ":NAME, profilegroup = :GROUPID;");
-                query.bindValue(":NAME", profile_names[idx]);
+                query.bindValue(":NAME", name);
                 query.bindValue(":GROUPID", groupid);
                 if (!query.exec())
                 {
