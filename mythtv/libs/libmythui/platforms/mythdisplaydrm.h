@@ -9,7 +9,7 @@
 
 class MythDRMDevice;
 
-class MythDisplayDRM final : public MythDisplay
+class MythDisplayDRM : public MythDisplay
 {
     Q_OBJECT
 

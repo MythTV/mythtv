@@ -5,6 +5,7 @@
 #define LOC QString("DispDRM: ")
 
 MythDisplayDRM::MythDisplayDRM()
+  : MythDisplay()
 {
     m_device = new MythDRMDevice(m_screen);
     Initialise();
