@@ -81,7 +81,6 @@ class BECache( object ):
 
         else:
             backend = backend.strip('[]')
-            query = "SELECT hostname FROM settings WHERE value=? AND data=?"
             if self._reip.match(backend):
                 # given backend is IP address
                 self.host = backend

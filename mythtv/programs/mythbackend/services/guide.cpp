@@ -229,7 +229,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     sSQL += "deleted IS NULL AND ";
 
     if (!bWithInvisible)
-        sSQL += "visible != 0 AND ";
+        sSQL += "visible > 0 AND ";
 
     sSQL += "program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
 

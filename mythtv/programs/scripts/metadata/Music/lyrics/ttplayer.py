@@ -8,7 +8,12 @@ taxigps
 import os
 import sys
 import socket
-import urllib
+
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
+
 import re
 import chardet
 import random
@@ -37,7 +42,7 @@ class ttpClient(object):
     '''
     privide ttplayer specific function, such as encoding artist and title,
     generate a Id code for server authorizition.
-    (see http://ttplyrics.googlecode.com/svn/trunk/crack) 
+    (see http://ttplyrics.googlecode.com/svn/trunk/crack)
     '''
     @staticmethod
     def CodeFunc(Id, data):
@@ -46,7 +51,7 @@ class ttpClient(object):
         These code may be ugly coz it is translated
         from C code which is translated from asm code
         grabed by ollydbg from ttp_lrcs.dll.
-        (see http://ttplyrics.googlecode.com/svn/trunk/crack) 
+        (see http://ttplyrics.googlecode.com/svn/trunk/crack)
         '''
         length = len(data)
 
@@ -108,13 +113,18 @@ class ttpClient(object):
         return tmp1
 
     @staticmethod
-    def EncodeArtTit(str):
+    def EncodeArtTit(mystr):
         rtn = ''
-        uni = unicode(str, 'UTF-8')
-        str = uni.encode('UTF-16')[2:]
-        for i in range(len(str)):
-            rtn += '%02x' % ord(str[i])
-
+        if utilities.IS_PY2:
+            uni = unicode(mystr, 'UTF-8')
+            mystr = uni.encode('UTF-16')[2:]
+            for i in range(len(mystr)):
+                rtn += '%02x' % ord(mystr[i])
+        else:
+            uni = str(mystr)
+            mystr = uni.encode('UTF-16')[2:]
+            for i in range(len(mystr)):
+                rtn += '%02x' % (mystr[i])
         return rtn
 
 
@@ -145,8 +155,8 @@ class LyricsFetcher:
 
         try:
             url = self.LIST_URL %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(title.replace(' ','').lower()))
-            f = urllib.urlopen(url)
-            Page = f.read()
+            f = urlopen(url)
+            Page = f.read().decode('utf-8')
         except:
             utilities.log(True, "%s: %s::%s (%d) [%s]" % (
                    __title__, self.__class__.__name__,
@@ -168,7 +178,7 @@ class LyricsFetcher:
             lyrics.list = links
         for link in links:
             lyr = self.get_lyrics_from_list(link)
-            if lyr and lyr.startswith('['):
+            if lyr and lyr.startswith(b'['):
                 enc = chardet.detect(lyr)
                 lyr = lyr.decode(enc['encoding'], 'ignore')
                 lyrics.lyrics = lyr
@@ -180,7 +190,7 @@ class LyricsFetcher:
         utilities.log(debug, '%s %s %s' %(Id, artist, song))
         try:
             url = self.LYRIC_URL %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
-            f = urllib.urlopen(url)
+            f = urlopen(url)
             Page = f.read()
         except:
             utilities.log(True, "%s: %s::%s (%d) [%s]" % (
@@ -190,7 +200,7 @@ class LyricsFetcher:
                    sys.exc_info()[ 1 ]
                    ))
             return None
-        if Page.startswith('['):
+        if Page.startswith(b'['):
             return Page
         return ''
 
@@ -208,6 +218,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -226,8 +237,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -242,8 +253,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():

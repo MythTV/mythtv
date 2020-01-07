@@ -26,7 +26,10 @@ class LyricsFetcher:
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
-        filename = lyrics.filename.decode("utf-8")
+        if utilities.IS_PY2:
+            filename = lyrics.filename.decode("utf-8")
+        else:
+            filename = lyrics.filename
         filename = os.path.splitext(filename)[0]
 
         # look for a file ending in .lrc with the same filename as the track minus the extension
@@ -83,8 +86,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                      pretty_print=True, xml_declaration=True)))
 
 def buildVersion():
     from lxml import etree
@@ -98,8 +101,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                      pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():

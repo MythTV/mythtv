@@ -1,10 +1,13 @@
 #ifndef MYTHRENDER_H_
 #define MYTHRENDER_H_
 
+// Qt
 #include <QString>
 #include <QMutex>
 #include <QSize>
+#include <QStringList>
 
+// MythTV
 #include "referencecounter.h"
 #include "mythuiexp.h"
 
@@ -37,6 +40,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
     virtual void ReleaseResources(void) { }
+    virtual QStringList GetDescription(void) { return QStringList(); }
 
   protected:
      ~MythRender() override = default;

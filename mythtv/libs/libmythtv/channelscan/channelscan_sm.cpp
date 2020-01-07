@@ -279,8 +279,7 @@ void ChannelScanSM::HandleAllGood(void)
             0      /* ATSC major channel */,
             0      /* ATSC minor channel */,
             false  /* use on air guide   */,
-            false  /* hidden             */,
-            false  /* hidden in guide    */,
+            kChannelVisible /* visible   */,
             freqid);
 
         msg = (ok) ?

@@ -27,6 +27,8 @@ using namespace std;
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
+#include "mythrender_base.h"
+#include "mythdisplay.h"
 
 struct LogLine {
     QString m_line;
@@ -116,6 +118,10 @@ void StatusBox::Init()
     item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
                             qVariantFromValue((void*)SLOT(doJobQueueStatus())));
     item->DisplayState("jobqueue", "icon");
+
+    item = new MythUIButtonListItem(m_categoryList, tr("Display"),
+                            qVariantFromValue((void*)SLOT(doDisplayStatus())));
+    item->DisplayState("display", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Machine Status"),
                             qVariantFromValue((void*)SLOT(doMachineStatus())));
@@ -1452,6 +1458,31 @@ void StatusBox::doMachineStatus()
         }
     }
 
+}
+
+void StatusBox::doDisplayStatus()
+{
+    if (m_iconState)
+        m_iconState->DisplayState("display");
+    m_logList->Reset();
+    QString displayhelp = tr("Display and rendering information.");
+    if (m_helpText)
+        m_helpText->SetText(displayhelp);
+    if (m_justHelpText)
+        m_justHelpText->SetText(displayhelp);
+
+    QStringList desc = MythDisplay::GetDescription();
+    for (auto it = desc.cbegin(); it != desc.cend(); ++it)
+        AddLogLine(*it);
+    AddLogLine("");
+
+    MythRender* render = GetMythMainWindow()->GetRenderDevice();
+    if (render)
+    {
+        desc = render->GetDescription();
+        for (auto it = desc.cbegin(); it != desc.cend(); ++it)
+            AddLogLine(*it);
+    }
 }
 
 /** \fn StatusBox::doAutoExpireList()

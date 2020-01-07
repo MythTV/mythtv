@@ -19,6 +19,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from optparse import OptionParser
 import musicbrainzngs
+from musicbrainzngs.compat import is_py2
 import sys
 import pprint
 
@@ -43,6 +44,14 @@ def log(debug, txt):
     if debug:
         print(txt)
 
+def convert_etree(etostr):
+    """lxml.etree.tostring is a bytes object in python3, and a str in python2.
+    """
+    if is_py2:
+        return(etostr)
+    else:
+        return(etostr.decode())
+
 def search_releases(artist, album, limit):
     from lxml import etree
 
@@ -52,7 +61,7 @@ def search_releases(artist, album, limit):
 
     if not result['release-list']:
         etree.SubElement(root, "error").text = "No Releases found"
-        log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+        log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
         sys.exit(1)
 
     for (idx, release) in enumerate(result['release-list']):
@@ -72,7 +81,7 @@ def search_releases(artist, album, limit):
         if 'release-group' in release:
             etree.SubElement(relNode, "releasegroup").text = release["release-group"]["id"]
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
 
     sys.exit(0)
 
@@ -93,10 +102,10 @@ def search_artists(artist, limit):
             etree.SubElement(artistNode, "sort-name").text = artist['sort-name']
     else:
         etree.SubElement(root, "error").text = "No Artists found"
-        log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+        log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
         sys.exit(1)
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
 
     sys.exit(0)
 
@@ -125,10 +134,10 @@ def get_artist(artistid):
                     node.set("type", url['type'])
     else:
         etree.SubElement(root, "error").text = "MusicBrainz ID was not found"
-        log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+        log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
         sys.exit(1)
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def find_coverart(release):
@@ -141,11 +150,11 @@ def find_coverart(release):
     except musicbrainzngs.ResponseError as err:
         if err.cause.code == 404:
             etree.SubElement(root, "error").text = "Release ID not found"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
         else:
             etree.SubElement(root, "error").text = "Received bad response from the MB server"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
 
     if debug:
@@ -161,7 +170,7 @@ def find_coverart(release):
         etree.SubElement(imageNode, "thumb-small").text = image["thumbnails"]["small"]
         etree.SubElement(imageNode, "thumb-large").text = image["thumbnails"]["large"]
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def find_coverart_releasegroup(releaseGroup):
@@ -174,11 +183,11 @@ def find_coverart_releasegroup(releaseGroup):
     except musicbrainzngs.ResponseError as err:
         if err.cause.code == 404:
             etree.SubElement(root, "error").text = "Release ID not found"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
         else:
             etree.SubElement(root, "error").text = "Received bad response from the MB server"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
 
     if debug:
@@ -194,7 +203,7 @@ def find_coverart_releasegroup(releaseGroup):
         etree.SubElement(imageNode, "thumb-small").text = image["thumbnails"]["small"]
         etree.SubElement(imageNode, "thumb-large").text = image["thumbnails"]["large"]
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def find_disc(cddrive):
@@ -209,7 +218,7 @@ def find_disc(cddrive):
         toc = disc.toc_string
     except discid.DiscError as err:
         etree.SubElement(root, "error").text = "Failed to get discid ({})".format(str(err))
-        log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+        log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
         sys.exit(1)
 
     etree.SubElement(root, "discid").text = id
@@ -221,11 +230,11 @@ def find_disc(cddrive):
     except musicbrainzngs.ResponseError as err:
         if err.cause.code == 404:
             etree.SubElement(root, "error").text = "Disc not found"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
         else:
             etree.SubElement(root, "error").text = "Received bad response from the MB server"
-            log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+            log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
             sys.exit(1)
 
     # The result can either be a "disc" or a "cdstub"
@@ -266,10 +275,10 @@ def find_disc(cddrive):
             etree.SubElement(stubnode, "barcode").text = result['cdstub']['barcode']
     else:
         etree.SubElement(root, "error").text = "No valid results"
-        log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+        log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
         sys.exit(1)
 
-    log(True, etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True))
+    log(True, convert_etree(etree.tostring(root, encoding='UTF-8', pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -281,8 +290,8 @@ def buildVersion():
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__
 
-    log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                             xml_declaration=True))
+    log(True, convert_etree(etree.tostring(version, encoding='UTF-8', pretty_print=True,
+                             xml_declaration=True)))
     sys.exit(0)
 
 def performSelfTest():
@@ -356,7 +365,7 @@ def main():
         if opts.album == None:
             print("Missing --album argument")
             sys.exit(1)
- 
+
         limit = 5
         if opts.limit:
             limit = int(opts.limit)
@@ -399,6 +408,6 @@ def main():
             find_coverart_releasegroup(opts.relgroupid)
 
     sys.exit(0)
-    
+
 if __name__ == '__main__':
     main()

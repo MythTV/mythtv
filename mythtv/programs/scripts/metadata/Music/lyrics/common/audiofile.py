@@ -73,7 +73,7 @@ class AudioFile(object):
     def AnalyzeOgg(self):
         # Parse page (OggS)
         while True:
-            buf = self.f.read(27)    # header 
+            buf = self.f.read(27)    # header
             if len(buf) < 27 or self.f.tell() > 50000:
                 # parse error
                 raise FormatError
@@ -85,7 +85,7 @@ class AudioFile(object):
 
             segtbl = struct.unpack('%dB'%numseg, self.f.read(numseg))    # segment table
             for seglen in segtbl:
-                buf = self.f.read(7)    # segment header 
+                buf = self.f.read(7)    # segment header
                 #print "segLen(%s): %d" % (buf[1:7],seglen)
                 if buf == "\x05vorbis":
                     self.f.seek(-7,1)   # rollback
@@ -124,4 +124,4 @@ class AudioFile(object):
                 # it was the last metadata block
                 self.audioStart = self.f.tell()
                 return
- 
+

@@ -245,7 +245,7 @@ uint ChannelImporter::DeleteChannels(
             int j = item & 0xFFFF;
             int chanid = transports[i].m_channels[j].m_channelId;
             QString channum = ChannelUtil::GetChanNum(chanid);
-            ChannelUtil::SetVisible(chanid, false);
+            ChannelUtil::SetVisible(chanid, kChannelNotVisible);
             ChannelUtil::SetChannelValue("channum", QString("_%1").arg(channum),
                                          chanid);
         }
@@ -649,7 +649,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.m_atscMajorChannel,
                         chan.m_atscMinorChannel,
                         chan.m_useOnAirGuide,
-                        chan.m_hidden, chan.m_hiddenInGuide,
+                        chan.m_hidden ? kChannelNotVisible : kChannelVisible,
                         chan.m_freqId,
                         QString(),
                         chan.m_format,
@@ -818,7 +818,10 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.m_atscMajorChannel,
                     chan.m_atscMinorChannel,
                     chan.m_useOnAirGuide,
-                    chan.m_hidden, chan.m_hiddenInGuide,
+                    ((chan.m_visible == kChannelAlwaysVisible ||
+                      chan.m_visible == kChannelNeverVisible) ?
+                     chan.m_visible :
+                     (chan.m_hidden ? kChannelNotVisible : kChannelVisible)),
                     chan.m_freqId,
                     QString(),
                     chan.m_format,

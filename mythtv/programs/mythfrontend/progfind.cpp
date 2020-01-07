@@ -515,7 +515,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
     QString querystr = "WHERE program.title = :TITLE "
                        "  AND program.endtime > :ENDTIME "
                        "  AND channel.deleted IS NULL "
-                       "  AND channel.visible = 1 ";
+                       "  AND channel.visible > 0 ";
     bindings[":TITLE"] = progTitle;
     bindings[":ENDTIME"] = progStart.addSecs(50 - progStart.time().second());
 
@@ -553,7 +553,7 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         where = "SELECT DISTINCT title FROM program "
                 "LEFT JOIN channel ON program.chanid = channel.chanid "
                 "WHERE channel.deleted IS NULL AND "
-                "      channel.visible = 1 AND "
+                "      channel.visible > 0 AND "
                 "( title NOT REGEXP '^[A-Z0-9]' AND "
                 "  title NOT REGEXP '^The [A-Z0-9]' AND "
                 "  title NOT REGEXP '^A [A-Z0-9]' AND "
@@ -580,7 +580,7 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         where = "SELECT DISTINCT title FROM program "
                 "LEFT JOIN channel ON program.chanid = channel.chanid "
                 "WHERE channel.deleted IS NULL "
-                "AND   channel.visible = 1 "
+                "AND   channel.visible > 0 "
                 "AND ( title LIKE :ONE OR title LIKE :TWO "
                 "      OR title LIKE :THREE "
                 "      OR title LIKE :FOUR ) "
@@ -742,7 +742,7 @@ void JaProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 
     where = "SELECT DISTINCT title FROM program "
             "LEFT JOIN channel ON program.chanid = channel.chanid "
-            "WHERE channel.deleted IS NULL AND channel.visible = 1 ";
+            "WHERE channel.deleted IS NULL AND channel.visible > 0 ";
 
     switch (charNum) {
     case 0:
@@ -864,7 +864,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 
     where = "SELECT DISTINCT title FROM program "
             "LEFT JOIN channel ON program.chanid = channel.chanid "
-            "WHERE channel.deleted IS NULL AND channel.visible = 1 ";
+            "WHERE channel.deleted IS NULL AND channel.visible > 0 ";
 
     if (searchChar.contains('E'))
     {
@@ -981,7 +981,7 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        where = "SELECT DISTINCT title FROM program "
                "LEFT JOIN channel ON program.chanid = channel.chanid "
                "WHERE channel.deleted IS NULL AND "
-               "      channel.visible = 1 AND "
+               "      channel.visible > 0 AND "
                "( "
                   "title NOT REGEXP '^[A-Z0-9]' AND "
                   "title NOT REGEXP '^The [A-Z0-9]' AND "
@@ -1010,7 +1010,7 @@ void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
        where = "SELECT DISTINCT title FROM program "
                "LEFT JOIN channel ON program.chanid = channel.chanid "
                "WHERE channel.deleted IS NULL "
-               "AND   channel.visible = 1 "
+               "AND   channel.visible > 0 "
                "AND ( title LIKE :ONE OR title LIKE :TWO "
                "      OR title LIKE :THREE "
                "      OR title LIKE :FOUR  "

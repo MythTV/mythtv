@@ -199,7 +199,8 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
         pChannel->setIconURL( sIconURL );
     }
     pChannel->setChannelName(channelInfo.m_name);
-    pChannel->setVisible(channelInfo.m_visible);
+    pChannel->setVisible(channelInfo.m_visible > kChannelNotVisible);
+    pChannel->setExtendedVisible(toRawString(channelInfo.m_visible));
 
     pChannel->setSerializeDetails( bDetails );
 

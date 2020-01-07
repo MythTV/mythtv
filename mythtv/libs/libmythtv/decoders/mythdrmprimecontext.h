@@ -2,6 +2,11 @@
 #define MYTHDRMPRIMECONTEXT_H
 
 // MythTV
+#ifdef USING_EGL
+#include "mythdrmprimeinterop.h"
+#else
+#include "mythopenglinterop.h"
+#endif
 #include "mythcodeccontext.h"
 
 class MythDRMPRIMEInterop;
@@ -35,7 +40,7 @@ class MythDRMPRIMEContext : public MythCodecContext
                                           AVPixelFormat   Format);
     static QMutex        s_drmPrimeLock;
     static QStringList   s_drmPrimeDecoders;
-    MythDRMPRIMEInterop *m_interop { nullptr };
+    MythOpenGLInterop   *m_interop { nullptr };
 };
 
 #endif // MYTHDRMPRIMECONTEXT_H

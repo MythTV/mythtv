@@ -175,7 +175,7 @@ void IPTVChannelFetcher::run(void)
                 chanid = ChannelUtil::CreateChanID(m_sourceId, channum);
                 ChannelUtil::CreateChannel(0, m_sourceId, chanid, name, name,
                                            channum, programnumber, 0, 0,
-                                           false, false, false, QString(),
+                                           false, kChannelVisible, QString(),
                                            QString(), "Default", xmltvid);
                 ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
             }
@@ -188,7 +188,7 @@ void IPTVChannelFetcher::run(void)
                 }
                 ChannelUtil::UpdateChannel(0, m_sourceId, chanid, name, name,
                                            channum, programnumber, 0, 0,
-                                           false, false, false, QString(),
+                                           false, kChannelVisible, QString(),
                                            QString(), "Default", xmltvid);
                 ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
             }

@@ -9,6 +9,8 @@
 #define SERIAL_OFFSET     0x0C
 #define VERSION_OFFSET    0x12
 #define DISPLAY_OFFSET    0x14
+#define WIDTH_OFFSET      0x15
+#define HEIGHT_OFFSET     0x16
 #define GAMMA_OFFSET      0x17
 #define FEATURES_OFFSET   0x18
 #define EXTENSIONS_OFFSET 0x7E
@@ -27,42 +29,52 @@ MythEDID::MythEDID(const char* Data, int Length)
     Parse();
 }
 
-bool MythEDID::Valid(void)
+bool MythEDID::Valid(void) const
 {
     return m_valid;
 }
 
-QStringList MythEDID::SerialNumbers(void)
+QStringList MythEDID::SerialNumbers(void) const
 {
     return m_serialNumbers;
 }
 
-uint16_t MythEDID::PhysicalAddress(void)
+QSize MythEDID::DisplaySize(void) const
+{
+    return m_displaySize;
+}
+
+double MythEDID::DisplayAspect(void) const
+{
+    return m_displayAspect;
+}
+
+uint16_t MythEDID::PhysicalAddress(void) const
 {
     return m_physicalAddress;
 }
 
-float MythEDID::Gamma(void)
+float MythEDID::Gamma(void) const
 {
     return m_gamma;
 }
 
-bool MythEDID::IsSRGB(void)
+bool MythEDID::IsSRGB(void) const
 {
     return m_sRGB;
 }
 
-MythEDID::Primaries MythEDID::ColourPrimaries(void)
+MythEDID::Primaries MythEDID::ColourPrimaries(void) const
 {
     return m_primaries;
 }
 
-int MythEDID::AudioLatency(bool Interlaced)
+int MythEDID::AudioLatency(bool Interlaced) const
 {
     return m_audioLatency[Interlaced ? 1 : 0];
 }
 
-int MythEDID::VideoLatency(bool Interlaced)
+int MythEDID::VideoLatency(bool Interlaced) const
 {
     return m_videoLatency[Interlaced ? 1 : 0];
 }
@@ -164,6 +176,19 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
 
     // digital or analog
     //bool digital = Data[DISPLAY_OFFSET] & 0x80;
+
+    // Display size
+    if (Data[WIDTH_OFFSET] && Data[HEIGHT_OFFSET])
+    {
+        m_displaySize = QSize(Data[WIDTH_OFFSET] * 10, Data[HEIGHT_OFFSET] * 10);
+    }
+    else if (m_minorVersion >= 4 && (Data[WIDTH_OFFSET] || Data[HEIGHT_OFFSET]))
+    {
+        if (Data[WIDTH_OFFSET])
+            m_displayAspect = 100.0 / (Data[HEIGHT_OFFSET] + 99); // Landscape
+        else
+            m_displayAspect = 100.0 / (Data[WIDTH_OFFSET] + 99); // Portrait
+    }
 
     // retrieve gamma
     quint8 gamma = Data[GAMMA_OFFSET];
@@ -313,7 +338,7 @@ bool MythEDID::ParseVSDB(const quint8 *Data, uint Offset, uint Length)
     return true;
 }
 
-void MythEDID::Debug(void)
+void MythEDID::Debug(void) const
 {
     if (!m_valid)
     {

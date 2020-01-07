@@ -63,7 +63,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &other)
 ChannelInfo::ChannelInfo(
     const QString &_channum, const QString &_callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
-    uint _mplexid, bool _visible,
+    uint _mplexid, ChannelVisibleType _visible,
     const QString &_name, const QString &_icon,
     uint _sourceid)
 {
@@ -167,7 +167,8 @@ bool ChannelInfo::Load(uint lchanid)
     m_colour            = query.value(12).toUInt();
     m_hue               = query.value(13).toUInt();
     m_tvFormat          = query.value(14).toString();
-    m_visible           = query.value(15).toBool();
+    m_visible           =
+        static_cast<ChannelVisibleType>(query.value(15).toInt());
     m_outputFilters     = query.value(16).toString();
     m_useOnAirGuide     = query.value(17).toBool();
     m_mplexId           = query.value(18).toUInt();
@@ -492,6 +493,58 @@ bool ChannelInsertInfo::IsSameChannel(
     }
 
     return false;
+}
+
+QString toString(ChannelVisibleType type)
+{
+    switch (type)
+    {
+        case kChannelAlwaysVisible:
+            return QObject::tr("Always Visible");
+        case kChannelVisible:
+            return QObject::tr("Visible");
+        case kChannelNotVisible:
+            return QObject::tr("Not Visible");
+        case kChannelNeverVisible:
+            return QObject::tr("Never Visible");
+        default:
+            return QObject::tr("Unknown");
+    }
+}
+
+QString toRawString(ChannelVisibleType type)
+{
+    switch (type)
+    {
+        case kChannelAlwaysVisible:
+            return QString("Always Visible");
+        case kChannelVisible:
+            return QString("Visible");
+        case kChannelNotVisible:
+            return QString("Not Visible");
+        case kChannelNeverVisible:
+            return QString("Never Visible");
+        default:
+            return QString("Unknown");
+    }
+}
+
+ChannelVisibleType channelVisibleTypeFromString(const QString& type)
+{
+    if (type.toLower() == "always visible" ||
+        type.toLower() == "always")
+        return kChannelAlwaysVisible;
+    if (type.toLower() == "visible" ||
+        type.toLower() == "yes")
+        return kChannelVisible;
+    if (type.toLower() == "not visible" ||
+        type.toLower() == "not" ||
+        type.toLower() == "no")
+        return kChannelNotVisible;
+    if (type.toLower() == "never visible" ||
+        type.toLower() == "never")
+        return kChannelNeverVisible;
+    return kChannelVisible;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

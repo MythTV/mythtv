@@ -155,7 +155,7 @@ void ExternRecChannelScanner::run(void)
             chanid = ChannelUtil::CreateChanID(m_sourceId, channum);
             ChannelUtil::CreateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
-                                       false, false, false, QString(),
+                                       false, kChannelVisible, QString(),
                                        QString(), "Default", xmltvid);
         }
         else
@@ -165,7 +165,7 @@ void ExternRecChannelScanner::run(void)
 
             ChannelUtil::UpdateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
-                                       false, false, false, QString(),
+                                       false, kChannelVisible, QString(),
                                        QString(), "Default", xmltvid);
         }
 

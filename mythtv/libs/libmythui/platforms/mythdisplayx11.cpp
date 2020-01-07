@@ -27,19 +27,72 @@ bool MythDisplayX11::IsAvailable(void)
     return s_available;
 }
 
+/*! \brief Retrieve details for the current video mode.
+ *
+ * The Qt default implementation tends to get the details correct but only uses
+ * an integer refresh rate for some backends.
+ *
+ * The MythXDisplay methods now use the modeline to get accurate refresh, resolution
+ * and display size details regardless of the number of displays connected - but
+ * the closed source NVidia drivers do their own thing and return fictitious
+ * modelines for mutiple connected displays.
+ *
+ * So we now use the Qt defaults and override where possible with XRANDR versions.
+ * If XRANDR is not available we try and get a more accurate refresh rate only.
+*/
 void MythDisplayX11::UpdateCurrentMode(void)
 {
+    // Get some Qt basics first
+    MythDisplay::UpdateCurrentMode();
+
     MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
     if (display)
     {
-        m_refreshRate  = display->GetRefreshRate();
-        m_resolution   = display->GetDisplaySize();
-        m_physicalSize = display->GetDisplayDimensions();
+#ifdef USING_XRANDR
+        // XRANDR should always be accurate
         GetEDID(display);
+        XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+        XRROutputInfo *output = GetOutput(res, display, m_screen);
+        if (output)
+        {
+            m_physicalSize = QSize(static_cast<int>(output->mm_width),
+                                   static_cast<int>(output->mm_height));
+            XRRFreeOutputInfo(output);
+        }
+
+        if (!m_crtc)
+            (void)GetVideoModes();
+        while (m_crtc && res)
+        {
+            XRRCrtcInfo *currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
+            if (!currentcrtc)
+                break;
+            for (int i = 0; i < res->nmode; ++i)
+            {
+                if (res->modes[i].id != currentcrtc->mode)
+                    continue;
+                XRRModeInfo mode = res->modes[i];
+                m_resolution = QSize(static_cast<int>(mode.width),
+                                     static_cast<int>(mode.height));
+                if (mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1)
+                {
+                    m_refreshRate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+                    if (mode.modeFlags & RR_Interlace)
+                        m_refreshRate *= 2.0;
+                }
+            }
+            XRRFreeCrtcInfo(currentcrtc);
+            break;
+        }
+        XRRFreeScreenResources(res);
+#else
+        // Use Qt version apart from refresh rate
+        m_refreshRate  = display->GetRefreshRate();
+#endif
         delete display;
+        m_modeComplete = true;
         return;
     }
-    MythDisplay::UpdateCurrentMode();
 }
 
 #ifdef USING_XRANDR
@@ -82,36 +135,42 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
     for (int i = 0; i < output->nmode; ++i)
     {
         RRMode rrmode = output->modes[i];
-        XRRModeInfo mode = res->modes[i];
-        if (mode.id != rrmode)
-            continue;
-        if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
-            continue;
-        int width = static_cast<int>(mode.width);
-        int height = static_cast<int>(mode.height);
-        double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
-        bool interlaced = mode.modeFlags & RR_Interlace;
-        if (interlaced)
-            rate *= 2.0;
-
-        // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
-        // when not required. This may then be used in future to allow 'exact' match
-        // display modes to display interlaced material on interlaced displays
-        if (interlaced)
+        for (int j = 0; j < res->nmode; ++j)
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
-                .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
-            continue;
-        }
+            if (res->modes[j].id != rrmode)
+                continue;
 
-        QSize resolution(width, height);
-        QSize physical(mmwidth, mmheight);
-        uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
-        if (screenmap.find(key) == screenmap.end())
-            screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
-        else
-            screenmap[key].AddRefreshRate(rate);
-        m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), rrmode);
+            XRRModeInfo mode = res->modes[j];
+            if (mode.id != rrmode)
+                continue;
+            if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
+                continue;
+            int width = static_cast<int>(mode.width);
+            int height = static_cast<int>(mode.height);
+            double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+            bool interlaced = mode.modeFlags & RR_Interlace;
+            if (interlaced)
+                rate *= 2.0;
+
+            // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
+            // when not required. This may then be used in future to allow 'exact' match
+            // display modes to display interlaced material on interlaced displays
+            if (interlaced)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
+                    .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
+                continue;
+            }
+
+            QSize resolution(width, height);
+            QSize physical(mmwidth, mmheight);
+            uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
+            if (screenmap.find(key) == screenmap.end())
+                screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
+            else
+                screenmap[key].AddRefreshRate(rate);
+            m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), rrmode);
+        }
     }
 
     for (auto it = screenmap.begin(); screenmap.end() != it; ++it)

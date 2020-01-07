@@ -45,7 +45,7 @@ class OrdDict( dict ):
             del self[name]
 
     def __delitem__(self, key):
-        dict.__delitem(self, key)
+        dict.__delitem__(self, key)
         self._field_order.remove(key)
 
     def __iter__(self):

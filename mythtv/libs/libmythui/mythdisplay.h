@@ -23,6 +23,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
+    static QStringList  GetDescription(void);
 
     virtual bool  UsingVideoModes(void) { return false; }
     virtual const vector<MythDisplayMode>& GetVideoModes(void);
@@ -30,6 +31,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static bool  SpanAllScreens        (void);
     static QString GetExtraScreenInfo  (QScreen *qScreen);
 
+    QRect        GetScreenBounds       (void);
     QScreen*     GetCurrentScreen      (void);
     static int   GetScreenCount        (void);
     double       GetPixelAspectRatio   (void);
@@ -70,8 +72,11 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static QScreen* GetDesiredScreen   (void);
     static void     DebugScreen        (QScreen *qScreen, const QString &Message);
     void            Initialise         (void);
+    void            InitScreenBounds   (void);
     void            WaitForScreenChange(void);
+    void            WaitForNewScreen   (void);
 
+    bool            m_modeComplete     { false };
     double          m_refreshRate      { 0.0  };
     double          m_aspectRatio      { 0.0  };
     QSize           m_resolution       { 0, 0 };
@@ -86,12 +91,12 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static void PauseForModeSwitch(void);
 
     bool            m_initialised      { false };
+    bool            m_firstScreenChange{ true };
+    QRect           m_screenBounds     { };
     MythDisplayMode m_desktopMode      { };
     MythDisplayMode m_guiMode          { };
     MythDisplayMode m_videoMode        { };
     DisplayModeMap  m_overrideVideoModes { };
-
-    MythDisplayMode m_last             { };
 };
 
 #endif // MYTHDISPLAY_H

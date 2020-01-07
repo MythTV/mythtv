@@ -93,6 +93,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     // MythRender
     void  ReleaseResources(void) override;
+    QStringList GetDescription(void) override;
 
     void  makeCurrent();
     void  doneCurrent();
