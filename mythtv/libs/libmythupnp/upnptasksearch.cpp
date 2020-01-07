@@ -95,20 +95,18 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
-    for ( QList<QHostAddress>::Iterator it  = m_addressList.begin();
-                                it != m_addressList.end(); 
-                              ++it ) 
+    foreach (auto & addr, m_addressList)
     {
         QString ipaddress;
 
         // Avoid announcing the localhost address
-        if (*it == QHostAddress::LocalHost ||
-            *it == QHostAddress::LocalHostIPv6 ||
-            *it == QHostAddress::AnyIPv4 ||
-            *it == QHostAddress::AnyIPv6)
+        if (addr == QHostAddress::LocalHost ||
+            addr == QHostAddress::LocalHostIPv6 ||
+            addr == QHostAddress::AnyIPv4 ||
+            addr == QHostAddress::AnyIPv6)
             continue;
 
-        QHostAddress ip = *it;
+        QHostAddress ip = addr;
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it

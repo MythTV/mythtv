@@ -148,7 +148,6 @@ static QString StaticPage =
       "<BODY><H1>%2.</H1></BODY>"
     "</HTML>";
 
-static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 #ifdef USE_SETSOCKOPT
 //static const int g_on          = 1;
 //static const int g_off         = 0;
@@ -1031,12 +1030,12 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 {
     QString ext;
 
-    for (int i = 0; i < g_nMIMELength; i++)
+    for (auto & type : g_MIMETypes)
     {
-        ext = g_MIMETypes[i].pszExtension;
+        ext = type.pszExtension;
 
         if ( sFileExtension.toUpper() == ext.toUpper() )
-            return( g_MIMETypes[i].pszType );
+            return( type.pszType );
     }
 
     return( "text/plain" );
@@ -1050,10 +1049,10 @@ QStringList HTTPRequest::GetSupportedMimeTypes()
 {
     QStringList mimeTypes;
 
-    for (int i = 0; i < g_nMIMELength; i++)
+    for (auto & type : g_MIMETypes)
     {
-        if (!mimeTypes.contains( g_MIMETypes[i].pszType ))
-            mimeTypes.append( g_MIMETypes[i].pszType );
+        if (!mimeTypes.contains( type.pszType ))
+            mimeTypes.append( type.pszType );
     }
 
     return mimeTypes;
@@ -1129,11 +1128,10 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     {
         QStringList params = sParams.split('&', QString::SkipEmptyParts);
 
-        for ( QStringList::Iterator it  = params.begin();
-                                    it != params.end();  ++it )
+        foreach (auto & param, params)
         {
-            QString sName  = (*it).section( '=', 0, 0 );
-            QString sValue = (*it).section( '=', 1 );
+            QString sName  = param.section( '=', 0, 0 );
+            QString sValue = param.section( '=', 1 );
             sValue.replace("+"," ");
 
             if (!sName.isEmpty())

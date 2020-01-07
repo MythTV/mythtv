@@ -492,11 +492,9 @@ int SSDPCache::RemoveStale()
     // (This avoids issues when removing from a QMap while iterating it)
     // ----------------------------------------------------------------------
 
-    for ( QStringList::Iterator itKey = lstKeys.begin();
-                                itKey != lstKeys.end();
-                              ++itKey ) 
+    foreach (auto & key, lstKeys)
     {
-        SSDPCacheEntriesMap::iterator it = m_cache.find( *itKey );
+        SSDPCacheEntriesMap::iterator it = m_cache.find( key );
         if (it == m_cache.end())
             continue;
 

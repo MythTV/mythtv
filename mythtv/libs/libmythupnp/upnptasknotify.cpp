@@ -88,18 +88,16 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
     QList<QHostAddress> addressList = UPnp::g_IPAddrList;
 
-    for ( QList<QHostAddress>::Iterator it  = addressList.begin();
-                                        it != addressList.end();
-                                        ++it )
+    foreach (auto & addr, addressList)
     {
-        if ((*it).toString().isEmpty())
+        if (addr.toString().isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
             continue;
         }
 
-        QHostAddress ip = *it;
+        QHostAddress ip = addr;
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it
