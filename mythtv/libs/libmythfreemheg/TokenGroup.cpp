@@ -430,10 +430,8 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    for (int j = 0; j < m_ItemList.size(); j++)
-    {
-        m_ItemList.at(j)->m_pVisible->ResetPosition();
-    }
+    foreach (auto item, m_ItemList)
+        item->m_pVisible->ResetPosition();
 
     MHTokenGroup::Destruction(engine);
 }
@@ -449,10 +447,8 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    for (int j = 0; j < m_ItemList.size(); j++)
-    {
-        m_ItemList.at(j)->m_pVisible->Deactivation(engine);
-    }
+    foreach (auto item, m_ItemList)
+        item->m_pVisible->Deactivation(engine);
 
     MHTokenGroup::Deactivation(engine);
 }

@@ -780,9 +780,9 @@ void MHParseText::NextSym()
                 }
 
                 // Check the colour table.  If it's there generate a string containing the colour info.
-                for (int i = 0; i < (int)(sizeof(colourTable) / sizeof(colourTable[0])); i++)
+                for (auto & colour : colourTable)
                 {
-                    if (stricmp(buff, colourTable[i].m_name) == 0)
+                    if (stricmp(buff, colour.m_name) == 0)
                     {
                         m_nType = PTString;
                         auto *str = (unsigned char *)realloc(m_String, 4 + 1);
@@ -793,10 +793,10 @@ void MHParseText::NextSym()
                         }
 
                         m_String = str;
-                        m_String[0] = colourTable[i].m_r;
-                        m_String[1] = colourTable[i].m_g;
-                        m_String[2] = colourTable[i].m_b;
-                        m_String[3] = colourTable[i].m_t;
+                        m_String[0] = colour.m_r;
+                        m_String[1] = colour.m_g;
+                        m_String[2] = colour.m_b;
+                        m_String[3] = colour.m_t;
                         m_nStringLength = 4;
                         m_String[m_nStringLength] = 0;
                         return;
