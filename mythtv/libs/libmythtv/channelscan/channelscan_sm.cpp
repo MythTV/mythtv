@@ -333,8 +333,8 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
         return false;
     }
 
-    for (size_t i = 0; i < multiplexes.size(); ++i)
-        AddToList(multiplexes[i]);
+    for (uint multiplex : multiplexes)
+        AddToList(multiplex);
 
     m_extendScanList = follow_nit;
     m_waitingForTables  = false;
@@ -696,9 +696,9 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 
     vector<DTVTunerType> tts = chan->GetTunerTypes();
 
-    for (size_t i = 0; i < tts.size(); ++i)
+    for (auto & tt : tts)
     {
-        if (tts[i] == type)
+        if (tt == type)
             return type;
     }
 
@@ -828,9 +828,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // Grab PAT tables
     pat_vec_t pattmp = sd->GetCachedPATs();
     QMap<uint,bool> tsid_checked;
-    for (size_t i = 0; i < pattmp.size(); ++i)
+    for (auto & pat : pattmp)
     {
-        uint tsid = pattmp[i]->TransportStreamID();
+        uint tsid = pat->TransportStreamID();
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
@@ -883,9 +883,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
-    for (size_t i = 0; i < sdttmp.size(); ++i)
+    for (auto & sdt : sdttmp)
     {
-        uint tsid = sdttmp[i]->TSID();
+        uint tsid = sdt->TSID();
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
@@ -1251,11 +1251,11 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 
     QMap<uint,ChannelInsertInfo> list = GetChannelList(m_current, m_currentInfo);
     {
-        for (int i = 0; i < list.size(); ++i)
+        foreach (auto & info, list)
         {
             max_chan_cnt +=
-                (list[i].m_inPat || list[i].m_inPmt ||
-                 list[i].m_inSdt || list[i].m_inVct) ? 1 : 0;
+                (info.m_inPat || info.m_inPmt ||
+                 info.m_inSdt || info.m_inVct) ? 1 : 0;
         }
     }
 
@@ -1285,11 +1285,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // channels.conf
     const DTVChannelInfoList &echan = (*trans_info).m_expectedChannels;
-    for (size_t i = 0; i < echan.size(); ++i)
+    for (const auto & chan : echan)
     {
-        uint pnum = echan[i].m_serviceid;
+        uint pnum = chan.m_serviceid;
         PCM_INFO_INIT("mpeg");
-        info.m_serviceName = echan[i].m_name;
+        info.m_serviceName = chan.m_name;
         info.m_inChannelsConf = true;
     }
 
@@ -1341,9 +1341,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (size_t i = 0; i < descs.size(); ++i)
+        for (auto & desc : descs)
         {
-            RegistrationDescriptor reg(descs[i]);
+            RegistrationDescriptor reg(desc);
             if (!reg.IsValid())
                 continue;
             if (reg.FormatIdentifierString() == "CUEI" ||
@@ -2527,20 +2527,20 @@ bool ChannelScanSM::CheckImportedList(
         return true;
 
     bool found = false;
-    for (size_t i = 0; i < channels.size(); ++i)
+    for (const auto & channel : channels)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("comparing %1 %2 against %3 %4")
-                .arg(channels[i].m_serviceid).arg(channels[i].m_name)
+                .arg(channel.m_serviceid).arg(channel.m_name)
                 .arg(mpeg_program_num).arg(common_status_info));
 
-        if (channels[i].m_serviceid == mpeg_program_num)
+        if (channel.m_serviceid == mpeg_program_num)
         {
             found = true;
-            if (!channels[i].m_name.isEmpty())
+            if (!channel.m_name.isEmpty())
             {
-                service_name = channels[i].m_name;
-                callsign     = channels[i].m_name;
+                service_name = channel.m_name;
+                callsign     = channel.m_name;
             }
         }
     }

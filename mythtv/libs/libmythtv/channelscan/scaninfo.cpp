@@ -33,12 +33,12 @@ uint SaveScan(const ScanDTVTransportList &scan)
 
     // Delete very old scans
     const vector<ScanInfo> list = LoadScanList();
-    for (size_t i = 0; i < list.size(); ++i)
+    for (const auto & si : list)
     {
-        if (list[i].m_scandate > MythDate::current().addDays(-14))
+        if (si.m_scandate > MythDate::current().addDays(-14))
             continue;
-        if ((list[i].m_cardid == cardid) && (list[i].m_sourceid == sourceid))
-            ScanInfo::DeleteScan(list[i].m_scanid);
+        if ((si.m_cardid == cardid) && (si.m_sourceid == sourceid))
+            ScanInfo::DeleteScan(si.m_scanid);
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -64,8 +64,8 @@ uint SaveScan(const ScanDTVTransportList &scan)
     if (!scanid)
         return scanid;
 
-    for (size_t i = 0; i < scan.size(); ++i)
-        scan[i].SaveScan(scanid);
+    for (const auto & si : scan)
+        si.SaveScan(scanid);
 
     return scanid;
 }
