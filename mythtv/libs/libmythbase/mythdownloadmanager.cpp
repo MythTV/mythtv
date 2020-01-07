@@ -1753,11 +1753,9 @@ QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
 QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
                                        const QString& header)
 {
-    QNetworkCacheMetaData::RawHeaderList headers = cacheData.rawHeaders();
-
-    for (auto it = headers.begin(); it != headers.end(); ++it)
-        if (QString((*it).first) == header)
-            return QString((*it).second);
+    foreach (auto & rh, cacheData.rawHeaders())
+        if (QString(rh.first) == header)
+            return QString(rh.second);
     return QString();
 }
 
@@ -1813,11 +1811,8 @@ void MythCookieJar::save(const QString &filename)
     QList<QNetworkCookie> cookieList = allCookies();
     QTextStream stream(&f);
 
-    for (QList<QNetworkCookie>::iterator it = cookieList.begin();
-         it != cookieList.end(); ++it)
-    {
-        stream << (*it).toRawForm() << endl;
-    }
+    foreach (auto & cookie, cookieList)
+        stream << cookie.toRawForm() << endl;
 }
 
 

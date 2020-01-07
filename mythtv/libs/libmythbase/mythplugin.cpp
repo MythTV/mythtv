@@ -110,11 +110,8 @@ MythPluginManager::MythPluginManager()
             LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
-        for (QStringList::iterator i = libraries.begin(); i != libraries.end();
-             ++i)
+        foreach (auto library, libraries)
         {
-            QString library = *i;
-
             // pull out the base library name
             library = library.right(library.length() - prefixLength);
             library = library.left(library.length() - suffixLength);

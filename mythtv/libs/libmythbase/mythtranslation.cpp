@@ -111,10 +111,8 @@ void MythTranslation::reload()
              ++it)
             keys.append(it.key());
 
-        for (QStringList::Iterator it = keys.begin();
-             it != keys.end();
-             ++it)
-            load(*it);
+        foreach (auto & key, keys)
+            load(key);
     }
 }
 

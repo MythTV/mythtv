@@ -714,9 +714,9 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
     {
         // search for absolute path
         QStringList path = QString(getenv("PATH")).split(':');
-        for (auto pit = path.begin(); pit != path.end(); ++pit)
+        foreach (auto & pit, path)
         {
-            QFile file(QString("%1/%2").arg(*pit).arg(abscmd));
+            QFile file(QString("%1/%2").arg(pit).arg(abscmd));
             if (file.exists())
             {
                 abscmd = file.fileName();
