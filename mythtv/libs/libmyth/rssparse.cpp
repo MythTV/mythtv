@@ -123,8 +123,8 @@ void ResultItem::toMap(InfoMap &metadataMap)
     else
         metadataMap["filesize"] = QString::number(m_filesize);
 
-    QString tmpSize;
-    tmpSize.sprintf("%0.2f ", m_filesize / 1024.0 / 1024.0);
+    QString tmpSize = QString("%1 ")
+        .arg(m_filesize / 1024.0 / 1024.0, 0,'f',2);
     tmpSize += QObject::tr("MB", "Megabytes");
     if (m_filesize == -1)
         metadataMap["filesize_str"] = QString();

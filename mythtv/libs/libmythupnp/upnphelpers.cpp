@@ -36,13 +36,10 @@ QString TimeFormat(const QTime &time)
 
 QString TimeFormat(uint32_t msec)
 {
-    QString timeStr;
-    timeStr.sprintf("%02d:%02d:%02d",
-                        (msec / (1000 * 60 * 60)) % 24, // Hours
-                        (msec / (1000 * 60)) % 60,      // Minutes
-                        (msec / 1000) % 60);            // Seconds
-
-    return timeStr;
+    return QString("%1:%2:%3")
+        .arg((msec / (1000 * 60 * 60)) % 24, 2,10,QChar('0'))  // Hours
+        .arg((msec / (1000 * 60)) % 60,      2,10,QChar('0'))  // Minutes
+        .arg((msec / 1000) % 60,             2,10,QChar('0')); // Seconds
 }
 
 QString DateTimeFormat(const QDateTime &dateTime)
@@ -88,19 +85,16 @@ QString resDurationFormat(uint32_t msec)
     // Appendix B.2 Resource Encoding Characteristics Properties
     //          B.2.1.4 res@duration
 
-    QString resDurationStr;
     // H[H]:MM:SS[.FS]
     // H = Hours (1-2 digits),
     // M = Minutes (2 digits, 0 prefix)
     // S = Seconds (2 digits, 0 prefix)
     // FS = Fractional Seconds (milliseconds)
-    resDurationStr.sprintf("%01u:%02u:%02u.%01u",
-                (msec / (1000 * 60 * 60)) % 24, // Hours
-                (msec / (1000 * 60)) % 60,      // Minutes
-                (msec / 1000) % 60,             // Seconds
-                msec % 1000);
-
-    return resDurationStr;
+    return QString("%01u:%02u:%02u.%01u")
+        .arg((msec / (1000 * 60 * 60)) % 24, 1,10,QChar('0')) // Hours
+        .arg((msec / (1000 * 60)) % 60,      2,10,QChar('0')) // Minutes
+        .arg((msec / 1000) % 60,             2,10,QChar('0')) // Seconds
+        .arg(msec % 1000,                    1,10,QChar('0'));
 }
 
 };
@@ -393,8 +387,8 @@ QString FlagsString(uint32_t flags)
     if (flags & ~DLNA::kv1_5_flag)
         flags |= DLNA::kv1_5_flag;
 
-    str.sprintf("DLNA.ORG_FLAGS=%08X000000000000000000000000", flags); // 8 HEX Digits, following by 24 zeros
-    return str;
+    return QString("DLNA.ORG_FLAGS=%1") // 8 HEX Digits, following by 24 zeros
+        .arg(flags,8,10,QChar('0')) + "000000000000000000000000";
 }
 
 QString OpParamString(UPNPProtocol::TransferProtocol protocol)

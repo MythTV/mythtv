@@ -1655,9 +1655,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         if (((m_recEndTs > timeNow) && (m_recStatus <= RecStatus::WillRecord)) ||
             (m_recStatus == RecStatus::Conflict) || (m_recStatus == RecStatus::LaterShowing))
         {
-            tmp_rec += QString().sprintf(" %+d", m_recPriority);
+            tmp_rec += QString(" %1%2").arg(m_recPriority > 0 ? "+" : "").arg(m_recPriority);
             if (m_recPriority2)
-                tmp_rec += QString().sprintf("/%+d", m_recPriority2);
+                tmp_rec += QString("/%1%2").arg(m_recPriority2 > 0 ? "+" : "").arg(m_recPriority2);
             tmp_rec += " ";
         }
         else

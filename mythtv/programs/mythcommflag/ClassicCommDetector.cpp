@@ -979,16 +979,15 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 
     if (m_verboseDebugging)
     {
-        LOG(VB_COMMFLAG, LOG_DEBUG,
-            QString().sprintf("Frame: %6ld -> %3d %3d %3d %3d %1d %1d %04x",
-                (long)m_curFrameNumber,
-                m_frameInfo[m_curFrameNumber].minBrightness,
-                m_frameInfo[m_curFrameNumber].maxBrightness,
-                m_frameInfo[m_curFrameNumber].avgBrightness,
-                m_frameInfo[m_curFrameNumber].sceneChangePercent,
-                m_frameInfo[m_curFrameNumber].format,
-                m_frameInfo[m_curFrameNumber].aspect,
-                m_frameInfo[m_curFrameNumber].flagMask ));
+        LOG(VB_COMMFLAG, LOG_DEBUG, QString("Frame: %1 -> %2 %3 %4 %5 %6 %7 %8")
+            .arg(m_curFrameNumber, 6)
+            .arg(m_frameInfo[m_curFrameNumber].minBrightness, 3)
+            .arg(m_frameInfo[m_curFrameNumber].maxBrightness, 3)
+            .arg(m_frameInfo[m_curFrameNumber].avgBrightness, 3)
+            .arg(m_frameInfo[m_curFrameNumber].sceneChangePercent, 3)
+            .arg(m_frameInfo[m_curFrameNumber].format, 1)
+            .arg(m_frameInfo[m_curFrameNumber].aspect, 1)
+            .arg(m_frameInfo[m_curFrameNumber].flagMask, 4, 16, QChar('0')));
     }
 
 #ifdef SHOW_DEBUG_WIN

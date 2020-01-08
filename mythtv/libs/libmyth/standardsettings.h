@@ -283,13 +283,14 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
     {
         int hour;
         int minute;
-        QString timeStr;
 
         for (hour = 0; hour < 24; hour++)
         {
             for (minute = 0; minute < 60; minute += interval)
             {
-                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                QString timeStr = QString("%1:%2")
+                    .arg(hour,  2,10,QChar('0'))
+                    .arg(minute,2,10,QChar('0'));
                 addSelection(timeStr, timeStr,
                              timeStr == defaultTime);
             }
@@ -307,13 +308,14 @@ class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
     {
         int hour;
         int minute;
-        QString timeStr;
 
         for (hour = 0; hour < 24; hour++)
         {
             for (minute = 0; minute < 60; minute += interval)
             {
-                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                QString timeStr = QString("%1:%2")
+                    .arg(hour,  2,10,QChar('0'))
+                    .arg(minute,2,10,QChar('0'));
                 addSelection(timeStr, timeStr,
                              timeStr == defaultTime);
             }

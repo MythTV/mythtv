@@ -212,7 +212,7 @@ QString TeletextReader::GetPage(void)
             else
                 str += " ";
 
-            str += QString().sprintf("%02X", subpage->subpagenum);
+            str += QString("%1").arg(subpage->subpagenum,2,16,QChar('0'));
 
             ++subpageIter;
             ++count;

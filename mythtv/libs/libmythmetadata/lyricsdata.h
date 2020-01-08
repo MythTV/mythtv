@@ -41,8 +41,10 @@ class META_PUBLIC LyricsLine
         int seconds = m_time  % (1000 * 60) / 1000;
         int hundredths = (m_time % 1000) / 10;
 
-        res.sprintf("[%02d:%02d.%02d]", minutes, seconds, hundredths);
-        return res;
+        return QString("[%1:%2.%3]")
+            .arg(minutes,    2,10,QChar('0'))
+            .arg(seconds,    2,10,QChar('0'))
+            .arg(hundredths, 2,10,QChar('0'));
     }
 };
 

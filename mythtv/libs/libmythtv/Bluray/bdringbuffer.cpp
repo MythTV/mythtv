@@ -946,9 +946,9 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     int minutes = ((int)total_secs / 60) - (hours * 60);
     double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
     QString duration = QString("%1:%2:%3")
-                        .arg(QString().sprintf("%02d", hours))
-                        .arg(QString().sprintf("%02d", minutes))
-                        .arg(QString().sprintf("%02.1f", secs));
+        .arg(hours,   2,10,QChar('0'))
+        .arg(minutes, 2,10,QChar('0'))
+        .arg(secs,    2,'f',1,QChar('0'));
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Index %1 Playlist: %2 Duration: %3 "
                 "Chapters: %5")
@@ -973,11 +973,11 @@ bool BDRingBuffer::UpdateTitleInfo(void)
                           (double)(hours * 60 * 60 + minutes * 60);
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Chapter %1 found @ [%2:%3:%4]->%5")
-                    .arg(QString().sprintf("%02d", i + 1))
-                    .arg(QString().sprintf("%02d", hours))
-                    .arg(QString().sprintf("%02d", minutes))
-                    .arg(QString().sprintf("%06.3f", secs))
-                    .arg(framenum));
+                .arg(i + 1,   2,10,QChar('0'))
+                .arg(hours,   2,10,QChar('0'))
+                .arg(minutes, 2,10,QChar('0'))
+                .arg(secs,    6,'f',3,QChar('0'))
+                .arg(framenum));
         }
     }
 

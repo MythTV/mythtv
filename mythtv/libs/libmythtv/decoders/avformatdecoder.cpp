@@ -1264,10 +1264,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         auto framenum = (long long)(total_secs * m_fps);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2:%3:%4]->%5")
-                .arg(QString().sprintf("%02d", i + 1))
-                .arg(QString().sprintf("%02d", hours))
-                .arg(QString().sprintf("%02d", minutes))
-                .arg(QString().sprintf("%06.3f", secs))
+                .arg(i + 1,   2,10,QChar('0'))
+                .arg(hours,   2,10,QChar('0'))
+                .arg(minutes, 2,10,QChar('0'))
+                .arg(secs,    6,'f',3,QChar('0'))
                 .arg(framenum));
     }
 

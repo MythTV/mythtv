@@ -168,10 +168,9 @@ static void exec_program_tv_cb(const QString &cmd)
 
     if (cardid >= 0)
     {
-        s = s.sprintf(qPrintable(s),
-                      qPrintable(strlist[1]),
-                      qPrintable(strlist[2]),
-                      qPrintable(strlist[3]));
+        s = s.arg(qPrintable(strlist[1]))
+            .arg(qPrintable(strlist[2]))
+            .arg(qPrintable(strlist[3]));
 
         myth_system(s);
 

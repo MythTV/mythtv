@@ -4985,30 +4985,30 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         QString text3;
         if (paddedFields)
         {
-            text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
-            text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
-            text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
+            text1.asprintf("%02d:%02d:%02d", phours, pmins, psecs);
+            text2.asprintf("%02d:%02d:%02d", shours, smins, ssecs);
+            text3.asprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
         }
         else
         {
             if (shours > 0)
             {
-                text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
-                text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+                text1.asprintf("%d:%02d:%02d", phours, pmins, psecs);
+                text2.asprintf("%d:%02d:%02d", shours, smins, ssecs);
             }
             else
             {
-                text1.sprintf("%d:%02d", pmins, psecs);
-                text2.sprintf("%d:%02d", smins, ssecs);
+                text1.asprintf("%d:%02d", pmins, psecs);
+                text2.asprintf("%d:%02d", smins, ssecs);
             }
 
             if (sbhours > 0)
             {
-                text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
+                text3.asprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
             }
             else if (sbmins > 0)
             {
-                text3.sprintf("%d:%02d", sbmins, sbsecs);
+                text3.asprintf("%d:%02d", sbmins, sbsecs);
             }
             else
             {

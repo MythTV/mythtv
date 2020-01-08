@@ -51,9 +51,9 @@
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))
 #endif
 
-#define esyslog(a...) LOG(VB_GENERAL, LOG_ERR, QString().sprintf(a))
-#define isyslog(a...) LOG(VB_DVBCAM, LOG_INFO, QString().sprintf(a))
-#define dsyslog(a...) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
+#define esyslog(a...) LOG(VB_GENERAL, LOG_ERR, QString().asprintf(a))
+#define isyslog(a...) LOG(VB_DVBCAM, LOG_INFO, QString().asprintf(a))
+#define dsyslog(a...) LOG(VB_DVBCAM, LOG_DEBUG, QString().asprintf(a))
 
 #define LOG_ERROR         esyslog("ERROR (%s,%d): %m", __FILE__, __LINE__)
 #define LOG_ERROR_STR(s)  esyslog("ERROR: %s: %m", s)
@@ -64,7 +64,7 @@ static bool DumpTPDUDataTransfer = false;
 static bool DebugProtocol = false;
 static bool _connected = false;
 
-#define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
+#define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString().asprintf(a))
 
 #define OK       0
 #define TIMEOUT (-1)
