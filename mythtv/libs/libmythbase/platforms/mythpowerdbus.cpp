@@ -301,7 +301,7 @@ bool MythPowerDBus::ScheduleFeature(enum Feature Type, uint Delay)
                 default: break;
             }
             QDBusReply<void> reply =
-                m_logindInterface->call(QLatin1Literal("ScheduleShutdown"), type, nanosecs / 1000);
+                m_logindInterface->call(QLatin1String("ScheduleShutdown"), type, nanosecs / 1000);
 
             if (reply.isValid() && !reply.error().isValid())
             {
