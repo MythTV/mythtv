@@ -232,7 +232,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool              m_scanning          {false};
     volatile bool     m_threadExit        {false};
     bool              m_waitingForTables  {false};
-    QTime             m_timer;
+    QElapsedTimer     m_timer;
 
     // Transports List
     int                         m_transportsScanned {0};
