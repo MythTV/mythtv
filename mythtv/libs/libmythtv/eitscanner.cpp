@@ -229,6 +229,7 @@ void EITScanner::StopPassiveScan(void)
     EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
+    LOG(VB_EIT, LOG_INFO, LOC_ID + "Stopped passive scan.");
 }
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
@@ -307,6 +308,8 @@ void EITScanner::StopActiveScan(void)
     locker.unlock();
     StopPassiveScan();
     locker.relock();
+
+    LOG(VB_EIT, LOG_INFO, LOC_ID + "Stopped active scan.");
 
     while (!m_activeScan && !m_activeScanStopped)
         m_activeScanCond.wait(&m_lock, 100);
