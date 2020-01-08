@@ -448,7 +448,7 @@ class PaneError : public GroupSetting
   public:
     explicit PaneError(const QString &error)
     {
-        TransTextEditSetting* label = new TransTextEditSetting();
+        auto* label = new TransTextEditSetting();
         label->setValue(error);
         addChild(label);
     }

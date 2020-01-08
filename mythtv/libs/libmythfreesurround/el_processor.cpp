@@ -166,8 +166,8 @@ public:
     // flush the internal buffers
     void flush() {
         for (unsigned k=0;k<m_n;k++) {
-            for (unsigned c=0;c<6;c++)
-                m_outbuf[c][k] = 0;
+            for (auto & c : m_outbuf)
+                c[k] = 0;
             m_inbuf[0][k] = 0;
             m_inbuf[1][k] = 0;
         }

@@ -433,13 +433,12 @@ void MythPowerDBus::UpdateBattery(void)
         int   count = 0;
 
         // take an average (who has more than 1 battery?)
-        QMap<QString,int>::iterator it = m_batteries.begin();
-        for ( ; it != m_batteries.end(); ++it)
+        foreach (int level, m_batteries)
         {
-            if (it.value() >= 0 && it.value() <= 100)
+            if (level >= 0 && level <= 100)
             {
                 count++;
-                total += static_cast<qreal>(it.value());
+                total += static_cast<qreal>(level);
             }
         }
 

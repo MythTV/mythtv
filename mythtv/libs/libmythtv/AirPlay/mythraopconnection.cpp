@@ -715,10 +715,8 @@ void MythRAOPConnection::ProcessAudio()
             }
             m_lastSequence++;
 
-            QList<AudioData>::iterator it = frames.data->begin();
-            for (; it != frames.data->end(); ++it)
+            foreach (auto & data, *frames.data)
             {
-                AudioData *data = &(*it);
                 int offset = 0;
                 int framecnt = 0;
 
@@ -727,8 +725,8 @@ void MythRAOPConnection::ProcessAudio()
                         // calculate how many frames we have to drop to catch up
                     offset = (m_adjustedLatency * m_frameRate / 1000) *
                         m_audio->GetBytesPerFrame();
-                    if (offset > data->length)
-                        offset = data->length;
+                    if (offset > data.length)
+                        offset = data.length;
                     framecnt = offset / m_audio->GetBytesPerFrame();
                     m_adjustedLatency -= framesToMs(framecnt+1);
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -737,8 +735,8 @@ void MythRAOPConnection::ProcessAudio()
                         .arg(framecnt).arg(m_adjustedLatency));
                     timestamp += framesToMs(framecnt);
                 }
-                m_audio->AddData((char *)data->data + offset,
-                                 data->length - offset,
+                m_audio->AddData((char *)data.data + offset,
+                                 data.length - offset,
                                  timestamp, framecnt);
                 timestamp += m_audio->LengthLastData();
             }
@@ -769,11 +767,8 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
             AudioPacket frames = packet_it.value();
             if (frames.data)
             {
-                QList<AudioData>::iterator it = frames.data->begin();
-                for (; it != frames.data->end(); ++it)
-                {
-                    av_free(it->data);
-                }
+                foreach (auto & data, *frames.data)
+                    av_free(data.data);
                 delete frames.data;
             }
             m_audioQueue.remove(packet_it.key());

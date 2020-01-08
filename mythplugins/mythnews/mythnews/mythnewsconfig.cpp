@@ -151,12 +151,11 @@ void MythNewsConfig::loadData(void)
 {
     QMutexLocker locker(&m_lock);
 
-    auto it = m_priv->m_categoryList.begin();
-    for (; it != m_priv->m_categoryList.end(); ++it)
+    for (auto & category : m_priv->m_categoryList)
     {
-        auto *item = new MythUIButtonListItem(m_categoriesList, (*it).m_name);
-        item->SetData(qVariantFromValue(&(*it)));
-        if (!(*it).m_siteList.empty())
+        auto *item = new MythUIButtonListItem(m_categoriesList,category.m_name);
+        item->SetData(qVariantFromValue(&category));
+        if (!category.m_siteList.empty())
             item->setDrawArrow(true);
     }
     slotCategoryChanged(m_categoriesList->GetItemFirst());
@@ -206,15 +205,14 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
     if (!cat)
         return;
 
-    auto it = cat->m_siteList.begin();
-    for (; it != cat->m_siteList.end(); ++it)
+    for (auto & site : cat->m_siteList)
     {
         auto *newitem =
-            new MythUIButtonListItem(m_siteList, (*it).m_name, nullptr, true,
-                                     (*it).m_inDB ?
+            new MythUIButtonListItem(m_siteList, site.m_name, nullptr, true,
+                                     site.m_inDB ?
                                      MythUIButtonListItem::FullChecked :
                                      MythUIButtonListItem::NotChecked);
-        newitem->SetData(qVariantFromValue(&(*it)));
+        newitem->SetData(qVariantFromValue(&site));
     }
 }
 

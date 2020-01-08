@@ -129,14 +129,13 @@ QString RecordingQuality::toStringXML(void) const
 
     str += ">\n";
 
-    RecordingGaps::const_iterator it = m_recordingGaps.begin();
-    for (; it != m_recordingGaps.end(); ++it)
+    foreach (const auto & gap, m_recordingGaps)
     {
         str += xml_indent(1) +
             QString("<Gap start=\"%1\" end=\"%2\" duration=\"%3\" />\n")
-            .arg((*it).GetStart().toString(Qt::ISODate))
-            .arg((*it).GetEnd().toString(Qt::ISODate))
-            .arg((*it).GetStart().secsTo((*it).GetEnd()));
+            .arg(gap.GetStart().toString(Qt::ISODate))
+            .arg(gap.GetEnd().toString(Qt::ISODate))
+            .arg(gap.GetStart().secsTo(gap.GetEnd()));
     }
 
     return str + "</RecordingQuality>";

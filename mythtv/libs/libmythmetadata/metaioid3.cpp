@@ -427,9 +427,9 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
         {
             TagLib::ID3v2::FrameList apicframes = tag->frameListMap()["APIC"];
 
-            for(auto it = apicframes.begin(); it != apicframes.end(); ++it)
+            for (auto & apicframe : apicframes)
             {
-                auto *frame = dynamic_cast<AttachedPictureFrame *>(*it);
+                auto *frame = dynamic_cast<AttachedPictureFrame *>(apicframe);
                 if (frame && frame->type() == apicType)
                 {
                     picture->loadFromData((const uchar *)frame->picture().data(),
@@ -482,9 +482,9 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
     {
         TagLib::ID3v2::FrameList apicframes = tag->frameListMap()["APIC"];
 
-        for(auto it = apicframes.begin(); it != apicframes.end(); ++it)
+        for (auto & apicframe : apicframes)
         {
-            auto *frame = dynamic_cast<AttachedPictureFrame *>(*it);
+            auto *frame = dynamic_cast<AttachedPictureFrame *>(apicframe);
             if (frame == nullptr)
             {
                 LOG(VB_GENERAL, LOG_DEBUG,
@@ -585,9 +585,9 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
                                         const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("APIC");
-  for(auto it = l.begin(); it != l.end(); ++it)
+  for (auto & frame : l)
   {
-    auto *f = dynamic_cast<AttachedPictureFrame *>(*it);
+    auto *f = dynamic_cast<AttachedPictureFrame *>(frame);
     if (f && f->type() == type &&
         (description.isNull() || f->description() == description))
       return f;
@@ -810,9 +810,9 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
                                                 const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("TXXX");
-  for(auto it = l.begin(); it != l.end(); ++it)
+  for (auto & frame : l)
   {
-    auto *f = dynamic_cast<UserTextIdentificationFrame *>(*it);
+    auto *f = dynamic_cast<UserTextIdentificationFrame *>(frame);
     if (f && f->description() == description)
       return f;
   }
@@ -830,9 +830,9 @@ PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
                                         const String &_email)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("POPM");
-  for(auto it = l.begin(); it != l.end(); ++it)
+  for (auto & frame : l)
   {
-    auto *f = dynamic_cast<PopularimeterFrame *>(*it);
+    auto *f = dynamic_cast<PopularimeterFrame *>(frame);
     if (f && f->email() == _email)
       return f;
   }

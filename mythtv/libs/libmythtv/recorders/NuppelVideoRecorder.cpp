@@ -816,10 +816,10 @@ void NuppelVideoRecorder::InitBuffers(void)
 
 void NuppelVideoRecorder::ResizeVideoBuffers(void)
 {
-    for (size_t i = 0; i < m_videoBuffer.size(); i++)
+    for (auto & vidbuf : m_videoBuffer)
     {
-        delete [] (m_videoBuffer[i]->buffer);
-        m_videoBuffer[i]->buffer = new unsigned char[m_videoBufferSize];
+        delete [] (vidbuf->buffer);
+        vidbuf->buffer = new unsigned char[m_videoBufferSize];
     }
 }
 
@@ -2050,10 +2050,9 @@ void NuppelVideoRecorder::WriteSeekTable(void)
     char *seekbuf = new char[frameheader.packetlength];
     int offset = 0;
 
-    auto it = m_seekTable->begin();
-    for (; it != m_seekTable->end(); ++it)
+    for (auto & entry : *m_seekTable)
     {
-        memcpy(seekbuf + offset, (const void *)&(*it),
+        memcpy(seekbuf + offset, (const void *)&entry,
                sizeof(struct seektable_entry));
         offset += sizeof(struct seektable_entry);
     }
@@ -2087,10 +2086,9 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     char *kfa_buf = new char[frameheader.packetlength];
     uint offset = 0;
 
-    auto it = kfa_table.cbegin();
-    for (; it != kfa_table.cend() ; ++it)
+    for (auto kfa : kfa_table)
     {
-        memcpy(kfa_buf + offset, &(*it),
+        memcpy(kfa_buf + offset, &kfa,
                sizeof(struct kfatable_entry));
         offset += sizeof(struct kfatable_entry);
     }

@@ -774,11 +774,11 @@ QColor createColor(const QString &color)
         { "lightgreen", 144, 238, 144}
         };
 
-        for (size_t i = 0; i < (sizeof(kCMap) / sizeof(kCMap[0])); i++)
+        for (auto entry : kCMap)
         {
-            s_x11ColorMap[QString(kCMap[i].m_name)] = QColor(kCMap[i].m_r,
-                                                             kCMap[i].m_g,
-                                                             kCMap[i].m_b);
+            s_x11ColorMap[QString(entry.m_name)] = QColor(entry.m_r,
+                                                          entry.m_g,
+                                                          entry.m_b);
         }
     }
 

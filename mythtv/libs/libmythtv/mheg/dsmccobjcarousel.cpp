@@ -33,9 +33,8 @@ DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,
 
 DSMCCCacheModuleData::~DSMCCCacheModuleData()
 {
-    auto it = m_blocks.begin();
-    for (; it != m_blocks.end(); ++it)
-        delete *it;
+    for (auto & block : m_blocks)
+        delete block;
     m_blocks.clear();
 }
 
@@ -69,8 +68,8 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
     if (m_blocks[ddb->m_blockNumber])
     {
         QString s;
-        for (size_t i = 0; i < m_blocks.size(); ++i)
-            s += m_blocks[i] ? '+' : 'X';
+        for (auto & block : m_blocks)
+            s += block ? '+' : 'X';
 
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 block %2 dup: %3")
             .arg(ddb->m_moduleId).arg(ddb->m_blockNumber +1).arg(s));
@@ -101,9 +100,8 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         return nullptr;
 
     uint curp = 0;
-    for (size_t i = 0; i < m_blocks.size(); i++)
+    for (auto & block : m_blocks)
     {
-        QByteArray *block = m_blocks[i];
         if (block == nullptr)
         {
             LOG(VB_DSMCC, LOG_INFO,
@@ -111,7 +109,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
             free(tmp_data);
             return nullptr;
         }
-        m_blocks[i] = nullptr;
+        block = nullptr;
         uint size = block->size();
         memcpy(tmp_data + curp, block->data(), size);
         curp += size;
@@ -148,9 +146,8 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
 ObjCarousel::~ObjCarousel()
 {
-    QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
-    for (; it != m_Cache.end(); ++it)
-        delete *it;
+    foreach (auto & cache, m_Cache)
+        delete cache;
     m_Cache.clear();
 }
 
@@ -164,8 +161,7 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
         // Do we already know this module?
         // If so and it is the same version we don't need to do anything.
         // If the version has changed we have to replace it.
-        QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
-        for ( ; it != m_Cache.end(); ++it)
+        for (auto it = m_Cache.begin(); it != m_Cache.end(); ++it)
         {
             DSMCCCacheModuleData *cachep = *it;
             if (cachep->CarouselId() == dii->m_downloadId &&
@@ -234,10 +230,8 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
     LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
-    QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
-    for (; it != m_Cache.end(); ++it)
+    foreach (auto cachep, m_Cache)
     {
-        DSMCCCacheModuleData *cachep = *it;
         if (cachep->CarouselId() == m_id &&
             (cachep->ModuleId() == ddb->m_moduleId))
         {

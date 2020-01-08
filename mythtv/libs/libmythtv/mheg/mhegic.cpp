@@ -33,10 +33,10 @@ MHInteractionChannel::MHInteractionChannel(QObject* parent) : QObject(parent)
 MHInteractionChannel::~MHInteractionChannel()
 {
     QMutexLocker locker(&m_mutex);
-    for ( map_t::iterator it = m_pending.begin(); it != m_pending.end(); ++it)
-        (*it)->deleteLater();
-    for ( map_t::iterator it = m_finished.begin(); it != m_finished.end(); ++it)
-        (*it)->deleteLater();
+    foreach (auto & req, m_pending)
+        req->deleteLater();
+    foreach (auto & req, m_finished)
+        req->deleteLater();
 }
 
 // Get network status

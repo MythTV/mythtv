@@ -35,8 +35,8 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-#define FULL_BUFFER  -1000
-#define EMPTY_BUFFER  -1000
+#define FULL_BUFFER  (-1000)
+#define EMPTY_BUFFER  (-1000)
 	typedef struct ringbuffer {
 		int read_pos;
 		int write_pos;

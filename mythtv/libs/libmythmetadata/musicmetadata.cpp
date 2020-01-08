@@ -1190,11 +1190,11 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     if (!m_albumArt)
         m_albumArt = new AlbumArtImages(this, false);
 
-    for (int x = 0; x < albumart.size(); x++)
+    foreach (auto art, albumart)
     {
-        AlbumArtImage *image = albumart.at(x);
+        AlbumArtImage *image = art;
         image->m_filename = QString("%1-%2").arg(m_id).arg(image->m_filename);
-        m_albumArt->addImage(albumart.at(x));
+        m_albumArt->addImage(art);
     }
 
     m_changed = true;
@@ -1600,18 +1600,17 @@ void AllMusic::resync()
 
     // get a list of tracks in our cache that's now not in the database
     QList<MusicMetadata::IdType> deleteList;
-    for (int x = 0; x < m_allMusic.size(); x++)
+    foreach (auto track, m_allMusic)
     {
-        if (!idList.contains(m_allMusic.at(x)->ID()))
+        if (!idList.contains(track->ID()))
         {
-            deleteList.append(m_allMusic.at(x)->ID());
+            deleteList.append(track->ID());
         }
     }
 
     // remove the no longer available tracks
-    for (int x = 0; x < deleteList.size(); x++)
+    for (uint id : deleteList)
     {
-        MusicMetadata::IdType id = deleteList.at(x);
         MusicMetadata *mdata = m_musicMap[id];
         m_allMusic.removeAll(mdata);
         m_musicMap.remove(id);
@@ -1657,11 +1656,10 @@ bool AllMusic::updateMetadata(int an_id, MusicMetadata *the_track)
 /// \brief Check each MusicMetadata entry and save those that have changed (ratings, etc.)
 void AllMusic::save(void)
 {
-    MetadataPtrList::iterator it = m_allMusic.begin();
-    for (; it != m_allMusic.end(); ++it)
+    foreach (auto & item, m_allMusic)
     {
-        if ((*it)->hasChanged())
-            (*it)->persist();
+        if (item->hasChanged())
+            item->persist();
     }
 }
 
@@ -1700,12 +1698,11 @@ bool AllMusic::checkCDTrack(MusicMetadata *the_track)
 
 MusicMetadata* AllMusic::getCDMetadata(int the_track)
 {
-    MetadataPtrList::iterator anit;
-    for (anit = m_cdData.begin(); anit != m_cdData.end(); ++anit)
+    foreach (auto & anit, m_cdData)
     {
-        if ((*anit)->Track() == the_track)
+        if (anit->Track() == the_track)
         {
-            return (*anit);
+            return anit;
         }
     }
 
@@ -2105,11 +2102,10 @@ void AlbumArtImages::scanForImages()
 
 AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 {
-    AlbumArtList::iterator it = m_imageList.begin();
-    for (; it != m_imageList.end(); ++it)
+    foreach (auto & item, m_imageList)
     {
-        if ((*it)->m_imageType == type)
-            return *it;
+        if (item->m_imageType == type)
+            return item;
     }
 
     return nullptr;
@@ -2117,11 +2113,10 @@ AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 
 AlbumArtImage *AlbumArtImages::getImageByID(int imageID)
 {
-    AlbumArtList::iterator it = m_imageList.begin();
-    for (; it != m_imageList.end(); ++it)
+    foreach (auto & item, m_imageList)
     {
-        if ((*it)->m_id == imageID)
-            return *it;
+        if (item->m_id == imageID)
+            return item;
     }
 
     return nullptr;
@@ -2131,9 +2126,8 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 {
     QStringList paths;
 
-    AlbumArtList::const_iterator it = m_imageList.begin();
-    for (; it != m_imageList.end(); ++it)
-        paths += (*it)->m_filename;
+    foreach (auto item, m_imageList)
+        paths += item->m_filename;
 
     return paths;
 }
@@ -2229,13 +2223,12 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     // do we already have an image of this type?
     AlbumArtImage *image = nullptr;
 
-    AlbumArtList::iterator it = m_imageList.begin();
-    for (; it != m_imageList.end(); ++it)
+    foreach (auto & item, m_imageList)
     {
-        if ((*it)->m_imageType == newImage.m_imageType
-            && (*it)->m_embedded == newImage.m_embedded)
+        if (item->m_imageType == newImage.m_imageType
+            && item->m_embedded == newImage.m_embedded)
         {
-            image = *it;
+            image = item;
             break;
         }
     }
@@ -2288,11 +2281,8 @@ void AlbumArtImages::dumpToDatabase(void)
     }
 
     // now add the albumart to the db
-    AlbumArtList::iterator it = m_imageList.begin();
-    for (; it != m_imageList.end(); ++it)
+    foreach (auto image, m_imageList)
     {
-        AlbumArtImage *image = (*it);
-
         //TODO: for the moment just ignore artist images
         if (image->m_imageType == IT_ARTIST)
             continue;

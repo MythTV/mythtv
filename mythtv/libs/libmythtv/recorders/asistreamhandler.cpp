@@ -225,8 +225,8 @@ void ASIStreamHandler::run(void)
             continue;
         }
 
-        StreamDataList::const_iterator sit = m_streamDataList.begin();
-        for (; sit != m_streamDataList.end(); ++sit)
+        for (auto sit = m_streamDataList.cbegin();
+             sit != m_streamDataList.cend(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
         WriteMPTS(buffer, len - remainder);

@@ -131,10 +131,9 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     continue;
 
                 // loop through discovered scripts
-                QStringList::const_iterator it2 = scripts.begin();
-                for (; it2 != scripts.end(); ++it2)
+                foreach (auto & name, scripts)
                 {
-                    QString cmd = QDir(path).filePath(*it2);
+                    QString cmd = QDir(path).filePath(name);
                     MetaGrabberScript script(cmd);
 
                     if (script.IsValid())
@@ -151,11 +150,10 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         tmpGrabberList = grabberList;
     }
 
-    GrabberList::const_iterator it = tmpGrabberList.begin();
-    for (; it != tmpGrabberList.end(); ++it)
+    foreach (auto & item, tmpGrabberList)
     {
-        if ((type == kGrabberAll) || (it->GetType() == type))
-            retGrabberList.append(*it);
+        if ((type == kGrabberAll) || (item.GetType() == type))
+            retGrabberList.append(item);
     }
 
     return retGrabberList;
@@ -214,11 +212,9 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
     {
         // just pull it from the cache
         GrabberList list = GetList();
-        GrabberList::const_iterator it = list.begin();
-
-        for (; it != list.end(); ++it)
-            if (it->GetPath().endsWith(cmd))
-                return *it;
+        foreach (auto & item, list)
+            if (item.GetPath().endsWith(cmd))
+                return item;
     }
 
     // polling the cache will cause a refresh, so lets just grab and
@@ -238,25 +234,24 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
                                             bool absolute)
 {
     GrabberList list = GetList();
-    GrabberList::const_iterator it = list.begin();
 
     // search for direct match on tag
-    for (; it != list.end(); ++it)
+    foreach (auto & item, list)
     {
-        if (it->GetCommand() == tag)
+        if (item.GetCommand() == tag)
         {
-            return *it;
+            return item;
         }
     }
 
     // no direct match. do we require a direct match? search for one that works
     if (!absolute)
     {
-        for (it = list.begin(); it != list.end(); ++it)
+        foreach (auto & item, list)
         {
-            if (it->Accepts(tag))
+            if (item.Accepts(tag))
             {
-                return *it;
+                return item;
             }
         }
     }

@@ -21,9 +21,8 @@ static void free_vec(VPI_ptr &v)
 {
     if (v)
     {
-        auto it = v->begin();
-        for (; it != v->end(); ++it)
-            delete *it;
+        for (auto & it : *v)
+            delete it;
         delete v;
         v = nullptr;
     }
@@ -120,13 +119,12 @@ void ProgramInfoCache::Refresh(void)
     if (m_nextCache)
     {
         Clear();
-        auto it = m_nextCache->begin();
-        for (; it != m_nextCache->end(); ++it)
+        for (auto & it : *m_nextCache)
         {
-            if (!(*it)->GetChanID())
+            if (!it->GetChanID())
                 continue;
 
-            m_cache[(*it)->GetRecordingID()] = *it;
+            m_cache[it->GetRecordingID()] = it;
         }
         delete m_nextCache;
         m_nextCache = nullptr;
@@ -247,8 +245,8 @@ namespace {
 
 void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
 {
-    for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++it)
-            list.push_back(*it);
+    foreach (auto & pi, m_cache)
+        list.push_back(pi);
 
     if (newest_first)
         std::sort(list.begin(), list.end(), reversePISort);
@@ -270,7 +268,7 @@ ProgramInfo *ProgramInfoCache::GetRecordingInfo(uint recordingID) const
 /// Clears the cache, m_lock must be held when this is called.
 void ProgramInfoCache::Clear(void)
 {
-    for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++it)
-        delete (*it);
+    foreach (auto & pi, m_cache)
+        delete pi;
     m_cache.clear();
 }

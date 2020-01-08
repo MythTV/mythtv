@@ -82,8 +82,8 @@ QStringList GetVideoDirsByHost(const QString& host)
     QStringList tmp;
 
     QStringList tmp2 = StorageGroup::getGroupDirs("Videos", host);
-    for (QStringList::iterator p = tmp2.begin(); p != tmp2.end(); ++p)
-        tmp.append(*p);
+    foreach (auto & dir, tmp2)
+        tmp.append(dir);
 
     if (host.isEmpty())
     {
@@ -94,17 +94,15 @@ QStringList GetVideoDirsByHost(const QString& host)
         QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
                     DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
 #endif
-        for (QStringList::iterator p = tmp3.begin(); p != tmp3.end(); ++p)
+        foreach (auto & dir, tmp3)
         {
             bool matches = false;
-            QString newpath = *p;
+            QString newpath = dir;
             if (!newpath.endsWith("/"))
                 newpath.append("/");
 
-            for (QStringList::iterator q = tmp2.begin(); q != tmp2.end(); ++q)
+            foreach (auto comp, tmp2)
             {
-                QString comp = *q;
-
                 if (comp.endsWith(newpath))
                 {
                     matches = true;
@@ -112,7 +110,7 @@ QStringList GetVideoDirsByHost(const QString& host)
                 }
             }
             if (!matches)
-                tmp.append(QDir::cleanPath(*p));
+                tmp.append(QDir::cleanPath(dir));
         }
     }
 

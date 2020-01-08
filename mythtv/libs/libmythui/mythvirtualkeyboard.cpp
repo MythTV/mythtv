@@ -287,9 +287,9 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
 {
     QList<MythUIType *> *children = GetAllChildren();
-    for (int i = 0; i < children->size(); ++i)
+    foreach (auto child, *children)
     {
-        auto *button = dynamic_cast<MythUIButton *>(children->at(i));
+        auto *button = dynamic_cast<MythUIButton *>(child);
         if (button)
         {
             if (m_keyMap.contains(button->objectName()))
@@ -421,11 +421,11 @@ void MythUIVirtualKeyboard::charClicked(void)
         else
         {
             // Produce the composed key.
-            for (int i = 0; i < numcomps; i++)
+            for (const auto & comp : comps)
             {
-                if ((m_composeStr == comps[i][0]) && (c == comps[i][1]))
+                if ((m_composeStr == comp[0]) && (c == comp[1]))
                 {
-                    c = comps[i][2];
+                    c = comp[2];
 
                     emit keyPressed(c);
 

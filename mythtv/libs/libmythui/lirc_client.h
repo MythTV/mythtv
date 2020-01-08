@@ -105,7 +105,7 @@ char *lirc_ir2char(const struct lirc_state *state, struct lirc_config *config,ch
 #endif
 
 int lirc_nextcode(struct lirc_state *state, char **code);
-int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,char *code,char **string);
+int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,const char *code,char **string);
 
 /* new interface for client daemon */
 int lirc_readconfig_only(const struct lirc_state *state,

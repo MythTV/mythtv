@@ -84,10 +84,8 @@ void MythMenu::AddItem(MythMenuItem *item, bool selected, MythMenu *subMenu)
 
 void MythMenu::SetSelectedByTitle(const QString& title)
 {
-    QList<MythMenuItem*>::iterator it = m_menuItems.begin();
-    for ( ; it < m_menuItems.end(); ++it)
+    foreach (auto & item, m_menuItems)
     {
-        MythMenuItem *item = (*it);
         if (!item)
             continue;
 
@@ -101,10 +99,8 @@ void MythMenu::SetSelectedByTitle(const QString& title)
 
 void MythMenu::SetSelectedByData(const QVariant& data)
 {
-    QList<MythMenuItem*>::iterator it = m_menuItems.begin();
-    for ( ; it < m_menuItems.end(); ++it)
+    foreach (auto & item, m_menuItems)
     {
-        MythMenuItem *item = (*it);
         if (!item)
             continue;
 

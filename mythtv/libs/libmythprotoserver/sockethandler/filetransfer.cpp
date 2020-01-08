@@ -56,7 +56,7 @@ bool FileTransfer::isOpen(void)
     return m_rbuffer && m_rbuffer->IsOpen();
 }
 
-bool FileTransfer::ReOpen(QString newFilename)
+bool FileTransfer::ReOpen(const QString& newFilename)
 {
     if (!m_writemode)
         return false;

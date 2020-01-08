@@ -158,9 +158,9 @@ QStringList LCDServer::parseCommand(QString &command)
     QChar c;
     bool bInString = false;
 
-    for (int x = 0; x < command.length(); x++)
+    foreach (auto && x, command)
     {
-        c = command[x];
+        c = x;
         if (!bInString && c == '"')
             bInString = true;
         else if (bInString && c == '"')

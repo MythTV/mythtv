@@ -418,17 +418,17 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
         return d.rmdir(dirName);
     }
 
-    for (QFileInfoList::iterator p = contents.begin(); p != contents.end(); ++p)
+    foreach (auto & entry, contents)
     {
-        if (p->isDir())
+        if (entry.isDir())
         {
-            QString fileName = p->fileName();
+            QString fileName = entry.fileName();
             if (!removeDir(fileName))
                 return false;
         }
         else
         {
-            if (!QFile(p->fileName()).remove())
+            if (!QFile(entry.fileName()).remove())
                 return false;
         }
     }
@@ -499,13 +499,12 @@ void VideoMetadataImp::fillGenres()
     if (vgm.get(m_id, genres))
     {
         VideoGenre &vg = VideoGenre::getGenre();
-        for (VideoGenreMap::entry::values_type::const_iterator p =
-             genres.values.begin(); p != genres.values.end(); ++p)
+        for (long value : genres.values)
         {
             // Just add empty string for no-name genres
             QString name;
-            vg.get(*p, name);
-            m_genres.push_back(genre_list::value_type(*p, name));
+            vg.get(value, name);
+            m_genres.push_back(genre_list::value_type(value, name));
         }
     }
 }
@@ -518,13 +517,12 @@ void VideoMetadataImp::fillCountries()
     if (vcm.get(m_id, countries))
     {
         VideoCountry &vc = VideoCountry::getCountry();
-        for (VideoCountryMap::entry::values_type::const_iterator p =
-             countries.values.begin(); p != countries.values.end(); ++p)
+        for (long value : countries.values)
         {
             // Just add empty string for no-name countries
             QString name;
-            vc.get(*p, name);
-            m_countries.push_back(country_list::value_type(*p, name));
+            vc.get(value, name);
+            m_countries.push_back(country_list::value_type(value, name));
         }
     }
 }
@@ -537,13 +535,12 @@ void VideoMetadataImp::fillCast()
     if (vcm.get(m_id, cast))
     {
         VideoCast &vc = VideoCast::GetCast();
-        for (VideoCastMap::entry::values_type::const_iterator p =
-             cast.values.begin(); p != cast.values.end(); ++p)
+        for (long value : cast.values)
         {
             // Just add empty string for no-name cast
             QString name;
-            vc.get(*p, name);
-            m_cast.push_back(cast_list::value_type(*p, name));
+            vc.get(value, name);
+            m_cast.push_back(cast_list::value_type(value, name));
         }
     }
 }

@@ -128,6 +128,7 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
 
 void VideoVisualSpectrum::prepare(void)
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_magnitudes.size(); i++)
         m_magnitudes[i] = 0.0;
     VideoVisual::prepare();
@@ -162,9 +163,9 @@ bool VideoVisualSpectrum::Initialise(const QRect &area)
     m_scale.setMax(192, m_area.width() / m_barWidth);
 
     m_magnitudes.resize(m_scale.range() * 2);
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_magnitudes.size(); i++)
         m_magnitudes[i] = 0.0;
-
     InitialisePriv();
     return true;
 }

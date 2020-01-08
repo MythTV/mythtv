@@ -189,9 +189,8 @@ MythSocket *RemoteFile::openSocket(bool control)
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
-        QStringList::const_iterator it = m_possibleAuxFiles.begin();
-        for (; it != m_possibleAuxFiles.end(); ++it)
-            strlist << *it;
+        foreach (auto fname, m_possibleAuxFiles)
+            strlist << fname;
 
         if (!lsock->SendReceiveStringList(strlist))
         {
@@ -205,7 +204,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
         if (strlist.size() >= 3)
         {
-            it = strlist.begin(); ++it;
+            auto it = strlist.begin(); ++it;
             m_recorderNum = (*it).toInt(); ++it;
             m_fileSize = (*(it)).toLongLong(); ++it;
             for (; it != strlist.end(); ++it)

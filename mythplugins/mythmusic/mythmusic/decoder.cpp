@@ -79,9 +79,8 @@ QStringList Decoder::all()
 
     QStringList l;
 
-    QList<DecoderFactory*>::iterator it = factories->begin();
-    for (; it != factories->end(); ++it)
-        l += (*it)->description();
+    foreach (auto & factory, *factories)
+        l += factory->description();
 
     return l;
 }
@@ -90,10 +89,9 @@ bool Decoder::supports(const QString &source)
 {
     checkFactories();
 
-    QList<DecoderFactory*>::iterator it = factories->begin();
-    for (; it != factories->end(); ++it)
+    foreach (auto & factory, *factories)
     {
-        if ((*it)->supports(source))
+        if (factory->supports(source))
             return true;
     }
 
@@ -109,11 +107,10 @@ Decoder *Decoder::create(const QString &source, AudioOutput *output, bool deleta
 {
     checkFactories();
 
-    QList<DecoderFactory*>::iterator it = factories->begin();
-    for (; it != factories->end(); ++it)
+    foreach (auto & factory, *factories)
     {
-        if ((*it)->supports(source))
-            return (*it)->create(source, output, deletable);
+        if (factory->supports(source))
+            return factory->create(source, output, deletable);
     }
 
     return nullptr;

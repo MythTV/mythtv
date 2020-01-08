@@ -110,7 +110,7 @@ void MythEDID::Parse(void)
     }
 
     m_size = static_cast<uint>(m_data.size());
-    const quint8 *data = reinterpret_cast<const quint8 *>(m_data.constData());
+    const auto *data = reinterpret_cast<const quint8 *>(m_data.constData());
 
     // EDID data should be in 128 byte blocks
     if ((m_size % 0x80) || data[0] != 0x00 || data[1] != 0xff)
@@ -121,8 +121,8 @@ void MythEDID::Parse(void)
 
     // checksum
     qint8 sum = 0;
-    for (int i = 0; i < m_data.size(); ++i)
-        sum += m_data.at(i);
+    foreach (char i, m_data)
+        sum += i;
     if (sum != 0)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Checksum error");
@@ -210,7 +210,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     m_sRGB = Data[FEATURES_OFFSET] & 0x04;
     static const unsigned char s_sRGB[10] =
         { 0xEE, 0x91, 0xA3, 0x54, 0x4C, 0x99, 0x26, 0x0F, 0x50, 0x54 };
-    bool srgb = !memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB));
+    bool srgb = memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB)) == 0;
 
     if (!m_sRGB && srgb)
         m_sRGB = true;
@@ -244,8 +244,8 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     }
 
     // Set status
-    for (auto it = m_serialNumbers.cbegin(); it != m_serialNumbers.cend(); ++it)
-        if (!(*it).isEmpty())
+    foreach (const auto & sn, m_serialNumbers)
+        if (!sn.isEmpty())
             m_valid = true;
     if (!m_valid)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No serial number(s) in EDID");
@@ -275,10 +275,10 @@ bool MythEDID::ParseCTABlock(const quint8 *Data, uint Offset)
     uint type  = (Data[Offset] & 0xE0) >> 5;
     switch (type)
     {
-        case 0x01: break; // Audio data block
+        case 0x01: break; // Audio data block // NOLINT(bugprone-suspicious-string-compare)
         case 0x02: break; // Video data block
         case 0x03: ParseVSDB(Data, Offset + 1, length); break; // Vendor Specific Data Block
-        case 0x04: break; // Speaker Allocation data block
+        case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-suspicious-string-compare)
         case 0x05: break; // VESA DTC data block
         case 0x07: break; // Extended tag. HDR metadata here
         default: break;

@@ -71,7 +71,7 @@ public:
         {
             static char *hostname = (char *)"MythTV";
             uint32_t len = strlen(hostname);
-            uchar *rtcp = new uchar[46 + len + 1];
+            auto *rtcp = new uchar[46 + len + 1];
 
             rtcp[0] = (RTP_VERSION << 6) + 1;   // 1 report block
             rtcp[1] = RTCP_RR;                  // RTCP_RR)

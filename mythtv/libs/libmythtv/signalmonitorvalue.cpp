@@ -177,23 +177,21 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
 bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
 {
     bool good = true;
-    auto it = slist.cbegin();
-    for (; it != slist.cend(); ++it)
-        good &= it->IsGood();
+    for (const auto & smv : slist)
+        good &= smv.IsGood();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     if (!good)
     {
         QString msg("AllGood failed on ");
-        it = slist.begin();
-        for (; it != slist.end(); ++it)
+        for (const auto & smv : slist)
         {
-            if (!it->IsGood())
+            if (!smv.IsGood())
             {
-                msg += it->m_noSpaceName;
+                msg += smv.m_noSpaceName;
                 msg += QString("(%1%2%3) ")
-                           .arg(it->GetValue())
-                           .arg(it->m_highThreshold ? "<" : ">")
-                           .arg(it->GetThreshold());
+                           .arg(smv.GetValue())
+                           .arg(smv.m_highThreshold ? "<" : ">")
+                           .arg(smv.GetThreshold());
             }
         }
         LOG(VB_GENERAL, LOG_DEBUG, msg);
@@ -210,11 +208,10 @@ int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
 {
     int wait = 0;
     int minWait = 0;
-    auto it = slist.cbegin();
-    for (; it != slist.cend(); ++it)
+    for (const auto & smv : slist)
     {
-        wait = max(wait, it->GetTimeout());
-        minWait = min(minWait, it->GetTimeout());
+        wait = max(wait, smv.GetTimeout());
+        minWait = min(minWait, smv.GetTimeout());
     }
     return (minWait<0) ? -1 : wait;
 }

@@ -28,7 +28,7 @@ template <class DBFS>
 class META_PUBLIC ImageScanThread : public MThread
 {
 public:
-    ImageScanThread(DBFS *const dbfs, ImageThumb<DBFS> *thumbGen);
+    ImageScanThread(DBFS *dbfs, ImageThumb<DBFS> *thumbGen);
     ~ImageScanThread() override;
 
     void        cancel();

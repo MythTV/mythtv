@@ -37,10 +37,10 @@ void MythOpenGLPainter::FreeResources(void)
     DeleteTextures();
     if (m_mappedBufferPoolReady)
     {
-        for (int i = 0; i < MAX_BUFFER_POOL; i++)
+        for (auto & buf : m_mappedBufferPool)
         {
-            delete m_mappedBufferPool[i];
-            m_mappedBufferPool[i] = nullptr;
+            delete buf;
+            buf = nullptr;
         }
         m_mappedBufferPoolReady = false;
     }
@@ -106,8 +106,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     {
         m_mappedBufferPoolReady = true;
         // initialise the VBO pool
-        for (int i = 0 ; i < MAX_BUFFER_POOL; i++)
-            m_mappedBufferPool[i] = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
+        for (auto & buf : m_mappedBufferPool)
+            buf = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
     }
 
     // check if we need to adjust cache sizes

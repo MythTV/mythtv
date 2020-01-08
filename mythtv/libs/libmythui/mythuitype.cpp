@@ -100,10 +100,8 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                         && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
 
-    for (int i = 0; i < children.size(); ++i)
+    foreach (auto obj, children)
     {
-        QObject *obj = children.at(i);
-
         if (onlyWidgets)
         {
             if (obj->isWidgetType() && (!objName || obj->objectName() == oName))
@@ -1038,6 +1036,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
     {
         bool reverse = m_ReverseDepend[dependee];
         visible = reverse ? !isDefault : isDefault;
+        // NOLINTNEXTLINE(modernize-loop-convert)
         for (int i = 0; i < m_dependsValue.size(); i++)
         {
             if (m_dependsValue[i].first != dependee)

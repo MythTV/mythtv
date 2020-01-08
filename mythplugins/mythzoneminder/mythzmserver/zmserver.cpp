@@ -551,9 +551,8 @@ ZMServer::ZMServer(int sock, bool debug)
 
 ZMServer::~ZMServer()
 {
-    for (size_t x = 0; x < m_monitors.size(); x++)
+    for (auto mon : m_monitors)
     {
-        MONITOR *mon = m_monitors.at(x);
         if (mon->m_mapFile != -1)
         {
             if (close(mon->m_mapFile) == -1)
@@ -780,10 +779,8 @@ void ZMServer::handleGetAlarmStates(void)
     // add the monitor count
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (int x = 0; x < (int)m_monitors.size(); x++)
+    for (auto monitor : m_monitors)
     {
-        MONITOR *monitor = m_monitors.at(x);
-
         // add monitor ID
         ADD_INT(outStr, monitor->m_monId)
 
@@ -1540,9 +1537,9 @@ void ZMServer::handleGetCameraList(void)
 
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (size_t x = 0; x < m_monitors.size(); x++)
+    for (auto & monitor : m_monitors)
     {
-        ADD_STR(outStr, m_monitors.at(x)->m_name)
+        ADD_STR(outStr, monitor->m_name)
     }
 
     send(outStr);
@@ -1559,10 +1556,8 @@ void ZMServer::handleGetMonitorList(void)
 
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (size_t x = 0; x < m_monitors.size(); x++)
+    for (auto mon : m_monitors)
     {
-        MONITOR *mon = m_monitors.at(x);
-
         ADD_INT(outStr, mon->m_monId)
         ADD_STR(outStr, mon->m_name)
         ADD_INT(outStr, mon->m_width)

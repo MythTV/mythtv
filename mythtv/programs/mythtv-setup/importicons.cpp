@@ -500,9 +500,8 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
     bool in_comment = false;
     bool in_escape = false;
     int comma_count = 0;
-    for (int i = 0; i < line.length(); i++)
+    foreach (auto cur, line)
     {
-        QChar cur = line[i];
         if (in_escape)
         {
             str += cur;

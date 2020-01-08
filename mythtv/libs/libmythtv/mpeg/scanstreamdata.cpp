@@ -65,11 +65,8 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
 
     QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::const_iterator it = m_cachedPmts.begin();
-    for (; it != m_cachedPmts.end(); ++it)
+    foreach (auto pmt, m_cachedPmts)
     {
-        ProgramMapTable *pmt = *it;
-
         for (uint i = 0; (guess != "dvb") && (i < pmt->StreamCount()); i++)
         {
             if (StreamID::OpenCableVideo == pmt->StreamType(i))
@@ -80,9 +77,9 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (size_t i = 0; i < descs.size(); i++)
+        for (auto & desc : descs)
         {
-            RegistrationDescriptor reg(descs[i]);
+            RegistrationDescriptor reg(desc);
             if (!reg.IsValid())
                 continue;
             if (reg.FormatIdentifierString() == "SCTE")

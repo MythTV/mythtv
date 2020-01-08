@@ -251,9 +251,8 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
     root.appendChild(item);
     QDomElement markup = xml.createElement("markup");
     item.appendChild(markup);
-    for (int i = 0; i < mapMark.size(); ++i)
+    foreach (auto & entry, mapMark)
     {
-        ProgramInfo::MarkupEntry &entry = mapMark[i];
         QDomElement child = xml.createElement("mark");
         child.setAttribute("type", entry.type);
         child.setAttribute("frame", (qulonglong)entry.frame);
@@ -261,9 +260,8 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
             child.setAttribute("data", (qulonglong)entry.data);
         markup.appendChild(child);
     }
-    for (int i = 0; i < mapSeek.size(); ++i)
+    foreach (auto & entry, mapSeek)
     {
-        ProgramInfo::MarkupEntry &entry = mapSeek[i];
         QDomElement child = xml.createElement("seek");
         child.setAttribute("type", entry.type);
         child.setAttribute("frame", (qulonglong)entry.frame);

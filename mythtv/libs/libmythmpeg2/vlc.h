@@ -23,8 +23,8 @@
 
 #define GETWORD(bit_buf,shift,bit_ptr)				\
 do {								\
-    bit_buf |= ((bit_ptr[0] << 8) | bit_ptr[1]) << (shift);	\
-    bit_ptr += 2;						\
+    (bit_buf) |= (((bit_ptr)[0] << 8) | (bit_ptr)[1]) << (shift); \
+    (bit_ptr) += 2;						\
 } while (0)
 
 static inline void bitstream_init (mpeg2_decoder_t * decoder,
@@ -39,17 +39,17 @@ static inline void bitstream_init (mpeg2_decoder_t * decoder,
 /* make sure that there are at least 16 valid bits in bit_buf */
 #define NEEDBITS(bit_buf,bits,bit_ptr)		\
 do {						\
-    if (unlikely (bits > 0)) {			\
+    if (unlikely ((bits) > 0)) {		\
 	GETWORD (bit_buf, bits, bit_ptr);	\
-	bits -= 16;				\
+	(bits) -= 16;				\
     }						\
 } while (0)
 
 /* remove num valid bits from bit_buf */
 #define DUMPBITS(bit_buf,bits,num)	\
 do {					\
-    bit_buf <<= (num);			\
-    bits += (num);			\
+    (bit_buf) <<= (num);		\
+    (bits) += (num);			\
 } while (0)
 
 /* take num bits from the high part of bit_buf and zero extend them */
@@ -118,7 +118,7 @@ static const MBtab MB_P [] = {
 
 #define FWD MACROBLOCK_MOTION_FORWARD
 #define BWD MACROBLOCK_MOTION_BACKWARD
-#define INTER MACROBLOCK_MOTION_FORWARD|MACROBLOCK_MOTION_BACKWARD
+#define INTER (MACROBLOCK_MOTION_FORWARD|MACROBLOCK_MOTION_BACKWARD)
 
 static const MBtab MB_B [] = {
     {0,                 6}, {INTRA|QUANT,       6},

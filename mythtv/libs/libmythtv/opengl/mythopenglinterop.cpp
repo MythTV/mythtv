@@ -249,16 +249,15 @@ void MythOpenGLInterop::DeleteTextures(void)
     {
         OpenGLLocker locker(m_context);
         int count = 0;
-        QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
-        for ( ; it != m_openglTextures.constEnd(); ++it)
+        for (auto it = m_openglTextures.constBegin();
+             it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            auto it2 = textures.begin();
-            for ( ; it2 != textures.end(); ++it2)
+            for (auto & texture : textures)
             {
-                if ((*it2)->m_textureId)
-                    m_context->glDeleteTextures(1, &(*it2)->m_textureId);
-                MythVideoTexture::DeleteTexture(m_context, *it2);
+                if (texture->m_textureId)
+                    m_context->glDeleteTextures(1, &texture->m_textureId);
+                MythVideoTexture::DeleteTexture(m_context, texture);
                 count++;
             }
             textures.clear();

@@ -46,7 +46,7 @@ class NetworkCommand : public QObject
 {
     Q_OBJECT
   public:
-    NetworkCommand(NetworkControlClient *cli, QString c)
+    NetworkCommand(NetworkControlClient *cli, const QString& c)
     {
         m_command = c.trimmed();
         m_client = cli;
@@ -124,7 +124,7 @@ class NetworkControl : public ServerPool, public QRunnable
 
     static QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     static QString listSchedule(const QString& chanID = "") ;
-    static QString listChannels(const uint start, const uint limit) ;
+    static QString listChannels(uint start, uint limit) ;
     static QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);

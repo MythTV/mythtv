@@ -45,10 +45,10 @@ class MPUBLIC MythContext
     explicit MythContext(QString binversion, bool needsBackend = false);
     virtual ~MythContext();
 
-    bool Init(const bool gui = true,
-              const bool promptForBackend = false,
-              const bool disableAutoDiscovery = false,
-              const bool ignoreDB = false);
+    bool Init(bool gui = true,
+              bool promptForBackend = false,
+              bool disableAutoDiscovery = false,
+              bool ignoreDB = false);
 
     DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);
@@ -65,7 +65,7 @@ class MPUBLIC MythContext
 extern MPUBLIC MythContext *gContext;
 
 /// Service type for the backend's UPnP server
-extern const QString gBackendURI;
+extern const QString kBackendURI;
 
 #endif
 

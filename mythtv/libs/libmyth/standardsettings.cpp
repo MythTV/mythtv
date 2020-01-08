@@ -585,14 +585,8 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
 
 void MythUIComboBoxSetting::fillSelectionsFromDir(const QDir &dir, bool absPath)
 {
-    QFileInfoList il = dir.entryInfoList();
-
-    for (QFileInfoList::Iterator it = il.begin();
-                                 it != il.end();
-                               ++it )
+    foreach (auto & fi, dir.entryInfoList())
     {
-        QFileInfo &fi = *it;
-
         if (absPath)
             addSelection( fi.absoluteFilePath() );
         else

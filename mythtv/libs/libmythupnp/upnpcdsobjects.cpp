@@ -53,8 +53,8 @@ CDSObject::~CDSObject()
         m_children.takeLast()->DecrRef();
     }
 
-    Properties::iterator it = m_properties.begin();
-    for (; it != m_properties.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_properties.begin(); it != m_properties.end(); ++it)
     {
         delete *it;
         *it = nullptr;
@@ -360,11 +360,8 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
     // Output all Properties
     // ----------------------------------------------------------------------
 
-    Properties::const_iterator it = m_properties.begin();
-    for (; it != m_properties.end(); ++it)
+    foreach (auto pProp, m_properties)
     {
-        const Property *pProp = *it;
-
         if (pProp->m_bRequired || (!pProp->GetValue().isEmpty()))
         {
             QString sName;
@@ -384,14 +381,13 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
                 os << "<"  << sName;
 
-                NameValues::const_iterator nit = pProp->m_lstAttributes.begin();
-                for (; nit != pProp->m_lstAttributes.end(); ++ nit)
+                for (const auto & attr : pProp->m_lstAttributes)
                 {
                     QString filterName = QString("%1@%2").arg(sName)
-                                                         .arg((*nit).m_sName);
-                    if ((*nit).m_bRequired  || !filterAttributes ||
+                                                         .arg(attr.m_sName);
+                    if (attr.m_bRequired  || !filterAttributes ||
                         filter.contains(filterName))
-                        os << " " << (*nit).m_sName << "=\"" << (*nit).m_sValue << "\"";
+                        os << " " << attr.m_sName << "=\"" << attr.m_sValue << "\"";
                 }
 
                 os << ">";
@@ -410,22 +406,20 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
         bool filterAttributes = true;
         if (!bFilter || filter.contains("res#"))
             filterAttributes = false;
-        Resources::const_iterator rit = m_resources.begin();
-        for (; rit != m_resources.end(); ++rit)
+        foreach (auto resource, m_resources)
         {
-            os << "<res protocolInfo=\"" << (*rit)->m_sProtocolInfo << "\" ";
+            os << "<res protocolInfo=\"" << resource->m_sProtocolInfo << "\" ";
 
             QString filterName;
-            NameValues::const_iterator nit = (*rit)->m_lstAttributes.begin();
-            for (; nit != (*rit)->m_lstAttributes.end(); ++ nit)
+            for (const auto & attr : resource->m_lstAttributes)
             {
-                filterName = QString("res@%1").arg((*nit).m_sName);
-                if ((*nit).m_bRequired  || !filterAttributes ||
+                filterName = QString("res@%1").arg(attr.m_sName);
+                if (attr.m_bRequired  || !filterAttributes ||
                     filter.contains(filterName))
-                    os << (*nit).m_sName << "=\"" << (*nit).m_sValue << "\" ";
+                    os << attr.m_sName << "=\"" << attr.m_sValue << "\" ";
             }
 
-            os << ">" << (*rit)->m_sURI;
+            os << ">" << resource->m_sURI;
             os << "</res>" << endl;
         }
     }
@@ -436,9 +430,8 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
     if (!ignoreChildren)
     {
-        CDSObjects::const_iterator cit = m_children.begin();
-        for (; cit != m_children.end(); ++cit)
-            (*cit)->toXml(os, filter);
+        for (auto cit : m_children)
+            cit->toXml(os, filter);
     }
 
     // ----------------------------------------------------------------------

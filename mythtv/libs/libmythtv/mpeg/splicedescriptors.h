@@ -42,7 +42,7 @@ class SpliceDescriptorID
 class SpliceDescriptor
 {
   public:
-    operator const unsigned char*(void) const { return m_data; }
+    explicit operator const unsigned char*(void) const { return m_data; }
 
     SpliceDescriptor(const unsigned char *data, int len) : m_data(data)
     {
@@ -99,7 +99,7 @@ class SpliceDescriptor
 class AvailDescriptor : public SpliceDescriptor
 {
   public:
-    AvailDescriptor(const unsigned char *data, int len = 300) :
+    explicit AvailDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation) { }
     //       Name             bits  loc  expected value
     // splice_descriptor_tag    8   0.0  0x00
@@ -125,7 +125,7 @@ class AvailDescriptor : public SpliceDescriptor
 class DTMFDescriptor : public SpliceDescriptor
 {
   public:
-    DTMFDescriptor(const unsigned char *data, int len = 300) :
+    explicit DTMFDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::dtmf) { }
 
     //       Name             bits  loc  expected value
@@ -157,7 +157,7 @@ class DTMFDescriptor : public SpliceDescriptor
 class SegmentationDescriptor : public SpliceDescriptor
 {
   public:
-    SegmentationDescriptor(const unsigned char *data, int len = 300) :
+    explicit SegmentationDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
         _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;

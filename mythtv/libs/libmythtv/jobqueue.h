@@ -42,7 +42,7 @@ using namespace std;
     F(JOB_CANCELLED,    0x0140, JobQueue::tr("Cancelled")) \
 
 enum JobStatus {
-#define JOBSTATUS_ENUM(A,B,C)   A = B ,
+#define JOBSTATUS_ENUM(A,B,C)   A = (B) ,
     JOBSTATUS_MAP(JOBSTATUS_ENUM)
 };
 

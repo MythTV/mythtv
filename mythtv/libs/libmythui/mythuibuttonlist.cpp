@@ -1547,10 +1547,8 @@ void MythUIButtonList::SetValueByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (int i = 0; i < m_itemList.size(); ++i)
+    foreach (auto item, m_itemList)
     {
-        MythUIButtonListItem *item = m_itemList.at(i);
-
         if (item->GetData() == data)
         {
             SetItemCurrent(item);
@@ -1691,10 +1689,8 @@ MythUIButtonListItem *MythUIButtonList::GetItemByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    for (int i = 0; i < m_itemList.size(); ++i)
+    foreach (auto item, m_itemList)
     {
-        MythUIButtonListItem *item = m_itemList.at(i);
-
         if (item->GetData() == data)
             return item;
     }

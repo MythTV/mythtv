@@ -117,9 +117,8 @@ void LanguageSelection::Load(void)
     QStringList langs = langMap.values();
     langs.sort();
     bool foundLanguage = false;
-    for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
+    foreach (auto nativeLang, langs)
     {
-        QString nativeLang = *it;
         QString code = langMap.key(nativeLang); // Slow, but map is small
         QString language = GetISO639EnglishLanguageName(code);
         auto item = new MythUIButtonListItem(m_languageList, nativeLang);
@@ -154,10 +153,8 @@ void LanguageSelection::Load(void)
     ISO3166ToNameMap localesMap = GetISO3166EnglishCountryMap();
     QStringList locales = localesMap.values();
     locales.sort();
-    for (QStringList::Iterator it = locales.begin(); it != locales.end();
-         ++it)
+    foreach (auto country, locales)
     {
-        QString country = *it;
         QString code = localesMap.key(country); // Slow, but map is small
         QString nativeCountry = GetISO3166CountryName(code);
         auto item = new MythUIButtonListItem(m_countryList, country);

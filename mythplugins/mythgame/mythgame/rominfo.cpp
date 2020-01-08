@@ -160,9 +160,9 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
 
 
     BaseFileName.truncate(dotLocation + 1);
-    for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
+    foreach (auto & format, graphic_formats)
     {
-        *result = BaseFileName + *i;
+        *result = BaseFileName + format;
         if (QFile::exists(*result))
             return true;
     }

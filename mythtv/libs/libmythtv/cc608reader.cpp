@@ -189,7 +189,6 @@ int CC608Reader::Update(unsigned char *inpos)
         int linecont = (subtitle.resumetext & CC_LINE_CONT);
 
         auto *ccbuf = new vector<CC608Text*>;
-        vector<CC608Text*>::iterator ccp;
         CC608Text *tmpcc = nullptr;
         int replace = linecont;
         int scroll = 0;
@@ -287,10 +286,9 @@ int CC608Reader::Update(unsigned char *inpos)
             // - fix display of old (badly-encoded) files
             if (m_state[streamIdx].m_outputRow > 15)
             {
-                ccp = ccbuf->begin();
-                for (; ccp != ccbuf->end(); ++ccp)
+                for (auto & ccp : *ccbuf)
                 {
-                    tmpcc = *ccp;
+                    tmpcc = ccp;
                     tmpcc->m_y -= (m_state[streamIdx].m_outputRow - 15);
                 }
             }
@@ -462,8 +460,8 @@ void CC608Reader::ClearBuffers(bool input, bool output, int outputStreamIdx)
 
     if (output && outputStreamIdx < 0)
     {
-        for (int i = 0; i < MAXOUTBUFFERS; ++i)
-            m_state[i].Clear();
+        for (auto & state : m_state)
+            state.Clear();
     }
 
     if (output && outputStreamIdx >= 0)

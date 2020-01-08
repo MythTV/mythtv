@@ -439,14 +439,14 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 {
                     QMutexLocker locker(&m_positionMapLock);
-                    for (size_t i = 0; i < m_positionMap.size(); i++)
+                    for (auto & entry : m_positionMap)
                     {
-                        long long adj = m_positionMap[i].adjFrame;
+                        long long adj = entry.adjFrame;
 
                         if (keyFrameAdjustMap.contains(adj))
                             adjust += keyFrameAdjustMap[adj];
 
-                        m_positionMap[i].adjFrame -= adjust;
+                        entry.adjFrame -= adjust;
                     }
                 }
 
@@ -985,10 +985,8 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
 
-    auto it = m_storedData.begin();
-    for ( ; it != m_storedData.end(); ++it)
+    for (auto data : m_storedData)
     {
-        RawDataList *data = *it;
         if (data->frameheader.frametype == 'S' &&
             data->frameheader.comptype == 'V')
         {

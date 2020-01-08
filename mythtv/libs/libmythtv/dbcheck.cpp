@@ -2114,8 +2114,8 @@ nullptr
             "       CONCAT(startdate, ' ', starttime), "
             "       CONCAT(enddate, ' ', endtime) FROM record",
         };
-        for (size_t i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
-            updates_ba.push_back(QByteArray(pre_sql[i]));
+        for (auto & pre : pre_sql)
+            updates_ba.push_back(QByteArray(pre));
 
         // Convert various DATETIME fields from local time to UTC
         if (0 != utc_offset)
@@ -2129,7 +2129,7 @@ nullptr
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (size_t i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            for (auto & field : with_endtime)
             {
                 updates_ba.push_back(
                          QString("UPDATE %1 "
@@ -2138,18 +2138,18 @@ nullptr
                                  "    endtime   = "
                                  "    CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                                  "ORDER BY %4")
-                         .arg(with_endtime[i])
+                         .arg(field)
                          .arg(order).toLocal8Bit());
             }
 
-            for (size_t i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            for (auto & field : without_endtime)
             {
                 updates_ba.push_back(
                           QString("UPDATE %1 "
                                   "SET starttime = "
                                   "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                                   "ORDER BY %3")
-                          .arg(without_endtime[i]).arg(order)
+                          .arg(field).arg(order)
                           .toLocal8Bit());
             }
 
@@ -2185,14 +2185,13 @@ nullptr
             "DROP TABLE recordupdate",
         };
 
-        for (size_t i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
-            updates_ba.push_back(QByteArray(post_sql[i]));
+        for (auto & post : post_sql)
+            updates_ba.push_back(QByteArray(post));
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         // do the actual update
@@ -2221,31 +2220,30 @@ nullptr
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (size_t i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            for (auto & field : with_endtime)
             {
                 updates_ba.push_back(
                      QString("UPDATE %1 "
                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
                      "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                      "ORDER BY %4")
-                     .arg(with_endtime[i]).arg(order).toLocal8Bit());
+                     .arg(field).arg(order).toLocal8Bit());
             }
 
-            for (size_t i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            for (auto & field : without_endtime)
             {
                 updates_ba.push_back(
                       QString("UPDATE %1 "
                       "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                       "ORDER BY %3")
-                      .arg(without_endtime[i]).arg(order).toLocal8Bit());
+                      .arg(field).arg(order).toLocal8Bit());
             }
         }
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         // do the actual update
@@ -2276,10 +2274,9 @@ nullptr
                              .toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         if (!performActualUpdate(&updates[0], "1305", dbver))
@@ -2305,10 +2302,9 @@ nullptr
 "                    'Etc/UTC', 'SYSTEM')) ").toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         if (!performActualUpdate(&updates[0], "1306", dbver))

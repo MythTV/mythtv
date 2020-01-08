@@ -110,7 +110,7 @@ QSize MythXDisplay::GetDisplaySize(void)
                      DisplayHeight(m_disp, m_screenNum));
     }
 
-    return QSize(mode.hdisplay, mode.vdisplay);
+    return {mode.hdisplay, mode.vdisplay};
 }
 
 /**
@@ -204,17 +204,17 @@ bool MythXDisplay::CheckErrors(Display *Disp)
     if (events.empty())
         return true;
 
-    for (size_t i = 0; i < events.size(); ++i)
+    for (const auto & event : events)
     {
         char buf[200];
-        XGetErrorText(d, events[i].error_code, buf, sizeof(buf));
+        XGetErrorText(d, event.error_code, buf, sizeof(buf));
         LOG(VB_GENERAL, LOG_ERR,
             QString("XError type: %1\nSerial no: %2\nErr code: %3 (%4)\n"
                    "Req code: %5\nmMinor code: %6\nResource id: %7\n")
-                   .arg(events[i].type).arg(events[i].serial)
-                   .arg(events[i].error_code).arg(buf)
-                   .arg(events[i].request_code).arg(events[i].minor_code)
-                   .arg(events[i].resourceid));
+                   .arg(event.type).arg(event.serial)
+                   .arg(event.error_code).arg(buf)
+                   .arg(event.request_code).arg(event.minor_code)
+                   .arg(event.resourceid));
     }
     xerrors.erase(d);
     return false;
@@ -225,10 +225,9 @@ void MythXDisplay::CheckOrphanedErrors(void)
     if (xerrors.empty())
         return;
 
-    auto errors = xerrors.begin();
-    for (; errors != xerrors.end(); ++errors)
-        if (!xerror_handlers.count(errors->first))
-            CheckErrors(errors->first);
+    for (auto & xerror : xerrors)
+        if (!xerror_handlers.count(xerror.first))
+            CheckErrors(xerror.first);
 }
 
 #endif // USING_X11

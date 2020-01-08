@@ -7,9 +7,9 @@
 MTV_PUBLIC bool InitializeMythSchema(void);
 
 // Call after initializing the main db connection.
-MTV_PUBLIC bool UpgradeTVDatabaseSchema(const bool upgradeAllowed = false,
-                                        const bool upgradeIfNoUI  = false,
-                                        const bool informSystemd  = false);
+MTV_PUBLIC bool UpgradeTVDatabaseSchema(bool upgradeAllowed = false,
+                                        bool upgradeIfNoUI  = false,
+                                        bool informSystemd  = false);
 
 #endif
 

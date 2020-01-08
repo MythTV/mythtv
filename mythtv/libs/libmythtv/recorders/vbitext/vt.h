@@ -23,7 +23,7 @@ struct vt_event
 #define EV_RESET       8       // ./.
 #define EV_TIMER       9       // ./.
 
-#define KEY_F(i)       (1000+i)
+#define KEY_F(i)       (1000+(i))
 #define KEY_LEFT       2001
 #define KEY_RIGHT      2002
 #define KEY_UP         2003

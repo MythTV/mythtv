@@ -100,7 +100,7 @@ enum PlayerFlags
     kMusicChoice          = 0x040000,
 };
 
-#define FlagIsSet(arg) (m_playerFlags & arg)
+#define FlagIsSet(arg) (m_playerFlags & (arg))
 
 class DecoderThread : public MThread
 {
@@ -371,7 +371,7 @@ class MTV_PUBLIC MythPlayer
     virtual QString GetAngleName(int /*title*/) const { return QString(); }
 
     // DVD public stuff
-    virtual bool GoToMenu(QString /*str*/)      { return false;     }
+    virtual bool GoToMenu(const QString& /*str*/) { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
     virtual bool IsInStillFrame() const         { return false;     }
 

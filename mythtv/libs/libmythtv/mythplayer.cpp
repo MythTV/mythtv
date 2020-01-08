@@ -141,9 +141,9 @@ void MythMultiLocker::Unlock(void)
 
 void MythMultiLocker::Relock(void)
 {
-    for (QVector<QMutex*>::const_iterator it = m_locks.cbegin(); it != m_locks.cend(); ++it)
-        if (*it)
-            (*it)->lock();
+    foreach (auto lock, m_locks)
+        if (lock)
+            lock->lock();
 }
 
 MythPlayer::MythPlayer(PlayerFlags flags)
@@ -3430,13 +3430,13 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     PIPLocation ols[] =
         { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
 
-    for (size_t i = 0; i < sizeof(ols)/sizeof(PIPLocation); i++)
+    for (auto & ol : ols)
     {
         PIPMap::const_iterator it = m_pipPlayers.begin();
-        for (; it != m_pipPlayers.end() && (*it != ols[i]); ++it);
+        for (; it != m_pipPlayers.end() && (*it != ol); ++it);
 
         if (it == m_pipPlayers.end())
-            return ols[i];
+            return ol;
     }
 
     return kPIP_END;

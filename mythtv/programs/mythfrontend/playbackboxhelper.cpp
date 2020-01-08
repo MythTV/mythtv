@@ -125,12 +125,11 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
     list.push_back(QString::number(tm.second()));
     list.push_back(QString::number(tm.msec()));
 
-    QSet<CheckAvailabilityType>::iterator cit = cats.begin();
-    for (; cit != cats.end(); ++cit)
+    foreach (auto type, cats)
     {
-        if (*cit == kCheckForCache && cats.size() > 1)
+        if (type == kCheckForCache && cats.size() > 1)
             continue;
-        list[1] = QString::number((int)*cit);
+        list[1] = QString::number((int)type);
         auto *e = new MythEvent("AVAILABILITY", list);
         QCoreApplication::postEvent(m_pbh.m_listener, e);
     }
@@ -390,12 +389,12 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
     QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
 
     QMutexLocker locker(&m_lock);
-    for (int i = 0; i < fsInfos.size(); i++)
+    foreach (auto & fsInfo, fsInfos)
     {
-        if (fsInfos[i].getPath() == "TotalDiskSpace")
+        if (fsInfo.getPath() == "TotalDiskSpace")
         {
-            m_freeSpaceTotalMB = (uint64_t) (fsInfos[i].getTotalSpace() >> 10);
-            m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].getUsedSpace()  >> 10);
+            m_freeSpaceTotalMB = (uint64_t) (fsInfo.getTotalSpace() >> 10);
+            m_freeSpaceUsedMB  = (uint64_t) (fsInfo.getUsedSpace()  >> 10);
         }
     }
     auto *e = new MythEvent("UPDATE_USAGE_UI");

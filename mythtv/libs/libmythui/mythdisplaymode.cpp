@@ -52,7 +52,7 @@ void MythDisplayMode::Init(void)
 
 QSize MythDisplayMode::Resolution(void) const
 {
-    return QSize(m_width, m_height);
+    return {m_width, m_height};
 }
 
 int MythDisplayMode::Width(void) const
@@ -136,7 +136,7 @@ bool MythDisplayMode::CompareRates(double First, double Second, double Precision
     return qAbs(First - Second) < Precision;
 }
 
-int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
+int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode>& Modes,
                                    const MythDisplayMode& Mode, double &TargetRate)
 {
     double videorate = Mode.RefreshRate();
@@ -162,15 +162,15 @@ int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
                 {
                     for (double precision : { 0.001, 0.01, 0.1 })
                     {
-                        for (size_t j = 0; j < rates.size(); ++j)
+                        for (double rate : rates)
                         {
                             // Multiple of target_rate will do
-                            if (CompareRates(videorate, rates[j], precision) ||
-                                (qAbs(videorate - fmod(rates[j], videorate))
+                            if (CompareRates(videorate, rate, precision) ||
+                                (qAbs(videorate - fmod(rate, videorate))
                                  <= precision) ||
-                                (fmod(rates[j],videorate) <= precision))
+                                (fmod(rate,videorate) <= precision))
                             {
-                                TargetRate = rates[j];
+                                TargetRate = rate;
                                 return static_cast<int>(i);
                             }
                         }
@@ -180,14 +180,14 @@ int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
                     for (double precision : { 0.01, 0.1, 1.0 })
                     {
                         double rounded = round(videorate);
-                        for (size_t j = 0; j < rates.size(); ++j)
+                        for (double rate : rates)
                         {
                             // Multiple of target_rate will do
-                            if (CompareRates(rounded, rates[j], precision) ||
-                                (qAbs(rounded - fmod(rates[j], rounded)) <= precision) ||
-                                (fmod(rates[j],rounded) <= precision))
+                            if (CompareRates(rounded, rate, precision) ||
+                                (qAbs(rounded - fmod(rate, rounded)) <= precision) ||
+                                (fmod(rate,rounded) <= precision))
                             {
-                                TargetRate = rates[j];
+                                TargetRate = rate;
                                 return static_cast<int>(i);
                             }
                         }
@@ -232,20 +232,19 @@ uint64_t MythDisplayMode::FindBestScreen(const DisplayModeMap& Map,
     // 4. search for 2x rate
     // 5. search for 1x rate
 
-    auto it = Map.cbegin();
-    for ( ; it != Map.cend(); ++it)
+    for ( auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if (width == Width && height == Height && CompareRates(Rate, rate, 0.01))
             return it->first;
     }
-    for (it = Map.cbegin(); it != Map.cend(); ++it)
+    for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if (width == Width && height == Height && qFuzzyCompare(rate + 1.0, 1.0))
             return it->first;
     }
-    for (it = Map.cbegin(); it != Map.cend(); ++it)
+    for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if ((width == 0 && height == Height &&

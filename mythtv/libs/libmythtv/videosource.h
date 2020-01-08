@@ -125,7 +125,7 @@ class XMLTV_generic_config: public GroupSetting
                          StandardSetting *_setting);
 
     void Save(void) override; // StandardSetting
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
   public slots:
     void RunConfig(void);
@@ -142,7 +142,7 @@ public:
     EITOnly_config(const VideoSource& _parent, StandardSetting *_setting);
 
     void Save(void) override; // StandardSetting
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
 protected:
     UseEIT *m_useEit {nullptr};
@@ -154,7 +154,7 @@ public:
     explicit NoGrabber_config(const VideoSource& _parent);
 
     void Save(void) override; // StandardSetting
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
 protected:
     UseEIT *m_useEit {nullptr};
@@ -291,7 +291,7 @@ class EmptyAudioDevice : public MythUITextEditSetting
         setValue("");
         GetStorage()->Save();
     }
-    void Save(QString destination)
+    void Save(const QString& destination)
     {
         GetStorage()->SetSaveRequired();
         setValue("");
@@ -316,7 +316,7 @@ class EmptyVBIDevice : public MythUITextEditSetting
         setValue("");
         GetStorage()->Save();
     }
-    void Save(QString destination)
+    void Save(const QString& destination)
     {
         GetStorage()->SetSaveRequired();
         setValue("");

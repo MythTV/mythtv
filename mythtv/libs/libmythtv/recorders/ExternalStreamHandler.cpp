@@ -781,8 +781,8 @@ void ExternalStreamHandler::run(void)
         if (!m_listenerLock.tryLock())
             continue;
 
-        StreamDataList::const_iterator sit = m_streamDataList.begin();
-        for (; sit != m_streamDataList.end(); ++sit)
+        for (auto sit = m_streamDataList.cbegin();
+             sit != m_streamDataList.cend(); ++sit)
         {
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
@@ -1089,8 +1089,8 @@ void ExternalStreamHandler::ReplayStream(void)
 
         if (!m_streamDataList.empty())
         {
-            StreamDataList::const_iterator sit = m_streamDataList.begin();
-            for (; sit != m_streamDataList.end(); ++sit)
+            for (auto sit = m_streamDataList.cbegin();
+                 sit != m_streamDataList.cend(); ++sit)
             {
                 sit.key()->ProcessData(reinterpret_cast<const uint8_t *>
                                        (m_replayBuffer.constData()),

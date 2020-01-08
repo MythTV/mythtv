@@ -26,7 +26,7 @@ class ProgramInfoCache
         : m_listener(o) {}
     ~ProgramInfoCache();
 
-    void ScheduleLoad(const bool updateUI = true);
+    void ScheduleLoad(bool updateUI = true);
     bool IsLoadInProgress(void) const;
     void WaitForLoadToComplete(void) const;
 
@@ -43,7 +43,7 @@ class ProgramInfoCache
     ProgramInfo *GetRecordingInfo(uint recordingID) const;
 
   private:
-    void Load(const bool updateUI = true);
+    void Load(bool updateUI = true);
     void Clear(void);
 
   private:

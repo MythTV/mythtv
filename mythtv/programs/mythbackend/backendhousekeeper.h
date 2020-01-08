@@ -33,7 +33,7 @@ class RadioStreamUpdateTask : public DailyHouseKeeperTask
     RadioStreamUpdateTask(void);
     ~RadioStreamUpdateTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
-    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
     MythSystemLegacy *m_msMU { nullptr };
@@ -45,7 +45,7 @@ class ThemeUpdateTask : public DailyHouseKeeperTask
     ThemeUpdateTask(void) : DailyHouseKeeperTask("ThemeUpdateNotifications",
                                             kHKGlobal, kHKRunOnStartup) {};
     bool DoRun(void) override; // HouseKeeperTask
-    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
     bool LoadVersion(const QString &version, int download_log_level);
@@ -60,7 +60,7 @@ class ArtworkTask : public DailyHouseKeeperTask
     ArtworkTask(void);
     ~ArtworkTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
-    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
     MythSystemLegacy *m_msMML { nullptr };
@@ -84,7 +84,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 
     static bool UseSuggestedTime(void);
 
-    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // PeriodicHouseKeeperTask
     bool DoRun(void) override; // HouseKeeperTask
 
     void Terminate(void) override; // HouseKeeperTask

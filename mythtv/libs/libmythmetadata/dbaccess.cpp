@@ -688,11 +688,8 @@ class FileAssociationsImp
 
     void getExtensionIgnoreList(ext_ignore_list &ext_ignore) const
     {
-        for (auto p = m_fileAssociations.cbegin();
-             p != m_fileAssociations.cend(); ++p)
-        {
-            ext_ignore.push_back(std::make_pair(p->extension, p->ignore));
-        }
+        for (const auto & fa : m_fileAssociations)
+            ext_ignore.push_back(std::make_pair(fa.extension, fa.ignore));
     }
 
     mutable QMutex m_mutex;

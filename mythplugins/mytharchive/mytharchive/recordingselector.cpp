@@ -195,12 +195,8 @@ void RecordingSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    auto i = m_recordingList->begin();
-    for ( ; i != m_recordingList->end(); ++i)
-    {
-        ProgramInfo *p = *i;
+    for (auto p : *m_recordingList)
         m_selectedList.append(p);
-    }
 
     updateRecordingList();
 }
@@ -288,14 +284,12 @@ void RecordingSelector::OKPressed()
     // loop though selected recordings and add them to the list
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
-    for (int x = 0; x < m_archiveList->size(); x++)
+    foreach (auto a, *m_archiveList)
     {
-        ArchiveItem *a = m_archiveList->at(x);
         bool found = false;
 
-        for (int y = 0; y < m_selectedList.size(); y++)
+        foreach (auto p, m_selectedList)
         {
-            ProgramInfo *p = m_selectedList.at(y);
             if (a->type != "Recording" || a->filename == p->GetPlaybackURL(false, true))
             {
                 found = true;
@@ -307,18 +301,15 @@ void RecordingSelector::OKPressed()
             tempAList.append(a);
     }
 
-    for (int x = 0; x < tempAList.size(); x++)
-        m_archiveList->removeAll(tempAList.at(x));
+    foreach (auto x, tempAList)
+        m_archiveList->removeAll(x);
 
     // remove any items that are already in the list
     QList<ProgramInfo *> tempSList;
-    for (int x = 0; x < m_selectedList.size(); x++)
+    foreach (auto p, m_selectedList)
     {
-        ProgramInfo *p = m_selectedList.at(x);
-
-        for (int y = 0; y < m_archiveList->size(); y++)
+        foreach (auto a, *m_archiveList)
         {
-            ArchiveItem *a = m_archiveList->at(y);
             if (a->filename == p->GetPlaybackURL(false, true))
             {
                 tempSList.append(p);
@@ -327,13 +318,12 @@ void RecordingSelector::OKPressed()
         }
     }
 
-    for (int x = 0; x < tempSList.size(); x++)
-        m_selectedList.removeAll(tempSList.at(x));
+    foreach (auto x, tempSList)
+        m_selectedList.removeAll(x);
 
     // add all that are left
-    for (int x = 0; x < m_selectedList.size(); x++)
+    foreach (auto p, m_selectedList)
     {
-        ProgramInfo *p = m_selectedList.at(x);
         auto *a = new ArchiveItem;
         a->type = "Recording";
         a->title = p->GetTitle();
@@ -377,11 +367,8 @@ void RecordingSelector::updateRecordingList(void)
 
     if (m_categorySelector)
     {
-        auto i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); ++i)
+        for (auto p : *m_recordingList)
         {
-            ProgramInfo *p = *i;
-
             if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))
             {
@@ -511,12 +498,10 @@ void RecordingSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    for (int x = 0; x < m_archiveList->size(); x++)
+    foreach (auto a, *m_archiveList)
     {
-        ArchiveItem *a = m_archiveList->at(x);
-        for (size_t y = 0; y < m_recordingList->size(); y++)
+        for (auto p : *m_recordingList)
         {
-            ProgramInfo *p = m_recordingList->at(y);
             if (p->GetPlaybackURL(false, true) == a->filename)
             {
                 if (m_selectedList.indexOf(p) == -1)

@@ -126,7 +126,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void SetImages(QVector<MythImage *> *images);
 
     void SetDelay(int delayms);
-    void SetDelays(QVector<int> delays);
+    void SetDelays(const QVector<int>& delays);
 
     void Reset(void) override; // MythUIType
     bool Load(bool allowLoadInBackground = true, bool forceStat = false);
@@ -146,7 +146,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     void Clear(void);
 
-    void SetAnimationFrames(AnimationFrames frames);
+    void SetAnimationFrames(const AnimationFrames& frames);
     void customEvent(QEvent *event) override; // MythUIType
 
     bool ParseElement(const QString &filename, QDomElement &element,

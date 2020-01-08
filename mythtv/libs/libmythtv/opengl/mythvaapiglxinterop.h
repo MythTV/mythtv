@@ -30,11 +30,11 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
 {
   public:
-    MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context);
     ~MythVAAPIInteropGLXCopy() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override final;
+                                      VideoFrame *Frame, FrameScanType Scan) final;
 
   private:
     void* m_glxSurface { nullptr };
@@ -48,11 +48,11 @@ using MYTH_GLXRELEASETEXIMAGEEXT = void (*)(Display*, GLXDrawable, int);
 class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
 {
   public:
-    MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context);
     ~MythVAAPIInteropGLXPixmap() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override final;
+                                      VideoFrame *Frame, FrameScanType Scan) final;
     static bool IsSupported(MythRenderOpenGL *Context);
 
   private:

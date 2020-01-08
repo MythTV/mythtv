@@ -176,26 +176,25 @@ int main(int argc, char *argv[])
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
     {
-        QStringList::const_iterator i = sl.constBegin();
-        for (; i != sl.constEnd(); ++i)
+        foreach (auto item, sl)
         {
             QString warn = QString("Invalid entry in --refresh list: %1")
-                                .arg(*i);
+                                .arg(item);
 
-            bool enable = !(*i).contains("not");
+            bool enable = !item.contains("not");
 
-            if ((*i).contains("today"))
+            if (item.contains("today"))
                 fill_data.SetRefresh(0, enable);
-            else if ((*i).contains("tomorrow"))
+            else if (item.contains("tomorrow"))
                 fill_data.SetRefresh(1, enable);
-            else if ((*i).contains("second"))
+            else if (item.contains("second"))
                 fill_data.SetRefresh(2, enable);
-            else if ((*i).contains("all"))
+            else if (item.contains("all"))
                 fill_data.SetRefresh(FillData::kRefreshAll, enable);
-            else if ((*i).contains("-"))
+            else if (item.contains("-"))
             {
                 bool ok = false;
-                QStringList r = (*i).split("-");
+                QStringList r = item.split("-");
 
                 uint lower = r[0].toUInt(&ok);
                 if (!ok)
@@ -223,7 +222,7 @@ int main(int argc, char *argv[])
             else
             {
                 bool ok = false;
-                uint day = (*i).toUInt(&ok);
+                uint day = item.toUInt(&ok);
                 if (!ok)
                 {
                     cerr << warn.toLocal8Bit().constData() << endl;

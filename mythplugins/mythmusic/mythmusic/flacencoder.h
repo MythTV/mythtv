@@ -73,7 +73,7 @@
 
 #include "encoder.h"
 
-#define MAX_SAMPLES 588 * 4
+#define MAX_SAMPLES (588 * 4)
 #define NUM_CHANNELS 2
 
 class MusicMetadata;

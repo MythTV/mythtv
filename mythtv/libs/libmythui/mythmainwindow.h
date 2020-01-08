@@ -92,7 +92,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     bool IsExitingToMain(void) const;
 
-    static MythMainWindow *getMainWindow(const bool useDB = true);
+    static MythMainWindow *getMainWindow(bool useDB = true);
     static void destroyMainWindow();
 
     MythPainter *GetCurrentPainter();
@@ -117,8 +117,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);
     QSize NormSize(const QSize &size);
-    int NormX(const int x);
-    int NormY(const int y);
+    int NormX(int x);
+    int NormY(int y);
     void SetScalingFactors(float wmult, float hmult);
     void StartLIRC(void);
     uint PushDrawDisabled(void);
@@ -150,7 +150,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void signalSetDrawEnabled(bool enable);
 
   protected:
-    explicit MythMainWindow(const bool useDB = true);
+    explicit MythMainWindow(bool useDB = true);
     ~MythMainWindow() override;
 
     void InitKeys(void);

@@ -819,54 +819,25 @@ void ImportMusicDialog::setRating(void)
 
 void ImportMusicDialog::setTitleInitialCap(void)
 {
+    QLocale locale = gCoreContext->GetQLocale();
     MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
-    QString title = data->Title();
-    bool bFoundCap = false;
-
-    for (int x = 0; x < title.length(); x++)
-    {
-        if (title[x].isLetter())
-        {
-            if (!bFoundCap)
-            {
-                title[x] = title[x].toUpper();
-                bFoundCap = true;
-            }
-            else
-                title[x] = title[x].toLower();
-        }
-    }
-
+    QString title = locale.toLower(data->Title().simplified());
+    title[0] = title[0].toUpper();
     data->setTitle(title);
     fillWidgets();
 }
 
 void ImportMusicDialog::setTitleWordCaps(void)
 {
+    QLocale locale = gCoreContext->GetQLocale();
     MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
-    QString title = data->Title();
-    bool bInWord = false;
+    QString title = locale.toLower(data->Title().simplified());
+    QStringList title_words = title.split(' ');
 
-    for (int x = 0; x < title.length(); x++)
-    {
-        if (title[x].isSpace())
-            bInWord = false;
-        else
-        {
-            if (title[x].isLetter())
-            {
-                if (!bInWord)
-                {
-                    title[x] = title[x].toUpper();
-                    bInWord = true;
-                }
-                else
-                    title[x] = title[x].toLower();
-            }
-        }
-    }
+    for (int x = 0; x < title_words.size(); ++x)
+        title_words[x][0] = title_words[x][0].toUpper();
 
-    data->setTitle(title);
+    data->setTitle(title_words.join(' '));
     fillWidgets();
 }
 

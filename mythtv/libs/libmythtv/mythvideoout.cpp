@@ -666,8 +666,7 @@ QRect MythVideoOutput::GetPIPRect(PIPLocation Location, MythPlayer *PiPPlayer, b
 
 void MythVideoOutput::ShowPIPs(VideoFrame *Frame, const PIPMap &PiPPlayers)
 {
-    PIPMap::const_iterator it = PiPPlayers.begin();
-    for (; it != PiPPlayers.end(); ++it)
+    for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
         ShowPIP(Frame, it.key(), *it);
 }
 

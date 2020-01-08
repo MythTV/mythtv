@@ -92,14 +92,14 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     if (!m_Children.isEmpty())
     {
-        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        foreach (auto & draw, m_DrawOrder)
         {
-            if (*it != screen && !(*it)->IsDeleting())
+            if (draw != screen && !draw->IsDeleting())
             {
-                m_topScreen = (*it);
-                (*it)->SetAlpha(255);
+                m_topScreen = draw;
+                draw->SetAlpha(255);
                 if (poppedFullscreen)
-                    (*it)->aboutToShow();
+                    draw->aboutToShow();
             }
         }
     }
@@ -1056,13 +1056,11 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
 
 void NCPrivate::DeleteAllRegistrations(void)
 {
-    QMap<int, MythNotificationScreen*>::iterator it = m_registrations.begin();
-
-    for (; it != m_registrations.end(); ++it)
+    foreach (auto & registration, m_registrations)
     {
-        if (*it)
+        if (registration)
         {
-            m_deletedScreens.append(*it);
+            m_deletedScreens.append(registration);
         }
     }
     m_registrations.clear();
@@ -1102,10 +1100,9 @@ void NCPrivate::DeleteAllScreens(void)
 
 void NCPrivate::DeleteUnregistered(void)
 {
-    QMap<int,bool>::iterator it = m_unregistered.begin();
     bool needdelete = false;
 
-    for (; it != m_unregistered.end(); ++it)
+    for (auto it = m_unregistered.begin(); it != m_unregistered.end(); ++it)
     {
         int id = it.key();
         bool closeimemdiately = it.value();
@@ -1235,13 +1232,10 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
 
     m_screenStack->GetScreenList(screens);
 
-    QVector<MythScreenType*>::const_iterator it       = screens.begin();
-    QVector<MythScreenType*>::const_iterator itend    = screens.end();
-
     int position = 0;
-    for (; it != itend; ++it)
+    foreach (auto item, screens)
     {
-        auto *screen = dynamic_cast<MythNotificationScreen*>(*it);
+        auto *screen = dynamic_cast<MythNotificationScreen*>(item);
         if (screen)
         {
             if ((screen->m_visibility & MythNotification::kPlayback) == 0)
@@ -1272,7 +1266,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
         }
         else
         {
-            list.append(*it);
+            list.append(item);
         }
     }
     _screens = list;

@@ -1,15 +1,19 @@
 #ifndef METADATACOMMON_H_
 #define METADATACOMMON_H_
 
-#include <QList>
-#include <QPair>
-#include <QMultiMap>
-#include <QString>
-#include <QStringList>
-#include <QDateTime>
+// c++
+#include <utility>
+
+// qt
 #include <QDate>
+#include <QDateTime>
 #include <QDomElement>
 #include <QEvent>
+#include <QList>
+#include <QMultiMap>
+#include <QPair>
+#include <QString>
+#include <QStringList>
 
 #include "mythtypes.h"
 #include "mythmetaexp.h"
@@ -101,7 +105,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         QString network,
         QString status,
         QStringList categories,
-        const float userrating,
+        float userrating,
         uint ratingcount,
         QString language,
         QString subtitle,
@@ -109,7 +113,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         QString description,
         uint season,
         uint episode,
-        const uint chanid,
+        uint chanid,
         QString channum,
         QString chansign,
         QString channame,
@@ -123,23 +127,23 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         QDateTime endts,
         QDateTime recstartts,
         QDateTime recendts,
-        const uint programflags,
-        const uint audioproperties,
-        const uint videoproperties,
-        const uint subtitletype,
+        uint programflags,
+        uint audioproperties,
+        uint videoproperties,
+        uint subtitletype,
         QString certification,
         QStringList countries,
-        const float popularity,
-        const uint budget,
-        const uint revenue,
+        float popularity,
+        uint budget,
+        uint revenue,
         QString album,
         uint tracknum,
         QString system,
-        const uint year,
+        uint year,
         const QDate &releasedate,
         QDateTime lastupdated,
-        const uint runtime,
-        const uint runtimesecs,
+        uint runtime,
+        uint runtimesecs,
         QString inetref,
         QString collectionref,
         QString tmsref,
@@ -166,7 +170,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         QString filename,
         const QString &title,
         QStringList categories,
-        const float userrating,
+        float userrating,
         QString subtitle,
         QString description,
         uint chanid,
@@ -187,11 +191,11 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         uint audioproperties,
         uint videoproperties,
         uint subtitletype,
-        const uint year,
+        uint year,
         const QDate &releasedate,
         QDateTime lastupdated,
-        const uint runtime,
-        const uint runtimesecs);
+        uint runtime,
+        uint runtimesecs);
 
     // XBMC NFO Constructor
     MetadataLookup(
@@ -208,17 +212,17 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         QString filename,
         const QString &title,
         QStringList categories,
-        const float userrating,
+        float userrating,
         QString subtitle,
         QString tagline,
         QString description,
         uint season,
         uint episode,
         QString certification,
-        const uint year,
-        const QDate releasedate,
-        const uint runtime,
-        const uint runtimesecs,
+        uint year,
+        QDate releasedate,
+        uint runtime,
+        uint runtimesecs,
         QString inetref,
         PeopleMap  people,
         QString trailerURL,
@@ -234,7 +238,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     // For some lookup, it helps to know the subtype (TV vs. Movie)
     void SetSubtype(LookupType subtype) { m_subtype = subtype; };
     // Reference value- when the event comes back, need to associate with an item.
-    void SetData(QVariant data) { m_data = data; };
+    void SetData(QVariant data) { m_data = std::move(data); };
     // Steps: SEARCH, GETDATA
     void SetStep(LookupStep step) { m_step = step; };
     // Don't prompt the user, just make an educated decision.
@@ -245,7 +249,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetAllowOverwrites(bool allow) { m_allowOverwrites = allow; };
     void SetAllowGeneric(bool allow) { m_allowGeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
-    void SetDownloads(ArtworkMap map) { m_downloads = map; };
+    void SetDownloads(ArtworkMap map) { m_downloads = std::move(map); };
 
     // General Sets
     void SetTitle(const QString &title)

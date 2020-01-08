@@ -677,8 +677,8 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
     if (!transportid)
         return transportid;
 
-    for (size_t i = 0; i < m_channels.size(); i++)
-        m_channels[i].SaveScan(scanid, transportid);
+    for (const auto & channel : m_channels)
+        channel.SaveScan(scanid, transportid);
 
     return transportid;
 }

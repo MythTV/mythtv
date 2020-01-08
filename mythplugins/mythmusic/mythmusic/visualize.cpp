@@ -613,16 +613,16 @@ void Spectrum::resize(const QSize &newsize)
     m_scale.setMax(192, m_size.width() / m_analyzerBarWidth);
 
     m_rects.resize( m_scale.range() );
-    unsigned int i = 0;
     int w = 0;
-    for (; i < (uint)m_rects.size(); i++, w += m_analyzerBarWidth)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (uint i = 0; i < (uint)m_rects.size(); i++, w += m_analyzerBarWidth)
     {
         m_rects[i].setRect(w, m_size.height() / 2, m_analyzerBarWidth - 1, 1);
     }
 
-    unsigned int os = m_magnitudes.size();
     m_magnitudes.resize( m_scale.range() * 2 );
-    for (; os < (uint)m_magnitudes.size(); os++)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (uint os = m_magnitudes.size(); os < (uint)m_magnitudes.size(); os++)
     {
         m_magnitudes[os] = 0.0;
     }
@@ -1029,10 +1029,8 @@ void Piano::resize(const QSize &newsize)
     }
 
     m_magnitude.resize(PIANO_N);
-    for (uint key = 0; key < (uint)m_magnitude.size(); key++)
-    {
-        m_magnitude[key] = 0.0;
-    }
+    for (double & key : m_magnitude)
+        key = 0.0;
 }
 
 unsigned long Piano::getDesiredSamples(void)

@@ -1181,9 +1181,9 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
         QHostAddress v6;
 
         // Return the first address fitting the type critera
-        for (int i=0; i < list.size(); i++)
+        foreach (const auto & item, list)
         {
-            addr = list[i];
+            addr = item;
             QAbstractSocket::NetworkLayerProtocol prot = addr.protocol();
 
             if (prot == QAbstractSocket::IPv4Protocol)

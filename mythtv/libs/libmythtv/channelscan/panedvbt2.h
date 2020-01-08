@@ -66,15 +66,15 @@ class PaneDVBT2 : public GroupSetting
     QString mod_sys(void)        const { return m_pmod_sys->getValue();       }
 
     void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);          }
-    void setBandwidth(QString bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
-    void setInversion(QString inversion)          { m_pinversion->setValue(inversion);          }
-    void setConstellation(QString constellation)  { m_pconstellation->setValue(constellation);  }
-    void setCodeRateLP(QString coderate_lp)       { m_pcoderate_lp->setValue(coderate_lp);      }
-    void setCodeRateHP(QString coderate_hp)       { m_pcoderate_hp->setValue(coderate_hp);      }
-    void setTransmode(QString trans_mode)         { m_ptrans_mode->setValue(trans_mode);        }
-    void setGuardInterval(QString guard_interval) { m_pguard_interval->setValue(guard_interval);}
-    void setHierarchy(QString hierarchy)          { m_phierarchy->setValue(hierarchy);          }
-    void setModsys(QString mod_sys)               { m_pmod_sys->setValue(mod_sys);              }
+    void setBandwidth(const QString& bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
+    void setInversion(const QString& inversion)          { m_pinversion->setValue(inversion);          }
+    void setConstellation(const QString& constellation)  { m_pconstellation->setValue(constellation);  }
+    void setCodeRateLP(const QString& coderate_lp)       { m_pcoderate_lp->setValue(coderate_lp);      }
+    void setCodeRateHP(const QString& coderate_hp)       { m_pcoderate_hp->setValue(coderate_hp);      }
+    void setTransmode(const QString& trans_mode)         { m_ptrans_mode->setValue(trans_mode);        }
+    void setGuardInterval(const QString& guard_interval) { m_pguard_interval->setValue(guard_interval);}
+    void setHierarchy(const QString& hierarchy)          { m_phierarchy->setValue(hierarchy);          }
+    void setModsys(const QString& mod_sys)               { m_pmod_sys->setValue(mod_sys);              }
 
   protected:
     ScanFrequency        *m_pfrequency      {nullptr};

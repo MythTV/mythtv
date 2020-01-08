@@ -36,6 +36,10 @@ class NuppelDecoder : public DecoderBase
     NuppelDecoder(MythPlayer *parent, const ProgramInfo &pginfo);
    ~NuppelDecoder() override;
 
+    // Deleted functions should be public.
+    NuppelDecoder(const NuppelDecoder &) = delete;            // not copyable
+    NuppelDecoder &operator=(const NuppelDecoder &) = delete; // not copyable
+
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
                           int testbufsize = kDecoderProbeBufferSize);
 
@@ -60,9 +64,6 @@ class NuppelDecoder : public DecoderBase
     MythCodecID GetVideoCodecID(void) const override; // DecoderBase
 
   private:
-    NuppelDecoder(const NuppelDecoder &) = delete;            // not copyable
-    NuppelDecoder &operator=(const NuppelDecoder &) = delete; // not copyable
-
     inline bool ReadFileheader(struct rtfileheader *fh);
     inline bool ReadFrameheader(struct rtframeheader *fh);
 

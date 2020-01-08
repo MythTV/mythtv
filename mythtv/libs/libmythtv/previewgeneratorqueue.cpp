@@ -109,8 +109,8 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
 {
     // disconnect preview generators
     QMutexLocker locker(&m_lock);
-    PreviewMap::iterator it = m_previewMap.begin();
-    for (;it != m_previewMap.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_previewMap.begin(); it != m_previewMap.end(); ++it)
     {
         if ((*it).m_gen)
             (*it).m_gen->deleteLater();
@@ -304,22 +304,20 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             list.push_back(filename);
             list.push_back(msg);
             list.push_back(datetime);
-            QSet<QString>::const_iterator tit = (*it).m_tokens.begin();
-            for (; tit != (*it).m_tokens.end(); ++tit)
+            foreach (const auto & tok, (*it).m_tokens)
             {
-                kit = m_tokenToKeyMap.find(*tit);
+                kit = m_tokenToKeyMap.find(tok);
                 if (kit != m_tokenToKeyMap.end())
                     m_tokenToKeyMap.erase(kit);
-                list.push_back(*tit);
+                list.push_back(tok);
             }
 
             if (list.size() > 4)
             {
-                QSet<QObject*>::iterator sit = m_listeners.begin();
-                for (; sit != m_listeners.end(); ++sit)
+                foreach (auto listener, m_listeners)
                 {
                     auto *le = new MythEvent(me->Message(), list);
-                    QCoreApplication::postEvent(*sit, le);
+                    QCoreApplication::postEvent(listener, le);
                 }
                 (*it).m_tokens.clear();
             }
@@ -369,11 +367,10 @@ void PreviewGeneratorQueue::SendEvent(
     list.push_back(token);
 
     QMutexLocker locker(&m_lock);
-    QSet<QObject*>::iterator it = m_listeners.begin();
-    for (; it != m_listeners.end(); ++it)
+    foreach (auto listener, m_listeners)
     {
         auto *e = new MythEvent(eventname, list);
-        QCoreApplication::postEvent(*it, e);
+        QCoreApplication::postEvent(listener, e);
     }
 }
 

@@ -797,18 +797,12 @@ class VideoDevice : public CaptureCardComboBoxSetting
                                bool allow_duplicates)
     {
         uint cnt = 0;
-
-        QFileInfoList il = dir.entryInfoList();
         QRegExp *driverExp = nullptr;
         if (!driver.isEmpty())
             driverExp = new QRegExp(driver);
 
-        for( QFileInfoList::iterator it  = il.begin();
-                                     it != il.end();
-                                   ++it )
+        foreach (auto & fi, dir.entryInfoList())
         {
-            QFileInfo &fi = *it;
-
             struct stat st {};
             QString filepath = fi.absoluteFilePath();
             int err = lstat(filepath.toLocal8Bit().constData(), &st);
@@ -913,13 +907,8 @@ class VBIDevice : public CaptureCardComboBoxSetting
                                const QString &driver)
     {
         QStringList devices;
-        QFileInfoList il = dir.entryInfoList();
-        for( QFileInfoList::iterator it  = il.begin();
-                                     it != il.end();
-                                   ++it )
+        foreach (auto & fi, dir.entryInfoList())
         {
-            QFileInfo &fi = *it;
-
             QString    device = fi.absoluteFilePath();
             QByteArray adevice = device.toLatin1();
             int vbifd = open(adevice.constData(), O_RDWR);
@@ -1229,10 +1218,10 @@ class FirewireGUID : public CaptureCardComboBoxSetting
         setLabel(QObject::tr("GUID"));
 #ifdef USING_FIREWIRE
         vector<AVCInfo> list = FirewireDevice::GetSTBList();
-        for (size_t i = 0; i < list.size(); i++)
+        for (auto & i : list)
         {
-            QString guid = list[i].GetGUIDString();
-            m_guidToAvcInfo[guid] = list[i];
+            QString guid = i.GetGUIDString();
+            m_guidToAvcInfo[guid] = i;
             addSelection(guid);
         }
 #endif // USING_FIREWIRE
@@ -1663,8 +1652,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 
     const QString& current = cur;
 
-    VBoxDeviceList::iterator it = m_deviceList->begin();
-    for (; it != m_deviceList->end(); ++it)
+    for (auto it = m_deviceList->begin(); it != m_deviceList->end(); ++it)
     {
         devs.push_back(it.key());
         in_use[it.key()] = (*it).m_inUse;
@@ -1674,17 +1662,15 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
     QString sel = man_addr;
     devs.push_back(sel);
 
-    vector<QString>::const_iterator it2 = devs.begin();
-    for (; it2 != devs.end(); ++it2)
-        sel = (current == *it2) ? *it2 : sel;
+    for (const auto & dev : devs)
+        sel = (current == dev) ? dev : sel;
 
     QString usestr = QString(" -- ");
     usestr += QObject::tr("Warning: already in use");
 
-    for (size_t i = 0; i < devs.size(); i++)
+    for (const auto & dev : devs)
     {
-        const QString dev = devs[i];
-        QString desc = dev + (in_use[devs[i]] ? usestr : "");
+        QString desc = dev + (in_use[dev] ? usestr : "");
         addSelection(desc, dev, dev == sel);
     }
 
@@ -2633,8 +2619,8 @@ void CaptureCard::Save(void)
     if (CardUtil::IsTunerSharingCapable(type))
     {
         vector<uint> clones = CardUtil::GetChildInputIDs(cardid);
-        for (size_t i = 0; i < clones.size(); i++)
-            CardUtil::CloneCard(cardid, clones[i]);
+        for (uint clone : clones)
+            CardUtil::CloneCard(cardid, clone);
     }
 }
 
@@ -3030,11 +3016,11 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     for (size_t i = 0; i < channels.size() && !has_visible; i++)
         has_visible |= channels[i].m_visible;
 
-    for (size_t i = 0; i < channels.size(); i++)
+    for (auto & channel : channels)
     {
-        const QString channum = channels[i].m_chanNum;
+        const QString channum = channel.m_chanNum;
         bool sel = channum == startChan;
-        if (!has_visible || channels[i].m_visible || sel)
+        if (!has_visible || channel.m_visible || sel)
         {
             addSelection(channum, channum, sel);
         }
@@ -3448,10 +3434,8 @@ void CardInput::Save(void)
     }
 
     // Clone this config to existing clone cards.
-    for (size_t i = 0; i < cardids.size(); ++i)
-    {
-        CardUtil::CloneCard(cardid, cardids[i]);
-    }
+    for (uint id : cardids)
+        CardUtil::CloneCard(cardid, id);
 
     // Create new clone cards as required.
     for (size_t i = cardids.size() + 1; i < icount; i++)
@@ -3860,13 +3844,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     {
         m_cardType->clearSelections();
         QStringList delsyslist = CardUtil::ProbeDeliverySystems(videodevice);
-        QStringList::iterator it = delsyslist.begin();
-        for (; it != delsyslist.end(); it++)
+        foreach (auto & item, delsyslist)
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
-                .arg(*it));
+                .arg(item));
 
-            m_cardType->addSelection(*it, *it);
+            m_cardType->addSelection(item, item);
         }
 
         // Default value, used if not already defined in capturecard/inputname

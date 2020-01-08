@@ -152,10 +152,10 @@ void TaskQueue::Clear( )
 {
     m_mutex.lock(); 
 
-    for ( auto it  = m_mapTasks.begin(); it != m_mapTasks.end(); ++it )
+    for (auto & task : m_mapTasks)
     {
-        if ((*it).second != nullptr)
-            (*it).second->DecrRef();
+        if (task.second != nullptr)
+            task.second->DecrRef();
     }
 
     m_mapTasks.clear();

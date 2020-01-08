@@ -58,7 +58,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         m_desiredRecStartTs(m_startTs),
         m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
     RecordingInfo(QStringList::const_iterator &it,
-                  QStringList::const_iterator  end) :
+                  const QStringList::const_iterator&  end) :
         ProgramInfo(it, end),
         m_desiredRecStartTs(m_startTs),
         m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
@@ -94,7 +94,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &seriesid,
         const QString &programid,
         const QString &inetref,
-        const CategoryType catType,
+        CategoryType catType,
 
         int recpriority,
 

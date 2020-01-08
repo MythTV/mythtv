@@ -273,7 +273,7 @@ QString HardwareProfile::GetHardwareProfile()
     return system.ReadAll();
 }
 
-bool HardwareProfileTask::DoCheckRun(QDateTime now)
+bool HardwareProfileTask::DoCheckRun(const QDateTime& now)
 {
     if (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 0)
         // global disable, we don't want to run

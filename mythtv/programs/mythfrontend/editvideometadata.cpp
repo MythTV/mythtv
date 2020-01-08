@@ -212,11 +212,8 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
-        for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
-        {
-            ret.append(QString("*.").append(*p));
-        }
-
+        foreach (auto & ext, exts)
+            ret.append(QString("*.").append(ext));
         return ret;
     }
 
@@ -260,10 +257,8 @@ namespace
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
-        for (auto p = fa_list.cbegin(); p != fa_list.cend(); ++p)
-        {
-            exts << QString("*.%1").arg(p->extension.toUpper());
-        }
+        for (const auto & fa : fa_list)
+            exts << QString("*.%1").arg(fa.extension.toUpper());
 
         auto *fb = new MythUIFileBrowser(popupStack, fp);
         fb->SetNameFilter(exts);
@@ -328,12 +323,12 @@ void EditMetadataDialog::fillWidgets()
     new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
     const VideoCategory::entry_list &vcl =
             VideoCategory::GetCategory().getList();
-    for (auto p = vcl.cbegin(); p != vcl.cend(); ++p)
+    for (const auto & vc : vcl)
     {
         // No memory leak. MythUIButtonListItem adds the new item into
         // m_categoryList.
-        auto *button = new MythUIButtonListItem(m_categoryList, p->second);
-        button->SetData(p->first);
+        auto *button = new MythUIButtonListItem(m_categoryList, vc.second);
+        button->SetData(vc.first);
     }
     m_categoryList->SetValueByData(m_workingMetadata->GetCategoryID());
 
@@ -363,29 +358,29 @@ void EditMetadataDialog::fillWidgets()
     const VideoMetadataListManager::metadata_list &mdl = m_metaCache.getList();
     title_list tc;
     tc.reserve(mdl.size());
-    for (auto p = mdl.cbegin(); p != mdl.cend(); ++p)
+    for (const auto & md : mdl)
     {
         QString title;
-        if ((*p)->GetSeason() > 0 || (*p)->GetEpisode() > 0)
+        if (md->GetSeason() > 0 || md->GetEpisode() > 0)
         {
-            title = QString("%1 %2x%3").arg((*p)->GetTitle())
-                                       .arg(QString::number((*p)->GetSeason()))
-                                       .arg(QString::number((*p)->GetEpisode()));
+            title = QString("%1 %2x%3").arg(md->GetTitle())
+                                       .arg(QString::number(md->GetSeason()))
+                                       .arg(QString::number(md->GetEpisode()));
         }
         else
         {
-            title = (*p)->GetTitle();
+            title = md->GetTitle();
         }
-        tc.push_back(std::make_pair((*p)->GetID(), title));
+        tc.push_back(std::make_pair(md->GetID(), title));
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 
-    for (title_list::const_iterator p = tc.begin(); p != tc.end(); ++p)
+    for (const auto & t : tc)
     {
-        if (p->first != m_workingMetadata->GetID())
+        if (t.first != m_workingMetadata->GetID())
         {
-            auto *button = new MythUIButtonListItem(m_childList,p->second);
-            button->SetData(p->first);
+            auto *button = new MythUIButtonListItem(m_childList,t.second);
+            button->SetData(t.first);
         }
     }
 

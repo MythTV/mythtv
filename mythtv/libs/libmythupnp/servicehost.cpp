@@ -34,8 +34,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         throw;
 
      // Change params to lower case for case-insensitive comparison
-    QStringMap::const_iterator it = reqParams.begin();
-    for (; it != reqParams.end(); ++it)
+    for (auto it = reqParams.cbegin(); it != reqParams.cend(); ++it)
     {
         lowerParams[it.key().toLower()] = *it;
     }

@@ -20,7 +20,7 @@ class RecordingRule;
 class META_PUBLIC MetadataFactoryMultiResult : public QEvent
 {
   public:
-    explicit MetadataFactoryMultiResult(MetadataLookupList res)
+    explicit MetadataFactoryMultiResult(const MetadataLookupList& res)
         : QEvent(kEventType), m_results(res) {}
     ~MetadataFactoryMultiResult() override = default;
 

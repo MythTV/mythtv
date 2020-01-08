@@ -87,13 +87,8 @@ ServerSideScripting::~ServerSideScripting()
 {
     Lock();
 
-    QMap<QString, ScriptInfo*>::iterator it = m_mapScripts.begin();
-
-    for (; it != m_mapScripts.end(); ++it)
-    {
-        if (*it)
-            delete (*it);
-    }
+    foreach (auto & script, m_mapScripts)
+        delete script;
 
     m_mapScripts.clear();
     Unlock();
@@ -217,10 +212,9 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
 
         QVariantMap params;
-        QMap<QString, QString>::const_iterator it = mapParams.begin();
         QString prevArrayName = "";
         QVariantMap array;
-        for (; it != mapParams.end(); ++it)
+        for (auto it = mapParams.cbegin(); it != mapParams.cend(); ++it)
         {
             const QString& key = it.key();
             QVariant value = QVariant(it.value());
@@ -271,7 +265,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QStringMap mapHeaders = pRequest->m_mapHeaders;
 
         QVariantMap requestHeaders;
-        for (it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
+        for (auto it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
         {
             QString key = it.key();
             key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace
@@ -290,7 +284,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QStringMap mapCookies = pRequest->m_mapCookies;
 
         QVariantMap requestCookies;
-        for (it = mapCookies.begin(); it != mapCookies.end(); ++it)
+        for (auto it = mapCookies.begin(); it != mapCookies.end(); ++it)
         {
             QString key = it.key();
             key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace

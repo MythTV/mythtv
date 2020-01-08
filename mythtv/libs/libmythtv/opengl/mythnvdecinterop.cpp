@@ -42,18 +42,17 @@ void MythNVDECInterop::DeleteTextures(void)
     if (!m_openglTextures.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting CUDA resources");
-        QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
-        for ( ; it != m_openglTextures.constEnd(); ++it)
+        for (auto it = m_openglTextures.constBegin();
+             it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            auto it2 = textures.begin();
-            for ( ; it2 != textures.end(); ++it2)
+            for (auto & texture : textures)
             {
-                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(texture->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
-                (*it2)->m_data = nullptr;
+                texture->m_data = nullptr;
             }
         }
     }
@@ -210,17 +209,16 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         }
         else
         {
-            auto it = textures.begin();
-            for ( ; it != textures.end(); ++it)
+            for (auto & texture : textures)
             {
-                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(texture->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
-                (*it)->m_data = nullptr;
-                if ((*it)->m_textureId)
-                    m_context->glDeleteTextures(1, &(*it)->m_textureId);
-                MythVideoTexture::DeleteTexture(m_context, *it);
+                texture->m_data = nullptr;
+                if (texture->m_textureId)
+                    m_context->glDeleteTextures(1, &texture->m_textureId);
+                MythVideoTexture::DeleteTexture(m_context, texture);
             }
         }
     }

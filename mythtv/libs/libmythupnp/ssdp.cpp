@@ -127,10 +127,8 @@ SSDP::~SSDP()
         m_pNotifyTask = nullptr;
     }
 
-    for (int nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
-    {
-        delete m_sockets[ nIdx ];
-    }
+    for (auto & socket : m_sockets)
+        delete socket;
 
     LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );
 }
@@ -263,20 +261,20 @@ void SSDP::run()
 
         FD_ZERO( &read_set ); // NOLINT(readability-isolate-declaration)
 
-        for (size_t nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
+        for (auto & socket : m_sockets)
         {
-            if (m_sockets[nIdx] != nullptr && m_sockets[nIdx]->socket() >= 0)
+            if (socket != nullptr && socket->socket() >= 0)
             {
-                FD_SET( m_sockets[ nIdx ]->socket(), &read_set );
-                nMaxSocket = max( m_sockets[ nIdx ]->socket(), nMaxSocket );
+                FD_SET( socket->socket(), &read_set );
+                nMaxSocket = max( socket->socket(), nMaxSocket );
 
 #if 0
-                if (m_sockets[ nIdx ]->bytesAvailable() > 0)
+                if (socket->bytesAvailable() > 0)
                 {
                     LOG(VB_GENERAL, LOG_DEBUG,
                         QString("Found Extra data before select: %1")
                         .arg(nIdx));
-                    ProcessData( m_sockets[ nIdx ] );
+                    ProcessData( socket );
                 }
 #endif
             }
@@ -406,10 +404,8 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         QStringMap  headers;
 
-        for ( QStringList::Iterator it = lines.begin();
-                                    it != lines.end(); ++it ) 
+        foreach (auto sLine, lines)
         {
-            QString sLine  = *it;
             QString sName  = sLine.section( ':', 0, 0 ).trimmed();
             QString sValue = sLine.section( ':', 1 );
 

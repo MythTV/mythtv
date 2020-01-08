@@ -111,10 +111,9 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, uint Minimum
     {
         // Update the maximum requested delay
         uint max = 0;
-        QHash<void*,uint>::const_iterator cit = s_delays.constBegin();
-        for ( ; cit != s_delays.constEnd(); ++cit)
-            if (cit.value() > max)
-                max = cit.value();
+        foreach (uint delay, s_delays)
+            if (delay > max)
+                max = delay;
         s_instance->SetRequestedDelay(max);
     }
     return s_instance;

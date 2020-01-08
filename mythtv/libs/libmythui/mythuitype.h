@@ -214,8 +214,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     int CalcAlpha(int alphamod);
 
-    static int NormX(const int width);
-    static int NormY(const int height);
+    static int NormX(int width);
+    static int NormY(int height);
 
     void ConnectDependants(bool recurse = false);
 

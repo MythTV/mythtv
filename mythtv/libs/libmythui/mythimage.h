@@ -3,10 +3,14 @@
 
 // Base class, inherited by painter-specific classes.
 
+// C++ headers
+#include <utility>
+
+// QT headers
 #include <QImage>
+#include <QImageReader>
 #include <QMutex>
 #include <QPixmap>
-#include <QImageReader>
 
 #include "referencecounter.h"
 #include "mythpainter.h"
@@ -82,7 +86,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     void SetID(unsigned int id) { m_imageId = id; }
     unsigned int GetID(void) const { return m_imageId; }
 
-    void SetFileName(QString fname) { m_FileName = fname; }
+    void SetFileName(QString fname) { m_FileName = std::move(fname); }
     QString GetFileName(void) const { return m_FileName; }
 
     void setIsReflected(bool reflected) { m_isReflected = reflected; }

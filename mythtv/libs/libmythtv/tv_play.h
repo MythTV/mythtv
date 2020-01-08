@@ -386,7 +386,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool HandleJumpToProgramAction(PlayerContext *ctx,
                                    const QStringList   &actions);
     bool SeekHandleAction(PlayerContext *actx, const QStringList &actions,
-                          const bool isDVD);
+                          bool isDVD);
     bool TimeStretchHandleAction(PlayerContext *ctx,
                                  const QStringList &actions);
     static bool DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions);
@@ -421,7 +421,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void DoEditSchedule(int editType = kScheduleProgramGuide);
     QString GetRecordingGroup(int player_idx) const;
     void ChangeVolume(PlayerContext *ctx, bool up, int newvolume = -1);
-    void ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels = false);
+    void ToggleMute(PlayerContext *ctx, bool muteIndividualChannels = false);
     void UpdateChannelList(int groupID);
 
     // Lock handling

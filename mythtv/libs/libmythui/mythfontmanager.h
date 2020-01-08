@@ -31,7 +31,7 @@ class MUI_PUBLIC MythFontManager
                                 const QString &registeredFor);
     void LoadFontFile(const QString &fontPath, const QString &registeredFor);
     bool RegisterFont(const QString &fontPath, const QString &registeredFor,
-                      const int fontID = -1);
+                      int fontID = -1);
     bool IsFontFileLoaded(const QString &fontPath);
 
     QMutex m_lock;

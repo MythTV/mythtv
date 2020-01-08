@@ -277,8 +277,7 @@ void RemoteEncoder::FillPositionMap(int64_t start, int64_t end,
     if (!SendReceiveStringList(strlist))
         return;
 
-    QStringList::const_iterator it = strlist.begin();
-    for (; it != strlist.end(); ++it)
+    for (auto it = strlist.cbegin(); it != strlist.cend(); ++it)
     {
         bool ok;
         uint64_t index = (*it).toLongLong(&ok);
@@ -304,8 +303,7 @@ void RemoteEncoder::FillDurationMap(int64_t start, int64_t end,
     if (!SendReceiveStringList(strlist))
         return;
 
-    QStringList::const_iterator it = strlist.begin();
-    for (; it != strlist.end(); ++it)
+    for (auto it = strlist.cbegin(); it != strlist.cend(); ++it)
     {
         bool ok;
         uint64_t index = (*it).toLongLong(&ok);

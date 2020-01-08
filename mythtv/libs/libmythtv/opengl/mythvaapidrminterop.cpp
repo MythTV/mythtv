@@ -67,12 +67,12 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
         for (auto it = m_openglTextures.constBegin() ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            for (auto it2 = textures.begin() ; it2 != textures.end(); ++it2)
+            for (auto & texture : textures)
             {
-                if ((*it2)->m_data)
+                if (texture->m_data)
                 {
-                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it2)->m_data);
-                    (*it2)->m_data = nullptr;
+                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
+                    texture->m_data = nullptr;
                     count++;
                 }
             }
@@ -427,6 +427,7 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_drmFrames.begin() ; it != m_drmFrames.end(); ++it)
     {
         for (int i = 0; i < (*it)->nb_objects; i++)
@@ -477,16 +478,15 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             if (!textures.empty())
             {
                 s_supported = true;
-                auto it = textures.begin();
-                for ( ; it != textures.end(); ++it)
+                for (auto & texture : textures)
                 {
-                    s_supported &= (*it)->m_data && (*it)->m_textureId;
-                    if ((*it)->m_data)
-                        m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it)->m_data);
-                    (*it)->m_data = nullptr;
-                    if ((*it)->m_textureId)
-                        m_context->glDeleteTextures(1, &(*it)->m_textureId);
-                    MythVideoTexture::DeleteTexture(m_context, *it);
+                    s_supported &= texture->m_data && texture->m_textureId;
+                    if (texture->m_data)
+                        m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
+                    texture->m_data = nullptr;
+                    if (texture->m_textureId)
+                        m_context->glDeleteTextures(1, &texture->m_textureId);
+                    MythVideoTexture::DeleteTexture(m_context, texture);
                 }
                 textures.clear();
             }

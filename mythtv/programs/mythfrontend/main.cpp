@@ -859,12 +859,10 @@ static void handleGalleryMedia(MythMediaDevice *dev)
     QVector<MythScreenType*> screens;
     GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
 
-    QVector<MythScreenType*>::const_iterator it    = screens.begin();
-    QVector<MythScreenType*>::const_iterator itend = screens.end();
 
-    for (; it != itend; ++it)
+    foreach (auto screen, screens)
     {
-        if (dynamic_cast<GalleryThumbView*>(*it))
+        if (dynamic_cast<GalleryThumbView*>(screen))
         {
             // Running gallery will receive this event later
             LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - already running");
@@ -1789,16 +1787,15 @@ static bool WasAutomaticStart(void)
                     // Find the first recording to be recorded
                     // on this machine
                     QString hostname = gCoreContext->GetHostName();
-                    ProgramList::const_iterator it = progList.begin();
-                    for (; it != progList.end(); ++it)
+                    for (auto prog : progList)
                     {
-                        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord ||
-                             (*it)->GetRecordingStatus() == RecStatus::Pending) &&
-                            ((*it)->GetHostname() == hostname) &&
+                        if ((prog->GetRecordingStatus() == RecStatus::WillRecord ||
+                             prog->GetRecordingStatus() == RecStatus::Pending) &&
+                            (prog->GetHostname() == hostname) &&
                             (nextRecordingStart.isNull() ||
-                             nextRecordingStart > (*it)->GetRecordingStartTime()))
+                             nextRecordingStart > prog->GetRecordingStartTime()))
                         {
-                            nextRecordingStart = (*it)->GetRecordingStartTime();
+                            nextRecordingStart = prog->GetRecordingStartTime();
                         }
                     }
 

@@ -88,18 +88,16 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
     QList<QHostAddress> addressList = UPnp::g_IPAddrList;
 
-    for ( QList<QHostAddress>::Iterator it  = addressList.begin();
-                                        it != addressList.end();
-                                        ++it )
+    foreach (auto & addr, addressList)
     {
-        if ((*it).toString().isEmpty())
+        if (addr.toString().isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
             continue;
         }
 
-        QHostAddress ip = *it;
+        QHostAddress ip = addr;
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it
@@ -193,15 +191,13 @@ void UPnpNotifyTask::ProcessDevice(
     // Loop for each service in this device and send the 1 required message
     // ------------------------------------------------------------------
 
-    UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
-    for (; sit != pDevice->m_listServices.end(); ++sit)
+    for (auto sit = pDevice->m_listServices.cbegin(); sit != pDevice->m_listServices.cend(); ++sit)
         SendNotifyMsg( pSocket, (*sit)->m_sServiceType, pDevice->GetUDN() );
 
     // ----------------------------------------------------------------------
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    UPnpDeviceList::iterator dit = pDevice->m_listDevices.begin();
-    for (; dit != pDevice->m_listDevices.end(); ++dit)
-        ProcessDevice( pSocket, *dit);
+    foreach (auto & dev, pDevice->m_listDevices)
+        ProcessDevice( pSocket, dev);
 }

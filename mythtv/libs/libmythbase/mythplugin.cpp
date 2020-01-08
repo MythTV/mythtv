@@ -110,11 +110,8 @@ MythPluginManager::MythPluginManager()
             LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
-        for (QStringList::iterator i = libraries.begin(); i != libraries.end();
-             ++i)
+        foreach (auto library, libraries)
         {
-            QString library = *i;
-
             // pull out the base library name
             library = library.right(library.length() - prefixLength);
             library = library.left(library.length() - suffixLength);
@@ -224,11 +221,10 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 
 void MythPluginManager::DestroyAllPlugins(void)
 {
-    QHash<QString, MythPlugin*>::iterator it = m_dict.begin();
-    for (; it != m_dict.end(); ++it)
+    foreach (auto & it, m_dict)
     {
-        (*it)->destroy();
-        delete *it;
+        it->destroy();
+        delete it;
     }
 
     m_dict.clear();
@@ -238,8 +234,7 @@ void MythPluginManager::DestroyAllPlugins(void)
 QStringList MythPluginManager::EnumeratePlugins(void)
 {
     QStringList ret;
-    QHash<QString, MythPlugin*>::const_iterator it = m_dict.begin();
-    for (; it != m_dict.end(); ++it)
-        ret << (*it)->getName();
+    foreach (auto it, m_dict)
+        ret << it->getName();
     return ret;
 }

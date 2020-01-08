@@ -260,11 +260,9 @@ void MusicPlayer::stop(bool stopAll)
         // remove any listeners from the decoder
         {
             QMutexLocker locker(m_lock);
-            QSet<QObject*>::const_iterator it = m_listeners.begin();
-            for (; it != m_listeners.end() ; ++it)
-            {
+            // NOLINTNEXTLINE(modernize-loop-convert)
+            for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
                 getDecoder()->removeListener(*it);
-            }
         }
     }
 
@@ -403,20 +401,15 @@ bool MusicPlayer::openOutputDevice(void)
     m_output->addListener(this);
 
     // add any visuals to the audio output
-    QSet<QObject*>::const_iterator it = m_visualisers.begin();
-
-    for (; it != m_visualisers.end() ; ++it)
-    {
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
         m_output->addVisual((MythTV::Visual*)(*it));
-    }
 
     // add any listeners to the audio output
     QMutexLocker locker(m_lock);
-    it = m_listeners.begin();
-    for (; it != m_listeners.end() ; ++it)
-    {
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
         m_output->addListener(*it);
-    }
 
     return true;
 }
@@ -1502,11 +1495,9 @@ void MusicPlayer::setupDecoderHandler(void)
     // add any listeners to the decoderHandler
     {
         QMutexLocker locker(m_lock);
-        QSet<QObject*>::const_iterator it = m_listeners.begin();
-        for (; it != m_listeners.end() ; ++it)
-        {
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
             m_decoderHandler->addListener(*it);
-        }
     }
 }
 
@@ -1538,18 +1529,16 @@ void MusicPlayer::decoderHandlerReady(void)
     // add any listeners to the decoder
     {
         QMutexLocker locker(m_lock);
-        QSet<QObject*>::const_iterator it = m_listeners.begin();
-        for (; it != m_listeners.end() ; ++it)
-        {
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
             getDecoder()->addListener(*it);
-        }
     }
 
     m_currentTime = 0;
     m_lastTrackStart = 0;
 
-    QSet<QObject*>::const_iterator it = m_visualisers.begin();
-    for (; it != m_visualisers.end() ; ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
     {
         //m_output->addVisual((MythTV::Visual*)(*it));
         //(*it)->setDecoder(getDecoder());

@@ -1,17 +1,18 @@
 #ifndef MYTHGENERICTREE_H_
 #define MYTHGENERICTREE_H_
 
+#include <utility>
+
+#include <QHash>
+#include <QList>
+#include <QMap>
+#include <QMetaType>
 #include <QString>
 #include <QStringList>
-#include <QList>
-#include <QVector>
-#include <QMetaType>
 #include <QVariant>
-#include <QMap>
-#include <QHash>
+#include <QVector>
 
 #include "mythuiexp.h"
-
 #include "mythuibuttonlist.h"
 
 class SortableMythGenericTreeList;
@@ -83,7 +84,7 @@ class MUI_PUBLIC MythGenericTree
     void DisplayStateFromMap(const InfoMap &infoMap);
     QString GetState(const QString &name="") const;
 
-    void SetData(QVariant data) { m_data = data; }
+    void SetData(QVariant data) { m_data = std::move(data); }
     QVariant GetData(void) const { return m_data; }
 
     int childCount(void) const;

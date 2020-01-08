@@ -128,7 +128,7 @@ private:
   int     m_infoLengthPos {0};
   uint8_t m_capmt[2048]   {0}; ///< XXX is there a specified maximum?
 public:
-  cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
+  explicit cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
   void AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
                        const uint8_t *data);
@@ -177,10 +177,10 @@ private:
   bool CloseSession(int SessionId);
   int CloseAllSessions(int Slot);
   cLlCiHandler(int Fd, int NumSlots);
-  cLlCiHandler(const cLlCiHandler &) = delete;            // not copyable
-  cLlCiHandler &operator=(const cLlCiHandler &) = delete; // not copyable
 public:
   ~cLlCiHandler() override;
+  cLlCiHandler(const cLlCiHandler &) = delete;            // not copyable
+  cLlCiHandler &operator=(const cLlCiHandler &) = delete; // not copyable
   int NumSlots(void) override // cCiHandler
       { return m_numSlots; }
   bool Process(void) override; // cCiHandler
@@ -231,7 +231,7 @@ class cHlCiHandler : public cCiHandler {
 
 int tcp_listen(struct sockaddr_in *name,int sckt,unsigned long address=INADDR_ANY);
 int accept_tcp(int ip_sock,struct sockaddr_in *ip_name);
-int udp_listen(struct sockaddr_un *name,char const * const filename);
+int udp_listen(struct sockaddr_un *name,char const * filename);
 int accept_udp(int ip_sock,struct sockaddr_un *ip_name);
 
 #endif //__CI_H

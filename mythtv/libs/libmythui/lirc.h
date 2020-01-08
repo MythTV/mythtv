@@ -41,7 +41,7 @@ class LIRC : public QObject, public MThread
     bool IsDoRunSet(void) const;
     void run(void) override; // MThread
     QList<QByteArray> GetCodes(void);
-    void Process(QByteArray &data);
+    void Process(const QByteArray &data);
 
     mutable QMutex  m_lock        {QMutex::Recursive};
     static  QMutex  s_lirclibLock;

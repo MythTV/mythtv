@@ -404,11 +404,10 @@ void MHListGroup::Preparation(MHEngine *engine)
         {
             MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
-            QList<MHListItem *>::iterator it = m_ItemList.begin();
 
-            for (; it != m_ItemList.end(); ++it)
+            foreach (auto & item, m_ItemList)
             {
-                p = *it;
+                p = item;
 
                 if (p->m_pVisible == pItem)
                 {
@@ -430,10 +429,8 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    for (int j = 0; j < m_ItemList.size(); j++)
-    {
-        m_ItemList.at(j)->m_pVisible->ResetPosition();
-    }
+    foreach (auto item, m_ItemList)
+        item->m_pVisible->ResetPosition();
 
     MHTokenGroup::Destruction(engine);
 }
@@ -449,10 +446,8 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    for (int j = 0; j < m_ItemList.size(); j++)
-    {
-        m_ItemList.at(j)->m_pVisible->Deactivation(engine);
-    }
+    foreach (auto item, m_ItemList)
+        item->m_pVisible->Deactivation(engine);
 
     MHTokenGroup::Deactivation(engine);
 }
@@ -550,11 +545,9 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    QList<MHListItem *>::iterator it = m_ItemList.begin();
-
-    for (; it != m_ItemList.end(); ++it)
+    foreach (auto & item, m_ItemList)
     {
-        if ((*it)->m_pVisible == pItem)
+        if (item->m_pVisible == pItem)
         {
             return;
         }

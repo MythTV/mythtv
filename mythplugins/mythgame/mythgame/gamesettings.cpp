@@ -33,11 +33,11 @@ QString GetGameTypeName(const QString &GameType)
 {
     QString result = "";
 
-    for (int i = 0; i < MAX_GAME_TYPES; i++)
+    for (const auto & console : GameTypeList)
     {
-        if (GameTypeList[i].m_idStr == GameType) {
+        if (console.m_idStr == GameType) {
             result = QCoreApplication::translate("(GameTypes)",
-                                                 GameTypeList[i].m_nameStr.toUtf8());
+                                                 console.m_nameStr.toUtf8());
             break;
         }
     }
@@ -48,10 +48,10 @@ QString GetGameTypeExtensions(const QString &GameType)
 {
     QString result = "";
 
-    for (int i = 0; i < MAX_GAME_TYPES; i++)
+    for (const auto & console : GameTypeList)
     {
-        if (GameTypeList[i].m_idStr == GameType) {
-            result = GameTypeList[i].m_extensions;
+        if (console.m_idStr == GameType) {
+            result = console.m_extensions;
             break;
         }
     }
@@ -257,11 +257,11 @@ struct GameType : public MythUIComboBoxSetting
     {
         //: Game type
         setLabel(TR("Type"));
-        for (int i = 0; i < MAX_GAME_TYPES; i++)
+        for (const auto & console : GameTypeList)
         {
             addSelection(QCoreApplication::translate("(GameTypes)",
-                                                     GameTypeList[i].m_nameStr.toUtf8()),
-                         GameTypeList[i].m_idStr);
+                                                     console.m_nameStr.toUtf8()),
+                         console.m_idStr);
         }
         setValue(0);
         setHelpText(TR("Type of Game/Emulator. Mostly for informational "

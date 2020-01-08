@@ -18,7 +18,7 @@ extern "C" {
 class MythDRMDevice : public ReferenceCounter
 {
   public:
-    MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
+    explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
    ~MythDRMDevice() override;
 
     QString  GetSerialNumber(void) const;

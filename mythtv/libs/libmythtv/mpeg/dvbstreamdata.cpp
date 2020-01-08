@@ -183,19 +183,16 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     {
         m_cacheLock.lock();
 
-        nit_cache_t::iterator nit = m_cachedNit.begin();
-        for (; nit != m_cachedNit.end(); ++nit)
-            DeleteCachedTable(*nit);
+        foreach (auto & nit, m_cachedNit)
+            DeleteCachedTable(nit);
         m_cachedNit.clear();
 
-        sdt_cache_t::iterator sit = m_cachedSdts.begin();
-        for (; sit != m_cachedSdts.end(); ++sit)
-            DeleteCachedTable(*sit);
+        foreach (auto & cached, m_cachedSdts)
+            DeleteCachedTable(cached);
         m_cachedSdts.clear();
 
-        bat_cache_t::iterator bat = m_cachedBats.begin();
-        for (; bat != m_cachedBats.end(); ++bat)
-            DeleteCachedTable(*bat);
+        foreach (auto & cached, m_cachedBats)
+            DeleteCachedTable(cached);
         m_cachedBats.clear();
 
         m_cacheLock.unlock();
@@ -247,15 +244,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 auto *nit = new NetworkInformationTable(psip);
                 CacheNIT(nit);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                    m_dvbMainListeners[i]->HandleNIT(nit);
+                for (auto & listener : m_dvbMainListeners)
+                    listener->HandleNIT(nit);
             }
             else
             {
                 NetworkInformationTable nit(psip);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                    m_dvbMainListeners[i]->HandleNIT(&nit);
+                for (auto & listener : m_dvbMainListeners)
+                    listener->HandleNIT(&nit);
             }
 
             return true;
@@ -287,8 +284,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             UpdateTimeOffset(tdt.UTCUnix());
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-                m_dvbMainListeners[i]->HandleTDT(&tdt);
+            for (auto & listener : m_dvbMainListeners)
+                listener->HandleTDT(&tdt);
 
             return true;
         }
@@ -299,8 +296,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             NetworkInformationTable nit(psip);
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                m_dvbOtherListeners[i]->HandleNITo(&nit);
+            for (auto & listener : m_dvbOtherListeners)
+                listener->HandleNITo(&nit);
 
             return true;
         }
@@ -336,8 +333,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             }
 
             QMutexLocker locker(&m_listenerLock);
-            for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                m_dvbOtherListeners[i]->HandleSDTo(tsid, &sdt);
+            for (auto & listener : m_dvbOtherListeners)
+                listener->HandleSDTo(tsid, &sdt);
 
             return true;
         }
@@ -352,15 +349,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 auto *bat = new BouquetAssociationTable(psip);
                 CacheBAT(bat);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                    m_dvbOtherListeners[i]->HandleBAT(bat);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleBAT(bat);
             }
             else
             {
                 BouquetAssociationTable bat(psip);
                 QMutexLocker locker(&m_listenerLock);
-                for (size_t i = 0; i < m_dvbOtherListeners.size(); i++)
-                    m_dvbOtherListeners[i]->HandleBAT(&bat);
+                for (auto & listener : m_dvbOtherListeners)
+                    listener->HandleBAT(&bat);
             }
 
             return true;
@@ -383,8 +380,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                                     psip.LastSection());
 
         DVBEventInformationTable eit(psip);
-        for (size_t i = 0; i < m_dvbEitListeners.size(); i++)
-            m_dvbEitListeners[i]->HandleEIT(&eit);
+        for (auto & listener : m_dvbEitListeners)
+            listener->HandleEIT(&eit);
 
         if (m_eitHelper)
             m_eitHelper->AddEIT(&eit);
@@ -403,8 +400,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         PremiereContentInformationTable cit(psip);
         m_citStatus.SetSectionSeen(cit.ContentID(), psip.Version(), psip.Section(), psip.LastSection());
 
-        for (size_t i = 0; i < m_dvbEitListeners.size(); i++)
-            m_dvbEitListeners[i]->HandleEIT(&cit);
+        for (auto & listener : m_dvbEitListeners)
+            listener->HandleEIT(&cit);
 
         if (m_eitHelper)
             m_eitHelper->AddEIT(&cit);
@@ -433,8 +430,8 @@ void DVBStreamData::ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt)
             m_dvbHasEit[sdt->ServiceID(i)] = true;
     }
 
-    for (size_t i = 0; i < m_dvbMainListeners.size(); i++)
-        m_dvbMainListeners[i]->HandleSDT(tsid, sdt);
+    for (auto & listener : m_dvbMainListeners)
+        listener->HandleSDT(tsid, sdt);
 }
 
 bool DVBStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
@@ -663,8 +660,7 @@ bool DVBStreamData::HasCachedAllBATs(bool current) const
     if (m_cachedBats.empty())
         return false;
 
-    bat_cache_t::const_iterator it = m_cachedBats.begin();
-    for (; it != m_cachedBats.end(); ++it)
+    for (auto it = m_cachedBats.cbegin(); it != m_cachedBats.cend(); ++it)
     {
         if (!HasCachedAllBAT(it.key() >> 8, current))
             return false;
@@ -718,12 +714,11 @@ bool DVBStreamData::HasCachedSDT(bool current) const
     if (m_cachedNit.empty())
         return false;
 
-    nit_cache_t::const_iterator it = m_cachedNit.begin();
-    for (; it != m_cachedNit.end(); ++it)
+    foreach (auto nit, m_cachedNit)
     {
-        for (uint i = 0; i < (*it)->TransportStreamCount(); i++)
+        for (uint i = 0; i < nit->TransportStreamCount(); i++)
         {
-            if (HasCachedAllSDT((*it)->TSID(i), current))
+            if (HasCachedAllSDT(nit->TSID(i), current))
                 return true;
         }
     }
@@ -744,14 +739,13 @@ bool DVBStreamData::HasCachedAllSDTs(bool current) const
     if (m_cachedNit.empty())
         return false;
 
-    nit_cache_t::const_iterator it = m_cachedNit.begin();
-    for (; it != m_cachedNit.end(); ++it)
+    foreach (auto nit, m_cachedNit)
     {
-        if ((int)(*it)->TransportStreamCount() > m_cachedSdts.size())
+        if ((int)nit->TransportStreamCount() > m_cachedSdts.size())
             return false;
 
-        for (uint i = 0; i < (*it)->TransportStreamCount(); i++)
-            if (!HasCachedAllSDT((*it)->TSID(i), current))
+        for (uint i = 0; i < nit->TransportStreamCount(); i++)
+            if (!HasCachedAllSDT(nit->TSID(i), current))
                 return false;
     }
 
@@ -821,11 +815,10 @@ bat_vec_t DVBStreamData::GetCachedBATs(bool current) const
 
     bat_vec_t bats;
 
-    bat_cache_t::const_iterator it = m_cachedBats.begin();
-    for (; it != m_cachedBats.end(); ++it)
+    foreach (auto bat, m_cachedBats)
     {
-        IncrementRefCnt(*it);
-        bats.push_back(*it);
+        IncrementRefCnt(bat);
+        bats.push_back(bat);
     }
 
     return bats;
@@ -889,11 +882,10 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 
     sdt_vec_t sdts;
 
-    sdt_cache_t::const_iterator it = m_cachedSdts.begin();
-    for (; it != m_cachedSdts.end(); ++it)
+    foreach (auto sdt, m_cachedSdts)
     {
-        IncrementRefCnt(*it);
-        sdts.push_back(*it);
+        IncrementRefCnt(sdt);
+        sdts.push_back(sdt);
     }
 
     return sdts;
@@ -901,8 +893,8 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 
 void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
 {
-    for (auto it = sdts.begin(); it != sdts.end(); ++it)
-        ReturnCachedTable(*it);
+    for (auto & sdt : sdts)
+        ReturnCachedTable(sdt);
     sdts.clear();
 }
 
@@ -991,9 +983,8 @@ void DVBStreamData::AddDVBMainListener(DVBMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbMainListeners.begin();
-    for (; it != m_dvbMainListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_dvbMainListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_dvbMainListeners.push_back(val);
@@ -1003,8 +994,7 @@ void DVBStreamData::RemoveDVBMainListener(DVBMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbMainListeners.begin();
-    for (; it != m_dvbMainListeners.end(); ++it)
+    for (auto it = m_dvbMainListeners.begin(); it != m_dvbMainListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1018,9 +1008,8 @@ void DVBStreamData::AddDVBOtherListener(DVBOtherStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbOtherListeners.begin();
-    for (; it != m_dvbOtherListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_dvbOtherListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_dvbOtherListeners.push_back(val);
@@ -1030,8 +1019,7 @@ void DVBStreamData::RemoveDVBOtherListener(DVBOtherStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbOtherListeners.begin();
-    for (; it != m_dvbOtherListeners.end(); ++it)
+    for (auto it = m_dvbOtherListeners.begin(); it != m_dvbOtherListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1045,9 +1033,8 @@ void DVBStreamData::AddDVBEITListener(DVBEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbEitListeners.begin();
-    for (; it != m_dvbEitListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_dvbEitListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_dvbEitListeners.push_back(val);
@@ -1057,8 +1044,7 @@ void DVBStreamData::RemoveDVBEITListener(DVBEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_dvbEitListeners.begin();
-    for (; it != m_dvbEitListeners.end(); ++it)
+    for (auto it = m_dvbEitListeners.begin(); it != m_dvbEitListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {

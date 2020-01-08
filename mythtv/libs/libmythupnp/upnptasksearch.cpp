@@ -95,20 +95,18 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
-    for ( QList<QHostAddress>::Iterator it  = m_addressList.begin();
-                                it != m_addressList.end(); 
-                              ++it ) 
+    foreach (auto & addr, m_addressList)
     {
         QString ipaddress;
 
         // Avoid announcing the localhost address
-        if (*it == QHostAddress::LocalHost ||
-            *it == QHostAddress::LocalHostIPv6 ||
-            *it == QHostAddress::AnyIPv4 ||
-            *it == QHostAddress::AnyIPv6)
+        if (addr == QHostAddress::LocalHost ||
+            addr == QHostAddress::LocalHostIPv6 ||
+            addr == QHostAddress::AnyIPv4 ||
+            addr == QHostAddress::AnyIPv6)
             continue;
 
-        QHostAddress ip = *it;
+        QHostAddress ip = addr;
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it
@@ -202,16 +200,15 @@ void UPnpSearchTask::ProcessDevice(
     // Loop for each service in this device and send the 1 required message
     // ------------------------------------------------------------------
 
-    UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
-    for (; sit != pDevice->m_listServices.end(); ++sit)
+    for (auto sit = pDevice->m_listServices.cbegin();
+         sit != pDevice->m_listServices.cend(); ++sit)
         SendMsg(pSocket, (*sit)->m_sServiceType, pDevice->GetUDN());
 
     // ----------------------------------------------------------------------
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    UPnpDeviceList::const_iterator dit = pDevice->m_listDevices.begin();
-    for (; dit != pDevice->m_listDevices.end(); ++dit)
-        ProcessDevice( pSocket, *dit);
+    foreach (auto device, pDevice->m_listDevices)
+        ProcessDevice( pSocket, device);
 }
 

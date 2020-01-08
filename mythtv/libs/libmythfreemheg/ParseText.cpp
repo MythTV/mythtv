@@ -44,7 +44,7 @@ This is very basic and is only there to enable some test programs to be run.
 
 MHParseText::~MHParseText()
 {
-    free(m_String);
+    free(m_string);
 }
 
 // Get the next character.
@@ -466,19 +466,19 @@ void MHParseText::NextSym()
                     }
 
                     // We grow the buffer to the largest string in the input.
-                    auto *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
+                    auto *str = (unsigned char *)realloc(m_string, m_nStringLength + 2);
 
                     if (str == nullptr)
                     {
                         Error("Insufficient memory");
                     }
 
-                    m_String = str;
-                    m_String[m_nStringLength++] = m_ch;
+                    m_string = str;
+                    m_string[m_nStringLength++] = m_ch;
                 }
 
                 GetNextChar(); // Skip the closing quote
-                m_String[m_nStringLength] = 0;
+                m_string[m_nStringLength] = 0;
                 return;
             }
 
@@ -568,19 +568,19 @@ void MHParseText::NextSym()
                     }
 
                     // We grow the buffer to the largest string in the input.
-                    auto *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
+                    auto *str = (unsigned char *)realloc(m_string, m_nStringLength + 2);
 
                     if (str == nullptr)
                     {
                         Error("Insufficient memory");
                     }
 
-                    m_String = str;
-                    m_String[m_nStringLength++] = m_ch;
+                    m_string = str;
+                    m_string[m_nStringLength++] = m_ch;
                 }
 
                 GetNextChar(); // Skip the closing quote
-                m_String[m_nStringLength] = 0;
+                m_string[m_nStringLength] = 0;
                 return;
             }
 
@@ -780,25 +780,25 @@ void MHParseText::NextSym()
                 }
 
                 // Check the colour table.  If it's there generate a string containing the colour info.
-                for (int i = 0; i < (int)(sizeof(colourTable) / sizeof(colourTable[0])); i++)
+                for (auto & colour : colourTable)
                 {
-                    if (stricmp(buff, colourTable[i].m_name) == 0)
+                    if (stricmp(buff, colour.m_name) == 0)
                     {
                         m_nType = PTString;
-                        auto *str = (unsigned char *)realloc(m_String, 4 + 1);
+                        auto *str = (unsigned char *)realloc(m_string, 4 + 1);
 
                         if (str == nullptr)
                         {
                             Error("Insufficient memory");
                         }
 
-                        m_String = str;
-                        m_String[0] = colourTable[i].m_r;
-                        m_String[1] = colourTable[i].m_g;
-                        m_String[2] = colourTable[i].m_b;
-                        m_String[3] = colourTable[i].m_t;
+                        m_string = str;
+                        m_string[0] = colour.m_r;
+                        m_string[1] = colour.m_g;
+                        m_string[2] = colour.m_b;
+                        m_string[3] = colour.m_t;
                         m_nStringLength = 4;
-                        m_String[m_nStringLength] = 0;
+                        m_string[m_nStringLength] = 0;
                         return;
                     }
                 }
@@ -1059,7 +1059,7 @@ MHParseNode *MHParseText::DoParse()
             case PTString:
             {
                 MHOctetString str;
-                str.Copy(MHOctetString((const char *)m_String, m_nStringLength));
+                str.Copy(MHOctetString((const char *)m_string, m_nStringLength));
                 pRes = new MHPString(str);
                 NextSym();
                 break;

@@ -7,6 +7,7 @@
 #define JSMENU_H_
 
 // C++ headers
+#include <utility>
 #include <vector>
 
 // QT headers
@@ -52,13 +53,13 @@ class JoystickMap
     public:
         void AddButton(int in_button, QString in_keystr, int in_chord = -1)
         {
-            buttonMapType new_button = { in_button, in_keystr, in_chord };
+            buttonMapType new_button = { in_button, std::move(in_keystr), in_chord };
             m_buttonMap.push_back(new_button);
         }
 
         void AddAxis(int in_axis, int in_from, int in_to, QString in_keystr)
         {
-            axisMapType new_axis = { in_axis, in_from, in_to, in_keystr};
+            axisMapType new_axis = { in_axis, in_from, in_to, std::move(in_keystr)};
             m_axisMap.push_back(new_axis);
         }
 

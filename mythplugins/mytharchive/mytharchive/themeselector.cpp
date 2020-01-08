@@ -134,9 +134,8 @@ void DVDThemeSelector::getThemeList(void)
         filters << "*";
         QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
 
-        for (int x = 0; x < list.size(); x++)
+        foreach (const auto & fi, list)
         {
-            const QFileInfo& fi = list.at(x);
             if (QFile::exists(m_themeDir + fi.fileName() + "/preview.png"))
             {
                 m_themeList.append(fi.fileName());

@@ -273,56 +273,56 @@ enum MythCodecID
 };
 
 // MythCodecID convenience functions
-#define codec_is_std(id)      (id < kCodec_NORMAL_END)
-#define codec_is_std_mpeg(id) (id == kCodec_MPEG1 || id == kCodec_MPEG2)
+#define codec_is_std(id)      ((id) < kCodec_NORMAL_END)
+#define codec_is_std_mpeg(id) ((id) == kCodec_MPEG1 || (id) == kCodec_MPEG2)
 
-#define codec_is_drmprime(id) ((id > kCodec_DRMPRIME_BEGIN) && \
-                               (id < kCodec_DRMPRIME_END))
-#define codec_is_vdpau(id)    ((id > kCodec_VDPAU_BEGIN) && \
-                               (id < kCodec_VDPAU_END))
+#define codec_is_drmprime(id) (((id) > kCodec_DRMPRIME_BEGIN) && \
+                               ((id) < kCodec_DRMPRIME_END))
+#define codec_is_vdpau(id)    (((id) > kCodec_VDPAU_BEGIN) && \
+                               ((id) < kCodec_VDPAU_END))
 #define codec_is_vdpau_hw(id) ((codec_is_vdpau(id) && \
-                                (id != kCodec_H263_VDPAU) && \
-                                (id != kCodec_VP8_VDPAU) && \
-                                (id != kCodec_VP9_VDPAU)))
-#define codec_is_vdpau_dec(id)((id > kCodec_VDPAU_DEC_BEGIN) && \
-                               (id < kCodec_VDPAU_DEC_END))
+                                ((id) != kCodec_H263_VDPAU) && \
+                                ((id) != kCodec_VP8_VDPAU) && \
+                                ((id) != kCodec_VP9_VDPAU)))
+#define codec_is_vdpau_dec(id)(((id) > kCodec_VDPAU_DEC_BEGIN) && \
+                               ((id) < kCodec_VDPAU_DEC_END))
 #define codec_is_vdpau_dechw(id) ((codec_is_vdpau_dec(id) && \
-                                  (id != kCodec_H263_VDPAU_DEC) && \
-                                  (id != kCodec_VP8_VDPAU_DEC) && \
-                                  (id != kCodec_VP9_VDPAU)))
+                                  ((id) != kCodec_H263_VDPAU_DEC) && \
+                                  ((id) != kCodec_VP8_VDPAU_DEC) && \
+                                  ((id) != kCodec_VP9_VDPAU)))
 
-#define codec_is_vaapi(id)    ((id > kCodec_VAAPI_BEGIN) && \
-                               (id < kCodec_VAAPI_END))
-#define codec_is_vaapi_dec(id)((id > kCodec_VAAPI_DEC_BEGIN) && \
-                               (id < kCodec_VAAPI_DEC_END))
+#define codec_is_vaapi(id)    (((id) > kCodec_VAAPI_BEGIN) && \
+                               ((id) < kCodec_VAAPI_END))
+#define codec_is_vaapi_dec(id)(((id) > kCodec_VAAPI_DEC_BEGIN) && \
+                               ((id) < kCodec_VAAPI_DEC_END))
 
-#define codec_is_dxva2(id)    ((id > kCodec_DXVA2_BEGIN) && \
-                               (id < kCodec_DXVA2_END))
+#define codec_is_dxva2(id)    (((id) > kCodec_DXVA2_BEGIN) && \
+                               ((id) < kCodec_DXVA2_END))
 #define codec_is_dxva2_hw(id) (codec_is_dxva2(id) && \
-                               ((id == kCodec_H264_DXVA2)  || \
-                                (id == kCodec_MPEG2_DXVA2) || \
-                                (id == kCodec_VC1_DXVA2)))
+                               (((id) == kCodec_H264_DXVA2)  || \
+                                ((id) == kCodec_MPEG2_DXVA2) || \
+                                ((id) == kCodec_VC1_DXVA2)))
 
-#define codec_is_mediacodec(id)((id > kCodec_MEDIACODEC_BEGIN) && \
-                               (id < kCodec_MEDIACODEC_END))
-#define codec_is_mediacodec_dec(id) ((id > kCodec_MEDIACODEC_DEC_BEGIN) && \
-                               (id < kCodec_MEDIACODEC_DEC_END))
+#define codec_is_mediacodec(id)(((id) > kCodec_MEDIACODEC_BEGIN) && \
+                               ((id) < kCodec_MEDIACODEC_END))
+#define codec_is_mediacodec_dec(id) (((id) > kCodec_MEDIACODEC_DEC_BEGIN) && \
+                               ((id) < kCodec_MEDIACODEC_DEC_END))
 
-#define codec_is_nvdec(id)    ((id > kCodec_NVDEC_BEGIN) && \
-                               (id < kCodec_NVDEC_END))
-#define codec_is_nvdec_dec(id)((id > kCodec_NVDEC_DEC_BEGIN) && \
-                               (id < kCodec_NVDEC_DEC_END))
+#define codec_is_nvdec(id)    (((id) > kCodec_NVDEC_BEGIN) && \
+                               ((id) < kCodec_NVDEC_END))
+#define codec_is_nvdec_dec(id)(((id) > kCodec_NVDEC_DEC_BEGIN) && \
+                               ((id) < kCodec_NVDEC_DEC_END))
 
-#define codec_is_vtb(id)      ((id > kCodec_VTB_BEGIN) && \
-                               (id < kCodec_VTB_END))
-#define codec_is_vtb_dec(id)  ((id > kCodec_VTB_DEC_BEGIN) && \
-                               (id < kCodec_VTB_DEC_END))
+#define codec_is_vtb(id)      (((id) > kCodec_VTB_BEGIN) && \
+                               ((id) < kCodec_VTB_END))
+#define codec_is_vtb_dec(id)  (((id) > kCodec_VTB_DEC_BEGIN) && \
+                               ((id) < kCodec_VTB_DEC_END))
 
-#define codec_is_v4l2(id)     ((id > kCodec_V4L2_BEGIN) && (id < kCodec_V4L2_END))
-#define codec_is_v4l2_dec(id) ((id > kCodec_V4L2_DEC_BEGIN) && (id < kCodec_V4L2_DEC_END))
+#define codec_is_v4l2(id)     (((id) > kCodec_V4L2_BEGIN) && ((id) < kCodec_V4L2_END))
+#define codec_is_v4l2_dec(id) (((id) > kCodec_V4L2_DEC_BEGIN) && ((id) < kCodec_V4L2_DEC_END))
 
-#define codec_is_mmal(id)     ((id > kCodec_MMAL_BEGIN) && (id < kCodec_MMAL_END))
-#define codec_is_mmal_dec(id) ((id > kCodec_MMAL_DEC_BEGIN) && (id < kCodec_MMAL_DEC_END))
+#define codec_is_mmal(id)     (((id) > kCodec_MMAL_BEGIN) && ((id) < kCodec_MMAL_END))
+#define codec_is_mmal_dec(id) (((id) > kCodec_MMAL_DEC_BEGIN) && ((id) < kCodec_MMAL_DEC_END))
 
 #define codec_is_copyback(id) (codec_is_mediacodec_dec(id) || \
                                codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
@@ -342,13 +342,13 @@ uint mpeg_version(int codec_id);
 #define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
 #define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))
 #ifdef USING_VDPAU
-#define CODEC_IS_VDPAU(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_VDPAU))
+#define CODEC_IS_VDPAU(codec, enc) ((codec) && ((enc)->pix_fmt == AV_PIX_FMT_VDPAU))
 #else
 #define CODEC_IS_VDPAU(codec) (0)
 #endif
 
 #ifdef USING_VAAPI
-#define CODEC_IS_VAAPI(codec, enc) (codec && (enc->pix_fmt == AV_PIX_FMT_VAAPI))
+#define CODEC_IS_VAAPI(codec, enc) ((codec) && ((enc)->pix_fmt == AV_PIX_FMT_VAAPI))
 #else
 #define CODEC_IS_VAAPI(codec, enc) (0)
 #endif

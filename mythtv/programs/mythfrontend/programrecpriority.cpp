@@ -1118,20 +1118,18 @@ void ProgramRecPriority::FillList(void)
 
     RemoteGetAllScheduledRecordings(recordinglist);
 
-    auto pgiter = recordinglist.begin();
-
-    for (; pgiter != recordinglist.end(); ++pgiter)
+    for (auto & pgiter : recordinglist)
     {
-        ProgramInfo *progInfo = *pgiter;
-        m_programData[(*pgiter)->GetRecordingRuleID()] =
+        ProgramInfo *progInfo = pgiter;
+        m_programData[pgiter->GetRecordingRuleID()] =
             (*progInfo);
 
         // save recording priority value in map so we don't have to
         // save all program's recording priority values when we exit
-        m_origRecPriorityData[(*pgiter)->GetRecordingRuleID()] =
-            (*pgiter)->GetRecordingPriority();
+        m_origRecPriorityData[pgiter->GetRecordingRuleID()] =
+            pgiter->GetRecordingPriority();
 
-        delete (*pgiter);
+        delete pgiter;
     }
 
     // get recording types associated with each program from db
@@ -1204,12 +1202,11 @@ void ProgramRecPriority::countMatches()
     LoadFromScheduler(schedList);
     QDateTime now = MythDate::current();
 
-    ProgramList::const_iterator it = schedList.begin();
-    for (; it != schedList.end(); ++it)
+    for (auto program : schedList)
     {
-        const RecStatus::Type recstatus = (**it).GetRecordingStatus();
-        const uint          recordid  = (**it).GetRecordingRuleID();
-        if ((**it).GetRecordingEndTime() > now && recstatus != RecStatus::NotListed)
+        const RecStatus::Type recstatus = (*program).GetRecordingStatus();
+        const uint          recordid  = (*program).GetRecordingRuleID();
+        if ((*program).GetRecordingEndTime() > now && recstatus != RecStatus::NotListed)
         {
             m_listMatch[recordid]++;
             if (recstatus == RecStatus::Conflict || recstatus == RecStatus::Offline)

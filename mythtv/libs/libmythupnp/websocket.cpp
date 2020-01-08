@@ -667,7 +667,6 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
 {
     if (frame.m_finalFrame)
     {
-        QList<WebSocketExtension*>::iterator it;
         switch (frame.m_opCode)
         {
             case WebSocketFrame::kOpTextFrame :
@@ -680,20 +679,18 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                 // For Debugging and fuzz testing
                 if (m_fuzzTesting)
                     SendText(frame.m_payload);
-                it = m_extensions.begin();
-                for (; it != m_extensions.end(); ++it)
+                foreach (auto & extension, m_extensions)
                 {
-                    if ((*it)->HandleTextFrame(frame))
+                    if (extension->HandleTextFrame(frame))
                         break;
                 }
                 break;
             case WebSocketFrame::kOpBinaryFrame :
                 if (m_fuzzTesting)
                     SendBinary(frame.m_payload);
-                it = m_extensions.begin();
-                for (; it != m_extensions.end(); ++it)
+                foreach (auto & extension, m_extensions)
                 {
-                    if ((*it)->HandleBinaryFrame(frame))
+                    if (extension->HandleBinaryFrame(frame))
                         break;
                 }
                 break;
@@ -938,8 +935,7 @@ void WebSocketWorker::DeregisterExtension(WebSocketExtension* extension)
     if (!extension)
         return;
 
-    QList<WebSocketExtension*>::iterator it = m_extensions.begin();
-    for (; it != m_extensions.end(); ++it)
+    for (auto it = m_extensions.begin(); it != m_extensions.end(); ++it)
     {
         if ((*it) == extension)
         {

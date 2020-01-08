@@ -48,7 +48,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
-    void SetMaxLength(const int length);
+    void SetMaxLength(int length);
 
     enum MoveDirection { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
     bool MoveCursor(MoveDirection moveDir);

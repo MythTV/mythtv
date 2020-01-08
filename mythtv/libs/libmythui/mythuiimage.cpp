@@ -725,13 +725,13 @@ void MythUIImage::SetDelay(int delayms)
 /**
  *  \brief Sets the delays between each image in an animation
  */
-void MythUIImage::SetDelays(QVector<int> delays)
+void MythUIImage::SetDelays(const QVector<int>& delays)
 {
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker imageLocker(&m_ImagesLock);
 
-    for (auto it = delays.begin(); it != delays.end(); ++it)
-        m_Delays[m_Delays.size()] = *it;
+    foreach (const int & delay, delays)
+        m_Delays[m_Delays.size()] = delay;
 
     if (m_Delay == -1)
         m_Delay = m_Delays[0];
@@ -815,10 +815,8 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_imageProperties.m_isThemeImage = false;
 
-    for (auto it = images->begin(); it != images->end(); ++it)
+    foreach (auto im, *images)
     {
-        MythImage *im = (*it);
-
         if (!im)
         {
             QMutexLocker locker(&m_ImagesLock);
@@ -874,15 +872,15 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
     SetRedraw();
 }
 
-void MythUIImage::SetAnimationFrames(AnimationFrames frames)
+void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
 {
     QVector<int> delays;
     QVector<MythImage *> images;
 
-    for (auto it = frames.begin(); it != frames.end(); ++it)
+    foreach (auto & frame, frames)
     {
-        images.append((*it).first);
-        delays.append((*it).second);
+        images.append(frame.first);
+        delays.append(frame.second);
     }
 
     if (!images.empty())
@@ -1342,11 +1340,9 @@ bool MythUIImage::ParseElement(
         {
             QVector<int> delays;
             QStringList tokens = value.split(",");
-            QStringList::iterator it = tokens.begin();
-
-            for (; it != tokens.end(); ++it)
+            foreach (auto & token, tokens)
             {
-                if ((*it).isEmpty())
+                if (token.isEmpty())
                 {
                     if (!delays.empty())
                         delays.append(delays[delays.size()-1]);
@@ -1355,7 +1351,7 @@ bool MythUIImage::ParseElement(
                 }
                 else
                 {
-                    delays.append((*it).toInt());
+                    delays.append(token.toInt());
                 }
             }
 
@@ -1570,11 +1566,9 @@ void MythUIImage::customEvent(QEvent *event)
 
             if (animationFrames)
             {
-                for (auto it = animationFrames->begin();
-                     it != animationFrames->end();
-                     ++it)
+                foreach (auto & frame, *animationFrames)
                 {
-                    MythImage *im = (*it).first;
+                    MythImage *im = frame.first;
                     if (im)
                         im->DecrRef();
                 }
@@ -1650,11 +1644,9 @@ void MythUIImage::FindRandomImage(void)
     QStringList imageTypes;
 
     QList< QByteArray > exts = QImageReader::supportedImageFormats();
-    QList< QByteArray >::Iterator it = exts.begin();
-
-    for (; it != exts.end(); ++it)
+    foreach (auto & ext, exts)
     {
-        imageTypes.append(QString("*.").append(*it));
+        imageTypes.append(QString("*.").append(ext));
     }
 
     imageDir.setNameFilters(imageTypes);

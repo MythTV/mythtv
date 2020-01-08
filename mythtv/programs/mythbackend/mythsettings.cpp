@@ -27,16 +27,15 @@ static QString extract_query_list(
 {
     QString list;
 
-    MythSettingList::const_iterator it = settings.begin();
-    for (; it != settings.end(); ++it)
+    foreach (auto val, settings)
     {
-        const auto *group = dynamic_cast<const MythSettingGroup*>(*it);
+        const auto *group = dynamic_cast<const MythSettingGroup*>(val);
         if (group)
         {
             list += extract_query_list(group->m_settings, stype);
             continue;
         }
-        const auto *setting = dynamic_cast<const MythSetting*>(*it);
+        const auto *setting = dynamic_cast<const MythSetting*>(val);
         if (setting && (setting->m_stype == stype))
             list += QString(",'%1'").arg(setting->m_value);
     }
@@ -53,9 +52,8 @@ static void fill_setting(
     const auto *group = dynamic_cast<const MythSettingGroup*>(sb);
     if (group)
     {
-        MythSettingList::const_iterator it = group->m_settings.begin();
-        for (; it != group->m_settings.end(); ++it)
-            fill_setting(*it, map, stype);
+        foreach (auto setting, group->m_settings)
+            fill_setting(setting, map, stype);
         return;
     }
 
@@ -130,9 +128,8 @@ static void fill_settings(
     while (query.next())
         map[query.value(0).toString()] = query.value(1).toString();
 
-    MythSettingList::const_iterator it = settings.begin();
-    for (; it != settings.end(); ++it)
-        fill_setting(*it, map, stype);
+    foreach (auto setting, settings)
+        fill_setting(setting, map, stype);
 }
 
 QString MythSettingGroup::ToHTML(uint depth) const
@@ -147,9 +144,8 @@ QString MythSettingGroup::ToHTML(uint depth) const
             .arg(depth+1).arg(m_human_label).arg(depth+1);
     }
 
-    MythSettingList::const_iterator it = m_settings.begin();
-    for (; it != m_settings.end(); ++it)
-        ret += (*it)->ToHTML(depth+1);
+    foreach (auto setting, m_settings)
+        ret += setting->ToHTML(depth+1);
 
     ret += indent(depth) +"</div>";
 
@@ -408,11 +404,11 @@ QStringList GetSettingValueList(const QString &type)
     if (type == "LocalIPAddress")
     {
         QList<QHostAddress> list = QNetworkInterface::allAddresses();
-        for (uint i = 0; i < (uint)list.size(); i++)
+        foreach (auto & addr, list)
         {
-            if (list[i].toString().contains(":"))
+            if (addr.toString().contains(":"))
                 continue; // ignore IP6 addresses for now
-            sList << list[i].toString();
+            sList << addr.toString();
         }
 
         if (sList.isEmpty())
@@ -451,8 +447,7 @@ QString StringListToJSON(const QString &key,
 {
     QString result;
 
-    QStringList::const_iterator it = sList.begin();
-    for (; it != sList.end(); ++it)
+    foreach (const auto & item, sList)
     {
         if (result.isEmpty())
             result += QString("{ \"%1\" : [ ").arg(key);
@@ -460,7 +455,7 @@ QString StringListToJSON(const QString &key,
             result += ", ";
 
         // FIXME, howto encode double quotes in JSON?
-        result += "\"" + *it + "\"";
+        result += "\"" + item + "\"";
     }
 
     if (!result.isEmpty())

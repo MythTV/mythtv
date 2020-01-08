@@ -28,10 +28,8 @@ class CleanupHooksImp
 
     void cleanup()
     {
-        for (auto p = m_cleanList.begin(); p != m_cleanList.end(); ++p)
-        {
-            (*p)->doClean();
-        }
+        for (auto & item : m_cleanList)
+            item->doClean();
         m_cleanList.clear();
     }
 };

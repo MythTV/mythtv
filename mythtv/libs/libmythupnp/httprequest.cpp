@@ -148,7 +148,6 @@ static QString StaticPage =
       "<BODY><H1>%2.</H1></BODY>"
     "</HTML>";
 
-static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 #ifdef USE_SETSOCKOPT
 //static const int g_on          = 1;
 //static const int g_off         = 0;
@@ -786,29 +785,27 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     else
         stream << "<" << m_sMethod << "Response>\r\n";
 
-    NameValues::const_iterator nit = args.begin();
-    for (; nit != args.end(); ++nit)
+    foreach (const auto & arg, args)
     {
-        stream << "<" << (*nit).m_sName;
+        stream << "<" << arg.m_sName;
 
-        if ((*nit).m_pAttributes)
+        if (arg.m_pAttributes)
         {
-            NameValues::const_iterator nit2 = (*nit).m_pAttributes->begin();
-            for (; nit2 != (*nit).m_pAttributes->end(); ++nit2)
+            foreach (const auto & attr, *arg.m_pAttributes)
             {
-                stream << " " << (*nit2).m_sName << "='"
-                       << Encode( (*nit2).m_sValue ) << "'";
+                stream << " " << attr.m_sName << "='"
+                       << Encode( attr.m_sValue ) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( (*nit).m_sValue );
+            stream << Encode( arg.m_sValue );
         else
-            stream << (*nit).m_sValue;
+            stream << arg.m_sValue;
 
-        stream << "</" << (*nit).m_sName << ">\r\n";
+        stream << "</" << arg.m_sName << ">\r\n";
     }
 
     if (m_bSOAPRequest)
@@ -1031,12 +1028,12 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 {
     QString ext;
 
-    for (int i = 0; i < g_nMIMELength; i++)
+    for (auto & type : g_MIMETypes)
     {
-        ext = g_MIMETypes[i].pszExtension;
+        ext = type.pszExtension;
 
         if ( sFileExtension.toUpper() == ext.toUpper() )
-            return( g_MIMETypes[i].pszType );
+            return( type.pszType );
     }
 
     return( "text/plain" );
@@ -1050,10 +1047,10 @@ QStringList HTTPRequest::GetSupportedMimeTypes()
 {
     QStringList mimeTypes;
 
-    for (int i = 0; i < g_nMIMELength; i++)
+    for (auto & type : g_MIMETypes)
     {
-        if (!mimeTypes.contains( g_MIMETypes[i].pszType ))
-            mimeTypes.append( g_MIMETypes[i].pszType );
+        if (!mimeTypes.contains( type.pszType ))
+            mimeTypes.append( type.pszType );
     }
 
     return mimeTypes;
@@ -1129,11 +1126,10 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     {
         QStringList params = sParams.split('&', QString::SkipEmptyParts);
 
-        for ( QStringList::Iterator it  = params.begin();
-                                    it != params.end();  ++it )
+        foreach (auto & param, params)
         {
-            QString sName  = (*it).section( '=', 0, 0 );
-            QString sValue = (*it).section( '=', 1 );
+            QString sName  = param.section( '=', 0, 0 );
+            QString sValue = param.section( '=', 1 );
             sValue.replace("+"," ");
 
             if (!sName.isEmpty())

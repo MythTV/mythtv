@@ -245,10 +245,10 @@ int main(int argc, char *argv[])
 
             uint64_t last = 0;
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
-            for (auto it = cutlist.begin(); it != cutlist.end(); ++it)
+            foreach (auto & cut, cutlist)
             {
                 QStringList startend =
-                    (*it).split("-", QString::SkipEmptyParts);
+                    cut.split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
                     uint64_t start = startend.first().toULongLong();
@@ -1009,9 +1009,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         QDir dir (fInfo.path());
         QFileInfoList previewFiles = dir.entryInfoList(nameFilters);
 
-        for (int nIdx = 0; nIdx < previewFiles.size(); nIdx++)
+        foreach (const auto & previewFile, previewFiles)
         {
-            const QFileInfo& previewFile = previewFiles.at(nIdx);
             QString oldFileName = previewFile.absoluteFilePath();
 
             // Delete previews if cutlist was applied.  They will be re-created as

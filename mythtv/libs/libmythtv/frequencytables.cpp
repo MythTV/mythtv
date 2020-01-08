@@ -252,8 +252,8 @@ freq_table_list_t get_matching_freq_tables(
         get_matching_freq_tables_internal(format, modulation, country);
 
     freq_table_list_t new_list;
-    for (size_t i = 0; i < list.size(); i++)
-        new_list.push_back(new FrequencyTable(*list[i]));
+    for (auto & ft : list)
+        new_list.push_back(new FrequencyTable(*ft));
 
     return new_list;
 }
@@ -267,16 +267,16 @@ long long get_center_frequency(
     freq_table_list_t list =
         get_matching_freq_tables_internal(format, modulation, country);
 
-    for (size_t i = 0; i < list.size(); ++i)
+    for (auto & ft : list)
     {
-        int min_freqid = list[i]->m_nameOffset;
+        int min_freqid = ft->m_nameOffset;
         int max_freqid = min_freqid +
-            ((list[i]->m_frequencyEnd - list[i]->m_frequencyStart) /
-             list[i]->m_frequencyStep);
+            ((ft->m_frequencyEnd - ft->m_frequencyStart) /
+             ft->m_frequencyStep);
 
         if ((min_freqid <= freqid) && (freqid <= max_freqid))
-            return list[i]->m_frequencyStart +
-                list[i]->m_frequencyStep * (freqid - min_freqid);
+            return ft->m_frequencyStart +
+                ft->m_frequencyStep * (freqid - min_freqid);
     }
     return -1;
 }
@@ -289,15 +289,15 @@ int get_closest_freqid(
     freq_table_list_t list =
         get_matching_freq_tables_internal(format, modulation, country);
 
-    for (size_t i = 0; i < list.size(); ++i)
+    for (auto & ft : list)
     {
-        int min_freqid = list[i]->m_nameOffset;
+        int min_freqid = ft->m_nameOffset;
         int max_freqid = min_freqid +
-            ((list[i]->m_frequencyEnd - list[i]->m_frequencyStart) /
-             list[i]->m_frequencyStep);
+            ((ft->m_frequencyEnd - ft->m_frequencyStart) /
+             ft->m_frequencyStep);
         int freqid =
-            ((centerfreq - list[i]->m_frequencyStart) /
-             list[i]->m_frequencyStep) + min_freqid;
+            ((centerfreq - ft->m_frequencyStart) /
+             ft->m_frequencyStep) + min_freqid;
 
         if ((min_freqid <= freqid) && (freqid <= max_freqid))
             return freqid;

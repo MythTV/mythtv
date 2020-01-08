@@ -528,8 +528,8 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
             // in the vast majority of cases it is significantly quicker to just
             // clear the unused portions of the screen
             QRegion toclear = m_window.GetBoundingRegion();
-            for (auto it = toclear.begin() ; it != toclear.end(); ++it)
-                m_render->ClearRect(nullptr, *it, gray);
+            foreach (auto rect, toclear)
+                m_render->ClearRect(nullptr, rect, gray);
         }
     }
 #endif
@@ -592,8 +592,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     // PiPs/PBPs
     if (!m_openGLVideoPiPs.empty())
     {
-        QMap<MythPlayer*,MythOpenGLVideo*>::iterator it = m_openGLVideoPiPs.begin();
-        for (; it != m_openGLVideoPiPs.end(); ++it)
+        for (auto it = m_openGLVideoPiPs.begin(); it != m_openGLVideoPiPs.end(); ++it)
         {
             if (m_openGLVideoPiPsReady[it.key()])
             {

@@ -77,7 +77,7 @@ class MPUBLIC OutputEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
-    OutputEvent &operator=(const OutputEvent&);
+    OutputEvent &operator=(const OutputEvent&) = delete;
 
   private:
     QString       *m_errorMsg        {nullptr};

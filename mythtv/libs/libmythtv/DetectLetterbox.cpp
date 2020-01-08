@@ -115,10 +115,10 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
 
     // Establish the level of light in the edge
     int averageY = 0;
-    for (int detectionLine = 0; detectionLine < NUMBER_OF_DETECTION_LINES; detectionLine++)
+    for (int pos : xPos)
     {
-        averageY += buf[offsets[0] + 5 * pitches[0]            + xPos[detectionLine]];
-        averageY += buf[offsets[0] + (height - 6) * pitches[0] + xPos[detectionLine]];
+        averageY += buf[offsets[0] + 5 * pitches[0]            + pos];
+        averageY += buf[offsets[0] + (height - 6) * pitches[0] + pos];
     }
 
     averageY /= NUMBER_OF_DETECTION_LINES * 2;

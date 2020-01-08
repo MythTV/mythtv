@@ -48,7 +48,7 @@ class MythDeque : public deque<T>
     /// \brief Finds an item in the list via linear search O(n).
     iterator find(T const item)
     {
-        for (iterator it = deque<T>::begin(); it != deque<T>::end(); ++it)
+        for (auto it = deque<T>::begin(); it != deque<T>::end(); ++it)
             if (*it == item)
                 return it;
         return deque<T>::end();
@@ -57,7 +57,7 @@ class MythDeque : public deque<T>
     /// \brief Finds an item in the list via linear search O(n).
     const_iterator find(T const item) const
     {
-        for (const_iterator it = deque<T>::begin(); it != deque<T>::end(); ++it)
+        for (auto it = deque<T>::begin(); it != deque<T>::end(); ++it)
             if (*it == item)
                 return it;
         return deque<T>::end();
@@ -66,7 +66,7 @@ class MythDeque : public deque<T>
     /// \brief Removes any item from list. O(n).
     void remove(T const item)
     {
-        iterator it = find(item);
+        auto it = find(item);
         if (it != deque<T>::end())
             deque<T>::erase(it);
     }
@@ -83,7 +83,7 @@ class MythDeque : public deque<T>
         { if (!deque<T>::empty()) return deque<T>::front();
           T *dummy = nullptr; return myth_deque_init(dummy); }
     /// \brief Returns item at head of list. O(1).
-    const T head() const
+    T head() const
         { if (!deque<T>::empty()) return deque<T>::front();
           T *dummy = NULL; return myth_deque_init(dummy); }
 

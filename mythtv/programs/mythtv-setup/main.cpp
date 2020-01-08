@@ -447,14 +447,11 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
             cerr << "Valid cards: " << endl;
-            for (size_t i = 0; i < cardids.size(); i++)
+            for (uint id : cardids)
             {
-                fprintf(stderr, "%5u: %s %s\n",
-                        cardids[i],
-                        CardUtil::GetRawInputType(cardids[i])
-                        .toLatin1().constData(),
-                        CardUtil::GetVideoDevice(cardids[i])
-                        .toLatin1().constData());
+                fprintf(stderr, "%5u: %s %s\n", id,
+                        CardUtil::GetRawInputType(id).toLatin1().constData(),
+                        CardUtil::GetVideoDevice(id).toLatin1().constData());
             }
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
@@ -522,12 +519,12 @@ int main(int argc, char *argv[])
         vector<ScanInfo> scans = LoadScanList();
 
         cout<<" scanid cardid sourceid processed        date"<<endl;
-        for (size_t i = 0; i < scans.size(); i++)
+        for (auto & scan : scans)
         {
             printf("%5i %6i %8i %8s    %20s\n",
-                   scans[i].m_scanid,   scans[i].m_cardid,
-                   scans[i].m_sourceid, (scans[i].m_processed) ? "yes" : "no",
-                   scans[i].m_scandate.toString(Qt::ISODate)
+                   scan.m_scanid,   scan.m_cardid,
+                   scan.m_sourceid, (scan.m_processed) ? "yes" : "no",
+                   scan.m_scandate.toString(Qt::ISODate)
                    .toLatin1().constData());
         }
         cout<<endl;

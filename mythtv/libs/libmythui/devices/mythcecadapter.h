@@ -33,17 +33,17 @@ class MythCECAdapter
     Q_DECLARE_FLAGS(MythCECActions, MythCECAction)
 
 #if CEC_LIB_VERSION_MAJOR <= 3
-    static int  LogMessageCallback(void*, const cec_log_message);
-    static int  KeyPressCallback  (void*, const cec_keypress);
-    static int  CommandCallback   (void*, const cec_command);
-    static int  AlertCallback     (void*, const libcec_alert, const libcec_parameter);
+    static int  LogMessageCallback(void* /*unused*/, const cec_log_message Message);
+    static int  KeyPressCallback  (void* /*unused*/, const cec_keypress Keypress);
+    static int  CommandCallback   (void* /*unused*/, const cec_command Command);
+    static int  AlertCallback     (void* /*unused*/, const libcec_alert Alert, const libcec_parameter Data);
 #else
-    static void LogMessageCallback(void*, const cec_log_message*);
-    static void KeyPressCallback  (void*, const cec_keypress*);
-    static void CommandCallback   (void*, const cec_command*);
-    static void AlertCallback     (void*, const libcec_alert, const libcec_parameter);
+    static void LogMessageCallback(void* /*unused*/, const cec_log_message* Message);
+    static void KeyPressCallback  (void* /*unused*/, const cec_keypress* Keypress);
+    static void CommandCallback   (void* /*unused*/, const cec_command* Command);
+    static void AlertCallback     (void* /*unused*/, libcec_alert Alert, libcec_parameter Data);
 #endif
-    static void SourceCallback    (void*, const cec_logical_address, const uint8_t);
+    static void SourceCallback    (void* /*unused*/, cec_logical_address Address, uint8_t Activated);
     static QString AddressToString(int Address);
 
     MythCECAdapter() = default;
@@ -56,9 +56,9 @@ class MythCECAdapter
     void        HandleActions (MythCECActions Actions);
     static int  HandleCommand (const cec_command &Command);
     static int  HandleKeyPress(const cec_keypress &Key);
-    static void HandleSource  (const cec_logical_address Address, const uint8_t Activated);
+    static void HandleSource  (cec_logical_address Address, uint8_t Activated);
     static int  LogMessage    (const cec_log_message &Message);
-    static int  HandleAlert   (const libcec_alert Alert, const libcec_parameter &Data);
+    static int  HandleAlert   (libcec_alert Alert, const libcec_parameter &Data);
 
   protected:
     ICECAdapter   *m_adapter            { nullptr };

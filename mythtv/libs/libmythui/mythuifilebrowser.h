@@ -2,6 +2,10 @@
 #ifndef MYTHUIFILEBROWSER_H_
 #define MYTHUIFILEBROWSER_H_
 
+// C++ headers
+#include <utility>
+
+// QT headers
 #include <QDir>
 #include <QEvent>
 #include <QFileInfo>
@@ -47,7 +51,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
     void setIsDir(bool isDir) { m_isDir = isDir; m_isFile = !isDir; }
     void setIsFile(bool isFile) { m_isFile = isFile; m_isDir = !isFile; }
     void setIsParentDir(bool isParentDir) { m_isParentDir = isParentDir; }
-    void setSGDir(QString sgDir) { m_storageGroupDir = sgDir; }
+    void setSGDir(QString sgDir) { m_storageGroupDir = std::move(sgDir); }
 
     QString hostName(void) const { return m_hostName; }
     QString storageGroup(void) const { return m_storageGroup; }
@@ -85,7 +89,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void SetTypeFilter(QDir::Filters filter) { m_typeFilter = filter; }
-    void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
+    void SetNameFilter(QStringList filter) { m_nameFilter = std::move(filter); }
 
   private slots:
     void OKPressed(void);

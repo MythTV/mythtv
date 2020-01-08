@@ -55,10 +55,10 @@ class PaneDVBC : public GroupSetting
     QString modulation(void) const { return m_pmodulation->getValue(); }
 
     void setFrequency(uint frequency)      { m_pfrequency->setValue(frequency);  }
-    void setSymbolrate(QString symbolrate) { m_psymbolrate->setValue(symbolrate);}
-    void setInversion(QString inversion)   { m_pinversion->setValue(inversion);  }
-    void setModulation(QString modulation) { m_pmodulation->setValue(modulation);}
-    void setFec(QString fec)               { m_pfec->setValue(fec);              }
+    void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
+    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
+    void setModulation(const QString& modulation) { m_pmodulation->setValue(modulation);}
+    void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
 
   protected:
     ScanFrequency      *m_pfrequency  {nullptr};

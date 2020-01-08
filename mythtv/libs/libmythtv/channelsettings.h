@@ -149,7 +149,7 @@ class MTV_PUBLIC ChannelOptionsRawTS: public GroupSetting
 
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
   private:
     const ChannelID &m_cid;

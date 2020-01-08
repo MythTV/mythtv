@@ -21,6 +21,9 @@ class FirewireChannel : public DTVChannel
                     FireWireDBOptions firewire_opts);
     ~FirewireChannel() override;
 
+    FirewireChannel(const FirewireChannel &) = delete;            // not copyable
+    FirewireChannel &operator=(const FirewireChannel &) = delete; // not copyable
+
     // Commands
      bool Open(void) override; // ChannelBase
     void Close(void) override; // ChannelBase
@@ -44,8 +47,6 @@ class FirewireChannel : public DTVChannel
         { return true; }
 
   private:
-    FirewireChannel(const FirewireChannel &) = delete;            // not copyable
-    FirewireChannel &operator=(const FirewireChannel &) = delete; // not copyable
     virtual FirewireDevice::PowerState GetPowerState(void) const;
     virtual FirewireDevice *GetFirewireDevice(void) { return m_device; }
 

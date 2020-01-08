@@ -16,7 +16,7 @@ struct AVDRMFrameDescriptor;
 class MythEGLDMABUF
 {
   public:
-    MythEGLDMABUF(MythRenderOpenGL *Context);
+    explicit MythEGLDMABUF(MythRenderOpenGL *Context);
    ~MythEGLDMABUF() = default;
     static bool HaveDMABuf(MythRenderOpenGL *Context);
     vector<MythVideoTexture*> CreateTextures(AVDRMFrameDescriptor* Desc,

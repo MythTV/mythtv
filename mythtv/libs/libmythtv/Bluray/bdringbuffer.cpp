@@ -1638,6 +1638,7 @@ void BDRingBuffer::ClearOverlays(void)
         overlay = nullptr;
     }
 
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_overlayPlanes.size(); i++)
     {
         BDOverlay*& osd = m_overlayPlanes[i];

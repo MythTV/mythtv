@@ -25,7 +25,7 @@
 class MBroadcastSocketDevice : public MSocketDevice
 {
   public:
-    MBroadcastSocketDevice(QString sAddress, quint16 nPort) :
+    MBroadcastSocketDevice(const QString& sAddress, quint16 nPort) :
         MSocketDevice(MSocketDevice::Datagram),
         m_address(sAddress), m_port(nPort)
     {

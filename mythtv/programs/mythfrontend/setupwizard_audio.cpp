@@ -138,10 +138,9 @@ void AudioSetupWizard::Init(void)
 
     if (!current.isEmpty())
     {
-        for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
-             it != m_outputlist->end(); ++it)
+        foreach (const auto & ao, *m_outputlist)
         {
-            if (it->m_name == current)
+            if (ao.m_name == current)
             {
                 found = true;
                 break;
@@ -164,10 +163,9 @@ void AudioSetupWizard::Init(void)
             delete adc;
         }
     }
-    for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
-         it != m_outputlist->end(); ++it)
+    foreach (const auto & ao, *m_outputlist)
     {
-        QString name = it->m_name;
+        QString name = ao.m_name;
         auto *output = new MythUIButtonListItem(m_audioDeviceButtonList, name);
         output->SetData(name);
     }
@@ -197,12 +195,11 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 
     AudioOutputSettings settings;
 
-    for (AudioOutput::ADCVect::const_iterator it = m_outputlist->begin();
-         it != m_outputlist->end(); ++it)
+    foreach (const auto & ao, *m_outputlist)
     {
-        if (it->m_name == out)
+        if (ao.m_name == out)
         {
-            settings = it->m_settings;
+            settings = ao.m_settings;
             break;
         }
     }

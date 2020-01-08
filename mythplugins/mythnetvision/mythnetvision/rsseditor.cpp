@@ -37,8 +37,8 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
-        for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
-            ret.append(QString("*.").append(*p));
+        foreach (auto & ext, exts)
+            ret.append(QString("*.").append(ext));
 
         return ret;
     }
@@ -420,16 +420,15 @@ void RSSEditor::fillRSSButtonList()
 
     m_sites->Reset();
 
-    for (RSSSite::rssList::iterator i = m_siteList.begin();
-            i != m_siteList.end(); ++i)
+    foreach (auto & site, m_siteList)
     {
-        auto *item = new MythUIButtonListItem(m_sites, (*i)->GetTitle());
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetText((*i)->GetDescription(), "description");
-        item->SetText((*i)->GetURL(), "url");
-        item->SetText((*i)->GetAuthor(), "author");
-        item->SetData(qVariantFromValue(*i));
-        item->SetImage((*i)->GetImage());
+        auto *item = new MythUIButtonListItem(m_sites, site->GetTitle());
+        item->SetText(site->GetTitle(), "title");
+        item->SetText(site->GetDescription(), "description");
+        item->SetText(site->GetURL(), "url");
+        item->SetText(site->GetAuthor(), "author");
+        item->SetData(qVariantFromValue(site));
+        item->SetImage(site->GetImage());
     }
 }
 

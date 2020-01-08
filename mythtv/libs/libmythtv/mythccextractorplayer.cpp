@@ -311,8 +311,8 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
     };
 
     // for each CC of each video...
-    CC608Info::iterator it = m_cc608Info.begin();
-    for (; it != m_cc608Info.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_cc608Info.begin(); it != m_cc608Info.end(); ++it)
     {
         while (true)
         {
@@ -351,15 +351,14 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 void MythCCExtractorPlayer::Process608Captions(uint flags)
 {
     int i = 0;
-    CC608Info::iterator cc608it = m_cc608Info.begin();
-    for (; cc608it != m_cc608Info.end(); ++cc608it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto cc608it = m_cc608Info.begin(); cc608it != m_cc608Info.end(); ++cc608it)
     {
         QString stream_id_str = (m_cc608Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         CC608StreamType &subs = (*cc608it).m_subs;
-        CC608StreamType::iterator it = subs.begin();
-        for (; it != subs.end(); ++it)
+        for (auto it = subs.begin(); it != subs.end(); ++it)
         {
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
@@ -412,8 +411,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 void MythCCExtractorPlayer::Ingest708Captions(void)
 {
     // For each window of each service of each video...
-    CC708Info::const_iterator it = m_cc708Info.begin();
-    for (; it != m_cc708Info.end(); ++it)
+    for (auto it = m_cc708Info.cbegin(); it != m_cc708Info.cend(); ++it)
     {
         for (uint serviceIdx = 1; serviceIdx < k708MaxServices; ++serviceIdx)
         {
@@ -454,14 +452,12 @@ void MythCCExtractorPlayer::Ingest708Caption(
     cc708win[windowIdx].text = winContent;
 
     QMap<uint, QStringList> orderedContent;
-    QMap<int, Window>::const_iterator ccIt = cc708win.begin();
-    for (; ccIt != cc708win.end() ; ++ccIt)
+    foreach (const auto & ccIt, cc708win)
     {
-        uint idx = (*ccIt).row * 1000 + (*ccIt).column;
-        for (QStringList::const_iterator sit = (*ccIt).text.begin();
-             sit != (*ccIt).text.end(); ++sit)
+        uint idx = ccIt.row * 1000 + ccIt.column;
+        foreach (const auto & str, ccIt.text)
         {
-            orderedContent[idx] += (*sit);
+            orderedContent[idx] += str;
         }
     }
 
@@ -478,15 +474,14 @@ void MythCCExtractorPlayer::Ingest708Caption(
 void MythCCExtractorPlayer::Process708Captions(uint flags)
 {
     int i = 0;
-    CC708Info::iterator cc708it = m_cc708Info.begin();
-    for (; cc708it != m_cc708Info.end(); ++cc708it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto cc708it = m_cc708Info.begin(); cc708it != m_cc708Info.end(); ++cc708it)
     {
         QString stream_id_str = (m_cc708Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         CC708StreamType &subs = (*cc708it).m_subs;
-        CC708StreamType::iterator it = subs.begin();
-        for (; it != subs.end(); ++it)
+        for (auto it = subs.begin(); it != subs.end(); ++it)
         {
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
@@ -552,16 +547,15 @@ static QStringList to_string_list(const TeletextSubPage &subPage)
 
 void MythCCExtractorPlayer::IngestTeletext(void)
 {
-    TeletextInfo::iterator ttxit = m_ttxInfo.begin();
-    for (; ttxit != m_ttxInfo.end(); ++ttxit)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto ttxit = m_ttxInfo.begin(); ttxit != m_ttxInfo.end(); ++ttxit)
     {
         using qpii = QPair<int, int>;
         QSet<qpii> updatedPages = (*ttxit).m_reader->GetUpdatedPages();
         if (updatedPages.isEmpty())
             continue;
 
-        QSet<qpii>::const_iterator it = updatedPages.constBegin();
-        for (; it != updatedPages.constEnd(); ++it)
+        for (auto it = updatedPages.constBegin(); it != updatedPages.constEnd(); ++it)
         {
             (*ttxit).m_reader->SetPage((*it).first, (*it).second);
             TeletextSubPage *subpage = (*ttxit).m_reader->FindSubPage();
@@ -579,15 +573,14 @@ void MythCCExtractorPlayer::IngestTeletext(void)
 void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 {
     int i = 0;
-    TeletextInfo::iterator ttxit = m_ttxInfo.begin();
-    for (; ttxit != m_ttxInfo.end(); ++ttxit)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto ttxit = m_ttxInfo.begin(); ttxit != m_ttxInfo.end(); ++ttxit)
     {
         QString stream_id_str = (m_cc608Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         TeletextStreamType &subs = (*ttxit).m_subs;
-        TeletextStreamType::iterator it = subs.begin();
-        for (; it != subs.end(); ++it)
+        for (auto it = subs.begin(); it != subs.end(); ++it)
         {
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
@@ -639,8 +632,8 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 
 void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 {
-    DVBSubInfo::iterator subit = m_dvbsubInfo.begin();
-    for (; subit != m_dvbsubInfo.end(); ++subit)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto subit = m_dvbsubInfo.begin(); subit != m_dvbsubInfo.end(); ++subit)
     {
         /// INFO -- start
         if ((*subit).m_reader->HasTextSubtitles())
@@ -739,9 +732,8 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 {
     // Process (DVB) subtitle streams.
-    DVBSubInfo::iterator subit = m_dvbsubInfo.begin();
     int subtitleStreamCount = 0;
-    for (; subit != m_dvbsubInfo.end(); ++subit)
+    for (auto subit = m_dvbsubInfo.begin(); subit != m_dvbsubInfo.end(); ++subit)
     {
         int langCode = 0;
         auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);

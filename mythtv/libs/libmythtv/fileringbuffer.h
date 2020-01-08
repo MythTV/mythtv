@@ -19,7 +19,7 @@ class MTV_PUBLIC FileRingBuffer : public RingBuffer
     // General Commands
     bool OpenFile(const QString &lfilename,
                   uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
-    bool ReOpen(QString newFilename = "") override; // RingBuffer
+    bool ReOpen(const QString& newFilename = "") override; // RingBuffer
 
   protected:
     FileRingBuffer(const QString &lfilename,

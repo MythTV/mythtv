@@ -110,7 +110,7 @@ HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
 {
 }
 
-bool HouseKeeperTask::CheckRun(QDateTime now)
+bool HouseKeeperTask::CheckRun(const QDateTime& now)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("Checking to run %1").arg(GetTag()));
     bool check = false;
@@ -385,7 +385,7 @@ void PeriodicHouseKeeperTask::SetLastRun(const QDateTime& last, bool successful)
     m_currentProb = 1.0;
 }
 
-bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
+bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 {
     int elapsed = GetLastRun().secsTo(now);
 
@@ -616,9 +616,8 @@ HouseKeeper::~HouseKeeper(void)
         // issue a terminate call to any long-running tasks
         // this is just a noop unless overwritten by a subclass
         QMutexLocker mapLock(&m_mapLock);
-        QMap<QString,HouseKeeperTask*>::iterator it = m_taskMap.begin();
-        for (; it != m_taskMap.end(); ++it)
-            (*it)->Terminate();
+        foreach (auto & it, m_taskMap)
+            it->Terminate();
     }
 
     if (!m_threadList.isEmpty())

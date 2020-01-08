@@ -645,8 +645,8 @@ bool WakeOnLAN(const QString& MAC)
     }
 
     for (int x = 0; x < 16; x++)
-        for (int y = 0; y < 6; y++)
-            msg[msglen++] = macaddr[y];
+        for (int y : macaddr)
+            msg[msglen++] = y;
 
     LOG(VB_NETWORK, LOG_INFO,
             QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));

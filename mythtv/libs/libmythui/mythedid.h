@@ -19,8 +19,8 @@ class MUI_PUBLIC MythEDID
         float whitepoint[2];
     };
 
-    MythEDID(void) { }
-    MythEDID(QByteArray &Data);
+    MythEDID(void) = default;
+    explicit MythEDID(QByteArray &Data);
     MythEDID(const char* Data, int Length);
 
     bool        Valid             (void) const;

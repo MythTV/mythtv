@@ -52,10 +52,9 @@ static bool performActualUpdate(const QStringList &updates,
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Upgrading to MythVideo schema version %1") .arg(version));
 
-    for (QStringList::const_iterator p = updates.begin();
-         p != updates.end(); ++p)
+    foreach (const auto & update, updates)
     {
-        if (!query.exec(*p))
+        if (!query.exec(update))
         {
             MythDB::DBError("performActualUpdate", query);
             return false;

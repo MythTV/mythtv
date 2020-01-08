@@ -472,12 +472,12 @@ void MDBManager::CloseDatabases()
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 
-    for (DBList::iterator it = list.begin(); it != list.end(); ++it)
+    foreach (auto & conn, list)
     {
         LOG(VB_DATABASE, LOG_INFO,
-            "Closing DB connection named '" + (*it)->m_name + "'");
-        (*it)->m_db.close();
-        delete (*it);
+            "Closing DB connection named '" + conn->m_name + "'");
+        conn->m_db.close();
+        delete conn;
         m_connCount--;
     }
 
@@ -651,6 +651,7 @@ bool MSqlQuery::exec()
         QString err = MythDB::GetError("MSqlQuery", *this);
         MSqlBindings tmp = QSqlQuery::boundValues();
         bool has_null_strings = false;
+        // NOLINTNEXTLINE(modernize-loop-convert)
         for (MSqlBindings::iterator it = tmp.begin(); it != tmp.end(); ++it)
         {
             if (it->type() != QVariant::String)

@@ -933,13 +933,13 @@ void EditAlbumartDialog::updateImageGrid(void)
 
     m_coverartList->Reset();
 
-    for (int x = 0; x < albumArtList->size(); x++)
+    foreach (auto art, *albumArtList)
     {
         auto *item = new MythUIButtonListItem(m_coverartList,
-                                     AlbumArtImages::getTypeName(albumArtList->at(x)->m_imageType),
-                                     qVariantFromValue(albumArtList->at(x)));
-        item->SetImage(albumArtList->at(x)->m_filename);
-        QString state = albumArtList->at(x)->m_embedded ? "tag" : "file";
+                                     AlbumArtImages::getTypeName(art->m_imageType),
+                                     qVariantFromValue(art));
+        item->SetImage(art->m_filename);
+        QString state = art->m_embedded ? "tag" : "file";
         item->DisplayState(state, "locationstate");
     }
 }

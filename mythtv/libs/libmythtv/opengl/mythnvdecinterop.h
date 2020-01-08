@@ -28,7 +28,7 @@ class MythNVDECInterop : public MythOpenGLInterop
 
   protected:
     static Type GetInteropType(VideoFrameType Format);
-    MythNVDECInterop(MythRenderOpenGL *Context);
+    explicit MythNVDECInterop(MythRenderOpenGL *Context);
    ~MythNVDECInterop() override;
 
   private:

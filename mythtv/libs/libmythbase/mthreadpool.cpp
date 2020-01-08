@@ -282,10 +282,9 @@ void MThreadPool::DeletePoolThreads(void)
     waitForDone();
 
     QMutexLocker locker(&m_priv->m_lock);
-    QSet<MPoolThread*>::iterator it = m_priv->m_availThreads.begin();
-    for (; it != m_priv->m_availThreads.end(); ++it)
+    foreach (auto thread, m_priv->m_availThreads)
     {
-        m_priv->m_deleteThreads.push_front(*it);
+        m_priv->m_deleteThreads.push_front(thread);
     }
     m_priv->m_availThreads.clear();
 
@@ -552,11 +551,10 @@ void MThreadPool::ReleaseThread(void)
 static void print_set(QString title, QSet<MPoolThread*> set)
 {
     LOG(VB_GENERAL, LOG_INFO, title);
-    QSet<MPoolThread*>::iterator it = set.begin();
-    for (; it != set.end(); ++it)
+    foreach (auto item, set)
     {
         LOG(VB_GENERAL, LOG_INFO, QString(" : 0x%1")
-            .arg((quint64)(*it),0,16));
+            .arg((quint64)item,0,16));
     }
     LOG(VB_GENERAL, LOG_INFO, "");
 }

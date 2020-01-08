@@ -1542,9 +1542,9 @@ QStringList MetadataOptions::GetSupportedImageExtensionFilter()
     QStringList ret;
 
     QList<QByteArray> exts = QImageReader::supportedImageFormats();
-    for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
+    foreach (auto & ext, exts)
     {
-        ret.append(QString("*.").append(*p));
+        ret.append(QString("*.").append(ext));
     }
 
     return ret;
@@ -2058,11 +2058,11 @@ void SchedOptMixin::Load(void)
                                      qVariantFromValue(0));
 
             vector<uint> inputids = CardUtil::GetSchedInputList();
-            for (size_t i = 0; i < inputids.size(); ++i)
+            for (uint id : inputids)
             {
                 new MythUIButtonListItem(m_inputList,
                     QObject::tr("Prefer input %1")
-                    .arg(CardUtil::GetDisplayName(inputids[i])), inputids[i]);
+                    .arg(CardUtil::GetDisplayName(id)), id);
             }
         }
         m_inputList->SetValueByData(m_rule->m_prefInput);

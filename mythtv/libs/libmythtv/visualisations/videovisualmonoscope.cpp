@@ -11,7 +11,7 @@ VideoVisualMonoScope::VideoVisualMonoScope(AudioPlayer *Audio, MythRender *Rende
 
 VideoVisualMonoScope::~VideoVisualMonoScope()
 {
-    MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return;
 
@@ -31,7 +31,7 @@ QString VideoVisualMonoScope::Name(void)
 
 MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
 {
-    MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return nullptr;
 
@@ -97,7 +97,7 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     return nullptr;
 }
 
-void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
+void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPaintDevice* /*device*/)
 {
     if (m_disabled)
         return;
@@ -119,7 +119,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
         int xstep = m_area.width() / NUM_SAMPLES + 1;
 
         double index = 0;
-        double const step = node->m_length / NUM_SAMPLES;
+        double const step = static_cast<double>(node->m_length) / NUM_SAMPLES;
         for ( int i = 0; i < NUM_SAMPLES; i++)
         {
             auto indexTo = static_cast<long>(index + step);
@@ -186,7 +186,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
                                 static_cast<GLfloat>(color.blueF()), 1.0F);
     render->SetShaderProjection(m_shader);
     render->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    render->glLineWidth(static_cast<int>(m_area.height() * 0.004f));
+    render->glLineWidth(static_cast<int>(m_area.height() * 0.004F));
     render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
     render->glLineWidth(1);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);

@@ -23,7 +23,7 @@ using namespace std;
 #include "mthread.h"
 
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
-    QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<MSG));
+    QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<(MSG)));
 
 inline QString sm_flags_to_string(uint64_t flags);
 
@@ -41,6 +41,9 @@ class SignalMonitor : protected MThread
                                ChannelBase *channel,
                                bool release_stream);
     ~SignalMonitor() override;
+
+    // Prevent implicit conversion of wrongly ordered arguments
+    SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //
@@ -119,8 +122,6 @@ class SignalMonitor : protected MThread
   protected:
     SignalMonitor(int _inputid, ChannelBase *_channel,
                   bool _release_stream, uint64_t wait_for_mask);
-    // Prevent implicit conversion of wrongly ordered arguments
-    SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
     void run(void) override; // MThread
 

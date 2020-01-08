@@ -18,7 +18,7 @@ class MythDisplayX11 : public MythDisplay
     MythDisplayX11();
    ~MythDisplayX11() override = default;
     static bool IsAvailable(void);
-    void UpdateCurrentMode(void) override final;
+    void UpdateCurrentMode(void) final;
 
 #ifdef USING_XRANDR
     bool UsingVideoModes(void) override;
@@ -26,7 +26,7 @@ class MythDisplayX11 : public MythDisplay
     bool SwitchToVideoMode(QSize Size, double DesiredRate) override;
 
   private:
-    XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
+    static XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
                              QScreen* qScreen, RROutput* Output = nullptr);
 #endif
 

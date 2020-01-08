@@ -141,14 +141,14 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
     if (!m_Children.isEmpty())
     {
-        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        foreach (auto & draw, m_DrawOrder)
         {
-            if (*it != screen && !(*it)->IsDeleting())
+            if (draw != screen && !draw->IsDeleting())
             {
-                m_topScreen = (*it);
-                (*it)->SetAlpha(255);
+                m_topScreen = draw;
+                draw->SetAlpha(255);
                 if (poppedFullscreen)
-                    (*it)->aboutToShow();
+                    draw->aboutToShow();
             }
         }
     }
@@ -236,10 +236,8 @@ void MythScreenStack::RecalculateDrawOrder(void)
     if (m_Children.isEmpty())
         return;
 
-    for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
+    foreach (auto screen, m_Children)
     {
-        MythScreenType *screen = (*it);
-
         if (screen->IsFullscreen())
             m_DrawOrder.clear();
 
@@ -262,10 +260,10 @@ void MythScreenStack::DoNewFadeTransition(void)
 
     if (m_newTop->IsFullscreen())
     {
-        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        foreach (auto & draw, m_DrawOrder)
         {
-            if (!(*it)->IsDeleting())
-                (*it)->AdjustAlpha(1, -kFadeVal);
+            if (!draw->IsDeleting())
+                draw->AdjustAlpha(1, -kFadeVal);
         }
 
         m_DrawOrder.push_back(m_newTop);
@@ -314,11 +312,9 @@ void MythScreenStack::CheckDeletes(bool force)
         {
             bool found = false;
 
-            for (auto test = m_DrawOrder.begin();
-                 test != m_DrawOrder.end();
-                 ++test)
+            foreach (auto & test, m_DrawOrder)
             {
-                if (*it == *test)
+                if (*it == test)
                 {
                     found = true;
                     break;
@@ -366,14 +362,14 @@ QString MythScreenStack::GetLocation(bool fullPath) const
     if (fullPath)
     {
         QString path;
-        for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
+        foreach (auto child, m_Children)
         {
-            if (!(*it)->IsDeleting())
+            if (!child->IsDeleting())
             {
                 if (path.isEmpty())
-                    path = (*it)->objectName();
+                    path = child->objectName();
                 else
-                    path += '/' + (*it)->objectName();
+                    path += '/' + child->objectName();
             }
         }
         return path;

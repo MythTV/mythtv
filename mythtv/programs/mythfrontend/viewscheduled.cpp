@@ -458,13 +458,11 @@ void ViewScheduled::FillList()
         if (m_conflictBool)
         {
             // Find first conflict and store in m_conflictDate field
-            ProgramList::const_iterator it = plist.begin();
-            for (; it != plist.end(); ++it)
+            for (auto & conflict : plist)
             {
-                ProgramInfo &p = **it;
-                if (p.GetRecordingStatus() == RecStatus::Conflict)
+                if (conflict->GetRecordingStatus() == RecStatus::Conflict)
                 {
-                    m_conflictDate = p.GetRecordingStartTime()
+                    m_conflictDate = conflict->GetRecordingStartTime()
                         .toLocalTime().date();
                     break;
                 }

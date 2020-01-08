@@ -44,12 +44,11 @@ TVBrowseHelper::TVBrowseHelper(
     ChannelUtil::SortChannels(
         m_dbAllChannels, db_channel_ordering, false);
 
-    ChannelInfoList::const_iterator it = m_dbAllChannels.begin();
-    for (; it != m_dbAllChannels.end(); ++it)
+    for (const auto & chan : m_dbAllChannels)
     {
-        m_dbChanidToChannum[(*it).m_chanId] = (*it).m_chanNum;
-        m_dbChanidToSourceid[(*it).m_chanId] = (*it).m_sourceId;
-        m_dbChannumToChanids.insert((*it).m_chanNum,(*it).m_chanId);
+        m_dbChanidToChannum[chan.m_chanId] = chan.m_chanNum;
+        m_dbChanidToSourceid[chan.m_chanId] = chan.m_sourceId;
+        m_dbChannumToChanids.insert(chan.m_chanNum,chan.m_chanId);
     }
 
     m_dbAllVisibleChannels = ChannelUtil::GetChannels(
@@ -223,32 +222,29 @@ uint TVBrowseHelper::GetChanId(
 {
     if (pref_sourceid)
     {
-        auto it = m_dbAllChannels.cbegin();
-        for (; it != m_dbAllChannels.cend(); ++it)
+        for (const auto & chan : m_dbAllChannels)
         {
-            if ((*it).m_sourceId == pref_sourceid && (*it).m_chanNum == channum)
-                return (*it).m_chanId;
+            if (chan.m_sourceId == pref_sourceid && chan.m_chanNum == channum)
+                return chan.m_chanId;
         }
     }
 
     if (pref_cardid)
     {
-        auto it = m_dbAllChannels.cbegin();
-        for (; it != m_dbAllChannels.cend(); ++it)
+        for (const auto & chan : m_dbAllChannels)
         {
-            if ((*it).GetInputIds().contains(pref_cardid) &&
-                (*it).m_chanNum == channum)
-                return (*it).m_chanId;
+            if (chan.GetInputIds().contains(pref_cardid) &&
+                chan.m_chanNum == channum)
+                return chan.m_chanId;
         }
     }
 
     if (m_dbBrowseAllTuners)
     {
-        auto it = m_dbAllChannels.cbegin();
-        for (; it != m_dbAllChannels.cend(); ++it)
+        for (const auto & chan : m_dbAllChannels)
         {
-            if ((*it).m_chanNum == channum)
-                return (*it).m_chanId;
+            if (chan.m_chanNum == channum)
+                return chan.m_chanId;
         }
     }
 
@@ -521,11 +517,11 @@ void TVBrowseHelper::run()
             {
                 if (!chanids.empty())
                 {
-                    for (size_t i = 0; i < chanids.size(); i++)
+                    for (uint chanid : chanids)
                     {
-                        if (TV::IsTunable(ctx, chanids[i]))
+                        if (TV::IsTunable(ctx, chanid))
                         {
-                            infoMap["chanid"] = QString::number(chanids[i]);
+                            infoMap["chanid"] = QString::number(chanid);
                             GetNextProgramDB(direction, infoMap);
                             break;
                         }

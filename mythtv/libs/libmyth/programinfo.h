@@ -201,7 +201,7 @@ class MPUBLIC ProgramInfo
 
                 QString seriesid,
                 QString programid,
-                const CategoryType catType,
+                CategoryType catType,
 
                 float stars,
                 uint year,
@@ -279,7 +279,7 @@ class MPUBLIC ProgramInfo
           m_startTs(std::move(_startts)), m_endTs(std::move(_endts))
     { ensureSortFields(); }
     ProgramInfo(QStringList::const_iterator &it,
-                QStringList::const_iterator  end)
+                const QStringList::const_iterator&  end)
     {
         if (!FromStringList(it, end))
             ProgramInfo::clear();
@@ -719,7 +719,7 @@ class MPUBLIC ProgramInfo
     QString CreateRecordBasename(const QString &ext) const;
 
     bool  LoadProgramFromRecorded(
-        const uint chanid, const QDateTime &recstartts);
+        uint chanid, const QDateTime &recstartts);
 
     bool FromStringList(QStringList::const_iterator &it,
                         const QStringList::const_iterator&  end);
@@ -848,7 +848,7 @@ MPUBLIC bool LoadFromProgram(
     uint               &count);
 
 MPUBLIC ProgramInfo*  LoadProgramFromProgram(
-        const uint chanid, const QDateTime &starttime);
+        uint chanid, const QDateTime &starttime);
 
 MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
@@ -877,7 +877,7 @@ template<typename TYPE>
 bool LoadFromScheduler(
     AutoDeleteDeque<TYPE*> &destination,
     bool               &hasConflicts,
-    QString             altTable = "",
+    const QString&      altTable = "",
     int                 recordid = -1)
 {
     destination.clear();

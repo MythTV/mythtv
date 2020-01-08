@@ -169,8 +169,7 @@ void HDHRStreamHandler::run(void)
             continue;
         }
 
-        StreamDataList::const_iterator sit = m_streamDataList.begin();
-        for (; sit != m_streamDataList.end(); ++sit)
+        for (auto sit = m_streamDataList.cbegin(); sit != m_streamDataList.cend(); ++sit)
             remainder = sit.key()->ProcessData(data_buffer, data_length);
 
         WriteMPTS(data_buffer, data_length - remainder);
@@ -254,8 +253,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
     vector<uint> range_min;
     vector<uint> range_max;
 
-    PIDInfoMap::const_iterator it = m_pidInfo.begin();
-    for (; it != m_pidInfo.end(); ++it)
+    for (auto it = m_pidInfo.cbegin(); it != m_pidInfo.cend(); ++it)
     {
         range_min.push_back(it.key());
         PIDInfoMap::const_iterator eit = it;

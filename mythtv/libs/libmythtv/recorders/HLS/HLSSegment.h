@@ -35,7 +35,7 @@ class HLSRecSegment
     bool DecodeData(const uint8_t *IV, QByteArray& data);
     bool HasKeyPath(void) const { return !m_psz_key_path.isEmpty(); }
     QString KeyPath(void) const { return m_psz_key_path; }
-    void SetKeyPath(const QString path) { m_psz_key_path = path; }
+    void SetKeyPath(const QString& path) { m_psz_key_path = path; }
 #endif
 
   protected:

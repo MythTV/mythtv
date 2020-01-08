@@ -212,9 +212,8 @@ void HTTPReader::WriteBytes()
     int remainder = 0;
     {
         QMutexLocker locker(&m_parent->m_listenerLock);
-        HTTPTSStreamHandler::StreamDataList::const_iterator sit;
-        sit = m_parent->m_streamDataList.begin();
-        for (; sit != m_parent->m_streamDataList.end(); ++sit)
+        for (auto sit = m_parent->m_streamDataList.cbegin();
+             sit != m_parent->m_streamDataList.cend(); ++sit)
         {
             remainder = sit.key()->ProcessData(m_buffer, m_size);
         }

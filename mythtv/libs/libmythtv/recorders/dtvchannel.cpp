@@ -347,17 +347,16 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         int pcrpid = -1;
         vector<uint> pids;
         vector<uint> types;
-        auto pit = pid_cache.begin();
-        for (; pit != pid_cache.end(); ++pit)
+        for (auto & pit : pid_cache)
         {
-            if (!pit->GetStreamID())
+            if (!pit.GetStreamID())
                 continue;
-            pids.push_back(pit->GetPID());
-            types.push_back(pit->GetStreamID());
-            if (pit->IsPCRPID())
-                pcrpid = pit->GetPID();
-            if ((pcrpid < 0) && StreamID::IsVideo(pit->GetStreamID()))
-                pcrpid = pit->GetPID();
+            pids.push_back(pit.GetPID());
+            types.push_back(pit.GetStreamID());
+            if (pit.IsPCRPID())
+                pcrpid = pit.GetPID();
+            if ((pcrpid < 0) && StreamID::IsVideo(pit.GetStreamID()))
+                pcrpid = pit.GetPID();
         }
         if (pcrpid < 0)
             pcrpid = pid_cache[0].GetPID();

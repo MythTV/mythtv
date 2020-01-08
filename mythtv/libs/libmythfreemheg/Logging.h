@@ -35,7 +35,7 @@ extern FILE *__mhlogStream;
 
 #define MHLOG(__level,__text) \
 do { \
-    if (__level & __mhlogoptions) \
+    if ((__level) & __mhlogoptions) \
         __mhlog(__text); \
 } while (false)
 

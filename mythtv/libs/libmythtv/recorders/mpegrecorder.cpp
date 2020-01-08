@@ -712,22 +712,22 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
     }
     s_controlDescriptionLock.unlock();
 
-    for (size_t i = 0; i < ext_ctrls.size(); i++)
+    for (auto & ext_ctrl : ext_ctrls)
     {
         struct v4l2_ext_controls ctrls {};
 
-        int value = ext_ctrls[i].value;
+        int value = ext_ctrl.value;
 
         ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
         ctrls.count       = 1;
-        ctrls.controls    = &ext_ctrls[i];
+        ctrls.controls    = &ext_ctrl;
 
         if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
             QMutexLocker locker(&s_controlDescriptionLock);
             LOG(VB_GENERAL, LOG_ERR, QString("mpegrecorder.cpp:set_ctrls(): ") +
                 QString("Could not set %1 to %2")
-                    .arg(s_controlDescription[ext_ctrls[i].id]).arg(value) +
+                    .arg(s_controlDescription[ext_ctrl.id]).arg(value) +
                     ENO);
         }
     }

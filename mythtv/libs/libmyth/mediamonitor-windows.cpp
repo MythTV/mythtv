@@ -105,10 +105,9 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
-    for (; itr != m_Devices.end(); ++itr)
+    foreach (auto & device, m_Devices)
     {
-        if ((*itr)->getDevicePath() == path)
+        if (device->getDevicePath() == path)
         {
             LOG(VB_MEDIA, LOG_INFO,
                      "MediamonitorWindows::AddDevice() -- " +

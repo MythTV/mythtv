@@ -950,9 +950,9 @@ void Ripper::artistChanged()
 
     if (!m_tracks->empty())
     {
-        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        foreach (auto track, *m_tracks)
         {
-            MusicMetadata *data = m_tracks->at(trackno)->metadata;
+            MusicMetadata *data = track->metadata;
             if (data)
             {
                 if (m_compilationCheck->GetBooleanCheckState())
@@ -979,9 +979,9 @@ void Ripper::albumChanged()
 
     if (!m_tracks->empty())
     {
-        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        foreach (auto track, *m_tracks)
         {
-            MusicMetadata *data = m_tracks->at(trackno)->metadata;
+            MusicMetadata *data = track->metadata;
             if (data)
                 data->setAlbum(newalbum);
         }
@@ -996,9 +996,9 @@ void Ripper::genreChanged()
 
     if (!m_tracks->empty())
     {
-        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        foreach (auto track, *m_tracks)
         {
-            MusicMetadata *data = m_tracks->at(trackno)->metadata;
+            MusicMetadata *data = track->metadata;
             if (data)
                 data->setGenre(newgenre);
         }
@@ -1013,9 +1013,9 @@ void Ripper::yearChanged()
 
     if (!m_tracks->empty())
     {
-        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        foreach (auto track, *m_tracks)
         {
-            MusicMetadata *data = m_tracks->at(trackno)->metadata;
+            MusicMetadata *data = track->metadata;
             if (data)
                 data->setYear(newyear.toInt());
         }
@@ -1031,9 +1031,9 @@ void Ripper::compilationChanged(bool state)
         if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the ablum...
-            for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+            foreach (auto track, *m_tracks)
             {
-                MusicMetadata *data = m_tracks->at(trackno)->metadata;
+                MusicMetadata *data = track->metadata;
                 if (data)
                 {
                     data->setCompilationArtist("");
@@ -1050,9 +1050,9 @@ void Ripper::compilationChanged(bool state)
         if (!m_tracks->empty())
         {
             // Update artist MetaData of each track on the album...
-            for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+            foreach (auto track, *m_tracks)
             {
-                MusicMetadata *data = m_tracks->at(trackno)->metadata;
+                MusicMetadata *data = track->metadata;
 
                 if (data)
                 {
@@ -1078,9 +1078,9 @@ void Ripper::switchTitlesAndArtists()
     QString tmp;
     if (!m_tracks->empty())
     {
-        for (int track = 0; track < m_tracks->size(); ++track)
+        foreach (auto track, *m_tracks)
         {
-            MusicMetadata *data = m_tracks->at(track)->metadata;
+            MusicMetadata *data = track->metadata;
 
             if (data)
             {

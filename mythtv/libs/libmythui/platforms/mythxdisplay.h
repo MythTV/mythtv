@@ -16,7 +16,7 @@
 // Std
 #include <vector>
 
-#define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
+#define XLOCK(dpy, arg) { (dpy)->Lock(); arg; (dpy)->Unlock(); }
 
 class MUI_PUBLIC MythXDisplay
 {

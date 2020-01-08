@@ -52,17 +52,17 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     // Methods to GET a URL
     void preCache(const QString &url);
     void queueDownload(const QString &url, const QString &dest,
-                       QObject *caller, const bool reload = false);
+                       QObject *caller, bool reload = false);
     void queueDownload(QNetworkRequest *req, QByteArray *data,
                        QObject *caller);
     bool download(const QString &url, const QString &dest,
-                  const bool reload = false);
+                  bool reload = false);
     bool download(const QString &url, QByteArray *data,
-                  const bool reload = false, QString *finalUrl = nullptr);
-    QNetworkReply *download(const QString &url, const bool reload = false);
+                  bool reload = false, QString *finalUrl = nullptr);
+    QNetworkReply *download(const QString &url, bool reload = false);
     bool download(QNetworkRequest *req, QByteArray *data);
     bool downloadAuth(const QString &url, const QString &dest,
-                      const bool reload = false,
+                      bool reload = false,
                       AuthCallback authCallback = nullptr,
                       void *authArg = nullptr,
                       const QHash<QByteArray, QByteArray> *headers = nullptr);
@@ -111,13 +111,13 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     // Helper methods for initializing and performing requests
     void queueItem(const QString &url, QNetworkRequest *req,
                    const QString &dest, QByteArray *data, QObject *caller,
-                   const MRequestType reqType = kRequestGet,
-                   const bool reload = false);
+                   MRequestType reqType = kRequestGet,
+                   bool reload = false);
 
     bool processItem(const QString &url, QNetworkRequest *req,
                      const QString &dest, QByteArray *data,
-                     const MRequestType reqType = kRequestGet,
-                     const bool reload = false,
+                     MRequestType reqType = kRequestGet,
+                     bool reload = false,
                      AuthCallback authCallback = nullptr,
                      void *authArg = nullptr,
                      const QHash<QByteArray, QByteArray> *headers = nullptr,
@@ -135,7 +135,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                             const QUrl& oldRedirectUrl) ;
 
     static bool saveFile(const QString &outFile, const QByteArray &data,
-                         const bool append = false);
+                         bool append = false);
 
     void updateCookieJar(QNetworkCookieJar *jar);
 

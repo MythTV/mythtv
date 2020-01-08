@@ -150,9 +150,6 @@ Checks: '-*,
         # Lots of changes to be done. ,
        -modernize-avoid-c-arrays,
 
-        # Not investigated yet. ,
-       -modernize-loop-convert,
-
         # Run again.  Seems like should do more.  Supposedly presence
         # of *any* of \\, \<squote>, \<dquote>, \?, octal, hex. ,
        -modernize-raw-string-literal,

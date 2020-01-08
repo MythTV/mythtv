@@ -131,11 +131,8 @@ void ExportNative::updateSizeBar()
 {
     int64_t size = 0;
 
-    for (int x = 0; x < m_archiveList.size(); x++)
-    {
-        ArchiveItem *a = m_archiveList.at(x);
+    foreach (auto a, m_archiveList)
         size += a->size;
-    }
 
     m_usedSpace = size / 1024 / 1024;
     uint freeSpace = m_archiveDestination.freeSpace / 1024;
@@ -234,10 +231,8 @@ void ExportNative::updateArchiveList(void)
     }
     else
     {
-        for (int x = 0;  x < m_archiveList.size(); x++)
+        foreach (auto a, m_archiveList)
         {
-            ArchiveItem *a = m_archiveList.at(x);
-
             auto* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
             item->SetData(qVariantFromValue(a));
         }
@@ -318,10 +313,8 @@ void ExportNative::saveConfiguration(void)
                     ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST, :DURATION, "
                     ":CUTDURATION, :VIDEOWIDTH, :VIDEOHEIGHT, :FILECODEC, "
                     ":VIDEOCODEC, :ENCODERPROFILE);");
-    for (int x = 0; x < m_archiveList.size(); x++)
+    foreach (auto a, m_archiveList)
     {
-        ArchiveItem *a = m_archiveList.at(x);
-
         query.bindValue(":TYPE", a->type);
         query.bindValue(":TITLE", a->title);
         query.bindValue(":SUBTITLE", a->subtitle);
@@ -389,10 +382,8 @@ void ExportNative::createConfigFile(const QString &filename)
     job.appendChild(media);
 
     // now loop though selected archive items and add them to the xml file
-    for (int x = 0; x < m_archiveList.size(); x++)
+    foreach (auto a, m_archiveList)
     {
-        ArchiveItem *a = m_archiveList.at(x);
-
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.toLower() );
         file.setAttribute("title", a->title);

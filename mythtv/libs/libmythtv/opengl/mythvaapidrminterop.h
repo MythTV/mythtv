@@ -11,11 +11,11 @@ struct AVDRMFrameDescriptor;
 class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
 {
   public:
-    MythVAAPIInteropDRM(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropDRM(MythRenderOpenGL *Context);
     ~MythVAAPIInteropDRM() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame,FrameScanType Scan) override final;
+                                      VideoFrame *Frame,FrameScanType Scan) final;
     static bool    IsSupported(MythRenderOpenGL *Context);
     void           DeleteTextures(void) override;
 

@@ -101,13 +101,12 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 
     vector<CardUtil::INPUT_TYPES> cardtypes;
 
-    vector<uint>::const_iterator it = cardids.begin();
-    for (; it != cardids.end(); ++it)
+    for (uint cardid : cardids)
     {
         CardUtil::INPUT_TYPES nType = CardUtil::ERROR_PROBE;
-        QString cardtype = CardUtil::GetRawInputType(*it);
+        QString cardtype = CardUtil::GetRawInputType(cardid);
         if (cardtype == "DVB")
-            cardtype = CardUtil::ProbeSubTypeName(*it);
+            cardtype = CardUtil::ProbeSubTypeName(cardid);
         nType = CardUtil::toInputType(cardtype);
 
         if ((CardUtil::ERROR_OPEN    == nType) ||

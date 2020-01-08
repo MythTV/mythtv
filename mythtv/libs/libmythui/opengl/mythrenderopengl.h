@@ -89,7 +89,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
   public:
     static MythRenderOpenGL* GetOpenGLRender(void);
     static MythRenderOpenGL* Create(void);
-    MythRenderOpenGL(const QSurfaceFormat &Format);
+    explicit MythRenderOpenGL(const QSurfaceFormat &Format);
 
     // MythRender
     void  ReleaseResources(void) override;
@@ -178,7 +178,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     // Prevent compiler complaints about using 0 as a null pointer.
     inline void glVertexAttribPointerI(GLuint Index, GLint Size, GLenum Type,
                                        GLboolean Normalize, GLsizei Stride,
-                                       const GLuint Value);
+                                       GLuint Value);
     // Framebuffers
     QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
 

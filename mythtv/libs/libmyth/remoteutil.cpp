@@ -547,13 +547,10 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
         return reclist;
     }
 
-    ProgramInfo *p = nullptr;
-    auto it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
     // only has RecStatus::Recording shows
-    for ( ; it != info->end(); ++it)
+    for (auto & p : *info)
     {
-        p = *it;
         if (p->GetRecordingStatus() == RecStatus::Recording ||
             p->GetRecordingStatus() == RecStatus::Tuning ||
             p->GetRecordingStatus() == RecStatus::Failing ||

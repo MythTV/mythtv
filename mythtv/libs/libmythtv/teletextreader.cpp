@@ -260,14 +260,14 @@ void TeletextReader::SetPage(int page, int subpage)
 
 void TeletextReader::Reset(void)
 {
-    for (uint mag = 0; mag < 8; mag++)
+    for (auto & mag : m_magazines)
     {
-        QMutexLocker lock(&m_magazines[mag].lock);
+        QMutexLocker lock(&mag.lock);
 
         // clear all sub pages in page
         int_to_page_t::iterator iter;
-        iter = m_magazines[mag].pages.begin();
-        while (iter != m_magazines[mag].pages.end())
+        iter = mag.pages.begin();
+        while (iter != mag.pages.end())
         {
             TeletextPage *page = &iter->second;
             page->subpages.clear();
@@ -275,10 +275,10 @@ void TeletextReader::Reset(void)
         }
 
         // clear pages
-        m_magazines[mag].pages.clear();
-        m_magazines[mag].current_page = 0;
-        m_magazines[mag].current_subpage = 0;
-        m_magazines[mag].loadingpage.active = false;
+        mag.pages.clear();
+        mag.current_page = 0;
+        mag.current_subpage = 0;
+        mag.loadingpage.active = false;
     }
     memset(m_header, ' ', 40);
 
@@ -363,8 +363,8 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
     ttpage->active = true;
     ttpage->subpagenum = subpage;
 
-    for (uint i = 0; i < 6; i++)
-        ttpage->floflink[i] = 0;
+    for (int & flof : ttpage->floflink)
+        flof = 0;
 
     ttpage->lang = lang;
     ttpage->flags = flags;

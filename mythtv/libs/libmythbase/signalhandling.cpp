@@ -96,10 +96,8 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
     connect(m_notifier, SIGNAL(activated(int)), this, SLOT(handleSignal()));
 
-    QList<int>::iterator it = signallist.begin();
-    for( ; it != signallist.end(); ++it )
+    foreach (int signum, signallist)
     {
-        int signum = *it;
         if (!s_defaultHandlerList.contains(signum))
         {
             cerr << "No default handler for signal " << signum << endl;
@@ -124,8 +122,8 @@ SignalHandler::~SignalHandler()
     }
 
     QMutexLocker locker(&m_sigMapLock);
-    QMap<int, SigHandlerFunc>::iterator it = m_sigMap.begin();
-    for ( ; it != m_sigMap.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_sigMap.begin(); it != m_sigMap.end(); ++it)
     {
         int signum = it.key();
         signal(signum, SIG_DFL);

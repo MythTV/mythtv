@@ -14,9 +14,8 @@ void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
 
     if (!sub.m_text.isEmpty())
     {
-        QStringList::const_iterator it = sub.m_text.begin();
-        for (; it != sub.m_text.end(); ++it)
-            m_outStream << *it << endl;
+        foreach (const auto & text, sub.m_text)
+            m_outStream << text << endl;
         m_outStream << endl;
     }
 }

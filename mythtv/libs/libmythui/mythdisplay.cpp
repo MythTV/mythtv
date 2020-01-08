@@ -710,7 +710,7 @@ std::vector<double> MythDisplay::GetRefreshRates(QSize Size)
     return modes[static_cast<size_t>(match)].RefreshRates();
 }
 
-bool MythDisplay::SwitchToVideoMode(QSize, double)
+bool MythDisplay::SwitchToVideoMode(QSize /*Size*/, double /*Framerate*/)
 {
     return false;
 }
@@ -908,13 +908,11 @@ void MythDisplay::DebugModes(void) const
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Available modes:");
-        auto it = m_videoModes.crbegin();
-        for ( ; it != m_videoModes.crend(); ++it)
+        for (auto it = m_videoModes.crbegin(); it != m_videoModes.crend(); ++it)
         {
             auto rates = (*it).RefreshRates();
             QStringList rateslist;
-            auto it2 = rates.crbegin();
-            for ( ; it2 != rates.crend(); ++it2)
+            for (auto it2 = rates.crbegin(); it2 != rates.crend(); ++it2)
                 rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
             LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
                 .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));

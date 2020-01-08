@@ -573,9 +573,8 @@ void Scheduler::FillRecordListFromMaster(void)
 
     QMutexLocker lockit(&m_schedLock);
 
-    auto it = schedList.begin();
-    for (; it != schedList.end(); ++it)
-        m_recList.push_back(*it);
+    for (auto & it : schedList)
+        m_recList.push_back(it);
 }
 
 void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
@@ -589,11 +588,8 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
                                "Day Start  End    G  I  T  N Pri");
 
-    auto i = list.begin();
-    for ( ; i != list.end(); ++i)
+    for (auto first : list)
     {
-        RecordingInfo *first = (*i);
-
         if (onlyFutureRecordings &&
             ((first->GetRecordingEndTime() < now &&
               first->GetScheduledEndTime() < now) ||
@@ -638,9 +634,8 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
 {
     QMutexLocker lockit(&m_schedLock);
 
-    for (auto dreciter = m_recList.begin(); dreciter != m_recList.end(); ++dreciter)
+    for (auto p : m_recList)
     {
-        RecordingInfo *p = *dreciter;
         if (p->IsSameTitleTimeslotAndChannel(*pginfo))
         {
             // FIXME!  If we are passed an RecStatus::Unknown recstatus, an
@@ -699,9 +694,8 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
 {
     QMutexLocker lockit(&m_schedLock);
 
-    for (auto dreciter = m_recList.begin(); dreciter != m_recList.end(); ++dreciter)
+    for (auto p : m_recList)
     {
-        RecordingInfo *p = *dreciter;
         if (p->GetInputID() == cardid && p->GetChanID() == chanid &&
             p->GetScheduledStartTime() == startts)
         {
@@ -786,14 +780,14 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     else
     {
         RecordingInfo *foundp = nullptr;
-        for (auto i = m_recList.begin(); i != m_recList.end(); ++i)
+        for (auto & p : m_recList)
         {
-            RecordingInfo *recp = *i;
+            RecordingInfo *recp = p;
             if (recp->GetInputID() == oldp->GetInputID() &&
                 recp->IsSameTitleStartTimeAndChannel(*oldp))
             {
                 *recp = *oldp;
-                foundp = *i;
+                foundp = p;
                 break;
             }
         }
@@ -824,16 +818,12 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
     QMutexLocker lockit(&m_schedLock);
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    auto it = slavelist.begin();
-    for (; it != slavelist.end(); ++it)
+    for (auto sp : slavelist)
     {
-        RecordingInfo *sp = *it;
         bool found = false;
 
-        for (auto ri = m_recList.begin(); ri != m_recList.end(); ++ri)
+        for (auto rp : m_recList)
         {
-            RecordingInfo *rp = *ri;
-
             if (!sp->GetTitle().isEmpty() &&
                 sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
                 sp->GetChannelSchedulingID().compare(
@@ -902,10 +892,8 @@ void Scheduler::SlaveDisconnected(uint cardid)
 {
     QMutexLocker lockit(&m_schedLock);
 
-    for (auto ri = m_recList.begin(); ri != m_recList.end(); ++ri)
+    for (auto rp : m_recList)
     {
-        RecordingInfo *rp = *ri;
-
         if (rp->GetInputID() == cardid &&
             (rp->GetRecordingStatus() == RecStatus::Recording ||
              rp->GetRecordingStatus() == RecStatus::Tuning ||
@@ -933,9 +921,8 @@ void Scheduler::SlaveDisconnected(uint cardid)
 
 void Scheduler::BuildWorkList(void)
 {
-    for (auto i = m_recList.begin(); i != m_recList.end(); ++i)
+    for (auto p : m_recList)
     {
-        RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == RecStatus::Recording ||
             p->GetRecordingStatus() == RecStatus::Tuning ||
             p->GetRecordingStatus() == RecStatus::Failing ||
@@ -1017,9 +1004,8 @@ void Scheduler::BuildListMaps(void)
 {
     QMap<uint, uint> badinputs;
 
-    for (auto i = m_workList.begin(); i != m_workList.end(); ++i)
+    for (auto p : m_workList)
     {
-        RecordingInfo *p = *i;
         if (p->GetRecordingStatus() == RecStatus::Recording ||
             p->GetRecordingStatus() == RecStatus::Tuning ||
             p->GetRecordingStatus() == RecStatus::Failing ||
@@ -1051,8 +1037,8 @@ void Scheduler::BuildListMaps(void)
 
 void Scheduler::ClearListMaps(void)
 {
-    for (size_t i = 0; i < m_conflictLists.size(); ++i)
-        m_conflictLists[i]->clear();
+    for (auto & conflict : m_conflictLists)
+        conflict->clear();
     m_titleListMap.clear();
     m_recordIdListMap.clear();
     m_cacheIsSameProgram.clear();
@@ -1215,10 +1201,8 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
 
 void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
 {
-    auto i = showinglist.begin();
-    for ( ; i != showinglist.end(); ++i)
+    for (auto q : showinglist)
     {
-        RecordingInfo *q = *i;
         if (q == p)
             continue;
         if (q->GetRecordingStatus() != RecStatus::Unknown &&
@@ -1242,18 +1226,16 @@ void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
 
 void Scheduler::BackupRecStatus(void)
 {
-    for (auto i = m_workList.begin(); i != m_workList.end(); ++i)
+    for (auto p : m_workList)
     {
-        RecordingInfo *p = *i;
         p->m_savedrecstatus = p->GetRecordingStatus();
     }
 }
 
 void Scheduler::RestoreRecStatus(void)
 {
-    for (auto i = m_workList.begin(); i != m_workList.end(); ++i)
+    for (auto p : m_workList)
     {
-        RecordingInfo *p = *i;
         p->SetRecordingStatus(p->m_savedrecstatus);
     }
 }
@@ -1277,10 +1259,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
     RecordingInfo *best = nullptr;
     uint bestaffinity = 0;
 
-    auto j = showinglist->begin();
-    for ( ; j != showinglist->end(); ++j)
+    for (auto q : *showinglist)
     {
-        RecordingInfo *q = *j;
         if (q == p)
             continue;
 
@@ -1527,10 +1507,8 @@ void Scheduler::SchedNewRetryPass(const RecIter& start, const RecIter& end,
     }
     SORT_RECLIST(retry_list, comp_retry);
 
-    i = retry_list.begin();
-    for ( ; i != retry_list.end(); ++i)
+    for (auto p : retry_list)
     {
-        RecordingInfo *p = *i;
         if (p->GetRecordingStatus() != RecStatus::Unknown)
             continue;
 
@@ -1750,14 +1728,14 @@ bool Scheduler::GetAllPending(RecList &retList, int recRuleId) const
 
     bool hasconflicts = false;
 
-    for (auto it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
         if (recRuleId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(recRuleId))
+            p->GetRecordingRuleID() != static_cast<uint>(recRuleId))
             continue;
-        if ((*it)->GetRecordingStatus() == RecStatus::Conflict)
+        if (p->GetRecordingStatus() == RecStatus::Conflict)
             hasconflicts = true;
-        retList.push_back(new RecordingInfo(**it));
+        retList.push_back(new RecordingInfo(*p));
     }
 
     return hasconflicts;
@@ -1769,15 +1747,15 @@ bool Scheduler::GetAllPending(ProgramList &retList, int recRuleId) const
 
     bool hasconflicts = false;
 
-    for (auto it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
         if (recRuleId > 0 &&
-            (*it)->GetRecordingRuleID() != static_cast<uint>(recRuleId))
+            p->GetRecordingRuleID() != static_cast<uint>(recRuleId))
             continue;
 
-        if ((*it)->GetRecordingStatus() == RecStatus::Conflict)
+        if (p->GetRecordingStatus() == RecStatus::Conflict)
             hasconflicts = true;
-        retList.push_back(new ProgramInfo(**it));
+        retList.push_back(new ProgramInfo(*p));
     }
 
     return hasconflicts;
@@ -1788,12 +1766,12 @@ QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
     QMutexLocker lockit(&m_schedLock);
 
     QMap<QString,ProgramInfo*> recMap;
-    for (auto it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
-        if (RecStatus::Recording == (*it)->GetRecordingStatus() ||
-            RecStatus::Tuning == (*it)->GetRecordingStatus() ||
-            RecStatus::Failing == (*it)->GetRecordingStatus())
-            recMap[(*it)->MakeUniqueKey()] = new ProgramInfo(**it);
+        if (RecStatus::Recording == p->GetRecordingStatus() ||
+            RecStatus::Tuning    == p->GetRecordingStatus() ||
+            RecStatus::Failing   == p->GetRecordingStatus())
+            recMap[p->MakeUniqueKey()] = new ProgramInfo(*p);
     }
 
     return recMap;
@@ -1803,15 +1781,15 @@ RecStatus::Type Scheduler::GetRecStatus(const ProgramInfo &pginfo)
 {
     QMutexLocker lockit(&m_schedLock);
 
-    for (RecConstIter it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
-        if (pginfo.IsSameRecording(**it))
+        if (pginfo.IsSameRecording(*p))
         {
-            return (RecStatus::Recording == (**it).GetRecordingStatus() ||
-                    RecStatus::Tuning == (**it).GetRecordingStatus() ||
-                    RecStatus::Failing == (**it).GetRecordingStatus() ||
-                    RecStatus::Pending == (**it).GetRecordingStatus()) ?
-                (**it).GetRecordingStatus() : pginfo.GetRecordingStatus();
+            return (RecStatus::Recording == (*p).GetRecordingStatus() ||
+                    RecStatus::Tuning    == (*p).GetRecordingStatus() ||
+                    RecStatus::Failing   == (*p).GetRecordingStatus() ||
+                    RecStatus::Pending   == (*p).GetRecordingStatus()) ?
+                (*p).GetRecordingStatus() : pginfo.GetRecordingStatus();
         }
     }
 
@@ -1868,9 +1846,8 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("AddRecording() recid: %1")
             .arg(pi.GetRecordingRuleID()));
 
-    for (auto it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
-        RecordingInfo *p = *it;
         if (p->GetRecordingStatus() == RecStatus::Recording &&
             p->IsSameTitleTimeslotAndChannel(pi))
         {
@@ -1933,19 +1910,19 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
     uint inputid = rcinfo->GetInputID();
     vector<uint> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
     vector<uint> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
-    for (size_t i = 0; i < inputids.size(); i++)
+    for (uint id : inputids)
     {
-        if (!m_tvList->contains(inputids[i]))
+        if (!m_tvList->contains(id))
         {
 #if 0
             LOG(VB_SCHEDULE, LOG_ERR, LOC +
                 QString("IsBusyRecording() -> true, rctv(NULL) for input %2")
-                    .arg(inputids[i]));
+                    .arg(id));
 #endif
             return true;
         }
 
-        EncoderLink *rctv2 = (*m_tvList)[inputids[i]];
+        EncoderLink *rctv2 = (*m_tvList)[id];
         if (rctv2->IsBusy(&busy_input, -1))
         {
             if ((!busy_input.m_mplexId ||
@@ -1968,7 +1945,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         }
         else if (is_busy &&
                  std::find(group_inputs.begin(), group_inputs.end(),
-                           inputids[i]) != group_inputs.end())
+                           id) != group_inputs.end())
         {
             // This conflicting input is not busy, is also a child
             // input and the main input is busy on the desired
@@ -2448,9 +2425,8 @@ bool Scheduler::HandleReschedule(void)
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     // Write changed entries to oldrecorded.
-    for (auto it = m_recList.begin(); it != m_recList.end(); ++it)
+    for (auto p : m_recList)
     {
-        RecordingInfo *p = *it;
         if (p->GetRecordingStatus() != p->m_oldrecstatus)
         {
             if (p->GetRecordingEndTime() < m_schedTime)
@@ -2571,9 +2547,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
         if (keys.empty())
         {
-            RecConstIter it = m_recList.begin();
-            for ( ; it != m_recList.end(); ++it)
-                keys.insert((*it)->MakeUniqueKey());
+            for (auto rec : m_recList)
+                keys.insert(rec->MakeUniqueKey());
             keys.insert("something");
         }
 
@@ -2622,11 +2597,10 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
                     "to reschedule around its tuners.")
                 .arg(nexttv->GetHostName()));
 
-        QMap<int, EncoderLink*>::iterator it = m_tvList->begin();
-        for (; it != m_tvList->end(); ++it)
+        foreach (auto & enc, *m_tvList)
         {
-            if ((*it)->GetHostName() == nexttv->GetHostName())
-                (*it)->SetSleepStatus(sStatus_Undefined);
+            if (enc->GetHostName() == nexttv->GetHostName())
+                enc->SetSleepStatus(sStatus_Undefined);
         }
 
         EnqueuePlace("HandleWakeSlave3");
@@ -2780,11 +2754,8 @@ bool Scheduler::HandleRecording(
                         "to reschedule around its tuners.")
                     .arg(nexttv->GetHostName()));
 
-            QMap<int, EncoderLink *>::Iterator enciter =
-                m_tvList->begin();
-            for (; enciter != m_tvList->end(); ++enciter)
+            foreach (auto enc, *m_tvList)
             {
-                EncoderLink *enc = *enciter;
                 if (enc->GetHostName() == nexttv->GetHostName())
                     enc->SetSleepStatus(sStatus_Undefined);
             }
@@ -2947,9 +2918,8 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
 
         // First, see if anything is already pending or still
         // recording.
-        for (auto j = m_recList.begin(); j != m_recList.end(); ++j)
+        for (auto p : m_recList)
         {
-            RecordingInfo *p = (*j);
             if (now.secsTo(p->GetRecordingStartTime()) >
                 prerollseconds + 60)
                 break;
@@ -3463,11 +3433,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
     bool someSlavesCanSleep = false;
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
-
         if (enc->CanSleep())
             someSlavesCanSleep = true;
     }
@@ -3486,13 +3453,10 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                 "next %1 minutes.") .arg(sleepThreshold / 60));
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "Checking scheduler's reclist");
-    auto recIter = m_recList.begin();
     QDateTime curtime = MythDate::current();
     QStringList SlavesInUse;
-    for ( ; recIter != m_recList.end(); ++recIter)
+    for (auto pginfo : m_recList)
     {
-        RecordingInfo *pginfo = *recIter;
-
         if (pginfo->GetRecordingStatus() != RecStatus::Recording &&
             pginfo->GetRecordingStatus() != RecStatus::Tuning &&
             pginfo->GetRecordingStatus() != RecStatus::Failing &&
@@ -3551,11 +3515,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         "be inactive for the next %1 minutes and can be put to sleep.")
             .arg(sleepThreshold / 60));
 
-    enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
-
         if ((!enc->IsLocal()) &&
             (enc->IsAwake()) &&
             (!SlavesInUse.contains(enc->GetHostName())) &&
@@ -3578,11 +3539,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
                 if (enc->GoToSleep())
                 {
-                    QMap<int, EncoderLink *>::Iterator slviter =
-                        m_tvList->begin();
-                    for (; slviter != m_tvList->end(); ++slviter)
+                    foreach (auto slv, *m_tvList)
                     {
-                        EncoderLink *slv = *slviter;
                         if (slv->GetHostName() == thisHost)
                         {
                             LOG(VB_SCHEDULE, LOG_DEBUG,
@@ -3599,11 +3557,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("Unable to shutdown %1 slave backend, setting "
                                 "sleep status to undefined.").arg(thisHost));
-                    QMap<int, EncoderLink *>::Iterator slviter =
-                        m_tvList->begin();
-                    for (; slviter != m_tvList->end(); ++slviter)
+                    foreach (auto slv, *m_tvList)
                     {
-                        EncoderLink *slv = *slviter;
                         if (slv->GetHostName() == thisHost)
                             slv->SetSleepStatus(sStatus_Undefined);
                     }
@@ -3632,10 +3587,8 @@ bool Scheduler::WakeUpSlave(const QString& slaveHostname, bool setWakingStatus)
             QString("Trying to Wake Up %1, but this slave "
                     "does not have a WakeUpCommand set.").arg(slaveHostname));
 
-        QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-        for (; enciter != m_tvList->end(); ++enciter)
+        foreach (auto enc, *m_tvList)
         {
-            EncoderLink *enc = *enciter;
             if (enc->GetHostName() == slaveHostname)
                 enc->SetSleepStatus(sStatus_Undefined);
         }
@@ -3644,10 +3597,8 @@ bool Scheduler::WakeUpSlave(const QString& slaveHostname, bool setWakingStatus)
     }
 
     QDateTime curtime = MythDate::current();
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
         if (setWakingStatus && (enc->GetHostName() == slaveHostname))
             enc->SetSleepStatus(sStatus_Waking);
         enc->SetLastWakeTime(curtime);
@@ -3670,11 +3621,8 @@ void Scheduler::WakeUpSlaves(void)
 
     QStringList SlavesThatCanWake;
     QString thisSlave;
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
-
         if (enc->IsLocal())
             continue;
 
@@ -3785,7 +3733,7 @@ void Scheduler::UpdateManuals(uint recordid)
 
     while (progcount--)
     {
-        for (int i = 0; i < (int)chanidlist.size(); i++)
+        for (uint id : chanidlist)
         {
             if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
                 continue;
@@ -3794,7 +3742,7 @@ void Scheduler::UpdateManuals(uint recordid)
                           " title, subtitle, description, manualid, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, 1)");
-            query.bindValue(":CHANID", chanidlist[i]);
+            query.bindValue(":CHANID", id);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
             query.bindValue(":TITLE", title);
@@ -4333,10 +4281,8 @@ void Scheduler::AddNewRecords(void)
     RecList tmpList;
 
     QMap<int, bool> cardMap;
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
         if (enc->IsConnected() || enc->IsAsleep())
             cardMap[enc->GetInputID()] = true;
     }
@@ -4643,9 +4589,8 @@ void Scheduler::AddNewRecords(void)
         // time should be done after PruneOverlaps, but that would
         // complicate the list handling.  Do it here unless it becomes
         // problematic.
-        for (auto rec = m_workList.begin(); rec != m_workList.end(); ++rec)
+        for (auto r : m_workList)
         {
-            RecordingInfo *r = *rec;
             if (p->IsSameTitleStartTimeAndChannel(*r))
             {
                 if (r->m_sgroupId == p->m_sgroupId &&
@@ -4744,9 +4689,8 @@ void Scheduler::AddNewRecords(void)
     }
 
     LOG(VB_SCHEDULE, LOG_INFO, " +-- Cleanup...");
-    auto tmp = tmpList.begin();
-    for ( ; tmp != tmpList.end(); ++tmp)
-        m_workList.push_back(*tmp);
+    for (auto & tmp : tmpList)
+        m_workList.push_back(tmp);
 }
 
 void Scheduler::AddNotListed(void) {
@@ -4869,9 +4813,8 @@ void Scheduler::AddNotListed(void) {
         tmpList.push_back(p);
     }
 
-    auto tmp = tmpList.begin();
-    for ( ; tmp != tmpList.end(); ++tmp)
-        m_workList.push_back(*tmp);
+    for (auto & tmp : tmpList)
+        m_workList.push_back(tmp);
 }
 
 /** \brief Returns all scheduled programs
@@ -5166,6 +5109,7 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
 
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto fsit = m_fsInfoCache.begin(); fsit != m_fsInfoCache.end(); ++fsit)
     {
         FileSystemInfo *fs = &(*fsit);
@@ -5282,10 +5226,9 @@ int Scheduler::FillRecordingDir(
                                 .arg(fs->getFSysID()).arg(weightOffset));
 
                         // need to offset all directories on this filesystem
-                        for (auto fsit2 = m_fsInfoCache.begin();
-                             fsit2 != m_fsInfoCache.end(); ++fsit2)
+                        for (auto & fsit2 : m_fsInfoCache)
                         {
-                            FileSystemInfo *fs2 = &(*fsit2);
+                            FileSystemInfo *fs2 = &fsit2;
                             if (fs2->getFSysID() == fs->getFSysID())
                             {
                                 LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
@@ -5310,10 +5253,8 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Adjusting FS Weights from scheduler.");
 
-    for (auto recIter = reclist.begin(); recIter != reclist.end(); ++recIter)
+    for (auto thispg : reclist)
     {
-        RecordingInfo *thispg = *recIter;
-
         if ((recendts < thispg->GetRecordingStartTime()) ||
             (recstartts > thispg->GetRecordingEndTime()) ||
             (thispg->GetRecordingStatus() != RecStatus::WillRecord &&
@@ -5339,6 +5280,7 @@ int Scheduler::FillRecordingDir(
                         .arg(fs->getHostname()).arg(fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
+                // NOLINTNEXTLINE(modernize-loop-convert)
                 for (auto fsit2 = m_fsInfoCache.begin();
                      fsit2 != m_fsInfoCache.end(); ++fsit2)
                 {
@@ -5438,7 +5380,7 @@ int Scheduler::FillRecordingDir(
             pginfolist_t expiring;
             m_expirer->GetAllExpiring(expiring);
 
-            for(auto it=expiring.begin(); it != expiring.end(); ++it)
+            for (auto & expire : expiring)
             {
                 // find the filesystem its on
                 FileSystemInfo *fs = nullptr;
@@ -5446,7 +5388,7 @@ int Scheduler::FillRecordingDir(
                     fslistit != fsInfoList.end(); ++fslistit)
                 {
                     // recording is not on this filesystem's host
-                    if ((*it)->GetHostname() != (*fslistit)->getHostname())
+                    if (expire->GetHostname() != (*fslistit)->getHostname())
                         continue;
 
                     // directory is not in the Storage Group dir list
@@ -5454,10 +5396,10 @@ int Scheduler::FillRecordingDir(
                         continue;
 
                     QString filename =
-                        (*fslistit)->getPath() + "/" + (*it)->GetPathname();
+                        (*fslistit)->getPath() + "/" + expire->GetPathname();
 
                     // recording is local
-                    if ((*it)->GetHostname() == gCoreContext->GetHostName())
+                    if (expire->GetHostname() == gCoreContext->GetHostName())
                     {
                         QFile checkFile(filename);
 
@@ -5469,18 +5411,16 @@ int Scheduler::FillRecordingDir(
                     }
                     else // recording is remote
                     {
-                        QString backuppath = (*it)->GetPathname();
-                        ProgramInfo *programinfo = *it;
+                        QString backuppath = expire->GetPathname();
+                        ProgramInfo *programinfo = expire;
                         bool foundSlave = false;
 
-                        QMap<int, EncoderLink *>::Iterator enciter =
-                            m_tvList->begin();
-                        for (; enciter != m_tvList->end(); ++enciter)
+                        foreach (auto & enc, *m_tvList)
                         {
-                            if ((*enciter)->GetHostName() ==
+                            if (enc->GetHostName() ==
                                 programinfo->GetHostname())
                             {
-                                (*enciter)->CheckFile(programinfo);
+                                enc->CheckFile(programinfo);
                                 foundSlave = true;
                                 break;
                             }
@@ -5501,13 +5441,13 @@ int Scheduler::FillRecordingDir(
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to match '%1' "
                                 "to any file system.  Ignoring it.")
-                            .arg((*it)->GetBasename()));
+                            .arg(expire->GetBasename()));
                     continue;
                 }
 
                 // add this files size to the remaining free space
                 remainingSpaceKB[fs->getFSysID()] +=
-                    (*it)->GetFilesize() / 1024;
+                    expire->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
                 long long desiredSpaceKB =
@@ -5633,11 +5573,8 @@ void Scheduler::SchedLiveTV(void)
         return;
 
     // Build a list of active livetv programs
-    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
-    for (; enciter != m_tvList->end(); ++enciter)
+    foreach (auto enc, *m_tvList)
     {
-        EncoderLink *enc = *enciter;
-
         if (kState_WatchingLiveTV != enc->GetState())
             continue;
 
@@ -5877,10 +5814,8 @@ void Scheduler::AddChildInput(uint parentid, uint inputid)
 
     // Now, fixup the infos for the parent and conflicting inputs.
     m_sinputInfoMap[parentid].m_groupInputs.push_back(inputid);
-    for (auto it = siinfo.m_conflictingInputs.begin();
-         it != siinfo.m_conflictingInputs.end(); ++it)
+    for (uint otherid : siinfo.m_conflictingInputs)
     {
-        uint otherid = *it;
         m_sinputInfoMap[otherid].m_conflictingInputs.push_back(inputid);
     }
 }

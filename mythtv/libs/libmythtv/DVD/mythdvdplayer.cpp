@@ -650,7 +650,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
 }
 
-bool MythDVDPlayer::GoToMenu(QString Menu)
+bool MythDVDPlayer::GoToMenu(const QString& Menu)
 {
     if (!m_playerCtx->m_buffer->IsDVD())
         return false;

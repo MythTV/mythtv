@@ -181,9 +181,8 @@ class UPNP_PUBLIC StateVariables
         StateVariables() = default;
         virtual ~StateVariables()
         {
-            SVMap::iterator it = m_map.begin();
-            for (; it != m_map.end(); ++it)
-                delete *it;
+            foreach (auto & it, m_map)
+                delete it;
             m_map.clear();
         }
 

@@ -73,9 +73,9 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
-    for (auto cit = m_channels.begin(); cit != m_channels.end(); ++cit)
+    for (auto & channel : m_channels)
     {
-        if ((*cit).m_chanNum == startchannel &&
+        if (channel.m_chanNum == startchannel &&
             IsTunable(startchannel))
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -237,9 +237,9 @@ bool ChannelBase::IsInputAvailable(
     chanid_restriction = 0;
 
     vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputId);
-    for (size_t i = 0; i < inputids.size(); ++i)
+    for (uint inputid : inputids)
     {
-        if (RemoteIsBusy(inputids[i], info))
+        if (RemoteIsBusy(inputid, info))
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Input %1 is busy on %2/%3")

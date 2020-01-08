@@ -240,14 +240,12 @@ bool StreamHandler::RemoveAllPIDFilters(void)
 #endif // DEBUG_PID_FILTERS
 
     vector<int> del_pids;
-    PIDInfoMap::iterator it = m_pidInfo.begin();
-    for (; it != m_pidInfo.end(); ++it)
+    for (auto it = m_pidInfo.begin(); it != m_pidInfo.end(); ++it)
         del_pids.push_back(it.key());
 
     bool ok = true;
-    auto dit = del_pids.begin();
-    for (; dit != del_pids.end(); ++dit)
-        ok &= RemovePIDFilter(*dit);
+    for (int & pid : del_pids)
+        ok &= RemovePIDFilter(pid);
 
     return UpdateFilters() && ok;
 }
@@ -259,26 +257,25 @@ void StreamHandler::UpdateListeningForEIT(void)
 
     QMutexLocker read_locker(&m_listenerLock);
 
-    StreamDataList::const_iterator it1 = m_streamDataList.begin();
-    for (; it1 != m_streamDataList.end(); ++it1)
+    for (auto it1 = m_streamDataList.cbegin(); it1 != m_streamDataList.cend(); ++it1)
     {
         MPEGStreamData *sd = it1.key();
         if (sd->HasEITPIDChanges(m_eitPids) &&
             sd->GetEITPIDChanges(m_eitPids, add_eit, del_eit))
         {
-            for (size_t i = 0; i < del_eit.size(); i++)
+            for (uint eit : del_eit)
             {
                 uint_vec_t::iterator it2;
-                it2 = find(m_eitPids.begin(), m_eitPids.end(), del_eit[i]);
+                it2 = find(m_eitPids.begin(), m_eitPids.end(), eit);
                 if (it2 != m_eitPids.end())
                     m_eitPids.erase(it2);
-                sd->RemoveListeningPID(del_eit[i]);
+                sd->RemoveListeningPID(eit);
             }
 
-            for (size_t i = 0; i < add_eit.size(); i++)
+            for (uint eit : add_eit)
             {
-                m_eitPids.push_back(add_eit[i]);
-                sd->AddListeningPID(add_eit[i]);
+                m_eitPids.push_back(eit);
+                sd->AddListeningPID(eit);
             }
         }
     }
@@ -292,8 +289,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
 
     {
         QMutexLocker read_locker(&m_listenerLock);
-        StreamDataList::const_iterator it = m_streamDataList.begin();
-        for (; it != m_streamDataList.end(); ++it)
+        for (auto it = m_streamDataList.cbegin(); it != m_streamDataList.cend(); ++it)
             it.key()->GetPIDs(pids);
     }
 
@@ -304,8 +300,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         QMutexLocker read_locker(&m_pidLock);
 
         // PIDs that need to be added..
-        pid_map_t::const_iterator lit = pids.constBegin();
-        for (; lit != pids.constEnd(); ++lit)
+        for (auto lit = pids.constBegin(); lit != pids.constEnd(); ++lit)
         {
             if (*lit && (m_pidInfo.find(lit.key()) == m_pidInfo.end()))
             {
@@ -315,8 +310,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         }
 
         // PIDs that need to be removed..
-        PIDInfoMap::const_iterator fit = m_pidInfo.begin();
-        for (; fit != m_pidInfo.end(); ++fit)
+        for (auto fit = m_pidInfo.cbegin(); fit != m_pidInfo.cend(); ++fit)
         {
             bool in_pids = pids.find(fit.key()) != pids.end();
             if (!in_pids)
@@ -326,14 +320,12 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
 
     // Remove PIDs
     bool ok = true;
-    auto dit = del_pids.begin();
-    for (; dit != del_pids.end(); ++dit)
-        ok &= RemovePIDFilter(*dit);
+    for (uint & pid : del_pids)
+        ok &= RemovePIDFilter(pid);
 
     // Add PIDs
-    QMap<uint, PIDInfo*>::iterator ait = add_pids.begin();
-    for (; ait != add_pids.end(); ++ait)
-        ok &= AddPIDFilter(*ait);
+    for (auto & pid : add_pids)
+        ok &= AddPIDFilter(pid);
 
     // Cycle filters if it's been a while
     if (m_cycleTimer.isRunning() && (m_cycleTimer.elapsed() > 1000))
@@ -348,8 +340,7 @@ PIDPriority StreamHandler::GetPIDPriority(uint pid) const
 
     PIDPriority tmp = kPIDPriorityNone;
 
-    StreamDataList::const_iterator it = m_streamDataList.begin();
-    for (; it != m_streamDataList.end(); ++it)
+    for (auto it = m_streamDataList.cbegin(); it != m_streamDataList.cend(); ++it)
         tmp = max(tmp, it.key()->GetPIDPriority(pid));
 
     return tmp;

@@ -705,10 +705,8 @@ void StatusBox::doScheduleStatus()
     tmpstr = tr("%n matching showing(s)", "", schedList.size());
     AddLogLine(tmpstr, helpmsg);
 
-    ProgramList::const_iterator it = schedList.begin();
-    for (; it != schedList.end(); ++it)
+    for (auto s : schedList)
     {
-        const ProgramInfo *s = *it;
         const RecStatus::Type recstatus = s->GetRecordingStatus();
 
         if (statusMatch[recstatus] < 1)
@@ -904,11 +902,8 @@ void StatusBox::doTunerStatus()
         }
     }
 
-    QList<int>::iterator it = inputids.begin();
-    for ( ; it != inputids.end(); ++it)
+    foreach (int inputid, inputids)
     {
-        int inputid = *it;
-
         QStringList statuslist;
         if (info[inputid].m_errored)
             statuslist << tr("%1 errored").arg(info[inputid].m_errored);
@@ -1135,8 +1130,8 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     if (free<0)
         return;
 
-    recprof2bps_t::const_iterator it = prof2bps.begin();
-    for (; it != prof2bps.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = prof2bps.begin(); it != prof2bps.end(); ++it)
     {
         const QString pro =
                 tail.arg(it.key()).arg((int)((float)(*it) / 1024.0F));
@@ -1456,10 +1451,9 @@ void StatusBox::doMachineStatus()
             }
         }
 
-        QStringList::iterator it = list.begin();
-        for (;it != list.end(); ++it)
+        for (auto & diskinfo : list)
         {
-            line = QString("   ") + (*it);
+            line = QString("   ") + diskinfo;
             AddLogLine(line, machineStr);
         }
     }

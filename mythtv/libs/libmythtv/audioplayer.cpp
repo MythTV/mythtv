@@ -56,8 +56,8 @@ void AudioPlayer::AddVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (size_t i = 0; i < m_visuals.size(); i++)
-        m_audioOutput->addVisual(m_visuals[i]);
+    for (auto & visual : m_visuals)
+        m_audioOutput->addVisual(visual);
 }
 
 void AudioPlayer::RemoveVisuals(void)
@@ -66,8 +66,8 @@ void AudioPlayer::RemoveVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (size_t i = 0; i < m_visuals.size(); i++)
-        m_audioOutput->removeVisual(m_visuals[i]);
+    for (auto & visual : m_visuals)
+        m_audioOutput->removeVisual(visual);
 }
 
 void AudioPlayer::ResetVisuals(void)
@@ -76,8 +76,8 @@ void AudioPlayer::ResetVisuals(void)
         return;
 
     QMutexLocker lock(&m_lock);
-    for (size_t i = 0; i < m_visuals.size(); i++)
-        m_visuals[i]->prepare();
+    for (auto & visual : m_visuals)
+        visual->prepare();
 }
 
 void AudioPlayer::Reset(void)

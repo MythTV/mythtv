@@ -75,9 +75,9 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                 .arg(ret));
     }
 
-    for (int i = 0; i < NUM_CHANNELS; i++)
-        for (int j = 0; j < MAX_SAMPLES; j++)
-            m_inputIn[i][j] = 0;
+    for (auto & i : m_inputIn)
+        for (int & j : i)
+            j = 0;
 
     for (int i = 0; i < NUM_CHANNELS; i++)
         m_input[i] = &(m_inputIn[i][0]);

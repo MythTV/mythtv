@@ -196,9 +196,9 @@ void SourceManager::setupSources()
 ScriptInfo *SourceManager::getSourceByName(const QString &name)
 {
     ScriptInfo *src = nullptr;
-    for (int x = 0; x < m_scripts.size(); x++)
+    foreach (auto script, m_scripts)
     {
-        src = m_scripts.at(x);
+        src = script;
         if (src->name == name)
         {
             return src;
@@ -230,9 +230,8 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
                                             units_t units)
 {
     // matching source exists?
-    for (int x = 0; x < m_sources.size(); x++)
+    foreach (auto src, m_sources)
     {
-        WeatherSource *src = m_sources.at(x);
         if (src->getId() == id && src->getLocale() == loc &&
             src->getUnits() == units)
         {
@@ -241,9 +240,8 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
     }
 
     // no matching source, make one
-    for (int x = 0; x < m_scripts.size(); x++)
+    foreach (auto si, m_scripts)
     {
-        ScriptInfo *si = m_scripts.at(x);
         if (si->id == id)
         {
             auto *ws = new WeatherSource(si);
@@ -262,27 +260,20 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
 
 void SourceManager::startTimers()
 {
-    for (int x = 0; x < m_sources.size(); x++)
-    {
-        WeatherSource *src = m_sources.at(x);
+    foreach (auto src, m_sources)
         src->startUpdateTimer();
-    }
 }
 
 void SourceManager::stopTimers()
 {
-    for (int x = 0; x < m_sources.size(); x++)
-    {
-        WeatherSource *src = m_sources.at(x);
+    foreach (auto src, m_sources)
         src->stopUpdateTimer();
-    }
 }
 
 void SourceManager::doUpdate(bool forceUpdate)
 {
-    for (int x = 0; x < m_sources.size(); x++)
+    foreach (auto src, m_sources)
     {
-        WeatherSource *src = m_sources.at(x);
         if (src->inUse())
             src->startUpdate(forceUpdate);
     }
@@ -291,9 +282,8 @@ void SourceManager::doUpdate(bool forceUpdate)
 bool SourceManager::findPossibleSources(QStringList types,
                                         QList<ScriptInfo *> &sources)
 {
-    for (int x = 0; x < m_scripts.size(); x++)
+    foreach (auto si, m_scripts)
     {
-        ScriptInfo *si = m_scripts.at(x);
         QStringList stypes = si->types;
         bool handled = true;
         for (int i = 0; i < types.count() && handled; ++i)
@@ -367,12 +357,10 @@ void SourceManager::recurseDirs( QDir dir )
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs |
                   QDir::NoDotAndDotDot);
     QFileInfoList files = dir.entryInfoList();
-    QFileInfo file;
 
-    for (int x = 0; x < files.size(); x++)
+    for (const auto & file : files)
     {
         qApp->processEvents();
-        file = files.at(x);
         if (file.isDir())
         {
             QDir recurseTo(file.filePath());

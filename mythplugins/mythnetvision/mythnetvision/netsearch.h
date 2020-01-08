@@ -28,7 +28,7 @@ class NetSearch : public NetBase
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
-    void PopulateResultList(ResultItem::resultList list);
+    void PopulateResultList(const ResultItem::resultList& list);
 
   protected:
     ResultItem *GetStreamItem() override; // NetBase
