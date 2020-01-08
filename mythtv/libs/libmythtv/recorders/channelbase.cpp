@@ -515,10 +515,10 @@ int ChannelBase::GetChanID(void) const
 
     while (query.next())
     {
-        if (query.value(1).toBool())
+        if (query.value(1).toInt() > 0)
         {
             ++found;
-            visible = query.value(0).toInt() > 0;
+            visible = query.value(0).toInt();
         }
         else
             id = query.value(0).toInt();
