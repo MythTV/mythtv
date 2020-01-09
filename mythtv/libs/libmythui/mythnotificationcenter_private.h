@@ -252,9 +252,7 @@ public:
 
     void CheckDeletes()
     {
-        QVector<MythScreenType*>::const_iterator it;
-
-        for (it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
+        for (auto it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
         {
             (*it)->SetAlpha(0);
             (*it)->SetVisible(false);

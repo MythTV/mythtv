@@ -417,14 +417,11 @@ void ExternIO::Fork(void)
     /* run command */
     char *command = strdup(m_app.canonicalFilePath()
                                  .toUtf8().constData());
-    char **arguments;
-    int    len;
-
     // Copy QStringList to char**
-    arguments = new char*[m_args.size() + 1];
+    char **arguments = new char*[m_args.size() + 1];
     for (int i = 0; i < m_args.size(); ++i)
     {
-        len = m_args[i].size() + 1;
+        int len = m_args[i].size() + 1;
         arguments[i] = new char[len];
         memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
     }
@@ -570,9 +567,9 @@ void ExternalStreamHandler::run(void)
     QString    result;
     QString    ready_cmd;
     QByteArray buffer;
-    int        sz;
-    uint       len;
-    uint       read_len;
+    int        sz = 0;
+    uint       len = 0;
+    uint       read_len = 0;
     uint       restart_cnt = 0;
     MythTimer  status_timer;
     MythTimer  nodata_timer;
@@ -1238,8 +1235,6 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
                                         QString & result, int timeout,
                                         uint retry_cnt)
 {
-    bool okay;
-
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer1('%1')")
         .arg(cmd));
 
@@ -1306,7 +1301,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
         }
         else
         {
-            okay = result.startsWith("OK");
+            bool okay = result.startsWith("OK");
             if (okay || result.startsWith("WARN") || result.startsWith("ERR"))
             {
                 LogLevel_t level = LOG_INFO;
@@ -1345,8 +1340,6 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                                         QString & result, int timeout,
                                         uint retry_cnt)
 {
-    bool    okay;
-    bool    err;
     QString status;
     QString raw;
 
@@ -1411,7 +1404,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                 // Remove serial#
                 tokens.removeFirst();
                 result = tokens.join(':');
-                err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
+                bool err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
                 LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + raw);
                 if (err)
                 {
@@ -1448,7 +1441,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             status = tokens[0].trimmed();
             result = tokens.join(':');
 
-            okay = (status == "OK");
+            bool okay = (status == "OK");
             if (okay || status.startsWith("WARN") || status.startsWith("ERR"))
             {
                 LogLevel_t level = LOG_INFO;

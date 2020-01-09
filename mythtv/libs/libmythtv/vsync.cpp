@@ -343,7 +343,7 @@ int RTCVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 
     m_delay = CalcDelay(nominal_frame_interval);
 
-    unsigned long rtcdata;
+    unsigned long rtcdata = 0;
     while (m_delay > 0)
     {
         ssize_t val = read(m_rtcfd, &rtcdata, sizeof(rtcdata));

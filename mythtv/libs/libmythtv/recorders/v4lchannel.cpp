@@ -65,8 +65,8 @@ bool V4LChannel::Open(void)
          return false;
     }
 
-    uint32_t version;
-    uint32_t capabilities;
+    uint32_t version = 0;
+    uint32_t capabilities = 0;
     if (!CardUtil::GetV4LInfo(m_videoFd, m_deviceName, m_driverName,
                               version, capabilities))
     {
@@ -394,8 +394,8 @@ bool V4LChannel::Tune(uint64_t frequency)
 
     int ioctlval = 0;
 
-    uint mplexid_restriction;
-    uint chanid_restriction;
+    uint mplexid_restriction = 0;
+    uint chanid_restriction = 0;
     if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
         return false;
 
@@ -509,7 +509,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
     bool input_switch = (0 != ioctlval || (uint)inputNumV4L != input.index);
 
     const v4l2_std_id new_vid_mode = format_to_mode(newFmt);
-    v4l2_std_id cur_vid_mode;
+    v4l2_std_id cur_vid_mode = 0;
     ioctlval = ioctl(m_videoFd, VIDIOC_G_STD, &cur_vid_mode);
     bool mode_switch = (0 != ioctlval || new_vid_mode != cur_vid_mode);
     bool needs_switch = input_switch || mode_switch;

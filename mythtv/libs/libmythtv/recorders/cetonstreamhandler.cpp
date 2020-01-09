@@ -297,7 +297,7 @@ void CetonStreamHandler::RepeatTuning(void)
 
 bool CetonStreamHandler::TunerOff(void)
 {
-    bool result;
+    bool result = false;
     if (m_usingCablecard)
         result = TuneVChannel("0");
     else
@@ -336,7 +336,7 @@ bool CetonStreamHandler::TuneFrequency(
     params.addQueryItem("force_tune","0");
 
     QString response;
-    uint status;
+    uint status = 0;
     bool result =  HttpRequest(
         "POST", "/tune_request.cgi", params, response, status);
 
@@ -371,7 +371,7 @@ bool CetonStreamHandler::TuneProgram(uint program)
     params.addQueryItem("program", QString::number(program));
 
     QString response;
-    uint status;
+    uint status = 0;
     bool result = HttpRequest(
         "POST", "/program_request.cgi", params, response, status);
 
@@ -395,7 +395,7 @@ bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
     params.addQueryItem("channel", vchannel);
 
     QString response;
-    uint status;
+    uint status = 0;
     bool result = HttpRequest(
         "POST", "/channel_request.cgi", params, response, status);
 
@@ -477,7 +477,7 @@ QString CetonStreamHandler::GetVar(
     params.addQueryItem("v", variable);
 
     QString response;
-    uint status;
+    uint status = 0;
     if (!HttpRequest("GET", "/get_var.json", params, response, status))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
@@ -507,7 +507,7 @@ QStringList CetonStreamHandler::GetProgramList()
     params.addQueryItem("i", QString::number(m_tuner));
 
     QString response;
-    uint status;
+    uint status = 0;
     if (!HttpRequest("GET", "/get_pat.json", params, response, status))
     {
         LOG(VB_GENERAL, LOG_ERR,

@@ -129,7 +129,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
     file->tell = file_tell_mythiowrapper;
     file->eof = nullptr;
 
-    int fd;
+    int fd = -1;
     int intMode = O_RDONLY;
     if (strcasecmp(cmode, "wb") == 0)
         intMode = O_WRONLY;

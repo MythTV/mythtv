@@ -519,7 +519,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
         m_rwLock.lockForWrite();
     }
 
-    long long ret;
+    long long ret = 0;
 
     if (m_readInternalMode)
     {
@@ -1533,7 +1533,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
 
     LOG(VB_FILE, LOG_DEBUG, LOC + loc_desc + " -- copying data");
 
-    int rpos;
+    int rpos = 0;
     if (m_rbrPos + m_readOffset > (int) m_bufferSize)
     {
         rpos = (m_rbrPos + m_readOffset) - m_bufferSize;
@@ -1600,7 +1600,7 @@ int RingBuffer::Read(void *buf, int count)
 QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
 {
     QString msg;
-    float bitrate;
+    float bitrate = NAN;
     int range = 0;
     if (rate < 1)
     {

@@ -637,12 +637,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     if (false) // NOLINT(readability-simplify-boolean-expr)
 #endif
     {
-        int j;
         int srv = (pkt_buf[off]>>5) & 0x7;
         int seq_num = (((int)pkt_buf[0])>>6)&0x3;
         QString msg = QString("CC708 len %1 srv0 %2 seq %3 ").arg(len, 2)
                           .arg(srv) .arg(seq_num);
-        for (j = 0; j < pkt_size; j++)
+        for (int j = 0; j < pkt_size; j++)
             msg += QString("0x%1").arg(pkt_buf[j], 0, 16);
         LOG(VB_VBI, LOG_DEBUG, msg);
     }

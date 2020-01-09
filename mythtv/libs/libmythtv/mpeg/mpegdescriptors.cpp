@@ -603,7 +603,7 @@ QString MPEGDescriptor::toStringXML(uint level) const
 // Dump the descriptor in the same format as hexdump -C
 QString MPEGDescriptor::hexdump(void) const
 {
-    uint i;
+    uint i = 0;
     QString str;
     QString hex;
     QString prt;

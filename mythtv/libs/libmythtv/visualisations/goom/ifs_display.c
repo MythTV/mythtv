@@ -21,11 +21,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	static int s_mode = MOD_MERVER;
 	static int s_justChanged = 0;
 	static int s_cycle = 0;
-	int     cycle10;
-
-	int     nbpt;
-	IFSPoint *points;
-
+	int     cycle10 = 0;
 	int     couleursl = s_couleur;
 
 	s_cycle++;
@@ -46,7 +42,8 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 		}
 	}
 
-	points = draw_ifs (&nbpt);
+	int nbpt = 0;
+	IFSPoint *points = draw_ifs (&nbpt);
 	nbpt--;
 
 #ifdef MMX

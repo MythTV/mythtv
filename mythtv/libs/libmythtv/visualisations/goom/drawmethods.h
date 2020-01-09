@@ -44,13 +44,13 @@ movd_r2m (mm0, _out); \
 #define DRAWMETHOD DRAWMETHOD_PLUS(*p,*p,col)
 
 static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx, int screeny) {
-    int     x;	// am, tmp
-    int     y;
-    int     dx;
-    int     dy;
-    int     yy;
-    int     xx;
-    int    *p;
+    int     x = 0;	// am, tmp
+    int     y = 0;
+    int     dx = 0;
+    int     dy = 0;
+    int     yy = 0;
+    int     xx = 0;
+    int    *p = NULL;
 
 
 	if ((y1 < 0) || (y2 < 0) || (x1 < 0) || (x2 < 0) || (y1 >= screeny) || (y2 >= screeny) || (x1 >= screenx) || (x2 >= screenx)) 
@@ -59,9 +59,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 	dx = x2 - x1;
 	dy = y2 - y1;
 	if (x1 > x2) {
-		int     tmp;
-
-		tmp = x1;
+		int tmp = x1;
 		x1 = x2;
 		x2 = tmp;
 		tmp = y1;

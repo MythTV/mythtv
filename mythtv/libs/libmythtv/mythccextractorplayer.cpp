@@ -642,7 +642,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                 "There are unhandled text dvb subtitles");
         }
 
-        uint64_t duration;
+        uint64_t duration = 0;
         const QStringList rawSubs =
             (*subit).m_reader->GetRawTextSubtitles(duration);
         if (!rawSubs.isEmpty())

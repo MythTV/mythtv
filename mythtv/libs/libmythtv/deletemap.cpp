@@ -425,8 +425,8 @@ void DeleteMap::NewCut(uint64_t frame)
             Delete(otherframe);
         else
         {
-            uint64_t startframe;
-            uint64_t endframe;
+            uint64_t startframe = 0;
+            uint64_t endframe = 0;
             int64_t cut_start = -1;
             int64_t cut_end = -1;
             if (IsInDelete(frame))
@@ -617,7 +617,7 @@ bool DeleteMap::IsTemporaryMark(uint64_t frame) const
 uint64_t DeleteMap::GetNearestMark(uint64_t frame, bool right, bool *hasMark)
     const
 {
-    uint64_t result;
+    uint64_t result = 0;
     if (hasMark)
         *hasMark = true;
     frm_dir_map_t::const_iterator it = m_deleteMap.begin();

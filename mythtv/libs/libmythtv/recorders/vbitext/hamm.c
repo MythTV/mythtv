@@ -226,7 +226,7 @@ hamm24(const unsigned char *p, int *err)
 int
 chk_parity(unsigned char *p, int n)
 {
-    int err;
+    int err = 0;
 
     for (err = 0; n--; p++)
     {

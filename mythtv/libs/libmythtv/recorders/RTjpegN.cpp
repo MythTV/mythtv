@@ -110,9 +110,6 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
 {
  int co=1;
- int16_t ZZvalue;
- unsigned char bitten;
- unsigned char bitoff;
 
  auto *ustrm = (uint8_t *)strm;
 #ifdef SHOWBLOCK
@@ -138,7 +135,7 @@ int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
  int ci=63;
  while (data[RTjpeg_ZZ[ci]]==0 && ci>0) ci--;
 
- bitten = ((unsigned char)ci) << 2;
+ unsigned char bitten = ((unsigned char)ci) << 2;
 
  if (ci==0) {
    ustrm[1]= bitten;
@@ -147,12 +144,12 @@ int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
  }
 
  /* bitoff=0 because the high 6bit contain first non zero position */
- bitoff = 0;
+ unsigned char bitoff = 0;
  co = 1;
 
  for(; ci>0; ci--) {
 
-   ZZvalue = data[RTjpeg_ZZ[ci]];
+   int16_t ZZvalue = data[RTjpeg_ZZ[ci]];
 
    switch(ZZvalue) {
    case 0:
@@ -210,7 +207,7 @@ HERZWEH:
 
  for(; ci>0; ci--) {
 
-   ZZvalue = data[RTjpeg_ZZ[ci]];
+   int16_t ZZvalue = data[RTjpeg_ZZ[ci]];
 
    if ( (ZZvalue > 7) || (ZZvalue < -7) ) {
         bitten |= (0x08<<bitoff);
@@ -244,7 +241,7 @@ HIRNWEH:
  /* bitting is over now we bite */
  for(; ci>0; ci--) {
 
-   ZZvalue = data[RTjpeg_ZZ[ci]];
+   int16_t ZZvalue = data[RTjpeg_ZZ[ci]];
 
    if (ZZvalue>0)
    {
@@ -281,20 +278,17 @@ fprintf(stdout, "\n\n");
 int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
 {
  auto *qtbl = (uint32_t *)qtbla;
- int ci;
- int co;
- int i;
- unsigned char bitten;
- unsigned char bitoff;
+ int ci = 0;
+ unsigned char bitoff = 0;
 
  /* first byte always read */
- i=RTjpeg_ZZ[0];
+ int i=RTjpeg_ZZ[0];
  data[i]=((uint8_t)strm[0])*qtbl[i];
 
  /* we start at the behind */
 
- bitten = ((unsigned char)strm[1]) >> 2;
- co = 63;
+ unsigned char bitten = ((unsigned char)strm[1]) >> 2;
+ int co = 63;
  for(; co > bitten; co--) {
 
    data[RTjpeg_ZZ[co]] = 0;
@@ -517,17 +511,16 @@ int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 #ifdef MMX
 void RTjpeg::QuantInit(void)
 {
- int i;
  using P16_32 = union { int16_t *m_int16; int32_t *m_int32; };
  P16_32 qtbl;
 
  qtbl.m_int32 = m_lqt;
- for (i = 0; i < 64; i++)
+ for (int i = 0; i < 64; i++)
      qtbl.m_int16[i] = static_cast<int16_t>(m_lqt[i]);
 
  // cppcheck-suppress unreadVariable
  qtbl.m_int32 = m_cqt;
- for (i = 0; i < 64; i++)
+ for (int i = 0; i < 64; i++)
     qtbl.m_int16[i] = static_cast<int16_t>(m_cqt[i]);
 }
 
@@ -593,9 +586,7 @@ void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
 
 void RTjpeg::DctInit()
 {
-    int i;
-
-    for(i = 0; i < 64; i++)
+    for (int i = 0; i < 64; i++)
     {
         m_lqt[i] = (((uint64_t)m_lqt[i] << 32) / RTjpeg_aan_tab[i]);
         m_cqt[i] = (((uint64_t)m_cqt[i] << 32) / RTjpeg_aan_tab[i]);
@@ -2711,12 +2702,11 @@ int RTjpeg::SetSize(const int *w, const int *h)
 
     if (m_keyRate > 0)
     {
-        unsigned long tmp;
         if (m_old)
             delete [] m_oldStart;
         m_oldStart = new int16_t[((4*m_width*m_height)+32)];
 
-        tmp = (unsigned long)m_oldStart;
+        auto tmp = (unsigned long)m_oldStart;
         tmp += 32;
         tmp = tmp>>5;
 
@@ -2733,8 +2723,6 @@ int RTjpeg::SetSize(const int *w, const int *h)
 
 int RTjpeg::SetIntra(int *key, int *lm, int *cm)
 {
-    unsigned long tmp;
-
     if (*key < 0)
         *key = 0;
     if (*key > 255)
@@ -2761,7 +2749,7 @@ int RTjpeg::SetIntra(int *key, int *lm, int *cm)
     if (m_old)
         delete [] m_oldStart;
     m_oldStart = new int16_t[((4*m_width*m_height)+32)];
-    tmp = (unsigned long)m_oldStart;
+    auto tmp = (unsigned long)m_oldStart;
     tmp += 32;
     tmp = tmp >> 5;
     m_old = (int16_t *)(tmp << 5);
@@ -2795,7 +2783,6 @@ RTjpeg::~RTjpeg(void)
 
 inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
 {
- int8_t * sb;
  uint8_t * bp = planes[0];
  uint8_t * bp1 = bp + (m_width<<3);
  uint8_t * bp2 = planes[1];
@@ -2804,7 +2791,7 @@ inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
 #ifdef MMX
  emms();
 #endif
- sb = sp;
+ int8_t * sb = sp;
 /* Y */
  for(int i = m_height >> 1; i; i -= 8)
  {
@@ -2847,7 +2834,6 @@ inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
 
 inline int RTjpeg::compressYUV422(int8_t *sp, uint8_t **planes)
 {
- int8_t * sb;
  uint8_t * bp = planes[0];
  uint8_t * bp2 = planes[1];
  uint8_t * bp3 = planes[2];
@@ -2855,7 +2841,7 @@ inline int RTjpeg::compressYUV422(int8_t *sp, uint8_t **planes)
 #ifdef MMX
  emms();
 #endif
- sb=sp;
+ int8_t * sb=sp;
 /* Y */
  for(int i=m_height; i; i-=8)
  {
@@ -2891,7 +2877,7 @@ inline int RTjpeg::compressYUV422(int8_t *sp, uint8_t **planes)
 
 inline int RTjpeg::compress8(int8_t *sp, uint8_t **planes)
 {
- int8_t * sb;
+ int8_t * sb = nullptr;
  uint8_t * bp = planes[0];
 
 #ifdef MMX
@@ -3055,7 +3041,6 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 
 int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 {
- int i;
  auto *mold=(mmx_t *)_old;
  auto *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
@@ -3065,7 +3050,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
  movq_m2r(s_neg, mm6);
  pxor_r2r(mm5, mm5);
 
- for(i=0; i<8; i++)
+ for(int i=0; i<8; i++)
  {
   movq_m2r(*(mblock++), mm0);
                         movq_m2r(*(mblock++), mm2);
@@ -3090,7 +3075,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 
  if (result.q)
  {
-  for(i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
+  for(int i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
   return 0;
  }
  return 1;
@@ -3111,15 +3096,13 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, uint16_t *mask)
 
 inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 {
- int8_t * sb;
- int16_t * lblock;
  uint8_t * bp = planes[0];
  uint8_t * bp1 = bp + (m_width<<3);
  uint8_t * bp2 = planes[1];
  uint8_t * bp3 = planes[2];
+ int8_t  * sb = sp;
+ int16_t * lblock = m_old;
 
- sb = sp;
- lblock = m_old;
 /* Y */
  for(int i = m_height>>1; i; i-=8)
  {
@@ -3195,14 +3178,12 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
 inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 {
- int8_t * sb;
- int16_t *lblock;
  uint8_t * bp = planes[0];
  uint8_t * bp2 = planes[1];
  uint8_t * bp3 = planes[2];
+ int8_t  * sb=sp;
+ int16_t *lblock = m_old;
 
- sb=sp;
- lblock = m_old;
  for(int i = m_height; i; i-=8)
  {
   for(int j=0, k=0; j<m_width; j+=16, k+=8)

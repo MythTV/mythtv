@@ -811,8 +811,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
 
 uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 {
-    uint64_t key;
-    key  = ((uint64_t) m_sourceid);
+    uint64_t key  = ((uint64_t) m_sourceid);
     key |= ((uint64_t) atsc_minor) << 16;
     key |= ((uint64_t) atsc_major) << 32;
 
@@ -828,8 +827,7 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 
 uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 {
-    uint64_t key;
-    key  = ((uint64_t) m_sourceid);
+    uint64_t key  = ((uint64_t) m_sourceid);
     key |= ((uint64_t) serviceid) << 16;
     key |= ((uint64_t) networkid) << 32;
     key |= ((uint64_t) tsid)      << 48;
@@ -846,8 +844,7 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 
 uint EITHelper::GetChanID(uint program_number)
 {
-    uint64_t key;
-    key  = ((uint64_t) m_sourceid);
+    uint64_t key  = ((uint64_t) m_sourceid);
     key |= ((uint64_t) program_number) << 16;
     key |= ((uint64_t) m_channelid)    << 32;
 

@@ -124,10 +124,10 @@ bool CardUtil::IsCableCardPresent(uint inputid,
     if (inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
-        hdhomerun_device_t *hdhr;
         hdhomerun_tuner_status_t status {};
         QString device = GetVideoDevice(inputid);
-        hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+        hdhomerun_device_t *hdhr =
+            hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
         if (!hdhr)
             return false;
 
@@ -2780,8 +2780,8 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
     (void) device;
 
 #ifdef USING_HDHOMERUN
-    hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+    hdhomerun_device_t *hdhr =
+        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)
         return false;
 
@@ -2808,8 +2808,8 @@ bool CardUtil::HDHRdoesDVBC(const QString &device)
     (void) device;
 
 #ifdef USING_HDHOMERUN
-    hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+    hdhomerun_device_t *hdhr =
+        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)
         return false;
 
@@ -2853,8 +2853,8 @@ QString CardUtil::GetHDHRdesc(const QString &device)
     LOG(VB_GENERAL, LOG_INFO, "CardUtil::GetHDHRdescription(" + device +
                               ") - trying to locate device");
 
-    hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+    hdhomerun_device_t *hdhr =
+        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)
         return QObject::tr("Invalid Device ID or address.");
 
@@ -2867,8 +2867,8 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
 
     QString   description = model;
-    char     *sVersion;
-    uint32_t  iVersion;
+    char     *sVersion = nullptr;
+    uint32_t  iVersion = 0;
 
     if (hdhomerun_device_get_version(hdhr, &sVersion, &iVersion))
         description += QObject::tr(", firmware: %2").arg(sVersion);
@@ -3020,7 +3020,7 @@ uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
 #ifdef USING_ASI
     // get the buffer size
     QString sys_bufsize_contents = read_sys(sys_dev(device_num, "bufsize"));
-    bool ok;
+    bool ok = false;
     uint buf_size = sys_bufsize_contents.toUInt(&ok);
     if (!ok)
     {
@@ -3045,7 +3045,7 @@ uint CardUtil::GetASINumBuffers(uint device_num, QString *error)
 #ifdef USING_ASI
     // get the buffer size
     QString sys_numbuffers_contents = read_sys(sys_dev(device_num, "buffers"));
-    bool ok;
+    bool ok = false;
     uint num_buffers = sys_numbuffers_contents.toUInt(&ok);
     if (!ok)
     {
@@ -3069,7 +3069,7 @@ int CardUtil::GetASIMode(uint device_num, QString *error)
 {
 #ifdef USING_ASI
     QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
-    bool ok;
+    bool ok = false;
     uint mode = sys_bufsize_contents.toUInt(&ok);
     if (!ok)
     {
@@ -3093,7 +3093,7 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
 {
 #ifdef USING_ASI
     QString sys_bufsize_contents = read_sys(sys_dev(device_num, "mode"));
-    bool ok;
+    bool ok = false;
     uint old_mode = sys_bufsize_contents.toUInt(&ok);
     if (ok && old_mode == mode)
         return true;

@@ -194,8 +194,8 @@ void V4L2encRecorder::run(void)
             continue;
         }
 
-        bool failing;
-        bool failed;
+        bool failing = false;
+        bool failed = false;
         if (!m_streamHandler->Status(failed, failing))
         {
             if (failed)

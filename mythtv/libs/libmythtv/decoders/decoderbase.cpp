@@ -100,22 +100,22 @@ bool DecoderBase::PosMapFromDb(void)
 
     if (m_ringBuffer && m_ringBuffer->IsDVD())
     {
-        long long totframes;
         m_keyframeDist = 15;
         m_fps = m_ringBuffer->DVD()->GetFrameRate();
         if (m_fps < 26 && m_fps > 24)
            m_keyframeDist = 12;
-        totframes = (long long)(m_ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
+        auto totframes =
+            (long long)(m_ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
         posMap[totframes] = m_ringBuffer->DVD()->GetTotalReadPosition();
     }
     else if (m_ringBuffer && m_ringBuffer->IsBD())
     {
-        long long totframes;
         m_keyframeDist = 15;
         m_fps = m_ringBuffer->BD()->GetFrameRate();
         if (m_fps < 26 && m_fps > 24)
            m_keyframeDist = 12;
-        totframes = (long long)(m_ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
+        auto totframes =
+            (long long)(m_ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
         posMap[totframes] = m_ringBuffer->BD()->GetTotalReadPosition();
 #if 0
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -432,7 +432,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     while (upper - 1 > lower)
     {
         long long i = (upper + lower) / 2;
-        long long value;
+        long long value = 0;
         if (search_adjusted)
             value = m_positionMap[i].adjFrame;
         else
@@ -604,8 +604,8 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     }
 
     // Find keyframe <= desiredFrame, store in lastKey (frames)
-    int pre_idx;
-    int post_idx;
+    int pre_idx = 0;
+    int post_idx = 0;
     FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     PosMapEntry e;
@@ -837,8 +837,8 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
         return;
     }
 
-    int pre_idx;
-    int post_idx;
+    int pre_idx = 0;
+    int post_idx = 0;
     FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     // if exactseeks, use keyframe <= desiredFrame
@@ -1218,10 +1218,10 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
                                         long long key,
                                         float fallback_ratio)
 {
-    uint64_t key1;
-    uint64_t key2;
-    uint64_t val1;
-    uint64_t val2;
+    uint64_t key1 = 0;
+    uint64_t key2 = 0;
+    uint64_t val1 = 0;
+    uint64_t val2 = 0;
 
     frm_pos_map_t::const_iterator lower = map.lowerBound(key);
     // QMap::lowerBound() finds a key >= the given key.  We want one

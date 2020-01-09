@@ -838,8 +838,8 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame* /*Frame*/, MythPlayer *PiPPlayer
     if (!PiPPlayer)
         return;
 
-    int pipw;
-    int piph;
+    int pipw = 0;
+    int piph = 0;
     VideoFrame *pipimage     = PiPPlayer->GetCurrentFrame(pipw, piph);
     const QSize pipvideodim  = PiPPlayer->GetVideoBufferSize();
     QRect       pipvideorect = QRect(QPoint(0, 0), pipvideodim);

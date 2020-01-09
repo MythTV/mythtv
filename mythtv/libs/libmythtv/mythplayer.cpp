@@ -412,8 +412,8 @@ void MythPlayer::ReinitOSD(void)
         }
         QRect visible;
         QRect total;
-        float aspect;
-        float scaling;
+        float aspect = NAN;
+        float scaling = NAN;
         m_videoOutput->GetOSDBounds(total, visible, aspect,
                                   scaling, 1.0F);
         if (m_osd)
@@ -2123,8 +2123,8 @@ void MythPlayer::VideoStart(void)
     {
         QRect visible;
         QRect total;
-        float aspect;
-        float scaling;
+        float aspect = NAN;
+        float scaling = NAN;
 
         m_osdLock.lock();
         m_osd = new OSD(this, m_tv, m_videoOutput->GetOSDPainter());
@@ -3577,7 +3577,7 @@ uint64_t MythPlayer::GetBookmark(void)
 
 bool MythPlayer::UpdateFFRewSkip(void)
 {
-    bool skip_changed;
+    bool skip_changed = false;
 
     float temp_speed = (m_playSpeed == 0.0F) ?
         m_audio.GetStretchFactor() : m_playSpeed;
@@ -4839,7 +4839,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
     bool islivetvcur    = (m_liveTV && m_playerCtx->m_tvchain &&
                         !m_playerCtx->m_tvchain->HasNext());
     uint64_t length_ms  = TranslatePositionFrameToMs(m_totalFrames, use_cutlist);
-    uint64_t position_ms;
+    uint64_t position_ms = 0;
 
     if (signbit(offset))
     {

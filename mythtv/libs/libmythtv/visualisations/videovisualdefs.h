@@ -29,7 +29,6 @@ class LogScale
 
         delete [] m_indices;
 
-        double alpha;
         auto domain = (long double) maxscale;
         auto range  = (long double) maxrange;
         long double x  = 1.0;
@@ -50,7 +49,7 @@ class LogScale
             x -= dx;
         }
 
-        alpha = x;
+        double alpha = x;
         for (int i = 1; i < (int) domain; i++)
         {
             int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));

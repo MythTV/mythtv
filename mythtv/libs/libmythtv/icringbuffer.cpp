@@ -101,7 +101,7 @@ long long ICRingBuffer::SeekInternal(long long pos, int whence)
 
     m_posLock.lockForWrite();
 
-    long long ret;
+    long long ret = 0;
 
     // Optimize no-op seeks
     if (m_readAheadRunning &&

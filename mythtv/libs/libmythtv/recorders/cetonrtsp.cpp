@@ -431,7 +431,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
     Q_UNUSED(transport);
     if (params.contains("ssrc"))
     {
-        bool ok;
+        bool ok = false;
         ssrc = params["ssrc"].toUInt(&ok, 16);
     }
     if (params.contains("server_port"))

@@ -454,7 +454,7 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     if (angle.length() < 2)
         return 0.0;
 
-    double pos;
+    double pos = NAN;
     QChar postfix = angle.at(angle.length() - 1);
     if (postfix.isLetter())
     {
@@ -572,8 +572,7 @@ void RotorConfig::Load()
 
 void RotorConfig::SetType(const QString &type)
 {
-    DiSEqCDevRotor::dvbdev_rotor_t rtype;
-    rtype = (DiSEqCDevRotor::dvbdev_rotor_t) type.toUInt();
+    auto rtype = (DiSEqCDevRotor::dvbdev_rotor_t) type.toUInt();
     m_pos->setEnabled(rtype == DiSEqCDevRotor::kTypeDiSEqC_1_2);
 }
 
@@ -712,8 +711,8 @@ static lnb_preset lnb_presets[] =
 
 static uint FindPreset(const DiSEqCDevLNB &lnb)
 {
-    uint i;
-    for (i = 0; !lnb_presets[i].m_name.isEmpty(); i++)
+    uint i = 0;
+    for ( ; !lnb_presets[i].m_name.isEmpty(); i++)
     {
         if (lnb_presets[i].m_type   == lnb.GetType()      &&
             lnb_presets[i].m_lofSw == lnb.GetLOFSwitch()  &&

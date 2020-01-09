@@ -135,7 +135,7 @@ void DVBStreamHandler::run(void)
 void DVBStreamHandler::RunTS(void)
 {
     QByteArray dvr_dev_path = m_dvrDevPath.toLatin1();
-    int dvr_fd;
+    int dvr_fd = 0;
     for (int tries = 1; ; ++tries)
     {
         dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
@@ -513,8 +513,8 @@ void DVBStreamHandler::RetuneMonitor(void)
         const DiSEqCDevRotor *rotor = m_dvbChannel->GetRotor();
         if (rotor)
         {
-            bool was_moving;
-            bool is_moving;
+            bool was_moving = false;
+            bool is_moving = false;
             m_sigMon->GetRotorStatus(was_moving, is_moving);
 
             // Retune if move completes normally

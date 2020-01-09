@@ -162,12 +162,9 @@ generatePrecalCoef ()
 		for (int coefh = 0; coefh < 16; coefh++) {
 
 			for (int coefv = 0; coefv < 16; coefv++) {
-				int     i;
-				int     diffcoeffh;
-				int     diffcoeffv;
-
-				diffcoeffh = sqrtperte - coefh;
-				diffcoeffv = sqrtperte - coefv;
+				int i = 0;
+				int diffcoeffh = sqrtperte - coefh;
+				int diffcoeffv = sqrtperte - coefv;
 
 				// coeffs[myPos] = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC)) <<
 				// 2;
@@ -206,9 +203,8 @@ calculatePXandPY (int x, int y, int *px, int *py)
 	if (theMode == WATER_MODE) {
 		static int s_wave = 0;
 		static int s_wavesp = 0;
-		int     yy;
 
-		yy = y + RAND () % 4 - RAND () % 4 + s_wave / 10;
+		int yy = y + RAND () % 4 - RAND () % 4 + s_wave / 10;
 		if (yy < 0)
 			yy = 0;
 		if (yy >= (int)c_resoly)
@@ -229,8 +225,6 @@ calculatePXandPY (int x, int y, int *px, int *py)
 	}
 	else {
 		int     dist = 0;
-		int     ppx;
-		int     ppy;
 		int     fvitesse = vitesse << 4;
 
 		if (noisify) {
@@ -307,6 +301,8 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		if (fvitesse < -3024)
 			fvitesse = -3024;
 
+		int ppx = 0;
+		int ppy = 0;
 		if (vx < 0) { // pb avec decalage sur nb negatif
 			ppx = -(-(vx * fvitesse) >> 16);
 		/* 16 = 9 + 7 (7 = nb chiffre virgule de vitesse * (v = 128 => immobile)
@@ -361,9 +357,6 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 inline void
 getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 {
-//    register unsigned char *tmp8;
-	unsigned int i;
-
 #ifdef _DEBUG
 	if (x + y * resolx >= resolx * c_resoly) {
 		printf ("getPixel ERROR : hors du tableau... %i, %i\n", x, y);
@@ -372,7 +365,7 @@ getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 #endif
 
 	/* ATTENTION AU PETIT INDIEN  */
-	i = *(buffer + (x + y * resolx));
+	unsigned int i = *(buffer + (x + y * resolx));
 	c->b = (i >> (BLEU * 8)) & 0xff;
 	c->v = (i >> (VERT * 8)) & 0xff;
 	c->r = (i >> (ROUGE * 8)) & 0xff;
@@ -382,7 +375,7 @@ getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 /*inline*/ void
 getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 {
-	register unsigned char *tmp8;
+	register unsigned char *tmp8 = NULL;
 
 #ifdef _DEBUG
 	if (x >= resolx * c_resoly) {
@@ -411,7 +404,6 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
              const signed int *lbrutS, const signed int *lbrutD)
 {
-	int     myPos;
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
@@ -423,7 +415,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 
 	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
-	for (myPos = 0; myPos < bufsize; myPos += 2) {
+	for (int myPos = 0; myPos < bufsize; myPos += 2) {
 		Color   col1;
 		Color   col2;
 		Color   col3;
@@ -501,9 +493,6 @@ getAsmUse ()
 void
 zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
 {
-	register Uint x;
-	register Uint y;
-
 	static unsigned char s_pertedec = 8;
 	static char s_firstTime = 1;
 
@@ -567,8 +556,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 		// generation d'une table de sinus
 		if (s_firstTime) {
-			unsigned short us;
-
 			s_firstTime = 0;
 			generatePrecalCoef ();
 			select_zoom_filter ();
@@ -585,13 +572,13 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			/** modif here by jeko : plus de multiplications **/
 			{
 				int     yperte = 0;
-                                int     yofs;
+                                int     yofs = 0;
 
-				for (y = 0, yofs = 0; y < resy; y++, yofs += resx) {
+				for (Uint y = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
 					int     xperte = 0;
 
-					for (x = 0; x < resx; x++) {
+					for (Uint x = 0; x < resx; x++) {
 						brutS[xofs++] = xperte;
 						brutS[xofs++] = yperte;
 						xperte += sqrtperte;
@@ -601,7 +588,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 				buffratio = 0;
 			}
 
-			for (us = 0; us < 0xffff; us++) {
+			for (uint16_t us = 0; us < 0xffff; us++) {
                                 sintable[us] =
                                     roundf(1024 * sinf ((float) us * 360
                                                        / ((float)sizeof (sintable)
@@ -610,10 +597,9 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			}
 
 			{
-				int     loopv;
 				firedec = (int *) malloc (prevY * sizeof (int));
 
-				for (loopv = prevY; loopv != 0;) {
+				for (int loopv = prevY; loopv != 0;) {
 					static int s_decc = 0;
 					static int s_spdc = 0;
 					static int s_accel = 0;
@@ -660,8 +646,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 			/* sauvegarde de l'etat actuel dans la nouvelle source */
 
-			y = prevX * prevY * 2;
-			for (x = 0; x < y; x += 2) {
+			Uint y = prevX * prevY * 2;
+			for (Uint x = 0; x < y; x += 2) {
 				int     brutSmypos = brutS[x];
 				int     x2 = x + 1;
 				
@@ -676,8 +662,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
         }
 	
         if (s_interlaceStart==-1) {
-            signed int * tmp;
-            tmp = brutD;
+            signed int * tmp = brutD;
             brutD=brutT;
             brutT=tmp;
             tmp = freebrutD;
@@ -689,11 +674,12 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	if (s_interlaceStart>=0) {
             int maxEnd = (s_interlaceStart+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-		for (y = (Uint)s_interlaceStart; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
+                Uint y = (Uint)s_interlaceStart;
+		for ( ; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
 			Uint premul_y_prevX = y * prevX * 2;
-			for (x = 0; x < prevX; x++) {
-				int     px;
-				int     py;
+			for (Uint x = 0; x < prevX; x++) {
+				int     px = 0;
+				int     py = 0;
 				
 				calculatePXandPY (x, y, &px, &py);
 				

@@ -294,8 +294,8 @@ static void handle_transport_desc(vector<uint> &muxes,
         {
             QString dummy_mod;
             QString dummy_sistd;
-            uint dummy_tsid;
-            uint dummy_netid;
+            uint dummy_tsid = 0;
+            uint dummy_netid = 0;
             ChannelUtil::GetTuningParams(mux, dummy_mod, freq,
                                          dummy_tsid, dummy_netid, dummy_sistd);
         }
@@ -2174,8 +2174,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     static QMutex s_sepExprLock;
     static const QRegExp kSepExpr(ChannelUtil::kATSCSeparators);
 
-    bool isIntA;
-    bool isIntB;
+    bool isIntA = false;
+    bool isIntB = false;
     int a_int   = a.m_chanNum.toUInt(&isIntA);
     int b_int   = b.m_chanNum.toUInt(&isIntB);
     int a_major = a.m_atscMajorChan;
@@ -2184,10 +2184,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     int b_minor = b.m_atscMinorChan;
 
     // Extract minor and major numbers from channum..
-    bool tmp1;
-    bool tmp2;
-    int idxA;
-    int idxB;
+    int idxA = 0;
+    int idxB = 0;
     {
         QMutexLocker locker(&s_sepExprLock);
         idxA = a.m_chanNum.indexOf(kSepExpr);
@@ -2195,6 +2193,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     }
     if (idxA >= 0)
     {
+        bool tmp1 = false;
+        bool tmp2 = false;
         int major = a.m_chanNum.left(idxA).toUInt(&tmp1);
         int minor = a.m_chanNum.mid(idxA+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
@@ -2203,6 +2203,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
 
     if (idxB >= 0)
     {
+        bool tmp1 = false;
+        bool tmp2 = false;
         int major = b.m_chanNum.left(idxB).toUInt(&tmp1);
         int minor = b.m_chanNum.mid(idxB+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
@@ -2229,7 +2231,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         int a_maj = (!a_minor && isIntA) ? a_int : a_major;
         int b_maj = (!b_minor && isIntB) ? b_int : b_major;
-        int cmp;
+        int cmp = 0;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
 

@@ -96,7 +96,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
     if (!path.isEmpty())
     {
         // Locate the start block of the requested title
-        uint32_t len;
+        uint32_t len = 0;
         m_start = UDFFindFile(m_reader, qPrintable(path), &len);
         if (m_start == 0)
         {
@@ -112,7 +112,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
     else
     {
         // Create a list of the possibly encrypted files
-        uint32_t len;
+        uint32_t len = 0;
 
         // Root menu
         char name[64] = "VIDEO_TS/VIDEO_TS.VOB";

@@ -180,7 +180,7 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
     m_stream_handler->ProcessCommand("SignalStrengthPercent?", result);
     if (result.startsWith("OK:"))
     {
-        bool ok;
+        bool ok = false;
         int percent = result.mid(3).toInt(&ok);
         if (!ok)
         {
@@ -206,7 +206,7 @@ int ExternalSignalMonitor::GetLockTimeout(void)
     m_stream_handler->ProcessCommand("LockTimeout?", result, 10000);
     if (result.startsWith("OK:"))
     {
-        bool ok;
+        bool ok = false;
         int timeout = result.mid(3).toInt(&ok);
         if (!ok)
         {

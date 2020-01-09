@@ -448,7 +448,6 @@ MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject 
                                              Func slot, bool showCancel = false)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
-    MythConfirmationDialog  *pop;
     MythScreenStack         *stk = nullptr;
 
     MythMainWindow *win = GetMythMainWindow();
@@ -468,7 +467,7 @@ MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject 
         return nullptr;
     }
 
-    pop = new MythConfirmationDialog(stk, message, showCancel);
+    auto *pop = new MythConfirmationDialog(stk, message, showCancel);
     if (pop->Create())
     {
         stk->AddScreen(pop);

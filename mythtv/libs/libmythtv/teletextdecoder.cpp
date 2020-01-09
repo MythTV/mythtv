@@ -44,13 +44,13 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 {
     int err = 0;
     int latin1 = -1;
-    int pagenum;
-    int subpagenum;
-    int lang;
-    int flags;
-    uint magazine;
-    uint packet;
-    uint header;
+    int pagenum = 0;
+    int subpagenum = 0;
+    int lang = 0;
+    int flags = 0;
+    uint magazine = 0;
+    uint packet = 0;
+    uint header = 0;
 
     if (!m_teletextReader)
         return;
@@ -105,10 +105,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             return; // error in vbimode
     }
 
+    int b1=0, b2=0, b3=0, b4=0;
     switch (packet)
     {
         case 0:  // Page Header
-            int b1, b2, b3, b4;
             switch (vbimode)
             {
                 case VBI_IVTV:

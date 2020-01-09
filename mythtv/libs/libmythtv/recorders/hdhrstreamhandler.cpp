@@ -149,7 +149,7 @@ void HDHRStreamHandler::run(void)
         read_size /= VIDEO_DATA_PACKET_SIZE;
         read_size *= VIDEO_DATA_PACKET_SIZE;
 
-        size_t data_length;
+        size_t data_length = 0;
         unsigned char *data_buffer = hdhomerun_device_stream_recv(
             m_hdhomerunDevice, read_size, &data_length);
 
@@ -193,7 +193,7 @@ void HDHRStreamHandler::run(void)
 
     if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
     {
-        struct hdhomerun_video_sock_t* vs;
+        struct hdhomerun_video_sock_t* vs = nullptr;
         struct hdhomerun_video_stats_t stats {};
         vs = hdhomerun_device_get_video_sock(m_hdhomerunDevice);
         if (vs)

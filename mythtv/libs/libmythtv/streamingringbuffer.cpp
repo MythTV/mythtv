@@ -25,9 +25,8 @@ StreamingRingBuffer::~StreamingRingBuffer()
 
 bool StreamingRingBuffer::IsOpen(void) const
 {
-    bool result;
     m_rwLock.lockForRead();
-    result = (bool)m_context;
+    bool result = (bool)m_context;
     m_rwLock.unlock();
     return result;
 }

@@ -784,7 +784,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
     set_ctrls(chanfd, ext_ctrls);
 
-    bool ok;
+    bool ok = false;
     int audioinput = m_audioDeviceName.toUInt(&ok);
     if (ok)
     {
@@ -837,7 +837,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 #ifdef V4L2_CAP_SLICED_VBI_CAPTURE
     if (m_supportsSlicedVbi)
     {
-        int fd;
+        int fd = 0;
 
         if (OpenVBIDevice() >= 0)
             fd = m_vbiFd;
@@ -950,7 +950,7 @@ void MpegRecorder::run(void)
     }
 
     auto *buffer = new unsigned char[m_bufferSize + 1];
-    int len;
+    int len = 0;
     int remainder = 0;
 
     bool      good_data = false;
@@ -958,7 +958,7 @@ void MpegRecorder::run(void)
     QDateTime gap_start;
 
     MythTimer elapsedTimer;
-    float elapsed;
+    float elapsed = NAN;
     long long bytesRead = 0;
     int dummyBPS = 0;  // Bytes per second, but env var is BITS PER SECOND
 
@@ -1342,7 +1342,7 @@ bool MpegRecorder::StartEncoding(void)
     int idx = 1;
     for ( ; idx < 50; ++idx)
     {
-        uint8_t dummy;
+        uint8_t dummy = 0;
         int len = read(m_readfd, &dummy, 0);
         if (len == 0)
             break;

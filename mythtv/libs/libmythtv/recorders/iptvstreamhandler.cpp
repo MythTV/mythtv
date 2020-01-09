@@ -345,7 +345,7 @@ IPTVStreamHandlerReadHelper::IPTVStreamHandlerReadHelper(
 void IPTVStreamHandlerReadHelper::ReadPending(void)
 {
     QHostAddress sender;
-    quint16 senderPort;
+    quint16 senderPort = 0;
     bool sender_null = m_sender.isNull();
 
     if (0 == m_stream)

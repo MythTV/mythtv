@@ -1108,14 +1108,13 @@ bool VideoDisplayProfile::DeleteProfileGroup(const QString &GroupName, const QSt
 void VideoDisplayProfile::CreateProfiles(const QString &HostName)
 {
     QStringList profiles = GetProfiles(HostName);
-    uint groupid;
 
 #ifdef USING_OPENGL
     if (!profiles.contains("OpenGL High Quality"))
     {
         (void) QObject::tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
-        groupid = CreateProfileGroup("OpenGL High Quality", HostName);
+        uint groupid = CreateProfileGroup("OpenGL High Quality", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 2, true, "opengl-yv12",
                       "shader:high", "shader:high");
@@ -1124,7 +1123,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("OpenGL Normal"))
     {
         (void) QObject::tr("OpenGL Normal", "Sample: OpenGL medium quality");
-        groupid = CreateProfileGroup("OpenGL Normal", HostName);
+        uint groupid = CreateProfileGroup("OpenGL Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 2, true, "opengl-yv12",
                       "shader:medium", "shader:medium");
@@ -1133,7 +1132,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("OpenGL Slim"))
     {
         (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
-        groupid = CreateProfileGroup("OpenGL Slim", HostName);
+        uint groupid = CreateProfileGroup("OpenGL Slim", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 1, true, "opengl",
                       "medium", "medium");
@@ -1144,7 +1143,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("VAAPI Normal"))
     {
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
-        groupid = CreateProfileGroup("VAAPI Normal", HostName);
+        uint groupid = CreateProfileGroup("VAAPI Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vaapi", 2, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
@@ -1158,7 +1157,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("VDPAU Normal"))
     {
         (void) QObject::tr("VDPAU Normal", "Sample: VDPAU medium quality");
-        groupid = CreateProfileGroup("VDPAU Normal", HostName);
+        uint groupid = CreateProfileGroup("VDPAU Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vdpau", 1, true, "opengl-hw",
                       "driver:medium", "driver:medium");
@@ -1170,7 +1169,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     {
         (void) QObject::tr("MediaCodec Normal",
                            "Sample: MediaCodec Normal");
-        groupid = CreateProfileGroup("MediaCodec Normal", HostName);
+        uint groupid = CreateProfileGroup("MediaCodec Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec-dec", 4, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");
@@ -1181,7 +1180,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("NVDEC Normal"))
     {
         (void) QObject::tr("NVDEC Normal", "Sample: NVDEC Normal");
-        groupid = CreateProfileGroup("NVDEC Normal", HostName);
+        uint groupid = CreateProfileGroup("NVDEC Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "nvdec", 1, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
@@ -1191,7 +1190,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
 #if defined(USING_VTB) && defined(USING_OPENGL)
     if (!profiles.contains("VideoToolBox Normal")) {
         (void) QObject::tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
-        groupid = CreateProfileGroup("VideoToolBox Normal", HostName);
+        uint groupid = CreateProfileGroup("VideoToolBox Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vtb", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
@@ -1202,7 +1201,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("MMAL"))
     {
         (void) QObject::tr("MMAL", "Sample: MMAL");
-        groupid = CreateProfileGroup("MMAL", HostName);
+        uint groupid = CreateProfileGroup("MMAL", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "mmal", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
@@ -1213,7 +1212,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("V4L2 Codecs"))
     {
         (void) QObject::tr("V4L2 Codecs", "Sample: V4L2");
-        groupid = CreateProfileGroup("V4L2 Codecs", HostName);
+        uint groupid = CreateProfileGroup("V4L2 Codecs", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "v4l2-dec", 1, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");

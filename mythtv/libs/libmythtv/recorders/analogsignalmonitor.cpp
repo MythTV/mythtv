@@ -26,7 +26,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
     int videofd = m_channel->GetFd();
     if (videofd >= 0)
     {
-        uint32_t caps;
+        uint32_t caps = 0;
         if (!CardUtil::GetV4LInfo(videofd, m_card, m_driver, m_version, caps))
             return;
 
@@ -50,8 +50,6 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
         return false;
     }
 
-    int  current_audio;
-
     struct v4l2_ext_control  ext_ctrl {};
     struct v4l2_ext_controls ext_ctrls {};
 
@@ -69,7 +67,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
         return false;
     }
 
-    current_audio = ext_ctrls.controls->value;
+    int current_audio = ext_ctrls.controls->value;
 
     if (audtype != current_audio)
     {

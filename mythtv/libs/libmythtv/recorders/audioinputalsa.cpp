@@ -115,7 +115,7 @@ int AudioInputALSA::GetNumReadyBytes(void)
     int bytes_avail = 0;
     if (m_pcmHandle != nullptr)
     {
-        snd_pcm_sframes_t frames_avail;
+        snd_pcm_sframes_t frames_avail = 0;
         int pcm_state = snd_pcm_state(m_pcmHandle);
         switch (pcm_state)
         {
@@ -132,7 +132,7 @@ int AudioInputALSA::GetNumReadyBytes(void)
 
 bool AudioInputALSA::PrepHwParams(void)
 {
-    snd_pcm_hw_params_t* hwparams;
+    snd_pcm_hw_params_t* hwparams = nullptr;
     snd_pcm_hw_params_alloca(&hwparams);
     if (AlsaBad(snd_pcm_hw_params_any(m_pcmHandle, hwparams),
                 "failed to init hw params"))
@@ -149,8 +149,8 @@ bool AudioInputALSA::PrepHwParams(void)
         return false;
     if (VERBOSE_LEVEL_CHECK(VB_AUDIO, LOG_DEBUG))
     {
-        uint min_chans;
-        uint max_chans;
+        uint min_chans = 0;
+        uint max_chans = 0;
         if(AlsaBad(snd_pcm_hw_params_get_channels_min(hwparams, &min_chans),
                     QString("unable to get min channel count")))
             min_chans = 0;
@@ -214,9 +214,9 @@ bool AudioInputALSA::PrepHwParams(void)
 
 bool AudioInputALSA::PrepSwParams(void)
 {
-    snd_pcm_sw_params_t* swparams;
+    snd_pcm_sw_params_t* swparams = nullptr;
     snd_pcm_sw_params_alloca(&swparams);
-    snd_pcm_uframes_t boundary;
+    snd_pcm_uframes_t boundary = 0;
     if (AlsaBad(snd_pcm_sw_params_current(m_pcmHandle, swparams),
                "failed to get swparams"))
         return false;
@@ -242,8 +242,8 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
     auto* bufptr = (unsigned char*)buf;
     snd_pcm_uframes_t to_read = snd_pcm_bytes_to_frames(m_pcmHandle, nbytes);
     snd_pcm_uframes_t nframes = to_read;
-    snd_pcm_sframes_t nread;
-    snd_pcm_sframes_t avail;
+    snd_pcm_sframes_t nread = 0;
+    snd_pcm_sframes_t avail = 0;
     int retries = 0;
     while (nframes > 0 && retries < 3)
     {

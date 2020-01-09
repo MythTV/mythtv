@@ -102,8 +102,8 @@ void MythVAAPIInterop::InitaliseDisplay(void)
 {
     if (!m_vaDisplay)
         return;
-    int major;
-    int minor;
+    int major = 0;
+    int minor = 0;
     if (vaInitialize(m_vaDisplay, &major, &minor) != VA_STATUS_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI display");
@@ -181,7 +181,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
         return false;
     }
 
-    int ret;
+    int ret = 0;
     QString args;
     QString deinterlacer = "bob";
     if (DEINT_MEDIUM == Deinterlacer)

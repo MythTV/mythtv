@@ -1153,7 +1153,6 @@ void MythAirplayServer::DisconnectAllClients(const QByteArray &session)
 
     while (it != m_connections.end())
     {
-        QTcpSocket *socket;
         AirplayConnection& cnx = it.value();
 
         if (it.key() == session ||
@@ -1171,7 +1170,7 @@ void MythAirplayServer::DisconnectAllClients(const QByteArray &session)
         {
             StopSession(it.key());
         }
-        socket = cnx.m_reverseSocket;
+        QTcpSocket *socket = cnx.m_reverseSocket;
         if (socket)
         {
             socket->disconnect();

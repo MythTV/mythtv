@@ -494,9 +494,8 @@ void NuppelVideoRecorder::SetupRTjpeg(void)
 {
     m_pictureFormat = AV_PIX_FMT_YUV420P;
 
-    int setval;
     m_rtjc = new RTjpeg();
-    setval = RTJ_YUV420;
+    int setval = RTJ_YUV420;
     m_rtjc->SetFormat(&setval);
     setval = (int)(m_hOut * m_heightMultiplier);
     m_rtjc->SetSize(&m_wOut, &setval);
@@ -510,7 +509,7 @@ void NuppelVideoRecorder::UpdateResolutions(void)
 {
     int tot_height = (int)(m_height * m_heightMultiplier);
     double aspectnum = m_wOut / (double)tot_height;
-    uint aspect;
+    uint aspect = 0;
 
     if (aspectnum == 0.0)
         aspect = 0;
@@ -629,7 +628,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 {
     if (!skipdevice)
     {
-        int blocksize;
+        int blocksize = 0;
         m_audioDevice = AudioInput::CreateDevice(m_audioDeviceName.toLatin1());
         if (!m_audioDevice)
         {
@@ -664,7 +663,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (m_compressAudio)
     {
-        int tmp;
+        int tmp = 0;
         m_gf = lame_init();
         lame_set_bWriteVbrTag(m_gf, 0);
         lame_set_quality(m_gf, m_mp3Quality);
@@ -753,7 +752,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 
 void NuppelVideoRecorder::InitBuffers(void)
 {
-    int videomegs;
+    int videomegs = 0;
     // cppcheck-suppress variableScope
     int audiomegs = 2;
 
@@ -1793,11 +1792,9 @@ void NuppelVideoRecorder::KillChildren(void)
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 {
-    int act;
-    long tcres;
     struct timeval now {};
 
-    act = m_actVideoBuffer;
+    int act = m_actVideoBuffer;
 
     if (!m_videoBuffer[act]->freeToBuffer) {
         return;
@@ -1805,7 +1802,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
     gettimeofday(&now, &m_tzone);
 
-    tcres = (now.tv_sec-m_stm.tv_sec)*1000 + now.tv_usec/1000 - m_stm.tv_usec/1000;
+    long tcres = (now.tv_sec-m_stm.tv_sec)*1000 + now.tv_usec/1000 - m_stm.tv_usec/1000;
 
     m_useBttv = 0;
     // here is the non preferable timecode - drop algorithm - fallback

@@ -41,7 +41,7 @@ void HLSStreamWorker::run(void)
     m_downloader = new MythSingleDownload;
     m_downloaderLock.unlock();
 
-    uint64_t delay;
+    uint64_t delay = 0;
     int retries = 0;
     while (!m_cancel)
     {

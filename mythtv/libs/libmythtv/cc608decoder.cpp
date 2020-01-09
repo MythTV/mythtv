@@ -100,8 +100,8 @@ static const QChar extendedchar3[] =
 
 void CC608Decoder::FormatCCField(int tc, int field, int data)
 {
-    int len;
-    int mode;
+    int len = 0;
+    int mode = 0;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
     {
@@ -563,8 +563,8 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
     // bttv-0.7 reads don't seem to work as well so if read intervals
     // vary from this, be more conservative in detecting duplicate
     // CC codes.
-    int dup_text_fudge;
-    int dup_ctrl_fudge;
+    int dup_text_fudge = 0;
+    int dup_ctrl_fudge = 0;
     if (m_badVbi[field] < 100 && b1 != 0 && b2 != 0)
     {
         int d = tc - m_lastTc[field];
@@ -671,13 +671,12 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         len = min(tmpbuf.length(), 255);
     }
 
-    unsigned char f;
     unsigned char *bp = m_rbuf;
     *(bp++) = m_row[mode];
     *(bp++) = m_rowCount[mode];
     *(bp++) = m_style[mode];
     // overload resumetext field
-    f = m_resumeText[mode];
+    unsigned char f = m_resumeText[mode];
     f |= mode << 4;
     if (m_lineCont[mode])
         f |= CC_LINE_CONT;

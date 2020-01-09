@@ -268,7 +268,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->deinterlace_inuse2x = 0;
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
-    int width_aligned;
+    int width_aligned = 0;
     int height_aligned = (_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
     if (!_aligned)
         width_aligned = _width;

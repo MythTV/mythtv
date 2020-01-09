@@ -105,7 +105,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
 
     for (uint plane = 0; plane < count; ++plane)
     {
-        GLuint textureid;
+        GLuint textureid = 0;
         Context->glGenTextures(1, &textureid);
         if (!textureid)
             continue;

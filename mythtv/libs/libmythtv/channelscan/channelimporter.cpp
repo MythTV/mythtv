@@ -1695,7 +1695,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
         {
             string ret;
             cin >> ret;
-            bool ok;
+            bool ok = false;
             uint val = QString(ret.c_str()).toUInt(&ok);
             if (ok && (val == 1 || val == 2 || val == 4))
             {
@@ -1766,7 +1766,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         {
             string ret;
             cin >> ret;
-            bool ok;
+            bool ok = false;
             uint val = QString(ret.c_str()).toUInt(&ok);
             if (ok && (1 <= val) && (val <= 3))
             {
@@ -1834,7 +1834,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         {
             string ret;
             cin >> ret;
-            bool ok;
+            bool ok = false;
             uint val = QString(ret.c_str()).toUInt(&ok);
             if (ok && (1 <= val) && (val <= 3))
             {

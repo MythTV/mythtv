@@ -77,7 +77,6 @@ static bool eol(char p) {
 }
 
 static inline void trail_space(char *s) {
-  int i;
   while (isspace(*s)) {
     char *copy = s;
     do {
@@ -85,7 +84,7 @@ static inline void trail_space(char *s) {
       copy++;
     } while(*copy);
   }
-  i = strlen(s) - 1;
+  int i = strlen(s) - 1;
   while (i > 0 && isspace(s[i]))
     s[i--] = '\0';
 }
@@ -95,7 +94,6 @@ static inline void trail_space(char *s) {
  */
 static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t len) {
   off_t nread = 0;
-  char *s;
 
   // Since our RemoteFile code sleeps 200ms whenever we get back less data
   // than requested, but this code just keeps trying to read until it gets
@@ -121,7 +119,7 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
   demuxstr->buflen += nread;
   demuxstr->buf[demuxstr->buflen] = '\0';
 
-  s = strchr(demuxstr->buf, '\n');
+  char *s = strchr(demuxstr->buf, '\n');
 
   if (line && (s || demuxstr->buflen)) {
 
@@ -285,7 +283,7 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
 static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t *current) {
 
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
+  int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -304,7 +302,7 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
     char *p=line;
     for (current->lines=1; current->lines <= SUB_MAX_TEXT; current->lines++) {
       char *q=nullptr;
-      int len;
+      int len = 0;
       for (q=p,len=0; *p && *p!='\r' && *p!='\n' && *p!='|' &&
                (strncasecmp(p,"[br]",4) != 0); p++,len++);
       current->text[current->lines-1]=(char *)malloc (len+1);
@@ -323,8 +321,8 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
 
 static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *current) {
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
-  int i;
+  int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
+  int i = 0;
 
   memset(current,0,sizeof(subtitle_t));
   do {
@@ -337,9 +335,9 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
   i=0;
   int end_sub=0;
   do {
-    char *p; /* pointer to the curently read char */
+    char *p = nullptr; /* pointer to the curently read char */
     char temp_line[SUB_BUFSIZE]; /* subtitle line that will be transfered to current->text[i] */
-    int temp_index; /* ... and its index wich 'points' to the first EMPTY place -> last read char is at temp_index-1 if temp_index>0 */
+    int temp_index = 0; /* ... and its index wich 'points' to the first EMPTY place -> last read char is at temp_index-1 if temp_index>0 */
     temp_line[SUB_BUFSIZE-1]='\0'; /* just in case... */
     if(!read_line_from_input(demuxstr,line,LINE_LEN)) {
       if(i)
@@ -414,7 +412,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
 
 static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *current) {
   char line[LINE_LEN + 1];
-  int a1,a2,a3,b1,b2,b3; // NOLINT(readability-isolate-declaration)
+  int a1=0,a2=0,a3=0,b1=0,b2=0,b3=0; // NOLINT(readability-isolate-declaration)
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -472,8 +470,8 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
    * WARNING: full XML parses can be required for proper parsing
    */
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
-  int plen;
+  int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
+  int plen = 0;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -515,22 +513,22 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
 }
 
 static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *current) {
-  int comma;
+  int comma = 0;
   static int s_maxComma = 32; /* let's use 32 for the case that the */
   /*  amount of commas increase with newer SSA versions */
 
-  int hour1;
-  int min1;
-  int sec1;
-  int hunsec1;
-  int hour2;
-  int min2;
-  int sec2;
-  int hunsec2;
-  int nothing;
+  int hour1   = 0;
+  int min1    = 0;
+  int sec1    = 0;
+  int hunsec1 = 0;
+  int hour2   = 0;
+  int min2    = 0;
+  int sec2    = 0;
+  int hunsec2 = 0;
+  int nothing = 0;
   char line[LINE_LEN + 1];
   char line3[LINE_LEN + 1];
-  char *tmp;
+  char *tmp = nullptr;
 
   do {
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
@@ -598,8 +596,8 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
 static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
   char text[LINE_LEN + 1];
-  char *s;
-  char *d;
+  char *s = nullptr;
+  char *d = nullptr;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -636,8 +634,8 @@ static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *cur
 
 static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
-  float a;
-  float b;
+  float a = NAN;
+  float b = NAN;
   int num=0;
 
   do {
@@ -664,7 +662,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     if (eol(*p))
       return nullptr;
 
-    char *q;
+    char *q = nullptr;
     for (q=p; !eol(*q); q++);
     *q='\0';
     if (strlen(p)) {
@@ -718,9 +716,9 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
     char line1[LINE_LEN+1];
     char line2[LINE_LEN+1];
     char directive[LINE_LEN+1];
-    char *p;
-    char *q;
-    unsigned a1, a2, a3, a4, b1, b2, b3, b4; // NOLINT(readability-isolate-declaration)
+    char *p = nullptr;
+    char *q = nullptr;
+    unsigned a1=0, a2=0, a3=0, a4=0, b1=0, b2=0, b3=0, b4=0; // NOLINT(readability-isolate-declaration)
     unsigned comment = 0;
     static unsigned s_jacoTimeRes = 30;
     static int s_jacoShift = 0;
@@ -740,8 +738,8 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                 if (line1[0] == '#') {
                     int hours = 0;
                     int minutes = 0;
-                    int seconds;
-                    int delta;
+                    int seconds = 0;
+                    int delta = 0;
                     unsigned units = s_jacoShift;
                     int inverter = 1;
                     switch (toupper(line1[1])) {
@@ -926,9 +924,9 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
 
 static subtitle_t *sub_read_line_subviewer2(demux_sputext_t *demuxstr, subtitle_t *current) {
     char line[LINE_LEN+1];
-    int a1,a2,a3,a4; // NOLINT(readability-isolate-declaration)
+    int a1=0,a2=0,a3=0,a4=0; // NOLINT(readability-isolate-declaration)
     char *p=nullptr;
-    int i;
+    int i = 0;
 
     while (!current->text[0]) {
         if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
@@ -958,9 +956,9 @@ static subtitle_t *sub_read_line_subviewer2(demux_sputext_t *demuxstr, subtitle_
 
 static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
-  int h;
-  int m;
-  int s;
+  int h = 0;
+  int m = 0;
+  int s = 0;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -1027,9 +1025,9 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
 static int sub_autodetect (demux_sputext_t *demuxstr) {
 
   char line[LINE_LEN + 1];
-  int  i;
-  int  j=0;
-  char p;
+  int  i = 0;
+  int  j = 0;
+  char p = 0;
 
   while (j < 100) {
     j++;
@@ -1117,9 +1115,6 @@ static int sub_autodetect (demux_sputext_t *demuxstr) {
 
 subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
-  int n_max;
-  int timeout;
-  subtitle_t *first;
   // These functions all return either 1) nullptr, 2) (subtitle_t*)ERR,
   // or 3) a pointer to the dest parameter.
   subtitle_t * (*func[])(demux_sputext_t *demuxstr,subtitle_t *dest)=
@@ -1157,10 +1152,11 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   demuxstr->buflen = 0;
   demuxstr->emptyReads = 0;
 
-  demuxstr->num=0;n_max=32;
-  first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));
+  demuxstr->num=0;
+  int n_max=32;
+  auto *first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));
   if(!first) return nullptr;
-  timeout = MAX_TIMEOUT;
+  int timeout = MAX_TIMEOUT;
 
   if (demuxstr->uses_time) timeout *= 100;
   else timeout *= 10;

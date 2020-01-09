@@ -52,7 +52,7 @@ error(const char *str, ...)
 static void
 out_of_sync(struct vbi *vbi)
 {
-    int i;
+    int i = 0;
 
     // discard all in progress pages
     for (i = 0; i < 8; ++i)
@@ -66,8 +66,8 @@ static void
 vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
 {
     struct vt_event ev[1];
-    struct vbi_client *cl;
-    struct vbi_client *cln;
+    struct vbi_client *cl = NULL;
+    struct vbi_client *cln = NULL;
 
     ev->resource = vbi;
     ev->type = type;
@@ -168,8 +168,8 @@ vbi_pll_reset(struct vbi *vbi, int fine_tune)
 static int
 vt_line(struct vbi *vbi, unsigned char *p)
 {
-    struct vt_page *cvtp;
-    struct raw_page *rvtp;
+    struct vt_page *cvtp = NULL;
+    struct raw_page *rvtp = NULL;
     int err = 0;
 
     int hdr = hamm16(p, &err);
@@ -323,8 +323,8 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
     int dt[256];
     int hi[6];
     int lo[6];
-    int i;
-    int n;
+    int i = 0;
+    int n = 0;
     int bpb = vbi->bpb;
 
     /* remove DC. edge-detector */
@@ -401,8 +401,8 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
 void
 vbi_handler(struct vbi *vbi, int fd)
 {
-    int n;
-    unsigned int seq;
+    int n = 0;
+    unsigned int seq = 0;
 
     (void)fd;
 
@@ -444,7 +444,7 @@ vbi_handler(struct vbi *vbi, int fd)
 int
 vbi_add_handler(struct vbi *vbi, void *handler, void *data)
 {
-    struct vbi_client *cl;
+    struct vbi_client *cl = NULL;
 
     if (!(cl = malloc(sizeof(*cl))))
        return -1;
@@ -462,7 +462,7 @@ vbi_add_handler(struct vbi *vbi, void *handler, void *data)
 void
 vbi_del_handler(struct vbi *vbi, void *handler, void *data)
 {
-    struct vbi_client *cl;
+    struct vbi_client *cl = NULL;
 
     for (cl = (void*) vbi->clients->first; cl->node->next; cl = (void*) cl->node->next)
     {

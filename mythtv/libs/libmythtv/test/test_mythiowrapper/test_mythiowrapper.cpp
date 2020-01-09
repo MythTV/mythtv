@@ -38,7 +38,7 @@ void TestMythIOWrapper::local_directory_test(void)
     int dirid = mythdir_opendir(qPrintable(dirname));
     QVERIFY2(dirid != 0, "mythdir_opendir failed");
 
-    char *name;
+    char *name = nullptr;
     QSet<QString> found;
     while ((name = mythdir_readdir(dirid)) != nullptr) {
         if (name[0] != '.')

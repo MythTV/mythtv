@@ -1901,8 +1901,8 @@ bool ChannelScanSM::HasTimedOut(void)
         const DiSEqCDevRotor *rotor = GetDVBChannel()->GetRotor();
         if (rotor)
         {
-            bool was_moving;
-            bool is_moving;
+            bool was_moving = false;
+            bool is_moving = false;
             sigmon->GetRotorStatus(was_moving, is_moving);
             if (was_moving && !is_moving)
             {

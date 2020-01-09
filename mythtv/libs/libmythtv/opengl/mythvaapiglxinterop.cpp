@@ -384,7 +384,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
                 GLX_BLUE_SIZE, 8,
                 GLX_ALPHA_SIZE, 8,
                 None };
-        int fbcount;
+        int fbcount = 0;
         GLXFBConfig *fbs = glXChooseFBConfig(display, DefaultScreen(display), fbattribs, &fbcount);
         if (!fbcount)
         {

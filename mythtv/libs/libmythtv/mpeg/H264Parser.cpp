@@ -1,6 +1,7 @@
 // MythTV headers
 #include "H264Parser.h"
 #include <iostream>
+
 #include "mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate
 
@@ -423,8 +424,6 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                               const uint64_t  stream_offset)
 {
     const uint8_t *startP = bytes;
-    const uint8_t *endP;
-    bool           good_nal_unit;
 
     m_stateChanged = false;
     m_onFrame      = false;
@@ -432,7 +431,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 
     while (startP < bytes + byte_count && !m_onFrame)
     {
-        endP = avpriv_find_start_code(startP,
+        const uint8_t *endP = avpriv_find_start_code(startP,
                                   bytes + byte_count, &m_syncAccumulator);
 
         bool found_start_code = ((m_syncAccumulator & 0xffffff00) == 0x00000100);
@@ -501,7 +500,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
             m_nalUnitType = m_syncAccumulator & 0x1f;
             m_nalRefIdc = (m_syncAccumulator >> 5) & 0x3;
 
-            good_nal_unit = true;
+            bool good_nal_unit = true;
             if (m_nalRefIdc)
             {
                 /* nal_ref_idc shall be equal to 0 for all NAL units having
@@ -830,11 +829,9 @@ bool H264Parser::decode_Header(GetBitContext *gb)
  */
 void H264Parser::decode_SPS(GetBitContext * gb)
 {
-    int profile_idc;
-
     m_seenSps = true;
 
-    profile_idc = get_bits(gb, 8);
+    int profile_idc = get_bits(gb, 8);
     get_bits1(gb);      // constraint_set0_flag
     get_bits1(gb);      // constraint_set1_flag
     get_bits1(gb);      // constraint_set2_flag
@@ -886,10 +883,6 @@ void H264Parser::decode_SPS(GetBitContext * gb)
      */
     m_log2MaxFrameNum = get_ue_golomb(gb) + 4;
 
-    int  offset_for_non_ref_pic;
-    int  offset_for_top_to_bottom_field;
-    uint tmp;
-
     /*
       m_picOrderCntType specifies the method to decode picture order
       count (as specified in subclause 8.2.1). The value of
@@ -928,7 +921,8 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           8.2.1. The value of offset_for_non_ref_pic shall be in the
           range of -231 to 231 - 1, inclusive.
          */
-        offset_for_non_ref_pic = get_se_golomb(gb);
+        int offset_for_non_ref_pic = get_se_golomb(gb);
+        (void) offset_for_non_ref_pic; // suppress unused var warning
 
         /*
           offset_for_top_to_bottom_field is used to calculate the
@@ -936,7 +930,8 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           subclause 8.2.1. The value of offset_for_top_to_bottom_field
           shall be in the range of -231 to 231 - 1, inclusive.
          */
-        offset_for_top_to_bottom_field = get_se_golomb(gb);
+        int offset_for_top_to_bottom_field = get_se_golomb(gb);
+        (void) offset_for_top_to_bottom_field; // suppress unused var warning
 
         /*
           offset_for_ref_frame[ i ] is an element of a list of
@@ -945,12 +940,10 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           subclause 8.2.1. The value of offset_for_ref_frame[ i ]
           shall be in the range of -231 to 231 - 1, inclusive.
          */
-        tmp = get_ue_golomb(gb);
+        uint tmp = get_ue_golomb(gb);
         for (uint idx = 0; idx < tmp; ++idx)
             get_se_golomb(gb);  // offset_for_ref_frame[i]
     }
-    (void) offset_for_non_ref_pic; // suppress unused var warning
-    (void) offset_for_top_to_bottom_field; // suppress unused var warning
 
     /*
       m_numRefFrames specifies the maximum number of short-term and
@@ -1315,11 +1308,8 @@ void H264Parser::vui_parameters(GetBitContext * gb)
 
 double H264Parser::frameRate(void) const
 {
-    uint64_t    num;
-    double      fps;
-
-    num   = 500 * (uint64_t)m_timeScale; /* 1000 * 0.5 */
-    fps   = ( m_unitsInTick != 0 ? num / (double)m_unitsInTick : 0 ) / 1000;
+    uint64_t num   = 500 * (uint64_t)m_timeScale; /* 1000 * 0.5 */
+    double   fps   = ( m_unitsInTick != 0 ? num / (double)m_unitsInTick : 0 ) / 1000;
 
     return fps;
 }

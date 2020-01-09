@@ -72,7 +72,7 @@ bool operator < (const DSMCCCacheKey &key1, const DSMCCCacheKey &key2)
     const char *data2 = key2.data();
     uint size1 = key1.size();
     uint size2 = key2.size();
-    uint size;
+    uint size = 0;
     if (size1 < size2)
         size = size1;
     else
@@ -180,8 +180,6 @@ DSMCCCacheDir *DSMCCCache::Directory(const DSMCCCacheReference &ref)
 void DSMCCCache::CacheFileData(const DSMCCCacheReference &ref,
                                const QByteArray &data)
 {
-    DSMCCCacheFile *pFile;
-
     // Do we have the file already?
     LOG(VB_DSMCC, LOG_INFO,
         QString("[DSMCCCache] Adding file data size %1 for reference %2")
@@ -190,6 +188,7 @@ void DSMCCCache::CacheFileData(const DSMCCCacheReference &ref,
     QMap<DSMCCCacheReference, DSMCCCacheFile*>::Iterator fil =
         m_files.find(ref);
 
+    DSMCCCacheFile *pFile = nullptr;
     if (fil == m_files.end())
     {
         pFile = new DSMCCCacheFile(ref);

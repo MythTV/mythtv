@@ -21,20 +21,17 @@ void tentacle_new (void);
 void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit);
 
 void tentacle_free (void) {
-        int tmp;
 	free (vals);
-        for (tmp=0;tmp<nbgrid;tmp++) {
+        for (int tmp=0;tmp<nbgrid;tmp++) {
                 grid3d_free(&(grille[tmp]));
         }
 }
 
 void tentacle_new (void) {
-	int tmp;
-
 	v3d center = {0,-17.0,0};
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
-	for (tmp=0;tmp<nbgrid;tmp++) {
+	for (int tmp=0;tmp<nbgrid;tmp++) {
 		// Pseudo-random is good enough. Don't need a true random.
 		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		int z = 45+rand()%30;
@@ -67,9 +64,7 @@ lighten (unsigned char value, float power)
 static void
 lightencolor (int *col, float power)
 {
-	unsigned char *color;
-
-	color = (unsigned char *) col;
+	unsigned char *color = (unsigned char *) col;
 	*color = lighten (*color, power);
 	color++;
 	*color = lighten (*color, power);
@@ -102,7 +97,6 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	static float s_distT2 = 0.0F;
 	static float s_rot = 0.0F; // entre 0 et 2 * M_PI
 	static int s_happens = 0;
-	float tmp;
         static int s_rotation = 0;
 	static int s_lock = 0;
 
@@ -115,7 +109,7 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	else s_lock --;
 //	happens = 1;
 	
-	tmp = s_happens?8.0F:0;
+	float tmp = s_happens?8.0F:0;
 	*dist2 = s_distT2 = (tmp + 15.0F*s_distT2)/16.0F;
 
 	tmp = 30+D-90.0F*(1.0F+sinf(lcycle*19/20));
@@ -163,12 +157,9 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 	static float s_lig = 1.15F;
 	static float s_ligs = 0.1F;
 
-	int color;
-	int colorlow;
-
-	float dist;
-	float dist2;
-	float rotangle;
+	float dist = NAN;
+	float dist2 = NAN;
+	float rotangle = NAN;
 
 	if ((!drawit) && (s_ligs>0.0F))
 		s_ligs = -s_ligs;
@@ -186,8 +177,8 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff0000,0x010000);
 		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff000000,0x01000000);
 		
-		color = s_col;
-		colorlow = s_col;
+                int color = s_col;
+                int colorlow = s_col;
 		
 		lightencolor(&color,s_lig * 2.0F + 2.0F);
 		lightencolor(&colorlow,(s_lig/3.0F)+0.67F);

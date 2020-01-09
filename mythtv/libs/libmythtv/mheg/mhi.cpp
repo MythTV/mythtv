@@ -241,7 +241,7 @@ void MHIContext::run(void)
 
     while (!m_stop)
     {
-        int toWait;
+        int toWait = 0;
         // Dequeue and process any key presses.
         int key = 0;
         do
@@ -906,7 +906,7 @@ int MHIContext::GetChannelIndex(const QString &str)
                 break; // Malformed.
             // The various fields are expressed in hexadecimal.
             // Convert them to decimal for the DB.
-            bool ok;
+            bool ok = false;
             int netID = list[0].toInt(&ok, 16);
             if (!ok)
                 break;
@@ -943,7 +943,7 @@ int MHIContext::GetChannelIndex(const QString &str)
         else if (str.startsWith("rec://svc/lcn/"))
         {
             // I haven't seen this yet so this is untested.
-            bool ok;
+            bool ok = false;
             int channelNo = str.mid(14).toInt(&ok); // Decimal integer
             if (!ok)
                 break;
@@ -1054,10 +1054,10 @@ bool MHIContext::BeginStream(const QString &stream, MHStream *notify)
         return false;
     if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
     {
-        int netId;
-        int origNetId;
-        int transportId;
-        int serviceId;
+        int netId = 0;
+        int origNetId = 0;
+        int transportId = 0;
+        int serviceId = 0;
         GetServiceInfo(chan, netId, origNetId, transportId, serviceId);
     }
 
@@ -1369,7 +1369,6 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
 {
     if (!m_parent->IsFaceLoaded()) return;
     FT_Face face = m_parent->GetFontFace();
-    FT_Error error;
 
     FT_Set_Char_Size(face, 0, Point2FT(m_fontSize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
@@ -1400,7 +1399,7 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
                            FT_KERNING_DEFAULT, &delta);
             posX += delta.x;
         }
-        error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER);
+        FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER);
 
         if (error)
             continue; // ignore errors
@@ -1873,7 +1872,6 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     AVPacket pkt;
     uint8_t *buff = nullptr;
     bool gotPicture = false;
-    int len;
     m_image = QImage();
 
     // Find the mpeg2 video decoder.
@@ -1899,7 +1897,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     // packet to be decoded. It should take only 2-3 loops
     for (int limit=0; limit<10 && !gotPicture; limit++)
     {
-        len = avcodec_receive_frame(c, picture);
+        int len = avcodec_receive_frame(c, picture);
         if (len == 0)
             gotPicture = true;
         if (len == AVERROR(EAGAIN))

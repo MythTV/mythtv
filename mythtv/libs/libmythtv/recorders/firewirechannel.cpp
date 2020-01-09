@@ -143,7 +143,7 @@ bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
 {
     LOG(VB_CHANNEL, LOG_INFO, QString("Tune(%1)").arg(freqid));
 
-    bool ok;
+    bool ok = false;
     uint channel = freqid.toUInt(&ok);
     if (!ok)
         return false;

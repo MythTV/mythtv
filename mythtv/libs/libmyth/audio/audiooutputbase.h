@@ -37,7 +37,7 @@ public:
     AsyncLooseLock() = default;
     void Clear() { m_head = m_tail = 0; }
     void Ref() { m_head++; }
-    bool TestAndDeref() { bool r; if ((r=(m_head != m_tail))) m_tail++; return r; }
+    bool TestAndDeref() { bool r = false; if ((r=(m_head != m_tail))) m_tail++; return r; }
 private:
     int m_head {0};
     int m_tail {0};

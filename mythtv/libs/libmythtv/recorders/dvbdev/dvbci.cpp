@@ -1709,7 +1709,7 @@ bool cLlCiHandler::Process(void)
         m_tc = m_tpl->Process(Slot);
         if (m_tc)
         {
-            int Length;
+            int Length = 0;
             const uint8_t *Data = m_tc->Data(Length);
             if (Data && Length > 1)
             {

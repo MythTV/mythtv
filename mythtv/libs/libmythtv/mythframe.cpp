@@ -646,7 +646,7 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
 #if ARCH_X86
         if (sse2_check())
         {
-            MythTimer *timer;
+            MythTimer *timer = nullptr;
 
             if ((m_uswc != uswcState::Use_SW) && m_cache)
             {
@@ -715,7 +715,7 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
 #if ARCH_X86
     if (sse2_check() && (m_uswc != uswcState::Use_SW) && m_cache)
     {
-        MythTimer *timer;
+        MythTimer *timer = nullptr;
 
         if (m_uswc == uswcState::Detect)
         {

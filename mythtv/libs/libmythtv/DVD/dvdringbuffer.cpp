@@ -83,8 +83,8 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
                                   const QString &filename,
                                   const QString &logPrefix)
 {
-    const char* dvdname;
-    const char* dvdserial;
+    const char* dvdname = nullptr;
+    const char* dvdserial = nullptr;
 
     dvdnav_status_t res = dvdnav_get_title_string(nav, &dvdname);
     if (res == DVDNAV_STATUS_ERR)
@@ -118,7 +118,7 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
             if (fd > 0)
             {
                 uint8_t buf[2048];
-                ssize_t read;
+                ssize_t read = 0;
                 uint32_t crc = crc32(0L, Z_NULL, 0);
 
                 while((read = mythfile_read(fd, buf, sizeof(buf))) > 0)
@@ -569,8 +569,8 @@ uint64_t DVDRingBuffer::GetChapterTimes(uint title)
     if (!m_dvdnav)
         return 0;
 
-    uint64_t duration;
-    uint64_t *chaps;
+    uint64_t duration = 0;
+    uint64_t *chaps = nullptr;
     uint32_t num = dvdnav_describe_title_chapters(m_dvdnav, title,
                                                   &chaps, &duration);
 
@@ -677,7 +677,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
-    bool            bReprocessing;
+    bool            bReprocessing = false;
     bool            waiting      = false;
 
     if (m_gotStop)
@@ -755,8 +755,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 m_lastTitle = m_title;
                 m_lastPart  = m_part;
                 m_lastStill = m_still;
-                uint32_t pos;
-                uint32_t length;
+                uint32_t pos = 0;
+                uint32_t length = 0;
                 uint32_t stillTimer = dvdnav_get_next_still_flag(m_dvdnav);
                 m_still = 0;
                 m_titleParts = 0;
@@ -1365,7 +1365,7 @@ void DVDRingBuffer::WaitSkip(void)
  */
 bool DVDRingBuffer::GoToMenu(const QString &str)
 {
-    DVDMenuID_t menuid;
+    DVDMenuID_t menuid = DVD_MENU_Escape;
     QMutexLocker locker(&m_seekLock);
 
     LOG(VB_PLAYBACK, LOG_INFO,
@@ -1552,8 +1552,7 @@ void DVDRingBuffer::GetMenuSPUPkt(uint8_t *buf, int buf_size,
     QMutexLocker lock(&m_menuBtnLock);
 
     ClearMenuSPUParameters();
-    uint8_t *spu_pkt;
-    spu_pkt = (uint8_t*)av_malloc(buf_size);
+    auto *spu_pkt = (uint8_t*)av_malloc(buf_size);
     memcpy(spu_pkt, buf, buf_size);
     m_menuSpuPkt = spu_pkt;
     m_menuBuflength = buf_size;
@@ -1565,7 +1564,7 @@ void DVDRingBuffer::GetMenuSPUPkt(uint8_t *buf, int buf_size,
 
     if (DVDButtonUpdate(false))
     {
-        int32_t gotbutton;
+        int32_t gotbutton = 0;
         m_buttonExists = DecodeSubtitles(&m_dvdMenuButton, &gotbutton,
                                         m_menuSpuPkt, m_menuBuflength, startTime);
     }
@@ -1799,13 +1798,11 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
     int videoheight = video_disp_dim.height();
     int videowidth = video_disp_dim.width();
 
-    int32_t button;
-    pci_t *pci;
-    dvdnav_status_t dvdRet;
+    int32_t button = 0;
     dvdnav_highlight_area_t hl;
     dvdnav_get_current_highlight(m_dvdnav, &button);
-    pci = dvdnav_get_current_nav_pci(m_dvdnav);
-    dvdRet =
+    pci_t *pci = dvdnav_get_current_nav_pci(m_dvdnav);
+    dvdnav_status_t dvdRet =
         dvdnav_get_highlight_area_from_group(pci, DVD_BTN_GRP_Wide, button,
                                              static_cast<int32_t>(b_mode), &hl);
 
@@ -2237,8 +2234,7 @@ int DVDRingBuffer::get_nibble(const uint8_t *buf, int nibble_offset)
 int DVDRingBuffer::is_transp(const uint8_t *buf, int pitch, int n,
                      const uint8_t *transp_color)
 {
-    int i;
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (!transp_color[*buf])
             return 0;

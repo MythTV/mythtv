@@ -129,7 +129,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
                                           int length)
 {
     /* 0-19 Server id = 20 * 0xFF */
-    int off;
+    int off = 0;
     for (off = 0; off < 20; ++off)
     {
         if (data[off] != 0xff)
@@ -612,10 +612,9 @@ static unsigned long crc_table[256] =
 
 static uint32_t crc32(const unsigned char *data, int len)
 {
-    int i;
     uint32_t crc = 0xffffffff;
 
-    for (i = 0; i < len; i++)
+    for (int i = 0; i < len; i++)
         crc = (crc << 8) ^ crc_table[((crc >> 24) ^ *data++) & 0xff];
 
     return crc;

@@ -2268,15 +2268,15 @@ QString atsc_huffman2_to_string(const unsigned char *compressed,
 {
     QString decompressed = "";
 
-    unsigned char        bitpos;
-    const unsigned char *bufptr;
+    unsigned char        bitpos = 0;
+    const unsigned char *bufptr = nullptr;
     huffman2_set_pos(bitpos, &bufptr, compressed, 0);
 
     // Determine which huffman table to use
-    struct huffman_table *ptrTable;
-    const unsigned char  *lookup;
-    uint                  min_size;
-    uint                  max_size;
+    struct huffman_table *ptrTable = nullptr;
+    const unsigned char  *lookup = nullptr;
+    uint                  min_size = 0;
+    uint                  max_size = 0;
     if (table == 1)
     {
         ptrTable = Table128;

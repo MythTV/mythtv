@@ -193,7 +193,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     else
     {
         // 2rd Try searching for RecordingInfo
-        RecordingInfo::LoadStatus status;
+        RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
         RecordingInfo recinfo2(chanid, recstartts, false, 0, &status);
         if (status == RecordingInfo::kFoundProgram)
             recinfo2.SubstituteMatches(command);

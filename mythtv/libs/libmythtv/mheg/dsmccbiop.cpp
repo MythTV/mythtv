@@ -285,8 +285,6 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
 {
     int off = 0;
     const unsigned char *buf = data + (*curp);
-    unsigned long msgbody_len;
-    unsigned long content_len;
 
     if (m_objInfoLen != 8)
         LOG(VB_DSMCC, LOG_WARNING, QString("[biop] ProcessFile objectInfo_length = %1")
@@ -301,9 +299,9 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
         return false; // Error
     }
 
-    msgbody_len = COMBINE32(buf, off);
+    unsigned long msgbody_len = COMBINE32(buf, off);
     off += 4;
-    content_len = COMBINE32(buf, off);
+    unsigned long content_len = COMBINE32(buf, off);
     off += 4;
     if (content_len + 4 != msgbody_len)
         LOG(VB_DSMCC, LOG_WARNING, "[biop] ProcessFile incorrect msgbody_len");
@@ -352,13 +350,12 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
 
 int BiopModuleInfo::Process(const unsigned char *data)
 {
-    int off;
     m_modTimeout   = COMBINE32(data, 0);
     m_blockTimeout = COMBINE32(data, 4);
     m_minBlockTime = COMBINE32(data, 8);
 
     m_tapsCount = data[12];
-    off = 13;
+    int off = 13;
 
     LOG(VB_DSMCC, LOG_DEBUG, QString("[Biop] "
         "ModuleTimeout %1 BlockTimeout %2 MinBlockTime %3 Taps %4")

@@ -1004,7 +1004,7 @@ void DTVRecorder::HandleH264Keyframe(void)
     // Perform ringbuffer switch if needed.
     CheckForRingBufferSwitch();
 
-    uint64_t startpos;
+    uint64_t startpos = 0;
     uint64_t frameNum = m_framesWrittenCount;
 
     if (m_firstKeyframe < 0)

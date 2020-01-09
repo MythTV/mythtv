@@ -915,7 +915,7 @@ bool LoadFromScheduler(
 template<typename T>
 bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
 {
-    bool dummyConflicts;
+    bool dummyConflicts = false;
     return LoadFromScheduler(destination, dummyConflicts, "", -1);
 }
 

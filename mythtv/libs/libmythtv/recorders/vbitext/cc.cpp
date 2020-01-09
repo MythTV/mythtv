@@ -37,8 +37,8 @@
 static int parityok(int n)      /* check parity for 2 bytes packed in n */
 {
     int mask = 0;
-    int j;
-    int k;
+    int j = 0;
+    int k = 0;
     for (k = 1, j = 0; j < 7; j++)
     {
         if (n & (1 << j))
@@ -71,7 +71,7 @@ static int decode(unsigned char *vbiline, int scale0, int scale1)
     int max[7];
     int min[7];
     int val[7];
-    int sample;
+    int sample = 0;
     int packedbits = 0;
 
     for (int clk = 0; clk < 7; clk++)

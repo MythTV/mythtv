@@ -306,11 +306,9 @@ void DeviceReadBuffer::run(void)
     RunProlog();
 
     uint      errcnt = 0;
-    uint      cnt;
-    ssize_t   len;
-    size_t    read_size;
-    size_t    unused;
-    size_t    total;
+    uint      cnt = 0;
+    ssize_t   len = 0;
+    size_t    total = 0;
     size_t    throttle = m_devReadSize * m_devBufferCount / 2;
 
     m_lock.lock();
@@ -349,8 +347,8 @@ void DeviceReadBuffer::run(void)
              m_doRun && len >= 0 && cnt < m_devBufferCount; ++cnt)
         {
             // Limit read size for faster return from read
-            unused = static_cast<size_t>(WaitForUnused(m_readQuanta));
-            read_size = min(m_devReadSize, unused);
+            auto unused = static_cast<size_t>(WaitForUnused(m_readQuanta));
+            size_t read_size = min(m_devReadSize, unused);
 
             // if read_size > 0 do the read...
             if (read_size)

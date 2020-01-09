@@ -168,7 +168,6 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     struct rtframeheader frameheader {};
     long long startpos = 0;
     int foundit = 0;
-    char *space;
 
     if (!ReadFileheader(&m_fileHeader))
     {
@@ -181,7 +180,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
            (QString(m_fileHeader.finfo) != "MythTVVideo"))
     {
         m_ringBuffer->Seek(startpos, SEEK_SET);
-        char dummychar;
+        char dummychar = 0;
         m_ringBuffer->Read(&dummychar, 1);
 
         startpos = m_ringBuffer->GetReadPosition();
@@ -226,7 +225,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-    space = new char[m_videoSize];
+    char *space = new char[m_videoSize];
 
     if (frameheader.comptype == 'F')
     {
@@ -465,7 +464,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     {
         m_ringBuffer->Seek(startpos, SEEK_SET);
 
-        char dummychar;
+        char dummychar = 0;
         m_ringBuffer->Read(&dummychar, 1);
 
         startpos = m_ringBuffer->GetReadPosition();
@@ -556,7 +555,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
             m_ringBuffer->Seek(startpos2, SEEK_SET);
 
-            char dummychar;
+            char dummychar = 0;
             m_ringBuffer->Read(&dummychar, 1);
 
             startpos2 = m_ringBuffer->GetReadPosition();
@@ -617,9 +616,7 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     auto *nd = (NuppelDecoder *)(c->opaque);
 
-    int i;
-
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         pic->data[i] = nd->m_directFrame->buf + nd->m_directFrame->offsets[i];
         pic->linesize[i] = nd->m_directFrame->pitches[i];
@@ -791,7 +788,7 @@ static void CopyToVideo(unsigned char *buf, int video_width,
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                                 unsigned char *lstrm, VideoFrame *frame)
 {
-    lzo_uint out_len;
+    lzo_uint out_len = 0;
     int compoff = 0;
 
     m_directFrame = frame;
@@ -968,14 +965,12 @@ bool NuppelDecoder::isValidFrametype(char type)
 
 void NuppelDecoder::StoreRawData(unsigned char *newstrm)
 {
-    unsigned char *strmcpy;
+    unsigned char *strmcpy = nullptr;
     if (newstrm)
     {
         strmcpy = new unsigned char[m_frameHeader.packetlength];
         memcpy(strmcpy, newstrm, m_frameHeader.packetlength);
     }
-    else
-        strmcpy = nullptr;
 
     m_storedData.push_back(new RawDataList(m_frameHeader, strmcpy));
 }

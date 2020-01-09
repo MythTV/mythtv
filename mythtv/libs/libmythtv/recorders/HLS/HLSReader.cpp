@@ -354,8 +354,8 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
 
                     if ((Istream = m_streams.find(url)) == m_streams.end())
                     {
-                        int id;
-                        uint64_t bandwidth;
+                        int id = 0;
+                        uint64_t bandwidth = 0;
                         if (!M3U::ParseStreamInformation(line, url, StreamURL(),
                                                          id, bandwidth))
                             break;
@@ -380,10 +380,8 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + "Meta playlist");
 
-        HLSRecStream *hls;
-        if (stream)
-            hls = stream;
-        else
+        HLSRecStream *hls = stream;
+        if (stream == nullptr)
         {
             /* No Meta playlist used */
             StreamContainer::iterator Istream;
@@ -410,7 +408,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             p = buffer.indexOf("#EXT-X-TARGETDURATION:");
             if (p >= 0)
             {
-                int duration;
+                int duration = 0;
 
                 text.seek(p);
                 if (!M3U::ParseTargetDuration(text.readLine(), StreamURL(),
@@ -455,7 +453,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-TARGETDURATION")))
             {
-                int duration;
+                int duration = 0;
                 if (!M3U::ParseTargetDuration(line, StreamURL(), duration))
                     return false;
                 hls->SetTargetDuration(duration); /* seconds */
@@ -496,7 +494,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ALLOW-CACHE")))
             {
-                bool do_cache;
+                bool do_cache = false;
                 if (!M3U::ParseAllowCache(line, StreamURL(), do_cache))
                     return false;
                 hls->SetCache(do_cache);
@@ -509,14 +507,14 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version2;
+                int version2 = 0;
                 if (!M3U::ParseVersion(line, StreamURL(), version2))
                     return false;
                 hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
             {
-                bool is_vod;
+                bool is_vod = false;
                 if (!M3U::ParseEndList(StreamURL(), is_vod))
                     return false;
                 hls->SetLive(!is_vod);

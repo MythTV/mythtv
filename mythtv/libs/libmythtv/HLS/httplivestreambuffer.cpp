@@ -1037,7 +1037,7 @@ public:
         {
             m_lock.lock();
         }
-        int ret;
+        int ret = 0;
         if (!m_segmap.contains(segmentid))
         {
             ret = -1; // we never downloaded that segment on any streams
@@ -1586,8 +1586,7 @@ void HLSRingBuffer::FreeStreamsList(StreamsList *streams) const
     /* Free hls streams */
     for (int i = 0; i < streams->size(); i++)
     {
-        HLSStream *hls;
-        hls = GetStream(i, streams);
+        HLSStream *hls = GetStream(i, streams);
         delete hls;
     }
     if (streams != &m_streams)
@@ -1712,7 +1711,7 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
 bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
 {
     bool isHLS = false;
-    URLContext *context;
+    URLContext *context = nullptr;
 
     // Do a peek on the URL to test the format
     RingBuffer::AVFormatInitNetwork();
@@ -1803,10 +1802,10 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
         return RET_ERROR;
     }
     QString val = list[0];
-    bool ok;
 
     if (hls->Version() < 3)
     {
+        bool ok = false;
         duration = val.toInt(&ok);
         if (!ok)
         {
@@ -1816,6 +1815,7 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
     }
     else
     {
+        bool ok = false;
         double d = val.toDouble(&ok);
         if (!ok)
         {
@@ -1861,8 +1861,7 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString &line, const QStr
      * #EXT-X-STREAM-INF:[attribute=value][,attribute=value]*
      *  <URI>
      */
-    int id;
-    uint64_t bw;
+    int id = 0;
     QString attr;
 
     attr = ParseAttributes(line, "PROGRAM-ID");
@@ -1882,7 +1881,7 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString &line, const QStr
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "#EXT-X-STREAM-INF: expected BANDWIDTH=<value>");
         return nullptr;
     }
-    bw = attr.toInt();
+    uint64_t bw = attr.toInt();
 
     if (bw == 0)
     {
@@ -1909,7 +1908,7 @@ int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, const QString &line)
      * tag then the sequence number of the first URI in the playlist SHALL
      * be considered to be 0.
      */
-    int sequence;
+    int sequence = 0;
 
     if (ParseDecimalValue(line, sequence) != RET_OK)
     {
@@ -2263,7 +2262,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 err = ParseDiscontinuity(hls, line);
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version2;
+                int version2 = 0;
                 err = ParseVersion(line, version2);
                 hls->SetVersion(version2);
             }
@@ -2788,7 +2787,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     QWriteLocker lock(&m_posLock);
 
     int totalsize = SizeMedia();
-    int64_t where;
+    int64_t where = 0;
     switch (whence)
     {
         case SEEK_CUR:
@@ -2813,10 +2812,9 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     int count       = NumSegments();
     int segnum      = m_playback->Segment();
     HLSStream  *hls = GetStreamForSegment(segnum);
-    HLSSegment *segment;
 
     /* restore current segment's file position indicator to 0 */
-    segment = hls->GetSegment(segnum);
+    HLSSegment *segment = hls->GetSegment(segnum);
     if (segment != nullptr)
     {
         segment->Lock();

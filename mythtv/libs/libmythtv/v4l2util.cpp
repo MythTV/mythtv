@@ -595,7 +595,7 @@ int V4L2util::GetOptionValue(DriverOption::category_t cat, const QString& desc)
 
 bool V4L2util::GetVideoStandard(QString& name) const
 {
-    v4l2_std_id std_id;
+    v4l2_std_id std_id = 0;
     struct v4l2_standard standard {};
 
     if (-1 == ioctl (m_fd, VIDIOC_G_STD, &std_id))
@@ -800,7 +800,7 @@ QString V4L2util::StreamTypeDesc(int value)
 
 int V4L2util::GetStreamType(void) const
 {
-    int type;
+    int type = V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
 
     if (DriverName().startsWith("saa7164"))
     {

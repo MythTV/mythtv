@@ -214,10 +214,10 @@ namespace M3U
         }
 
         QString val = list[0];
-        bool ok;
 
         if (version < 3)
         {
+            bool ok = false;
             duration = val.toInt(&ok);
             if (!ok)
             {
@@ -229,6 +229,7 @@ namespace M3U
         }
         else
         {
+            bool ok = false;
             double d = val.toDouble(&ok);
             if (!ok)
             {

@@ -207,8 +207,7 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
 
         if (blocking && m_fbCount[id] < m_fbMaxCount[id])
         {
-            struct fifo_buf *tmpfifo;
-            tmpfifo = m_fbInptr[id]->next;
+            struct fifo_buf *tmpfifo = m_fbInptr[id]->next;
             m_fbInptr[id]->next = new struct fifo_buf;
             m_fbInptr[id]->next->data = new unsigned char[m_maxBlkSize[id]];
             m_fbInptr[id]->next->next = tmpfifo;

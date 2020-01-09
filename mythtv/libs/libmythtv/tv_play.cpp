@@ -1085,11 +1085,10 @@ void TV::InitFromDB(void)
     m_screenPressKeyMapLiveTV = ConvertScreenPressKeyMap(kv["LiveTVScreenPressKeyMap"]);
 
     QString db_channel_ordering;
-    uint    db_browse_max_forward;
 
     // convert from minutes to ms.
     m_dbIdleTimeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
-    db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
+    uint db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
     m_dbPlaybackExitPrompt = kv["PlaybackExitPrompt"].toInt();
     m_dbAutoSetWatched     = (kv["AutomaticSetWatched"].toInt() != 0);
     m_dbEndOfRecExitPrompt = (kv["EndOfRecordingExitPrompt"].toInt() != 0);
@@ -3359,9 +3358,8 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent(void)
     }
     ReturnOSDLock(mctx, osd);
 
-    bool do_prompt;
     mctx->LockDeletePlayer(__FILE__, __LINE__);
-    do_prompt = (mctx->GetState() == kState_WatchingPreRecorded &&
+    bool do_prompt = (mctx->GetState() == kState_WatchingPreRecorded &&
                  mctx->m_player &&
                  !mctx->m_player->IsEmbedding() &&
                  !mctx->m_player->IsPlaying());
@@ -5077,7 +5075,6 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             if (ok)
             {
                 float searchSpeed = fabs(tmpSpeed);
-                size_t index;
 
                 if (paused)
                     DoTogglePause(ctx, true);
@@ -5100,7 +5097,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
                 NormalSpeed(ctx);
 
-                for (index = 0; index < m_ffRewSpeeds.size(); index++)
+                size_t index = 0;
+                for ( ; index < m_ffRewSpeeds.size(); index++)
                     if (float(m_ffRewSpeeds[index]) == searchSpeed)
                         break;
 
@@ -6244,7 +6242,7 @@ void TV::RestartMainPlayer(PlayerContext *mctx)
     }
 
 //  MuteState mctx_mute = mctx->m_player->GetMuteState();
-    MuteState mctx_mute; //FOR HACK
+    MuteState mctx_mute = kMuteOff; //FOR HACK
 
     // HACK - FIXME
     // workaround muted audio when Player is re-created
@@ -6712,7 +6710,7 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
     ctx->m_ffRewSpeed += direction;
 
     float time = StopFFRew(ctx);
-    float speed;
+    float speed = NAN;
     QString mesg;
 
     switch (ctx->m_ffRewSpeed)
@@ -6818,7 +6816,7 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
         return;
     }
 
-    int speed;
+    int speed = 0;
     QString mesg;
     if (ctx->m_ffRewState > 0)
     {
@@ -7430,7 +7428,7 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     // Check for and remove duplicate separator characters
     if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)))
     {
-        bool ok;
+        bool ok = false;
         chan.right(1).toUInt(&ok);
         if (!ok)
         {
@@ -7446,7 +7444,7 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     // Look for channel in line-up
     QString needed_spacer;
     // cppcheck-suppress variableScope
-    uint    pref_cardid;
+    uint    pref_cardid = 0;
     bool    is_not_complete = true;
 
     bool valid_prefix = false;
@@ -7679,9 +7677,9 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         else
         {
             QString needed_spacer;
-            uint pref_cardid;
+            uint pref_cardid = 0;
             uint cardid = ctx->GetCardID();
-            bool dummy;
+            bool dummy = false;
 
             ctx->m_recorder->CheckChannelPrefix(chan,  pref_cardid,
                                               dummy, needed_spacer);
@@ -8191,7 +8189,7 @@ void TV::UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist)
         infoMap["signal"] = QString::number(sig); // use normalized value
 
     bool    allGood = SignalMonitorValue::AllGood(slist);
-    char    tuneCode;
+    char    tuneCode = 0;
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
@@ -8379,12 +8377,11 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
     {
         QString timeMins;
         QString timeHrsMin;
-        int playingTitle;
-        int playingPart;
-        int totalParts;
+        int playingTitle = 0;
+        int playingPart = 0;
 
         dvd->GetPartAndTitle(playingPart, playingTitle);
-        totalParts = dvd->NumPartsInTitle();
+        int totalParts = dvd->NumPartsInTitle();
         format_time(dvd->GetTotalTimeOfTitle(), timeMins, timeHrsMin);
 
         mainStatus = tr("Title: %1 (%2)").arg(playingTitle).arg(timeHrsMin);
@@ -8927,8 +8924,6 @@ void TV::ChangeSubtitleDelay(PlayerContext *ctx, int dir)
 // dir in 10ms jumps
 void TV::ChangeAudioSync(PlayerContext *ctx, int dir, int newsync)
 {
-    long long newval;
-
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->m_player)
     {
@@ -8937,7 +8932,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, int newsync)
     }
 
     m_audiosyncAdjustment = true;
-    newval = ctx->m_player->AdjustAudioTimecodeOffset(dir * 10, newsync);
+    long long newval = ctx->m_player->AdjustAudioTimecodeOffset(dir * 10, newsync);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!m_browseHelper->IsBrowsing())
@@ -8961,7 +8956,7 @@ void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
         return;
     }
 
-    MuteState mute_status;
+    MuteState mute_status = kMuteOff;
 
     if (!muteIndividualChannels)
     {
@@ -9691,7 +9686,6 @@ void TV::customEvent(QEvent *e)
     {
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-        PlayerContext *mctx;
         MythMainWindow *mwnd = GetMythMainWindow();
 
         StopEmbedding();
@@ -9699,7 +9693,7 @@ void TV::customEvent(QEvent *e)
         if (painter)
             painter->FreeResources();
 
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
         if (mctx->m_player && mctx->m_player->GetVideoOutput())
             mctx->m_player->GetVideoOutput()->ResizeForVideo();
@@ -9827,7 +9821,7 @@ void TV::QuickRecord(PlayerContext *ctx)
         InfoMap infoMap;
         QDateTime startts = MythDate::fromString(bi.m_startTime);
 
-        RecordingInfo::LoadStatus status;
+        RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
         RecordingInfo recinfo(bi.m_chanId, startts, false, 0, &status);
         if (RecordingInfo::kFoundProgram == status)
             recinfo.QuickRecord();
@@ -10510,7 +10504,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         EnableUpmix(actx, false);
     else if (action.startsWith("ADJUSTSTRETCH"))
     {
-        bool floatRead;
+        bool floatRead = false;
         float stretch = action.right(action.length() - 13).toFloat(&floatRead);
         if (floatRead &&
             stretch <= 2.0F &&
@@ -10984,15 +10978,13 @@ bool MenuBase::Show(const QDomNode &node,
                 (show == "active" ? kMenuShowActive :
                  show == "inactive" ? kMenuShowInactive : kMenuShowAlways);
             QString current = e.attribute("current", "");
-            MenuCurrentContext currentContext;
+            MenuCurrentContext currentContext = kMenuCurrentDefault;
             if ((current == "active") && !hasSelected)
                 currentContext = kMenuCurrentActive;
             else if (((current.startsWith("y") ||
                        current.startsWith("t") ||
                        current == "1")) && !hasSelected)
                 currentContext = kMenuCurrentAlways;
-            else
-                currentContext = kMenuCurrentDefault;
             if (e.tagName() == "menu")
             {
                 if (hasSelected && n == selected)
@@ -12380,7 +12372,7 @@ bool TV::HandleJumpToProgramAction(
         if (!action.startsWith("JUMPPROG"))
             continue;
 
-        bool ok;
+        bool ok = false;
         QString progKey   = action.section(" ",1,-2);
         uint    progIndex = action.section(" ",-1,-1).toUInt(&ok);
         ProgramInfo *p = nullptr;

@@ -525,7 +525,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     bool can_fec_auto, bool do_tune = true)
 {
     uint c = 0;
-    struct dtv_properties *cmdseq;
 
     if (tuner_type != DTVTunerType::kTunerTypeDVBT  &&
         tuner_type != DTVTunerType::kTunerTypeDVBC  &&
@@ -540,7 +539,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
 
     LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.m_modSys.toString());
 
-    cmdseq = (struct dtv_properties*) calloc(1, sizeof(*cmdseq));
+    auto *cmdseq = (struct dtv_properties*) calloc(1, sizeof(struct dtv_properties));
     if (!cmdseq)
         return nullptr;
 
@@ -1017,7 +1016,11 @@ bool DVBChannel::HasLock(bool *ok) const
     }
     ReturnMasterLock(master); // if we're the master we don't need this lock..
 
-    fe_status_t status;
+#if ((DVB_API_VERSION > 5) || ((DVB_API_VERSION == 5) && (DVB_API_VERSION_MINOR > 10)))
+    fe_status_t status = FE_NONE;
+#else // debian9, centos7
+    fe_status_t status = (fe_status_t)0;
+#endif
     memset(&status, 0, sizeof(status));
 
     int ret = ioctl(m_fdFrontend, FE_READ_STATUS, &status);
@@ -1434,7 +1437,11 @@ static bool wait_for_backend(int fd, int timeout_ms)
     }
 
     // This is supposed to work on all cards, post 2.6.12...
-    fe_status_t status;
+#if ((DVB_API_VERSION > 5) || ((DVB_API_VERSION == 5) && (DVB_API_VERSION_MINOR > 10)))
+    fe_status_t status = FE_NONE;
+#else // debian9, centos7
+    fe_status_t status = (fe_status_t)0;
+#endif
     memset(&status, 0, sizeof(status));
 
     if (ioctl(fd, FE_READ_STATUS, &status) < 0)

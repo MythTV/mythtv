@@ -14,8 +14,7 @@ bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 QStringList VideoVisual::GetVisualiserList(RenderType type)
 {
     QStringList result;
-    VideoVisualFactory* factory;
-    for (factory = VideoVisualFactory::VideoVisualFactories();
+    for (auto factory = VideoVisualFactory::VideoVisualFactories();
          factory; factory = factory->next())
     {
         if (factory->SupportedRenderer(type))
@@ -31,8 +30,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
     if (!audio || !render || name.isEmpty())
         return nullptr;
 
-    const VideoVisualFactory* factory;
-    for (factory = VideoVisualFactory::VideoVisualFactories();
+    for (auto factory = VideoVisualFactory::VideoVisualFactories();
          factory; factory = factory->next())
     {
         if (name.isEmpty())

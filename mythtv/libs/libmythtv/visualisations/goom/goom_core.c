@@ -153,13 +153,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 #define DRAWLINES 80
 	static int s_lineMode = DRAWLINES;	// l'effet lineaire a dessiner
 	static int s_nombreCddc = 0;		// nombre de Cycle Depuis Dernier Changement
-	guint32 *return_val;
-	guint32 pointWidth;
-	guint32 pointHeight;
-	int     incvar;				// volume du son
 	static int s_accelVar=0;		// acceleration des particules
-	int     i;
-	float   largfactor;			// elargissement de l'intervalle d'évolution
 	static int s_stopLines = 0;
 
 	// des points
@@ -179,20 +173,20 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		0, 0, 0, 0, 0
 	};
 
-	ZoomFilterData *pzfd;
+	ZoomFilterData *pzfd = NULL;
 
 	/* test if the config has changed, update it if so */
-	pointWidth = (resolx * 2) / 5;
-	pointHeight = ((c_resoly) * 2) / 5;
+	guint32 pointWidth = (resolx * 2) / 5;
+	guint32 pointHeight = ((c_resoly) * 2) / 5;
 
 	/* ! etude du signal ... */
-	incvar = 0;
-	for (i = 0; i < 512; i++) {
+	int incvar = 0;				// volume du son
+	for (int i = 0; i < 512; i++) {
 		if (incvar < data[0][i])
 			incvar = data[0][i];
 	}
 
-	i = s_accelVar;
+	int i = s_accelVar;
 	s_accelVar = incvar / 1000;
 
 	if (s_speedVar > 5) {
@@ -224,7 +218,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 	/* ! calcul du deplacement des petits points ... */
 
-	largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
+        // largfactor: elargissement de l'intervalle d'évolution
+	float largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
 	if (largfactor > 1.5F)
 		largfactor = 1.5F;
 
@@ -448,11 +443,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 			// if (goomvar % 1 == 0)
 			{
-				guint32 vtmp;
-				guint32 newvit;
-
 				s_lockVar = 50;
-				newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
+				guint32 newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
                                 // Pseudo-random is good enough. Don't need a true random.
                                 // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
@@ -499,7 +491,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 					s_zfd.middleY = c_resoly / 2;
 				}
 
-				switch (vtmp = (iRAND (15))) {
+				guint32 vtmp = iRAND (15);
+				switch (vtmp) {
 				case 0:
                                     
                                         // NOLINTNEXTLINE(misc-redundant-expression)
@@ -643,13 +636,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 */
 	if (pzfd != NULL) {
 		static int s_exvit = 128;
-		int     dif;
 
 		s_nombreCddc = 0;
 
 		s_switchIncr = SWITCHINCR;
 
-		dif = s_zfd.vitesse - s_exvit;
+		int dif = s_zfd.vitesse - s_exvit;
 		if (dif < 0)
 			dif = -dif;
 
@@ -750,11 +742,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 * arret demande
 	 */
 	if ((s_stopLines & 0xf000)||(!curGState->m_drawScope)) {
-		float   param1;
-		float   param2;
-		float   amplitude;
-		int     couleur;
-		int     mode;
+		float   param1 = NAN;
+		float   param2 = NAN;
+		float   amplitude = NAN;
+		int     couleur = 0;
+		int     mode = 0;
 		
 		choose_a_goom_line (&param1, &param2, &couleur, &mode, &amplitude,1);
 		couleur = GML_BLACK;
@@ -782,12 +774,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		if (s_lineMode == 0)
 			s_lineMode = DRAWLINES;
 		else if (s_lineMode == DRAWLINES) {
-			float   param1;
-			float   param2;
-			float   amplitude;
-			int     couleur1;
-			int     couleur2;
-			int     mode;
+			float   param1 = NAN;
+			float   param2 = NAN;
+			float   amplitude = NAN;
+			int     couleur1 = 0;
+			int     couleur2 = 0;
+			int     mode = 0;
 
 			s_lineMode--;
 			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude,s_stopLines);
@@ -815,12 +807,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 		if (((cycle % 121) == 9) && (iRAND (3) == 1)
 				&& ((s_lineMode == 0) || (s_lineMode == DRAWLINES))) {
-			float   param1;
-			float   param2;
-			float   amplitude;
-			int     couleur1;
-			int     couleur2;
-			int     mode;
+			float   param1 = NAN;
+			float   param2 = NAN;
+			float   amplitude = NAN;
+			int     couleur1 = 0;
+			int     couleur2 = 0;
+			int     mode = 0;
 
 			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, s_stopLines);
 			couleur2 = 5-couleur1;
@@ -835,7 +827,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		}
 	}
 
-	return_val = p1;
+	guint32 *return_val = p1;
 	tmp = p1;
 	p1 = p2;
 	p2 = tmp;

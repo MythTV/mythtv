@@ -76,6 +76,7 @@ static const char sccsid[] = "@(#)ifs.c	5.00 2002/04/11 baffe";
 
 #include "goom_tools.h"
 
+
 #define LRAND()                    ((long) (RAND() & 0x7fffffff))
 #define NRAND(n)           ((int) (LRAND() % (n)))
 #define MAXRAND                    (2147483648.0)	/* unsigned 1<<31 as a * *
@@ -152,9 +153,7 @@ static int Cur_Pt;
 static  DBL
 Gauss_Rand (DBL c, DBL A, DBL S)
 {
-	DBL     y;
-
-	y = (DBL) LRAND () / MAXRAND;
+	DBL y = (DBL) LRAND () / MAXRAND;
 	y = A * (1.0 - exp (-y * y * S)) / (1.0 - exp (-S));
 	if (NRAND (2))
 		return (c + y);
@@ -164,9 +163,7 @@ Gauss_Rand (DBL c, DBL A, DBL S)
 static  DBL
 Half_Gauss_Rand (DBL c, DBL A, DBL S)
 {
-	DBL     y;
-
-	y = (DBL) LRAND () / MAXRAND;
+	DBL y = (DBL) LRAND () / MAXRAND;
 	y = A * (1.0 - exp (-y * y * S)) / (1.0 - exp (-S));
 	return (c + y);
 }
@@ -210,9 +207,6 @@ free_ifs (FRACTAL * Fractal)
 void
 init_ifs (int width, int height)
 {
-	int     i;
-	FRACTAL *Fractal;
-
 //      printf ("initing ifs\n");
 
 	if (Root == NULL) {
@@ -222,13 +216,13 @@ init_ifs (int width, int height)
 		Root->m_buffer1 = (IFSPoint *) NULL;
 		Root->m_buffer2 = (IFSPoint *) NULL;
 	}
-	Fractal = Root;
+	FRACTAL *Fractal = Root;
 
 //      fprintf (stderr,"--ifs freeing ex-buffers\n");
 	free_ifs_buffers (Fractal);
 //      fprintf (stderr,"--ifs ok\n");
 
-	i = (NRAND (4)) + 2;					/* Number of centers */
+	int i = (NRAND (4)) + 2;					/* Number of centers */
 	switch (i) {
 	case 3:
 		Fractal->m_depth = MAX_DEPTH_3;
@@ -360,11 +354,10 @@ Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 static void
 Trace (FRACTAL * F, F_PT xo, F_PT yo)
 {
-	F_PT    x;
-	F_PT    y;
-	SIMI   *Cur;
+	F_PT    x = NAN;
+	F_PT    y = NAN;
 
-	Cur = Cur_F->m_components;
+	SIMI *Cur = Cur_F->m_components;
 	for (F_PT i = Cur_F->m_nbSimi; i; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
@@ -386,10 +379,10 @@ static void
 Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
-	int     i;
-	int     j;
-	SIMI   *Cur;
-	SIMI   *Simi;
+	int     i = 0;
+	int     j = 0;
+	SIMI   *Cur = NULL;
+	SIMI   *Simi = NULL;
 
 	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
 		Cur->m_fCx = DBL_To_F_PT (Cur->m_dCx);
@@ -412,8 +405,8 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 		F_PT xo = Cur->m_fCx;
 		F_PT yo = Cur->m_fCy;
 		for (Simi = F->m_components, j = F->m_nbSimi; j; --j, Simi++) {
-			F_PT x;
-			F_PT y;
+			F_PT x = NAN;
+			F_PT y = NAN;
 			if (Simi == Cur)
 				continue;
 			Transform (Simi, xo, yo, &x, &y);

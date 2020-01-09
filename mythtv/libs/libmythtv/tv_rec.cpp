@@ -445,7 +445,6 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     bool cancelNext = false;
     PendingInfo pendinfo;
     PendingMap::iterator it;
-    bool has_pending;
 
     m_pendingRecLock.lock();
     if ((it = m_pendingRecordings.find(m_inputId)) != m_pendingRecordings.end())
@@ -463,7 +462,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     // since the HandlePendingRecordings loop will have deleted it.
     m_pendingRecLock.lock();
     it = m_pendingRecordings.find(m_inputId);
-    has_pending = (it != m_pendingRecordings.end());
+    bool has_pending = (it != m_pendingRecordings.end());
     if (has_pending)
         pendinfo = *it;
     m_pendingRecLock.unlock();
@@ -676,7 +675,7 @@ RecStatus::Type TVRec::GetRecordingStatus(void) const
 void TVRec::SetRecordingStatus(
     RecStatus::Type new_status, int line, bool have_lock)
 {
-    RecStatus::Type old_status;
+    RecStatus::Type old_status = RecStatus::Unknown;
     if (have_lock)
     {
         old_status = m_recStatus;
@@ -2501,7 +2500,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
     }
 
     PendingInfo pendinfo;
-    bool        has_pending;
+    bool has_pending = false;
     {
         m_pendingRecLock.lock();
         PendingMap::const_iterator it = m_pendingRecordings.find(m_inputId);
@@ -2639,7 +2638,7 @@ bool TVRec::GetKeyframeDurations(
  */
 long long TVRec::GetMaxBitrate(void) const
 {
-    long long bitrate;
+    long long bitrate = 0;
     if (m_genOpt.m_inputType == "MPEG")
     {   // NOLINT(bugprone-branch-clone)
         bitrate = 10080000LL; // use DVD max bit rate
@@ -2971,10 +2970,7 @@ void TVRec::ToggleChannelFavorite(const QString& changroupname)
         return;
     }
 
-    int  changrpid;
-
-    changrpid = ChannelGroup::GetChannelGroupId(changroupname);
-
+    int changrpid = ChannelGroup::GetChannelGroupId(changroupname);
     if (changrpid <1)
     {
           LOG(VB_RECORD, LOG_ERR, LOC +
@@ -3719,7 +3715,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     QString channum = request.m_channel;
 
-    bool ok1;
+    bool ok1 = true;
     if (m_channel)
     {
         m_channel->Open();
@@ -3728,8 +3724,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         else
             ok1 = false;
     }
-    else
-        ok1 = true;
 
     if (!ok1)
     {
@@ -3775,7 +3769,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (use_dr)
     {
         // We need there to be a ringbuffer for these modes
-        bool ok2;
+        bool ok2 = false;
         RecordingInfo *tmp = m_pseudoLiveTVRecording;
         m_pseudoLiveTVRecording = nullptr;
 
@@ -3909,7 +3903,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  */
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
-    RecStatus::Type newRecStatus;
+    RecStatus::Type newRecStatus = RecStatus::Unknown;
     bool keep_trying  = false;
     QDateTime current_time = MythDate::current();
 
@@ -4192,7 +4186,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (m_tvChain)
     {
-        bool ok;
+        bool ok = false;
         if (!m_ringBuffer)
         {
             ok = CreateLiveTVRingBuffer(m_channel->GetChannelName());

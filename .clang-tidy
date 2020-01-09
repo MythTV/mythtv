@@ -96,6 +96,7 @@ Checks: '-*,
     # Explicitly list the tests that arent aliases. ,
     #cppcoreguidelines-*,
        -cppcoreguidelines-avoid-goto,
+        cppcoreguidelines-init-variables,
        -cppcoreguidelines-interfaces-global-init,
        -cppcoreguidelines-macro-usage,
 

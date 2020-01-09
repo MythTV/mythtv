@@ -48,7 +48,6 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     m_audio_sample_bits = sample_bits;
     m_audio_sample_rate = sample_rate;
     //m_audio_channels = channels;
-    int chk;
 
     if (IsOpen())
         Close();
@@ -62,7 +61,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
 
-    chk = 0; // disable input for now
+    int chk = 0; // disable input for now
     if (ioctl(m_dspFd, SNDCTL_DSP_SETTRIGGER, &chk) < 0)
     {
         LOG(VB_GENERAL, LOG_WARNING,
@@ -70,8 +69,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     // Set format
-    int format;
-    int choice;
+    int choice = 0;
     QString tag;
     switch (sample_bits)
     {
@@ -90,7 +88,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
 #endif
             break;
     }
-    format = choice;
+    int format = choice;
     if (ioctl(m_dspFd, SNDCTL_DSP_SETFMT, &format) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
@@ -139,8 +137,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     // sample rate
-    int choice_sample_rate;
-    m_audio_sample_rate = choice_sample_rate = sample_rate;
+    int choice_sample_rate = sample_rate;
+    m_audio_sample_rate = choice_sample_rate;
     if (ioctl(m_dspFd, SNDCTL_DSP_SPEED, &m_audio_sample_rate) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +

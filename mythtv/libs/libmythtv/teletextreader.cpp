@@ -29,7 +29,7 @@ bool TeletextReader::KeyPress(const QString &key)
     bool numeric_input = false;
 
     TeletextSubPage *curpage = FindSubPage(m_curpage, m_cursubpage);
-    TeletextPage *page;
+    TeletextPage *page = nullptr;
 
     if (key == ACTION_0 || key == ACTION_1 || key == ACTION_2 ||
         key == ACTION_3 || key == ACTION_4 || key == ACTION_5 ||
@@ -397,9 +397,9 @@ void TeletextReader::AddTeletextData(int magazine, int row,
     //LOG(VB_GENERAL, LOG_ERR, QString("AddTeletextData(%1, %2)")
     //    .arg(magazine).arg(row));
 
-    int b1;
-    int b2;
-    int b3;
+    int b1 = 0;
+    int b2 = 0;
+    int b3 = 0;
     int err = 0;
 
     if (magazine < 1 || magazine > 8)

@@ -92,7 +92,7 @@ static unsigned char g2map_latin2[] =
 void
 lang_init(void)
 {
-    int i;
+    int i = 0;
 
     memset(lang_char, 0, sizeof(lang_char));
     for (i = 1; i <= 13; i++)
@@ -107,7 +107,7 @@ conv2latin(unsigned char *p, int n, int lang)
 
     while (n--)
     {
-       int c;
+       int c = 0;
        if (lang_char[c = *p])
        {
            if (! gfx || (c & 0xa0) != 0x20)
@@ -174,7 +174,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
                            struct mark *mark = marks + (mode - 16);
-                           char *x;
+                           char *x = NULL;
 
                            if ((x = strchr(mark->m_g0, data)))
                            {

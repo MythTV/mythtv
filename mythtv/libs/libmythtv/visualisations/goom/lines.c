@@ -31,9 +31,7 @@ lighten (unsigned char value, float power)
 static void
 lightencolor (int *col, float power)
 {
-	unsigned char *color;
-
-	color = (unsigned char *) col;
+	unsigned char *color = (unsigned char *) col;
 	*color = lighten (*color, power);
 	color++;
 	*color = lighten (*color, power);
@@ -46,25 +44,23 @@ lightencolor (int *col, float power)
 static void
 genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 {
-	int     i;
-
 	switch (id) {
 	case GML_HLINE:
-		for (i = 0; i < 512; i++) {
+		for (int i = 0; i < 512; i++) {
 			l[i].x = ((float) i * rx) / 512.0F;
 			l[i].y = param;
 			l[i].angle = M_PI_F / 2.0F;
 		}
 		return;
 	case GML_VLINE:
-		for (i = 0; i < 512; i++) {
+		for (int i = 0; i < 512; i++) {
 			l[i].y = ((float) i * ry) / 512.0F;
 			l[i].x = param;
 			l[i].angle = 0.0F;
 		}
 		return;
 	case GML_CIRCLE:
-		for (i = 0; i < 512; i++) {
+		for (int i = 0; i < 512; i++) {
 			l[i].angle = 2.0F * M_PI_F * (float) i / 512.0F;
 			float cosa = param * cosf (l[i].angle);
 			float sina = param * sinf (l[i].angle);

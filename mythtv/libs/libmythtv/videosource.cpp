@@ -626,8 +626,7 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_set
     m_useEit->setVisible(false);
     addChild(m_useEit);
 
-    TransTextEditSetting *label;
-    label=new TransTextEditSetting();
+    auto *label=new TransTextEditSetting();
     label->setValue(QObject::tr("Use only the transmitted guide data."));
     label->setHelpText(
         QObject::tr("This will usually only work with ATSC or DVB channels, "

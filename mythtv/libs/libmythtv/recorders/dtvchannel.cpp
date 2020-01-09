@@ -171,8 +171,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     if (!m_inputId)
         return false;
 
-    uint mplexid_restriction;
-    uint chanid_restriction;
+    uint mplexid_restriction = 0;
+    uint chanid_restriction = 0;
     if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_INFO, loc +
@@ -189,15 +189,15 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     QString freqtable;
     QString freqid;
     QString si_std;
-    int finetune;
-    uint64_t frequency;
-    int mpeg_prog_num;
-    uint atsc_major;
-    uint atsc_minor;
-    uint mplexid;
-    uint chanid;
-    uint tsid;
-    uint netid;
+    int finetune = 0;
+    uint64_t frequency = 0;
+    int mpeg_prog_num = 0;
+    uint atsc_major = 0;
+    uint atsc_minor = 0;
+    uint mplexid = 0;
+    uint chanid = 0;
+    uint tsid = 0;
+    uint netid = 0;
 
     if (!ChannelUtil::GetChannelData(
         m_sourceId, chanid, channum,

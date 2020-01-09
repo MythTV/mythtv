@@ -193,8 +193,8 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         return nullptr;
     }
 
-    size_t i;
-    for (i = 0; i < inputs.size(); ++i)
+    size_t i = 0;
+    for ( ; i < inputs.size(); ++i)
         if (inputs[i].m_inputId == (uint)inputid)
             break;
 

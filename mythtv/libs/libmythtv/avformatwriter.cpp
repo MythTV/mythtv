@@ -438,11 +438,7 @@ bool AVFormatWriter::ReOpen(const QString& filename)
 
 AVStream* AVFormatWriter::AddVideoStream(void)
 {
-    AVCodecContext *c;
-    AVStream *st;
-    AVCodec *codec;
-
-    st = avformat_new_stream(m_ctx, nullptr);
+    AVStream *st = avformat_new_stream(m_ctx, nullptr);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -451,8 +447,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
     st->id = 0;
 
-
-    codec = avcodec_find_encoder(m_ctx->oformat->video_codec);
+    AVCodec *codec = avcodec_find_encoder(m_ctx->oformat->video_codec);
     if (!codec)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -461,7 +456,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
 
     gCodecMap->freeCodecContext(st);
-    c = gCodecMap->getCodecContext(st, codec);
+    AVCodecContext *c = gCodecMap->getCodecContext(st, codec);
 
     c->codec                      = codec;
     c->codec_id                   = m_ctx->oformat->video_codec;
@@ -570,9 +565,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
 
 bool AVFormatWriter::OpenVideo(void)
 {
-    AVCodecContext *c;
-
-    c = gCodecMap->getCodecContext(m_videoStream);
+    AVCodecContext *c = gCodecMap->getCodecContext(m_videoStream);
 
     if (!m_width || !m_height)
         return false;
@@ -604,10 +597,7 @@ bool AVFormatWriter::OpenVideo(void)
 
 AVStream* AVFormatWriter::AddAudioStream(void)
 {
-    AVCodecContext *c;
-    AVStream *st;
-
-    st = avformat_new_stream(m_ctx, nullptr);
+    AVStream *st = avformat_new_stream(m_ctx, nullptr);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -616,7 +606,7 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     }
     st->id = 1;
 
-    c = gCodecMap->getCodecContext(st, nullptr, true);
+    AVCodecContext *c = gCodecMap->getCodecContext(st, nullptr, true);
 
     c->codec_id     = m_ctx->oformat->audio_codec;
     c->codec_type   = AVMEDIA_TYPE_AUDIO;
@@ -659,14 +649,11 @@ bool AVFormatWriter::FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFo
 
 bool AVFormatWriter::OpenAudio(void)
 {
-    AVCodecContext *c;
-    AVCodec *codec;
-
-    c = gCodecMap->getCodecContext(m_audioStream);
+    AVCodecContext *c = gCodecMap->getCodecContext(m_audioStream);
 
     c->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
-    codec = avcodec_find_encoder(c->codec_id);
+    AVCodec *codec = avcodec_find_encoder(c->codec_id);
     if (!codec)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -718,19 +705,15 @@ bool AVFormatWriter::OpenAudio(void)
 
 AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
 {
-    AVFrame *picture;
-    unsigned char *picture_buf;
-    int size;
-
-    picture = av_frame_alloc();
+    AVFrame *picture = av_frame_alloc();
     if (!picture)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AllocPicture(): avcodec_alloc_frame() failed");
         return nullptr;
     }
-    size = av_image_get_buffer_size(pix_fmt, m_width, m_height, IMAGE_ALIGN);
-    picture_buf = (unsigned char *)av_malloc(size);
+    int size = av_image_get_buffer_size(pix_fmt, m_width, m_height, IMAGE_ALIGN);
+    auto *picture_buf = (unsigned char *)av_malloc(size);
     if (!picture_buf)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "AllocPicture(): av_malloc() failed");

@@ -56,7 +56,7 @@ ChannelBase::~ChannelBase(void)
 
 bool ChannelBase::Init(QString &startchannel, bool setchan)
 {
-    bool ok;
+    bool ok = false;
 
     if (!setchan)
         ok = IsTunable(startchannel);
@@ -154,16 +154,16 @@ bool ChannelBase::IsTunable(const QString &channum) const
     QString freqtable;
     QString freqid;
     QString dtv_si_std;
-    int finetune;
-    uint64_t frequency;
-    int mpeg_prog_num;
-    uint atsc_major;
-    uint atsc_minor;
-    uint mplexid;
-    uint chanid;
-    uint tsid;
-    uint netid;
-    bool commfree;
+    int finetune = 0;
+    uint64_t frequency = 0;
+    int mpeg_prog_num = 0;
+    uint atsc_major = 0;
+    uint atsc_minor = 0;
+    uint mplexid = 0;
+    uint chanid = 0;
+    uint tsid = 0;
+    uint netid = 0;
+    bool commfree = false;
 
     if (!ChannelUtil::GetChannelData(m_sourceId, chanid, channum,
                                      tvformat, modulation, freqtable, freqid,
@@ -446,7 +446,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("GetScriptStatus() %1")
         .arg(m_systemStatus));
 
-    uint ret;
+    uint ret = 0;
     switch(m_systemStatus)
     {
         case GENERIC_EXIT_OK:

@@ -1413,7 +1413,7 @@ int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
                 if (offset)
                 {
                     H264Parser parser;
-                    bool dummy;
+                    bool dummy = false;
                     parser.parse_SPS(Context->extradata + offset,
                                      static_cast<uint>(Context->extradata_size - offset), dummy, result);
                 }
@@ -1539,7 +1539,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                  kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
-            LCDVideoFormatSet video_format;
+            LCDVideoFormatSet video_format = VIDEO_MPG;
 
             switch (enc->codec_id)
             {
@@ -1637,7 +1637,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
 
-    uint i;
+    uint i = 0;
     for (i = 0; i < pmt.StreamCount(); i++)
     {
         // MythTV remaps OpenCable Video to normal video during recording
@@ -2175,7 +2175,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             else
             {
-                int logical_stream_id;
+                int logical_stream_id = 0;
                 if (m_ringBuffer && m_ringBuffer->IsDVD())
                 {
                     logical_stream_id = m_ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[strm]->id);
@@ -2824,7 +2824,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 
         if (scte || cc_type <= 0x1) // EIA-608 field-1/2
         {
-            uint field;
+            uint field = 0;
             if (cc_type == 0x2)
             {
                 // SCTE repeated field
@@ -3626,7 +3626,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         return false;
     }
 
-    long long pts;
+    long long pts = 0;
     if (m_useFrameTiming)
     {
         pts = AvFrame->pts;
@@ -3862,9 +3862,9 @@ void AvFormatDecoder::ProcessDSMCCPacket(
     // The packet may contain several tables.
     uint8_t *data = pkt->data;
     int length = pkt->size;
-    int componentTag;
-    int dataBroadcastId;
-    unsigned carouselId;
+    int componentTag = 0;
+    int dataBroadcastId = 0;
+    unsigned carouselId = 0;
     {
         QMutexLocker locker(avcodeclock);
         componentTag    = str->component_tag;
@@ -5203,7 +5203,7 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 
 bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfile)
 {
-    bool passthru;
+    bool passthru = false;
 
     // if withProfile == false, we will accept any DTS stream regardless
     // of its profile. We do so, so we can bitstream DTS-HD as DTS core
@@ -5236,7 +5236,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AVStream *curstream = nullptr;
     AVCodecContext *ctx = nullptr;
     AudioInfo old_in    = m_audioIn;
-    int requested_channels;
+    int requested_channels = 0;
 
     if ((m_currentTrack[kTrackTypeAudio] >= 0) && m_ic &&
         (m_selectedTrack[kTrackTypeAudio].m_av_stream_index <=
@@ -5320,7 +5320,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (LCD *lcd = LCD::Get())
     {
-        LCDAudioFormatSet audio_format;
+        LCDAudioFormatSet audio_format = AUDIO_MP3;
 
         switch (ctx->codec_id)
         {
@@ -5426,7 +5426,7 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         }
     }
     if (duration != INT64_MIN) {
-        int64_t filesize;
+        int64_t filesize = 0;
         ic->duration = duration;
         if (ic->pb && (filesize = avio_size(ic->pb)) > 0) {
             /* compute the bitrate */

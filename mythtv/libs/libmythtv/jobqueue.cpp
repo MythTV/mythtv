@@ -166,10 +166,7 @@ void JobQueue::ProcessQueue(void)
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + "ProcessQueue() started");
 
     QString logInfo;
-    int jobID;
-    int cmds;
     //int flags;
-    int status;
     QString hostname;
 
     QMap<int, int> jobStatus;
@@ -210,7 +207,7 @@ void JobQueue::ProcessQueue(void)
             inTimeWindow = InJobRunWindow();
             foreach (auto & job, jobs)
             {
-                status = job.status;
+                int status = job.status;
                 hostname = job.hostname;
 
                 if (((status == JOB_RUNNING) ||
@@ -249,10 +246,10 @@ void JobQueue::ProcessQueue(void)
             for ( int x = 0;
                  (x < jobs.size()) && (m_jobsRunning < maxJobs); x++)
             {
-                jobID = jobs[x].id;
-                cmds = jobs[x].cmds;
+                int jobID = jobs[x].id;
+                int cmds = jobs[x].cmds;
                 //flags = jobs[x].flags;
-                status = jobs[x].status;
+                int status = jobs[x].status;
                 hostname = jobs[x].hostname;
 
                 if (!jobs[x].chanid)
@@ -1778,7 +1775,7 @@ void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
     jts->jq = this;
     jts->jobID = jobID;
 
-    pthread_t childThread;
+    pthread_t childThread = 0;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -1889,10 +1886,9 @@ QString JobQueue::PrettyPrint(off_t bytes)
         { "ZB", 999, 1 },
         { "YB", 0, 0 },
     };
-    unsigned int    ii;
-    float           fbytes = bytes;
+    float fbytes = bytes;
 
-    ii = 0;
+    unsigned int ii = 0;
     while (kPpTab[ii].m_max && fbytes > kPpTab[ii].m_max) {
         fbytes /= 1024;
         ii++;

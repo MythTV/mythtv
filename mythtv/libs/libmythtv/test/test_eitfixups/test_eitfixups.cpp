@@ -807,8 +807,7 @@ void TestEITFixups::test64BitEnum(void)
     FixupMap   fixes;
     fixes[0xFFFFULL<<32] = EITFixUp::kFixDisneyChannel;
     fixes[0xFFFFULL<<32] |= EITFixUp::kFixATV;
-    FixupValue fix;
-    fix = EITFixUp::kFixGenericDVB;
+    FixupValue fix = EITFixUp::kFixGenericDVB;
     fix |= fixes.value(0xFFFFULL<<32);
     QCOMPARE(fix, EITFixUp::kFixGenericDVB | EITFixUp::kFixDisneyChannel | EITFixUp::kFixATV);
     QVERIFY(EITFixUp::kFixATV & fix);

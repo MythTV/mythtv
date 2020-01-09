@@ -875,7 +875,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
         for (int node = 0; node < raw1394_get_nodecount(item.m_handle); node++)
         {
-            uint64_t guid;
+            uint64_t guid = 0;
 
             guid = rom1394_get_guid(item.m_handle, node);
             item.m_port = port;

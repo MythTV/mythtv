@@ -196,7 +196,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     bool foundentry   = false;
     bool sizeok       = true;
 
-    VAConfigID config;
+    VAConfigID config = 0;
     if (vaCreateConfig(hwctx->display, desired, VAEntrypointVLD, nullptr, 0, &config) == VA_STATUS_SUCCESS)
     {
         auto *hwconfig = reinterpret_cast<AVVAAPIHWConfig*>(av_hwdevice_hwconfig_alloc(hwdevicectx));

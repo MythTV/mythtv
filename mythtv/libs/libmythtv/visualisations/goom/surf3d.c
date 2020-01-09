@@ -44,10 +44,9 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 #include "drawmethods.h"
 
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
-	int i;
 	v2d v2;
 	
-	for (i=0;i<s->nbvertex;i++) {
+	for (int i=0;i<s->nbvertex;i++) {
 		V3D_TO_V2D(s->svertex[i],v2,W,H,dist);
 		int *p1 = buf + v2.x + (v2.y*W);
 		int *p2 = back + v2.x + (v2.y*W);
@@ -62,15 +61,13 @@ void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int
 
 void grid3d_draw (grid3d *g, int color, int colorlow,
 									int dist, int *buf, int *back, int W,int H) {
-	int x;
 	v2d v2;
 	v2d v2x;
 	
-	for (x=0;x<g->defx;x++) {
-		int z;
+	for (int x=0;x<g->defx;x++) {
 		V3D_TO_V2D(g->surf.svertex[x],v2x,W,H,dist);
 
-		for (z=1;z<g->defz;z++) {
+		for (int z=1;z<g->defz;z++) {
 			V3D_TO_V2D(g->surf.svertex[z*g->defx + x],v2,W,H,dist);
 			if (((v2.x != -666) || (v2.y!=-666))
 					&& ((v2x.x != -666) || (v2x.y!=-666))) {
@@ -84,26 +81,23 @@ void grid3d_draw (grid3d *g, int color, int colorlow,
 }
 
 void surf3d_rotate (surf3d *s, float angle) {
-	int i;
-	float cosa;
-	float sina;
+	float cosa = NAN;
+	float sina = NAN;
 	SINCOS(angle,sina,cosa);
-	for (i=0;i<s->nbvertex;i++) {
+	for (int i=0;i<s->nbvertex;i++) {
 		Y_ROTATE_V3D(s->vertex[i],s->svertex[i],cosa,sina);
 	}
 }
 
 void surf3d_translate (surf3d *s) {
-	int i;
-	for (i=0;i<s->nbvertex;i++) {
+	for (int i=0;i<s->nbvertex;i++) {
 		TRANSLATE_V3D(s->center,s->svertex[i]);
 	}
 }
 
 void grid3d_update (grid3d *g, float angle, const float *vals, float dist) {
-	int i;
-	float cosa;
-	float sina;
+	float cosa = NAN;
+	float sina = NAN;
 	surf3d *s = &(g->surf);
 	v3d cam = s->center;
 	cam.z += dist;
@@ -114,16 +108,16 @@ void grid3d_update (grid3d *g, float angle, const float *vals, float dist) {
 
 	if (g->mode==0) {
 		if (vals)
-			for (i=0;i<g->defx;i++)
+			for (int i=0;i<g->defx;i++)
 				s->vertex[i].y = s->vertex[i].y*0.2F + vals[i]*0.8F;
 
-		for (i=g->defx;i<s->nbvertex;i++) {
+		for (int i=g->defx;i<s->nbvertex;i++) {
 			s->vertex[i].y *= 0.255F;
 			s->vertex[i].y += (s->vertex[i-g->defx].y * 0.777F);
 		}
 	}
 
-	for (i=0;i<s->nbvertex;i++) {
+	for (int i=0;i<s->nbvertex;i++) {
 		Y_ROTATE_V3D(s->vertex[i],s->svertex[i],cosa,sina);
 		TRANSLATE_V3D(cam,s->svertex[i]);
 	}

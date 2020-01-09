@@ -281,12 +281,9 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
                        const int interval = 1) :
         HostComboBoxSetting(name, false)
     {
-        int hour;
-        int minute;
-
-        for (hour = 0; hour < 24; hour++)
+        for (int hour = 0; hour < 24; hour++)
         {
-            for (minute = 0; minute < 60; minute += interval)
+            for (int minute = 0; minute < 60; minute += interval)
             {
                 QString timeStr = QString("%1:%2")
                     .arg(hour,  2,10,QChar('0'))
@@ -306,12 +303,9 @@ class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
                        const int interval = 1) :
         GlobalComboBoxSetting(name, false)
     {
-        int hour;
-        int minute;
-
-        for (hour = 0; hour < 24; hour++)
+        for (int hour = 0; hour < 24; hour++)
         {
-            for (minute = 0; minute < 60; minute += interval)
+            for (int minute = 0; minute < 60; minute += interval)
             {
                 QString timeStr = QString("%1:%2")
                     .arg(hour,  2,10,QChar('0'))

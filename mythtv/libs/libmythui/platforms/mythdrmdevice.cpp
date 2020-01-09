@@ -131,7 +131,7 @@ void MythDRMDevice::Authenticate(void)
 
     if (!m_authenticated)
     {
-        drm_magic_t magic;
+        drm_magic_t magic = 0;
         m_authenticated = drmGetMagic(m_fd, &magic) == 0 && drmAuthMagic(m_fd, magic) == 0;
     }
 }

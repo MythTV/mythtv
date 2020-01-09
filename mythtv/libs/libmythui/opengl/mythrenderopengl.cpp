@@ -1,5 +1,6 @@
 // Std
 #include <algorithm>
+#include <cmath>
 using std::min;
 
 // Qt
@@ -698,7 +699,7 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenu
         return nullptr;
 
     OpenGLLocker locker(this);
-    QOpenGLFramebufferObject *framebuffer;
+    QOpenGLFramebufferObject *framebuffer = nullptr;
     if (InternalFormat)
     {
         framebuffer = new QOpenGLFramebufferObject(Size, QOpenGLFramebufferObject::NoAttachment,
@@ -1274,7 +1275,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
 
     if (Texture->m_rotation != 0)
     {
-        GLfloat temp;
+        GLfloat temp = NAN;
         if (Texture->m_rotation == 90)
         {
             temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];

@@ -97,8 +97,8 @@ class MTV_PUBLIC ChannelUtil
                                   uint &major,   uint          &minor);
     static bool    IsATSCChannel(uint sourceid, const QString &channum)
         {
-            uint m1;
-            uint m2;
+            uint m1 = 0;
+            uint m2 = 0;
             GetATSCChannel(sourceid, channum, m1,m2); return m2;
         }
 

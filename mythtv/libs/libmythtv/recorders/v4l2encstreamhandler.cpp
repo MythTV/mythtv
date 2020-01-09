@@ -497,7 +497,7 @@ void V4L2encStreamHandler::Close(void)
 bool V4L2encStreamHandler::StartEncoding(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding() -- begin");
-    int old_cnt;
+    int old_cnt = 0;
 
     QMutexLocker lock(&m_streamLock);
 
@@ -536,7 +536,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
         int idx = 1;
         for ( ; idx < 50; ++idx)
         {
-            uint8_t dummy;
+            uint8_t dummy = 0;
             int len = read(m_fd, &dummy, 0);
             if (len >= 0)
             {
@@ -960,8 +960,8 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
 {
     m_width = m_height = -1;
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
     int idx = 0;
     for ( ; idx < 10; ++idx)
     {

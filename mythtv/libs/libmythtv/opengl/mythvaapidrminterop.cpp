@@ -449,8 +449,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
 
     OpenGLLocker locker(m_context);
 
-    VASurfaceID surface;
-    VAStatus status;
+    VASurfaceID surface = 0;
 
     VASurfaceAttrib attribs = {};
     attribs.flags = VA_SURFACE_ATTRIB_SETTABLE;
@@ -462,7 +461,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
                          &surface, 1, &attribs, 1) == VA_STATUS_SUCCESS)
     {
         VADRMPRIMESurfaceDescriptor vadesc;
-        status = vaExportSurfaceHandle(m_vaDisplay, surface, VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+        VAStatus status = vaExportSurfaceHandle(m_vaDisplay, surface, VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
                                        VA_EXPORT_SURFACE_READ_ONLY | VA_EXPORT_SURFACE_SEPARATE_LAYERS,
                                        &vadesc);
         if (status == VA_STATUS_SUCCESS)

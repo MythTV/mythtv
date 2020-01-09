@@ -235,9 +235,9 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
     if (!m_audio || !m_codec || !m_codecContext)
         return;
 
-    uint8_t  type;
-    uint16_t seq;
-    uint64_t timestamp;
+    uint8_t  type = 0;
+    uint16_t seq = 0;
+    uint64_t timestamp = 0;
 
     if (!GetPacketType(buf, type, seq, timestamp))
     {
@@ -632,7 +632,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     auto *samples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     while (tmp_pkt.size > 0)
     {
-        int data_size;
+        int data_size = 0;
         int ret = AudioOutputUtil::DecodeAudio(ctx, samples,
                                                data_size, &tmp_pkt);
         if (ret < 0)
@@ -1196,8 +1196,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             if (m_eventServer)
             {
                 // Should never get here, but just in case
-                QTcpSocket *client;
-                foreach (client, m_eventClients)
+                foreach (auto client, m_eventClients)
                 {
                     client->disconnect();
                     client->abort();
@@ -1777,7 +1776,7 @@ void MythRAOPConnection::SendNotification(bool update)
     int position =
         (m_progressCurrent-m_progressStart) / m_frameRate;
 
-    MythNotification *n;
+    MythNotification *n = nullptr;
 
     if (!update || !m_firstSend)
     {

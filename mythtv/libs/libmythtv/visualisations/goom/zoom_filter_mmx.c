@@ -30,16 +30,13 @@ void zoom_filter_mmx (int prevX, int prevY,
     unsigned int ay = (prevY-1)<<PERTEDEC;
     
     int bufsize = prevX * prevY;
-    int loop;
 
     pxor_r2r(mm7,mm7);
     
-    for (loop=0; loop<bufsize; loop++)
+    for (int loop=0; loop<bufsize; loop++)
     {
-        int pos;
-        int coeffs;
-    
-        int posplusprevX;
+        int pos = 0;
+        int coeffs = 0;
     
         int myPos = loop << 1;
         int myPos2 = myPos + 1;
@@ -68,7 +65,7 @@ void zoom_filter_mmx (int prevX, int prevY,
             coeffs = precalCoef [px & PERTEMASK][py & PERTEMASK];
         }
 
-        posplusprevX = pos + prevX;
+        int posplusprevX = pos + prevX;
             
         movd_m2r(coeffs, mm6);
 

@@ -94,7 +94,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
     }
     else
     {
-        bool gotPacket;
+        bool gotPacket = false;
 
         do
         {

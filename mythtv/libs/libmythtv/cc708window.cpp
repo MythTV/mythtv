@@ -198,17 +198,17 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         auto *new_text = new CC708Character[new_rows * new_columns];
         m_pen.m_column = 0;
         m_pen.m_row = 0;
-        uint i;
-        uint j;
+        uint i = 0;
         for (i = 0; m_text && i < m_row_count; ++i)
         {
+            uint j = 0;
             for (j = 0; j < m_column_count; ++j)
                 new_text[i * new_columns + j] = m_text[i * m_true_column_count + j];
             for (; j < new_columns; ++j)
                 new_text[i * new_columns + j].m_attr = m_pen.m_attr;
         }
         for (; i < new_rows; ++i)
-            for (j = 0; j < new_columns; ++j)
+            for (uint j = 0; j < new_columns; ++j)
                 new_text[i * new_columns + j].m_attr = m_pen.m_attr;
 
         delete [] m_text;

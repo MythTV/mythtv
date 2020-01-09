@@ -523,7 +523,7 @@ void MythNVDECContext::NVDECCheck(void)
     {
         OpenGLLocker locker(opengl);
         CuvidFunctions *cuvid = nullptr;
-        CUcontext dummy;
+        CUcontext dummy = nullptr;
         cuda->cuCtxPushCurrent(context);
 
         if (cuvid_load_functions(&cuvid, nullptr) == 0)
