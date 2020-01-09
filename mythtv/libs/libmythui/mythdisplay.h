@@ -54,7 +54,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static void  PrimaryScreenChanged  (QScreen *qScreen);
     void         ScreenAdded           (QScreen *qScreen);
     void         ScreenRemoved         (QScreen *qScreen);
-    static void  GeometryChanged       (const QRect &Geometry);
+    void         GeometryChanged       (const QRect &Geometry);
 
   signals:
     void         CurrentScreenChanged  (QScreen *qScreen);

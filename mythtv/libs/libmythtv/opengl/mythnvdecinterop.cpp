@@ -42,8 +42,7 @@ void MythNVDECInterop::DeleteTextures(void)
     if (!m_openglTextures.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting CUDA resources");
-        for (auto it = m_openglTextures.constBegin();
-             it != m_openglTextures.constEnd(); ++it)
+        for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
             for (auto & texture : textures)
