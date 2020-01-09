@@ -4988,30 +4988,48 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         QString text3;
         if (paddedFields)
         {
-            text1.asprintf("%02d:%02d:%02d", phours, pmins, psecs);
-            text2.asprintf("%02d:%02d:%02d", shours, smins, ssecs);
-            text3.asprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
+            text1 = QString("%1:%2:%3")
+                    .arg(phours, 2, 10, QLatin1Char('0'))
+                    .arg(pmins,  2, 10, QLatin1Char('0'))
+                    .arg(psecs,  2, 10, QLatin1Char('0'));
+            text2 = QString("%1:%2:%3")
+                    .arg(shours, 2, 10, QLatin1Char('0'))
+                    .arg(smins,  2, 10, QLatin1Char('0'))
+                    .arg(ssecs,  2, 10, QLatin1Char('0'));
+            text3 = QString("%1:%2:%3")
+                    .arg(sbhours, 2, 10, QLatin1Char('0'))
+                    .arg(sbmins,  2, 10, QLatin1Char('0'))
+                    .arg(sbsecs,  2, 10, QLatin1Char('0'));
         }
         else
         {
             if (shours > 0)
             {
-                text1.asprintf("%d:%02d:%02d", phours, pmins, psecs);
-                text2.asprintf("%d:%02d:%02d", shours, smins, ssecs);
+                text1 = QString("%1:%2:%3")
+                        .arg(phours)
+                        .arg(pmins,  2, 10, QLatin1Char('0'))
+                        .arg(psecs,  2, 10, QLatin1Char('0'));
+                text2 = QString("%1:%2:%3")
+                        .arg(shours)
+                        .arg(smins,  2, 10, QLatin1Char('0'))
+                        .arg(ssecs,  2, 10, QLatin1Char('0'));
             }
             else
             {
-                text1.asprintf("%d:%02d", pmins, psecs);
-                text2.asprintf("%d:%02d", smins, ssecs);
+                text1 = QString("%1:%2").arg(pmins).arg(psecs,  2, 10, QLatin1Char('0'));
+                text2 = QString("%1:%2").arg(smins).arg(ssecs,  2, 10, QLatin1Char('0'));
             }
 
             if (sbhours > 0)
             {
-                text3.asprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
+                text3 = QString("%1:%2:%3")
+                        .arg(sbhours)
+                        .arg(sbmins,  2, 10, QLatin1Char('0'))
+                        .arg(sbsecs,  2, 10, QLatin1Char('0'));
             }
             else if (sbmins > 0)
             {
-                text3.asprintf("%d:%02d", sbmins, sbsecs);
+                text3 = QString("%1:%2").arg(sbmins).arg(sbsecs,  2, 10, QLatin1Char('0'));
             }
             else
             {
