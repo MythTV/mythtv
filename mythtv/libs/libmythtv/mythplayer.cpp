@@ -732,6 +732,9 @@ int MythPlayer::OpenFile(int Retries)
     if (!m_playerCtx || (m_playerCtx && !m_playerCtx->m_buffer))
         return -1;
 
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opening '%1'")
+        .arg(m_playerCtx->m_buffer->GetSafeFilename()));
+
     // Disable hardware acceleration for second PBP
     if (m_playerCtx && (m_playerCtx->IsPBP() && !m_playerCtx->IsPrimaryPBP()) &&
         FlagIsSet(kDecodeAllowGPU))
