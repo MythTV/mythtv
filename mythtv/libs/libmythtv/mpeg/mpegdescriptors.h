@@ -218,6 +218,17 @@ class PrivateDescriptorID
         premiere_content_order         = 0xF0,
         premiere_parental_information  = 0xF1,
         premiere_content_transmission  = 0xF2,
+
+        // Private -- OpenTV
+        opentv_titles_1                = 0xA0, /* implemented */
+        opentv_titles_2                = 0xA1, /* implemented */
+        opentv_titles_3                = 0xA2, /* implemented */
+        opentv_titles_4                = 0xA3, /* implemented */
+        opentv_summaries_1             = 0xA8, /* implemented */
+        opentv_summaries_2             = 0xA9, /* implemented */
+        opentv_summaries_3             = 0xAA, /* implemented */
+        opentv_summaries_4             = 0xAB, /* implemented */
+        opentv_channel_list            = 0xB1, /* partial */
     };
 };
 

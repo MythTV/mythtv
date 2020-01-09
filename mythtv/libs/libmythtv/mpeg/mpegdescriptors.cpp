@@ -372,6 +372,9 @@ QString MPEGDescriptor::DescriptorTagString(void) const
         case PrivateDescriptorID::premiere_content_transmission: /* 0xF2 */
             comma_list_append(str, "Possibly Premiere DE Content Transmission");
             break;
+        case PrivateDescriptorID::opentv_channel_list: /* 0xB1 */
+            comma_list_append(str, "Possibly DVB OpenTV Channel List");
+            break;
     }
 
     if (str.isEmpty())
@@ -556,6 +559,11 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
              DescriptorID::component_name == DescriptorTag())
     {
         SET_STRING(ComponentNameDescriptor);
+    }
+    // OpenTV descriptors
+    else if (PrivateDescriptorID::opentv_channel_list == DescriptorTag())
+    {
+        SET_STRING(OpenTVChannelListDescriptor);
     }
     // POSSIBLY UNSAFE ! -- end
     else

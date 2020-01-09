@@ -2327,6 +2327,38 @@ class BSkyBLCNDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
+class OpenTVChannelListDescriptor : public MPEGDescriptor
+{
+  public:
+    OpenTVChannelListDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::opentv_channel_list) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0xB1
+    // descriptor_length        8   1.0
+
+    uint ChannelCount(void) const { return (DescriptorLength() - 2)/9; }
+
+    uint RegionID() const
+        { return (m_data[2] << 8) | m_data[3]; }
+
+    uint ServiceID(uint i) const
+        { return (m_data[4 + 0 + (i*9)] << 8) | m_data[4 + 1 + (i*9)]; }
+
+    uint ChannelType(uint i) const
+        { return m_data[4 + 2 + (i*9)]; }
+
+    uint ChannelID(uint i) const
+        { return ((m_data[4 + 3 + (i*9)] << 8) | m_data[4 + 5 + (i*9)]); }
+
+    uint ChannelNumber(uint i) const
+        { return ((m_data[4 + 5 + (i*9)] << 8) | m_data[4 + 6 + (i*9)]); }
+
+    uint Flags(uint i) const
+        { return ((m_data[4 + 7 + (i*9)] << 8) | m_data[4 + 8 + (i*9)]) & 0xf; }
+
+    QString toString(void) const override;
+};
+
 // ETSI TS 102 323 (TV Anytime)
 class DVBContentIdentifierDescriptor : public MPEGDescriptor
 {
