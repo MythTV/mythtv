@@ -109,11 +109,11 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
             free(tmp_data);
             return nullptr;
         }
-        block = nullptr;
         uint size = block->size();
         memcpy(tmp_data + curp, block->data(), size);
         curp += size;
         delete block;
+        block = nullptr;
     }
 
     /* Uncompress....  */
