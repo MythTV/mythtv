@@ -344,7 +344,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     struct DeferredDeleteStruct
     {
-        PlaybackSock *sock;
+        PlaybackSock *sock{};
         QDateTime ts;
     };
 

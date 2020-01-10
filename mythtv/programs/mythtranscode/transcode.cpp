@@ -863,7 +863,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (m_hlsMode)
         GetPlayer()->ForceDeinterlacer(false, DEINT_CPU | DEINT_MEDIUM);
 
-    VideoFrame frame;
+    VideoFrame frame {};
     memset(&frame, 0, sizeof(frame));
     // Do not use padding when compressing to RTjpeg or when in fifomode.
     // The RTjpeg compressor doesn't know how to handle strides different to

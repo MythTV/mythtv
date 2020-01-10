@@ -339,9 +339,9 @@ class PTSListener :
   public:
     uint32_t        m_startCode     {0xFFFFFFFF};
     QMap<uint,uint> m_ptsStreams;
-    uint32_t        m_ptsCount[256];
-    int64_t         m_ptsFirst[256];
-    int64_t         m_ptsLast[256];
+    uint32_t        m_ptsCount[256] {};
+    int64_t         m_ptsFirst[256] {};
+    int64_t         m_ptsLast[256]  {};
 };
 
 

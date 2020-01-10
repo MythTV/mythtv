@@ -39,7 +39,7 @@ class CustomEventRelayer : public QObject
     ~CustomEventRelayer() override = default;
 
   private:
-    void (*m_fp)(QEvent*);
+    void (*m_fp)(QEvent*) {nullptr};
 };
 
 #endif

@@ -50,7 +50,7 @@ class MPEG2frame
     void ensure_size(int size);
     void set_pkt(AVPacket *newpkt);
 
-    AVPacket          m_pkt;
+    AVPacket          m_pkt        {};
     bool              m_isSequence {false};
     bool              m_isGop      {false};
     uint8_t          *m_framePos   {nullptr};

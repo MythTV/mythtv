@@ -317,7 +317,7 @@ private:
     const QDateTime m_lastTime;
 
     QVector<ProgramList*> m_proglists;
-    ProgInfoGuideArray m_programInfos;
+    ProgInfoGuideArray m_programInfos {};
     int m_progPast {0};
     //QVector<GuideUIElement> m_result;
     QLinkedList<GuideUIElement> m_result;

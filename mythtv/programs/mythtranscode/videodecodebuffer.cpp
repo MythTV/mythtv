@@ -34,7 +34,7 @@ void VideoDecodeBuffer::run()
         {
             locker.unlock();
 
-            DecodedFrameInfo tfInfo;
+            DecodedFrameInfo tfInfo {};
             tfInfo.frame = nullptr;
             tfInfo.didFF = 0;
             tfInfo.isKey = false;

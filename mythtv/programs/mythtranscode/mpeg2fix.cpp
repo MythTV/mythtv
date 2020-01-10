@@ -134,7 +134,7 @@ void MPEG2frame::set_pkt(AVPacket *newpkt)
 
 PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
 {
-    poq_idx_t idx;
+    poq_idx_t idx {};
     m_vidId = vidid;
     m_keyList = std::move(keys);
     m_keyList.append(m_vidId);
@@ -177,7 +177,7 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
 
 void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 {
-    poq_idx_t idx;
+    poq_idx_t idx {};
 
     idx.newPTS = newPTS;
     idx.pos_pts = atPTS;
@@ -191,7 +191,7 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
 {
     int64_t delta = MPEG2fixup::diff2x33(newPTS, m_offset[m_vidId].last().newPTS);
-    poq_idx_t idx;
+    poq_idx_t idx {};
 
     idx.pos_pts = pkt->pos;
     idx.framenum = pkt->duration;

@@ -43,7 +43,7 @@ private:
 
     struct {
         int         row, col, width, height;
-    }               m_exclude;
+    }               m_exclude {};
 };
 
 #endif  /* !__CANNYEDGEDETECTOR_H__ */

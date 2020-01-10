@@ -797,15 +797,15 @@ void StatusBox::doTunerStatus()
 {
     struct info
     {
-        int         m_inputid;
-        bool        m_schedgroup;
+        int         m_inputid     {0};
+        bool        m_schedgroup  {false};
         QString     m_displayname;
-        int         m_errored;
-        int         m_unavailable;
-        int         m_sleeping;
-        int         m_recording;
-        int         m_livetv;
-        int         m_available;
+        int         m_errored     {0};
+        int         m_unavailable {0};
+        int         m_sleeping    {0};
+        int         m_recording   {0};
+        int         m_livetv      {0};
+        int         m_available   {0};
         QStringList m_recordings;
     };
     QMap<int, struct info> info;
