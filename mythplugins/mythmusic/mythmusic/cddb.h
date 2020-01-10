@@ -63,7 +63,7 @@ struct Cddb
     struct Album
     {
         QString discGenre; // the genre used in the query to differentiate similar discID's
-        discid_t discID;
+        discid_t discID       { 0 };
         QString artist;
         QString title;
         QString genre;     // the genre from the DGENRE= item

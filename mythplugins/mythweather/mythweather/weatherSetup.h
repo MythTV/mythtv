@@ -27,9 +27,9 @@ struct SourceListInfo
     QString author;
     QString email;
     QString version;
-    uint update_timeout;
-    uint retrieve_timeout;
-    uint id;
+    uint update_timeout   {DEFAULT_UPDATE_TIMEOUT};
+    uint retrieve_timeout {};
+    uint id               {};
 };
 
 Q_DECLARE_METATYPE(SourceListInfo *);
@@ -124,7 +124,7 @@ class SourceSetup : public MythScreenType
 struct ResultListInfo
 {
     QString idstr;
-    ScriptInfo *src;
+    ScriptInfo *src { nullptr };
 };
 
 Q_DECLARE_METATYPE(ResultListInfo *)

@@ -31,8 +31,8 @@ class NewsSiteItem
     QString m_category;
     QString m_url;
     QString m_ico;
-    bool    m_inDB;
-    bool    m_podcast;
+    bool    m_inDB    { false };
+    bool    m_podcast { false };
 };
 Q_DECLARE_METATYPE(NewsSiteItem*)
 

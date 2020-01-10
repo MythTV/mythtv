@@ -48,10 +48,10 @@ private:
 
     QSize m_size                 {0,0};
 
-    double m_cosTable[NumSamples];
-    double m_negSinTable[NumSamples];
-    int    m_bitReverse[NumSamples];
-    int    m_scaleDown[256];
+    double m_cosTable[NumSamples]    {};
+    double m_negSinTable[NumSamples] {};
+    int    m_bitReverse[NumSamples]  {};
+    int    m_scaleDown[256]          {};
     int    m_maxStarRadius       {1};
     int    m_fadeMode            {Stars};
     bool   m_pointsAreDiamonds   {true};
@@ -66,7 +66,7 @@ private:
     Bitmap<unsigned short> m_lastLastOutputBmp;
     QImage *m_outputImage        {nullptr};
 
-    unsigned char m_palette[768];
+    unsigned char m_palette[768] {};
     double m_fgRedSlider         {0.0};
     double m_fgGreenSlider       {0.5};
     double m_bgRedSlider         {0.75};

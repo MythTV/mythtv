@@ -24,7 +24,7 @@ struct RomFileInfo
     QString romfile;
     QString rompath;
     QString romname;
-    bool indb;
+    bool    indb     { false };
 };
 
 using RomFileInfoList = QList< RomFileInfo >;

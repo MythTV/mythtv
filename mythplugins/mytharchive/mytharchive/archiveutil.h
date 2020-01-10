@@ -38,19 +38,19 @@ struct EncoderProfile
 {
     QString name;
     QString description;
-    float bitrate;
+    float bitrate { 0.0F };
 };
 
 struct ThumbImage
 {
     QString caption;
     QString filename;
-    qint64  frame;
+    qint64  frame { 0 };
 };
 
 struct ArchiveItem
 {
-    int     id;
+    int     id                     { 0 };
     QString type;
     QString title;
     QString subtitle;
@@ -58,17 +58,18 @@ struct ArchiveItem
     QString startDate;
     QString startTime;
     QString filename;
-    int64_t size;
-    int64_t newsize;
-    int duration;
-    int cutDuration;
-    EncoderProfile *encoderProfile;
+    int64_t size                   { 0 };
+    int64_t newsize                { 0 };
+    int duration                   { 0 };
+    int cutDuration                { 0 };
+    EncoderProfile *encoderProfile { nullptr };
     QString fileCodec;
     QString videoCodec;
-    int videoWidth, videoHeight;
-    bool hasCutlist;
-    bool useCutlist;
-    bool editedDetails;
+    int videoWidth                 { 0 };
+    int videoHeight                { 0 };
+    bool hasCutlist                { false };
+    bool useCutlist                { false };
+    bool editedDetails             { false };
     QList<ThumbImage*> thumbList;
 };
 

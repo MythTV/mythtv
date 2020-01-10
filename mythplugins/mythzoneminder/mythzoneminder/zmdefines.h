@@ -93,7 +93,7 @@ enum State
 struct Frame
 {
     QString type;
-    double delta;
+    double delta {0.0};
 };
 
 class Monitor

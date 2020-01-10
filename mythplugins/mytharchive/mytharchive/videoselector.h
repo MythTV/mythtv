@@ -25,14 +25,14 @@ class MythUIButtonListItem;
 
 struct VideoInfo
 {
-    int     id;
+    int     id            { 0 };
     QString title;
     QString plot;
     QString category;
     QString filename;
     QString coverfile;
-    int     parentalLevel;
-    uint64_t size;
+    int     parentalLevel { ParentalLevel::plNone };
+    uint64_t size         { 0 };
 };
 
 class VideoSelector : public MythScreenType

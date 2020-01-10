@@ -17,10 +17,10 @@
 
 struct FileData
 {
-    bool directory;
-    bool selected;
+    bool directory   { false };
+    bool selected    { false };
     QString filename;
-    int64_t size;
+    int64_t size     { 0 };
 };
 
 enum FSTYPE
