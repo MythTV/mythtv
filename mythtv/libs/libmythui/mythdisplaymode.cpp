@@ -52,7 +52,7 @@ void MythDisplayMode::Init(void)
 
 QSize MythDisplayMode::Resolution(void) const
 {
-    return {m_width, m_height};
+    return { m_width, m_height };
 }
 
 int MythDisplayMode::Width(void) const

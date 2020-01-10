@@ -234,6 +234,12 @@ enum
     /// The all-ones PID value 0x1FFF indicates a Null TS Packet
     /// introduced to maintain a constant bit rate of a TS Multiplex.
     MPEG_NULL_PID      = 0x1fff,
+
+    // OpenTV EIT PIDs
+    OTV_EIT_TIT_PID_START  = 0x30,
+    OTV_EIT_TIT_PID_END    = 0x37,
+    OTV_EIT_SUP_PID_START  = 0x40,
+    OTV_EIT_SUP_PID_END    = 0x47,
 };
 
 /** \class TableID
@@ -364,6 +370,12 @@ class MTV_PUBLIC TableID
         SRVLOC   = 0xA1,
         TSS      = 0xA2,
         CMPNAME  = 0xA3,
+
+        // opentv
+        OTV_EIT_TITbeg  = 0xA0, // always on pids config (0x30-0x37)
+        OTV_EIT_TITend  = 0xA3, // always on pids config (0x30-0x37)
+        OTV_EIT_SUMbeg  = 0xA8, // always on pids config (0x40-0x47)
+        OTV_EIT_SUMend  = 0xAB, // always on pids config (0x40-0x47)
     };
 };
 

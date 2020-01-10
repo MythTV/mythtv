@@ -249,8 +249,7 @@ void MythOpenGLInterop::DeleteTextures(void)
     {
         OpenGLLocker locker(m_context);
         int count = 0;
-        for (auto it = m_openglTextures.constBegin();
-             it != m_openglTextures.constEnd(); ++it)
+        for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
             for (auto & texture : textures)

@@ -110,7 +110,7 @@ QSize MythXDisplay::GetDisplaySize(void)
                      DisplayHeight(m_disp, m_screenNum));
     }
 
-    return {mode.hdisplay, mode.vdisplay};
+    return { mode.hdisplay, mode.vdisplay };
 }
 
 /**
@@ -123,7 +123,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     MythXLocker locker(this);
     int displayWidthMM  = DisplayWidthMM( m_disp, m_screenNum);
     int displayHeightMM = DisplayHeightMM(m_disp, m_screenNum);
-    return {displayWidthMM, displayHeightMM};
+    return { displayWidthMM, displayHeightMM };
 }
 
 double MythXDisplay::GetRefreshRate(void)

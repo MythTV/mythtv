@@ -94,6 +94,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     bool    DoFullChannelSearch(void)    const;
     bool    DoAddFullTS(void)            const;
     bool    DoTestDecryption(void)       const;
+    bool    DoScanOpenTV(void)           const;
 
   protected:
     VideoSourceSelector  *m_videoSource   {nullptr};
@@ -107,6 +108,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     FullChannelSearch    *m_fullSearch    {nullptr};
     AddFullTS            *m_addFullTS     {nullptr};
     TrustEncSISetting    *m_trustEncSI    {nullptr};
+    ScanOpenTV           *m_scanOpenTV    {nullptr};
 // End of members moved from ScanWizardConfig
 };
 

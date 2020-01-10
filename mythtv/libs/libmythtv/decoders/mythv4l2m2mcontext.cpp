@@ -346,12 +346,12 @@ AVPixelFormat MythV4L2M2MContext::GetV4L2RequestFormat(AVCodecContext *Context, 
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
-        if (*PixFmt == AV_PIX_FMT_DRM_PRIME) {
+        if (*PixFmt == AV_PIX_FMT_DRM_PRIME)
+        {
             if (MythCodecContext::InitialiseDecoder(Context, MythV4L2M2MContext::InitialiseV4L2RequestContext,
                                                     "V4L2 request context creation") >= 0)
                 return AV_PIX_FMT_DRM_PRIME;
-
-}
+        }
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;

@@ -118,6 +118,7 @@ class ScannedChannelInfo
     nit_vec_t               m_nits;
     sdt_map_t               m_sdts;
     bat_vec_t               m_bats;
+    QMap<uint64_t,uint64_t> m_opentv_channels;
 };
 
 /** \class ChannelScanSM
@@ -158,6 +159,9 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_channelTimeout(channel_timeout),
       m_inputName(std::move(_inputname)),
       m_testDecryption(test_decryption),
+      m_scanOpenTVBouquet(0),
+      m_scanOpenTVRegion(0),
+      m_scanOpenTVRegionMask(0),
       // Misc
       m_analogSignalHandler(new AnalogSignalHandler(this))
 {
@@ -192,7 +196,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("Freesat/BSkyB bouquet_id:%1 region_id:%2")
+            QString("Freesat/BSkyB/OpenTV bouquet_id:%1 region_id:%2")
                 .arg(m_bouquetId).arg(m_regionId));
 
         dtvSigMon->SetStreamData(data);
@@ -249,6 +253,27 @@ void ChannelScanSM::SetAnalog(bool is_analog)
 
     if (is_analog)
         m_signalMonitor->AddListener(m_analogSignalHandler);
+}
+
+void ChannelScanSM::SetOpenTV(void)
+{
+    if (m_bouquetId > 0)
+    {
+        m_scanOpenTVBouquet = m_bouquetId;
+        m_scanOpenTVRegion = m_regionId;
+        if (m_regionId)
+            m_scanOpenTVRegionMask = 1 << m_regionId;
+        else
+            m_scanOpenTVRegionMask = (uint)-1;
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Scan for OpenTV channels on bouquet ID %1 and region ID %2")
+                .arg(m_scanOpenTVBouquet).arg(m_scanOpenTVRegion));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Cannot scan for OpenTV channels, bouquet ID is 0"));
+    }
 }
 
 void ChannelScanSM::HandleAllGood(void)
@@ -544,6 +569,44 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
                                  services.ServiceID(j);
                if (! m_defAuthorities.contains(index))
                    m_defAuthorities[index] = authority.DefaultAuthority();
+            }
+        }
+
+        if (m_scanOpenTVBouquet > 0)
+        {
+            const unsigned char *otv_chan_list =
+                MPEGDescriptor::Find(parsed, PrivateDescriptorID::opentv_channel_list);
+            if (otv_chan_list)
+            {
+                OpenTVChannelListDescriptor opentvChannelList(otv_chan_list);
+
+                uint64_t regionMask = (uint64_t)-1;
+                if (opentvChannelList.RegionID() > 0 && opentvChannelList.RegionID() < 32)
+                    regionMask = ((uint64_t)1) << opentvChannelList.RegionID();
+
+                for (uint j = 0; j < opentvChannelList.ChannelCount(); j++)
+                {
+                    uint64_t index = ((uint64_t)netid << 32) |
+                        bat->BouquetID() << 16 |
+                        opentvChannelList.ServiceID(j);
+                    if (!m_currentInfo)
+                        m_currentInfo = new ScannedChannelInfo();
+                    if (m_currentInfo->m_opentv_channels.contains(index))
+                    {
+                        m_currentInfo->m_opentv_channels[index] |= regionMask << 32;
+                    }
+                    else
+                    {
+                        m_currentInfo->m_opentv_channels[index] =
+                            regionMask << 32 |
+                            (opentvChannelList.ChannelID(j) << 16);
+                    }
+                    if (regionMask & m_scanOpenTVRegionMask)
+                    {
+                        m_currentInfo->m_opentv_channels[index] |=
+                            opentvChannelList.ChannelNumber(j);
+                    }
+                }
             }
         }
     }
@@ -1493,7 +1556,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         {
             uint netid = bat->OriginalNetworkID(t);
 
-            if (!(netid == OriginalNetworkID::SES2 || netid == OriginalNetworkID::BBC))
+            if (!(netid == OriginalNetworkID::SES2  ||
+                  netid == OriginalNetworkID::BBC   ||
+                  netid == OriginalNetworkID::SKYNZ ))
                 continue;
 
             desc_list_t parsed =
@@ -1651,6 +1716,25 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             if (it != sid_lcn.end())
             {
                 info.m_chanNum = QString::number(*it);
+            }
+        }
+
+        // OpenTV Logical Channel Numbers
+        if (info.m_chanNum.isEmpty())
+        {
+            if (m_scanOpenTVBouquet > 0)
+            {
+                qlonglong key =
+                    ((qlonglong)info.m_origNetId<<32) | m_scanOpenTVBouquet << 16 | info.m_serviceId;
+                QMap<uint64_t, uint64_t>::const_iterator it = scan_info->m_opentv_channels.find(key);
+                if (it != scan_info->m_opentv_channels.end())
+                {
+                    uint chanNum = (*it) & 0xffff;
+                    if (chanNum > 0)
+                    {
+                        info.m_chanNum = chanNum;
+                    }
+                }
             }
         }
 

@@ -218,6 +218,17 @@ class PrivateDescriptorID
         premiere_content_order         = 0xF0,
         premiere_parental_information  = 0xF1,
         premiere_content_transmission  = 0xF2,
+
+        // Private -- OpenTV
+        opentv_titles_1                = 0xA0, /* implemented */
+        opentv_titles_2                = 0xA1, /* implemented */
+        opentv_titles_3                = 0xA2, /* implemented */
+        opentv_titles_4                = 0xA3, /* implemented */
+        opentv_summaries_1             = 0xA8, /* implemented */
+        opentv_summaries_2             = 0xA9, /* implemented */
+        opentv_summaries_3             = 0xAA, /* implemented */
+        opentv_summaries_4             = 0xAB, /* implemented */
+        opentv_channel_list            = 0xB1, /* partial */
     };
 };
 
@@ -229,7 +240,7 @@ class PrivateDataSpecifierID
   public:
     enum
     {
-        BSB1   = 0x00000002,    // UK BSkyB on Astra 28.2E
+        BSB1   = 0x00000002,    // UK BSkyB (Astra 28.2E), Sky New Zealand (Optus D1 160E0)
         CASEMA = 0x00000016,    // NL Casema
         EACEM  = 0x00000028,    // NL Ziggo
         NORDIG = 0x00000029,    // EU Nordig
@@ -250,6 +261,7 @@ class OriginalNetworkID
         SES2    = 0x0002,       // Société Européenne des Satellites
         BBC     = 0x003B,       // BBC / Freesat
         TELENOR = 0x0046,       // Telenor Norway
+        SKYNZ   = 0x00A9,       // Sky New Zealand / Sky Network Television Ltd (NDS)
         NOZEMA  = 0x2210,       // Netherlands Digital Terrestrial Television
     };
 };

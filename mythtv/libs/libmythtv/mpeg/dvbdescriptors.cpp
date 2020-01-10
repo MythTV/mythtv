@@ -682,6 +682,17 @@ QString FreesatCallsignDescriptor::toString(void) const
     return ret;
 }
 
+QString OpenTVChannelListDescriptor::toString() const
+{
+    QString ret = QString("OpenTV ChannelList Descriptor region: %1 sid->chan_num(id): ").arg(RegionID());
+    for (uint i = 0; i < ChannelCount(); i++)
+    {
+        ret += QString("%1->%2(%3)").arg(ServiceID(i)).arg(ChannelNumber(i)).arg(ChannelID(i));
+        ret += (i+1<ChannelCount()) ? ", " : "";
+    }
+    return ret;
+}
+
 QString CAIdentifierDescriptor::toString(void) const
 {
     QString ret = QString("CAIdentifierDescriptor ");

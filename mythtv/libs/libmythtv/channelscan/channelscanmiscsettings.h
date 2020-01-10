@@ -201,6 +201,18 @@ class TrustEncSISetting : public TransMythUICheckBoxSetting
     }
 };
 
+class ScanOpenTV: public TransMythUICheckBoxSetting
+{
+  public:
+    ScanOpenTV()
+    {
+        setLabel(QObject::tr("Scan OpenTV"));
+        setHelpText(QObject::tr("Scan for OpenTV channel numbers.\n"
+                                "Set the Bouquet ID and Region ID in the Video Source."));
+        setValue(false);
+    };
+};
+
 class ScanFrequencykHz: public TransTextEditSetting
 {
   public:
