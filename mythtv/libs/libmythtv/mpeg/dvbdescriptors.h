@@ -2348,7 +2348,7 @@ class OpenTVChannelListDescriptor : public MPEGDescriptor
         { return m_data[4 + 2 + (i*9)]; }
 
     uint ChannelID(uint i) const
-        { return ((m_data[4 + 3 + (i*9)] << 8) | m_data[4 + 5 + (i*9)]); }
+        { return ((m_data[4 + 3 + (i*9)] << 8) | m_data[4 + 4 + (i*9)]); }
 
     uint ChannelNumber(uint i) const
         { return ((m_data[4 + 5 + (i*9)] << 8) | m_data[4 + 6 + (i*9)]); }
