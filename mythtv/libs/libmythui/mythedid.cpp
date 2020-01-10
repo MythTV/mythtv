@@ -59,6 +59,11 @@ float MythEDID::Gamma(void) const
     return m_gamma;
 }
 
+bool MythEDID::IsHDMI(void) const
+{
+    return m_isHDMI;
+}
+
 bool MythEDID::IsSRGB(void) const
 {
     return m_sRGB;
@@ -296,6 +301,8 @@ bool MythEDID::ParseVSDB(const quint8 *Data, uint Offset, uint Length)
     // HDMI
     while (registration == 0x000C03)
     {
+        m_isHDMI = true;
+
         if (Length < 5 || (Offset + 5 >= m_size))
             break;
 

@@ -29,6 +29,7 @@ class MUI_PUBLIC MythEDID
     double      DisplayAspect     (void) const;
     uint16_t    PhysicalAddress   (void) const;
     float       Gamma             (void) const;
+    bool        IsHDMI            (void) const;
     bool        IsSRGB            (void) const;
     Primaries   ColourPrimaries   (void) const;
     int         AudioLatency      (bool Interlaced) const;
@@ -52,6 +53,7 @@ class MUI_PUBLIC MythEDID
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
     Primaries   m_primaries       { {{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}, {0.0F, 0.0F} };
+    bool        m_isHDMI          { false };
     uint16_t    m_physicalAddress { 0 };
     bool        m_latencies       { false };
     bool        m_interLatencies  { false };
