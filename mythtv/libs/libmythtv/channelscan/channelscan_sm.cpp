@@ -1556,7 +1556,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         {
             uint netid = bat->OriginalNetworkID(t);
 
-            if (!(netid == OriginalNetworkID::SES2 || netid == OriginalNetworkID::BBC))
+            if (!(netid == OriginalNetworkID::SES2  ||
+                  netid == OriginalNetworkID::BBC   ||
+                  netid == OriginalNetworkID::SKYNZ ))
                 continue;
 
             desc_list_t parsed =
