@@ -39,7 +39,7 @@ class META_PUBLIC MultiValue
   public:
     struct entry
     {
-        int id;
+        int id {0};
         using values_type = std::vector<long>;
         values_type values;
     };

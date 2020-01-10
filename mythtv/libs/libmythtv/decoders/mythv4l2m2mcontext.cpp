@@ -267,7 +267,7 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
             {
                 bool found = false;
                 uint32_t v4l2pixfmt = V4L2CodecType(codec);
-                struct v4l2_fmtdesc fdesc;
+                struct v4l2_fmtdesc fdesc {};
                 memset(&fdesc, 0, sizeof(fdesc));
 
                 // check output first

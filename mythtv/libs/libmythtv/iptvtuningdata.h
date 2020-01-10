@@ -267,7 +267,7 @@ class MTV_PUBLIC IPTVTuningData
     FECType      m_fecType    {kNone};
     QUrl         m_fecUrl0;
     QUrl         m_fecUrl1;
-    uint         m_bitrate[3];
+    uint         m_bitrate[3] {};
     IPTVProtocol m_protocol   {inValid};
 };
 

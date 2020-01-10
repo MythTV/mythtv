@@ -1416,7 +1416,7 @@ void NuppelVideoRecorder::DoV4L2(void)
     if (ioctl(m_fd, VIDIOC_STREAMON, &turnon) < 0)
         LOG(VB_GENERAL, LOG_ERR, LOC + "unable to start capture (VIDIOC_STREAMON failed) " + ENO);
 
-    struct timeval tv;
+    struct timeval tv {};
     fd_set rdset {};
     int frame = 0;
     bool forcekey = false;
@@ -2573,7 +2573,7 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                VideoFrame frame;
+                VideoFrame frame {};
                 init(&frame,
                      FMT_YV12, m_videoBuffer[m_actVideoEncode]->buffer,
                      m_width, m_height, m_videoBuffer[m_actVideoEncode]->bufferlen);

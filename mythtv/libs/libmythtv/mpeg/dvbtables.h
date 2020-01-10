@@ -90,7 +90,7 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 
   private:
     mutable QString m_cachedNetworkName;
-    mutable const unsigned char* m_tscPtr;
+    mutable const unsigned char* m_tscPtr {nullptr};
     mutable vector<const unsigned char*> m_ptrs; // used to parse
 };
 
@@ -236,7 +236,7 @@ class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
     QString toString(void) const override; // PSIPTable
 
   private:
-    mutable const unsigned char* m_tscPtr;
+    mutable const unsigned char* m_tscPtr {nullptr};
     mutable vector<const unsigned char*> m_ptrs;
 };
 

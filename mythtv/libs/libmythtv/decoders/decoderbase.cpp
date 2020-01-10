@@ -608,7 +608,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     int post_idx = 0;
     FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
-    PosMapEntry e;
+    PosMapEntry e {};
     {
         QMutexLocker locker(&m_positionMapLock);
         PosMapEntry e_pre  = m_positionMap[pre_idx];
@@ -843,9 +843,9 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 
     // if exactseeks, use keyframe <= desiredFrame
 
-    PosMapEntry e;
-    PosMapEntry e_pre;
-    PosMapEntry e_post;
+    PosMapEntry e {};
+    PosMapEntry e_pre {};
+    PosMapEntry e_post {};
     {
         QMutexLocker locker(&m_positionMapLock);
         e_pre  = m_positionMap[pre_idx];

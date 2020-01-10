@@ -340,7 +340,7 @@ class HDHomeRunDevice
     QString m_deviceId;
     QString m_model;
     QString m_cardIp;
-    UseHDHomeRunDevice *m_checkbox;
+    UseHDHomeRunDevice *m_checkbox {nullptr};
 };
 
 using HDHomeRunDeviceList = QMap<QString, HDHomeRunDevice>;
@@ -391,8 +391,8 @@ class VBoxDevice
     QString m_cardIp;
     QString m_tunerNo;
     QString m_tunerType;
-    bool    m_inUse;
-    bool    m_discovered;
+    bool    m_inUse      {false};
+    bool    m_discovered {false};
 };
 
 using VBoxDeviceList = QMap<QString, VBoxDevice>;

@@ -2381,7 +2381,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
 
   private:
     size_t m_cridCount;
-    const uint8_t *m_crid[8];
+    const uint8_t *m_crid[8] {};
 };
 
 // ETSI TS 102 323 (TV Anytime)

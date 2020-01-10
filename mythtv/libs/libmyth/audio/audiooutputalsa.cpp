@@ -33,9 +33,6 @@ using namespace std;
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
-    m_mixer.handle = nullptr;
-    m_mixer.elem = nullptr;
-
     // Set everything up
     if (m_passthruDevice == "auto")
     {

@@ -97,16 +97,16 @@ static QMap< QString, int > JobNameToType {
 };
 
 struct JobQueueEntry {
-    int id;
-    uint chanid;
+    int       id           {0};
+    uint      chanid       {0};
     QDateTime recstartts;
     QDateTime schedruntime;
     QString startts;
     QDateTime inserttime;
-    int type;
-    int cmds;
-    int flags;
-    int status;
+    int       type         {0};
+    int       cmds         {0};
+    int       flags        {0};
+    int       status       {0};
     QDateTime statustime;
     QString hostname;
     QString args;
@@ -114,12 +114,12 @@ struct JobQueueEntry {
 };
 
 struct RunningJobInfo {
-    int          id;
-    int          type;
-    int          flag;
+    int          id      {0};
+    int          type    {0};
+    int          flag    {0};
     QString      desc;
     QString      command;
-    ProgramInfo *pginfo;
+    ProgramInfo *pginfo  {nullptr};
 };
 
 class JobQueue;

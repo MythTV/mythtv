@@ -51,11 +51,11 @@ class AudioOutputALSA : public AudioOutputBase
     struct {
         QString            device;
         QString            control;
-        snd_mixer_t*       handle;
-        snd_mixer_elem_t*  elem;
-        long               volmin;
-        long               volmax;
-        long               volrange;
+        snd_mixer_t*       handle   { nullptr };
+        snd_mixer_elem_t*  elem     { nullptr };
+        long               volmin   { 0L };
+        long               volmax   { 0L };
+        long               volrange { 0L };
     } m_mixer;
 
 };

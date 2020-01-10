@@ -78,7 +78,7 @@ class META_PUBLIC VideoScannerThread : public MThread
 
     struct CheckStruct
     {
-        bool check;
+        bool check {false};
         QString host;
     };
 

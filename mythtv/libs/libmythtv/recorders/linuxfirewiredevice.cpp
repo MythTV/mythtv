@@ -845,7 +845,7 @@ struct dev_item
 
 bool LinuxFirewireDevice::UpdateDeviceList(void)
 {
-    dev_item item;
+    dev_item item {};
 
     item.m_handle = raw1394_new_handle();
     if (!item.m_handle)

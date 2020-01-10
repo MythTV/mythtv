@@ -193,7 +193,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     lzo_byte            m_out[OUT_LEN] {};
 #define HEAP_ALLOC(var,size) \
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
-    HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
+    HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS) {};
 
     vector<struct vidbuffertype *> m_videoBuffer;
     vector<struct audbuffertype *> m_audioBuffer;

@@ -18,10 +18,10 @@ class MythSocket;
 
 struct MTV_PUBLIC LiveTVChainEntry
 {
-    uint chanid;
+    uint    chanid        {0};
     QDateTime starttime;
     QDateTime endtime;
-    bool discontinuity; // if true, can't play smooth from last entry
+    bool    discontinuity {false}; // if true, can't play smooth from last entry
     QString hostprefix;
     QString inputtype;
     QString channum;

@@ -186,7 +186,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     GLuint                       m_fence { 0 };
 
     // Shaders
-    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount];
+    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] {};
     QOpenGLShaderProgram*        m_activeProgram { nullptr };
 
     // Vertices

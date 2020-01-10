@@ -38,7 +38,7 @@ class MHVisible;
 // 
 class MHTimer {
   public:
-    int m_nTimerId;
+    int   m_nTimerId {0};
     QTime m_Time;
 };
 

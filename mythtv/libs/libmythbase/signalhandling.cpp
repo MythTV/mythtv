@@ -202,7 +202,7 @@ struct SignalInfo {
 
 void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
 {
-    SignalInfo signalInfo;
+    SignalInfo signalInfo {};
 
     (void)context;
     signalInfo.m_signum = signum;
@@ -287,7 +287,7 @@ void SignalHandler::handleSignal(void)
 #ifndef _WIN32
     m_notifier->setEnabled(false);
 
-    SignalInfo signalInfo;
+    SignalInfo signalInfo {};
     int ret = ::read(s_sigFd[1], &signalInfo, sizeof(SignalInfo));
     bool infoComplete = (ret == sizeof(SignalInfo));
     int signum = (infoComplete ? signalInfo.m_signum : 0);

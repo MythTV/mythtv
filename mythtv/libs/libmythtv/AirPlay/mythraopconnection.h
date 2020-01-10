@@ -135,7 +135,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     QMap<uint16_t,uint64_t> m_resends;
     // crypto
     QByteArray      m_aesIV;
-    AES_KEY         m_aesKey;
+    AES_KEY         m_aesKey              {};
     static RSA     *g_rsa;
     static QString  g_rsaLastError;
     // audio out

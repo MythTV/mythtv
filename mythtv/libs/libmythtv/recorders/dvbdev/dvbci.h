@@ -46,7 +46,7 @@
 class cMutex {
   friend class cCondVar;
 private:
-  pthread_mutex_t m_mutex;
+  pthread_mutex_t m_mutex      {};
   pid_t           m_lockingPid {0};
   int             m_locked     {0};
 public:

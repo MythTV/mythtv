@@ -186,8 +186,8 @@ class DTVRecorder :
     int                      m_minimumRecordingQuality    {95};
     bool                     m_use_pts                    {false}; // vs use dts
     uint64_t                 m_tsCount[256]               {0};
-    int64_t                  m_tsLast[256];
-    int64_t                  m_tsFirst[256];
+    int64_t                  m_tsLast[256]                {};
+    int64_t                  m_tsFirst[256]               {};
     QDateTime                m_tsFirstDt[256];
     mutable QAtomicInt       m_packetCount                {0};
     mutable QAtomicInt       m_continuityErrorCount       {0};

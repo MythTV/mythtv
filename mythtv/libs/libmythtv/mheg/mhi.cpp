@@ -67,9 +67,9 @@ class MHIImageData
 {
   public:
     QImage m_image;
-    int    m_x;
-    int    m_y;
-    bool   m_bUnder;
+    int    m_x      {0};
+    int    m_y      {0};
+    bool   m_bUnder {false};
 };
 
 MHIContext::MHIContext(InteractiveTV *parent)

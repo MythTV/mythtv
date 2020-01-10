@@ -43,11 +43,11 @@ class ChannelImporterBasicStats
     }
 
     // totals
-    uint m_atscChannels[3];
-    uint m_dvbChannels [3];
-    uint m_scteChannels[3];
-    uint m_mpegChannels[3];
-    uint m_ntscChannels[3];
+    uint m_atscChannels[3] {};
+    uint m_dvbChannels [3] {};
+    uint m_scteChannels[3] {};
+    uint m_mpegChannels[3] {};
+    uint m_ntscChannels[3] {};
 
     // per channel counts
     QMap<uint,uint>    m_progNumCnt;

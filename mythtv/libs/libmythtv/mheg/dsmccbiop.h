@@ -214,10 +214,10 @@ class BiopModuleInfo
   public:
     int Process(const unsigned char *Data);
 
-    unsigned long        m_modTimeout;
-    unsigned long        m_blockTimeout;
-    unsigned long        m_minBlockTime;
-    unsigned char        m_tapsCount;
+    unsigned long        m_modTimeout   {0};
+    unsigned long        m_blockTimeout {0};
+    unsigned long        m_minBlockTime {0};
+    unsigned char        m_tapsCount    {0};
     BiopTap              m_tap;
 
     ModuleDescriptorData m_descriptorData;
@@ -226,12 +226,12 @@ class BiopModuleInfo
 class DsmccModuleInfo
 {
   public:
-    unsigned short  m_moduleId;
-    unsigned long   m_moduleSize;
-    unsigned char   m_moduleVersion;
-    unsigned char   m_moduleInfoLen;
+    unsigned short  m_moduleId        {0};
+    unsigned long   m_moduleSize      {0};
+    unsigned char   m_moduleVersion   {0};
+    unsigned char   m_moduleInfoLen   {0};
     unsigned char  *m_data            {nullptr};
-    unsigned int    m_curp;
+    unsigned int    m_curp            {0};
     BiopModuleInfo  m_modInfo;
 };
 

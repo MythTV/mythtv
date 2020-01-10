@@ -186,7 +186,7 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
         imageType = kDVD;
     else
     {
-        blockInput_t blockInput;
+        blockInput_t blockInput {};
 
         blockInput.m_file = new RemoteFile(path); // Normally deleted via a call to udfread_close
         blockInput.m_input.close = _def_close;

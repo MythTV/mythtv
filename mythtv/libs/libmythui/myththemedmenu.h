@@ -18,8 +18,8 @@ struct ThemedButton
     QString text;
     QString alttext;
     QString description;
-    MythImage *icon;
-    bool active;
+    MythImage *icon     {nullptr};
+    bool    active      {false};
     QString password;
 };
 

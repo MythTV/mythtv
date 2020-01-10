@@ -17,8 +17,8 @@ class InputInfo;
 class TunerStatus
 {
   public:
-    uint      id;
-    bool      isRecording;
+    uint      id          {0};
+    bool      isRecording {false};
     QString   channame;
     QString   title;
     QString   subtitle;

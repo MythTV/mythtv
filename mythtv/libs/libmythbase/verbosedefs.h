@@ -201,17 +201,17 @@ LOGLEVEL_POSTAMBLE
 #ifndef _IMPLEMENT_VERBOSE
 #ifdef __cplusplus
 struct VerboseDef {
-    uint64_t    mask;
+    uint64_t    mask     {0};
     QString     name;
-    bool        additive;
+    bool        additive {false};
     QString     helpText;
 };
 using VerboseMap = QMap<QString, VerboseDef *>;
 
 struct LoglevelDef {
-    int         value;
+    int         value     {LOG_UNKNOWN};
     QString     name;
-    char        shortname;
+    char        shortname {'-'};
 };
 using LoglevelMap = QMap<int, LoglevelDef *>;
 using ComponentLogLevelMap = QMap<uint64_t, LogLevel_t>;

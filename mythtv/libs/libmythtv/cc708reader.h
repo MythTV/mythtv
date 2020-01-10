@@ -75,18 +75,18 @@ class CC708Reader
                            short* unicode_string, short len);
 
     // Data
-    unsigned char *m_buf[k708MaxServices];
-    uint           m_bufAlloc[k708MaxServices];
-    uint           m_bufSize[k708MaxServices];
-    bool           m_delayed[k708MaxServices];
+    unsigned char *m_buf[k708MaxServices]          {};
+    uint           m_bufAlloc[k708MaxServices]     {};
+    uint           m_bufSize[k708MaxServices]      {};
+    bool           m_delayed[k708MaxServices]      {};
 
-    short         *m_tempStr[k708MaxServices];
-    int            m_tempStrAlloc[k708MaxServices];
-    int            m_tempStrSize[k708MaxServices];
+    short         *m_tempStr[k708MaxServices]      {};
+    int            m_tempStrAlloc[k708MaxServices] {};
+    int            m_tempStrSize[k708MaxServices]  {};
 
     int            m_currentService {1};
     CC708Service   CC708services[k708MaxServices];
-    int            CC708DelayedDeletes[k708MaxServices];
+    int            CC708DelayedDeletes[k708MaxServices] {};
 
     MythPlayer    *m_parent  {nullptr};
     bool           m_enabled {false};

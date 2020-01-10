@@ -89,9 +89,9 @@ class MBASE_PUBLIC MDBManager
 /// \brief MSqlDatabase Info, used by MSqlQuery. Do not use directly.
 struct MSqlQueryInfo
 {
-    MSqlDatabase *db;
+    MSqlDatabase *db      {nullptr};
     QSqlDatabase qsqldb;
-    bool returnConnection;
+    bool returnConnection {false};
 };
 
 /// \brief typedef for a map of string -> string bindings for generic queries.

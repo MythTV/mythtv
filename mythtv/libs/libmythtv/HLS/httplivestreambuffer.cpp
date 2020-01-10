@@ -377,7 +377,7 @@ private:
 #endif
 
 private:
-    int         m_id;           // unique sequence number
+    int         m_id       {0}; // unique sequence number
     int         m_duration {0}; // segment duration (seconds)
     uint64_t    m_bitrate {0};  // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
@@ -848,11 +848,11 @@ private:
 #endif
 
 private:
-    int         m_id;                   // program id
+    int         m_id             {0};   // program id
     int         m_version        {1};   // protocol version should be 1
     int         m_startsequence  {0};   // media starting sequence number
     int         m_targetduration {-1};  // maximum duration per segment (s)
-    uint64_t    m_bitrate;              // bitrate of stream content (bits per second)
+    uint64_t    m_bitrate        {0LL}; // bitrate of stream content (bits per second)
     uint64_t    m_size           {0LL}; // stream length is calculated by taking the sum
                                         // foreach segment of (segment->duration * hls->bitrate/8)
     int64_t     m_duration       {0LL}; // duration of the stream in seconds

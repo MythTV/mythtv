@@ -108,6 +108,9 @@ class KeyContext
     QMap<int, QStringList> m_actionMap;
 };
 
+// Adding member initializers caused compilation to fail with an error
+// that it cannot convert a brace-enclosed initializer list to JumpData.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 struct JumpData
 {
     void (*m_callback)(void);
@@ -117,6 +120,7 @@ struct JumpData
     QString m_localAction;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 struct MPData {
     QString           m_description;
     MediaPlayCallback m_playFn;

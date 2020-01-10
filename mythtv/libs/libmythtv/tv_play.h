@@ -979,7 +979,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // kTrackTypeCount, and it unnecessarily includes
     // kTrackTypeUnknown.
     QStringList m_tvmTracks[kTrackTypeCount];
-    int         m_tvmCurtrack[kTrackTypeCount];
+    int         m_tvmCurtrack[kTrackTypeCount] {};
 
     // Audio
     bool    m_tvmAvsync {true};

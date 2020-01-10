@@ -43,7 +43,7 @@ class AVCInfo
     uint     m_modelid           {0};
     uint     m_firmware_revision {0};
     QString  m_product_name;
-    uint8_t  m_unit_table[32];
+    uint8_t  m_unit_table[32]    {};
 };
 
 #endif // _AVC_INFO_H_

@@ -237,7 +237,7 @@ class SequenceHeader
     SequenceHeader() {;} // only used via reinterpret cast
     ~SequenceHeader() {;}
 
-    unsigned char m_data[11];
+    unsigned char m_data[11] {};
     static const float kMpeg1Aspect[16];
     static const float kMpeg2Aspect[16];
     static const float kMpeg2Fps[16];

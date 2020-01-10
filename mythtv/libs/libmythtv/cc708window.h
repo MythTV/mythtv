@@ -177,8 +177,8 @@ class CC708Character
 class CC708String
 {
   public:
-    uint                    m_x;
-    uint                    m_y;
+    uint                    m_x {0};
+    uint                    m_y {0};
     QString                 m_str;
     CC708CharacterAttribute m_attr;
 };

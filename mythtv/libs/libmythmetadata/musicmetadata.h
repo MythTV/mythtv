@@ -349,7 +349,7 @@ class META_PUBLIC MusicMetadata
 
     LyricsData *m_lyricsData   {nullptr};
 
-    IdType   m_id;
+    IdType   m_id              {0};
     QString  m_filename;       // file name as stored in the DB
     QString  m_hostname;       // host where file is located as stored in the DB
     QString  m_actualFilename; // actual URL of the file if found

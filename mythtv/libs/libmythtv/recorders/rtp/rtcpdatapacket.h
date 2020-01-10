@@ -150,8 +150,12 @@ public:
     }
 
 protected:
-    uint32_t m_timestamp, m_last_timestamp;
-    uint32_t m_sequence, m_last_sequence, m_lost, m_lost_interval;
+    uint32_t m_timestamp;
+    uint32_t m_last_timestamp;
+    uint32_t m_sequence;
+    uint32_t m_last_sequence;
+    uint32_t m_lost;
+    uint32_t m_lost_interval {0};
     uint32_t m_ssrc;
 };
 #endif

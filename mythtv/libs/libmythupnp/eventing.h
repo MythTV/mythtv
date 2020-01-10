@@ -59,8 +59,8 @@ class UPNP_PUBLIC SubscriberInfo
             return m_nKey;
         }
 
-        TaskTime            m_ttExpires;
-        TaskTime            m_ttLastNotified;
+        TaskTime            m_ttExpires      {};
+        TaskTime            m_ttLastNotified {};
 
         QString             m_sUUID;
         QUrl                m_qURL;
@@ -96,7 +96,7 @@ class UPNP_PUBLIC  StateVariableBase
 
         bool        m_bNotify;
         QString     m_sName;
-        TaskTime    m_ttLastChanged;
+        TaskTime    m_ttLastChanged {};
 
     public:
 

@@ -52,8 +52,8 @@ using int_to_subpage_t = map<int, TeletextSubPage>;
 class TeletextPage
 {
   public:
-    int               pagenum;
-    int               current_subpage;
+    int               pagenum         {0};
+    int               current_subpage {0};
     int_to_subpage_t  subpages;
 };
 using int_to_page_t = map<int, TeletextPage>;
@@ -62,9 +62,9 @@ class TeletextMagazine
 {
   public:
     mutable QMutex    lock;
-    int               current_page;
-    int               current_subpage;
-    TeletextSubPage   loadingpage;
+    int               current_page    {0};
+    int               current_subpage {0};
+    TeletextSubPage   loadingpage     {};
     int_to_page_t     pages;
 };
 
@@ -134,7 +134,7 @@ class TeletextReader
     bool             m_header_changed     {false};
     bool             m_page_changed       {false};
     TeletextMagazine m_magazines[8];
-    unsigned char    m_bitswap[256];
+    unsigned char    m_bitswap[256]       {};
     int              m_fetchpage          {0};
     int              m_fetchsubpage       {0};
 };

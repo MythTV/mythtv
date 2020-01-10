@@ -13,10 +13,13 @@
 #include "mythmedia.h"
 
 /// Stores details of media handlers
+
+// Adding member initializers caused compilation to fail with an error
+// that it cannot convert a brace-enclosed initializer list to MHData.
 struct MHData
 {
-    void   (*callback)(MythMediaDevice *mediadevice);
-    int      MythMediaType;
+    void   (*callback)(MythMediaDevice *mediadevice); // NOLINT(cppcoreguidelines-pro-type-member-init)
+    int      MythMediaType;                           // NOLINT(cppcoreguidelines-pro-type-member-init)
     QString  destination;
     QString  description;
 };

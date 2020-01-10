@@ -23,8 +23,8 @@ struct ArtworkInfo
     QString label;
     QString thumbnail;
     QString url;
-    uint width;
-    uint height;
+    uint    width     {0};
+    uint    height    {0};
 };
 
 using ArtworkList = QList< ArtworkInfo >;

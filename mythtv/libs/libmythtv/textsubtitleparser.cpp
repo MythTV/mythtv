@@ -281,7 +281,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         }
         return;
     }
-    demux_sputext_t sub_data;
+    demux_sputext_t sub_data {};
     RemoteFileWrapper rfile(fileName/*, false, false, 0*/);
 
     LOG(VB_VBI, LOG_INFO,

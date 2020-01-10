@@ -155,7 +155,7 @@ class MTV_PUBLIC TSHeader
     static const unsigned int kHeaderSize;
     static const unsigned char kPayloadOnlyHeader[4];
   private:
-    unsigned char m_tsData[4];
+    unsigned char m_tsData[4] {};
 };
 
 /** \class TSPacket
@@ -224,7 +224,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     static const unsigned int k8VSBEmissionSize;
     static const TSPacket    *kNullPacket;
   private:
-    unsigned char m_tsPayload[184];
+    unsigned char m_tsPayload[184] {};
 };
 
 #if 0 /* not used yet */

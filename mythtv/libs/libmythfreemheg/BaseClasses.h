@@ -128,7 +128,7 @@ class MHOctetString
     void PrintMe(FILE *fd, int nTabs) const;
 
 protected:
-    int m_nLength;
+    int            m_nLength {0};
     unsigned char *m_pChars {nullptr};
 };
 
@@ -192,7 +192,7 @@ class MHGenericBase
 {
   public:
     MHObjectRef *GetReference(); // Return the indirect reference or fail if it's direct
-    bool    m_fIsDirect;
+    bool    m_fIsDirect {false};
 protected:
     MHObjectRef m_Indirect;
 };

@@ -25,7 +25,7 @@ struct KeyDefinition
 
 struct KeyEventDefinition
 {
-    int keyCode;
+    int keyCode {0};
     Qt::KeyboardModifiers modifiers;
 };
 

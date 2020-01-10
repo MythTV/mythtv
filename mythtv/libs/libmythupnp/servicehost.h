@@ -65,7 +65,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
 
         QString             m_sBaseUrl;
 
-        QMetaObject         m_oMetaObject;
+        QMetaObject         m_oMetaObject {};
         MetaInfoMap         m_Methods;
 
     protected:

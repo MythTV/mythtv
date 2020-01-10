@@ -158,8 +158,8 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     class Window
     {
       public:
-        uint row;
-        uint column;
+        uint row    {0};
+        uint column {0};
         QStringList text;
     };
     using WindowsOnService = QHash<uint, QMap<int, Window> >;

@@ -38,9 +38,9 @@ class CC708Decoder
     void services(uint seconds, bool seen[64]) const;
 
   private:
-    CaptionPacket  m_partialPacket;
-    CC708Reader   *m_reader {nullptr};
-    time_t         m_lastSeen[64];
+    CaptionPacket  m_partialPacket {};
+    CC708Reader   *m_reader        {nullptr};
+    time_t         m_lastSeen[64]  {};
 };
 
 #endif // CC708DECODER_H_

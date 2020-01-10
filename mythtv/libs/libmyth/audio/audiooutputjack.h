@@ -58,8 +58,8 @@ class AudioOutputJACK : public AudioOutputBase
     void DeinterleaveAudio(const float *aubuf, float **bufs,
                            int nframes, const int* channel_volumes);
 
-    jack_port_t   *m_ports[JACK_CHANNELS_MAX];
-    int            m_chanVolumes[JACK_CHANNELS_MAX];
+    jack_port_t   *m_ports[JACK_CHANNELS_MAX]       {};
+    int            m_chanVolumes[JACK_CHANNELS_MAX] {};
     jack_client_t *m_client       {nullptr};
     jack_client_t *m_staleClient  {nullptr};
     int            m_jackLatency  {0};
