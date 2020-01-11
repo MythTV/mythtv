@@ -202,8 +202,8 @@ class PrivateDescriptorID
         // Private -- CH UPC Cablecom
         upc_event_episode_title        = 0xA7,
 
-        // Private -- BSkyB Astra-2 28.2E
-        bskyb_lcn_table                = 0xb1,  /* implemented */
+        // Private -- BSkyB Astra-2 28.2E and other Sky satellites
+        sky_lcn_table                  = 0xb1,  /* implemented */
 
         // Private -- FreeSat Astra-2 28.2E
         freesat_lcn_table              = 0xd3,  /* implemented */
@@ -220,15 +220,15 @@ class PrivateDescriptorID
         premiere_content_transmission  = 0xF2,
 
         // Private -- OpenTV
-        opentv_titles_1                = 0xA0, /* implemented */
-        opentv_titles_2                = 0xA1, /* implemented */
-        opentv_titles_3                = 0xA2, /* implemented */
-        opentv_titles_4                = 0xA3, /* implemented */
-        opentv_summaries_1             = 0xA8, /* implemented */
-        opentv_summaries_2             = 0xA9, /* implemented */
-        opentv_summaries_3             = 0xAA, /* implemented */
-        opentv_summaries_4             = 0xAB, /* implemented */
-        opentv_channel_list            = 0xB1, /* partial */
+        opentv_titles_1                = 0xA0,
+        opentv_titles_2                = 0xA1,
+        opentv_titles_3                = 0xA2,
+        opentv_titles_4                = 0xA3,
+        opentv_summaries_1             = 0xA8,
+        opentv_summaries_2             = 0xA9,
+        opentv_summaries_3             = 0xAA,
+        opentv_summaries_4             = 0xAB,
+        opentv_channel_list            = 0xB1, /* sky_lcn_table */
     };
 };
 

@@ -32,7 +32,7 @@
 
 /** Leap seconds as of June 30th, 2012. */
 #define GPS_LEAP_SECONDS 16
-// Note: You can optain this number by adding one
+// Note: You can obtain this number by adding one
 // for every leap second added to UTC since Jan 6th, 1980
 // and subtracting one for every leap second removed.
 // See http://en.wikipedia.org/wiki/Leap_second

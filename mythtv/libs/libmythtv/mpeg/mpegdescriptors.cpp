@@ -494,7 +494,7 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     //
     // User Defined DVB descriptors, range 0x80-0xFE
     else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
-             PrivateDescriptorID::bskyb_lcn_table== DescriptorTag())
+             PrivateDescriptorID::sky_lcn_table== DescriptorTag())
     {
         SET_STRING(BSkyBLCNDescriptor);
     }
@@ -559,11 +559,6 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
              DescriptorID::component_name == DescriptorTag())
     {
         SET_STRING(ComponentNameDescriptor);
-    }
-    // OpenTV descriptors
-    else if (PrivateDescriptorID::opentv_channel_list == DescriptorTag())
-    {
-        SET_STRING(OpenTVChannelListDescriptor);
     }
     // POSSIBLY UNSAFE ! -- end
     else

@@ -1556,11 +1556,13 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         {
             uint netid = bat->OriginalNetworkID(t);
 
+            // No network check to allow scanning on all Sky satellites
+#if 0
             if (!(netid == OriginalNetworkID::SES2  ||
                   netid == OriginalNetworkID::BBC   ||
                   netid == OriginalNetworkID::SKYNZ ))
                 continue;
-
+#endif
             desc_list_t parsed =
                 MPEGDescriptor::Parse(bat->TransportDescriptors(t),
                                       bat->TransportDescriptorsLength(t));
@@ -1603,9 +1605,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     }
                 }
 
-                // BSkyB logical channels
+                // Sky logical channels
                 if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
-                    item[0] == PrivateDescriptorID::bskyb_lcn_table)
+                    item[0] == PrivateDescriptorID::sky_lcn_table)
                 {
                     BSkyBLCNDescriptor ld(item);
                     if (ld.IsValid())

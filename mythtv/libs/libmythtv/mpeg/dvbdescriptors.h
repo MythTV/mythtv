@@ -2270,7 +2270,7 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
 };
 
 /**
- *  \brief BSkyB Logical Channel Number descriptor
+ *  \brief Sky Logical Channel Number descriptor
  *
  * BAT descriptor ID 0xb1 (Private Extension)
  *
@@ -2284,9 +2284,9 @@ class BSkyBLCNDescriptor : public MPEGDescriptor
 {
   public:
     explicit BSkyBLCNDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, PrivateDescriptorID::bskyb_lcn_table)
+        MPEGDescriptor(data, len, PrivateDescriptorID::sky_lcn_table)
     {
-        assert(PrivateDescriptorID::bskyb_lcn_table== DescriptorTag());
+        assert(PrivateDescriptorID::sky_lcn_table== DescriptorTag());
     }
     //       Name                 bits  loc  expected value
     // descriptor_tag               8   0.0       0xd3
@@ -2315,13 +2315,13 @@ class BSkyBLCNDescriptor : public MPEGDescriptor
     uint ServiceType(int i) const
         { return *(m_data + 6 + i*9); }
 
-    uint Unknown1(int i) const
+    uint ChannelID(int i) const
         { return *(m_data + 7 + i*9) << 8 | *(m_data + 8 + i*9); }
 
     uint LogicalChannelNumber(int i) const
         { return *(m_data + 9 + i*9) << 8 | *(m_data + 10 + i*9); }
 
-    uint Unknown2(int i) const
+    uint Flags(int i) const
         { return *(m_data + 11 + i*9) << 8 | *(m_data + 12 + i*9); }
 
     QString toString(void) const override; // MPEGDescriptor
@@ -2356,7 +2356,7 @@ class OpenTVChannelListDescriptor : public MPEGDescriptor
     uint Flags(uint i) const
         { return ((m_data[4 + 7 + (i*9)] << 8) | m_data[4 + 8 + (i*9)]) & 0xf; }
 
-    QString toString(void) const override;
+    QString toString(void) const override; // MPEGDescriptor
 };
 
 // ETSI TS 102 323 (TV Anytime)
