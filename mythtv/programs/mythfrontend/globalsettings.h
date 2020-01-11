@@ -147,9 +147,9 @@ class AppearanceSettings : public GroupSetting
     void PopulateScreens(int Screens);
 
   private:
-    HostComboBoxSetting *m_xineramaScreen { nullptr };
-    HostComboBoxSetting *m_xineramaAspect { nullptr };
-    MythDisplay         *m_display        { nullptr };
+    HostComboBoxSetting *m_screen       { nullptr };
+    HostComboBoxSetting *m_screenAspect { nullptr };
+    MythDisplay         *m_display      { nullptr };
 };
 
 class HostRefreshRateComboBoxSetting : public HostComboBoxSetting

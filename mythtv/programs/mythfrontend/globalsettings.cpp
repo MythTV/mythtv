@@ -2009,7 +2009,7 @@ static HostTextEditSetting *SetupPinCode()
     return ge;
 }
 
-static HostComboBoxSetting *XineramaScreen()
+static HostComboBoxSetting *ScreenSelection()
 {
     auto *gc = new HostComboBoxSetting("XineramaScreen", false);
     gc->setLabel(AppearanceSettings::tr("Display on screen"));
@@ -2020,7 +2020,7 @@ static HostComboBoxSetting *XineramaScreen()
 }
 
 
-static HostComboBoxSetting *XineramaMonitorAspectRatio()
+static HostComboBoxSetting *ScreenAspectRatio()
 {
     auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
@@ -2039,7 +2039,6 @@ static HostComboBoxSetting *XineramaMonitorAspectRatio()
             "The aspect ratio cannot always be queried when using multiple "
             "displays . Use Auto to try and detect a sensible value, otherwise "
             "choose an appropriate override."));
-
     return gc;
 }
 
@@ -2155,38 +2154,6 @@ static HostSpinBoxSetting *GuiOffsetY()
     return gs;
 }
 
-#if 0
-static HostSpinBoxSetting *DisplaySizeWidth()
-{
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeWidth", 0, 10000, 1);
-
-    gs->setLabel(AppearanceSettings::tr("Display size - width"));
-
-    gs->setValue(0);
-
-    gs->setHelpText(AppearanceSettings::tr("Horizontal size of the monitor or TV. Used "
-                    "to calculate the actual aspect ratio of the display. This "
-                    "will override the DisplaySize from the system."));
-
-    return gs;
-}
-
-static HostSpinBoxSetting *DisplaySizeHeight()
-{
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeHeight", 0, 10000, 1);
-
-    gs->setLabel(AppearanceSettings::tr("Display size - height"));
-
-    gs->setValue(0);
-
-    gs->setHelpText(AppearanceSettings::tr("Vertical size of the monitor or TV. Used "
-                    "to calculate the actual aspect ratio of the display. This "
-                    "will override the DisplaySize from the system."));
-
-    return gs;
-}
-#endif
-
 static HostCheckBoxSetting *GuiSizeForTV()
 {
     auto *gc = new HostCheckBoxSetting("GuiSizeForTV");
@@ -2210,8 +2177,9 @@ static HostCheckBoxSetting *UseVideoModes()
 
     gc->setValue(false);
 
-    gc->setHelpText(VideoModeSettings::tr("Switch X Window video modes for TV. "
-                                          "Requires \"xrandr\" support."));
+    gc->setHelpText(VideoModeSettings::tr(
+                        "Switch video modes for playback depending on the source "
+                        "resolution and frame rate."));
     return gc;
 }
 
@@ -4506,15 +4474,15 @@ void AppearanceSettings::applyChange()
 
 void AppearanceSettings::PopulateScreens(int Screens)
 {
-    m_xineramaScreen->setEnabled(Screens > 1);
-    m_xineramaAspect->setEnabled(Screens > 1);
-    m_xineramaScreen->clearSelections();
+    m_screen->setEnabled(Screens > 1);
+    m_screenAspect->setEnabled(Screens > 1);
+    m_screen->clearSelections();
     foreach (QScreen *qscreen, qGuiApp->screens())
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
-        m_xineramaScreen->addSelection(qscreen->name() + extra, qscreen->name());
+        m_screen->addSelection(qscreen->name() + extra, qscreen->name());
     }
-    m_xineramaScreen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
+    m_screen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
 }
 
 AppearanceSettings::AppearanceSettings()
@@ -4527,15 +4495,12 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(GUIRGBLevels());
 
     m_display = MythDisplay::AcquireRelease();
-    m_xineramaScreen = XineramaScreen();
-    m_xineramaAspect = XineramaMonitorAspectRatio();
-    screen->addChild(m_xineramaScreen);
-    screen->addChild(m_xineramaAspect);
+    m_screen = ScreenSelection();
+    m_screenAspect = ScreenAspectRatio();
+    screen->addChild(m_screen);
+    screen->addChild(m_screenAspect);
     PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
-
-//    screen->addChild(DisplaySizeHeight());
-//    screen->addChild(DisplaySizeWidth());
 
     screen->addChild(new GuiDimension());
 
