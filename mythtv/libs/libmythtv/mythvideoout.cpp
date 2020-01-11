@@ -261,8 +261,6 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
 MythVideoOutput::MythVideoOutput()
   : m_display(nullptr)
 {
-    m_dbDisplayDimensionsMM = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
-                                    gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
     m_dbAspectOverride  = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
     m_dbAdjustFill      = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
     m_dbLetterboxColour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
@@ -996,11 +994,7 @@ void MythVideoOutput::InitDisplayMeasurements(void)
     // get the physical dimensions (in mm) of the display. If using
     // DisplayRes, this will be overridden when we call ResizeForVideo
     float disp_aspect = m_window.GetDisplayAspect();
-    QSize disp_dim = m_dbDisplayDimensionsMM;
-    if (disp_dim.isEmpty())
-        disp_dim = m_display->GetPhysicalSize();
-    else
-        source = "Database";
+    QSize disp_dim    = m_display->GetPhysicalSize();
     m_window.SetDisplayProperties(disp_dim, disp_aspect);
 
     // Determine window and screen dimensions in pixels
@@ -1020,7 +1014,6 @@ void MythVideoOutput::InitDisplayMeasurements(void)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-//  disp_aspect = m_window.GetDisplayAspect();
     disp_dim = m_window.GetDisplayDim();
 
     // If we are using Xinerama the display dimensions cannot be trusted.
@@ -1054,10 +1047,6 @@ void MythVideoOutput::InitDisplayMeasurements(void)
         QString("%1 display dimensions: %2x%3 mm  Aspect: %4")
             .arg(source).arg(disp_dim.width()).arg(disp_dim.height())
             .arg(static_cast<double>(disp_aspect)));
-
-    // Save the unscaled size and dimensions for window resizing
-    m_monitorSize  = screen_size;
-    m_monitorDimensions = disp_dim;
 
     // We must now scale the display measurements to our window size and save
     // them. If we are running fullscreen this is a no-op.
