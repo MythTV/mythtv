@@ -18,7 +18,7 @@ extern "C" {
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT709 =
     {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_525 =
-    {{{0.640F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}, {0.3127F, 0.3290F}};
+    {{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_625 =
     {{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
