@@ -24,9 +24,7 @@
 
 #include "mythcorecontext.h"
 #include "audiooutpututil.h"
-extern "C" {
 #include "pink.h"
-}
 
 #define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
 

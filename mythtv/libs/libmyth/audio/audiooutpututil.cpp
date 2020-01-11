@@ -11,8 +11,8 @@
 
 extern "C" {
 #include "libavcodec/avcodec.h"
-#include "pink.h"
 }
+#include "pink.h"
 
 #define LOC QString("AOUtil: ")
 

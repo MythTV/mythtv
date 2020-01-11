@@ -24,9 +24,8 @@
   Copyleft 1999 Phil Burk - No rights reserved.
 */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <math.h>
+#include <cmath>
+#include <cstdio>
 #include "pink.h"
 
 /************************************************************/

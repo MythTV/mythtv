@@ -17,7 +17,7 @@ typedef struct
   float     pink_scalar;       /* Used to scale within range of -1.0 to +1.0 */
 } pink_noise_t;
 
-void initialize_pink_noise( pink_noise_t *pink, int num_rows );
-float generate_pink_noise_sample( pink_noise_t *pink );
+MPUBLIC void initialize_pink_noise( pink_noise_t *pink, int num_rows );
+MPUBLIC float generate_pink_noise_sample( pink_noise_t *pink );
 
 #endif
