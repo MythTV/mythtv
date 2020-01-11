@@ -26,8 +26,8 @@
  *
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "ringbuffer.h"
 #include "pes.h"
 
@@ -55,7 +55,7 @@ int ring_init (ringbuffer *rbuf, int size)
 int ring_reinit (ringbuffer *rbuf, int size)
 {
 	if (size > (int)(rbuf->size)) {
-		uint8_t *tmpalloc = (uint8_t *) realloc(rbuf->buffer,
+		auto *tmpalloc = (uint8_t *) realloc(rbuf->buffer,
 							sizeof(uint8_t)*size);
 		if (! tmpalloc)
 			return -1;
@@ -96,8 +96,8 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	if ( free < count ){
 		if (DEBUG) {
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer overflow %d<%d %d",
-				free, count, rbuf->size);
+			    QString("ringbuffer overflow %1<%2 %3")
+			    .arg(free).arg(count).arg(rbuf->size));
 		}
 		return FULL_BUFFER;
 	}
@@ -113,8 +113,8 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
-		     ring_free(rbuf)*100.0/rbuf->size);
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
 
@@ -130,8 +130,8 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 #if 0
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer peek underflow %d<%d %d %d",
-				avail, count, pos, rbuf->write_pos);
+			    QString("ringbuffer peek underflow %1<%2 %3 %4")
+			    .arg(avail).arg(count).arg(pos).arg(rbuf->write_pos));
 #endif
 		return EMPTY_BUFFER;
 	}
@@ -159,8 +159,8 @@ int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 #if 0
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer peek underflow %d<%d %d %d",
-				avail, count, pos, rbuf->write_pos);
+			    QString("ringbuffer peek underflow %1<%2 %3 %4")
+			    .arg(avail).arg(count).arg(pos).arg(rbuf->write_pos));
 #endif
 		return EMPTY_BUFFER;
 	}
@@ -187,8 +187,8 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 #if 0
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer underflow %d<%d %d \n",
-				avail, count, rbuf->size);
+			    QString("ringbuffer underflow %1<%2 %3 \n")
+			    .arg(avail).arg(count).arg(rbuf->size));
 #endif
 		return EMPTY_BUFFER;
 	}
@@ -204,8 +204,8 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
-		     ring_free(rbuf)*100.0/rbuf->size);
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
 
@@ -219,8 +219,8 @@ int ring_skip(ringbuffer *rbuf, int count)
 	if ( avail < count ){
 #if 0
 		LOG(VB_GENERAL, LOG_ERR,
-		    "ringbuffer skip underflow %d<%d %d %d\n",
-			avail, count, pos, rbuf->write_pos);
+		    QString("ringbuffer skip underflow %1<%2 %3 %4\n")
+		    .arg(avail).arg(count).arg(pos).arg(rbuf->write_pos));
 #endif
 		return EMPTY_BUFFER;
 	}
@@ -231,8 +231,8 @@ int ring_skip(ringbuffer *rbuf, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
-		     ring_free(rbuf)*100.0/rbuf->size);
+	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		.arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
 
@@ -250,8 +250,8 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	if ( free < count ){
 		if (DEBUG) {
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer overflow %d<%d %d %d\n",
-				free, count, pos, rbuf->read_pos);
+			    QString("ringbuffer overflow %1<%2 %3 %4\n")
+			    .arg(free).arg(count).arg(pos).arg(rbuf->read_pos));
 		}
 		return FULL_BUFFER;
 	}
@@ -269,8 +269,8 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
-		   ring_free(rbuf)*100.0/rbuf->size);
+	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %.2f%%")
+		.arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return rr;
 }
 
@@ -289,8 +289,8 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 #if 0
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer underflow %d<%d %d %d",
-				avail, count, pos, rbuf->write_pos);
+			    QString("ringbuffer underflow %1<%2 %3 %4")
+			    .arg(avail).arg(count).arg(pos).arg(rbuf->write_pos));
 #endif
 		return EMPTY_BUFFER;
 	}
@@ -309,48 +309,48 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, "Buffer empty %.2f%%",
-		     ring_free(rbuf)*100.0/rbuf->size);
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return rr;
 }
 
 
 static void show(uint8_t *buf, int length)
 {
-	uint8_t temp[8];
-	uint8_t buffer[100];
+	char temp[8];
+	char buffer[100];
 	buffer[0] = '\0';
 
 	for (int i=0; i<length; i+=16){
 		int j = 0;
 		for (j=0; j < 8 && j+i<length; j++)
 		{
-			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
-			strcat(buffer, temp);
+			std::sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			std::strcat(buffer, temp);
 		}
 		for (int r=j; r<8; r++)
-			strcat(buffer, "     ");
+			std::strcat(buffer, "     ");
 
-		strcat(buffer,"  ");
+		std::strcat(buffer,"  ");
 
 		for (j=8; j < 16 && j+i<length; j++)
 		{
-			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
-			strcat(buffer, temp);
+			std::sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			std::strcat(buffer, temp);
 		}
 		for (int r=j; r<16; r++)
-			strcat(buffer, "     ");
+			std::strcat(buffer, "     ");
 
 		for (j=0; j < 16 && j+i<length; j++){
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				sprintf(temp, "%c", buf[i+j]);
+				std::sprintf(temp, "%c", buf[i+j]);
 				break;
 			default:
-				sprintf(temp, ".");
+				std::sprintf(temp, ".");
 			}
-			strcat(buffer, temp);
+			std::strcat(buffer, temp);
 		}
 		LOG(VB_GENERAL, LOG_INFO, buffer);
 	}
@@ -368,8 +368,8 @@ void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off)
 #if 0
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_ERR,
-			    "ringbuffer peek underflow %d<%d %d %d\n",
-				avail, count, pos, rbuf->write_pos);
+			    QString("ringbuffer peek underflow %1<%2 %3 %4\n")
+			    .arg(avail).arg(count).arg(pos).arg(rbuf->write_pos));
 #endif
 		return;
 	}
@@ -413,7 +413,7 @@ int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size)
 {
 	if (dummy_space(dbuf) < size) return -1;
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "add %d ", dummy_space(dbuf));
+	LOG(VB_GENERAL, LOG_INFO, QString("add %1 ").arg(dummy_space(dbuf)));
 #endif
 	dbuf->fill += size;
 	if (ring_write(&dbuf->time_index, (uint8_t *)&time, sizeof(uint64_t)) < 0) 
@@ -421,7 +421,8 @@ int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size)
 	if (ring_write(&dbuf->data_index, (uint8_t *)&size, sizeof(uint32_t)) < 0) 
 		return -3;
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, " - %d = %d", size, dummy_space(dbuf));
+	LOG(VB_GENERAL, LOG_INFO,
+            QString(" - %1 = %2").arg(size).arg(dummy_space(dbuf)));
 #endif
 	return size;
 }
@@ -448,16 +449,18 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 		} else ex = 1;
 	} while (!ex);
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "delete %d ", dummy_space(dbuf));
+	LOG(VB_GENERAL, LOG_INFO, QString("delete %1 ").arg(dummy_space(dbuf)));
 #endif
 	dbuf->fill -= dsize;
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, " + %d = %d", dsize, dummy_space(dbuf));
+	LOG(VB_GENERAL, LOG_INFO,
+            QString(" + %1 = %2").arg(dsize).arg(dummy_space(dbuf)));
 #endif
 
 	return dsize;
 }
 
+#if 0
 static void dummy_print(dummy_buffer *dbuf)
 {
    uint64_t rtime = 0;
@@ -469,9 +472,10 @@ static void dummy_print(dummy_buffer *dbuf)
        ring_peek(&dbuf->data_index,(uint8_t *) &size, 
 			      sizeof(uint32_t), i * sizeof(uint32_t));
 
-       LOG(VB_GENERAL, LOG_INFO, "%d : %llu %u", i,
-           (long long unsigned int)rtime, size);
+       LOG(VB_GENERAL, LOG_INFO, QString("%1 : %2 %3").arg(i)
+	   .arg(rtime).arg(size));
    }
-   LOG(VB_GENERAL, LOG_INFO, "Used: %d Free: %d data-free: %d", avail,
-       1000-avail, dbuf->size - dbuf->fill);
+   LOG(VB_GENERAL, LOG_INFO, QString("Used: %d Free: %d data-free: %d")
+       .arg(avail).arg(1000-avail).arg(dbuf->size - dbuf->fill));
 }
+#endif

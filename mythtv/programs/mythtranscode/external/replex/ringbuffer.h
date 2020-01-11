@@ -27,13 +27,9 @@
 #ifndef _RINGBUFFER_H_
 #define _RINGBUFFER_H_
 
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdint>
 #include <unistd.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
 
 #define FULL_BUFFER  (-1000)
 #define EMPTY_BUFFER  (-1000)
@@ -120,7 +116,4 @@ extern "C" {
         void dummy_destroy(dummy_buffer *dbuf);
 	void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
 #endif /* _RINGBUFFER_H_ */

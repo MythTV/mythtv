@@ -26,10 +26,10 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -125,7 +125,7 @@ int find_pids_pos(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf,
 
 int find_pids(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int len)
 {
-	return find_pids_pos(vpid, apid, ac3pid, buf, len, NULL, NULL, NULL);
+	return find_pids_pos(vpid, apid, ac3pid, buf, len, nullptr, nullptr, nullptr);
 }
 
 //taken and adapted from libdtv, (c) Rolf Hakenes
@@ -210,11 +210,11 @@ static int write_ts_header(int pid, int payload_start, int count,
 			size--;
 		}
 		if(SCR >= 0) {
-			uint32_t lscr = (uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL);
+			auto lscr = (uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL);
 			uint8_t bit = (lscr & 0x01) << 7;
 			lscr = htonl(lscr >> 1);
-			uint8_t *scr = (uint8_t *) &lscr;
-			uint16_t scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
+			auto *scr = (uint8_t *) &lscr;
+			auto scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
 			obuf[c++] = scr[0];
 			obuf[c++] = scr[1];
 			obuf[c++] = scr[2];
@@ -257,8 +257,10 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 	}
 	if(ptsdts) {
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "SCR: %f PTS: %f DTS: %f",
-		 SCR/27000000.0, vpts / 27000000.0, vdts / 27000000.0);
+	LOG(VB_GENERAL, LOG_INFO, QString("SCR: %1 PTS: %2 DTS: %3")
+	    .arg(SCR  / 27000000.0, 0,'f')
+	    .arg(vpts / 27000000.0, 0,'f')
+	    .arg(vdts / 27000000.0, 0,'f'));
 #endif
 		pos = write_ts_header(TS_VIDPID, 1, s_count, SCR, buf, stuff);
 		// always use length == 0 for video streams
@@ -270,8 +272,8 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 	s_count = (s_count+1) & 0x0f;
 
 	if (length-pos > *vlength){
-		LOG(VB_GENERAL, LOG_ERR, "WHAT THE HELL  %d > %d\n", length-pos,
-			*vlength);
+                LOG(VB_GENERAL, LOG_ERR, QString("WHAT THE HELL  %1 > %2\n")
+                    .arg(length-pos).arg(*vlength));
 	}
 
 	int add = ring_read( vrbuffer, buf+pos, length-pos);
@@ -318,7 +320,7 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	pos += add;
 
 	if (pos != TS_SIZE) {
-		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
+                LOG(VB_GENERAL, LOG_ERR, QString("apos: %1").arg(pos));
 		exit(1);
 	}
 
@@ -368,7 +370,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	pos += add;
 
 	if (pos != TS_SIZE) {
-		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
+                LOG(VB_GENERAL, LOG_ERR, QString("apos: %1").arg(pos));
 		exit(1);
 	}
 

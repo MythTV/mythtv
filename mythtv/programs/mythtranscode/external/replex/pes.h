@@ -6,7 +6,7 @@
 #ifndef _PES_H_
 #define _PES_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include "ringbuffer.h"
 
 #define TS_HEADER_MIN	4

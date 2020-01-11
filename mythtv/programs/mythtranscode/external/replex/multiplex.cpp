@@ -1,6 +1,6 @@
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 
 #include "multiplex.h"
 #include "ts.h"
@@ -62,9 +62,9 @@ static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
 	ring_peek(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit),0);
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG,
-	    "video index start: %d  stop: %d  (%d)  rpos: %d\n",
-		viu->start, (viu->start+viu->length),
-		viu->length, ring_rpos(mx->vrbuffer));
+	    QString("video index start: %1  stop: %2  (%3)  rpos: %4\n")
+	    .arg(viu->start).arg(viu->start+viu->length)
+	    .arg(viu->length).arg(ring_rpos(mx->vrbuffer)));
 #endif
 
 	return 1;
@@ -86,9 +86,9 @@ static int get_next_video_unit(multiplex_t *mx, index_unit *viu)
 	ring_read(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit));
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_INFO,
-	    "video index start: %d  stop: %d  (%d)  rpos: %d\n",
-		viu->start, (viu->start+viu->length),
-		viu->length, ring_rpos(mx->vrbuffer));
+	    QString("video index start: %1  stop: %2  (%3)  rpos: %4\n")
+	    .arg(viu->start).arg(viu->start+viu->length)
+	    .arg(viu->length).arg(ring_rpos(mx->vrbuffer)));
 #endif
 	if(! peek_next_video_unit(mx, &nviu))
 		return 1;
@@ -113,9 +113,9 @@ static int peek_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 		  sizeof(index_unit),0);
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG,
-	    "ext index start: %d  stop: %d  (%d)  rpos: %d",
-		extiu->start, (extiu->start+extiu->length),
-		extiu->length, ring_rpos(mx->extrbuffer));
+	    QString("ext index start: %1  stop: %2  (%3)  rpos: %4")
+	    .arg(extiu->start).arg(extiu->start+extiu->length)
+	    .arg(extiu->length).arg(ring_rpos(mx->extrbuffer)));
 #endif
 
 	return 1;
@@ -155,9 +155,9 @@ static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG,
-	    "ext index start: %d  stop: %d  (%d)  rpos: %d",
-		extiu->start, (extiu->start+extiu->length),
-		extiu->length, ring_rpos(&mx->extrbuffer[i]));
+	    QString("ext index start: %1  stop: %2  (%3)  rpos: %4")
+	    .arg(extiu->start).arg(extiu->start+extiu->length)
+	    .arg(extiu->length).arg(ring_rpos(&mx->extrbuffer[i])));
 #endif
 	return 1;
 }
@@ -259,10 +259,10 @@ static void writeout_video(multiplex_t *mx)
 						  mx->SCR + 500*CLOCK_MS);
 #ifdef OUT_DEBUG1
 			LOG(VB_GENERAL, LOG_DEBUG,
-			    "EXTRACLOCK2: %lli %lli %lli",
-				viu->dts, mx->video_delay, mx->SCR);
-			LOG(VB_GENERAL, LOG_DEBUG, "EXTRACLOCK2: %lli",
-				 mx->extra_clock);
+			    QString("EXTRACLOCK2: %1 %2 %3")
+			    .arg(viu->dts).arg(mx->video_delay).arg(mx->SCR));
+			LOG(VB_GENERAL, LOG_DEBUG, QString("EXTRACLOCK2: %1")
+			    .arg(mx->extra_clock));
 			printpts(mx->extra_clock);
 #endif
 
@@ -335,13 +335,13 @@ static void writeout_ext(multiplex_t *mx, int n)
 
 	case MPEG_AUDIO:
 #ifdef OUT_DEBUG
-		LOG(VB_GENERAL, LOG_DEBUG, "writing AUDIO%d pack\n", n);
+		LOG(VB_GENERAL, LOG_DEBUG, QString("writing AUDIO%1 pack\n").arg(n));
 #endif
 		break;
 
 	case AC3:
 #ifdef OUT_DEBUG
-		LOG(VB_GENERAL, LOG_DEBUG, "writing AC3%d pack\n", n);
+		LOG(VB_GENERAL, LOG_DEBUG, QString("writing AC3%1 pack\n").arg(n));
 #endif
 		rest_data = 1; // 4 bytes AC3 header
 		break;
@@ -364,9 +364,9 @@ static void writeout_ext(multiplex_t *mx, int n)
 	dummy_add(dbuf, pts, aiu->length);
 
 #ifdef OUT_DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, "start: %d  stop: %d (%d)  length %d",
-		aiu->start, (aiu->start+aiu->length),
-		aiu->length, length);
+	LOG(VB_GENERAL, LOG_DEBUG, QString("start: %1  stop: %2 (%3)  length %4")
+	    .arg(aiu->start).arg(aiu->start+aiu->length)
+	    .arg(aiu->length).arg(length));
 	printpts(*apts);
 	printpts(aiu->pts);
 	printpts(mx->audio_delay);
@@ -390,9 +390,9 @@ static void writeout_ext(multiplex_t *mx, int n)
 			nframes++;
 #ifdef OUT_DEBUG
 			LOG(VB_GENERAL, LOG_DEBUG,
-			     "start: %d  stop: %d (%d)  length %d",
-				aiu->start, (aiu->start+aiu->length),
-				aiu->length, length);
+			    QString("start: %1  stop: %2 (%3)  length %4")
+			    .arg(aiu->start).arg(aiu->start+aiu->length)
+			    .arg(aiu->length).arg(length));
 			printpts(*apts);
 			printpts(aiu->pts);
 			printpts(mx->audio_delay);
@@ -502,7 +502,8 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	
 	if (mx->VBR) {
 #ifdef OUT_DEBUG1
-		LOG(VB_GENERAL, LOG_DEBUG, "EXTRACLOCK: %lli", mx->extra_clock);
+		LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("EXTRACLOCK: %1").arg(mx->extra_clock));
 		printpts(mx->extra_clock);
 #endif
 		
@@ -564,13 +565,17 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 		printpts(mx->oldSCR);
 		LOG(VB_GENERAL, LOG_DEBUG, "VDTS");
 		printpts(mx->viu.dts);
-		LOG(VB_GENERAL, LOG_DEBUG, " (%d) EXT", *video_ok);
-		for (i = 0; i < mx->extcnt; i++){
-			LOG(VB_GENERAL, LOG_DEBUG, "%d:", mx->ext[i].type);
+		LOG(VB_GENERAL, LOG_DEBUG, QString(" (%1) EXT").arg(*video_ok));
+		for (int i = 0; i < mx->extcnt; i++){
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    QString("%1:").arg(mx->ext[i].type));
 			printpts(mx->ext[i].pts);
-			LOG(VB_GENERAL, LOG_DEBUG, " (%d)", ext_ok[i]);
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    QString(" (%1)").arg(ext_ok[i]));
 		}
 	}
+#else
+        (void)set_ok;
 #endif
 }
 void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
@@ -775,8 +780,8 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	for (mx->extcnt = 0, data_rate = 0, i = 0;
 			 i < N_AUDIO && exttype[i]; i++){
 		if (exttype[i] >= MAX_TYPES) {
-			LOG(VB_GENERAL, LOG_ERR, "Found illegal stream type %d",
-				exttype[i]);
+                    LOG(VB_GENERAL, LOG_ERR,
+			QString("Found illegal stream type %1").arg(exttype[i]));
 			exit(1);
 		}
 		mx->ext[i].type = exttype[i];
@@ -822,8 +827,8 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 			    "data rate may be to high for required mux rate");
                 mx->muxr = mx->mux_rate;
         }
-	LOG(VB_GENERAL, LOG_INFO, "Mux rate: %.2f Mbit/s",
-	    mx->muxr*8.0/1000000.0);
+	LOG(VB_GENERAL, LOG_INFO, QString("Mux rate: %1 Mbit/s")
+	    .arg(mx->muxr*8.0/1000000.0, 0,'f',2,QChar('0')));
 	
 	mx->SCRinc = 27000000ULL/((uint64_t)mx->muxr / 
 				     (uint64_t) mx->pack_size);

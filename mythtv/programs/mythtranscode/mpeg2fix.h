@@ -12,10 +12,6 @@ extern "C"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 
-//replex
-#include "external/replex/ringbuffer.h"
-#include "external/replex/multiplex.h"
-
 //libmpeg2
 #include "config.h"
 #if CONFIG_LIBMPEG2EXTERNAL
@@ -24,6 +20,10 @@ extern "C"
 #include "mpeg2.h"
 #endif
 }
+
+//replex
+#include "external/replex/ringbuffer.h"
+#include "external/replex/multiplex.h"
 
 //Qt
 #include <QMap>

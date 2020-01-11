@@ -27,7 +27,7 @@
 #ifndef _MPG_COMMON_H_
 #define _MPG_COMMON_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include "ringbuffer.h"
 
 

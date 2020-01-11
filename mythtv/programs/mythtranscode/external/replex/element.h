@@ -27,7 +27,7 @@
 #ifndef _ELEMENT_H_
 #define _ELEMENT_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "ringbuffer.h"
 
@@ -74,8 +74,8 @@ enum { VIDEO_NONE=0, VIDEO_PAL, VIDEO_NTSC};
 #define PULLDOWN32 1
 #define PULLDOWN23 2
 
-#define CLOCK_MS        27000ULL
-#define CLOCK_PER    27000000000ULL
+#define CLOCK_MS        27000LL
+#define CLOCK_PER    27000000000LL
 #define SEC_PER      (CLOCK_PER/s->frame_rate)
 
 
