@@ -1882,7 +1882,7 @@ void ASIConfigurationGroup::probeCard(const QString &device)
 ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
                                                    CardType& a_cardtype):
     m_parent(a_parent),
-    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
+    m_info(new GroupSetting()), m_size(new GroupSetting())
 {
     setVisible(false);
     auto *device = new FileDevice(m_parent);
@@ -1895,11 +1895,9 @@ ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
     a_cardtype.addTargetedChild("IMPORT", new EmptyVBIDevice(m_parent));
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("IMPORT", m_info);
 
     m_size->setLabel(tr("File size"));
-    m_size->setEnabled(false);
     a_cardtype.addTargetedChild("IMPORT", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
@@ -2219,7 +2217,7 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
 DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
                                                CardType &a_cardtype) :
     m_parent(a_parent),
-    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
+    m_info(new GroupSetting()), m_size(new GroupSetting())
 {
     setVisible(false);
     auto *device = new FileDevice(m_parent);
@@ -2231,11 +2229,9 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("DEMO", new EmptyVBIDevice(m_parent));
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("DEMO", m_info);
 
     m_size->setLabel(tr("File size"));
-    m_size->setEnabled(false);
     a_cardtype.addTargetedChild("DEMO", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
@@ -2248,7 +2244,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 {
     QString   ci;
     QString   cs;
-    QFileInfo fileInfo(device.mid(5));
+    QFileInfo fileInfo(device);
     if (fileInfo.exists())
     {
         if (fileInfo.isReadable() && (fileInfo.isFile()))

@@ -112,7 +112,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     void updateWidgets(void);
 
     static bool IsImage(QString extension);
-    static QString FormatSize(int size);
+    static QString FormatSize(int64_t size);
 
     bool               m_isRemote        {false};
 

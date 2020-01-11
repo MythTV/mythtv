@@ -522,8 +522,8 @@ class ImportConfigurationGroup: public GroupSetting
 
   private:
     CaptureCard          &m_parent;
-    TransTextEditSetting *m_info {nullptr};
-    TransTextEditSetting *m_size {nullptr};
+    GroupSetting *m_info {nullptr};
+    GroupSetting *m_size {nullptr};
 };
 
 class DemoConfigurationGroup: public GroupSetting
@@ -538,8 +538,8 @@ class DemoConfigurationGroup: public GroupSetting
 
   private:
     CaptureCard          &m_parent;
-    TransTextEditSetting *m_info {nullptr};
-    TransTextEditSetting *m_size {nullptr};
+    GroupSetting *m_info {nullptr};
+    GroupSetting *m_size {nullptr};
 };
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
