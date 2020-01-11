@@ -31,6 +31,7 @@ class MUI_PUBLIC MythEDID
     float       Gamma             (void) const;
     bool        IsHDMI            (void) const;
     bool        IsSRGB            (void) const;
+    bool        IsLikeSRGB        (void) const;
     Primaries   ColourPrimaries   (void) const;
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
@@ -52,6 +53,7 @@ class MUI_PUBLIC MythEDID
     QStringList m_serialNumbers   { };
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
+    bool        m_likeSRGB        { false }; // Temporary until Colourspace handling in libmythui
     Primaries   m_primaries       { {{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}, {0.0F, 0.0F} };
     bool        m_isHDMI          { false };
     uint16_t    m_physicalAddress { 0 };
