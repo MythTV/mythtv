@@ -176,13 +176,13 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     }
     m_minorVersion = Data[VERSION_OFFSET + 1];
 
-    // retrieve serial number. This may be subsequently overridden
+    // retrieve serial number. This may be subsequently overridden.
+    // N.B. 0 is a valid serial number.
     qint32 serial = Data[SERIAL_OFFSET] +
                     (Data[SERIAL_OFFSET + 1] << 8) +
                     (Data[SERIAL_OFFSET + 2] << 16) +
                     (Data[SERIAL_OFFSET + 3] << 24);
-    if (serial > 0)
-        m_serialNumbers << QString::number(serial);
+    m_serialNumbers << QString::number(serial);
 
     // digital or analog
     //bool digital = Data[DISPLAY_OFFSET] & 0x80;
