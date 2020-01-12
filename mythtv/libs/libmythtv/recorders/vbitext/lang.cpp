@@ -1,4 +1,4 @@
-#include <string.h>
+#include <cstring>
 #include "vt.h"
 #include "lang.h"
 
@@ -174,9 +174,8 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
                            struct mark *mark = marks + (mode - 16);
-                           char *x = NULL;
-
-                           if ((x = strchr(mark->m_g0, data)))
+                           const char *x = std::strchr(mark->m_g0, data);
+                           if (x != nullptr)
                            {
                                if (latin1)
                                    data = mark->m_latin1[x - mark->m_g0];

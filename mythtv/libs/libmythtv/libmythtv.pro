@@ -89,14 +89,12 @@ using_valgrind:DEFINES += USING_VALGRIND
     !mingw:!win32-msvc* {
         HEADERS += recorders/vbitext/cc.h
         HEADERS += recorders/vbitext/dllist.h
-        HEADERS += recorders/vbitext/hamm.h
         HEADERS += recorders/vbitext/lang.h
         HEADERS += recorders/vbitext/vbi.h
         HEADERS += recorders/vbitext/vt.h
         SOURCES += recorders/vbitext/cc.cpp
-        SOURCES += recorders/vbitext/vbi.c
-        SOURCES += recorders/vbitext/hamm.c
-        SOURCES += recorders/vbitext/lang.c
+        SOURCES += recorders/vbitext/vbi.cpp
+        SOURCES += recorders/vbitext/lang.cpp
     }
 #}
 

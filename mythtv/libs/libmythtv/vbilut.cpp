@@ -1,6 +1,5 @@
 #include <vbilut.h>
 
-extern "C" {
 const unsigned char lang_chars[1+8+8][16] =
 {
     { 0, 0x23,0x24,0x40,0x5b,0x5c,0x5d,0x5e,0x5f,0x60,0x7b,0x7c,0x7d,0x7e },
@@ -41,7 +40,6 @@ const unsigned char lang_chars[1+8+8][16] =
     // Rumanian (95%)
     { 0, 0x23,0xa2,0xde,0xc2,0xaa,0xc3,0xce,0x69,0xfe,0xe2,0xba,0xe3,0xee }, // #¢ÞÂªÃÎiþâºãî
 };
-}
 
 // TODO - Add the rest...page 107
 const unsigned char chartab_original[13] =
@@ -349,4 +347,13 @@ int hamm16(const uint8_t *p, int *err)
     *err += a;
     *err += b;
     return (a & 15) | (b & 15) * 16;
+}
+
+int hamm24(const uint8_t *p, int *err)
+{
+    int e = hamm24par[0][p[0]] ^ hamm24par[1][p[1]] ^ hamm24par[2][p[2]];
+    int x = hamm24val[p[0]] + p[1] % 128 * 16 + p[2] % 128 * 2048;
+
+    *err += hamm24err[e];
+    return x ^ hamm24cor[e];
 }
