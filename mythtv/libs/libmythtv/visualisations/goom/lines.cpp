@@ -2,12 +2,13 @@
  *  lines.c
  */
 
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+
 #include "lines.h"
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "goom_tools.h"
 #include "drawmethods.h"
+#include "goom_tools.h"
 
 extern unsigned int resolx, c_resoly;
 
@@ -95,7 +96,7 @@ static guint32 getcouleur (int mode)
 void
 goom_lines_set_res (GMLine * gml, int rx, int ry)
 {
-	if (gml != NULL) {
+	if (gml != nullptr) {
 		//int     i;
 
 		gml->screenX = rx;
@@ -194,13 +195,13 @@ goom_lines_free (GMLine ** l)
 	free ((*l)->points);
 	free ((*l)->points2);
 	free (*l);
-	*l = NULL;
+	*l = nullptr;
 }
 
 void
 goom_lines_draw (GMLine * line, const gint16 data[512], unsigned int *p)
 {
-	if (line != NULL) {
+	if (line != nullptr) {
 		guint32 color = line->color;
 		GMUnitPointer *pt = &(line->points[0]);
 

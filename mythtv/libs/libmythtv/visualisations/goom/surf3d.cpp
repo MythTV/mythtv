@@ -1,14 +1,15 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 #include "surf3d.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 void grid3d_free(grid3d **grid)
 {
     free ((*grid)->surf.vertex);
     free ((*grid)->surf.svertex);
     free (*grid);
-    *grid = NULL;
+    *grid = nullptr;
 }
 
 grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {

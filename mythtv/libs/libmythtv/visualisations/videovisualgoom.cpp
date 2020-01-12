@@ -6,10 +6,8 @@
 #include "opengl/mythrenderopengl.h"
 #endif
 
-extern "C" {
 #include "goom/goom_tools.h"
 #include "goom/goom_core.h"
-}
 
 #include "videovisualgoom.h"
 

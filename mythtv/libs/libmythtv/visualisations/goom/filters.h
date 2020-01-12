@@ -1,10 +1,10 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include "goomconfig.h"
+#include <cmath>
 
+#include "goomconfig.h"
 #include "graphic.h"
-#include "math.h"
 
 typedef struct
 {

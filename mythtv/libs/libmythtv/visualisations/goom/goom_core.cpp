@@ -1,13 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "../config.h"
 #ifdef HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
 #endif
 
-#include <inttypes.h>
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "goom_core.h"
 #include "goom_tools.h"
@@ -18,10 +17,6 @@
 //#include "gfontlib.h"
 
 //#define VERBOSE
-
-#ifdef VERBOSE
-#include <stdio.h>
-#endif
 
 #define STOP_SPEED 128
 
@@ -65,8 +60,8 @@ GoomState *curGState = states+4;
 guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
 // effet de ligne..
-static GMLine *gmline1 = NULL;
-static GMLine *gmline2 = NULL;
+static GMLine *gmline1 = nullptr;
+static GMLine *gmline2 = nullptr;
 
 void    choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far);
 
@@ -173,7 +168,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		0, 0, 0, 0, 0
 	};
 
-	ZoomFilterData *pzfd = NULL;
+	ZoomFilterData *pzfd = nullptr;
 
 	/* test if the config has changed, update it if so */
 	guint32 pointWidth = (resolx * 2) / 5;
@@ -267,7 +262,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	}
 
 	// par défaut pas de changement de zoom
-	pzfd = NULL;
+	pzfd = nullptr;
 
 	/* 
 	 * Test forceMode
@@ -328,7 +323,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			s_zfd.hypercosEffect = iRAND (2);
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
-			// fall through
+			[[clang::fallthrough]];
                     case 13:
                     case 20:
                     case 21:
@@ -628,13 +623,13 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	}
 
 	if (forceMode == -1) {
-		pzfd = NULL;
+		pzfd = nullptr;
 	}
 
 	/*
 	 * Changement d'effet de zoom !
 	 */
-	if (pzfd != NULL) {
+	if (pzfd != nullptr) {
 		static int s_exvit = 128;
 
 		s_nombreCddc = 0;
@@ -857,11 +852,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 }
 
 void goom_close () {
-	if (pixel != NULL)
+	if (pixel != nullptr)
 		free (pixel);
-	if (back != NULL)
+	if (back != nullptr)
 		free (back);
-	pixel = back = NULL;
+	pixel = back = nullptr;
 	RAND_CLOSE ();
 	release_ifs ();
 	goom_lines_free (&gmline1);
@@ -919,7 +914,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 
 /*
 void goom_set_font (int ***chars, int *width, int *height) {
-    if (chars == NULL)
+    if (chars == nullptr)
         return ;
 }
 */

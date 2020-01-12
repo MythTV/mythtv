@@ -1,6 +1,4 @@
-/* Prototypes to keep gcc from spewing warnings */
-void    zoom_filter_mmx (int prevX, int prevY, const unsigned int *expix1, unsigned int *expix2, const int *brutS, const int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_mmx_supported (void);
+#include "goom/zoom_filters.h"
 
 #ifdef MMX
 #define BUFFPOINTNB 16
@@ -15,7 +13,9 @@ int 	zoom_filter_mmx_supported (void);
 // faire : a / sqrtperte <=> a >> PERTEDEC
 #define PERTEDEC 4
 
+extern "C" {
 #include "libavutil/cpu.h"
+}
 
 int zoom_filter_mmx_supported () {
     return (av_get_cpu_flags() & AV_CPU_FLAG_MMX);

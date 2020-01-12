@@ -26,7 +26,7 @@ static inline int RAND(void) {
 
 #define RAND_CLOSE()\
 	free (rand_tab);\
-	rand_tab = 0;
+	rand_tab = nullptr;
 
 
 //#define iRAND(i) ((guint32)((float)i * RAND()/RAND_MAX))

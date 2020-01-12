@@ -1,9 +1,9 @@
 #ifndef _V3D_H
 #define _V3D_H
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #include "mathtools.h"
 

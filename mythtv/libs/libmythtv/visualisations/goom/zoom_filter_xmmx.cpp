@@ -1,9 +1,6 @@
 #include "mythconfig.h"
 
-/* Prototypes to keep gcc from spewing warnings */
-void    zoom_filter_xmmx (int prevX, int prevY, const unsigned int *expix1, const unsigned int *expix2, const int *brutS, const int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_xmmx_supported (void);
-
+#include "goom/zoom_filters.h"
 
 #if defined(MMX) && !defined(ARCH_X86_64)
 /* a definir pour avoir exactement le meme resultat que la fonction C
@@ -25,7 +22,9 @@ int 	zoom_filter_xmmx_supported (void);
 
 //#define MMX_TRACE
 #include "mmx.h"
+extern "C" {
 #include "libavutil/cpu.h"
+}
 
 int zoom_filter_xmmx_supported () {
     return (av_get_cpu_flags() & AV_CPU_FLAG_SSE) >> 3;
@@ -255,7 +254,7 @@ int zoom_filter_xmmx_supported () {
 	return 0;
 }
 void zoom_filter_xmmx (int prevX, int prevY,
-                       const unsigned int *expix1, const unsigned int *expix2,
+                       const unsigned int *expix1, unsigned int *expix2,
                        const int *brutS, const int *brutD, int buffratio,
                        int precalCoef[16][16])
 {
