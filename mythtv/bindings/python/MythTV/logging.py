@@ -7,16 +7,21 @@ from MythTV.exceptions import MythError
 import os
 import syslog
 import codecs
-
+try:
+    # needs python-systemd package installed
+    from systemd import journal
+except ImportError:
+    # bail only when '--systemd-journal' is selected
+    journal = None
 from sys import version_info, stdout, argv
 from datetime import datetime
 try:
     from thread import allocate_lock
-except:
+except ImportError:
     from _thread import allocate_lock
 try:
     from StringIO import StringIO
-except:
+except ImportError:
     from io import StringIO
 from traceback import format_exc
 
@@ -102,8 +107,9 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._LOGFILE = stdout
         cls._logwrite = cls._logfile
         cls._QUIET = 0
-        cls._DBLOG = True
+        cls._DBLOG = False
         cls._SYSLOG = None
+        cls._JOURNALLOG = False
         cls._lock = allocate_lock()
         cls._parseinput()
 
@@ -111,6 +117,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     def _parseinput(cls):
         args = iter(argv)
         next(args)
+        n = 0
         try:
             while True:
                 arg = next(args)
@@ -118,57 +125,89 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                     cls._QUIET += 1
                 elif arg == '--nodblog':
                     cls._DBLOG = False
+                elif arg == '--enable-dblog':
+                    cls._DBLOG = True
                 elif arg == '--loglevel':
                     cls._setlevel(next(args))
                 elif arg == '--verbose':
                     cls._setmask(next(args))
                 elif arg == '--logfile':
                     cls._setfile(next(args))
+                    n += 1
                 elif arg == '--logpath':
                     cls._setpath(next(args))
+                    n += 1
                 elif arg == '--syslog':
                     cls._setsyslog(next(args))
+                    n += 1
+                elif arg == '--systemd-journal':
+                    cls._setjournallog()
+                    n += 1
                 elif arg == '--':
                     break
-
         except StopIteration:
             pass
+        # only allow one logging method
+        if (n > 1):
+            raise MythError("Error:  These logging options are mutually exclusive: " + \
+                            "'logfile', 'logpath', 'syslog' or 'systemd-journal'!")
 
     @classmethod
     def _optparseinput(cls):
         opts, args = cls._parser.parse_args()
+        n = 0
         if opts.quiet:
             cls._QUIET = opts.quiet
         if opts.dblog:
-            cls._DBLOG = False
+            cls._DBLOG = True
         if opts.loglevel:
             cls._setlevel(opts.loglevel)
         if opts.verbose:
             cls._setmask(opts.verbose)
         if opts.logfile:
             cls._setfile(opts.logfile)
+            n += 1
         if opts.logpath:
             cls._setpath(opts.logpath)
+            n += 1
         if opts.syslog:
             cls._setsyslog(opts.syslog)
+            n += 1
+        if opts.journallog:
+            cls._setjournallog()
+            n += 1
+        if (n > 1):
+            cls._parser.error("These logging options are mutually exclusive: " + \
+                              "'logfile', 'logpath', 'syslog' or 'systemd-journal'!")
+
 
     @classmethod
     def _argparseinput(cls):
         opts = cls._parser.parse_args()
+        n = 0
         if opts.quiet:
             cls._QUIET = opts.quiet
         if opts.dblog:
-            cls._DBLOG = False
+            cls._DBLOG = True
         if opts.loglevel:
             cls._setlevel(opts.loglevel)
         if opts.verbose:
             cls._setmask(opts.verbose)
         if opts.logfile:
             cls._setfile(opts.logfile)
+            n += 1
         if opts.logpath:
             cls._setpath(opts.logpath)
+            n += 1
         if opts.syslog:
             cls._setsyslog(opts.syslog)
+            n += 1
+        if opts.journallog:
+            cls._setjournallog()
+            n += 1
+        if (n > 1):
+            cls._parser.error("These logging options are mutually exclusive: " + \
+                              "'logfile', 'logpath', 'syslog' or 'systemd-journal'!")
 
     @classmethod
     def loadOptParse(cls, parser):
@@ -176,8 +215,10 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._parseinput = cls._optparseinput
         parser.add_option('--quiet', action="count", dest="quiet",
             help="Run quiet. One use squelches terminal, two stops all logging.")
-        parser.add_option('--nodblog', action="store_true", dest="dblog",
-            help="Prevent logging to the database.")
+        parser.add_option('--nodblog', action="store_true", dest="nodblog",
+            help="Prevent logging to the database (legacy: disabled by default).")
+        parser.add_option('--enable-dblog', action="store_true", dest="dblog",
+            help="Enable logging to the database.")
         parser.add_option('--loglevel', type="string", action="store", dest="loglevel",
             help="Specify log verbosity, using standard syslog levels.")
         parser.add_option('--verbose', type="string", action="store", dest="verbose",
@@ -188,6 +229,8 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
             help="Specify directory to log to, filename will be automatically decided.")
         parser.add_option('--syslog', type="string", action="store", dest="syslog",
             help="Specify syslog facility to log to.")
+        parser.add_option('--systemd-journal', action="store_true", dest="journallog",
+            help="Specify systemd-journal to log to.")
 
     @classmethod
     def loadArgParse(cls, parser):
@@ -204,8 +247,10 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         cls._parseinput = cls._argparseinput
         parser.add_argument('--quiet', action=Count, nargs=0, dest="quiet",
             help="Run quiet. One use squelches terminal, two stops all logging.")
-        parser.add_argument('--nodblog', action="store_true", dest="dblog",
-            help="Prevent logging to the database.")
+        parser.add_argument('--nodblog', action="store_true", dest="nodblog",
+            help="Prevent logging to the database (legacy: disabled by default).")
+        parser.add_argument('--enable-dblog', action="store_true", dest="dblog",
+            help="Enable logging to the database.")
         parser.add_argument('--loglevel', action="store", dest="loglevel",
             help="Specify log verbosity, using standard syslog levels.")
         parser.add_argument('--verbose', action="store", dest="verbose",
@@ -216,6 +261,8 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
             help="Specify directory to log to, filename will be automatically decided.")
         parser.add_argument('--syslog', action="store", dest="syslog",
             help="Specify syslog facility to log to.")
+        parser.add_argument('--systemd-journal', action="store_true", dest="journallog",
+            help="Specify systemd-journal to log to.")
 
     def __repr__(self):
         return "<%s '%s','%s' at %s>" % \
@@ -275,9 +322,12 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
             cls._LOGFILE.close()
         cls._LOGFILE = fileobject
         cls._logwrite = cls._logfile
+        # clear other logging options:
         if cls._SYSLOG:
             cls._SYSLOG = None
             syslog.closelog()
+        if cls._JOURNALLOG:
+            cls._JOURNALLOG = False
 
     @classmethod
     def _setsyslog(cls, facility=LOGFACILITY.USER):
@@ -300,14 +350,37 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                 raise MythError("Invalid syslog facility")
 
         cls._SYSLOG = facility
-        syslog.openlog(argv[0].rsplit('/', 1)[1],
-                       syslog.LOG_NDELAY|syslog.LOG_PID,
-                       getattr(syslog, facility))
+        application = argv[0]
+        if '/' in application:
+            application = application.rsplit('/', 1)[1]
+        syslog.openlog(application, syslog.LOG_NDELAY|syslog.LOG_PID,
+                                    getattr(syslog, facility))
         cls._logwrite = cls._logsyslog
+        # clear other logging options:
         if cls._LOGFILE:
             if cls._LOGFILE.fileno() != 1:
                 cls._LOGFILE.close()
             cls._LOGFILE = None
+        if cls._JOURNALLOG:
+            cls._JOURNALLOG = False
+
+    @classmethod
+    def _setjournallog(cls):
+        cls._initlogger()
+        if journal:
+            cls._JOURNALLOG = True
+            cls._logwrite = cls._logjournallog
+            # clear other logging options:
+            if cls._LOGFILE:
+                if cls._LOGFILE.fileno() != 1:
+                    cls._LOGFILE.close()
+                cls._LOGFILE = None
+            if cls._SYSLOG:
+                cls._SYSLOG = None
+                syslog.closelog()
+        else:
+            raise MythError("Error: Python module 'systemd.journal' not available! " + \
+                            "Please install 'python-systemd' module.")
 
     @classmethod
     def _parsemask(cls, mstr=None):
@@ -411,6 +484,17 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     def _logsyslog(self, mask, level, message, detail):
         syslog.syslog(level,
                       message + (' -- {0}'.format(detail) if detail else ''))
+
+    def _logjournallog(self, mask, level, message, detail):
+        if detail:
+            detail = ' -- {0}'.format(detail)
+        else:
+            detail = ''
+        application = argv[0]
+        if '/' in application:
+            application = application.rsplit('/', 1)[1]
+        msg = ("[{0}]: {1}{2}".format(self.module, message, detail))
+        journal.send(msg, PRIORITY=level, SYSLOG_IDENTIFIER=application )
 
     def _logdatabase(self, mask, level, message, detail):
         if self.db and self._DBLOG:
