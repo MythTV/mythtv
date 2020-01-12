@@ -28,7 +28,7 @@
 #ifndef FFNV_CUDA_DYNLINK_LOADER_H
 #define FFNV_CUDA_DYNLINK_LOADER_H
 
-#include <cstdlib>
+#include <stdlib.h>
 
 #include "dynlink_cuda.h"
 #include "dynlink_nvcuvid.h"
