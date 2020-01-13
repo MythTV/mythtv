@@ -1,9 +1,9 @@
-#ifndef _VIDEOOUT_TYPES_H_
-#define _VIDEOOUT_TYPES_H_
+#ifndef VIDEOOUT_TYPES_H_
+#define VIDEOOUT_TYPES_H_
 
+// Qt
 #include <QString>
 #include <QObject>
-#include <QSize>
 
 enum PIPState
 {
@@ -152,20 +152,15 @@ inline PrimariesMode toPrimariesMode(QString Mode)
     return PrimariesRelaxed;
 }
 
-inline QString StereoscopictoString(StereoscopicMode mode)
+inline QString StereoscopictoString(StereoscopicMode Mode)
 {
-    switch (mode)
+    switch (Mode)
     {
-        case kStereoscopicModeNone:
-            return QObject::tr("No 3D");
-        case kStereoscopicModeSideBySide:
-            return QObject::tr("3D Side by Side");
-        case kStereoscopicModeSideBySideDiscard:
-            return QObject::tr("Discard 3D Side by Side");
-        case kStereoscopicModeTopAndBottom:
-            return QObject::tr("3D Top and Bottom");
-        case kStereoscopicModeTopAndBottomDiscard:
-            return QObject::tr("Discard 3D Top and Bottom");
+        case kStereoscopicModeNone:                return QObject::tr("No 3D");
+        case kStereoscopicModeSideBySide:          return QObject::tr("3D Side by Side");
+        case kStereoscopicModeSideBySideDiscard:   return QObject::tr("Discard 3D Side by Side");
+        case kStereoscopicModeTopAndBottom:        return QObject::tr("3D Top and Bottom");
+        case kStereoscopicModeTopAndBottomDiscard: return QObject::tr("Discard 3D Top and Bottom");
     }
     return QObject::tr("Unknown");
 }
@@ -176,250 +171,190 @@ enum VideoErrorState
     kError_Unknown         = 0x01,
 };
 
-inline bool is_interlaced(FrameScanType scan)
+inline bool is_interlaced(FrameScanType Scan)
 {
-    return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);
+    return (kScan_Interlaced == Scan) || (kScan_Intr2ndField == Scan);
 }
 
-inline bool is_progressive(FrameScanType scan)
+inline bool is_progressive(FrameScanType Scan)
 {
-    return (kScan_Progressive == scan);
+    return (kScan_Progressive == Scan);
 }
 
-inline QString toString(FrameScanType scan, bool brief = false)
+inline QString toString(FrameScanType Scan, bool Brief = false)
 {
-    QString ret = QObject::tr("Unknown");
-    switch (scan)
+    switch (Scan)
     {
-        case kScan_Ignore:
-            ret = QObject::tr("Ignore"); break;
-        case kScan_Detect:
-            ret = QObject::tr("Detect"); break;
-        case kScan_Interlaced:
-            if (brief)
-                ret = QObject::tr("Interlaced");
-            else
-                ret = QObject::tr("Interlaced (Normal)");
-            break;
-        case kScan_Intr2ndField:
-            if (brief)
-                ret = QObject::tr("Interlaced");
-            else
-                ret = QObject::tr("Interlaced (Reversed)");
-            break;
-        case kScan_Progressive:
-            ret = QObject::tr("Progressive"); break;
-        default:
-            break;
+        case kScan_Ignore:       return QObject::tr("Ignore");
+        case kScan_Detect:       return QObject::tr("Detect");
+        case kScan_Progressive:  return QObject::tr("Progressive");
+        case kScan_Interlaced:   return Brief ? QObject::tr("Interlaced") : QObject::tr("Interlaced (Normal)");
+        case kScan_Intr2ndField: return Brief ? QObject::tr("Interlaced") : QObject::tr("Interlaced (Reversed)");
     }
-
-    return ret;
+    return QObject::tr("Unknown");
 }
 
 inline QString toString(PIPState State)
 {
     switch (State)
     {
-    case kPIPOff: return QString("Pip Off");
-    case kPIPonTV: return QString("Pip on TV");
-    case kPIPStandAlone: return QString("Pip Standalone");
-    case kPBPLeft: return QString("PBP Left");
-    case kPBPRight: return QString("PBP Right");
+        case kPIPOff:        return QString("Pip Off");
+        case kPIPonTV:       return QString("Pip on TV");
+        case kPIPStandAlone: return QString("Pip Standalone");
+        case kPBPLeft:       return QString("PBP Left");
+        case kPBPRight:      return QString("PBP Right");
     }
     return QString("Unknown");
 }
 
-inline QString toString(PIPLocation location)
+inline QString toString(PIPLocation Location)
 {
-    QString ret;
-    switch (location)
+    switch (Location)
     {
-        case kPIPTopLeft:     ret = QObject::tr("Top Left");     break;
-        case kPIPBottomLeft:  ret = QObject::tr("Bottom Left");  break;
-        case kPIPTopRight:    ret = QObject::tr("Top Right");    break;
-        case kPIPBottomRight: ret = QObject::tr("Bottom Right"); break;
-        case kPIP_END: break;
+        case kPIPTopLeft:     return QObject::tr("Top Left");
+        case kPIPBottomLeft:  return QObject::tr("Bottom Left");
+        case kPIPTopRight:    return QObject::tr("Top Right");
+        case kPIPBottomRight: return QObject::tr("Bottom Right");
+        case kPIP_END:        break;
     }
-
-    return ret;
+    return "";
 }
 
-inline QString toString(AspectOverrideMode aspectmode)
+inline QString toString(AspectOverrideMode Aspectmode)
 {
-    QString ret = QObject::tr("Off");
-    switch (aspectmode)
+    switch (Aspectmode)
     {
-        case kAspect_4_3:    ret = QObject::tr("4:3");    break;
-        case kAspect_14_9:   ret = QObject::tr("14:9");   break;
-        case kAspect_16_9:   ret = QObject::tr("16:9");   break;
-        case kAspect_2_35_1: ret = QObject::tr("2.35:1"); break;
+        case kAspect_4_3:    return QObject::tr("4:3");
+        case kAspect_14_9:   return QObject::tr("14:9");
+        case kAspect_16_9:   return QObject::tr("16:9");
+        case kAspect_2_35_1: return QObject::tr("2.35:1");
         case kAspect_Toggle:
         case kAspect_Off:
-        case kAspect_END: break;
+        case kAspect_END:    break;
     }
-
-    return ret;
+    return QObject::tr("Off");
 }
 
-inline QString toString(LetterBoxColour letterboxcolour)
+inline QString toString(LetterBoxColour LetterboxColour)
 {
-    QString ret = QObject::tr("Black");
-    switch (letterboxcolour)
+    switch (LetterboxColour)
     {
-        case kLetterBoxColour_Gray25: ret = QObject::tr("Gray"); break;
+        case kLetterBoxColour_Gray25: return QObject::tr("Gray");
         case kLetterBoxColour_Black:
         case kLetterBoxColour_Toggle:
-        case kLetterBoxColour_END: break;
+        case kLetterBoxColour_END:    break;
     }
-
-    return ret;
+    return QObject::tr("Black");
 }
 
-inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
+inline float get_aspect_override(AspectOverrideMode Aspectmode, float Original)
 {
-    float ret = orig;
-    switch (aspectmode)
+    switch (Aspectmode)
     {
-        case kAspect_4_3:    ret = 4.0F  / 3.0F; break;
-        case kAspect_14_9:   ret = 14.0F / 9.0F; break;
-        case kAspect_16_9:   ret = 16.0F / 9.0F; break;
-        case kAspect_2_35_1: ret = 2.35F       ; break;
+        case kAspect_4_3:    return 4.0F  / 3.0F;
+        case kAspect_14_9:   return 14.0F / 9.0F;
+        case kAspect_16_9:   return 16.0F / 9.0F;
+        case kAspect_2_35_1: return 2.35F;
         case kAspect_Toggle:
         case kAspect_Off:
-        case kAspect_END: break;
+        case kAspect_END:    break;
     }
-    return ret;
+    return Original;
 }
 
-inline QString toString(AdjustFillMode aspectmode)
+inline QString toString(AdjustFillMode Aspectmode)
 {
-    QString ret = QObject::tr("Off");
-    switch (aspectmode)
+    switch (Aspectmode)
     {
-        case kAdjustFill_Half:    ret = QObject::tr("Half");    break;
-        case kAdjustFill_Full:    ret = QObject::tr("Full");    break;
-        case kAdjustFill_HorizontalStretch:
-            ret = QObject::tr("H.Stretch"); break;
-        case kAdjustFill_VerticalStretch:
-            ret = QObject::tr("V.Stretch"); break;
-        case kAdjustFill_VerticalFill:
-            ret = QObject::tr("V.Fill"); break;
-        case kAdjustFill_HorizontalFill:
-            ret = QObject::tr("H.Fill"); break;
+        case kAdjustFill_Half: return QObject::tr("Half");
+        case kAdjustFill_Full: return QObject::tr("Full");
+        case kAdjustFill_HorizontalStretch: return QObject::tr("H.Stretch");
+        case kAdjustFill_VerticalStretch:   return QObject::tr("V.Stretch");
+        case kAdjustFill_VerticalFill:      return QObject::tr("V.Fill");
+        case kAdjustFill_HorizontalFill:    return QObject::tr("H.Fill");
+        case kAdjustFill_AutoDetect_DefaultOff: return QObject::tr("Auto Detect (Default Off)");
+        case kAdjustFill_AutoDetect_DefaultHalf: return QObject::tr("Auto Detect (Default Half)");
         case kAdjustFill_Toggle:
         case kAdjustFill_Off:
         case kAdjustFill_END: break;
-        case kAdjustFill_AutoDetect_DefaultOff:
-            ret = QObject::tr("Auto Detect (Default Off)");
-            break;
-        case kAdjustFill_AutoDetect_DefaultHalf:
-            ret = QObject::tr("Auto Detect (Default Half)");
-            break;
     }
-
-    return ret;
+    return QObject::tr("Off");
 }
 
-inline QString toString(PictureAttribute pictureattribute)
+inline QString toString(PictureAttribute PictureAttribute)
 {
-    QString ret = QObject::tr("None");
-    switch (pictureattribute)
+    switch (PictureAttribute)
     {
-      case kPictureAttribute_None:            break;
-      case kPictureAttribute_Brightness:
-          ret = QObject::tr("Brightness");    break;
-      case kPictureAttribute_Contrast:
-          ret = QObject::tr("Contrast");      break;
-      case kPictureAttribute_Colour:
-          ret = QObject::tr("Color");         break;
-      case kPictureAttribute_Hue:
-          ret = QObject::tr("Hue");           break;
-      case kPictureAttribute_Range:
-          ret = QObject::tr("Range"); break;
-      case kPictureAttribute_Volume:
-          ret = QObject::tr("Volume");        break;
-      case kPictureAttribute_MAX:
-          ret = "MAX";                        break;
+        case kPictureAttribute_Brightness: return QObject::tr("Brightness");
+        case kPictureAttribute_Contrast:   return QObject::tr("Contrast");
+        case kPictureAttribute_Colour:     return QObject::tr("Color");
+        case kPictureAttribute_Hue:        return QObject::tr("Hue");
+        case kPictureAttribute_Range:      return QObject::tr("Range");
+        case kPictureAttribute_Volume:     return QObject::tr("Volume");
+        case kPictureAttribute_MAX:        return "MAX";
+        case kPictureAttribute_None:       break;
     }
-
-    return ret;
+    return QObject::tr("None");
 }
 
-inline QString toDBString(PictureAttribute pictureattribute)
+inline QString toDBString(PictureAttribute PictureAttribute)
 {
-    QString ret;
-    switch (pictureattribute)
+    switch (PictureAttribute)
     {
-      case kPictureAttribute_None: break;
-      case kPictureAttribute_Brightness:
-          ret = "brightness";      break;
-      case kPictureAttribute_Contrast:
-          ret = "contrast";        break;
-      case kPictureAttribute_Colour:
-          ret = "colour";          break;
-      case kPictureAttribute_Hue:
-          ret = "hue";             break;
-      case kPictureAttribute_Range:
-      case kPictureAttribute_Volume:
-      case kPictureAttribute_MAX:  break;
+        case kPictureAttribute_Brightness: return "brightness";
+        case kPictureAttribute_Contrast:   return "contrast";
+        case kPictureAttribute_Colour:     return "colour";
+        case kPictureAttribute_Hue:        return "hue";
+        case kPictureAttribute_None:
+        case kPictureAttribute_Range:
+        case kPictureAttribute_Volume:
+        case kPictureAttribute_MAX:        break;
     }
-
-    return ret;
+    return "";
 }
 
-inline QString toString(PictureAttributeSupported supported)
+inline QString toString(PictureAttributeSupported Supported)
 {
     QStringList list;
-
-    if (kPictureAttributeSupported_Brightness & supported)
+    if (kPictureAttributeSupported_Brightness & Supported)
         list += "Brightness";
-    if (kPictureAttributeSupported_Contrast & supported)
+    if (kPictureAttributeSupported_Contrast & Supported)
         list += "Contrast";
-    if (kPictureAttributeSupported_Colour & supported)
+    if (kPictureAttributeSupported_Colour & Supported)
         list += "Colour";
-    if (kPictureAttributeSupported_Hue & supported)
+    if (kPictureAttributeSupported_Hue & Supported)
         list += "Hue";
-    if (kPictureAttributeSupported_Range & supported)
+    if (kPictureAttributeSupported_Range & Supported)
         list += "Range";
-    if (kPictureAttributeSupported_Volume & supported)
+    if (kPictureAttributeSupported_Volume & Supported)
         list += "Volume";
     return list.join(",");
 }
 
-inline PictureAttributeSupported toMask(PictureAttribute pictureattribute)
+inline PictureAttributeSupported toMask(PictureAttribute PictureAttribute)
 {
-    PictureAttributeSupported ret = kPictureAttributeSupported_None;
-    switch (pictureattribute)
+    switch (PictureAttribute)
     {
-        case kPictureAttribute_None: break;
-        case kPictureAttribute_Brightness:
-            ret = kPictureAttributeSupported_Brightness; break;
-        case kPictureAttribute_Contrast:
-            ret = kPictureAttributeSupported_Contrast; break;
-        case kPictureAttribute_Colour:
-            ret = kPictureAttributeSupported_Colour; break;
-        case kPictureAttribute_Hue:
-            ret = kPictureAttributeSupported_Hue; break;
-        case kPictureAttribute_Range:
-            ret = kPictureAttributeSupported_Range; break;
-        case kPictureAttribute_Volume:
-            ret = kPictureAttributeSupported_Volume; break;
-        case kPictureAttribute_MAX: break;
+        case kPictureAttribute_Brightness: return kPictureAttributeSupported_Brightness;
+        case kPictureAttribute_Contrast:   return kPictureAttributeSupported_Contrast;
+        case kPictureAttribute_Colour:     return kPictureAttributeSupported_Colour;
+        case kPictureAttribute_Hue:        return kPictureAttributeSupported_Hue;
+        case kPictureAttribute_Range:      return kPictureAttributeSupported_Range;
+        case kPictureAttribute_Volume:     return kPictureAttributeSupported_Volume;
+        case kPictureAttribute_None:
+        case kPictureAttribute_MAX:        break;
     }
-    return ret;
+    return kPictureAttributeSupported_None;
 }
 
-inline PictureAttribute next(PictureAttributeSupported supported,
-                             PictureAttribute          attribute)
+inline PictureAttribute next(PictureAttributeSupported Supported,
+                             PictureAttribute          Attribute)
 {
-    int i = ((int) attribute + 1) % (int) kPictureAttribute_MAX;
-    for (int j = 0; j < kPictureAttribute_MAX;
-         (i = (i+1) % kPictureAttribute_MAX), j++)
-    {
-        if (toMask((PictureAttribute) i) & supported)
-            return (PictureAttribute) i;
-    }
+    int i = static_cast<int>(Attribute + 1) % static_cast<int>(kPictureAttribute_MAX);
+    for (int j = 0; j < kPictureAttribute_MAX; (i = (i +1 ) % kPictureAttribute_MAX), j++)
+        if (toMask(static_cast<PictureAttribute>(i)) & Supported)
+            return static_cast<PictureAttribute>(i);
     return kPictureAttribute_None;
 }
 
-#endif // _VIDEOOUT_TYPES_H_
+#endif // VIDEOOUT_TYPES_H_
