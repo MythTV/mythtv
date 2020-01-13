@@ -44,6 +44,8 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     static const ColourPrimaries kBT610_525;
     static const ColourPrimaries kBT610_625;
     static const ColourPrimaries kBT2020;
+    static bool  Similar(const ColourPrimaries &First, const ColourPrimaries &Second,
+                         float Fuzz);
 
   public slots:
     int   SetPictureAttribute(PictureAttribute Attribute, int Value);
@@ -66,7 +68,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  Update(void);
     void  Debug(void);
     QMatrix4x4 GetPrimaryConversion(int Source, int Dest);
-    static void GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma);
+    static ColourPrimaries GetPrimaries(int Primary, float &Gamma);
     static QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
 
   private:
@@ -85,13 +87,13 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     bool              m_updatesDisabled        { true };
     int               m_colourShifted          { 0 };
     int               m_colourTransfer         { AVCOL_TRC_BT709 };
-    PrimariesMode     m_primariesMode          { PrimariesAuto };
+    PrimariesMode     m_primariesMode          { PrimariesRelaxed };
     int               m_colourPrimaries        { AVCOL_PRI_BT709 };
     int               m_displayPrimaries       { AVCOL_PRI_BT709 };
     float             m_colourGamma            { 2.2F };
     float             m_displayGamma           { 2.2F };
     QMatrix4x4        m_primaryMatrix          { };
-    float             m_customDisplayGamma     { 2.2F };
+    float             m_customDisplayGamma     { 0.0F };
     ColourPrimaries  *m_customDisplayPrimaries { nullptr };
     VideoColourSpace *m_parent                 { nullptr };
 };

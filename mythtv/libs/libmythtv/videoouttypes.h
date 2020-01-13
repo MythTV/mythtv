@@ -1,5 +1,3 @@
-// -*- Mode: c++ -*-
-
 #ifndef _VIDEOOUT_TYPES_H_
 #define _VIDEOOUT_TYPES_H_
 
@@ -129,9 +127,30 @@ enum StereoscopicMode
 enum PrimariesMode
 {
     PrimariesDisabled = 0,
-    PrimariesAuto,
-    PrimariesAlways
+    PrimariesRelaxed,
+    PrimariesExact
 };
+
+inline QString toUserString(PrimariesMode Mode)
+{
+    if (PrimariesMode::PrimariesDisabled == Mode) return QObject::tr("Disabled");
+    if (PrimariesMode::PrimariesExact == Mode)    return QObject::tr("Exact");
+    return QObject::tr("Auto");
+}
+
+inline QString toDBString(PrimariesMode Mode)
+{
+    if (Mode == PrimariesDisabled) return "disabled";
+    if (Mode == PrimariesExact)    return "exact";
+    return "auto";
+}
+
+inline PrimariesMode toPrimariesMode(QString Mode)
+{
+    if (Mode == "disabled") return PrimariesDisabled;
+    if (Mode == "exact")    return PrimariesExact;
+    return PrimariesRelaxed;
+}
 
 inline QString StereoscopictoString(StereoscopicMode mode)
 {

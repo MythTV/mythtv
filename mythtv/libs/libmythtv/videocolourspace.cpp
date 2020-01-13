@@ -77,6 +77,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         m_dbSettings[kPictureAttribute_Colour]     = gCoreContext->GetNumSetting("PlaybackColour",     50);
         m_dbSettings[kPictureAttribute_Hue]        = gCoreContext->GetNumSetting("PlaybackHue",        0);
         m_dbSettings[kPictureAttribute_Range]      = gCoreContext->GetBoolSetting("GUIRGBLevels",      true);
+        m_primariesMode = toPrimariesMode(gCoreContext->GetSetting("ColourPrimariesMode", "auto"));
     }
 
     SetBrightness(m_dbSettings[kPictureAttribute_Brightness]);
@@ -89,12 +90,23 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         MythDisplay* display = MythDisplay::AcquireRelease();
         MythEDID& edid = display->GetEDID();
         // We assume sRGB/Rec709 by default
-        if (edid.Valid() && !edid.IsSRGB())
+        bool custom   = edid.Valid() && !edid.IsSRGB();
+        bool likesrgb = custom && edid.IsLikeSRGB() && m_primariesMode != PrimariesExact;
+        if (custom)
         {
-            m_customDisplayGamma = edid.Gamma();
-            m_customDisplayPrimaries = new ColourPrimaries;
-            MythEDID::Primaries displayprimaries = edid.ColourPrimaries();
-            memcpy(m_customDisplayPrimaries, &displayprimaries, sizeof(ColourPrimaries));
+            // Use sRGB if we don't want exact matching (i.e. close is good enough)
+            // and the display primaries are similar to sRGB.
+            if (likesrgb && qFuzzyCompare(edid.Gamma() + 1.0F, 2.2F + 1.0F))
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "sRGB primaries preferred as close match to display primaries");
+            }
+            else
+            {
+                m_customDisplayGamma = edid.Gamma();
+                m_customDisplayPrimaries = new ColourPrimaries;
+                MythEDID::Primaries displayprimaries = edid.ColourPrimaries();
+                memcpy(m_customDisplayPrimaries, &displayprimaries, sizeof(ColourPrimaries));
+            }
         }
         MythDisplay::AcquireRelease(false);
     }
@@ -483,49 +495,66 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
 
 QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 {
-    QMatrix4x4 result; // identity
+    // Default to identity
+    QMatrix4x4 result;
+
+    // User isn't interested in quality
+    if (PrimariesDisabled == m_primariesMode)
+        return result;
+
     auto source = static_cast<AVColorPrimaries>(Source);
     auto dest   = static_cast<AVColorPrimaries>(Dest);
-    auto force  = m_customDisplayPrimaries != nullptr;
+    auto custom = m_customDisplayPrimaries != nullptr || m_customDisplayGamma > 0.0F;
 
-    if (!force && ((source == dest) || (m_primariesMode == PrimariesDisabled)))
+    // No-op
+    if (!custom && (source == dest))
         return result;
 
-    ColourPrimaries srcprimaries {};
-    ColourPrimaries dstprimaries {};
-    GetPrimaries(source, srcprimaries, m_colourGamma);
-    GetPrimaries(dest,   dstprimaries, m_displayGamma);
-
-    // Auto will only enable if there is a significant difference between source
-    // and destination. Most people will not notice the difference bt709 and bt610 etc
-    // and we avoid extra GPU processing.
-    // BT2020 is currently the main target - which is easily differentiated by its gamma.
-    if (!force && (m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F))
-        return result;
-
-    // Use the display's chromaticities if not sRGB
-    if (force)
+    ColourPrimaries srcprimaries = GetPrimaries(source, m_colourGamma);
+    ColourPrimaries dstprimaries = GetPrimaries(dest, m_displayGamma);
+    if (custom)
     {
-        dstprimaries = *m_customDisplayPrimaries;
+        dstprimaries   = *m_customDisplayPrimaries;
         m_displayGamma = m_customDisplayGamma;
+    }
+
+    // If 'exact' is not requested and the primaries and gamma are similar, then
+    // ignore. Note: 0.021F should cover any differences between Rec.709/sRGB and Rec.610
+    if ((m_primariesMode == PrimariesRelaxed) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F) &&
+        Similar(srcprimaries, dstprimaries, 0.021F))
+    {
+        return result;
     }
 
     return (RGBtoXYZ(srcprimaries) * RGBtoXYZ(dstprimaries).inverted());
 }
 
-void VideoColourSpace::GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma)
+VideoColourSpace::ColourPrimaries VideoColourSpace::GetPrimaries(int Primary, float &Gamma)
 {
     auto primary = static_cast<AVColorPrimaries>(Primary);
     Gamma = 2.2F;
     switch (primary)
     {
         case AVCOL_PRI_BT470BG:
-        case AVCOL_PRI_BT470M:    Out = kBT610_625; return;
+        case AVCOL_PRI_BT470M:    return kBT610_625;
         case AVCOL_PRI_SMPTE170M:
-        case AVCOL_PRI_SMPTE240M: Out = kBT610_525; return;
-        case AVCOL_PRI_BT2020:    Out = kBT2020; Gamma = 2.4F; return;
-        default: Out = kBT709; return;
+        case AVCOL_PRI_SMPTE240M: return kBT610_525;
+        case AVCOL_PRI_BT2020:    Gamma = 2.4F; return kBT2020;
+        default: return kBT709;
     }
+}
+
+bool VideoColourSpace::Similar(const ColourPrimaries &First, const ColourPrimaries &Second, float Fuzz)
+{
+    auto cmp = [=](float One, float Two) { return (abs(One - Two) < Fuzz); };
+    return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
+           cmp(First.primaries[0][1], Second.primaries[0][1]) &&
+           cmp(First.primaries[1][0], Second.primaries[1][0]) &&
+           cmp(First.primaries[1][1], Second.primaries[1][1]) &&
+           cmp(First.primaries[2][0], Second.primaries[2][0]) &&
+           cmp(First.primaries[2][1], Second.primaries[2][1]) &&
+           cmp(First.whitepoint[0],   Second.whitepoint[0])   &&
+           cmp(First.whitepoint[1],   Second.whitepoint[1]);
 }
 
 inline float CalcBy(const float p[3][2], const float w[2])
