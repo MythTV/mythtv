@@ -69,6 +69,22 @@ static HostSpinBoxSetting *AudioReadAhead()
     return gc;
 }
 
+static HostComboBoxSetting *ColourPrimaries()
+{
+    auto *gc = new HostComboBoxSetting("ColourPrimariesMode");
+    gc->setLabel(PlaybackSettings::tr("Primary colourspace conversion"));
+    gc->addSelection(toUserString(PrimariesRelaxed),  toDBString(PrimariesRelaxed));
+    gc->addSelection(toUserString(PrimariesExact),    toDBString(PrimariesExact));
+    gc->addSelection(toUserString(PrimariesDisabled), toDBString(PrimariesDisabled));
+    gc->setHelpText(PlaybackSettings::tr(
+        "Converting between different primary colourspaces incurs a small "
+        "performance penalty but in some situations the difference in output is "
+        "barely noticeable. The default ('Auto') behavour is to only enforce "
+        "this converion when there is a significant difference between source "
+        "colourspace primaries and the display."));
+    return gc;
+}
+
 static HostCheckBoxSetting *ChromaUpsampling()
 {
     auto *gc = new HostCheckBoxSetting("ChromaUpsamplingFilter");
@@ -4199,6 +4215,7 @@ void PlaybackSettings::Load(void)
     advanced->setLabel(tr("Advanced Playback Settings"));
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
+    advanced->addChild(ColourPrimaries());
     advanced->addChild(ChromaUpsampling());
 #ifdef USING_VAAPI
     advanced->addChild(VAAPIDevice());
