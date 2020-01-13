@@ -124,7 +124,7 @@ bool CetonRTSP::ProcessRequest(
     QRegExp firstLineRegex(
         "^RTSP/1.0 (\\d+) ([^\r\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
     QRegExp headerRegex(
-        "^([^:]+):\\s*([^\\r\\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
+        R"(^([^:]+):\s*([^\r\n]+))", Qt::CaseSensitive, QRegExp::RegExp2);
     QRegExp blankLineRegex(
         "^[\\r\\n]*$", Qt::CaseSensitive, QRegExp::RegExp2);
 

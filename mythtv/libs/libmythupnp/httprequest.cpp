@@ -721,7 +721,7 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
 
     QTextStream stream( &m_response );
 
-    stream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+    stream << R"(<?xml version="1.0" encoding="utf-8"?>)";
 
     QString sWhere = ( bServerError ) ? "s:Server" : "s:Client";
 

@@ -297,7 +297,7 @@ static UPnpCDSClientException clientExceptions[] = {
     // Sony Blu-ray players
     { CDS_ClientSonyDB,
       "X-AV-Client-Info",
-      "cn=\"Sony Corporation\"; mn=\"Blu-ray Disc Player\"" },
+      R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")" },
 };
 static uint clientExceptionCount = sizeof(clientExceptions) /
                                    sizeof(clientExceptions[0]);

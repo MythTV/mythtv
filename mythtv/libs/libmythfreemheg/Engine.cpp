@@ -1188,7 +1188,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
 bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 {
     QString csFeat = QString::fromUtf8((const char *)feature.Bytes(), feature.Size());
-    QStringList strings = csFeat.split(QRegExp("[\\(\\,\\)]"));
+    QStringList strings = csFeat.split(QRegExp(R"([\(\,\)])"));
 
     MHLOG(MHLogNotifications, "NOTE GetEngineSupport " + csFeat);
 

@@ -209,7 +209,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         // word characters and numbers, _ and $
         // They must not start with a number - to simplify the regexp, we
         // restrict the first character to the English alphabet
-        QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
+        QRegExp validChars = QRegExp(R"(^([a-zA-Z]|_|\$)(\w|\$)+$)");
 
         QVariantMap params;
         QString prevArrayName = "";

@@ -131,7 +131,7 @@ bool PList::ToXML(QIODevice *device)
     xml.setAutoFormatting(true);
     xml.setAutoFormattingIndent(4);
     xml.writeStartDocument();
-    xml.writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+    xml.writeDTD(R"(<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">)");
     xml.writeStartElement("plist");
     xml.writeAttribute("version", "1.0");
     bool success = ToXML(m_result, xml);

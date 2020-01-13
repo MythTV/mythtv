@@ -5046,14 +5046,14 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 QString speed = tokens[2].left(tokens[2].length()-1);
                 tmpSpeed = speed.toFloat(&ok);
             }
-            else if (tokens[2].contains(QRegExp("^\\-*\\d*\\.\\d+x$")))
+            else if (tokens[2].contains(QRegExp(R"(^\-*\d*\.\d+x$)")))
             {
                 QString speed = tokens[2].left(tokens[2].length() - 1);
                 tmpSpeed = speed.toFloat(&ok);
             }
             else
             {
-                QRegExp re = QRegExp("^(\\-*\\d+)\\/(\\d+)x$");
+                QRegExp re = QRegExp(R"(^(\-*\d+)\/(\d+)x$)");
                 if (tokens[2].contains(re))
                 {
                     QStringList matches = re.capturedTexts();

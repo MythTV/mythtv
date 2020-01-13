@@ -155,7 +155,7 @@ static bool read_time_zone_id(const QString& filename, QString& zone_id)
             QString line;
             QTextStream in(&file);
             // Handle whitespace and quotes
-            QRegExp re("^(?:ZONE\\s*=)?\\s*(['\"]?)([\\w\\s/-\\+]+)\\1\\s*(?:#.*)?$");
+            QRegExp re(R"(^(?:ZONE\s*=)?\s*(['"]?)([\w\s/-\+]+)\1\s*(?:#.*)?$)");
             re.setPatternSyntax(QRegExp::RegExp2);
             while (!in.atEnd())
             {

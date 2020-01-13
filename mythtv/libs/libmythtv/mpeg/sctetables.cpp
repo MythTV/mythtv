@@ -38,13 +38,13 @@ QString CarrierDefinitionSubtable::toStringXML(uint indent_level) const
         .arg(DescriptorsCount());
     str += QString("number_of_carriers=\"%1\"").arg(NumberOfCarriers());
     str += "\n" + indent_1;
-    str += QString("spacing_unit=\"%1\" spacing_unit_hz=\"%2\"")
+    str += QString(R"(spacing_unit="%1" spacing_unit_hz="%2")")
         .arg(SpacingUnit()).arg(SpacingUnitHz());
     str += "\n" + indent_1;
-    str += QString("frequency_spacing=\"%1\" frequency_spacing_hz=\"%2\"")
+    str += QString(R"(frequency_spacing="%1" frequency_spacing_hz="%2")")
         .arg(FrequencySpacing()).arg(FrequencySpacingHz());
     str += "\n" + indent_1;
-    str += QString("frequency_unit=\"%1\" frequency_unit_hz=\"%2\"")
+    str += QString(R"(frequency_unit="%1" frequency_unit_hz="%2")")
         .arg(FrequencyUnit()).arg(FrequencyUnitHz());
     str += "\n" + indent_1;
     str += QString("first_carrier_frequency=\"%1\" "
@@ -139,10 +139,10 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
         QString("<ModulationMode descriptors_count=\"%2\"")
         .arg(DescriptorsCount());
     str += "\n" + indent_1;
-    str += QString("transmission_system=\"%1\" transmission_system_desc=\"%2\"")
+    str += QString(R"(transmission_system="%1" transmission_system_desc="%2")")
         .arg(TransmissionSystem()).arg(TransmissionSystemString());
     str += "\n" + indent_1;
-    str += QString("inner_coding_mode=\"%1\" inner_coding_mode_desc=\"%2\"")
+    str += QString(R"(inner_coding_mode="%1" inner_coding_mode_desc="%2")")
         .arg(InnerCodingMode()).arg(InnerCodingModeString());
     str += "\n" + indent_1;
     str += QString("split_bitstream_mode=\"%1\" ")
@@ -396,7 +396,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
     str += QString("splice=\"%1\" ")
         .arg(xml_bool_to_string(Splice()));
     str += "\n" + indent_1;
-    str += QString("activation_time=\"%1\" actication_time_desc=\"%2\"")
+    str += QString(R"(activation_time="%1" actication_time_desc="%2")")
         .arg(ActivationTimeRaw())
         .arg(ActivationTimeUTC().toString(Qt::ISODate));
     str += ">\n";
@@ -411,10 +411,10 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
             .arg(xml_bool_to_string(ApplicationVirtualChannel(i)));
         str += QString("path_select=\"%1\" ").arg(PathSelect(i));
         str += "\n" + indent_2;
-        str += QString("transport_type=\"%1\" transport_type_desc=\"%2\" ")
+        str += QString(R"(transport_type="%1" transport_type_desc="%2" )")
             .arg(TransportType(i)).arg(TransportTypeString(i));
         str += "\n" + indent_2;
-        str += QString("channel_type=\"%1\" channel_type_desc=\"%2\" ")
+        str += QString(R"(channel_type="%1" channel_type_desc="%2" )")
             .arg(ChannelType(i)).arg(ChannelTypeString(i));
         if (ApplicationVirtualChannel(i))
             str += QString("application_id=\"%1\" ").arg(ApplicationID(i));
@@ -432,7 +432,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
             str += QString("cds_reference=\"%1\" ").arg(CDSReference(i));
             str += QString("scrampled=\"%1\" ").arg(Scrambled(i));
             str += "\n" + indent_2;
-            str += QString("video_standard=\"%1\" video_standard_desc=\"%2\" ")
+            str += QString(R"(video_standard="%1" video_standard_desc="%2" )")
                 .arg(VideoStandard(i)).arg(VideoStandardString(i));
         }
         if (!DescriptorsIncluded())
@@ -504,7 +504,7 @@ QString ShortVirtualChannelTable::toStringXML(uint indent_level) const
         QString("<ShortVirtualChannelSection vct_id=\"%1\" ").arg(ID());
     str += QString("transmission_medium=\"%1\" ").arg(TransmissionMedium());
     str += "\n" + indent_1;
-    str += QString("table_subtype=\"%1\" table_subtype_desc=\"%2\"")
+    str += QString(R"(table_subtype="%1" table_subtype_desc="%2")")
         .arg(TableSubtype()).arg(TableSubtypeString());
     str += "\n" + indent_1 + PSIPTable::XMLValues(indent_level + 1) + ">\n";
 

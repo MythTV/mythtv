@@ -2084,7 +2084,7 @@ void CetonDeviceID::Load(void)
 
 void CetonDeviceID::UpdateValues(void)
 {
-    QRegExp newstyle("^([0-9.]+)-(\\d|RTP)\\.(\\d)$");
+    QRegExp newstyle(R"(^([0-9.]+)-(\d|RTP)\.(\d)$)");
     if (newstyle.exactMatch(getValue()))
     {
         emit LoadedIP(newstyle.cap(1));

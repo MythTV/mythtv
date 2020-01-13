@@ -1087,7 +1087,7 @@ QDateTime Parse::FromRFC3339(const QString& t)
             result = result.addMSecs(fractional);
         }
     }
-    QRegExp timeZone("(\\+|\\-)(\\d\\d)(:)(\\d\\d)$");
+    QRegExp timeZone(R"((\+|\-)(\d\d)(:)(\d\d)$)");
     if (timeZone.indexIn(t) > -1)
     {
         short int multiplier = -1;

@@ -788,13 +788,13 @@ QString PSIPTable::XMLValues(uint indent_level) const
     QString indent = xml_indent(indent_level);
 
     QString str = QString(
-        "table_id=\"0x%1\" length=\"%2\"")
+        R"(table_id="0x%1" length="%2")")
         .arg(TableID(), 2, 16, QChar('0'))
         .arg(Length());
 
     if (HasSectionNumber())
     {
-        str += QString(" section=\"%4\" last_section=\"%5\"")
+        str += QString(R"( section="%4" last_section="%5")")
             .arg(Section()).arg(LastSection());
     }
 

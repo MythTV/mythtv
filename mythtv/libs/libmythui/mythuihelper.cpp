@@ -860,7 +860,7 @@ void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor
 void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 {
     QRegExp     sre("^(\\d+)x(\\d+)$");
-    QRegExp     lre("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
+    QRegExp     lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
     QStringList geo;
     bool        longForm = false;
 
