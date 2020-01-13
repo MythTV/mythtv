@@ -4817,7 +4817,7 @@ int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
     uint64_t pos = m_totalFrames;
 
     if (IsWatchingInprogress())
-        pos = (uint64_t)-1;
+        pos = UINT64_MAX;
 
     return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
 }
@@ -5055,7 +5055,7 @@ uint64_t MythPlayer::TranslatePositionFrameToMs(uint64_t position,
                                                 bool use_cutlist) const
 {
     float frameRate = GetFrameRate();
-    if (position == (uint64_t)-1 &&
+    if (position == UINT64_MAX &&
         m_playerCtx->m_recorder && m_playerCtx->m_recorder->IsValidRecorder())
     {
         float recorderFrameRate = m_playerCtx->m_recorder->GetFrameRate();

@@ -141,7 +141,7 @@ class LoggingItem: public QObject, public ReferenceCounter
   protected:
     int                 m_pid        {-1};
     qlonglong           m_tid        {-1};
-    qulonglong          m_threadId   {(qulonglong)-1};
+    qulonglong          m_threadId   {UINT64_MAX};
     uint                m_usec       {0};
     int                 m_line       {0};
     LoggingType         m_type       {kMessage};

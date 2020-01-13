@@ -553,11 +553,11 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
 
     m_fragmentSize = (m_sampleRate * 25 * m_outputBytesPerFrame) / 1000;
 
-    m_bufferSettings.maxlength   = (uint32_t)-1;
+    m_bufferSettings.maxlength   = UINT32_MAX;
     m_bufferSettings.tlength     = m_fragmentSize * 4;
-    m_bufferSettings.prebuf      = (uint32_t)-1;
-    m_bufferSettings.minreq      = (uint32_t)-1;
-    m_bufferSettings.fragsize    = (uint32_t) -1;
+    m_bufferSettings.prebuf      = UINT32_MAX;
+    m_bufferSettings.minreq      = UINT32_MAX;
+    m_bufferSettings.fragsize    = UINT32_MAX;
 
     int flags = PA_STREAM_INTERPOLATE_TIMING
         | PA_STREAM_ADJUST_LATENCY

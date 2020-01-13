@@ -481,7 +481,7 @@ static void _update_textst_timer(BLURAY *bd)
             gc_run(bd->graphics_controller, GC_CTRL_PG_UPDATE, bd->gc_wakeup_time, &cmds);
 
             bd->gc_wakeup_time = cmds.wakeup_time;
-            bd->gc_wakeup_pos = (uint64_t)(int64_t)-1; /* no wakeup */
+            bd->gc_wakeup_pos = UINT64_MAX; /* no wakeup */
 
             /* next event in this clip ? */
             if (cmds.wakeup_time >= bd->st0.clip->in_time && cmds.wakeup_time < bd->st0.clip->out_time) {
@@ -1538,7 +1538,7 @@ static void _find_next_playmark(BLURAY *bd)
     unsigned ii;
 
     bd->next_mark = -1;
-    bd->next_mark_pos = (uint64_t)-1;
+    bd->next_mark_pos = UINT64_MAX;
     for (ii = 0; ii < bd->title->mark_list.count; ii++) {
         uint64_t pos = (uint64_t)bd->title->mark_list.mark[ii].title_pkt * 192L;
         if (pos > bd->s_pos) {
@@ -1564,7 +1564,7 @@ static void _playmark_reached(BLURAY *bd)
         bd->next_mark_pos = (uint64_t)bd->title->mark_list.mark[bd->next_mark].title_pkt * 192L;
     } else {
         bd->next_mark = -1;
-        bd->next_mark_pos = (uint64_t)-1;
+        bd->next_mark_pos = UINT64_MAX;
     }
 
     /* chapter tracking */

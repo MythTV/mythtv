@@ -580,7 +580,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             {
                 OpenTVChannelListDescriptor opentvChannelList(otv_chan_list);
 
-                uint64_t regionMask = (uint64_t)-1;
+                uint64_t regionMask = UINT64_MAX;
                 if (opentvChannelList.RegionID() > 0 && opentvChannelList.RegionID() < 32)
                     regionMask = ((uint64_t)1) << opentvChannelList.RegionID();
 
