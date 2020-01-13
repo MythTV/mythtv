@@ -1213,6 +1213,7 @@ void FormattedTextSubtitle608::Layout(void)
 
     // Shift Y coordinates back up into the safe area.
     int shift = min(firstY, max(0, prevY - safeHeight));
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_lines.size(); i++)
         m_lines[i].m_yIndent -= shift;
 

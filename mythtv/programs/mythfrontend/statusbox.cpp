@@ -1472,16 +1472,16 @@ void StatusBox::doDisplayStatus()
         m_justHelpText->SetText(displayhelp);
 
     QStringList desc = MythDisplay::GetDescription();
-    for (auto it = desc.cbegin(); it != desc.cend(); ++it)
-        AddLogLine(*it);
+    foreach (const auto & line, desc)
+        AddLogLine(line);
     AddLogLine("");
 
     MythRender* render = GetMythMainWindow()->GetRenderDevice();
     if (render)
     {
         desc = render->GetDescription();
-        for (auto it = desc.cbegin(); it != desc.cend(); ++it)
-            AddLogLine(*it);
+        foreach (const auto & line, desc)
+            AddLogLine(line);
     }
 }
 

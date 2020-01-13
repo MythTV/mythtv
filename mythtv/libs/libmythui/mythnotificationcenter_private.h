@@ -252,11 +252,11 @@ public:
 
     void CheckDeletes()
     {
-        for (auto it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
+        foreach (auto & screen, m_ToDelete)
         {
-            (*it)->SetAlpha(0);
-            (*it)->SetVisible(false);
-            (*it)->Close();
+            screen->SetAlpha(0);
+            screen->SetVisible(false);
+            screen->Close();
         }
         MythScreenStack::CheckDeletes();
     }

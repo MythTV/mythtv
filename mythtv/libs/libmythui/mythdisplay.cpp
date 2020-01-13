@@ -134,23 +134,23 @@ QStringList MythDisplay::GetDescription(void)
     QScreen *current = display->GetCurrentScreen();
     QList<QScreen*> screens = qGuiApp->screens();
     bool first = true;
-    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
+    foreach (auto screen, screens)
     {
         if (!first)
             result.append("");
         first = false;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-        QString id = QString("(%1)").arg((*it)->manufacturer());
+        QString id = QString("(%1)").arg(screen->manufacturer());
 #else
         QString id;
 #endif
-        if ((*it) == current && !spanall)
-            result.append(tr("Current screen %1 %2:").arg((*it)->name()).arg(id));
+        if (screen == current && !spanall)
+            result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
         else
-            result.append(tr("Screen %1 %2:").arg((*it)->name()).arg(id));
+            result.append(tr("Screen %1 %2:").arg(screen->name()).arg(id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
-                .arg((*it)->physicalSize().width()).arg((*it)->physicalSize().height()));
-        if ((*it) == current && !spanall)
+                .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
+        if (screen == current && !spanall)
         {
             result.append(tr("Aspect ratio") + QString("\t: %1")
                     .arg(display->GetAspectRatio(), 0, 'f', 3));
@@ -525,12 +525,12 @@ void MythDisplay::Initialise(void)
 void MythDisplay::InitScreenBounds(void)
 {
     QList<QScreen*> screens = qGuiApp->screens();
-    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
+    for (auto screen : screens)
     {
-        QRect dim = (*it)->geometry();
-        QString extra = MythDisplay::GetExtraScreenInfo(*it);
+        QRect dim = screen->geometry();
+        QString extra = MythDisplay::GetExtraScreenInfo(screen);
         LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1: %2x%3 %4")
-            .arg((*it)->name()).arg(dim.width()).arg(dim.height()).arg(extra));
+            .arg(screen->name()).arg(dim.width()).arg(dim.height()).arg(extra));
     }
 
     QScreen *primary = qGuiApp->primaryScreen();
