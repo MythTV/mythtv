@@ -261,7 +261,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
                cmp(First.whitepoint[1],   Second.whitepoint[1]);
     };
 
-    m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F);
+    m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F) && qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
     for (int i = 0; i < 5; ++i)
