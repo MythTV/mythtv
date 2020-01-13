@@ -256,7 +256,10 @@ void TransportListEditor::Load()
             QString tid = query.value(5).toUInt() ?
                 QString("tid %1").arg(query.value(5).toUInt(), 5) : "";
 
-            QString hz = (CardUtil::QPSK == m_cardtype) ? "kHz" : "Hz";
+            QString hz = "Hz";
+            if (CardUtil::QPSK == m_cardtype ||
+                CardUtil::DVBS2 == m_cardtype)
+                hz = "kHz";
 
             QString type = "";
             if (CardUtil::OFDM == m_cardtype)
