@@ -2268,7 +2268,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
     m_parent(a_parent),
-    m_info(new TransTextEditSetting())
+    m_info(new GroupSetting())
 {
     setVisible(false);
     auto *device = new CommandPath(m_parent);
@@ -2279,7 +2279,6 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("EXTERNAL", device);
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("EXTERNAL", m_info);
 
     a_cardtype.addTargetedChild("EXTERNAL",
@@ -2317,6 +2316,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     }
 
     m_info->setValue(ci);
+    m_info->setHelpText(ci);
 }
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 
