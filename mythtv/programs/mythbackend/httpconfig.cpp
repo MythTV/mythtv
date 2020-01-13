@@ -107,7 +107,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
     }
     else if (request->m_sMethod == "Settings")
     {
-        QString result = "{ \"Error\": \"Unknown Settings List\" }";
+        QString result = R"({ "Error": "Unknown Settings List" })";
         QString fn = GetShareDir() + "backend-config/";
 
         if (request->m_sBaseUrl == "/Config/Database")
@@ -217,17 +217,17 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                                                         storageGroup);
                     if (entry.startsWith("sgdir::"))
                     {
-                        os << "    <li class=\"directory collapsed\"><a href=\"#\" rel=\""
+                        os << R"(    <li class="directory collapsed"><a href="#" rel=")"
                            << path << "/\">" << parts[1] << "</a></li>\r\n";
                     }
                     else if (entry.startsWith("dir::"))
                     {
-                        os << "    <li class=\"directory collapsed\"><a href=\"#\" rel=\""
+                        os << R"(    <li class="directory collapsed"><a href="#" rel=")"
                            << path << "/\">" << fi.fileName() << "</a></li>\r\n";
                     }
                     else if (entry.startsWith("file::"))
                     {
-                        os << "    <li class=\"file ext_" << fi.suffix() << "\"><a href=\"#\" rel=\""
+                        os << "    <li class=\"file ext_" << fi.suffix() << R"("><a href="#" rel=")"
                            << parts[3] << "\">" << fi.fileName() << "</a></li>\r\n";
                     }
                 }
@@ -250,7 +250,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                     if (fi.fileName().startsWith("."))
                         continue;
 
-                    os << "    <li class=\"directory collapsed\"><a href=\"#\" rel=\""
+                    os << R"(    <li class="directory collapsed"><a href="#" rel=")"
                        << fi.absoluteFilePath() << "/\">" << fi.fileName() << "</a></li>\r\n";
                 }
 
@@ -267,7 +267,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                         if (fi.fileName().startsWith("."))
                             continue;
 
-                        os << "    <li class=\"file ext_" << fi.suffix() << "\"><a href=\"#\" rel=\""
+                        os << "    <li class=\"file ext_" << fi.suffix() << R"("><a href="#" rel=")"
                            << fi.absoluteFilePath() << "\">" << fi.fileName() << "</a></li>\r\n";
                     }
                 }
@@ -387,8 +387,8 @@ void HttpConfig::OpenForm(QBuffer &buffer, const QString &form,
     os.setCodec("UTF-8");
 
     os << "  <form id=\"config_form_" << group << "\">\r\n"
-       << "    <input type=\"hidden\" id=\"__config_form_action__\" value=\"" << form << "\" />\r\n"
-       << "    <input type=\"hidden\" id=\"__group__\" value=\"" << group << "\" />\r\n";
+       << R"(    <input type="hidden" id="__config_form_action__" value=")" << form << "\" />\r\n"
+       << R"(    <input type="hidden" id="__group__" value=")" << group << "\" />\r\n";
 }
 
 void HttpConfig::CloseForm(QBuffer &buffer, const QString &group)
@@ -397,7 +397,7 @@ void HttpConfig::CloseForm(QBuffer &buffer, const QString &group)
 
 //    os << "    <div class=\"config_form_submit\"\r\n"
 //       << "         id=\"config_form_submit\">\r\n";
-    os << "      <input type=\"button\" value=\"Save Changes\" onClick=\"javascript:submitConfigForm('" << group << "')\" />\r\n"
+    os << R"(      <input type="button" value="Save Changes" onClick="javascript:submitConfigForm(')" << group << "')\" />\r\n"
 //       << "    </div>\r\n"
        << "  </form>\r\n";
 }

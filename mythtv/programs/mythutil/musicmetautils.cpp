@@ -536,7 +536,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
         gCoreContext->SendMessage(QString("MUSIC_LYRICS_STATUS %1 %2").arg(songID).arg(statusMessage));
 
         QProcess p;
-        p.start(QString("%1 %2 --artist=\"%3\" --album=\"%4\" --title=\"%5\" --filename=\"%6\"")
+        p.start(QString(R"(%1 %2 --artist="%3" --album="%4" --title="%5" --filename="%6")")
                         .arg(PYTHON_EXE).arg(grabber.m_filename).arg(artist).arg(album).arg(title).arg(filename));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();

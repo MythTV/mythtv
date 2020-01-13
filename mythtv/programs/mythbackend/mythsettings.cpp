@@ -728,7 +728,7 @@ bool check_settings(MythSettingList &/*database_settings*/,
         else
             result += ", ";
 
-        result += QString("\"%1\": \"DEBUG: New value for '%2' would be '%3'\"")
+        result += QString(R"("%1": "DEBUG: New value for '%2' would be '%3'")")
                           .arg(it.key()).arg(it.key()).arg(*it);
     }
 

@@ -607,7 +607,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
              (is_abbrev("program", nc->getArg(1))) &&
              (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
              (nc->getArg(3).contains(QRegExp(
-                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
+                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$)"))))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
         {
@@ -834,7 +834,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         else if (is_abbrev("rewind",   nc->getArg(2)) ||
                  is_abbrev("backward", nc->getArg(2)))
             message = "NETWORK_CONTROL SEEK BACKWARD";
-        else if (nc->getArg(2).contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
+        else if (nc->getArg(2).contains(QRegExp(R"(^\d\d:\d\d:\d\d$)")))
         {
             int hours   = nc->getArg(2).mid(0, 2).toInt();
             int minutes = nc->getArg(2).mid(3, 2).toInt();
@@ -854,8 +854,8 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
         QString token2 = nc->getArg(2).toLower();
         if ((token2.contains(QRegExp("^\\-*\\d+x$"))) ||
-            (token2.contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
-            (token2.contains(QRegExp("^\\-*\\d*\\.\\d+x$"))))
+            (token2.contains(QRegExp(R"(^\-*\d+\/\d+x$)"))) ||
+            (token2.contains(QRegExp(R"(^\-*\d*\.\d+x$)"))))
             message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
         else if (is_abbrev("normal", token2))
             message = QString("NETWORK_CONTROL SPEED normal");
@@ -1053,7 +1053,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
              is_abbrev("recording", nc->getArg(1)) &&
              (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
              (nc->getArg(3).contains(QRegExp(
-                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
+                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$)"))))
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
     else if (is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
@@ -1803,7 +1803,7 @@ QString NetworkControl::listChannels(const uint start, const uint limit)
     uint cnt = 0;
     if (maxcnt == 0)    // Feedback we have no usefull information
     {
-        result += QString("0:0 0 \"Invalid\" \"Invalid\"");
+        result += QString(R"(0:0 0 "Invalid" "Invalid")");
         return result;
     }
 

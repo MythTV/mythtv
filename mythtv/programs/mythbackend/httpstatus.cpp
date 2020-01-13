@@ -133,7 +133,7 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
     // UTF-8 is the default, but good practice to specify it anyway
     QDomProcessingInstruction encoding =
         doc.createProcessingInstruction("xml",
-                                        "version=\"1.0\" encoding=\"UTF-8\"");
+                                        R"(version="1.0" encoding="UTF-8")");
     doc.appendChild(encoding);
 
     FillStatusXML( &doc );
