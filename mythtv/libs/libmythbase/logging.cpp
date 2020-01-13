@@ -577,16 +577,12 @@ LoggingItem *LoggingItem::create(QByteArray &buf)
 /// \param  file    Filename of source code logging the message
 /// \param  line    Line number within the source of log message source
 /// \param  function    Function name of the log message source
-/// \param  fromQString true if this message originated from QString
 /// \param  format  printf format string (when not from QString), log message
 ///                 (when from QString)
-/// \param  ...     printf arguments (when not from QString)
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
-                   const char *function, int fromQString,
-                   const char *format, ... )
+                   const char *function,
+                   const char *format)
 {
-    va_list         arguments;
-
     int type = kMessage;
     type |= (mask & VB_FLUSH) ? kFlush : 0;
     type |= (mask & VB_STDIO) ? kStandardIO : 0;
@@ -596,7 +592,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
         return;
 
     char *formatcopy = nullptr;
-    if( fromQString && strchr(format, '%') )
+    if( strchr(format, '%') )
     {
         QString string(format);
         format = strdup(string.replace(logRegExp, "%%").toLocal8Bit()
@@ -604,9 +600,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
         formatcopy = (char *)format;
     }
 
-    va_start(arguments, format);
-    vsnprintf(item->m_message, LOGLINE_MAX, format, arguments);
-    va_end(arguments);
+    strncpy(item->m_message, format, LOGLINE_MAX);
 
     if (formatcopy)
         free(formatcopy);
