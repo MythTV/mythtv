@@ -27,6 +27,9 @@
 #if defined(Q_OS_WIN)
 #include "mythdisplaywindows.h"
 #endif
+#ifdef USING_MMAL
+#include "mythdisplayrpi.h"
+#endif
 
 #define LOC QString("Display: ")
 
@@ -80,6 +83,10 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 #ifdef USING_X11
             if (MythDisplayX11::IsAvailable())
                 s_display = new MythDisplayX11();
+#endif
+#ifdef USING_MMAL
+            if (!s_display)
+                s_display = new MythDisplayRPI();
 #endif
 #ifdef USING_DRM
 #if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
@@ -743,7 +750,7 @@ double MythDisplay::GetAspectRatio(void)
             return aspect;
     }
 
-    // Assume pixel aspect ration is 1
+    // Assume pixel aspect ratio is 1
     if (m_resolution.width() > 0 && m_resolution.height() > 0)
     {
         double aspect = static_cast<double>(m_resolution.width()) / m_resolution.height();

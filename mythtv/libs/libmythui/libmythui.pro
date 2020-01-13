@@ -113,6 +113,15 @@ using_drm {
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
 }
 
+# Use MMAL as a proxy for Raspberry Pi support
+using_mmal {
+    DEFINES += USING_MMAL
+    HEADERS += platforms/mythdisplayrpi.h
+    SOURCES += platforms/mythdisplayrpi.cpp
+    LIBS    += -L/opt/vc/lib -lvchostif -lvchiq_arm
+    QMAKE_CXXFLAGS += -isystem /opt/vc/include
+}
+
 using_qtdbus {
     QT      += dbus
     DEFINES += USING_DBUS
