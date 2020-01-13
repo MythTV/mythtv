@@ -52,8 +52,7 @@
 #define MAX_PTS (0x0000000200000000ULL)
 #define MAX_PTS2 (300* MAX_PTS)
 
-typedef
-struct ps_packet_{
+struct ps_packet {
 	uint8_t scr[6];
 	uint8_t mux_rate[3];
 	uint8_t stuff_length;
@@ -65,11 +64,10 @@ struct ps_packet_{
 	uint8_t video_bound;
 	uint8_t reserved;
 	int npes;
-} ps_packet;
+};
 
 
-typedef
-struct pes_in_s{
+struct pes_in_t {
 	int type;
 	unsigned int found;
 	int withbuf;
@@ -89,7 +87,7 @@ struct pes_in_s{
 	int done;
 	int which;
 	void *priv;
-} pes_in_t;
+};
 
 
 void init_pes_in(pes_in_t *p, int type, ringbuffer *rb, int wi);

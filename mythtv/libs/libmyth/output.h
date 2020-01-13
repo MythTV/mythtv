@@ -46,6 +46,8 @@ class MPUBLIC OutputEvent : public MythEvent
         delete m_errorMsg;
     }
 
+    OutputEvent &operator=(const OutputEvent&) = delete;
+
     const QString *errorMessage() const { return m_errorMsg; }
 
     const long &elapsedSeconds() const { return m_elaspedSeconds; }
@@ -77,7 +79,6 @@ class MPUBLIC OutputEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
-    OutputEvent &operator=(const OutputEvent&) = delete;
 
   private:
     QString       *m_errorMsg        {nullptr};

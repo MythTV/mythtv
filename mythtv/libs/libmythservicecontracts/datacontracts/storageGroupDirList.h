@@ -44,7 +44,7 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            StorageGroupDir *pObject = new StorageGroupDir( this );
+            auto *pObject = new StorageGroupDir( this );
             m_StorageGroupDirs.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

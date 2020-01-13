@@ -84,8 +84,8 @@
 
 /*****************************************************/
 
-typedef double DBL;
-typedef float F_PT;
+using DBL = double;
+using F_PT = float;
 
 /* typedef float               F_PT; */
 
@@ -112,8 +112,8 @@ typedef float F_PT;
 
 #define DBL_To_F_PT(x)  (F_PT)( (DBL)(UNIT)*(x) )
 
-typedef struct Similitude_Struct SIMI;
-typedef struct Fractal_Struct FRACTAL;
+using SIMI = struct Similitude_Struct;
+using FRACTAL = struct Fractal_Struct;
 
 struct Similitude_Struct
 {

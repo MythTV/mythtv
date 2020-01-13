@@ -70,7 +70,7 @@ void V4LRecorder::SetOption(const QString &name, const QString &value)
 
 static void vbi_event(void *data_in, struct vt_event *ev)
 {
-    struct VBIData *data = static_cast<struct VBIData *>(data_in);
+    auto *data = static_cast<struct VBIData *>(data_in);
     switch (ev->type)
     {
        case EV_PAGE:

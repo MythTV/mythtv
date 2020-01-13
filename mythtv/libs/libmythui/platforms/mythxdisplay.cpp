@@ -106,8 +106,8 @@ QSize MythXDisplay::GetDisplaySize(void)
     {
         LOG(VB_GENERAL, LOG_ERR, "X11 ModeLine query failed");
         // Fallback to old display size code - which is not updated for mode switches
-        return QSize(DisplayWidth(m_disp, m_screenNum),
-                     DisplayHeight(m_disp, m_screenNum));
+        return {DisplayWidth(m_disp, m_screenNum),
+                DisplayHeight(m_disp, m_screenNum)};
     }
 
     return { mode.hdisplay, mode.vdisplay };

@@ -32,7 +32,7 @@ lighten (unsigned char value, float power)
 static void
 lightencolor (int *col, float power)
 {
-	unsigned char *color = (unsigned char *) col;
+	auto *color = (unsigned char *) col;
 	*color = lighten (*color, power);
 	color++;
 	*color = lighten (*color, power);
@@ -117,8 +117,8 @@ goom_lines_move (GMLine * l)
 			(l->points2[i].angle + 39.0F * l->points[i].angle) / 40.0F;
 	}
 
-	unsigned char *c1 = (unsigned char *) &l->color;
-	unsigned char *c2 = (unsigned char *) &l->color2;
+	auto *c1 = (unsigned char *) &l->color;
+	auto *c2 = (unsigned char *) &l->color2;
 	for (int i = 0; i < 4; i++) {
 		int cc1 = *c1;
 		int cc2 = *c2;
@@ -161,7 +161,7 @@ goom_lines_init (int rx, int ry,
 	//unsigned char *color;
 	//unsigned char power = 4;
 
-	GMLine *l = (GMLine *) malloc (sizeof (GMLine));
+	auto *l = (GMLine *) malloc (sizeof (GMLine));
 
 	l->points = (GMUnitPointer *) malloc (512 * sizeof (GMUnitPointer));
 	l->points2 = (GMUnitPointer *) malloc (512 * sizeof (GMUnitPointer));

@@ -32,7 +32,7 @@
 
 
 
-typedef struct index_unit_s{
+struct index_unit {
 	uint8_t  active;
 	uint32_t length;
 	uint32_t start;
@@ -49,9 +49,9 @@ typedef struct index_unit_s{
 	uint8_t  err;
 	uint32_t framesize;
 	uint64_t ptsrate;
-} index_unit;
+};
 
-typedef struct extdata_s{
+struct extdata_t {
 	index_unit iu;
 	uint64_t pts;
 	uint64_t pts_off;
@@ -60,7 +60,7 @@ typedef struct extdata_s{
 	int frmperpkt;
 	char language[4];
 	dummy_buffer dbuf;
-} extdata_t;
+};
 
 
 #define NO_ERR    0

@@ -75,7 +75,7 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            ChannelInfo *pObject = new ChannelInfo( this );
+            auto *pObject = new ChannelInfo( this );
             m_ChannelInfos.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

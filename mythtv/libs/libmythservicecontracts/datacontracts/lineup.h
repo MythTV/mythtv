@@ -96,7 +96,7 @@ class SERVICE_PUBLIC LineupList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            Lineup *pObject = new Lineup( this );
+            auto *pObject = new Lineup( this );
             m_Lineups.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

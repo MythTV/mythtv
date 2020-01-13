@@ -9,15 +9,15 @@
 #include "graphic.h"
 #include "goomconfig.h"
 
-typedef struct _GMUNITPOINTER
+struct GMUnitPointer
 {
 	float   x;
 	float   y;
 	float   angle;
-} GMUnitPointer;
+};
 
 // tableau de points
-typedef struct _GMLINE
+struct GMLine
 {
 	GMUnitPointer *points;
 	GMUnitPointer *points2;
@@ -35,7 +35,7 @@ typedef struct _GMLINE
 
 	float   power;
 	float   powinc;
-} GMLine;
+};
 
 // les ID possibles
 #define GML_CIRCLE 0

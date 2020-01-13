@@ -30,7 +30,7 @@ static guint32 *back;
 static guint32 *p1, *p2, *tmp;
 static guint32 cycle;
 
-typedef struct {
+struct GoomState {
 	int m_drawIfs;
 	int m_drawPoints;
 	int m_drawTentacle;
@@ -40,7 +40,7 @@ typedef struct {
 
 	int m_rangeMin;
 	int m_rangeMax;
-} GoomState;
+};
 
 #define STATES_NB 8
 #define STATES_RANGEMAX 510

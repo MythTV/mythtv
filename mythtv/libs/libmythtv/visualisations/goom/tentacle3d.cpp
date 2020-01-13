@@ -64,7 +64,7 @@ lighten (unsigned char value, float power)
 static void
 lightencolor (int *col, float power)
 {
-	unsigned char *color = (unsigned char *) col;
+	auto *color = (unsigned char *) col;
 	*color = lighten (*color, power);
 	color++;
 	*color = lighten (*color, power);

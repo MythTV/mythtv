@@ -6,7 +6,7 @@
 #include "goomconfig.h"
 #include "graphic.h"
 
-typedef struct
+struct ZoomFilterData
 {
 	int     vitesse;					/* 128 = vitesse nule... * * 256 = en arriere * hyper vite.. * * 0 = en avant hype vite. */
 	unsigned char pertedec;
@@ -23,8 +23,7 @@ typedef struct
 																 */
 
 	char    noisify;					/* ajoute un bruit a la transformation */
-}
-ZoomFilterData;
+};
 
 
 #define NORMAL_MODE 0

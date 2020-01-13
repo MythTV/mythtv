@@ -54,7 +54,7 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            TitleInfo *pObject = new TitleInfo( this );
+            auto *pObject = new TitleInfo( this );
             m_TitleInfos.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

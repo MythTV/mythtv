@@ -33,22 +33,22 @@
 
 #define FULL_BUFFER  (-1000)
 #define EMPTY_BUFFER  (-1000)
-	typedef struct ringbuffer {
+	struct ringbuffer {
 		int read_pos;
 		int write_pos;
 		uint32_t size;
 		uint8_t *buffer;
-	} ringbuffer;
+	};
 
 
 #define DBUF_INDEX 10000
 
-	typedef struct dummy_buffer_s {
+	struct dummy_buffer {
 		uint32_t size;
 		uint32_t fill;
 		ringbuffer time_index;
 		ringbuffer data_index;
-	} dummy_buffer;
+	};
 
 
 	int  ring_init (ringbuffer *rbuf, int size);

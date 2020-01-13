@@ -7,13 +7,13 @@
 
 #include "mathtools.h"
 
-typedef struct {
+struct v3d {
 	float x,y,z;
-} v3d;
+};
 
-typedef struct {
+struct v2d {
 	int x,y;
-} v2d;
+};
 
 /* 
  * projete le vertex 3D sur le plan d'affichage

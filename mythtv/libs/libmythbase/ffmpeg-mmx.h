@@ -36,7 +36,7 @@
  * extensions. -- Daniel Kristjansson 2012-12-13
  */
 
-typedef        union {
+union mmx_t {
         unsigned long long      uq;     /* Unsigned Quadword */
         long long               q;      /* Quadword (64-bit) value */
         int                     d[2];   /* 2 Doubleword (32-bit) values */
@@ -46,7 +46,7 @@ typedef        union {
         char                    b[8];   /* 8 Byte (8-bit) values */
         unsigned char           ub[8];  /* 8 Unsigned Byte */
         float                   s[2];   /* Single-precision (32-bit) value */
-} mmx_t;        /* On an 8-byte (64-bit) boundary */
+};        /* On an 8-byte (64-bit) boundary */
 
 
 #define         mmx_i2r(op,imm,reg) \

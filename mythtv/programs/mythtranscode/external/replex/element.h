@@ -83,7 +83,7 @@ enum {
 	NONE=0,AC3, MPEG_AUDIO, LPCM, MAX_TYPES
 };
 
-typedef struct sequence_s{
+struct sequence_t {
 	int set;
 	int ext_set;
 	uint16_t h_size;
@@ -103,10 +103,9 @@ typedef struct sequence_s{
 	uint8_t  pulldown;
 	uint8_t  current_frame;
 	uint8_t  current_tmpref;
-} sequence_t;
+};
 
-typedef
-struct audio_frame_s{
+struct audio_frame_t {
 	int set;
 	int layer;
 	uint32_t bit_rate;
@@ -118,7 +117,7 @@ struct audio_frame_s{
 	uint32_t frametime;
 	uint32_t off;
 	char     language[4];
-} audio_frame_t;
+};
 
 void pts2time(uint64_t pts, uint8_t *buf, int len);
 int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le);

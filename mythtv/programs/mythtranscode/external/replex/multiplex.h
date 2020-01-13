@@ -33,7 +33,7 @@
 #define N_AUDIO 32
 #define N_AC3 8
 
-typedef struct multiplex_s{
+struct multiplex_t {
 	int fd_out;
 #define REPLEX_MPEG2  0
 #define REPLEX_DVD    1
@@ -81,7 +81,7 @@ typedef struct multiplex_s{
 
 	int (*fill_buffers)(void *p, int f);
 	void *priv;
-} multiplex_t;
+};
 
 void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start);
 void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok);
