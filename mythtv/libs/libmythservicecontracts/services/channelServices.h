@@ -160,8 +160,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &UserId,
                                                                    const QString &Password ) = 0;
 
-        virtual int                       FetchChannelsFromSource( const uint SourceId,
-                                                                   const uint CardId,
+        virtual int                       FetchChannelsFromSource( uint       SourceId,
+                                                                   uint       CardId,
                                                                    bool       WaitForFinish ) = 0;
 
         /* Multiplex Methods */
