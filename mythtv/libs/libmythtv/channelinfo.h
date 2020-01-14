@@ -26,9 +26,9 @@ enum ChannelVisibleType
     kChannelNotVisible    = 0,
     kChannelNeverVisible  = -1
 };
-MPUBLIC QString toString(ChannelVisibleType);
-MPUBLIC QString toRawString(ChannelVisibleType);
-MPUBLIC ChannelVisibleType channelVisibleTypeFromString(const QString&);
+MPUBLIC QString toString(ChannelVisibleType /*type*/);
+MPUBLIC QString toRawString(ChannelVisibleType /*type*/);
+MPUBLIC ChannelVisibleType channelVisibleTypeFromString(const QString& /*type*/);
 
 class MTV_PUBLIC ChannelInfo
 {

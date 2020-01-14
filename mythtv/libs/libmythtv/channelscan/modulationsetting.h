@@ -84,7 +84,7 @@ class ScanModulationSetting: public TransMythUIComboBoxSetting
 class ScanModulation: public ScanModulationSetting
 {
   public:
-    ScanModulation() : ScanModulationSetting()
+    ScanModulation()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
@@ -97,7 +97,7 @@ class ScanModulation: public ScanModulationSetting
 class ScanConstellation: public ScanModulationSetting
 {
   public:
-    ScanConstellation() : ScanModulationSetting()
+    ScanConstellation()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Constellation"));

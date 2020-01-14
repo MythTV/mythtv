@@ -194,11 +194,15 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     {
         if (channel.m_visible == kChannelVisible ||
             channel.m_visible == kChannelNotVisible)
+        {
             channel.m_visible =
                 (Visible ? kChannelVisible : kChannelNotVisible);
+        }
         else if ((channel.m_visible == kChannelAlwaysVisible && !Visible) ||
                  (channel.m_visible == kChannelNeverVisible && Visible))
+        {
             throw QString("Can't override Always/NeverVisible");
+        }
     }
     if (HAS_PARAM("frequencyid"))
         channel.m_freqId = FrequencyID;

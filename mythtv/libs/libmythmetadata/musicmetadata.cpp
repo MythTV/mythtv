@@ -1097,14 +1097,18 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     int em = (len / 60) % 60;
     int es = len % 60;
     if (eh > 0)
+    {
         metadataMap[prefix + "length"] = QString("%1:%2:%3")
             .arg(eh,1,10)
             .arg(em,2,10,QChar('0'))
             .arg(es,2,10,QChar('0'));
+    }
     else
+    {
         metadataMap[prefix + "length"] = QString("%1:%2")
             .arg(em,2,10,QChar('0'))
             .arg(es,2,10,QChar('0'));
+    }
 
     if (m_lastPlay.isValid())
     {
