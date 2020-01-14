@@ -1542,7 +1542,7 @@ void ChannelImporter::CountChannels(
     new_chan = old_chan = 0;
     for (const auto & transport : transports)
     {
-        for (auto chan : transport.m_channels)
+        for (const auto& chan : transport.m_channels)
         {
             if (IsType(info, chan, type))
             {
