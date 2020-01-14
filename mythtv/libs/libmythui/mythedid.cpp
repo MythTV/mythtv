@@ -250,7 +250,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
 
     auto like = [](const Primaries &First, const Primaries &Second, float Fuzz)
     {
-        auto cmp = [=](float One, float Two) { return (abs(One - Two) < Fuzz); };
+        auto cmp = [=](float One, float Two) { return (qAbs(One - Two) < Fuzz); };
         return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
                cmp(First.primaries[0][1], Second.primaries[0][1]) &&
                cmp(First.primaries[1][0], Second.primaries[1][0]) &&
