@@ -6,7 +6,7 @@
 #include <QWindow>
 
 // MythTV
-#include <mythlogging.h>
+#include "mythlogging.h"
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythdisplay.h"
@@ -157,13 +157,18 @@ QStringList MythDisplay::GetDescription(void)
             result.append(tr("Screen %1 %2:").arg((*it)->name()).arg(id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
                 .arg((*it)->physicalSize().width()).arg((*it)->physicalSize().height()));
-        if ((*it) == current && !spanall)
+        if ((*it) == current)
         {
-            result.append(tr("Aspect ratio") + QString("\t: %1")
-                    .arg(display->GetAspectRatio(), 0, 'f', 3));
-            result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
-                          .arg(display->GetResolution().width()).arg(display->GetResolution().height())
-                          .arg(display->GetRefreshRate(), 0, 'f', 2));
+            QString source;
+            double aspect = display->GetAspectRatio(source);
+            result.append(tr("Aspect ratio") + QString("\t: %1 (%2)")
+                    .arg(aspect, 0, 'f', 3).arg(source));
+            if (!spanall)
+            {
+                result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
+                              .arg(display->GetResolution().width()).arg(display->GetResolution().height())
+                              .arg(display->GetRefreshRate(), 0, 'f', 2));
+            }
         }
     }
     MythDisplay::AcquireRelease(false);
@@ -209,14 +214,14 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     m_widget = MainWindow;
     if (!m_modeComplete)
         UpdateCurrentMode();
-    if (!m_widget)
-        return;
 
     QWindow* oldwindow = m_window;
     if (m_widget)
         m_window = m_widget->windowHandle();
+    else
+        m_window = nullptr;
 
-    if (m_widget != oldwidget)
+    if (m_widget && (m_widget != oldwidget))
         LOG(VB_GENERAL, LOG_INFO, LOC + "Have main widget");
 
     if (m_window && (m_window != oldwindow))
@@ -729,36 +734,80 @@ const vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
 
 /** \brief Returns current screen aspect ratio.
  *
- * If there is an aspect overide in the database that aspect ratio is returned
- * instead of the actual screen aspect ratio and if the physical size of the screen
- * is not valid, use the resolution (and implicitly assume that the pixel aspect
- * ratio matches the display aspect ratio).
+ * For the vast majority of cases we should be using the physical display size to
+ * compute the actual aspect ratio.
+ *
+ * This is currently overridden by:-
+ *  - a custom, user specified aspect ratio for a given display mode. This feature
+ *    is considered legacy as I don't believe it should be needed anymore,
+ *    complicates both the code and the user 'experience' and offers very
+ *    limited values for the override (4:3 and 16:9).
+ *  - a general override for setups where the aspect ratio is not correctly detected.
+ *    This generally means exotic multiscreen setups and displays with invalid and/or
+ *    misleading EDIDs.
+ *
+ * If no override is specified and a valid physical aspect ratio cannot be
+ * calculated, then we fallback to the screen resolution (i.e. assume square pixels)
+ * and finally a guess at 16:9.
 */
-double MythDisplay::GetAspectRatio(void)
+double MythDisplay::GetAspectRatio(QString &Source)
 {
     auto valid = [](double Aspect) { return (Aspect > 0.1 && Aspect < 10.0); };
 
-    // Override
+    // Override for this video mode
+    // Is this behaviour still needed?
     if (valid(m_aspectRatioOverride))
+    {
+        Source = tr("Video mode override");
         return m_aspectRatioOverride;
+    }
+
+    // General override for invalid/misleading EDIDs or multiscreen setups
+    bool multiscreen = MythDisplay::SpanAllScreens() && GetScreenCount() > 1;
+    double override = gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
+                                                          gCoreContext->GetHostName(), 0.0);
+
+    // Zero (not valid) indicates auto
+    if (valid(override))
+    {
+        Source = tr("Override");
+        return override;
+    }
+    // Auto for multiscreen is a best guess
+    else if (multiscreen)
+    {
+        double aspect = EstimateVirtualAspectRatio();
+        if (valid(aspect))
+        {
+            Source = tr("Multiscreen estimate");
+            return aspect;
+        }
+    }
 
     // Based on actual physical size if available
-    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0)
+    if (!m_physicalSize.isEmpty())
     {
         double aspect = static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
         if (valid(aspect))
+        {
+            Source = tr("Detected");
             return aspect;
+        }
     }
 
-    // Assume pixel aspect ratio is 1
-    if (m_resolution.width() > 0 && m_resolution.height() > 0)
+    // Assume pixel aspect ratio is 1 (square pixels)
+    if (!m_resolution.isEmpty())
     {
         double aspect = static_cast<double>(m_resolution.width()) / m_resolution.height();
         if (valid(aspect))
+        {
+            Source = tr("Fallback");
             return aspect;
+        }
     }
 
     // the aspect ratio of last resort
+    Source = tr("Guessed");
     return 16.0 / 9.0;
 }
 
@@ -788,12 +837,12 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     };
 
     // default
-    auto result = GetAspectRatio();
+    double result = 16.0 / 9.0;
 
     QList<QScreen*> screens;
     if (m_screen)
         screens = m_screen->virtualSiblings();
-    if (screens.size() < 2)
+    if (screens.empty())
         return result;
 
     // N.B. This sorting may not be needed

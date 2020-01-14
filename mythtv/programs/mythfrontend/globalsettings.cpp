@@ -2040,21 +2040,24 @@ static HostComboBoxSetting *ScreenAspectRatio()
 {
     auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
-    gc->setLabel(AppearanceSettings::tr("Virtual monitor aspect ratio"));
-
-    gc->addSelection(AppearanceSettings::tr("Auto",                     "0.0"));
-    gc->addSelection(AppearanceSettings::tr("16:9 (Grid)"),             "1.7777");
-    gc->addSelection(AppearanceSettings::tr("32:9 (Side by side)"),     "3.5555");
-    gc->addSelection(AppearanceSettings::tr("16:18 (Above and below)"), "0.8888");
-    gc->addSelection(AppearanceSettings::tr("16:10 (Grid)"),            "1.6");
-    gc->addSelection(AppearanceSettings::tr("32:10 (Side by Side)"),    "3.2");
-    gc->addSelection(AppearanceSettings::tr("16:20 (Above and below)"), "0.8");
-    gc->addSelection(AppearanceSettings::tr("4:3 (Grid)"),              "1.3333");
-
+    gc->setLabel(AppearanceSettings::tr("Screen aspect ratio"));
+    gc->addSelection(AppearanceSettings::tr("Auto"),    "0.0");
+    gc->addSelection(AppearanceSettings::tr("16:9"),    "1.7777");
+    gc->addSelection(AppearanceSettings::tr("16:10"),   "1.6");
+    gc->addSelection(AppearanceSettings::tr("21:9"),    "2.3704"); // N.B. Actually 64:27
+    gc->addSelection(AppearanceSettings::tr("32:9"),    "3.5555");
+    gc->addSelection(AppearanceSettings::tr("256:135"), "1.8963"); // '4K HD'
+    gc->addSelection(AppearanceSettings::tr("3:2"),     "1.5");
+    gc->addSelection(AppearanceSettings::tr("5:4"),     "1.25");
+    gc->addSelection(AppearanceSettings::tr("4:3"),     "1.3333");
+    gc->addSelection(AppearanceSettings::tr("16:18 (16:9 Above and below)"),  "0.8888");
+    gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
+    gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
-            "The aspect ratio cannot always be queried when using multiple "
-            "displays . Use Auto to try and detect a sensible value, otherwise "
-            "choose an appropriate override."));
+            "The aspect ratio of the screen (or screens) is usually automatically detected "
+            "from the connected display ('Auto'). If automatic detection fails, the correct "
+            "aspect ratio can be specified here. Note: Some values (e.g 32:10) are "
+            "primarily intended for multiscreen setups."));
     return gc;
 }
 
@@ -4491,15 +4494,14 @@ void AppearanceSettings::applyChange()
 
 void AppearanceSettings::PopulateScreens(int Screens)
 {
-    m_screen->setEnabled(Screens > 1);
-    m_screenAspect->setEnabled(Screens > 1);
     m_screen->clearSelections();
     foreach (QScreen *qscreen, qGuiApp->screens())
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
         m_screen->addSelection(qscreen->name() + extra, qscreen->name());
     }
-    m_screen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
+    if (Screens > 1)
+        m_screen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
 }
 
 AppearanceSettings::AppearanceSettings()

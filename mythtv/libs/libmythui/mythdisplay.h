@@ -44,7 +44,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QSize        GetPhysicalSize       (void);
     double       GetRefreshRate        (void);
     int          GetRefreshInterval    (int Fallback);
-    double       GetAspectRatio        (void);
+    double       GetAspectRatio        (QString &Source);
     double       EstimateVirtualAspectRatio(void);
     MythEDID&    GetEDID               (void);
     std::vector<double> GetRefreshRates(QSize Size);

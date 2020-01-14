@@ -459,7 +459,7 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float &VisibleAspect,
     QRect dvr = m_window.GetDisplayVisibleRect();
     float dispPixelAdj = 1.0F;
     if (dvr.height() && dvr.width())
-        dispPixelAdj = (GetDisplayAspect() * dvr.height()) / dvr.width();
+        dispPixelAdj = (m_window.GetDisplayAspect() * dvr.height()) / dvr.width();
 
     float ova = m_window.GetOverridenVideoAspect();
     QRect vr = m_window.GetVideoRect();
@@ -676,11 +676,6 @@ AspectOverrideMode MythVideoOutput::GetAspectOverride(void) const
 AdjustFillMode MythVideoOutput::GetAdjustFill(void) const
 {
     return m_window.GetAdjustFill();
-}
-
-float MythVideoOutput::GetDisplayAspect(void) const
-{
-    return m_window.GetDisplayAspect();
 }
 
 /// \bug not implemented correctly. vpos is not updated.
@@ -946,8 +941,11 @@ void MythVideoOutput::ResizeForVideo(QSize Size)
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        m_window.SetDisplayProperties(m_display->GetPhysicalSize(),
-                                      static_cast<float>(m_display->GetAspectRatio()));
+        QString source;
+        double aspect = m_display->GetAspectRatio(source);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Aspect ratio: %1 (%2)")
+            .arg(aspect).arg(source));
+        m_window.SetDisplayAspect(static_cast<float>(aspect));
         m_window.SetWindowSize(m_display->GetResolution());
 
         bool fullscreen = !m_window.UsingGuiSize();
@@ -980,87 +978,28 @@ void MythVideoOutput::ResizeForVideo(QSize Size)
         window->Show();
 }
 
-/**
- * \brief Init display measurements based on database settings and
- *        actual screen parameters.
- */
+/*! \brief Initialise display measurement
+ *
+ * The sole intent here is to ensure that VideoOutWindow has the correct aspect
+ * ratio when it calculates the video display rectangle.
+*/
 void MythVideoOutput::InitDisplayMeasurements(void)
 {
     if (!m_display)
         return;
 
-    QString source = "Actual";
-
-    // get the physical dimensions (in mm) of the display. If using
-    // DisplayRes, this will be overridden when we call ResizeForVideo
-    float disp_aspect = m_window.GetDisplayAspect();
-    QSize disp_dim    = m_display->GetPhysicalSize();
-    m_window.SetDisplayProperties(disp_dim, disp_aspect);
-
-    // Determine window and screen dimensions in pixels
-    QSize screen_size = m_display->GetResolution();
-    QSize window_size = m_window.GetWindowRect().size();
-
-    if (screen_size.isEmpty())
-        screen_size = window_size.isEmpty() ? QSize(1920, 1080): window_size;
-    if (window_size.isEmpty())
-        window_size = screen_size;
-
-    float pixel_aspect = static_cast<float>(screen_size.width()) / screen_size.height();
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Pixel dimensions: Screen %1x%2, window %3x%4")
-            .arg(screen_size.width()).arg(screen_size.height())
-            .arg(window_size.width()).arg(window_size.height()));
-
-    // Check the display dimensions
-    disp_dim = m_window.GetDisplayDim();
-
-    // If we are using Xinerama the display dimensions cannot be trusted.
-    // We need to use the Xinerama monitor aspect ratio from the DB to set
-    // the physical screen width. This assumes the height is correct, which
-    // is more or less true in the typical side-by-side monitor setup.
-    if (m_window.UsingXinerama())
-    {
-        source = "Xinerama";
-        disp_aspect = static_cast<float>(gCoreContext->GetFloatSettingOnHost(
-            "XineramaMonitorAspectRatio",
-            gCoreContext->GetHostName(), static_cast<double>(pixel_aspect)));
-        // Auto setting
-        if (disp_aspect < 0.1F)
-            disp_aspect = static_cast<float>(m_display->EstimateVirtualAspectRatio());
-        if (disp_dim.height() <= 0)
-            disp_dim.setHeight(300);
-        disp_dim.setWidth(static_cast<int>(lroundf(disp_dim.height() * disp_aspect)));
-    }
-
-    if (disp_dim.isEmpty())
-    {
-        source = "Guessed!";
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Physical size of display unknown. Assuming 17\" monitor with square pixels.");
-        disp_dim = QSize(static_cast<int>(lroundf(300 * pixel_aspect)), 300);
-    }
-
-    disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("%1 display dimensions: %2x%3 mm  Aspect: %4")
-            .arg(source).arg(disp_dim.width()).arg(disp_dim.height())
-            .arg(static_cast<double>(disp_aspect)));
-
-    // We must now scale the display measurements to our window size and save
-    // them. If we are running fullscreen this is a no-op.
-    disp_dim = QSize((disp_dim.width()  * window_size.width()) /
-                      screen_size.width(),
-                     (disp_dim.height() * window_size.height()) /
-                      screen_size.height());
-    disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
-
-    // If we are using XRandR, use the aspect ratio from it
-    if (m_display->UsingVideoModes())
-        disp_aspect = static_cast<float>(m_display->GetAspectRatio());
-
-    m_window.SetDisplayProperties(disp_dim, disp_aspect);
+    // Retrieve the display aspect ratio.
+    // This will be, in priority order:-
+    // - aspect ratio override when using resolution/mode switching (if not 'Default')
+    // - aspect ratio override for setups where detection does not work/is broken (multiscreen, broken EDID etc)
+    // - aspect ratio based on detected physical size (this should be the common/default value)
+    // - aspect ratio fallback using screen resolution
+    // - 16:9
+    QString source;
+    double displayaspect = m_display->GetAspectRatio(source);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display aspect ratio: %1 (%2)")
+        .arg(displayaspect).arg(source));
+    m_window.SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
 ///\note Probably no longer required

@@ -969,6 +969,7 @@ bool MythMainWindow::event(QEvent *e)
 
 void MythMainWindow::Init(bool mayReInit)
 {
+    d->m_display->SetWidget(nullptr);
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
     if (!(mayReInit || d->m_firstinit))

@@ -76,7 +76,6 @@ class MythVideoOutput
                               float &VisibleAspect, float &FontScaling,
                               float ThemeAspect) const;
     QRect        GetMHEGBounds(void);
-    virtual float GetDisplayAspect(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     virtual void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
     AdjustFillMode GetAdjustFill(void) const;

@@ -3702,6 +3702,19 @@ nullptr
             return false;
     }
 
+    if (dbver == "1359")
+    {
+        // XineramaMonitorAspectRatio was previously ignored for single screen
+        // setups but now acts as an override for the display aspect ratio.
+        // 0.0 indicates 'Auto' - which should be the default.
+        const char *updates[] = {
+            "UPDATE settings SET data='0.0' WHERE value='XineramaMonitorAspectRatio'",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1360", dbver))
+            return false;
+    }
+
     return true;
 }
 
