@@ -9,6 +9,7 @@
 #include "mythlogging.h"
 #include "compat.h"
 #include "mythcorecontext.h"
+#include "mythuihelper.h"
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
@@ -296,8 +297,35 @@ QScreen *MythDisplay::GetDesiredScreen(void)
 {
     QScreen* newscreen = nullptr;
 
+    // If geometry is overriden at the command line level, try and determine
+    // which screen that applies to (if any).
+    // N.B. So many potential issues here e.g. should the geometry override be
+    // ignored after first use? (as it will continue to override the screen
+    // regardless of changes to screen preference).
+    if (MythUIHelper::IsGeometryOverridden())
+    {
+        // this matches the check in MythMainWindow
+        bool windowed = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
+                        !MythMainWindow::WindowIsAlwaysFullscreen();
+        QRect override = GetMythUI()->GetGeometryOverride();
+        // When windowed, we use topleft as a best guess as to which screen we belong in.
+        // When fullscreen, Qt appears to use the reverse - though this may be
+        // the window manager rather than Qt. So could be wrong.
+        QPoint point = windowed ? override.topLeft() : override.bottomRight();
+        foreach (QScreen *screen, qGuiApp->screens())
+        {
+            if (screen->geometry().contains(point))
+            {
+                newscreen = screen;
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString(
+                    "Geometry override places window in screen '%1'").arg(newscreen->name()));
+                break;
+            }
+        }
+    }
+
     // If spanning all screens, then always use the primary display
-    if (MythDisplay::SpanAllScreens())
+    if (!newscreen && MythDisplay::SpanAllScreens())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Using primary screen for multiscreen");
         newscreen = qGuiApp->primaryScreen();
