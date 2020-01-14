@@ -92,7 +92,7 @@ class MythDeque : public deque<T>
         { if (!deque<T>::empty()) return deque<T>::back();
           T *dummy = nullptr; return myth_deque_init(dummy); }
     /// \brief Returns item at tail of list. O(1).
-    const T tail() const
+    T tail() const
         { if (!deque<T>::empty()) return deque<T>::back();
           T *dummy = NULL; return myth_deque_init(dummy); }
 };
