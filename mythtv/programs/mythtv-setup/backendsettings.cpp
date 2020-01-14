@@ -24,11 +24,12 @@ static TransMythUICheckBoxSetting *IsMasterBackend()
     return gc;
 };
 
-static GroupSetting *MasterServerName()
+static GlobalTextEditSetting *MasterServerName()
 {
-    auto *gc = new GroupSetting();
+    auto *gc = new GlobalTextEditSetting("MasterServerName");
     gc->setLabel(QObject::tr("Master Backend Name"));
     gc->setValue("");
+    gc->setEnabled(false);
     gc->setHelpText(QObject::tr(
                     "Host name of Master Backend. This is set by selecting "
                     "\"This server is the Master Backend\" on that server."));
