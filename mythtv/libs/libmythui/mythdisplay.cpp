@@ -257,13 +257,11 @@ int MythDisplay::GetScreenCount(void)
 
 double MythDisplay::GetPixelAspectRatio(void)
 {
-    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0 &&
-        m_resolution.width() > 0 && m_resolution.height() > 0)
-    {
-        return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
-               (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
-    }
-    return 1.0;
+    if (m_physicalSize.isEmpty() || m_resolution.isEmpty())
+        return 1.0;
+
+    return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
+           (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
 }
 
 QSize MythDisplay::GetGUIResolution(void)
@@ -778,13 +776,13 @@ const vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
  * calculated, then we fallback to the screen resolution (i.e. assume square pixels)
  * and finally a guess at 16:9.
 */
-double MythDisplay::GetAspectRatio(QString &Source)
+double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
 {
     auto valid = [](double Aspect) { return (Aspect > 0.1 && Aspect < 10.0); };
 
     // Override for this video mode
     // Is this behaviour still needed?
-    if (valid(m_aspectRatioOverride))
+    if (!IgnoreModeOverride && valid(m_aspectRatioOverride))
     {
         Source = tr("Video mode override");
         return m_aspectRatioOverride;
