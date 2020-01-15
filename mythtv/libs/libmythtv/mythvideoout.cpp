@@ -999,6 +999,22 @@ void MythVideoOutput::InitDisplayMeasurements(void)
     double displayaspect = m_display->GetAspectRatio(source);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display aspect ratio: %1 (%2)")
         .arg(displayaspect).arg(source));
+
+    // Get the window and screen resolutions
+    QSize window = m_window.GetWindowRect().size();
+    QSize screen = m_display->GetResolution();
+
+    // If not running fullscreen, adjust for window size and ignore any video
+    // mode overrides as they do not apply when in a window
+    if (!window.isEmpty() && !screen.isEmpty() && window != screen)
+    {
+        displayaspect = m_display->GetAspectRatio(source, true);
+        double screenaspect = screen.width() / static_cast<double>(screen.height());
+        double windowaspect = window.width() / static_cast<double>(window.height());
+        displayaspect = displayaspect * (1.0 / screenaspect) * windowaspect;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window aspect ratio: %1").arg(displayaspect));
+    }
+
     m_window.SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
