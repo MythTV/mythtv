@@ -1295,75 +1295,107 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     return m_recordingHasPositionMap;
 }
 
-float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
+float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise)
 {
-    double fps = 0.0;
     double avg_fps = 0.0;
     double codec_fps = 0.0;
     double container_fps = 0.0;
     double estimated_fps = 0.0;
 
-    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
-        avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
+    if (Stream->avg_frame_rate.den && Stream->avg_frame_rate.num)
+        avg_fps = av_q2d(Stream->avg_frame_rate); // MKV default_duration
 
-    if (enc->time_base.den && enc->time_base.num) // tbc
-        codec_fps = 1.0 / av_q2d(enc->time_base) / enc->ticks_per_frame;
+    if (Context->time_base.den && Context->time_base.num) // tbc
+        codec_fps = 1.0 / av_q2d(Context->time_base) / Context->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
-    if (codec_fps > 121.0 && (enc->time_base.den > 10000) &&
-        (enc->time_base.num == 1))
+    if (codec_fps > 121.0 && (Context->time_base.den > 10000) &&
+        (Context->time_base.num == 1))
     {
-        enc->time_base.num = 1001;  // seems pretty standard
-        if (av_q2d(enc->time_base) > 0)
-            codec_fps = 1.0 / av_q2d(enc->time_base);
+        Context->time_base.num = 1001;  // seems pretty standard
+        if (av_q2d(Context->time_base) > 0)
+            codec_fps = 1.0 / av_q2d(Context->time_base);
     }
-    if (stream->time_base.den && stream->time_base.num) // tbn
-        container_fps = 1.0 / av_q2d(stream->time_base);
-    if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
-        estimated_fps = av_q2d(stream->r_frame_rate);
+    if (Stream->time_base.den && Stream->time_base.num) // tbn
+        container_fps = 1.0 / av_q2d(Stream->time_base);
+    if (Stream->r_frame_rate.den && Stream->r_frame_rate.num) // tbr
+        estimated_fps = av_q2d(Stream->r_frame_rate);
+
+    // build a list of possible rates, best first
+    vector<double> rates;
 
     // matroska demuxer sets the default_duration to avg_frame_rate
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
         avg_fps < 121.0 && avg_fps > 3.0)
-    {   // NOLINT(bugprone-branch-clone)
-        fps = avg_fps;
-    }
-    else if (QString(m_ic->iformat->name).contains("avi") &&
-        container_fps < 121.0 && container_fps > 3.0)
-    {   // NOLINT(bugprone-branch-clone)
-        fps = container_fps; // avi uses container fps for timestamps // NOLINT(bugprone-branch-clone)
-    }
-    else if (codec_fps < 121.0 && codec_fps > 3.0)
     {
-        fps = codec_fps;
-    }
-    else if (container_fps < 121.0 && container_fps > 3.0)
-    {
-        fps = container_fps;
-    }
-    else if (avg_fps < 121.0 && avg_fps > 3.0)
-    {
-        fps = avg_fps;
-    }
-    // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
-    else if (estimated_fps < 121.0 && estimated_fps > 3.0)
-    {
-        fps = estimated_fps;
-    }
-    else
-    {
-        fps = 30000.0 / 1001.0; // 29.97 fps
+        rates.emplace_back(avg_fps);
     }
 
-    if (!qFuzzyCompare(static_cast<float>(fps), m_fps))
+    if (QString(m_ic->iformat->name).contains("avi") &&
+        container_fps < 121.0 && container_fps > 3.0)
+    {
+        // avi uses container fps for timestamps
+        rates.emplace_back(container_fps);
+    }
+
+    if (codec_fps < 121.0 && codec_fps > 3.0)
+        rates.emplace_back(codec_fps);
+
+    if (container_fps < 121.0 && container_fps > 3.0)
+        rates.emplace_back(container_fps);
+
+    if (avg_fps < 121.0 && avg_fps > 3.0)
+        rates.emplace_back(avg_fps);
+
+    // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
+    if (estimated_fps < 121.0 && estimated_fps > 3.0)
+        rates.emplace_back(estimated_fps);
+
+    // last resort
+    rates.emplace_back(static_cast<float>(30000.0 / 1001.0));
+
+    // debug
+    if (!qFuzzyCompare(static_cast<float>(rates.front()), m_fps))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Selected FPS: %1 (Avg:%2 Mult:%3 Codec:%4 Container:%5 Estimated:%6)")
-                .arg(fps).arg(avg_fps).arg(m_fpsMultiplier).arg(codec_fps).arg(container_fps).arg(estimated_fps));
+                .arg(static_cast<double>(rates.front())).arg(avg_fps)
+                .arg(m_fpsMultiplier).arg(codec_fps).arg(container_fps).arg(estimated_fps));
     }
 
-    return static_cast<float>(fps);
+    auto IsStandard = [](double Rate)
+    {
+        // List of known, standards based frame rates
+        static const vector<double> s_normRates =
+        {
+            24000.0 / 1001.0, 23.976, 25.0, 30000.0 / 1001.0,
+            29.97, 30.0, 50.0, 60000.0 / 1001.0, 59.94, 60.0, 100.0,
+            120000.0 / 1001.0, 119.88, 120.0
+        };
+
+        if (Rate > 1.0 && Rate < 121.0)
+            for (auto rate : s_normRates)
+                if (qFuzzyCompare(rate, Rate))
+                    return true;
+        return false;
+    };
+
+    // If the first choice rate is unusual, see if there is something more 'usual'
+    if (Sanitise && !IsStandard(rates.front()))
+    {
+        for (auto rate : rates)
+        {
+            if (IsStandard(rate))
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 is non-standard. Selecting %2 instead.")
+                    .arg(rates.front()).arg(rate));
+                return static_cast<float>(rate);
+            }
+        }
+    }
+
+    return static_cast<float>(rates.front());
 }
 
 #ifdef USING_DXVA2
@@ -1513,7 +1545,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream)
     {
-        m_fps = normalized_fps(stream, enc);
+        m_fps = GetVideoFrameRate(stream, enc, true);
         QSize dim    = get_video_dim(*enc);
         int   width  = m_currentWidth  = dim.width();
         int   height = m_currentHeight = dim.height();
@@ -3131,7 +3163,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 m_reorderedPtsDetected = false;
 
                 // fps debugging info
-                float avFPS = normalized_fps(stream, context);
+                float avFPS = GetVideoFrameRate(stream, context);
                 if ((seqFPS > avFPS+0.01F) || (seqFPS < avFPS-0.01F))
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("avFPS(%1) != seqFPS(%2)")
@@ -3240,7 +3272,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_reorderedPtsDetected = false;
 
             // fps debugging info
-            auto avFPS = static_cast<double>(normalized_fps(stream, context));
+            auto avFPS = static_cast<double>(GetVideoFrameRate(stream, context));
             if ((seqFPS > avFPS + 0.01) || (seqFPS < avFPS - 0.01))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
