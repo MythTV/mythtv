@@ -363,6 +363,9 @@ QString MPEGDescriptor::DescriptorTagString(void) const
         case PrivateDescriptorID::dish_event_tags: /* 0x96 */
             comma_list_append(str, "Possibly Dishnet Tag");
             break;
+        case PrivateDescriptorID::opentv_channel_list: /* 0xB1 */
+            comma_list_append(str, "Possibly DVB Sky/OpenTV Channel List");
+            break;
         case PrivateDescriptorID::premiere_content_order: /* 0xF0 */
             comma_list_append(str, "Possibly Premiere DE Content Order");
             break;
@@ -371,9 +374,6 @@ QString MPEGDescriptor::DescriptorTagString(void) const
             break;
         case PrivateDescriptorID::premiere_content_transmission: /* 0xF2 */
             comma_list_append(str, "Possibly Premiere DE Content Transmission");
-            break;
-        case PrivateDescriptorID::opentv_channel_list: /* 0xB1 */
-            comma_list_append(str, "Possibly DVB OpenTV Channel List");
             break;
     }
 
@@ -496,7 +496,7 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
              PrivateDescriptorID::sky_lcn_table== DescriptorTag())
     {
-        SET_STRING(BSkyBLCNDescriptor);
+        SET_STRING(SkyLCNDescriptor);
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
              PrivateDescriptorID::freesat_region_table == DescriptorTag())

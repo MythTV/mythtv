@@ -2280,10 +2280,10 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
  * function dvb_bskyb_local_channels
  */
 
-class BSkyBLCNDescriptor : public MPEGDescriptor
+class SkyLCNDescriptor : public MPEGDescriptor
 {
   public:
-    explicit BSkyBLCNDescriptor(const unsigned char *data, int len = 300) :
+    explicit SkyLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::sky_lcn_table)
     {
         assert(PrivateDescriptorID::sky_lcn_table== DescriptorTag());
@@ -2327,6 +2327,7 @@ class BSkyBLCNDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
+// Descriptor layout similar to SkyLCNDescriptor
 class OpenTVChannelListDescriptor : public MPEGDescriptor
 {
   public:

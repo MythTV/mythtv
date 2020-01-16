@@ -202,7 +202,7 @@ class PrivateDescriptorID
         // Private -- CH UPC Cablecom
         upc_event_episode_title        = 0xA7,
 
-        // Private -- BSkyB Astra-2 28.2E and other Sky satellites
+        // Private -- Sky Astra-2 28.2E and other Sky satellites
         sky_lcn_table                  = 0xb1,  /* implemented */
 
         // Private -- FreeSat Astra-2 28.2E
@@ -240,7 +240,7 @@ class PrivateDataSpecifierID
   public:
     enum
     {
-        BSB1   = 0x00000002,    // UK BSkyB (Astra 28.2E), Sky New Zealand (Optus D1 160E0)
+        BSB1   = 0x00000002,    // UK Sky (Astra 28.2E), Sky New Zealand (Optus D1 160E0)
         CASEMA = 0x00000016,    // NL Casema
         EACEM  = 0x00000028,    // NL Ziggo
         NORDIG = 0x00000029,    // EU Nordig

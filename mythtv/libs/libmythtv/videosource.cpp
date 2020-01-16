@@ -431,7 +431,7 @@ class BouquetID : public MythUISpinBoxSetting
                              min_val, 0xffff, 1)
     {
        setLabel(QObject::tr("Bouquet ID"));
-       setHelpText(QObject::tr("Bouquet ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+       setHelpText(QObject::tr("Bouquet ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 if you do not receive this satellite. "
                                "This is needed to get the Freesat and Sky channel numbers. "
                                "Value 272 selects Freesat bouquet 'England HD'. "
@@ -448,7 +448,7 @@ class RegionID : public MythUISpinBoxSetting
                              min_val, 100, 1)
     {
        setLabel(QObject::tr("Region ID"));
-       setHelpText(QObject::tr("Region ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+       setHelpText(QObject::tr("Region ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 you do not receive this satellite.  "
                                "This is needed to get the Freesat and Sky channel numbers. "
                                "Value 1 selects region London. "

@@ -617,7 +617,7 @@ QString DVBSimulcastChannelDescriptor::toString() const
     return ret;
 }
 
-QString BSkyBLCNDescriptor::toString() const
+QString SkyLCNDescriptor::toString() const
 {
     QString ret = "Sky Logical Channel Number Descriptor ";
     ret += QString("(0x%1) ").arg(DescriptorTag(),2,16,QChar('0'));

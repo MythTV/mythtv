@@ -186,7 +186,6 @@ void ScanWizard::Scan()
             DoChannelNumbersOnly(),   DoCompleteChannelsOnly(),
             DoFullChannelSearch(),
             DoAddFullTS(),
-            DoScanOpenTV(),
             GetServiceRequirements(),
 
             // stuff needed for particular scans

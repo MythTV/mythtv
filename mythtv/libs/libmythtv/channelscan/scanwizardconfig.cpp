@@ -37,7 +37,6 @@ void ScanWizard::SetupConfig(
     m_fullSearch = new FullChannelSearch();
     m_addFullTS = new AddFullTS();
     m_trustEncSI = new TrustEncSISetting();
-    m_scanOpenTV = new ScanOpenTV();
 
     setLabel(tr("Channel Scan"));
 
@@ -48,7 +47,6 @@ void ScanWizard::SetupConfig(
     addChild(m_fullSearch);
     addChild(m_addFullTS);
     addChild(m_trustEncSI);
-    addChild(m_scanOpenTV);
 
     addChild(m_videoSource);
     addChild(m_input);
@@ -110,11 +108,6 @@ bool ScanWizard::DoAddFullTS(void) const
 bool ScanWizard::DoTestDecryption(void) const
 {
     return m_trustEncSI->boolValue();
-}
-
-bool ScanWizard::DoScanOpenTV(void) const
-{
-    return m_scanOpenTV->boolValue();
 }
 
 void ScanWizard::SetPaneDefaults(const QString &cardid_inputname)

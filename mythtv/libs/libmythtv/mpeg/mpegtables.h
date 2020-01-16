@@ -371,7 +371,7 @@ class MTV_PUBLIC TableID
         TSS      = 0xA2,
         CMPNAME  = 0xA3,
 
-        // opentv
+        // OpenTV
         OTV_EIT_TITbeg  = 0xA0, // always on pids config (0x30-0x37)
         OTV_EIT_TITend  = 0xA3, // always on pids config (0x30-0x37)
         OTV_EIT_SUMbeg  = 0xA8, // always on pids config (0x40-0x47)

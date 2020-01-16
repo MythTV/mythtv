@@ -121,7 +121,6 @@ void ChannelScanner::Scan(
     bool           do_complete_only,
     bool           do_full_channel_search,
     bool           do_add_full_ts,
-    bool           do_scanOpenTV,
     ServiceRequirements service_requirements,
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
@@ -137,7 +136,6 @@ void ChannelScanner::Scan(
     m_completeOnly = do_complete_only;
     m_fullSearch = do_full_channel_search;
     m_addFullTS = do_add_full_ts;
-    m_scanOpenTV = do_scanOpenTV;
     m_serviceRequirements = service_requirements;
     m_sourceid = sourceid;
 
@@ -156,11 +154,6 @@ void ChannelScanner::Scan(
     m_scanMonitor->ScanUpdateStatusText("");
 
     bool ok = false;
-
-    if (do_scanOpenTV)
-    {
-        m_sigmonScanner->SetOpenTV();
-    }
 
     if ((ScanTypeSetting::FullScan_ATSC   == scantype) ||
         (ScanTypeSetting::FullScan_DVBC   == scantype) ||

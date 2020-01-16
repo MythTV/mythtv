@@ -49,7 +49,6 @@ class CompleteChannelsOnly;
 class FullChannelSearch;
 class AddFullTS;
 class TrustEncSISetting;
-class ScanOpenTV;
 
 class PaneAll;
 class PaneATSC;

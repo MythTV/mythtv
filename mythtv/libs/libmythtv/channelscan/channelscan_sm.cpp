@@ -76,7 +76,7 @@ const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
 /// No logic here, lets just wait at least 15 seconds.
 const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
 
-// Astra 28.2E satellite Freesat/BSkyB
+// Freesat and Sky
 static const uint kRegionUndefined = 0xFFFF;        // Not regional
 
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
@@ -118,7 +118,6 @@ class ScannedChannelInfo
     nit_vec_t               m_nits;
     sdt_map_t               m_sdts;
     bat_vec_t               m_bats;
-    QMap<uint64_t,uint64_t> m_opentv_channels;
 };
 
 /** \class ChannelScanSM
@@ -159,9 +158,6 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_channelTimeout(channel_timeout),
       m_inputName(std::move(_inputname)),
       m_testDecryption(test_decryption),
-      m_scanOpenTVBouquet(0),
-      m_scanOpenTVRegion(0),
-      m_scanOpenTVRegionMask(0),
       // Misc
       m_analogSignalHandler(new AnalogSignalHandler(this))
 {
@@ -196,7 +192,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("Freesat/BSkyB/OpenTV bouquet_id:%1 region_id:%2")
+            QString("Freesat/Sky bouquet_id:%1 region_id:%2")
                 .arg(m_bouquetId).arg(m_regionId));
 
         dtvSigMon->SetStreamData(data);
@@ -253,27 +249,6 @@ void ChannelScanSM::SetAnalog(bool is_analog)
 
     if (is_analog)
         m_signalMonitor->AddListener(m_analogSignalHandler);
-}
-
-void ChannelScanSM::SetOpenTV(void)
-{
-    if (m_bouquetId > 0)
-    {
-        m_scanOpenTVBouquet = m_bouquetId;
-        m_scanOpenTVRegion = m_regionId;
-        if (m_regionId)
-            m_scanOpenTVRegionMask = 1 << m_regionId;
-        else
-            m_scanOpenTVRegionMask = (uint)-1;
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Scan for OpenTV channels on bouquet ID %1 and region ID %2")
-                .arg(m_scanOpenTVBouquet).arg(m_scanOpenTVRegion));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Cannot scan for OpenTV channels, bouquet ID is 0"));
-    }
 }
 
 void ChannelScanSM::HandleAllGood(void)
@@ -569,44 +544,6 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
                                  services.ServiceID(j);
                if (! m_defAuthorities.contains(index))
                    m_defAuthorities[index] = authority.DefaultAuthority();
-            }
-        }
-
-        if (m_scanOpenTVBouquet > 0)
-        {
-            const unsigned char *otv_chan_list =
-                MPEGDescriptor::Find(parsed, PrivateDescriptorID::opentv_channel_list);
-            if (otv_chan_list)
-            {
-                OpenTVChannelListDescriptor opentvChannelList(otv_chan_list);
-
-                uint64_t regionMask = (uint64_t)-1;
-                if (opentvChannelList.RegionID() > 0 && opentvChannelList.RegionID() < 32)
-                    regionMask = ((uint64_t)1) << opentvChannelList.RegionID();
-
-                for (uint j = 0; j < opentvChannelList.ChannelCount(); j++)
-                {
-                    uint64_t index = ((uint64_t)netid << 32) |
-                        bat->BouquetID() << 16 |
-                        opentvChannelList.ServiceID(j);
-                    if (!m_currentInfo)
-                        m_currentInfo = new ScannedChannelInfo();
-                    if (m_currentInfo->m_opentv_channels.contains(index))
-                    {
-                        m_currentInfo->m_opentv_channels[index] |= regionMask << 32;
-                    }
-                    else
-                    {
-                        m_currentInfo->m_opentv_channels[index] =
-                            regionMask << 32 |
-                            (opentvChannelList.ChannelID(j) << 16);
-                    }
-                    if (regionMask & m_scanOpenTVRegionMask)
-                    {
-                        m_currentInfo->m_opentv_channels[index] |=
-                            opentvChannelList.ChannelNumber(j);
-                    }
-                }
             }
         }
     }
@@ -1525,7 +1462,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // BAT
 
-    // Channel numbers for Freesat and BSkyB on Astra 28.2E
+    // Channel numbers for Freesat and Sky on Astra 28.2E
     //
     // Get the Logical Channel Number (LCN) information from the BAT.
     // The first filter is on the bouquet ID.
@@ -1537,7 +1474,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     // This works because the BAT of each transport contains
     // the LCN of all transports and services for all bouquets.
     //
-    // For reference, this website has the Freesat and BSkyB channel numbers
+    // For reference, this website has the Freesat and Sky channel numbers
     // for each bouquet and region:
     // https://www.satellite-calculations.com/DVB/28.2E/28E_FreeSat_ChannelNumber.php
     // https://www.satellite-calculations.com/DVB/28.2E/28E_Sky_ChannelNumber.php
@@ -1609,7 +1546,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
                     item[0] == PrivateDescriptorID::sky_lcn_table)
                 {
-                    BSkyBLCNDescriptor ld(item);
+                    SkyLCNDescriptor ld(item);
                     if (ld.IsValid())
                     {
                         uint region_id = ld.RegionID();
@@ -1709,7 +1646,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             }
         }
 
-        // DVB satellite Astra 28.2E Freesat or BSkyB channel numbers
+        // Freesat and Sky channel numbers
         if (info.m_chanNum.isEmpty())
         {
             qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
@@ -1718,25 +1655,6 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             if (it != sid_lcn.end())
             {
                 info.m_chanNum = QString::number(*it);
-            }
-        }
-
-        // OpenTV Logical Channel Numbers
-        if (info.m_chanNum.isEmpty())
-        {
-            if (m_scanOpenTVBouquet > 0)
-            {
-                qlonglong key =
-                    ((qlonglong)info.m_origNetId<<32) | m_scanOpenTVBouquet << 16 | info.m_serviceId;
-                QMap<uint64_t, uint64_t>::const_iterator it = scan_info->m_opentv_channels.find(key);
-                if (it != scan_info->m_opentv_channels.end())
-                {
-                    uint chanNum = (*it) & 0xffff;
-                    if (chanNum > 0)
-                    {
-                        info.m_chanNum = chanNum;
-                    }
-                }
             }
         }
 

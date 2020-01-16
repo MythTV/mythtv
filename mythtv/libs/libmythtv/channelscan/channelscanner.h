@@ -80,7 +80,6 @@ class MTV_PUBLIC ChannelScanner
               bool           do_complete_only,
               bool           do_full_channel_search,
               bool           do_add_full_ts,
-              bool           do_scanOpenTV,
               ServiceRequirements service_requirements,
               // stuff needed for particular scans
               uint           mplexid,
@@ -150,9 +149,6 @@ class MTV_PUBLIC ChannelScanner
 
     /// Add MPTS "full transport stream" channels
     bool                     m_addFullTS           {false};
-
-    /// Scan for OpenTV channel numbers
-    bool                     m_scanOpenTV          {false};
 
     int                      m_sourceid            {-1};
 
