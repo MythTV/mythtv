@@ -45,6 +45,7 @@ class StatusBox : public MythScreenType
     void doMachineStatus();
     void doAutoExpireList(bool updateExpList = true);
     void doDisplayStatus();
+    void doDecoderStatus();
 
   private:
     void AddLogLine(const QString & line,

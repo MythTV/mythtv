@@ -29,6 +29,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythrender_base.h"
 #include "mythdisplay.h"
+#include "decoders/mythcodeccontext.h"
 
 struct LogLine {
     QString m_line;
@@ -118,6 +119,10 @@ void StatusBox::Init()
     item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
                             QVariant::fromValue((void*)SLOT(doJobQueueStatus())));
     item->DisplayState("jobqueue", "icon");
+
+    item = new MythUIButtonListItem(m_categoryList, tr("Video decoders"),
+                            QVariant::fromValue((void*)SLOT(doDecoderStatus())));
+    item->DisplayState("decoders", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Display"),
                             QVariant::fromValue((void*)SLOT(doDisplayStatus())));
@@ -1458,6 +1463,29 @@ void StatusBox::doMachineStatus()
         }
     }
 
+}
+
+void StatusBox::doDecoderStatus()
+{
+    if (m_iconState)
+        m_iconState->DisplayState("decoders");
+    m_logList->Reset();
+    QString displayhelp = tr("Available hardware decoders for video playback.");
+    if (m_helpText)
+        m_helpText->SetText(displayhelp);
+    if (m_justHelpText)
+        m_justHelpText->SetText(displayhelp);
+
+    QStringList decoders = MythCodecContext::GetDecoderDescription();
+    if (decoders.isEmpty())
+    {
+        AddLogLine(tr("None"));
+    }
+    else
+    {
+        foreach (QString decoder, decoders)
+            AddLogLine(decoder);
+    }
 }
 
 void StatusBox::doDisplayStatus()
