@@ -49,7 +49,7 @@ void* MythMediaCodecInterop::GetSurface(void)
     return m_surface.object();
 }
 
-void Java_org_mythtv_android_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
+void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
 {
     QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
     if (wait)
