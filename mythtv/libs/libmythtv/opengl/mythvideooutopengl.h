@@ -51,6 +51,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     void DiscardFrames(bool KeyFrame, bool Flushed) override;
     VideoFrameType* DirectRenderFormats(void) override;
     void WindowResized(const QSize &Size) override;
+    void SetVideoFrameRate(float NewRate) override;
 
   protected:
     void DestroyBuffers(void);
@@ -69,6 +70,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     QSize                  m_newVideoDim;
     QSize                  m_newVideoDispDim;
     float                  m_newAspect            { 0.0F };
+    bool                   m_newFrameRate         { false };
     bool                   m_buffersCreated       { false };
 
     // performance monitoring (-v gpu)
