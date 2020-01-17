@@ -540,6 +540,111 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     return s_haveVaapi;
 }
 
+void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
+{
+    auto VAToMythProfile = [](VAProfile Profile)
+    {
+        switch (Profile)
+        {
+            case VAProfileMPEG2Simple:   return MythCodecContext::MPEG2Simple;
+            case VAProfileMPEG2Main:     return MythCodecContext::MPEG2Main;
+            case VAProfileMPEG4Simple:   return MythCodecContext::MPEG4Simple;
+            case VAProfileMPEG4AdvancedSimple: return MythCodecContext::MPEG4AdvancedSimple;
+            case VAProfileMPEG4Main:     return MythCodecContext::MPEG4Main;
+            case VAProfileH263Baseline:  return MythCodecContext::H263;
+            case VAProfileH264ConstrainedBaseline: return MythCodecContext::H264ConstrainedBaseline;
+            case VAProfileH264Main:      return MythCodecContext::H264Main;
+            case VAProfileH264High:      return MythCodecContext::H264High;
+            case VAProfileVC1Simple:     return MythCodecContext::VC1Simple;
+            case VAProfileVC1Main:       return MythCodecContext::VC1Main;
+            case VAProfileVC1Advanced:   return MythCodecContext::VC1Advanced;
+            case VAProfileVP8Version0_3: return MythCodecContext::VP8;
+    #if VA_CHECK_VERSION(0, 38, 0)
+            case VAProfileVP9Profile0:   return MythCodecContext::VP9_0;
+    #endif
+    #if VA_CHECK_VERSION(0, 39, 0)
+            case VAProfileVP9Profile2:   return MythCodecContext::VP9_2;
+    #endif
+    #if VA_CHECK_VERSION(0, 37, 0)
+            case VAProfileHEVCMain:      return MythCodecContext::HEVCMain;
+            case VAProfileHEVCMain10:    return MythCodecContext::HEVCMain10;
+    #endif
+            default: break;
+        }
+        return MythCodecContext::NoProfile;
+    };
+
+    if (!MythVAAPIContext::HaveVAAPI())
+        return;
+
+    Decoders.append("VAAPI:");
+
+    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
+                                                              gCoreContext->GetSetting("VAAPIDevice"));
+    if(!hwdevicectx)
+    {
+        Decoders.append(QObject::tr("None"));
+        return;
+    }
+
+    auto *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
+    auto *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
+
+    int profilecount = vaMaxNumProfiles(hwctx->display);
+    auto *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
+    if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
+    {
+        for (int i = 0; i < profilecount; ++i)
+        {
+            VAProfile profile = profilelist[i];
+            if (profile == VAProfileNone || profile == VAProfileJPEGBaseline ||
+                profile == VAProfileH264StereoHigh || profile == VAProfileH264MultiviewHigh)
+            {
+                continue;
+            }
+            int count = 0;
+            int entrysize = vaMaxNumEntrypoints(hwctx->display);
+            auto *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
+            if (vaQueryConfigEntrypoints(hwctx->display, profile, entrylist, &count) == VA_STATUS_SUCCESS)
+            {
+                for (int j = 0; j < count; ++j)
+                {
+                    if (entrylist[j] != VAEntrypointVLD)
+                        continue;
+
+                    int width = 0;
+                    int height = 0;
+                    VAConfigID config = 0;
+                    if (vaCreateConfig(hwctx->display, profile, VAEntrypointVLD, nullptr, 0, &config) != VA_STATUS_SUCCESS)
+                        continue;
+
+                    uint attrcount = 0;
+                    if (vaQuerySurfaceAttributes(hwctx->display, config, nullptr, &attrcount) == VA_STATUS_SUCCESS)
+                    {
+                        VASurfaceAttrib *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(*attrlist)));
+                        if (vaQuerySurfaceAttributes(hwctx->display, config, attrlist, &attrcount) == VA_STATUS_SUCCESS)
+                        {
+                            for (uint k = 0; k < attrcount; ++k)
+                            {
+                                if (attrlist[k].type == VASurfaceAttribMaxWidth)
+                                    width = attrlist[k].value.value.i;
+                                if (attrlist[k].type == VASurfaceAttribMaxHeight)
+                                    height = attrlist[k].value.value.i;
+                            }
+                        }
+                        av_freep(&attrlist);
+                    }
+                    vaDestroyConfig(hwctx->display, config);
+                    Decoders.append(MythCodecContext::GetProfileDescription(VAToMythProfile(profile), width, height));
+                }
+            }
+            av_freep(&entrylist);
+        }
+    }
+    av_freep(&profilelist);
+    av_buffer_unref(&hwdevicectx);
+}
+
 void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
     if (codec_is_vaapi(m_codecID))

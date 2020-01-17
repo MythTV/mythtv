@@ -40,6 +40,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     static enum AVPixelFormat GetFormat2 (AVCodecContext *Context,
                                           const AVPixelFormat *PixFmt);
     static bool HaveVAAPI                (bool ReCheck = false);
+    static void GetDecoderList           (QStringList &Decoders);
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);

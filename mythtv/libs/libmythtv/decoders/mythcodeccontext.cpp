@@ -111,6 +111,16 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     return mctx;
 }
 
+QStringList MythCodecContext::GetDecoderDescription(void)
+{
+    QStringList decoders;
+
+#ifdef USING_VAAPI
+    MythVAAPIContext::GetDecoderList(decoders);
+#endif
+    return decoders;
+}
+
 void MythCodecContext::GetDecoders(RenderOptions &Opts)
 {
 #ifdef USING_VDPAU
@@ -606,4 +616,51 @@ bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
     Frame->colorshifted = 1;
     av_frame_free(&temp);
     return ret >= 0;
+}
+
+QString MythCodecContext::GetProfileDescription(CodecProfile Profile, int Width, int Height)
+{
+    QString profile;
+    switch (Profile)
+    {
+        case NoProfile:    profile = QObject::tr("Unknown/Unsupported"); break;
+        case MPEG2:        profile = "MPEG2"; break;
+        case MPEG2Simple:  profile = "MPEG2 Simple"; break;
+        case MPEG2Main:    profile = "MPEG2 Main"; break;
+        case MPEG4:        profile = "MPEG4"; break;
+        case MPEG4Simple:  profile = "MPEG4 Simple"; break;
+        case MPEG4Main:    profile = "MPEG4 Main"; break;
+        case MPEG4AdvancedSimple: profile = "MPEG4 Advanced Simple"; break;
+        case H263:         profile = "H263"; break;
+        case H264:         profile = "H264"; break;
+        case H264Baseline: profile = "H264 Baseline"; break;
+        case H264ConstrainedBaseline: profile = "H264 Constrained"; break;
+        case H264Main:     profile = "H264 Main"; break;
+        case H264MainExtended: profile = "H264 Main Extended"; break;
+        case H264High:     profile = "H264 High"; break;
+        case H264High10:   profile = "H264 High10"; break;
+        case HEVC:         profile = "HEVC"; break;
+        case HEVCMain:     profile = "HEVC Main"; break;
+        case HEVCMain10:   profile = "HEVC Main10"; break;
+        case VC1:          profile = "VC1"; break;
+        case VC1Simple:    profile = "VC1 Simple"; break;
+        case VC1Main:      profile = "VC1 Main"; break;
+        case VC1Complex:   profile = "VC1 Complex"; break;
+        case VC1Advanced:  profile = "VC1 Advanced"; break;
+        case VP8:          profile = "VP8"; break;
+        case VP9:          profile = "VP9"; break;
+        case VP9_0:        profile = "VP9 Level 0"; break;
+        case VP9_1:        profile = "VP9 Level 1"; break;
+        case VP9_2:        profile = "VP9 Level 2"; break;
+        case VP9_3:        profile = "VP9 Level 3"; break;
+        case AV1:          profile = "AV1"; break;
+        case AV1Main:      profile = "AV1 Main"; break;
+        case AV1High:      profile = "AV1 High"; break;
+        case AV1Professional: profile = "AV1 Professional"; break;
+    }
+
+    if (!Width || !Height)
+        return profile;
+
+    return QObject::tr("%1 (Max size: %2x%3)").arg(profile).arg(Width).arg(Height);
 }
