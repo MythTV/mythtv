@@ -20,8 +20,16 @@ public:
     RefCountHandler() : r(new T()) { }
     RefCountHandler(T *_r) : r(_r) { r->IncrRef(); }
     RefCountHandler(const RefCountHandler &other) : r(other.r) { r->IncrRef(); }
+    // The first two lines of this function are the clang-tidy
+    // recommended solution to make a function properly handle
+    // self-assignment.  No idea why clang-tidy doesn't recognize
+    // this, unless it has something to do with templates?
+    //
+    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment,cert-oop54-cpp)
     RefCountHandler &operator= (const RefCountHandler &other)
     {
+        if (this == &other)
+            return *this;
         other.r->IncrRef();
         r->DecrRef();
         r = other.r;
@@ -162,8 +170,16 @@ public:
         QList<RefCountHandler<T> >::operator<<(value);
         return *this;
     }
+    // The first two lines of this function are the clang-tidy
+    // recommended solution to make a function properly handle
+    // self-assignment.  No idea why clang-tidy doesn't recognize
+    // this, unless it has something to do with templates?
+    //
+    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment,cert-oop54-cpp)
     RefCountedList<T> &operator=(const RefCountedList<T> &other)
     {
+        if (this == &other)
+            return *this;
         QList<RefCountHandler<T> >::operator=(other);
         return *this;
     }

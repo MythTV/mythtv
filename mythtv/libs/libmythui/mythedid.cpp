@@ -275,10 +275,10 @@ bool MythEDID::ParseCTABlock(const quint8 *Data, uint Offset)
     uint type  = (Data[Offset] & 0xE0) >> 5;
     switch (type)
     {
-        case 0x01: break; // Audio data block // NOLINT(bugprone-suspicious-string-compare)
+        case 0x01: break; // Audio data block // NOLINT(bugprone-branch-clone)
         case 0x02: break; // Video data block
         case 0x03: ParseVSDB(Data, Offset + 1, length); break; // Vendor Specific Data Block
-        case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-suspicious-string-compare)
+        case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-branch-clone)
         case 0x05: break; // VESA DTC data block
         case 0x07: break; // Extended tag. HDR metadata here
         default: break;
