@@ -72,7 +72,7 @@ static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
 	
 static int get_next_video_unit(multiplex_t *mx, index_unit *viu)
 {
-	index_unit nviu;
+	index_unit nviu {};
 	if (!ring_avail(mx->index_vrbuffer) && mx->finish) return 0;
 
 	while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit)) {
@@ -123,7 +123,7 @@ static int peek_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 	
 static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 {
-	index_unit niu;
+	index_unit niu {};
 	index_unit *piu = extiu;
 	int length = 0;
 	int j = 0;
@@ -220,7 +220,7 @@ static void writeout_video(multiplex_t *mx)
 	}
 	unsigned int length = viu->length;
 	while (!mx->is_ts && length  < mx->data_size){
-		index_unit nviu;
+		index_unit nviu {};
                 int old_start = viu->frame_start;
                 int old_frame = viu->frame;
                 uint64_t old_pts = viu->pts;

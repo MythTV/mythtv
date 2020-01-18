@@ -53,7 +53,7 @@ private:
 
     int            m_bpl            {0};
 
-    vector<vector<unsigned char> > m_phongDat;
+    vector<vector<unsigned char> > m_phongDat {};
     unsigned char *m_rgbBuf         {nullptr};
     double         m_intense1[256]  {};
     double         m_intense2[256]  {};

@@ -530,7 +530,7 @@ void *MPEG2fixup::ReplexStart(void *data)
 void MPEG2replex::Start()
 {
     int start = 1;
-    multiplex_t mx;
+    multiplex_t mx {};
 
     //array defines number of allowed audio streams
     // note that although only 1 stream is currently supported, multiplex.c
@@ -545,7 +545,6 @@ void MPEG2replex::Start()
     int video_delay = 0;
     int audio_delay = 0;
 
-    memset(&mx, 0, sizeof(mx));
     memset(ext_ok, 0, sizeof(ext_ok));
 
     mx.priv = (void *)this;
@@ -661,7 +660,7 @@ void MPEG2fixup::FrameInfo(MPEG2frame *f)
 
 int MPEG2fixup::AddFrame(MPEG2frame *f)
 {
-    index_unit iu;
+    index_unit iu {};
     ringbuffer *rb = nullptr;
     ringbuffer *rbi = nullptr;
     int id = f->m_pkt.stream_index;

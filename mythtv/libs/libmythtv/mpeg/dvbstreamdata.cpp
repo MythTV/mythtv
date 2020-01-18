@@ -473,14 +473,13 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         // opentv eit pids
         if (m_dvbEitDishnetLong)
         {
-            uint pid;
-            for(pid=OTV_EIT_TIT_PID_START; pid <= OTV_EIT_TIT_PID_END; pid++)
+            for(uint pid=OTV_EIT_TIT_PID_START; pid <= OTV_EIT_TIT_PID_END; pid++)
             {
                 if (find(cur_pids.begin(), cur_pids.end(),
                          pid) == cur_pids.end())
                     add_pids.push_back(pid);
             }
-            for(pid=OTV_EIT_SUP_PID_START; pid <= OTV_EIT_SUP_PID_END; pid++)
+            for(uint pid=OTV_EIT_SUP_PID_START; pid <= OTV_EIT_SUP_PID_END; pid++)
             {
                 if (find(cur_pids.begin(), cur_pids.end(),
                          pid) == cur_pids.end())
@@ -541,14 +540,13 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         // opentv eit pids
         if (m_dvbEitDishnetLong)
         {
-            uint pid;
-            for(pid=OTV_EIT_TIT_PID_START; pid <= OTV_EIT_TIT_PID_END; pid++)
+            for(uint pid=OTV_EIT_TIT_PID_START; pid <= OTV_EIT_TIT_PID_END; pid++)
             {
                 if (find(cur_pids.begin(), cur_pids.end(),
                          pid) != cur_pids.end())
                     del_pids.push_back(pid);
             }
-            for(pid=OTV_EIT_SUP_PID_START; pid <= OTV_EIT_SUP_PID_END; pid++)
+            for(uint pid=OTV_EIT_SUP_PID_START; pid <= OTV_EIT_SUP_PID_END; pid++)
             {
                 if (find(cur_pids.begin(), cur_pids.end(),
                          pid) != cur_pids.end())

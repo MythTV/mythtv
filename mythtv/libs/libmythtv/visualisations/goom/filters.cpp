@@ -401,7 +401,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
              const signed int *lbrutS, const signed int *lbrutD)
 {
-	Color   couleur;
+	Color   couleur {};
 //	unsigned int coefv, coefh;
 
 	unsigned int ax = (lprevX - 1) << PERTEDEC;
@@ -413,10 +413,10 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
 	for (int myPos = 0; myPos < bufsize; myPos += 2) {
-		Color   col1;
-		Color   col2;
-		Color   col3;
-		Color   col4;
+		Color   col1 {};
+		Color   col2 {};
+		Color   col3 {};
+		Color   col4 {};
 		int     brutSmypos = lbrutS[myPos];
 
 		int myPos2 = myPos + 1;

@@ -44,7 +44,7 @@ class MHDLADisplay;
 class MHAsynchEvent {
   public:
     MHRoot *m_pEventSource {nullptr};
-    enum EventType m_eventType;
+    enum EventType m_eventType {EventIsAvailable};
     MHUnion m_eventData;
 };
 

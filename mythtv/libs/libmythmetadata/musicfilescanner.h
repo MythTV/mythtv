@@ -24,7 +24,7 @@ class META_PUBLIC MusicFileScanner
     struct MusicFileData
     {
         QString startDir;
-        MusicFileLocation location;
+        MusicFileLocation location {kFileSystem};
     };
 
     using MusicLoadedMap = QMap <QString, MusicFileData>;

@@ -76,7 +76,7 @@ static CdIo_t * openCdio(const QString& name)
 // Stack-based cdio device open
 class StCdioDevice
 {
-    CdIo_t* m_cdio;
+    CdIo_t* m_cdio {nullptr};
 
     void* operator new(std::size_t); // Stack only
     // No copying

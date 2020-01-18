@@ -45,7 +45,7 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 #include "drawmethods.h"
 
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
-	v2d v2;
+	v2d v2 {};
 	
 	for (int i=0;i<s->nbvertex;i++) {
 		V3D_TO_V2D(s->svertex[i],v2,W,H,dist);
@@ -62,8 +62,8 @@ void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int
 
 void grid3d_draw (grid3d *g, int color, int colorlow,
 									int dist, int *buf, int *back, int W,int H) {
-	v2d v2;
-	v2d v2x;
+	v2d v2  {};
+	v2d v2x {};
 	
 	for (int x=0;x<g->defx;x++) {
 		V3D_TO_V2D(g->surf.svertex[x],v2x,W,H,dist);

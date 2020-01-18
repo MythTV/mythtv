@@ -512,7 +512,7 @@ static int write_ps_header(uint8_t *buf,
 		    uint8_t    video_bound,
 		    uint8_t    navpack)
 {
-	ps_packet p;
+	ps_packet p {};
 
 	init_ps(&p);
 	

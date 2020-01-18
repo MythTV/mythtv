@@ -923,8 +923,7 @@ class TestAudioUtils: public QObject
     static void PinkNoiseGenerator(void)
     {
         constexpr int kPinkTestSize = 1024;
-        std::array<float, kPinkTestSize> output;
-        output.fill(0);
+        std::array<float, kPinkTestSize> output {};
 
         // Most platforms
         float expected_start[16] = {
