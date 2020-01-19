@@ -526,6 +526,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         6900000, 0, 0);
 
+    // DVB-C United Kingdom
     fmap["dvbc_qam_gb0"] = new FrequencyTable(
         12324000, 12324000+1, 10, "Channel %1", 1,
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAMAuto,
@@ -535,6 +536,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
         6952000, 0, 0);
 
+    // DVB-C Unknown (British Forces ?)
     fmap["dvbc_qam_bf0"] = new FrequencyTable(
         203000000, 795000000, 100000, "BF Channel %1", 1,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
