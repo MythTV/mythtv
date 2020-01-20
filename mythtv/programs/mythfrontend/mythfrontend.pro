@@ -9,8 +9,8 @@ mingw | win32-msvc* {
 }
 using_qtwebkit {
     QT += webkitwidgets
-    android: QT += androidextras
 }
+android: QT += androidextras
 using_qtdbus: QT += dbus
 
 TEMPLATE = app
@@ -129,8 +129,6 @@ using_libdns_sd {
 }
 
 android {
-    QT += androidextras
-
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libtag.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libexiv2.13.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libfreetype.so
@@ -145,14 +143,14 @@ android {
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythswscale.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavcodec.so
     ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIBCOMMON)libmythavformat.so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythbase-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythui-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythservicecontracts-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythupnp-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmyth-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythtv-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythmetadata-$$(MYTHLIBVERSION).so
-    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythprotoserver-$$(MYTHLIBVERSION).so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythbase-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythui-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythservicecontracts-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythupnp-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmyth-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythtv-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythmetadata-$${LIBVERSION}.so
+    ANDROID_EXTRA_LIBS += $$(MYTHINSTALLLIB)libmythprotoserver-$${LIBVERSION}.so
 
     ANDROID_PACKAGE_SOURCE_DIR += $$(MYTHPACKAGEBASE)/android-package-source
 }

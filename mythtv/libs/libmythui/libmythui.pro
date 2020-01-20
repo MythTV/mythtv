@@ -3,8 +3,8 @@ include ( ../../settings.pro )
 QT += xml sql network widgets
 using_qtwebkit {
     QT += webkitwidgets
-    android: QT += androidextras
 }
+android: QT += androidextras
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
