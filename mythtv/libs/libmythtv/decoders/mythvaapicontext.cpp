@@ -1,4 +1,4 @@
-﻿// Qt
+// Qt
 #include <QCoreApplication>
 #include <QWaitCondition>
 
@@ -612,8 +612,7 @@ void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
                     if (entrylist[j] != VAEntrypointVLD)
                         continue;
 
-                    int width = 0;
-                    int height = 0;
+                    QSize size;
                     VAConfigID config = 0;
                     if (vaCreateConfig(hwctx->display, profile, VAEntrypointVLD, nullptr, 0, &config) != VA_STATUS_SUCCESS)
                         continue;
@@ -627,15 +626,15 @@ void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
                             for (uint k = 0; k < attrcount; ++k)
                             {
                                 if (attrlist[k].type == VASurfaceAttribMaxWidth)
-                                    width = attrlist[k].value.value.i;
+                                    size.setWidth(attrlist[k].value.value.i);
                                 if (attrlist[k].type == VASurfaceAttribMaxHeight)
-                                    height = attrlist[k].value.value.i;
+                                    size.setHeight(attrlist[k].value.value.i);
                             }
                         }
                         av_freep(&attrlist);
                     }
                     vaDestroyConfig(hwctx->display, config);
-                    Decoders.append(MythCodecContext::GetProfileDescription(VAToMythProfile(profile), width, height));
+                    Decoders.append(MythCodecContext::GetProfileDescription(VAToMythProfile(profile), size));
                 }
             }
             av_freep(&entrylist);

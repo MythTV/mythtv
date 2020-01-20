@@ -11,6 +11,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+typedef QList<QPair<MythCodecContext::CodecProfile,QSize> > MCProfiles;
+
 class MythMediaCodecContext : public MythCodecContext
 {
   public:
@@ -28,8 +30,11 @@ class MythMediaCodecContext : public MythCodecContext
     static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
     void   PostProcessFrame                 (AVCodecContext*, VideoFrame*) override;
     bool   IsDeinterlacing                  (bool &DoubleRate, bool = false) override;
+    static void GetDecoderList              (QStringList &Decoders);
+    static bool HaveMediaCodec              (void);
 
   private:
+    static MCProfiles& GetProfiles          (void);
     static int  InitialiseDecoder           (AVCodecContext *Context);
 };
 
