@@ -80,6 +80,7 @@ Advanced options (experts only):
   --sysinclude=PATH        location of cross-build system headers
   --cc=CC                  use C compiler CC [$cc_default]
   --cxx=CXX                use C++ compiler CXX [$cxx_default]
+  --enable-set-cc-default  set cc_default and cxx_default to that provided by --cc= and -cxx
   --ld=LD                  use linker LD
   --qmake=QMAKE            use specified qmake [$qmake_default]
   --qmakespecs=PATH        use specified mkspecs
@@ -2056,6 +2057,7 @@ CMDLINE_SELECT="
     lto
     optimizations
     rpath
+    set_cc_default
     stripping
     $MYTHTV_LIST
     $MYTHTV_CONFIG_LIST
@@ -3311,13 +3313,17 @@ if enabled cross_compile; then
 fi
 test -z "$cross_prefix_cc" && cross_prefix_cc="$cross_prefix"
 
-test -n "$cc" && cc_default="$cc"
-test -n "$cxx" && cxx_default="$cxx"
+if enabled set_cc_default; then
+    test -n "$cc" && cc_default="$cc"
+    test -n "$cxx" && cxx_default="$cxx"
+fi
 ar_default="${cross_prefix}${ar_default}"
 cc_default="${cross_prefix_cc}${cc_default}"
 cxx_default="${cross_prefix_cc}${cxx_default}"
-cc="$cc_default"
-cxx="$cxx_default"
+if enabled set_cc_default; then
+    cc="$cc_default"
+    cxx="$cxx_default"
+fi
 echo "cc_default $cc_default , ${cross_prefix_cc}"
 nm_default="${cross_prefix}${nm_default}"
 pkg_config_default="${cross_prefix}${pkg_config_default}"
