@@ -2186,7 +2186,6 @@ static HostCheckBoxSetting *GuiSizeForTV()
     return gc;
 }
 
-#if defined(USING_XRANDR) || CONFIG_DARWIN
 static HostCheckBoxSetting *UseVideoModes()
 {
     HostCheckBoxSetting *gc = new VideoModeSettings("UseVideoModes");
@@ -2472,7 +2471,6 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
 
     addChild(overrides);
 };
-#endif
 
 static HostCheckBoxSetting *HideMouseCursor()
 {
@@ -4536,13 +4534,15 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(AirPlayFullScreen());
 #endif
 
-#if defined(USING_XRANDR) || CONFIG_DARWIN
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<MythDisplayMode> scr = display->GetVideoModes();
+    if (display->VideoModesAvailable())
+    {
+        vector<MythDisplayMode> scr = display->GetVideoModes();
+        if (!scr.empty())
+            addChild(UseVideoModes());
+    }
     MythDisplay::AcquireRelease(false);
-    if (!scr.empty())
-        addChild(UseVideoModes());
-#endif
+
     auto *dates = new GroupSetting();
 
     dates->setLabel(tr("Localization"));

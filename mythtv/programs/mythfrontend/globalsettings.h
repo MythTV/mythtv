@@ -52,9 +52,7 @@ class VideoModeSettings : public HostCheckBoxSetting
 
   public:
     explicit VideoModeSettings(const char *c);
-#if defined(USING_XRANDR) || CONFIG_DARWIN
-    void updateButton(MythUIButtonListItem *item) override; // MythUICheckBoxSetting
-#endif
+    void updateButton(MythUIButtonListItem *item) override;
 };
 
 class LcdSettings
@@ -162,9 +160,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
     ~HostRefreshRateComboBoxSetting() override = default;
 
   public slots:
-#if defined(USING_XRANDR) || CONFIG_DARWIN
     virtual void ChangeResolution(StandardSetting *setting);
-#endif
 
   private:
     static vector<double> GetRefreshRates(const QString &resolution);
