@@ -357,6 +357,9 @@ static void SETBITS(unsigned char *ptr, long value, int num)
         s_sbPos = 0;
     }
 
+    if (s_sbPtr == nullptr)
+        return;
+
     int offset = s_sbPos >> 3;
     int offset_r = s_sbPos & 0x07;
     int offset_b = 32 - offset_r;
@@ -810,7 +813,7 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
         }
     }
 
-    m_mkvFile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
+    m_mkvFile = m_inputFC->iformat && strcmp(m_inputFC->iformat->name, "mkv") == 0;
 
     if (offset)
         av_seek_frame(m_inputFC, m_vidId, offset, AVSEEK_FLAG_BYTE);
@@ -2404,6 +2407,9 @@ int MPEG2fixup::Start()
                             markedFrame = nullptr;
                         }
 
+                        // Make clang-tidy null dereference checker happy.
+                        if (curFrame == nullptr)
+                            continue;
                         curFrame->m_pkt.dts = (expectedDTS / 300);
 #if 0
                         if (GetFrameTypeT(curFrame) == 'B')
