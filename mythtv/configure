@@ -1384,7 +1384,9 @@ EXTERNAL_LIBRARY_LIST="
     $EXTERNAL_LIBRARY_VERSION3_LIST
     $EXTERNAL_LIBRARY_GPLV3_LIST
     jni
+    libaom
     libass
+    libdav1d
     libfontconfig
     libfreetype
     libiec61883
@@ -2751,9 +2753,11 @@ enable hdpvr
 enable ivtv
 enable asi
 enable lamemp3
+enable libaom
 enable libass
 enable libcec
 enable libcrypto
+enable libdav1d
 enable libdns_sd
 enable libxml2
 enable lirc
@@ -6171,6 +6175,10 @@ fi
 
 check_func_headers "windows.h" CreateDIBSection "$gdigrab_indev_extralibs"
 
+# Check VA1 support before enabling in FFmpeg
+enabled libaom   && use_pkg_config libaom "aom >= 1.0.0" aom/aom_codec.h aom_codec_version || disable libaom
+enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.2.1" "dav1d/dav1d.h" dav1d_version || disable libdav1d
+
 enabled vaapi && enabled opengl &&
     check_header GL/glx.h &&
     check_lib vaapi va/va.h vaInitialize -lva
@@ -7183,6 +7191,15 @@ if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
+if enabled libaom; then
+    ffopts="$ffopts --enable-libaom"
+fi
+
+
+if enabled libdav1d; then
+    ffopts="$ffopts --enable-libdav1d"
+fi
+
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -7433,6 +7450,8 @@ echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "x265 (HEVC)               ${libx265-no}"
 echo "vpx                       ${libvpx-no}"
+echo "libaom   (AV1)            ${libaom-no}"
+echo "libdav1d (AV1)            ${libdav1d-no}"
 echo ""
 
 echo "# Compilation Options"
