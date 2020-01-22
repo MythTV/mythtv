@@ -284,41 +284,42 @@ bool MythGesture::record(const QPoint & pt)
     /* step by the greatest delta direction */
     if (abs(delx) > abs(dely))
     {
-        float iy = m_points.back().y();
+        float fy = m_points.back().y();
 
         /* go from the last point to the current, whatever direction
          * it may be */
-        for (float ix = m_points.back().x();
+        for (int ix = m_points.back().x();
              (delx > 0) ? (ix < pt.x()) : (ix > pt.x());
              ix += (delx > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
-            iy += std::fabs(((float) dely / (float) delx))
-                * (float) ((dely < 0) ? -1.0 : 1.0);
+            fy += std::fabs(static_cast<float>(dely) / static_cast<float>(delx))
+                * ((dely < 0) ? -1.0F : 1.0F);
+            int iy = static_cast<int>(fy);
 
-            m_points.push_back(QPoint((int)ix, (int)iy));
-
-            adjustExtremes((int)ix, (int)iy);
+            /* add the interpolated point */
+            m_points.push_back(QPoint(ix, iy));
+            adjustExtremes(ix, iy);
         }
     }
     else /* same thing, but for dely larger than delx case... */
     {
-        float ix = m_points.back().x();
+        float fx = m_points.back().x();
 
         /* go from the last point to the current, whatever direction
            it may be */
-        for (float iy = m_points.back().y();
+        for (int iy = m_points.back().y();
              (dely > 0) ? (iy < pt.y()) : (iy > pt.y());
              iy += (dely > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
-            ix += std::fabs(((float) delx / (float) dely))
-                * (float) ((delx < 0) ? -1.0 : 1.0);
+            fx += std::fabs(static_cast<float>(delx) / static_cast<float>(dely))
+                * ((delx < 0) ? -1.0F : 1.0F);
+            int ix = static_cast<int>(fx);
 
             /* add the interpolated point */
-            m_points.push_back(QPoint((int)ix, (int)iy));
-
-            adjustExtremes((int)ix, (int)iy);
+            m_points.push_back(QPoint((int)ix, iy));
+            adjustExtremes((int)ix, iy);
         }
     }
 
