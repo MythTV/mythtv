@@ -25,6 +25,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8:   return "VP8";
         case kCodec_VP9:   return "VP9";
         case kCodec_HEVC:  return "HEVC";
+        case kCodec_AV1:   return "AV1";
 
         case kCodec_MPEG1_VDPAU: return "MPEG1 VDPAU";
         case kCodec_MPEG2_VDPAU: return "MPEG2 VDPAU";
@@ -36,6 +37,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VDPAU:   return "VP8 VDPAU";
         case kCodec_VP9_VDPAU:   return "VP9 VDPAU";
         case kCodec_HEVC_VDPAU:  return "HEVC VDPAU";
+        case kCodec_AV1_VDPAU:   return "AV1 VDPAU";
 
         case kCodec_MPEG1_VDPAU_DEC: return "MPEG1 VDPAU DEC";
         case kCodec_MPEG2_VDPAU_DEC: return "MPEG2 VDPAU DEC";
@@ -47,6 +49,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VDPAU_DEC:   return "VP8 VDPAU DEC";
         case kCodec_VP9_VDPAU_DEC:   return "VP9 VDPAU DEC";
         case kCodec_HEVC_VDPAU_DEC:  return "HEVC VDPAU DEC";
+        case kCodec_AV1_VDPAU_DEC:   return "AV1 VDPAU DEC";
 
         case kCodec_MPEG1_VAAPI: return "MPEG1 VAAPI";
         case kCodec_MPEG2_VAAPI: return "MPEG2 VAAPI";
@@ -58,6 +61,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VAAPI:   return "VP8 VAAPI";
         case kCodec_VP9_VAAPI:   return "VP9 VAAPI";
         case kCodec_HEVC_VAAPI:  return "HEVC VAAPI";
+        case kCodec_AV1_VAAPI:   return "AV1 VAAPI";
 
         case kCodec_MPEG1_VAAPI_DEC: return "MPEG1 VAAPI DEC";
         case kCodec_MPEG2_VAAPI_DEC: return "MPEG2 VAAPI DEC";
@@ -69,6 +73,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VAAPI_DEC:   return "VP8 VAAPI DEC";
         case kCodec_VP9_VAAPI_DEC:   return "VP9 VAAPI DEC";
         case kCodec_HEVC_VAAPI_DEC:  return "HEVC VAAPI DEC";
+        case kCodec_AV1_VAAPI_DEC:   return "AV1 VAAPI DEC";
 
         case kCodec_MPEG1_DXVA2: return "MPEG1 DXVA2";
         case kCodec_MPEG2_DXVA2: return "MPEG2 DXVA2";
@@ -80,6 +85,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_DXVA2:   return "VP8 DXVA2";
         case kCodec_VP9_DXVA2:   return "VP9 DXVA2";
         case kCodec_HEVC_DXVA2:  return "HEVC DXVA2";
+        case kCodec_AV1_DXVA2:   return "AV1 DXVA2";
 
         case kCodec_MPEG1_MEDIACODEC: return "MPEG1 MEDIACODEC";
         case kCodec_MPEG2_MEDIACODEC: return "MPEG2 MEDIACODEC";
@@ -91,6 +97,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_MEDIACODEC:   return "VP8 MEDIACODEC";
         case kCodec_VP9_MEDIACODEC:   return "VP9 MEDIACODEC";
         case kCodec_HEVC_MEDIACODEC:  return "HEVC MEDIACODEC";
+        case kCodec_AV1_MEDIACODEC:   return "AV1 MEDIACODEC";
 
         case kCodec_MPEG1_MEDIACODEC_DEC: return "MPEG1 MEDIACODEC DEC";
         case kCodec_MPEG2_MEDIACODEC_DEC: return "MPEG2 MEDIACODEC DEC";
@@ -102,6 +109,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_MEDIACODEC_DEC:   return "VP8 MEDIACODEC DEC";
         case kCodec_VP9_MEDIACODEC_DEC:   return "VP9 MEDIACODEC DEC";
         case kCodec_HEVC_MEDIACODEC_DEC:  return "HEVC MEDIACODEC DEC";
+        case kCodec_AV1_MEDIACODEC_DEC:   return "AV1 MEDIACODEC DEC";
 
         case kCodec_MPEG1_NVDEC: return "MPEG1 NVDEC";
         case kCodec_MPEG2_NVDEC: return "MPEG2 NVDEC";
@@ -113,6 +121,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_NVDEC:   return "VP8 NVDEC";
         case kCodec_VP9_NVDEC:   return "VP9 NVDEC";
         case kCodec_HEVC_NVDEC:  return "HEVC NVDEC";
+        case kCodec_AV1_NVDEC:   return "AV1 NVDEC";
 
         case kCodec_MPEG1_NVDEC_DEC: return "MPEG1 NVDEC DEC";
         case kCodec_MPEG2_NVDEC_DEC: return "MPEG2 NVDEC DEC";
@@ -124,6 +133,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_NVDEC_DEC:   return "VP8 NVDEC DEC";
         case kCodec_VP9_NVDEC_DEC:   return "VP9 NVDEC DEC";
         case kCodec_HEVC_NVDEC_DEC:  return "HEVC NVDEC DEC";
+        case kCodec_AV1_NVDEC_DEC:   return "AV1 NVDEC DEC";
 
         case kCodec_MPEG1_VTB: return "MPEG1 VTB";
         case kCodec_MPEG2_VTB: return "MPEG2 VTB";
@@ -135,6 +145,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VTB:   return "VP8 VTB";
         case kCodec_VP9_VTB:   return "VP9 VTB";
         case kCodec_HEVC_VTB:  return "HEVC VTB";
+        case kCodec_AV1_VTB:   return "AV1 VTB";
 
         case kCodec_MPEG1_VTB_DEC: return "MPEG1 VTB DEC";
         case kCodec_MPEG2_VTB_DEC: return "MPEG2 VTB DEC";
@@ -146,6 +157,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_VTB_DEC:   return "VP8 VTB DEC";
         case kCodec_VP9_VTB_DEC:   return "VP9 VTB DEC";
         case kCodec_HEVC_VTB_DEC:  return "HEVC VTB DEC";
+        case kCodec_AV1_VTB_DEC:   return "AV1 VTB DEC";
 
         case kCodec_MPEG1_V4L2: return "MPEG1 V4L2";
         case kCodec_MPEG2_V4L2: return "MPEG2 V4L2";
@@ -157,6 +169,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_V4L2:   return "VP8 V4L2";
         case kCodec_VP9_V4L2:   return "VP9 V4L2";
         case kCodec_HEVC_V4L2:  return "HEVC V4L2";
+        case kCodec_AV1_V4L2:   return "AV1 V4L2";
 
         case kCodec_MPEG1_V4L2_DEC: return "MPEG1 V4L2 DEC";
         case kCodec_MPEG2_V4L2_DEC: return "MPEG2 V4L2 DEC";
@@ -168,6 +181,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_V4L2_DEC:   return "VP8 V4L2 DEC";
         case kCodec_VP9_V4L2_DEC:   return "VP9 V4L2 DEC";
         case kCodec_HEVC_V4L2_DEC:  return "HEVC V4L2 DEC";
+        case kCodec_AV1_V4L2_DEC:   return "AV1 V4L2 DEC";
 
         case kCodec_MPEG1_MMAL: return "MPEG1 MMAL";
         case kCodec_MPEG2_MMAL: return "MPEG2 MMAL";
@@ -179,6 +193,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_MMAL:   return "VP8 MMAL";
         case kCodec_VP9_MMAL:   return "VP9 MMAL";
         case kCodec_HEVC_MMAL:  return "HEVC MMAL";
+        case kCodec_AV1_MMAL:   return "AV1 MMAL";
 
         case kCodec_MPEG1_MMAL_DEC: return "MPEG1 MMAL DEC";
         case kCodec_MPEG2_MMAL_DEC: return "MPEG2 MMAL DEC";
@@ -190,6 +205,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_MMAL_DEC:   return "VP8 MMAL DEC";
         case kCodec_VP9_MMAL_DEC:   return "VP9 MMAL DEC";
         case kCodec_HEVC_MMAL_DEC:  return "HEVC MMAL DEC";
+        case kCodec_AV1_MMAL_DEC:   return "AV1 MMAL DEC";
 
         case kCodec_MPEG1_DRMPRIME: return "MPEG1 DRMPRIME";
         case kCodec_MPEG2_DRMPRIME: return "MPEG2 DRMPRIME";
@@ -201,6 +217,7 @@ QString toString(MythCodecID codecid)
         case kCodec_VP8_DRMPRIME:   return "VP8 DRMPRIME";
         case kCodec_VP9_DRMPRIME:   return "VP9 DRMPRIME";
         case kCodec_HEVC_DRMPRIME:  return "HEVC DRMPRIME";
+        case kCodec_AV1_DRMPRIME:   return "AV1 DRMPRIME";
         default:
             break;
     }
@@ -396,6 +413,24 @@ AVCodecID myth2av_codecid(MythCodecID codec_id)
         case kCodec_HEVC_DRMPRIME:
         case kCodec_HEVC_V4L2_DEC: return AV_CODEC_ID_HEVC;
 
+        case kCodec_AV1:
+        case kCodec_AV1_VDPAU:
+        case kCodec_AV1_VDPAU_DEC:
+        case kCodec_AV1_VAAPI:
+        case kCodec_AV1_VAAPI_DEC:
+        case kCodec_AV1_DXVA2:
+        case kCodec_AV1_MEDIACODEC:
+        case kCodec_AV1_MEDIACODEC_DEC:
+        case kCodec_AV1_NVDEC:
+        case kCodec_AV1_NVDEC_DEC:
+        case kCodec_AV1_VTB:
+        case kCodec_AV1_VTB_DEC:
+        case kCodec_AV1_MMAL:
+        case kCodec_AV1_MMAL_DEC:
+        case kCodec_AV1_V4L2:
+        case kCodec_AV1_DRMPRIME:
+        case kCodec_AV1_V4L2_DEC: return AV_CODEC_ID_AV1;
+
         case kCodec_NORMAL_END:
         case kCodec_VDPAU_END:
         case kCodec_VDPAU_DEC_END:
@@ -431,6 +466,7 @@ uint mpeg_version(int codec_id)
         case AV_CODEC_ID_VP8:        return 8;
         case AV_CODEC_ID_VP9:        return 9;
         case AV_CODEC_ID_HEVC:       return 10;
+        case AV_CODEC_ID_AV1:        return 11;
         default: break;
     }
     return 0;
@@ -631,6 +667,25 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_HEVC_MMAL_DEC:
         case kCodec_HEVC_DRMPRIME:
             return "HEVC";
+
+        case kCodec_AV1:
+        case kCodec_AV1_VDPAU:
+        case kCodec_AV1_VDPAU_DEC:
+        case kCodec_AV1_VAAPI:
+        case kCodec_AV1_VAAPI_DEC:
+        case kCodec_AV1_DXVA2:
+        case kCodec_AV1_MEDIACODEC:
+        case kCodec_AV1_MEDIACODEC_DEC:
+        case kCodec_AV1_NVDEC:
+        case kCodec_AV1_NVDEC_DEC:
+        case kCodec_AV1_VTB:
+        case kCodec_AV1_VTB_DEC:
+        case kCodec_AV1_V4L2:
+        case kCodec_AV1_V4L2_DEC:
+        case kCodec_AV1_MMAL:
+        case kCodec_AV1_MMAL_DEC:
+        case kCodec_AV1_DRMPRIME:
+            return "AV1";
 
         case kCodec_NONE:
         case kCodec_NORMAL_END:
