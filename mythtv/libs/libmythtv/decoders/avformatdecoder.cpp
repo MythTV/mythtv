@@ -2282,7 +2282,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
                     .arg(selTrack).arg(static_cast<uint64_t>(stream->id), 0, 16)
                     .arg(ff_codec_id_string(enc->codec_id))
-                    .arg(enc->profile).arg(codectype).arg(enc->bit_rate));
+                    .arg(avcodec_profile_name(enc->codec_id, enc->profile))
+                    .arg(codectype).arg(enc->bit_rate));
 
             // If ScanStreams has been called on a stream change triggered by a
             // decoder error - because the decoder does not handle resolution
