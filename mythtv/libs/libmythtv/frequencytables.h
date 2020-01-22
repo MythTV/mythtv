@@ -215,14 +215,20 @@ class transport_scan_items_it_t
         return *this;
     }
 
-    transport_scan_items_it_t operator++(int)
+    // cert-dcl21-cpp says this function should be const.
+    // readability-const-return-type says it shouldn't.
+    // NOLINTNEXTLINE(readability-const-return-type)
+    const transport_scan_items_it_t operator++(int)
     {
         transport_scan_items_it_t tmp = *this;
         operator++();
         return tmp;
     }
 
-    transport_scan_items_it_t operator--(int)
+    // cert-dcl21-cpp says this function should be const.
+    // readability-const-return-type says it shouldn't.
+    // NOLINTNEXTLINE(readability-const-return-type)
+    const transport_scan_items_it_t operator--(int)
     {
         transport_scan_items_it_t tmp = *this;
         operator--();
