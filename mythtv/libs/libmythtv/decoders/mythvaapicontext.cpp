@@ -189,8 +189,11 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     {
         foreach (auto vaprofile, profiles)
         {
-            if (vaprofile.first == Profile && vaprofile.second.width() >= Size.width() &&
-                vaprofile.second.height() >= Size.height())
+            if (vaprofile.first == Profile &&
+                vaprofile.second.first.width() <= Size.width() &&
+                vaprofile.second.first.height() <= Size.height() &&
+                vaprofile.second.second.width() >= Size.width() &&
+                vaprofile.second.second.height() >= Size.height())
             {
                 return true;
             }
@@ -465,8 +468,13 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VAAPI decoders:");
             const VAAPIProfiles& profiles = MythVAAPIContext::GetProfiles();
             foreach (auto profile, profiles)
+            {
                 if (profile.first != MythCodecContext::MJPEG)
-                    LOG(VB_GENERAL, LOG_INFO, LOC + MythCodecContext::GetProfileDescription(profile.first, profile.second));
+                {
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
+                }
+            }
         }
         av_buffer_unref(&context);
     }
@@ -549,7 +557,8 @@ const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
                     if (entrylist[j] != VAEntrypointVLD)
                         continue;
 
-                    QSize size;
+                    QSize minsize;
+                    QSize maxsize;
                     VAConfigID config = 0;
                     if (vaCreateConfig(hwctx->display, profile, VAEntrypointVLD, nullptr, 0, &config) != VA_STATUS_SUCCESS)
                         continue;
@@ -563,15 +572,19 @@ const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
                             for (uint k = 0; k < attrcount; ++k)
                             {
                                 if (attrlist[k].type == VASurfaceAttribMaxWidth)
-                                    size.setWidth(attrlist[k].value.value.i);
+                                    maxsize.setWidth(attrlist[k].value.value.i);
                                 if (attrlist[k].type == VASurfaceAttribMaxHeight)
-                                    size.setHeight(attrlist[k].value.value.i);
+                                    maxsize.setHeight(attrlist[k].value.value.i);
+                                if (attrlist[k].type == VASurfaceAttribMinWidth)
+                                    minsize.setWidth(attrlist[k].value.value.i);
+                                if (attrlist[k].type == VASurfaceAttribMinHeight)
+                                    minsize.setHeight(attrlist[k].value.value.i);
                             }
                         }
                         av_freep(&attrlist);
                     }
                     vaDestroyConfig(hwctx->display, config);
-                    s_profiles.append(VAAPIProfile(VAToMythProfile(profile), size));
+                    s_profiles.append(VAAPIProfile(VAToMythProfile(profile), QPair<QSize,QSize>(minsize, maxsize)));
                 }
             }
             av_freep(&entrylist);
@@ -591,7 +604,7 @@ void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
     Decoders.append("VAAPI:");
     foreach (auto profile, profiles)
         if (profile.first != MythCodecContext::MJPEG)
-            Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second));
+            Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
 }
 
 void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
