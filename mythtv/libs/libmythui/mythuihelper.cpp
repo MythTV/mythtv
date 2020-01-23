@@ -266,8 +266,6 @@ void MythUIHelperPrivate::StoreGUIsettings()
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
     font.setPixelSize(static_cast<int>(lroundf(19.0F * m_hmult)));
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
     int stretch = static_cast<int>(100 / m_display->GetPixelAspectRatio());
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI

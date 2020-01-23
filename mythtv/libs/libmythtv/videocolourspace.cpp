@@ -504,7 +504,7 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 
     auto source = static_cast<AVColorPrimaries>(Source);
     auto dest   = static_cast<AVColorPrimaries>(Dest);
-    auto custom = m_customDisplayPrimaries != nullptr || m_customDisplayGamma > 0.0F;
+    auto custom = m_customDisplayPrimaries != nullptr;
 
     // No-op
     if (!custom && (source == dest))

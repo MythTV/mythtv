@@ -345,6 +345,9 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       m_ccd708(new CC708Decoder(parent->GetCC708Reader())),
       m_ttd(new TeletextDecoder(parent->GetTeletextReader()))
 {
+    // this will be deleted and recreated once decoder is set up
+    m_mythCodecCtx = new MythCodecContext(this, kCodec_NONE);
+
     m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     m_ccd608->SetIgnoreTimecode(true);
 
@@ -3250,7 +3253,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             // size and rate is extremely error prone and FFmpeg gets it right far more often.
             // N.B. if a decoder deinterlacer is in use - the stream must be progressive
             bool doublerate = false;
-            bool decoderdeint = m_mythCodecCtx->IsDeinterlacing(doublerate, true);
+            bool decoderdeint = m_mythCodecCtx ? m_mythCodecCtx->IsDeinterlacing(doublerate, true) : false;
             m_parent->SetVideoParams(width, height, seqFPS, m_currentAspect, forcechange,
                                      static_cast<int>(m_h264Parser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
