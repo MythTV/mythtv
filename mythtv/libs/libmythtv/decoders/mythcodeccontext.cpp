@@ -628,6 +628,7 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
 {
     switch (CodecID)
     {
+        case AV_CODEC_ID_MPEG1VIDEO: return MPEG1;
         case AV_CODEC_ID_MPEG2VIDEO:
             switch (Profile)
             {
@@ -726,12 +727,13 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
     return NoProfile;
 }
 
-QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size)
+QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size, uint ColorDepth)
 {
     QString profile;
     switch (Profile)
     {
         case NoProfile:    profile = QObject::tr("Unknown/Unsupported"); break;
+        case MPEG1:        profile = "MPEG1"; break;
         case MPEG2:        profile = "MPEG2"; break;
         case MPEG2Simple:  profile = "MPEG2 Simple"; break;
         case MPEG2Main:    profile = "MPEG2 Main"; break;
@@ -800,5 +802,7 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
     if (Size.isEmpty())
         return profile;
 
-    return QObject::tr("%1 (Max size: %2x%3)").arg(profile).arg(Size.width()).arg(Size.height());
+    return QObject::tr("%1%2 (Max size: %3x%4)")
+            .arg(profile).arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
+            .arg(Size.width()).arg(Size.height());
 }
