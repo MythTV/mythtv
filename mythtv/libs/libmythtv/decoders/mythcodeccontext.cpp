@@ -143,7 +143,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 
 #ifdef USING_VAAPI
     // Only enable VAAPI if it is actually present and isn't actually VDPAU
-    if (MythVAAPIContext::HaveVAAPI())
+    if (!MythVAAPIContext::HaveVAAPI().isEmpty())
     {
         Opts.decoders->append("vaapi");
         (*Opts.equiv_decoders)["vaapi"].append("dummy");
@@ -719,6 +719,7 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
                 case FF_PROFILE_AV1_PROFESSIONAL: return AV1Professional;
             }
             break;
+        case AV_CODEC_ID_MJPEG: return MJPEG;
         default: break;
     }
 
@@ -793,6 +794,7 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
         case AV1Main:      profile = "AV1 Main"; break;
         case AV1High:      profile = "AV1 High"; break;
         case AV1Professional: profile = "AV1 Professional"; break;
+        case MJPEG:        profile = "MJPEG";
     }
 
     if (Size.isEmpty())
