@@ -258,7 +258,6 @@ int main(int argc, char *argv[])
     bool    scanCompleteOnly = false;
     bool    scanFullChannelSearch = false;
     bool    addFullTS = false;
-    bool    scanOpenTV = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
     QString frequencyStandard = "atsc";
@@ -352,8 +351,6 @@ int main(int argc, char *argv[])
         scanFullChannelSearch = true;
     if (cmdline.toBool("addfullts"))
         addFullTS = true;
-    if (cmdline.toBool("opentv"))
-        scanOpenTV = true;
     if (cmdline.toBool("servicetype"))
     {
         scanServiceRequirements = kRequireNothing;
@@ -508,7 +505,6 @@ int main(int argc, char *argv[])
                          scanCompleteOnly,
                          scanFullChannelSearch,
                          addFullTS,
-                         scanOpenTV,
                          scanServiceRequirements,
                          // stuff needed for particular scans
                          /* mplexid   */ 0,

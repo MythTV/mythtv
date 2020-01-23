@@ -59,9 +59,19 @@ float MythEDID::Gamma(void) const
     return m_gamma;
 }
 
+bool MythEDID::IsHDMI(void) const
+{
+    return m_isHDMI;
+}
+
 bool MythEDID::IsSRGB(void) const
 {
     return m_sRGB;
+}
+
+bool MythEDID::IsLikeSRGB(void) const
+{
+    return m_likeSRGB;
 }
 
 MythEDID::Primaries MythEDID::ColourPrimaries(void) const
@@ -166,13 +176,13 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     }
     m_minorVersion = Data[VERSION_OFFSET + 1];
 
-    // retrieve serial number. This may be subsequently overridden
+    // retrieve serial number. This may be subsequently overridden.
+    // N.B. 0 is a valid serial number.
     qint32 serial = Data[SERIAL_OFFSET] +
                     (Data[SERIAL_OFFSET + 1] << 8) +
                     (Data[SERIAL_OFFSET + 2] << 16) +
                     (Data[SERIAL_OFFSET + 3] << 24);
-    if (serial > 0)
-        m_serialNumbers << QString::number(serial);
+    m_serialNumbers << QString::number(serial);
 
     // digital or analog
     //bool digital = Data[DISPLAY_OFFSET] & 0x80;
@@ -229,6 +239,29 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     // White
     m_primaries.whitepoint[0]   = ((Data[0x21] << 2) | ((Data[0x1A] >> 2) & 3)) / 1024.0F;
     m_primaries.whitepoint[1]   = ((Data[0x22] << 2) |  (Data[0x1A] & 3)) / 1024.0F;
+
+    // Check whether this is very similar to sRGB and hence if non-exact colourspace
+    // handling is preferred, then just use sRGB.
+    // TODO Move to new MythColourSpace class.
+
+    // As per VideoColourspace.
+    static const Primaries s_sRGBPrim =
+        {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
+
+    auto like = [](const Primaries &First, const Primaries &Second, float Fuzz)
+    {
+        auto cmp = [=](float One, float Two) { return (qAbs(One - Two) < Fuzz); };
+        return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
+               cmp(First.primaries[0][1], Second.primaries[0][1]) &&
+               cmp(First.primaries[1][0], Second.primaries[1][0]) &&
+               cmp(First.primaries[1][1], Second.primaries[1][1]) &&
+               cmp(First.primaries[2][0], Second.primaries[2][0]) &&
+               cmp(First.primaries[2][1], Second.primaries[2][1]) &&
+               cmp(First.whitepoint[0],   Second.whitepoint[0]) &&
+               cmp(First.whitepoint[1],   Second.whitepoint[1]);
+    };
+
+    m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F) && qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
     for (int i = 0; i < 5; ++i)
@@ -296,6 +329,8 @@ bool MythEDID::ParseVSDB(const quint8 *Data, uint Offset, uint Length)
     // HDMI
     while (registration == 0x000C03)
     {
+        m_isHDMI = true;
+
         if (Length < 5 || (Offset + 5 >= m_size))
             break;
 

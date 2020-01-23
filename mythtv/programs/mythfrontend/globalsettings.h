@@ -52,9 +52,7 @@ class VideoModeSettings : public HostCheckBoxSetting
 
   public:
     explicit VideoModeSettings(const char *c);
-#if defined(USING_XRANDR) || CONFIG_DARWIN
-    void updateButton(MythUIButtonListItem *item) override; // MythUICheckBoxSetting
-#endif
+    void updateButton(MythUIButtonListItem *item) override;
 };
 
 class LcdSettings
@@ -147,9 +145,9 @@ class AppearanceSettings : public GroupSetting
     void PopulateScreens(int Screens);
 
   private:
-    HostComboBoxSetting *m_xineramaScreen { nullptr };
-    HostComboBoxSetting *m_xineramaAspect { nullptr };
-    MythDisplay         *m_display        { nullptr };
+    HostComboBoxSetting *m_screen       { nullptr };
+    HostComboBoxSetting *m_screenAspect { nullptr };
+    MythDisplay         *m_display      { nullptr };
 };
 
 class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
@@ -162,9 +160,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
     ~HostRefreshRateComboBoxSetting() override = default;
 
   public slots:
-#if defined(USING_XRANDR) || CONFIG_DARWIN
     virtual void ChangeResolution(StandardSetting *setting);
-#endif
 
   private:
     static vector<double> GetRefreshRates(const QString &resolution);

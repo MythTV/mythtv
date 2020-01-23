@@ -35,7 +35,7 @@ class MHPresentable : public MHIngredient
 {
   public:
     MHPresentable() = default;
-    MHPresentable(const MHPresentable &ref) = default;
+    MHPresentable(const MHPresentable&) = default;
     // No new components.
 
     // Actions.

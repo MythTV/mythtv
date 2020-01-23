@@ -28,7 +28,7 @@
 #if !defined(FFNV_DYNLINK_CUDA_H) && !defined(CUDA_VERSION)
 #define FFNV_DYNLINK_CUDA_H
 
-#include <cstddef>
+#include <stddef.h>
 
 #define CUDA_VERSION 7050
 

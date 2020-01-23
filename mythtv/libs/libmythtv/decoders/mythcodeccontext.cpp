@@ -111,6 +111,19 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     return mctx;
 }
 
+QStringList MythCodecContext::GetDecoderDescription(void)
+{
+    QStringList decoders;
+
+#ifdef USING_VAAPI
+    MythVAAPIContext::GetDecoderList(decoders);
+#endif
+#ifdef USING_MEDIACODEC
+    MythMediaCodecContext::GetDecoderList(decoders);
+#endif
+    return decoders;
+}
+
 void MythCodecContext::GetDecoders(RenderOptions &Opts)
 {
 #ifdef USING_VDPAU
@@ -130,7 +143,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 
 #ifdef USING_VAAPI
     // Only enable VAAPI if it is actually present and isn't actually VDPAU
-    if (MythVAAPIContext::HaveVAAPI())
+    if (!MythVAAPIContext::HaveVAAPI().isEmpty())
     {
         Opts.decoders->append("vaapi");
         (*Opts.equiv_decoders)["vaapi"].append("dummy");
@@ -149,10 +162,13 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_MEDIACODEC
-    Opts.decoders->append("mediacodec");
-    (*Opts.equiv_decoders)["mediacodec"].append("dummy");
-    Opts.decoders->append("mediacodec-dec");
-    (*Opts.equiv_decoders)["mediacodec-dec"].append("dummy");
+    if (MythMediaCodecContext::HaveMediaCodec())
+    {
+        Opts.decoders->append("mediacodec");
+        (*Opts.equiv_decoders)["mediacodec"].append("dummy");
+        Opts.decoders->append("mediacodec-dec");
+        (*Opts.equiv_decoders)["mediacodec-dec"].append("dummy");
+    }
 #endif
 #ifdef USING_VTB
     Opts.decoders->append("vtb");
@@ -606,4 +622,183 @@ bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
     Frame->colorshifted = 1;
     av_frame_free(&temp);
     return ret >= 0;
+}
+
+MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID CodecID, int Profile)
+{
+    switch (CodecID)
+    {
+        case AV_CODEC_ID_MPEG2VIDEO:
+            switch (Profile)
+            {
+                case FF_PROFILE_MPEG2_422:          return MPEG2422;
+                case FF_PROFILE_MPEG2_HIGH:         return MPEG2High;
+                case FF_PROFILE_MPEG2_SS:           return MPEG2Spatial;
+                case FF_PROFILE_MPEG2_SNR_SCALABLE: return MPEG2SNR;
+                case FF_PROFILE_MPEG2_SIMPLE:       return MPEG2Simple;
+                case FF_PROFILE_MPEG2_MAIN:         return MPEG2Main;
+                default: break;
+            }
+            break;
+        case AV_CODEC_ID_MPEG4:
+            switch (Profile)
+            {
+                case FF_PROFILE_MPEG4_SIMPLE:             return MPEG4Simple;
+                case FF_PROFILE_MPEG4_SIMPLE_SCALABLE:    return MPEG4SimpleScaleable;
+                case FF_PROFILE_MPEG4_CORE:               return MPEG4Core;
+                case FF_PROFILE_MPEG4_MAIN:               return MPEG4Main;
+                case FF_PROFILE_MPEG4_N_BIT:              return MPEG4NBit;
+                case FF_PROFILE_MPEG4_SCALABLE_TEXTURE:   return MPEG4ScaleableTexture;
+                case FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION:  return MPEG4SimpleFace;
+                case FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE: return MPEG4BasicAnimated;
+                case FF_PROFILE_MPEG4_HYBRID:             return MPEG4Hybrid;
+                case FF_PROFILE_MPEG4_ADVANCED_REAL_TIME: return MPEG4AdvancedRT;
+                case FF_PROFILE_MPEG4_CORE_SCALABLE:      return MPEG4CoreScaleable;
+                case FF_PROFILE_MPEG4_ADVANCED_CODING:    return MPEG4AdvancedCoding;
+                case FF_PROFILE_MPEG4_ADVANCED_CORE:      return MPEG4AdvancedCore;
+                case FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE: return MPEG4AdvancedScaleableTexture;
+                case FF_PROFILE_MPEG4_SIMPLE_STUDIO:      return MPEG4SimpleStudio;
+                case FF_PROFILE_MPEG4_ADVANCED_SIMPLE:    return MPEG4AdvancedSimple;
+            }
+            break;
+        case AV_CODEC_ID_H263: return H263;
+        case AV_CODEC_ID_H264:
+            switch (Profile)
+            {
+                // Mapping of H264MainExtended, H264ConstrainedHigh?
+                case FF_PROFILE_H264_BASELINE: return H264Baseline;
+                case FF_PROFILE_H264_CONSTRAINED_BASELINE: return H264ConstrainedBaseline;
+                case FF_PROFILE_H264_MAIN:     return H264Main;
+                case FF_PROFILE_H264_EXTENDED: return H264Extended;
+                case FF_PROFILE_H264_HIGH:     return H264High;
+                case FF_PROFILE_H264_HIGH_10:  return H264High10;
+                //case FF_PROFILE_H264_HIGH_10_INTRA:
+                //case FF_PROFILE_H264_MULTIVIEW_HIGH:
+                case FF_PROFILE_H264_HIGH_422: return H264High422;
+                //case FF_PROFILE_H264_HIGH_422_INTRA:
+                //case FF_PROFILE_H264_STEREO_HIGH:
+                case FF_PROFILE_H264_HIGH_444: return H264High444;
+                //case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
+                //case FF_PROFILE_H264_HIGH_444_INTRA:
+                //case FF_PROFILE_H264_CAVLC_444:
+            }
+            break;
+        case AV_CODEC_ID_HEVC:
+            switch (Profile)
+            {
+                case FF_PROFILE_HEVC_MAIN:    return HEVCMain;
+                case FF_PROFILE_HEVC_MAIN_10: return HEVCMain10;
+                case FF_PROFILE_HEVC_MAIN_STILL_PICTURE: return HEVCMainStill;
+                case FF_PROFILE_HEVC_REXT:    return HEVCRext;
+            }
+            break;
+        case AV_CODEC_ID_VC1:
+            switch (Profile)
+            {
+                case FF_PROFILE_VC1_SIMPLE:   return VC1Simple;
+                case FF_PROFILE_VC1_MAIN:     return VC1Main;
+                case FF_PROFILE_VC1_COMPLEX:  return VC1Complex;
+                case FF_PROFILE_VC1_ADVANCED: return VC1Advanced;
+            }
+            break;
+        case AV_CODEC_ID_VP8: return VP8;
+        case AV_CODEC_ID_VP9:
+            switch (Profile)
+            {
+                case FF_PROFILE_VP9_0: return VP9_0;
+                case FF_PROFILE_VP9_1: return VP9_1;
+                case FF_PROFILE_VP9_2: return VP9_2;
+                case FF_PROFILE_VP9_3: return VP9_3;
+            }
+            break;
+        case AV_CODEC_ID_AV1:
+            switch (Profile)
+            {
+                case FF_PROFILE_AV1_MAIN: return AV1Main;
+                case FF_PROFILE_AV1_HIGH: return AV1High;
+                case FF_PROFILE_AV1_PROFESSIONAL: return AV1Professional;
+            }
+            break;
+        case AV_CODEC_ID_MJPEG: return MJPEG;
+        default: break;
+    }
+
+    return NoProfile;
+}
+
+QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size)
+{
+    QString profile;
+    switch (Profile)
+    {
+        case NoProfile:    profile = QObject::tr("Unknown/Unsupported"); break;
+        case MPEG2:        profile = "MPEG2"; break;
+        case MPEG2Simple:  profile = "MPEG2 Simple"; break;
+        case MPEG2Main:    profile = "MPEG2 Main"; break;
+        case MPEG2422:     profile = "MPEG2 422"; break;
+        case MPEG2High:    profile = "MPEG2 High"; break;
+        case MPEG2Spatial: profile = "MPEG2 Spatial"; break;
+        case MPEG2SNR:     profile = "MPEG2 SNR"; break;
+        case MPEG4:        profile = "MPEG4"; break;
+        case MPEG4Simple:  profile = "MPEG4 Simple"; break;
+        case MPEG4SimpleScaleable: profile = "MPEG4 Simple Scaleable"; break;
+        case MPEG4Core:    profile = "MPEG4 Core"; break;
+        case MPEG4Main:    profile = "MPEG4 Main"; break;
+        case MPEG4NBit:    profile = "MPEG4 NBit"; break;
+        case MPEG4ScaleableTexture: profile = "MPEG4 Scaleable Texture"; break;
+        case MPEG4SimpleFace:     profile = "MPEG4 Simple Face"; break;
+        case MPEG4BasicAnimated:  profile = "MPEG4 Basic Animated"; break;
+        case MPEG4Hybrid:         profile = "MPEG4 Hybrid"; break;
+        case MPEG4AdvancedRT:     profile = "MPEG4 Advanced RT"; break;
+        case MPEG4CoreScaleable:  profile = "MPEG4 Core Scaleable"; break;
+        case MPEG4AdvancedCoding: profile = "MPEG4 Advanced Coding"; break;
+        case MPEG4AdvancedCore:   profile = "MPEG4 Advanced Core"; break;
+        case MPEG4AdvancedScaleableTexture: profile = "MPEG4 Advanced Scaleable Texture"; break;
+        case MPEG4SimpleStudio:   profile = "MPEG4 Simple Studio"; break;
+        case MPEG4AdvancedSimple: profile = "MPEG4 Advanced Simple"; break;
+        case H263:         profile = "H263"; break;
+        case H264:         profile = "H264"; break;
+        case H264Baseline: profile = "H264 Baseline"; break;
+        case H264ConstrainedBaseline: profile = "H264 Constrained"; break;
+        case H264Main:     profile = "H264 Main"; break;
+        case H264MainExtended: profile = "H264 Main Extended"; break;
+        case H264High:     profile = "H264 High"; break;
+        case H264High10:   profile = "H264 High10"; break;
+        case H264Extended: profile = "H264 Extended"; break;
+        case H264High422:  profile = "H264 High 422"; break;
+        case H264High444:  profile = "H264 High 444"; break;
+        case H264ConstrainedHigh: profile = "H264 Constrained High"; break;
+        case HEVC:         profile = "HEVC"; break;
+        case HEVCMain:     profile = "HEVC Main"; break;
+        case HEVCMain10:   profile = "HEVC Main10"; break;
+        case HEVCMainStill: profile = "HEVC Main Still"; break;
+        case HEVCRext:      profile = "HEVC Rext"; break;
+        case HEVCMain10HDR: profile = "HEVC Main10HDR"; break;
+        case HEVCMain10HDRPlus: profile = "HEVC Main10HDRPlus"; break;
+        case VC1:          profile = "VC1"; break;
+        case VC1Simple:    profile = "VC1 Simple"; break;
+        case VC1Main:      profile = "VC1 Main"; break;
+        case VC1Complex:   profile = "VC1 Complex"; break;
+        case VC1Advanced:  profile = "VC1 Advanced"; break;
+        case VP8:          profile = "VP8"; break;
+        case VP9:          profile = "VP9"; break;
+        case VP9_0:        profile = "VP9 Level 0"; break;
+        case VP9_1:        profile = "VP9 Level 1"; break;
+        case VP9_2:        profile = "VP9 Level 2"; break;
+        case VP9_2HDR:     profile = "VP9 Level 2 HDR"; break;
+        case VP9_2HDRPlus: profile = "VP9 Level 2 HDRPlus"; break;
+        case VP9_3:        profile = "VP9 Level 3"; break;
+        case VP9_3HDR:     profile = "VP9 Level 3 HDR"; break;
+        case VP9_3HDRPlus: profile = "VP9 Level 3 HDRPlus"; break;
+        case AV1:          profile = "AV1"; break;
+        case AV1Main:      profile = "AV1 Main"; break;
+        case AV1High:      profile = "AV1 High"; break;
+        case AV1Professional: profile = "AV1 Professional"; break;
+        case MJPEG:        profile = "MJPEG";
+    }
+
+    if (Size.isEmpty())
+        return profile;
+
+    return QObject::tr("%1 (Max size: %2x%3)").arg(profile).arg(Size.width()).arg(Size.height());
 }

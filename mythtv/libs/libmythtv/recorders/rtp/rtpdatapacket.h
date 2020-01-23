@@ -30,12 +30,12 @@
 class RTPDataPacket : public UDPPacket
 {
   public:
-    RTPDataPacket(const RTPDataPacket &o)  = default;
+    RTPDataPacket(const RTPDataPacket&)  = default;
     explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o), m_off(0) { }
     explicit RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
     RTPDataPacket(void) : UDPPacket(0ULL) { }
 
-    RTPDataPacket& operator=(const RTPDataPacket &rhs) = default;
+    RTPDataPacket& operator=(const RTPDataPacket&) = default;
 
     bool IsValid(void) const override // UDPPacket
     {

@@ -69,6 +69,22 @@ static HostSpinBoxSetting *AudioReadAhead()
     return gc;
 }
 
+static HostComboBoxSetting *ColourPrimaries()
+{
+    auto *gc = new HostComboBoxSetting("ColourPrimariesMode");
+    gc->setLabel(PlaybackSettings::tr("Primary colourspace conversion"));
+    gc->addSelection(toUserString(PrimariesRelaxed),  toDBString(PrimariesRelaxed));
+    gc->addSelection(toUserString(PrimariesExact),    toDBString(PrimariesExact));
+    gc->addSelection(toUserString(PrimariesDisabled), toDBString(PrimariesDisabled));
+    gc->setHelpText(PlaybackSettings::tr(
+        "Converting between different primary colourspaces incurs a small "
+        "performance penalty but in some situations the difference in output is "
+        "barely noticeable. The default ('Auto') behavour is to only enforce "
+        "this converion when there is a significant difference between source "
+        "colourspace primaries and the display."));
+    return gc;
+}
+
 static HostCheckBoxSetting *ChromaUpsampling()
 {
     auto *gc = new HostCheckBoxSetting("ChromaUpsamplingFilter");
@@ -2009,7 +2025,7 @@ static HostTextEditSetting *SetupPinCode()
     return ge;
 }
 
-static HostComboBoxSetting *XineramaScreen()
+static HostComboBoxSetting *ScreenSelection()
 {
     auto *gc = new HostComboBoxSetting("XineramaScreen", false);
     gc->setLabel(AppearanceSettings::tr("Display on screen"));
@@ -2020,26 +2036,28 @@ static HostComboBoxSetting *XineramaScreen()
 }
 
 
-static HostComboBoxSetting *XineramaMonitorAspectRatio()
+static HostComboBoxSetting *ScreenAspectRatio()
 {
     auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
-    gc->setLabel(AppearanceSettings::tr("Virtual monitor aspect ratio"));
-
-    gc->addSelection(AppearanceSettings::tr("Auto",                     "0.0"));
-    gc->addSelection(AppearanceSettings::tr("16:9 (Grid)"),             "1.7777");
-    gc->addSelection(AppearanceSettings::tr("32:9 (Side by side)"),     "3.5555");
-    gc->addSelection(AppearanceSettings::tr("16:18 (Above and below)"), "0.8888");
-    gc->addSelection(AppearanceSettings::tr("16:10 (Grid)"),            "1.6");
-    gc->addSelection(AppearanceSettings::tr("32:10 (Side by Side)"),    "3.2");
-    gc->addSelection(AppearanceSettings::tr("16:20 (Above and below)"), "0.8");
-    gc->addSelection(AppearanceSettings::tr("4:3 (Grid)"),              "1.3333");
-
+    gc->setLabel(AppearanceSettings::tr("Screen aspect ratio"));
+    gc->addSelection(AppearanceSettings::tr("Auto"),    "0.0");
+    gc->addSelection(AppearanceSettings::tr("16:9"),    "1.7777");
+    gc->addSelection(AppearanceSettings::tr("16:10"),   "1.6");
+    gc->addSelection(AppearanceSettings::tr("21:9"),    "2.3704"); // N.B. Actually 64:27
+    gc->addSelection(AppearanceSettings::tr("32:9"),    "3.5555");
+    gc->addSelection(AppearanceSettings::tr("256:135"), "1.8963"); // '4K HD'
+    gc->addSelection(AppearanceSettings::tr("3:2"),     "1.5");
+    gc->addSelection(AppearanceSettings::tr("5:4"),     "1.25");
+    gc->addSelection(AppearanceSettings::tr("4:3"),     "1.3333");
+    gc->addSelection(AppearanceSettings::tr("16:18 (16:9 Above and below)"),  "0.8888");
+    gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
+    gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
-            "The aspect ratio cannot always be queried when using multiple "
-            "displays . Use Auto to try and detect a sensible value, otherwise "
-            "choose an appropriate override."));
-
+            "The aspect ratio of the screen (or screens) is usually automatically detected "
+            "from the connected display ('Auto'). If automatic detection fails, the correct "
+            "aspect ratio can be specified here. Note: Some values (e.g 32:10) are "
+            "primarily intended for multiscreen setups."));
     return gc;
 }
 
@@ -2155,38 +2173,6 @@ static HostSpinBoxSetting *GuiOffsetY()
     return gs;
 }
 
-#if 0
-static HostSpinBoxSetting *DisplaySizeWidth()
-{
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeWidth", 0, 10000, 1);
-
-    gs->setLabel(AppearanceSettings::tr("Display size - width"));
-
-    gs->setValue(0);
-
-    gs->setHelpText(AppearanceSettings::tr("Horizontal size of the monitor or TV. Used "
-                    "to calculate the actual aspect ratio of the display. This "
-                    "will override the DisplaySize from the system."));
-
-    return gs;
-}
-
-static HostSpinBoxSetting *DisplaySizeHeight()
-{
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeHeight", 0, 10000, 1);
-
-    gs->setLabel(AppearanceSettings::tr("Display size - height"));
-
-    gs->setValue(0);
-
-    gs->setHelpText(AppearanceSettings::tr("Vertical size of the monitor or TV. Used "
-                    "to calculate the actual aspect ratio of the display. This "
-                    "will override the DisplaySize from the system."));
-
-    return gs;
-}
-#endif
-
 static HostCheckBoxSetting *GuiSizeForTV()
 {
     auto *gc = new HostCheckBoxSetting("GuiSizeForTV");
@@ -2200,7 +2186,6 @@ static HostCheckBoxSetting *GuiSizeForTV()
     return gc;
 }
 
-#if defined(USING_XRANDR) || CONFIG_DARWIN
 static HostCheckBoxSetting *UseVideoModes()
 {
     HostCheckBoxSetting *gc = new VideoModeSettings("UseVideoModes");
@@ -2210,8 +2195,9 @@ static HostCheckBoxSetting *UseVideoModes()
 
     gc->setValue(false);
 
-    gc->setHelpText(VideoModeSettings::tr("Switch X Window video modes for TV. "
-                                          "Requires \"xrandr\" support."));
+    gc->setHelpText(VideoModeSettings::tr(
+                        "Switch video modes for playback depending on the source "
+                        "resolution and frame rate."));
     return gc;
 }
 
@@ -2485,7 +2471,6 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
 
     addChild(overrides);
 };
-#endif
 
 static HostCheckBoxSetting *HideMouseCursor()
 {
@@ -4231,6 +4216,7 @@ void PlaybackSettings::Load(void)
     advanced->setLabel(tr("Advanced Playback Settings"));
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
+    advanced->addChild(ColourPrimaries());
     advanced->addChild(ChromaUpsampling());
 #ifdef USING_VAAPI
     advanced->addChild(VAAPIDevice());
@@ -4506,15 +4492,14 @@ void AppearanceSettings::applyChange()
 
 void AppearanceSettings::PopulateScreens(int Screens)
 {
-    m_xineramaScreen->setEnabled(Screens > 1);
-    m_xineramaAspect->setEnabled(Screens > 1);
-    m_xineramaScreen->clearSelections();
+    m_screen->clearSelections();
     foreach (QScreen *qscreen, qGuiApp->screens())
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
-        m_xineramaScreen->addSelection(qscreen->name() + extra, qscreen->name());
+        m_screen->addSelection(qscreen->name() + extra, qscreen->name());
     }
-    m_xineramaScreen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
+    if (Screens > 1)
+        m_screen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
 }
 
 AppearanceSettings::AppearanceSettings()
@@ -4527,15 +4512,12 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(GUIRGBLevels());
 
     m_display = MythDisplay::AcquireRelease();
-    m_xineramaScreen = XineramaScreen();
-    m_xineramaAspect = XineramaMonitorAspectRatio();
-    screen->addChild(m_xineramaScreen);
-    screen->addChild(m_xineramaAspect);
+    m_screen = ScreenSelection();
+    m_screenAspect = ScreenAspectRatio();
+    screen->addChild(m_screen);
+    screen->addChild(m_screenAspect);
     PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
-
-//    screen->addChild(DisplaySizeHeight());
-//    screen->addChild(DisplaySizeWidth());
 
     screen->addChild(new GuiDimension());
 
@@ -4552,13 +4534,15 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(AirPlayFullScreen());
 #endif
 
-#if defined(USING_XRANDR) || CONFIG_DARWIN
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<MythDisplayMode> scr = display->GetVideoModes();
+    if (display->VideoModesAvailable())
+    {
+        vector<MythDisplayMode> scr = display->GetVideoModes();
+        if (!scr.empty())
+            addChild(UseVideoModes());
+    }
     MythDisplay::AcquireRelease(false);
-    if (!scr.empty())
-        addChild(UseVideoModes());
-#endif
+
     auto *dates = new GroupSetting();
 
     dates->setLabel(tr("Localization"));

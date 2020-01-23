@@ -17,6 +17,9 @@ extern "C" {
 #include "libavfilter/buffersrc.h"
 }
 
+typedef QPair<MythCodecContext::CodecProfile,QPair<QSize,QSize>> VAAPIProfile;
+typedef QList<VAAPIProfile> VAAPIProfiles;
+
 class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 {
   public:
@@ -39,7 +42,8 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
                                           const AVPixelFormat *PixFmt);
     static enum AVPixelFormat GetFormat2 (AVCodecContext *Context,
                                           const AVPixelFormat *PixFmt);
-    static bool HaveVAAPI                (bool ReCheck = false);
+    static QString HaveVAAPI             (bool ReCheck = false);
+    static void GetDecoderList           (QStringList &Decoders);
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
@@ -47,6 +51,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
     static AVPixelFormat FramesFormat    (AVPixelFormat Format);
     void        DestroyDeinterlacer      (void);
+    static const VAAPIProfiles& GetProfiles(void);
 
     MythDeintType    m_deinterlacer      { DEINT_NONE };
     bool             m_deinterlacer2x    { false      };

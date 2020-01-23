@@ -266,8 +266,6 @@ void MythUIHelperPrivate::StoreGUIsettings()
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
     font.setPixelSize(static_cast<int>(lroundf(19.0F * m_hmult)));
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
     int stretch = static_cast<int>(100 / m_display->GetPixelAspectRatio());
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI
@@ -828,17 +826,15 @@ void MythUIHelper::UpdateScreenSettings(void)
     d->StoreGUIsettings();
 }
 
+QRect MythUIHelper::GetScreenSettings(void)
+{
+    return d->m_screenRect;
+}
+
 void MythUIHelper::GetScreenSettings(float &XFactor, float &YFactor)
 {
     XFactor = d->m_wmult;
     YFactor = d->m_hmult;
-}
-
-void MythUIHelper::GetScreenSettings(QSize &Size, float &XFactor, float &YFactor)
-{
-    XFactor = d->m_wmult;
-    YFactor = d->m_hmult;
-    Size    = d->m_screenRect.size();
 }
 
 void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor)
@@ -949,6 +945,18 @@ bool MythUIHelper::IsGeometryOverridden(void)
             MythUIHelperPrivate::y_override >= 0 ||
             MythUIHelperPrivate::w_override >= 0 ||
             MythUIHelperPrivate::h_override >= 0);
+}
+
+/*! \brief Return the raw geometry override rectangle.
+ *
+ * Used before MythUIHelper has been otherwise initialised (and hence GetScreenSettings
+ * does not return a valid result).
+*/
+QRect MythUIHelper::GetGeometryOverride(void)
+{
+    // NB Call IsGeometryOverridden first to ensure this is valid
+    return QRect(MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
+                 MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override);
 }
 
 /**

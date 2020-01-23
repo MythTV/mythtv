@@ -1,4 +1,4 @@
-﻿// Qt
+// Qt
 #include <QCoreApplication>
 #include <QWaitCondition>
 
@@ -135,8 +135,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     bool decodeonly = Decoder == "vaapi-dec";
     auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
     auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
-
-    if (!Decoder.startsWith("vaapi") || !HaveVAAPI() || getenv("NO_VAAPI"))
+    QString vendor = HaveVAAPI();
+    if (!Decoder.startsWith("vaapi") || vendor.isEmpty() || getenv("NO_VAAPI"))
         return failure;
 
     QString codec   = ff_codec_id_string((*Context)->codec_id);
@@ -152,7 +152,17 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
     }
 
-    if (!decodeonly)
+    // Check for ironlake decode only - which won't work due to FFmpeg frame format
+    // constraints. May apply to other platforms.
+    if (decodeonly)
+    {
+        if (vendor.contains("ironlake", Qt::CaseInsensitive))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Disallowing VAAPI decode only for Ironlake");
+            return failure;
+        }
+    }
+    else
     {
         // If called from outside of the main thread, we need a MythPlayer instance to
         // process the interop check callback - which may fail otherwise (depending
@@ -170,123 +180,46 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
             return failure;
     }
 
-    // Check for actual decoder support
-    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
-                                                              gCoreContext->GetSetting("VAAPIDevice"));
-    if(!hwdevicectx)
-        return failure;
-
-    // Check for ironlake decode only - which won't work due to FFmpeg frame format
-    // constraints. May apply to other platforms.
-    auto *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
-    auto *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
-
-    if (decodeonly)
+    // Check profile support
+    bool ok = false;
+    const VAAPIProfiles& profiles = MythVAAPIContext::GetProfiles();
+    MythCodecContext::CodecProfile mythprofile =
+            MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
+    auto haveprofile = [=](MythCodecContext::CodecProfile Profile, QSize Size)
     {
-        QString vendor = vaQueryVendorString(hwctx->display);
-        if (vendor.contains("ironlake", Qt::CaseInsensitive))
+        foreach (auto vaprofile, profiles)
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Disallowing VAAPI decode only for Ironlake");
-            av_buffer_unref(&hwdevicectx);
-            return failure;
-        }
-    }
-
-    bool foundprofile = false;
-    bool foundentry   = false;
-    bool sizeok       = true;
-
-    VAConfigID config = 0;
-    if (vaCreateConfig(hwctx->display, desired, VAEntrypointVLD, nullptr, 0, &config) == VA_STATUS_SUCCESS)
-    {
-        auto *hwconfig = reinterpret_cast<AVVAAPIHWConfig*>(av_hwdevice_hwconfig_alloc(hwdevicectx));
-        hwconfig->config_id = config;
-        AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, hwconfig);
-        vaDestroyConfig(hwctx->display, config);
-        av_free(hwconfig);
-
-        if (constraints)
-        {
-            if ((constraints->min_width > (*Context)->width) || (constraints->min_height > (*Context)->height))
-                sizeok = false;
-            if ((constraints->max_width < (*Context)->width) || (constraints->max_height < (*Context)->height))
-                sizeok = false;
-            av_hwframe_constraints_free(&constraints);
-        }
-    }
-
-    // FFmpeg checks profiles very late and never checks entrypoints.
-    int profilecount = vaMaxNumProfiles(hwctx->display);
-    auto *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
-    if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
-    {
-        for (int i = 0; i < profilecount; ++i)
-        {
-            if (profilelist[i] == desired)
+            if (vaprofile.first == Profile &&
+                vaprofile.second.first.width() <= Size.width() &&
+                vaprofile.second.first.height() <= Size.height() &&
+                vaprofile.second.second.width() >= Size.width() &&
+                vaprofile.second.second.height() >= Size.height())
             {
-                foundprofile = true;
-                break;
+                return true;
             }
         }
-    }
-    av_freep(&profilelist);
+        return false;
+    };
 
-    if (VAProfileNone != desired)
+    ok = haveprofile(mythprofile, QSize((*Context)->width, (*Context)->height));
+    // use JPEG support as a proxy for MJPEG (full range YUV)
+    if (ok && (AV_PIX_FMT_YUVJ420P == (*Context)->pix_fmt || AV_PIX_FMT_YUVJ422P == (*Context)->pix_fmt ||
+               AV_PIX_FMT_YUVJ444P == (*Context)->pix_fmt))
     {
-        int count = 0;
-        int entrysize = vaMaxNumEntrypoints(hwctx->display);
-        auto *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
-        if (vaQueryConfigEntrypoints(hwctx->display, desired, entrylist, &count) == VA_STATUS_SUCCESS)
-        {
-            for (int i = 0; i < count; ++i)
-            {
-                if (entrylist[i] == VAEntrypointVLD)
-                {
-                    foundentry = true;
-                    break;
-                }
-            }
-        }
-
-        // use JPEG support as a proxy for MJPEG (full range YUV)
-        if (foundentry && ((AV_PIX_FMT_YUVJ420P == (*Context)->pix_fmt || AV_PIX_FMT_YUVJ422P == (*Context)->pix_fmt ||
-                            AV_PIX_FMT_YUVJ444P == (*Context)->pix_fmt)))
-        {
-            bool jpeg = false;
-            if (vaQueryConfigEntrypoints(hwctx->display, VAProfileJPEGBaseline, entrylist, &count) == VA_STATUS_SUCCESS)
-            {
-                for (int i = 0; i < count; ++i)
-                {
-                    if (entrylist[i] == VAEntrypointVLD)
-                    {
-                        jpeg = true;
-                        break;
-                    }
-                }
-            }
-            if (!jpeg)
-                foundentry = false;
-        }
-
-        av_freep(&entrylist);
+        ok = haveprofile(MythCodecContext::MJPEG, QSize());
     }
 
-    av_buffer_unref(&hwdevicectx);
+    QString desc = QString("'%1 %2 %3 %4x%5'")
+        .arg(codec).arg(profile).arg(pixfmt).arg((*Context)->width).arg((*Context)->height);
 
-    if (foundprofile && sizeok && foundentry)
+    if (ok)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg(codec)
-                .arg(profile).arg(pixfmt));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI supports decoding %1").arg(desc));
         (*Context)->pix_fmt = AV_PIX_FMT_VAAPI;
         return success;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("HW device type '%1' does not support '%2 %3 %4' (Size:%5 Profile:%6 Entry: %7)")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI))
-            .arg(codec).arg(profile).arg(pixfmt)
-            .arg(sizeok).arg(foundprofile).arg(foundentry));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI does NOT support %1").arg(desc));
     return failure;
 }
 
@@ -506,12 +439,12 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
  * testing fails when used by FFmpeg. So disallow VAAPI over VDPAU - VDPAU should just
  * be used directly.
 */
-bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
+QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
 {
-    static bool s_haveVaapi = false;
-    static bool s_checked   = false;
+    static QString s_vendor;
+    static bool s_checked = false;
     if (s_checked && !ReCheck)
-        return s_haveVaapi;
+        return s_vendor;
     s_checked = true;
 
     AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
@@ -520,15 +453,28 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     {
         auto *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);
         auto *hwctx    = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevice->hwctx);
-        QString vendor(vaQueryVendorString(hwctx->display));
-        if (vendor.contains("vdpau", Qt::CaseInsensitive))
+        s_vendor = QString(vaQueryVendorString(hwctx->display));
+        if (s_vendor.contains("vdpau", Qt::CaseInsensitive))
         {
+            s_vendor = QString();
             LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI is using a VDPAU backend - ignoring VAAPI");
+        }
+        else if (s_vendor.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Unknown VAAPI vendor - ignoring VAAPI");
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI is available");
-            s_haveVaapi = true;
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VAAPI decoders:");
+            const VAAPIProfiles& profiles = MythVAAPIContext::GetProfiles();
+            foreach (auto profile, profiles)
+            {
+                if (profile.first != MythCodecContext::MJPEG)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
+                }
+            }
         }
         av_buffer_unref(&context);
     }
@@ -537,7 +483,128 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI functionality checked failed");
     }
 
-    return s_haveVaapi;
+    return s_vendor;
+}
+
+const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
+{
+    static QMutex lock(QMutex::Recursive);
+    static bool s_initialised = false;
+    static VAAPIProfiles s_profiles;
+
+    QMutexLocker locker(&lock);
+    if (s_initialised)
+        return s_profiles;
+    s_initialised = true;
+
+    auto VAToMythProfile = [](VAProfile Profile)
+    {
+        switch (Profile)
+        {
+            case VAProfileMPEG2Simple:   return MythCodecContext::MPEG2Simple;
+            case VAProfileMPEG2Main:     return MythCodecContext::MPEG2Main;
+            case VAProfileMPEG4Simple:   return MythCodecContext::MPEG4Simple;
+            case VAProfileMPEG4AdvancedSimple: return MythCodecContext::MPEG4AdvancedSimple;
+            case VAProfileMPEG4Main:     return MythCodecContext::MPEG4Main;
+            case VAProfileH263Baseline:  return MythCodecContext::H263;
+            case VAProfileH264ConstrainedBaseline: return MythCodecContext::H264ConstrainedBaseline;
+            case VAProfileH264Main:      return MythCodecContext::H264Main;
+            case VAProfileH264High:      return MythCodecContext::H264High;
+            case VAProfileVC1Simple:     return MythCodecContext::VC1Simple;
+            case VAProfileVC1Main:       return MythCodecContext::VC1Main;
+            case VAProfileVC1Advanced:   return MythCodecContext::VC1Advanced;
+            case VAProfileVP8Version0_3: return MythCodecContext::VP8;
+    #if VA_CHECK_VERSION(0, 38, 0)
+            case VAProfileVP9Profile0:   return MythCodecContext::VP9_0;
+    #endif
+    #if VA_CHECK_VERSION(0, 39, 0)
+            case VAProfileVP9Profile2:   return MythCodecContext::VP9_2;
+    #endif
+    #if VA_CHECK_VERSION(0, 37, 0)
+            case VAProfileHEVCMain:      return MythCodecContext::HEVCMain;
+            case VAProfileHEVCMain10:    return MythCodecContext::HEVCMain10;
+    #endif
+            case VAProfileJPEGBaseline:  return MythCodecContext::MJPEG;
+            default: break;
+        }
+        return MythCodecContext::NoProfile;
+    };
+
+    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
+                                                              gCoreContext->GetSetting("VAAPIDevice"));
+    if(!hwdevicectx)
+        return s_profiles;
+
+    auto *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
+    auto *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
+
+    int profilecount = vaMaxNumProfiles(hwctx->display);
+    auto *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
+    if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
+    {
+        for (int i = 0; i < profilecount; ++i)
+        {
+            VAProfile profile = profilelist[i];
+            if (profile == VAProfileNone || profile == VAProfileH264StereoHigh || profile == VAProfileH264MultiviewHigh)
+                continue;
+            int count = 0;
+            int entrysize = vaMaxNumEntrypoints(hwctx->display);
+            auto *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
+            if (vaQueryConfigEntrypoints(hwctx->display, profile, entrylist, &count) == VA_STATUS_SUCCESS)
+            {
+                for (int j = 0; j < count; ++j)
+                {
+                    if (entrylist[j] != VAEntrypointVLD)
+                        continue;
+
+                    QSize minsize;
+                    QSize maxsize;
+                    VAConfigID config = 0;
+                    if (vaCreateConfig(hwctx->display, profile, VAEntrypointVLD, nullptr, 0, &config) != VA_STATUS_SUCCESS)
+                        continue;
+
+                    uint attrcount = 0;
+                    if (vaQuerySurfaceAttributes(hwctx->display, config, nullptr, &attrcount) == VA_STATUS_SUCCESS)
+                    {
+                        VASurfaceAttrib *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(*attrlist)));
+                        if (vaQuerySurfaceAttributes(hwctx->display, config, attrlist, &attrcount) == VA_STATUS_SUCCESS)
+                        {
+                            for (uint k = 0; k < attrcount; ++k)
+                            {
+                                if (attrlist[k].type == VASurfaceAttribMaxWidth)
+                                    maxsize.setWidth(attrlist[k].value.value.i);
+                                if (attrlist[k].type == VASurfaceAttribMaxHeight)
+                                    maxsize.setHeight(attrlist[k].value.value.i);
+                                if (attrlist[k].type == VASurfaceAttribMinWidth)
+                                    minsize.setWidth(attrlist[k].value.value.i);
+                                if (attrlist[k].type == VASurfaceAttribMinHeight)
+                                    minsize.setHeight(attrlist[k].value.value.i);
+                            }
+                        }
+                        av_freep(&attrlist);
+                    }
+                    vaDestroyConfig(hwctx->display, config);
+                    s_profiles.append(VAAPIProfile(VAToMythProfile(profile), QPair<QSize,QSize>(minsize, maxsize)));
+                }
+            }
+            av_freep(&entrylist);
+        }
+    }
+    av_freep(&profilelist);
+    av_buffer_unref(&hwdevicectx);
+
+    return s_profiles;
+}
+
+void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
+{
+    const VAAPIProfiles& profiles = MythVAAPIContext::GetProfiles();
+    if (profiles.isEmpty())
+        return;
+    Decoders.append("VAAPI:");
+    foreach (auto profile, profiles)
+        if (profile.first != MythCodecContext::MJPEG)
+            Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
 }
 
 void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)

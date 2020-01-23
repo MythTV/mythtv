@@ -250,14 +250,12 @@ bool DTVMultiplex::ParseDVB_C(
     m_modSys.Parse(_mod_sys);
     if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_modSys)
     {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Undefined modulation system " +
+                QString("parameter '%1', using DVB-C/A.").arg(_mod_sys));
         m_modSys = DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG, LOC +
-        QString("%1 ").arg(__FUNCTION__) +
-        QString("_mod_sys:%1 ok:%2 ").arg(_mod_sys).arg(ok) +
-        QString("m_mod_sys:%1 %2 ").arg(m_modSys).arg(m_modSys.toString()));
-
+    // Only DVB-C variants can be used with a DVB-C tuner.
     if ((DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A != m_modSys) &&
         (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B != m_modSys) &&
         (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_C != m_modSys))
@@ -279,12 +277,8 @@ bool DTVMultiplex::ParseDVB_S2(
     bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
                                _fec_inner, _modulation, _polarity);
 
-    if (!m_modSys.Parse(_mod_sys))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid DVB-S2 modulation system " +
-                QString("parameter '%1', aborting.").arg(_mod_sys));
-        return false;
-    }
+    m_modSys = DTVModulationSystem::kModulationSystem_UNDEFINED;
+    m_modSys.Parse(_mod_sys);
 
     // For #10153, guess at modulation system based on modulation
     if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_modSys)
@@ -294,6 +288,7 @@ bool DTVMultiplex::ParseDVB_S2(
             DTVModulationSystem::kModulationSystem_DVBS2;
     }
 
+    // Only DVB-S and DVB_S2 can be used with a DVB-S2 tuner.
     if ((DTVModulationSystem::kModulationSystem_DVBS  != m_modSys) &&
         (DTVModulationSystem::kModulationSystem_DVBS2 != m_modSys))
     {
@@ -319,41 +314,39 @@ bool DTVMultiplex::ParseDVB_T2(
                          _coderate_hp, _coderate_lp, _modulation,
                          _trans_mode, _guard_interval, _hierarchy);
 
-    QString l_mod_sys = _mod_sys;
+    m_modSys = DTVModulationSystem::kModulationSystem_UNDEFINED;
+    m_modSys.Parse(_mod_sys);
 
-    // Accept "0" for "DVB-T" and "1" for "DVB-T2"
+    // Accept 0 for DVB-T
+    if (_mod_sys == "0")
+    {
+        m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T modulation system " +
+                QString("parameter '%1', using %2.").arg(_mod_sys).arg(m_modSys.toString()));
+    }
+
+    // Accept 1 for DVB-T2
     if (_mod_sys == "1")
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T2 modulation system " +
-                QString("parameter '%1', using DVB-T2.").arg(_mod_sys));
         m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
-        l_mod_sys = m_modSys.toString();
-    }
-    else if (_mod_sys == "0")
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T modulation system " +
-                QString("parameter '%1', using DVB-T.").arg(_mod_sys));
-        m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
-        l_mod_sys = m_modSys.toString();
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T2 modulation system " +
+                QString("parameter '%1', using %2.").arg(_mod_sys).arg(m_modSys.toString()));
     }
 
-    if (!m_modSys.Parse(l_mod_sys))
+    // We have a DVB-T2 tuner, change undefined modulation system to DVB-T2
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED == m_modSys)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid DVB-T/T2 modulation system " +
-                QString("parameter '%1', aborting.").arg(l_mod_sys));
-        return false;
+        m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Undefined modulation system, " +
+                QString("using %1.").arg(m_modSys.toString()));
     }
 
-    if (m_modSys == DTVModulationSystem::kModulationSystem_UNDEFINED)
-    {
-        m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
-    }
-
+    // Only DVB-T and DVB-T2 can be used with a DVB-T2 tuner.
     if ((DTVModulationSystem::kModulationSystem_DVBT  != m_modSys) &&
         (DTVModulationSystem::kModulationSystem_DVBT2 != m_modSys))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported DVB-T2 modulation system " +
-            QString("parameter '%1', aborting.").arg(l_mod_sys));
+            QString("%1, aborting.").arg(m_modSys.toString()));
         return false;
     }
 

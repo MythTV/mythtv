@@ -32,7 +32,7 @@
 
 /** Leap seconds as of June 30th, 2012. */
 #define GPS_LEAP_SECONDS 16
-// Note: You can optain this number by adding one
+// Note: You can obtain this number by adding one
 // for every leap second added to UTC since Jan 6th, 1980
 // and subtracting one for every leap second removed.
 // See http://en.wikipedia.org/wiki/Leap_second
@@ -371,7 +371,7 @@ class MTV_PUBLIC TableID
         TSS      = 0xA2,
         CMPNAME  = 0xA3,
 
-        // opentv
+        // OpenTV
         OTV_EIT_TITbeg  = 0xA0, // always on pids config (0x30-0x37)
         OTV_EIT_TITend  = 0xA3, // always on pids config (0x30-0x37)
         OTV_EIT_SUMbeg  = 0xA8, // always on pids config (0x40-0x47)
@@ -446,7 +446,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         m_pesDataSize = SectionLength();
     }
   public:
-    PSIPTable(const PSIPTable& table) = default;
+    PSIPTable(const PSIPTable&) = default;
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     explicit PSIPTable(const PESPacket& table) : PESPacket(table)

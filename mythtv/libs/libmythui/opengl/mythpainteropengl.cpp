@@ -82,7 +82,11 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     MythPainter::Begin(Parent);
 
     if (!m_parent)
+    {
         m_parent = dynamic_cast<QWidget *>(Parent);
+        if (!m_parent)
+            return;
+    }
 
     if (!m_render)
     {
@@ -132,8 +136,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     if (m_target || m_swapControl)
     {
         m_render->BindFramebuffer(m_target);
-        if (m_parent)
-            m_render->SetViewPort(QRect(0, 0, m_parent->width(), m_parent->height()));
+        m_render->SetViewPort(QRect(0, 0, m_parent->width(), m_parent->height()));
         m_render->SetBackground(0, 0, 0, 0);
         m_render->ClearFramebuffer();
     }

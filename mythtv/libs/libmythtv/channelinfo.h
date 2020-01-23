@@ -203,7 +203,7 @@ class MTV_PUBLIC ChannelInsertInfo
     m_decryptionStatus(_decryption_status) {}
 
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
-    ChannelInsertInfo &operator=(const ChannelInsertInfo &other) = default;
+    ChannelInsertInfo &operator=(const ChannelInsertInfo&) = default;
 
     bool IsSameChannel(const ChannelInsertInfo &other, int relaxed = 0) const;
 

@@ -78,7 +78,6 @@ void VideoOutWindow::PopulateGeometry(void)
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
-        m_usingXinerama = true;
         m_screenGeometry = screen->virtualGeometry();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window using all screens %1x%2")
             .arg(m_screenGeometry.width()).arg(m_screenGeometry.height()));
@@ -423,6 +422,12 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
         connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
     }
 
+    if (m_display)
+    {
+        QString dummy;
+        m_displayAspect = static_cast<float>(m_display->GetAspectRatio(dummy));
+    }
+
     // Refresh the geometry in case the video mode has changed
     PopulateGeometry();
 
@@ -459,29 +464,6 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
 
 void VideoOutWindow::PrintMoveResizeDebug(void)
 {
-#if 0
-    LOG(VB_PLAYBACK, LOG_DEBUG, "VideoOutWindow::MoveResize:");
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Img(%1,%2 %3,%4)")
-           .arg(video_rect.left()).arg(video_rect.top())
-           .arg(video_rect.width()).arg(video_rect.height()));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Disp(%1,%2 %3,%4)")
-           .arg(display_video_rect.left()).arg(display_video_rect.top())
-           .arg(display_video_rect.width()).arg(display_video_rect.height()));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Vscan(%1, %2)")
-           .arg(db_scale_vert).arg(db_scale_vert));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("DisplayAspect: %1")
-           .arg(GetDisplayAspect()));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("VideoAspect(%1)")
-           .arg(video_aspect));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overriden_video_aspect(%1)")
-           .arg(overriden_video_aspect));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("CDisplayAspect: %1")
-           .arg(fix_aspect(GetDisplayAspect())));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AspectOverride: %1")
-           .arg(aspectoverride));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AdjustFill: %1") .arg(adjustfill));
-#endif
-
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window Rect:  %1x%2+%3+%4")
         .arg(m_windowRect.width()).arg(m_windowRect.height())
         .arg(m_windowRect.left()).arg(m_windowRect.top()));
@@ -622,15 +604,13 @@ void VideoOutWindow::SetVideoScalingAllowed(bool Change)
     }
 }
 
-void VideoOutWindow::SetDisplayProperties(QSize DisplayDim, float DisplayAspect)
+void VideoOutWindow::SetDisplayAspect(float DisplayAspect)
 {
-    if (DisplayDim != m_displayDimensions || !qFuzzyCompare(DisplayAspect + 10.0F, m_displayAspect + 10.0F))
+    if (!qFuzzyCompare(DisplayAspect + 10.0F, m_displayAspect + 10.0F))
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("New display properties: %1mmx%2mm Aspect %3")
-            .arg(DisplayDim.width()).arg(DisplayDim.height())
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("New display aspect: %1")
             .arg(static_cast<double>(DisplayAspect)));
-        m_displayDimensions = DisplayDim;
-        m_displayAspect     = DisplayAspect;
+        m_displayAspect = DisplayAspect;
         MoveResize();
     }
 }

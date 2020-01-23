@@ -108,8 +108,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     FullChannelSearch    *m_fullSearch    {nullptr};
     AddFullTS            *m_addFullTS     {nullptr};
     TrustEncSISetting    *m_trustEncSI    {nullptr};
-    ScanOpenTV           *m_scanOpenTV    {nullptr};
-// End of members moved from ScanWizardConfig
+  // End of members moved from ScanWizardConfig
 };
 
 #endif // SCANWIZARD_H

@@ -3,8 +3,8 @@ include ( ../../settings.pro )
 QT += xml sql network widgets
 using_qtwebkit {
     QT += webkitwidgets
-    android: QT += androidextras
 }
+android: QT += androidextras
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
@@ -111,6 +111,15 @@ using_drm {
     SOURCES += platforms/mythdisplaydrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+}
+
+# Use MMAL as a proxy for Raspberry Pi support
+using_mmal {
+    DEFINES += USING_MMAL
+    HEADERS += platforms/mythdisplayrpi.h
+    SOURCES += platforms/mythdisplayrpi.cpp
+    LIBS    += -L/opt/vc/lib -lvchostif -lvchiq_arm
+    QMAKE_CXXFLAGS += -isystem /opt/vc/include
 }
 
 using_qtdbus {

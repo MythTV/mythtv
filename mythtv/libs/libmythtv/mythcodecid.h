@@ -28,6 +28,7 @@ enum MythCodecID
     kCodec_VP8,
     kCodec_VP9,
     kCodec_HEVC,
+    kCodec_AV1,
 
     kCodec_NORMAL_END,
     
@@ -43,6 +44,7 @@ enum MythCodecID
     kCodec_VP8_VDPAU,
     kCodec_VP9_VDPAU,
     kCodec_HEVC_VDPAU,
+    kCodec_AV1_VDPAU,
 
     kCodec_VDPAU_END,
 
@@ -58,6 +60,7 @@ enum MythCodecID
     kCodec_VP8_VDPAU_DEC,
     kCodec_VP9_VDPAU_DEC,
     kCodec_HEVC_VDPAU_DEC,
+    kCodec_AV1_VDPAU_DEC,
 
     kCodec_VDPAU_DEC_END,
 
@@ -73,6 +76,7 @@ enum MythCodecID
     kCodec_VP8_VAAPI,
     kCodec_VP9_VAAPI,
     kCodec_HEVC_VAAPI,
+    kCodec_AV1_VAAPI,
 
     kCodec_VAAPI_END,
 
@@ -88,6 +92,7 @@ enum MythCodecID
     kCodec_VP8_VAAPI_DEC,
     kCodec_VP9_VAAPI_DEC,
     kCodec_HEVC_VAAPI_DEC,
+    kCodec_AV1_VAAPI_DEC,
 
     kCodec_VAAPI_DEC_END,
 
@@ -103,6 +108,7 @@ enum MythCodecID
     kCodec_VP8_DXVA2,
     kCodec_VP9_DXVA2,
     kCodec_HEVC_DXVA2,
+    kCodec_AV1_DXVA2,
 
     kCodec_DXVA2_END,
 
@@ -118,6 +124,7 @@ enum MythCodecID
     kCodec_VP8_MEDIACODEC,
     kCodec_VP9_MEDIACODEC,
     kCodec_HEVC_MEDIACODEC,
+    kCodec_AV1_MEDIACODEC,
 
     kCodec_MEDIACODEC_END,
 
@@ -133,6 +140,7 @@ enum MythCodecID
     kCodec_VP8_MEDIACODEC_DEC,
     kCodec_VP9_MEDIACODEC_DEC,
     kCodec_HEVC_MEDIACODEC_DEC,
+    kCodec_AV1_MEDIACODEC_DEC,
 
     kCodec_MEDIACODEC_DEC_END,
 
@@ -148,6 +156,7 @@ enum MythCodecID
     kCodec_VP8_NVDEC,
     kCodec_VP9_NVDEC,
     kCodec_HEVC_NVDEC,
+    kCodec_AV1_NVDEC,
 
     kCodec_NVDEC_END,
 
@@ -163,6 +172,7 @@ enum MythCodecID
     kCodec_VP8_NVDEC_DEC,
     kCodec_VP9_NVDEC_DEC,
     kCodec_HEVC_NVDEC_DEC,
+    kCodec_AV1_NVDEC_DEC,
 
     kCodec_NVDEC_DEC_END,
 
@@ -178,6 +188,7 @@ enum MythCodecID
     kCodec_VP8_VTB,
     kCodec_VP9_VTB,
     kCodec_HEVC_VTB,
+    kCodec_AV1_VTB,
 
     kCodec_VTB_END,
 
@@ -193,6 +204,7 @@ enum MythCodecID
     kCodec_VP8_VTB_DEC,
     kCodec_VP9_VTB_DEC,
     kCodec_HEVC_VTB_DEC,
+    kCodec_AV1_VTB_DEC,
 
     kCodec_VTB_DEC_END,
 
@@ -208,6 +220,7 @@ enum MythCodecID
     kCodec_VP8_V4L2,
     kCodec_VP9_V4L2,
     kCodec_HEVC_V4L2,
+    kCodec_AV1_V4L2,
 
     kCodec_V4L2_END,
 
@@ -223,6 +236,7 @@ enum MythCodecID
     kCodec_VP8_V4L2_DEC,
     kCodec_VP9_V4L2_DEC,
     kCodec_HEVC_V4L2_DEC,
+    kCodec_AV1_V4L2_DEC,
 
     kCodec_V4L2_DEC_END,
 
@@ -238,6 +252,7 @@ enum MythCodecID
     kCodec_VP8_MMAL,
     kCodec_VP9_MMAL,
     kCodec_HEVC_MMAL,
+    kCodec_AV1_MMAL,
 
     kCodec_MMAL_END,
 
@@ -253,6 +268,7 @@ enum MythCodecID
     kCodec_VP8_MMAL_DEC,
     kCodec_VP9_MMAL_DEC,
     kCodec_HEVC_MMAL_DEC,
+    kCodec_AV1_MMAL_DEC,
 
     kCodec_MMAL_DEC_END,
 
@@ -268,6 +284,7 @@ enum MythCodecID
     kCodec_VP8_DRMPRIME,
     kCodec_VP9_DRMPRIME,
     kCodec_HEVC_DRMPRIME,
+    kCodec_AV1_DRMPRIME,
 
     kCodec_DRMPRIME_END
 };

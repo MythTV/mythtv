@@ -21,8 +21,8 @@ class text_subtitle_t
   public:
     text_subtitle_t(long start_, long end_) : m_start(start_), m_end(end_) {}
     text_subtitle_t() = default;
-    text_subtitle_t(const text_subtitle_t &other) = default;
-    text_subtitle_t& operator= (const text_subtitle_t &rhs) = default;
+    text_subtitle_t(const text_subtitle_t&) = default;
+    text_subtitle_t& operator= (const text_subtitle_t&) = default;
 
   public:
     uint64_t    m_start {0};  ///< Starting time in msec or starting frame

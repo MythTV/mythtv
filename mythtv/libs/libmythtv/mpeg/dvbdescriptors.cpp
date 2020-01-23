@@ -617,9 +617,9 @@ QString DVBSimulcastChannelDescriptor::toString() const
     return ret;
 }
 
-QString BSkyBLCNDescriptor::toString() const
+QString SkyLCNDescriptor::toString() const
 {
-    QString ret = "BSkyB Logical Channel Number Descriptor ";
+    QString ret = "Sky Logical Channel Number Descriptor ";
     ret += QString("(0x%1) ").arg(DescriptorTag(),2,16,QChar('0'));
     ret += QString("length(%1)").arg(DescriptorLength());
 
@@ -631,8 +631,8 @@ QString BSkyBLCNDescriptor::toString() const
         ret += QString("\n        ServiceID (%1) (0x%2) ").arg(ServiceID(i)).arg(ServiceID(i),4,16,QChar('0'));
         ret += QString("ServiceType (0x%1) ").arg(ServiceType(i),2,16,QChar('0'));
         ret += QString("LCN (%1) ").arg(LogicalChannelNumber(i));
-        ret += QString("U1(0x%1) ").arg(Unknown1(i),4,16,QChar('0'));
-        ret += QString("U2(0x%1) ").arg(Unknown2(i),4,16,QChar('0'));
+        ret += QString("ChannelID(0x%1) ").arg(ChannelID(i),4,16,QChar('0'));
+        ret += QString("Flags(0x%1) ").arg(Flags(i),4,16,QChar('0'));
     }
 
     return ret;

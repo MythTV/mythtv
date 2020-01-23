@@ -21,9 +21,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       m_totalDuration(AVRationalInit(0)),
 
       // language preference
-      m_languagePreference(iso639_get_language_key_list()),
-      // this will be deleted and recreated once decoder is set up
-      m_mythCodecCtx(new MythCodecContext(this, kCodec_NONE))
+      m_languagePreference(iso639_get_language_key_list())
 {
     ResetTracks();
     m_tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));

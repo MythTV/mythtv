@@ -521,9 +521,9 @@ class ImportConfigurationGroup: public GroupSetting
     void probeCard(const QString &device);
 
   private:
-    CaptureCard          &m_parent;
-    TransTextEditSetting *m_info {nullptr};
-    TransTextEditSetting *m_size {nullptr};
+    CaptureCard  &m_parent;
+    GroupSetting *m_info {nullptr};
+    GroupSetting *m_size {nullptr};
 };
 
 class DemoConfigurationGroup: public GroupSetting
@@ -537,9 +537,9 @@ class DemoConfigurationGroup: public GroupSetting
     void probeCard(const QString &device);
 
   private:
-    CaptureCard          &m_parent;
-    TransTextEditSetting *m_info {nullptr};
-    TransTextEditSetting *m_size {nullptr};
+    CaptureCard  &m_parent;
+    GroupSetting *m_info {nullptr};
+    GroupSetting *m_size {nullptr};
 };
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
@@ -554,8 +554,8 @@ class ExternalConfigurationGroup: public GroupSetting
     void probeApp(const QString & path);
 
   private:
-    CaptureCard          &m_parent;
-    TransTextEditSetting *m_info {nullptr};
+    CaptureCard  &m_parent;
+    GroupSetting *m_info {nullptr};
 };
 #endif
 

@@ -246,7 +246,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool GenerateDummyVideoFrames(void);
     bool HasVideo(const AVFormatContext *ic);
-    float normalized_fps(AVStream *stream, AVCodecContext *enc);
+    float GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise = false);
     static void av_update_stream_timings_video(AVFormatContext *ic);
     static bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 

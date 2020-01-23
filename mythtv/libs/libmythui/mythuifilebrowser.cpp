@@ -683,7 +683,7 @@ void MythUIFileBrowser::updateLocalFileList()
     m_locationEdit->SetText(m_subDirectory);
 }
 
-QString MythUIFileBrowser::FormatSize(int size)
+QString MythUIFileBrowser::FormatSize(int64_t size)
 {
     QString filesize("%L1 %2");
 

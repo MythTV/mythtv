@@ -17,7 +17,7 @@ class BackendSettings : public GroupSetting
     TransMythUICheckBoxSetting *m_isMasterBackend   {nullptr};
     HostTextEditSetting        *m_localServerPort   {nullptr};
     HostComboBoxSetting        *m_backendServerAddr {nullptr};
-    GroupSetting               *m_masterServerName  {nullptr};
+    GlobalTextEditSetting      *m_masterServerName  {nullptr};
     IpAddressSettings          *m_ipAddressSettings {nullptr};
     bool                        m_isLoaded          {false};
     QString                     m_priorMasterName;

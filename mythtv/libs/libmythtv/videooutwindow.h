@@ -59,7 +59,7 @@ class VideoOutWindow : public QObject
     void ToggleMoveBottomLine   (void);
     void SaveBottomLine         (void);
     void SetVideoScalingAllowed (bool Change);
-    void SetDisplayProperties   (QSize DisplayDim, float DisplayAspect);
+    void SetDisplayAspect       (float DisplayAspect);
     void SetPIPState            (PIPState Setting);
     void SetWindowSize          (QSize Size);
     void SetITVResize           (QRect Rect);
@@ -69,7 +69,6 @@ class VideoOutWindow : public QObject
     bool     IsEmbedding(void)             const { return m_embedding; }
     QSize    GetVideoDim(void)             const { return m_videoDim; }
     QSize    GetVideoDispDim(void)         const { return m_videoDispDim; }
-    QSize    GetDisplayDim(void)           const { return m_displayDimensions; }
     int      GetPIPSize(void)              const { return m_dbPipSize; }
     PIPState GetPIPState(void)             const { return m_pipState; }
     float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
@@ -79,7 +78,6 @@ class VideoOutWindow : public QObject
     QRect    GetVideoRect(void)            const { return m_videoRect; }
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
     QRect    GetEmbeddingRect(void)        const { return m_embeddingRect; }
-    bool     UsingXinerama(void)           const { return m_usingXinerama; }
     bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
     bool     GetITVResizing(void)          const { return m_itvResizing; }
     QRect    GetITVDisplayRect(void)       const { return m_itvDisplayVideoRect; }
@@ -116,7 +114,6 @@ class VideoOutWindow : public QObject
     int     m_dbPipSize        {26};    ///< percentage of full window to use for PiP
     bool    m_dbScalingAllowed {true};  ///< disable this to prevent overscan/underscan
     bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
-    bool    m_usingXinerama    {false}; ///< Display is using multiple screens
     QRect   m_screenGeometry   {0,0,1024,768}; ///< Full screen geometry
 
     // Manual Zoom
@@ -125,7 +122,6 @@ class VideoOutWindow : public QObject
     QPoint  m_manualMove       {0,0};  ///< Manually applied percentage move.
 
     // Physical dimensions
-    QSize   m_displayDimensions {400,300}; ///< Screen dimensions of playback window in mm
     float   m_displayAspect     {1.3333F}; ///< Physical aspect ratio of playback window
 
     // Video dimensions

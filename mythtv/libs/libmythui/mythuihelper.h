@@ -68,13 +68,14 @@ class MUI_PUBLIC MythUIHelper
 
     void UpdateScreenSettings(void);
     // which the user may have set to be different from the raw screen size
+    QRect GetScreenSettings(void);
     void GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor);
-    void GetScreenSettings(QSize &Size, float &XFactor, float &YFactor);
     void GetScreenSettings(float &XFactor, float &YFactor);
 
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);
     static bool IsGeometryOverridden(void);
+    static QRect GetGeometryOverride(void);
 
     /// Returns a reference counted image from the cache.
     /// \note The reference count is set for one use call DecrRef() to delete.

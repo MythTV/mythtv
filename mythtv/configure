@@ -74,11 +74,13 @@ Standard options:
 
 Advanced options (experts only):
   --cross-prefix=PREFIX    use PREFIX for compilation tools [$cross_prefix]
+  --cross-prefix-cc=PREFIX use PREFIX for compiler compilation tools [$cross_prefix_cc]
   --enable-cross-compile   assume a cross-compiler is used
   --sysroot=PATH           root of cross-build tree
   --sysinclude=PATH        location of cross-build system headers
   --cc=CC                  use C compiler CC [$cc_default]
   --cxx=CXX                use C++ compiler CXX [$cxx_default]
+  --enable-set-cc-default  set cc_default and cxx_default to that provided by --cc= and -cxx
   --ld=LD                  use linker LD
   --qmake=QMAKE            use specified qmake [$qmake_default]
   --qmakespecs=PATH        use specified mkspecs
@@ -1382,7 +1384,9 @@ EXTERNAL_LIBRARY_LIST="
     $EXTERNAL_LIBRARY_VERSION3_LIST
     $EXTERNAL_LIBRARY_GPLV3_LIST
     jni
+    libaom
     libass
+    libdav1d
     libfontconfig
     libfreetype
     libiec61883
@@ -2055,6 +2059,7 @@ CMDLINE_SELECT="
     lto
     optimizations
     rpath
+    set_cc_default
     stripping
     $MYTHTV_LIST
     $MYTHTV_CONFIG_LIST
@@ -2104,6 +2109,7 @@ CMDLINE_SET="
     objcc
     cpu
     cross_prefix
+    cross_prefix_cc
     custom_allocator
     cxx
     dep_cc
@@ -2747,9 +2753,11 @@ enable hdpvr
 enable ivtv
 enable asi
 enable lamemp3
+enable libaom
 enable libass
 enable libcec
 enable libcrypto
+enable libdav1d
 enable libdns_sd
 enable libxml2
 enable lirc
@@ -3307,10 +3315,20 @@ if enabled cross_compile; then
     test -n "$arch" && test -n "$target_os" ||
         die "Must specify target arch (--arch) and OS (--target-os) when cross-compiling"
 fi
+test -z "$cross_prefix_cc" && cross_prefix_cc="$cross_prefix"
 
+if enabled set_cc_default; then
+    test -n "$cc" && cc_default="$cc"
+    test -n "$cxx" && cxx_default="$cxx"
+fi
 ar_default="${cross_prefix}${ar_default}"
-cc_default="${cross_prefix}${cc_default}"
-cxx_default="${cross_prefix}${cxx_default}"
+cc_default="${cross_prefix_cc}${cc_default}"
+cxx_default="${cross_prefix_cc}${cxx_default}"
+if enabled set_cc_default; then
+    cc="$cc_default"
+    cxx="$cxx_default"
+fi
+echo "cc_default $cc_default , ${cross_prefix_cc}"
 nm_default="${cross_prefix}${nm_default}"
 pkg_config_default="${cross_prefix}${pkg_config_default}"
 if ${cross_prefix}${ranlib_default} 2>&1 | grep -q "\-D "; then
@@ -6157,6 +6175,10 @@ fi
 
 check_func_headers "windows.h" CreateDIBSection "$gdigrab_indev_extralibs"
 
+# Check VA1 support before enabling in FFmpeg
+enabled libaom   && use_pkg_config libaom "aom >= 1.0.0" aom/aom_codec.h aom_codec_version || disable libaom
+enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.2.1" "dav1d/dav1d.h" dav1d_version || disable libdav1d
+
 enabled vaapi && enabled opengl &&
     check_header GL/glx.h &&
     check_lib vaapi va/va.h vaInitialize -lva
@@ -7169,6 +7191,15 @@ if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
+if enabled libaom; then
+    ffopts="$ffopts --enable-libaom"
+fi
+
+
+if enabled libdav1d; then
+    ffopts="$ffopts --enable-libdav1d"
+fi
+
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -7419,6 +7450,8 @@ echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "x265 (HEVC)               ${libx265-no}"
 echo "vpx                       ${libvpx-no}"
+echo "libaom   (AV1)            ${libaom-no}"
+echo "libdav1d (AV1)            ${libdav1d-no}"
 echo ""
 
 echo "# Compilation Options"

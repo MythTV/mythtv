@@ -6,9 +6,10 @@
 #include <QWindow>
 
 // MythTV
-#include <mythlogging.h>
+#include "mythlogging.h"
 #include "compat.h"
 #include "mythcorecontext.h"
+#include "mythuihelper.h"
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
@@ -26,6 +27,9 @@
 #endif
 #if defined(Q_OS_WIN)
 #include "mythdisplaywindows.h"
+#endif
+#ifdef USING_MMAL
+#include "mythdisplayrpi.h"
 #endif
 
 #define LOC QString("Display: ")
@@ -80,6 +84,10 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 #ifdef USING_X11
             if (MythDisplayX11::IsAvailable())
                 s_display = new MythDisplayX11();
+#endif
+#ifdef USING_MMAL
+            if (!s_display)
+                s_display = new MythDisplayRPI();
 #endif
 #ifdef USING_DRM
 #if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
@@ -150,13 +158,18 @@ QStringList MythDisplay::GetDescription(void)
             result.append(tr("Screen %1 %2:").arg(screen->name()).arg(id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
                 .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
-        if (screen == current && !spanall)
+        if (screen == current)
         {
-            result.append(tr("Aspect ratio") + QString("\t: %1")
-                    .arg(display->GetAspectRatio(), 0, 'f', 3));
-            result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
-                          .arg(display->GetResolution().width()).arg(display->GetResolution().height())
-                          .arg(display->GetRefreshRate(), 0, 'f', 2));
+            QString source;
+            double aspect = display->GetAspectRatio(source);
+            result.append(tr("Aspect ratio") + QString("\t: %1 (%2)")
+                    .arg(aspect, 0, 'f', 3).arg(source));
+            if (!spanall)
+            {
+                result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
+                              .arg(display->GetResolution().width()).arg(display->GetResolution().height())
+                              .arg(display->GetRefreshRate(), 0, 'f', 2));
+            }
         }
     }
     MythDisplay::AcquireRelease(false);
@@ -202,14 +215,14 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     m_widget = MainWindow;
     if (!m_modeComplete)
         UpdateCurrentMode();
-    if (!m_widget)
-        return;
 
     QWindow* oldwindow = m_window;
     if (m_widget)
         m_window = m_widget->windowHandle();
+    else
+        m_window = nullptr;
 
-    if (m_widget != oldwidget)
+    if (m_widget && (m_widget != oldwidget))
         LOG(VB_GENERAL, LOG_INFO, LOC + "Have main widget");
 
     if (m_window && (m_window != oldwindow))
@@ -244,13 +257,11 @@ int MythDisplay::GetScreenCount(void)
 
 double MythDisplay::GetPixelAspectRatio(void)
 {
-    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0 &&
-        m_resolution.width() > 0 && m_resolution.height() > 0)
-    {
-        return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
-               (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
-    }
-    return 1.0;
+    if (m_physicalSize.isEmpty() || m_resolution.isEmpty())
+        return 1.0;
+
+    return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
+           (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
 }
 
 QSize MythDisplay::GetGUIResolution(void)
@@ -284,8 +295,35 @@ QScreen *MythDisplay::GetDesiredScreen(void)
 {
     QScreen* newscreen = nullptr;
 
+    // If geometry is overriden at the command line level, try and determine
+    // which screen that applies to (if any).
+    // N.B. So many potential issues here e.g. should the geometry override be
+    // ignored after first use? (as it will continue to override the screen
+    // regardless of changes to screen preference).
+    if (MythUIHelper::IsGeometryOverridden())
+    {
+        // this matches the check in MythMainWindow
+        bool windowed = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
+                        !MythMainWindow::WindowIsAlwaysFullscreen();
+        QRect override = GetMythUI()->GetGeometryOverride();
+        // When windowed, we use topleft as a best guess as to which screen we belong in.
+        // When fullscreen, Qt appears to use the reverse - though this may be
+        // the window manager rather than Qt. So could be wrong.
+        QPoint point = windowed ? override.topLeft() : override.bottomRight();
+        foreach (QScreen *screen, qGuiApp->screens())
+        {
+            if (screen->geometry().contains(point))
+            {
+                newscreen = screen;
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString(
+                    "Geometry override places window in screen '%1'").arg(newscreen->name()));
+                break;
+            }
+        }
+    }
+
     // If spanning all screens, then always use the primary display
-    if (MythDisplay::SpanAllScreens())
+    if (!newscreen && MythDisplay::SpanAllScreens())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Using primary screen for multiscreen");
         newscreen = qGuiApp->primaryScreen();
@@ -393,9 +431,9 @@ void MythDisplay::UpdateCurrentMode(void)
     QScreen *screen = GetCurrentScreen();
     if (!screen)
     {
-        m_refreshRate = 60.0;
-        m_physicalSize = QSize(160, 90);
-        m_resolution = QSize(1920, 1080);
+        m_refreshRate  = 60.0;
+        m_physicalSize = QSize(0, 0);
+        m_resolution   = QSize(1920, 1080);
         return;
     }
     m_refreshRate   = screen->refreshRate();
@@ -437,7 +475,7 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
         .arg(Message).arg(qScreen->name()).arg(extra));
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry %1x%2+%3+%4 Size %5mmx%6mm")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry: %1x%2+%3+%4 Size(Qt): %5mmx%6mm")
         .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top())
         .arg(qScreen->physicalSize().width()).arg(qScreen->physicalSize().height()));
 
@@ -645,7 +683,7 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
         WaitForScreenChange();
 
     // N.B. We used a computed aspect ratio unless overridden
-    m_aspectRatio = aspectoverride > 0.0 ? aspectoverride : 0.0;
+    m_aspectRatioOverride = aspectoverride > 0.0 ? aspectoverride : 0.0;
     UpdateCurrentMode();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Switched to %1x%2@%3Hz for video %4x%5")
         .arg(m_resolution.width()).arg(m_resolution.height())
@@ -681,7 +719,7 @@ bool MythDisplay::SwitchToGUI(bool Wait)
         WaitForScreenChange();
 
     UpdateCurrentMode();
-    m_aspectRatio = 0.0;
+    m_aspectRatioOverride = 0.0;
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Switched to %1x%2@%3Hz")
         .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate, 0, 'f', 3));
     return true;
@@ -722,17 +760,80 @@ const vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
 
 /** \brief Returns current screen aspect ratio.
  *
- * If there is an aspect overide in the database that aspect ratio is returned
- * instead of the actual screen aspect ratio.
+ * For the vast majority of cases we should be using the physical display size to
+ * compute the actual aspect ratio.
+ *
+ * This is currently overridden by:-
+ *  - a custom, user specified aspect ratio for a given display mode. This feature
+ *    is considered legacy as I don't believe it should be needed anymore,
+ *    complicates both the code and the user 'experience' and offers very
+ *    limited values for the override (4:3 and 16:9).
+ *  - a general override for setups where the aspect ratio is not correctly detected.
+ *    This generally means exotic multiscreen setups and displays with invalid and/or
+ *    misleading EDIDs.
+ *
+ * If no override is specified and a valid physical aspect ratio cannot be
+ * calculated, then we fallback to the screen resolution (i.e. assume square pixels)
+ * and finally a guess at 16:9.
 */
-double MythDisplay::GetAspectRatio(void)
+double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
 {
-    if (m_aspectRatio > 0.0)
-        return m_aspectRatio;
+    auto valid = [](double Aspect) { return (Aspect > 0.1 && Aspect < 10.0); };
 
-    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0)
-        return static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
+    // Override for this video mode
+    // Is this behaviour still needed?
+    if (!IgnoreModeOverride && valid(m_aspectRatioOverride))
+    {
+        Source = tr("Video mode override");
+        return m_aspectRatioOverride;
+    }
 
+    // General override for invalid/misleading EDIDs or multiscreen setups
+    bool multiscreen = MythDisplay::SpanAllScreens() && GetScreenCount() > 1;
+    double override = gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
+                                                          gCoreContext->GetHostName(), 0.0);
+
+    // Zero (not valid) indicates auto
+    if (valid(override))
+    {
+        Source = tr("Override");
+        return override;
+    }
+    // Auto for multiscreen is a best guess
+    else if (multiscreen)
+    {
+        double aspect = EstimateVirtualAspectRatio();
+        if (valid(aspect))
+        {
+            Source = tr("Multiscreen estimate");
+            return aspect;
+        }
+    }
+
+    // Based on actual physical size if available
+    if (!m_physicalSize.isEmpty())
+    {
+        double aspect = static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
+        if (valid(aspect))
+        {
+            Source = tr("Detected");
+            return aspect;
+        }
+    }
+
+    // Assume pixel aspect ratio is 1 (square pixels)
+    if (!m_resolution.isEmpty())
+    {
+        double aspect = static_cast<double>(m_resolution.width()) / m_resolution.height();
+        if (valid(aspect))
+        {
+            Source = tr("Fallback");
+            return aspect;
+        }
+    }
+
+    // the aspect ratio of last resort
+    Source = tr("Guessed");
     return 16.0 / 9.0;
 }
 
@@ -762,17 +863,18 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     };
 
     // default
-    auto result = GetAspectRatio();
+    double result = 16.0 / 9.0;
 
     QList<QScreen*> screens;
     if (m_screen)
         screens = m_screen->virtualSiblings();
-    if (screens.size() < 2)
+    if (screens.empty())
         return result;
 
     // N.B. This sorting may not be needed
     std::sort(screens.begin(), screens.end(), sortscreens);
     QList<double> aspectratios;
+    QSize totalresolution;
     int lasttop = 0;
     int lastleft = 0;
     int rows = 1;
@@ -780,6 +882,7 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     for (auto it = screens.constBegin() ; it != screens.constEnd(); ++it)
     {
         QRect geom = (*it)->geometry();
+        totalresolution += geom.size();
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1x%2+%3+%4 %5")
             .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top())
             .arg((*it)->physicalSize().width() / (*it)->physicalSize().height()));
@@ -797,6 +900,11 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
         aspectratios << (*it)->physicalSize().width() / (*it)->physicalSize().height();
     }
 
+    // If all else fails, use the total resolution and assume pixel aspect ratio
+    // equals display aspect ratio
+    if (!totalresolution.isEmpty())
+        result = totalresolution.width() / totalresolution.height();
+
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen layout: %1x%2").arg(rows).arg(columns));
     if (rows == columns)
     {
@@ -813,8 +921,8 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     else
     {
         LOG(VB_GENERAL, LOG_INFO,
-            LOC + QString("Unsupported layout - defaulting to %1")
-            .arg(result));
+            LOC + QString("Unsupported layout - defaulting to %1 (%2/%3)")
+            .arg(result).arg(totalresolution.width()).arg(totalresolution.height()));
         return result;
     }
 
@@ -829,8 +937,8 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
         if (qAbs(*it2 - average) > 0.1)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Inconsistent aspect ratios - defaulting to %1")
-                .arg(result));
+                QString("Inconsistent aspect ratios - defaulting to %1 (%2/%3)")
+                .arg(result).arg(totalresolution.width()).arg(totalresolution.height()));
             return result;
         }
     }
@@ -853,6 +961,11 @@ QSize MythDisplay::GetPhysicalSize(void)
 
 void MythDisplay::WaitForScreenChange(void)
 {
+    // Some implementations may have their own mechanism for ensuring the mode
+    // is updated before continuing
+    if (!m_waitForModeChanges)
+        return;
+
     LOG(VB_GENERAL, LOG_INFO, LOC + "Waiting for resolution change");
     QEventLoop loop;
     QTimer timer;
@@ -877,7 +990,7 @@ void MythDisplay::WaitForNewScreen(void)
     QEventLoop loop;
     QTimer timer;
     timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for new screen"); });
+    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for new screen"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_widget->windowHandle(), &QWindow::screenChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait

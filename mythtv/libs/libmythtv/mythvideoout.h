@@ -76,7 +76,6 @@ class MythVideoOutput
                               float &VisibleAspect, float &FontScaling,
                               float ThemeAspect) const;
     QRect        GetMHEGBounds(void);
-    virtual float GetDisplayAspect(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     virtual void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
     AdjustFillMode GetAdjustFill(void) const;
@@ -158,7 +157,6 @@ class MythVideoOutput
 
     MythDisplay*         m_display               {nullptr};
     VideoOutWindow       m_window;
-    QSize                m_dbDisplayDimensionsMM {0,0};
     VideoColourSpace     m_videoColourSpace;
     AspectOverrideMode   m_dbAspectOverride      {kAspect_Off};
     AdjustFillMode       m_dbAdjustFill          {kAdjustFill_Off};
@@ -169,8 +167,6 @@ class MythVideoOutput
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState            {kError_None};
     long long            m_framesPlayed          {0};
-    QSize                m_monitorSize           {640,480};
-    QSize                m_monitorDimensions     {400,300};
     VideoVisual         *m_visual                {nullptr};
     StereoscopicMode     m_stereo                {kStereoscopicModeNone};
     MythAVCopy           m_copyFrame;

@@ -1175,10 +1175,7 @@ bool TV::Init(bool createWindow)
                                  GetMythMainWindow()->size());
 
         // adjust for window manager wierdness.
-        float dummy1 = 0.0F;
-        float dummy2 = 0.0F;
-        QRect screen;
-        GetMythUI()->GetScreenSettings(screen, dummy1, dummy2);
+        QRect screen = GetMythUI()->GetScreenSettings();
         if ((abs(m_savedGuiBounds.x() - screen.left()) < 3) &&
             (abs(m_savedGuiBounds.y() - screen.top()) < 3))
         {

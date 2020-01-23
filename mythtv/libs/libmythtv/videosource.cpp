@@ -431,7 +431,7 @@ class BouquetID : public MythUISpinBoxSetting
                              min_val, 0xffff, 1)
     {
        setLabel(QObject::tr("Bouquet ID"));
-       setHelpText(QObject::tr("Bouquet ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+       setHelpText(QObject::tr("Bouquet ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 if you do not receive this satellite. "
                                "This is needed to get the Freesat and Sky channel numbers. "
                                "Value 272 selects Freesat bouquet 'England HD'. "
@@ -448,7 +448,7 @@ class RegionID : public MythUISpinBoxSetting
                              min_val, 100, 1)
     {
        setLabel(QObject::tr("Region ID"));
-       setHelpText(QObject::tr("Region ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+       setHelpText(QObject::tr("Region ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 you do not receive this satellite.  "
                                "This is needed to get the Freesat and Sky channel numbers. "
                                "Value 1 selects region London. "
@@ -1882,7 +1882,7 @@ void ASIConfigurationGroup::probeCard(const QString &device)
 ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
                                                    CardType& a_cardtype):
     m_parent(a_parent),
-    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
+    m_info(new GroupSetting()), m_size(new GroupSetting())
 {
     setVisible(false);
     auto *device = new FileDevice(m_parent);
@@ -1895,11 +1895,9 @@ ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
     a_cardtype.addTargetedChild("IMPORT", new EmptyVBIDevice(m_parent));
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("IMPORT", m_info);
 
     m_size->setLabel(tr("File size"));
-    m_size->setEnabled(false);
     a_cardtype.addTargetedChild("IMPORT", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
@@ -2219,7 +2217,7 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
 DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
                                                CardType &a_cardtype) :
     m_parent(a_parent),
-    m_info(new TransTextEditSetting()), m_size(new TransTextEditSetting())
+    m_info(new GroupSetting()), m_size(new GroupSetting())
 {
     setVisible(false);
     auto *device = new FileDevice(m_parent);
@@ -2231,11 +2229,9 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("DEMO", new EmptyVBIDevice(m_parent));
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("DEMO", m_info);
 
     m_size->setLabel(tr("File size"));
-    m_size->setEnabled(false);
     a_cardtype.addTargetedChild("DEMO", m_size);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
@@ -2248,7 +2244,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 {
     QString   ci;
     QString   cs;
-    QFileInfo fileInfo(device.mid(5));
+    QFileInfo fileInfo(device);
     if (fileInfo.exists())
     {
         if (fileInfo.isReadable() && (fileInfo.isFile()))
@@ -2272,7 +2268,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
     m_parent(a_parent),
-    m_info(new TransTextEditSetting())
+    m_info(new GroupSetting())
 {
     setVisible(false);
     auto *device = new CommandPath(m_parent);
@@ -2283,7 +2279,6 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("EXTERNAL", device);
 
     m_info->setLabel(tr("File info"));
-    m_info->setEnabled(false);
     a_cardtype.addTargetedChild("EXTERNAL", m_info);
 
     a_cardtype.addTargetedChild("EXTERNAL",
@@ -2321,6 +2316,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     }
 
     m_info->setValue(ci);
+    m_info->setHelpText(ci);
 }
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 

@@ -251,6 +251,20 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
     return true;
 }
 
+void MythVideoOutputOpenGL::SetVideoFrameRate(float NewRate)
+{
+    if (!m_dbDisplayProfile)
+        return;
+
+    if (qFuzzyCompare(m_dbDisplayProfile->GetOutput() + 1.0F, NewRate + 1.0F))
+        return;
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video frame rate changed: %1->%2)")
+        .arg(static_cast<double>(m_dbDisplayProfile->GetOutput())).arg(static_cast<double>(NewRate)));
+    m_dbDisplayProfile->SetOutput(NewRate);
+    m_newFrameRate = true;
+}
+
 bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                          float Aspect, MythCodecID CodecId, bool &AspectOnly,
                                          MythMultiLocker* /*Locks*/, int ReferenceFrames,
@@ -418,12 +432,20 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
         m_newAspect = 0.0F;
+        m_newFrameRate = false;
 
         if (wasembedding && ok)
             EmbedInWidget(oldrect);
 
         if (!ok)
             return;
+    }
+    else if (m_newFrameRate)
+    {
+        // If we are switching mode purely for a refresh rate change, then there
+        // is no need to recreate buffers etc etc
+        ResizeForVideo();
+        m_newFrameRate = false;
     }
 
     if (Frame)

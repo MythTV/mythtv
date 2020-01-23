@@ -552,6 +552,18 @@ static bool check_cardsource(int sourceid, QString &sourcename)
         return false;
     }
 
+    // At least one capture card connected to the video source
+    // must be able to do channel scanning
+    if (SourceUtil::IsUnscanable(sourceid))
+    {
+        MythConfirmationDialog *md = ShowOkPopup(QObject::tr(
+            "The capture card(s) connected to video source '%1' "
+            "cannot be used for channel scanning.")
+            .arg(sourcename));
+        WaitFor(md);
+        return false;
+    }
+
     return true;
 }
 

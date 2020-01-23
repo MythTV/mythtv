@@ -25,6 +25,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static MythDisplay* AcquireRelease(bool Acquire = true);
     static QStringList  GetDescription(void);
 
+    virtual bool  VideoModesAvailable(void) { return false; }
     virtual bool  UsingVideoModes(void) { return false; }
     virtual const vector<MythDisplayMode>& GetVideoModes(void);
 
@@ -44,7 +45,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QSize        GetPhysicalSize       (void);
     double       GetRefreshRate        (void);
     int          GetRefreshInterval    (int Fallback);
-    double       GetAspectRatio        (void);
+    double       GetAspectRatio        (QString &Source, bool IgnoreModeOverride = false);
     double       EstimateVirtualAspectRatio(void);
     MythEDID&    GetEDID               (void);
     std::vector<double> GetRefreshRates(QSize Size);
@@ -76,9 +77,11 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void            WaitForScreenChange(void);
     void            WaitForNewScreen   (void);
 
+
+    bool            m_waitForModeChanges { true };
     bool            m_modeComplete     { false };
     double          m_refreshRate      { 0.0  };
-    double          m_aspectRatio      { 0.0  };
+    double          m_aspectRatioOverride { 0.0  };
     QSize           m_resolution       { 0, 0 };
     QSize           m_physicalSize     { 0, 0 };
     MythEDID        m_edid             { };

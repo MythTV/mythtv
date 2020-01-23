@@ -20,12 +20,12 @@
 class UDPPacket
 {
   public:
-    UDPPacket(const UDPPacket &o)  = default;
+    UDPPacket(const UDPPacket&)  = default;
     explicit UDPPacket(uint64_t key) : m_key(key) { }
     UDPPacket(void) = default;
     virtual ~UDPPacket() = default;
 
-    UDPPacket& operator=(const UDPPacket &rhs) = default;
+    UDPPacket& operator=(const UDPPacket&) = default;
 
     /// IsValid() must return true before any data access methods are called,
     /// other than GetDataReference() and GetData()

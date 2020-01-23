@@ -50,11 +50,80 @@ class VideoDisplayProfile;
 class MTV_PUBLIC MythCodecContext
 {
   public:
+    enum CodecProfile
+    {
+        NoProfile = 0,
+        MPEG2,
+        MPEG2Simple,
+        MPEG2Main,
+        MPEG2422,
+        MPEG2High,
+        MPEG2Spatial,
+        MPEG2SNR,
+        MPEG4,
+        MPEG4Simple,
+        MPEG4SimpleScaleable,
+        MPEG4Core,
+        MPEG4Main,
+        MPEG4NBit,
+        MPEG4ScaleableTexture,
+        MPEG4SimpleFace,
+        MPEG4BasicAnimated,
+        MPEG4Hybrid,
+        MPEG4AdvancedRT,
+        MPEG4CoreScaleable,
+        MPEG4AdvancedCoding,
+        MPEG4AdvancedCore,
+        MPEG4AdvancedScaleableTexture,
+        MPEG4SimpleStudio,
+        MPEG4AdvancedSimple,
+        H263,
+        H264,
+        H264Baseline,
+        H264ConstrainedBaseline,
+        H264Main,
+        H264MainExtended,
+        H264High,
+        H264High10,
+        H264Extended,
+        H264High422,
+        H264High444,
+        H264ConstrainedHigh,
+        HEVC,
+        HEVCMain,
+        HEVCMain10,
+        HEVCMainStill,
+        HEVCRext,
+        HEVCMain10HDR,
+        HEVCMain10HDRPlus,
+        VC1,
+        VC1Simple,
+        VC1Main,
+        VC1Complex,
+        VC1Advanced,
+        VP8,
+        VP9,
+        VP9_0,
+        VP9_1,
+        VP9_2,
+        VP9_3,
+        VP9_2HDR,
+        VP9_2HDRPlus,
+        VP9_3HDR,
+        VP9_3HDRPlus,
+        AV1,
+        AV1Main,
+        AV1High,
+        AV1Professional,
+        MJPEG
+    };
+
     explicit MythCodecContext(DecoderBase *Parent, MythCodecID CodecID);
     virtual ~MythCodecContext() = default;
 
     static MythCodecContext* CreateContext (DecoderBase *Parent, MythCodecID Codec);
     static void GetDecoders                (RenderOptions &Opts);
+    static QStringList GetDecoderDescription(void);
     static MythCodecID FindDecoder         (const QString &Decoder, AVStream *Stream,
                                             AVCodecContext **Context, AVCodec **Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
@@ -68,6 +137,8 @@ class MTV_PUBLIC MythCodecContext
     static void CreateDecoderCallback      (void *Wait, void *Context, void *Callback);
     static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
+    static QString GetProfileDescription   (CodecProfile Profile, QSize Size);
+    static CodecProfile FFmpegToMythProfile(AVCodecID CodecID, int Profile);
 
     virtual void   InitVideoCodec          (AVCodecContext *Context,
                                             bool SelectedStream, bool &DirectRendering);
