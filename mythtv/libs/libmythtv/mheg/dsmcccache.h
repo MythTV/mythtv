@@ -39,8 +39,8 @@ class DSMCCCacheReference
         m_nCarouselId(car),             m_nModuleId(m),
         m_nStreamTag(s),                m_key(std::move(k)) {}
 
-    DSMCCCacheReference(const DSMCCCacheReference &r) = default;
-    DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs) = default;
+    DSMCCCacheReference(const DSMCCCacheReference&) = default;
+    DSMCCCacheReference& operator=(const DSMCCCacheReference&) = default;
 
     bool Equal(const DSMCCCacheReference &r) const;
     bool Equal(const DSMCCCacheReference *p) const;

@@ -27,8 +27,8 @@ class MTV_PUBLIC InputInfo
 
     virtual ~InputInfo() = default;
 
-    InputInfo(const InputInfo &other) = default;
-    InputInfo &operator=(const InputInfo &other) = default;
+    InputInfo(const InputInfo&) = default;
+    InputInfo &operator=(const InputInfo&) = default;
 
     bool operator == (uint inputid) const
         { return m_inputId == inputid; }

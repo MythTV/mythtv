@@ -16,7 +16,7 @@ using namespace std;
 class MTV_PUBLIC ChannelGroupItem
 {
   public:
-    ChannelGroupItem(const ChannelGroupItem &other)  = default;
+    ChannelGroupItem(const ChannelGroupItem&)  = default;
     ChannelGroupItem(const uint grpid, QString name) :
         m_grpId(grpid), m_name(std::move(name)) {}
 

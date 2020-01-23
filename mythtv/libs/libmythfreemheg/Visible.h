@@ -122,7 +122,7 @@ class MHRectangle : public MHLineArt
 {
   public:
     MHRectangle() = default;
-    MHRectangle(const MHRectangle &ref) = default;
+    MHRectangle(const MHRectangle&) = default;
     const char *ClassName() override // MHLineArt
         { return "Rectangle"; }
     void PrintMe(FILE *fd, int nTabs) const override; // MHLineArt

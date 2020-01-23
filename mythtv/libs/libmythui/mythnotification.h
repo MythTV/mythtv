@@ -257,7 +257,7 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
     QString GetImagePath(void) const        { return m_imagePath; }
 
   protected:
-    MythImageNotification(const MythImageNotification &o) = default;
+    MythImageNotification(const MythImageNotification&) = default;
 
   protected:
     QImage      m_image;
@@ -309,7 +309,7 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
     static QString stringFromSeconds(int time);
 
   protected:
-    MythPlaybackNotification(const MythPlaybackNotification &o) = default;
+    MythPlaybackNotification(const MythPlaybackNotification&) = default;
 
   protected:
     float       m_progress;

@@ -446,7 +446,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         m_pesDataSize = SectionLength();
     }
   public:
-    PSIPTable(const PSIPTable& table) = default;
+    PSIPTable(const PSIPTable&) = default;
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     explicit PSIPTable(const PESPacket& table) : PESPacket(table)
