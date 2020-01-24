@@ -417,10 +417,10 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
 
     vector<const VirtualChannelTable*> vct;
 
-    for (auto i : tvct)
+    for (const auto *i : tvct)
         vct.push_back(i);
 
-    for (auto i : cvct)
+    for (const auto *i : cvct)
         vct.push_back(i);
 
     for (size_t i = 0; i < tvct.size(); i++)

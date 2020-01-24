@@ -1038,7 +1038,7 @@ const QString& DebugString(uint FrameNum, bool Short)
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num)
 {
     unsigned long long bitmap = 0;
-    for (auto it : Queue)
+    for (auto *it : Queue)
     {
         int shift = DebugNum(it) % Num;
         bitmap |= 1ULL << shift;

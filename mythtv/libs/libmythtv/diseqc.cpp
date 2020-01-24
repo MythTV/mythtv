@@ -1333,7 +1333,7 @@ bool DiSEqCDevSwitch::Store(void) const
 
     // chain to children
     bool success = true;
-    for (auto child : m_children)
+    for (auto *child : m_children)
     {
         if (child)
             success &= child->Store();

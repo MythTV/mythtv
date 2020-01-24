@@ -980,7 +980,7 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
 
-    for (auto data : m_storedData)
+    for (auto *data : m_storedData)
     {
         if (data->frameheader.frametype == 'S' &&
             data->frameheader.comptype == 'V')

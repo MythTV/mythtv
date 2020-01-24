@@ -801,7 +801,7 @@ void AutoExpire::PrintExpireList(const QString& expHost)
     msg += "(programs listed in order of expiration)";
     cout << msg.toLocal8Bit().constData() << endl;
 
-    for (auto first : expireList)
+    for (auto *first : expireList)
     {
         if (expHost != "ALL" && first->GetHostname() != expHost)
             continue;
@@ -1114,7 +1114,7 @@ bool AutoExpire::IsInDontExpireSet(
 bool AutoExpire::IsInExpireList(
     const pginfolist_t &expireList, uint chanid, const QDateTime &recstartts)
 {
-    for (auto info : expireList)
+    for (auto *info : expireList)
     {
         if ((info->GetChanID()             == chanid) &&
             (info->GetRecordingStartTime() == recstartts))

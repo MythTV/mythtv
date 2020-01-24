@@ -196,7 +196,7 @@ void RawSettingsEditor::updatePrevNextTexts(void)
                 if (m_prevNextShapes.contains(i))
                     m_prevNextShapes[i]->Show();
 
-                auto tmpitem = m_settingsList->GetItemAt(curPos + i);
+                auto *tmpitem = m_settingsList->GetItemAt(curPos + i);
                 m_prevNextTexts[i]->SetText(
                     m_settingValues[tmpitem->GetData().toString()]);
             }

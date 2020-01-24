@@ -327,7 +327,7 @@ void MythScreenStack::CheckDeletes(bool force)
 
         if (deleteit)
         {
-            for (auto test = m_Children.begin();
+            for (auto *test = m_Children.begin();
                  test != m_Children.end();
                  ++test)
             {

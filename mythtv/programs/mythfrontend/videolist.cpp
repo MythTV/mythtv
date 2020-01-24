@@ -802,7 +802,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     smart_dir_node sdn1 = video_root->addSubDir("All");
     meta_dir_node* all_group_node = sdn1.get();
 
-    for (auto data : mlist)
+    for (auto *data : mlist)
     {
         all_group_node->addEntry(smart_meta_node(new meta_data_node(data)));
 

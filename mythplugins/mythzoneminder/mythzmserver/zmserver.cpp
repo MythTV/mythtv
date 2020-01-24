@@ -551,7 +551,7 @@ ZMServer::ZMServer(int sock, bool debug)
 
 ZMServer::~ZMServer()
 {
-    for (auto mon : m_monitors)
+    for (auto *mon : m_monitors)
     {
         if (mon->m_mapFile != -1)
         {
@@ -779,7 +779,7 @@ void ZMServer::handleGetAlarmStates(void)
     // add the monitor count
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (auto monitor : m_monitors)
+    for (auto *monitor : m_monitors)
     {
         // add monitor ID
         ADD_INT(outStr, monitor->m_monId)
@@ -1556,7 +1556,7 @@ void ZMServer::handleGetMonitorList(void)
 
     ADD_INT(outStr, (int)m_monitors.size())
 
-    for (auto mon : m_monitors)
+    for (auto *mon : m_monitors)
     {
         ADD_INT(outStr, mon->m_monId)
         ADD_STR(outStr, mon->m_name)

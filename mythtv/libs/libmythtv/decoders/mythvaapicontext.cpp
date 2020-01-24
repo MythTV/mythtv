@@ -170,7 +170,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
         MythPlayer* player = nullptr;
         if (!gCoreContext->IsUIThread())
         {
-            auto decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
+            auto *decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
             if (decoder)
                 player = decoder->GetPlayer();
         }

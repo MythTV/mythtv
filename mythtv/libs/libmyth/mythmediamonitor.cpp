@@ -216,7 +216,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
     int btnIndex = -2;
     while (btnIndex < -1)
     {
-        auto dlg = new MythDialogBox(label, stack, "select drive");
+        auto *dlg = new MythDialogBox(label, stack, "select drive");
         if (!dlg->Create())
         {
             delete dlg;
@@ -224,7 +224,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
         }
 
         // Add button for each drive
-        for (auto drive : drives)
+        for (auto *drive : drives)
             dlg->AddButton(DevName(drive));
 
         dlg->AddButton(tr("Cancel"));

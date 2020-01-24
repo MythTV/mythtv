@@ -253,8 +253,8 @@ void GallerySettings::ShowConfirmDialog()
     QString msg(TR("Warning! This will erase settings for: hidden images, "
                    "directory covers and re-orientations. "
                    "You will have to set them again after re-scanning."));
-    auto stack = GetMythMainWindow()->GetStack("popup stack");
-    auto dialog = new MythConfirmationDialog(stack, msg);
+    auto *stack = GetMythMainWindow()->GetStack("popup stack");
+    auto *dialog = new MythConfirmationDialog(stack, msg);
     if (dialog->Create())
     {
         stack->AddScreen(dialog);

@@ -716,7 +716,7 @@ void StatusBox::doScheduleStatus()
     tmpstr = tr("%n matching showing(s)", "", schedList.size());
     AddLogLine(tmpstr, helpmsg);
 
-    for (auto s : schedList)
+    for (auto *s : schedList)
     {
         const RecStatus::Type recstatus = s->GetRecordingStatus();
 

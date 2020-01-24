@@ -40,8 +40,8 @@ static void GameCallback(void *data, QString &selection)
     if (sel == "game_players")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        auto ssd = new StandardSettingDialog(mainStack, "gamesettings",
-                                             new GamePlayersList());
+        auto *ssd = new StandardSettingDialog(mainStack, "gamesettings",
+                                              new GamePlayersList());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);

@@ -589,7 +589,7 @@ ProgramInfo::ProgramInfo(
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
 
-    for (auto it : schedList)
+    for (auto *it : schedList)
     {
         // If this showing is scheduled to be recorded, then we need to copy
         // some of the information from the scheduler
@@ -6040,7 +6040,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
         return false;
 
     // find the earliest scheduled recording
-    for (auto prog : progList)
+    for (auto *prog : progList)
     {
         if ((prog->GetRecordingStatus() == RecStatus::WillRecord ||
              prog->GetRecordingStatus() == RecStatus::Pending) &&

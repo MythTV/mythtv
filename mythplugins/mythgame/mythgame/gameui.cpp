@@ -495,7 +495,7 @@ void GameUI::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         if (dce == nullptr)
             return;
         QString resultid   = dce->GetId();
@@ -555,7 +555,7 @@ void GameUI::customEvent(QEvent *event)
     }
     if (event->type() == MetadataLookupEvent::kEventType)
     {
-        auto lue = dynamic_cast<MetadataLookupEvent *>(event);
+        auto *lue = dynamic_cast<MetadataLookupEvent *>(event);
         if (lue == nullptr)
             return;
         MetadataLookupList lul = lue->m_lookupList;
@@ -588,7 +588,7 @@ void GameUI::customEvent(QEvent *event)
     }
     else if (event->type() == MetadataLookupFailure::kEventType)
     {
-        auto luf = dynamic_cast<MetadataLookupFailure *>(event);
+        auto *luf = dynamic_cast<MetadataLookupFailure *>(event);
         if (luf == nullptr)
             return;
         MetadataLookupList lul = luf->m_lookupList;

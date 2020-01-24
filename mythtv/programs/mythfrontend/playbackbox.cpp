@@ -682,7 +682,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         ProgramList  group     = m_progLists[groupname];
         float        groupSize = 0.0;
 
-        for (auto info : group)
+        for (auto *info : group)
         {
             if (info)
             {
@@ -1674,7 +1674,7 @@ bool PlaybackBox::UpdateUILists(void)
         vector<ProgramInfo*> list;
         bool newest_first = (0==m_allOrder);
         m_programInfoCache.GetOrdered(list, newest_first);
-        for (auto p : list)
+        for (auto *p : list)
         {
             if (p->IsDeletePending())
                 continue;

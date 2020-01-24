@@ -195,7 +195,7 @@ void RecordingSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    for (auto p : *m_recordingList)
+    for (auto *p : *m_recordingList)
         m_selectedList.append(p);
 
     updateRecordingList();
@@ -367,7 +367,7 @@ void RecordingSelector::updateRecordingList(void)
 
     if (m_categorySelector)
     {
-        for (auto p : *m_recordingList)
+        for (auto *p : *m_recordingList)
         {
             if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))
@@ -500,7 +500,7 @@ void RecordingSelector::updateSelectedList()
 
     foreach (auto a, *m_archiveList)
     {
-        for (auto p : *m_recordingList)
+        for (auto *p : *m_recordingList)
         {
             if (p->GetPlaybackURL(false, true) == a->filename)
             {

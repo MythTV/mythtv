@@ -1295,7 +1295,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     // PATs
     foreach (auto pat_list, scan_info->m_pats)
     {
-        for (auto pat : pat_list)
+        for (const auto *pat : pat_list)
         {
             bool could_be_opencable = false;
             for (uint i = 0; i < pat->ProgramCount(); ++i)
@@ -1351,7 +1351,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // Cable VCTs
-    for (auto cvct : scan_info->m_cvcts)
+    for (const auto *cvct : scan_info->m_cvcts)
     {
         for (uint i = 0; i < cvct->ChannelCount(); ++i)
         {
@@ -1362,7 +1362,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // Terrestrial VCTs
-    for (auto tvct : scan_info->m_tvcts)
+    for (const auto *tvct : scan_info->m_tvcts)
     {
         for (uint i = 0; i < tvct->ChannelCount(); ++i)
         {
@@ -1375,7 +1375,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     // SDTs
     foreach (auto sdt_list, scan_info->m_sdts)
     {
-        for (auto sdt_it : sdt_list)
+        for (const auto *sdt_it : sdt_list)
         {
             for (uint i = 0; i < sdt_it->ServiceCount(); ++i)
             {
@@ -1396,7 +1396,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         ChannelInsertInfo &info = *dbchan_it;
 
         // NIT
-        for (auto item : scan_info->m_nits)
+        for (const auto *item : scan_info->m_nits)
         {
             for (uint i = 0; i < item->TransportStreamCount(); ++i)
             {
@@ -1483,7 +1483,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     // Lookup table from LCN to service ID
     QMap<uint,qlonglong> lcn_sid;
 
-    for (auto bat : scan_info->m_bats)
+    for (const auto *bat : scan_info->m_bats)
     {
         // Only the bouquet selected by user
         if (bat->BouquetID() != m_bouquetId)
@@ -1505,7 +1505,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                                       bat->TransportDescriptorsLength(t));
 
             uint priv_dsid = 0;
-            for (auto item : parsed)
+            for (const auto *item : parsed)
             {
                 if (item[0] == DescriptorID::private_data_specifier)
                 {

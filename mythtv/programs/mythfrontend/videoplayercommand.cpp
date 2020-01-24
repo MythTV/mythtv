@@ -185,7 +185,7 @@ class VideoPlayerCommandPrivate
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
-        for (auto player : other.m_playerProcs)
+        for (auto *player : other.m_playerProcs)
         {
             m_playerProcs.push_back(player->Clone());
         }
@@ -330,7 +330,7 @@ class VideoPlayerCommandPrivate
 
     void Play() const
     {
-        for (auto player : m_playerProcs)
+        for (auto *player : m_playerProcs)
             if (player->Play())
                 break;
     }

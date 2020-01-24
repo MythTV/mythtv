@@ -14,12 +14,12 @@ class TestSettings: public QObject
     static void ByName(void)
     {
         GroupSetting parent;
-        auto setting = new ButtonStandardSetting("setting");
+        auto *setting = new ButtonStandardSetting("setting");
         setting->setName("setting");
         parent.addChild(setting);
 
-        auto combobox = new ComboBox();
-        auto targetedSetting = new ButtonStandardSetting("targetedsetting");
+        auto *combobox = new ComboBox();
+        auto *targetedSetting = new ButtonStandardSetting("targetedsetting");
         targetedSetting->setName("targetedsetting");
         combobox->addTargetedChild("target", targetedSetting);
         parent.addChild(combobox);

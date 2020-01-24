@@ -508,7 +508,7 @@ void MetadataFactory::customEvent(QEvent *levent)
 {
     if (levent->type() == MetadataLookupEvent::kEventType)
     {
-        auto lue = dynamic_cast<MetadataLookupEvent *>(levent);
+        auto *lue = dynamic_cast<MetadataLookupEvent *>(levent);
         if (lue == nullptr)
             return;
 
@@ -531,7 +531,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == MetadataLookupFailure::kEventType)
     {
-        auto luf = dynamic_cast<MetadataLookupFailure *>(levent);
+        auto *luf = dynamic_cast<MetadataLookupFailure *>(levent);
         if (luf == nullptr)
             return;
 

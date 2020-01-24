@@ -403,7 +403,7 @@ void SignalMonitor::SendMessage(
     m_statusLock.unlock();
 
     QMutexLocker locker(&m_listenerLock);
-    for (auto listener : m_listeners)
+    for (auto *listener : m_listeners)
     {
         auto *dvblistener = dynamic_cast<DVBSignalMonitorListener*>(listener);
 

@@ -64,7 +64,7 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for (auto pg : progList)
+    for (auto *pg : progList)
     {
         auto *pginfo = new ProgramInfo(*pg);
         if ((pginfo->GetRecordingGroup() != "Deleted") &&
@@ -158,7 +158,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for (auto pg : progList)
+    for (auto *pg : progList)
     {
         auto *pginfo = new ProgramInfo(*pg);
 
@@ -203,7 +203,7 @@ void LookerUpper::CopyRuleInetrefsToRecordings()
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for (auto pg : progList)
+    for (auto *pg : progList)
     {
         auto *pginfo = new ProgramInfo(*pg);
         if (pginfo && pginfo->GetInetRef().isEmpty())

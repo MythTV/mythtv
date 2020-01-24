@@ -78,7 +78,7 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
 const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
-    for (auto item : parsed)
+    for (const auto *item : parsed)
     {
         if (item[0] == desc_tag)
             return item;
@@ -89,7 +89,7 @@ const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
 desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;
-    for (auto item : parsed)
+    for (const auto *item : parsed)
     {
         if (item[0] == desc_tag)
             tmp.push_back(item);
@@ -194,7 +194,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     if (match_pri == UINT_MAX)
         return tmp;
 
-    for (auto j : parsed)
+    for (const auto *j : parsed)
     {
         if ((DescriptorID::extended_event == desc_tag) &&
             (DescriptorID::extended_event == j[0]))

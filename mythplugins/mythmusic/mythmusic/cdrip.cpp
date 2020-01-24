@@ -845,7 +845,7 @@ void Ripper::scanCD(void)
 
 void Ripper::deleteAllExistingTracks(void)
 {
-    for (auto it = m_tracks->begin(); it < m_tracks->end(); ++it)
+    for (auto *it = m_tracks->begin(); it < m_tracks->end(); ++it)
     {
         RipTrack *track = (*it);
         if (track && !track->isNew)
@@ -1416,7 +1416,7 @@ void Ripper::updateTrackLengths()
 {
     int length = 0;
 
-    for (auto it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
+    for (auto *it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
         RipTrack *track = *it;
         if (track->active)
@@ -1436,7 +1436,7 @@ void Ripper::customEvent(QEvent* event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto dce = dynamic_cast<DialogCompletionEvent *>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent *>(event);
         if (dce == nullptr)
             return;
         if (dce->GetId() == "conflictmenu")

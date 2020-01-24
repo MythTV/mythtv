@@ -798,9 +798,9 @@ void StandardSettingDialog::customEvent(QEvent *event)
     {
 #ifdef ANDROID
         // for unknown reaons the dynamic cast does not work on android
-        auto dce = static_cast<DialogCompletionEvent*>(event);
+        auto *dce = static_cast<DialogCompletionEvent*>(event);
 #else
-        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         if (dce == nullptr)
             return;
 #endif

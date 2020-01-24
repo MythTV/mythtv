@@ -105,7 +105,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
 
-    for (auto pInfo : progList)
+    for (auto *pInfo : progList)
     {
         if (pInfo->IsDeletePending() ||
             (!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||

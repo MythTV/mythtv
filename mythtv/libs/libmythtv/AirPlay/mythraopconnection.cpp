@@ -1103,7 +1103,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (tags.contains("Transport"))
         {
             // New client is trying to play audio, disconnect all the other clients
-            auto dev = dynamic_cast<MythRAOPDevice*>(parent());
+            auto *dev = dynamic_cast<MythRAOPDevice*>(parent());
             if (dev != nullptr)
                 dev->DeleteAllClients(this);
             gCoreContext->WantingPlayback(parent());

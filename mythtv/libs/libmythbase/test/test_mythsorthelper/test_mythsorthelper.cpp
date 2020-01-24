@@ -85,7 +85,7 @@ void TestSortHelper::pathnames_timing(void)
 void TestSortHelper::Variations_test(void)
 {
     // Case sensitive, keep prefixes (aka no-op)
-    auto sh = new MythSortHelper(Qt::CaseSensitive, SortPrefixKeep, "");
+    auto *sh = new MythSortHelper(Qt::CaseSensitive, SortPrefixKeep, "");
     QVERIFY(sh->doTitle("The Blob") == "The Blob");
     QVERIFY(sh->doTitle("The Blob") != "the blob");
     QVERIFY(sh->doTitle("The Blob") != "Blob");

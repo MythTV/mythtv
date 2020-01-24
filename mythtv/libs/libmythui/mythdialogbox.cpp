@@ -565,7 +565,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
         return nullptr;
     }
 
-    auto pop = new MythConfirmationDialog(stk, message, showCancel);
+    auto *pop = new MythConfirmationDialog(stk, message, showCancel);
     if (pop->Create())
     {
         stk->AddScreen(pop);
@@ -980,7 +980,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            auto item = new MythUIButtonListItem(m_dateList, text, nullptr, false);
+            auto *item = new MythUIButtonListItem(m_dateList, text, nullptr, false);
             item->SetData(QVariant(date));
 
             if (selected)
@@ -1021,7 +1021,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            auto item = new MythUIButtonListItem(m_timeList, text, nullptr, false);
+            auto *item = new MythUIButtonListItem(m_timeList, text, nullptr, false);
             item->SetData(QVariant(time));
 
             if (selected)

@@ -456,7 +456,7 @@ bool SmartPlaylistEditor::keyPressEvent(QKeyEvent *event)
 
 void SmartPlaylistEditor::customEvent(QEvent *event)
 {
-    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
+    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
         // make sure the user didn't ESCAPE out of the menu
         if (dce->GetResult() < 0)

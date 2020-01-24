@@ -295,7 +295,7 @@ void OSD::LoadWindows(void)
         "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
         "osd_program_editor", "osd_debug"};
 
-    for (auto window : s_defaultWindows)
+    for (const auto *window : s_defaultWindows)
     {
         auto *win = new MythOSDWindow(nullptr, window, true);
 
