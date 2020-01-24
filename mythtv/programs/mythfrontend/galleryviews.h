@@ -37,7 +37,7 @@ public:
     MarkedFiles() = default;
     void Initialise(int id)      { m_valid = true; m_parent = id; clear();}
     void Clear()                 { m_valid = false; clear(); }
-    bool IsFor(int id)           { return m_valid && m_parent == id; }
+    bool IsFor(int id) const           { return m_valid && m_parent == id; }
     void Add(const ImageIdList& newIds) { unite(newIds.toSet()); }
     void Add(int id)             { insert(id); }
     void Invert(const ImageIdList& all) { QSet tmp(all.toSet() - *this); swap(tmp); }
@@ -81,7 +81,7 @@ public:
     FileCacheEntry(int parent, QString url, QString thumbUrl)
         : m_parent(parent), m_url(std::move(url)), m_thumbUrl(std::move(thumbUrl))  {}
 
-    QString ToString(int id)
+    QString ToString(int id) const
     { return QString("File %1 Parent %2").arg(id).arg(m_parent); }
 
     int     m_parent {GALLERY_DB_ID};

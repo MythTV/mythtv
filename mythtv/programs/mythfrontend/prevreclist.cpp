@@ -307,7 +307,7 @@ void PrevRecordedList::UpdateShowList(void)
 }
 
 void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
-    ProgramList *progData, bool isShows)
+    ProgramList *progData, bool isShows) const
 {
     bnList->Reset();
     for (auto *pg : *progData)

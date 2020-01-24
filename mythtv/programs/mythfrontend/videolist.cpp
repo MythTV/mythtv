@@ -430,7 +430,7 @@ class VideoListImp
     void buildDbList(void);
     void buildTVList(void);
     void buildFileList(smart_dir_node &directory, metadata_list &metalist,
-                       const QString &prefix);
+                       const QString &prefix) const;
 
     void update_meta_view(bool flat_list);
 
@@ -1203,7 +1203,7 @@ class dirhandler : public DirectoryHandler
 };
 
 void VideoListImp::buildFileList(
-    smart_dir_node &directory, metadata_list &metalist, const QString &prefix)
+    smart_dir_node &directory, metadata_list &metalist, const QString &prefix) const
 {
     FileAssociations::ext_ignore_list ext_list;
     FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);

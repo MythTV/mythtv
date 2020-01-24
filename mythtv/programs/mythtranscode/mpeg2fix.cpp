@@ -1952,7 +1952,7 @@ FrameList MPEG2fixup::ReorderDTStoPTS(FrameList *dtsOrder, int pos)
 }
 
 void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
-                                 int64_t &PTSdiscrep, int numframes, bool fix)
+                                 int64_t &PTSdiscrep, int numframes, bool fix) const
 {
     int64_t tmpPTS = diff2x33(curFrame->m_pkt.pts,
                               origvPTS / 300);

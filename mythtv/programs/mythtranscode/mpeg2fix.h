@@ -170,7 +170,7 @@ class MPEG2fixup
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
     static FrameList ReorderDTStoPTS(FrameList *dtsOrder, int pos);
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
-                         int64_t &PTSdiscrep, int numframes, bool fix);
+                         int64_t &PTSdiscrep, int numframes, bool fix) const;
     static void SetFrameNum(uint8_t *ptr, int num);
     static int GetFrameNum(const MPEG2frame *frame)
     {

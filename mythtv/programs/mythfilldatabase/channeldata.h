@@ -14,10 +14,10 @@ class ChannelData
   public:
     ChannelData() = default;
 
-    bool insert_chan(uint sourceid);
+    bool insert_chan(uint sourceid) const;
     void handleChannels(int id, ChannelInfoList *chanlist);
     unsigned int promptForChannelUpdates(ChannelInfoList::iterator chaninfo,
-                                         unsigned int chanid);
+                                         unsigned int chanid) const;
 
     static ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
                             ChannelList existingChannels);

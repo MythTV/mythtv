@@ -4573,7 +4573,7 @@ class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
   public:
     ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &name);
-    uint getChannelId(){return m_channelId;};
+    uint getChannelId() const{return m_channelId;};
   private:
     uint m_channelId;
 

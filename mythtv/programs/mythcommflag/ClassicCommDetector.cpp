@@ -2271,7 +2271,7 @@ bool ClassicCommDetector::FrameIsInBreakMap(
     return false;
 }
 
-void ClassicCommDetector::DumpMap(frm_dir_map_t &map)
+void ClassicCommDetector::DumpMap(frm_dir_map_t &map) const
 {
     frm_dir_map_t::iterator it;
     QString msg;

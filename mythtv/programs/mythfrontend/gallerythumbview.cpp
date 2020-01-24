@@ -27,7 +27,7 @@ public:
     ShellThread(QString cmd, QString path)
         : MThread("Import"), m_command(std::move(cmd)), m_path(std::move(path)) {}
 
-    int GetResult(void) { return m_result; }
+    int GetResult(void) const { return m_result; }
 
     void run() override // MThread
     {

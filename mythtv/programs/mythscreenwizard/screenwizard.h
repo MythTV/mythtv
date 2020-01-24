@@ -70,9 +70,9 @@ class ScreenWizard : public MythScreenType
 
     void wireUpTheme();
     void updateScreen();
-    bool anythingChanged();
+    bool anythingChanged() const;
 
-    void slotSaveSettings();
+    void slotSaveSettings() const;
     void slotChangeCoarseFine();
     static void slotResetSettings();
 };
