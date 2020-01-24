@@ -265,7 +265,6 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
 
 
 PlayGroupEditor::PlayGroupEditor()
-    : m_addGroupButton(nullptr)
 {
     setLabel(tr("Playback Groups"));
     m_addGroupButton = new ButtonStandardSetting(tr("Create New Playback Group"));

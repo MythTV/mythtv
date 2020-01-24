@@ -44,8 +44,7 @@ class MTV_PUBLIC PESPacket
 
     // may be modified
     PESPacket(const PESPacket& pkt)
-        : m_pesData(nullptr),
-          m_psiOffset(pkt.m_psiOffset),
+        : m_psiOffset(pkt.m_psiOffset),
           m_ccLast(pkt.m_ccLast),
           m_pesDataSize(pkt.m_pesDataSize),
           m_allocSize(pkt.m_allocSize),

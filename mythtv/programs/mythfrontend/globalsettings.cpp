@@ -4589,8 +4589,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
-    : m_groupId(groupId),
-    m_groupName(nullptr)
+    : m_groupId(groupId)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
     setValue(groupName);

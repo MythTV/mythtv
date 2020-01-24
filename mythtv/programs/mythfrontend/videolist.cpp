@@ -39,7 +39,7 @@ class TreeNodeDataPrivate
     }
 
     TreeNodeDataPrivate(QString path, QString host, QString prefix) :
-        m_metadata(nullptr), m_host(std::move(host)), m_path(std::move(path)), m_prefix(std::move(prefix))
+        m_host(std::move(host)), m_path(std::move(path)), m_prefix(std::move(prefix))
     {
     }
 
@@ -85,7 +85,7 @@ TreeNodeData::TreeNodeData(QString path, QString host, QString prefix)
     m_d = new TreeNodeDataPrivate(std::move(path), std::move(host), std::move(prefix));
 }
 
-TreeNodeData::TreeNodeData(const TreeNodeData &other) : m_d(nullptr)
+TreeNodeData::TreeNodeData(const TreeNodeData &other)
 {
     *this = other;
 }

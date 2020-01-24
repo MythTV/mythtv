@@ -572,7 +572,6 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_programFlags(FL_NONE),
     m_properties((_subtitleType    << kSubtitlePropertyOffset) |
                (_videoproperties << kVideoPropertyOffset)    |
                (_audioproperties << kAudioPropertyOffset)),

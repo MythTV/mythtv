@@ -221,7 +221,6 @@ bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
 
 MythCoreContext::MythCoreContext(const QString &binversion,
                                  QObject *guiContext)
-    : d(nullptr)
 {
     d = new MythCoreContextPrivate(this, binversion, guiContext);
 }

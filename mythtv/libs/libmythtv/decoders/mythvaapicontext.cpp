@@ -566,7 +566,7 @@ const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
                     uint attrcount = 0;
                     if (vaQuerySurfaceAttributes(hwctx->display, config, nullptr, &attrcount) == VA_STATUS_SUCCESS)
                     {
-                        VASurfaceAttrib *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(*attrlist)));
+                        auto *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(VASurfaceAttrib)));
                         if (vaQuerySurfaceAttributes(hwctx->display, config, attrlist, &attrcount) == VA_STATUS_SUCCESS)
                         {
                             for (uint k = 0; k < attrcount; ++k)

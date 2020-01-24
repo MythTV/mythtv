@@ -11,8 +11,7 @@
 
 #define LOC QString("UDPListener: ")
 
-MythUDPListener::MythUDPListener() :
-    m_socketPool(nullptr)
+MythUDPListener::MythUDPListener()
 {
     Enable();
 }

@@ -56,8 +56,7 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     }
 }
 
-VideoFilterSettings::VideoFilterSettings(const VideoFilterSettings &rhs) :
-    m_changedState(0)
+VideoFilterSettings::VideoFilterSettings(const VideoFilterSettings &rhs)
 {
     *this = rhs;
 }

@@ -955,8 +955,8 @@ bool MythUIHelper::IsGeometryOverridden(void)
 QRect MythUIHelper::GetGeometryOverride(void)
 {
     // NB Call IsGeometryOverridden first to ensure this is valid
-    return QRect(MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
-                 MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override);
+    return {MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
+            MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override};
 }
 
 /**
