@@ -119,7 +119,7 @@ namespace
 
 void EditRomInfoDialog::customEvent(QEvent *event)
 {
-    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
+    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
         const QString resultid = dce->GetId();
 

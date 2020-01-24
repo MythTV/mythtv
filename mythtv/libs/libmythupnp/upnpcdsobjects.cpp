@@ -430,7 +430,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
     if (!ignoreChildren)
     {
-        for (auto cit : m_children)
+        for (auto *cit : m_children)
             cit->toXml(os, filter);
     }
 

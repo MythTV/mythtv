@@ -181,7 +181,7 @@ void ZMEvents::updateUIList()
 
     m_eventGrid->Reset();
 
-    for (auto event : *m_eventList)
+    for (auto *event : *m_eventList)
     {
         auto *item = new MythUIButtonListItem(m_eventGrid, "",
                                               QVariant::fromValue(event));

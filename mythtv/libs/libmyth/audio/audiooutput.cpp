@@ -391,7 +391,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     }
     LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
                                 .arg(name).arg(capabilities));
-    auto adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
+    auto *adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
     adc->m_settings = aosettings;
     return adc;
 }
@@ -434,7 +434,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             QString desc = i.value();
             QString devname = QString("ALSA:%1").arg(key);
 
-            auto adc = GetAudioDeviceConfig(devname, desc);
+            auto *adc = GetAudioDeviceConfig(devname, desc);
             if (!adc)
                 continue;
             list->append(*adc);
@@ -464,7 +464,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "JACK:";
         QString desc = tr("Use JACK default sound server.");
-        auto adc = GetAudioDeviceConfig(name, desc);
+        auto *adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -544,7 +544,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "PulseAudio:default";
         QString desc =  tr("PulseAudio default sound server.");
-        auto adc = GetAudioDeviceConfig(name, desc);
+        auto *adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -578,7 +578,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 
     QString name = "NULL";
     QString desc = "NULL device";
-    auto adc = GetAudioDeviceConfig(name, desc);
+    auto *adc = GetAudioDeviceConfig(name, desc);
     if (adc)
     {
         list->append(*adc);

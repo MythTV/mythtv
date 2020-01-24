@@ -451,7 +451,7 @@ vector<uint> ChannelUtil::CreateMultiplexes(
 
         uint tsid  = nit->TSID(i);
         uint netid = nit->OriginalNetworkID(i);
-        for (auto j : list)
+        for (const auto *j : list)
         {
             const MPEGDescriptor desc(j);
             handle_transport_desc(muxes, desc, sourceid, tsid, netid);

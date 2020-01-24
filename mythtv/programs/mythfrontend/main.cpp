@@ -1787,7 +1787,7 @@ static bool WasAutomaticStart(void)
                     // Find the first recording to be recorded
                     // on this machine
                     QString hostname = gCoreContext->GetHostName();
-                    for (auto prog : progList)
+                    for (auto *prog : progList)
                     {
                         if ((prog->GetRecordingStatus() == RecStatus::WillRecord ||
                              prog->GetRecordingStatus() == RecStatus::Pending) &&

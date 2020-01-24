@@ -139,7 +139,7 @@ QString GenerateNonce(void)
     int nonceParts[4];
     QString nonce;
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-    auto randgen = QRandomGenerator::global();
+    auto *randgen = QRandomGenerator::global();
     nonceParts[0] = randgen->generate();
     nonceParts[1] = randgen->generate();
     nonceParts[2] = randgen->generate();

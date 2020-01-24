@@ -305,7 +305,7 @@ QScreen *MythDisplay::GetDesiredScreen(void)
         // this matches the check in MythMainWindow
         bool windowed = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
                         !MythMainWindow::WindowIsAlwaysFullscreen();
-        QRect override = GetMythUI()->GetGeometryOverride();
+        QRect override = MythUIHelper::GetGeometryOverride();
         // When windowed, we use topleft as a best guess as to which screen we belong in.
         // When fullscreen, Qt appears to use the reverse - though this may be
         // the window manager rather than Qt. So could be wrong.
@@ -563,7 +563,7 @@ void MythDisplay::Initialise(void)
 void MythDisplay::InitScreenBounds(void)
 {
     QList<QScreen*> screens = qGuiApp->screens();
-    for (auto screen : screens)
+    for (auto *screen : screens)
     {
         QRect dim = screen->geometry();
         QString extra = MythDisplay::GetExtraScreenInfo(screen);
@@ -799,8 +799,9 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
         Source = tr("Override");
         return override;
     }
+
     // Auto for multiscreen is a best guess
-    else if (multiscreen)
+    if (multiscreen)
     {
         double aspect = EstimateVirtualAspectRatio();
         if (valid(aspect))

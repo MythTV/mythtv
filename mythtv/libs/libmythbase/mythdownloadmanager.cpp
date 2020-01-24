@@ -1151,7 +1151,7 @@ void MythDownloadManager::removeListener(QObject *caller)
  */
 void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
 {
-    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    auto *reply = dynamic_cast<QNetworkReply *>(sender());
     if (reply == nullptr)
         return;
 
@@ -1439,7 +1439,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 void MythDownloadManager::downloadProgress(qint64 bytesReceived,
                                            qint64 bytesTotal)
 {
-    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    auto *reply = dynamic_cast<QNetworkReply *>(sender());
     if (reply == nullptr)
         return;
 
@@ -1664,7 +1664,7 @@ void MythDownloadManager::saveCookieJar(const QString &filename)
     if (!m_manager->cookieJar())
         return;
 
-    auto jar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto *jar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
     if (jar == nullptr)
         return;
     jar->save(filename);
@@ -1686,7 +1686,7 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
     if (!m_manager->cookieJar())
         return nullptr;
 
-    auto inJar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto *inJar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
     if (inJar == nullptr)
         return nullptr;
     auto *outJar = new MythCookieJar;
@@ -1703,7 +1703,7 @@ void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
     QMutexLocker locker(&m_cookieLock);
     delete m_inCookieJar;
 
-    auto inJar = dynamic_cast<MythCookieJar *>(jar);
+    auto *inJar = dynamic_cast<MythCookieJar *>(jar);
     if (inJar == nullptr)
         return;
 
@@ -1721,7 +1721,7 @@ void MythDownloadManager::updateCookieJar(void)
 {
     QMutexLocker locker(&m_cookieLock);
 
-    auto inJar = dynamic_cast<MythCookieJar *>(m_inCookieJar);
+    auto *inJar = dynamic_cast<MythCookieJar *>(m_inCookieJar);
     if (inJar != nullptr)
     {
         auto *outJar = new MythCookieJar;

@@ -1378,9 +1378,11 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         };
 
         if (Rate > 1.0 && Rate < 121.0)
+        {
             for (auto rate : s_normRates)
                 if (qFuzzyCompare(rate, Rate))
                     return true;
+        }
         return false;
     };
 
@@ -1809,7 +1811,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::teletext);
 
-        for (auto desc : desc_list)
+        for (const auto *desc : desc_list)
         {
             const TeletextDescriptor td(desc);
             if (!td.IsValid())
@@ -1888,7 +1890,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
 
-        for (auto desc : desc_list)
+        for (const auto *desc : desc_list)
         {
             desc++; // Skip tag
             uint length = *desc++;

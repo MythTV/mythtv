@@ -1724,7 +1724,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
 
     m_sockListLock.lockForRead();
-    for (auto pbs : m_playbackList)
+    for (auto *pbs : m_playbackList)
     {
         if (pbs->getSocket() == socket)
         {
@@ -2839,7 +2839,7 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
             ProgramList schedList;
             bool hasConflicts = false;
             LoadFromScheduler(schedList, hasConflicts);
-            for (auto pInfo : schedList)
+            for (auto *pInfo : schedList)
             {
                 if ((pInfo->GetRecordingStatus() == RecStatus::Tuning ||
                      pInfo->GetRecordingStatus() == RecStatus::Failing ||
@@ -5211,7 +5211,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
         m_sockListLock.lockForRead();
 
-        for (auto pbs : m_playbackList)
+        for (auto *pbs : m_playbackList)
         {
             if ((pbs->IsDisconnected()) ||
                 (!pbs->isMediaServer()) ||
@@ -7922,7 +7922,7 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
 
     m_sockListLock.lockForRead();
 
-    for (auto pbs : m_playbackList)
+    for (auto *pbs : m_playbackList)
     {
         if (pbs->isSlaveBackend() &&
             gCoreContext->IsThisHost(hostname, pbs->getHostname()))
@@ -7945,7 +7945,7 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
 
     QReadLocker rlock(&m_sockListLock);
 
-    for (auto pbs : m_playbackList)
+    for (auto *pbs : m_playbackList)
     {
         if (pbs->isMediaServer() &&
             gCoreContext->IsThisHost(hostname, pbs->getHostname()))

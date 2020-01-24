@@ -737,7 +737,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
         if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
@@ -1095,7 +1095,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
         if ((dce == nullptr) || (dce->GetResult() < 0))
             return;

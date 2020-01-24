@@ -863,7 +863,7 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
 void ImportMusicDialog::customEvent(QEvent *event)
 {
-    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
+    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
         if (dce->GetId() == "locationchange")
         {

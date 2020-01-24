@@ -947,7 +947,7 @@ void GameHandler::registerHandler(GameHandler *handler)
 
 void GameHandler::customEvent(QEvent *event)
 {
-    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
+    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

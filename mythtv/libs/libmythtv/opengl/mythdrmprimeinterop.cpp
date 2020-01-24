@@ -107,7 +107,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     if (!Frame)
         return result;
 
-    auto drmdesc = VerifyBuffer(Context, Frame);
+    auto *drmdesc = VerifyBuffer(Context, Frame);
     if (!drmdesc)
         return result;
 

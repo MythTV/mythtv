@@ -1541,7 +1541,7 @@ void ProgLister::HandleVisible(MythUIButtonListItem *item)
 
 void ProgLister::UpdateButtonList(void)
 {
-    for (auto it : m_itemList)
+    for (auto *it : m_itemList)
         new MythUIButtonListItem(m_progList, "", QVariant::fromValue(it));
     m_progList->LoadInBackground();
 

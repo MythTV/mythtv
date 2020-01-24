@@ -179,7 +179,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "MISSING RECORDINGS" << endl;
         cout << "------------------" << endl;
-        for (auto p : missingRecordings)
+        for (auto *p : missingRecordings)
         {
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;
@@ -192,7 +192,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "ZERO BYTE RECORDINGS" << endl;
         cout << "--------------------" << endl;
-        for (auto p : zeroByteRecordings)
+        for (auto *p : zeroByteRecordings)
         {
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;
@@ -205,7 +205,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "NO SEEKTABLE RECORDINGS" << endl;
         cout << "-----------------------" << endl;
-        for (auto p : noSeektableRecordings)
+        for (auto *p : noSeektableRecordings)
         {
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;

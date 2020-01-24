@@ -159,7 +159,7 @@ MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
     int btnIndex = -1;
     while (btnIndex < 0)
     {
-        auto dlg = new MythDialogBox(message, stack, "upgrade");
+        auto *dlg = new MythDialogBox(message, stack, "upgrade");
         if (!dlg->Create())
         {
             delete dlg;

@@ -310,7 +310,7 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
     ProgramList *progData, bool isShows)
 {
     bnList->Reset();
-    for (auto pg : *progData)
+    for (auto *pg : *progData)
     {
         auto *item = new MythUIButtonListItem(bnList, "",
                                           QVariant::fromValue(pg));

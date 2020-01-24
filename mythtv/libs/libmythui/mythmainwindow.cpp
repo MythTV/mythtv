@@ -2122,7 +2122,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             }
 #endif
 
-            for (auto it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
+            for (auto *it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top)
@@ -2205,7 +2205,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                     ge->SetButton(button);
 
-                    for (auto it = d->m_stackList.end()-1;
+                    for (auto *it = d->m_stackList.end()-1;
                          it != d->m_stackList.begin()-1;
                          --it)
                     {
@@ -2244,7 +2244,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                     ge->SetPosition(p);
                     
-                    for (auto it = d->m_stackList.end()-1;
+                    for (auto *it = d->m_stackList.end()-1;
                          it != d->m_stackList.begin()-1;
                          --it)
                     {

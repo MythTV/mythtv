@@ -154,8 +154,8 @@ void BackendSelection::AddItem(DeviceLocation *dev)
         // We only want the version number, not the library version info
         infomap["version"] = infomap["modelnumber"].section('.', 0, 1);
 
-        auto item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
-                                             QVariant::fromValue(dev));
+        auto *item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
+                                              QVariant::fromValue(dev));
         item->SetTextFromMap(infomap);
 
         bool protoMatch = (infomap["protocolversion"] == MYTH_PROTO_VERSION);

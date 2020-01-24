@@ -259,7 +259,7 @@ void FlatView::Populate(ImageList &files)
             double     maxWeight = weights.last();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-            auto randgen = QRandomGenerator::global();
+            auto *randgen = QRandomGenerator::global();
 #else
             qsrand(QTime::currentTime().msec());
 #endif

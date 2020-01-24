@@ -167,7 +167,7 @@ ZMLivePlayer::~ZMLivePlayer()
     if (m_players)
     {
         QString s = "";
-        for (auto p : *m_players)
+        for (auto *p : *m_players)
         {
             if (s != "")
                 s += ",";
@@ -274,7 +274,7 @@ void ZMLivePlayer::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
         if ((dce == nullptr) || (dce->GetResult() < 0))
@@ -349,7 +349,7 @@ void ZMLivePlayer::updateFrame()
 
     // get a list of monitor id's that need updating
     QList<int> monList;
-    for (auto p : *m_players)
+    for (auto *p : *m_players)
     {
         if (!monList.contains(p->getMonitor()->id))
             monList.append(p->getMonitor()->id);
@@ -363,7 +363,7 @@ void ZMLivePlayer::updateFrame()
         if (frameSize > 0 && !status.startsWith("ERROR"))
         {
             // update each player that is displaying this monitor
-            for (auto p : *m_players)
+            for (auto *p : *m_players)
             {
                 if (p->getMonitor()->id == monList[x])
                 {

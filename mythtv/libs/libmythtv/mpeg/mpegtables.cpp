@@ -440,7 +440,7 @@ ProgramMapTable* ProgramMapTable::Create(
     pmt->SetVersionNumber(version);
 
     vector<unsigned char> gdesc;
-    for (auto gd : global_desc)
+    for (const auto *gd : global_desc)
     {
         uint len = gd[1] + 2;
         gdesc.insert(gdesc.end(), gd, gd + len);
@@ -450,7 +450,7 @@ ProgramMapTable* ProgramMapTable::Create(
     for (uint i = 0; i < count; i++)
     {
         vector<unsigned char> pdesc;
-        for (auto pd : prog_desc[i])
+        for (const auto *pd : prog_desc[i])
         {
             uint len = pd[1] + 2;
             pdesc.insert(pdesc.end(), pd, pd + len);

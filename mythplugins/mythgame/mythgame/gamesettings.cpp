@@ -321,7 +321,7 @@ GamePlayerSetting::GamePlayerSetting(const QString& name, uint id)
     setName(name);
 
     // Pre-set name for new players
-    auto nameChild = new Name(m_id);
+    auto *nameChild = new Name(m_id);
     nameChild->setValue(name);
 
     addChild(nameChild);
@@ -363,7 +363,7 @@ void GamePlayersList::Load()
 {
     clearSettings();
 
-    auto newPlayer = new ButtonStandardSetting(tr("(New Game Player)"));
+    auto *newPlayer = new ButtonStandardSetting(tr("(New Game Player)"));
     addChild(newPlayer);
     connect(newPlayer, &ButtonStandardSetting::clicked,
             this,      &GamePlayersList::NewPlayerDialog);
@@ -389,7 +389,7 @@ void GamePlayersList::Load()
             QString name = query.value(1).toString();
             QString type = query.value(2).toString();
 
-            auto child = new GamePlayerSetting(name, id);
+            auto *child = new GamePlayerSetting(name, id);
             addChild(child);
             child->setLabel(playerDisp.arg(name, GetGameTypeName(type)));
         }
@@ -401,7 +401,7 @@ void GamePlayersList::Load()
 void GamePlayersList::NewPlayerDialog()
 {
     MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
-    auto nameDialog = new MythTextInputDialog(stack, tr("Player Name"));
+    auto *nameDialog = new MythTextInputDialog(stack, tr("Player Name"));
 
     if (nameDialog->Create())
     {

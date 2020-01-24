@@ -12189,7 +12189,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
             QString currecgroup = ctx->m_playingInfo->GetRecordingGroup();
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-            for (auto pi : *infoList)
+            for (auto *pi : *infoList)
             {
                 if (pi->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
                      pi->GetRecordingGroup() == currecgroup)
@@ -12234,7 +12234,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
                         titles_seen.push_back(p->GetTitle());
 
                         int j = -1;
-                        for (auto q : plist)
+                        for (auto *q : plist)
                         {
                             j++;
 

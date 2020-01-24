@@ -1202,7 +1202,7 @@ void ProgramRecPriority::countMatches()
     LoadFromScheduler(schedList);
     QDateTime now = MythDate::current();
 
-    for (auto program : schedList)
+    for (auto *program : schedList)
     {
         const RecStatus::Type recstatus = (*program).GetRecordingStatus();
         const uint          recordid  = (*program).GetRecordingRuleID();

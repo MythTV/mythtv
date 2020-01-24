@@ -120,13 +120,13 @@ TagLib::ID3v2::Tag* MetaIOID3::GetID3v2Tag(bool create)
 
     if (m_fileType == kMPEG)
     {
-        auto file = dynamic_cast<TagLib::MPEG::File*>(m_file);
+        auto *file = dynamic_cast<TagLib::MPEG::File*>(m_file);
         return (file != nullptr) ? file->ID3v2Tag(create) : nullptr;
     }
 
     if (m_fileType == kFLAC)
     {
-        auto file = dynamic_cast<TagLib::FLAC::File*>(m_file);
+        auto *file = dynamic_cast<TagLib::FLAC::File*>(m_file);
         return (file != nullptr) ? file->ID3v2Tag(create) : nullptr;
     }
 
@@ -140,7 +140,7 @@ TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
 
     if (m_fileType == kMPEG)
     {
-        auto file = dynamic_cast<TagLib::MPEG::File*>(m_file);
+        auto *file = dynamic_cast<TagLib::MPEG::File*>(m_file);
         return (file != nullptr) ? file->ID3v1Tag(create) : nullptr;
     }
 

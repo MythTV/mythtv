@@ -174,7 +174,7 @@ int passFinished(FrameAnalyzerItem &pass, long long nframes, bool final)
 
 int passReportTime(const FrameAnalyzerItem &pass)
 {
-    for (auto pas : pass)
+    for (auto *pas : pass)
         (void)pas->reportTime();
 
     return 0;

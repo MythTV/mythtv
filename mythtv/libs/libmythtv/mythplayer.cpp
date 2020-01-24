@@ -3035,7 +3035,7 @@ void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
 void MythPlayer::ProcessCallbacks(void)
 {
     m_decoderCallbackLock.lock();
-    for (auto it = m_decoderCallbacks.cbegin(); it != m_decoderCallbacks.cend(); ++it)
+    for (const auto *it = m_decoderCallbacks.cbegin(); it != m_decoderCallbacks.cend(); ++it)
     {
         if (it->m_function)
         {

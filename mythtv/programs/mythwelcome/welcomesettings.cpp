@@ -10,7 +10,7 @@
 
 static StandardSetting *DailyWakeupStart(const QString& n)
 {
-    auto gc = new GlobalTimeBoxSetting("DailyWakeupStartPeriod" + n, "00:00");
+    auto *gc = new GlobalTimeBoxSetting("DailyWakeupStartPeriod" + n, "00:00");
     gc->setLabel(TR("Period %1 start time").arg(n));
     gc->setHelpText(TR("Period %1 start time. "
                        "Defines a period the master backend should be awake. "
@@ -30,7 +30,7 @@ static StandardSetting *DailyWakeupEnd(const QString& n)
 
 static StandardSetting *DailyWakeup(const QString& n)
 {
-    auto gc = new GroupSetting();
+    auto *gc = new GroupSetting();
 
     gc->setLabel(TR("Daily Wakeup/ShutDown Period %1").arg(n));
     gc->addChild(DailyWakeupStart(n));
@@ -40,7 +40,7 @@ static StandardSetting *DailyWakeup(const QString& n)
 
 static StandardSetting *AutoStartFrontend()
 {
-    auto gc = new HostCheckBoxSetting("AutoStartFrontend");
+    auto *gc = new HostCheckBoxSetting("AutoStartFrontend");
     gc->setLabel(TR("Automatically Start mythfrontend"));
     gc->setValue(true);
     gc->setHelpText(TR("Mythwelcome will automatically "
@@ -51,7 +51,7 @@ static StandardSetting *AutoStartFrontend()
 
 static StandardSetting *ShutdownWithBE()
 {
-    auto gc = new HostCheckBoxSetting("ShutdownWithMasterBE");
+    auto *gc = new HostCheckBoxSetting("ShutdownWithMasterBE");
     gc->setLabel(TR("Shutdown with Master Backend"));
     gc->setValue(false);
     gc->setHelpText(TR("Mythwelcome will automatically "
@@ -83,7 +83,7 @@ MythWelcomeSettings::MythWelcomeSettings()
 
 static StandardSetting *MythShutdownNvramCmd()
 {
-    auto gc = new HostTextEditSetting("MythShutdownNvramCmd");
+    auto *gc = new HostTextEditSetting("MythShutdownNvramCmd");
     gc->setLabel(TR("Command to Set Wakeup Time"));
     gc->setValue("/usr/bin/nvram-wakeup --settime $time");
     gc->setHelpText(TR("Command to set the wakeup time "
@@ -93,7 +93,7 @@ static StandardSetting *MythShutdownNvramCmd()
 
 static StandardSetting *WakeupTimeFormat()
 {
-    auto gc = new HostComboBoxSetting("MythShutdownWakeupTimeFmt", true);
+    auto *gc = new HostComboBoxSetting("MythShutdownWakeupTimeFmt", true);
     gc->setLabel(TR("Wakeup time format"));
     gc->addSelection("time_t");
     gc->addSelection("yyyy-MM-dd hh:mm:ss");
@@ -107,7 +107,7 @@ static StandardSetting *WakeupTimeFormat()
 
 static StandardSetting *MythShutdownNvramRestartCmd()
 {
-    auto gc = new HostTextEditSetting("MythShutdownNvramRestartCmd");
+    auto *gc = new HostTextEditSetting("MythShutdownNvramRestartCmd");
     gc->setLabel(TR("nvram-wakeup Restart Command"));
     gc->setValue("/sbin/grub-set-default 1");
     gc->setHelpText(TR("Command to run if your bios "
@@ -120,7 +120,7 @@ static StandardSetting *MythShutdownNvramRestartCmd()
 
 static StandardSetting *MythShutdownReboot()
 {
-    auto gc = new HostTextEditSetting("MythShutdownReboot");
+    auto *gc = new HostTextEditSetting("MythShutdownReboot");
     gc->setLabel(TR("Command to reboot"));
     gc->setValue("/sbin/reboot");
     gc->setHelpText(TR("Command to reboot computer."));
@@ -129,7 +129,7 @@ static StandardSetting *MythShutdownReboot()
 
 static StandardSetting *MythShutdownPowerOff()
 {
-    auto gc = new HostTextEditSetting("MythShutdownPowerOff");
+    auto *gc = new HostTextEditSetting("MythShutdownPowerOff");
     gc->setLabel(TR("Command to shutdown"));
     gc->setValue("/sbin/poweroff");
     gc->setHelpText(TR("Command to shutdown computer."));
@@ -138,7 +138,7 @@ static StandardSetting *MythShutdownPowerOff()
 
 static StandardSetting *MythShutdownStartFECmd()
 {
-    auto gc = new HostTextEditSetting("MythWelcomeStartFECmd");
+    auto *gc = new HostTextEditSetting("MythWelcomeStartFECmd");
     gc->setLabel(TR("Command to run to start the Frontend"));
     gc->setValue(GetAppBinDir() + "mythfrontend");
     gc->setHelpText(TR("Command to start mythfrontend."));
@@ -147,7 +147,7 @@ static StandardSetting *MythShutdownStartFECmd()
 
 static StandardSetting *MythShutdownXTermCmd()
 {
-    auto gc = new HostTextEditSetting("MythShutdownXTermCmd");
+    auto *gc = new HostTextEditSetting("MythShutdownXTermCmd");
     gc->setLabel(TR("Command to run Xterm"));
     gc->setValue("xterm");
     gc->setHelpText(TR("Command to start an Xterm. Can "
