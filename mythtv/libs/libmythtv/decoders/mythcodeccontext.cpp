@@ -121,6 +121,9 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 #ifdef USING_MEDIACODEC
     MythMediaCodecContext::GetDecoderList(decoders);
 #endif
+#ifdef USING_NVDEC
+    MythNVDECContext::GetDecoderList(decoders);
+#endif
     return decoders;
 }
 
