@@ -1553,7 +1553,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
         return;
 
     // Uniform value cacheing
-    QString tag = QStringLiteral("%1-%2").arg(Program->programId()).arg(Uniform);
+    QString tag = QString("%1-%2").arg(Program->programId()).arg(Uniform);
     QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
     if (it == m_cachedMatrixUniforms.end())
         m_cachedMatrixUniforms.insert(tag, Value);
