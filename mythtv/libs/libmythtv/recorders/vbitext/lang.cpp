@@ -142,7 +142,7 @@ add_enhance(struct enhance *eh, int dcode, unsigned int *data)
 void
 do_enhancements(struct enhance *eh, struct vt_page *vtp)
 {
-    int row = 0;
+    int8_t row = 0;
 
     if (eh->next_des < 1)
        return;
@@ -151,9 +151,9 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
     {
        if (*p % 2048 != 2047)
        {
-           int adr = *p % 64;
-           int mode = *p / 64 % 32;
-           int data = *p / 2048 % 128;
+           int8_t adr = *p % 64;
+           int8_t mode = *p / 64 % 32;
+           int8_t data = *p / 2048 % 128;
 
            //printf("%2x,%d,%d ", mode, adr, data);
            if (adr < 40)

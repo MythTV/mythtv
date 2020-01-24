@@ -1721,7 +1721,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
 
     int arrow = GridTimeNormal;
     int cnt = 0;
-    int spread = 1;
+    int8_t spread = 1;
     QDateTime lastprog;
     QRect tempRect;
     bool isCurrent = false;
@@ -2354,7 +2354,7 @@ void GuideGrid::cursorLeft()
         return;
     }
 
-    int startCol = test->m_startCol;
+    int8_t startCol = test->m_startCol;
     m_currentCol = startCol - 1;
 
     if (m_currentCol < 0)
@@ -2378,8 +2378,8 @@ void GuideGrid::cursorRight()
         return;
     }
 
-    int spread = test->m_spread;
-    int startCol = test->m_startCol;
+    int8_t spread = test->m_spread;
+    int8_t startCol = test->m_startCol;
 
     m_currentCol = startCol + spread;
 

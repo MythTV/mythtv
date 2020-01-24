@@ -330,6 +330,7 @@ public:
                m_data.size() - aeslen);
 
         // remove the PKCS#7 padding from the buffer
+        // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         int pad = decrypted_data[m_data.size()-1];
         if (pad <= 0 || pad > AES_BLOCK_SIZE)
         {

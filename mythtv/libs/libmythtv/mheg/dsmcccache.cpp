@@ -54,14 +54,7 @@ QString DSMCCCacheKey::toString() const
 {
     QString result;
     for (int i = 0; i < 4 && i < size(); i++)
-    {
-        int x = at(i);
-        if (x < 16)
-            result += QString("0%1").arg(x, 1, 16);
-        else
-            result += QString("%1").arg(x, 2, 16);
-    }
-
+        result += QString("%1").arg(at(i), 2, 16, QChar('0'));
     return result;
 }
 

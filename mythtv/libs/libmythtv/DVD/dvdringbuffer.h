@@ -143,7 +143,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
     // Subtitles
     uint GetSubtitleLanguage(int id);
-    int GetSubtitleTrackNum(uint stream_id);
+    int8_t GetSubtitleTrackNum(uint stream_id);
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
                          const uint8_t * spu_pkt, int buf_size, uint32_t startTime);
 

@@ -56,6 +56,7 @@ void MHParseText::GetNextChar()
     }
     else
     {
+        // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         m_ch = m_data[m_p++];
     }
 }

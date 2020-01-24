@@ -1,9 +1,9 @@
 #include "freesat_huffman.h"
 
 struct fsattab {
-    unsigned int m_value;
-    short m_bits;
-    char m_next;
+    uint32_t m_value;
+    uint16_t m_bits;
+    uint8_t  m_next;
 };
 
 #define START   '\0'
@@ -38,13 +38,13 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
             value |= src[byte] << ((5-byte) * 8);
             byte++;
         }
-        char lastch = START;
+        uchar lastch = START;
 
         do
         {
             bool found = false;
             unsigned bitShift = 0;
-            char nextCh = STOP;
+            uchar nextCh = STOP;
             if (lastch == ESCAPE)
             {
                 found = true;

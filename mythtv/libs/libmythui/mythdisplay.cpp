@@ -903,7 +903,7 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     // If all else fails, use the total resolution and assume pixel aspect ratio
     // equals display aspect ratio
     if (!totalresolution.isEmpty())
-        result = totalresolution.width() / totalresolution.height();
+        result = static_cast<double>(totalresolution.width()) / totalresolution.height();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen layout: %1x%2").arg(rows).arg(columns));
     if (rows == columns)

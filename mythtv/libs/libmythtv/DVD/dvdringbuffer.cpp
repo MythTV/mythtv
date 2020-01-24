@@ -1880,7 +1880,7 @@ int DVDRingBuffer::NumMenuButtons(void) const
 uint DVDRingBuffer::GetAudioLanguage(int idx)
 {
     uint audioLang = 0;
-    int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
+    int8_t physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
     if (physicalStreamId >= 0)
     {
@@ -1926,7 +1926,7 @@ int DVDRingBuffer::GetAudioTrackNum(uint stream_id)
     {
         // Get the physical stream number at the given index
         // of the logical mapping table (function name is wrong!)
-        int phys = dvdnav_get_audio_logical_stream(m_dvdnav, i);
+        int8_t phys = dvdnav_get_audio_logical_stream(m_dvdnav, i);
 
         if ((uint)phys == stream_id)
         {
@@ -1943,7 +1943,7 @@ int DVDRingBuffer::GetAudioTrackType(uint idx)
     int ret = -1;
     audio_attr_t attributes;
 
-    int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
+    int8_t physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
     if (physicalStreamId < 0)
         return -1;
@@ -1973,9 +1973,9 @@ uint DVDRingBuffer::GetSubtitleLanguage(int id)
 /** \brief get the logical subtitle track/stream number from the dvd
  * \param stream_id the stream id, range 0-31
  */
-int DVDRingBuffer::GetSubtitleTrackNum(uint stream_id)
+int8_t DVDRingBuffer::GetSubtitleTrackNum(uint stream_id)
 {
-    int logstream = -1;
+    int8_t logstream = -1;
 
     // VM always sets stream_id to zero if we're not in the VTS
     // domain and always returns 0 (instead of -1) if nothing has
@@ -2064,7 +2064,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
     uint8_t numChannels = 0U;
 
-    int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
+    int8_t physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
     if (physical >= 0)
     {
