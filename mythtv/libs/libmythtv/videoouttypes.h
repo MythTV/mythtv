@@ -145,7 +145,7 @@ inline QString toDBString(PrimariesMode Mode)
     return "auto";
 }
 
-inline PrimariesMode toPrimariesMode(QString Mode)
+inline PrimariesMode toPrimariesMode(const QString& Mode)
 {
     if (Mode == "disabled") return PrimariesDisabled;
     if (Mode == "exact")    return PrimariesExact;
