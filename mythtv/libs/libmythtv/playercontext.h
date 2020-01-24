@@ -58,7 +58,7 @@ class MTV_PUBLIC PlayerContext
                    bool muted = false);
     void TeardownPlayer(void);
     bool StartPlaying(int maxWait = -1);
-    void StopPlaying(void);
+    void StopPlaying(void) const;
     void UpdateTVChain(const QStringList &data = QStringList());
     bool ReloadTVChain(void);
     void CreatePIPWindow(const QRect &rect, int pos = -1,
@@ -67,8 +67,8 @@ class MTV_PUBLIC PlayerContext
     bool StartPIPPlayer(TV *tv, TVState desiredState);
     void PIPTeardown(void);
     void SetNullVideo(bool setting) { m_useNullVideo = setting; }
-    bool StartEmbedding(const QRect &rect);
-    void StopEmbedding(void);
+    bool StartEmbedding(const QRect &rect) const;
+    void StopEmbedding(void) const;
     void    PushPreviousChannel(void);
     QString PopPreviousChannel(void);
 

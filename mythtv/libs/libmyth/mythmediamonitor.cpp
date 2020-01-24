@@ -724,7 +724,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
  *        media event to the mainwindow
  */
 void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
-                                      MythMediaDevice* pMedia)
+                                      MythMediaDevice* pMedia) const
 {
     // If we're not active then ignore signal.
     if (!m_Active)

@@ -775,7 +775,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
                 return i;
         return -1;
     }
-    uint FindUnusedPID(uint desired_pid = 0x20);
+    uint FindUnusedPID(uint desired_pid = 0x20) const;
 
     void RemoveAllStreams(void)
     {

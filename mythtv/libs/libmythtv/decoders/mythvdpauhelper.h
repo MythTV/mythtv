@@ -42,7 +42,7 @@ class MythVDPAUHelper : public QObject
     explicit MythVDPAUHelper(AVVDPAUDeviceContext *Context);
     ~MythVDPAUHelper(void) override;
 
-    bool             IsValid(void);
+    bool             IsValid(void) const;
     void             SetPreempted(void);
     bool             IsFeatureAvailable(uint Feature);
     VdpOutputSurface CreateOutputSurface(QSize Size);

@@ -400,7 +400,7 @@ void LoggerThread::handleItem(LoggingItem *item)
 
 /// \brief Process a log message, writing to the console
 /// \param item LoggingItem containing the log message to process
-bool LoggerThread::logConsole(LoggingItem *item)
+bool LoggerThread::logConsole(LoggingItem *item) const
 {
     if (m_quiet || (m_progress && item->m_level > LOG_ERR))
         return false;

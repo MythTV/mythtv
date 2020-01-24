@@ -604,7 +604,7 @@ public:
             return;
         }
     }
-    int Process(void* out, const void* in, int bytes)
+    int Process(void* out, const void* in, int bytes) const
     {
         if (!m_swr)
             return -1;

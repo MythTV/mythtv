@@ -37,8 +37,8 @@ class META_PUBLIC BlurayMetadata : public QObject
     QString      GetAlternateTitle(void) { return m_alttitle; };
     QString      GetDiscLanguage(void) { return m_language; };
 
-    uint         GetCurrentDiscNumber(void) { return m_discnumber; };
-    uint         GetTotalDiscNumber(void) { return m_disctotal; };
+    uint         GetCurrentDiscNumber(void) const { return m_discnumber; };
+    uint         GetTotalDiscNumber(void) const { return m_disctotal; };
 
     uint         GetTitleCount(void) { return m_titles.count(); };
     BlurayTitles GetTitles(void) { return m_titles; };
@@ -46,20 +46,20 @@ class META_PUBLIC BlurayMetadata : public QObject
     uint         GetThumbnailCount(void) { return m_images.count(); };
     QStringList  GetThumbnails(void) {return m_images; };
 
-    bool         GetTopMenuSupported(void) { return m_topMenuSupported; };
-    bool         GetFirstPlaySupported(void) { return m_firstPlaySupported; };
+    bool         GetTopMenuSupported(void) const { return m_topMenuSupported; };
+    bool         GetFirstPlaySupported(void) const { return m_firstPlaySupported; };
 
-    uint32_t     GetNumHDMVTitles(void) { return m_numHDMVTitles; };
-    uint32_t     GetNumBDJTitles(void) { return m_numBDJTitles; };
-    uint32_t     GetNumUnsupportedTitles(void) { return m_numUnsupportedTitles; };
+    uint32_t     GetNumHDMVTitles(void) const { return m_numHDMVTitles; };
+    uint32_t     GetNumBDJTitles(void) const { return m_numBDJTitles; };
+    uint32_t     GetNumUnsupportedTitles(void) const { return m_numUnsupportedTitles; };
 
-    bool         GetAACSDetected(void) { return m_aacsDetected; };
-    bool         GetLibAACSDetected(void) { return m_libaacsDetected; };
-    bool         GetAACSHandled(void) { return m_aacsHandled; };
+    bool         GetAACSDetected(void) const { return m_aacsDetected; };
+    bool         GetLibAACSDetected(void) const { return m_libaacsDetected; };
+    bool         GetAACSHandled(void) const { return m_aacsHandled; };
 
-    bool         GetBDPlusDetected(void) { return m_bdplusDetected; };
-    bool         GetLibBDPlusDetected(void) { return m_libbdplusDetected; };
-    bool         GetBDPlusHandled(void) { return m_bdplusHandled; };
+    bool         GetBDPlusDetected(void) const { return m_bdplusDetected; };
+    bool         GetLibBDPlusDetected(void) const { return m_libbdplusDetected; };
+    bool         GetBDPlusHandled(void) const { return m_bdplusHandled; };
 
   private:
     BLURAY              *m_bdnav               {nullptr};

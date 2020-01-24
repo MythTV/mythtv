@@ -1358,7 +1358,7 @@ bool UnzipPrivate::testKeys(const ZipEntryP& header, quint32* keys)
 /*!
 	\internal Decrypts an array of bytes long \p read.
 */
-void UnzipPrivate::decryptBytes(quint32* keys, char* buffer, qint64 read)
+void UnzipPrivate::decryptBytes(quint32* keys, char* buffer, qint64 read) const
 {
 	for (int i=0; i<(int)read; ++i)
 		updateKeys(keys, buffer[i] ^= decryptByte(keys[2]));

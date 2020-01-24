@@ -449,12 +449,12 @@ QMatrix4x4 VideoColourSpace::GetPrimaryMatrix(void)
     return m_primaryMatrix;
 }
 
-float VideoColourSpace::GetColourGamma(void)
+float VideoColourSpace::GetColourGamma(void) const
 {
     return m_colourGamma;
 }
 
-float VideoColourSpace::GetDisplayGamma(void)
+float VideoColourSpace::GetDisplayGamma(void) const
 {
     return m_displayGamma;
 }

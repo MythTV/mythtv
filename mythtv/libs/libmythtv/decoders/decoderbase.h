@@ -263,7 +263,7 @@ class DecoderBase
     void ResetTotalDuration(void) { m_totalDuration = AVRationalInit(0); }
     void SaveTotalFrames(void);
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
-    int GetfpsMultiplier(void) { return m_fpsMultiplier; }
+    int GetfpsMultiplier(void) const { return m_fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythCodecCtx; }
     VideoDisplayProfile * GetVideoDisplayProfile(void) { return &m_videoDisplayProfile; }
     AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);

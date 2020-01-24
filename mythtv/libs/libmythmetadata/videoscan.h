@@ -70,7 +70,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     void SetHosts(const QStringList &hosts);
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
     QStringList GetOfflineSGHosts(void) { return m_offlineSGHosts; };
-    bool getDataChanged() { return m_dbDataChanged; };
+    bool getDataChanged() const { return m_dbDataChanged; };
 
     void ResetCounts() { m_addList.clear(); m_movList.clear(); m_delList.clear(); };
 
@@ -91,7 +91,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     bool updateDB(const FileCheckList &add, const PurgeList &remove);
     bool buildFileList(const QString &directory,
                                         const QStringList &imageExtensions,
-                                        FileCheckList &filelist);
+                                        FileCheckList &filelist) const;
 
     void SendProgressEvent(uint progress, uint total = 0,
             QString messsage = QString());

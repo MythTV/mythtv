@@ -941,7 +941,7 @@ HttpContentType HTTPRequest::SetContentType( const QString &sType )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetResponseStatus( void )
+QString HTTPRequest::GetResponseStatus( void ) const
 {
     switch( m_nResponseStatus )
     {
@@ -1004,7 +1004,7 @@ QByteArray HTTPRequest::GetResponsePage( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetResponseType( void )
+QString HTTPRequest::GetResponseType( void ) const
 {
     switch( m_eResponseType )
     {
@@ -1870,7 +1870,7 @@ QString HTTPRequest::GetAuthenticationHeader(bool isStale)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp)
+QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp) const
 {
     QString uniqueID = QString("%1:%2").arg(timeStamp).arg(m_sPrivateToken);
     QString hash = QCryptographicHash::hash( uniqueID.toLatin1(), QCryptographicHash::Sha1).toHex(); // TODO: Change to Sha2 with QT5?

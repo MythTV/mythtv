@@ -254,7 +254,7 @@ class APHTTPRequest
         return result;
     }
 
-    bool IsComplete(void)
+    bool IsComplete(void) const
     {
         return !m_incomingPartial;
     }

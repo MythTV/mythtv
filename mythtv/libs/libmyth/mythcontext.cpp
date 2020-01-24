@@ -86,17 +86,17 @@ class MythContextPrivate : public QObject
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
-    void    ResetDatabase(void);
+    void    ResetDatabase(void) const;
 
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int timeLimit);
+    bool    checkPort(QString &host, int port, int timeLimit) const;
     static void processEvents(void);
     bool    saveSettingsCache(void);
-    void    loadSettingsCacheOverride(void);
+    void    loadSettingsCacheOverride(void) const;
     static void clearSettingsCacheOverride(void);
 
 
@@ -324,7 +324,7 @@ void MythContextPrivate::EndTempWindow(void)
  * \param timeLimit Limit in seconds for testing.
  */
 
-bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit)
+bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
@@ -1130,7 +1130,7 @@ void MythContextPrivate::EnableDBerrors(void)
  * Any cached settings also need to be cleared,
  * so that they can be re-read from the new database
  */
-void MythContextPrivate::ResetDatabase(void)
+void MythContextPrivate::ResetDatabase(void) const
 {
     gCoreContext->GetDBManager()->CloseDatabases();
     gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
@@ -1500,7 +1500,7 @@ bool MythContextPrivate::saveSettingsCache(void)
     return config.Save();
 }
 
-void MythContextPrivate::loadSettingsCacheOverride(void)
+void MythContextPrivate::loadSettingsCacheOverride(void) const
 {
     if (!m_gui)
         return;

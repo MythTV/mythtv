@@ -120,7 +120,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     // FIXME: Rename "GetExitStatus" and document that this does not
     //        block until an exit status exists.
     // FIXME: Document what this actually returns.
-    uint GetStatus(void)             { return m_status; }
+    uint GetStatus(void) const       { return m_status; }
     // FIXME Make private.
     void SetStatus(uint status)      { m_status = status; }
 
@@ -148,8 +148,8 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     //        after construcion.
     void SetArgs(QStringList &args)  { m_args = args; }
 
-    int GetNice(void)                { return m_nice; }
-    int GetIOPrio(void)              { return m_ioprio; }
+    int GetNice(void) const          { return m_nice; }
+    int GetIOPrio(void) const        { return m_ioprio; }
 
     // FIXME: We should not return a pointer to a QBuffer
     QBuffer *GetBuffer(int index)    { return &m_stdbuff[index]; }

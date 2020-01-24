@@ -342,7 +342,7 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
-drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property)
+drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const
 {
     drmModePropertyBlobPtr result = nullptr;
     if (!Connector || Property.isEmpty())

@@ -131,7 +131,7 @@ class MHEngine: public MHEG {
     void AddLink(MHLink *pLink);
     void RemoveLink(MHLink *pLink);
 
-    bool InTransition() { return m_fInTransition; }
+    bool InTransition() const { return m_fInTransition; }
 
     bool GetEngineSupport(const MHOctetString &feature);
 

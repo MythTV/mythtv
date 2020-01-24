@@ -204,7 +204,7 @@ class LoggerThread : public QObject, public MThread
     pid_t   m_pid;         ///< Cached pid value
 
   protected:
-    bool logConsole(LoggingItem *item);
+    bool logConsole(LoggingItem *item) const;
 };
 
 #endif

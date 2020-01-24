@@ -22,7 +22,7 @@ class MythQtImage : public MythImage
     QPixmap *GetPixmap(void) { return m_pixmap; }
     void SetPixmap(QPixmap *p) { m_pixmap = p; }
 
-    bool NeedsRegen(void) { return m_bRegenPixmap; }
+    bool NeedsRegen(void) const { return m_bRegenPixmap; }
     void RegeneratePixmap(void);
 
   protected:

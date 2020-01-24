@@ -98,27 +98,27 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
     // gets
     int  GetTitle(void)        const { return m_title;                  }
-    bool DVDWaitingForPlayer(void)   { return m_playerWait;             }
+    bool DVDWaitingForPlayer(void) const { return m_playerWait;         }
     int  GetPart(void)         const { return m_part;                   }
     int  GetCurrentAngle(void) const { return m_currentAngle;           }
-    int  GetNumAngles(void)          { return m_currentTitleAngleCount; }
+    int  GetNumAngles(void) const    { return m_currentTitleAngleCount; }
     bool IsOpen(void)          const override { return m_dvdnav;        } // RingBuffer
-    long long GetTotalReadPosition(void) { return m_titleLength;        }
+    long long GetTotalReadPosition(void) const { return m_titleLength;  }
     uint GetChapterLength(void)    const { return m_pgLength / 90000;   }
     void GetChapterTimes(QList<long long> &times);
     uint64_t GetChapterTimes(uint title);
     long long GetReadPosition(void) const override; // RingBuffer
-    void GetDescForPos(QString &desc);
+    void GetDescForPos(QString &desc) const;
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
-    uint GetTotalTimeOfTitle(void);
-    float GetAspectOverride(void)     { return m_forcedAspect; }
+    uint GetTotalTimeOfTitle(void) const;
+    float GetAspectOverride(void) const { return m_forcedAspect; }
     bool IsBookmarkAllowed(void) override; // RingBuffer
     bool IsSeekingAllowed(void) override; // RingBuffer
     bool IsStreamed(void) override    { return true; } // RingBuffer
     int  BestBufferSize(void) override { return 2048; } // RingBuffer
 
-    uint GetCellStart(void);
+    uint GetCellStart(void) const;
     bool PGCLengthChanged(void);
     bool CellChanged(void);
     bool IsInStillFrame(void) const override { return m_still > 0; } // RingBuffer
@@ -128,8 +128,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
     void GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id, uint32_t startTime);
 
-    uint32_t AdjustTimestamp(uint32_t timestamp);
-    int64_t AdjustTimestamp(int64_t timestamp);
+    uint32_t AdjustTimestamp(uint32_t timestamp) const;
+    int64_t AdjustTimestamp(int64_t timestamp) const;
     MythDVDContext* GetDVDContext(void);
     int32_t GetLastEvent(void) const     { return m_dvdEvent; }
 
@@ -155,10 +155,10 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool GetDVDStateSnapshot(QString& state);
     bool RestoreDVDStateSnapshot(QString& state);
     double GetFrameRate(void);
-    bool StartOfTitle(void) { return (m_part == 0); }
-    bool EndOfTitle(void)   { return ((m_titleParts == 0) ||
-                                     (m_part == (m_titleParts - 1)) ||
-                                     (m_titleParts == 1)); }
+    bool StartOfTitle(void) const { return (m_part == 0); }
+    bool EndOfTitle(void) const   { return ((m_titleParts == 0) ||
+                                            (m_part == (m_titleParts - 1)) ||
+                                            (m_titleParts == 1)); }
 
     // commands
     bool OpenFile(const QString &lfilename,
@@ -184,10 +184,10 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
     void IgnoreWaitStates(bool ignore) override { m_skipstillorwait = ignore; } // RingBuffer
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
-    int64_t GetCurrentTime(void)          { return (m_currentTime / 90000); }
+    int64_t GetCurrentTime(void) const    { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
     void  SetTrack(uint type, int trackNo);
-    int   GetTrack(uint type);
+    int   GetTrack(uint type) const;
     uint8_t GetNumAudioChannels(int idx);
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);

@@ -481,7 +481,7 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     return true;
 }
 
-bool DiSEqCDevTree::SetTone(bool on)
+bool DiSEqCDevTree::SetTone(bool on) const
 {
     (void) on;
 
@@ -677,7 +677,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
  *  \param data Pointer to optional data.
  */
 bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
-                                uint data_len, unsigned char *data)
+                                uint data_len, unsigned char *data) const
 {
     // check payload validity
     if (data_len > 3 || (data_len > 0 && !data))

@@ -557,7 +557,7 @@ class MTV_PUBLIC MythPlayer
     bool ToggleCaptions(uint type);
     bool HasTextSubtitles(void)        { return m_subReader.HasTextSubtitles(); }
     void SetCaptionsEnabled(bool enable, bool osd_msg=true);
-    bool GetCaptionsEnabled(void);
+    bool GetCaptionsEnabled(void) const;
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
     virtual void EnableCaptions(uint mode, bool osd_msg=true);
 
@@ -593,7 +593,7 @@ class MTV_PUBLIC MythPlayer
   protected:
     // Private initialization stuff
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
-                                  float fps, int video_height);
+                                  float fps, int video_height) const;
     virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
 
     // Private Sets

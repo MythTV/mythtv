@@ -2506,7 +2506,7 @@ QString MythCommandLineParser::GetLogFilePath(void)
 
 /** \brief Helper utility for logging interface to return syslog facility
  */
-int MythCommandLineParser::GetSyslogFacility(void)
+int MythCommandLineParser::GetSyslogFacility(void) const
 {
     QString setting = toString("syslog").toLower();
     if (setting == "none")
@@ -2517,7 +2517,7 @@ int MythCommandLineParser::GetSyslogFacility(void)
 
 /** \brief Helper utility for logging interface to filtering level
  */
-LogLevel_t MythCommandLineParser::GetLogLevel(void)
+LogLevel_t MythCommandLineParser::GetLogLevel(void) const
 {
     QString setting = toString("loglevel");
     if (setting.isEmpty())
@@ -2731,7 +2731,7 @@ bool setUser(const QString &username)
 
 /** \brief Fork application into background, and detatch from terminal
  */
-int MythCommandLineParser::Daemonize(void)
+int MythCommandLineParser::Daemonize(void) const
 {
     ofstream pidfs;
     if (!openPidfile(pidfs, toString("pidfile")))

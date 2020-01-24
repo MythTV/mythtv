@@ -21,8 +21,8 @@ class MUI_PUBLIC ProgressUpdateEvent : public QEvent
         m_message(std::move(message)) { }
 
     QString GetMessage() { return m_message; }
-    uint GetTotal() { return m_total; }
-    uint GetCount() { return m_count; }
+    uint GetTotal() const { return m_total; }
+    uint GetCount() const { return m_count; }
 
     static Type kEventType;
 

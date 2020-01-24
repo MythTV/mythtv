@@ -36,7 +36,7 @@ class MUI_PUBLIC MythOpenGLPerf : public QOpenGLTimeMonitor
     MythOpenGLPerf(QString Name, QVector<QString> Names, int SampleCount = 30);
     void RecordSample    (void);
     void LogSamples      (void);
-    int  GetTimersRunning(void);
+    int  GetTimersRunning(void) const;
 
   private:
     QString m_name                 { };

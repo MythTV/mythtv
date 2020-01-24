@@ -243,8 +243,8 @@ class MBASE_PUBLIC MythCommandLineParser
     QString                 GetPassthrough(void) const;
     QMap<QString,QString>   GetSettingsOverride(void);
     QString                 GetLogFilePath(void);
-    int                     GetSyslogFacility(void);
-    LogLevel_t              GetLogLevel(void);
+    int                     GetSyslogFacility(void) const;
+    LogLevel_t              GetLogLevel(void) const;
     QString                 GetAppName(void) const { return m_appname; }
 
     bool                    toBool(const QString& key) const;
@@ -262,7 +262,7 @@ class MBASE_PUBLIC MythCommandLineParser
     int                     ConfigureLogging(const QString& mask = "general",
                                              unsigned int progress = 0);
     void                    ApplySettingsOverride(void);
-    int                     Daemonize(void);
+    int                     Daemonize(void) const;
 
   protected:
     void allowArgs(bool allow=true);

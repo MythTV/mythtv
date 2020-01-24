@@ -77,7 +77,7 @@ class MPUBLIC AudioOutputSettings
         int  BestSupportedChannels();
 
         void setPassthrough(int val)    { m_passthrough = val; };
-        int  canPassthrough()           { return m_passthrough; };
+        int  canPassthrough() const     { return m_passthrough; };
             /**
              * return DigitalFeature mask.
              * possible values are:
@@ -88,9 +88,9 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_TRUEHD
              * - FEATURE_DTSHD
              */
-        bool canFeature(DigitalFeature arg)
+        bool canFeature(DigitalFeature arg) const
         { return (m_features & arg) != 0U; };
-        bool canFeature(unsigned int arg)
+        bool canFeature(unsigned int arg) const
         { return (m_features & arg) != 0U; };
 
             /**
@@ -113,7 +113,7 @@ class MPUBLIC AudioOutputSettings
              * if true, you can not assume any of the other method returned
              * values are valid
              */
-        bool IsInvalid()                { return m_invalid; };
+        bool IsInvalid() const          { return m_invalid; };
 
             /**
              * set the provided digital feature
@@ -151,7 +151,7 @@ class MPUBLIC AudioOutputSettings
              * supported by the output device
              */
         static QString FeaturesToString(DigitalFeature arg);
-        QString FeaturesToString(void)
+        QString FeaturesToString(void) const
         { return FeaturesToString((DigitalFeature)m_features); };
 
             /**
@@ -166,7 +166,7 @@ class MPUBLIC AudioOutputSettings
             /**
              * get the ELD flag
              */
-        bool hasELD();
+        bool hasELD() const;
         bool hasValidELD();
             /**
              * set ELD data

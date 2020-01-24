@@ -357,7 +357,7 @@ void ChannelBase::HandleScript(const QString &freqid)
 }
 
 bool ChannelBase::ChangeInternalChannel(const QString &freqid,
-                                        uint inputid)
+                                        uint inputid) const
 {
 #ifdef USING_FIREWIRE
     FirewireDevice *device = nullptr;

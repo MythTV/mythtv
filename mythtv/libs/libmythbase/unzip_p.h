@@ -97,7 +97,7 @@ public:
 
 	bool createDirectory(const QString& path);
 
-	inline void decryptBytes(quint32* keys, char* buffer, qint64 read);
+	inline void decryptBytes(quint32* keys, char* buffer, qint64 read) const;
 
 	static inline quint32 getULong(const unsigned char* data, quint32 offset) ;
 	static inline quint64 getULLong(const unsigned char* data, quint32 offset) ;

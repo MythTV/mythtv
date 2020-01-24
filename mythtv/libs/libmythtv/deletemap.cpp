@@ -844,7 +844,7 @@ void DeleteMap::TrackerReset(uint64_t frame)
  * \brief Returns true if the given frame has passed the last cut point start
  *        and provides the frame number of the next jump.
  */
-bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t &to)
+bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t &to) const
 {
     if (IsEmpty() || !m_nextCutStartIsValid || frame < m_nextCutStart)
         return false;

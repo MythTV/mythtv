@@ -1219,7 +1219,7 @@ void MythUIWebBrowser::SetDefaultSaveFilename(const QString &filename)
  *  \brief Get the current zoom level
  *  \return the zoom level
  */
-float MythUIWebBrowser::GetZoom(void)
+float MythUIWebBrowser::GetZoom(void) const
 {
     return m_zoom;
 }

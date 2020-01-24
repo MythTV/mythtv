@@ -54,7 +54,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
    ~MythRAOPConnection() override;
     bool Init(void);
     QTcpSocket *GetSocket()   { return m_socket;   }
-    int         GetDataPort() { return m_dataPort; }
+    int         GetDataPort() const { return m_dataPort; }
     bool        HasAudio()    { return m_audio;    }
     static QMap<QString,QString> decodeDMAP(const QByteArray &dmap);
     static RSA *LoadKey(void);
@@ -106,7 +106,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     int64_t     AudioCardLatency(void);
     static QStringList splitLines(const QByteArray &lines);
     static QString     stringFromSeconds(int timeInSeconds);
-    uint64_t    framesToMs(uint64_t frames);
+    uint64_t    framesToMs(uint64_t frames) const;
 
     // notification functions
     void        SendNotification(bool update = false);

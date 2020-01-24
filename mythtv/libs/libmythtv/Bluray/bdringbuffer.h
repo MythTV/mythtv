@@ -83,7 +83,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     void ProgressUpdate(void);
 
     // Player interaction
-    bool BDWaitingForPlayer(void)     { return m_playerWait;  }
+    bool BDWaitingForPlayer(void) const { return m_playerWait;  }
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
     void IgnoreWaitStates(bool ignore) override { m_ignorePlayerWait = ignore; } // RingBuffer
     bool StartFromBeginning(void) override; // RingBuffer
@@ -104,12 +104,12 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t GetTitleSize(void) const { return m_titlesize; }
     // Get The total duration of the current title in 90Khz ticks.
     uint64_t GetTotalTimeOfTitle(void) const { return (m_currentTitleLength / 90000); }
-    uint64_t GetCurrentTime(void) { return (m_currentTime / 90000); }
+    uint64_t GetCurrentTime(void) const { return (m_currentTime / 90000); }
     long long GetReadPosition(void) const override; // RingBuffer
     uint64_t GetTotalReadPosition(void);
     uint32_t GetNumChapters(void);
     uint32_t GetCurrentChapter(void);
-    uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
+    uint64_t GetNumAngles(void) const { return m_currentTitleAngleCount; }
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void) const override { return m_bdnav; } // RingBuffer
@@ -120,7 +120,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     bool IsValidStream(int streamid);
     void UnblockReading(void)             { m_processState = PROCESS_REPROCESS; }
     bool IsReadingBlocked(void)           { return (m_processState == PROCESS_WAIT); }
-    int64_t AdjustTimestamp(int64_t timestamp);
+    int64_t AdjustTimestamp(int64_t timestamp) const;
 
     void GetDescForPos(QString &desc);
     double GetFrameRate(void);

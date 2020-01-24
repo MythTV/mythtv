@@ -129,7 +129,7 @@ class UPNP_PUBLIC UPnpDevice
 
         QString GetUDN(void) const;
 
-        void toMap(InfoMap &map);
+        void toMap(InfoMap &map) const;
 
         UPnpService GetService(const QString &urn, bool *found = nullptr) const;
 
@@ -173,7 +173,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static QString  FormatValue ( const QString &sName, const QString &sValue );
         static QString  FormatValue ( const QString &sName, int nValue );
 
-        QString  GetHostName ();
+        QString  GetHostName () const;
 
     public:
 

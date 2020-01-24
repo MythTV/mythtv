@@ -30,8 +30,8 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void          SetAlpha(int Value);
     QMatrix4x4    GetPrimaryMatrix(void);
     QStringList   GetColourMappingDefines(void);
-    float         GetColourGamma(void);
-    float         GetDisplayGamma(void);
+    float         GetColourGamma(void) const;
+    float         GetDisplayGamma(void) const;
     PrimariesMode GetPrimariesMode(void);
 
     struct ColourPrimaries

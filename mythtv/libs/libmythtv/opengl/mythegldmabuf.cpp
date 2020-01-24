@@ -57,7 +57,7 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame, FrameScanType Scan)
+                                                               VideoFrame *Frame, FrameScanType Scan) const
 {
     vector<MythVideoTexture*> result;
     for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
@@ -158,7 +158,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
 
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame)
+                                                               VideoFrame *Frame) const
 {
     // N.B. this works for YV12/NV12/P010 etc but will probably break for YUV422 etc
     vector<QSize> sizes;

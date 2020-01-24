@@ -162,7 +162,7 @@ bool MythPower::IsFeatureSupported(Feature Supported)
     return result;
 }
 
-int MythPower::GetPowerLevel(void)
+int MythPower::GetPowerLevel(void) const
 {
     int result = UnknownPower;
     s_lock.lock();

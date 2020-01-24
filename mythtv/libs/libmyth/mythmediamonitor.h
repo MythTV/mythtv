@@ -89,7 +89,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
-    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
+    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia) const;
 
   protected:
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);

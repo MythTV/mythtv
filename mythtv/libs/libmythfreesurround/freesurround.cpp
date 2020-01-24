@@ -440,17 +440,17 @@ void FreeSurround::close()
     m_decoder = nullptr;
 }
 
-uint FreeSurround::numUnprocessedFrames()
+uint FreeSurround::numUnprocessedFrames() const
 {
     return m_inCount;
 }
 
-uint FreeSurround::numFrames()
+uint FreeSurround::numFrames() const
 {
     return m_outCount;
 }
 
-uint FreeSurround::frameLatency()
+uint FreeSurround::frameLatency() const
 {
     if (m_processed)
         return m_inCount + m_outCount + (block_size/2);

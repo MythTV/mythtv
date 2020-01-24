@@ -75,7 +75,7 @@ class MTV_PUBLIC VideoDisplayProfile
     void    SetVideoRenderer(const QString &VideoRenderer);
     bool    CheckVideoRendererGroup(const QString &Renderer);
     QString GetDecoder(void) const;
-    bool    IsDecoderCompatible(const QString &Decoder);
+    bool    IsDecoderCompatible(const QString &Decoder) const;
     uint    GetMaxCPUs(void) const ;
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;

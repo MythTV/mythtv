@@ -4,7 +4,7 @@
 
 #include <QDomDocument>
 
-QRect UIEffects::GetExtent(const QSize &size)
+QRect UIEffects::GetExtent(const QSize &size) const
 {
     int x = 0;
     int y = 0;

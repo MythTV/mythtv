@@ -83,7 +83,7 @@ class NameValue
     inline ~NameValue();
 
     inline void AddAttribute(const QString &name, const QString &value, bool required);
-    inline QString toXML();
+    inline QString toXML() const;
 };
 class NameValues : public QList<NameValue> {};
 
@@ -135,7 +135,7 @@ inline void NameValue::AddAttribute(const QString &name, const QString &value,
 }
 
 
-inline QString NameValue::toXML()
+inline QString NameValue::toXML() const
 {
     QString sAttributes;
     QString attributeTemplate = " %1=\"%2\"";

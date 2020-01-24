@@ -24,7 +24,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
+QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) const
 {
     HttpRedirectException exception;
     bool                  bExceptionThrown = false;

@@ -42,7 +42,7 @@ public:
     uint getNum(void) const { return m_num; }
     uint getDen(void) const { return m_den; }
     QString toString(void) const { return QString("%1/%2").arg(m_num).arg(m_den); }
-    bool operator==(const FrameRate &other) {
+    bool operator==(const FrameRate &other) const {
         return m_num == other.m_num && m_den == other.m_den;
     }
     bool operator!=(const FrameRate &other) { return !(*this == other); }

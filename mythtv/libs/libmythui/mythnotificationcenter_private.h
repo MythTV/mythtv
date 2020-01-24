@@ -173,7 +173,7 @@ public:
     void UpdateFrom(const MythNotificationScreen &s);
 
     void SetSingleShotTimer(int s, bool update = false);
-    void SetErrorState(void);
+    void SetErrorState(void) const;
 
     // UI methods
     void AdjustYPosition(void);

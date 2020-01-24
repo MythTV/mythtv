@@ -93,7 +93,7 @@ class DiSEqCDevTree
     void SetRoot(DiSEqCDevDevice *root);
 
     bool SendCommand(uint adr, uint cmd, uint repeats = 0,
-                     uint data_len = 0, unsigned char *data = nullptr);
+                     uint data_len = 0, unsigned char *data = nullptr) const;
 
     bool ResetDiseqc(bool hard_reset, bool is_SCR);
 
@@ -103,7 +103,7 @@ class DiSEqCDevTree
     int  GetFD(void) const { return m_fdFrontend; }
 
     // Sets
-    bool SetTone(bool on);
+    bool SetTone(bool on) const;
     bool SetVoltage(uint voltage);
 
     // Gets

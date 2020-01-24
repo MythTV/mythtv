@@ -94,7 +94,7 @@ class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
     explicit ExternalKeycodeEvent(const int key) :
         QEvent(kEventType), m_keycode(key) {}
 
-    int getKeycode() { return m_keycode; }
+    int getKeycode() const { return m_keycode; }
 
     static Type kEventType;
 

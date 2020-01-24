@@ -681,7 +681,7 @@ class MPUBLIC ProgramInfo
                     const QVector<MarkupEntry> &mapSeek) const;
 
     /// Sends event out that the ProgramInfo should be reloaded.
-    void SendUpdateEvent(void);
+    void SendUpdateEvent(void) const;
     /// Sends event out that the ProgramInfo should be added to lists.
     void SendAddedEvent(void) const;
     /// Sends event out that the ProgramInfo should be delete from lists.

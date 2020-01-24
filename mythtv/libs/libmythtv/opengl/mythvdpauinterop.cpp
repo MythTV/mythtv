@@ -372,7 +372,7 @@ void MythVDPAUInterop::DisplayPreempted(void)
     m_preempted = true;
 }
 
-bool MythVDPAUInterop::IsPreempted(void)
+bool MythVDPAUInterop::IsPreempted(void) const
 {
     return m_preempted;
 }

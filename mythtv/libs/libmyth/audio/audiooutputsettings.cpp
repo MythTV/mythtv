@@ -556,7 +556,7 @@ bool AudioOutputSettings::hasValidELD()
     return m_hasEld && m_eld.isValid();
 };
 
-bool AudioOutputSettings::hasELD()
+bool AudioOutputSettings::hasELD() const
 {
     return m_hasEld;
 };

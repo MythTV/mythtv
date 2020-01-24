@@ -1050,7 +1050,7 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
     return 0;
 }
 
-int64_t BDRingBuffer::AdjustTimestamp(int64_t timestamp)
+int64_t BDRingBuffer::AdjustTimestamp(int64_t timestamp) const
 {
     int64_t newTimestamp = timestamp;
 

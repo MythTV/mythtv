@@ -1268,7 +1268,7 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
 }
 
 
-void VideoMetadata::GetStateMap(InfoMap &stateMap)
+void VideoMetadata::GetStateMap(InfoMap &stateMap) const
 {
     stateMap["trailerstate"] = TrailerToState(GetTrailer());
     stateMap["userratingstate"] =

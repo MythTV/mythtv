@@ -49,7 +49,7 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
           m_resultData(std::move(data)) { }
 
     QString GetId() { return m_id; }
-    int GetResult() { return m_result; }
+    int GetResult() const { return m_result; }
     QString GetResultText() { return m_resultText; }
     QVariant GetData() { return m_resultData; }
 

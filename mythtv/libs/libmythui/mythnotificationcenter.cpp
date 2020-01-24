@@ -494,7 +494,7 @@ void MythNotificationScreen::Init(void)
     m_refresh = false;
 }
 
-void MythNotificationScreen::SetErrorState(void)
+void MythNotificationScreen::SetErrorState(void) const
 {
     if (!m_errorState)
         return;

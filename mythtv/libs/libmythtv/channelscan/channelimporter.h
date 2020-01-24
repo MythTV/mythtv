@@ -165,7 +165,7 @@ class MTV_PUBLIC ChannelImporter
         UpdateAction action,
         ChannelType type,
         ScanDTVTransportList &updated,
-        ScanDTVTransportList &skipped);
+        ScanDTVTransportList &skipped) const;
 
     /// For multiple channels
     DeleteAction QueryUserDelete(const QString &msg);

@@ -509,7 +509,7 @@ static inline QString toQString(FrameScanType scan) {
 
 FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
                                           FrameScanType scan,
-                                          float fps, int video_height)
+                                          float fps, int video_height) const
 {
     QString dbg = QString("detectInterlace(") + toQString(newScan) +
         QString(", ") + toQString(scan) + QString(", ") +
@@ -1285,7 +1285,7 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     ResetCaptions();
 }
 
-bool MythPlayer::GetCaptionsEnabled(void)
+bool MythPlayer::GetCaptionsEnabled(void) const
 {
     return (kDisplayNUVTeletextCaptions == m_textDisplayMode) ||
            (kDisplayTeletextCaptions    == m_textDisplayMode) ||

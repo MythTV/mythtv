@@ -152,9 +152,9 @@ class MHInteractible
     virtual void InteractionCompleted(MHEngine * /*engine*/) {}
 
     void InteractSetInteractionStatus(bool newStatus, MHEngine *engine);
-    bool InteractGetInteractionStatus(void) { return m_fInteractionStatus; }
+    bool InteractGetInteractionStatus(void) const { return m_fInteractionStatus; }
     void InteractSetHighlightStatus(bool newStatus, MHEngine *engine);
-    bool InteractGetHighlightStatus(void) { return m_fHighlightStatus; }
+    bool InteractGetHighlightStatus(void) const { return m_fHighlightStatus; }
     // InteractDeactivation should be applied in every Deactivation action
     // of derived classes.
     void InteractDeactivation(void) { m_fInteractionStatus = false; }

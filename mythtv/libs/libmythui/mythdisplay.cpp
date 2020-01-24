@@ -725,12 +725,12 @@ bool MythDisplay::SwitchToGUI(bool Wait)
     return true;
 }
 
-double MythDisplay::GetRefreshRate(void)
+double MythDisplay::GetRefreshRate(void) const
 {
     return m_refreshRate;
 }
 
-int MythDisplay::GetRefreshInterval(int Fallback)
+int MythDisplay::GetRefreshInterval(int Fallback) const
 {
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
         return static_cast<int>(lround(1000000.0 / m_refreshRate));

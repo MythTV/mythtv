@@ -92,7 +92,7 @@ public:
 
 
     //! Delete thumbnails associated with device
-    void RemoveThumbs(void)
+    void RemoveThumbs(void) const
     {
         // Remove thumbnails
         QString dir = QString("%1/" TEMP_SUBDIR "/%2").arg(GetConfDir(), m_thumbs);

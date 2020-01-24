@@ -781,7 +781,7 @@ public:
      * Will download all required segment AES-128 keys
      * Will try to re-use already downloaded keys if possible
      */
-    int ManageSegmentKeys()
+    int ManageSegmentKeys() const
     {
         HLSSegment   *seg       = nullptr;
         HLSSegment   *prev_seg  = nullptr;

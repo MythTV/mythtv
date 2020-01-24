@@ -279,7 +279,7 @@ void MythUIText::SetJustification(int just)
     }
 }
 
-int MythUIText::GetJustification(void)
+int MythUIText::GetJustification(void) const
 {
     return m_Justification;
 }

@@ -397,7 +397,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
 
 bool VideoScannerThread::buildFileList(const QString &directory,
                                        const QStringList &imageExtensions,
-                                       FileCheckList &filelist)
+                                       FileCheckList &filelist) const
 {
     // TODO: FileCheckList is a std::map, keyed off the filename. In the event
     // multiple backends have access to shared storage, the potential exists

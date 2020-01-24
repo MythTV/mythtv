@@ -43,8 +43,8 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     bool         SwitchToVideo         (QSize Size, double Rate = 0.0);
     QSize        GetResolution         (void);
     QSize        GetPhysicalSize       (void);
-    double       GetRefreshRate        (void);
-    int          GetRefreshInterval    (int Fallback);
+    double       GetRefreshRate        (void) const;
+    int          GetRefreshInterval    (int Fallback) const;
     double       GetAspectRatio        (QString &Source, bool IgnoreModeOverride = false);
     double       EstimateVirtualAspectRatio(void);
     MythEDID&    GetEDID               (void);

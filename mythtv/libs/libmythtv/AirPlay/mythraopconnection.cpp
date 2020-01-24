@@ -1568,7 +1568,7 @@ QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
  * Description: return the duration in ms of frames
  *
  */
-uint64_t MythRAOPConnection::framesToMs(uint64_t frames)
+uint64_t MythRAOPConnection::framesToMs(uint64_t frames) const
 {
     return (frames * 1000ULL) / m_frameRate;
 }

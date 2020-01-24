@@ -33,7 +33,7 @@ public:
     static int64_t      AVF_Seek(URLContext *h, int64_t offset, int whence);
     static int          AVF_Close(URLContext *h);
     void                SetInInit(bool state);
-    bool                IsInInit(void) { return m_initState; }
+    bool                IsInInit(void) const { return m_initState; }
 
 private:
     RingBuffer         *m_rbuffer {nullptr};

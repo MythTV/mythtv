@@ -2617,7 +2617,7 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
     }
 }
 
-void ProgramInfo::SendUpdateEvent(void)
+void ProgramInfo::SendUpdateEvent(void) const
 {
     s_updater->insert(m_recordedId, kPIUpdate);
 }

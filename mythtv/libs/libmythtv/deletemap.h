@@ -79,7 +79,7 @@ class MTV_PUBLIC DeleteMap
     uint64_t TranslatePositionRelToAbs(uint64_t position) const;
 
     void TrackerReset(uint64_t frame);
-    bool TrackerWantsToJump(uint64_t frame, uint64_t &to);
+    bool TrackerWantsToJump(uint64_t frame, uint64_t &to) const;
 
     bool Undo(void);
     bool Redo(void);

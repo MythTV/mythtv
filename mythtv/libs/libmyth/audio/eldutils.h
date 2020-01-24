@@ -44,16 +44,16 @@ class MPUBLIC ELD
     ~ELD()= default;
     ELD& operator=(const ELD& /*rhs*/);
     void show();
-    QString eld_version_name();
-    QString edid_version_name();
-    QString info_desc();
-    QString channel_allocation_desc();
+    QString eld_version_name() const;
+    QString edid_version_name() const;
+    QString info_desc() const;
+    QString channel_allocation_desc() const;
     QString product_name();
-    QString connection_name();
-    bool isValid();
+    QString connection_name() const;
+    bool isValid() const;
     int maxLPCMChannels();
     int maxChannels();
-    QString codecs_desc();
+    QString codecs_desc() const;
     
     enum cea_audio_coding_types {
         TYPE_REF_STREAM_HEADER =  0,

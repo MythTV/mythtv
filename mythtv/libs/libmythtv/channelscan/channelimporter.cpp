@@ -711,7 +711,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
     UpdateAction action,
     ChannelType type,
     ScanDTVTransportList &updated_list,
-    ScanDTVTransportList &skipped_list)
+    ScanDTVTransportList &skipped_list) const
 {
     QString channelFormat = "%1_%2";
     bool renameChannels = false;

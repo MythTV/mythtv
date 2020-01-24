@@ -20,9 +20,9 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
                   QString hostname);
    ~SocketHandler() override;
 
-    bool DoesBlockShutdown(void)        { return m_blockShutdown; }
-    bool GetsStandardEvents(void)       { return m_standardEvents; }
-    bool GetsSystemEvents(void)         { return m_systemEvents; }
+    bool DoesBlockShutdown(void) const  { return m_blockShutdown; }
+    bool GetsStandardEvents(void) const { return m_standardEvents; }
+    bool GetsSystemEvents(void) const   { return m_systemEvents; }
 
     QString GetHostname(void)           { return m_hostname; }
 

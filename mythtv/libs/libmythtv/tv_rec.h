@@ -213,9 +213,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
     bool CheckChannel(const QString& name) const;
-    bool ShouldSwitchToAnotherInput(const QString& chanid);
+    bool ShouldSwitchToAnotherInput(const QString& chanid) const;
     bool CheckChannelPrefix(const QString &prefix, uint &complete_valid_channel_on_rec,
-                            bool &is_extra_char_useful, QString &needed_spacer);
+                            bool &is_extra_char_useful, QString &needed_spacer) const;
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
                         QString &desc,        QString &category,
@@ -231,8 +231,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                         const QString& channame, const QString& xmltvid);
 
     /// \brief Returns the inputid
-    uint GetInputId(void) { return m_inputId; }
-    uint GetParentId(void) { return m_parentId; }
+    uint GetInputId(void) const { return m_inputId; }
+    uint GetParentId(void) const { return m_parentId; }
     uint GetMajorId(void) { return m_parentId ? m_parentId : m_inputId; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
@@ -303,8 +303,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void ChangeState(TVState nextState);
     static bool StateIsRecording(TVState state);
     static bool StateIsPlaying(TVState state);
-    TVState RemovePlaying(TVState state);
-    TVState RemoveRecording(TVState state);
+    TVState RemovePlaying(TVState state) const;
+    TVState RemoveRecording(TVState state) const;
 
     void HandlePendingRecordings(void);
 
@@ -330,7 +330,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
         RecStatus::Type new_status, int line, bool have_lock = false);
 
     QString LoadProfile(void *tvchain, RecordingInfo *rec,
-                        RecordingProfile &profile);
+                        RecordingProfile &profile) const;
 
     // Various components TVRec coordinates
     RecorderBase      *m_recorder                 {nullptr};

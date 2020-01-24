@@ -45,8 +45,8 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
 
     bool            CheckRun(const QDateTime& now);
     bool            Run(void);
-    bool            ConfirmRun(void)                { return m_confirm;     }
-    bool            IsRunning(void)                 { return m_running;     }
+    bool            ConfirmRun(void) const          { return m_confirm;     }
+    bool            IsRunning(void) const           { return m_running;     }
 
     bool            CheckImmediate(void);
     bool            CheckStartup(void);
@@ -132,7 +132,7 @@ class HouseKeepingThread : public MThread
    ~HouseKeepingThread() override = default;
     void run(void) override; // MThread
     void Discard(void)                  { m_keepRunning = false;        }
-    bool isIdle(void)                   { return m_idle;                }
+    bool isIdle(void) const             { return m_idle;                }
     void Wake(void)                     { m_waitCondition.wakeAll();    }
 
     void Terminate(void);

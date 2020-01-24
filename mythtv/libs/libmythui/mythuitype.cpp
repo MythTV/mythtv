@@ -455,7 +455,7 @@ void MythUIType::Pulse(void)
         (*it)->Pulse();
 }
 
-int MythUIType::CalcAlpha(int alphamod)
+int MythUIType::CalcAlpha(int alphamod) const
 {
     return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }

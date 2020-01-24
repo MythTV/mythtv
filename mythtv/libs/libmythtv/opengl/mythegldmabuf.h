@@ -28,10 +28,10 @@ class MythEGLDMABUF
     vector<MythVideoTexture*> CreateComposed(AVDRMFrameDescriptor* Desc,
                                              MythRenderOpenGL *Context,
                                              VideoFrame *Frame,
-                                             FrameScanType Scan);
+                                             FrameScanType Scan) const;
     vector<MythVideoTexture*> CreateSeparate(AVDRMFrameDescriptor* Desc,
                                              MythRenderOpenGL *Context,
-                                             VideoFrame *Frame);
+                                             VideoFrame *Frame) const;
     bool m_useModifiers { false };
 };
 

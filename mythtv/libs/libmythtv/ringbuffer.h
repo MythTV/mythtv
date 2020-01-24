@@ -88,7 +88,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QString GetDecoderRate(void);
     QString GetStorageRate(void);
     QString GetAvailableBuffer(void);
-    uint    GetBufferSize(void) { return m_bufferSize; }
+    uint    GetBufferSize(void) const { return m_bufferSize; }
     long long GetWritePosition(void) const;
     /// \brief Returns the size of the file we are reading/writing,
     ///        or -1 if the query fails.
@@ -106,7 +106,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     // LiveTV used utilities
     int GetReadBufAvail() const;
     bool SetReadInternalMode(bool mode);
-    bool IsReadInternalMode(void) { return m_readInternalMode; }
+    bool IsReadInternalMode(void) const { return m_readInternalMode; }
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }

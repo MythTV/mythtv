@@ -145,7 +145,7 @@ bool MythVDPAUHelper::InitProcs(void)
     return ok;
 }
 
-bool MythVDPAUHelper::IsValid(void)
+bool MythVDPAUHelper::IsValid(void) const
 {
     return m_valid;
 }

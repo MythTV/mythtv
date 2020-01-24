@@ -39,7 +39,7 @@ class MythDRMDevice : public ReferenceCounter
     QString  FindBestDevice (void);
     static bool ConfirmDevice(const QString& Device);
 
-    drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property);
+    drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const;
 
   private:
     QScreen*           m_screen        { nullptr };

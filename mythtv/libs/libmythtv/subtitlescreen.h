@@ -177,7 +177,7 @@ public:
 
     void EnableSubtitles(int type, bool forced_only = false);
     void DisableForcedSubtitles(void);
-    int  EnabledSubtitleType(void) { return m_subtitleType; }
+    int  EnabledSubtitleType(void) const { return m_subtitleType; }
 
     void ClearAllSubtitles(void);
     void ClearNonDisplayedSubtitles(void);

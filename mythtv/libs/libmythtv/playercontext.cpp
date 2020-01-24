@@ -250,7 +250,7 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
     m_pipRect = QRect(rect);
 }
 
-bool PlayerContext::StartEmbedding(const QRect &embedRect)
+bool PlayerContext::StartEmbedding(const QRect &embedRect) const
 {
     bool ret = false;
     LockDeletePlayer(__FILE__, __LINE__);
@@ -273,7 +273,7 @@ bool PlayerContext::IsEmbedding(void) const
     return ret;
 }
 
-void PlayerContext::StopEmbedding(void)
+void PlayerContext::StopEmbedding(void) const
 {
     LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -454,7 +454,7 @@ bool PlayerContext::StartPlaying(int maxWait)
     return false;
 }
 
-void PlayerContext::StopPlaying(void)
+void PlayerContext::StopPlaying(void) const
 {
     if (m_player)
         m_player->StopPlaying();

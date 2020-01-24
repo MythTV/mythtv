@@ -141,7 +141,7 @@ MythThemedMenu::~MythThemedMenu(void)
 
 /// \brief Returns true iff a theme has been
 ///        found by a previous call to SetMenuTheme().
-bool MythThemedMenu::foundTheme(void)
+bool MythThemedMenu::foundTheme(void) const
 {
     return m_foundtheme;
 }

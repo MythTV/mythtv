@@ -220,7 +220,7 @@ bool MythCCExtractorPlayer::run(void)
  */
 
 void MythCCExtractorPlayer::IngestSubtitle(
-    QList<OneSubtitle> &list, const QStringList &content)
+    QList<OneSubtitle> &list, const QStringList &content) const
 {
     bool update_last =
         !list.isEmpty() &&

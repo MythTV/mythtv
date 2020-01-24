@@ -43,11 +43,11 @@ public:
     uint receiveFrames(void *buffer, uint maxFrames);
     // flush unprocessed samples
     void flush();
-    uint numUnprocessedFrames();
-    uint numFrames();
+    uint numUnprocessedFrames() const;
+    uint numFrames() const;
 
     long long getLatency();
-    uint frameLatency();
+    uint frameLatency() const;
 
     static uint framesPerBlock();
 

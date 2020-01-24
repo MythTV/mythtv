@@ -407,7 +407,7 @@ bool DVDRingBuffer::IsSeekingAllowed(void)
             (m_processState != PROCESS_WAIT));
 }
 
-void DVDRingBuffer::GetDescForPos(QString &desc)
+void DVDRingBuffer::GetDescForPos(QString &desc) const
 {
     if (m_inMenu)
     {
@@ -613,7 +613,7 @@ long long DVDRingBuffer::GetReadPosition(void) const
     return pos * DVD_BLOCK_SIZE;
 }
 
-uint32_t DVDRingBuffer::AdjustTimestamp(uint32_t timestamp)
+uint32_t DVDRingBuffer::AdjustTimestamp(uint32_t timestamp) const
 {
     uint32_t newTimestamp = timestamp;
 
@@ -625,7 +625,7 @@ uint32_t DVDRingBuffer::AdjustTimestamp(uint32_t timestamp)
     return newTimestamp;
 }
 
-int64_t DVDRingBuffer::AdjustTimestamp(int64_t timestamp)
+int64_t DVDRingBuffer::AdjustTimestamp(int64_t timestamp) const
 {
     int64_t newTimestamp = timestamp;
 
@@ -1308,14 +1308,14 @@ void DVDRingBuffer::prevTrack(void)
 /** \brief get the total time of the title in seconds
  * 90000 ticks = 1 sec
  */
-uint DVDRingBuffer::GetTotalTimeOfTitle(void)
+uint DVDRingBuffer::GetTotalTimeOfTitle(void) const
 {
     return lround(m_pgcLength / 90000.0);
 }
 
 /** \brief get the start of the cell in seconds
  */
-uint DVDRingBuffer::GetCellStart(void)
+uint DVDRingBuffer::GetCellStart(void) const
 {
     return m_cellStart / 90000;
 }
@@ -2050,7 +2050,7 @@ void DVDRingBuffer::SetTrack(uint type, int trackNo)
  * or determined from the dvd IFO.
  * \param type: use either kTrackTypeSubtitle or kTrackTypeAudio
  */
-int DVDRingBuffer::GetTrack(uint type)
+int DVDRingBuffer::GetTrack(uint type) const
 {
     if (type == kTrackTypeSubtitle)
         return m_curSubtitleTrack;

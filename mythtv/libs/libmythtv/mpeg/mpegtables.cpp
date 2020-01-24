@@ -733,7 +733,7 @@ uint ProgramMapTable::FindPIDs(uint           type,
     return pids.size();
 }
 
-uint ProgramMapTable::FindUnusedPID(uint desired_pid)
+uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
 {
     uint pid = desired_pid;
     if (pid >= MPEG_NULL_PID)
