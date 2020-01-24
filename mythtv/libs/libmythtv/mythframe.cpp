@@ -36,7 +36,7 @@ const char* format_description(VideoFrameType Type)
     {
         case FMT_NONE:       return "None";
         case FMT_RGB24:      return "RGB24";
-        case FMT_YV12:       return "YV12";
+        case FMT_YV12:       return "YUV420P";
         case FMT_RGB32:      return "RGB32";
         case FMT_ARGB32:     return "ARGB32";
         case FMT_RGBA32:     return "RGBA32";

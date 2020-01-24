@@ -54,6 +54,7 @@ class MythNVDECContext : public MythCodecContext
                       int Width, int Height);
 
         MythCodecContext::CodecProfile m_profile { MythCodecContext::NoProfile };
+        VideoFrameType m_type           { FMT_NONE };
         cudaVideoCodec m_codec          { cudaVideoCodec_NumCodecs };
         uint           m_depth          { 0 };
         cudaVideoChromaFormat m_format  { cudaVideoChromaFormat_Monochrome };

@@ -138,7 +138,8 @@ class MTV_PUBLIC MythCodecContext
     static void CreateDecoderCallback      (void *Wait, void *Context, void *Callback);
     static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
-    static QString GetProfileDescription   (CodecProfile Profile, QSize Size, uint ColorDepth = 0);
+    static QString GetProfileDescription   (CodecProfile Profile, QSize Size,
+                                            VideoFrameType Format = FMT_NONE, uint ColorDepth = 0);
     static CodecProfile FFmpegToMythProfile(AVCodecID CodecID, int Profile);
 
     virtual void   InitVideoCodec          (AVCodecContext *Context,

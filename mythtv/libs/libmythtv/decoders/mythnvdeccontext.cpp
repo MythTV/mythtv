@@ -458,7 +458,19 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
         return MythCodecContext::NoProfile;
     };
 
+    auto ToMythFormat = [](cudaVideoChromaFormat CudaFormat)
+    {
+        switch (CudaFormat)
+        {
+            case cudaVideoChromaFormat_420: return FMT_YV12;
+            case cudaVideoChromaFormat_422: return FMT_YUV422P;
+            case cudaVideoChromaFormat_444: return FMT_YUV444P;
+            default: break;
+        }
+        return FMT_NONE;
+    };
     m_profile = ToMythProfile(m_codec);
+    m_type = ToMythFormat(m_format);
 }
 
 bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format,
@@ -493,7 +505,8 @@ bool MythNVDECContext::HaveNVDEC(void)
                 for (auto profile : profiles)
                 {
                     LOG(VB_GENERAL, LOG_INFO, LOC +
-                        MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum, profile.m_depth + 8));
+                        MythCodecContext::GetProfileDescription(profile.m_profile,profile.m_maximum,
+                                                                profile.m_type, profile.m_depth + 8));
                 }
             }
         }
@@ -515,7 +528,8 @@ void MythNVDECContext::GetDecoderList(QStringList &Decoders)
     Decoders.append("NVDEC:");
     for (auto profile : profiles)
         if (!(profile.m_depth % 2)) // Ignore 9/11bit etc
-            Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum, profile.m_depth + 8));
+            Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum,
+                                                                    profile.m_type, profile.m_depth + 8));
 }
 
 const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfiles(void)

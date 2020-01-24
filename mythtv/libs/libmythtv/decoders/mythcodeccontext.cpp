@@ -730,7 +730,8 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
     return NoProfile;
 }
 
-QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size, uint ColorDepth)
+QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size,
+                                                VideoFrameType Format, uint ColorDepth)
 {
     QString profile;
     switch (Profile)
@@ -805,7 +806,8 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
     if (Size.isEmpty())
         return profile;
 
-    return QObject::tr("%1%2 (Max size: %3x%4)")
-            .arg(profile).arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
+    return QObject::tr("%1%2%3 (Max size: %4x%5)")
+            .arg(profile).arg(Format != FMT_NONE ? QString(" %1").arg(format_description(Format)) : "")
+            .arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
             .arg(Size.width()).arg(Size.height());
 }
