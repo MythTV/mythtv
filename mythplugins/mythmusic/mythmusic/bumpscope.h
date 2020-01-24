@@ -28,9 +28,9 @@ private:
     void generate_phongdat(void);
 
     void translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
-                   int *angle);
+                   int *angle) const;
 
-    inline void draw_vert_line(unsigned char *buffer, int x, int y1, int y2);
+    inline void draw_vert_line(unsigned char *buffer, int x, int y1, int y2) const;
     void render_light(int lx, int ly);
 
     static void rgb_to_hsv(unsigned int color, double *h, double *s, double *v);

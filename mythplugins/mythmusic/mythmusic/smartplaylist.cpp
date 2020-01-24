@@ -287,7 +287,7 @@ QString getSQLFieldName(const QString &fieldName)
 ///////////////////////////////////////////////////////////////////////
 */
 
-QString SmartPLCriteriaRow::getSQL(void)
+QString SmartPLCriteriaRow::getSQL(void) const
 {
     if (m_field.isEmpty())
         return QString();
@@ -300,7 +300,7 @@ QString SmartPLCriteriaRow::getSQL(void)
 }
 
 // return false on error
-bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
+bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID) const
 {
     // save playlistitem to database
 
@@ -326,7 +326,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
     return true;
 }
 
-QString SmartPLCriteriaRow::toString(void)
+QString SmartPLCriteriaRow::toString(void) const
 {
     SmartPLOperator *PLOperator = lookupOperator(m_operator);
     if (PLOperator)

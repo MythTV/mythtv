@@ -54,7 +54,7 @@ void MusicData::scanMusic (void)
 }
 
 /// reload music after a scan, rip or import
-void MusicData::reloadMusic(void)
+void MusicData::reloadMusic(void) const
 {
     if (!m_all_music || !m_all_playlists)
         return;
@@ -95,7 +95,7 @@ void MusicData::reloadMusic(void)
         gPlayer->restorePosition();
 }
 
-void MusicData::loadMusic(void)
+void MusicData::loadMusic(void) const
 {
     // only do this once
     if (m_initialized)

@@ -58,7 +58,7 @@ PlaylistContainer::~PlaylistContainer()
 }
 
 void PlaylistContainer::FillIntelliWeights(int &rating, int &playcount,
-                                            int &lastplay, int &random)
+                                            int &lastplay, int &random) const
 {
     rating = m_randomWeight;
     playcount = m_playCountWeight;

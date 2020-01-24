@@ -194,7 +194,7 @@ void CDRipperThread::cancel(void)
     m_quit = true;
 }
 
-bool CDRipperThread::isCancelled(void)
+bool CDRipperThread::isCancelled(void) const
 {
     return m_quit;
 }
@@ -939,7 +939,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
     return false;
 }
 
-bool Ripper::somethingWasRipped()
+bool Ripper::somethingWasRipped() const
 {
     return m_somethingwasripped;
 }

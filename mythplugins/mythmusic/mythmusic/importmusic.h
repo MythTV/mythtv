@@ -47,7 +47,7 @@ class FileCopyThread: public MThread
               m_dstFile(std::move(dst)) {}
         void run() override; // MThread
 
-        bool GetResult(void) { return m_result; }
+        bool GetResult(void) const { return m_result; }
 
     private:
         QString m_srcFile;
@@ -68,7 +68,7 @@ class ImportMusicDialog : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
-    bool somethingWasImported() { return m_somethingWasImported; }
+    bool somethingWasImported() const { return m_somethingWasImported; }
     void doScan(void);
     void doFileCopy(const QString &src, const QString &dst);
 

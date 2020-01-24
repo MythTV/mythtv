@@ -54,11 +54,11 @@ class SmartPLCriteriaRow
     SmartPLCriteriaRow(void) = default;
     ~SmartPLCriteriaRow(void) = default;
 
-    QString getSQL(void);
+    QString getSQL(void) const;
 
-    bool saveToDatabase(int smartPlaylistID);
+    bool saveToDatabase(int smartPlaylistID) const;
 
-    QString toString(void);
+    QString toString(void) const;
 
   public:
     QString m_field;

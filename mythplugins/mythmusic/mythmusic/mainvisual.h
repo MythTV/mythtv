@@ -56,7 +56,7 @@ class MainVisual :  public QObject, public MythTV::Visual
 
     QStringList getVisualizations(void) { return m_visualizers; }
 
-    int getCurrentVisual(void) { return m_currentVisualizer; }
+    int getCurrentVisual(void) const { return m_currentVisualizer; }
 
   public slots:
     void timeout();

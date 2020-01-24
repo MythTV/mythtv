@@ -32,7 +32,7 @@ class MPUBLIC ZMClient : public QObject
 
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);
-    bool connected(void) { return m_bConnected; }
+    bool connected(void) const { return m_bConnected; }
 
     bool checkProtoVersion(void);
 
@@ -61,7 +61,7 @@ class MPUBLIC ZMClient : public QObject
     void setMonitorFunction(int monitorID, const QString &function, bool enabled);
     bool updateAlarmStates(void);
 
-    bool isMiniPlayerEnabled(void) { return m_isMiniPlayerEnabled; }
+    bool isMiniPlayerEnabled(void) const { return m_isMiniPlayerEnabled; }
     void setIsMiniPlayerEnabled(bool enabled) { m_isMiniPlayerEnabled = enabled; }
 
     void saveNotificationMonitors(void);

@@ -400,7 +400,7 @@ void ThumbFinder::updateThumb(void)
     m_imageGrid->SetRedraw();
 }
 
-QString ThumbFinder::frameToTime(int64_t frame, bool addFrame)
+QString ThumbFinder::frameToTime(int64_t frame, bool addFrame) const
 {
     QString str;
 

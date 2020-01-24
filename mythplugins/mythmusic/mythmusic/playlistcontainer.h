@@ -62,12 +62,12 @@ class PlaylistContainer
 
     void            clearActive();
 
-    bool            doneLoading(){return m_doneLoading;}
+    bool            doneLoading() const{return m_doneLoading;}
 
     bool            cleanOutThreads();
 
     void            FillIntelliWeights(int &rating, int &playcount,
-                                       int &lastplay, int &random);
+                                       int &lastplay, int &random) const;
     QList<Playlist*> *getPlaylists(void) { return m_allPlaylists; }
     QStringList       getPlaylistNames(void);
 

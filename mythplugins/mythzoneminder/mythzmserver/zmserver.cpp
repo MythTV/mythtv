@@ -1875,7 +1875,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     return monitor->m_width * monitor->m_height * 3;
 }
 
-string ZMServer::getZMSetting(const string &setting)
+string ZMServer::getZMSetting(const string &setting) const
 {
     string result;
     string sql("SELECT Name, Value FROM Config ");

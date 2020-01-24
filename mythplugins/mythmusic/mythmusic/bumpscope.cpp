@@ -163,7 +163,7 @@ void BumpScope::generate_phongdat(void)
 
 #define M_PI_F static_cast<float>(M_PI)
 void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
-                          int *angle)
+                          int *angle) const
 {
     unsigned int HEIGHT = m_height;
     unsigned int WIDTH = m_width;
@@ -213,7 +213,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 }
 
 inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
-                                      int y2)
+                                      int y2) const
 {
     if (y1 < y2)
     {

@@ -35,15 +35,15 @@ private:
     void fft(double *x, double *y);
     void setStarSize(double lsize);
 
-    inline void addPixel(int x, int y, int br1, int br2);
+    inline void addPixel(int x, int y, int br1, int br2) const;
     static inline void addPixelFast(unsigned char *p, int br1, int br2);
-    inline unsigned char getPixel(int x, int y, int where);
+    inline unsigned char getPixel(int x, int y, int where) const;
 
     inline void fadePixelWave(int x, int y, int where, int step);
     void fadeWave(void);
     inline void fadePixelHeat(int x, int y, int where, int step);
     void fadeHeat(void);
-    void fadeFade(void);
+    void fadeFade(void) const;
     void fade(void);
 
     QSize m_size                 {0,0};

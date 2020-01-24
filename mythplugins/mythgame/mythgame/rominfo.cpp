@@ -14,7 +14,7 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return a.Romname() == b.Romname();
 }
 
-void RomInfo::SaveToDatabase()
+void RomInfo::SaveToDatabase() const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -91,7 +91,7 @@ void RomInfo::SaveToDatabase()
     }
 }
 
-void RomInfo::DeleteFromDatabase()
+void RomInfo::DeleteFromDatabase() const
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing %1 - %2").arg(Rompath())
             .arg(Romname()));
@@ -231,7 +231,7 @@ void RomInfo::setFavorite(bool updateDatabase)
     }
 }
 
-QString RomInfo::getExtension()
+QString RomInfo::getExtension() const
 {
     int pos = Romname().lastIndexOf(".");
     if (pos == -1)
@@ -413,7 +413,7 @@ RomInfo *RomInfo::GetRomInfoById(int id)
     return ret;
 }
 
-QString RomInfo::toString()
+QString RomInfo::toString() const
 {
     return QString ("Rom Info:\n"
                "ID: %1\n"
