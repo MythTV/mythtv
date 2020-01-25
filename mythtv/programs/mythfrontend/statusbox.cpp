@@ -28,6 +28,7 @@ using namespace std;
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
 #include "mythrender_base.h"
+#include "opengl/mythrenderopengl.h"
 #include "mythdisplay.h"
 #include "decoders/mythcodeccontext.h"
 
@@ -1560,6 +1561,29 @@ void StatusBox::doDisplayStatus()
     MythRender* render = GetMythMainWindow()->GetRenderDevice();
     if (render)
     {
+        MythRenderOpenGL* gl = MythRenderOpenGL::GetOpenGLRender();
+        if (gl && (gl->GetExtraFeatures() & kGLNVMemory))
+        {
+            auto UpdateGPUMem = [](StatusBoxItem *Item)
+            {
+                int total = 0;
+                int available = 0;
+                MythRenderOpenGL* opengl = MythRenderOpenGL::GetOpenGLRender();
+                if (opengl)
+                  opengl->GetGPUMemory(available, total);
+                if (total > 0)
+                {
+                    int percent = static_cast<int>((available / static_cast<float>(total) * 100.0F));
+                    Item->SetText(tr("GPU Memory: %1 MB total, %2 MB used, %3 MB (or %4%) free")
+                        .arg(total).arg(total - available).arg(available).arg(percent));
+                }
+            };
+            StatusBoxItem* gpumem = AddLogLine("");
+            UpdateGPUMem(gpumem);
+            connect(gpumem, &StatusBoxItem::UpdateRequired, UpdateGPUMem);
+            gpumem->Start();
+        }
+
         desc = render->GetDescription();
         for (auto it = desc.cbegin(); it != desc.cend(); ++it)
             AddLogLine(*it);
