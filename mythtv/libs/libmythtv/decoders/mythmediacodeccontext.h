@@ -11,7 +11,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-typedef QList<QPair<MythCodecContext::CodecProfile,QSize> > MCProfiles;
+using MCProfiles = QList<QPair<MythCodecContext::CodecProfile,QSize>>;
 
 class MythMediaCodecContext : public MythCodecContext
 {
