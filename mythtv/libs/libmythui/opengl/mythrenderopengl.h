@@ -35,7 +35,8 @@ enum GLFeatures
     kGLExtRGBA16      = 0x0004,
     kGLExtSubimage    = 0x0008,
     kGLTiled          = 0x0010,
-    kGLLegacyTextures = 0x0020
+    kGLLegacyTextures = 0x0020,
+    kGLNVMemory       = 0x0040
 };
 
 #define TEX_OFFSET 8
@@ -154,6 +155,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
                         const QRect &Area, int CornerRadius,
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
     void  ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color);
+
+    bool  GetGPUMemory(int &Available, int &Total);
 
   public slots:
     void  messageLogged  (const QOpenGLDebugMessage &Message);
