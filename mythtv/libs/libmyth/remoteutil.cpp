@@ -36,15 +36,15 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
     return info;
 }
 
-bool RemoteGetLoad(float load[3])
+bool RemoteGetLoad(double load[3])
 {
     QStringList strlist(QString("QUERY_LOAD"));
 
     if (gCoreContext->SendReceiveStringList(strlist) && strlist.size() >= 3)
     {
-        load[0] = strlist[0].toFloat();
-        load[1] = strlist[1].toFloat();
-        load[2] = strlist[2].toFloat();
+        load[0] = strlist[0].toDouble();
+        load[1] = strlist[1].toDouble();
+        load[2] = strlist[2].toDouble();
         return true;
     }
 

@@ -1,19 +1,39 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
-#include <vector> // For std::vector
+// Qt
+#include <QTimer>
 
-using namespace std;
-
+// MythTV
 #include "mythscreentype.h"
+#include "mythuibuttonlist.h"
+
+// Std
+#include <vector> // For std::vector
+using namespace std;
 
 class ProgramInfo;
 class MythUIText;
 class MythUIButtonList;
-class MythUIButtonListItem;
+
 class MythUIStateType;
 
 using recprof2bps_t = QMap<QString, unsigned int>;
+
+class StatusBoxItem : public QTimer, public MythUIButtonListItem
+{
+    Q_OBJECT
+
+  public:
+    StatusBoxItem(MythUIButtonList *lbtype, const QString& text, QVariant data)
+      : QTimer(),
+        MythUIButtonListItem (lbtype, text, data) { }
+
+    void Start(int Interval = 1); // Seconds
+
+  signals:
+    void UpdateRequired(StatusBoxItem* Item);
+};
 
 class StatusBox : public MythScreenType
 {
@@ -48,12 +68,12 @@ class StatusBox : public MythScreenType
     void doDecoderStatus();
 
   private:
-    void AddLogLine(const QString & line,
-                     const QString & help = "",
-                     const QString & detail = "",
-                     const QString & helpdetail = "",
-                     const QString & state = "",
-                     const QString & data = "");
+    StatusBoxItem* AddLogLine(const QString & line,
+                              const QString & help = "",
+                              const QString & detail = "",
+                              const QString & helpdetail = "",
+                              const QString & state = "",
+                              const QString & data = "");
 
     void getActualRecordedBPS(const QString& hostnames);
 

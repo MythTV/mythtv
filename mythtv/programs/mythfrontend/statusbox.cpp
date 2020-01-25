@@ -40,6 +40,11 @@ struct LogLine {
     QString m_state;
 };
 
+void StatusBoxItem::Start(int Interval)
+{
+    connect(this, &QTimer::timeout, [=]() { emit UpdateRequired(this); });
+    start(Interval * 1000);
+}
 
 /** \class StatusBox
  *  \brief Reports on various status items.
@@ -140,12 +145,12 @@ void StatusBox::Init()
     m_categoryList->SetItemCurrent(itemCurrent);
 }
 
-void StatusBox::AddLogLine(const QString & line,
-                                            const QString & help,
-                                            const QString & detail,
-                                            const QString & helpdetail,
-                                            const QString & state,
-                                            const QString & data)
+StatusBoxItem *StatusBox::AddLogLine(const QString & line,
+                           const QString & help,
+                           const QString & detail,
+                           const QString & helpdetail,
+                           const QString & state,
+                           const QString & data)
 {
     LogLine logline;
     logline.m_line = line;
@@ -168,14 +173,14 @@ void StatusBox::AddLogLine(const QString & line,
     logline.m_state = state;
     logline.m_data = data;
 
-    auto *item = new MythUIButtonListItem(m_logList, line,
-                                          QVariant::fromValue(logline));
+    auto *item = new StatusBoxItem(m_logList, line, QVariant::fromValue(logline));
     if (logline.m_state.isEmpty())
         logline.m_state = "normal";
 
     item->SetFontState(logline.m_state);
     item->DisplayState(logline.m_state, "status");
     item->SetText(logline.m_detail, "detail");
+    return item;
 }
 
 bool StatusBox::keyPressEvent(QKeyEvent *event)
@@ -1264,14 +1269,6 @@ void StatusBox::doMachineStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(machineStr);
 
-    int    totalM = 0;    // Physical memory
-    int    usedM = 0;
-    int    freeM = 0;
-    int    totalS = 0;    // Virtual  memory (swap)
-    int    usedS = 0;
-    int    freeS = 0;
-    time_t uptime = 0;
-
     QString line;
     if (m_isBackendActive)
         line = tr("System:");
@@ -1279,10 +1276,22 @@ void StatusBox::doMachineStatus()
         line = tr("This machine:");
     AddLogLine(line, machineStr);
 
+    // Time
+    StatusBoxItem *timebox = AddLogLine("");
+    auto UpdateTime = [](StatusBoxItem* Item)
+    {
+        Item->SetText("   " + tr("System time") + ": " + QDateTime::currentDateTime().toString());
+    };
+    UpdateTime(timebox);
+    connect(timebox, &StatusBoxItem::UpdateRequired, UpdateTime);
+    timebox->Start();
+
     // Hostname & IP
-    line = "   " + tr("Hostname") + ": " + gCoreContext->GetHostName();
-    line.append(", " + tr("IP") + ": ");
-    QString sep = "";
+    AddLogLine("   " + tr("Hostname") + ": " + gCoreContext->GetHostName());
+    AddLogLine("   " + tr("OS") + QString(": %1 (%2)").arg(QSysInfo::prettyProductName())
+                                                      .arg(QSysInfo::currentCpuArchitecture()));
+    AddLogLine("   " + tr("Qt version") + QString(": %1").arg(qVersion()));
+
     foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
     {
         QNetworkInterface::InterfaceFlags f = iface.flags();
@@ -1293,61 +1302,85 @@ void StatusBox::doMachineStatus()
         if (f & QNetworkInterface::IsLoopBack)
             continue;
 
+        QNetworkInterface::InterfaceType type = iface.type();
+        QString name = type == QNetworkInterface::Wifi ? tr("WiFi") : tr("Ethernet");
+        AddLogLine("   " + name + QString(" (%1): ").arg(iface.humanReadableName()));
+        AddLogLine("        " + tr("MAC Address") + ": " + iface.hardwareAddress());
         foreach(QNetworkAddressEntry addr, iface.addressEntries())
         {
             if (addr.ip().protocol() == QAbstractSocket::IPv4Protocol ||
                 addr.ip().protocol() == QAbstractSocket::IPv6Protocol)
             {
-                line += sep + addr.ip().toString();
-                if (sep.isEmpty())
-                    sep = ", ";
+                AddLogLine("        " + tr("IP Address") + ": " + addr.ip().toString());
             }
         }
-        line += "";
     }
     AddLogLine(line, machineStr);
 
     // uptime
-    if (!getUptime(uptime))
-        uptime = 0;
-    line = uptimeStr(uptime);
+    time_t uptime = 0;
+    if (getUptime(uptime))
+    {
+        auto UpdateUptime = [](StatusBoxItem* Item)
+        {
+            time_t time;
+            getUptime(time);
+            Item->SetText(uptimeStr(time));
+        };
+        StatusBoxItem *uptimeitem = AddLogLine(uptimeStr(uptime));
+        connect(uptimeitem, &StatusBoxItem::UpdateRequired, UpdateUptime);
+        uptimeitem->Start(60);
+    }
 
     // weighted average loads
-    line.append(", " + tr("Load") + ": ");
-
-#if defined(_WIN32) || defined(Q_OS_ANDROID)
-    line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
-#else // if !_WIN32
-    double loads[3];
-    if (getloadavg(loads,3) == -1)
-        line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
-    else
+#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
+    auto UpdateLoad = [](StatusBoxItem* Item)
     {
-        char buff[30];
-
-        sprintf(buff, "%0.2lf, %0.2lf, %0.2lf", loads[0], loads[1], loads[2]);
-        line.append(QString(buff));
-    }
-#endif // _WIN32
-
-    AddLogLine(line, machineStr);
+        double loads[3] = { 0.0 };
+        getloadavg(loads, 3);
+        Item->SetText(QString("   %1: %2 %3 %4").arg(tr("Load")).arg(loads[0], 1, 'f', 2)
+                .arg(loads[1], 1, 'f', 2).arg(loads[2], 1, 'f', 2));
+    };
+    StatusBoxItem* loaditem = AddLogLine("");
+    UpdateLoad(loaditem);
+    connect(loaditem, &StatusBoxItem::UpdateRequired, UpdateLoad);
+    loaditem->Start();
+#endif
 
     // memory usage
+    int totalM = 0; // Physical memory
+    int freeM = 0;
+    int totalS = 0; // Virtual  memory (swap)
+    int freeS = 0;
     if (getMemStats(totalM, freeM, totalS, freeS))
     {
-        usedM = totalM - freeM;
-        if (totalM > 0)
+        auto UpdateMem = [](StatusBoxItem* Item)
         {
-            line = "   " + tr("RAM") + ": " + usage_str_mb(totalM, usedM, freeM);
-            AddLogLine(line, machineStr);
-        }
-        usedS = totalS - freeS;
-        if (totalS > 0)
+            int totm = 0;
+            int freem = 0;
+            int tots = 0;
+            int frees = 0;
+            if (getMemStats(totm, freem, tots, frees))
+                Item->SetText(QString("   " + tr("RAM") + ": " + usage_str_mb(totm, totm - freem, freem)));
+        };
+
+        auto UpdateSwap = [](StatusBoxItem* Item)
         {
-            line = "   " + tr("Swap") +
-                                  ": "  + usage_str_mb(totalS, usedS, freeS);
-            AddLogLine(line, machineStr);
-        }
+            int totm = 0;
+            int freem = 0;
+            int tots = 0;
+            int frees = 0;
+            if (getMemStats(totm, freem, tots, frees))
+                Item->SetText(QString("   " + tr("Swap") + ": " + usage_str_mb(tots, tots - frees, frees)));
+        };
+        StatusBoxItem* mem  = AddLogLine("", machineStr);
+        StatusBoxItem* swap = AddLogLine("", machineStr);
+        UpdateMem(mem);
+        UpdateSwap(swap);
+        connect(mem,  &StatusBoxItem::UpdateRequired, UpdateMem);
+        connect(swap, &StatusBoxItem::UpdateRequired, UpdateSwap);
+        mem->Start(3);
+        swap->Start(3);
     }
 
     if (!m_isBackendActive)
@@ -1360,47 +1393,67 @@ void StatusBox::doMachineStatus()
         line.append(", " + tr("IP") + ": " + gCoreContext->GetSetting("MasterServerIP"));
         AddLogLine(line, machineStr);
 
-        // uptime
-        if (!RemoteGetUptime(uptime))
-            uptime = 0;
-        line = uptimeStr(uptime);
+        // uptime        
+        if (RemoteGetUptime(uptime))
+        {
+            auto UpdateRemoteUptime = [](StatusBoxItem* Item)
+            {
+                time_t time;
+                RemoteGetUptime(time);
+                Item->SetText(uptimeStr(time));
+            };
+            StatusBoxItem *remoteuptime = AddLogLine(uptimeStr(uptime));
+            connect(remoteuptime, &StatusBoxItem::UpdateRequired, UpdateRemoteUptime);
+            remoteuptime->Start(60);
+        }
 
         // weighted average loads
-        line.append(", " + tr("Load") + ": ");
-        float floads[3];
+        double floads[3];
         if (RemoteGetLoad(floads))
         {
-            char buff[30];
-
-            sprintf(buff, "%0.2f, %0.2f, %0.2f",
-                    static_cast<double>(floads[0]),
-                    static_cast<double>(floads[1]),
-                    static_cast<double>(floads[2]));
-            line.append(QString(buff));
+            auto UpdateRemoteLoad = [](StatusBoxItem* Item)
+            {
+                double loads[3] = { 0.0 };
+                RemoteGetLoad(loads);
+                Item->SetText(QString("   %1: %2 %3 %4").arg(tr("Load")).arg(loads[0], 1, 'f', 2)
+                        .arg(loads[1], 1, 'f', 2).arg(loads[2], 1, 'f', 2));
+            };
+            StatusBoxItem* remoteloaditem = AddLogLine("");
+            UpdateRemoteLoad(remoteloaditem);
+            connect(remoteloaditem, &StatusBoxItem::UpdateRequired, UpdateRemoteLoad);
+            remoteloaditem->Start();
         }
-        else
-            line.append(tr("unknown"));
-
-        AddLogLine(line, machineStr);
 
         // memory usage
         if (RemoteGetMemStats(totalM, freeM, totalS, freeS))
         {
-            usedM = totalM - freeM;
-            if (totalM > 0)
+            auto UpdateRemoteMem = [](StatusBoxItem* Item)
             {
-                line = "   " + tr("RAM") +
-                                     ": "  + usage_str_mb(totalM, usedM, freeM);
-                AddLogLine(line, machineStr);
-            }
+                int totm = 0;
+                int freem = 0;
+                int tots = 0;
+                int frees = 0;
+                if (RemoteGetMemStats(totm, freem, tots, frees))
+                    Item->SetText(QString("   " + tr("RAM") + ": " + usage_str_mb(totm, totm - freem, freem)));
+            };
 
-            usedS = totalS - freeS;
-            if (totalS > 0)
+            auto UpdateRemoteSwap = [](StatusBoxItem* Item)
             {
-                line = "   " + tr("Swap") +
-                                     ": "  + usage_str_mb(totalS, usedS, freeS);
-                AddLogLine(line, machineStr);
-            }
+                int totm = 0;
+                int freem = 0;
+                int tots = 0;
+                int frees = 0;
+                if (RemoteGetMemStats(totm, freem, tots, frees))
+                    Item->SetText(QString("   " + tr("Swap") + ": " + usage_str_mb(tots, tots - frees, frees)));
+            };
+            StatusBoxItem* rmem  = AddLogLine("", machineStr);
+            StatusBoxItem* rswap = AddLogLine("", machineStr);
+            UpdateRemoteMem(rmem);
+            UpdateRemoteSwap(rswap);
+            connect(rmem,  &StatusBoxItem::UpdateRequired, UpdateRemoteMem);
+            connect(rswap, &StatusBoxItem::UpdateRequired, UpdateRemoteSwap);
+            rmem->Start(10);
+            rswap->Start(11);
         }
     }
 
