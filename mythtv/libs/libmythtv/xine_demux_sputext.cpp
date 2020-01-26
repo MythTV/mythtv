@@ -80,6 +80,12 @@ static inline void trail_space(char *s) {
   while (isspace(*s)) {
     char *copy = s;
     do {
+      // The clang-tidy warning is wrong.  All callers have a null
+      // terminated string.  If the null is the first character in the
+      // string, this loop is never called.  If not, there's
+      // guaranteed to at least be a second character, even if that
+      // second character is the null.
+      // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
       copy[0] = copy[1];
       copy++;
     } while(*copy);
@@ -1156,6 +1162,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   int n_max=32;
   auto *first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));
   if(!first) return nullptr;
+  memset(first, 0, n_max*sizeof(subtitle_t));
   int timeout = MAX_TIMEOUT;
 
   if (demuxstr->uses_time) timeout *= 100;
@@ -1163,12 +1170,15 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
   while(true) {
     if(demuxstr->num>=n_max){
+      int old_size = n_max*sizeof(subtitle_t);
       n_max+=16;
       auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
       if (new_first == nullptr) {
           free(first);
           return nullptr;
       }
+      // Clear only the new space at the end of the array.
+      memset((char*)new_first + old_size, 0, 16*sizeof(subtitle_t));
       first = new_first;
     }
 
