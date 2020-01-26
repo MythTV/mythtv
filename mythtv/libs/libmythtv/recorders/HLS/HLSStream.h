@@ -1,5 +1,5 @@
-#ifndef _HLS_Stream_h_
-#define _HLS_Stream_h_
+#ifndef HLS_STREAM_H
+#define HLS_STREAM_H
 
 #ifdef USING_LIBCRYPTO
 // encryption related stuff
@@ -103,4 +103,4 @@ class HLSRecStream
 #endif // USING_LIBCRYPTO
 };
 
-#endif
+#endif // HLS_STREAM_H

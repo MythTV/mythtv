@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _MPEG_DESCRIPTORS_H_
-#define _MPEG_DESCRIPTORS_H_
+#ifndef MPEG_DESCRIPTORS_H
+#define MPEG_DESCRIPTORS_H
 
 // C++ headers
 #include <vector>
@@ -492,4 +492,4 @@ class HEVCVideoDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
-#endif // _MPEG_DESCRIPTORS_H_
+#endif // MPEG_DESCRIPTORS_H

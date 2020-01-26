@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SSDP_H__
-#define __SSDP_H__
+#ifndef SSDP_H
+#define SSDP_H
 
 #include <QFile>
 
@@ -162,4 +162,4 @@ class SSDPExtension : public HttpServerExtension
         bool     ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 };
 
-#endif
+#endif // SSDP_H

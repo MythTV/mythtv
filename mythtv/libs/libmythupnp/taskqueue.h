@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __TASKQUEUE_H__
-#define __TASKQUEUE_H__
+#ifndef TASKQUEUE_H
+#define TASKQUEUE_H
 
 // POSIX headers
 #include <sys/types.h>
@@ -123,4 +123,4 @@ class UPNP_PUBLIC TaskQueue : public MThread
                                                                 
 };
 
-#endif
+#endif // TASKQUEUE_H

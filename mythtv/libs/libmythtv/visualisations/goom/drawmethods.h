@@ -1,5 +1,5 @@
-#ifndef _DRAWMETHODS_H
-#define _DRAWMETHODS_H
+#ifndef DRAWMETHODS_H
+#define DRAWMETHODS_H
 
 #include "goomconfig.h"
 
@@ -166,4 +166,4 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 }
 #endif
 
-#endif
+#endif // DRAWMETHODS_H

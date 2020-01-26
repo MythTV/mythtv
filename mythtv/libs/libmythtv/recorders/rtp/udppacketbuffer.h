@@ -4,8 +4,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _UDP_PACKET_BUFFER_H_
-#define _UDP_PACKET_BUFFER_H_
+#ifndef UDP_PACKET_BUFFER_H
+#define UDP_PACKET_BUFFER_H
 
 #include "packetbuffer.h"
 
@@ -27,4 +27,4 @@ class UDPPacketBuffer : public PacketBuffer
     }
 };
 
-#endif // _UDP_PACKET_BUFFER_H_
+#endif // UDP_PACKET_BUFFER_H

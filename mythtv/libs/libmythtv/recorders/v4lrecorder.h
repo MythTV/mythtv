@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _V4L_RECORDER_H_
-#define _V4L_RECORDER_H_
+#ifndef V4L_RECORDER_H
+#define V4L_RECORDER_H
 
 #include "dtvrecorder.h"
 #include "cc608decoder.h"
@@ -87,4 +87,4 @@ class VBIThread : public MThread
     V4LRecorder *m_parent {nullptr};
 };
 
-#endif // _V4L_RECORDER_H_
+#endif // V4L_RECORDER_H

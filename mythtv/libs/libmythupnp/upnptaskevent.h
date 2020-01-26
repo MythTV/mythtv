@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPTASKEVENT_H__
-#define __UPNPTASKEVENT_H__
+#ifndef UPNPTASKEVENT_H
+#define UPNPTASKEVENT_H
 
 #include "upnp.h"
 #include "bufferedsocketdevice.h"
@@ -50,4 +50,4 @@ class UPnpEventTask : public Task
 };
 
 
-#endif
+#endif // UPNPTASKEVENT_H

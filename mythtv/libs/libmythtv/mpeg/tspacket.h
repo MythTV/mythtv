@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004,2010 Daniel Thor Kristjansson
-#ifndef _TS_PACKET_H_
-#define _TS_PACKET_H_
+#ifndef TS_PACKET_H
+#define TS_PACKET_H
 
 #include <chrono>
 #include <cstdlib>
@@ -256,4 +256,4 @@ class MTV_PUBLIC TS8VSBEmissionPacket : public TSPacket
 };
 #endif
 
-#endif // _TS_PACKET_H_
+#endif // TS_PACKET_H

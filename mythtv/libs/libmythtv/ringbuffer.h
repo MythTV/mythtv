@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _RINGBUFFER_H_
-#define _RINGBUFFER_H_
+#ifndef RINGBUFFER_H
+#define RINGBUFFER_H
 
 #include <QReadWriteLock>
 #include <QWaitCondition>
@@ -314,4 +314,4 @@ class MTV_PUBLIC RingBuffer : protected MThread
     bool m_bitrateInitialized {false};
 };
 
-#endif // _RINGBUFFER_H_
+#endif // RINGBUFFER_H

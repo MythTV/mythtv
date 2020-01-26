@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _PRIVATE_TABLES_H_
-#define _PRIVATE_TABLES_H_
+#ifndef PREMIERE_TABLES_H
+#define PREMIERE_TABLES_H
 
 #include <QString>
 #include <cstdint>  // uint32_t
@@ -49,4 +49,4 @@ class PremiereContentPresentationTable : public PSIPTable
     {
     }
 };
-#endif // _PRIVATE_TABLES_H_
+#endif // PREMIERE_TABLES_H

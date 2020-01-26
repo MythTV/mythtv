@@ -1,5 +1,5 @@
-#ifndef _MHI_H_
-#define _MHI_H_
+#ifndef MHI_H
+#define MHI_H
 
 // Misc header
 #include <ft2build.h>
@@ -390,4 +390,4 @@ class DSMCCPacket
     int            m_dataBroadcastId;
 };
 
-#endif // _MHI_H_
+#endif // MHI_H

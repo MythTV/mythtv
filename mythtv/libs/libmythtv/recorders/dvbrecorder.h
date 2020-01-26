@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _DVB_RECORDER_H_
-#define _DVB_RECORDER_H_
+#ifndef DVB_RECORDER_H
+#define DVB_RECORDER_H
 
 // Qt includes
 #include <QString>
@@ -42,4 +42,4 @@ class DVBRecorder : public DTVRecorder
     DVBStreamHandler *m_streamHandler  {nullptr};
 };
 
-#endif // _DVB_RECORDER_H_
+#endif // DVB_RECORDER_H

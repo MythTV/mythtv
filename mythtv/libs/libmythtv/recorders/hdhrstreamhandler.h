@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _HDHRSTREAMHANDLER_H_
-#define _HDHRSTREAMHANDLER_H_
+#ifndef HDHRSTREAMHANDLER_H
+#define HDHRSTREAMHANDLER_H
 
 #include <vector>
 using namespace std;
@@ -102,4 +102,4 @@ class HDHRStreamHandler : public StreamHandler
     static QMap<int, uint>                   s_handlersRefCnt;
 };
 
-#endif // _HDHRSTREAMHANDLER_H_
+#endif // HDHRSTREAMHANDLER_H

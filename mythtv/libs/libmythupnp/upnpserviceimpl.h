@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef _UPNPIMPL_H_
-#define _UPNPIMPL_H_
+#ifndef UPNPSERVICEIMPL_H
+#define UPNPSERVICEIMPL_H
 
 #include <utility>
 
@@ -78,4 +78,4 @@ class UPNP_PUBLIC UPnPFeatureList
 
 };
 
-#endif /// _UPNPIMPL_H_
+#endif // UPNPSERVICEIMPL_H

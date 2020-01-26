@@ -1,7 +1,7 @@
 /// -*- Mode: c++ -*-
 
-#ifndef _EXTERNAL_CHANNEL_H_
-#define _EXTERNAL_CHANNEL_H_
+#ifndef EXTERNAL_CHANNEL_H
+#define EXTERNAL_CHANNEL_H
 
 #include <cstdint>
 #include <utility>
@@ -58,4 +58,4 @@ class ExternalChannel : public DTVChannel
     QString                  m_loc;
 };
 
-#endif // _EXTERNAL_CHANNEL_H_
+#endif // EXTERNAL_CHANNEL_H

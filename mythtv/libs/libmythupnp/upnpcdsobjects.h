@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPCDSOBJECTS_H_
-#define __UPNPCDSOBJECTS_H_
+#ifndef UPNPCDSOBJECTS_H
+#define UPNPCDSOBJECTS_H
 
 #include <QDateTime>
 #include <QString>
@@ -282,4 +282,4 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
 
 };
 
-#endif
+#endif // UPNPCDSOBJECTS_H

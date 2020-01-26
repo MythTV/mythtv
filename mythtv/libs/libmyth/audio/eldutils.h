@@ -20,8 +20,8 @@
  *  Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef __ELDUTILS_H
-#define __ELDUTILS_H
+#ifndef ELDUTILS_H
+#define ELDUTILS_H
 
 #include <cstdint>
 #include <QString>
@@ -125,4 +125,4 @@ class MPUBLIC ELD
     eld_data m_e;
 };
 
-#endif /* __ELDUTILSL_H */
+#endif /* ELDUTILSL_H */

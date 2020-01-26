@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _ATSC_DESCRIPTORS_H_
-#define _ATSC_DESCRIPTORS_H_
+#ifndef ATSC_DESCRIPTORS_H
+#define ATSC_DESCRIPTORS_H
 
 #include <vector>
 using namespace std;
@@ -349,4 +349,4 @@ class ExtendedChannelNameDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
-#endif
+#endif // ATSC_DESCRIPTORS_H

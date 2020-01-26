@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SERIALIZER_H__
-#define __SERIALIZER_H__
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
 
 #include "upnpexp.h"
 #include "upnputil.h"
@@ -78,5 +78,4 @@ inline Serializer::Serializer() :
     qRegisterMetaType< QList<QObject*> >("QList<QObject*>");
 }
 
-#endif
-
+#endif // SERIALIZER_H

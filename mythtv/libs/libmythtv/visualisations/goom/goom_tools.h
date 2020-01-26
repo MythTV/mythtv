@@ -1,5 +1,5 @@
-#ifndef _GOOMTOOLS_H
-#define _GOOMTOOLS_H
+#ifndef GOOMTOOLS_H
+#define GOOMTOOLS_H
 
 #if !defined( M_PI ) 
  #define M_PI 3.14159265358979323846 
@@ -35,4 +35,4 @@ static inline int RAND(void) {
 //inline unsigned int RAND(void);
 //inline unsigned int iRAND(int i);
 
-#endif
+#endif // GOOMTOOLS_H

@@ -1,5 +1,5 @@
-#ifndef __MYTH_EXIT_CODES__
-#define __MYTH_EXIT_CODES__
+#ifndef MYTH_EXIT_CODES_H
+#define MYTH_EXIT_CODES_H
 
 // ALL statuses that are not to be mapped directly to an exit code *should*
 // be > 128 so as to not show up as a commercial count on commflag runs.
@@ -35,4 +35,4 @@
 #define GENERIC_EXIT_START              152 ///< MythSystemLegacy process starting
 #define GENERIC_EXIT_DB_NOTIMEZONE      153 ///< Missing DB time zone support
 
-#endif // __MYTH_EXIT_CODES__
+#endif // MYTH_EXIT_CODES_H

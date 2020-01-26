@@ -19,8 +19,8 @@
  */
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
-#ifndef _AUDIOINPUTOSS_H_
-#define _AUDIOINPUTOSS_H_
+#ifndef AUDIOINPUTOSS_H
+#define AUDIOINPUTOSS_H
 
 #include "audioinput.h"
 
@@ -46,5 +46,4 @@ class AudioInputOSS : public AudioInput
         QByteArray m_deviceName;
         int m_dspFd {-1};
 };
-#endif /* _AUDIOINPUTOSS_H_ */
-
+#endif /* AUDIOINPUTOSS_H */

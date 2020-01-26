@@ -2,8 +2,8 @@
  * vim: set expandtab tabstop=4 shiftwidth=4:
  */
 
-#ifndef _PANE_ATSC_H_
-#define _PANE_ATSC_H_
+#ifndef PANE_ATSC_H
+#define PANE_ATSC_H
 
 #include <algorithm>
 using namespace std;
@@ -179,4 +179,4 @@ class PaneATSC : public GroupSetting
     freq_table_list_t           m_tables;
 };
 
-#endif // _PANE_ATSC_H_
+#endif // PANE_ATSC_H

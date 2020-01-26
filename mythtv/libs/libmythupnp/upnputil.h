@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPUTIL_H__
-#define __UPNPUTIL_H__
+#ifndef UPNPUTIL_H
+#define UPNPUTIL_H
 
 #include <utility>
 
@@ -165,4 +165,4 @@ void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 UPNP_PUBLIC QStringList GetSourceProtocolInfos ();
 UPNP_PUBLIC QStringList GetSinkProtocolInfos ();
 
-#endif
+#endif // UPNPUTIL_H

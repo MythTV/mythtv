@@ -1,5 +1,5 @@
-#ifndef _GOOMCORE_H
-#define _GOOMCORE_H
+#ifndef GOOMCORE_H
+#define GOOMCORE_H
 
 #include "goomconfig.h"
 #include "mythtvexp.h"
@@ -17,4 +17,4 @@ MTV_PUBLIC void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope
 MTV_PUBLIC guint32 *goom_update (gint16 data[2][512], int forceMode);
 MTV_PUBLIC void    goom_close (void);
 
-#endif
+#endif // GOOMCORE_H

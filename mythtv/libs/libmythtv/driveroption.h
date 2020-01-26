@@ -1,5 +1,5 @@
-#ifndef _Driver_Option_h_
-#define _Driver_Option_h_
+#ifndef DRIVER_OPTION_H
+#define DRIVER_OPTION_H
 
 #include <QMap>
 
@@ -34,4 +34,4 @@ struct DriverOption
     type_t     m_type          {UNKNOWN_TYPE};
 };
 
-#endif
+#endif // DRIVER_OPTION_H

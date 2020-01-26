@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _CHANNEL_SCANNER_GUI_H_
-#define _CHANNEL_SCANNER_GUI_H_
+#ifndef CHANNEL_SCANNER_GUI_H
+#define CHANNEL_SCANNER_GUI_H
 
 // Qt headers
 #include <QStringList>
@@ -77,4 +77,4 @@ class ChannelScannerGUI :
     QStringList                m_messageList;
 };
 
-#endif // _CHANNEL_SCANNER_GUI_H_
+#endif // CHANNEL_SCANNER_GUI_H

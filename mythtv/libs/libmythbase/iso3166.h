@@ -1,7 +1,7 @@
 
 // -*- Mode: c++ -*-
-#ifndef _ISO_3166_1_H_
-#define _ISO_3166_1_H_
+#ifndef ISO_3166_1_H
+#define ISO_3166_1_H
 
 #include <QString>
 #include <QMap>
@@ -30,4 +30,4 @@ MBASE_PUBLIC  QString GetISO3166EnglishCountryName(const QString &iso3166Code);
 MBASE_PUBLIC  ISO3166ToNameMap GetISO3166CountryMap(void);
 MBASE_PUBLIC  QString GetISO3166CountryName(const QString &iso3166Code);
 
-#endif // _ISO_3166_1_H_
+#endif // ISO_3166_1_H

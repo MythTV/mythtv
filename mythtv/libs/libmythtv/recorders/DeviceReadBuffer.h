@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 /* Device Buffer written by John Poet */
 
-#ifndef _DEVICEREADBUFFER_H_
-#define _DEVICEREADBUFFER_H_
+#ifndef DEVICEREADBUFFER_H
+#define DEVICEREADBUFFER_H
 
 #include <unistd.h>
 
@@ -125,7 +125,7 @@ class DeviceReadBuffer : protected MThread
     MythTimer               m_lastReport;
 };
 
-#endif // _DEVICEREADBUFFER_H_
+#endif // DEVICEREADBUFFER_H
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

@@ -1,5 +1,5 @@
-#ifndef _VBILUT_H_
-#define _VBILUT_H_
+#ifndef VBILUT_H
+#define VBILUT_H
 
 #include <cstdint>
 
@@ -29,4 +29,4 @@ int hamm84(const uint8_t *p, int *err);
 int hamm16(const uint8_t *p, int *err);
 int hamm24(const uint8_t *p, int *err);
 
-#endif // _VBILUT_H_
+#endif // VBILUT_H

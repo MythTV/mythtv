@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _SOCKETHANDLER_H_
-#define _SOCKETHANDLER_H_
+#ifndef SOCKETHANDLER_H
+#define SOCKETHANDLER_H
 
 #include <QString>
 #include <QMutex>
@@ -47,4 +47,4 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
     QString             m_hostname;
 };
 
-#endif
+#endif // SOCKETHANDLER_H

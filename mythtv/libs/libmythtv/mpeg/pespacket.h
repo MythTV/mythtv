@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _PES_PACKET_H_
-#define _PES_PACKET_H_
+#ifndef PES_PACKET_H
+#define PES_PACKET_H
 
 /*
   max length of PSI table = 1024 bytes
@@ -242,4 +242,4 @@ class SequenceHeader
     static const float kMpeg2Fps[16];
 };
 
-#endif // _PES_PACKET_H_
+#endif // PES_PACKET_H

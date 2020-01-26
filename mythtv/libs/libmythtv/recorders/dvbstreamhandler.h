@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _DVBSTREAMHANDLER_H_
-#define _DVBSTREAMHANDLER_H_
+#ifndef DVBSTREAMHANDLER_H
+#define DVBSTREAMHANDLER_H
 
 #include <vector>
 using namespace std;
@@ -78,4 +78,4 @@ class DVBStreamHandler : public StreamHandler
     static QMap<QString,uint>              s_handlersRefCnt;
 };
 
-#endif // _DVBSTREAMHANDLER_H_
+#endif // DVBSTREAMHANDLER_H

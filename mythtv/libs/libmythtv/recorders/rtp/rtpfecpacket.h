@@ -5,8 +5,8 @@
 
 #include "udppacket.h"
 
-#ifndef _RTP_FEC_PACKET_H_
-#define _RTP_FEC_PACKET_H_
+#ifndef RTP_FEC_PACKET_H
+#define RTP_FEC_PACKET_H
 
 /** \brief RTP FEC Packet
  */
@@ -20,4 +20,4 @@ class RTPFECPacket : public UDPPacket
     // TODO
 };
 
-#endif // _RTP_FEC_PACKET_H_
+#endif // RTP_FEC_PACKET_H

@@ -1,5 +1,5 @@
-#ifndef _CODEC_UTIL_H_
-#define _CODEC_UTIL_H_
+#ifndef CODEC_UTIL_H
+#define CODEC_UTIL_H
 
 #include "mythbaseexp.h"
 
@@ -11,4 +11,4 @@ class MBASE_PUBLIC CodecUtil
     static bool isValidUTF8(const QByteArray &data);
 };
 
-#endif
+#endif // CODEC_UTIL_H

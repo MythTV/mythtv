@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_ALL_H_
-#define _PANE_ALL_H_
+#ifndef PANE_ALL_H
+#define PANE_ALL_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -57,4 +57,4 @@ class PaneAll : public GroupSetting
     FollowNITSetting    *m_follow_nit {nullptr};
 };
 
-#endif // _PANE_ALL_H_
+#endif // PANE_ALL_H

@@ -4,8 +4,8 @@
  * \author Copyright (C) 2006, Yeasah Pell
  */
 
-#ifndef _DISEQCSETTINGS_H_
-#define _DISEQCSETTINGS_H_
+#ifndef DISEQCSETTINGS_H
+#define DISEQCSETTINGS_H
 
 #include "diseqc.h"
 #include "standardsettings.h"
@@ -182,5 +182,4 @@ class DTVDeviceConfigGroup : public GroupSetting
     bool                m_switchesEnabled;
 };
 
-#endif // _DISEQCSETTINGS_H_
-
+#endif // DISEQCSETTINGS_H

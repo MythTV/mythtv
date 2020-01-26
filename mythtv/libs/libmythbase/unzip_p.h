@@ -36,8 +36,8 @@
 // We mean it.
 //
 
-#ifndef OSDAB_UNZIP_P__H
-#define OSDAB_UNZIP_P__H
+#ifndef OSDAB_UNZIP_P_H
+#define OSDAB_UNZIP_P_H
 
 #include "unzip.h"
 #include "zipentry_p.h"
@@ -109,4 +109,4 @@ public:
 	static inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) ;
 };
 
-#endif // OSDAB_UNZIP_P__H
+#endif // OSDAB_UNZIP_P_H

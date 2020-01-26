@@ -55,7 +55,7 @@
  *		et al.
  */
 #ifndef __LINUX_VIDEODEV2_H
-#define __LINUX_VIDEODEV2_H
+#define __LINUX_VIDEODEV2_H // NOLINT(bugprone-reserved-identifier) MUST MATCH SYSTEM HEADER
 
 #include <sys/time.h>
 

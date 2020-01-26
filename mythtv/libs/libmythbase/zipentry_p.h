@@ -36,8 +36,8 @@
 // We mean it.
 //
 
-#ifndef OSDAB_ZIPENTRY_P__H
-#define OSDAB_ZIPENTRY_P__H
+#ifndef OSDAB_ZIPENTRY_P_H
+#define OSDAB_ZIPENTRY_P_H
 
 #include <QtGlobal>
 #include <QString>
@@ -75,4 +75,4 @@ public:
 	inline bool hasDataDescriptor() const { return ( gpFlag[0] & 0x08 ) != 0; }
 };
 
-#endif // OSDAB_ZIPENTRY_P__H
+#endif // OSDAB_ZIPENTRY_P_H

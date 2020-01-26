@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
-#ifndef __MythTV__referencecounterlist__
-#define __MythTV__referencecounterlist__
+#ifndef MYTHTV_REFERENCECOUNTERLIST_H
+#define MYTHTV_REFERENCECOUNTERLIST_H
 
 #include "mythbaseexp.h"
 #include "referencecounter.h"
@@ -190,4 +190,4 @@ public:
 
 using ReferenceCounterList = RefCountedList<ReferenceCounter>;
 
-#endif /* defined(__MythTV__referencecounterlist__) */
+#endif /* defined(MYTHTV_REFERENCECOUNTERLIST_H) */

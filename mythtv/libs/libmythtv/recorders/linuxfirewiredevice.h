@@ -4,8 +4,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _LINUX_FIREWIRE_DEVICE_H_
-#define _LINUX_FIREWIRE_DEVICE_H_
+#ifndef LINUX_FIREWIRE_DEVICE_H
+#define LINUX_FIREWIRE_DEVICE_H
 
 #include <QRunnable>
 
@@ -95,4 +95,4 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     LFDPriv *m_priv              {nullptr};
 };
 
-#endif // _LINUX_FIREWIRE_DEVICE_H_
+#endif // LINUX_FIREWIRE_DEVICE_H

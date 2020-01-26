@@ -1,5 +1,5 @@
-#ifndef _FRAME_H
-#define _FRAME_H
+#ifndef MYTHFRAME_H
+#define MYTHFRAME_H
 
 #ifdef __cplusplus
 #include <cstdint>
@@ -759,4 +759,4 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
 }
 #endif /* __cplusplus */
 
-#endif
+#endif /* MYTHFRAME_H */

@@ -1,5 +1,5 @@
-#ifndef _AVFRINGBUFFER_H_
-#define _AVFRINGBUFFER_H_
+#ifndef AVFRINGBUFFER_H
+#define AVFRINGBUFFER_H
 
 #include "ringbuffer.h"
 
@@ -42,6 +42,6 @@ private:
     static URLProtocol  s_avfrURL;
 };
 
-#endif
+#endif // AVFRINGBUFFER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

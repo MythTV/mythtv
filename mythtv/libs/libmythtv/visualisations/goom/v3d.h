@@ -1,5 +1,5 @@
-#ifndef _V3D_H
-#define _V3D_H
+#ifndef V3D_H
+#define V3D_H
 
 #include <cmath>
 #include <cstdio>
@@ -57,4 +57,4 @@ struct v2d {
 
 #define MUL_V3D(lf,v) {(v).x*=(lf);(v).y*=(lf);(v).z*=(lf);}
 
-#endif
+#endif // V3D_H

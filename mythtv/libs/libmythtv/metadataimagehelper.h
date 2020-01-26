@@ -1,5 +1,5 @@
-#ifndef _METADATAIMAGEHELPER_H_
-#define _METADATAIMAGEHELPER_H_
+#ifndef METADATAIMAGEHELPER_H
+#define METADATAIMAGEHELPER_H
 
 #include <QObject>
 #include <QMultiMap>
@@ -47,4 +47,4 @@ MTV_PUBLIC bool SetArtwork(const QString &inetref,
 Q_DECLARE_METATYPE(VideoArtworkType)
 Q_DECLARE_METATYPE(ArtworkInfo)
 
-#endif
+#endif // METADATAIMAGEHELPER_H

@@ -1,5 +1,5 @@
-#ifndef _PROGRAM_INFO_UPDATER_H_
-#define _PROGRAM_INFO_UPDATER_H_
+#ifndef PROGRAM_INFO_UPDATER_H
+#define PROGRAM_INFO_UPDATER_H
 
 // C++ headers
 #include <cstdint> // for [u]int[32,64]_t
@@ -62,4 +62,4 @@ class MPUBLIC ProgramInfoUpdater : public QRunnable
     QHash<uint,PIKeyData>    m_needsUpdate;
 };
 
-#endif // _PROGRAM_INFO_UPDATER_H_
+#endif // PROGRAM_INFO_UPDATER_H

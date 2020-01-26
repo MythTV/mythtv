@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
-#ifndef __MythTV__mythnotifications__
-#define __MythTV__mythnotifications__
+#ifndef MYTHTV_MYTHNOTIFICATIONCENTER_H
+#define MYTHTV_MYTHNOTIFICATIONCENTER_H
 
 #include <QList>
 #include <QDateTime>
@@ -158,4 +158,4 @@ MUI_PUBLIC void ShowNotification(MythNotification::Type type,
                                  MythNotification::Priority priority = MythNotification::kDefault,
                                  const QString &style = QString());
 
-#endif /* defined(__MythTV__mythnotifications__) */
+#endif /* defined(MYTHTV_MYTHNOTIFICATIONCENTER_H) */

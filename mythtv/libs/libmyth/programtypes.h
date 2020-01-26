@@ -1,5 +1,5 @@
-#ifndef _PROGRAM_INFO_TYPES_H_
-#define _PROGRAM_INFO_TYPES_H_
+#ifndef PROGRAM_TYPES_H
+#define PROGRAM_TYPES_H
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -234,4 +234,4 @@ enum AutoExpireType {
     kLiveTVAutoExpire = 10000
 };
 
-#endif // _PROGRAM_INFO_TYPES_H_
+#endif // PROGRAM_TYPES_H

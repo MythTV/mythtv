@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SSDPCLIENT_H__
-#define __SSDPCLIENT_H__
+#ifndef SSDPCLIENT_H
+#define SSDPCLIENT_H
 
 // Qt headers
 #include <QObject>
@@ -139,4 +139,4 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         DeviceLocation   *Find( const QString &sURI, const QString &sUSN );
 };
 
-#endif
+#endif // SSDPCLIENT_H

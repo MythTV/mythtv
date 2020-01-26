@@ -1,5 +1,5 @@
-#ifndef _PLAYER_CONTEXT_H_
-#define _PLAYER_CONTEXT_H_
+#ifndef PLAYER_CONTEXT_H
+#define PLAYER_CONTEXT_H
 
 #include <vector>
 #include <deque>
@@ -211,4 +211,4 @@ class MTV_PUBLIC PlayerContext
     static const uint kMaxChannelHistory;
 };
 
-#endif // _PLAYER_CONTEXT_H_
+#endif // PLAYER_CONTEXT_H

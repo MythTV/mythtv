@@ -1,5 +1,5 @@
-#ifndef _LIVETVCHAIN_H_
-#define _LIVETVCHAIN_H_
+#ifndef LIVETVCHAIN_H
+#define LIVETVCHAIN_H
 
 #include <climits>
 
@@ -124,5 +124,4 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     QList<MythSocket*>      m_inUseSocks;
 };
 
-#endif
-    
+#endif // LIVETVCHAIN_H

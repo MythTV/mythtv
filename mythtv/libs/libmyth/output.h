@@ -5,8 +5,8 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef   __output_h
-#define   __output_h
+#ifndef   OUTPUT_H
+#define   OUTPUT_H
 
 class OutputListeners;
 class OutputEvent;
@@ -124,4 +124,4 @@ private:
 };
 
 
-#endif // __output_h
+#endif // OUTPUT_H

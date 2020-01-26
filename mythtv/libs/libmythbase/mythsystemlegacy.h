@@ -19,8 +19,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _MYTHSYSTEMLEGACY_H_
-#define _MYTHSYSTEMLEGACY_H_
+#ifndef MYTHSYSTEMLEGACY_H
+#define MYTHSYSTEMLEGACY_H
 
 #include "mythbaseexp.h"
 
@@ -205,7 +205,7 @@ extern "C"
 #endif // __cplusplus
 MBASE_PUBLIC uint myth_system_c(char *command, uint flags, uint timeout);
 
-#endif // _MYTHSYSTEMLEGACY_H_
+#endif // MYTHSYSTEMLEGACY_H
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */

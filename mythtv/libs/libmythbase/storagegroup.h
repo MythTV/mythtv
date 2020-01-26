@@ -1,5 +1,5 @@
-#ifndef _STORAGEGROUP_H
-#define _STORAGEGROUP_H
+#ifndef STORAGEGROUP_H
+#define STORAGEGROUP_H
 
 #include <QStringList>
 #include <QMutex>
@@ -69,6 +69,6 @@ class MBASE_PUBLIC StorageGroup
     static QHash<QString,QString> s_groupToUseCache;
 };
 
-#endif
+#endif // STORAGEGROUP_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

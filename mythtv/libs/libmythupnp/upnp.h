@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNP_H__
-#define __UPNP_H__
+#ifndef UPNP_H
+#define UPNP_H
 
 #include "configuration.h"
 
@@ -140,4 +140,4 @@ class UPNP_PUBLIC UPnp
 
 };
 
-#endif
+#endif // UPNP_H

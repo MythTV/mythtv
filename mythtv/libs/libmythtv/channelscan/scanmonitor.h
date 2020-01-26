@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _SCAN_MONITOR_H_
-#define _SCAN_MONITOR_H_
+#ifndef SCAN_MONITOR_H
+#define SCAN_MONITOR_H
 
 // Qt headers
 #include <QObject>
@@ -130,4 +130,4 @@ void post_event(QObject *dest, QEvent::Type type, const QString &val);
 void post_event(QObject *dest, QEvent::Type type, int val,
                 Configurable *spp);
 
-#endif // _SCAN_MONITOR_H_
+#endif // SCAN_MONITOR_H

@@ -1,5 +1,5 @@
-#ifndef _HLS_Reader_h_
-#define _HLS_Reader_h_
+#ifndef HLS_READER_H
+#define HLS_READER_H
 
 #include <QObject>
 #include <QString>
@@ -129,4 +129,4 @@ class MTV_PUBLIC  HLSReader
     QMutex             m_bufLock;
 };
 
-#endif
+#endif // HLS_READER_H

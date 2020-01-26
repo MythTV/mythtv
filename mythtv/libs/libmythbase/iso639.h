@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _ISO_639_2_H_
-#define _ISO_639_2_H_
+#ifndef ISO_639_2_H
+#define ISO_639_2_H
 
 #include <vector>
 
@@ -100,4 +100,4 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
 MBASE_PUBLIC  QString GetISO639LanguageName(const QString &iso639Code);
 MBASE_PUBLIC  QString GetISO639EnglishLanguageName(const QString &iso639Code);
 
-#endif // _ISO_639_2_H_
+#endif // ISO_639_2_H

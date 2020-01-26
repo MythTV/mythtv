@@ -20,8 +20,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _LINUX_IVTV_H
-#define _LINUX_IVTV_H
+#ifndef LINUX_IVTV_H
+#define LINUX_IVTV_H
 
 #define __u32 uint32_t
 #define __u64 uint64_t
@@ -277,4 +277,4 @@ struct ivtv_sliced_data {
 #ifdef ANDROID
 #undef __u64
 #endif
-#endif /* _LINUX_IVTV_H */
+#endif /* LINUX_IVTV_H */

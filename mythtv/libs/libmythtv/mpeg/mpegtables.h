@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _MPEG_TABLES_H_
-#define _MPEG_TABLES_H_
+#ifndef MPEG_TABLES_H
+#define MPEG_TABLES_H
 
 #include <cassert>
 #include <utility>
@@ -1243,4 +1243,4 @@ class MTV_PUBLIC AdaptationFieldControl
     const unsigned char* m_data;
 };
 
-#endif
+#endif // MPEG_TABLES_H

@@ -5,8 +5,8 @@
  *  Copyright notice is in asirecorder.cpp of the MythTV project.
  */
 
-#ifndef _ASI_RECORDER_H_
-#define _ASI_RECORDER_H_
+#ifndef ASI_RECORDER_H
+#define ASI_RECORDER_H
 
 // MythTV includes
 #include "dtvrecorder.h"
@@ -74,4 +74,4 @@ class ASIRecorder : public DTVRecorder
     ASIStreamHandler *m_streamHandler  {nullptr};
 };
 
-#endif // _ASI_RECORDER_H_
+#endif // ASI_RECORDER_H

@@ -6,8 +6,8 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
-#ifndef _AUDIO_OUTPUT_SETTINGS_H_
-#define _AUDIO_OUTPUT_SETTINGS_H_
+#ifndef AUDIO_OUTPUT_SETTINGS_H
+#define AUDIO_OUTPUT_SETTINGS_H
 
 #include <vector>
 
@@ -213,4 +213,4 @@ class MPUBLIC AudioOutputSettings
         std::vector<AudioFormat>::iterator m_sfIt;
 };
 
-#endif // _AUDIO_OUTPUT_SETTINGS_H_
+#endif // AUDIO_OUTPUT_SETTINGS_H

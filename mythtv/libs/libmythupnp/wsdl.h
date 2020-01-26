@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef _WSDL_H_
-#define _WSDL_H_
+#ifndef WSDL_H
+#define WSDL_H
 
 #include <QMetaObject>
 #include <QMetaMethod>
@@ -75,4 +75,4 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
         bool GetWSDL( HTTPRequest *pRequest );
 };
 
-#endif
+#endif // WSDL_H

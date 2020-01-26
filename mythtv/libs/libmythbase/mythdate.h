@@ -1,5 +1,5 @@
-#ifndef _MYTH_DATE_H_
-#define _MYTH_DATE_H_
+#ifndef MYTH_DATE_H
+#define MYTH_DATE_H
 
 #include <QDateTime>
 #include <QString>
@@ -59,4 +59,4 @@ MBASE_PUBLIC int toSeconds( const QTime &time );
 
 };
 
-#endif // _MYTH_DATE_H_
+#endif // MYTH_DATE_H

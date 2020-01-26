@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _STREAM_HANDLER_H_
-#define _STREAM_HANDLER_H_
+#ifndef STREAM_HANDLER_H
+#define STREAM_HANDLER_H
 
 #include <utility>
 #include <vector>
@@ -143,4 +143,4 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     StreamDataList      m_streamDataList;
 };
 
-#endif // _STREAM_HANDLER_H_
+#endif // STREAM_HANDLER_H

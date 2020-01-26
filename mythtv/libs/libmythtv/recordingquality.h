@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _RECORDER_QUALITY_H_
-#define _RECORDER_QUALITY_H_
+#ifndef RECORDING_QUALITY_H
+#define RECORDING_QUALITY_H
 
 #include <QDateTime>
 #include <QList>
@@ -52,4 +52,4 @@ class MTV_PUBLIC RecordingQuality
     RecordingGaps m_recordingGaps;
 };
 
-#endif // _RECORDER_QUALITY_H_
+#endif // RECORDING_QUALITY_H

@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _PREVIEW_GENERATOR_QUEUE_H_
-#define _PREVIEW_GENERATOR_QUEUE_H_
+#ifndef PREVIEW_GENERATOR_QUEUE_H
+#define PREVIEW_GENERATOR_QUEUE_H
 
 #include <QStringList>
 #include <QDateTime>
@@ -156,4 +156,4 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     uint                   m_minBlockSeconds;
 };
 
-#endif // _PREVIEW_GENERATOR_QUEUE_H_
+#endif // PREVIEW_GENERATOR_QUEUE_H

@@ -1,5 +1,5 @@
-#ifndef _UPNP_HELPERS_H_
-#define _UPNP_HELPERS_H_
+#ifndef UPNP_HELPERS_H
+#define UPNP_HELPERS_H
 
 #include <QString>
 #include <QDateTime>
@@ -311,4 +311,4 @@ namespace DLNA
     UPNP_PUBLIC QString ConversionIndicatorString(bool wasConverted);
 };
 
-#endif
+#endif // UPNP_HELPERS_H

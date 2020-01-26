@@ -2,8 +2,8 @@
 // Simple header which encapsulates platform incompatibilities, so we
 // do not need to litter the codebase with ifdefs.
 
-#ifndef __COMPAT_H__
-#define __COMPAT_H__
+#ifndef COMPAT_H
+#define COMPAT_H
 
 #ifdef __cplusplus
 #    include <cstdio>         // for snprintf(), used by inline dlerror()
@@ -418,4 +418,4 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #   define LZO_COMPILE_TIME_ASSERT( a )
 #endif
 
-#endif // __COMPAT_H__
+#endif // COMPAT_H

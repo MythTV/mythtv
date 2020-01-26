@@ -1,5 +1,5 @@
-#ifndef _BASESOCKETREQUESTHANDLER_H_
-#define _BASESOCKETREQUESTHANDLER_H_
+#ifndef BASESOCKETREQUESTHANDLER_H
+#define BASESOCKETREQUESTHANDLER_H
 
 #include <QString>
 #include <QStringList>
@@ -29,4 +29,4 @@ class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
     static bool HandleQueryTimeZone(SocketHandler *sock);
 };
 
-#endif
+#endif // BASESOCKETREQUESTHANDLER_H

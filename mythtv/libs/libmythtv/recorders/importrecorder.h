@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _IMPORT_RECORDER_H_
-#define _IMPORT_RECORDER_H_
+#ifndef IMPORT_RECORDER_H
+#define IMPORT_RECORDER_H
 
 #include <QMutex>
 
@@ -50,4 +50,4 @@ class ImportRecorder : public DTVRecorder
     long long           m_nfc       {0};
 };
 
-#endif // _IMPORT_RECORDER_H_
+#endif // IMPORT_RECORDER_H

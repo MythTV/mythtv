@@ -21,8 +21,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#ifndef __RTJPEG_H__
-#define __RTJPEG_H__
+#ifndef RTJPEG_H
+#define RTJPEG_H
 
 #include "mythconfig.h"
 #include "mythtvexp.h"
@@ -151,4 +151,4 @@ struct RTjpeg_frameheader {
 	uint8_t data;
 };
 
-#endif
+#endif // RTJPEG_H

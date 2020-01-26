@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef __CI_H
-#define __CI_H
+#ifndef DVBCI_H
+#define DVBCI_H
 
 #if HAVE_STDINT_H
 #include <cstdint>
@@ -234,4 +234,4 @@ int accept_tcp(int ip_sock,struct sockaddr_in *ip_name);
 int udp_listen(struct sockaddr_un *name,char const * filename);
 int accept_udp(int ip_sock,struct sockaddr_un *ip_name);
 
-#endif //__CI_H
+#endif // DVBCI_H

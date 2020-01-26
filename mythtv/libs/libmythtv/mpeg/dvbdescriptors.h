@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _DVB_DESCRIPTORS_H_
-#define _DVB_DESCRIPTORS_H_
+#ifndef DVB_DESCRIPTORS_H
+#define DVB_DESCRIPTORS_H
 
 #include <cassert>
 
@@ -2480,4 +2480,4 @@ class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
     }
 };
 
-#endif
+#endif // DVB_DESCRIPTORS_H

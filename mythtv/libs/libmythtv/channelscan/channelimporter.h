@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _CHANNEL_IMPORTER_H_
-#define _CHANNEL_IMPORTER_H_
+#ifndef CHANNEL_IMPORTER_H
+#define CHANNEL_IMPORTER_H
 
 // C++ headers
 #include <cstring>
@@ -275,4 +275,4 @@ class MTV_PUBLIC ChannelImporter
     QEventLoop          m_eventLoop;
 };
 
-#endif // _CHANNEL_IMPORTER_H_
+#endif // CHANNEL_IMPORTER_H

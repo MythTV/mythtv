@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _IPTVSTREAMHANDLER_H_
-#define _IPTVSTREAMHANDLER_H_
+#ifndef IPTVSTREAMHANDLER_H
+#define IPTVSTREAMHANDLER_H
 
 #include <vector>
 using namespace std;
@@ -124,4 +124,4 @@ private:
 
 };
 
-#endif // _IPTVSTREAMHANDLER_H_
+#endif // IPTVSTREAMHANDLER_H

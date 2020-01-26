@@ -1,5 +1,5 @@
-#ifndef _OUTBOUNDREQUESTHANDLER_H_
-#define _OUTBOUNDREQUESTHANDLER_H_
+#ifndef OUTBOUNDREQUESTHANDLER_H
+#define OUTBOUNDREQUESTHANDLER_H
 
 #include <QTimer>
 #include <QString>
@@ -34,4 +34,4 @@ class PROTOSERVER_PUBLIC OutboundRequestHandler : public SocketRequestHandler
     QTimer      m_timer;
 };
 
-#endif
+#endif // OUTBOUNDREQUESTHANDLER_H

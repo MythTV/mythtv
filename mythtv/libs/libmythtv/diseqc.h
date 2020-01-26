@@ -4,8 +4,8 @@
  * \author Copyright (C) 2006, Yeasah Pell
  */
 
-#ifndef _DISEQC_H_
-#define _DISEQC_H_
+#ifndef DISEQC_H
+#define DISEQC_H
 
 // C++ headers
 #include <cinttypes>
@@ -495,4 +495,4 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     static const TypeTable kLNBTypeTable[5];
 };
 
-#endif // _DISEQC_H_
+#endif // DISEQC_H

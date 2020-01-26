@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
-#ifndef _DVB_TABLES_H_
-#define _DVB_TABLES_H_
+#ifndef DVB_TABLES_H
+#define DVB_TABLES_H
 
 #include <QString>
 #include <cstdint>  // uint32_t
@@ -393,4 +393,4 @@ class MTV_PUBLIC TimeDateTable : public PSIPTable
     time_t UTCUnix(void) const { return dvbdate2unix(UTCdata()); }
 };
 
-#endif // _DVB_TABLES_H_
+#endif // DVB_TABLES_H

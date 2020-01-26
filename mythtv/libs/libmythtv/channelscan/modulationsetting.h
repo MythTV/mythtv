@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _MODULATION_SETTING_H_
-#define _MODULATION_SETTING_H_
+#ifndef MODULATION_SETTING_H
+#define MODULATION_SETTING_H
 
 // Qt headers
 #include <QCoreApplication>
@@ -129,4 +129,4 @@ class ScanDVBSModulation: public TransMythUIComboBoxSetting
     }
 };
 
-#endif // _MODULATION_SETTING_H_
+#endif // MODULATION_SETTING_H

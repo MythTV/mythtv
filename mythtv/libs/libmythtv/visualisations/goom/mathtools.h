@@ -1,3 +1,6 @@
+#ifndef MATHTOOLS_H
+#define MATHTOOLS_H
+
 #define _double2fixmagic (68719476736.0*1.5)
 //2^36 * 1.5,  (52-_shiftamt=36) uses limited precisicion to floor
 #define _shiftamt 16
@@ -24,3 +27,5 @@
 #else
 #define SINCOS(f,s,c) {(s)=sinf(f);(c)=cosf(f);}
 #endif
+
+#endif // MATHTOOLS_H

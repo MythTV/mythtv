@@ -18,8 +18,8 @@
  * 02110-1301, USA.
  */
 
-#ifndef _AUDIOINPUTALSA_H_
-#define _AUDIOINPUTALSA_H_
+#ifndef AUDIOINPUTALSA_H
+#define AUDIOINPUTALSA_H
 
 #include "audioinput.h"
 
@@ -64,6 +64,6 @@ class AudioInputALSA : public AudioInput
     snd_pcm_uframes_t   m_periodSize     {0};
     int                 m_mythBlockBytes {0};
 };
-#endif /* _AUDIOINPUTALSA_H_ */
+#endif /* AUDIOINPUTALSA_H */
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 

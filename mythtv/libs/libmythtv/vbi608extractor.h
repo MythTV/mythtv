@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef _VBI_608_EXTRACTOR_H_
-#define _VBI_608_EXTRACTOR_H_
+#ifndef VBI_608_EXTRACTOR_H
+#define VBI_608_EXTRACTOR_H
 
 #include <cstdint>
 
@@ -54,4 +54,4 @@ class VBI608Extractor
     uint16_t     m_code[2]     {UINT16_MAX, UINT16_MAX};
 };
 
-#endif // _VBI_608_EXTRACTOR_H_
+#endif // VBI_608_EXTRACTOR_H

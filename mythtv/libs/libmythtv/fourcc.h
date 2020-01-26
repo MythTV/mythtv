@@ -1,5 +1,5 @@
-#ifndef _FOURCC_H
-#define _FOURCC_H
+#ifndef FOURCC_H
+#define FOURCC_H
 /******************************************************************************
  * fourcc.h - Four Character Constants
  *
@@ -105,4 +105,4 @@ static inline char * fourcc_str(int i)
 
 
 /*****************************************************************************/
-#endif  // ifndef _FOURCC_H
+#endif  // ifndef FOURCC_H

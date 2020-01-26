@@ -3,8 +3,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _RTP_TS_DATA_PACKET_H_
-#define _RTP_TS_DATA_PACKET_H_
+#ifndef RTP_TS_DATA_PACKET_H
+#define RTP_TS_DATA_PACKET_H
 
 #include <algorithm>
 using namespace std;
@@ -36,4 +36,4 @@ class RTPTSDataPacket : public RTPDataPacket
     uint GetTSOffset(void) const { return m_off; }
 };
 
-#endif // _RTP_TS_DATA_PACKET_H_
+#endif // RTP_TS_DATA_PACKET_H

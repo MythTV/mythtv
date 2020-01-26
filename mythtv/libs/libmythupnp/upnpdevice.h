@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPDEVICE_H__
-#define __UPNPDEVICE_H__
+#ifndef UPNPDEVICE_H
+#define UPNPDEVICE_H
 
 #include <utility>
 
@@ -331,4 +331,4 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         }
 };
 
-#endif
+#endif // UPNPDEVICE_H

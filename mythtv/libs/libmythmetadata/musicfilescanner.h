@@ -1,5 +1,5 @@
-#ifndef _MUSICFILESCANNER_H_
-#define _MUSICFILESCANNER_H_
+#ifndef MUSICFILESCANNER_H
+#define MUSICFILESCANNER_H
 
 // MythTV
 #include "mythmetaexp.h"
@@ -71,4 +71,4 @@ class META_PUBLIC MusicFileScanner
         uint m_coverartUpdated   {0};
 };
 
-#endif // _MUSICFILESCANNER_H_
+#endif // MUSICFILESCANNER_H

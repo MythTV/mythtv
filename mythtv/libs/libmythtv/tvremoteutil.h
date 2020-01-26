@@ -1,5 +1,5 @@
-#ifndef _TV_REMOTE_UTIL_H_
-#define _TV_REMOTE_UTIL_H_
+#ifndef TV_REMOTE_UTIL_H
+#define TV_REMOTE_UTIL_H
 
 #include <QStringList>
 #include <QDateTime>
@@ -52,6 +52,6 @@ MTV_PUBLIC bool RemoteIsBusy(uint inputid, InputInfo &busy_input);
 MTV_PUBLIC bool RemoteGetRecordingStatus(
     vector<TunerStatus> *tunerList = nullptr, bool list_inactive = false);
 
-#endif // _TV_REMOTE_UTIL_H_
+#endif // TV_REMOTE_UTIL_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

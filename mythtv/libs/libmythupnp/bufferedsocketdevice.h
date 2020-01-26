@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BUFFEREDSOCKETDEVICE_H__
-#define __BUFFEREDSOCKETDEVICE_H__
+#ifndef BUFFEREDSOCKETDEVICE_H
+#define BUFFEREDSOCKETDEVICE_H
 
 // C++ headers
 #include <deque>
@@ -116,4 +116,4 @@ class BufferedSocketDevice
         int                 socket              () { return( ( m_pSocket ) ? m_pSocket->socket() : 0 ); }
 };
 
-#endif
+#endif // BUFFEREDSOCKETDEVICE_H

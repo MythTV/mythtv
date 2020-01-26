@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _SCRIPT_SIGNAL_MONITOR_H_
-#define _SCRIPT_SIGNAL_MONITOR_H_
+#ifndef SCRIPT_SIGNAL_MONITOR_H
+#define SCRIPT_SIGNAL_MONITOR_H
 
 // MythTV headers
 #include "signalmonitor.h"
@@ -28,4 +28,4 @@ class ScriptSignalMonitor : public SignalMonitor
     }
 };
 
-#endif // _SCRIPT_SIGNAL_MONITOR_H_
+#endif // SCRIPT_SIGNAL_MONITOR_H

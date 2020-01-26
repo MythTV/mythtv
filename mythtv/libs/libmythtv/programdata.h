@@ -1,5 +1,5 @@
-#ifndef _PROGRAMDATA_H_
-#define _PROGRAMDATA_H_
+#ifndef PROGRAMDATA_H
+#define PROGRAMDATA_H
 
 // C++ headers
 #include <cstdint>
@@ -265,4 +265,4 @@ class MTV_PUBLIC ProgramData
         MSqlQuery &query, uint chanid, const ProgInfo &pi);
 };
 
-#endif // _PROGRAMDATA_H_
+#endif // PROGRAMDATA_H

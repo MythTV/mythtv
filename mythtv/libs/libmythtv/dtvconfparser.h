@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef _DTVCONFPARSER_H_
-#define _DTVCONFPARSER_H_
+#ifndef DTVCONFPARSER_H
+#define DTVCONFPARSER_H
 
 // C++ headers
 #include <cstdint>
@@ -105,4 +105,4 @@ class DTVConfParser
     DTVChannelList m_channels;
 };
 
-#endif // _DTVCONFPARSER_H_
+#endif // DTVCONFPARSER_H

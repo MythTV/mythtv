@@ -1,5 +1,5 @@
-#ifndef _CLEANUPGUARD_H_
-#define _CLEANUPGUARD_H_
+#ifndef CLEANUPGUARD_H
+#define CLEANUPGUARD_H
 
 #include "mythbaseexp.h"
 
@@ -17,4 +17,4 @@ class MBASE_PUBLIC CleanupGuard
     CleanupFunc m_cleanFunction;
 };
 
-#endif // _CLEANUPGUARD_H_
+#endif // CLEANUPGUARD_H

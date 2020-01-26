@@ -2,8 +2,8 @@
  * vim: set expandtab tabstop=4 shiftwidth=4:
  */
 
-#ifndef _PANE_DVBS2_H_
-#define _PANE_DVBS2_H_
+#ifndef PANE_DVBS2_H
+#define PANE_DVBS2_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -56,4 +56,4 @@ class PaneDVBS2 : public GroupSetting
     ScanRollOff        *m_prolloff    {nullptr};
 };
 
-#endif // _PANE_DVBS2_H_
+#endif // PANE_DVBS2_H
