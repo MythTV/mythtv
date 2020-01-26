@@ -1,5 +1,5 @@
-#ifndef _PLAYLIST_CONTAINER_H_
-#define _PLAYLIST_CONTAINER_H_
+#ifndef PLAYLIST_CONTAINER_H
+#define PLAYLIST_CONTAINER_H
 
 // qt
 #include <QCoreApplication>
@@ -86,4 +86,4 @@ class PlaylistContainer
     int m_randomWeight                        {2};
 };
 
-#endif // _PLAYLIST_CONTAINER_H_
+#endif // PLAYLIST_CONTAINER_H

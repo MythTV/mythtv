@@ -4,8 +4,8 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef __mainvisual_h
-#define __mainvisual_h
+#ifndef MAINVISUAL_H
+#define MAINVISUAL_H
 
 #include <vector>
 using namespace std;
@@ -74,5 +74,4 @@ class MainVisual :  public QObject, public MythTV::Visual
     QTimer *m_updateTimer          {nullptr};
 };
 
-#endif // __mainvisual_h
-
+#endif // MAINVISUAL_H

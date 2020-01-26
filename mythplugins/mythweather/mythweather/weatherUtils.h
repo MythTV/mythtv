@@ -1,5 +1,5 @@
-#ifndef _WEATHERUTILS_H_
-#define _WEATHERUTILS_H_
+#ifndef WEATHERUTILS_H
+#define WEATHERUTILS_H
 
 #include <utility>
 
@@ -73,4 +73,4 @@ ScreenListMap loadScreens();
 QStringList loadScreen(const QDomElement& ScreenListInfo);
 bool doLoadScreens(const QString &filename, ScreenListMap &screens);
 
-#endif
+#endif /* WEATHERUTILS_H */

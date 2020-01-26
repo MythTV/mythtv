@@ -1,5 +1,5 @@
-#ifndef _WEATHERSCREEN_H_
-#define _WEATHERSCREEN_H_
+#ifndef WEATHERSCREEN_H
+#define WEATHERSCREEN_H
 
 // QT headers
 #include <QStringList>
@@ -74,4 +74,4 @@ class WeatherScreen : public MythScreenType
     int  m_id;
 };
 
-#endif
+#endif // WEATHERSCREEN_H

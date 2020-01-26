@@ -1,5 +1,5 @@
-#ifndef __WEATHER_SOURCE_H__
-#define __WEATHER_SOURCE_H__
+#ifndef WEATHER_SOURCE_H
+#define WEATHER_SOURCE_H
 
 #include <QStringList>
 #include <QObject>
@@ -101,4 +101,4 @@ class WeatherSource : public QObject
     DataMap m_data;
 };
 
-#endif
+#endif /* WEATHER_SOURCE_H */

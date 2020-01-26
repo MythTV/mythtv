@@ -1,5 +1,5 @@
-#ifndef _SOURCEMANAGER_H_
-#define _SOURCEMANAGER_H_
+#ifndef SOURCEMANAGER_H
+#define SOURCEMANAGER_H
 
 // QT headers
 #include <QDir>
@@ -46,4 +46,4 @@ class SourceManager : public QObject
     void recurseDirs(QDir dir);
 };
 
-#endif
+#endif /* SOURCEMANAGER_H */
