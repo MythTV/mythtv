@@ -29,7 +29,7 @@
 
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 
-static unsigned char *rawbuf;          // one common buffer for raw vbi data.
+static unsigned char *rawbuf = nullptr;// one common buffer for raw vbi data.
 #ifdef USING_V4L2
 static int rawbuf_size;                // its current size
 #endif // USING_V4L2
@@ -463,7 +463,7 @@ vbi_add_handler(struct vbi *vbi, vbic_handler handler, void *data)
 {
     struct vbi_client *cl = nullptr;
 
-    if (!(cl = static_cast<vbi_client*>(malloc(sizeof(*cl)))))
+    if (!(cl = new struct vbi_client))
        return -1;
     cl->handler = handler;
     cl->data = data;
@@ -488,6 +488,7 @@ vbi_del_handler(struct vbi *vbi, vbic_handler handler, void *data)
        if (cl->handler == handler && cl->data == data)
        {
            dl_remove(cl->node);
+           delete cl;
            break;
        }
     }
@@ -605,11 +606,11 @@ setup_dev(struct vbi *vbi)
     // grow buffer if necessary
     if (rawbuf_size < vbi->bufsize)
     {
-       if (rawbuf)
-           free(rawbuf);
-       if (!(rawbuf = static_cast<u_char*>(malloc(rawbuf_size = vbi->bufsize))))
+       delete [] rawbuf;
+       rawbuf_size = vbi->bufsize;
+       if (!(rawbuf = new u_char[rawbuf_size]))
        {
-            error("malloc refused in setup_dev()\n");
+            error("unable to allocate in setup_dev()\n");
        }
     }
 
@@ -634,7 +635,7 @@ vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
        lang_init();
     s_inited = 1;
 
-    vbi = static_cast<struct vbi *>(malloc(sizeof(*vbi)));
+    vbi = new struct vbi;
     if (vbi == nullptr)
     {
        error("out of memory");
@@ -667,7 +668,7 @@ vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 fail3:
     close(vbi->fd);
 fail2:
-    free(vbi);
+    delete vbi;
 fail1:
     return nullptr;
 }
@@ -681,7 +682,7 @@ vbi_close(struct vbi *vbi)
 //    if (vbi->cache)
 //     vbi->cache->op->close(vbi->cache);
     close(vbi->fd);
-    free(vbi);
+    delete vbi;
 }
 
 
