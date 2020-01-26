@@ -93,8 +93,8 @@ class ActionID
      */
     ActionID(QString context, QString action)
         : m_context(std::move(context)), m_action(std::move(action)) {}
-    ActionID(const ActionID &other) = default;
-    ActionID& operator=(const ActionID &rhs) = default;
+    ActionID(const ActionID&) = default;
+    ActionID& operator=(const ActionID&) = default;
 
     /// \brief Returns the context name.
     QString GetContext(void) const { return m_context; }
