@@ -176,29 +176,6 @@ class VideoPerformanceTest
 
 int main(int argc, char *argv[])
 {
-
-#if defined (Q_OS_LINUX)
-#if defined (USING_VAAPI) || defined (USING_MMAL)
-    // When using VAAPI (linux/desktop only) we want to use EGL to ensure we
-    // can use zero copy video buffers for the best performance (N.B. not tested
-    // on AMD desktops). For non-VAAPI users this should make no difference - on NVidia
-    // installations it has no effect.
-    // Likewise for MMAL (Raspberry Pi), we want EGL for zero copy direct rendering.
-    // This is the only way to force Qt to use EGL and must be done before any
-    // GUI is created.
-    // If problems are encountered, set the environment variable NO_EGL
-
-    // Disabled this for now as it does actually break NVidia desktops
-    //if (qgetenv("NO_EGL").isEmpty())
-    //    setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
-
-
-    // This makes Xlib calls thread-safe which seems to be required for hardware
-    // accelerated Flash playback to work without causing mythfrontend to abort.
-    QApplication::setAttribute(Qt::AA_X11InitThreads);
-#endif
-#endif
-
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
@@ -218,28 +195,20 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    QSurfaceFormat format;
-    format.setDepthBufferSize(0);
-    format.setStencilBufferSize(0);
-    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setSwapInterval(1);
-
-    // try and disable vsync if running test
+    int swapinterval = 1;
     if (cmdline.toBool("test"))
     {
         // try and disable sync to vblank on linux x11
         qputenv("vblank_mode", "0"); // Intel and AMD
         qputenv("__GL_SYNC_TO_VBLANK", "0"); // NVidia
-
         // the default surface format has a swap interval of 1. This is used by
         // the MythMainwindow widget that then drives vsync for all widgets/children
         // (i.e. MythPainterWindow) and we cannot override it on some drivers. So
         // force the default here.
-        format.setSwapInterval(0);
+        swapinterval = 0;
     }
 
-    QSurfaceFormat::setDefaultFormat(format);
+    MythDisplay::ConfigureQtGUI(swapinterval);
 
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);

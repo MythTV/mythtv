@@ -37,6 +37,7 @@
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
 #include "cleanupguard.h"
+#include "mythdisplay.h"
 
 #define LOC      QString("MythScreenWizard: ")
 #define LOC_WARN QString("MythScreenWizard, Warning: ")
@@ -120,12 +121,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-
-#ifdef Q_OS_MAC
-    // Without this, we can't set focus to any of the CheckBoxSetting, and most
-    // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(false);
-#endif
+    MythDisplay::ConfigureQtGUI();
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSCREENWIZARD);
 

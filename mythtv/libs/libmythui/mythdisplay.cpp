@@ -1033,3 +1033,52 @@ void MythDisplay::DebugModes(void) const
     }
 }
 
+/*! \brief Shared static initialistaion code for all MythTV GUI applications.
+ *
+ * \note This function must be called before Qt/QPA is initialised i.e. before
+ * any call to QApplication.
+*/
+void MythDisplay::ConfigureQtGUI(int SwapInterval)
+{
+    // Set the default surface format. Explicitly required on some platforms.
+    QSurfaceFormat format;
+    format.setDepthBufferSize(0);
+    format.setStencilBufferSize(0);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+    format.setSwapInterval(SwapInterval);
+    QSurfaceFormat::setDefaultFormat(format);
+
+#ifdef Q_OS_MAC
+    // Without this, we can't set focus to any of the CheckBoxSetting, and most
+    // of the MythPushButton widgets, and they don't use the themed background.
+    QApplication::setDesktopSettingsAware(false);
+#endif
+#if defined (Q_OS_LINUX)
+#if defined (USING_VAAPI) || defined (USING_MMAL)
+    // When using VAAPI (linux/desktop only) we want to use EGL to ensure we
+    // can use zero copy video buffers for the best performance (N.B. not tested
+    // on AMD desktops). For non-VAAPI users this should make no difference - on NVidia
+    // installations it has no effect.
+    // Likewise for MMAL (Raspberry Pi), we want EGL for zero copy direct rendering.
+    // This is the only way to force Qt to use EGL and must be done before any
+    // GUI is created.
+    // If problems are encountered, set the environment variable NO_EGL
+
+    // Disabled this for now as it does actually break NVidia desktops
+    //if (qgetenv("NO_EGL").isEmpty())
+    //    setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
+#endif
+    // This makes Xlib calls thread-safe which seems to be required for hardware
+    // accelerated Flash playback to work without causing mythfrontend to abort.
+    QApplication::setAttribute(Qt::AA_X11InitThreads);
+#endif
+#ifdef Q_OS_ANDROID
+    //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Ignore desktop scaling
+    QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
+}
