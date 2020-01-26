@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // vim:set sw=4 ts=4 expandtab:
-#ifndef _PLAYBACKBOXLISTITEM_H_
-#define _PLAYBACKBOXLISTITEM_H_
+#ifndef PLAYBACKBOXLISTITEM_H
+#define PLAYBACKBOXLISTITEM_H
 
 
 #include "mythuibuttonlist.h"
@@ -23,4 +23,4 @@ class PlaybackBoxListItem : public MythUIButtonListItem
 #endif
 };
 
-#endif // _PLAYBACKBOXLISTITEM_H_
+#endif // PLAYBACKBOXLISTITEM_H

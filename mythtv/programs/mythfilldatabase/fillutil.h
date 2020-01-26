@@ -1,5 +1,5 @@
-#ifndef _FILLUTIL_H_
-#define _FILLUTIL_H_
+#ifndef FILLUTIL_H
+#define FILLUTIL_H
 
 // Std C headers
 #include <cstdio>
@@ -14,4 +14,4 @@ bool dash_open(QFile &file, const QString &filename,
 
 QString SetupIconCacheDirectory(void);
 
-#endif // _FILLUTIL_H_
+#endif // FILLUTIL_H

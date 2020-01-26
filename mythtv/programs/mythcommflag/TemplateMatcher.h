@@ -15,8 +15,8 @@
  * template known to change locations, but at a very large cost of time.
  */
 
-#ifndef __TEMPLATEMATCHER_H__
-#define __TEMPLATEMATCHER_H__
+#ifndef TEMPLATEMATCHER_H
+#define TEMPLATEMATCHER_H
 
 extern "C" {
 #include "libavcodec/avcodec.h"    /* AVFrame */
@@ -83,7 +83,6 @@ private:
     struct timeval          m_analyzeTime       {0,0};
 };
 
-#endif  /* !__TEMPLATEMATCHER_H__ */
+#endif  /* !TEMPLATEMATCHER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

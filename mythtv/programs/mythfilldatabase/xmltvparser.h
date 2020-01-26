@@ -1,5 +1,5 @@
-#ifndef _XMLTVPARSER_H_
-#define _XMLTVPARSER_H_
+#ifndef XMLTVPARSER_H
+#define XMLTVPARSER_H
 
 // Qt headers
 #include <QMap>
@@ -30,4 +30,4 @@ class XMLTVParser
     QString m_tvGrabberPath;
 };
 
-#endif // _XMLTVPARSER_H_
+#endif // XMLTVPARSER_H

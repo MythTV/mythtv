@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _ELEMENT_H_
-#define _ELEMENT_H_
+#ifndef ELEMENT_H
+#define ELEMENT_H
 
 #include <cstdint>
 
@@ -136,4 +136,4 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af,
 		       int  off, int le, int type);
 int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le);
 
-#endif /*_ELEMENT_H_*/
+#endif /* ELEMENT_H */

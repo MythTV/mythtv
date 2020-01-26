@@ -1,5 +1,5 @@
-#ifndef _COMMDETECTOR2_H_
-#define _COMMDETECTOR2_H_
+#ifndef COMMDETECTOR2_H
+#define COMMDETECTOR2_H
 
 // C++ headers
 #include <vector>
@@ -87,6 +87,6 @@ class CommDetector2 : public CommDetectorBase
     QString                      m_debugdir;
 };
 
-#endif  /* !_COMMDETECTOR2_H_ */
+#endif  /* !COMMDETECTOR2_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

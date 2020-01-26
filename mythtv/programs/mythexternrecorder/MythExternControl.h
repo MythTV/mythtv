@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MythExternControl_H_
-#define _MythExternControl_H_
+#ifndef MYTHEXTERNCONTROL_H
+#define MYTHEXTERNCONTROL_H
 
 #include "MythExternRecApp.h"
 
@@ -181,4 +181,4 @@ class MythExternControl : public QObject
     std::atomic<bool> m_ready            {false};
 };
 
-#endif
+#endif // MYTHEXTERNCONTROL_H

@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _HTTPCONFIG_H_
-#define _HTTPCONFIG_H_
+#ifndef HTTPCONFIG_H
+#define HTTPCONFIG_H
 
 #include "httpserver.h"
 #include "mythsettings.h"
@@ -34,4 +34,4 @@ class HttpConfig : public HttpServerExtension
     MythSettingList m_generalSettings;
 };
 
-#endif
+#endif // HTTPCONFIG_H

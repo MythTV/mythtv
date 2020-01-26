@@ -1,5 +1,5 @@
-#ifndef _CLASSICLOGOGEDETECTOR_H_
-#define _CLASSICLOGOGEDETECTOR_H_
+#ifndef CLASSICLOGOGEDETECTOR_H
+#define CLASSICLOGOGEDETECTOR_H
 
 #include "LogoDetectorBase.h"
 
@@ -54,7 +54,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     bool                 m_logoInfoAvailable               {false};
 };
 
-#endif
+#endif // CLASSICLOGOGEDETECTOR_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 

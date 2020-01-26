@@ -1,5 +1,5 @@
-#ifndef _SLOTRELAYER_H_
-#define _SLOTRELAYER_H_
+#ifndef SLOTRELAYER_H
+#define SLOTRELAYER_H
 
 #include <QObject>
 class QString;
@@ -31,7 +31,6 @@ class SlotRelayer : public QObject
     void (*m_fpVoid)()                  { nullptr };
 };
 
-#endif
-
+#endif // SLOTRELAYER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

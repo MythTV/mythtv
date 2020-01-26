@@ -1,5 +1,5 @@
-#ifndef _LOGODETECTORBASE_H_
-#define _LOGODETECTORBASE_H_
+#ifndef LOGODETECTORBASE_H
+#define LOGODETECTORBASE_H
 
 #include <QObject>
 #include "mythframe.h"
@@ -31,7 +31,6 @@ class LogoDetectorBase : public QObject
     unsigned int m_width, m_height;
 };
 
-#endif
+#endif // LOGODETECTORBASE_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

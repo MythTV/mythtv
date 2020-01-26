@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _MPG_COMMON_H_
-#define _MPG_COMMON_H_
+#ifndef MPG_COMMON_H
+#define MPG_COMMON_H
 
 #include <cstdint>
 #include "ringbuffer.h"
@@ -75,4 +75,4 @@ int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off);
 int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le);
 int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le);
 
-#endif /*_MPG_COMMON_H_*/
+#endif /* MPG_COMMON_H */

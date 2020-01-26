@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MythTVExternRecApp_H_
-#define _MythTVExternRecApp_H_
+#ifndef MYTHTVEXTERNRECAPP_H
+#define MYTHTVEXTERNRECAPP_H
 
 #include <QObject>
 #include <QtCore/QtCore>
@@ -124,4 +124,4 @@ class MythExternRecApp : public QObject
 
 };
 
-#endif
+#endif // MYTHTVEXTERNRECAPP_H

@@ -4,8 +4,8 @@
  * Provide a generic interface for plugging in video frame analysis algorithms.
  */
 
-#ifndef __FRAMEANALYZER_H__
-#define __FRAMEANALYZER_H__
+#ifndef FRAMEANALYZER_H
+#define FRAMEANALYZER_H
 
 /* Base class for commercial flagging video frame analyzers. */
 
@@ -96,6 +96,6 @@ FrameAnalyzer::FrameMap::const_iterator frameMapSearchBackwards(
 
 }; /* namespace */
 
-#endif  /* !__FRAMEANALYZER_H__ */
+#endif  /* !FRAMEANALYZER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

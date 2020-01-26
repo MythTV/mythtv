@@ -1,5 +1,5 @@
-#ifndef _CLASSIC_COMMDETECTOR_H_
-#define _CLASSIC_COMMDETECTOR_H_
+#ifndef CLASSIC_COMMDETECTOR_H
+#define CLASSIC_COMMDETECTOR_H
 
 // C++ headers
 #include <cstdint>
@@ -187,7 +187,6 @@ public slots:
         void sceneChangeDetectorHasNewInformation(unsigned int framenum, bool isSceneChange,float debugValue);
 };
 
-#endif
-
+#endif // CLASSIC_COMMDETECTOR_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

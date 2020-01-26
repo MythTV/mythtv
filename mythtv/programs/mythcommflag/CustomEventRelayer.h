@@ -1,5 +1,5 @@
-#ifndef _CUSTOMEVENTRELAYER_H_
-#define _CUSTOMEVENTRELAYER_H_
+#ifndef CUSTOMEVENTRELAYER_H
+#define CUSTOMEVENTRELAYER_H
 
 #include <QObject>
 
@@ -42,7 +42,6 @@ class CustomEventRelayer : public QObject
     void (*m_fp)(QEvent*) {nullptr};
 };
 
-#endif
-
+#endif //  CUSTOMEVENTRELAYER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

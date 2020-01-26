@@ -1,5 +1,5 @@
-#ifndef __THEMECHOOSER_H__
-#define __THEMECHOOSER_H__
+#ifndef THEMECHOOSER_H
+#define THEMECHOOSER_H
 
 // Qt headers
 #include <QString>
@@ -115,6 +115,6 @@ class ThemeUpdateChecker : public QObject
     QString    m_newVersion;
 };
 
-#endif /* THEMECHOOSER */
+#endif /* THEMECHOOSER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

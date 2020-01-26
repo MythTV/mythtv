@@ -1,5 +1,5 @@
-#ifndef _CHANNELDATA_H_
-#define _CHANNELDATA_H_
+#ifndef CHANNELDATA_H
+#define CHANNELDATA_H
 
 // Qt headers
 #include <QString>
@@ -33,4 +33,4 @@ class ChannelData
     QString m_cardType;
 };
 
-#endif // _CHANNELDATA_H_
+#endif // CHANNELDATA_H

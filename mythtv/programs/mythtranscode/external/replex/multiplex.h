@@ -23,8 +23,8 @@
  * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
  *
  */
-#ifndef _MULTIPLEX_H_
-#define _MULTIPLEX_H_
+#ifndef MULTIPLEX_H
+#define MULTIPLEX_H
 
 #include "mpg_common.h"
 #include "pes.h"
@@ -95,4 +95,4 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 		     int otype);
 
 void setup_multiplex(multiplex_t *mx);
-#endif /* _MULTIPLEX_H_*/
+#endif /* MULTIPLEX_H */

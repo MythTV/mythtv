@@ -1,8 +1,8 @@
-#ifndef _MPEG_UTILS_H_
-#define _MPEG_UTILS_H_
+#ifndef MPEG_UTILS_H
+#define MPEG_UTILS_H
 
 #include "mythutil.h"
 
 void registerMPEGUtils(UtilMap &utilMap);
 
-#endif // _MPEG_UTILS_H_
+#endif // MPEG_UTILS_H

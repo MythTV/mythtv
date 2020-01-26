@@ -3,8 +3,8 @@
 
 */
 
-#ifndef _PES_H_
-#define _PES_H_
+#ifndef PES_H
+#define PES_H
 
 #include <cstdint>
 #include "ringbuffer.h"
@@ -129,7 +129,4 @@ static inline void ptsinc(uint64_t *pts1, uint64_t pts2)
 	*pts1 = (*pts1 + pts2)%MAX_PTS2;
 }
 
-
-
-
-#endif /*_PES_H_*/
+#endif /* PES_H */

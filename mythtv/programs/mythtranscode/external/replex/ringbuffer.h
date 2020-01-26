@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _RINGBUFFER_H_
-#define _RINGBUFFER_H_
+#ifndef RINGBUFFER_H
+#define RINGBUFFER_H
 
 #include <cstdio>
 #include <cstdint>
@@ -116,4 +116,4 @@
         void dummy_destroy(dummy_buffer *dbuf);
 	void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off);
 
-#endif /* _RINGBUFFER_H_ */
+#endif /* RINGBUFFER_H */
