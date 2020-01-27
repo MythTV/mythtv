@@ -513,7 +513,7 @@ void AudioOutputALSA::CloseDevice()
 }
 
 template <class AudioDataType>
-static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
+static inline void tReorderSmpteToAlsa(AudioDataType *buf, uint frames,
                                        uint extrach)
 {
     AudioDataType tmpC;
@@ -539,9 +539,9 @@ static inline void ReorderSmpteToAlsa(void *buf, uint frames,
 {
     switch(AudioOutputSettings::FormatToBits(format))
     {
-        case  8: _ReorderSmpteToAlsa((uchar *)buf, frames, extrach); break;
-        case 16: _ReorderSmpteToAlsa((short *)buf, frames, extrach); break;
-        default: _ReorderSmpteToAlsa((int   *)buf, frames, extrach); break;
+        case  8: tReorderSmpteToAlsa((uchar *)buf, frames, extrach); break;
+        case 16: tReorderSmpteToAlsa((short *)buf, frames, extrach); break;
+        default: tReorderSmpteToAlsa((int   *)buf, frames, extrach); break;
     }
 }
 

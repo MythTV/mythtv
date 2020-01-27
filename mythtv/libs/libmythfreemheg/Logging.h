@@ -29,20 +29,20 @@
 
 #define MHASSERT(f)          Q_ASSERT(f)
 
-extern int __mhlogoptions;
-extern void __mhlog(const QString& logtext);
-extern FILE *__mhlogStream;
+extern int  gMHLogoptions;
+extern void mhlog_fn(const QString& logtext);
+extern FILE *gMHLogStream;
 
 #define MHLOG(__level,__text) \
 do { \
-    if ((__level) & __mhlogoptions) \
-        __mhlog(__text); \
+    if ((__level) & gMHLogoptions) \
+        mhlog_fn(__text); \
 } while (false)
 
 #define MHERROR(__text) \
 do { \
-    if (MHLogError & __mhlogoptions) \
-        __mhlog(__text); \
+    if (MHLogError & gMHLogoptions) \
+        mhlog_fn(__text); \
     throw "Failed"; \
 } while (false)
 

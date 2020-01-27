@@ -142,7 +142,7 @@ void handleSIGUSR2(void);
 static bool gLoaded = false;
 #endif
 
-static const QString _Location = qApp->translate("(Common)",
+static const QString sLocation = qApp->translate("(Common)",
                                                  "MythFrontend");
 
 namespace
@@ -1321,7 +1321,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         {
             ShowNotificationError(qApp->translate("(MythFrontendMain)",
                                                   "DVD Failure"),
-                                                  _Location,
+                                                  sLocation,
                                                   dvd->GetLastError());
             delete dvd;
             delete pginfo;
@@ -1347,7 +1347,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             // ToDo: Change string to "BD Failure" after 0.28 is released
             ShowNotificationError(qApp->translate("(MythFrontendMain)",
                                                   "DVD Failure"),
-                                                  _Location,
+                                                  sLocation,
                                                   bd.GetLastError());
             delete pginfo;
             return res;

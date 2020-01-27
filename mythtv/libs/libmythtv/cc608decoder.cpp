@@ -854,23 +854,23 @@ static void DumpPIL(int pil)
     int hour = (pil >> 6 ) & 0x1F;
     int min  = (pil      ) & 0x3F;
 
-#define _PIL_(day, mon, hour, min) \
+#define PIL_TIME(day, mon, hour, min) \
   (((day) << 15) + ((mon) << 11) + ((hour) << 6) + ((min) << 0))
 
-    if (pil == _PIL_(0, 15, 31, 63))
+    if (pil == PIL_TIME(0, 15, 31, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Timer-control (no PDC)");
-    else if (pil == _PIL_(0, 15, 30, 63))
+    else if (pil == PIL_TIME(0, 15, 30, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Recording inhibit/terminate");
-    else if (pil == _PIL_(0, 15, 29, 63))
+    else if (pil == PIL_TIME(0, 15, 29, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Interruption");
-    else if (pil == _PIL_(0, 15, 28, 63))
+    else if (pil == PIL_TIME(0, 15, 28, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Continue");
-    else if (pil == _PIL_(31, 15, 31, 63))
+    else if (pil == PIL_TIME(31, 15, 31, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: No time");
     else
         LOG(VB_VBI, LOG_INFO, QString(" PDC: %1, 200X-%2-%3 %4:%5")
                 .arg(pil).arg(mon).arg(day).arg(hour).arg(min));
-#undef _PIL_
+#undef PIL_TIME
 }
 
 void CC608Decoder::DecodeVPS(const unsigned char *buf)

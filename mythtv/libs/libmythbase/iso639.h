@@ -11,7 +11,7 @@ class QStringList;
 
 #include "mythbaseexp.h"
 
-extern MBASE_PUBLIC QMap<int, QString> _iso639_key_to_english_name;
+extern MBASE_PUBLIC QMap<int, QString> iso639_key_to_english_name;
 
 /** \file iso639.h
  *  \brief ISO 639-1 and ISO 639-2 support functions

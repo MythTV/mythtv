@@ -156,7 +156,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
 }
 
 template <class AudioDataType>
-void _MuteChannel(AudioDataType *buffer, int channels, int ch, int frames)
+void tMuteChannel(AudioDataType *buffer, int channels, int ch, int frames)
 {
     AudioDataType *s1 = buffer + ch;
     AudioDataType *s2 = buffer - ch + 1;
@@ -181,11 +181,11 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
     int frames = bytes / ((obits >> 3) * channels);
 
     if (obits == 8)
-        _MuteChannel((uchar *)buffer, channels, ch, frames);
+        tMuteChannel((uchar *)buffer, channels, ch, frames);
     else if (obits == 16)
-        _MuteChannel((short *)buffer, channels, ch, frames);
+        tMuteChannel((short *)buffer, channels, ch, frames);
     else
-        _MuteChannel((int *)buffer, channels, ch, frames);
+        tMuteChannel((int *)buffer, channels, ch, frames);
 }
 
 #if HAVE_BIGENDIAN

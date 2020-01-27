@@ -21,7 +21,7 @@
 #include "gamescan.h"
 #include "gameui.h"
 
-static const QString _Location = "MythGame";
+static const QString sLocation = "MythGame";
 
 class GameTreeInfo
 {
@@ -629,7 +629,7 @@ void GameUI::customEvent(QEvent *event)
     else if (event->type() == ImageDLFailureEvent::kEventType)
     {
         MythErrorNotification n(tr("Failed to retrieve image(s)"),
-                                _Location,
+                                sLocation,
                                 tr("Check logs"));
         GetNotificationCenter()->Queue(n);
     }

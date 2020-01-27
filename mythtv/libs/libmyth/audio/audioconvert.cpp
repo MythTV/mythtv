@@ -732,7 +732,7 @@ void AudioConvert::MonoToStereo(void* dst, const void* src, int samples)
 }
 
 template <class AudioDataType>
-void _DeinterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames)
+void tDeinterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames)
 {
     AudioDataType* outp[8];
 
@@ -768,20 +768,20 @@ void AudioConvert::DeinterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _DeinterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
+        tDeinterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
     }
     else if (bits == 16)
     {
-        _DeinterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
+        tDeinterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
     }
     else
     {
-        _DeinterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
+        tDeinterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
     }
 }
 
 template <class AudioDataType>
-void _InterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
+void tInterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
                        const AudioDataType*  const* inp = nullptr)
 {
     const AudioDataType* my_inp[8];
@@ -830,17 +830,17 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _InterleaveSample((char*)output, (const char*)nullptr, channels, data_size/sizeof(char)/channels,
+        tInterleaveSample((char*)output, (const char*)nullptr, channels, data_size/sizeof(char)/channels,
                           (const char*  const*)input);
     }
     else if (bits == 16)
     {
-        _InterleaveSample((short*)output, (const short*)nullptr, channels, data_size/sizeof(short)/channels,
+        tInterleaveSample((short*)output, (const short*)nullptr, channels, data_size/sizeof(short)/channels,
                           (const short*  const*)input);
     }
     else
     {
-        _InterleaveSample((int*)output, (const int*)nullptr, channels, data_size/sizeof(int)/channels,
+        tInterleaveSample((int*)output, (const int*)nullptr, channels, data_size/sizeof(int)/channels,
                           (const int*  const*)input);
     }
 }
@@ -856,15 +856,15 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _InterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
+        tInterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
     }
     else if (bits == 16)
     {
-        _InterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
+        tInterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
     }
     else
     {
-        _InterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
+        tInterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
     }
 }
 

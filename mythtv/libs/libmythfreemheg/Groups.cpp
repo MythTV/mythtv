@@ -205,8 +205,8 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
         catch (...)
         {
             MHLOG(MHLogError, "ERROR in MHGroup::Initialise ingredient");
-            if (pIngredient && __mhlogStream)
-                pIngredient->PrintMe(__mhlogStream, 0);
+            if (pIngredient && gMHLogStream)
+                pIngredient->PrintMe(gMHLogStream, 0);
 
             delete(pIngredient);
             throw;

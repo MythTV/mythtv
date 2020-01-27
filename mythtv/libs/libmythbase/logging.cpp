@@ -910,14 +910,14 @@ void verboseInit(void)
 
     // This looks funky, so I'll put some explanation here.  The verbosedefs.h
     // file gets included as part of the mythlogging.h include, and at that
-    // time, the normal (without _IMPLEMENT_VERBOSE defined) code case will
-    // define the VerboseMask enum.  At this point, we force it to allow us
-    // to include the file again, but with _IMPLEMENT_VERBOSE set so that the
+    // time, the normal (without MYTH_IMPLEMENT_VERBOSE defined) code case will
+    // define the VerboseMask enum.  At this point, we force it to allow us to
+    // include the file again, but with MYTH_IMPLEMENT_VERBOSE set so that the
     // single definition of the VB_* values can be shared to define also the
     // contents of verboseMap, via repeated calls to verboseAdd()
 
 #undef VERBOSEDEFS_H_
-#define _IMPLEMENT_VERBOSE
+#define MYTH_IMPLEMENT_VERBOSE
 #include "verbosedefs.h"
 
     verboseInitialized = true;

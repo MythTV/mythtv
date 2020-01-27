@@ -44,13 +44,13 @@ QString MythRAOPConnection::g_rsaLastError;
 // anything lower than 50ms on windows, isn't reliable
 #define AUDIO_BUFFER     100
 
-class _NetStream : public QTextStream
+class RaopNetStream : public QTextStream
 {
 public:
-    explicit _NetStream(QIODevice *device) : QTextStream(device)
+    explicit RaopNetStream(QIODevice *device) : QTextStream(device)
     {
     };
-    _NetStream &operator<<(const QString &str)
+    RaopNetStream &operator<<(const QString &str)
     {
         LOG(VB_PLAYBACK, LOG_DEBUG,
             LOC + QString("Sending(%1): ").arg(str.length()) + str);
@@ -175,7 +175,7 @@ void MythRAOPConnection::CleanUp(void)
 bool MythRAOPConnection::Init(void)
 {
     // connect up the request socket
-    m_textStream = new _NetStream(m_socket);
+    m_textStream = new RaopNetStream(m_socket);
     m_textStream->setCodec("UTF-8");
     if (!connect(m_socket, SIGNAL(readyRead()), this, SLOT(readClient())))
     {
@@ -1420,7 +1420,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
     FinishResponse(m_textStream, m_socket, option, tags["CSeq"], responseData);
 }
 
-void MythRAOPConnection::FinishAuthenticationResponse(_NetStream *stream,
+void MythRAOPConnection::FinishAuthenticationResponse(RaopNetStream *stream,
                                                       QTcpSocket *socket,
                                                       QString &cseq)
 {
@@ -1438,7 +1438,7 @@ void MythRAOPConnection::FinishAuthenticationResponse(_NetStream *stream,
         .arg(cseq).arg(socket->flush()));
 }
 
-void MythRAOPConnection::FinishResponse(_NetStream *stream, QTcpSocket *socket,
+void MythRAOPConnection::FinishResponse(RaopNetStream *stream, QTcpSocket *socket,
                                         QString &option, QString &cseq, QString &responseData)
 {
     if (!stream)

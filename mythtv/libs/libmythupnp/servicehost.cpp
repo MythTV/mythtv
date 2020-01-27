@@ -18,7 +18,7 @@
 #include "xsd.h"
 //#include "services/rtti.h"
 
-#define _MAX_PARAMS 256
+static constexpr int MAX_PARAMS = 256;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -50,15 +50,15 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     QList<QByteArray> paramTypes = m_oMethod.parameterTypes();
 
     // ----------------------------------------------------------------------
-    // Create Parameter array (Can't have more than _MAX_PARAMS parameters)....
+    // Create Parameter array (Can't have more than MAX_PARAMS parameters)....
     // switched to static array for performance.
     // ----------------------------------------------------------------------
 
-    void *param[ _MAX_PARAMS ];
-    int   types[ _MAX_PARAMS ];
+    void *param[ MAX_PARAMS ];
+    int   types[ MAX_PARAMS ];
 
-    memset( param, 0, _MAX_PARAMS * sizeof(void *));
-    memset( types, 0, _MAX_PARAMS * sizeof(int));
+    memset( param, 0, MAX_PARAMS * sizeof(void *));
+    memset( types, 0, MAX_PARAMS * sizeof(int));
 
     try
     {

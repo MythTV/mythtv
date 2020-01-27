@@ -129,7 +129,7 @@ static void bd_logger(const char* msg)
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("libbluray: %1").arg(QString(msg).trimmed()));
 }
 
-static int _img_read(void *handle, void *buf, int lba, int num_blocks)
+static int img_read(void *handle, void *buf, int lba, int num_blocks)
 {
     int result = -1;
 
@@ -191,7 +191,7 @@ BDInfo::BDInfo(const QString &filename)
             m_bdnav = bd_init();
 
             if (m_bdnav)
-                bd_open_stream(m_bdnav, &imgHandle, _img_read);
+                bd_open_stream(m_bdnav, &imgHandle, img_read);
         }
     }
     else
@@ -573,7 +573,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
             m_bdnav = bd_init();
 
             if (m_bdnav)
-                bd_open_stream(m_bdnav, &m_imgHandle, _img_read);
+                bd_open_stream(m_bdnav, &m_imgHandle, img_read);
         }
     }
     else

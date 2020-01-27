@@ -116,7 +116,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool ScanExistingTransports(uint sourceid, bool follow_nit);
 
     void SetAnalog(bool is_analog);
-    void SetSourceID(int _SourceID)   { m_sourceID                = _SourceID; }
+    void SetSourceID(int SourceID)     { m_sourceID = SourceID; }
     void SetSignalTimeout(uint val)    { m_signalTimeout = val; }
     void SetChannelTimeout(uint val)   { m_channelTimeout = val; }
     void SetScanDTVTunerType(DTVTunerType t) { m_scanDTVTunerType = t; }

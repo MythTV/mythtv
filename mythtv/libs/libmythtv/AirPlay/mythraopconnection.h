@@ -25,7 +25,7 @@ class QUdpSocket;
 class QTimer;
 class AudioOutput;
 class ServerPool;
-class _NetStream;
+class RaopNetStream;
 
 using RawHash = QHash<QString,QString>;
 
@@ -79,9 +79,9 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     void     ResetAudio(void);
     void     ProcessRequest(const QStringList &header,
                             const QByteArray &content);
-    static void  FinishResponse(_NetStream *stream, QTcpSocket *socket,
+    static void  FinishResponse(RaopNetStream *stream, QTcpSocket *socket,
                                 QString &option, QString &cseq, QString &responseData);
-    void     FinishAuthenticationResponse(_NetStream *stream, QTcpSocket *socket,
+    void     FinishAuthenticationResponse(RaopNetStream *stream, QTcpSocket *socket,
                                           QString &cseq);
 
     static RawHash  FindTags(const QStringList &lines);
@@ -114,7 +114,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     QTimer         *m_watchdogTimer       {nullptr};
     // comms socket
     QTcpSocket     *m_socket              {nullptr};
-    _NetStream     *m_textStream          {nullptr};
+    RaopNetStream  *m_textStream          {nullptr};
     QByteArray      m_hardwareId;
     QStringList     m_incomingHeaders;
     QByteArray      m_incomingContent;

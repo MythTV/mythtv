@@ -61,7 +61,7 @@ using namespace std;
 
 MythContext *gContext = nullptr;
 
-static const QString _Location = "MythContext";
+static const QString sLocation = "MythContext";
 
 class MythContextPrivate : public QObject
 {
@@ -216,7 +216,7 @@ static void configplugin_cb(const QString &cmd)
 
     if (GetNotificationCenter() && pmanager->config_plugin(cmd.trimmed()))
     {
-        ShowNotificationError(cmd, _Location,
+        ShowNotificationError(cmd, sLocation,
                               QObject::tr("Failed to configure plugin"));
     }
 }
@@ -230,7 +230,7 @@ static void plugin_cb(const QString &cmd)
     if (GetNotificationCenter() && pmanager->run_plugin(cmd.trimmed()))
     {
         ShowNotificationError(QObject::tr("Plugin failure"),
-                              _Location,
+                              sLocation,
                               QObject::tr("%1 failed to run for some reason").arg(cmd));
     }
 }
@@ -1408,7 +1408,7 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
             "mythtv-setup correct?");
 
     QString message = QObject::tr("Could not connect to master backend");
-    MythErrorNotification n(message, _Location, description);
+    MythErrorNotification n(message, sLocation, description);
     n.SetId(m_registration);
     n.SetParent(this);
     GetNotificationCenter()->Queue(n);
@@ -1422,7 +1422,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     if (!m_lastCheck.isValid())
         return;
 
-    MythCheckNotification n(QObject::tr("Backend is online"), _Location);
+    MythCheckNotification n(QObject::tr("Backend is online"), sLocation);
     n.SetId(m_registration);
     n.SetParent(this);
     n.SetDuration(5);

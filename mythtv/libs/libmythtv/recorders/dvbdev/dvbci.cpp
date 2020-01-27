@@ -60,11 +60,11 @@
 
 
 // Set these to 'true' for debug output:
-static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = false;
-static bool _connected = false;
+static bool sDumpTPDUDataTransfer = false;
+static bool sDebugProtocol = false;
+static bool sConnected = false;
 
-#define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
+#define dbgprotocol(a...) if (sDebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString::asprintf(a))
 
 #define OK       0
 #define TIMEOUT (-1)
@@ -323,7 +323,7 @@ int cTPDU::Read(int fd)
 
 void cTPDU::Dump(bool Outgoing)
 {
-  if (DumpTPDUDataTransfer) {
+  if (sDumpTPDUDataTransfer) {
 #define MAX_DUMP 256
      QString msg = QString("%1 ").arg(Outgoing ? "-->" : "<--");
      for (int i = 0; i < m_size && i < MAX_DUMP; i++)
@@ -521,7 +521,7 @@ int cCiTransportConnection::CreateConnection(void)
      if (SendTPDU(T_CREATE_TC) == OK) {
         m_state = stCREATION;
         if (RecvTPDU() == T_CTC_REPLY) {
-           _connected=true;
+           sConnected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
         }
@@ -530,7 +530,7 @@ int cCiTransportConnection::CreateConnection(void)
             dsyslog("CAM: retrying to establish connection");
             if (RecvTPDU() == T_CTC_REPLY) {
                 dsyslog("CAM: connection established");
-                _connected=true;
+                sConnected=true;
                 return OK;
             }
         }
@@ -1852,7 +1852,7 @@ bool cLlCiHandler::Reset(int Slot)
 
 bool cLlCiHandler::connected()
 {
-  return _connected;
+  return sConnected;
 }
 
 // -- cHlCiHandler -------------------------------------------------------------

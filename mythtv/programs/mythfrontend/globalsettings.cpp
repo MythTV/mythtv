@@ -3067,8 +3067,8 @@ static void ISO639_fill_selections(MythUIComboBoxSetting *widget, uint i)
         lang = iso639_str2_to_str3(gCoreContext->GetLanguage().toLower());
     }
 
-    QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
-    QMap<int,QString>::iterator ite = _iso639_key_to_english_name.end();
+    QMap<int,QString>::iterator it  = iso639_key_to_english_name.begin();
+    QMap<int,QString>::iterator ite = iso639_key_to_english_name.end();
 
     for (; it != ite; ++it)
     {
