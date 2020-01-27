@@ -146,6 +146,12 @@ void ExitPrompter::HandleExit()
     bool havereboot   = !m_rebootCommand.isEmpty();
     bool havesuspend  = !m_suspendCommand.isEmpty();
 
+#ifdef Q_OS_ANDROID
+    haveshutdown = false;
+    havereboot   = false;
+    havesuspend  = false;
+#endif
+
     if (m_power)
     {
         havereboot   |= m_power->IsFeatureSupported(MythPower::FeatureRestart);

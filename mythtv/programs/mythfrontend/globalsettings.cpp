@@ -1955,6 +1955,7 @@ static HostComboBoxSetting *OverrideExitMenu(MythPower *Power)
     return gc;
 }
 
+#ifndef Q_OS_ANDROID
 static HostTextEditSetting *RebootCommand(MythPower *Power)
 {
     auto *ge = new HostTextEditSetting("RebootCommand");
@@ -2011,6 +2012,7 @@ static HostTextEditSetting *HaltCommand(MythPower *Power)
     ge->setHelpText(help);
     return ge;
 }
+#endif
 
 static HostTextEditSetting *LircDaemonDevice()
 {
@@ -3953,9 +3955,11 @@ ShutDownRebootSetting::ShutDownRebootSetting()
     addChild(FrontendIdleTimeout());
     auto *power = MythPower::AcquireRelease(this, true);
     addChild(m_overrideExitMenu = OverrideExitMenu(power));
+#ifndef Q_OS_ANDROID
     addChild(m_haltCommand      = HaltCommand(power));
     addChild(m_rebootCommand    = RebootCommand(power));
     addChild(m_suspendCommand   = SuspendCommand(power));
+#endif
     if (power)
         MythPower::AcquireRelease(this, false);
     connect(m_overrideExitMenu,SIGNAL(valueChanged(StandardSetting *)),
@@ -3964,6 +3968,9 @@ ShutDownRebootSetting::ShutDownRebootSetting()
 
 void ShutDownRebootSetting::childChanged(StandardSetting*)
 {
+    if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand)
+        return;
+
     switch (m_overrideExitMenu->getValue().toInt())
     {
         case 2:
