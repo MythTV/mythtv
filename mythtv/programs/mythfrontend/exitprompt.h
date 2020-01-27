@@ -25,4 +25,5 @@ class ExitPrompter : public QObject
     MythPower* m_power { nullptr };
     QString    m_haltCommand;
     QString    m_rebootCommand;
+    QString    m_suspendCommand;
 };

@@ -15,8 +15,9 @@
 ExitPrompter::ExitPrompter()
   : m_power(MythPower::AcquireRelease(this, true))
 {
-    m_haltCommand = gCoreContext->GetSetting("HaltCommand","");
-    m_rebootCommand = gCoreContext->GetSetting("RebootCommand","");
+    m_haltCommand = gCoreContext->GetSetting("HaltCommand", "");
+    m_rebootCommand = gCoreContext->GetSetting("RebootCommand", "");
+    m_suspendCommand = gCoreContext->GetSetting("SuspendCommand", "");
 }
 
 ExitPrompter::~ExitPrompter()
@@ -101,6 +102,18 @@ void ExitPrompter::DoSuspend(bool Confirmed)
     if (!Confirmed)
         return;
 
+    // Use user specified command if it exists
+    if (!m_suspendCommand.isEmpty())
+    {
+        uint ret = myth_system(m_suspendCommand);
+        if (ret == GENERIC_EXIT_OK)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            "User defined SuspendCommand failed, falling back to "
+            "alternative methods.");
+    }
+
     if (m_power && m_power->IsFeatureSupported(MythPower::FeatureSuspend))
         m_power->RequestFeature(MythPower::FeatureSuspend);
 }
@@ -131,13 +144,13 @@ void ExitPrompter::HandleExit()
 
     bool haveshutdown = !m_haltCommand.isEmpty();
     bool havereboot   = !m_rebootCommand.isEmpty();
-    bool havesuspend  = false;
+    bool havesuspend  = !m_suspendCommand.isEmpty();
 
     if (m_power)
     {
         havereboot   |= m_power->IsFeatureSupported(MythPower::FeatureRestart);
         haveshutdown |= m_power->IsFeatureSupported(MythPower::FeatureShutdown);
-        havesuspend   = m_power->IsFeatureSupported(MythPower::FeatureSuspend);
+        havesuspend  |= m_power->IsFeatureSupported(MythPower::FeatureSuspend);
     }
 
     switch (gCoreContext->GetNumSetting("OverrideExitMenu", 0))
