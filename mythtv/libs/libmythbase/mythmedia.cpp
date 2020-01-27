@@ -64,6 +64,10 @@ const char* MythMediaDevice::MediaErrorStrings[] =
 QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+MythMediaEvent::~MythMediaEvent()
+{
+}
+
 ext_to_media_t MythMediaDevice::s_ext_to_media;
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,

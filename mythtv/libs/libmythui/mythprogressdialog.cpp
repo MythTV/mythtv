@@ -12,6 +12,10 @@
 QEvent::Type ProgressUpdateEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+ProgressUpdateEvent::~ProgressUpdateEvent()
+{
+}
+
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)

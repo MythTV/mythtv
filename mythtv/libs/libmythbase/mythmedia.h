@@ -185,6 +185,7 @@ class MBASE_PUBLIC MythMediaEvent : public QEvent
   public:
     MythMediaEvent(MythMediaStatus oldStatus, MythMediaDevice *pDevice) :
         QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
+    ~MythMediaEvent() override;
 
     MythMediaStatus getOldStatus(void) const { return m_OldStatus; }
     MythMediaDevice* getDevice(void) { return m_Device; }

@@ -99,6 +99,8 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
         (gesture >= MaxGesture) ? m_gesture = MaxGesture : m_gesture = gesture;
     }
 
+    ~MythGestureEvent() override;
+
     /**
      * \brief Get the gesture type.
      * \return The gesture value corresponding to the Gesture
