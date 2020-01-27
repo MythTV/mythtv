@@ -128,12 +128,7 @@ MythPower::MythPower()
 
 void MythPower::Init(void)
 {
-    QStringList supported;
-    if (m_features.testFlag(FeatureSuspend))     supported << FeatureToString(FeatureSuspend);
-    if (m_features.testFlag(FeatureHibernate))   supported << FeatureToString(FeatureHibernate);
-    if (m_features.testFlag(FeatureRestart))     supported << FeatureToString(FeatureRestart);
-    if (m_features.testFlag(FeatureShutdown))    supported << FeatureToString(FeatureShutdown);
-    if (m_features.testFlag(FeatureHybridSleep)) supported << FeatureToString(FeatureHybridSleep);
+    QStringList supported = GetFeatureList();
     if (supported.isEmpty())
         supported << "None";
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Supported actions: %1").arg(supported.join(",")));
@@ -151,6 +146,18 @@ MythPower::Features MythPower::GetFeatures(void)
     result = m_features;
     s_lock.unlock();
     return result;
+}
+
+QStringList MythPower::GetFeatureList(void)
+{
+    QStringList supported;
+    MythPower::Features features = GetFeatures();
+    if (features.testFlag(FeatureSuspend))     supported << FeatureToString(FeatureSuspend);
+    if (features.testFlag(FeatureHibernate))   supported << FeatureToString(FeatureHibernate);
+    if (features.testFlag(FeatureRestart))     supported << FeatureToString(FeatureRestart);
+    if (features.testFlag(FeatureShutdown))    supported << FeatureToString(FeatureShutdown);
+    if (features.testFlag(FeatureHybridSleep)) supported << FeatureToString(FeatureHybridSleep);
+    return supported;
 }
 
 bool MythPower::IsFeatureSupported(Feature Supported)

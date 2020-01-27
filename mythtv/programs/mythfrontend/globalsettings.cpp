@@ -48,6 +48,7 @@
 #ifdef USING_VAAPI
 #include "decoders/mythvaapicontext.h"
 #endif
+#include "mythpower.h"
 
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
@@ -1929,11 +1930,30 @@ static HostComboBoxSetting *OverrideExitMenu()
     gc->addSelection(MainGeneralSettings::tr("Show standby"), "7");
     gc->addSelection(MainGeneralSettings::tr("Show suspend"), "8");
 
-    gc->setHelpText(
-        MainGeneralSettings::tr("By default, only remote frontends are shown "
-                                 "the shutdown option on the exit menu. Here "
-                                 "you can force specific shutdown and reboot "
-                                 "options to be displayed."));
+    QString helptext = MainGeneralSettings::tr("By default, only remote frontends are shown "
+                                               "the shutdown option on the exit menu. Here "
+                                               "you can force specific shutdown and reboot "
+                                               "options to be displayed.");
+    MythPower* power = MythPower::AcquireRelease(gc, true);
+    if (power)
+    {
+        QStringList supported = power->GetFeatureList();
+        if (!supported.isEmpty())
+        {
+            helptext.prepend(MainGeneralSettings::tr(
+                "This system supports '%1' without additional setup. ")
+                .arg(supported.join(", ")));
+        }
+        else
+        {
+            helptext.append(MainGeneralSettings::tr(
+                " This system appears to have no power options available. Try "
+                "setting the Halt/Reboot commands below."));
+        }
+        MythPower::AcquireRelease(gc, false);
+    }
+    gc->setHelpText(helptext);
+
     return gc;
 }
 
