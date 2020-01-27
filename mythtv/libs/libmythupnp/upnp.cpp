@@ -40,8 +40,20 @@ Configuration   *UPnp::g_pConfig        = nullptr;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
+  : QObject()
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
+    // N.B. Ask for 5 second delay to send Bye Bye twice
+    // TODO Check whether we actually send Bye Bye twice:)
+    m_power = MythPower::AcquireRelease(this, true, 5);
+    if (m_power)
+    {
+        // NB We only listen for WillXXX signals which should give us time to send notifications
+        connect(m_power, &MythPower::WillRestart,  this, &UPnp::DisableNotifications);
+        connect(m_power, &MythPower::WillSuspend,  this, &UPnp::DisableNotifications);
+        connect(m_power, &MythPower::WillShutDown, this, &UPnp::DisableNotifications);
+        connect(m_power, &MythPower::WokeUp,       this, &UPnp::EnableNotificatins);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,6 +64,8 @@ UPnp::~UPnp()
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Destructor");
     CleanUp();
+    if (m_power)
+        MythPower::AcquireRelease(this, false);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -318,4 +332,14 @@ void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
                                .arg(url.toString()));
 
     pRequest->SendResponse();
+}
+
+void UPnp::DisableNotifications(uint)
+{
+    SSDP::Instance()->DisableNotifications();
+}
+
+void UPnp::EnableNotificatins(qint64)
+{
+    SSDP::Instance()->EnableNotifications(m_nServicePort);
 }
