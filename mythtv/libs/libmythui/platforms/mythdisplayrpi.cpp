@@ -101,7 +101,7 @@ MythDisplayRPI::~MythDisplayRPI()
     vchi_disconnect(m_vchiInstance);
 }
 
-void MythDisplayRPI::Callback(uint32_t Reason, uint32_t Param1, uint32_t Param2)
+void MythDisplayRPI::Callback(uint32_t Reason, uint32_t, uint32_t)
 {
     if (Reason == VC_HDMI_DVI || Reason == VC_HDMI_HDMI)
         m_modeChangeWait.wakeAll();

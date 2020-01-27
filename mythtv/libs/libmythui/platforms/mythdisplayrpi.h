@@ -26,7 +26,7 @@ class MythDisplayRPI : public MythDisplay
     bool  UsingVideoModes   (void) override final;
     bool  SwitchToVideoMode (QSize Size, double Framerate) override final;
     const vector<MythDisplayMode>& GetVideoModes(void) override final;
-    void  Callback(uint32_t Reason, uint32_t Param1, uint32_t Param2);
+    void  Callback(uint32_t Reason, uint32_t, uint32_t);
 
   private:
     void  GetEDID(void);
