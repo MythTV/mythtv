@@ -22,7 +22,6 @@
 
 extern "C" {
 #include <cinttypes>
-#include "ivtv_myth.h"
 #include "vbitext/vt.h"
 }
 

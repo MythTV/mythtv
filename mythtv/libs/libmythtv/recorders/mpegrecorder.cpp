@@ -32,13 +32,6 @@ using namespace std;
 #include "mythdate.h"
 #include "cardutil.h"
 
-// ivtv header
-extern "C" {
-#include "ivtv_myth.h"
-}
-
-#define IVTV_KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-
 #define LOC QString("MPEGRec[%1](%2): ") \
             .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)
 
