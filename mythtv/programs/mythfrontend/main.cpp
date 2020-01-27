@@ -1207,8 +1207,7 @@ static void handleExit(bool prompt)
     {
         if (!g_exitPopup)
             g_exitPopup = new ExitPrompter();
-
-        g_exitPopup->handleExit();
+        g_exitPopup->HandleExit();
     }
     else
         qApp->quit();

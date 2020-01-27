@@ -29,7 +29,7 @@ QMutex MythPower::s_lock(QMutex::Recursive);
  * for at least that period of time. This behaviour is not guaranteed - most
  * notably in the case of externally triggered events. The actual delay attempted
  * will be the maximum of those registered and, in the case of user initiated
- * events, the EXIT_SHUTDOWN_DELAY user setting (which defaults to 5 seconds).
+ * events, the EXIT_SHUTDOWN_DELAY user setting (which defaults to 3 seconds).
  *
  * There is no method to subsequently alter the delay. Should this be needed, release
  * the current reference and re-acquire with a new MinimumDelay. To ensure the
@@ -181,7 +181,7 @@ bool MythPower::RequestFeature(Feature Request, bool Delay)
     // N.B Always check for a new user delay value as this class is persistent.
     // Default is user preference, limited by the maximum supported system value
     // and possibly overriden by the maximum delay requested by other Myth classes.
-    int user = gCoreContext->GetNumSetting("EXIT_SHUTDOWN_DELAY", 5);
+    int user = gCoreContext->GetNumSetting("EXIT_SHUTDOWN_DELAY", 3);
     uint delay = qMin(qMax(static_cast<uint>(user), m_maxRequestedDelay), m_maxSupportedDelay);
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Delay: %1 User: %2 Requested: %3 Supported: %4")

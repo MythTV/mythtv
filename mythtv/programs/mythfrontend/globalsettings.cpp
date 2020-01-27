@@ -1919,6 +1919,7 @@ static HostComboBoxSetting *OverrideExitMenu()
 
     gc->addSelection(MainGeneralSettings::tr("Default"), "0");
     gc->addSelection(MainGeneralSettings::tr("Show quit"), "1");
+    gc->addSelection(MainGeneralSettings::tr("Show quit and suspend"), "9");
     gc->addSelection(MainGeneralSettings::tr("Show quit and shutdown"), "2");
     gc->addSelection(MainGeneralSettings::tr("Show quit, reboot and shutdown"),
                      "3");
@@ -1926,6 +1927,7 @@ static HostComboBoxSetting *OverrideExitMenu()
     gc->addSelection(MainGeneralSettings::tr("Show reboot"), "5");
     gc->addSelection(MainGeneralSettings::tr("Show reboot and shutdown"), "6");
     gc->addSelection(MainGeneralSettings::tr("Show standby"), "7");
+    gc->addSelection(MainGeneralSettings::tr("Show suspend"), "8");
 
     gc->setHelpText(
         MainGeneralSettings::tr("By default, only remote frontends are shown "
