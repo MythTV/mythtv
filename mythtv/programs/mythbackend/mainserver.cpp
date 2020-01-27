@@ -3265,6 +3265,8 @@ bool MainServer::HandleAddChildInput(uint inputid)
                             "Failed to initialize input %1").arg(childid));
                 delete tv;
                 CardUtil::DeleteInput(childid);
+                TVRec::s_inputsLock.unlock();
+                m_addChildInputLock.unlock();
                 return false;
             }
 
@@ -3280,6 +3282,8 @@ bool MainServer::HandleAddChildInput(uint inputid)
                     QString("HandleAddChildInput: "
                             "Failed to add remote input %1").arg(childid));
                 CardUtil::DeleteInput(childid);
+                TVRec::s_inputsLock.unlock();
+                m_addChildInputLock.unlock();
                 return false;
             }
 
@@ -3302,6 +3306,8 @@ bool MainServer::HandleAddChildInput(uint inputid)
                 QString("HandleAddChildInput: "
                         "Failed to initialize input %1").arg(inputid));
             delete tv;
+            TVRec::s_inputsLock.unlock();
+            m_addChildInputLock.unlock();
             return false;
         }
 
