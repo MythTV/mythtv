@@ -796,9 +796,14 @@ void StandardSettingDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
+#ifdef ANDROID
+        // for unknown reaons the dynamic cast does not work on android
+        auto dce = static_cast<DialogCompletionEvent*>(event);
+#else
         auto dce = dynamic_cast<DialogCompletionEvent*>(event);
         if (dce == nullptr)
             return;
+#endif
         QString resultid  = dce->GetId();
 
         if (resultid == "leveldown")
