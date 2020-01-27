@@ -414,7 +414,7 @@ void MythDialogBox::SendEvent(int res, const QString& text, const QVariant& data
         if (!m_currentMenu->m_retObject)
             return;
 
-        auto *dce = new DialogCompletionEvent(m_currentMenu->m_resultid, res, text, data);
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_currentMenu->m_resultid, res, text, data);
         QCoreApplication::postEvent(m_currentMenu->m_retObject, dce);
     }
     else
@@ -424,7 +424,7 @@ void MythDialogBox::SendEvent(int res, const QString& text, const QVariant& data
         if (!m_retObject)
             return;
 
-        auto *dce = new DialogCompletionEvent(m_id, res, text, data);
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
         QCoreApplication::postEvent(m_retObject, dce);
     }
 }
