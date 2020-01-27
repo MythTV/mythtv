@@ -70,6 +70,30 @@ void* MythEGL::GetEGLDisplay(void)
     return m_eglDisplay;
 }
 
+QString MythEGL::GetEGLVendor(void)
+{
+#ifdef USING_EGL
+    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display == EGL_NO_DISPLAY)
+        return EGL_NO_VENDOR;
+
+    int major = 1;
+    int minor = 2;
+    if (!eglInitialize(display, &major, &minor))
+    {
+        // This may not be needed
+        eglTerminate(display);
+        return EGL_NO_VENDOR;
+    }
+
+    QString vendor = QString(reinterpret_cast<const char*>(eglQueryString(display, EGL_VENDOR)));
+    eglTerminate(display);
+    return vendor;
+#else
+    return EGL_NO_VENDOR;
+#endif
+}
+
 qint32 MythEGL::GetEGLError(void)
 {
 #ifdef USING_EGL

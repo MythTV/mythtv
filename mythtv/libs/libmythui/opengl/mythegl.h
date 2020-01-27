@@ -13,6 +13,8 @@ using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
 
 class MythRenderOpenGL;
 
+#define EGL_NO_VENDOR (QString("unknown"))
+
 class MUI_PUBLIC MythEGL
 {
   public:
@@ -27,6 +29,7 @@ class MUI_PUBLIC MythEGL
     void* eglCreateImageKHR          (void* Disp, void* Context, unsigned int Target,
                                       void* Buffer, const int32_t *Attributes);
     void  eglDestroyImageKHR         (void* Disp, void* Image);
+    static QString GetEGLVendor(void);
 
   private:
     Q_DISABLE_COPY(MythEGL)
