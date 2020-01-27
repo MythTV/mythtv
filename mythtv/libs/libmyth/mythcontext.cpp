@@ -1647,12 +1647,14 @@ bool MythContext::Init(const bool gui,
         d->m_settingsCacheDirty = false;
     }
     gCoreContext->ActivateSettingsCache(true);
+    gCoreContext->InitPower();
 
     return true;
 }
 
 MythContext::~MythContext()
 {
+    gCoreContext->InitPower(false /*destroy*/);
     if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
