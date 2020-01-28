@@ -1385,20 +1385,39 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     };
 
     // If the first choice rate is unusual, see if there is something more 'usual'
-    if (Sanitise && !IsStandard(rates.front()))
+    double detected = rates.front();
+    if (Sanitise && !IsStandard(detected))
     {
         for (auto rate : rates)
         {
             if (IsStandard(rate))
             {
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 is non-standard. Selecting %2 instead.")
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 is non-standard - using %2 instead.")
                     .arg(rates.front()).arg(rate));
+
+                // The most common problem here is mpegts files where the average
+                // rate is slightly out and the estimated rate is the fallback.
+                // As noted above, however, the estimated rate is sometimes twice
+                // the actual for interlaced content. Try and detect and fix this
+                // so that we don't throw out deinterlacing and video mode switching.
+                // Assume anything under 30 may be interlaced - with +-10% error.
+                if (rate > 33.0 && detected < 33.0)
+                {
+                    double half = rate / 2.0;
+                    if (qAbs(half - detected) < (half * 0.1))
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, LOC +
+                            QString("Assuming %1 is a better choice than %2")
+                            .arg(half).arg(rate));
+                        return static_cast<float>(half);
+                    }
+                }
                 return static_cast<float>(rate);
             }
         }
     }
 
-    return static_cast<float>(rates.front());
+    return static_cast<float>(detected);
 }
 
 #ifdef USING_DXVA2
