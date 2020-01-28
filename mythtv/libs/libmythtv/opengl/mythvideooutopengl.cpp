@@ -259,7 +259,7 @@ void MythVideoOutputOpenGL::SetVideoFrameRate(float NewRate)
     if (qFuzzyCompare(m_dbDisplayProfile->GetOutput() + 1.0F, NewRate + 1.0F))
         return;
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video frame rate changed: %1->%2)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video frame rate changed: %1->%2")
         .arg(static_cast<double>(m_dbDisplayProfile->GetOutput())).arg(static_cast<double>(NewRate)));
     m_dbDisplayProfile->SetOutput(NewRate);
     m_newFrameRate = true;

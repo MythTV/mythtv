@@ -40,7 +40,6 @@ class RemoteEncoder;
 class MythSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
-class VideoSync;
 class LiveTVChain;
 class TV;
 struct SwsContext;
@@ -851,10 +850,8 @@ class MTV_PUBLIC MythPlayer
     bool       m_fileChanged              {false};
 
     // Audio and video synchronization stuff
-    VideoSync *m_videoSync                {nullptr};
     int        m_avsyncAvg                {0};
     int        m_avsyncPredictor          {0};
-    int        m_refreshRate              {0};
     int64_t    m_dispTimecode             {0};
     bool       m_avsyncAudioPaused        {false};
     int64_t    m_rtcBase                  {0}; // real time clock base for presentation time (microsecs)
