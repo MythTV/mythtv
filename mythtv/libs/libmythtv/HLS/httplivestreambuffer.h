@@ -110,7 +110,9 @@ private:
     mutable QMutex      m_lock;     // protect general class members
     bool                m_meta    {false}; // meta playlist
     bool                m_error   {false}; // parsing error
+#ifdef USING_LIBCRYPTO
     bool                m_aesmsg  {false}; // only print one time that the media is encrypted
+#endif
     int                 m_startup {0};  // starting segment (where seek start)
     /**
      * assumed bitrate of playback
