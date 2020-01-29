@@ -6910,7 +6910,9 @@ elif enabled clangxx; then
     # Flag implicit fallthrough in case statements
     check_cxxflags -Wimplicit-fallthrough
     # Clang needs this to link on Fedora
-    add_extralibs -lstdc++
+    if [ $target_os != "android" ] ; then
+        add_extralibs -lstdc++
+    fi
     # Don't complain about over-aligned types.
     case $target_os in
         freebsd)
