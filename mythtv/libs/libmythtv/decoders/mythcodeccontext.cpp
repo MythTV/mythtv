@@ -115,6 +115,9 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 {
     QStringList decoders;
 
+#ifdef USING_VDPAU
+    MythVDPAUHelper::GetDecoderList(decoders);
+#endif
 #ifdef USING_VAAPI
     MythVAAPIContext::GetDecoderList(decoders);
 #endif
