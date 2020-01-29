@@ -208,9 +208,9 @@ const vector<MythDisplayMode>& MythDisplayRPI::GetVideoModes(void)
                 continue;
             }
 
-            if (!modes[j].scan_mode)
+            if (modes[j].scan_mode)
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring progressive mode %1x%2 %3")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3")
                     .arg(modes[j].width).arg(modes[j].height).arg(modes[j].frame_rate));
                 continue;
             }
