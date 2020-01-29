@@ -127,6 +127,12 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 #ifdef USING_NVDEC
     MythNVDECContext::GetDecoderList(decoders);
 #endif
+#ifdef USING_MMAL
+    MythMMALContext::GetDecoderList(decoders);
+#endif
+#ifdef USING_V4L2
+    MythV4L2M2MContext::GetDecoderList(decoders);
+#endif
     return decoders;
 }
 
@@ -201,12 +207,15 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_MMAL
-    Opts.decoders->append("mmal-dec");
-    (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-    if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
+    if (MythMMALContext::HaveMMAL())
     {
-        Opts.decoders->append("mmal");
-        (*Opts.equiv_decoders)["mmal"].append("dummy");
+        Opts.decoders->append("mmal-dec");
+        (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
+        if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
+        {
+            Opts.decoders->append("mmal");
+            (*Opts.equiv_decoders)["mmal"].append("dummy");
+        }
     }
 #endif
 }

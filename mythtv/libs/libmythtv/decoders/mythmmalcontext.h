@@ -5,6 +5,8 @@
 #include "mythcodeccontext.h"
 #include "mythmmalinterop.h"
 
+using MMALProfiles = QList<MythCodecContext::CodecProfile>;
+
 class MythMMALContext : public MythCodecContext
 {
   public:
@@ -22,8 +24,11 @@ class MythMMALContext : public MythCodecContext
     static bool GetBuffer               (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
     bool        GetBuffer2              (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
     static enum AVPixelFormat GetFormat (AVCodecContext*, const AVPixelFormat *PixFmt);
+    static void GetDecoderList          (QStringList &Decoders);
+    static bool HaveMMAL                (void);
 
   protected:
+    static const MMALProfiles& GetProfiles(void);
     MythMMALInterop* m_interop { nullptr };
 };
 

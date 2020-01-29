@@ -2,11 +2,6 @@
 #include "decoders/avformatdecoder.h"
 #include "mythmmalcontext.h"
 
-// Broadcom
-extern "C" {
-#include "interface/vmcs_host/vc_vchi_gencmd.h"
-}
-
 // FFmpeg
 extern "C" {
 #include "libavutil/opt.h"
@@ -39,54 +34,22 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     // Only MPEG2, MPEG4, VC1 and H264 supported (and HEVC will never be supported)
-    QString codecstr;
+    MythCodecContext::CodecProfile mythprofile = MythCodecContext::NoProfile;
     switch ((*Codec)->id)
     {
-        case AV_CODEC_ID_MPEG2VIDEO: codecstr = "MPG2"; break;
-        case AV_CODEC_ID_MPEG4: codecstr = "MPG4"; break;
-        case AV_CODEC_ID_VC1: codecstr = "WVC1"; break;
-        case AV_CODEC_ID_H264: codecstr = "H264"; break;
+        case AV_CODEC_ID_MPEG2VIDEO: mythprofile = MythCodecContext::MPEG2; break;
+        case AV_CODEC_ID_MPEG4:      mythprofile = MythCodecContext::MPEG4; break;
+        case AV_CODEC_ID_VC1:        mythprofile = MythCodecContext::VC1;   break;
+        case AV_CODEC_ID_H264:       mythprofile = MythCodecContext::H264;  break;
         default: break;
     }
 
-    if (codecstr.isEmpty())
+    if (mythprofile == MythCodecContext::NoProfile)
         return failure;
 
     // check actual decoder support
-    vcos_init();
-    VCHI_INSTANCE_T vchi_instance;
-    if (vchi_initialise(&vchi_instance) != 0)
-        return failure;
-    if (vchi_connect(nullptr, 0, vchi_instance) != 0)
-        return failure;
-    VCHI_CONNECTION_T *vchi_connection = nullptr;
-    vc_vchi_gencmd_init(vchi_instance, &vchi_connection, 1 );
-
-    bool found = false;
-    char command[32];
-    char* response = nullptr;
-    int responsesize = 0;
-    QString msg = QString("codec_enabled %1").arg(codecstr);
-    if (!vc_gencmd(command, sizeof(command), msg.toLocal8Bit().constData()))
-        vc_gencmd_string_property(command, codecstr.toLocal8Bit().constData(), &response, &responsesize);
- 
-    if (!response || responsesize < 1)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to query codec support");
-    }
-    else
-    {
-        if (qstrcmp(response, "enabled") != 0)
-            LOG(VB_GENERAL, LOG_INFO, LOC +QString("Codec '%1' not supported (no license?)")
-                .arg(avcodec_get_name((*Codec)->id)));
-        else
-            found = true;
-    }
-
-    vc_gencmd_stop();
-    vchi_disconnect(vchi_instance);
-
-    if (!found)
+    const MMALProfiles& profiles = MythMMALContext::GetProfiles();
+    if (!profiles.contains(mythprofile))
         return failure;
 
     if (!decodeonly)
@@ -265,4 +228,91 @@ AVPixelFormat MythMMALContext::GetFormat(AVCodecContext*, const AVPixelFormat *P
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
+}
+
+bool MythMMALContext::HaveMMAL(void)
+{
+    static QMutex lock(QMutex::Recursive);
+    QMutexLocker locker(&lock);
+    static bool s_checked = false;
+    static bool s_available = false;
+
+    if (s_checked)
+        return s_available;
+    s_checked = true;
+
+    const MMALProfiles& profiles = MythMMALContext::GetProfiles();
+    if (profiles.isEmpty())
+        return s_available;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available MMAL decoders:");
+    s_available = true;
+    QSize size{0, 0};
+    foreach (auto profile, profiles)
+        LOG(VB_GENERAL, LOG_INFO, LOC + MythCodecContext::GetProfileDescription(profile, size));
+    return s_available;
+}
+
+void MythMMALContext::GetDecoderList(QStringList &Decoders)
+{
+    const MMALProfiles& profiles = MythMMALContext::GetProfiles();
+    if (profiles.isEmpty())
+        return;
+
+    QSize size(0, 0);
+    Decoders.append("MMAL:");
+    for (MythCodecContext::CodecProfile profile : profiles)
+        Decoders.append(MythCodecContext::GetProfileDescription(profile, size));
+}
+
+// Broadcom
+extern "C" {
+#include "interface/vmcs_host/vc_vchi_gencmd.h"
+}
+
+const MMALProfiles& MythMMALContext::GetProfiles(void)
+{
+    static QMutex lock(QMutex::Recursive);
+    static bool s_initialised = false;
+    static MMALProfiles s_profiles;
+
+    QMutexLocker locker(&lock);
+    if (s_initialised)
+        return s_profiles;
+    s_initialised = true;
+
+    static const QPair<QString, MythCodecContext::CodecProfile> s_map[] =
+    {
+        { "MPG2", MythCodecContext::MPEG2 },
+        { "MPG4", MythCodecContext::MPEG4 },
+        { "WVC1", MythCodecContext::VC1   },
+        { "H264", MythCodecContext::H264  }
+    };
+
+    vcos_init();
+    VCHI_INSTANCE_T vchi_instance;
+    if (vchi_initialise(&vchi_instance) != 0)
+        return s_profiles;
+    if (vchi_connect(nullptr, 0, vchi_instance) != 0)
+        return s_profiles;
+    VCHI_CONNECTION_T *vchi_connection = nullptr;
+    vc_vchi_gencmd_init(vchi_instance, &vchi_connection, 1 );
+
+    for (auto profile : s_map)
+    {
+        char command[32];
+        char* response = nullptr;
+        int responsesize = 0;
+        QString msg = QString("codec_enabled %1").arg(profile.first);
+        if (!vc_gencmd(command, sizeof(command), msg.toLocal8Bit().constData()))
+            vc_gencmd_string_property(command, profile.first.toLocal8Bit().constData(), &response, &responsesize);
+
+        if (response && responsesize && qstrcmp(response, "enabled") == 0)
+            s_profiles.append(profile.second);
+    }
+
+    vc_gencmd_stop();
+    vchi_disconnect(vchi_instance);
+
+    return s_profiles;
 }
