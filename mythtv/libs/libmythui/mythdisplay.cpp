@@ -1055,7 +1055,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
-#if defined (Q_OS_LINUX)
+#if defined (Q_OS_LINUX) && defined (USING_EGL)
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
     // can use zero copy video buffers for the best performance (N.B. not tested
     // on AMD desktops). To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION'
@@ -1067,21 +1067,19 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
     // NOTE force using EGL by setting MYTHTV_FORCE_EGL
     // NOTE disable using EGL by setting MYTHTV_NO_EGL
     // NOTE We have no Qt platform information, window/surface or logging when this is called.
-    if (qgetenv("MYTHTV_NO_EGL").isEmpty())
+    bool allow = qgetenv("MYTHTV_NO_EGL").isEmpty();
+    bool force = !qgetenv("MYTHTV_FORCE_EGL").isEmpty();
+    if (force || allow)
     {
-        bool force = !qgetenv("MYTHTV_FORCE_EGL").isEmpty();
+        // N.B. By default, ignore EGL if vendor string is not returned
         QString vendor = MythEGL::GetEGLVendor();
-        if ((vendor == EGL_NO_VENDOR) && !force)
-        {
-            qInfo() << LOC + "Failed to check EGL vendor - will not request EGL.";
-        }
-        else if (vendor.contains("nvidia", Qt::CaseInsensitive) && !force)
+        if (vendor.contains("nvidia", Qt::CaseInsensitive) && !force)
         {
             qInfo() << LOC + QString("Not requesting EGL for vendor '%1'").arg(vendor);
         }
-        else
+        else if (!vendor.isEmpty() || force)
         {
-            qInfo() << LOC + "Requesting EGL";
+            qInfo() << LOC + QString("Requesting EGL for '%1'").arg(vendor);
             setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
         }
     }

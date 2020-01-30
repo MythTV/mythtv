@@ -10,10 +10,9 @@
 using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
 using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);
 using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
+using MYTH_EGLGETPLATFORMDISPLAY = void* (*)(GLenum, void*, const intptr_t*);
 
 class MythRenderOpenGL;
-
-#define EGL_NO_VENDOR (QString("unknown"))
 
 class MUI_PUBLIC MythEGL
 {
