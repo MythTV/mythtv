@@ -136,6 +136,25 @@ static enum AVColorRange v4l2_get_color_range(V4L2Buffer *buf)
      return AVCOL_RANGE_UNSPECIFIED;
 }
 
+static void v4l2_get_interlacing(AVFrame *frame, V4L2Buffer *buf)
+{
+    enum v4l2_field field;
+    field = V4L2_TYPE_IS_MULTIPLANAR(buf->buf.type) ?
+        buf->context->format.fmt.pix_mp.field :
+        buf->context->format.fmt.pix.field;
+
+    if (field == V4L2_FIELD_INTERLACED || field == V4L2_FIELD_INTERLACED_TB) {
+        frame->interlaced_frame = 1;
+        frame->top_field_first  = 1;
+    } else if (field == V4L2_FIELD_INTERLACED_BT) {
+        frame->interlaced_frame = 1;
+        frame->top_field_first  = 0;
+    } else {
+        frame->interlaced_frame = 0;
+        frame->top_field_first  = 0;
+    }
+}
+
 static enum AVColorSpace v4l2_get_color_space(V4L2Buffer *buf)
 {
     enum v4l2_ycbcr_encoding ycbcr;
@@ -570,6 +589,7 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
     frame->color_trc = v4l2_get_color_trc(avbuf);
     frame->pts = v4l2_get_pts(avbuf);
     frame->pkt_dts = AV_NOPTS_VALUE;
+    v4l2_get_interlacing(frame, avbuf);
 
     /* these values are updated also during re-init in v4l2_process_driver_event */
     frame->height = avbuf->context->height;
