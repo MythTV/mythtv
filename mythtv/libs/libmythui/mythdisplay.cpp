@@ -1067,7 +1067,9 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
     // NOTE force using EGL by setting MYTHTV_FORCE_EGL
     // NOTE disable using EGL by setting MYTHTV_NO_EGL
     // NOTE We have no Qt platform information, window/surface or logging when this is called.
-    bool allow = qgetenv("MYTHTV_NO_EGL").isEmpty();
+    QString soft = qgetenv("LIBGL_ALWAYS_SOFTWARE");
+    bool ignore = soft == "1" || soft.compare("true", Qt::CaseInsensitive) == 0;
+    bool allow = qgetenv("MYTHTV_NO_EGL").isEmpty() && !ignore;
     bool force = !qgetenv("MYTHTV_FORCE_EGL").isEmpty();
     if (force || allow)
     {
