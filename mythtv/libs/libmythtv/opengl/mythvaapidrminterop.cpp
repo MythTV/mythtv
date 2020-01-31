@@ -324,7 +324,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id,
                 drmdesc.layers[i].planes[0].offset = vaimage.offsets[i];
             }
 
-            result = CreateTextures(&drmdesc, Context, Frame);
+            result = CreateTextures(&drmdesc, Context, Frame, false);
         }
     }
 
@@ -412,7 +412,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 
     if (!m_drmFrames.contains(Id))
         return result;
-    result = CreateTextures(m_drmFrames[Id], Context, Frame);
+    result = CreateTextures(m_drmFrames[Id], Context, Frame, false);
 #else
     (void)Id;
     (void)Context;
@@ -471,22 +471,14 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             AVDRMFrameDescriptor drmdesc;
             memset(&drmdesc, 0, sizeof(drmdesc));
             VADRMtoPRIME(&vadesc, &drmdesc);
-            vector<MythVideoTexture*> textures = CreateTextures(&drmdesc, m_context, &frame);
+            vector<MythVideoTexture*> textures = CreateTextures(&drmdesc, m_context, &frame, false);
 
             if (!textures.empty())
             {
                 s_supported = true;
                 for (auto & texture : textures)
-                {
                     s_supported &= texture->m_data && texture->m_textureId;
-                    if (texture->m_data)
-                        m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
-                    texture->m_data = nullptr;
-                    if (texture->m_textureId)
-                        m_context->glDeleteTextures(1, &texture->m_textureId);
-                    MythVideoTexture::DeleteTexture(m_context, texture);
-                }
-                textures.clear();
+                ClearDMATextures(m_context, textures);
             }
             for (uint32_t i = 0; i < vadesc.num_objects; ++i)
                 close(vadesc.objects[i].fd);
