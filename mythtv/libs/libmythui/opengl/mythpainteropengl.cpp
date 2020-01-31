@@ -21,6 +21,10 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
+    if (!m_render)
+        return;
+    if (!m_render->IsReady())
+        return;
     OpenGLLocker locker(m_render);
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_START");

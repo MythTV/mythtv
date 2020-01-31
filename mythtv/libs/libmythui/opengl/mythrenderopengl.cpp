@@ -126,7 +126,9 @@ MythRenderOpenGL* MythRenderOpenGL::Create(void)
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format)
-  : MythEGL(this),
+  : QOpenGLContext(),
+    QOpenGLFunctions(),
+    MythEGL(this),
     MythRender(kRenderOpenGL),
     m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true))
 {
@@ -144,7 +146,8 @@ MythRenderOpenGL::~MythRenderOpenGL()
     if (!isValid())
         return;
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
-    MythRenderOpenGL::ReleaseResources();
+    if (m_ready)
+        MythRenderOpenGL::ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
@@ -221,6 +224,7 @@ bool MythRenderOpenGL::Init(void)
 
     OpenGLLocker locker(this);
     initializeOpenGLFunctions();
+    m_ready = true;
     m_features = openGLFeatures();
 
     // don't enable this by default - it can generate a lot of detail
@@ -465,6 +469,9 @@ QOpenGLFunctions::OpenGLFeatures MythRenderOpenGL::GetFeatures(void) const
 
 bool MythRenderOpenGL::IsRecommendedRenderer(void)
 {
+    if (!IsReady())
+        return false;
+
     bool recommended = true;
     OpenGLLocker locker(this);
     QString renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
@@ -492,6 +499,11 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
         recommended = false;
     }
     return recommended;
+}
+
+bool MythRenderOpenGL::IsReady(void)
+{
+    return isValid() && m_ready;
 }
 
 void MythRenderOpenGL::swapBuffers()

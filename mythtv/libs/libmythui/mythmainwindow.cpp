@@ -1099,12 +1099,11 @@ void MythMainWindow::Init(bool mayReInit)
                 LOG(VB_GENERAL, LOG_WARNING,
                     "OpenGL painter not recommended with this system's "
                     "hardware/drivers. Falling back to Qt painter.");
-                d->m_render->DecrRef();
-                d->m_render = nullptr;
                 delete d->m_painter;
                 delete d->m_paintwin;
                 d->m_painter = nullptr;
                 d->m_paintwin = nullptr;
+                d->m_render = nullptr;
             }
         }
     }

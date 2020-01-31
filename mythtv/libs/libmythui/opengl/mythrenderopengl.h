@@ -96,6 +96,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  ReleaseResources(void) override;
     QStringList GetDescription(void) override;
 
+    bool  IsReady(void);
     void  makeCurrent();
     void  doneCurrent();
     void  swapBuffers();
@@ -182,6 +183,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     inline void glVertexAttribPointerI(GLuint Index, GLint Size, GLenum Type,
                                        GLboolean Normalize, GLsizei Stride,
                                        GLuint Value);
+
+    bool                         m_ready { false };
+
     // Framebuffers
     QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
 
