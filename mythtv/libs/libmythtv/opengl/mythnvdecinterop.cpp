@@ -316,7 +316,7 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFuncti
     // retrieve CUDA entry points
     if (cuda_load_functions(&CudaFuncs, nullptr) != 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load functions");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to load functions");
         return false;
     }
 
