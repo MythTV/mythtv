@@ -77,8 +77,11 @@ MythRenderOpenGL* MythRenderOpenGL::GetOpenGLRender(void)
     return nullptr;
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(void)
+MythRenderOpenGL* MythRenderOpenGL::Create(QWidget *Widget)
 {
+    if (!Widget)
+        return nullptr;
+
     QString display = getenv("DISPLAY");
     // Determine if we are running a remote X11 session
     // DISPLAY=:x or DISPLAY=unix:x are local
@@ -122,10 +125,10 @@ MythRenderOpenGL* MythRenderOpenGL::Create(void)
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         format.setOption(QSurfaceFormat::DebugContext);
 
-    return new MythRenderOpenGL(format);
+    return new MythRenderOpenGL(format, Widget);
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format)
+MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QWidget *Widget)
   : QOpenGLContext(),
     QOpenGLFunctions(),
     MythEGL(this),
@@ -138,6 +141,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format)
     m_transforms.push(QMatrix4x4());
     setFormat(Format);
     connect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
+    SetWidget(Widget);
 }
 
 MythRenderOpenGL::~MythRenderOpenGL()
@@ -498,6 +502,13 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
             "configuration, and device permissions.");
         recommended = false;
     }
+
+    if (!recommended)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "OpenGL not recommended with this system's hardware/drivers.");
+    }
+
     return recommended;
 }
 

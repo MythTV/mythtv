@@ -188,7 +188,6 @@ class MythMainWindowPrivate
 
     MythDisplay     *m_display           { MythDisplay::AcquireRelease() };
     MythPainter     *m_painter           {nullptr};
-    MythRender      *m_render            {nullptr};
 
     QRegion          m_repaintRegion;
 
@@ -200,11 +199,10 @@ class MythMainWindowPrivate
     std::vector<QWidget *> m_widgetList;
     QMap<QWidget *, bool> m_enabledWidgets;
 
-    QWidget         *m_paintwin          {nullptr};
+    MythPainterWindow *m_paintwin        {nullptr};
 
     QWidget         *m_oldpaintwin       {nullptr};
     MythPainter     *m_oldpainter        {nullptr};
-    MythRender      *m_oldrender         {nullptr};
 
     QMutex           m_drawDisableLock;
     uint             m_drawDisabledDepth {0};
@@ -330,23 +328,37 @@ MythNotificationCenter *GetNotificationCenter(void)
     return mainWin->GetCurrentNotificationCenter();
 }
 
+MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
+  : QWidget(MainWin)
+{
+}
+
 #ifdef USING_OPENGL
-MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
-                                         MythMainWindowPrivate *priv,
-                                         MythRenderOpenGL *rend)
-  : QWidget(win),
-    m_parent(win),
-    d(priv),
-    m_render(rend)
+MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *MainWin,
+                                         MythMainWindowPrivate *MainWinPriv)
+  : MythPainterWindow(MainWin),
+    m_parent(MainWin),
+    d(MainWinPriv)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     winId();
 #ifdef Q_OS_MACOS
-    setVisible(true); // must be visible before OpenGL initialisation on OSX
+     // must be visible before OpenGL initialisation on OSX
+    setVisible(true);
 #endif
-    m_render->SetWidget(this);
+    MythRenderOpenGL *render = MythRenderOpenGL::Create(this);
+    if (render)
+    {
+        m_render = render;
+        if (render->Init() && render->IsRecommendedRenderer())
+            m_valid = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create MythRenderOpenGL");
+    }
 }
 
 QPaintEngine *MythPainterWindowGL::paintEngine() const
@@ -357,10 +369,12 @@ QPaintEngine *MythPainterWindowGL::paintEngine() const
 MythPainterWindowGL::~MythPainterWindowGL()
 {
     if (m_render)
-    {
         m_render->DecrRef();
-        m_render = nullptr;
-    }
+}
+
+bool MythPainterWindowGL::IsValid(void)
+{
+    return m_valid;
 }
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
@@ -386,10 +400,11 @@ void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
 }
 #endif
 
-MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *win,
-                                         MythMainWindowPrivate *priv)
-                   : QWidget(win),
-                     m_parent(win), d(priv)
+MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *MainWin,
+                                         MythMainWindowPrivate *MainWinPriv)
+  : MythPainterWindow(MainWin),
+    m_parent(MainWin),
+    d(MainWinPriv)
 {
     setAttribute(Qt::WA_NoSystemBackground);
 }
@@ -401,7 +416,7 @@ void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
 }
 
 MythMainWindow::MythMainWindow(const bool useDB)
-              : QWidget(nullptr)
+  : QWidget(nullptr)
 {
     d = new MythMainWindowPrivate;
 
@@ -415,7 +430,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_paintwin = nullptr;
     d->m_oldpainter = nullptr;
     d->m_oldpaintwin = nullptr;
-    d->m_oldrender = nullptr;
 
     //Init();
 
@@ -574,9 +588,7 @@ MythMainWindow::~MythMainWindow()
     delete d->m_nc;
 
     delete d->m_painter;
-    // Don't delete. If the app is closing down it causes intermittent segfaults
-    if (d->m_render)
-        d->m_render->ReleaseResources();
+    delete d->m_paintwin;
 
     MythDisplay::AcquireRelease(false);
 
@@ -612,14 +624,14 @@ void MythMainWindow::HidePainterWindow(void)
     if (d->m_paintwin)
     {
         d->m_paintwin->clearMask();
-        if (!(d->m_render && d->m_render->IsShared()))
+        if (!d->m_paintwin->RenderIsShared())
             d->m_paintwin->hide();
     }
 }
 
 MythRender *MythMainWindow::GetRenderDevice()
 {
-    return d->m_render;
+    return d->m_paintwin->GetRenderDevice();
 }
 
 void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
@@ -697,7 +709,7 @@ void MythMainWindow::animate(void)
         }
     }
 
-    if (redraw && !(d->m_render && d->m_render->IsShared()))
+    if (redraw && !d->m_paintwin->RenderIsShared())
         d->m_paintwin->update(d->m_repaintRegion);
 
     foreach (auto & widget, d->m_stackList)
@@ -777,7 +789,7 @@ void MythMainWindow::drawScreen(void)
         }
     }
 
-    if (!(d->m_render && d->m_render->IsShared()))
+    if (!d->m_paintwin->RenderIsShared())
         draw();
 
     d->m_repaintRegion = QRegion(QRect(0, 0, 0, 0));
@@ -1070,41 +1082,20 @@ void MythMainWindow::Init(bool mayReInit)
         d->m_painter = nullptr;
     }
 
-    if (d->m_render)
-    {
-        d->m_oldrender = d->m_render;
-        d->m_render = nullptr;
-    }
-
 #ifdef USING_OPENGL
     // always use OpenGL by default. Only fallback to Qt painter as a last resort.
     if (!d->m_painter && !d->m_paintwin)
     {
-        MythRenderOpenGL *gl = MythRenderOpenGL::Create();
-        d->m_render = gl;
-        if (!gl)
+        MythPainterWindowGL* glwindow = new MythPainterWindowGL(this, d);
+        if (glwindow && glwindow->IsValid())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL render.");
+            d->m_paintwin = glwindow;
+            MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
+            d->m_painter = new MythOpenGLPainter(render, this);
         }
-        else
+        else if (glwindow)
         {
-            d->m_painter = new MythOpenGLPainter(gl);
-            // NB MythPainterWindowGL takes ownership of gl
-            d->m_paintwin = new MythPainterWindowGL(this, d, gl);
-
-            // we need to initialise MythRenderOpenGL before checking
-            // IsRecommendedRenderer
-            if (!gl->Init() || !gl->IsRecommendedRenderer())
-            {
-                LOG(VB_GENERAL, LOG_WARNING,
-                    "OpenGL painter not recommended with this system's "
-                    "hardware/drivers. Falling back to Qt painter.");
-                delete d->m_painter;
-                delete d->m_paintwin;
-                d->m_painter = nullptr;
-                d->m_paintwin = nullptr;
-                d->m_render = nullptr;
-            }
+            delete glwindow;
         }
     }
 #endif
@@ -1119,8 +1110,7 @@ void MythMainWindow::Init(bool mayReInit)
 
     if (!d->m_paintwin)
     {
-        LOG(VB_GENERAL, LOG_ERR, "MythMainWindow failed to create a "
-                                 "painter window.");
+        LOG(VB_GENERAL, LOG_ERR, "MythMainWindow failed to create a painter window.");
         return;
     }
 
@@ -1347,13 +1337,9 @@ void MythMainWindow::ReinitDone(void)
 {
     delete d->m_oldpainter;
     d->m_oldpainter = nullptr;
-
     delete d->m_oldpaintwin;
     d->m_oldpaintwin = nullptr;
 
-    // For OpenGL contexts (at least), deleting the painter window also
-    // deletes the render context
-    d->m_oldrender = nullptr;
 
     ShowPainterWindow();
     MoveResize(d->m_screenRect);
