@@ -305,10 +305,18 @@ bool ShortVirtualChannelTable::Parse(void)
         bool descriptors_included = (pesdata()[7] & 0x20) != 0;
         uint number_of_vc_records = pesdata()[13];
         const unsigned char *next = pesdata() + 14;
+        const unsigned char *end = pesdata()+Length();
+        bool ok = true;
+
         if (!descriptors_included)
         {
-            for (uint i = 0; i < number_of_vc_records; i++)
+            for (uint i = 0; i < number_of_vc_records && ok; i++)
             {
+                if (next + 10 >= end)
+                {
+                    ok = false;
+                    break;
+                }
                 m_ptrs.push_back(next);
                 next += 9;
             }
@@ -323,7 +331,12 @@ bool ShortVirtualChannelTable::Parse(void)
                 next += 10;
                 for (uint j = 0; j < desc_count; j++)
                 {
-                    MPEGDescriptor desc(next);
+                    if (next >= end)
+                    {
+                        ok = false;
+                        break;
+                    }
+                    MPEGDescriptor desc(next, end-next);
                     if (!desc.IsValid())
                     {
                         m_ptrs.clear();
@@ -334,6 +347,11 @@ bool ShortVirtualChannelTable::Parse(void)
             }
         }
         m_ptrs.push_back(next);
+        if (!ok || next >= end)
+        {
+            m_ptrs.clear();
+            return false;
+        }
     }
     else if (kInverseChannelMap == TableSubtype())
     {
