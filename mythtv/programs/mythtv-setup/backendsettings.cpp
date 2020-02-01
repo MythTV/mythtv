@@ -126,11 +126,12 @@ class IpAddressSettings : public HostCheckBoxSetting
      explicit IpAddressSettings(/*Setting* trigger*/) :
          HostCheckBoxSetting("ListenOnAllIps")
      {
-         setLabel(QObject::tr("Listen on All IP Addresses"));
+         setLabel(BackendSettings::tr("Listen on All IP Addresses"));
          setValue(true);
-         setHelpText(tr("Allow this backend to receive connections on any IP "
-                        "Address assigned to it. Recommended for most users "
-                        "for ease and reliability."));
+         setHelpText(BackendSettings::tr("Allow this backend to receive "
+                        "connections on any IP Address assigned to it. "
+                        "Recommended for most users for ease and "
+                        "reliability."));
 
          m_localServerIP = LocalServerIP();
          m_localServerIP6 = LocalServerIP6();

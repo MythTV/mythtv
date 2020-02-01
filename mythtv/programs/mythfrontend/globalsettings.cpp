@@ -4126,7 +4126,7 @@ class PlayBackScaling : public GroupSetting
 
 PlayBackScaling::PlayBackScaling()
 {
-    setLabel(tr("Scaling"));
+    setLabel(PlaybackSettings::tr("Scaling"));
     addChild(m_vertScan = VertScanPercentage());
     addChild(m_yScan = YScanDisplacement());
     addChild(m_horizScan = HorizScanPercentage());
@@ -4150,7 +4150,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
         m_yScan->getValue() == "0" &&
         m_xScan->getValue() == "0")
     {
-        item->SetText(tr("No scaling"),"value");
+        item->SetText(PlaybackSettings::tr("No scaling"), "value");
     }
     else
     {
@@ -4651,7 +4651,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
     : m_channelId(chanid)
 {
     setLabel(QString("%1 %2").arg(channum).arg(channame));
-    setHelpText(tr("Select/Unselect channels for this channel group"));
+    setHelpText(ChannelGroupSettings::tr("Select/Unselect channels for this channel group"));
 }
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
