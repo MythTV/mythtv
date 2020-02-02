@@ -343,7 +343,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 // Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
 // Luckily, its lseek() is already 64bit compatible
 #ifdef BSD
-    typedef off_t off64_t; //NOLINT(modernize-use-using)included from C code
+    typedef off_t off64_t; //NOLINT(modernize-use-using) included from dvdnav C code
     #define lseek64(f,o,w) lseek(f,o,w)
 #endif
 

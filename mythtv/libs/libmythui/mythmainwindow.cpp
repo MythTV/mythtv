@@ -1086,11 +1086,11 @@ void MythMainWindow::Init(bool mayReInit)
     // always use OpenGL by default. Only fallback to Qt painter as a last resort.
     if (!d->m_painter && !d->m_paintwin)
     {
-        MythPainterWindowGL* glwindow = new MythPainterWindowGL(this, d);
+        auto* glwindow = new MythPainterWindowGL(this, d);
         if (glwindow && glwindow->IsValid())
         {
             d->m_paintwin = glwindow;
-            MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
+            auto *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
             d->m_painter = new MythOpenGLPainter(render, this);
         }
         else if (glwindow)

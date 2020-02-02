@@ -113,7 +113,7 @@ class VisFactory
     VisFactory*        m_pNextVisFactory {nullptr};
 };
 
-#define RUBBERBAND 0
+#define RUBBERBAND false
 #define TWOCOLOUR 0
 
 class StereoScope : public VisualBase

@@ -64,6 +64,8 @@ const char* MythMediaDevice::MediaErrorStrings[] =
 QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+// Force this class to have a vtable so that dynamic_cast works.
+// NOLINTNEXTLINE(modernize-use-equals-default)
 MythMediaEvent::~MythMediaEvent()
 {
 }

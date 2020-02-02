@@ -63,6 +63,8 @@ MetadataFactorySingleResult::~MetadataFactorySingleResult()
 QEvent::Type MetadataFactoryMultiResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+// Force this class to have a vtable so that dynamic_cast works.
+// NOLINTNEXTLINE(modernize-use-equals-default)
 MetadataFactoryMultiResult::~MetadataFactoryMultiResult()
 {
 }
@@ -70,6 +72,8 @@ MetadataFactoryMultiResult::~MetadataFactoryMultiResult()
 QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+// Force this class to have a vtable so that dynamic_cast works.
+// NOLINTNEXTLINE(modernize-use-equals-default)
 MetadataFactoryVideoChanges::~MetadataFactoryVideoChanges()
 {
 }

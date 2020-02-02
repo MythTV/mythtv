@@ -33,7 +33,8 @@
 
 #include "mythlogging.h"
 
-#define DEBUG 1
+#define DEBUG true
+
 int ring_init (ringbuffer *rbuf, int size)
 {
 	if (size > 0){

@@ -113,8 +113,8 @@ class UPNP_PUBLIC UPnp : public QObject
         static QList<QHostAddress>  g_IPAddrList;
 
     public:
-                 UPnp();
-        virtual ~UPnp();
+        UPnp();
+       ~UPnp() override;
 
         static void           SetConfiguration( Configuration *pConfig );
         static Configuration* GetConfiguration();

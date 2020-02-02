@@ -87,8 +87,6 @@
 using DBL = double;
 using F_PT = float;
 
-/* typedef float               F_PT; */
-
 /*****************************************************/
 
 #define FIX 12

@@ -51,7 +51,7 @@ unsigned int ac3_bitrates[32] =
 static uint8_t ac3half[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
 uint32_t ac3_freq[4] = {480, 441, 320, 0};
 
-#define DEBUG 1
+#define DEBUG true
 
 uint64_t add_pts_audio(uint64_t pts, audio_frame_t *aframe, uint64_t frames)
 {
