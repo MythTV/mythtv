@@ -221,7 +221,7 @@ const char *descriptor_tag_strings[256] =
     /* 0x0C */ "Multiplex Buffer Utilization", /* 0x0D */ "Copyright",
     /* 0x0E */ "Maximum Bitrate",       /* 0x0F */ "Private Data Indicator",
 
-    /* 0x10 */ "Smooting Buffer",       /* 0x11 */ "STD",
+    /* 0x10 */ "Smoothing Buffer",      /* 0x11 */ "STD",
     /* 0x12 */ "IBP",                   /* 0x13 */ "DSM-CC Carousel Identifier",
     /* 0x14 */ "DSM-CC Association Tag",
     /* 0x15 */ "DSM-CC Deferred Association Tag",

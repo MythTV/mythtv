@@ -121,7 +121,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     freeMB  = (int)((sinfo.freeram   * sinfo.mem_unit)/MB);
     totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB);
     freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
-
+    return true;
 #elif CONFIG_DARWIN
     mach_port_t             mp;
     mach_msg_type_number_t  count;
@@ -156,18 +156,14 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     free = getDiskSpace("/private/var/vm", total, used);
     totalVM = (int)(total >> 10);
     freeVM = (int)(free >> 10);
-
+    return true;
 #else
     Q_UNUSED(totalMB);
     Q_UNUSED(freeMB);
     Q_UNUSED(totalVM);
     Q_UNUSED(freeVM);
-    LOG(VB_GENERAL, LOG_NOTICE, "getMemStats(): Unknown platform. "
-        "How do I get the memory stats?");
     return false;
 #endif
-
-    return true;
 }
 
 /**

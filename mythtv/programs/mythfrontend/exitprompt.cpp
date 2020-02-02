@@ -1,11 +1,8 @@
-#include "config.h"
-
+// Qt
 #include <QCoreApplication>
-#if CONFIG_QTDBUS
-#include <QtDBus>
-#include <QDBusInterface>
-#endif
 
+// MythTV
+#include "config.h"
 #include "exitprompt.h"
 #include "mythcontext.h"
 #include "mythdialogbox.h"
@@ -15,172 +12,118 @@
 #include "mythlogging.h"
 #include "exitcodes.h"
 
-void ExitPrompter::quit()
+ExitPrompter::ExitPrompter()
+  : m_power(MythPower::AcquireRelease(this, true))
+{
+    m_haltCommand = gCoreContext->GetSetting("HaltCommand", "");
+    m_rebootCommand = gCoreContext->GetSetting("RebootCommand", "");
+    m_suspendCommand = gCoreContext->GetSetting("SuspendCommand", "");
+}
+
+ExitPrompter::~ExitPrompter()
+{
+    if (m_power)
+        m_power->AcquireRelease(this, false);
+}
+
+void ExitPrompter::DoQuit()
 {
     qApp->exit();
 }
 
-static bool DBusHalt(void)
+void ExitPrompter::ConfirmHalt()
 {
-#if CONFIG_QTDBUS
-    QDBusInterface kde("org.kde.ksmserver",
-                       "/KSMServer",
-                       "org.kde.KSMServerInterface");
-    QDBusInterface gnome("org.gnome.SessionManager",
-                         "/org/gnome/SessionManager",
-                         "org.gnome.SessionManager");
-    QDBusInterface consolekit("org.freedesktop.ConsoleKit",
-                              "/org/freedesktop/ConsoleKit/Manager",
-                              "org.freedesktop.ConsoleKit.Manager",
-                              QDBusConnection::systemBus());
-    QDBusInterface logind("org.freedesktop.login1",
-                          "/org/freedesktop/login1",
-                          "org.freedesktop.login1.Manager",
-                          QDBusConnection::systemBus());
-    QDBusInterface hal("org.freedesktop.Hal",
-                       "/org/freedesktop/Hal/devices/computer",
-                       "org.freedesktop.Hal.Device.SystemPowerManagement",
-                       QDBusConnection::systemBus());
-
-    QDBusReply<void> void_reply = kde.call("logout", 0, 2, 2);
-    QDBusReply<bool> bool_reply;
-    QDBusReply<int>  int_reply;
-    QDBusReply<QString> string_reply;
-
-    if (!void_reply.isValid())
-    {
-        bool_reply = logind.call("CanPowerOff");
-        if (string_reply.isValid() && string_reply.value() == "yes")
-            void_reply = logind.call("PowerOff", false);
-    }
-    if (!void_reply.isValid())
-    {
-        bool_reply = gnome.call("CanShutdown");
-        if (bool_reply.isValid() && bool_reply.value())
-            void_reply = gnome.call("RequestShutdown");
-    }
-    if (!void_reply.isValid())
-    {
-        bool_reply = consolekit.call("CanStop");
-        if (bool_reply.isValid() && bool_reply.value())
-            void_reply = consolekit.call("Stop");
-    }
-    if (!void_reply.isValid())
-        int_reply = hal.call("Shutdown");
-
-    return void_reply.isValid() || int_reply.isValid();
-#else
-    return false;
-#endif
+    Confirm(MythPower::FeatureShutdown);
 }
 
-void ExitPrompter::confirmHalt()
-{
-    confirm(HALT);
-}
-
-void ExitPrompter::halt(bool Confirmed)
+void ExitPrompter::DoHalt(bool Confirmed)
 {
     if (!Confirmed)
         return;
 
-    QString halt_cmd = gCoreContext->GetSetting("HaltCommand","");
-    int ret = -1;
-
-    if (!halt_cmd.isEmpty()) /* Use user specified command if it exists */
+    // Use user specified command if it exists
+    if (!m_haltCommand.isEmpty())
     {
-        ret = myth_system(halt_cmd);
-        if (ret != GENERIC_EXIT_OK)
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "User defined HaltCommand failed, falling back to "
-                "alternative methods.");
-        }
+        uint ret = myth_system(m_haltCommand);
+        if (ret == GENERIC_EXIT_OK)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            "User defined HaltCommand failed, falling back to "
+            "alternative methods.");
     }
 
-    /* If supported, use DBus to shutdown */
-    if (ret != GENERIC_EXIT_OK && !DBusHalt())
-        myth_system("sudo /sbin/halt -p");
+    // Otherwise use MythPower
+    if (m_power && m_power->IsFeatureSupported(MythPower::FeatureShutdown))
+        if (m_power->RequestFeature(MythPower::FeatureShutdown))
+            return;
+
+    // halt of last resort
+    myth_system("sudo /sbin/halt -p");
 }
 
-static bool DBusReboot(void)
+void ExitPrompter::ConfirmReboot()
 {
-#if CONFIG_QTDBUS
-    QDBusInterface kde("org.kde.ksmserver",
-                       "/KSMServer",
-                       "org.kde.KSMServerInterface");
-    QDBusInterface gnome("org.gnome.SessionManager",
-                         "/org/gnome/SessionManager",
-                         "org.gnome.SessionManager");
-    QDBusInterface consolekit("org.freedesktop.ConsoleKit",
-                              "/org/freedesktop/ConsoleKit/Manager",
-                              "org.freedesktop.ConsoleKit.Manager",
-                              QDBusConnection::systemBus());
-    QDBusInterface hal("org.freedesktop.Hal",
-                       "/org/freedesktop/Hal/devices/computer",
-                       "org.freedesktop.Hal.Device.SystemPowerManagement",
-                       QDBusConnection::systemBus());
-
-    QDBusReply<void> void_reply = kde.call("logout", 0, 1, 2);
-    QDBusReply<bool> bool_reply;
-    QDBusReply<int>  int_reply;
-
-    if (!void_reply.isValid())
-    {
-        bool_reply = gnome.call("CanShutdown");
-        if (bool_reply.isValid() && bool_reply.value())
-            void_reply=gnome.call("RequestReboot");
-    }
-    if (!void_reply.isValid())
-    {
-        bool_reply = consolekit.call("CanRestart");
-        if (bool_reply.isValid() && bool_reply.value())
-            void_reply = consolekit.call("Restart");
-    }
-    if (!void_reply.isValid())
-        int_reply = hal.call("Reboot");
-
-    return void_reply.isValid() || int_reply.isValid();
-#else
-    return false;
-#endif
+    Confirm(MythPower::FeatureRestart);
 }
 
-void ExitPrompter::confirmReboot()
-{
-    confirm(REBOOT);
-}
-
-void ExitPrompter::reboot(bool Confirmed)
+void ExitPrompter::DoReboot(bool Confirmed)
 {
     if (!Confirmed)
         return;
 
-    QString reboot_cmd = gCoreContext->GetSetting("RebootCommand","");
-    int ret = -1;
-
-    if (!reboot_cmd.isEmpty()) /* Use user specified command if it exists */
+    if (!m_rebootCommand.isEmpty())
     {
-        ret = myth_system(reboot_cmd);
-        if (ret != GENERIC_EXIT_OK)
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "User defined RebootCommand failed, falling back to "
-                "alternative methods.");
-        }
+        uint ret = myth_system(m_rebootCommand);
+        if (ret == GENERIC_EXIT_OK)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            "User defined RebootCommand failed, falling back to "
+            "alternative methods.");
     }
 
-    /* If supported, use DBus to reboot */
-    if (ret != GENERIC_EXIT_OK && !DBusReboot())
-        myth_system("sudo /sbin/reboot");
+    // Otherwise use MythPower
+    if (m_power && m_power->IsFeatureSupported(MythPower::FeatureRestart))
+        if (m_power->RequestFeature(MythPower::FeatureRestart))
+            return;
+
+    // reboot of last resort
+    myth_system("sudo /sbin/reboot");
 }
 
-void ExitPrompter::standby()
+void ExitPrompter::ConfirmSuspend(void)
+{
+    Confirm(MythPower::FeatureSuspend);
+}
+
+void ExitPrompter::DoSuspend(bool Confirmed)
+{
+    if (!Confirmed)
+        return;
+
+    // Use user specified command if it exists
+    if (!m_suspendCommand.isEmpty())
+    {
+        uint ret = myth_system(m_suspendCommand);
+        if (ret == GENERIC_EXIT_OK)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            "User defined SuspendCommand failed, falling back to "
+            "alternative methods.");
+    }
+
+    if (m_power && m_power->IsFeatureSupported(MythPower::FeatureSuspend))
+        m_power->RequestFeature(MythPower::FeatureSuspend);
+}
+
+void ExitPrompter::DoStandby()
 {
     GetMythMainWindow()->IdleTimeout();
 }
 
-void ExitPrompter::handleExit()
+void ExitPrompter::HandleExit()
 {
     // HACK IsFrontendOnly() triggers a popup if there is no BE connection.
     // We really don't need that right now. This hack prevents it.
@@ -192,44 +135,68 @@ void ExitPrompter::handleExit()
     // HACK Undo the hack, just in case we _don't_ quit:
     gContext->SetDisableEventPopup(false);
 
-
     // how do you want to quit today?
     bool allowExit     = false;
     bool allowReboot   = false;
     bool allowShutdown = false;
     bool allowStandby  = false;
+    bool allowSuspend  = false;
+
+    bool haveshutdown = !m_haltCommand.isEmpty();
+    bool havereboot   = !m_rebootCommand.isEmpty();
+    bool havesuspend  = !m_suspendCommand.isEmpty();
+
+#ifdef Q_OS_ANDROID
+    haveshutdown = false;
+    havereboot   = false;
+    havesuspend  = false;
+#endif
+
+    if (m_power)
+    {
+        havereboot   |= m_power->IsFeatureSupported(MythPower::FeatureRestart);
+        haveshutdown |= m_power->IsFeatureSupported(MythPower::FeatureShutdown);
+        havesuspend  |= m_power->IsFeatureSupported(MythPower::FeatureSuspend);
+    }
 
     switch (gCoreContext->GetNumSetting("OverrideExitMenu", 0))
     {
         case 0:
             allowExit = true;
             if (frontendOnly)
-                allowShutdown = true;
+                allowShutdown = haveshutdown;
             break;
         case 1:
             allowExit = true;
             break;
         case 2:
             allowExit = true;
-            allowShutdown = true;
+            allowShutdown = haveshutdown;
             break;
         case 3:
             allowExit     = true;
-            allowReboot   = true;
-            allowShutdown = true;
+            allowReboot   = havereboot;
+            allowShutdown = haveshutdown;
             break;
         case 4:
-            allowShutdown = true;
+            allowShutdown = haveshutdown;
             break;
         case 5:
-            allowReboot = true;
+            allowReboot   = havereboot;
             break;
         case 6:
-            allowReboot   = true;
-            allowShutdown = true;
+            allowReboot   = havereboot;
+            allowShutdown = haveshutdown;
             break;
         case 7:
-            allowStandby = true;
+            allowStandby  = true;
+            break;
+        case 8:
+            allowSuspend  = havesuspend;
+            break;
+        case 9:
+            allowExit = true;
+            allowSuspend  = havesuspend;
             break;
     }
 
@@ -241,25 +208,21 @@ void ExitPrompter::handleExit()
     {
         LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
         delete dlg;
-        quit();
+        DoQuit();
         return;
     }
 
     dlg->AddButton(QCoreApplication::translate("(Common)", "No"));
     if (allowExit)
-        dlg->AddButton(tr("Yes, Exit now"),          SLOT(quit()));
+        dlg->AddButton(tr("Yes, Exit now"), SLOT(DoQuit()));
     if (allowReboot)
-    {
-        dlg->AddButton(tr("Yes, Exit and Reboot"),
-                       frontendOnly ? SLOT(reboot()) : SLOT(confirmReboot()));
-    }
+        dlg->AddButton(tr("Yes, Exit and Reboot"), SLOT(ConfirmReboot()));
     if (allowShutdown)
-    {
-        dlg->AddButton(tr("Yes, Exit and Shutdown"),
-                       frontendOnly ? SLOT(halt()) : SLOT(confirmHalt()));
-    }
+        dlg->AddButton(tr("Yes, Exit and Shutdown"), SLOT(ConfirmHalt()));
     if (allowStandby)
-        dlg->AddButton(tr("Yes, Enter Standby Mode"), SLOT(standby()));
+        dlg->AddButton(tr("Yes, Enter Standby Mode"), SLOT(DoStandby()));
+    if (allowSuspend)
+        dlg->AddButton(tr("Yes, Suspend"), SLOT(ConfirmSuspend()));
 
     // This is a hack so that the button clicks target the correct slot:
     dlg->SetReturnEvent(this, QString());
@@ -267,23 +230,39 @@ void ExitPrompter::handleExit()
     ss->AddScreen(dlg);
 }
 
-void ExitPrompter::confirm(int Action)
+void ExitPrompter::Confirm(MythPower::Feature Action)
 {
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-    auto *dlg = new MythConfirmationDialog(ss,
-        tr("Mythbackend is running on this system. Are you sure you want to continue?"));
+
+    QString msg;
+    switch (Action)
+    {
+        case MythPower::FeatureShutdown: msg = tr("Are you sure you want to shutdown?"); break;
+        case MythPower::FeatureRestart:  msg = tr("Are you sure you want to reboot?");   break;
+        case MythPower::FeatureSuspend:  msg = tr("Are you sure you want to suspend?");  break;
+        default: break;
+    }
+
+    gContext->SetDisableEventPopup(true);
+    if (!gCoreContext->IsFrontendOnly())
+        msg.prepend(tr("Mythbackend is running on this system. "));
+    gContext->SetDisableEventPopup(false);
+
+    auto *dlg = new MythConfirmationDialog(ss, msg);
 
     if (!dlg->Create())
     {
         delete dlg;
-        quit();
+        DoQuit();
         return;
     }
 
-    if (Action == HALT)
-        connect(dlg, SIGNAL(haveResult(bool)), SLOT(halt(bool)));
-    else if (Action == REBOOT)
-        connect(dlg, SIGNAL(haveResult(bool)), SLOT(reboot(bool)));
+    if (Action == MythPower::FeatureShutdown)
+        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoHalt);
+    else if (Action == MythPower::FeatureRestart)
+        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoReboot);
+    else if (Action == MythPower::FeatureSuspend)
+        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoSuspend);
 
     ss->AddScreen(dlg);
 }

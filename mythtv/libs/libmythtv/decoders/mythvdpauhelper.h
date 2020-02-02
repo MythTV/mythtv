@@ -8,6 +8,7 @@
 
 // MythTV
 #include "mythframe.h"
+#include "mythcodeccontext.h"
 #include "videoouttypes.h"
 
 // FFmpeg
@@ -19,6 +20,20 @@ extern "C" {
 
 class MythXDisplay;
 class VideoColourSpace;
+
+class VDPAUCodec
+{
+  public:
+    VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size,
+               uint32_t Macroblocks, uint32_t Level);
+    bool Supported(int Width, int Height, int Level);
+    QSize    m_maxSize        { 0, 0 };
+    uint32_t m_maxMacroBlocks { 0 };
+    uint32_t m_maxLevel       { 0 };
+};
+
+using VDPAUProfile = QPair<MythCodecContext::CodecProfile, VDPAUCodec>;
+using VDPAUProfiles = QList<VDPAUProfile>;
 
 class MythVDPAUHelper : public QObject
 {
@@ -35,9 +50,9 @@ class MythVDPAUHelper : public QObject
     Q_DECLARE_FLAGS(VDPMixerFeatures, VDPMixerFeature)
 
     static bool   HaveVDPAU(void);
-    static bool   HaveMPEG4Decode(void);
     static bool   CheckH264Decode(AVCodecContext *Context);
-    static bool   CheckHEVCDecode(AVCodecContext *Context);
+    static const VDPAUProfiles& GetProfiles(void);
+    static void   GetDecoderList (QStringList &Decoders);
 
     explicit MythVDPAUHelper(AVVDPAUDeviceContext *Context);
     ~MythVDPAUHelper(void) override;
@@ -61,14 +76,10 @@ class MythVDPAUHelper : public QObject
   protected:
     MythVDPAUHelper(void);
 
-    bool   CheckMPEG4(void);
-    bool   H264DecodeCheck(VdpDecoderProfile Profile, AVCodecContext *Context);
-    bool   H264ProfileCheck(VdpDecoderProfile Profile, AVCodecContext *Context);
-    bool   HEVCProfileCheck(AVCodecContext *Context);
-
-    static QMutex gVDPAULock;
-    static bool   gVDPAUAvailable;
-    static bool   gVDPAUMPEG4Available;
+    bool   H264DecodeCheck  (VdpDecoderProfile Profile, AVCodecContext *Context);
+    bool   HEVCSupported    (void);
+    bool   ProfileCheck     (VdpDecoderProfile Profile, uint32_t &Level,
+                             uint32_t &Macros, uint32_t &Width, uint32_t &Height);
 
   private:
     bool   InitProcs(void);

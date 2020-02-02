@@ -113,34 +113,37 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
 
     bool firstpass  = m_openglTextures.isEmpty();
     bool interlaced = is_interlaced(Scan);
-    bool composed   = static_cast<uint>(drmdesc->nb_layers) == 1;
+    bool composed   = static_cast<uint>(drmdesc->nb_layers) == 1 && m_composable;
     auto id         = reinterpret_cast<unsigned long long>(drmdesc);
 
-    // Separate texture for each plane
-    if (!composed)
+    auto Separate = [=]()
     {
+        vector<MythVideoTexture*> textures;
         if (!m_openglTextures.contains(id))
         {
-            result = CreateTextures(drmdesc, m_context, Frame);
-            m_openglTextures.insert(id, result);
+            textures = CreateTextures(drmdesc, m_context, Frame, true);
+            m_openglTextures.insert(id, textures);
         }
         else
         {
-            result = m_openglTextures[id];
+            textures = m_openglTextures[id];
         }
 
-        if (!result.empty() ? format_is_yuv(result[0]->m_frameType) : false)
+        if (textures.empty() ? false : format_is_yuv(textures[0]->m_frameFormat))
         {
-            // YUV frame - enable picture attributes
+            // Enable colour controls for YUV frame
             if (firstpass)
                 ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
             ColourSpace->UpdateColourSpace(Frame);
-
-            // Enable shader based deinterlacing for YUV frames
+            // and shader based deinterlacing
             Frame->deinterlace_allowed = Frame->deinterlace_allowed | DEINT_SHADER;
         }
-        return result;
-    }
+        return textures;
+    };
+
+    // Separate texture for each plane
+    if (!composed)
+        return Separate();
 
     // Single RGB texture
     // Disable picture attributes
@@ -173,8 +176,17 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     {
         // This will create 2 half height textures representing the top and bottom fields
         // if deinterlacing
-        result = CreateTextures(drmdesc, m_context, Frame,
+        result = CreateTextures(drmdesc, m_context, Frame, false,
                                 m_deinterlacing ? kScan_Interlaced : kScan_Progressive);
+        // Fallback to separate textures if the driver does not support composition
+        if (result.empty())
+        {
+            m_composable = false;
+            m_deinterlacing = false;
+            DeleteTextures();
+            LOG(VB_GENERAL, LOG_INFO, LOC + "YUV composition failed. Trying separate textures.");
+            return Separate();
+        }
         m_openglTextures.insert(id, result);
     }
     else

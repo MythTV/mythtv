@@ -35,7 +35,8 @@ enum GLFeatures
     kGLExtRGBA16      = 0x0004,
     kGLExtSubimage    = 0x0008,
     kGLTiled          = 0x0010,
-    kGLLegacyTextures = 0x0020
+    kGLLegacyTextures = 0x0020,
+    kGLNVMemory       = 0x0040
 };
 
 #define TEX_OFFSET 8
@@ -88,18 +89,17 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
   public:
     static MythRenderOpenGL* GetOpenGLRender(void);
-    static MythRenderOpenGL* Create(void);
-    explicit MythRenderOpenGL(const QSurfaceFormat &Format);
+    static MythRenderOpenGL* Create(QWidget *Widget);
 
     // MythRender
     void  ReleaseResources(void) override;
     QStringList GetDescription(void) override;
 
+    bool  IsReady(void);
     void  makeCurrent();
     void  doneCurrent();
     void  swapBuffers();
 
-    void  SetWidget(QWidget *Widget);
     bool  Init(void);
     int   GetColorDepth(void) const;
     int   GetMaxTextureSize(void) const;
@@ -155,13 +155,17 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
     void  ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color);
 
+    bool  GetGPUMemory(int &Available, int &Total);
+
   public slots:
     void  messageLogged  (const QOpenGLDebugMessage &Message);
     void  logDebugMarker (const QString &Message);
     void  contextToBeDestroyed(void);
 
   protected:
+    MythRenderOpenGL(const QSurfaceFormat &Format, QWidget *Widget);
     ~MythRenderOpenGL() override;
+    void  SetWidget(QWidget *Widget);
     void  Init2DState(void);
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
@@ -179,6 +183,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     inline void glVertexAttribPointerI(GLuint Index, GLint Size, GLenum Type,
                                        GLboolean Normalize, GLsizei Stride,
                                        GLuint Value);
+
+    bool                         m_ready { false };
+
     // Framebuffers
     QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
 

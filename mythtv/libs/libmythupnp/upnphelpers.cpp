@@ -338,13 +338,13 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     //  2nd Field =
     //
 
-        // Not applicable to us, return wildcard
-        protocolInfoFields << "*";
+    // Not applicable to us, return wildcard
+    protocolInfoFields << "*";
 
     //
     //  3rd Field = mime type
     //
-        protocolInfoFields << mimeType;
+    protocolInfoFields << mimeType;
 
     //
     //  4th Field = Additional Implementation Information (Used by DLNA)

@@ -2273,9 +2273,9 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     setVisible(false);
     auto *device = new CommandPath(m_parent);
     device->setLabel(tr("Command path"));
-    device->setHelpText(tr("A 'black box' application controlled via "
-                           "stdin, status on stderr and TransportStream "
-                           "read from stdout"));
+    device->setHelpText(tr("A 'black box' application controlled via stdin, status on "
+                           "stderr and TransportStream read from stdout.\n"
+                           "Use absolute path or path relative to the current directory."));
     a_cardtype.addTargetedChild("EXTERNAL", device);
 
     m_info->setLabel(tr("File info"));
@@ -2301,17 +2301,17 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 
     if (fileInfo.exists())
     {
-        ci = tr("'%1' is valid.").arg(fileInfo.absoluteFilePath());
+        ci = tr("File '%1' is valid.").arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isReadable() || !fileInfo.isFile())
-            ci = tr("WARNING: '%1' is not readable.")
+            ci = tr("WARNING: File '%1' is not readable.")
                  .arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isExecutable())
-            ci = tr("WARNING: '%1' is not executable.")
+            ci = tr("WARNING: File '%1' is not executable.")
                  .arg(fileInfo.absoluteFilePath());
     }
     else
     {
-        ci = tr("WARNING: '%1' does not exist.")
+        ci = tr("WARNING: File '%1' does not exist.")
              .arg(fileInfo.absoluteFilePath());
     }
 

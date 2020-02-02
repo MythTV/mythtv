@@ -206,6 +206,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     void dispatch(const MythEvent &event);
 
+    void InitPower(bool Create = true);
     void InitLocale(void);
     void ReInitLocale(void);
     MythLocale *GetLocale(void) const;

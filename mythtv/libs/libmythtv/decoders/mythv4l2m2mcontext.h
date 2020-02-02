@@ -4,6 +4,8 @@
 // MythTV
 #include "mythdrmprimecontext.h"
 
+using V4L2Profiles = QList<MythCodecContext::CodecProfile>;
+
 class MythV4L2M2MContext : public MythDRMPRIMEContext
 {
   public:
@@ -20,10 +22,14 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
     int         HwDecoderInit            (AVCodecContext *Context) override;
     bool        DecoderWillResetOnFlush  (void) override;
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int/*Flags*/);
-    static bool HaveV4L2Codecs           (AVCodecID Codec = AV_CODEC_ID_NONE);
+    static bool HaveV4L2Codecs           (void);
+    static void GetDecoderList           (QStringList &Decoders);
 
     static enum AVPixelFormat GetV4L2RequestFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt);
     static int  InitialiseV4L2RequestContext(AVCodecContext *Context);
+
+  protected:
+    static const V4L2Profiles& GetProfiles(void);
 };
 
 #endif // MYTHV4L2M2MCONTEXT_H

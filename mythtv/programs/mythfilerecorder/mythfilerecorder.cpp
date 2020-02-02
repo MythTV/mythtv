@@ -21,7 +21,7 @@ using namespace std;
 #include "mythversion.h"
 #include "mythlogging.h"
 
-
+#define API_VERSION 1
 #define VERSION "1.0.0"
 #define LOC QString("File(%1): ").arg(m_fileName)
 
@@ -181,6 +181,17 @@ bool Commands::process_command(QString & cmd)
     if (cmd.startsWith("Version?"))
     {
         send_status(QString("OK:%1").arg(VERSION));
+        return true;
+    }
+    if (cmd.startsWith("APIVersion?"))
+    {
+        send_status(QString("OK:%1").arg(API_VERSION));
+        return true;
+    }
+    if (cmd.startsWith("APIVersion:1"))
+    {
+        QString reply = (API_VERSION == 1) ? "OK:Yes": "OK:No";
+        send_status(reply);
         return true;
     }
     if (cmd.startsWith("HasLock?"))

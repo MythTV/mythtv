@@ -115,11 +115,23 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 {
     QStringList decoders;
 
+#ifdef USING_VDPAU
+    MythVDPAUHelper::GetDecoderList(decoders);
+#endif
 #ifdef USING_VAAPI
     MythVAAPIContext::GetDecoderList(decoders);
 #endif
 #ifdef USING_MEDIACODEC
     MythMediaCodecContext::GetDecoderList(decoders);
+#endif
+#ifdef USING_NVDEC
+    MythNVDECContext::GetDecoderList(decoders);
+#endif
+#ifdef USING_MMAL
+    MythMMALContext::GetDecoderList(decoders);
+#endif
+#ifdef USING_V4L2
+    MythV4L2M2MContext::GetDecoderList(decoders);
 #endif
     return decoders;
 }
@@ -195,12 +207,15 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_MMAL
-    Opts.decoders->append("mmal-dec");
-    (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-    if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
+    if (MythMMALContext::HaveMMAL())
     {
-        Opts.decoders->append("mmal");
-        (*Opts.equiv_decoders)["mmal"].append("dummy");
+        Opts.decoders->append("mmal-dec");
+        (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
+        if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
+        {
+            Opts.decoders->append("mmal");
+            (*Opts.equiv_decoders)["mmal"].append("dummy");
+        }
     }
 #endif
 }
@@ -628,6 +643,7 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
 {
     switch (CodecID)
     {
+        case AV_CODEC_ID_MPEG1VIDEO: return MPEG1;
         case AV_CODEC_ID_MPEG2VIDEO:
             switch (Profile)
             {
@@ -726,12 +742,14 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
     return NoProfile;
 }
 
-QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size)
+QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size,
+                                                VideoFrameType Format, uint ColorDepth)
 {
     QString profile;
     switch (Profile)
     {
         case NoProfile:    profile = QObject::tr("Unknown/Unsupported"); break;
+        case MPEG1:        profile = "MPEG1"; break;
         case MPEG2:        profile = "MPEG2"; break;
         case MPEG2Simple:  profile = "MPEG2 Simple"; break;
         case MPEG2Main:    profile = "MPEG2 Main"; break;
@@ -800,5 +818,8 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
     if (Size.isEmpty())
         return profile;
 
-    return QObject::tr("%1 (Max size: %2x%3)").arg(profile).arg(Size.width()).arg(Size.height());
+    return QObject::tr("%1%2%3 (Max size: %4x%5)")
+            .arg(profile).arg(Format != FMT_NONE ? QString(" %1").arg(format_description(Format)) : "")
+            .arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
+            .arg(Size.width()).arg(Size.height());
 }

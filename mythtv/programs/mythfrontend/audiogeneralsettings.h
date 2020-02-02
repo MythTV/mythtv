@@ -23,6 +23,8 @@ class AudioTest;
 
 class AudioConfigScreen : public StandardSettingDialog
 {
+    Q_OBJECT
+
   public:
     AudioConfigScreen(MythScreenStack *parent, const char *name,
                       GroupSetting *groupSetting);

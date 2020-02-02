@@ -17,7 +17,7 @@ extern "C" {
 #include "libavfilter/buffersrc.h"
 }
 
-typedef QPair<MythCodecContext::CodecProfile,QPair<QSize,QSize>> VAAPIProfile;
+using VAAPIProfile = QPair<MythCodecContext::CodecProfile,QPair<QSize,QSize>>;
 using VAAPIProfiles = QList<VAAPIProfile>;
 
 class MTV_PUBLIC MythVAAPIContext : public MythCodecContext

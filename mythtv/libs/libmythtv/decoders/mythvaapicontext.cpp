@@ -593,6 +593,20 @@ const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
     av_freep(&profilelist);
     av_buffer_unref(&hwdevicectx);
 
+    // Once only check for EGL support for best performance
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    if (!s_profiles.isEmpty() && render)
+    {
+        if (render->IsEGL())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "EGL DMABUF available for best VAAPI performance");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "No EGL support. VAAPI performance will be reduced");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Consider setting MYTHTV_FORCE_EGL=1 to try and enable");
+        }
+    }
     return s_profiles;
 }
 

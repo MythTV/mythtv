@@ -159,24 +159,38 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
     bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
-    if (vdpau && (success == kCodec_MPEG4_VDPAU || success == kCodec_MPEG4_VDPAU_DEC))
-        vdpau = MythVDPAUHelper::HaveMPEG4Decode();
+
+    if (vdpau)
+    {
+        MythCodecContext::CodecProfile mythprofile =
+                MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
+        const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
+        vdpau = false;
+        for (auto vdpauprofile : profiles)
+        {
+            if (vdpauprofile.first == mythprofile &&
+                vdpauprofile.second.Supported((*Context)->width, (*Context)->height, (*Context)->level))
+            {
+                vdpau = true;
+                break;
+            }
+        }
+    }
+
+    // H264 needs additional checks for old hardware
     if (vdpau && (success == kCodec_H264_VDPAU || success == kCodec_H264_VDPAU_DEC))
         vdpau = MythVDPAUHelper::CheckH264Decode(*Context);
-    if (vdpau && (success == kCodec_HEVC_VDPAU || success == kCodec_HEVC_VDPAU_DEC))
-        vdpau = MythVDPAUHelper::CheckHEVCDecode(*Context);
+
+    QString desc = QString("'%1 %2 %3 %4x%5'")
+        .arg(codec).arg(profile).arg(pixfmt).arg((*Context)->width).arg((*Context)->height);
 
     if (!vdpau)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg(codec)
-                .arg(profile).arg(pixfmt));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VDPAU does not support decoding %1").arg(desc));
         return failure;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4'")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg(codec)
-            .arg(profile).arg(pixfmt));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VDPAU supports decoding %1").arg(desc));
     (*Context)->pix_fmt = AV_PIX_FMT_VDPAU;
     return success;
 }

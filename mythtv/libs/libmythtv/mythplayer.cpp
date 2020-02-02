@@ -55,7 +55,6 @@ using namespace std;
 #include <mythmainwindow.h>
 
 extern "C" {
-#include "vsync.h"
 #include "libavcodec/avcodec.h"
 }
 
@@ -198,9 +197,6 @@ MythPlayer::~MythPlayer(void)
 
     delete m_decoderThread;
     m_decoderThread = nullptr;
-
-    delete m_videoSync;
-    m_videoSync = nullptr;
 
     delete m_videoOutput;
     m_videoOutput = nullptr;
@@ -469,20 +465,6 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
             return;
         }
 
-        // the display refresh rate may have been changed by VideoOutput
-        if (m_videoSync)
-        {
-            int ri = m_display->GetRefreshInterval(m_frameInterval);
-            if (ri != m_videoSync->getRefreshInterval())
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Refresh rate has changed from %1 to %2")
-                    .arg(m_videoSync->getRefreshInterval())
-                    .arg(ri));
-                m_videoSync->setRefreshInterval(ri);
-             }
-        }
-
         if (m_osd)
             m_osd->SetPainter(m_videoOutput->GetOSDPainter());
         ReinitOSD();
@@ -590,7 +572,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
         return;
     }
 
-    if (!m_videoOutput || !m_videoSync)
+    if (!m_videoOutput)
         return; // hopefully this will be called again later...
 
     m_resetScan = kScan_Ignore;
@@ -716,14 +698,14 @@ void MythPlayer::OpenDummy(void)
 
 void MythPlayer::CreateDecoder(char *TestBuffer, int TestSize)
 {
-    if (NuppelDecoder::CanHandle(TestBuffer, TestSize))
+    if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename(), TestSize))
     {
-        SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
+        SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
         return;
     }
 
-    if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename(), TestSize))
-        SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
+    if (NuppelDecoder::CanHandle(TestBuffer, TestSize))
+        SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
 }
 
 int MythPlayer::OpenFile(int Retries)
@@ -1519,8 +1501,6 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval Interval:%1 Speed:%2 Scan:%3 (Multiplier: %4)")
         .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(toQString(scan)).arg(m_fpsMultiplier));
-    if (m_playSpeed < 1 || m_playSpeed > 2 || m_refreshRate <= 0)
-        return;
 }
 
 void MythPlayer::ResetAVSync(void)
@@ -1536,10 +1516,6 @@ void MythPlayer::ResetAVSync(void)
 
 void MythPlayer::InitAVSync(void)
 {
-    m_videoSync->Start();
-
-    m_refreshRate = m_display->GetRefreshInterval(m_frameInterval);
-
     m_rtcBase = 0;
     m_priorAudioTimecode = 0;
     m_priorVideoTimecode = 0;
@@ -1547,17 +1523,11 @@ void MythPlayer::InitAVSync(void)
 
     if (!FlagIsSet(kVideoIsNull))
     {
-        QString timing_type = m_videoSync->getName();
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display Refresh Rate: %1 Video Frame Rate: %2")
+            .arg(1000000.0 / m_display->GetRefreshInterval(m_frameInterval), 0, 'f', 3)
+            .arg(1000000.0 / m_frameInterval, 0, 'f', 3));
 
-        QString msg = QString("Video timing method: %1").arg(timing_type);
-        LOG(VB_GENERAL, LOG_INFO, LOC + msg);
-        msg = QString("Display Refresh Rate: %1 Video Frame Rate: %2")
-                       .arg(1000000.0 / m_refreshRate, 0, 'f', 3)
-                       .arg(1000000.0 / m_frameInterval, 0, 'f', 3);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
-
-        SetFrameInterval(m_scan,
-                         1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
+        SetFrameInterval(m_scan, 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
 
         // try to get preferential scheduling, but ignore if we fail to.
         myth_nice(-19);
@@ -1838,7 +1808,7 @@ void MythPlayer::RefreshPauseFrame(void)
 
 void MythPlayer::DisplayPauseFrame(void)
 {
-    if (!m_videoOutput || ! m_videoSync)
+    if (!m_videoOutput)
         return;
 
     if (m_videoOutput->IsErrored())
@@ -1859,7 +1829,6 @@ void MythPlayer::DisplayPauseFrame(void)
     m_videoOutput->PrepareFrame(nullptr, scan, m_osd);
     m_osdLock.unlock();
     m_videoOutput->Show(scan);
-    m_videoSync->Start();
 }
 
 void MythPlayer::SetBuffering(bool new_buffering)
@@ -1903,6 +1872,11 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - m_framesPlayed;
+            // Sometimes m_framesPlayed > frameCount.  Until that can
+            // be fixed, set framesLeft = 0 so the forced pause below
+            // is performed.
+            if (m_framesPlayed > frameCount)
+                framesLeft = 0;
             auto margin = (uint64_t) (m_videoFrameRate * 3);
             if (framesLeft < margin)
             {
@@ -1985,8 +1959,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 "Waited too long for decoder to fill video buffers. Exiting..");
             SetErrored(tr("Video frame buffering failed too many times."));
         }
-        if (m_normalSpeed)
-            m_videoSync->Start();
         return false;
     }
 
@@ -2085,15 +2057,8 @@ void MythPlayer::PreProcessNormalFrame(void)
 bool MythPlayer::CanSupportDoubleRate(void)
 {
     int refreshinterval = 1;
-    if (m_videoSync)
-    {
-        refreshinterval = m_videoSync->getRefreshInterval();
-    }
-    else if (m_display)
-    {
-        // used by the decoder before m_videoSync is created
+    if (m_display)
         refreshinterval = m_display->GetRefreshInterval(m_frameInterval);
-    }
 
     // At this point we may not have the correct frame rate.
     // Since interlaced is always at 25 or 30 fps, if the interval
@@ -2176,14 +2141,8 @@ void MythPlayer::VideoStart(void)
     ClearAfterSeek(false);
 
     m_avsyncAvg = 0;  // Frames till next sync check
-    m_refreshRate = 0;
 
     EnableFrameRateMonitor();
-    m_refreshRate = m_frameInterval;
-
-    float temp_speed = (m_playSpeed == 0.0F) ? m_audio.GetStretchFactor() : m_playSpeed;
-    int fr_int = static_cast<int>(1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed));
-    int displayinterval = m_display->GetRefreshInterval(fr_int);
 
     // Default to interlaced playback but set the tracker to progressive
     // Enable autodetection of interlaced/progressive from video stream
@@ -2198,27 +2157,13 @@ void MythPlayer::VideoStart(void)
     m_doubleFramerate  = false;
     m_scanTracker      = -2;
 
-    if (m_playerCtx->IsPIP() && FlagIsSet(kVideoIsNull))
+    if (!FlagIsSet(kVideoIsNull) && m_videoOutput)
     {
-        m_videoSync = new DummyVideoSync(m_videoOutput, 0);
-    }
-    else if (FlagIsSet(kVideoIsNull))
-    {
-        m_videoSync = new USleepVideoSync(m_videoOutput, 0);
-    }
-    else if (m_videoOutput)
-    {
-        m_videoSync = VideoSync::BestMethod(m_videoOutput, static_cast<uint>(displayinterval));
-        m_doubleFramerate = CanSupportDoubleRate(); // needs m_videoSync
+        m_doubleFramerate = CanSupportDoubleRate();
         m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
     }
 
-    if (!m_videoSync)
-        m_videoSync = new BusyWaitVideoSync(m_videoOutput, displayinterval);
-
     InitAVSync();
-    m_videoSync->Start();
-
     AutoVisualise();
 }
 
@@ -2258,10 +2203,8 @@ void MythPlayer::VideoEnd(void)
     m_osdLock.lock();
     m_vidExitLock.lock();
     delete m_osd;
-    delete m_videoSync;
     delete m_videoOutput;
     m_osd         = nullptr;
-    m_videoSync   = nullptr;
     m_videoOutput = nullptr;
     m_vidExitLock.unlock();
     m_osdLock.unlock();
@@ -3638,7 +3581,7 @@ void MythPlayer::ChangeSpeed(void)
         .arg(m_videoFrameRate).arg(static_cast<double>(m_playSpeed))
         .arg(m_ffrewSkip).arg(m_frameInterval));
 
-    if (m_videoOutput && m_videoSync)
+    if (m_videoOutput)
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));
 
     // ensure we re-check double rate support following a speed change

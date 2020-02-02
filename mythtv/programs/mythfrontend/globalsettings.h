@@ -285,6 +285,8 @@ class PlaybackProfileConfig : public GroupSetting
 
 class ChannelGroupSetting : public GroupSetting
 {
+    Q_OBJECT
+
   public:
     ChannelGroupSetting(const QString &groupName, int groupId);
     void Load() override; // StandardSetting

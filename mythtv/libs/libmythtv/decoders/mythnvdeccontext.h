@@ -42,6 +42,7 @@ class MythNVDECContext : public MythCodecContext
                                           AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
     static bool HaveNVDEC                (void);
+    static void GetDecoderList           (QStringList &Decoders);
 
   private:
     class MythNVDECCaps
@@ -49,21 +50,21 @@ class MythNVDECContext : public MythCodecContext
       public:
         MythNVDECCaps(cudaVideoCodec Codec, uint Depth, cudaVideoChromaFormat Format,
                       QSize Minimum, QSize Maximum, uint MacroBlocks);
+        bool Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format, uint Depth,
+                      int Width, int Height);
 
-        cudaVideoCodec m_codec;
-        uint           m_depth;
-        cudaVideoChromaFormat m_format;
-        QSize          m_minimum;
-        QSize          m_maximum;
-        uint           m_macroBlocks;
+        MythCodecContext::CodecProfile m_profile { MythCodecContext::NoProfile };
+        VideoFrameType m_type           { FMT_NONE };
+        cudaVideoCodec m_codec          { cudaVideoCodec_NumCodecs };
+        uint           m_depth          { 0 };
+        cudaVideoChromaFormat m_format  { cudaVideoChromaFormat_Monochrome };
+        QSize          m_minimum        { };
+        QSize          m_maximum        { };
+        uint           m_macroBlocks    { 0 };
     };
 
-    static QMutex*     s_NVDECLock;
-    static bool        s_NVDECAvailable;
-    static std::vector<MythNVDECCaps> s_NVDECDecoderCaps;
-    static void   NVDECCheck             (void);
-
   private:
+    static const std::vector<MythNVDECCaps>& GetProfiles(void);
     MythDeintType m_deinterlacer         { DEINT_NONE  };
     bool          m_deinterlacer2x       { false       };
 };

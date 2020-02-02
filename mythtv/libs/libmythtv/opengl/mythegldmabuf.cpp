@@ -19,7 +19,6 @@ MythEGLDMABUF::MythEGLDMABUF(MythRenderOpenGL *Context)
     {
         OpenGLLocker locker(Context);
         m_useModifiers = Context->IsEGL() && Context->HasEGLExtension("EGL_EXT_image_dma_buf_import_modifiers");
-        QSurfaceFormat fmt = Context->format();
     }
 }
 
@@ -55,6 +54,11 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
             .arg(i).arg(Desc->objects[i].fd).arg(Desc->objects[i].format_modifier, 0 , 16));
 }
 
+/*! \brief Create a single RGBA32 texture using the provided AVDRMFramDescriptor.
+ *
+ * \note This assumes one layer with multiple planes, typically where the layer
+ * is a YUV format.
+*/
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
                                                                VideoFrame *Frame, FrameScanType Scan) const
@@ -68,8 +72,13 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
         vector<MythVideoTexture*> textures =
                 MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
                                                  GL_TEXTURE_EXTERNAL_OES);
-        for (auto & texture : textures)
-            texture->m_allowGLSLDeint = false;
+        if (textures.empty())
+        {
+            ClearDMATextures(Context, result);
+            return result;
+        }
+
+        textures[0]->m_allowGLSLDeint = false;
 
         EGLint colourspace = EGL_ITU_REC709_EXT;
         switch (Frame->colorspace)
@@ -144,7 +153,13 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
         EGLImageKHR image = Context->eglCreateImageKHR(Context->GetEGLDisplay(), EGL_NO_CONTEXT,
                                                        EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
         if (!image)
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(Context->GetEGLError()));
+            // Ensure we release anything already created and return nothing
+            ClearDMATextures(Context, result);
+            return result;
+        }
+
         MythVideoTexture *texture = textures[0];
         Context->glBindTexture(texture->m_target, texture->m_textureId);
         Context->eglImageTargetTexture2DOES(texture->m_target, image);
@@ -156,6 +171,10 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
     return result;
 }
 
+/*! \brief Create multiple textures that represent the planes for the given AVDRMFrameDescriptor
+ *
+ * \note This assumes multiple layers each with one plane.
+*/
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
                                                                VideoFrame *Frame) const
@@ -173,11 +192,12 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
                                              QOpenGLTexture::Target2D);
-    for (auto & texture : result)
-        texture->m_allowGLSLDeint = true;
+    if (result.empty())
+        return result;
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
+        result[plane]->m_allowGLSLDeint = true;
         AVDRMLayerDescriptor* layer    = &Desc->layers[plane];
         AVDRMPlaneDescriptor* drmplane = &layer->planes[0];
         QVector<EGLint> attribs = {
@@ -202,8 +222,12 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
         EGLImageKHR image = Context->eglCreateImageKHR(Context->GetEGLDisplay(), EGL_NO_CONTEXT,
                                                          EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
         if (!image)
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
                 .arg(plane).arg(Context->GetEGLError()));
+            ClearDMATextures(Context, result);
+            return result;
+        }
 
         Context->glBindTexture(result[plane]->m_target, result[plane]->m_textureId);
         Context->eglImageTargetTexture2DOES(result[plane]->m_target, image);
@@ -214,9 +238,134 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     return result;
 }
 
+#ifndef DRM_FORMAT_R8
+#define MKTAG2(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | (static_cast<unsigned>(d) << 24))
+#define DRM_FORMAT_R8     MKTAG2('R', '8', ' ', ' ')
+#define DRM_FORMAT_GR88   MKTAG2('G', 'R', '8', '8')
+#define DRM_FORMAT_R16    MKTAG2('R', '1', '6', ' ')
+#define DRM_FORMAT_GR32   MKTAG2('G', 'R', '3', '2')
+#define DRM_FORMAT_NV12	  MKTAG2('N', 'V', '1', '2')
+#define DRM_FORMAT_NV21   MKTAG2('N', 'V', '2', '1')
+#define DRM_FORMAT_YUV420 MKTAG2('Y', 'U', '1', '2')
+#define DRM_FORMAT_YVU420 MKTAG2('Y', 'V', '1', '2')
+#define DRM_FORMAT_P010   MKTAG2('P', '0', '1', '0')
+#endif
+
+/*! \brief Create multiple textures that represent the planes for the given AVDRMFrameDescriptor
+ *
+ * \note This assumes one layer with multiple planes that represent a YUV format.
+ *
+ * It is used where the OpenGL DMA BUF implementation does not support composing YUV formats.
+ * It offers better feature support (as we can enable colour controls, shader
+ * deinterlacing etc) but may not be as fast on low end hardware; it might not
+ * use hardware accelerated paths and shader deinterlacing may not be as fast as the
+ * simple EGL based onefield/bob deinterlacer. It is essentially the same as
+ * CreateSeparate but the DRM descriptor uses a different layout and we have
+ * to 'guess' the correct DRM_FORMATs for each plane.
+ *
+ * \todo Add support for simple onefield/bob with YUV textures.
+*/
+inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
+                                                                MythRenderOpenGL *Context,
+                                                                VideoFrame *Frame)
+{
+    // As for CreateSeparate - may not work for some formats
+    AVDRMLayerDescriptor* layer = &Desc->layers[0];
+    vector<QSize> sizes;
+    for (int plane = 0 ; plane < layer->nb_planes; ++plane)
+    {
+        int width = Frame->width >> ((plane > 0) ? 1 : 0);
+        int height = Frame->height >> ((plane > 0) ? 1 : 0);
+        sizes.emplace_back(QSize(width, height));
+    }
+
+    // TODO - the v4l2_m2m decoder is not setting the correct sw_fmt - so we
+    // need to deduce the frame format from the fourcc
+    VideoFrameType format = FMT_YV12;
+    EGLint fourcc1 = DRM_FORMAT_R8;
+    EGLint fourcc2 = DRM_FORMAT_R8;
+    if (layer->format == DRM_FORMAT_NV12 || layer->format == DRM_FORMAT_NV21)
+    {
+        format  = FMT_NV12;
+        fourcc2 = DRM_FORMAT_GR88;
+    }
+    else if (layer->format == DRM_FORMAT_P010)
+    {
+        format  = FMT_P010;
+        fourcc1 = DRM_FORMAT_R16;
+        fourcc2 = DRM_FORMAT_GR32;
+    }
+
+    vector<MythVideoTexture*> result =
+            MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
+                                             QOpenGLTexture::Target2D);
+    if (result.empty())
+        return result;
+
+    for (uint plane = 0; plane < result.size(); ++plane)
+    {
+        result[plane]->m_allowGLSLDeint = true;
+        EGLint fourcc = fourcc1;
+        if (plane > 0)
+            fourcc = fourcc2;
+        AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];
+        QVector<EGLint> attribs = {
+            EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+            EGL_WIDTH,  result[plane]->m_size.width(),
+            EGL_HEIGHT, result[plane]->m_size.height(),
+            EGL_DMA_BUF_PLANE0_FD_EXT,     Desc->objects[drmplane->object_index].fd,
+            EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(drmplane->offset),
+            EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(drmplane->pitch)
+        };
+
+        if (m_useModifiers && (Desc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
+        {
+            attribs << EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT
+                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier & 0xffffffff)
+                    << EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT
+                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier >> 32);
+        }
+
+        attribs << EGL_NONE;
+
+        EGLImageKHR image = Context->eglCreateImageKHR(Context->GetEGLDisplay(), EGL_NO_CONTEXT,
+                                                       EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
+        if (!image)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
+                .arg(plane).arg(Context->GetEGLError()));
+            ClearDMATextures(Context, result);
+            return result;
+        }
+
+        Context->glBindTexture(result[plane]->m_target, result[plane]->m_textureId);
+        Context->eglImageTargetTexture2DOES(result[plane]->m_target, image);
+        Context->glBindTexture(result[plane]->m_target, 0);
+        result[plane]->m_data = static_cast<unsigned char *>(image);
+    }
+
+    return result;
+}
+
+void MythEGLDMABUF::ClearDMATextures(MythRenderOpenGL* Context,
+                                     vector<MythVideoTexture *> &Textures) const
+{
+    for (auto & texture : Textures)
+    {
+        if (texture->m_data)
+            Context->eglDestroyImageKHR(Context->GetEGLDisplay(), texture->m_data);
+        texture->m_data = nullptr;
+        if (texture->m_textureId)
+            Context->glDeleteTextures(1, &texture->m_textureId);
+        MythVideoTexture::DeleteTexture(Context, texture);
+    }
+    Textures.clear();
+}
+
 vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* Desc,
                                                         MythRenderOpenGL *Context,
                                                         VideoFrame *Frame,
+                                                        bool UseSeparate,
                                                         FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
@@ -246,7 +395,11 @@ vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* De
 
     // One layer with X planes
     if (numlayers == 1)
+    {
+        if (UseSeparate)
+            return CreateSeparate2(Desc, Context, Frame);
         return CreateComposed(Desc, Context, Frame, Scan);
+    }
     // X layers with one plane each
     return CreateSeparate(Desc, Context, Frame);
 }

@@ -10,6 +10,7 @@
 using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
 using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);
 using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
+using MYTH_EGLGETPLATFORMDISPLAY = void* (*)(GLenum, void*, const intptr_t*);
 
 class MythRenderOpenGL;
 
@@ -27,6 +28,7 @@ class MUI_PUBLIC MythEGL
     void* eglCreateImageKHR          (void* Disp, void* Context, unsigned int Target,
                                       void* Buffer, const int32_t *Attributes);
     void  eglDestroyImageKHR         (void* Disp, void* Image);
+    static QString GetEGLVendor(void);
 
   private:
     Q_DISABLE_COPY(MythEGL)

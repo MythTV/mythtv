@@ -48,6 +48,7 @@
 #ifdef USING_VAAPI
 #include "decoders/mythvaapicontext.h"
 #endif
+#include "mythpower.h"
 
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
@@ -1911,7 +1912,7 @@ static HostSpinBoxSetting *FrontendIdleTimeout()
     return gs;
 }
 
-static HostComboBoxSetting *OverrideExitMenu()
+static HostComboBoxSetting *OverrideExitMenu(MythPower *Power)
 {
     auto *gc = new HostComboBoxSetting("OverrideExitMenu");
 
@@ -1919,6 +1920,7 @@ static HostComboBoxSetting *OverrideExitMenu()
 
     gc->addSelection(MainGeneralSettings::tr("Default"), "0");
     gc->addSelection(MainGeneralSettings::tr("Show quit"), "1");
+    gc->addSelection(MainGeneralSettings::tr("Show quit and suspend"), "9");
     gc->addSelection(MainGeneralSettings::tr("Show quit and shutdown"), "2");
     gc->addSelection(MainGeneralSettings::tr("Show quit, reboot and shutdown"),
                      "3");
@@ -1926,48 +1928,91 @@ static HostComboBoxSetting *OverrideExitMenu()
     gc->addSelection(MainGeneralSettings::tr("Show reboot"), "5");
     gc->addSelection(MainGeneralSettings::tr("Show reboot and shutdown"), "6");
     gc->addSelection(MainGeneralSettings::tr("Show standby"), "7");
+    gc->addSelection(MainGeneralSettings::tr("Show suspend"), "8");
 
-    gc->setHelpText(
-        MainGeneralSettings::tr("By default, only remote frontends are shown "
-                                 "the shutdown option on the exit menu. Here "
-                                 "you can force specific shutdown and reboot "
-                                 "options to be displayed."));
+    QString helptext = MainGeneralSettings::tr("By default, only remote frontends are shown "
+                                               "the shutdown option on the exit menu. Here "
+                                               "you can force specific shutdown, reboot and suspend "
+                                               "options to be displayed.");
+    if (Power)
+    {
+        QStringList supported = Power->GetFeatureList();
+        if (!supported.isEmpty())
+        {
+            helptext.prepend(MainGeneralSettings::tr(
+                "This system supports '%1' without additional setup. ")
+                .arg(supported.join(", ")));
+        }
+        else
+        {
+            helptext.append(MainGeneralSettings::tr(
+                " This system appears to have no power options available. Try "
+                "setting the Halt/Reboot/Suspend commands below."));
+        }
+    }
+    gc->setHelpText(helptext);
+
     return gc;
 }
 
-static HostTextEditSetting *RebootCommand()
+#ifndef Q_OS_ANDROID
+static HostTextEditSetting *RebootCommand(MythPower *Power)
 {
     auto *ge = new HostTextEditSetting("RebootCommand");
-
     ge->setLabel(MainGeneralSettings::tr("Reboot command"));
-
     ge->setValue("");
-
-    ge->setHelpText(MainGeneralSettings::tr("Optional. Script to run if you "
-                                            "select the reboot option from the "
-                                            "exit menu, if the option is "
-                                            "displayed. You must configure an "
-                                            "exit key to display the exit "
-                                            "menu."));
+    QString help = MainGeneralSettings::tr(
+        "Optional. Script to run if you select the reboot option from the "
+        "exit menu, if the option is displayed. You must configure an "
+        "exit key to display the exit menu.");
+    if (Power && Power->IsFeatureSupported(MythPower::FeatureRestart))
+    {
+        help.append(MainGeneralSettings::tr(
+            " Note: This system appears to support reboot without using this setting."));
+    }
+    ge->setHelpText(help);
     return ge;
 }
 
-static HostTextEditSetting *HaltCommand()
+static HostTextEditSetting *SuspendCommand(MythPower *Power)
+{
+    auto *suspend = new HostTextEditSetting("SuspendCommand");
+    suspend->setLabel(MainGeneralSettings::tr("Suspend command"));
+    suspend->setValue("");
+    QString help = MainGeneralSettings::tr(
+            "Optional: Script to run if you select the suspend option from the "
+            "exit menu, if the option is displayed.");
+
+    if (Power && Power->IsFeatureSupported(MythPower::FeatureSuspend))
+    {
+        help.append(MainGeneralSettings::tr(
+            " Note: This system appears to support suspend without using this setting."));
+    }
+    suspend->setHelpText(help);
+    return suspend;
+}
+
+static HostTextEditSetting *HaltCommand(MythPower *Power)
 {
     auto *ge = new HostTextEditSetting("HaltCommand");
-
     ge->setLabel(MainGeneralSettings::tr("Halt command"));
-
     ge->setValue("");
+    QString help = MainGeneralSettings::tr("Optional. Script to run if you "
+                                           "select the shutdown option from "
+                                           "the exit menu, if the option is "
+                                           "displayed. You must configure an "
+                                           "exit key to display the exit "
+                                           "menu.");
+    if (Power && Power->IsFeatureSupported(MythPower::FeatureShutdown))
+    {
+        help.append(MainGeneralSettings::tr(
+            " Note: This system appears to support shutdown without using this setting."));
+    }
 
-    ge->setHelpText(MainGeneralSettings::tr("Optional. Script to run if you "
-                                            "select the shutdown option from "
-                                            "the exit menu, if the option is "
-                                            "displayed. You must configure an "
-                                            "exit key to display the exit "
-                                            "menu."));
+    ge->setHelpText(help);
     return ge;
 }
+#endif
 
 static HostTextEditSetting *LircDaemonDevice()
 {
@@ -2794,7 +2839,7 @@ static HostCheckBoxSetting *BrowseChannelGroup()
 #if 0
 static GlobalCheckBoxSetting *SortCaseSensitive()
 {
-    auto gc = new GlobalCheckBoxSetting("SortCaseSensitive");
+    auto *gc = new GlobalCheckBoxSetting("SortCaseSensitive");
     gc->setLabel(GeneralSettings::tr("Case-sensitive sorting"));
     gc->setValue(false);
     gc->setHelpText(GeneralSettings::tr("If enabled, all sorting will be "
@@ -2808,7 +2853,7 @@ static GlobalCheckBoxSetting *SortCaseSensitive()
 
 static GlobalCheckBoxSetting *SortStripPrefixes()
 {
-    auto gc = new GlobalCheckBoxSetting("SortStripPrefixes");
+    auto *gc = new GlobalCheckBoxSetting("SortStripPrefixes");
 
     gc->setLabel(GeneralSettings::tr("Remove prefixes when sorting"));
     gc->setValue(true);
@@ -2824,7 +2869,7 @@ static GlobalCheckBoxSetting *SortStripPrefixes()
 
 static GlobalTextEditSetting *SortPrefixExceptions()
 {
-    auto gc = new GlobalTextEditSetting("SortPrefixExceptions");
+    auto *gc = new GlobalTextEditSetting("SortPrefixExceptions");
 
     gc->setLabel(MainGeneralSettings::tr("Names exempt from prefix removal"));
     gc->setValue("");
@@ -3893,48 +3938,70 @@ class ShutDownRebootSetting : public GroupSetting
 {
   public:
     ShutDownRebootSetting();
+
   private slots:
-    void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
+    void childChanged(StandardSetting*) override;
+
   private:
-    StandardSetting *m_overrideExitMenu {nullptr};
-    StandardSetting *m_haltCommand      {nullptr};
-    StandardSetting *m_rebootCommand    {nullptr};
+    StandardSetting *m_overrideExitMenu { nullptr };
+    StandardSetting *m_haltCommand      { nullptr };
+    StandardSetting *m_rebootCommand    { nullptr };
+    StandardSetting *m_suspendCommand   { nullptr };
 };
 
 ShutDownRebootSetting::ShutDownRebootSetting()
 {
     setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
     addChild(FrontendIdleTimeout());
-    addChild(m_overrideExitMenu = OverrideExitMenu());
-    addChild(m_haltCommand      = HaltCommand());
-    addChild(m_rebootCommand    = RebootCommand());
+    auto *power = MythPower::AcquireRelease(this, true);
+    addChild(m_overrideExitMenu = OverrideExitMenu(power));
+#ifndef Q_OS_ANDROID
+    addChild(m_haltCommand      = HaltCommand(power));
+    addChild(m_rebootCommand    = RebootCommand(power));
+    addChild(m_suspendCommand   = SuspendCommand(power));
+#endif
+    if (power)
+        MythPower::AcquireRelease(this, false);
     connect(m_overrideExitMenu,SIGNAL(valueChanged(StandardSetting *)),
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting * /*setting*/)
+void ShutDownRebootSetting::childChanged(StandardSetting*)
 {
+    if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand)
+        return;
+
     switch (m_overrideExitMenu->getValue().toInt())
     {
         case 2:
         case 4:
             m_haltCommand->setEnabled(true);
             m_rebootCommand->setEnabled(false);
+            m_suspendCommand->setEnabled(false);
             break;
         case 3:
         case 6:
             m_haltCommand->setEnabled(true);
             m_rebootCommand->setEnabled(true);
+            m_suspendCommand->setEnabled(false);
             break;
         case 5:
             m_haltCommand->setEnabled(false);
             m_rebootCommand->setEnabled(true);
+            m_suspendCommand->setEnabled(false);
+            break;
+        case 8:
+        case 9:
+            m_suspendCommand->setEnabled(true);
+            m_haltCommand->setEnabled(false);
+            m_rebootCommand->setEnabled(false);
             break;
         case 0:
         case 1:
         default:
             m_haltCommand->setEnabled(false);
             m_rebootCommand->setEnabled(false);
+            m_suspendCommand->setEnabled(false);
             break;
     }
 }
@@ -3964,7 +4031,7 @@ MainGeneralSettings::MainGeneralSettings()
         // presenting this option to a user.
         general->addChild(SortCaseSensitive());
 #endif
-        auto stripPrefixes = SortStripPrefixes();
+        auto *stripPrefixes = SortStripPrefixes();
         general->addChild(stripPrefixes);
         stripPrefixes->addTargetedChild("1", SortPrefixExceptions());
     }
@@ -4059,7 +4126,7 @@ class PlayBackScaling : public GroupSetting
 
 PlayBackScaling::PlayBackScaling()
 {
-    setLabel(tr("Scaling"));
+    setLabel(PlaybackSettings::tr("Scaling"));
     addChild(m_vertScan = VertScanPercentage());
     addChild(m_yScan = YScanDisplacement());
     addChild(m_horizScan = HorizScanPercentage());
@@ -4083,7 +4150,7 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
         m_yScan->getValue() == "0" &&
         m_xScan->getValue() == "0")
     {
-        item->SetText(tr("No scaling"),"value");
+        item->SetText(PlaybackSettings::tr("No scaling"), "value");
     }
     else
     {
@@ -4584,7 +4651,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
     : m_channelId(chanid)
 {
     setLabel(QString("%1 %2").arg(channum).arg(channame));
-    setHelpText(tr("Select/Unselect channels for this channel group"));
+    setHelpText(ChannelGroupSettings::tr("Select/Unselect channels for this channel group"));
 }
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,

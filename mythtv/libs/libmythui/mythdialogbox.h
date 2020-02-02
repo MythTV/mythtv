@@ -47,6 +47,7 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
           m_id(std::move(id)), m_result(result),
           m_resultText(std::move(text)),
           m_resultData(std::move(data)) { }
+    ~DialogCompletionEvent() override;
 
     QString GetId() { return m_id; }
     int GetResult() const { return m_result; }

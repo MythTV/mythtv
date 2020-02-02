@@ -22,7 +22,7 @@ class META_PUBLIC MetadataFactoryMultiResult : public QEvent
   public:
     explicit MetadataFactoryMultiResult(const MetadataLookupList& res)
         : QEvent(kEventType), m_results(res) {}
-    ~MetadataFactoryMultiResult() override = default;
+    ~MetadataFactoryMultiResult() override;
 
     MetadataLookupList m_results;
 
@@ -40,14 +40,7 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
             m_result->IncrRef();
         }
     }
-    ~MetadataFactorySingleResult() override
-    {
-        if (m_result)
-        {
-            m_result->DecrRef();
-            m_result = nullptr;
-        }
-    }
+    ~MetadataFactorySingleResult() override;
 
     MetadataLookup *m_result {nullptr};
 
@@ -65,14 +58,7 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
             m_result->IncrRef();
         }
     }
-    ~MetadataFactoryNoResult() override
-    {
-        if (m_result)
-        {
-            m_result->DecrRef();
-            m_result = nullptr;
-        }
-    }
+    ~MetadataFactoryNoResult() override;
 
     MetadataLookup *m_result {nullptr};
 
@@ -87,7 +73,7 @@ class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
                                 m_additions(std::move(adds)),
                                 m_moved(std::move(movs)),
                                 m_deleted(std::move(dels)) {}
-    ~MetadataFactoryVideoChanges() override = default;
+    ~MetadataFactoryVideoChanges() override;
 
     QList<int> m_additions; // newly added intids
     QList<int> m_moved; // intids moved to new filename

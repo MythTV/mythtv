@@ -27,6 +27,9 @@
 QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+DialogCompletionEvent::~DialogCompletionEvent()
+{
+}
 
 MythMenu::MythMenu(QString text, QObject *retobject, QString resultid) :
     m_text(std::move(text)), m_resultid(std::move(resultid)), m_retObject(retobject)

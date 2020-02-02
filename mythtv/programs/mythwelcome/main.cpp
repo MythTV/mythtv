@@ -12,6 +12,7 @@
 #include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "mythdisplay.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -62,6 +63,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+    MythDisplay::ConfigureQtGUI();
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 

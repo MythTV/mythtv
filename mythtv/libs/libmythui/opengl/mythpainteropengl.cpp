@@ -17,10 +17,17 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
     m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
+
+    if (!m_render)
+        LOG(VB_GENERAL, LOG_ERR, "OpenGL painter has no render device");
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
+    if (!m_render)
+        return;
+    if (!m_render->IsReady())
+        return;
     OpenGLLocker locker(m_render);
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_START");
@@ -90,20 +97,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 
     if (!m_render)
     {
-        auto* glwin = dynamic_cast<MythPainterWindowGL*>(m_parent);
-        if (!glwin)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");
-            return;
-        }
-
-        if (glwin)
-            m_render = glwin->m_render;
-        if (!m_render)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to get MythRenderOpenGL");
-            return;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'Begin'");
+        return;
     }
 
     if (!m_mappedBufferPoolReady)

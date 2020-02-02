@@ -1,25 +1,29 @@
-#include <QObject>
-
-#define NO_EXIT  0
-#define QUIT     1
-#define HALT     2
-#define REBOOT   3
+// MythTV
+#include "mythpower.h"
 
 class ExitPrompter : public QObject
 {
     Q_OBJECT
 
   public:
-    ExitPrompter() = default;
-   ~ExitPrompter() override = default;
+    ExitPrompter();
+   ~ExitPrompter() override;
 
   public slots:
-    static void quit(void);
-    static void halt(bool Confirmed = true);
-    static void reboot(bool Confirmed = true);
-    static void standby(void);
-    void handleExit(void);
-    void confirmHalt(void);
-    void confirmReboot(void);
-    void confirm(int Action);
+    void DoQuit(void);
+    void DoHalt(bool Confirmed = true);
+    void DoReboot(bool Confirmed = true);
+    void DoStandby(void);
+    void DoSuspend(bool Confirmed = true);
+    void HandleExit(void);
+    void ConfirmHalt(void);
+    void ConfirmReboot(void);
+    void ConfirmSuspend(void);
+    void Confirm(MythPower::Feature Action);
+
+  private:
+    MythPower* m_power { nullptr };
+    QString    m_haltCommand;
+    QString    m_rebootCommand;
+    QString    m_suspendCommand;
 };

@@ -39,14 +39,40 @@ using std::max;
 QEvent::Type MetadataFactoryNoResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+MetadataFactoryNoResult::~MetadataFactoryNoResult()
+{
+    if (m_result)
+    {
+        m_result->DecrRef();
+        m_result = nullptr;
+    }
+}
+
 QEvent::Type MetadataFactorySingleResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
+
+MetadataFactorySingleResult::~MetadataFactorySingleResult()
+{
+    if (m_result)
+    {
+        m_result->DecrRef();
+        m_result = nullptr;
+    }
+}
 
 QEvent::Type MetadataFactoryMultiResult::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+MetadataFactoryMultiResult::~MetadataFactoryMultiResult()
+{
+}
+
 QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
+
+MetadataFactoryVideoChanges::~MetadataFactoryVideoChanges()
+{
+}
 
 MetadataFactory::MetadataFactory(QObject *parent) :
     QObject(parent)

@@ -38,6 +38,10 @@
 QEvent::Type MythGestureEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+MythGestureEvent::~MythGestureEvent()
+{
+}
+
 /**
  * @class MythGesturePrivate
  * @brief Private information used only by a stroke class.

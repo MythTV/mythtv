@@ -1,3 +1,4 @@
+// Qt
 #include <QCoreApplication>
 #include <QUrl>
 #include <QDir>
@@ -17,6 +18,7 @@
 #include <QDateTime>
 #include <QRunnable>
 
+// Std
 #include <algorithm>
 #include <cmath>
 #include <cstdarg>
@@ -31,6 +33,7 @@ using namespace std;
 #include <utility>
 #endif
 
+// MythTV
 #include "compat.h"
 #include "mythconfig.h"       // for CONFIG_DARWIN
 #include "mythdownloadmanager.h"
@@ -47,6 +50,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythplugin.h"
 #include "mythmiscutil.h"
+#include "mythpower.h"
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
@@ -116,16 +120,20 @@ class MythCoreContextPrivate : public QObject
 
     QList<QHostAddress> m_approvedIps;
     QList<QHostAddress> m_deniedIps;
+
+    MythPower *m_power;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
                                                QString binversion,
                                                QObject *guicontext)
     : m_parent(lparent),
-      m_guiContext(guicontext), m_guiObject(nullptr),
+      m_guiContext(guicontext),
+      m_guiObject(nullptr),
       m_appBinaryVersion(std::move(binversion)),
       m_sockLock(QMutex::NonRecursive),
-      m_serverSock(nullptr), m_eventSock(nullptr),
+      m_serverSock(nullptr),
+      m_eventSock(nullptr),
       m_wolInProgress(false),
       m_isWOLAllowed(true),
       m_backend(false),
@@ -140,7 +148,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_announcedProtocol(false),
       m_pluginmanager(nullptr),
       m_isexiting(false),
-      m_sessionManager(nullptr)
+      m_sessionManager(nullptr),
+      m_power(nullptr)
 {
     MThread::ThreadSetup("CoreContext");
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
@@ -164,6 +173,9 @@ static void delete_sock(QMutexLocker &locker, MythSocket **s)
 
 MythCoreContextPrivate::~MythCoreContextPrivate()
 {
+    if (m_power)
+        MythPower::AcquireRelease(this, false);
+
     MThreadPool::StopAllPools();
 
     {
@@ -1774,7 +1786,20 @@ void MythCoreContext::ResetSockets(void)
     dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
 }
 
-void MythCoreContext::InitLocale(void )
+void MythCoreContext::InitPower(bool Create)
+{
+    if (Create && !d->m_power)
+    {
+        d->m_power = MythPower::AcquireRelease(d, true);
+    }
+    else if (!Create && d->m_power)
+    {
+        MythPower::AcquireRelease(d, false);
+        d->m_power = nullptr;
+    }
+}
+
+void MythCoreContext::InitLocale(void)
 {
     if (!d->m_locale)
         d->m_locale = new MythLocale();

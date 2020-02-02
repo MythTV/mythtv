@@ -204,7 +204,7 @@ int ExternIO::Write(const QByteArray & buffer)
     }
 
     LOG(VB_RECORD, LOG_DEBUG, QString("ExternIO::Write('%1')")
-        .arg(QString(buffer)));
+        .arg(QString(buffer).simplified()));
 
     int len = write(m_appIn, buffer.constData(), buffer.size());
     if (len != buffer.size())

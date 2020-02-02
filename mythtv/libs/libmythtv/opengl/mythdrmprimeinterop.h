@@ -24,8 +24,9 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
     static Type GetInteropType(VideoFrameType Format);
 
   private:
-    AVDRMFrameDescriptor*     VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);
+    AVDRMFrameDescriptor* VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);
     bool m_deinterlacing { false };
+    bool m_composable    { true  };
 };
 
 #endif // MYTHDRMPRIMEINTEROP_H

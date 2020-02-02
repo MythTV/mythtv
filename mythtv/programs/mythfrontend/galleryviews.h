@@ -58,7 +58,7 @@ public:
                  bool hiddenMarked, bool unhiddenMarked)
         : m_selected(selection),
           m_selectedMarked(selection && marked.contains(selection->m_id)),
-          m_markedId(marked.toList()),  m_prevMarkedId(prevMarked.toList()),
+          m_markedId(marked.values()),  m_prevMarkedId(prevMarked.values()),
           m_childCount(childCount),
           m_hiddenMarked(hiddenMarked), m_unhiddenMarked(unhiddenMarked)
     {}

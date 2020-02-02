@@ -7,10 +7,6 @@
 // Std
 #include <cmath>
 
-QMutex MythVDPAUHelper::gVDPAULock(QMutex::Recursive);
-bool   MythVDPAUHelper::gVDPAUAvailable = false;
-bool   MythVDPAUHelper::gVDPAUMPEG4Available = false;
-
 #define LOC QString("VDPAUHelp: ")
 
 #define INIT_ST \
@@ -29,31 +25,170 @@ if (!ok) \
 #define GET_PROC(FUNC_ID, PROC) \
 status = m_vdpGetProcAddress(m_device, FUNC_ID, reinterpret_cast<void **>(&(PROC))); CHECK_ST
 
+VDPAUCodec::VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size, uint32_t Macroblocks, uint32_t Level)
+  : m_maxSize(Size),
+    m_maxMacroBlocks(Macroblocks),
+    m_maxLevel(Level)
+{
+    // Levels don't work for MPEG1/2
+    if (MythCodecContext::MPEG1 <= Profile && Profile <= MythCodecContext::MPEG2SNR)
+        m_maxLevel = 1000;
+}
+
+bool VDPAUCodec::Supported(int Width, int Height, int Level)
+{
+    uint32_t macros = static_cast<uint32_t>(((Width + 15) & ~15) * ((Height + 15) & ~15)) / 256;
+    return (Width <= m_maxSize.width()) && (Height <= m_maxSize.height()) &&
+           (macros <= m_maxMacroBlocks) && (static_cast<uint32_t>(Level) <= m_maxLevel);
+}
+
 bool MythVDPAUHelper::HaveVDPAU(void)
 {
-    QMutexLocker locker(&gVDPAULock);
+    static QMutex s_mutex;
     static bool s_checked = false;
-    if (s_checked)
-        return gVDPAUAvailable;
+    static bool s_available = false;
 
-    MythVDPAUHelper vdpau;
-    gVDPAUAvailable = vdpau.IsValid();
-    s_checked = true;
-    if (gVDPAUAvailable)
+    QMutexLocker locker(&s_mutex);
+    if (s_checked)
+        return s_available;
+
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is available");
-        gVDPAUMPEG4Available = vdpau.CheckMPEG4();
+        MythVDPAUHelper vdpau;
+        s_available = vdpau.IsValid();
+    }
+
+    s_checked = true;
+    if (s_available)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VDPAU decoders:");
+        const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
+        foreach (auto profile, profiles)
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                MythCodecContext::GetProfileDescription(profile.first, profile.second.m_maxSize));
     }
     else
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is NOT available");
     }
-    return gVDPAUAvailable;
+    return s_available;
 }
 
-bool MythVDPAUHelper::HaveMPEG4Decode(void)
+bool MythVDPAUHelper::ProfileCheck(VdpDecoderProfile Profile, uint32_t &Level,
+                                   uint32_t &Macros, uint32_t &Width, uint32_t &Height)
 {
-    return gVDPAUMPEG4Available;
+    if (!m_device)
+        return false;
+
+    INIT_ST
+    VdpBool supported = 0;
+    status = m_vdpDecoderQueryCapabilities(m_device, Profile, &supported,
+                                           &Level, &Macros, &Width, &Height);
+    CHECK_ST
+    return supported > 0;
+}
+
+const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
+{
+    static const VdpDecoderProfile MainProfiles[] =
+    {
+        VDP_DECODER_PROFILE_MPEG1, VDP_DECODER_PROFILE_MPEG2_SIMPLE, VDP_DECODER_PROFILE_MPEG2_MAIN,
+        VDP_DECODER_PROFILE_MPEG4_PART2_SP, VDP_DECODER_PROFILE_MPEG4_PART2_ASP,
+        VDP_DECODER_PROFILE_VC1_SIMPLE, VDP_DECODER_PROFILE_VC1_MAIN, VDP_DECODER_PROFILE_VC1_ADVANCED,
+        VDP_DECODER_PROFILE_H264_BASELINE, VDP_DECODER_PROFILE_H264_MAIN, VDP_DECODER_PROFILE_H264_HIGH,
+        VDP_DECODER_PROFILE_H264_EXTENDED, VDP_DECODER_PROFILE_H264_CONSTRAINED_BASELINE,
+        VDP_DECODER_PROFILE_H264_CONSTRAINED_HIGH, VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE
+    };
+
+    static const VdpDecoderProfile HEVCProfiles[] =
+    {
+        VDP_DECODER_PROFILE_HEVC_MAIN, VDP_DECODER_PROFILE_HEVC_MAIN_10,
+        VDP_DECODER_PROFILE_HEVC_MAIN_STILL, VDP_DECODER_PROFILE_HEVC_MAIN_444
+    };
+
+    auto VDPAUToMythProfile = [](VdpDecoderProfile Profile)
+    {
+        switch (Profile)
+        {
+            case VDP_DECODER_PROFILE_MPEG1:           return MythCodecContext::MPEG1;
+            case VDP_DECODER_PROFILE_MPEG2_SIMPLE:    return MythCodecContext::MPEG2Simple;
+            case VDP_DECODER_PROFILE_MPEG2_MAIN:      return MythCodecContext::MPEG2Main;
+
+            case VDP_DECODER_PROFILE_MPEG4_PART2_SP:  return MythCodecContext::MPEG4Simple;
+            case VDP_DECODER_PROFILE_MPEG4_PART2_ASP: return MythCodecContext::MPEG4AdvancedSimple;
+
+            case VDP_DECODER_PROFILE_VC1_SIMPLE:      return MythCodecContext::VC1Simple;
+            case VDP_DECODER_PROFILE_VC1_MAIN:        return MythCodecContext::VC1Main;
+            case VDP_DECODER_PROFILE_VC1_ADVANCED:    return MythCodecContext::VC1Advanced;
+
+            case VDP_DECODER_PROFILE_H264_BASELINE:   return MythCodecContext::H264Baseline;
+            case VDP_DECODER_PROFILE_H264_MAIN:       return MythCodecContext::H264Main;
+            case VDP_DECODER_PROFILE_H264_HIGH:       return MythCodecContext::H264High;
+            case VDP_DECODER_PROFILE_H264_EXTENDED:   return MythCodecContext::H264Extended;
+            case VDP_DECODER_PROFILE_H264_CONSTRAINED_BASELINE: return MythCodecContext::H264ConstrainedBaseline;
+            case VDP_DECODER_PROFILE_H264_CONSTRAINED_HIGH:     return MythCodecContext::H264ConstrainedHigh;
+            case VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE:  return MythCodecContext::H264High444; // ?
+
+            case VDP_DECODER_PROFILE_HEVC_MAIN:       return MythCodecContext::HEVCMain;
+            case VDP_DECODER_PROFILE_HEVC_MAIN_10:    return MythCodecContext::HEVCMain10;
+            case VDP_DECODER_PROFILE_HEVC_MAIN_STILL: return MythCodecContext::HEVCMainStill;
+            case VDP_DECODER_PROFILE_HEVC_MAIN_444:   return MythCodecContext::HEVCRext;
+        }
+        return MythCodecContext::NoProfile;
+    };
+
+    static QMutex lock(QMutex::Recursive);
+    static bool s_initialised = false;
+    static VDPAUProfiles s_profiles;
+
+    QMutexLocker locker(&lock);
+    if (s_initialised)
+        return s_profiles;
+    s_initialised = true;
+
+    MythVDPAUHelper helper;
+    if (!helper.IsValid())
+        return s_profiles;
+
+    uint32_t level  = 0;
+    uint32_t macros = 0;
+    uint32_t width  = 0;
+    uint32_t height = 0;
+    for (VdpDecoderProfile profile : MainProfiles)
+    {
+        if (helper.ProfileCheck(profile, level, macros, width, height))
+        {
+            MythCodecContext::CodecProfile prof = VDPAUToMythProfile(profile);
+            s_profiles.append(VDPAUProfile(prof,
+                VDPAUCodec(prof, QSize(static_cast<int>(width), static_cast<int>(height)), macros, level)));
+        }
+    }
+
+    if (helper.HEVCSupported())
+    {
+        for (VdpDecoderProfile profile : HEVCProfiles)
+        {
+            if (helper.ProfileCheck(profile, level, macros, width, height))
+            {
+                MythCodecContext::CodecProfile prof = VDPAUToMythProfile(profile);
+                s_profiles.append(VDPAUProfile(prof,
+                    VDPAUCodec(prof, QSize(static_cast<int>(width), static_cast<int>(height)), macros, level)));
+            }
+        }
+    }
+
+    return s_profiles;
+}
+
+void MythVDPAUHelper::GetDecoderList(QStringList &Decoders)
+{
+    const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
+    if (profiles.isEmpty())
+        return;
+
+    Decoders.append("VDPAU:");
+    foreach (auto profile, profiles)
+        if (profile.first != MythCodecContext::MJPEG)
+            Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.m_maxSize));
 }
 
 static void vdpau_preemption_callback(VdpDevice /*unused*/, void* Opaque)
@@ -155,42 +290,9 @@ void MythVDPAUHelper::SetPreempted(void)
     emit DisplayPreempted();
 }
 
-bool MythVDPAUHelper::CheckMPEG4(void)
+bool MythVDPAUHelper::HEVCSupported(void)
 {
     if (!m_valid)
-        return false;
-
-#ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
-    INIT_ST
-    VdpBool supported = false;
-    uint32_t tmp1 = 0;
-    uint32_t tmp2 = 0;
-    uint32_t tmp3 = 0;
-    uint32_t tmp4 = 0;
-    status = m_vdpDecoderQueryCapabilities(m_device,
-                VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
-                &tmp1, &tmp2, &tmp3, &tmp4);
-    CHECK_ST
-    return supported;
-#else
-    return false;
-#endif
-}
-
-bool MythVDPAUHelper::CheckHEVCDecode(AVCodecContext *Context)
-{
-    if (!Context)
-        return false;
-
-    MythVDPAUHelper vdpau;
-    if (vdpau.IsValid())
-        return vdpau.HEVCProfileCheck(Context);
-    return false;
-}
-
-bool MythVDPAUHelper::HEVCProfileCheck(AVCodecContext *Context)
-{
-    if (!m_valid || !Context)
         return false;
 
     // FFmpeg will disallow HEVC VDPAU for driver versions < 410
@@ -203,43 +305,20 @@ bool MythVDPAUHelper::HEVCProfileCheck(AVCodecContext *Context)
 
     int driver = 0;
     sscanf(infostring, "NVIDIA VDPAU Driver Shared Library  %d", &driver);
-    if (driver < 410)
-        return false;
-
-    VdpDecoderProfile profile = 0;
-    switch (Context->profile)
-    {
-#ifdef VDP_DECODER_PROFILE_HEVC_MAIN
-        case FF_PROFILE_HEVC_MAIN: profile = VDP_DECODER_PROFILE_HEVC_MAIN; break;
-#endif
-#ifdef VDP_DECODER_PROFILE_HEVC_MAIN_10
-        case FF_PROFILE_HEVC_MAIN_10: profile = VDP_DECODER_PROFILE_HEVC_MAIN_10; break;
-#endif
-#ifdef VDP_DECODER_PROFILE_HEVC_MAIN_STILL
-        case FF_PROFILE_HEVC_MAIN_STILL_PICTURE: profile = VDP_DECODER_PROFILE_HEVC_MAIN_STILL; break;
-#endif
-        default: return false;
-    }
-
-    VdpBool supported = false;
-    uint32_t level = 0;
-    uint32_t macros = 0;
-    uint32_t width = 0;
-    uint32_t height = 0;
-    status = m_vdpDecoderQueryCapabilities(m_device, profile, &supported, &level, &macros, &width, &height);
-    CHECK_ST
-    if (!supported)
-        return false;
-
-    return (width  >= static_cast<uint>(Context->width)) &&
-           (height >= static_cast<uint>(Context->height)) &&
-           (level  >= static_cast<uint>(Context->level));
+    return !(driver < 410);
 }
 
 bool MythVDPAUHelper::CheckH264Decode(AVCodecContext *Context)
 {
     if (!Context)
         return false;
+
+    int mbs = static_cast<int>(ceil(static_cast<double>(Context->width) / 16.0));
+    if (!(mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
+         (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128))
+    {
+        return true;
+    }
 
     VdpDecoderProfile profile = 0;
     switch (Context->profile & ~FF_PROFILE_H264_INTRA)
@@ -262,17 +341,11 @@ bool MythVDPAUHelper::CheckH264Decode(AVCodecContext *Context)
         default: return false;
     }
 
-    int mbs = static_cast<int>(ceil(static_cast<double>(Context->width) / 16.0));
-    int check = (mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
-                (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128);
-
     // Create an instance
     MythVDPAUHelper helper;
-    if (!helper.IsValid())
-        return false;
-    if (check)
+    if (helper.IsValid())
         return helper.H264DecodeCheck(profile, Context);
-    return helper.H264ProfileCheck(profile, Context);
+    return false;
 }
 
 bool MythVDPAUHelper::H264DecodeCheck(VdpDecoderProfile Profile, AVCodecContext *Context)
@@ -293,27 +366,6 @@ bool MythVDPAUHelper::H264DecodeCheck(VdpDecoderProfile Profile, AVCodecContext 
             .arg(Context->width).arg(Context->height));
     }
     return ok;
-}
-
-bool MythVDPAUHelper::H264ProfileCheck(VdpDecoderProfile Profile, AVCodecContext *Context)
-{
-    if (!m_valid || !Context)
-        return false;
-
-    VdpBool supported = false;
-    uint32_t level = 0;
-    uint32_t macros = 0;
-    uint32_t width = 0;
-    uint32_t height = 0;
-    INIT_ST
-    status = m_vdpDecoderQueryCapabilities(m_device, Profile, &supported, &level, &macros, &width, &height);
-    CHECK_ST
-    if (!supported)
-        return false;
-
-    return (width  >= static_cast<uint>(Context->width)) &&
-           (height >= static_cast<uint>(Context->height)) &&
-           (level  >= static_cast<uint>(Context->level));
 }
 
 VdpOutputSurface MythVDPAUHelper::CreateOutputSurface(QSize Size)

@@ -101,7 +101,7 @@ MythDisplayRPI::~MythDisplayRPI()
     vchi_disconnect(m_vchiInstance);
 }
 
-void MythDisplayRPI::Callback(uint32_t Reason, uint32_t Param1, uint32_t Param2)
+void MythDisplayRPI::Callback(uint32_t Reason, uint32_t, uint32_t)
 {
     if (Reason == VC_HDMI_DVI || Reason == VC_HDMI_HDMI)
         m_modeChangeWait.wakeAll();
@@ -208,9 +208,9 @@ const vector<MythDisplayMode>& MythDisplayRPI::GetVideoModes(void)
                 continue;
             }
 
-            if (!modes[j].scan_mode)
+            if (modes[j].scan_mode)
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring progressive mode %1x%2 %3")
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3")
                     .arg(modes[j].width).arg(modes[j].height).arg(modes[j].frame_rate));
                 continue;
             }

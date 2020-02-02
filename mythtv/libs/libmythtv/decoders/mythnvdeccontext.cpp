@@ -7,14 +7,11 @@
 #include "mythnvdeccontext.h"
 
 extern "C" {
-    #include "libavutil/opt.h"
+#include "libavutil/opt.h"
 }
 
 #define LOC QString("NVDEC: ")
 
-QMutex* MythNVDECContext::s_NVDECLock = new QMutex(QMutex::Recursive);
-bool MythNVDECContext::s_NVDECAvailable = false;
-vector<MythNVDECContext::MythNVDECCaps> MythNVDECContext::s_NVDECDecoderCaps = vector<MythNVDECContext::MythNVDECCaps>();
 
 MythNVDECContext::MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID)
   : MythCodecContext(Parent, CodecID)
@@ -47,8 +44,6 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     QString profile  = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
     QString pixfmt   = av_get_pix_fmt_name((*Context)->pix_fmt);
 
-    // Check actual decoder capabilities. These are loaded statically and in a thread safe
-    // manner in HaveNVDEC
     cudaVideoCodec cudacodec = cudaVideoCodec_NumCodecs;
     switch ((*Context)->codec_id)
     {
@@ -77,38 +72,23 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     uint depth = static_cast<uint>(ColorDepth(type) - 8);
     bool supported = false;
 
-    if ((cudacodec != cudaVideoCodec_NumCodecs) && (cudaformat != cudaVideoChromaFormat_Monochrome))
-    {
-        // iterate over known decoder capabilities
-        s_NVDECLock->lock();
-        for (const auto & cap : s_NVDECDecoderCaps)
-        {
-            if ((cap.m_codec == cudacodec) && (cap.m_depth == depth) && (cap.m_format == cudaformat))
-            {
-                // match - now check restrictions
-                int width = (*Context)->width;
-                int height = (*Context)->height;
-                uint mblocks = static_cast<uint>((width * height) / 256);
-                if ((cap.m_maximum.width() >= width) && (cap.m_maximum.height() >= height) &&
-                    (cap.m_minimum.width() <= width) && (cap.m_minimum.height() <= height) &&
-                    (cap.m_macroBlocks >= mblocks))
-                {
-                    supported = true;
-                }
-                else
-                {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Codec '%9' failed size constraints: source: %1x%2 min: %3x%4 max: %5x%6 mbs: %7, max %8")
-                        .arg(width).arg(height).arg(cap.m_minimum.width()).arg(cap.m_minimum.height())
-                        .arg(cap.m_maximum.width()).arg(cap.m_maximum.height()).arg(mblocks).arg(cap.m_macroBlocks)
-                        .arg(get_encoding_type(success)));
+    if ((cudacodec == cudaVideoCodec_NumCodecs) || (cudaformat == cudaVideoChromaFormat_Monochrome))
+        return failure;
 
-                }
-                break;
-            }
+    // iterate over known decoder capabilities
+    const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
+    for (auto cap : profiles)
+    {
+        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->width))
+        {
+            supported = true;
+            break;
         }
-        s_NVDECLock->unlock();
     }
+
+    QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
+            .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
+            .arg((*Context)->width).arg((*Context)->height);
 
     // and finally try and retrieve the actual FFmpeg decoder
     if (supported)
@@ -128,9 +108,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                 AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
                 if (codec)
                 {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4' depth %5")
-                            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg(codecstr)
-                            .arg(profile).arg(pixfmt).arg(depth + 8));
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
                     *Codec = codec;
                     gCodecMap->freeCodecContext(Stream);
                     *Context = gCodecMap->getCodecContext(Stream, *Codec);
@@ -141,9 +119,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         }
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4' depth %5")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg(codecstr)
-            .arg(profile).arg(pixfmt).arg(depth + 8));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));
     return failure;
 }
 
@@ -465,63 +441,114 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
     m_maximum(Maximum),
     m_macroBlocks(MacroBlocks)
 {
+    auto ToMythProfile = [](cudaVideoCodec CudaCodec)
+    {
+        switch (CudaCodec)
+        {
+            case cudaVideoCodec_MPEG1: return MythCodecContext::MPEG1;
+            case cudaVideoCodec_MPEG2: return MythCodecContext::MPEG2;
+            case cudaVideoCodec_MPEG4: return MythCodecContext::MPEG4;
+            case cudaVideoCodec_VC1:   return MythCodecContext::VC1;
+            case cudaVideoCodec_H264:  return MythCodecContext::H264;
+            case cudaVideoCodec_HEVC:  return MythCodecContext::HEVC;
+            case cudaVideoCodec_VP8:   return MythCodecContext::VP8;
+            case cudaVideoCodec_VP9:   return MythCodecContext::VP9;
+            default: break;
+        }
+        return MythCodecContext::NoProfile;
+    };
+
+    auto ToMythFormat = [](cudaVideoChromaFormat CudaFormat)
+    {
+        switch (CudaFormat)
+        {
+            case cudaVideoChromaFormat_420: return FMT_YV12;
+            case cudaVideoChromaFormat_422: return FMT_YUV422P;
+            case cudaVideoChromaFormat_444: return FMT_YUV444P;
+            default: break;
+        }
+        return FMT_NONE;
+    };
+    m_profile = ToMythProfile(m_codec);
+    m_type = ToMythFormat(m_format);
+}
+
+bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format,
+                                               uint Depth, int Width, int Height)
+{
+    uint mblocks = static_cast<uint>((Width * Height) / 256);
+    return (Codec == m_codec) && (Format == m_format) && (Depth == m_depth) &&
+           (m_maximum.width() >= Width) && (m_maximum.height() >= Height) &&
+           (m_minimum.width() <= Width) && (m_minimum.height() <= Height) &&
+           (m_macroBlocks >= mblocks);
 }
 
 bool MythNVDECContext::HaveNVDEC(void)
 {
-    QMutexLocker locker(s_NVDECLock);
+    static QMutex lock(QMutex::Recursive);
+    QMutexLocker locker(&lock);
     static bool s_checked = false;
+    static bool s_available = false;
     if (!s_checked)
     {
         if (gCoreContext->IsUIThread())
-            NVDECCheck();
+        {
+            const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
+            if (profiles.empty())
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + "No NVDEC decoders found");
+            }
+            else
+            {
+                s_available = true;
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available NVDEC decoders:");
+                for (auto profile : profiles)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        MythCodecContext::GetProfileDescription(profile.m_profile,profile.m_maximum,
+                                                                profile.m_type, profile.m_depth + 8));
+                }
+            }
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_WARNING, LOC + "HaveNVDEC must be initialised from the main thread");
+        }
     }
     s_checked = true;
-    return s_NVDECAvailable;
+    return s_available;
 }
 
-inline MythCodecID cuda_to_myth(cudaVideoCodec Codec)
+
+void MythNVDECContext::GetDecoderList(QStringList &Decoders)
 {
-    switch (Codec)
-    {
-        case cudaVideoCodec_MPEG1: return kCodec_MPEG1;
-        case cudaVideoCodec_MPEG2: return kCodec_MPEG2;
-        case cudaVideoCodec_MPEG4: return kCodec_MPEG4;
-        case cudaVideoCodec_VC1:   return kCodec_VC1;
-        case cudaVideoCodec_H264:  return kCodec_H264;
-        case cudaVideoCodec_HEVC:  return kCodec_HEVC;
-        case cudaVideoCodec_VP8:   return kCodec_VP8;
-        case cudaVideoCodec_VP9:   return kCodec_VP9;
-        default: break;
-    }
-    return kCodec_NONE;
+    const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
+    if (profiles.empty())
+        return;
+    Decoders.append("NVDEC:");
+    for (auto profile : profiles)
+        if (!(profile.m_depth % 2)) // Ignore 9/11bit etc
+            Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum,
+                                                                    profile.m_type, profile.m_depth + 8));
 }
 
-inline VideoFrameType cuda_to_myth(cudaVideoChromaFormat Format)
+const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfiles(void)
 {
-    switch (Format)
-    {
-        case cudaVideoChromaFormat_420: return FMT_YV12;
-        case cudaVideoChromaFormat_422: return FMT_YUV422P;
-        case cudaVideoChromaFormat_444: return FMT_YUV444P;
-        default: break;
-    }
-    return FMT_NONE;
-}
+    static QMutex lock(QMutex::Recursive);
+    static bool s_initialised = false;
+    static std::vector<MythNVDECContext::MythNVDECCaps> s_profiles;
 
-/*! \brief Perform the actual NVDEC availability and capability check
- * \note lock is held in HaveNVDEC
-*/
-void MythNVDECContext::NVDECCheck(void)
-{
+    QMutexLocker locker(&lock);
+    if (s_initialised)
+        return s_profiles;
+    s_initialised = true;
+
     MythRenderOpenGL *opengl = MythRenderOpenGL::GetOpenGLRender();
     CUcontext     context = nullptr;
     CudaFunctions   *cuda = nullptr;
     if (MythNVDECInterop::CreateCUDAContext(opengl, cuda, context))
     {
-        OpenGLLocker locker(opengl);
+        OpenGLLocker gllocker(opengl);
         CuvidFunctions *cuvid = nullptr;
         CUcontext dummy = nullptr;
         cuda->cuCtxPushCurrent(context);
@@ -529,13 +556,7 @@ void MythNVDECContext::NVDECCheck(void)
         if (cuvid_load_functions(&cuvid, nullptr) == 0)
         {
             // basic check passed
-            LOG(VB_GENERAL, LOG_INFO, LOC + "NVDEC is available");
-            s_NVDECAvailable = true;
-            s_NVDECDecoderCaps.clear();
-
-            if (cuvid->cuvidGetDecoderCaps)
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Decoder support check:");
-            else
+            if (!cuvid->cuvidGetDecoderCaps)
                 LOG(VB_GENERAL, LOG_WARNING, LOC + "Old driver - cannot check decoder capabilities");
 
             // now iterate over codecs, depths and formats to check support
@@ -557,24 +578,18 @@ void MythNVDECContext::NVDECCheck(void)
                         if (cuvid->cuvidGetDecoderCaps && (cuvid->cuvidGetDecoderCaps(&caps) == CUDA_SUCCESS) &&
                             caps.bIsSupported)
                         {
-                            s_NVDECDecoderCaps.emplace_back(
+                            s_profiles.emplace_back(
                                     MythNVDECCaps(cudacodec, depth, cudaformat,
                                         QSize(caps.nMinWidth, caps.nMinHeight),
                                         QSize(static_cast<int>(caps.nMaxWidth), static_cast<int>(caps.nMaxHeight)),
                                         caps.nMaxMBCount));
-                            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                                QString("Codec: %1: Depth: %2 Format: %3 Min: %4x%5 Max: %6x%7 MBs: %8")
-                                    .arg(toString(cuda_to_myth(cudacodec))).arg(depth + 8)
-                                    .arg(format_description(cuda_to_myth(cudaformat)))
-                                    .arg(caps.nMinWidth).arg(caps.nMinHeight)
-                                    .arg(caps.nMaxWidth).arg(caps.nMaxHeight).arg(caps.nMaxMBCount));
                         }
                         else if (!cuvid->cuvidGetDecoderCaps)
                         {
                             // dummy - just support everything:)
-                            s_NVDECDecoderCaps.emplace_back(MythNVDECCaps(cudacodec, depth, cudaformat,
-                                                                       QSize(32, 32), QSize(8192, 8192),
-                                                                       (8192 * 8192) / 256));
+                            s_profiles.emplace_back(MythNVDECCaps(cudacodec, depth, cudaformat,
+                                                                  QSize(32, 32), QSize(8192, 8192),
+                                                                  (8192 * 8192) / 256));
                         }
                     }
                 }
@@ -585,6 +600,5 @@ void MythNVDECContext::NVDECCheck(void)
     }
     MythNVDECInterop::CleanupContext(opengl, cuda, context);
 
-    if (!s_NVDECAvailable)
-        LOG(VB_GENERAL, LOG_INFO, LOC + "NVDEC functionality checked failed");
+    return s_profiles;
 }

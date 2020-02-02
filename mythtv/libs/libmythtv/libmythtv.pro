@@ -385,7 +385,7 @@ using_frontend {
 
     # Video output
     HEADERS += mythvideoout.h           mythvideooutnull.h
-    HEADERS += videobuffers.h           vsync.h
+    HEADERS += videobuffers.h
     HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h
@@ -394,7 +394,7 @@ using_frontend {
     HEADERS += visualisations/videovisualdefs.h
     HEADERS += mythdeinterlacer.h
     SOURCES += mythvideoout.cpp         mythvideooutnull.cpp
-    SOURCES += videobuffers.cpp         vsync.cpp
+    SOURCES += videobuffers.cpp
     SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp
