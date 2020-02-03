@@ -314,8 +314,8 @@ bool MythVDPAUHelper::CheckH264Decode(AVCodecContext *Context)
         return false;
 
     int mbs = static_cast<int>(ceil(static_cast<double>(Context->width) / 16.0));
-    if (!(mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
-         (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128))
+    if (!(mbs == 49  || mbs == 54  || mbs == 59 || mbs == 64 ||
+          mbs == 113 || mbs == 118 ||mbs == 123 || mbs == 128))
     {
         return true;
     }
