@@ -131,6 +131,7 @@ Advanced options (experts only):
                            directory with frontend.h [$dvb_path_default]
   --disable-asi            disable support for DVEO ASI recorder
   --disable-x11            disable X11 support
+  --enable-opengles        link to OpenGL ES (auto)
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
@@ -2768,7 +2769,6 @@ enable mheg
 enable mmal
 enable mythtranscode
 enable opengl
-enable opengles
 enable egl
 enable symbol_visibility
 enable deprecation_warnings
@@ -2999,6 +2999,8 @@ for opt do
         --disable-backend)
         ;;
         --enable-mac-bundle) enable mac_bundle
+        ;;
+        --enable-opengles) enable opengles && disable opengl
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
@@ -5995,27 +5997,6 @@ enabled libx264           && { use_pkg_config libx264 x264 "stdint.h x264.h" x26
                              { check_cpp_condition x264.h "X264_MPEG2" &&
                                enable libx262; }
 enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml/xmlversion.h xmlCheckVersion
-enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL" ||
-                               check_lib opengl windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
-                               check_lib opengl OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
-                               check_lib opengl ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
-                               check_lib opengl GLES/gl.h glGetError "-Wl,-framework,OpenGLES" ||
-                               { check_pkg_config GLESv2 glesv2 GLES2/gl2.h glGetError &&
-                                 check_pkg_config EGL egl EGL/egl.h eglGetProcAddress &&
-                                 enable opengl
-                               } ||
-                               { check_lib GLESv2 GLES2/gl2.h glGetError "-lGLESv2" &&
-                                 check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" &&
-                                 enable opengl
-                               } ||
-                               die "ERROR: opengl not found."
-                             }
-
-enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
-                  {
-                    check_pkg_config EGL egl EGL/egl.h eglGetProcAddress && enable egl
-                  }
-                }
 
 enabled drm && use_pkg_config libdrm libdrm xf86drm.h drmGetVersion || disable drm
 enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)' || disable drm
@@ -6507,6 +6488,57 @@ case "$cc_type" in
         ;;
 esac
 
+# we need either OpenGL or OpenGL ES and 'ideally' the same version that Qt was
+# configured with. Linking to both can cause problems on some systems.
+# opengl is enabled by default (and hence opengles is disabled by default)
+
+qt_opengles_check() {
+    log "qt_opengles_check $@"
+    "qt_opengles_check $@" >> $logfile 2>&1
+    check_ecxx ${qt_inc} <<EOF
+#include <QtCore/QtCore>
+#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+#include <QtGui/qtguiglobal.h>
+#endif
+#if !defined(QT_OPENGL_ES_2)
+No OpenGL ES here!
+#endif
+int x;
+EOF
+}
+
+qt_opengles_check && enable opengles && disable opengl && echo Qt built for OpenGL ES
+
+enabled opengl && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL" ||
+                    check_lib opengl windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
+                    check_lib opengl OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" || disable opengl
+                  }
+
+disabled opengl || enabled opengles && {
+                    check_lib opengl ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
+                    check_lib opengl GLES/gl.h glGetError "-Wl,-framework,OpenGLES" ||
+                    { check_pkg_config GLESv2 glesv2 GLES2/gl2.h glGetError &&
+                      check_pkg_config EGL egl EGL/egl.h eglGetProcAddress &&
+                      enable opengles
+                    } ||
+                    { check_lib GLESv2 GLES2/gl2.h glGetError "-lGLESv2" &&
+                      check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" &&
+                      enable opengles
+                    } ||
+                      disable opengles
+                  }
+
+enabled opengles && enable opengl
+if disabled opengl; then
+    die "Neither OpenGL or OpenGLES found!"
+fi
+
+enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
+                  {
+                    check_pkg_config EGL egl EGL/egl.h eglGetProcAddress && enable egl
+                  }
+                }
+
 enable enforce_wshadow
 case $target_os in
     android)
@@ -6637,12 +6669,6 @@ EOF
 if enabled taglib; then
     taglib_include=`taglib-config --prefix`/include/taglib
     taglib_libs=`taglib-config --libs`
-fi
-
-if enabled x11; then
-    if enabled opengles; then
-        check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || disable opengles
-    fi
 fi
 
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
@@ -7405,8 +7431,7 @@ fi
   echo "DRM support               ${drm-no}"
   echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"
-  echo "OpenGL support            ${opengl-no}"
-  echo "OpenGL ES 2.0             ${opengles-no}"
+  echo "OpenGL                    ${opengl-no} (OpenGLES ${opengles-no})"
   echo "EGL support               ${egl-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"

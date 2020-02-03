@@ -223,6 +223,10 @@ win32 {
 
     EXTRA_LIBS += $$LOCAL_LIBDIR_OGL
     EXTRA_LIBS += $$LOCAL_LIBDIR_X11
+    # FIXME MK Jan/20 I'm not sure this is necessary or necessarily accurate.
+    # FFmpeg OpenGL is an option that we do not (and should not imho) enable -
+    # and we should in that case be stripping out GLES etc as well.
+    # and CONFIG_OPENGL_LIBS is always empty as we never set gl_lib anymore
     !isEmpty( CONFIG_OPENGL_LIBS ) {
         # Replace FFmpeg's OpenGL with OpenGLES
         EXTRA_LIBS -= -lGL
