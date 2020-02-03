@@ -1206,7 +1206,7 @@ void RemoteFile::SetTimeout(bool fast)
     // handled.  The CheckConnection function can call Resume which
     // calls Close, which deletes m_controlSock.  However, the
     // subsequent call to OpenInternal is guaranteed to recreate the
-    // socket or return false for a non-local connection, an this must
+    // socket or return false for a non-local connection, and this must
     // be a non-local connection if this line of code is executed.
     if (!CheckConnection())
     {
@@ -1214,6 +1214,8 @@ void RemoteFile::SetTimeout(bool fast)
             "RemoteFile::SetTimeout(): Couldn't connect");
         return;
     }
+    if (m_controlSock == nullptr)
+        return;
 
     QStringList strlist( m_query.arg(m_recorderNum) );
     strlist << "SET_TIMEOUT";

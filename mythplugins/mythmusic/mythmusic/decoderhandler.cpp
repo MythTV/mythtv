@@ -205,6 +205,9 @@ void DecoderHandler::stop(void)
 
 void DecoderHandler::customEvent(QEvent *event)
 {
+    if (event == nullptr)
+        return;
+
     if (auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event))
     {
         // Proxy all DecoderHandlerEvents

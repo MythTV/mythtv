@@ -3532,6 +3532,9 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 /// This handles all standard events
 bool TV::event(QEvent *e)
 {
+    if (e == nullptr)
+        return false;
+
     if (QEvent::Resize == e->type())
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
@@ -3799,6 +3802,9 @@ bool TV::TranslateKeyPressOrGesture(const QString &context,
                                     QEvent *e, QStringList &actions,
                                     bool isLiveTV, bool allowJumps)
 {
+    if (e == nullptr)
+        return false;
+
     if (QEvent::KeyPress == e->type())
     {
         return GetMythMainWindow()->TranslateKeyPress(
@@ -3814,6 +3820,9 @@ bool TV::TranslateKeyPressOrGesture(const QString &context,
 
 bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 {
+    if (e == nullptr)
+        return false;
+
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
 #if DEBUG_ACTIONS
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("ignoreKeys: %1")

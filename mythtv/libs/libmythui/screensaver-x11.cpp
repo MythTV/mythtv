@@ -60,7 +60,7 @@ class ScreenSaverX11Private
                 "Failed to open connection to X11 server");
         }
 
-        if (m_dpmsaware)
+        if (m_dpmsaware && m_display)
         {
             CARD16 power_level = 0;
 

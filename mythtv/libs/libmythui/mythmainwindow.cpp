@@ -530,7 +530,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
 MythMainWindow::~MythMainWindow()
 {
-    gCoreContext->removeListener(this);
+    if (gCoreContext != nullptr)
+        gCoreContext->removeListener(this);
 
     d->m_drawTimer->stop();
 
@@ -1114,7 +1115,7 @@ void MythMainWindow::Init(bool mayReInit)
         return;
     }
 
-    if (d->m_painter->GetName() != "Qt")
+    if (d->m_painter && d->m_painter->GetName() != "Qt")
     {
         setAttribute(Qt::WA_NoSystemBackground);
         setAutoFillBackground(false);

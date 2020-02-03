@@ -1143,6 +1143,10 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         m_PersistentStore.Append(pEntry);
     }
 
+    // This should never happen
+    if (pEntry == nullptr)
+        return false;
+
     if (fIsLoad)   // Copy the data into the variables.
     {
         // Check that we have sufficient data before we continue?

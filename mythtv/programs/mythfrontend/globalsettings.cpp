@@ -4673,10 +4673,11 @@ void ChannelGroupSetting::Save()
         if (m_groupId == -1)//create a new group
         {
             MSqlQuery query(MSqlQuery::InitCon());
+            QString newname = m_groupName ? m_groupName->getValue() : "undefined";
             QString qstr =
                 "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
             query.prepare(qstr);
-            query.bindValue(":NEWNAME", m_groupName->getValue());
+            query.bindValue(":NEWNAME", newname);
 
             if (!query.exec())
                 MythDB::DBError("ChannelGroupSetting::Close", query);
@@ -4686,7 +4687,7 @@ void ChannelGroupSetting::Save()
                 QString qstr2 = "SELECT grpid FROM channelgroupnames "
                                 "WHERE name = :NEWNAME;";
                 query.prepare(qstr2);
-                query.bindValue(":NEWNAME", m_groupName->getValue());
+                query.bindValue(":NEWNAME", newname);
                 if (!query.exec())
                     MythDB::DBError("ChannelGroupSetting::Close", query);
                 else

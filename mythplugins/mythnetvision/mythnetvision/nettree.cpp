@@ -267,7 +267,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 
         if (QFile::exists(dlfile))
             item->SetImage(dlfile);
-        else if (video->GetThumbnail().startsWith("http"))
+        else if (m_imageDownload && video->GetThumbnail().startsWith("http"))
             m_imageDownload->addThumb(video->GetTitle(), video->GetThumbnail(),
                                       QVariant::fromValue<uint>(pos));
     }
@@ -287,7 +287,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                                                       node->GetText());
                 if (QFile::exists(dlfile))
                     item->SetImage(dlfile);
-                else
+                else if (m_imageDownload)
                     m_imageDownload->addThumb(node->GetText(), tpath,
                                               QVariant::fromValue<uint>(pos));
             }
