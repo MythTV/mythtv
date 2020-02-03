@@ -468,7 +468,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
         {
             for (uint i = 0; i < 32; ++i)
             {
-                int streamid = m_ringBuffer->DVD()->GetSubtitleTrackNum(i);
+                int8_t streamid = m_ringBuffer->DVD()->GetSubtitleTrackNum(i);
                 if (streamid >= 0)
                 {
                     // This stream is mapped in the current program chain

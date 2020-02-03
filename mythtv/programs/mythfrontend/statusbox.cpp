@@ -1328,7 +1328,7 @@ void StatusBox::doMachineStatus()
     {
         auto UpdateUptime = [](StatusBoxItem* Item)
         {
-            time_t time;
+            time_t time = 0;
             getUptime(time);
             Item->SetText(uptimeStr(time));
         };
@@ -1403,7 +1403,7 @@ void StatusBox::doMachineStatus()
         {
             auto UpdateRemoteUptime = [](StatusBoxItem* Item)
             {
-                time_t time;
+                time_t time = 0;
                 RemoteGetUptime(time);
                 Item->SetText(uptimeStr(time));
             };

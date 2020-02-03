@@ -199,7 +199,7 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
 char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
                                           int channel, int count, int bits)
 {
-    pink_noise_t pink;
+    pink_noise_t pink{};
 
     initialize_pink_noise(&pink, bits);
 
