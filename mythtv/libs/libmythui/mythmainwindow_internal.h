@@ -1,13 +1,14 @@
 #ifndef MYTHMAINWINDOW_INT
 #define MYTHMAINWINDOW_INT
 
+// Qt
 #include <QWidget>
-class MythRender;
+
+// MythTV
+#include "mythrender_base.h"
+
 class MythMainWindow;
 class MythMainWindowPrivate;
-
-#ifdef USING_OPENGL
-#include "mythrenderopengl.h"
 
 class MythPainterWindow : public QWidget
 {
@@ -20,6 +21,8 @@ class MythPainterWindow : public QWidget
     MythRender* m_render { nullptr };
 };
 
+#ifdef USING_OPENGL
+#include "mythrenderopengl.h"
 class MythPainterWindowGL : public MythPainterWindow
 {
     Q_OBJECT
