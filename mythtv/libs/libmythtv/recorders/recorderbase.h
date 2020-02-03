@@ -45,7 +45,7 @@ public:
     bool operator==(const FrameRate &other) const {
         return m_num == other.m_num && m_den == other.m_den;
     }
-    bool operator!=(const FrameRate &other) { return !(*this == other); }
+    bool operator!=(const FrameRate &other) const { return !(*this == other); }
 private:
     uint m_num;
     uint m_den;

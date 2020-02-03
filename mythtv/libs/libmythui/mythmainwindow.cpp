@@ -372,7 +372,7 @@ MythPainterWindowGL::~MythPainterWindowGL()
         m_render->DecrRef();
 }
 
-bool MythPainterWindowGL::IsValid(void)
+bool MythPainterWindowGL::IsValid(void) const
 {
     return m_valid;
 }

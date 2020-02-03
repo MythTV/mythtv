@@ -185,7 +185,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void IgnoreWaitStates(bool ignore) override { m_skipstillorwait = ignore; } // RingBuffer
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     int64_t GetCurrentTime(void) const    { return (m_currentTime / 90000); }
-    uint TitleTimeLeft(void);
+    uint TitleTimeLeft(void) const;
     void  SetTrack(uint type, int trackNo);
     int   GetTrack(uint type) const;
     uint8_t GetNumAudioChannels(int idx);

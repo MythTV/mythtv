@@ -428,7 +428,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     return aosettings;
 }
 
-int AudioOutputSettings::GetMaxHDRate()
+int AudioOutputSettings::GetMaxHDRate() const
 {
     if (!canFeature(FEATURE_DTSHD))
         return 0;

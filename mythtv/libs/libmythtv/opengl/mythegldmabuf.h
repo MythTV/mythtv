@@ -37,7 +37,7 @@ class MythEGLDMABUF
                                              VideoFrame *Frame) const;
     vector<MythVideoTexture*> CreateSeparate2(AVDRMFrameDescriptor* Desc,
                                              MythRenderOpenGL *Context,
-                                             VideoFrame *Frame);
+                                             VideoFrame *Frame) const;
     bool m_useModifiers { false };
 };
 

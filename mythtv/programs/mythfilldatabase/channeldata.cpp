@@ -185,7 +185,7 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
     return existChan;
 }
 
-void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
+void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
 {
     if (m_guideDataOnly)
     {

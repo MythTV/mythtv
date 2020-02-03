@@ -2144,7 +2144,7 @@ void DVDRingBuffer::SetDVDSpeed(int speed)
 
 /**\brief returns seconds left in the title
  */
-uint DVDRingBuffer::TitleTimeLeft(void)
+uint DVDRingBuffer::TitleTimeLeft(void) const
 {
     return (GetTotalTimeOfTitle() - GetCurrentTime());
 }

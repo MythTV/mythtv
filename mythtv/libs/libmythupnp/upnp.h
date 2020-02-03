@@ -145,7 +145,7 @@ class UPNP_PUBLIC UPnp : public QObject
 
     public slots:
         static void DisableNotifications(uint /*unused*/);
-        void EnableNotificatins(qint64 /*unused*/);
+        void EnableNotificatins(qint64 /*unused*/) const;
 
     private:
         MythPower* m_power;

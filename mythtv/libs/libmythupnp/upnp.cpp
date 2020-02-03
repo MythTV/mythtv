@@ -338,7 +338,7 @@ void UPnp::DisableNotifications(uint /*unused*/)
     SSDP::Instance()->DisableNotifications();
 }
 
-void UPnp::EnableNotificatins(qint64 /*unused*/)
+void UPnp::EnableNotificatins(qint64 /*unused*/) const
 {
     SSDP::Instance()->EnableNotifications(m_nServicePort);
 }

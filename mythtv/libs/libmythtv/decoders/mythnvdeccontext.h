@@ -51,7 +51,7 @@ class MythNVDECContext : public MythCodecContext
         MythNVDECCaps(cudaVideoCodec Codec, uint Depth, cudaVideoChromaFormat Format,
                       QSize Minimum, QSize Maximum, uint MacroBlocks);
         bool Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format, uint Depth,
-                      int Width, int Height);
+                      int Width, int Height) const;
 
         MythCodecContext::CodecProfile m_profile { MythCodecContext::NoProfile };
         VideoFrameType m_type           { FMT_NONE };

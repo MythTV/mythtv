@@ -97,17 +97,17 @@ class MPUBLIC AudioOutputSettings
              * return true if device can or may support AC3
              * (deprecated, see canFeature())
              */
-        bool canAC3()                   { return canFeature(FEATURE_AC3); };
+        bool canAC3() const             { return canFeature(FEATURE_AC3); };
             /**
              * return true if device can or may support DTS
              * (deprecated, see canFeature())
              */
-        bool canDTS()                   { return canFeature(FEATURE_DTS); };
+        bool canDTS() const             { return canFeature(FEATURE_DTS); };
             /**
              * return true if device supports multichannels PCM
              * (deprecated, see canFeature())
              */
-        bool canLPCM()                  { return canFeature(FEATURE_LPCM); };
+        bool canLPCM() const            { return canFeature(FEATURE_LPCM); };
             /**
              * return true if class instance is marked invalid.
              * if true, you can not assume any of the other method returned
@@ -144,7 +144,7 @@ class MPUBLIC AudioOutputSettings
              * return the highest iec958 rate supported.
              * return 0 if no HD rate are supported
              */
-        int  GetMaxHDRate();
+        int  GetMaxHDRate() const;
 
             /**
              * Display in human readable form the digital features

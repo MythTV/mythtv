@@ -15,7 +15,7 @@ class ChannelData
     ChannelData() = default;
 
     bool insert_chan(uint sourceid) const;
-    void handleChannels(int id, ChannelInfoList *chanlist);
+    void handleChannels(int id, ChannelInfoList *chanlist) const;
     unsigned int promptForChannelUpdates(ChannelInfoList::iterator chaninfo,
                                          unsigned int chanid) const;
 

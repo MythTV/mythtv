@@ -984,7 +984,7 @@ void ZMClient::customEvent (QEvent* event)
     QObject::customEvent(event);
 }
 
-void ZMClient::showMiniPlayer(int monitorID)
+void ZMClient::showMiniPlayer(int monitorID) const
 {
     if (!isMiniPlayerEnabled())
         return;

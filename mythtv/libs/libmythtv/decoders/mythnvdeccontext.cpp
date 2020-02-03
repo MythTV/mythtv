@@ -474,7 +474,7 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
 }
 
 bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format,
-                                               uint Depth, int Width, int Height)
+                                               uint Depth, int Width, int Height) const
 {
     uint mblocks = static_cast<uint>((Width * Height) / 256);
     return (Codec == m_codec) && (Format == m_format) && (Depth == m_depth) &&

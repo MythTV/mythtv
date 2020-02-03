@@ -193,7 +193,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
         static UPnpDeviceDesc *Retrieve  ( QString &sURL );
 
-        void toMap(InfoMap &map)
+        void toMap(InfoMap &map) const
         {
             map["hostname"] = m_sHostName;
             m_rootDevice.toMap(map);

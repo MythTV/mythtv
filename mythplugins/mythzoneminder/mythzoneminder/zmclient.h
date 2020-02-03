@@ -65,7 +65,7 @@ class MPUBLIC ZMClient : public QObject
     void setIsMiniPlayerEnabled(bool enabled) { m_isMiniPlayerEnabled = enabled; }
 
     void saveNotificationMonitors(void);
-    void showMiniPlayer(int monitorID);
+    void showMiniPlayer(int monitorID) const;
 
   private slots:
     void restartConnection(void);  // Try to re-establish the connection to 

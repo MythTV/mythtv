@@ -35,7 +35,7 @@ VDPAUCodec::VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size, uint3
         m_maxLevel = 1000;
 }
 
-bool VDPAUCodec::Supported(int Width, int Height, int Level)
+bool VDPAUCodec::Supported(int Width, int Height, int Level) const
 {
     uint32_t macros = static_cast<uint32_t>(((Width + 15) & ~15) * ((Height + 15) & ~15)) / 256;
     return (Width <= m_maxSize.width()) && (Height <= m_maxSize.height()) &&

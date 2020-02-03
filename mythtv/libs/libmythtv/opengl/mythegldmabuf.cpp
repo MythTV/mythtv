@@ -267,7 +267,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
 */
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
                                                                 MythRenderOpenGL *Context,
-                                                                VideoFrame *Frame)
+                                                                VideoFrame *Frame) const
 {
     // As for CreateSeparate - may not work for some formats
     AVDRMLayerDescriptor* layer = &Desc->layers[0];
