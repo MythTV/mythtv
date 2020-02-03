@@ -730,6 +730,8 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     }
     unsigned long long FrequencyHz(void) const
     {
+        if (m_data == nullptr)
+            return 0;
         return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
     }
     // reserved_future_use     12   6.0

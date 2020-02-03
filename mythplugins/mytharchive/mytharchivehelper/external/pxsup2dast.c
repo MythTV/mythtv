@@ -118,6 +118,8 @@ struct
 #define exc_catchall else
 #define exc_endall(x) EXC.m_last = exc_s##x.m_prev; } while (0)
 
+#define exc_cleanup() EXC.m_last = NULL;
+
 static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
 {
     struct exc__state * exc_s = EXC.m_last;
@@ -816,6 +818,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
         size_t len = write(1, sptsstr, strlen(sptsstr));
         if (len != strlen(sptsstr))
             printf("ERROR: write failed");
+        exc_cleanup();
         return;
     }
     exc_end(1);
@@ -977,6 +980,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         if (write(2, "\n", 1) != 1)
             printf("ERROR: write failed");
 
+        exc_cleanup();
         return 1;
     }
     exc_endall(1);

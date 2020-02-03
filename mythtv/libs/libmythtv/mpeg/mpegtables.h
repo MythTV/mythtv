@@ -800,7 +800,8 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
                               uint infoLength)
     {
         SetStreamInfoLength(i, infoLength);
-        memcpy(m_ptrs[i] + 5, streamInfo, infoLength);
+        if ((streamInfo != nullptr) && (infoLength > 0))
+            memcpy(m_ptrs[i] + 5, streamInfo, infoLength);
     }
 
     void SetProgramInfoLength(uint length)

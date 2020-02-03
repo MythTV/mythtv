@@ -1174,6 +1174,8 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
       n_max+=16;
       auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
       if (new_first == nullptr) {
+          // clang-tidy-11 says this is fine.  ct-9 produces a weird
+          // warning here.  NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
           free(first);
           return nullptr;
       }

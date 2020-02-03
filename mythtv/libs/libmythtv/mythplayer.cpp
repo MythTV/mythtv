@@ -1129,7 +1129,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
         msg += tr("TXT CAP");
     if (kDisplayTeletextCaptions & mode)
     {
-        msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
                                        GetTrack(kTrackTypeTeletextCaptions));
         DisableTeletext();
     }
@@ -1140,7 +1141,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
         (kDisplayAVSubtitle & mode) || (kDisplayRawTextSubtitle & mode))
     {
         int type = toTrackType(mode);
-        msg += m_decoder->GetTrackDesc(type, GetTrack(type));
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
         if (m_osd)
             m_osd->EnableSubtitles(preserve);
     }
@@ -1169,7 +1171,8 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
         int type = toTrackType(mode);
-        msg += m_decoder->GetTrackDesc(type, GetTrack(type));
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
         if (m_osd)
             m_osd->EnableSubtitles(mode);
     }
@@ -1181,7 +1184,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
     }
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT %1").arg(m_ttPageNum, 3, 16);
-    if (kDisplayTeletextCaptions & mode)
+    if ((kDisplayTeletextCaptions & mode) && (m_decoder != nullptr))
     {
         msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
                                        GetTrack(kTrackTypeTeletextCaptions));
