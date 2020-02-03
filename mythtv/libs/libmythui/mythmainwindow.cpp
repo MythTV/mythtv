@@ -1093,7 +1093,7 @@ void MythMainWindow::Init(bool mayReInit)
             auto *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
             d->m_painter = new MythOpenGLPainter(render, this);
         }
-        else if (glwindow)
+        else
         {
             delete glwindow;
         }

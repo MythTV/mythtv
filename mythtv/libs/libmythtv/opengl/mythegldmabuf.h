@@ -24,8 +24,8 @@ class MythEGLDMABUF
                                              VideoFrame *Frame,
                                              bool UseSeparate,
                                              FrameScanType Scan = kScan_Progressive);
-    void                      ClearDMATextures(MythRenderOpenGL *Context,
-                                               vector<MythVideoTexture*>& Textures) const;
+    static void               ClearDMATextures(MythRenderOpenGL *Context,
+                                               vector<MythVideoTexture*>& Textures) ;
 
   private:
     vector<MythVideoTexture*> CreateComposed(AVDRMFrameDescriptor* Desc,

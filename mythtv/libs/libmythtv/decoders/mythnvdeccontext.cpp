@@ -527,9 +527,11 @@ void MythNVDECContext::GetDecoderList(QStringList &Decoders)
         return;
     Decoders.append("NVDEC:");
     for (auto profile : profiles)
+    {
         if (!(profile.m_depth % 2)) // Ignore 9/11bit etc
             Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum,
                                                                     profile.m_type, profile.m_depth + 8));
+    }
 }
 
 const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfiles(void)

@@ -40,7 +40,6 @@ Configuration   *UPnp::g_pConfig        = nullptr;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
-  : QObject()
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
     // N.B. Ask for 5 second delay to send Bye Bye twice
@@ -334,12 +333,12 @@ void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
     pRequest->SendResponse();
 }
 
-void UPnp::DisableNotifications(uint)
+void UPnp::DisableNotifications(uint /*unused*/)
 {
     SSDP::Instance()->DisableNotifications();
 }
 
-void UPnp::EnableNotificatins(qint64)
+void UPnp::EnableNotificatins(qint64 /*unused*/)
 {
     SSDP::Instance()->EnableNotifications(m_nServicePort);
 }

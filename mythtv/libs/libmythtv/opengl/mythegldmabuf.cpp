@@ -348,7 +348,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescri
 }
 
 void MythEGLDMABUF::ClearDMATextures(MythRenderOpenGL* Context,
-                                     vector<MythVideoTexture *> &Textures) const
+                                     vector<MythVideoTexture *> &Textures)
 {
     for (auto & texture : Textures)
     {

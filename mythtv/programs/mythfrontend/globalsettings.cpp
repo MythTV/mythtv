@@ -3940,7 +3940,7 @@ class ShutDownRebootSetting : public GroupSetting
     ShutDownRebootSetting();
 
   private slots:
-    void childChanged(StandardSetting*) override;
+    void childChanged(StandardSetting* /*unused*/) override;
 
   private:
     StandardSetting *m_overrideExitMenu { nullptr };
@@ -3966,7 +3966,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting*)
+void ShutDownRebootSetting::childChanged(StandardSetting* /*unused*/)
 {
     if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand)
         return;
