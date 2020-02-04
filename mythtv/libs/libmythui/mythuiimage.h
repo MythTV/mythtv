@@ -66,7 +66,7 @@ class ImageProperties
     bool     m_isMasked       {false};
     bool     m_isOriented     {false};
 
-    ReflectAxis m_reflectAxis {ReflectVertical};
+    ReflectAxis m_reflectAxis {ReflectAxis::Vertical};
     int m_reflectScale        {100};
     int m_reflectLength       {100};
     int m_reflectShear        {0};

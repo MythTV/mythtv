@@ -151,7 +151,8 @@ void MythImage::Resize(const QSize &newSize, bool preserveAspect)
     if (m_isGradient)
     {
         *(static_cast<QImage *> (this)) = QImage(newSize, QImage::Format_ARGB32);
-        MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha, m_gradDirection);
+        MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha,
+                     BoundaryWanted::Yes, m_gradDirection);
         SetChanged();
     }
     else
@@ -171,8 +172,8 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
         return;
 
     QImage mirrorImage;
-    FillDirection fillDirection = FillTopToBottom;
-    if (axis == ReflectVertical)
+    FillDirection fillDirection = FillDirection::TopToBottom;
+    if (axis == ReflectAxis::Vertical)
     {
         mirrorImage = mirrored(false,true);
         if (length < 100)
@@ -180,9 +181,9 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
             int height = (int)((float)mirrorImage.height() * (float)length/100);
             mirrorImage = mirrorImage.copy(0,0,mirrorImage.width(),height);
         }
-        fillDirection = FillTopToBottom;
+        fillDirection = FillDirection::TopToBottom;
     }
-    else if (axis == ReflectHorizontal)
+    else if (axis == ReflectAxis::Horizontal)
     {
         mirrorImage = mirrored(true,false);
         if (length < 100)
@@ -190,21 +191,21 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
             int width = (int)((float)mirrorImage.width() * (float)length/100);
             mirrorImage = mirrorImage.copy(0,0,width,mirrorImage.height());
         }
-        fillDirection = FillLeftToRight;
+        fillDirection = FillDirection::LeftToRight;
     }
 
     QImage alphaChannel(mirrorImage.size(), QImage::Format_ARGB32);
     MakeGradient(alphaChannel, QColor("#AAAAAA"), QColor("#000000"), 255,
-                 false, fillDirection);
+                 BoundaryWanted::No, fillDirection);
     mirrorImage.setAlphaChannel(alphaChannel);
 
     QMatrix shearMatrix;
-    if (axis == ReflectVertical)
+    if (axis == ReflectAxis::Vertical)
     {
         shearMatrix.scale(1,(float)scale/100);
         shearMatrix.shear((float)shear/100,0);
     }
-    else if (axis == ReflectHorizontal)
+    else if (axis == ReflectAxis::Horizontal)
     {
         shearMatrix.scale((float)scale/100,1);
         shearMatrix.shear(0,(float)shear/100);
@@ -213,9 +214,9 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     mirrorImage = mirrorImage.transformed(shearMatrix, Qt::SmoothTransformation);
 
     QSize newsize;
-    if (axis == ReflectVertical)
+    if (axis == ReflectAxis::Vertical)
         newsize = QSize(mirrorImage.width(), height()+spacing+mirrorImage.height());
-    else if (axis == ReflectHorizontal)
+    else if (axis == ReflectAxis::Horizontal)
         newsize = QSize(width()+spacing+mirrorImage.width(), mirrorImage.height());
 
     QImage temp(newsize, QImage::Format_ARGB32);
@@ -223,7 +224,7 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
 
     QPainter newpainter(&temp);
     newpainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    if (axis == ReflectVertical)
+    if (axis == ReflectAxis::Vertical)
     {
         if (shear < 0)
         {
@@ -237,7 +238,7 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
 
         newpainter.drawImage(0, height()+spacing, mirrorImage);
     }
-    else if (axis == ReflectHorizontal)
+    else if (axis == ReflectAxis::Horizontal)
     {
         if (shear < 0)
         {
@@ -372,7 +373,8 @@ bool MythImage::Load(const QString &filename)
 }
 
 void MythImage::MakeGradient(QImage &image, const QColor &begin,
-                             const QColor &end, int alpha, bool drawBoundary,
+                             const QColor &end, int alpha,
+                             BoundaryWanted drawBoundary,
                              FillDirection direction)
 {
     // Gradient fill colours
@@ -384,11 +386,11 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
     // Define Gradient
     QPoint pointA(0,0);
     QPoint pointB;
-    if (direction == FillTopToBottom)
+    if (direction == FillDirection::TopToBottom)
     {
         pointB = QPoint(0,image.height());
     }
-    else if (direction == FillLeftToRight)
+    else if (direction == FillDirection::LeftToRight)
     {
         pointB = QPoint(image.width(),0);
     }
@@ -402,7 +404,7 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     painter.fillRect(0, 0, image.width(), image.height(), gradient);
 
-    if (drawBoundary)
+    if (drawBoundary == BoundaryWanted::Yes)
     {
         // Draw boundary rect
         QColor black(0, 0, 0, alpha);
@@ -421,7 +423,7 @@ MythImage *MythImage::Gradient(MythPainter *painter,
 {
     QImage img(size.width(), size.height(), QImage::Format_ARGB32);
 
-    MakeGradient(img, begin, end, alpha, true, direction);
+    MakeGradient(img, begin, end, alpha, BoundaryWanted::Yes, direction);
 
     MythImage *ret = painter->GetFormatImage();
     ret->Assign(img);
