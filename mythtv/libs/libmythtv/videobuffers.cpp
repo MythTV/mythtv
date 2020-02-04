@@ -841,7 +841,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     {
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
            .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
         return success;
     }
