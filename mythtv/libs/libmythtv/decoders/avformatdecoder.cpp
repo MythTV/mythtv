@@ -3277,6 +3277,16 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
                                      static_cast<int>(m_h264Parser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
 
+            // the SetVideoParams call above will have released all held frames
+            // when using a hardware frames context - but for H264 (as opposed to mpeg2)
+            // the codec will still hold references for reference frames (decoded picture buffer).
+            // Flushing the context will release these references and the old
+            // hardware context is released correctly before a new one is created.
+            // TODO check what is needed here when a device context is used
+            // TODO check whether any codecs need to be flushed for a frame rate change (e.g. mediacodec?)
+            if (context->hw_frames_ctx && (forcechange || res_changed))
+                avcodec_flush_buffers(context);
+
             m_currentWidth  = width;
             m_currentHeight = height;
 
