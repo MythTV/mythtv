@@ -1374,9 +1374,9 @@ bool MythUIImage::ParseElement(
         if (!tmp.isEmpty())
         {
             if (tmp.toLower() == "horizontal")
-                m_imageProperties.m_reflectAxis = ReflectHorizontal;
+                m_imageProperties.m_reflectAxis = ReflectAxis::Horizontal;
             else
-                m_imageProperties.m_reflectAxis = ReflectVertical;
+                m_imageProperties.m_reflectAxis = ReflectAxis::Vertical;
         }
 
         tmp = element.attribute("shear");

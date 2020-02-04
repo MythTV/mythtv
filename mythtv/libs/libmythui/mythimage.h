@@ -15,8 +15,9 @@
 #include "referencecounter.h"
 #include "mythpainter.h"
 
-enum ReflectAxis {ReflectHorizontal, ReflectVertical};
-enum FillDirection {FillLeftToRight, FillTopToBottom};
+enum class ReflectAxis {Horizontal, Vertical};
+enum class FillDirection {LeftToRight, TopToBottom};
+enum class BoundaryWanted {No, Yes};
 
 class QNetworkReply;
 class MythUIHelper;
@@ -81,7 +82,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     static MythImage *Gradient(MythPainter *painter,
                                const QSize & size, const QColor &begin,
                                const QColor &end, uint alpha,
-                               FillDirection direction = FillTopToBottom);
+                               FillDirection direction = FillDirection::TopToBottom);
 
     void SetID(unsigned int id) { m_imageId = id; }
     unsigned int GetID(void) const { return m_imageId; }
@@ -107,8 +108,8 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     ~MythImage() override;
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
-                             bool drawBoundary=true,
-                             FillDirection direction = FillTopToBottom);
+                             BoundaryWanted drawBoundary = BoundaryWanted::Yes,
+                             FillDirection direction = FillDirection::TopToBottom);
 
     bool           m_Changed       {false};
     MythPainter   *m_Parent        {nullptr};
@@ -117,7 +118,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     QColor         m_gradBegin     {"#000000"};
     QColor         m_gradEnd       {"#FFFFFF"};
     int            m_gradAlpha     {255};
-    FillDirection  m_gradDirection {FillTopToBottom};
+    FillDirection  m_gradDirection {FillDirection::TopToBottom};
 
     bool           m_isOriented    {false};
     bool           m_isReflected   {false};
