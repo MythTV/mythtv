@@ -3056,7 +3056,12 @@ void Scheduler::HandleIdleShutdown(
     // the frontend may have connected then gone idle between scheduler runs
     if (blockShutdown)
     {
-        if (m_mainServer->isClientConnected())
+        m_schedLock.unlock();
+        bool b = m_mainServer->isClientConnected();
+        m_schedLock.lock();
+        if (m_recListChanged)
+            return;
+        if (b)
         {
             LOG(VB_GENERAL, LOG_NOTICE, "Client is connected, removing startup block on shutdown");
             blockShutdown = false;
@@ -3071,6 +3076,7 @@ void Scheduler::HandleIdleShutdown(
 
         // find out, if we are currently recording (or LiveTV)
         bool recording = false;
+        m_schedLock.unlock();
         TVRec::s_inputsLock.lockForRead();
         QMap<int, EncoderLink *>::Iterator it;
         for (it = m_tvList->begin(); (it != m_tvList->end()) &&
@@ -3083,6 +3089,9 @@ void Scheduler::HandleIdleShutdown(
 
         // If there are BLOCKING clients, then we're not idle
         bool blocking = m_mainServer->isClientConnected(true);
+        m_schedLock.lock();
+        if (m_recListChanged)
+            return;
 
         // If there are active jobs, then we're not idle
         bool activeJobs = JobQueue::HasRunningOrPendingJobs(0);
