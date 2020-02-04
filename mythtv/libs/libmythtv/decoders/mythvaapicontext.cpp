@@ -696,7 +696,7 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
         {
             // preserve interlaced flags
             m_lastInterlaced = Frame->interlaced_frame;
-            m_lastTopFieldFirst = Frame->top_field_first;
+            m_lastTopFieldFirst = (Frame->top_field_first != 0);
         }
 
         if (ret < 0)
@@ -756,7 +756,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->top_field_first = m_lastTopFieldFirst;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->decoder_deinterlaced = 1;
+        Frame->decoder_deinterlaced = true;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can

@@ -85,7 +85,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     int               m_colourSpaceDepth       { 8 };
     int               m_range                  { AVCOL_RANGE_MPEG };
     bool              m_updatesDisabled        { true };
-    int               m_colourShifted          { 0 };
+    bool              m_colourShifted          { false };
     int               m_colourTransfer         { AVCOL_TRC_BT709 };
     PrimariesMode     m_primariesMode          { PrimariesRelaxed };
     int               m_colourPrimaries        { AVCOL_PRI_BT709 };

@@ -2777,7 +2777,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
         //frame->height = c->height;
     }
 
-    frame->colorshifted = 0;
+    frame->colorshifted = false;
     uint max = planes(frame->codec);
     for (uint i = 0; i < 3; i++)
     {
@@ -3614,13 +3614,13 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         // So we can release the unconverted blank video frame to the
         // display queue.
         if (frame)
-            frame->directrendering = 0;
+            frame->directrendering = false;
     }
     else if (!m_directRendering)
     {
         VideoFrame *oldframe = frame;
         frame = m_parent->GetNextVideoFrame();
-        frame->directrendering = 0;
+        frame->directrendering = false;
 
         if (!m_mythCodecCtx->RetrieveFrame(context, frame, AvFrame))
         {
@@ -3655,10 +3655,10 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         {
             // Set the frame flags, but then discard it
             // since we are not using it for display.
-            oldframe->pause_frame = 0;
+            oldframe->pause_frame = false;
             oldframe->interlaced_frame = AvFrame->interlaced_frame;
-            oldframe->top_field_first = AvFrame->top_field_first;
-            oldframe->interlaced_reversed = 0;
+            oldframe->top_field_first = (AvFrame->top_field_first != 0);
+            oldframe->interlaced_reversed = false;
             oldframe->colorspace = AvFrame->colorspace;
             oldframe->colorrange = AvFrame->color_range;
             oldframe->colorprimaries = AvFrame->color_primaries;
@@ -3668,8 +3668,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
             oldframe->frameCounter = m_frameCounter++;
             oldframe->aspect = m_currentAspect;
             oldframe->deinterlace_inuse = DEINT_NONE;
-            oldframe->deinterlace_inuse2x = 0;
-            oldframe->decoder_deinterlaced = 0;
+            oldframe->deinterlace_inuse2x = false;
+            oldframe->decoder_deinterlaced = false;
             oldframe->rotation = m_videoRotation;
             m_parent->DiscardVideoFrame(oldframe);
         }
@@ -3740,15 +3740,15 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     if (frame)
     {
         frame->interlaced_frame = AvFrame->interlaced_frame;
-        frame->top_field_first  = AvFrame->top_field_first;
-        frame->interlaced_reversed = 0;
-        frame->repeat_pict      = AvFrame->repeat_pict;
+        frame->top_field_first  = (AvFrame->top_field_first != 0);
+        frame->interlaced_reversed = false;
+        frame->repeat_pict      = (AvFrame->repeat_pict != 0);
         frame->disp_timecode    = NormalizeVideoTimecode(Stream, temppts);
         frame->frameNumber      = m_framesPlayed;
         frame->frameCounter     = m_frameCounter++;
         frame->aspect           = m_currentAspect;
-        frame->dummy            = 0;
-        frame->pause_frame      = 0;
+        frame->dummy            = false;
+        frame->pause_frame      = false;
         frame->colorspace       = AvFrame->colorspace;
         frame->colorrange       = AvFrame->color_range;
         frame->colorprimaries   = AvFrame->color_primaries;
@@ -3756,8 +3756,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         frame->chromalocation   = AvFrame->chroma_location;
         frame->pix_fmt          = AvFrame->format;
         frame->deinterlace_inuse = DEINT_NONE;
-        frame->deinterlace_inuse2x = 0;
-        frame->decoder_deinterlaced = 0;
+        frame->deinterlace_inuse2x = false;
+        frame->decoder_deinterlaced = false;
         frame->rotation         = m_videoRotation;
         m_parent->ReleaseNextVideoFrame(frame, temppts);
         m_mythCodecCtx->PostProcessFrame(context, frame);
@@ -5167,26 +5167,26 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
             return false;
 
         clear(frame);
-        frame->dummy = 1;
+        frame->dummy = true;
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
         m_parent->DeLimboFrame(frame);
 
         frame->interlaced_frame = 0; // not interlaced
-        frame->top_field_first  = 1; // top field first
-        frame->interlaced_reversed = 0;
-        frame->repeat_pict      = 0; // not a repeated picture
+        frame->top_field_first  = true; // top field first
+        frame->interlaced_reversed = false;
+        frame->repeat_pict      = false; // not a repeated picture
         frame->frameNumber      = m_framesPlayed;
         frame->frameCounter     = m_frameCounter++;
-        frame->dummy            = 1;
-        frame->pause_frame      = 0;
+        frame->dummy            = true;
+        frame->pause_frame      = false;
         frame->colorspace       = AVCOL_SPC_BT709;
         frame->colorrange       = AVCOL_RANGE_MPEG;
         frame->colorprimaries   = AVCOL_PRI_BT709;
         frame->colortransfer    = AVCOL_TRC_BT709;
         frame->chromalocation   = AVCHROMA_LOC_LEFT;
         frame->deinterlace_inuse = DEINT_NONE;
-        frame->deinterlace_inuse2x = 0;
-        frame->decoder_deinterlaced = 0;
+        frame->deinterlace_inuse2x = false;
+        frame->decoder_deinterlaced = false;
         frame->rotation         = 0;
 
         m_decodedVideoFrame = frame;

@@ -331,8 +331,8 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame 
     if (Frame && m_deinterlacer)
     {
         Frame->interlaced_frame = 0;
-        Frame->interlaced_reversed = 0;
-        Frame->top_field_first = 0;
+        Frame->interlaced_reversed = false;
+        Frame->top_field_first = false;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
     }
@@ -400,7 +400,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     Frame->width = AvFrame->width;
     Frame->height = AvFrame->height;
     Frame->pix_fmt = Context->pix_fmt;
-    Frame->directrendering = 1;
+    Frame->directrendering = true;
 
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
@@ -414,7 +414,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     }
 
     // NVDEC 'fixes' 10/12/16bit colour values
-    Frame->colorshifted = 1;
+    Frame->colorshifted = true;
 
     // Frame->data[0] holds CUdeviceptr for the frame data - offsets calculated above
     Frame->buf = AvFrame->data[0];

@@ -324,7 +324,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     }
 
     // VAAPI 'fixes' 10/12/16bit colour values. Irrelevant for VDPAU.
-    videoframe->colorshifted = 1;
+    videoframe->colorshifted = true;
 
     // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
     // hardware surfaces stored within AVHWFramesContext. The pointer to the surface is stored
@@ -356,8 +356,8 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
     auto *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
 
     Frame->pix_fmt = Context->pix_fmt;
-    Frame->directrendering = 1;
-    Frame->colorshifted = 1;
+    Frame->directrendering = true;
+    Frame->colorshifted = true;
 
     AvFrame->reordered_opaque = Context->reordered_opaque;
     AvFrame->opaque = Frame;
@@ -634,7 +634,7 @@ bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
         if ((ret = av_hwframe_transfer_data(temp, AvFrame, 0)) < 0)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error %1 transferring the data to system memory").arg(ret));
 
-    Frame->colorshifted = 1;
+    Frame->colorshifted = true;
     av_frame_free(&temp);
     return ret >= 0;
 }

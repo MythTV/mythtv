@@ -173,7 +173,7 @@ bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Fram
     Frame->height = AvFrame->height;
     Frame->pix_fmt = Context->pix_fmt;
     Frame->sw_pix_fmt = Context->sw_pix_fmt;
-    Frame->directrendering = 1;
+    Frame->directrendering = true;
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
 

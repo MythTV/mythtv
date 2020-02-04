@@ -88,7 +88,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
         double fps = frame->frame_rate;
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
-        double duration = 1 / fps + frame->repeat_pict * 0.5 / fps;
+        double duration = 1 / fps + static_cast<double>(frame->repeat_pict) * 0.5 / fps;
         m_curTime += duration * 1000;
         m_videoOutput->DoneDisplayingFrame(frame);
     }

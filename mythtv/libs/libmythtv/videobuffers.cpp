@@ -169,7 +169,7 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
         memset(At(i), 0, sizeof(VideoFrame));
         At(i)->codec            = FMT_NONE;
         At(i)->interlaced_frame = -1;
-        At(i)->top_field_first  = 1;
+        At(i)->top_field_first  = true;
         m_vbufferMap[At(i)]     = i;
     }
 
@@ -375,7 +375,7 @@ void VideoBuffers::ReleaseFrame(VideoFrame *Frame)
     m_vpos = m_vbufferMap[Frame];
     m_limbo.remove(Frame);
     //non directrendering frames are ffmpeg handled
-    if (Frame->directrendering != 0)
+    if (Frame->directrendering)
         m_decode.enqueue(Frame);
     m_used.enqueue(Frame);
 }
@@ -546,7 +546,7 @@ void VideoBuffers::Enqueue(BufferType Type, VideoFrame *Frame)
     queue->remove(Frame);
     queue->enqueue(Frame);
     if (Type == kVideoBuffer_pause)
-        Frame->pause_frame = 1;
+        Frame->pause_frame = true;
     m_globalLock.unlock();
 }
 

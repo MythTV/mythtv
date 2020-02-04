@@ -1691,7 +1691,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     else if (buffer && is_interlaced(ps))
     {
         ps = kScan_Interlaced;
-        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
+        buffer->interlaced_reversed = (m_scan == kScan_Intr2ndField);
     }
 
     // only display the second field if needed
