@@ -41,7 +41,7 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
                                              ExternalChannel *_channel,
                                              bool _release_stream,
                                              uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags, _release_stream)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     QString result;
 
