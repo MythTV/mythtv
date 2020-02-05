@@ -8,21 +8,21 @@
 
 struct ZoomFilterData
 {
-	int     vitesse;					/* 128 = vitesse nule... * * 256 = en arriere * hyper vite.. * * 0 = en avant hype vite. */
+	int     vitesse;		/* 128 = vitesse nule... * * 256 = en arriere
+                                         * hyper vite.. * * 0 = en avant hype vite. */
 	unsigned char pertedec;
 	unsigned char sqrtperte;
-	int     middleX, middleY;			/* milieu de l'effet */
-	char    reverse;					/* inverse la vitesse */
-	char    mode;						/* type d'effet à appliquer (cf les #define)
-																 * * * * * ** @since June 2001 */
-	int     hPlaneEffect;				/* deviation horitontale */
-	int     vPlaneEffect;				/* deviation verticale */
+	int     middleX, middleY;	/* milieu de l'effet */
+	char    reverse;		/* inverse la vitesse */
+	char    mode;			/* type d'effet à appliquer (cf les #define) */
+	/** @since June 2001 */
+	int     hPlaneEffect;		/* deviation horitontale */
+	int     vPlaneEffect;		/* deviation verticale */
 	/** @since April 2002 */
-	int     waveEffect;					/* applique une "surcouche" de wave effect */
-	int     hypercosEffect;				/* applique une "surcouche de hypercos effect 
-																 */
+	int     waveEffect;		/* applique une "surcouche" de wave effect */
+	int     hypercosEffect;		/* applique une "surcouche de hypercos effect */
 
-	char    noisify;					/* ajoute un bruit a la transformation */
+	char    noisify;		/* ajoute un bruit a la transformation */
 };
 
 
