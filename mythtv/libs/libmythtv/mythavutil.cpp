@@ -368,7 +368,7 @@ int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
 
 int MythAVCopy::Copy(VideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
 {
-    if (fmt == AV_PIX_FMT_NV12 || AV_PIX_FMT_YUV420P)
+    if (fmt == AV_PIX_FMT_NV12 || fmt == AV_PIX_FMT_YUV420P)
     {
         VideoFrame framein {};
         FillFrame(&framein, pic, frame->width, frame->width, frame->height, fmt);
