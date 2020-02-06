@@ -45,7 +45,8 @@ extern MBASE_PUBLIC QStringList logPropagateArgList;
 extern MBASE_PUBLIC QString     logPropagateArgs;
 extern MBASE_PUBLIC QString     verboseString;
 
-MBASE_PUBLIC void logStart(const QString& logfile, int progress = 0, int quiet = 0,
+MBASE_PUBLIC void logStart(const QString& logfile, bool progress = false,
+                           int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
                            bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);

@@ -693,7 +693,7 @@ void logPropagateCalc(void)
 /// \return true if --quiet is being propagated
 bool logPropagateQuiet(void)
 {
-    return logPropagateOpts.m_quiet;
+    return logPropagateOpts.m_quiet != 0;
 }
 
 /// \brief  Entry point to start logging for the application.  This will
@@ -708,7 +708,7 @@ bool logPropagateQuiet(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-void logStart(const QString& logfile, int progress, int quiet, int facility,
+void logStart(const QString& logfile, bool progress, int quiet, int facility,
               LogLevel_t level, bool dblog, bool propagate)
 {
     if (logThread && logThread->isRunning())

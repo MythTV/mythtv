@@ -196,7 +196,7 @@ class LoggerThread : public QObject, public MThread
                                     ///  Protected by logQueueMutex
     QString m_filename;    ///< Filename of debug logfile
     bool    m_progress;    ///< show only LOG_ERR and more important (console only)
-    int     m_quiet;       ///< silence the console (console only)
+    bool    m_quiet;       ///< silence the console (console only)
     QString m_appname {QCoreApplication::applicationName()};
                            ///< Cached application name
     QString m_tablename;   ///< Cached table name for db logging
