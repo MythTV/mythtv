@@ -3496,12 +3496,14 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
             // Detect faulty video timestamps using logic from ffplay.
             if (pkt->dts != AV_NOPTS_VALUE)
             {
-                m_faultyDts += (pkt->dts <= m_lastDtsForFaultDetection);
+                if (pkt->dts <= m_lastDtsForFaultDetection)
+                    m_faultyDts += 1;
                 m_lastDtsForFaultDetection = pkt->dts;
             }
             if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
             {
-                m_faultyPts += (mpa_pic->reordered_opaque <= m_lastPtsForFaultDetection);
+                if (mpa_pic->reordered_opaque <= m_lastPtsForFaultDetection)
+                    m_faultyPts += 1;
                 m_lastPtsForFaultDetection = mpa_pic->reordered_opaque;
                 m_reorderedPtsDetected = true;
             }
