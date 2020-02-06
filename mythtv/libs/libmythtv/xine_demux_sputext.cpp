@@ -88,7 +88,7 @@ static inline void trail_space(char *s) {
       // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
       copy[0] = copy[1];
       copy++;
-    } while(*copy);
+    } while(*copy != 0);
   }
   int i = strlen(s) - 1;
   while (i > 0 && isspace(s[i]))
@@ -409,7 +409,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
         }
       }
     }
-  } while(i<SUB_MAX_TEXT && !end_sub);
+  } while(i<SUB_MAX_TEXT && (end_sub == 0));
   if(i>=SUB_MAX_TEXT)
     printf("Too many lines in a subtitle\n");
   current->lines=i;

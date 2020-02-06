@@ -97,7 +97,7 @@ class ScannerEvent : public QEvent
     int     intValue()       const { return m_intValue; }
     void    intValue(int intvalue) { m_intValue = intvalue; }
 
-    int     boolValue()       const { return m_intValue != 0; }
+    bool    boolValue()       const { return m_intValue != 0; }
 
     Configurable *ConfigurableValue() const { return m_cfgPtr; }
     void    ConfigurableValue(Configurable *cfg_ptr)

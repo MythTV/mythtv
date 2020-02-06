@@ -155,7 +155,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
 {
     // filter unwanted messages
-    if (m_openGLDebuggerFilter & Message.type())
+    if ((m_openGLDebuggerFilter & Message.type()) != 0U)
         return;
 
     QString source("Unknown");
@@ -647,7 +647,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
 
 QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
 {
-    if ((m_features & NPOTTextures) || !Normalised)
+    if (((m_features & NPOTTextures) != 0U) || !Normalised)
         return size;
 
     int w = 64;

@@ -2378,9 +2378,9 @@ uint ChannelUtil::GetNextChannel(
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
-                (mplexid_restriction &&
+                ((mplexid_restriction != 0U) &&
                  (mplexid_restriction != it->m_mplexId)) ||
-                (chanid_restriction &&
+                ((chanid_restriction != 0U) &&
                  (chanid_restriction != it->m_chanId))));
     }
     else if ((CHANNEL_DIRECTION_UP == direction) ||
@@ -2397,9 +2397,9 @@ uint ChannelUtil::GetNextChannel(
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
-                (mplexid_restriction &&
+                ((mplexid_restriction != 0U) &&
                  (mplexid_restriction != it->m_mplexId)) ||
-                (chanid_restriction &&
+                ((chanid_restriction != 0U) &&
                  (chanid_restriction != it->m_chanId))));
     }
 

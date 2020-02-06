@@ -97,7 +97,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
         ChannelInfoList::const_iterator cit =
             find(m_channels.begin(), m_channels.end(), chanid);
 
-        if (chanid && cit != m_channels.end())
+        if ((chanid != 0U) && (cit != m_channels.end()))
         {
             if (!setchan)
             {

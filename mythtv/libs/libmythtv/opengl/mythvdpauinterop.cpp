@@ -204,7 +204,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         return true;
     }
 
-    return m_mixer && m_outputSurface;
+    return (m_mixer != 0U) && (m_outputSurface != 0U);
 }
 
 /*! \brief Map VDPAU video surfaces to an OpenGL texture.

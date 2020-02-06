@@ -51,7 +51,7 @@ class Action
     /// \return true on success, false otherwise.
     bool RemoveKey(const QString &key)
     {
-        return m_keys.removeAll(key);
+        return m_keys.removeAll(key) != 0;
     }
 
     // Gets

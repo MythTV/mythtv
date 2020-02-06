@@ -436,7 +436,7 @@ void CC608Reader::Update608Text(
             }
         }
     }
-    m_state[streamIdx].m_changed = visible;
+    m_state[streamIdx].m_changed = (visible != 0);
     m_state[streamIdx].m_output.m_lock.unlock();
 }
 

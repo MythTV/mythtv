@@ -1564,7 +1564,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 float flagFPS = 0.0;
                 float elapsed = flagTime.elapsed() / 1000.0;
-                if (elapsed)
+                if (elapsed != 0.0F)
                     flagFPS = curFrameNum / elapsed;
 
                 total_frame_count = GetPlayer()->GetCurrentFrameCount();

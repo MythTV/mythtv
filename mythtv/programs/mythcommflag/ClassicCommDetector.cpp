@@ -503,7 +503,7 @@ bool ClassicCommDetector::go()
         {
             float elapsed = flagTime.elapsed() / 1000.0;
 
-            if (elapsed)
+            if (elapsed != 0.0F)
                 flagFPS = currentFrameNumber / elapsed;
             else
                 flagFPS = 0.0;

@@ -84,7 +84,7 @@ class Source : public MythUIComboBoxSetting
         fillSelections();
         StandardSetting::Load();
 
-        if (m_defaultSourceId && (getValue().toUInt() == 0U))
+        if ((m_defaultSourceId != 0U) && (getValue().toUInt() == 0U))
         {
             uint which = m_sourceIdToIndex[m_defaultSourceId];
             if (which)

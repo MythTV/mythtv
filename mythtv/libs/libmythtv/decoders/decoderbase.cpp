@@ -392,7 +392,7 @@ bool DecoderBase::SyncPositionMap(void)
         {
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index * m_keyframeDist;
-            if (m_fps)
+            if (m_fps != 0.0)
                 length = (int)((totframes * 1.0) / m_fps);
         }
 

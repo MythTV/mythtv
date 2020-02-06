@@ -356,7 +356,7 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 	F_PT    y = NAN;
 
 	SIMI *Cur = Cur_F->m_components;
-	for (F_PT i = Cur_F->m_nbSimi; i; --i, Cur++) {
+	for (int i = Cur_F->m_nbSimi; i != 0; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
 		Buf->x = F->m_lx + ((x * F->m_lx) / (UNIT*2) );
@@ -365,7 +365,7 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 
 		Cur_Pt++;
 
-		if (F->m_depth && ((x - xo) / 16) && ((y - yo) / 16)) {
+		if (F->m_depth && (((x - xo) / 16) != 0.0F) && (((y - yo) / 16) != 0.0F)) {
 			F->m_depth--;
 			Trace (F, x, y);
 			F->m_depth++;

@@ -293,7 +293,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             float elapsed = flagTime.elapsed() / 1000.0;
 
             float flagFPS = 0.0F;
-            if (elapsed)
+            if (elapsed != 0.0F)
                 flagFPS = framesProcessed / elapsed;
 
             int percentage = 0;

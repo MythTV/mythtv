@@ -436,7 +436,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
     bool HRDManagementValid(void)      const { return ( m_data[2]&0x80 ) != 0; }
     // reserved                 6   2.1
     // picture_and_timing_info_present 1 2.7
-    bool HasPictureAndTimingInfo(void) const { return m_data[2]&0x01;}
+    bool HasPictureAndTimingInfo(void) const { return (m_data[2]&0x01) != 0;}
     // if (picture_and_timing_info_present) {
     //   90kHz_flag             1   3.0
     //   reserved               7   3.1

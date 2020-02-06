@@ -202,8 +202,8 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
     if (!minBottom)
         minBottom = height / 4;
 
-    bool horizontal = ((minTop && maxTop - minTop < HORIZONTAL_THRESHOLD) &&
-                       (minBottom && maxBottom - minBottom < HORIZONTAL_THRESHOLD));
+    bool horizontal = (((minTop != 0) && (maxTop - minTop < HORIZONTAL_THRESHOLD)) &&
+                       ((minBottom != 0) && (maxBottom - minBottom < HORIZONTAL_THRESHOLD)));
 
     if (m_detectLetterboxSwitchFrame > Frame->frameNumber) // user is reversing
     {

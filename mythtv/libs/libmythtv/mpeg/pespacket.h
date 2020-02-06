@@ -96,33 +96,33 @@ class MTV_PUBLIC PESPacket
     uint ScramblingControl() const
         { return (m_pesData[3] & 0x30) >> 4; }
     /// 1 bit  Indicates if this is a high priority packet
-    bool HighPriority()       const { return (m_pesData[3] & 0x8) >> 3; }
+    bool HighPriority()       const { return ((m_pesData[3] & 0x8) >> 3) != 0; }
     /// 1 bit  Data alignment indicator (must be 0 for video)
-    bool DataAligned()        const { return (m_pesData[3] & 0x4) >> 2; }
+    bool DataAligned()        const { return ((m_pesData[3] & 0x4) >> 2) != 0; }
     /// 1 bit  If true packet may contain copy righted material and is
     ///        known to have once contained materiale with copy rights.
     ///        If false packet may contain copy righted material but is
     ///        not known to have ever contained materiale with copy rights.
-    bool CopyRight()          const { return (m_pesData[3] & 0x2) >> 1; }
+    bool CopyRight()          const { return ((m_pesData[3] & 0x2) >> 1) != 0; }
     /// 1 bit  Original Recording
-    bool OriginalRecording()  const { return m_pesData[3] & 0x1; }
+    bool OriginalRecording()  const { return (m_pesData[3] & 0x1) != 0; }
 
     /// 1 bit  Presentation Time Stamp field is present
-    bool HasPTS()             const { return (m_pesData[4] & 0x80) >> 7; }
+    bool HasPTS()             const { return ((m_pesData[4] & 0x80) >> 7) != 0; }
     /// 1 bit  Decoding Time Stamp field is present
-    bool HasDTS()             const { return (m_pesData[4] & 0x40) >> 6; }
+    bool HasDTS()             const { return ((m_pesData[4] & 0x40) >> 6) != 0; }
     /// 1 bit  Elementary Stream Clock Reference field is present
-    bool HasESCR()            const { return (m_pesData[4] & 0x20) >> 5; }
+    bool HasESCR()            const { return ((m_pesData[4] & 0x20) >> 5) != 0; }
     /// 1 bit  Elementary Stream Rate field is present
-    bool HasESR()             const { return (m_pesData[4] & 0x10) >> 4; }
+    bool HasESR()             const { return ((m_pesData[4] & 0x10) >> 4) != 0; }
     /// 1 bit  DSM field present (should always be false for broadcasts)
-    bool HasDSM()             const { return (m_pesData[4] & 0x8) >> 3; }
+    bool HasDSM()             const { return ((m_pesData[4] & 0x8) >> 3) != 0; }
     /// 1 bit  Additional Copy Info field is present
-    bool HasACI()             const { return (m_pesData[4] & 0x4) >> 2; }
+    bool HasACI()             const { return ((m_pesData[4] & 0x4) >> 2) != 0; }
     /// 1 bit  Cyclic Redundancy Check present
-    virtual bool HasCRC()     const { return (m_pesData[4] & 0x2) >> 1; }
+    virtual bool HasCRC()     const { return ((m_pesData[4] & 0x2) >> 1) != 0; }
     /// 1 bit  Extension flags are present
-    bool HasExtensionFlags()  const { return m_pesData[4] & 0x1; }
+    bool HasExtensionFlags()  const { return (m_pesData[4] & 0x1) != 0; }
 
     /// Presentation Time Stamp, present if HasPTS() is true
     uint64_t PTS(void) const

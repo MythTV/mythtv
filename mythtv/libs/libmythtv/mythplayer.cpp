@@ -1212,7 +1212,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 bool MythPlayer::ToggleCaptions(void)
 {
     SetCaptionsEnabled(!((bool)m_textDisplayMode));
-    return m_textDisplayMode;
+    return m_textDisplayMode != 0U;
 }
 
 bool MythPlayer::ToggleCaptions(uint type)
@@ -1224,10 +1224,10 @@ bool MythPlayer::ToggleCaptions(uint type)
     if (m_textDisplayMode)
         DisableCaptions(m_textDisplayMode, (origMode & mode) != 0U);
     if (origMode & mode)
-        return m_textDisplayMode;
+        return m_textDisplayMode != 0U;
     if (mode)
         EnableCaptions(mode);
-    return m_textDisplayMode;
+    return m_textDisplayMode != 0U;
 }
 
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
@@ -3537,7 +3537,7 @@ bool MythPlayer::UpdateFFRewSkip(void)
             m_fpsMultiplier = m_decoder->GetfpsMultiplier();
         m_frameInterval = (int) (1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed))
             / m_fpsMultiplier;
-        m_ffrewSkip = (m_playSpeed != 0.0F);
+        m_ffrewSkip = static_cast<int>(m_playSpeed != 0.0F);
     }
     else
     {

@@ -1300,7 +1300,7 @@ void StatusBox::doMachineStatus()
             continue;
         if (!(f & QNetworkInterface::IsRunning))
             continue;
-        if (f & QNetworkInterface::IsLoopBack)
+        if ((f & QNetworkInterface::IsLoopBack) != 0U)
             continue;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)

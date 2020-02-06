@@ -880,7 +880,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
         if (!(count = fillSelectionsFromDir(dev, card, driver)))
         {
             dev.setPath("/dev");
-            if (!(count = fillSelectionsFromDir(dev, card, driver)) &&
+            if (((count = fillSelectionsFromDir(dev, card, driver)) == 0U) &&
                 !getValue().isEmpty())
             {
                 addSelection(getValue(),getValue(),true);
@@ -1199,7 +1199,7 @@ class DVBTuningDelay : public CaptureCardSpinBoxSetting
     {
         setValue("0");
         setLabel(QObject::tr("DVB tuning delay (ms)"));
-        setValue(true);
+        setValue(static_cast<int>(true));
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
@@ -1857,7 +1857,7 @@ void ASIConfigurationGroup::probeCard(const QString &device)
         return;
     }
 
-    if (m_parent.getCardID() && m_parent.GetRawCardType() != "ASI")
+    if ((m_parent.getCardID() != 0) && m_parent.GetRawCardType() != "ASI")
     {
         m_cardInfo->setValue("");
         return;
@@ -2876,7 +2876,7 @@ void InputGroup::Load(void)
         while (query.next())
         {
             uint groupid = query.value(1).toUInt();
-            if (inputid && (query.value(0).toUInt() == inputid))
+            if ((inputid != 0U) && (query.value(0).toUInt() == inputid))
                 selected_groupids.push_back(groupid);
 
             grpcnt[groupid]++;
@@ -3720,7 +3720,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         return;
     }
 
-    if (m_parent.getCardID() && m_parent.GetRawCardType() != "DVB")
+    if ((m_parent.getCardID() != 0) && m_parent.GetRawCardType() != "DVB")
     {
         m_cardName->setValue("");
         m_cardType->setValue("");

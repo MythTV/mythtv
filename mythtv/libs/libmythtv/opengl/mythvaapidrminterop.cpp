@@ -477,7 +477,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             {
                 s_supported = true;
                 for (auto & texture : textures)
-                    s_supported &= texture->m_data && texture->m_textureId;
+                    s_supported &= texture->m_data && (texture->m_textureId != 0U);
                 ClearDMATextures(m_context, textures);
             }
             for (uint32_t i = 0; i < vadesc.num_objects; ++i)

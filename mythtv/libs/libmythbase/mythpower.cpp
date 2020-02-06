@@ -164,7 +164,7 @@ bool MythPower::IsFeatureSupported(Feature Supported)
 {
     bool result = false;
     s_lock.lock();
-    result = m_features & Supported;
+    result = ((m_features & Supported) != 0U);
     s_lock.unlock();
     return result;
 }

@@ -2186,7 +2186,7 @@ static inline int huffman1_get_root(uint input, const unsigned char *table)
 /* Returns the bit number bit from string test[] */
 static inline bool huffman1_get_bit(const unsigned char *src, uint bit)
 {
-    return (src[(bit - (bit & 0x7)) >> 3] >> (7 - (bit & 0x7))) & 0x01;
+    return ((src[(bit - (bit & 0x7)) >> 3] >> (7 - (bit & 0x7))) & 0x01) != 0;
 }
 
 QString atsc_huffman1_to_string(const unsigned char *compressed,

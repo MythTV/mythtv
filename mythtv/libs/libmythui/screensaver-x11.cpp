@@ -51,8 +51,8 @@ class ScreenSaverX11Private
         {
             int dummy0 = 0;
             int dummy1 = 0;
-            m_dpmsaware = DPMSQueryExtension(m_display->GetDisplay(),
-                                            &dummy0, &dummy1);
+            m_dpmsaware = (DPMSQueryExtension(m_display->GetDisplay(),
+                                            &dummy0, &dummy1) != 0);
         }
         else
         {

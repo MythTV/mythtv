@@ -225,7 +225,7 @@ class DecoderBase
 
     bool IsErrored() const { return m_errored; }
 
-    bool HasPositionMap(void) const { return GetPositionMapSize(); }
+    bool HasPositionMap(void) const { return GetPositionMapSize() != 0U; }
 
     void SetWaitForChange(void);
     bool GetWaitForChange(void) const;

@@ -210,7 +210,7 @@ class MTV_PUBLIC MythPlayer
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
     void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void)
-        { return !(FlagIsSet(kVideoIsNull)) && m_playerCtx->IsAudioNeeded(); }
+        { return ((FlagIsSet(kVideoIsNull)) == 0) && m_playerCtx->IsAudioNeeded(); }
     uint    GetVolume(void) { return m_audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;

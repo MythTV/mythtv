@@ -196,7 +196,7 @@ uint ChannelImporter::DeleteChannels(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
-            bool was_in_db = chan.m_dbMplexId && chan.m_channelId;
+            bool was_in_db = (chan.m_dbMplexId != 0U) && (chan.m_channelId != 0U);
             if (!was_in_db)
                 continue;
 
@@ -1184,11 +1184,11 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
         {
             int enc = (chan.m_isEncrypted) ?
                 ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
-            info.m_atscChannels[enc] += (chan.m_siStandard == "atsc");
-            info.m_dvbChannels [enc] += (chan.m_siStandard == "dvb");
-            info.m_mpegChannels[enc] += (chan.m_siStandard == "mpeg");
-            info.m_scteChannels[enc] += (chan.m_siStandard == "opencable");
-            info.m_ntscChannels[enc] += (chan.m_siStandard == "ntsc");
+            if (chan.m_siStandard == "atsc")      info.m_atscChannels[enc] += 1;
+            if (chan.m_siStandard == "dvb")       info.m_dvbChannels[enc]  += 1;
+            if (chan.m_siStandard == "mpeg")      info.m_mpegChannels[enc] += 1;
+            if (chan.m_siStandard == "opencable") info.m_scteChannels[enc] += 1;
+            if (chan.m_siStandard == "ntsc")      info.m_ntscChannels[enc] += 1;
             if (chan.m_siStandard != "ntsc")
             {
                 ++info.m_progNumCnt[chan.m_serviceId];

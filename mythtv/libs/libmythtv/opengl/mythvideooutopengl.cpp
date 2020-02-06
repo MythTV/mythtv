@@ -524,7 +524,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
         m_render->logDebugMarker(LOC + "CLEAR_START");
 
     int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
-    bool useclear = !Frame || dummy || m_render->GetExtraFeatures() & kGLTiled;
+    bool useclear = !Frame || dummy || ((m_render->GetExtraFeatures() & kGLTiled) != 0);
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     // Qt < 5.8 uses a different QRegion API. Just clear and remove this code
     // when 5.8 is standard

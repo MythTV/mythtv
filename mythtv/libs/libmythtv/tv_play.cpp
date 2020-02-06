@@ -4878,7 +4878,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!CommitQueuedInput(ctx))
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(ctx, ctx->m_player->GetBookmark());
+            SetBookmark(ctx, ctx->m_player->GetBookmark() != 0U);
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
@@ -6422,7 +6422,7 @@ void TV::UpdateNavDialog(PlayerContext *ctx)
         osdInfo info;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         bool paused = (ctx->m_player
-            && (ctx->m_ffRewState || ctx->m_ffRewSpeed != 0
+            && ((ctx->m_ffRewState != 0) || (ctx->m_ffRewSpeed != 0)
                 || ctx->m_player->IsPaused()));
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         info.text["paused"] = (paused ? "Y" : "N");
@@ -6739,7 +6739,7 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->m_player && !ctx->m_player->Play(
-            (!ctx->m_ffRewSpeed) ? ctx->m_tsNormal: speed, !ctx->m_ffRewSpeed))
+            (!ctx->m_ffRewSpeed) ? ctx->m_tsNormal: speed, ctx->m_ffRewSpeed == 0))
     {
         ctx->m_ffRewSpeed = old_speed;
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -7722,7 +7722,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
             }
             foreach (const auto & rec, tmp)
             {
-                if (!chanid || tunable_on.contains(rec.toUInt()))
+                if ((chanid == 0U) || tunable_on.contains(rec.toUInt()))
                     reclist.push_back(rec);
             }
         }
@@ -7786,7 +7786,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ctx->m_player)
         ctx->m_player->GetAudio()->Reset();
 
-    UnpauseLiveTV(ctx, chanid && GetQueuedChanID());
+    UnpauseLiveTV(ctx, (chanid != 0U) && (GetQueuedChanID() != 0U));
 
     if (oldinputname != ctx->m_recorder->GetInput())
         UpdateOSDInput(ctx);
@@ -11945,7 +11945,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmIsDvd             = (m_tvmState == kState_WatchingDVD);
     m_tvmIsBd              = (ctx->m_buffer && ctx->m_buffer->IsBD() &&
                               ctx->m_buffer->BD()->IsHDMVNavigation());
-    m_tvmJump              = (!m_tvmNumChapters && !m_tvmIsDvd &&
+    m_tvmJump              = ((m_tvmNumChapters == 0) && !m_tvmIsDvd &&
                               !m_tvmIsBd && ctx->m_buffer &&
                               ctx->m_buffer->IsSeekingAllowed());
     m_tvmIsLiveTv          = StateIsLiveTV(m_tvmState);

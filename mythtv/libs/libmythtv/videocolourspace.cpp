@@ -84,7 +84,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     SetContrast(m_dbSettings[kPictureAttribute_Contrast]);
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
-    SetFullRange(m_dbSettings[kPictureAttribute_Range]);
+    SetFullRange(m_dbSettings[kPictureAttribute_Range] != 0);
     if (HasMythMainWindow())
     {
         MythDisplay* display = MythDisplay::AcquireRelease();

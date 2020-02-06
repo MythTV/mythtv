@@ -412,7 +412,7 @@ uint VideoDisplayProfile::GetMaxCPUs(void) const
 
 bool VideoDisplayProfile::IsSkipLoopEnabled(void) const
 {
-    return GetPreference("pref_skiploop").toInt();
+    return GetPreference("pref_skiploop").toInt() != 0;
 }
 
 QString VideoDisplayProfile::GetVideoRenderer(void) const

@@ -708,7 +708,7 @@ void MythCECAdapter::HandleActions(MythCECActions Actions)
         return;
 
     // power state
-    if ((Actions & PowerOffTV) && m_powerOffTVAllowed)
+    if (((Actions & PowerOffTV) != 0U) && m_powerOffTVAllowed)
     {
         if (m_adapter->StandbyDevices(CECDEVICE_TV))
             LOG(VB_GENERAL, LOG_INFO, LOC + "Asked TV to turn off.");
@@ -716,7 +716,7 @@ void MythCECAdapter::HandleActions(MythCECActions Actions)
             LOG(VB_GENERAL, LOG_ERR,  LOC + "Failed to turn TV off.");
     }
 
-    if ((Actions & PowerOnTV) && m_powerOnTVAllowed)
+    if (((Actions & PowerOnTV) != 0U) && m_powerOnTVAllowed)
     {
         if (m_adapter->PowerOnDevices(CECDEVICE_TV))
             LOG(VB_GENERAL, LOG_INFO, LOC + "Asked TV to turn on.");
@@ -725,7 +725,7 @@ void MythCECAdapter::HandleActions(MythCECActions Actions)
     }
 
     // HDMI input
-    if ((Actions & SwitchInput) && m_switchInputAllowed)
+    if (((Actions & SwitchInput) != 0U) && m_switchInputAllowed)
     {
         if (m_adapter->SetActiveSource())
             LOG(VB_GENERAL, LOG_INFO, LOC + "Asked TV to switch to this input.");

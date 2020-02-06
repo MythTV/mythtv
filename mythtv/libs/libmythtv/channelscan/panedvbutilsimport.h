@@ -53,7 +53,7 @@ class PaneDVBUtilsImport : public GroupSetting
 
     QString GetFilename(void)   const { return m_filename->getValue();    }
     bool DoIgnoreSignalTimeout(void) const
-        { return m_ignoreSignalTimeout->getValue().toInt(); }
+        { return m_ignoreSignalTimeout->getValue().toInt() != 0; }
 
   private:
     TransTextEditSetting    *m_filename              {nullptr};

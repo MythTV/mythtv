@@ -38,7 +38,7 @@ class FrameRate
 public:
     explicit FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
     double toDouble(void) const { return m_num / (double)m_den; }
-    bool isNonzero(void) const { return m_num; }
+    bool isNonzero(void) const { return m_num != 0U; }
     uint getNum(void) const { return m_num; }
     uint getDen(void) const { return m_den; }
     QString toString(void) const { return QString("%1/%2").arg(m_num).arg(m_den); }

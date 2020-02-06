@@ -915,10 +915,10 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 QString MythOpenGLVideo::VideoResizeToString(VideoResizing Resize)
 {
     QStringList reasons;
-    if (Resize & Deinterlacer) reasons << "Deinterlacer";
-    if (Resize & Sampling)     reasons << "Sampling";
-    if (Resize & Performance)  reasons << "Performance";
-    if (Resize & Framebuffer)  reasons << "Framebuffer";
+    if ((Resize & Deinterlacer) != 0U) reasons << "Deinterlacer";
+    if ((Resize & Sampling)     != 0U) reasons << "Sampling";
+    if ((Resize & Performance)  != 0U) reasons << "Performance";
+    if ((Resize & Framebuffer)  != 0U) reasons << "Framebuffer";
     return reasons.join(",");
 }
 
@@ -934,7 +934,7 @@ QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType
     // GLES3.0 needs specific texture formats - needs more work and it
     // is currently unclear whether QOpenGLFrameBufferObject has the
     // requisite flexibility for those formats.
-    bool sixteenbitfb = !m_gles;
+    bool sixteenbitfb = (m_gles == 0);
     bool sixteenbitvid = ColorDepth(OutputType) > 8;
     GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16_UNorm : 0;
     if (format)

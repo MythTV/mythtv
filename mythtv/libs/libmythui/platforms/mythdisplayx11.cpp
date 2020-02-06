@@ -148,7 +148,7 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
             int width = static_cast<int>(mode.width);
             int height = static_cast<int>(mode.height);
             double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
-            bool interlaced = mode.modeFlags & RR_Interlace;
+            bool interlaced = (mode.modeFlags & RR_Interlace) != 0U;
             if (interlaced)
                 rate *= 2.0;
 

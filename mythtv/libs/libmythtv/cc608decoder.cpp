@@ -693,7 +693,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     else
         len = sizeof(ccsubtitle);
 
-    if (len && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
+    if ((len != 0) && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
         LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 - '%8'")
             .arg(m_timeCode[mode], 10)

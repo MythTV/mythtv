@@ -805,12 +805,12 @@ void ExternalStreamHandler::run(void)
         if (remainder == 0)
         {
             buffer.clear();
-            good_data = len;
+            good_data = (len != 0U);
         }
         else if (len > remainder) // leftover bytes
         {
             buffer.remove(0, len - remainder);
-            good_data = len;
+            good_data = (len != 0U);
         }
         else if (len == remainder)
             good_data = false;

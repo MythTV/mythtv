@@ -217,7 +217,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     // Note - the EDID format introduces slight rounding errors when converting
     // to sRGB specs. If sRGB is set, the client should use the spec values - not
     // the computed values
-    m_sRGB = Data[FEATURES_OFFSET] & 0x04;
+    m_sRGB = ((Data[FEATURES_OFFSET] & 0x04) != 0);
     static const unsigned char s_sRGB[10] =
         { 0xEE, 0x91, 0xA3, 0x54, 0x4C, 0x99, 0x26, 0x0F, 0x50, 0x54 };
     bool srgb = memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB)) == 0;
@@ -340,8 +340,8 @@ bool MythEDID::ParseVSDB(const quint8 *Data, uint Offset, uint Length)
             break;
 
         // Audio and video latencies
-        m_latencies  = (Data[Offset + 7] & 0x80);
-        m_interLatencies = (Data[Offset + 7] & 0x40) && m_latencies;
+        m_latencies  = ((Data[Offset + 7] & 0x80) != 0);
+        m_interLatencies = ((Data[Offset + 7] & 0x40) != 0) && m_latencies;
 
         if (Length < 10 || (Offset + 10 >= m_size))
             break;

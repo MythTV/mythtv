@@ -220,7 +220,7 @@ class ModulationParamsDescriptor : public MPEGDescriptor
     // inner_coding_mode        4   2.4
     uint InnerCodingMode(void) const { return m_data[2] & 0x0f; }
     // split_bitstream_mode     1   3.0
-    bool SplitBitstreamMode(void) const { return m_data[3] >> 7; }
+    bool SplitBitstreamMode(void) const { return (m_data[3] >> 7) != 0; }
     //reserved                  2   3.1
     //modulation_format         5   3.3
     uint ModulationFormat(void) const { return m_data[3] & 0x1F; }

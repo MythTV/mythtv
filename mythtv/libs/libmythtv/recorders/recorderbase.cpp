@@ -800,7 +800,7 @@ void RecorderBase::FrameRateChange(uint framerate, long long frame)
     {
         // Populate the recordfile table as early as possible, the average
         // value will be determined when the recording completes.
-        if (!m_curRecording->GetRecordingFile()->m_videoFrameRate)
+        if (m_curRecording->GetRecordingFile()->m_videoFrameRate == 0.0)
         {
             m_curRecording->GetRecordingFile()->m_videoFrameRate = (double)framerate / 1000.0;
             m_curRecording->GetRecordingFile()->Save();

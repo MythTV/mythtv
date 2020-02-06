@@ -840,7 +840,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
                         bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+        ((m_chanId != 0U) && m_recStartTs.isValid() && m_startTs.isValid() &&
          m_chanId == other.m_chanId && m_recStartTs == other.m_recStartTs &&
          m_startTs == other.m_startTs);
 
@@ -1179,7 +1179,7 @@ bool ProgramInfo::ExtractKey(const QString &uniquekey,
         return false;
     chanid     = keyParts[0].toUInt();
     recstartts = MythDate::fromString(keyParts[1]);
-    return chanid && recstartts.isValid();
+    return (chanid != 0U) && recstartts.isValid();
 }
 
 bool ProgramInfo::ExtractKeyFromPathname(
