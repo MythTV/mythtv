@@ -32,12 +32,13 @@ class MythNVDECContext : public MythCodecContext
                                           VideoDisplayProfile *Profile, bool DoubleRate) override;
     void PostProcessFrame                (AVCodecContext *Context, VideoFrame *Frame) override;
     bool IsDeinterlacing                 (bool &DoubleRate, bool StreamChange = false) override;
+    bool DecoderWillResetOnFlush         (void) override;
     static MythCodecID GetSupportedCodec (AVCodecContext **CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
                                           AVStream       *Stream,
                                           uint            StreamType);
-    static enum AVPixelFormat GetFormat  (AVCodecContext *Contextconst, const AVPixelFormat *PixFmt);
+    static enum AVPixelFormat GetFormat  (AVCodecContext *Context, const AVPixelFormat *PixFmt);
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame,
                                           AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);

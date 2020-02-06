@@ -3170,6 +3170,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                                          forceaspectchange, 2,
                                          decoderdeint ? kScan_Progressive : kScan_Ignore);
 
+                if (context->hw_frames_ctx)
+                    if (context->internal)
+                        avcodec_flush_buffers(context);
+
                 m_currentWidth   = width;
                 m_currentHeight  = height;
                 m_fps            = seqFPS;
@@ -3285,7 +3289,8 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             // TODO check what is needed here when a device context is used
             // TODO check whether any codecs need to be flushed for a frame rate change (e.g. mediacodec?)
             if (context->hw_frames_ctx && (forcechange || res_changed))
-                avcodec_flush_buffers(context);
+                if (context->internal)
+                    avcodec_flush_buffers(context);
 
             m_currentWidth  = width;
             m_currentHeight = height;

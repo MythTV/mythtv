@@ -79,7 +79,7 @@ static inline int format_is_hw(VideoFrameType Type)
 
 static inline int format_is_hwframes(VideoFrameType Type)
 {
-    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI);
+    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) || (Type == FMT_NVDEC);
 }
 
 static inline int format_is_420(VideoFrameType Type)
