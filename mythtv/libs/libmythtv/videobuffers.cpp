@@ -284,7 +284,7 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
 
-        if (format_is_hwframes(Frame->codec) || (Frame->codec == FMT_NVDEC))
+        if (format_is_hwframes(Frame->codec))
         {
             ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (ref != nullptr)
