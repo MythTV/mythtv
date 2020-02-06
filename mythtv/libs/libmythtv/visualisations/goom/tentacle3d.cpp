@@ -167,7 +167,8 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 	s_lig += s_ligs;
 
 	if (s_lig > 1.01F) {
-		if ((s_lig>10.0F) | (s_lig<1.1F)) s_ligs = -s_ligs;
+		if ((s_lig>10.0F) || (s_lig<1.1F))
+                    s_ligs = -s_ligs;
 		
 		if ((s_lig<6.3F)&&(iRAND(30)==0))
 			s_dstCol=iRAND(3);
