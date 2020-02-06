@@ -118,8 +118,8 @@ class MPEG2fixup
 {
   public:
     MPEG2fixup(const QString &inf, const QString &outf,
-               frm_dir_map_t *deleteMap, const char *fmt, int norp,
-               int fixPTS, int maxf, bool showprog, int otype,
+               frm_dir_map_t *deleteMap, const char *fmt, bool norp,
+               bool fixPTS, int maxf, bool showprog, int otype,
                void (*update_func)(float) = nullptr, int (*check_func)() = nullptr);
     ~MPEG2fixup();
     int Start();
@@ -240,8 +240,8 @@ class MPEG2fixup
 
     bool            m_discard       {false};
     //control options
-    int             m_noRepeat;
-    int             m_fixPts;
+    bool            m_noRepeat;
+    bool            m_fixPts;
     int             m_maxFrames;
     QString         m_infile;
     const char     *m_format        {nullptr};

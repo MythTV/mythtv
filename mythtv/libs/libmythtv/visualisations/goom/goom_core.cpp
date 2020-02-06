@@ -164,8 +164,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	static char s_goomLimit = 2;		// sensibilité du goom
 	static ZoomFilterData s_zfd = {
 		127, 8, 16,
-		1, 1, 0, NORMAL_MODE,
-		0, 0, 0, 0, 0
+		1, 1, false, NORMAL_MODE,
+		0, 0, false, false, 0
 	};
 
 	ZoomFilterData *pzfd = nullptr;
@@ -328,7 +328,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                     case 20:
                     case 21:
 			s_zfd.mode = WAVE_MODE;
-			s_zfd.reverse = 0;
+			s_zfd.reverse = false;
 			s_zfd.waveEffect = (iRAND (3) == 0);
 			if (iRAND (2))
                             s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
@@ -336,38 +336,38 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                     case 1:
                     case 11:
 			s_zfd.mode = CRYSTAL_BALL_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 2:
                     case 12:
 			s_zfd.mode = AMULETTE_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 3:
 			s_zfd.mode = WATER_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 4:
                     case 14:
 			s_zfd.mode = SCRUNCH_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 5:
                     case 15:
                     case 22:
 			s_zfd.mode = HYPERCOS1_MODE;
-			s_zfd.waveEffect = 0;
+			s_zfd.waveEffect = false;
 			s_zfd.hypercosEffect = (iRAND (3) == 0);
 			break;
                     case 6:
                     case 16:
 			s_zfd.mode = HYPERCOS2_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 7:
                     case 17:
@@ -379,8 +379,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                     case 18:
                     case 19:
 			s_zfd.mode = SCRUNCH_MODE;
-			s_zfd.waveEffect = 1;
-			s_zfd.hypercosEffect = 1;
+			s_zfd.waveEffect = true;
+			s_zfd.hypercosEffect = true;
 			break;
                     case 29:
                     case 30:
@@ -392,8 +392,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			break;
                     default:
 			s_zfd.mode = NORMAL_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
                     }
                 }
 	}
@@ -444,12 +444,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                                 // Pseudo-random is good enough. Don't need a true random.
                                 // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
-					s_zfd.reverse = 0;
+					s_zfd.reverse = false;
 					s_zfd.vitesse = STOP_SPEED - 2;
 					s_lockVar = 75;
 				}
 				if (iRAND (10) == 0) {
-					s_zfd.reverse = 1;
+					s_zfd.reverse = true;
 					s_lockVar = 100;
 				}
 

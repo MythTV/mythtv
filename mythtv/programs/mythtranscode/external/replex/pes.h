@@ -84,7 +84,7 @@ struct pes_in_t {
 	uint8_t pts[5];
 	uint8_t dts[5];
 	int mpeg;
-	int done;
+	bool done;
 	int which;
 	void *priv;
 };

@@ -492,7 +492,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
         m_render->logDebugMarker(LOC + "PREPARE_FRAME_START");
 
     bool dummy = false;
-    int topfieldfirst = 0;
+    bool topfieldfirst = false;
     if (Frame)
     {
         m_framesPlayed = Frame->frameNumber + 1;

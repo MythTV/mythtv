@@ -877,7 +877,7 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
 {
     resetOtherTrees(node);
 
-    if (node->getParent() == m_favouriteNode && romInfo->Favorite() == 0)
+    if (node->getParent() == m_favouriteNode && !romInfo->Favorite())
     {
         // node is being removed
         m_gameUITree->SetCurrentNode(m_favouriteNode);

@@ -233,7 +233,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
 
 MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        frm_dir_map_t *deleteMap,
-                       const char *fmt, int norp, int fixPTS, int maxf,
+                       const char *fmt, bool norp, bool fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
 {

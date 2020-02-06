@@ -145,7 +145,7 @@ void H264Parser::Reset(void)
     m_seqParameterSetId = 0;
 
     m_deltaPicOrderAlwaysZeroFlag = 0;
-    m_separateColourPlaneFlag = 0;
+    m_separateColourPlaneFlag = false;
     m_chromaFormatIdc = 1;
     m_frameMbsOnlyFlag = -1;
     m_picOrderPresentFlag = -1;

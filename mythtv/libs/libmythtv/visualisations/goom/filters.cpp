@@ -108,8 +108,8 @@ unsigned int     prevX = 0, prevY = 0;
 static int sintable[0x10000];
 static int vitesse = 127;
 static char theMode = AMULETTE_MODE;
-static int waveEffect = 0;
-static int hypercosEffect = 0;
+static bool waveEffect = false;
+static bool hypercosEffect = false;
 static int vPlaneEffect = 0;
 static int hPlaneEffect = 0;
 static char noisify = 2;
@@ -529,7 +529,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	/** changement de config **/
 	if (zf) {
-		static char s_reverse = 0;			// vitesse inversé..(zoom out)
+		static bool s_reverse = false;	// vitesse inversé..(zoom out)
 		s_reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (s_reverse)

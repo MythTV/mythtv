@@ -13,14 +13,14 @@ struct ZoomFilterData
 	unsigned char pertedec;
 	unsigned char sqrtperte;
 	int     middleX, middleY;	/* milieu de l'effet */
-	char    reverse;		/* inverse la vitesse */
+	bool    reverse;		/* inverse la vitesse */
 	char    mode;			/* type d'effet à appliquer (cf les #define) */
 	/** @since June 2001 */
 	int     hPlaneEffect;		/* deviation horitontale */
 	int     vPlaneEffect;		/* deviation verticale */
 	/** @since April 2002 */
-	int     waveEffect;		/* applique une "surcouche" de wave effect */
-	int     hypercosEffect;		/* applique une "surcouche de hypercos effect */
+	bool    waveEffect;		/* applique une "surcouche" de wave effect */
+	bool    hypercosEffect;		/* applique une "surcouche de hypercos effect */
 
 	char    noisify;		/* ajoute un bruit a la transformation */
 };

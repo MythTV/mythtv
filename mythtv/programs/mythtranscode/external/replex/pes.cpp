@@ -154,7 +154,7 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 		memset(p->buf,0,MAX_PLENGTH*sizeof(uint8_t));
 	} else if (rb) p->rbuf = rb;
 	if (p->rbuf) p->ini_pos = ring_wpos(p->rbuf); 
-        p->done = 0;
+        p->done = false;
 	memset(p->pts, 0 , 5);
 	memset(p->dts, 0 , 5);
 }
@@ -163,12 +163,12 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 {
 	unsigned short *pl = nullptr;
-	int done = 1;
+	bool done = true;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
 	do {
 		int c=0;
-		done = 1;
+		done = true;
 		while (c < count && (!p->mpeg ||
 				     (p->mpeg == 2 && p->found < 9))
 	               &&  (p->found < 5 || !p->done)){
@@ -197,7 +197,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				case PADDING_STREAM :
 				case DSM_CC_STREAM  :
 				case ISO13522_STREAM:
-					p->done = 1;
+					p->done = true;
 					[[clang::fallthrough]];
 				case PRIVATE_STREAM1:
 				case VIDEO_STREAM_S ... VIDEO_STREAM_E:
@@ -382,7 +382,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			if (p->plength && p->found == p->plength+6) {
 				init_pes_in(p, p->type, nullptr, p->withbuf);
 				if (c < count) {
-					done = 0;
+					done = false;
 					count -= c;
 					buf += c;
 				}

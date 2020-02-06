@@ -73,7 +73,7 @@ class MBASE_PUBLIC LCDTextItem
     QString getText() const { return m_itemText; }
     QString getScreen() const { return m_itemScreen; }
     QString getWidget() const { return m_itemWidget; }
-    int getScroll() const { return m_itemScrollable; }
+    bool getScroll() const { return m_itemScrollable; }
 
     void setRow(unsigned int value) { m_itemRow = value; }
     void setAlignment(TEXT_ALIGNMENT value) { m_itemAlignment = value; }

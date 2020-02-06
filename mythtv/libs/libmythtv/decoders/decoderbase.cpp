@@ -1066,9 +1066,9 @@ int DecoderBase::AutoSelectTrack(uint type)
         selTrack = 0;
         for (uint i = 0; i < numStreams; i++)
         {
-            int forced = (type == kTrackTypeSubtitle &&
-                          m_tracks[type][i].m_forced &&
-                          m_parent->ForcedSubtitlesFavored());
+            bool forced = (type == kTrackTypeSubtitle &&
+                           m_tracks[type][i].m_forced &&
+                           m_parent->ForcedSubtitlesFavored());
             int position = numStreams - i;
             int language = 0;
             for (uint j = 0;
