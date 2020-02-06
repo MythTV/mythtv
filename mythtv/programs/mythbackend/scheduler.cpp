@@ -311,14 +311,16 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
 
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
-    int arec = (a->GetRecordingStatus() != RecStatus::Recording &&
-                a->GetRecordingStatus() != RecStatus::Tuning &&
-                a->GetRecordingStatus() != RecStatus::Failing &&
-                a->GetRecordingStatus() != RecStatus::Pending);
-    int brec = (b->GetRecordingStatus() != RecStatus::Recording &&
-                b->GetRecordingStatus() != RecStatus::Tuning &&
-                b->GetRecordingStatus() != RecStatus::Failing &&
-                b->GetRecordingStatus() != RecStatus::Pending);
+    int arec = static_cast<int>
+        (a->GetRecordingStatus() != RecStatus::Recording &&
+         a->GetRecordingStatus() != RecStatus::Tuning &&
+         a->GetRecordingStatus() != RecStatus::Failing &&
+         a->GetRecordingStatus() != RecStatus::Pending);
+    int brec = static_cast<int>
+        (b->GetRecordingStatus() != RecStatus::Recording &&
+         b->GetRecordingStatus() != RecStatus::Tuning &&
+         b->GetRecordingStatus() != RecStatus::Failing &&
+         b->GetRecordingStatus() != RecStatus::Pending);
 
     if (arec != brec)
         return arec < brec;
@@ -329,16 +331,20 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
         return a->GetRecordingPriority2() > b->GetRecordingPriority2();
 
-    int atype = (a->GetRecordingRuleType() == kOverrideRecord ||
-                 a->GetRecordingRuleType() == kSingleRecord);
-    int btype = (b->GetRecordingRuleType() == kOverrideRecord ||
-                 b->GetRecordingRuleType() == kSingleRecord);
+    int atype = static_cast<int>
+        (a->GetRecordingRuleType() == kOverrideRecord ||
+         a->GetRecordingRuleType() == kSingleRecord);
+    int btype = static_cast<int>
+         (b->GetRecordingRuleType() == kOverrideRecord ||
+          b->GetRecordingRuleType() == kSingleRecord);
     if (atype != btype)
         return atype > btype;
 
     QDateTime pasttime = MythDate::current().addSecs(-30);
-    int apast = (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
-    int bpast = (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
+    int apast = static_cast<int>
+        (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
+    int bpast = static_cast<int>
+        (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
     if (apast != bpast)
         return apast < bpast;
 
@@ -371,10 +377,12 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 
 static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
 {
-    int arec = (a->GetRecordingStatus() != RecStatus::Recording &&
-                a->GetRecordingStatus() != RecStatus::Tuning);
-    int brec = (b->GetRecordingStatus() != RecStatus::Recording &&
-                b->GetRecordingStatus() != RecStatus::Tuning);
+    int arec = static_cast<int>
+        (a->GetRecordingStatus() != RecStatus::Recording &&
+         a->GetRecordingStatus() != RecStatus::Tuning);
+    int brec = static_cast<int>
+        (b->GetRecordingStatus() != RecStatus::Recording &&
+         b->GetRecordingStatus() != RecStatus::Tuning);
 
     if (arec != brec)
         return arec < brec;
@@ -385,16 +393,20 @@ static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
         return a->GetRecordingPriority2() > b->GetRecordingPriority2();
 
-    int atype = (a->GetRecordingRuleType() == kOverrideRecord ||
-                 a->GetRecordingRuleType() == kSingleRecord);
-    int btype = (b->GetRecordingRuleType() == kOverrideRecord ||
-                 b->GetRecordingRuleType() == kSingleRecord);
+    int atype = static_cast<int>
+        (a->GetRecordingRuleType() == kOverrideRecord ||
+         a->GetRecordingRuleType() == kSingleRecord);
+    int btype = static_cast<int>
+         (b->GetRecordingRuleType() == kOverrideRecord ||
+          b->GetRecordingRuleType() == kSingleRecord);
     if (atype != btype)
         return atype > btype;
 
     QDateTime pasttime = MythDate::current().addSecs(-30);
-    int apast = (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
-    int bpast = (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
+    int apast = static_cast<int>
+        (a->GetRecordingStartTime() < pasttime && !a->IsReactivated());
+    int bpast = static_cast<int>
+        (b->GetRecordingStartTime() < pasttime && !b->IsReactivated());
     if (apast != bpast)
         return apast < bpast;
 
