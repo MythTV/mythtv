@@ -6436,12 +6436,9 @@ if test $target_os = mingw32 ; then
 elif test $target_os = darwin ; then
     qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd` -F`cd $(${qmake} -query QT_INSTALL_LIBS); pwd`"
     qt_libs="-L`cd $(${qmake} -query QT_INSTALL_LIBS) ; pwd`"
-elif test $target_os = android ; then
+else
     qt_inc="-I$(${qmake} -query QT_INSTALL_HEADERS)"
     qt_libs="-L$(${qmake} -query QT_INSTALL_LIBS)"
-else
-    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-    qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 fi
 
 qt_compiler_check() {
