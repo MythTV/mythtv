@@ -391,7 +391,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
         QString type = IsFrontend() ? "Frontend" : (blockingClient ? "Playback" : "Monitor");
         QString ann = QString("ANN %1 %2 %3")
             .arg(type)
-            .arg(d->m_localHostname).arg(false);
+            .arg(d->m_localHostname).arg(static_cast<int>(false));
         d->m_serverSock = ConnectCommandSocket(
             server, port, ann, &proto_mismatch);
     }
@@ -564,7 +564,7 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
     }
 
     QString str = QString("ANN Monitor %1 %2")
-        .arg(d->m_localHostname).arg(true);
+        .arg(d->m_localHostname).arg(static_cast<int>(true));
     QStringList strlist(str);
     eventSock->WriteStringList(strlist);
     bool ok = true;

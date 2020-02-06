@@ -42,7 +42,7 @@ void MythNotification::ToStringList(void)
     m_extradata.clear();
 
     m_extradata << QString::number(Type())
-                << QString::number(m_fullScreen)
+                << QString::number(static_cast<int>(m_fullScreen))
                 << m_description
                 << QString::number(m_duration)
                 << m_style

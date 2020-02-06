@@ -767,7 +767,7 @@ QString PSIPTable::toString(void) const
                .arg(TableIDExtension(), 0, 16));
     str.append(QString("      version(%1) current(%2) "
                        "section(%3) last_section(%4)\n")
-               .arg(Version()).arg(IsCurrent())
+               .arg(Version()).arg(static_cast<int>(IsCurrent()))
                .arg(Section()).arg(LastSection()));
     if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
     {

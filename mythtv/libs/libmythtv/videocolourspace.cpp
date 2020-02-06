@@ -76,7 +76,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         m_dbSettings[kPictureAttribute_Contrast]   = gCoreContext->GetNumSetting("PlaybackContrast",   50);
         m_dbSettings[kPictureAttribute_Colour]     = gCoreContext->GetNumSetting("PlaybackColour",     50);
         m_dbSettings[kPictureAttribute_Hue]        = gCoreContext->GetNumSetting("PlaybackHue",        0);
-        m_dbSettings[kPictureAttribute_Range]      = gCoreContext->GetBoolSetting("GUIRGBLevels",      true);
+        m_dbSettings[kPictureAttribute_Range]      = static_cast<int>(gCoreContext->GetBoolSetting("GUIRGBLevels", true));
         m_primariesMode = toPrimariesMode(gCoreContext->GetSetting("ColourPrimariesMode", "auto"));
     }
 

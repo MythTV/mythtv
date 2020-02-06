@@ -1514,9 +1514,9 @@ static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
 	/* no remote/button specified */
 	if(scan->code==nullptr)
 	{
-		return rep==0 ||
-			(scan->rep>0 && rep>scan->rep_delay &&
-			 ((rep-scan->rep_delay-1)%scan->rep)==0);
+		return static_cast<int>(rep==0 ||
+                                        (scan->rep>0 && rep>scan->rep_delay &&
+                                         ((rep-scan->rep_delay-1)%scan->rep)==0));
 	}
 	
 	/* remote/button match? */

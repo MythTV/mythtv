@@ -237,7 +237,7 @@ bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
          << metadata->GetInetRef() << QString::number(metadata->GetLength())
          << QString::number(metadata->GetYear())
          << QString::number(metadata->GetID())
-         << QString::number(UseBookmark);
+         << QString::number(static_cast<int>(UseBookmark));
 
     auto *me = new MythEvent(ACTION_HANDLEMEDIA, args);
     qApp->postEvent(GetMythMainWindow(), me);

@@ -1118,7 +1118,7 @@ void TV::InitFromDB(void)
 
     RecordingRule record;
     record.LoadTemplate("Default");
-    m_dbAutoexpireDefault  = record.m_autoExpire;
+    m_dbAutoexpireDefault  = static_cast<uint>(record.m_autoExpire);
 
     if (m_dbUseChannelGroups)
     {
@@ -10220,10 +10220,10 @@ void TV::ShowOSDAlreadyEditing(PlayerContext *ctx)
 
         QString message = tr("This program is currently being edited");
         osd->DialogShow(OSD_DLG_EDITING, message);
-        QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(was_paused);
+        QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(static_cast<int>(was_paused));
         osd->DialogAddButton(tr("Continue Editing"), def, false, true);
         osd->DialogAddButton(tr("Do not edit"),
-                             QString("DIALOG_EDITING_STOP_%1").arg(was_paused));
+                             QString("DIALOG_EDITING_STOP_%1").arg(static_cast<int>(was_paused)));
         osd->DialogBack("", def, true);
     }
     ReturnOSDLock(ctx, osd);

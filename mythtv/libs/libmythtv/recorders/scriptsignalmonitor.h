@@ -14,7 +14,7 @@ class ScriptSignalMonitor : public SignalMonitor
                         uint64_t _flags = 0) :
         SignalMonitor(db_cardnum, _channel, _release_stream, _flags)
     {
-        m_signalLock.SetValue(true);
+        m_signalLock.SetValue(static_cast<int>(true));
         m_signalStrength.SetValue(100);
     }
 

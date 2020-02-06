@@ -448,7 +448,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
         else
         {
             str += QString("cds_reference=\"%1\" ").arg(CDSReference(i));
-            str += QString("scrampled=\"%1\" ").arg(Scrambled(i));
+            str += QString("scrampled=\"%1\" ").arg(static_cast<int>(Scrambled(i)));
             str += "\n" + indent_2;
             str += QString(R"(video_standard="%1" video_standard_desc="%2" )")
                 .arg(VideoStandard(i)).arg(VideoStandardString(i));

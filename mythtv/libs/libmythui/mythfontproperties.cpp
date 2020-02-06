@@ -91,8 +91,8 @@ void MythFontProperties::CalcHash(void)
 
     m_hash = QString("%1%2%3%4").arg(m_face.toString())
                                 .arg(m_brush.color().name())
-                                .arg(m_hasShadow)
-                                .arg(m_hasOutline);
+                                .arg(static_cast<int>(m_hasShadow))
+                                .arg(static_cast<int>(m_hasOutline));
 
     if (m_hasShadow)
     {

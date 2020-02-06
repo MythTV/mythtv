@@ -733,9 +733,13 @@ QString AVCVideoDescriptor::toString() const
     return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
                    "compat(%6) still(%7) 24hr(%8) FramePacking(%9)")
         .arg(ProfileIDC()).arg(LevelIDC())
-        .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
-        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture())
-        .arg(FramePackingSEINotPresentFlag());
+        .arg(static_cast<int>(ConstaintSet0()))
+        .arg(static_cast<int>(ConstaintSet1()))
+        .arg(static_cast<int>(ConstaintSet2()))
+        .arg(AVCCompatible())
+        .arg(static_cast<int>(AVCStill()))
+        .arg(static_cast<int>(AVC24HourPicture()))
+        .arg(static_cast<int>(FramePackingSEINotPresentFlag()));
 }
 
 QString HEVCVideoDescriptor::toString() const

@@ -445,7 +445,7 @@ bool RemoteGetFileList(const QString& host, const QString& path, QStringList* li
     *list << host;
     *list << StorageGroup::GetGroupToUse(host, sgroup);
     *list << path;
-    *list << QString::number(fileNamesOnly);
+    *list << QString::number(static_cast<int>(fileNamesOnly));
 
     bool ok = false;
 

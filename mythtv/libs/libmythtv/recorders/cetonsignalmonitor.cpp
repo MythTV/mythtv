@@ -105,7 +105,7 @@ void CetonSignalMonitor::UpdateValues(void)
     {
         QMutexLocker locker(&m_statusLock);
         m_signalStrength.SetValue(sig);
-        m_signalLock.SetValue(true);
+        m_signalLock.SetValue(static_cast<int>(true));
         // TODO add some way to indicate if there is actually a lock
         isLocked = m_signalLock.IsGood();
     }

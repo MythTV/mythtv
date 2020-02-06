@@ -448,7 +448,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
                 // add another frame
                 MythAVFrame sourceframe;
-                sourceframe->top_field_first = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+                sourceframe->top_field_first =
+                    static_cast<int>(Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first);
                 sourceframe->interlaced_frame = 1;
                 sourceframe->data[3] = Frame->buf;
                 sourceframe->buf[0] = av_buffer_ref(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));

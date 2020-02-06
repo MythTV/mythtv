@@ -530,10 +530,10 @@ bool MythVDPAUHelper::IsFeatureAvailable(uint Feature)
         return false;
 
     INIT_ST
-    VdpBool supported = false;
+    auto supported = static_cast<VdpBool>(false);
     status = m_vdpVideoMixerQueryFeatureSupport(m_device, Feature, &supported);
     CHECK_ST
-    return ok && supported;
+    return ok && static_cast<bool>(supported);
 }
 
 QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma)

@@ -1077,7 +1077,7 @@ int DecoderBase::AutoSelectTrack(uint type)
                 if (m_tracks[type][i].m_language == m_languagePreference[j])
                     language = m_languagePreference.size() - j;
             }
-            int score = kForcedWeight * forced
+            int score = kForcedWeight * static_cast<int>(forced)
                 + kLanguageWeight * language
                 + kPositionWeight * position;
             if (score > bestScore)

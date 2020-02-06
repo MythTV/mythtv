@@ -163,7 +163,7 @@ pll_add(struct vbi *vbi, int n, int err)
 void
 vbi_pll_reset(struct vbi *vbi, int fine_tune)
 {
-    vbi->pll_fixed = fine_tune >= -PLL_ADJUST && fine_tune <= PLL_ADJUST;
+    vbi->pll_fixed = static_cast<int>(fine_tune >= -PLL_ADJUST && fine_tune <= PLL_ADJUST);
 
     vbi->pll_err = 0;
     vbi->pll_lerr = 0;

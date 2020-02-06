@@ -348,8 +348,8 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
     // Render surface
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
-                          Frame->interlaced_reversed ? !Frame->top_field_first :
-                          Frame->top_field_first, m_referenceFrames);
+                          static_cast<int>(Frame->interlaced_reversed ? !Frame->top_field_first :
+                          Frame->top_field_first), m_referenceFrames);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 

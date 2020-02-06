@@ -48,7 +48,7 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(m_displayName.isEmpty() ? "<EMPTY>" : m_displayName);
     list.push_back(QString::number(m_recPriority));
     list.push_back(QString::number(m_scheduleOrder));
-    list.push_back(QString::number(m_quickTune));
+    list.push_back(QString::number(static_cast<int>(m_quickTune)));
     list.push_back(QString::number(m_chanId));
 }
 

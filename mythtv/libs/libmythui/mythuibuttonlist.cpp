@@ -1239,7 +1239,7 @@ bool MythUIButtonList::DistributeButtons(void)
 
     // Set m_topPosition so arrows are displayed correctly.
     if (m_scrollStyle == ScrollCenter || m_scrollStyle == ScrollGroupCenter)
-        m_topPosition = m_itemsVisible < m_itemCount;
+        m_topPosition = static_cast<int>(m_itemsVisible < m_itemCount);
     else
         m_topPosition = first_item;
 

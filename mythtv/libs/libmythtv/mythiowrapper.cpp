@@ -382,10 +382,12 @@ int mythfile_exists(const char *path, const char *file)
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
             .arg(path).arg(file));
 
+    bool ret = false;
     if (strncmp(path, "myth://", 7) == 0)
-        return RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
-
-    return QFile::exists(QString("%1/%2").arg(path).arg(file));
+        ret = RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
+    else
+        ret = QFile::exists(QString("%1/%2").arg(path).arg(file));
+    return static_cast<int>(ret);
 }
 
 //////////////////////////////////////////////////////////////////////////////

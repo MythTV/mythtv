@@ -867,7 +867,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
         {
             LOG(VB_FILE, LOG_INFO, "Getting remote info");
             res << "QUERY_SG_GETFILELIST" << wantHost << groupname << path
-                << QString::number(fileNamesOnly);
+                << QString::number(static_cast<int>(fileNamesOnly));
             remsock->SendReceiveStringList(res);
             remsock->DecrRef();
         }
@@ -1024,7 +1024,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     }
     else if (slist[1] == "IS_OPEN")
     {
-        res << QString::number(ft->isOpen());
+        res << QString::number(static_cast<int>(ft->isOpen()));
     }
     else if (slist[1] == "DONE")
     {
@@ -1050,7 +1050,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     {
         // return size and if the file is not opened for writing
         res << QString::number(ft->GetFileSize());
-        res << QString::number(!gCoreContext->IsRegisteredFileForWrite(ft->GetFileName()));
+        res << QString::number(static_cast<int>(!gCoreContext->IsRegisteredFileForWrite(ft->GetFileName())));
     }
     else
     {

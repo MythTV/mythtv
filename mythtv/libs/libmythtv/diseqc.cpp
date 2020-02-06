@@ -1593,8 +1593,8 @@ bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
             horizontal  = lnb->IsHorizontal(tuning);
         }
 
-        if(high_band != m_lastHighBand ||
-           horizontal != m_lastHorizontal)
+        if(static_cast<uint>(high_band) != m_lastHighBand ||
+           static_cast<uint>(horizontal) != m_lastHorizontal)
             return true;
     }
     else if (kTypeLegacySW42 == m_type ||
@@ -1606,7 +1606,7 @@ bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
         if (lnb)
             horizontal  = lnb->IsHorizontal(tuning);
 
-        if (horizontal != m_lastHorizontal)
+        if (static_cast<unsigned int>(horizontal) != m_lastHorizontal)
             return true;
     }
     else if (kTypeVoltage == m_type ||
@@ -1656,8 +1656,8 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     bool ret = m_tree.SendCommand(m_address, cmd, m_repeat, 1, &data);
     if(ret)
     {
-        m_lastHighBand = high_band;
-        m_lastHorizontal = horizontal;
+        m_lastHighBand = static_cast<uint>(high_band);
+        m_lastHorizontal = static_cast<uint>(horizontal);
     }
     return ret;
 }

@@ -899,10 +899,10 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 void AvFormatDecoder::InitByteContext(bool forceseek)
 {
     int buf_size                  = m_ringBuffer->BestBufferSize();
-    int streamed                  = m_ringBuffer->IsStreamed();
+    bool streamed                 = m_ringBuffer->IsStreamed();
     m_readContext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
     m_readContext.flags           = AVIO_FLAG_READ;
-    m_readContext.is_streamed     = streamed;
+    m_readContext.is_streamed     = static_cast<int>(streamed);
     m_readContext.max_packet_size = 0;
     m_readContext.priv_data       = m_avfRingBuffer;
     auto *buffer                  = (unsigned char *)av_malloc(buf_size);
@@ -913,7 +913,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
                                                       AVFRingBuffer::AVF_Seek_Packet);
 
     // We can always seek during LiveTV
-    m_ic->pb->seekable            = !streamed || forceseek;
+    m_ic->pb->seekable = static_cast<int>(!streamed || forceseek);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 Streamed %2 Seekable %3 Available %4")
         .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable).arg(m_ringBuffer->GetReadBufAvail()));
 }
@@ -1295,7 +1295,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 
     // Return true if recording has position map
-    return m_recordingHasPositionMap;
+    return static_cast<int>(m_recordingHasPositionMap);
 }
 
 float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise)
@@ -1729,7 +1729,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
             {
                 StreamInfo si(av_index, lang, 0/*lang_idx*/,
                               csd.CaptionServiceNumber(k),
-                              csd.EasyReader(k),
+                              static_cast<int>(csd.EasyReader(k)),
                               csd.WideAspectRatio(k));
                 uint key = csd.CaptionServiceNumber(k) + 4;
                 m_ccX08InPmt[key] = true;

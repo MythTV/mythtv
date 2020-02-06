@@ -448,7 +448,7 @@ void ChannelScanner::PreScanCommon(
         // Make sure that channel_timeout is at least 7 seconds to catch
         // at least one SDT section. kDVBTableTimeout in ChannelScanSM
         // ensures that we catch the NIT then.
-        channel_timeout = max(channel_timeout, need_nit * 7 * 1000U);
+        channel_timeout = max(channel_timeout, static_cast<int>(need_nit) * 7 * 1000U);
     }
 
 #ifdef USING_DVB

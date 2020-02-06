@@ -293,7 +293,8 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
 
     while (rroutput)
     {
-        Atom edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID, false);
+        Atom edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID,
+                                        static_cast<Bool>(false));
         if (!edidproperty)
             break;
 
@@ -321,7 +322,8 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
         unsigned long nitems = 0;
         unsigned char* data = nullptr;
         if (XRRGetOutputProperty(mDisplay->GetDisplay(), rroutput, edidproperty,
-                                 0, 128, false, false, AnyPropertyType, &actualtype,
+                                 0, 128, static_cast<Bool>(false), static_cast<Bool>(false),
+                                 AnyPropertyType, &actualtype,
                                  &actualformat, &nitems, &bytesafter, &data) == Success)
         {
             if (actualtype == XA_INTEGER && actualformat == 8)

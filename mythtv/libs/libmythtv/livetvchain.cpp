@@ -762,7 +762,7 @@ QStringList LiveTVChain::entriesToStringList() const
         ret << QString::number(entry.chanid);
         ret << entry.starttime.toString(Qt::ISODate);
         ret << entry.endtime.toString(Qt::ISODate);
-        ret << QString::number(entry.discontinuity);
+        ret << QString::number(static_cast<int>(entry.discontinuity));
         ret << entry.hostprefix;
         ret << entry.inputtype;
         ret << entry.channum;

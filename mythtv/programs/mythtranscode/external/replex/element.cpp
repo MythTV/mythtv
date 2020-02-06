@@ -127,8 +127,8 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 
 	pdiff = ptsdiff(origpts,pts);
 	ddiff = ptsdiff(origdts,dts);
-	psig = pdiff > 0;
-	dsig = ddiff > 0;
+	psig = static_cast<int>(pdiff > 0);
+	dsig = static_cast<int>(ddiff > 0);
 	if (!psig) pdiff = -pdiff;
 	if (!dsig) ddiff = -ddiff;
 

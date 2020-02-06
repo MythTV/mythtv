@@ -873,7 +873,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     auto chan = (snd_mixer_selem_channel_id_t) channel;
 
     if (snd_mixer_selem_has_playback_switch(m_mixer.elem))
-        snd_mixer_selem_set_playback_switch(m_mixer.elem, chan, (volume > 0));
+        snd_mixer_selem_set_playback_switch(m_mixer.elem, chan, static_cast<int>(volume > 0));
 
     if (snd_mixer_selem_set_playback_volume(m_mixer.elem, chan, mixervol) < 0)
         VBERROR(QString("failed to set channel %1 volume").arg(channel));

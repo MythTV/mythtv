@@ -132,7 +132,7 @@ void ExternalSignalMonitor::UpdateValues(void)
     {
         QMutexLocker locker(&m_statusLock);
         m_signalStrength.SetValue(strength);
-        m_signalLock.SetValue(is_locked);
+        m_signalLock.SetValue(static_cast<int>(is_locked));
     }
 
     EmitStatus();

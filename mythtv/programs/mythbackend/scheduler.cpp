@@ -1801,7 +1801,7 @@ void Scheduler::GetAllPending(QStringList &strList) const
     RecList retlist;
     bool hasconflicts = GetAllPending(retlist);
 
-    strList << QString::number(hasconflicts);
+    strList << QString::number(static_cast<int>(hasconflicts));
     strList << QString::number(retlist.size());
 
     while (!retlist.empty())

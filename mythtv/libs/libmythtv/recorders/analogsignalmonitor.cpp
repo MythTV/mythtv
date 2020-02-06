@@ -210,7 +210,7 @@ void AnalogSignalMonitor::UpdateValues(void)
 
     {
         QMutexLocker locker(&m_statusLock);
-        m_signalLock.SetValue(isLocked);
+        m_signalLock.SetValue(static_cast<int>(isLocked));
         if (isLocked)
             m_signalStrength.SetValue(100);
     }

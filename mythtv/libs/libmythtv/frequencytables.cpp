@@ -172,7 +172,7 @@ QString TransportScanItem::toString() const
     str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
         .arg(m_mplexid).arg(m_tuning.m_sistandard).arg(m_sourceID);
     str += QString("\tuseTimer(%1) scanning(%2)\n")
-        .arg(m_useTimer).arg(m_scanning);
+        .arg(static_cast<int>(m_useTimer)).arg(static_cast<int>(m_scanning));
     str += QString("\ttimeoutTune(%3 msec)\n").arg(m_timeoutTune);
     if (m_tuning.m_sistandard == "atsc" || m_tuning.m_sistandard == "analog")
     {

@@ -73,7 +73,7 @@ class FrameRateDescriptor : public MPEGDescriptor
     {
         return QString("FrameRateDescriptor: "
                        "MultipleFrameRates(%1) MaximumFrameRate(%2)")
-            .arg(MultipleFrameRates())
+            .arg(static_cast<int>(MultipleFrameRates()))
             .arg(FrameRate());
     }
 };
@@ -97,8 +97,8 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     {
         return QString("ExtendedVideoDescriptor: "
                        "CatalogModeFlag(%1) VideoIncludesSetup(%2)")
-            .arg(CatalogModeFlag())
-            .arg(VideoIncludesSetup());
+            .arg(static_cast<int>(CatalogModeFlag()))
+            .arg(static_cast<int>(VideoIncludesSetup()));
     }
 };
 

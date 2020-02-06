@@ -651,7 +651,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("CountryAvailabilityDescriptor: Available(%1) in (%2)")
-            .arg(IsAvailable()).arg(CountryNames());
+            .arg(static_cast<int>(IsAvailable())).arg(CountryNames());
     }
 };
 

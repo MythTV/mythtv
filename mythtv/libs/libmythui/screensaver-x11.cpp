@@ -72,7 +72,7 @@ class ScreenSaverX11Private
 
             DPMSInfo(m_display->GetDisplay(), &power_level, &m_dpmsenabled);
 
-            if (m_dpmsenabled)
+            if (static_cast<bool>(m_dpmsenabled))
                 LOG(VB_GENERAL, LOG_INFO, LOC + "DPMS is active.");
             else
                 LOG(VB_GENERAL, LOG_INFO, LOC + "DPMS is disabled.");
@@ -94,7 +94,7 @@ class ScreenSaverX11Private
         return m_xscreensaverRunning;
     }
 
-    bool IsDPMSEnabled(void) const { return m_dpmsenabled; }
+    bool IsDPMSEnabled(void) const { return static_cast<bool>(m_dpmsenabled); }
 
     void StopTimer(void)
     {
@@ -219,7 +219,7 @@ class ScreenSaverX11Private
     bool m_dpmsaware           {false};
     bool m_dpmsdeactivated     {false}; ///< true if we disabled DPMS
     bool m_xscreensaverRunning {false};
-    BOOL m_dpmsenabled         {false};
+    BOOL m_dpmsenabled         {static_cast<BOOL>(false)};
 
     int m_timeoutInterval      {-1};
     QTimer *m_resetTimer       {nullptr};
@@ -311,7 +311,7 @@ bool ScreenSaverX11::Asleep(void)
     if (d->DeactivatedDPMS())
         return false;
 
-    BOOL on = false;
+    BOOL on = static_cast<BOOL>(false);
     CARD16 power_level = DPMSModeOn;
 
     if (d->m_display)

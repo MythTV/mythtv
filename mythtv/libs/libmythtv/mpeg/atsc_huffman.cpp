@@ -2219,7 +2219,7 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
                 for (int i = 0 ; i < 7 ; i++)
                 {
                     val2 |=
-                        huffman1_get_bit(compressed, bit + i + 2) << (6 - i);
+                        static_cast<int>(huffman1_get_bit(compressed, bit + i + 2)) << (6 - i);
                 }
                 retval += QChar(val2);
                 bit += 8;
@@ -2244,7 +2244,7 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
 static inline int huffman2_get_bit(unsigned char &bitpos,
                                    const unsigned char **bufptr)
 {
-   int ret = ((**bufptr & bitpos) != 0);
+   int ret = static_cast<int>((**bufptr & bitpos) != 0);
    bitpos >>= 1;
    if (!bitpos)
    {
