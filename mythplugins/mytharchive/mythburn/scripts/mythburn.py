@@ -2,6 +2,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+# python 3 doesn't have a unicode type
+try:
+    unicode
+except:
+    unicode = str
+
+# python 3 doesn't have a long type
+try:
+    long
+except:
+    long = int
+
+
 # mythburn.py
 # The ported MythBurn scripts which feature:
 
@@ -49,7 +62,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20131119-1"
+VERSION="0.2.20200122-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -96,7 +109,23 @@ import unicodedata
 import time
 import tempfile
 from fcntl import ioctl
-import CDROM
+
+try:
+    import CDROM
+except:
+    # Some hardcoded values for ioctl calls,
+    # not available on python > 3.5, see include/linux/cdrom.h
+    class CDROM(object):
+        CDS_NO_INFO = 0
+        CDS_NO_DISC = 1
+        CDS_TRAY_OPEN = 2
+        CDS_DRIVE_NOT_READY = 3
+        CDS_DISC_OK = 4
+        CDROMEJECT = 0x5309
+        CDROMRESET = 0x5312
+        CDROM_DRIVE_STATUS = 0x5326
+        CDROM_LOCKDOOR = 0x5329
+
 from shutil import copy
 
 import MythTV
@@ -155,7 +184,7 @@ drivespeed = 0;
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
 
-#chapter menu aspect ratio (4:3, 16:9 or Video) 
+#chapter menu aspect ratio (4:3, 16:9 or Video)
 #video means same aspect ratio as the video title
 chaptermenuAspectRatio = "Video"
 
@@ -279,7 +308,10 @@ class FontDef(object):
 def write(text, progress=True):
     """Simple place to channel all text output through"""
 
-    sys.stdout.write((text + "\n").encode("utf-8", "replace"))
+    if sys.version_info == 2:
+        sys.stdout.write((text + "\n").encode("utf-8", "replace"))
+    else:
+        sys.stdout.write(text + "\n")
     sys.stdout.flush()
 
     if progress == True and progresslog != "":
@@ -505,18 +537,18 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
     command = quoteCmdArg(path_jpeg2yuv[0]) + " -n %s -v0 -I p -f %s -j %s | %s -b 5000 -a %s -v 1 -f 8 -o %s" \
               % (totalframes, framespersecond, quoteCmdArg(background), quoteCmdArg(path_mpeg2enc[0]), aspectratio, quoteCmdArg(tempvideo))
     result = runCommand(command)
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running jpeg2yuv - %s" % command)
 
     command = quoteCmdArg(path_mplex[0]) + " -f 8 -v 0 -o %s %s %s" % (quoteCmdArg(tempmovie), quoteCmdArg(tempvideo), quoteCmdArg(music))
     result = runCommand(command)
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running mplex - %s" % command)
 
     if xmlfile != "":
         command = quoteCmdArg(path_spumux[0]) + " -m dvd -s 0 %s < %s > %s" % (quoteCmdArg(xmlfile), quoteCmdArg(tempmovie), quoteCmdArg(finaloutput))
         result = runCommand(command)
-        if result<>0:
+        if result!=0:
             fatalError("Failed while running spumux - %s" % command)
     else:
         os.rename(tempmovie, finaloutput)
@@ -527,7 +559,7 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
             os.remove(tempmovie)
 
 #############################################################
-# Return an xml node from a re-encoding profile xml file for 
+# Return an xml node from a re-encoding profile xml file for
 # a given profile name
 
 def findEncodingProfile(profile):
@@ -606,7 +638,7 @@ def getLengthOfVideo(index):
     return duration
 
 #############################################################
-# Gets the audio sample rate and number of channels of a video file 
+# Gets the audio sample rate and number of channels of a video file
 # from its stream info file
 
 def getAudioParams(folder):
@@ -643,7 +675,7 @@ def getVideoParams(folder):
     if video.attributes["aspectratio"].value != 'N/A':
         aspect_ratio = video.attributes["aspectratio"].value
     else:
-        aspect_ratio = "1.77778" 
+        aspect_ratio = "1.77778"
 
     videores = video.attributes["width"].value + 'x' + video.attributes["height"].value
     fps = video.attributes["fps"].value
@@ -729,9 +761,9 @@ def getFormatedLengthOfVideo(index):
 def frameToTime(frame, fps):
     sec = int(frame / fps)
     frame = frame - int(sec * fps)
-    mins = sec / 60
+    mins = sec // 60
     sec %= 60
-    hour = mins / 60
+    hour = mins // 60
     mins %= 60
 
     return '%02d:%02d:%02d' % (hour, mins, sec)
@@ -740,7 +772,7 @@ def frameToTime(frame, fps):
 # Convert a time string of format 00:00:00 to number of seconds
 
 def timeStringToSeconds(formatedtime):
-    parts = string.split(formatedtime, ':')
+    parts = formatedtime.split(':')
     if len(parts) != 3:
         return 0
 
@@ -801,8 +833,8 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
 #############################################################
 # Creates some fixed length chapter marks
 
-def createVideoChaptersFixedLength(itemnum, segment, lengthofvideo): 
-    """Returns chapter marks at cut list ends, 
+def createVideoChaptersFixedLength(itemnum, segment, lengthofvideo):
+    """Returns chapter marks at cut list ends,
        or evenly spaced chapters 'segment' seconds through the file"""
 
 
@@ -820,7 +852,7 @@ def createVideoChaptersFixedLength(itemnum, segment, lengthofvideo):
     if lengthofvideo < segment:
         return "00:00:00"
 
-    numofchapters = lengthofvideo / segment + 1;
+    numofchapters = lengthofvideo // segment + 1;
     chapters = "00:00:00"
     starttime = 0
     count = 2
@@ -845,7 +877,7 @@ def getDefaultParametersFromMythTVDB():
     sqlstatement="""SELECT value, data FROM settings WHERE value IN(
                         'DBSchemaVer',
                         'ISO639Language0',
-                        'ISO639Language1') 
+                        'ISO639Language1')
                     OR (hostname=%s AND value IN(
                         'VideoStartupDir',
                         'GalleryDir',
@@ -939,33 +971,33 @@ def getOptions(options):
 
 def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumber, chapterlist ):
     """Replaces keywords in a string with variables from the XML and filesystem"""
-    text=string.replace(text,"%page","%s" % pagenumber)
+    text=text.replace("%page","%s" % pagenumber)
 
     #See if we can use the thumbnail/cover file for videos if there is one.
     if getText( infoDOM.getElementsByTagName("coverfile")[0]) =="":
-        text=string.replace(text,"%thumbnail", os.path.join( getItemTempPath(itemnumber), "title.jpg"))
+        text=text.replace("%thumbnail", os.path.join( getItemTempPath(itemnumber), "title.jpg"))
     else:
-        text=string.replace(text,"%thumbnail", getText( infoDOM.getElementsByTagName("coverfile")[0]) )
+        text=text.replace("%thumbnail", getText( infoDOM.getElementsByTagName("coverfile")[0]) )
 
-    text=string.replace(text,"%itemnumber","%s" % itemnumber )
-    text=string.replace(text,"%keynumber","%s" % keynumber )
+    text=text.replace("%itemnumber","%s" % itemnumber )
+    text=text.replace("%keynumber","%s" % keynumber )
 
-    text=string.replace(text,"%title",getText( infoDOM.getElementsByTagName("title")[0]) )
-    text=string.replace(text,"%subtitle",getText( infoDOM.getElementsByTagName("subtitle")[0]) )
-    text=string.replace(text,"%description",getText( infoDOM.getElementsByTagName("description")[0]) )
-    text=string.replace(text,"%type",getText( infoDOM.getElementsByTagName("type")[0]) )
+    text=text.replace("%title",getText( infoDOM.getElementsByTagName("title")[0]) )
+    text=text.replace("%subtitle",getText( infoDOM.getElementsByTagName("subtitle")[0]) )
+    text=text.replace("%description",getText( infoDOM.getElementsByTagName("description")[0]) )
+    text=text.replace("%type",getText( infoDOM.getElementsByTagName("type")[0]) )
 
-    text=string.replace(text,"%recordingdate",getText( infoDOM.getElementsByTagName("recordingdate")[0]) )
-    text=string.replace(text,"%recordingtime",getText( infoDOM.getElementsByTagName("recordingtime")[0]) )
+    text=text.replace("%recordingdate",getText( infoDOM.getElementsByTagName("recordingdate")[0]) )
+    text=text.replace("%recordingtime",getText( infoDOM.getElementsByTagName("recordingtime")[0]) )
 
-    text=string.replace(text,"%duration", getFormatedLengthOfVideo(itemnumber))
+    text=text.replace("%duration", getFormatedLengthOfVideo(itemnumber))
 
-    text=string.replace(text,"%myfolder",getThemeFile(themeName,""))
+    text=text.replace("%myfolder",getThemeFile(themeName,""))
 
     if chapternumber>0:
-        text=string.replace(text,"%chapternumber","%s" % chapternumber )
-        text=string.replace(text,"%chaptertime","%s" % chapterlist[chapternumber - 1] )
-        text=string.replace(text,"%chapterthumbnail", os.path.join( getItemTempPath(itemnumber), "chapter-%s.jpg" % chapternumber))
+        text=text.replace("%chapternumber","%s" % chapternumber )
+        text=text.replace("%chaptertime","%s" % chapterlist[chapternumber - 1] )
+        text=text.replace("%chapterthumbnail", os.path.join( getItemTempPath(itemnumber), "chapter-%s.jpg" % chapternumber))
 
     return text
 
@@ -994,7 +1026,7 @@ def intelliDraw(drawer, text, font, containerWidth):
     #write("containerWidth: %s" % containerWidth)
     words = text.split()
     lines = [] # prepare a return argument
-    lines.append(words) 
+    lines.append(words)
     finished = False
     line = 0
     while not finished:
@@ -1008,7 +1040,7 @@ def intelliDraw(drawer, text, font, containerWidth):
             if drawer.textsize(' '.join(thistext),font.getFont())[0] > containerWidth:
                 # this is the heart of the algorithm: we pop words off the current
                 # sentence until the width is ok, then in the next outer loop
-                # we move on to the next sentence. 
+                # we move on to the next sentence.
                 if str(thistext).find(' ') != -1:
                     newline.insert(0,thistext.pop(-1))
                 else:
@@ -1133,13 +1165,13 @@ def paintButton(draw, bgimage, bgimagemask, node, infoDOM, itemnum, page,
 #############################################################
 # Paint some theme text on to an image
 
-def paintText(draw, image, text, node, color = None, 
+def paintText(draw, image, text, node, color = None,
               x = None, y = None, width = None, height = None):
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
 
     if x == None:
-        x = getScaledAttribute(node, "x") 
+        x = getScaledAttribute(node, "x")
         y = getScaledAttribute(node, "y")
         width = getScaledAttribute(node, "w")
         height = getScaledAttribute(node, "h")
@@ -1186,12 +1218,12 @@ def paintText(draw, image, text, node, color = None,
     for i in lines:
         if (j * h) < (height - (vindent * 2) - h):
             textImage = font.drawText(i, color)
-            write( "Wrapped text  = " + i.encode("ascii", "replace"), False)
+            write( "Wrapped text  = " + i )  # encoding is done within 'write'
 
             if halign == "left":
                 xoffset = hindent
             elif  halign == "center" or halign == "centre":
-                xoffset = (width / 2) - (textImage.size[0] / 2)
+                xoffset = (width // 2) - (textImage.size[0] // 2)
             elif  halign == "right":
                 xoffset = width - textImage.size[0] - hindent
             else:
@@ -1200,7 +1232,7 @@ def paintText(draw, image, text, node, color = None,
             if valign == "top":
                 yoffset = vindent
             elif  valign == "center" or halign == "centre":
-                yoffset = (height / 2) - (textImage.size[1] / 2)
+                yoffset = (height // 2) - (textImage.size[1] // 2)
             elif  valign == "bottom":
                 yoffset = height - textImage.size[1] - vindent
             else:
@@ -1208,7 +1240,7 @@ def paintText(draw, image, text, node, color = None,
 
             image.paste(textImage, (x + xoffset,y + yoffset + j * h), textImage)
         else:
-            write( "Truncated text = " + i.encode("ascii", "replace"), False)
+            write( "Wrapped text  = " + i )  # encoding is done within 'write'
         #Move to next line
         j = j + 1
 
@@ -1230,8 +1262,8 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
     (imgw, imgh) = picture.size
     write("Image (%s, %s) into space of (%s, %s) at (%s, %s)" % (imgw, imgh, w, h, xpos, ypos), False)
 
-    # the theme can override the default stretch behaviour 
-    if imageDom.hasAttribute("stretch"): 
+    # the theme can override the default stretch behaviour
+    if imageDom.hasAttribute("stretch"):
         if imageDom.attributes["stretch"].value == "True":
             stretch = True
         else:
@@ -1243,7 +1275,7 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
     else:
         if float(w)/imgw < float(h)/imgh:
             # Width is the constraining dimension
-            imgh = imgh*w/imgw
+            imgh = imgh*w//imgw
             imgw = w
             if imageDom.hasAttribute("valign"):
                 valign = imageDom.attributes["valign"].value
@@ -1253,10 +1285,10 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
             if valign == "bottom":
                 ypos += h - imgh
             if valign == "center":
-                ypos += (h - imgh)/2
+                ypos += (h - imgh)//2
         else:
             # Height is the constraining dimension
-            imgw = imgw*h/imgh
+            imgw = imgw*h//imgh
             imgh = h
             if imageDom.hasAttribute("halign"):
                 halign = imageDom.attributes["halign"].value
@@ -1266,13 +1298,13 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
             if halign == "right":
                 xpos += w - imgw
             if halign == "center":
-                xpos += (w - imgw)/2
+                xpos += (w - imgw)//2
 
     write("Image resized to (%s, %s) at (%s, %s)" % (imgw, imgh, xpos, ypos), False)
     picture = picture.resize((imgw, imgh))
     picture = picture.convert("RGBA")
 
-    if maskfilename <> None and doesFileExist(maskfilename):
+    if maskfilename != None and doesFileExist(maskfilename):
         maskpicture = Image.open(maskfilename, "r").resize((imgw, imgh))
         maskpicture = maskpicture.convert("RGBA")
     else:
@@ -1280,7 +1312,7 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
 
     destimage.paste(picture, (xpos, ypos), maskpicture)
     del picture
-    if maskfilename <> None and doesFileExist(maskfilename):
+    if maskfilename != None and doesFileExist(maskfilename):
         del maskpicture
 
     write ("Added image %s" % filename)
@@ -1294,7 +1326,7 @@ def paintImage(filename, maskfilename, imageDom, destimage, stretch=True):
 def checkBoundaryBox(boundarybox, node):
     # We work out how much space all of our graphics and text are taking up
     # in a bounding rectangle so that we can use this as an automatic highlight
-    # on the DVD menu   
+    # on the DVD menu
     if getText(node.attributes["static"]) == "False":
         if getScaledAttribute(node, "x") < boundarybox[0]:
             boundarybox = getScaledAttribute(node, "x"), boundarybox[1], boundarybox[2], boundarybox[3]
@@ -1389,7 +1421,7 @@ def getFileInformation(file, folder):
         if file.attributes["type"].value=="recording":
             filename = file.attributes["filename"].value
             try:
-                rec = DB.searchRecorded(basename=os.path.basename(filename)).next()
+                rec = next(DB.searchRecorded(basename=os.path.basename(filename)))
             except StopIteration:
                 fatalError("Failed to get recording details from the DB for %s" % filename)
 
@@ -1412,7 +1444,7 @@ def getFileInformation(file, folder):
     elif file.attributes["type"].value=="recording":
         filename = file.attributes["filename"].value
         try:
-            rec = DB.searchRecorded(basename=os.path.basename(filename)).next()
+            rec = next(DB.searchRecorded(basename=os.path.basename(filename)))
         except StopIteration:
             fatalError("Failed to get recording details from the DB for %s" % filename)
 
@@ -1443,7 +1475,7 @@ def getFileInformation(file, folder):
     elif file.attributes["type"].value=="video":
         filename = file.attributes["filename"].value
         try:
-            vid = MVID.searchVideos(file=filename).next()
+            vid = next(MVID.searchVideos(file=filename))
         except StopIteration:
             vid = Video.fromFilename(filename)
 
@@ -1489,7 +1521,7 @@ def getFileInformation(file, folder):
 
         data.thumblist = ','.join(thumblist)
 
-    for k,v in data.items():
+    for k,v in list(data.items()):
         write( "Node = %s, Data = %s" % (k, v))
         node = infoDOM.createElement(k)
         # v may be either an integer. Therefore we have to
@@ -1507,10 +1539,13 @@ def getFileInformation(file, folder):
 # Write an xml file to disc
 
 def WriteXMLToFile(myDOM, filename):
+
     #Save the XML file to disk for use later on
     f=open(filename, 'w')
 
-    if sys.hexversion >= 0x020703F0:
+    if sys.hexversion >= 0x03000000:
+        f.write(myDOM.toprettyxml(indent="    ", encoding="UTF-8").decode())
+    elif sys.hexversion >= 0x020703F0:
         f.write(myDOM.toprettyxml(indent="    ", encoding="UTF-8"))
     else:
         f.write(myDOM.toxml(encoding="UTF-8"))
@@ -1588,7 +1623,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 
     write("Multiplexing MPEG stream to %s" % destination)
 
-    # no need to use a sync offset if projectx was used to demux the streams 
+    # no need to use a sync offset if projectx was used to demux the streams
     if useprojectx:
         syncOffset = 0
     else:
@@ -1631,6 +1666,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 
     if not doesFileExist(audio2):
         write("Available streams - video and one audio stream")
+        write("running %s -M -f 8 -v 0 --sync-offset %sms -o %s %s %s" %(path_mplex[0], syncOffset, destination, video, audio1))
         result=os.spawnlp(mode, path_mplex[0], path_mplex[1],
                     '-M',
                     '-f', '8',
@@ -1663,13 +1699,13 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
         write("Checking integrity of subtitle pngs")
         command = quoteCmdArg(os.path.join(scriptpath, "testsubtitlepngs.sh")) + " " + quoteCmdArg(os.path.dirname(destination) + "/stream.d/spumux.xml")
         result = runCommand(command)
-        if result<>0:
+        if result!=0:
             fatalError("Failed while running testsubtitlepngs.sh - %s" % command)
 
         write("Running spumux to add subtitles")
         command = quoteCmdArg(path_spumux[0]) + " -P %s <%s >%s" % (quoteCmdArg(os.path.dirname(destination) + "/stream.d/spumux.xml"), quoteCmdArg(destination), quoteCmdArg(os.path.splitext(destination)[0] + "-sub.mpg"))
         result = runCommand(command)
-        if result<>0:
+        if result!=0:
             nonfatalError("Failed while running spumux.\n"
                           "Command was - %s.\n"
                           "Look in the full log to see why it failed" % command)
@@ -1691,7 +1727,7 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
 
     result = runCommand(command)
 
-    if result <> 0:
+    if result != 0:
         fatalError("Failed while running mytharchivehelper to get stream information.\n"
                    "Result: %d, Command was %s" % (result, command))
 
@@ -1730,7 +1766,7 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtranscode to cut commercials and/or clean up an mpeg2 file"""
 
     try:
-        rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
+        rec = next(DB.searchRecorded(chanid=chanid, starttime=starttime))
         cutlist = rec.markup.getcutlist()
     except StopIteration:
         cutlist = []
@@ -1770,7 +1806,7 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
 def generateProjectXCutlist(chanid, starttime, folder):
     """generate cutlist_x.txt for ProjectX"""
 
-    rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
+    rec = next(DB.searchRecorded(chanid=chanid, starttime=starttime))
     starttime = rec.starttime.utcisoformat()
     cutlist = rec.markup.getcutlist()
 
@@ -1781,7 +1817,7 @@ def generateProjectXCutlist(chanid, starttime, folder):
             for cut in cutlist:
                 # we need to reverse the cutlist because ProjectX wants to know
                 # the bits to keep not what to cut
-                
+
                 if i == 0:
                     if cut[0] != 0:
                         cutlist_f.write('0\n%d\n' % cut[0])
@@ -1979,19 +2015,19 @@ def extractVideoFrame(source, destination, seconds):
 
         command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (quoteCmdArg(source), seconds, quoteCmdArg(destination))
         result = runCommand(command)
-        if result <> 0:
+        if result != 0:
             fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
                        "Result: %d, Command was %s" % (result, command))
     try:
         myimage=Image.open(destination,"r")
 
-        if myimage.format <> "JPEG":
+        if myimage.format != "JPEG":
             write( "Something went wrong with thumbnail capture - " + myimage.format)
-            return (0L,0L)
+            return (long(0),long(0))
         else:
             return myimage.size
     except IOError:
-        return (0L, 0L)
+        return (long(0),long(0))
 
 #############################################################
 # Grabs a list of single frames from a file
@@ -2003,7 +2039,7 @@ def extractVideoFrames(source, destination, thumbList):
     command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (quoteCmdArg(source), thumbList, quoteCmdArg(destination))
     write(command)
     result = runCommand(command)
-    if result <> 0:
+    if result != 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
                    "Result: %d, Command was %s" % (result, command))
 
@@ -2083,8 +2119,8 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
     else:
         passLog = os.path.join(getTempPath(), 'pass')
 
-        pass1 = string.replace(command, "%passno","1")
-        pass1 = string.replace(pass1, "%passlogfile", quoteCmdArg(passLog))
+        pass1 = command.replace("%passno","1")
+        pass1 = pass1.replace("%passlogfile", quoteCmdArg(passLog))
         write("Pass 1 - " + pass1)
         result = runCommand(pass1)
 
@@ -2095,8 +2131,8 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if os.path.exists(destvideofile):
             os.remove(destvideofile)
 
-        pass2 = string.replace(command, "%passno","2")
-        pass2 = string.replace(pass2, "%passlogfile", passLog)
+        pass2 = command.replace("%passno","2")
+        pass2 = pass2.replace("%passlogfile", passLog)
         write("Pass 2 - " + pass2)
         result = runCommand(pass2)
 
@@ -2117,7 +2153,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     profileNode = findEncodingProfile(profile)
     parameters = profileNode.getElementsByTagName("parameter")
 
-    # default values - will be overriden by values from the profile 
+    # default values - will be overriden by values from the profile
     outvideobitrate = "5000k"
     if videomode == "ntsc":
         outvideores = "720x480"
@@ -2198,7 +2234,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     if cpuCount > 1:
         command += "-threads %d " % cpuCount
 
-    command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, quoteCmdArg(os.path.join(folder, "audout"))) 
+    command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, quoteCmdArg(os.path.join(folder, "audout")))
     command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
     command += "-i %s " % quoteCmdArg(os.path.join(folder, "vidout"))
     command += "-aspect %s -r %s " % (aspectratio, fps)
@@ -2235,7 +2271,7 @@ def runDVDAuthor():
     write( "Starting dvdauthor")
     checkCancelFlag()
     result=os.spawnlp(os.P_WAIT, path_dvdauthor[0],path_dvdauthor[1],'-x',os.path.join(getTempPath(),'dvdauthor.xml'))
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running dvdauthor. Result: %d" % result)
     write( "Finished  dvdauthor")
 
@@ -2252,14 +2288,14 @@ def CreateDVDISO(title):
 
     result = runCommand(command)
 
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running mkisofs.\n"
                    "Command was %s" % command)
 
     write("Finished creating ISO image")
 
 #############################################################
-# Burns the contents of a directory to create a DVD 
+# Burns the contents of a directory to create a DVD
 
 
 def BurnDVDISO(title):
@@ -2293,7 +2329,7 @@ def BurnDVDISO(title):
                 try:
                   ioctl(f,action, value)
                 except:
-                  write("Sending command ", action, " to drive failed", False)
+                  write("Sending command '0x%x' to drive failed" %action, False)
                 os.close(f)
             else:   # try eject-command
                 if runCommand("eject " + quoteCmdArg(dvddrivepath)) == 32512:
@@ -2312,10 +2348,10 @@ def BurnDVDISO(title):
               ioctl(f,action, value)
               res = True
             except:
-              write("Sending command ", action, " to drive failed", False)
+              write("Sending command '0x%x' to drive failed" %action, False)
               res = False
-            os.close(f) 
-        return res 
+            os.close(f)
+        return res
     def waitForDrive():
         tries = 0
         while drivestatus() == CDROM.CDS_DRIVE_NOT_READY:
@@ -2363,7 +2399,7 @@ def BurnDVDISO(title):
             result = runCommand(command)
             if result == 0:
                 finished = True
-                
+
                 # Wait till the drive is not busy any longer
                 f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
                 busy = True
@@ -2427,7 +2463,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
         command = "mythreplex --demux --fix_sync -t TS -o %s " % quoteCmdArg(folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID])
 
-        if audio1[AUDIO_ID] != -1: 
+        if audio1[AUDIO_ID] != -1:
             if audio1[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio1[AUDIO_ID])
             elif audio1[AUDIO_CODEC] == 'AC3':
@@ -2435,7 +2471,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
             elif audio1[AUDIO_CODEC] == 'EAC3':
                 command += "-c %d " % (audio1[AUDIO_ID])
 
-        if audio2[AUDIO_ID] != -1: 
+        if audio2[AUDIO_ID] != -1:
             if audio2[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio2[AUDIO_ID])
             elif audio2[AUDIO_CODEC] == 'AC3':
@@ -2447,7 +2483,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
         command = "mythreplex --demux --fix_sync -o %s " % quoteCmdArg(folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID] & 255)
 
-        if audio1[AUDIO_ID] != -1: 
+        if audio1[AUDIO_ID] != -1:
             if audio1[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio1[AUDIO_ID] & 255)
             elif audio1[AUDIO_CODEC] == 'AC3':
@@ -2456,7 +2492,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-c %d " % (audio1[AUDIO_ID] & 255)
 
 
-        if audio2[AUDIO_ID] != -1: 
+        if audio2[AUDIO_ID] != -1:
             if audio2[AUDIO_CODEC] == 'MP2':
                 command += "-a %d " % (audio2[AUDIO_ID] & 255)
             elif audio2[AUDIO_CODEC] == 'AC3':
@@ -2470,7 +2506,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
 
     result = runCommand(command)
 
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running mythreplex. Command was %s" % command)
 
 #############################################################
@@ -2486,20 +2522,20 @@ def runM2VRequantiser(source,destination,factor):
     command += " %s "  % M2Vsize0
     command += " <  %s " % quoteCmdArg(source)
     command += " >  %s " % quoteCmdArg(destination)
- 
+
     write("Running: " + command)
     result = runCommand(command)
-    if result<>0:
+    if result!=0:
         fatalError("Failed while running M2VRequantiser. Command was %s" % command)
 
     M2Vsize1 = os.path.getsize(destination)
-       
+
     write("M2Vsize after requant is  %.2f Mb " % (float(M2Vsize1)/mega))
     fac1=float(M2Vsize0) / float(M2Vsize1)
     write("Factor demanded %.5f, achieved %.5f, ratio %.5f " % ( factor, fac1, fac1/factor))
 
 #############################################################
-# Calculates the total size of all the video, audio and menu files 
+# Calculates the total size of all the video, audio and menu files
 
 def calculateFileSizes(files):
     """ Returns the sizes of all video, audio and menu files"""
@@ -2515,23 +2551,23 @@ def calculateFileSizes(files):
         #Process this file
         file=os.path.join(folder,"stream.mv2")
         #Get size of vobfile in MBytes
-        totalvideosize+=os.path.getsize(file) 
+        totalvideosize+=os.path.getsize(file)
 
         #Get size of audio track 1
         if doesFileExist(os.path.join(folder,"stream0.ac3")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) 
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3"))
         if doesFileExist(os.path.join(folder,"stream0.mp2")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2")) 
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2"))
 
-        #Get size of audio track 2 if available 
+        #Get size of audio track 2 if available
         if doesFileExist(os.path.join(folder,"stream1.ac3")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3")) 
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3"))
         if doesFileExist(os.path.join(folder,"stream1.mp2")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2")) 
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2"))
 
         # add chapter menu if available
         if doesFileExist(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)):
-            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)) 
+            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount))
 
         # add details page if available
         if doesFileExist(os.path.join(getTempPath(),"details-%s.mpg" % filecount)):
@@ -2547,8 +2583,8 @@ def calculateFileSizes(files):
 ########################################
 #returns total size of bitrate-limited m2v files
 
-def total_mv2_brl(files,rate): 
-    tvsize=0  
+def total_mv2_brl(files,rate):
+    tvsize=0
     filecount=0
     for node in files:
         filecount+=1
@@ -2557,15 +2593,15 @@ def total_mv2_brl(files,rate):
         file=os.path.join(folder,"stream.mv2")
         progvsize=os.path.getsize(file)
         progvbitrate=progvsize/progduration
-        if progvbitrate>rate : 
+        if progvbitrate>rate :
             tvsize+=progduration*rate
         else:
             tvsize+=progvsize
 
-    return tvsize    
+    return tvsize
 
 #########################################
-# Uses requantiser if available to shrink the video streams so 
+# Uses requantiser if available to shrink the video streams so
 # they will fit on a DVD
 
 def performMPEG2Shrink(files,dvdrsize):
@@ -2582,7 +2618,7 @@ def performMPEG2Shrink(files,dvdrsize):
 
     #Subtract the audio, menus and packaging overhead from the size of the disk (we cannot shrink this further)
     mv2space=((dvdrsize*mega-totalmenusize)/fudge_pack)-totalaudiosize
- 
+
     if mv2space<0:
         fatalError("Audio and menu files are too big. No room for video. Giving up!")
 
@@ -2602,21 +2638,21 @@ def performMPEG2Shrink(files,dvdrsize):
             vsize+=os.path.getsize(file)
             duration+=getLengthOfVideo(filecount)
 
-        #We need to shrink the video files to fit into the space available.  It seems sensible 
-        #to do this by imposing a common upper limit on the mean video bit-rate of each recording; 
+        #We need to shrink the video files to fit into the space available.  It seems sensible
+        #to do this by imposing a common upper limit on the mean video bit-rate of each recording;
         #this will not further reduce the visual quality of any that were transmitted at lower bit-rates.
 
-        #Now find the bit-rate limit by iteration between initially defined upper and lower bounds. 
+        #Now find the bit-rate limit by iteration between initially defined upper and lower bounds.
         #The code is based on 'rtbis' from Numerical Recipes by W H Press et al., CUP.
-        
+
         #A small multiple of the average input bit-rate should be ok as the initial upper bound,
         #(although a fixed value or one related to the max value could be used), and zero as the lower bound.
         #The function relating bit-rate upper limit to total file size is smooth and monotonic,
-        #so there should be no convergence problem. 
-     
+        #so there should be no convergence problem.
+
         vrLo=0.0
         vrHi=3.0*float(vsize)/duration
-        
+
         vrate=vrLo
         vrinc=vrHi-vrLo
         count=0
@@ -2628,7 +2664,7 @@ def performMPEG2Shrink(files,dvdrsize):
             testsize=total_mv2_brl(files,vrtest)
             if (testsize<mv2space):
                 vrate=vrtest
-           
+
         write("vrate %.3f kb/s, testsize %.4f , mv2space %.4f Mb " % ((vrate)/1000.0, (testsize)/mega, (mv2space)/mega) )
         filecount=0
         for node in files:
@@ -2665,7 +2701,7 @@ def createDVDAuthorXML(screensize, numberofitems):
     #Total number of video items on a single menu page (no less than 1!)
     itemsperpage = menuitems.length
     write( "Menu items per page %s" % itemsperpage)
-    autoplaymenu = 2 + ((numberofitems + itemsperpage - 1)/itemsperpage)
+    autoplaymenu = 2 + ((numberofitems + itemsperpage - 1)//itemsperpage)
 
     if wantChapterMenu:
         #Get the chapter menu node (we must only have 1)
@@ -2775,7 +2811,7 @@ def createDVDAuthorXML(screensize, numberofitems):
         #g4 holds the menu page last displayed
         pre = dvddom.createElement("pre")
         pre.appendChild(dvddom.createTextNode("{button=g2*1024;g4=%s;}" % page))
-        menupgc.appendChild(pre)    
+        menupgc.appendChild(pre)
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file",os.path.join(getTempPath(),"menu-%s.mpg" % page))
@@ -2833,7 +2869,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             elif chaptermenuAspectRatio == "16:9":
                 video.setAttribute("aspect", "16:9")
                 video.setAttribute("widescreen", "nopanscan")
-            else: 
+            else:
                 # use same aspect ratio as the video
                 if getAspectRatioOfVideo(itemnum) > aspectRatioThreshold:
                     video.setAttribute("aspect", "16:9")
@@ -2849,26 +2885,26 @@ def createDVDAuthorXML(screensize, numberofitems):
 
                 pre = dvddom.createElement("pre")
                 mymenupgc.appendChild(pre)
-                if wantDetailsPage: 
+                if wantDetailsPage:
                     pre.appendChild(dvddom.createTextNode("{button=s7 - 1 * 1024;}"))
                 else:
                     pre.appendChild(dvddom.createTextNode("{button=s7 * 1024;}"))
 
                 vob = dvddom.createElement("vob")
                 vob.setAttribute("file",os.path.join(getTempPath(),"chaptermenu-%s.mpg" % itemnum))
-                mymenupgc.appendChild(vob)    
+                mymenupgc.appendChild(vob)
 
                 #Loop menu forever
                 post = dvddom.createElement("post")
                 post.appendChild(dvddom.createTextNode("jump cell 1;"))
                 mymenupgc.appendChild(post)
 
-                # the first chapter MUST be 00:00:00 if its not dvdauthor adds it which 
+                # the first chapter MUST be 00:00:00 if its not dvdauthor adds it which
                 # throws of the chapter selection - so make sure we add it if needed so we
-                # can compensate for it in the chapter selection menu 
+                # can compensate for it in the chapter selection menu
                 firstChapter = 0
                 thumblist = createVideoChapters(itemnum, chapters, getLengthOfVideo(itemnum), False)
-                chapterlist = string.split(thumblist, ",")
+                chapterlist = thumblist.split(",")
                 if chapterlist[0] != '00:00:00':
                     firstChapter = 1
                 x = 1
@@ -2876,7 +2912,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                     #Add this recording to this page's menu...
                     button = dvddom.createElement("button")
                     button.setAttribute("name","%s" % x)
-                    if wantDetailsPage: 
+                    if wantDetailsPage:
                         button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, firstChapter + x + 1)))
                     else:
                         button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, firstChapter + x)))
@@ -2933,14 +2969,14 @@ def createDVDAuthorXML(screensize, numberofitems):
             vob = dvddom.createElement("vob")
             if wantChapterMenu:
                 thumblist = createVideoChapters(itemnum, chapters, getLengthOfVideo(itemnum), False)
-                chapterlist = string.split(thumblist, ",")
+                chapterlist = thumblist.split(",")
                 if chapterlist[0] != '00:00:00':
                     thumblist = '00:00:00,' + thumblist
                 vob.setAttribute("chapters", thumblist)
             else:
-                vob.setAttribute("chapters", 
+                vob.setAttribute("chapters",
                     createVideoChaptersFixedLength(itemnum,
-                                                   chapterLength, 
+                                                   chapterLength,
                                                    getLengthOfVideo(itemnum)))
 
             vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.vob"))
@@ -3006,7 +3042,7 @@ def createDVDAuthorXML(screensize, numberofitems):
 
     pre = dvddom.createElement("pre")
     pre.appendChild(dvddom.createTextNode(dvdcode))
-    menupgc.appendChild(pre)    
+    menupgc.appendChild(pre)
 
     if wantIntro:
         #Menu creation is finished so we know how many pages were created
@@ -3018,7 +3054,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             dvdcode+="jump menu %s;" % (page + 1)
             if (page>1):
                 dvdcode+=" else "
-        dvdcode+="}"       
+        dvdcode+="}"
         vmgm_pre_node.appendChild(dvddom.createTextNode(dvdcode))
 
     #write(dvddom.toprettyxml())
@@ -3026,7 +3062,7 @@ def createDVDAuthorXML(screensize, numberofitems):
     WriteXMLToFile (dvddom,os.path.join(getTempPath(),"dvdauthor.xml"))
 
     #Destroy the DOM and free memory
-    dvddom.unlink()   
+    dvddom.unlink()
 
 #############################################################
 # Creates the DVDAuthor xml file used to create a DVD with no main menu
@@ -3220,7 +3256,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
     dvddom.unlink()
 
 #############################################################
-# Creates the directory to hold the preview images for an animated menu 
+# Creates the directory to hold the preview images for an animated menu
 
 def createEmptyPreviewFolder(videoitem):
     previewfolder = os.path.join(getItemTempPath(videoitem), "preview")
@@ -3264,7 +3300,7 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
                 #see if this graphics item has a mask
                 if node.hasAttribute("mask"):
                     imagemaskfilename = getThemeFile(themeName, node.attributes["mask"].value)
-                    if node.attributes["mask"].value <> "" and doesFileExist(imagemaskfilename):
+                    if node.attributes["mask"].value != "" and doesFileExist(imagemaskfilename):
                         maskpicture = Image.open(imagemaskfilename,"r").resize((width, height))
                         maskpicture = maskpicture.convert("RGBA")
 
@@ -3276,7 +3312,7 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
 def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                   bgimagemask, drawmask, highlightcolor, spumuxdom, spunode,
                   numberofitems, chapternumber, chapterlist):
-    """Draws text and graphics onto a dvd menu, called by 
+    """Draws text and graphics onto a dvd menu, called by
        createMenu and createChapterMenu"""
 
     #Get the XML containing information about this item
@@ -3287,7 +3323,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         fatalError("The info.xml file (%s) doesn't look right" %
                     os.path.join(getItemTempPath(itemnum),"info.xml"))
 
-    #boundarybox holds the max and min dimensions for this item 
+    #boundarybox holds the max and min dimensions for this item
     #so we can auto build a menu highlight box
     boundarybox = 9999,9999,0,0
     wantHighlightBox = True
@@ -3319,10 +3355,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
 
                 # see if an image mask exists
                 maskfilename = None
-                if node.hasAttribute("mask") and node.attributes["mask"].value <> "":
+                if node.hasAttribute("mask") and node.attributes["mask"].value != "":
                     maskfilename = getThemeFile(themeName, node.attributes["mask"].value)
 
-                # if this is a thumb image and is a MythVideo coverart image then preserve 
+                # if this is a thumb image and is a MythVideo coverart image then preserve
                 # its aspect ratio unless overriden later by the theme
                 if (node.attributes["filename"].value == "%thumbnail"
                   and getText(infoDOM.getElementsByTagName("coverfile")[0]) !=""):
@@ -3366,7 +3402,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                 button.setAttribute("name","previous")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") +
                                                 getScaledAttribute(node, "w")))
                 button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
                                                 getScaledAttribute(node, "h")))
@@ -3390,9 +3426,9 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                 button.setAttribute("name","next")
                 button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
                 button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") +
                                                  getScaledAttribute(node, "w")))
-                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + 
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
                                                  getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
@@ -3411,7 +3447,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
             button.setAttribute("name","playall")
             button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
             button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
-            button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + 
+            button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") +
                                              getScaledAttribute(node, "w")))
             button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") +
                                              getScaledAttribute(node, "h")))
@@ -3426,8 +3462,8 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                 # draw background if required
                 paintBackground(bgimage, node)
 
-                paintButton(draw, bgimage, bgimagemask, node, infoDOM, 
-                            itemnum, page, itemsonthispage, chapternumber, 
+                paintButton(draw, bgimage, bgimagemask, node, infoDOM,
+                            itemnum, page, itemsonthispage, chapternumber,
                             chapterlist)
 
                 button = spumuxdom.createElement("button")
@@ -3616,12 +3652,14 @@ def createMenu(screensize, screendpi, numberofitems):
         bgimage.paste(overlayimage, (0,0), overlayimage)
 
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"background-%s.jpg" % page),"JPEG", quality=99)
+        rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+        rgb_bgimage.save(os.path.join(getTempPath(),"background-%s.jpg" % page),"JPEG", quality=99)
+        del rgb_bgimage
         bgimagemask.save(os.path.join(getTempPath(),"backgroundmask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
         #now that the base background has been made and all the previews generated
         #we need to add the previews to the background
-        #Assumption: We assume that there is nothing in the location of where the items go 
+        #Assumption: We assume that there is nothing in the location of where the items go
         #(ie, no text on the images)
 
         itemsonthispage = 0
@@ -3654,7 +3692,9 @@ def createMenu(screensize, screendpi, numberofitems):
                             del picture
                     previewitem+=1
                 #bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.png" % (page, framenum)),"PNG",quality=100,optimize=0,dpi=screendpi)
-                bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
+                rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+                rgb_bgimage.save(os.path.join(getTempPath(),"background-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
+                del rgb_bgimage
                 framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"backgroundmask-%s.png" % page))
@@ -3769,7 +3809,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
 
         #Extract the thumbnails
         chapterlist=createVideoChapters(page,itemsperpage,getLengthOfVideo(page),True)
-        chapterlist=string.split(chapterlist,",")
+        chapterlist=chapterlist.split(",")
 
         #now need to preprocess the menu to see if any preview videos are required
         #This must be done on an individual basis since we do the resize as the
@@ -3813,7 +3853,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
             chapter+=1
 
             drawThemeItem(page, itemsperpage, page, menuitem,
-                        overlayimage, draw, 
+                        overlayimage, draw,
                         bgimagemask, drawmask, highlightcolor,
                         spumuxdom, spunode,
                         999, chapter, chapterlist)
@@ -3821,7 +3861,9 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         #Save this menu image and its mask
         bgimage=Image.open(backgroundfilename,"r").resize(screensize)
         bgimage.paste(overlayimage, (0,0), overlayimage)
-        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),"JPEG", quality=99)
+        rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+        rgb_bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.jpg" % page),"JPEG", quality=99)
+        del rgb_bgimage
 
         bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=90,optimize=0)
 
@@ -3850,7 +3892,9 @@ def createChapterMenu(screensize, screendpi, numberofitems):
                                 bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]))
                             del picture
                     previewchapter+=1
-                bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
+                rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+                rgb_bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s-f%06d.jpg" % (page, framenum)),"JPEG",quality=99)
+                del rgb_bgimage
                 framenum+=1
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
@@ -3873,7 +3917,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
             aspect_ratio = '2'
         elif chaptermenuAspectRatio == "16:9":
             aspect_ratio = '3'
-        else: 
+        else:
             if getAspectRatioOfVideo(page) > aspectRatioThreshold:
                 aspect_ratio = '3'
             else:
@@ -3971,7 +4015,9 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         #Save this details image
         bgimage=Image.open(backgroundfilename,"r").resize(screensize)
         bgimage.paste(overlayimage, (0,0), overlayimage)
-        bgimage.save(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),"JPEG", quality=99)
+        rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+        rgb_bgimage.save(os.path.join(getTempPath(),"details-%s.jpg" % itemnum),"JPEG", quality=99)
+        del rgb_bgimage
 
         if haspreview == True:
             numframes=secondsToFrames(menulength)
@@ -3994,7 +4040,9 @@ def createDetailsPage(screensize, screendpi, numberofitems):
                         else:
                             bgimage.paste(picture, (previewx, previewy))
                         del picture
-                bgimage.save(os.path.join(getTempPath(),"details-%s-f%06d.jpg" % (itemnum, framenum)),"JPEG",quality=99)
+                rgb_bgimage=bgimage.convert('RGB')  ### ticket #13306
+                rgb_bgimage.save(os.path.join(getTempPath(),"details-%s-f%06d.jpg" % (itemnum, framenum)),"JPEG",quality=99)
+                del rgb_bgimage
                 framenum+=1
 
 
@@ -4043,7 +4091,7 @@ def isMediaAVIFile(file):
     return Magic=="RIFF"
 
 #############################################################
-# checks to see if an audio stream need to be converted to ac3 
+# checks to see if an audio stream need to be converted to ac3
 
 def processAudio(folder):
     """encode audio to ac3 for better compression and compatability with NTSC players"""
@@ -4135,7 +4183,7 @@ def selectStreams(folder):
     for node in nodes:
         index = int(node.attributes["ffmpegindex"].value)
         lang = node.attributes["language"].value
-        format = string.upper(node.attributes["codec"].value)
+        format = node.attributes["codec"].value.upper()
         pid = int(node.attributes["id"].value)
         if lang == preferredlang1 and format == "AC3":
             if found:
@@ -4150,7 +4198,7 @@ def selectStreams(folder):
         for node in nodes:
             index = int(node.attributes["ffmpegindex"].value)
             lang = node.attributes["language"].value
-            format = string.upper(node.attributes["codec"].value)
+            format = node.attributes["codec"].value.upper()
             pid = int(node.attributes["id"].value)
             if lang == preferredlang1 and format == "MP2":
                 if found:
@@ -4164,7 +4212,7 @@ def selectStreams(folder):
     if not found:
         for node in nodes:
             index = int(node.attributes["ffmpegindex"].value)
-            format = string.upper(node.attributes["codec"].value)
+            format = node.attributes["codec"].value.upper()
             pid = int(node.attributes["id"].value)
             if not found:
                 audio1 = (index, format, pid, lang)
@@ -4183,7 +4231,7 @@ def selectStreams(folder):
         for node in nodes:
             index = int(node.attributes["ffmpegindex"].value)
             lang = node.attributes["language"].value
-            format = string.upper(node.attributes["codec"].value)
+            format = node.attributes["codec"].value.upper()
             pid = int(node.attributes["id"].value)
             if lang == preferredlang2 and format == "AC3":
                 if found:
@@ -4198,7 +4246,7 @@ def selectStreams(folder):
             for node in nodes:
                 index = int(node.attributes["ffmpegindex"].value)
                 lang = node.attributes["language"].value
-                format = string.upper(node.attributes["codec"].value)
+                format = node.attributes["codec"].value.upper()
                 pid = int(node.attributes["id"].value)
                 if lang == preferredlang2 and format == "MP2":
                     if found:
@@ -4212,7 +4260,7 @@ def selectStreams(folder):
         if not found:
             for node in nodes:
                 index = int(node.attributes["ffmpegindex"].value)
-                format = string.upper(node.attributes["codec"].value)
+                format = node.attributes["codec"].value.upper()
                 pid = int(node.attributes["id"].value)
                 if not found:
                     # make sure we don't choose the same stream as audio1
@@ -4266,7 +4314,7 @@ def selectSubtitleStream(folder):
     for node in nodes:
         index = int(node.attributes["ffmpegindex"].value)
         lang = node.attributes["language"].value
-        format = string.upper(node.attributes["codec"].value)
+        format = node.attributes["codec"].value.upper()
         pid = int(node.attributes["id"].value)
         if not found and lang == preferredlang1 and format == "dvbsub":
             subtitle = (index, format, pid, lang)
@@ -4277,7 +4325,7 @@ def selectSubtitleStream(folder):
         for node in nodes:
             index = int(node.attributes["ffmpegindex"].value)
             lang = node.attributes["language"].value
-            format = string.upper(node.attributes["codec"].value)
+            format = node.attributes["codec"].value.upper()
             pid = int(node.attributes["id"].value)
             if not found and lang == preferredlang2 and format == "dvbsub":
                 subtitle = (index, format, pid, lang)
@@ -4287,7 +4335,7 @@ def selectSubtitleStream(folder):
     if not found:
         for node in nodes:
             index = int(node.attributes["ffmpegindex"].value)
-            format = string.upper(node.attributes["codec"].value)
+            format = node.attributes["codec"].value.upper()
             pid = int(node.attributes["id"].value)
             if not found:
                 subtitle = (index, format, pid, lang)
@@ -4414,10 +4462,11 @@ def getStreamList(folder):
 def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
 
-    if not string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
+    if not getVideoCodec(folder).lower().startswith("mpeg2video"):
         return False
 
-#    if string.lower(getAudioCodec(folder)) != "ac3" and encodeToAC3:
+
+#    if (getAudioCodec(folder)).lower() != "ac3" and encodeToAC3:
 #        return False
 
     videosize = getVideoSize(os.path.join(folder, "streaminfo.xml"))
@@ -4454,7 +4503,7 @@ def processFile(file, folder, count):
 
 #############################################################
 # process a single file ready for burning using mythtranscode/mythreplex
-# to cut and demux 
+# to cut and demux
 
 def doProcessFile(file, folder, count):
     """Process a single video/recording file ready for burning."""
@@ -4494,7 +4543,7 @@ def doProcessFile(file, folder, count):
         #can only use mythtranscode to cut commercials on mpeg2 files
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
-        if string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
+        if (getVideoCodec(folder)).lower().startswith("mpeg2video"):
             if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
                 # Run from local file?
                 if file.hasAttribute("localfilename"):
@@ -4510,8 +4559,8 @@ def doProcessFile(file, folder, count):
                     write("Failed to run mythtranscode to remove unwanted segments")
             else:
                 #does the user always want to run recordings through mythtranscode?
-                #may help to fix any errors in the file 
-                if (alwaysRunMythtranscode == True or 
+                #may help to fix any errors in the file
+                if (alwaysRunMythtranscode == True or
                         (getFileType(folder) == "mpegts" and isFileOkayForDVD(file, folder))):
                     # Run from local file?
                     if file.hasAttribute("localfilename"):
@@ -4527,12 +4576,12 @@ def doProcessFile(file, folder, count):
                         write("Failed to run mythtranscode to fix any errors")
     else:
         #does the user always want to run mpeg2 files through mythtranscode?
-        #may help to fix any errors in the file 
+        #may help to fix any errors in the file
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
 
         if (alwaysRunMythtranscode == True and
-                string.lower(getVideoCodec(folder)).startswith("mpeg2video") and
+                getVideoCodec(folder).lower().startswith("mpeg2video")  and
                 isFileOkayForDVD(file, folder)):
             if file.hasAttribute("localfilename"):
                 localfile = file.attributes["localfilename"].value
@@ -4579,7 +4628,7 @@ def doProcessFile(file, folder, count):
                 mediafile = -1
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-                usecutlist = (file.attributes["usecutlist"].value == "1" and 
+                usecutlist = (file.attributes["usecutlist"].value == "1" and
                             getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
             else:
                 chanid = -1
@@ -4612,7 +4661,7 @@ def doProcessFile(file, folder, count):
             else:
                 profile = defaultEncodingProfile
 
-            #do the re-encode 
+            #do the re-encode
             encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
                             audio1, audio2, aspectratio, profile)
             mediafile = os.path.join(folder, 'newfile2.mpg')
@@ -4677,7 +4726,7 @@ def doProcessFileProjectX(file, folder, count):
 
     #As part of this routine we need to pre-process the video this MAY mean:
     #1. encoding to mpeg2 (if its an avi for instance or isn't DVD compatible)
-    #2. removing commercials/cleaning up mpeg2 stream 
+    #2. removing commercials/cleaning up mpeg2 stream
     #3. selecting audio track(s) to use and encoding audio from mp2 into ac3
     #4. de-multiplexing into video and audio steams
 
@@ -4733,7 +4782,7 @@ def doProcessFileProjectX(file, folder, count):
                 mediafile = -1
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-                usecutlist = (file.attributes["usecutlist"].value == "1" and 
+                usecutlist = (file.attributes["usecutlist"].value == "1" and
                             getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
             else:
                 chanid = -1
@@ -4766,7 +4815,7 @@ def doProcessFileProjectX(file, folder, count):
             else:
                 profile = defaultEncodingProfile
 
-            #do the re-encode 
+            #do the re-encode
             encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
                             audio1, audio2, aspectratio, profile)
             mediafile = os.path.join(folder, 'newfile2.mpg')
@@ -4787,7 +4836,7 @@ def doProcessFileProjectX(file, folder, count):
     # now attempt to split the source file into video and audio parts
     # using projectX
 
-    # If this is an mpeg2 myth recording and there is a cut list available and the 
+    # If this is an mpeg2 myth recording and there is a cut list available and the
     # user wants to use it run projectx to cut out commercials etc
     if file.attributes["type"].value == "recording":
         if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
@@ -4995,7 +5044,7 @@ def processJob(job):
                 filecount+=1
                 folder=getItemTempPath(filecount)
                 #Multiplex this file
-                #(This also removes non-required audio feeds inside mpeg streams 
+                #(This also removes non-required audio feeds inside mpeg streams
                 #(through re-multiplexing) we only take 1 video and 1 or 2 audio streams)
                 pid=multiplexMPEGStream(os.path.join(folder,'stream.mv2'),
                         os.path.join(folder,'stream0'),
@@ -5166,7 +5215,7 @@ def main():
     videopath = defaultsettings.get("VideoStartupDir", None)
     gallerypath = defaultsettings.get("GalleryDir", None)
     musicpath = defaultsettings.get("MusicLocation", None)
-    videomode = string.lower(defaultsettings["MythArchiveVideoFormat"])
+    videomode = defaultsettings["MythArchiveVideoFormat"].lower()
     temppath = os.path.join(defaultsettings["MythArchiveTempDir"], "work")
     logpath = os.path.join(defaultsettings["MythArchiveTempDir"], "logs")
     write("temppath: " + temppath)
@@ -5233,12 +5282,12 @@ def main():
         try:
             fd = os.open(lckpath, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
             try:
-                os.write(fd, "%d\n" % os.getpid())
+                os.write(fd, b"%d\n" % os.getpid())
                 os.close(fd)
             except:
                 os.remove(lckpath)
                 raise
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EEXIST:
                 write("Lock file exists -- already running???")
                 sys.exit(1)
@@ -5281,7 +5330,7 @@ def main():
             # remove our lock file
             os.remove(lckpath)
 
-            # make sure the files we created are read/writable by all 
+            # make sure the files we created are read/writable by all
             os.system("chmod -R a+rw-x+X %s" % defaultsettings["MythArchiveTempDir"])
     except SystemExit:
         write("Terminated")
