@@ -41,7 +41,7 @@
 #define CU_CTX_SCHED_BLOCKING_SYNC 4
 
 typedef int CUdevice;
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__LP64__)
 typedef unsigned long long CUdeviceptr;
 #else
 typedef unsigned int CUdeviceptr;
