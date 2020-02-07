@@ -279,12 +279,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             m_ringBuffer->Read(&m_extraData, frameheader.packetlength);
 #if HAVE_BIGENDIAN
-            struct extendeddata *ed = &m_extradata;
+            struct extendeddata *ed = &m_extraData;
             ed->version                 = bswap_32(ed->version);
             ed->video_fourcc            = bswap_32(ed->video_fourcc);
             ed->audio_fourcc            = bswap_32(ed->audio_fourcc);
             ed->audio_sample_rate       = bswap_32(ed->audio_sample_rate);
-            ed->audio_bitsPerSample     = bswap_32(ed->audio_BitsPerSample);
+            ed->audio_bits_per_sample   = bswap_32(ed->audio_bits_per_sample);
             ed->audio_channels          = bswap_32(ed->audio_channels);
             ed->audio_compression_ratio = bswap_32(ed->audio_compression_ratio);
             ed->audio_quality           = bswap_32(ed->audio_quality);
@@ -494,7 +494,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_audioSamplerate = m_extraData.audio_sample_rate;
 #if HAVE_BIGENDIAN
         // Why only if using extradata?
-        m_audio_bits_per_sample = m_extraData.audio_bits_per_sample;
+        m_audioBitsPerSample = m_extraData.audio_bits_per_sample;
 #endif
         AudioFormat format = FORMAT_NONE;
         switch (m_extraData.audio_bits_per_sample)
@@ -1271,7 +1271,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 #if HAVE_BIGENDIAN
                 // Why endian correct the audio buffer here?
                 // Don't big-endian clients have to do it in audiooutBlah.cpp?
-                if (m_audio_bits_per_sample == 16) {
+                if (m_audioBitsPerSample == 16) {
                     // swap bytes
                     for (int i = 0; i < (m_frameHeader.packetlength & ~1); i+=2) {
                         char tmp;
