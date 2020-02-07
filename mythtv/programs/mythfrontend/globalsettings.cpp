@@ -80,8 +80,8 @@ static HostComboBoxSetting *ColourPrimaries()
     gc->setHelpText(PlaybackSettings::tr(
         "Converting between different primary colourspaces incurs a small "
         "performance penalty but in some situations the difference in output is "
-        "barely noticeable. The default ('Auto') behavour is to only enforce "
-        "this converion when there is a significant difference between source "
+        "negligible. The default ('Auto') behaviour is to only enforce "
+        "this conversion when there is a significant difference between source "
         "colourspace primaries and the display."));
     return gc;
 }
