@@ -25,6 +25,7 @@ class MythNVDECContext : public MythCodecContext
 {
   public:
     MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID);
+   ~MythNVDECContext() override;
     void InitVideoCodec                  (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     int  HwDecoderInit                   (AVCodecContext *Context) override;
     bool RetrieveFrame                   (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
@@ -65,6 +66,9 @@ class MythNVDECContext : public MythCodecContext
     };
 
   private:
+    void          InitFramesContext(AVCodecContext *Context);
+    AVBufferRef*  m_framesContext { nullptr };
+
     static const std::vector<MythNVDECCaps>& GetProfiles(void);
     MythDeintType m_deinterlacer         { DEINT_NONE  };
     bool          m_deinterlacer2x       { false       };
