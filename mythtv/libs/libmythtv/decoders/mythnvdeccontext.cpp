@@ -18,6 +18,11 @@ MythNVDECContext::MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
+MythNVDECContext::~MythNVDECContext()
+{
+    av_buffer_unref(&m_framesContext);
+}
+
 /*! \brief Determine whether NVDEC decoding is supported for this codec.
  *
  * The objective here is, as for other decoders, to fail fast so that we can fallback
@@ -360,30 +365,12 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
     {
         if (*PixFmt == AV_PIX_FMT_CUDA)
         {
-            // the mpeg2 decoder in particular seems to call GetFormat spontaneously
-            // i.e. not during an apparent stream change. In this case we need
-            // to release the video buffers otherwise they try and release deceased
-            // decoder context
             AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-            if (decoder && decoder->GetPlayer() && codec_is_nvdec(decoder->GetVideoCodecID()))
-                decoder->GetPlayer()->DiscardVideoFrames(true, true);
-
-            AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
-            AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
-            frames->free = MythCodecContext::FramesContextFinished;
-            frames->user_opaque = nullptr;
-            frames->sw_format = Context->sw_pix_fmt;
-            frames->format    = AV_PIX_FMT_CUDA;
-            frames->width     = Context->coded_width;
-            frames->height    = Context->coded_height;
-            if (av_hwframe_ctx_init(framesref) < 0)
+            if (decoder)
             {
-                av_buffer_unref(&framesref);
-            }
-            else
-            {
-                Context->hw_frames_ctx = framesref;
-                NewHardwareFramesContext();
+                MythNVDECContext* me = dynamic_cast<MythNVDECContext*>(decoder->GetMythCodecContext());
+                if (me)
+                    me->InitFramesContext(Context);
             }
             return AV_PIX_FMT_CUDA;
         }
@@ -635,3 +622,45 @@ const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfile
     return s_profiles;
 }
 
+void MythNVDECContext::InitFramesContext(AVCodecContext *Context)
+{
+    if (!Context)
+        return;
+
+    if (m_framesContext)
+    {
+        AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
+        if ((frames->sw_format == Context->sw_pix_fmt) && (frames->width == Context->coded_width) &&
+            (frames->height == Context->coded_height))
+        {
+            Context->hw_frames_ctx = av_buffer_ref(m_framesContext);
+            return;
+        }
+    }
+
+    // If this is a 'spontaneous' callback from FFmpeg (i.e. not on a stream change)
+    // then we must release any direct render buffers.
+    if (codec_is_nvdec(m_codecID) && m_parent->GetPlayer())
+        m_parent->GetPlayer()->DiscardVideoFrames(true, true);
+
+    av_buffer_unref(&m_framesContext);
+
+    AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
+    AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
+    frames->free = MythCodecContext::FramesContextFinished;
+    frames->user_opaque = nullptr;
+    frames->sw_format = Context->sw_pix_fmt;
+    frames->format    = AV_PIX_FMT_CUDA;
+    frames->width     = Context->coded_width;
+    frames->height    = Context->coded_height;
+    if (av_hwframe_ctx_init(framesref) < 0)
+    {
+        av_buffer_unref(&framesref);
+    }
+    else
+    {
+        Context->hw_frames_ctx = framesref;
+        m_framesContext = av_buffer_ref(framesref);
+        NewHardwareFramesContext();
+    }
+}
