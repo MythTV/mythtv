@@ -173,7 +173,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     // --------------------------------------------------------------
 
     if (bExceptionThrown)
-        throw exception;
+        throw HttpRedirectException(exception);
 
     return vReturn;
 }

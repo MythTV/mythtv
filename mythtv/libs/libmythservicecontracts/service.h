@@ -85,7 +85,7 @@ inline Service::Service(QObject *parent) : QObject(parent)
             {                        \
                 code                 \
             }                        \
-            catch( QString msg )     \
+            catch( QString &msg )    \
             {                        \
                 m_pEngine->currentContext()->throwError( QScriptContext::UnknownError, msg ); \
                 return default;      \

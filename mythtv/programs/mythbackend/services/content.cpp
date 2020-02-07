@@ -70,7 +70,7 @@ QFileInfo Content::GetFile( const QString &sStorageGroup,
 
         //LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw sMsg;
+        throw QString(sMsg);
     }
 
     // ------------------------------------------------------------------
@@ -127,7 +127,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 
         //LOG(VB_UPNP, LOG_WARNING, sMsg);
 
-        throw sMsg;
+        throw QString(sMsg);
     }
 
     // ------------------------------------------------------------------
@@ -217,7 +217,7 @@ QStringList Content::GetDirList( const QString &sStorageGroup )
         QString sMsg( "GetDirList - StorageGroup missing.");
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw sMsg;
+        throw QString(sMsg);
     }
 
     StorageGroup sgroup(sStorageGroup);
@@ -237,7 +237,7 @@ QStringList Content::GetFileList( const QString &sStorageGroup )
         QString sMsg( "GetFileList - StorageGroup missing.");
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw sMsg;
+        throw QString(sMsg);
     }
 
     StorageGroup sgroup(sStorageGroup);
@@ -885,7 +885,7 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
 
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw sMsg;
+        throw QString(sMsg);
     }
 
     // ------------------------------------------------------------------

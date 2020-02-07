@@ -1201,7 +1201,7 @@ uint Dvr::AddRecordSchedule   (
 
     QString msg;
     if (!rule.IsValid(msg))
-        throw msg;
+        throw QString(msg);
 
     rule.Save();
 
@@ -1362,7 +1362,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
 
     QString msg;
     if (!pRule.IsValid(msg))
-        throw msg;
+        throw QString(msg);
 
     bool bResult = pRule.Save();
 
