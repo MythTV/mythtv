@@ -117,7 +117,7 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
  * On return, dest_size will contain the length of the data copied
  * Upon completion, the internal encoder buffer is emptied.
  */
-int SPDIFEncoder::GetData(unsigned char *buffer, int &dest_size)
+int SPDIFEncoder::GetData(unsigned char *buffer, size_t &dest_size)
 {
     if(m_size > 0)
     {

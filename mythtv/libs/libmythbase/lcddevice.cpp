@@ -261,7 +261,7 @@ void LCD::ReadyRead(void)
     // We currently spend most of our time (except for the first line sent
     // back) ignoring it.
 
-    int dataSize = m_socket->bytesAvailable() + 1;
+    int dataSize = static_cast<int>(m_socket->bytesAvailable() + 1);
     QByteArray data(dataSize + 1, 0);
 
     m_socket->read(data.data(), dataSize);

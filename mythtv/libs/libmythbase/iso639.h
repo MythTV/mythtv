@@ -46,9 +46,9 @@ MBASE_PUBLIC  QString     iso639_str2_to_str3(const QString &str2);
 static inline QString iso639_key_to_str3(int code)
 {
     char str[4];
-    str[0] = (code>>16) & 0xFF;
-    str[1] = (code>>8)  & 0xFF;
-    str[2] = code & 0xFF;
+    str[0] = static_cast<char>((code>>16) & 0xFF);
+    str[1] = static_cast<char>((code>>8)  & 0xFF);
+    str[2] = static_cast<char>(code & 0xFF);
     str[3] = 0;
     return QString(str);
 }

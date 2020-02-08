@@ -8,8 +8,8 @@ QRect UIEffects::GetExtent(const QSize &size) const
 {
     int x = 0;
     int y = 0;
-    int zoomedWidth = size.width() * m_hzoom;
-    int zoomedHeight = size.height() * m_vzoom;
+    int zoomedWidth = static_cast<int>(static_cast<float>(size.width()) * m_hzoom);
+    int zoomedHeight = static_cast<int>(static_cast<float>(size.height()) * m_vzoom);
 
     switch (m_centre)
     {

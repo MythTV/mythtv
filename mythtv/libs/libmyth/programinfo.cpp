@@ -3085,7 +3085,7 @@ bool ProgramInfo::QueryIsInUse(QString &byWho) const
     QStringList users;
     bool inuse = QueryIsInUse(users);
     byWho.clear();
-    for (uint i = 0; i+2 < (uint)users.size(); i+=3)
+    for (int i = 0; i+2 < users.size(); i+=3)
         byWho += users[i+2] + "\n";
     return inuse;
 }
@@ -3261,7 +3261,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
     if (setTime)
     {
         QDateTime timeNow = MythDate::current();
-        int delay = m_recStartTs.secsTo(timeNow) / 3600;
+        qint64 delay = m_recStartTs.secsTo(timeNow) / 3600;
 
         if (delay > 200)
             delay = 200;
@@ -5566,7 +5566,7 @@ bool LoadFromProgram( ProgramList &destination,
                 query.value(14).toString(), // programid
                 string_to_myth_category_type(query.value(18).toString()), // catType
 
-                query.value(16).toDouble(), // stars
+                query.value(16).toFloat(), // stars
                 query.value(15).toUInt(), // year
                 query.value(27).toUInt(), // partnumber
                 query.value(28).toUInt(), // parttotal
@@ -5993,7 +5993,7 @@ bool LoadFromRecorded(
                 MythDate::as_utc(query.value(24).toDateTime()), // recstartts
                 MythDate::as_utc(query.value(25).toDateTime()), // recendts
 
-                query.value(23).toDouble(), // stars
+                query.value(23).toFloat(), // stars
 
                 query.value(26).toUInt(), // year
                 query.value(49).toUInt(), // partnumber

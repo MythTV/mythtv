@@ -17,16 +17,16 @@ class UIEffects
 
     QPointF GetCentre(const QRect &rect, int xoff, int yoff) const
     {
-        float x = xoff + rect.left();
-        float y = yoff + rect.top();
+        float x = static_cast<float>(xoff) + static_cast<float>(rect.left());
+        float y = static_cast<float>(yoff) + static_cast<float>(rect.top());
         if (Middle == m_centre || Top == m_centre || Bottom == m_centre)
-            x += rect.width() / 2.0F;
+            x += static_cast<float>(rect.width()) / 2.0F;
         if (Middle == m_centre || Left == m_centre || Right == m_centre)
-            y += rect.height() / 2.0F;
+            y += static_cast<float>(rect.height()) / 2.0F;
         if (Right == m_centre || TopRight == m_centre || BottomRight == m_centre)
-            x += rect.width();
+            x += static_cast<float>(rect.width());
         if (Bottom == m_centre || BottomLeft == m_centre || BottomRight == m_centre)
-            y += rect.height();
+            y += static_cast<float>(rect.height());
         return {x, y};
     }
 
