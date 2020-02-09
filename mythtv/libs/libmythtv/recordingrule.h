@@ -81,36 +81,37 @@ class MTV_PUBLIC RecordingRule
     QString                m_subtitle;
     QString                m_sortSubtitle;
     QString                m_description;
-    uint                   m_season             {0};
-    uint                   m_episode            {0};
     QString                m_category;
-
-    QTime                  m_starttime;
-    QDate                  m_startdate;
-    QTime                  m_endtime;
-    QDate                  m_enddate;
 
     QString                m_seriesid;
     QString                m_programid;
     // String could be null when we trying to insert into DB
     QString                m_inetref;
 
+    QDate                  m_startdate;
+    QDate                  m_enddate;
+    QTime                  m_starttime;
+    QTime                  m_endtime;
+
+    uint                   m_season             {0};
+    uint                   m_episode            {0};
+
     // Associated data for rule types
     int                    m_channelid          {0};
     QString                m_station;     /// callsign?
-    /// Day of the week for once per week etc
-    int                    m_findday            {0};
     /// Time for timeslot rules
     QTime                  m_findtime;
     int                    m_findid;
+    /// Day of the week for once per week etc
+    int                    m_findday            {0};
 
     // Scheduling Options
-    RecordingType          m_type               {kNotRecording};
-    RecSearchType          m_searchType         {kNoSearch};
     int                    m_recPriority        {0};
     int                    m_prefInput          {0};
     int                    m_startOffset        {0};
     int                    m_endOffset          {0};
+    RecordingType          m_type               {kNotRecording};
+    RecSearchType          m_searchType         {kNoSearch};
     RecordingDupMethodType m_dupMethod          {kDupCheckSubThenDesc};
     RecordingDupInType     m_dupIn              {kDupsInAll};
     unsigned               m_filter             {0};
@@ -118,18 +119,18 @@ class MTV_PUBLIC RecordingRule
     // Storage Options
     // TODO: These should all be converted to integer IDs instead
     QString                m_recProfile         {tr("Default")};
-    uint                   m_recGroupID         {RecordingInfo::kDefaultRecGroup};
     QString                m_storageGroup       {tr("Default")};
     QString                m_playGroup          {tr("Default")};
+    uint                   m_recGroupID         {RecordingInfo::kDefaultRecGroup};
 
-    bool                   m_autoExpire         {false};
     int                    m_maxEpisodes        {0};
+    bool                   m_autoExpire         {false};
     bool                   m_maxNewest          {false};
 
     // Post Processing Options
+    int                    m_transcoder;
     bool                   m_autoCommFlag       {true};
     bool                   m_autoTranscode      {false};
-    int                    m_transcoder;
     bool                   m_autoUserJob1       {false};
     bool                   m_autoUserJob2       {false};
     bool                   m_autoUserJob3       {false};
@@ -138,10 +139,10 @@ class MTV_PUBLIC RecordingRule
 
     // Statistic fields - Used to generate statistics about particular rules
     // and influence watch list weighting
+    int                    m_averageDelay       {100};
     QDateTime              m_nextRecording;
     QDateTime              m_lastRecorded;
     QDateTime              m_lastDeleted;
-    int                    m_averageDelay       {100};
 
     // Temporary table related - Used for schedule previews
     QString                m_recordTable        {"record"};
