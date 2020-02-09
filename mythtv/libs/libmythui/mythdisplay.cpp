@@ -735,6 +735,8 @@ int MythDisplay::GetRefreshInterval(int Fallback)
 {
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
         return static_cast<int>(lround(1000000.0 / m_refreshRate));
+    if (Fallback > 33000) // ~30Hz
+        Fallback /= 2;
     return Fallback;
 }
 
@@ -1028,6 +1030,8 @@ void MythDisplay::DebugModes(void) const
             QStringList rateslist;
             for (auto it2 = rates.crbegin(); it2 != rates.crend(); ++it2)
                 rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
+            if (rateslist.empty())
+                rateslist.append("Variable rate?");
             LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
                 .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));
         }
