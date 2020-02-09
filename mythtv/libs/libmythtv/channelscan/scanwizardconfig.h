@@ -130,6 +130,7 @@ class ScanOptionalConfig : public GroupSetting
     QMap<QString,QString> GetStartChan(void) const;
     uint    GetScanID(void)                  const;
     void    SetTuningPaneValues(uint frequency, const DTVMultiplex &mpx);
+    void    SetTuningPaneValuesATSC(const QString &freqtable);
 
   public slots:
     void SetSourceID(const QString &sourceid);

@@ -60,6 +60,9 @@ class PaneATSC : public GroupSetting
         }
     }
 
+    void SetFrequencyTable(const QString &atsc_table)
+        { m_atsc_table->setValue(atsc_table); }
+
     QString GetFrequencyTable(void) const
         { return m_atsc_table->getValue(); }
     QString GetModulation(void) const
