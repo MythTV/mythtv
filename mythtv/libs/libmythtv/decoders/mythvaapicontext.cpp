@@ -627,11 +627,13 @@ void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
     {
         Context->get_buffer2 = MythCodecContext::GetBuffer;
         Context->get_format  = MythVAAPIContext::GetFormat;
+        Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
         return;
     }
     if (codec_is_vaapi_dec(m_codecID))
     {
         Context->get_format = MythVAAPIContext::GetFormat2;
+        Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
         DirectRendering = false;
         return;
     }
