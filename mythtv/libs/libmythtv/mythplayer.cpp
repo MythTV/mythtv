@@ -1624,9 +1624,11 @@ void MythPlayer::AVSync(VideoFrame *buffer)
         else
             framedue = unow + m_frameInterval / 2;
 
+        // This code is disabled as it appears to cause multiple issues. It is
+        // retained for future reference...
         // recalculate m_framesPlayed to conform to actual time code.
-        m_framesPlayed = TranslatePositionMsToFrame(static_cast<uint64_t>(videotimecode + m_timeOffsetBase), false);
-        m_decoder->SetFramesPlayed(static_cast<long long>(m_framesPlayed));
+        //m_framesPlayed = TranslatePositionMsToFrame(static_cast<uint64_t>(videotimecode + m_timeOffsetBase), false);
+        //m_decoder->SetFramesPlayed(static_cast<long long>(m_framesPlayed));
 
         lateness = unow - framedue;
         dropframe = false;
