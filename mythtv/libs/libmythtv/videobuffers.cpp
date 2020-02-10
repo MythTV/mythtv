@@ -104,7 +104,9 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
     switch (PixelFormat)
     {
         case FMT_DXVA2: return 30;
-        case FMT_VTB:   return 24;
+        // It is currrently unclear whether VTB just happy with a smaller buffer size
+        // or needs reference frames plus headroom - use the latter for now.
+        case FMT_VTB:   return refs + 8;
         // Max 16 ref frames, 12 headroom and allocate 2 extra in the VAAPI frames
         // context for additional references held by the VPP deinterlacer (i.e.
         // prevent buffer starvation in the decoder)
