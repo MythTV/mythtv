@@ -1167,7 +1167,7 @@ class DBCache( MythSchema ):
                 self._db = db
                 self._host = host
                 self._log = log
-                if host is 'NULL':
+                if host == 'NULL':
                     self._insert = """INSERT INTO settings
                                              (value, data, hostname)
                                       VALUES (?, ?, NULL)"""
