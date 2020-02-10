@@ -270,7 +270,7 @@ bool MythPlayer::Pause(void)
         if (FlagIsSet(kVideoIsNull) && m_decoder)
             m_decoder->UpdateFramesPlayed();
         else if (m_videoOutput && !FlagIsSet(kVideoIsNull))
-            m_framesPlayed = m_videoOutput->GetFramesPlayed() + m_framesPlayedExtra;
+            m_framesPlayed = m_videoOutput->GetFramesPlayed();
     }
     m_pauseLock.unlock();
     return already_paused;
@@ -860,7 +860,6 @@ int MythPlayer::OpenFile(int Retries)
 void MythPlayer::SetFramesPlayed(uint64_t played)
 {
     m_framesPlayed = played;
-    m_framesPlayedExtra = 0;
     if (m_videoOutput)
         m_videoOutput->SetFramesPlayed(played);
 }
@@ -2194,7 +2193,7 @@ bool MythPlayer::VideoLoop(void)
     else if (m_decoder && m_decoder->GetEof() != kEofStateNone)
         ++m_framesPlayed;
     else
-        m_framesPlayed = m_videoOutput->GetFramesPlayed() + m_framesPlayedExtra;
+        m_framesPlayed = m_videoOutput->GetFramesPlayed();
     return !IsErrored();
 }
 
@@ -2289,7 +2288,7 @@ void MythPlayer::ResetPlaying(bool resetframes)
     ClearAfterSeek();
     m_ffrewSkip = 1;
     if (resetframes)
-        m_framesPlayed = m_framesPlayedExtra = 0;
+        m_framesPlayed = 0;
     if (m_decoder)
     {
         m_decoder->Reset(true, true, true);
@@ -2602,7 +2601,6 @@ bool MythPlayer::StartPlaying(void)
     }
 
     m_framesPlayed = 0;
-    m_framesPlayedExtra = 0;
     m_rewindTime = m_ffTime = 0;
     m_nextPlaySpeed = m_audio.GetStretchFactor();
     m_jumpChapter = 0;
@@ -4594,7 +4592,6 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     }
 
     m_framesPlayed = 0;
-    m_framesPlayedExtra = 0;
     ClearAfterSeek();
 
     if (copyvideo && m_decoder)
