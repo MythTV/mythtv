@@ -1719,8 +1719,8 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     if (dropframe)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("dropping frame to catch up, lateness=%1 usec")
-                .arg(lateness));
+            QString("Dropping frame: Video is behind by %1ms").arg(lateness / 1000));
+        m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
     }
     else if (!FlagIsSet(kVideoIsNull) && buffer)
     {
