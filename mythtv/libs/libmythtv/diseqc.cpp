@@ -221,7 +221,7 @@ double DiSEqCDevSettings::GetValue(uint devid) const
 void DiSEqCDevSettings::SetValue(uint devid, double value)
 {
     m_config[devid] = value;
-    m_inputId = (uint) -1;
+    m_inputId = UINT_MAX;
 }
 
 //////////////////////////////////////// DiSEqCDev
@@ -542,7 +542,7 @@ void DiSEqCDevTree::Reset(void)
     if (m_root)
         m_root->Reset();
 
-    m_lastVoltage = (uint) -1;
+    m_lastVoltage = UINT_MAX;
 }
 
 /** \fn DiSEqCDevTree::FindRotor(const DiSEqCDevSettings&,uint)
@@ -1142,9 +1142,9 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
 
 void DiSEqCDevSwitch::Reset(void)
 {
-    m_lastPos = (uint) -1;
-    m_lastHighBand = (uint) -1;
-    m_lastHorizontal = (uint) -1;
+    m_lastPos = UINT_MAX;
+    m_lastHighBand = UINT_MAX;
+    m_lastHorizontal = UINT_MAX;
     for (auto & child : m_children)
     {
         if (child)
