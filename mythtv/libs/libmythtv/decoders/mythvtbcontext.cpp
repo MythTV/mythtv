@@ -64,56 +64,8 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
     return -1;
 }
 
-bool MythVTBContext::CheckDecoderSupport(AVCodecContext **Context, uint StreamType)
-{
-    static bool initialised = false;
-    static QVector<uint> supported;
-    if (!initialised)
-    {
-        initialised = true;
-        if (__builtin_available(macOS 10.13, *))
-        {
-            QStringList debug;
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG1Video)) { supported.append(1); debug << "MPEG1"; }
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG2Video)) { supported.append(2); debug << "MPEG2"; }
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_H263))       { supported.append(3); debug << "H.263"; }
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG4Video)) { supported.append(4); debug << "MPEG4"; }
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_H264))       { supported.append(5); debug << "H.264"; }
-            if (VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC))       { supported.append(10); debug << "HEVC"; }
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Supported VideoToolBox codecs: %1").arg(debug.join(",")));
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Unable to check hardware decode support. Assuming all.");
-            supported.append(1); supported.append(2); supported.append(3);
-            supported.append(4); supported.append(5); supported.append(10);
-        }
-    }
-
-    QString codec   = ff_codec_id_string((*Context)->codec_id);
-    QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
-    QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
-
-    if (!supported.contains(StreamType))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX))
-                .arg(codec).arg(profile).arg(pixfmt));
-        return false;
-    }
-
-    // There is no guarantee (and no obvious way to check) whether the given H264 or HEVC
-    // profile is actually supported.
-    bool maybe = (StreamType == 5) || (StreamType == 10);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' %2 decoding '%3 %4 %5'")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX))
-            .arg(maybe ? "MAY support" : "supports")
-            .arg(codec).arg(profile).arg(pixfmt));
-    return true;
-}
-
 MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
-                                              AVCodec **,
+                                              AVCodec ** Codec,
                                               const QString &Decoder,
                                               uint StreamType)
 {
@@ -125,9 +77,40 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     // Check decoder support
-    if (!CheckDecoderSupport(Context, StreamType))
+    MythCodecContext::CodecProfile mythprofile = MythCodecContext::NoProfile;
+    switch ((*Codec)->id)
+    {
+        case AV_CODEC_ID_MPEG1VIDEO: mythprofile = MythCodecContext::MPEG1; break;
+        case AV_CODEC_ID_MPEG2VIDEO: mythprofile = MythCodecContext::MPEG2; break;
+        case AV_CODEC_ID_MPEG4:      mythprofile = MythCodecContext::MPEG4; break;
+        case AV_CODEC_ID_H263:       mythprofile = MythCodecContext::H263;  break;
+        case AV_CODEC_ID_H264:       mythprofile = MythCodecContext::H264;  break;
+        case AV_CODEC_ID_VC1:        mythprofile = MythCodecContext::VC1;   break;
+        case AV_CODEC_ID_VP8:        mythprofile = MythCodecContext::VP8;   break;
+        case AV_CODEC_ID_VP9:        mythprofile = MythCodecContext::VP9;   break;
+        case AV_CODEC_ID_HEVC:       mythprofile = MythCodecContext::HEVC;  break;
+        default: break;
+    }
+
+    if (mythprofile == MythCodecContext::NoProfile)
         return failure;
 
+    QString codec   = ff_codec_id_string((*Context)->codec_id);
+    QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
+
+    const VTBProfiles& profiles = MythVTBContext::GetProfiles();
+    if (!profiles.contains(mythprofile))
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VideoToolbox does not support decoding '%1 %2 %3'")
+                .arg(codec).arg(profile).arg(pixfmt));
+        return failure;
+    }
+
+    // There is no guarantee (and no obvious way to check) whether the given
+    // profile is actually supported.
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VideoToolbox MAY support decoding '%1 %2 %3'")
+            .arg(codec).arg(profile).arg(pixfmt));
     (*Context)->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;
     return success;
 }
@@ -203,3 +186,79 @@ enum AVPixelFormat MythVTBContext::GetFormat(struct AVCodecContext*, const enum 
     }
     return ret;
 }
+
+const VTBProfiles& MythVTBContext::GetProfiles(void)
+{
+    static QMutex lock(QMutex::Recursive);
+    static bool s_initialised = false;
+    static VTBProfiles s_profiles;
+
+    QMutexLocker locker(&lock);
+    if (s_initialised)
+        return s_profiles;
+    s_initialised = true;
+
+    if (__builtin_available(macOS 10.13, *))
+    {
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG1Video)) { s_profiles.append(MythCodecContext::MPEG1); }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG2Video)) { s_profiles.append(MythCodecContext::MPEG2); }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_H263))       { s_profiles.append(MythCodecContext::H263);  }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_MPEG4Video)) { s_profiles.append(MythCodecContext::MPEG4); }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_H264))       { s_profiles.append(MythCodecContext::H264);  }
+        if (VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC))       { s_profiles.append(MythCodecContext::HEVC);  }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Unable to check hardware decode support. Assuming all.");
+        s_profiles.append(MythCodecContext::MPEG1);
+        s_profiles.append(MythCodecContext::MPEG2);
+        s_profiles.append(MythCodecContext::H263);
+        s_profiles.append(MythCodecContext::MPEG4);
+        s_profiles.append(MythCodecContext::H264);
+        s_profiles.append(MythCodecContext::HEVC);
+    }
+
+    return s_profiles;
+}
+
+bool MythVTBContext::HaveVTB(void)
+{
+    static QMutex lock(QMutex::Recursive);
+    QMutexLocker locker(&lock);
+    static bool s_checked = false;
+    static bool s_available = false;
+    if (!s_checked)
+    {
+        const VTBProfiles& profiles = MythVTBContext::GetProfiles();
+        if (profiles.empty())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "No VideoToolbox decoders found");
+        }
+        else
+        {
+            s_available = true;
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VideoToolbox decoders:");
+            QSize size{0, 0};
+            for (auto profile : profiles)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    MythCodecContext::GetProfileDescription(profile, size));
+            }
+        }
+    }
+    s_checked = true;
+    return s_available;
+}
+
+void MythVTBContext::GetDecoderList(QStringList &Decoders)
+{
+    const VTBProfiles& profiles = MythVTBContext::GetProfiles();
+    if (profiles.isEmpty())
+        return;
+
+    QSize size(0, 0);
+    Decoders.append("VideoToolbox:");
+    for (MythCodecContext::CodecProfile profile : profiles)
+        Decoders.append(MythCodecContext::GetProfileDescription(profile, size));
+}
+

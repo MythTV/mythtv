@@ -12,6 +12,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+using VTBProfiles = QList<MythCodecContext::CodecProfile>;
+
 class MythVTBContext : public MythCodecContext
 {
   public:
@@ -29,9 +31,11 @@ class MythVTBContext : public MythCodecContext
                                           uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
+    static bool HaveVTB                  (void);
+    static void GetDecoderList           (QStringList &Decoders);
 
   private:
-    static bool CheckDecoderSupport      (AVCodecContext **Context, uint StreamType);
+    static const VTBProfiles& GetProfiles(void);
     static int  InitialiseDecoder        (AVCodecContext *Context);
 };
 
