@@ -1567,6 +1567,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream)
     {
+        // m_fps is now set 'correctly' in ScanStreams so this additional call
+        // to GetVideoFrameRate may now be redundant
         m_fps = GetVideoFrameRate(stream, enc, true);
         QSize dim    = get_video_dim(*enc);
         int   width  = m_currentWidth  = dim.width();
@@ -2333,10 +2335,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             QString codecName;
             if (enc->codec)
                 codecName = enc->codec->name;
+            // framerate appears to never be set - which is probably why
+            // GetVideoFrameRate never uses it:)
+            // So fallback to the GetVideoFrameRate call which should then ensure
+            // the video display profile gets an accurate frame rate - instead of 0
             if (enc->framerate.den && enc->framerate.num)
                 m_fps = float(enc->framerate.num) / float(enc->framerate.den);
             else
-                m_fps = 0;
+                m_fps = GetVideoFrameRate(stream, enc, true);
             if (!m_isDbIgnored)
             {
                 m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName);
