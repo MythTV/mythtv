@@ -83,8 +83,7 @@ __inline AVRational GetAVTimeBaseQ()
 // Maximum number of sequential invalid data packet errors before we try
 // switching to software decoder. Packet errors are often seen when using
 // hardware contexts and, for example, seeking. Hence this needs to be high and
-// is probably best removed as it is treating the symptoms and not the cause
-// (e.g. VAAPI2 does not currently do any hardware support checks).
+// is probably best removed as it is treating the symptoms and not the cause.
 // See also comment in MythCodecMap::freeCodecContext re trying to free an
 // active hardware context when it is errored.
 #define SEQ_PKT_ERR_MAX 50
