@@ -295,29 +295,30 @@ class DecoderBase
     AudioPlayer         *m_audio                   {nullptr};
     RingBuffer          *m_ringBuffer              {nullptr};
 
-    int                  m_currentWidth            {640};
-    int                  m_currentHeight           {480};
-    float                m_currentAspect           {1.33333F};
     double               m_fps                     {29.97};
     int                  m_fpsMultiplier           {1};
     int                  m_fpsSkip                 {0};
     uint                 m_bitrate                 {4000};
+    int                  m_currentWidth            {640};
+    int                  m_currentHeight           {480};
+    float                m_currentAspect           {1.33333F};
 
     long long            m_framesPlayed            {0};
     long long            m_framesRead              {0};
     unsigned long long   m_frameCounter            {0};
     AVRational           m_totalDuration;
-    long long            m_lastKey                 {0};
     int                  m_keyframeDist            {-1};
+    long long            m_lastKey                 {0};
     long long            m_indexOffset             {0};
     MythAVCopy           m_copyFrame;
+
+    EofState             m_atEof                   {kEofStateNone};
 
     // The totalDuration field is only valid when the video is played
     // from start to finish without any jumping.  trackTotalDuration
     // indicates whether this is the case.
     bool                 m_trackTotalDuration      {false};
 
-    EofState             m_atEof                   {kEofStateNone};
     bool                 m_exitAfterDecoded        {false};
     bool                 m_transcoding             {false};
 
@@ -330,10 +331,10 @@ class DecoderBase
     vector<PosMapEntry>  m_positionMap;
     frm_pos_map_t        m_frameToDurMap; // guarded by m_positionMapLock
     frm_pos_map_t        m_durToFrameMap; // guarded by m_positionMapLock
-    bool                 m_dontSyncPositionMap     {false};
     mutable QDateTime    m_lastPositionMapUpdate; // guarded by m_positionMapLock
 
     uint64_t             m_seekSnap                {UINT64_MAX};
+    bool                 m_dontSyncPositionMap     {false};
     bool                 m_livetv                  {false};
     bool                 m_watchingRecording       {false};
 
@@ -345,8 +346,8 @@ class DecoderBase
     bool                 m_errored                 {false};
 
     bool                 m_waitingForChange        {false};
-    long long            m_readAdjust              {0};
     bool                 m_justAfterChange         {false};
+    long long            m_readAdjust              {0};
     int                  m_videoRotation           {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
