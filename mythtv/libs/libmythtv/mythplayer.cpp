@@ -1871,11 +1871,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - m_framesPlayed;
-            // Sometimes m_framesPlayed > frameCount.  Until that can
-            // be fixed, set framesLeft = 0 so the forced pause below
-            // is performed.
-            if (m_framesPlayed > frameCount)
-                framesLeft = 0;
             auto margin = (uint64_t) (m_videoFrameRate * 3);
             if (framesLeft < margin)
             {
