@@ -861,6 +861,10 @@ void MythUIWebBrowser::Finalize(void)
  */
 void MythUIWebBrowser::Init(void)
 {
+    // only do the initialisation for widgets not being stored in the global object store
+    if (parent() == GetGlobalObjectStore())
+        return;
+
     if (m_initialized)
         return;
 
@@ -1116,6 +1120,9 @@ void MythUIWebBrowser::SetBackgroundColor(QColor color)
  */
 void MythUIWebBrowser::SetActive(bool active)
 {
+    if (!m_browser)
+        return;
+
     if (m_active == active)
         return;
 
@@ -1318,6 +1325,9 @@ QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
 
 void MythUIWebBrowser::Scroll(int dx, int dy)
 {
+    if (!m_browser)
+        return;
+
     QPoint startPos = m_browser->page()->currentFrame()->scrollPosition();
     QPoint endPos = startPos + QPoint(dx, dy);
 
@@ -1427,6 +1437,9 @@ bool MythUIWebBrowser::IsOnTopScreen(void)
 
 void MythUIWebBrowser::UpdateScrollBars(void)
 {
+    if (!m_browser)
+        return;
+
     QPoint position = m_browser->page()->currentFrame()->scrollPosition();
     if (m_verticalScrollbar)
     {
@@ -1453,7 +1466,7 @@ void MythUIWebBrowser::UpdateBuffer(void)
 {
     UpdateScrollBars();
 
-    if (!m_image)
+    if (!m_image || !m_browser)
         return;
 
     if (!m_active || (m_active && !m_browser->hasFocus()))
@@ -1472,6 +1485,9 @@ void MythUIWebBrowser::UpdateBuffer(void)
  */
 void MythUIWebBrowser::Pulse(void)
 {
+    if (!m_browser)
+        return;
+
     if (m_scrollAnimation.IsActive() &&
         m_destinationScrollPos !=
         m_browser->page()->currentFrame()->scrollPosition())
@@ -1514,6 +1530,9 @@ void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
  */
 bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 {
+    if (!m_browser)
+        return false;
+
     QStringList actions;
     bool handled = false;
     handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
