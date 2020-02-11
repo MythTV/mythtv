@@ -17,7 +17,7 @@ MythMMALContext::MythMMALContext(DecoderBase *Parent, MythCodecID Codec)
 MythMMALContext::~MythMMALContext()
 {
     if (m_interop)
-        m_interop->DecrRef();
+        DestroyInterop(m_interop);
 }
 
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,

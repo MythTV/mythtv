@@ -33,7 +33,7 @@ MythDRMPRIMEContext::MythDRMPRIMEContext(DecoderBase *Parent, MythCodecID CodecI
 MythDRMPRIMEContext::~MythDRMPRIMEContext()
 {
     if (m_interop)
-        m_interop->DecrRef();
+        DestroyInterop(m_interop);
 }
 
 MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
