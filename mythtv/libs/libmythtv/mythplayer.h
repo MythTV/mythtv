@@ -733,9 +733,6 @@ class MTV_PUBLIC MythPlayer
     /// How often we have tried to wait for a video output buffer and failed
     int       m_videobufRetries           {0};
     uint64_t  m_framesPlayed              {0};
-    // "Fake" frame counter for when the container frame rate doesn't
-    // match the stream frame rate.
-    uint64_t  m_framesPlayedExtra         {0};
     uint64_t  m_totalFrames               {0};
     long long m_totalLength               {0};
     int64_t   m_totalDuration             {0};

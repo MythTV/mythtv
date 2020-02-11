@@ -606,7 +606,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     bool hwframes = false;
     bool useframebufferimage = false;
 
-    // We lose the pause frame when seeking and using VDPAU or VAAPI direct rendering.
+    // We lose the pause frame when seeking and using VDPAU/VAAPI/NVDEC direct rendering.
     // As a workaround, we always use the resize stage so the last displayed frame
     // should be retained in the Framebuffer used for resizing. If there is
     // nothing to display, then fallback to this framebuffer.

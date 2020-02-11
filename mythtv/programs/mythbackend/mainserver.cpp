@@ -3318,9 +3318,9 @@ bool MainServer::HandleAddChildInput(uint inputid)
     TVRec::s_inputsLock.unlock();
     m_addChildInputLock.unlock();
 
-    LOG(VB_GENERAL, LOG_ERR, LOC +
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("HandleAddChildInput: "
-                "Succesffuly handled input %1").arg(inputid));
+                "Successfully handled input %1").arg(inputid));
 
     return true;
 }

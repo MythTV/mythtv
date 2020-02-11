@@ -427,7 +427,7 @@ class MARKUPLIST( object ):
         if len(start) > len(stop):
             # endpoint missing, no known better option
             stop.append(9999999)
-        return zip(start, stop)
+        return list(zip(start, stop))
 
 def levenshtein(s1, s2):
     """Compute the Levenshtein distance of two strings."""

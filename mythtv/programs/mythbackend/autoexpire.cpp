@@ -134,15 +134,15 @@ void AutoExpire::CalcParams()
         // without handling that issue too.  It is done this way
         // because the scheduler thread can't afford to be blocked by
         // an unresponsive, remote filesystem and the autoexpirer
-        // thrad can.
+        // thread can.
         m_mainServer->GetFilesystemInfos(fsInfos, false);
     }
     m_instanceLock.unlock();
 
     if (fsInfos.empty())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Filesystem Info cache is empty, unable "                                       "to calculate necessary parameters.");
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Filesystem Info cache is empty, unable " 
+                                       "to calculate necessary parameters.");
         return;
     }
 
@@ -154,9 +154,9 @@ void AutoExpire::CalcParams()
     QMap<int, uint64_t> fsMap;
     QMap<int, vector<int> > fsEncoderMap;
 
-    // we use this copying on purpose. The used_encoders map ensures
+    // We use this copying on purpose. The used_encoders map ensures
     // that every encoder writes only to one fs.
-    // Copying the data minimizes the time the lock is held
+    // Copying the data minimizes the time the lock is held.
     m_instanceLock.lock();
     QMap<int, int>::const_iterator ueit = m_usedEncoders.begin();
     while (ueit != m_usedEncoders.end())
@@ -196,7 +196,7 @@ void AutoExpire::CalcParams()
                 {
                     // remove encoder since it can't write to any file system
                     LOG(VB_FILE, LOG_INFO, LOC +
-                        QString("Cardid %1: is not recoding, removing it "
+                        QString("Cardid %1: is not recording, removing it "
                                 "from used list.").arg(cardid));
                     m_instanceLock.lock();
                     m_usedEncoders.remove(cardid);

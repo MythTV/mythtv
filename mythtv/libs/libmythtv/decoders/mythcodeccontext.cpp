@@ -133,6 +133,9 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 #ifdef USING_V4L2
     MythV4L2M2MContext::GetDecoderList(decoders);
 #endif
+#ifdef USING_VTB
+    MythVTBContext::GetDecoderList(decoders);
+#endif
     return decoders;
 }
 
@@ -183,10 +186,13 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_VTB
-    Opts.decoders->append("vtb");
-    Opts.decoders->append("vtb-dec");
-    (*Opts.equiv_decoders)["vtb"].append("dummy");
-    (*Opts.equiv_decoders)["vtb-dec"].append("dummy");
+    if (MythVTBContext::HaveVTB())
+    {
+        Opts.decoders->append("vtb");
+        Opts.decoders->append("vtb-dec");
+        (*Opts.equiv_decoders)["vtb"].append("dummy");
+        (*Opts.equiv_decoders)["vtb-dec"].append("dummy");
+    }
 #endif
 #ifdef USING_V4L2
     if (MythV4L2M2MContext::HaveV4L2Codecs())

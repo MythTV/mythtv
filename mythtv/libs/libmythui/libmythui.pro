@@ -199,10 +199,6 @@ using_opengl {
     HEADERS += opengl/mythegl.h
     SOURCES += opengl/mythegl.cpp
 
-    using_opengles {
-        DEFINES += USING_OPENGLES
-    }
-
     using_egl {
         LIBS    += -lEGL
         DEFINES += USING_EGL

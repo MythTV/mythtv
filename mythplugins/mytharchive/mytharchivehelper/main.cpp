@@ -352,7 +352,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         if (!burnISOImage(mediaType, bEraseDVDRW, true))
         {
             LOG(VB_JOBQUEUE, LOG_ERR,
-                "Native archive job failed to completed");
+                "Native archive job failed to complete");
             return 1;
         }
     }
@@ -362,7 +362,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
     {
         if (!createISOImage(saveDirectory))
         {
-            LOG(VB_JOBQUEUE, LOG_ERR, "Native archive job failed to completed");
+            LOG(VB_JOBQUEUE, LOG_ERR, "Native archive job failed to complete");
             return 1;
         }
     }

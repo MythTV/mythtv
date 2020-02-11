@@ -460,8 +460,6 @@ using_frontend {
 
     using_opengl {
         DEFINES += USING_OPENGL
-        using_opengles: DEFINES += USING_OPENGLES
-
         HEADERS += opengl/mythopenglvideo.h
         HEADERS += opengl/mythvideooutopengl.h
         HEADERS += opengl/mythopenglvideoshaders.h

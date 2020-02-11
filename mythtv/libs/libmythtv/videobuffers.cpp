@@ -104,7 +104,9 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
     switch (PixelFormat)
     {
         case FMT_DXVA2: return 30;
-        case FMT_VTB:   return 24;
+        // It is currrently unclear whether VTB just happy with a smaller buffer size
+        // or needs reference frames plus headroom - use the latter for now.
+        case FMT_VTB:   return refs + 8;
         // Max 16 ref frames, 12 headroom and allocate 2 extra in the VAAPI frames
         // context for additional references held by the VPP deinterlacer (i.e.
         // prevent buffer starvation in the decoder)
@@ -284,7 +286,7 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
 
-        if (format_is_hwframes(Frame->codec) || (Frame->codec == FMT_NVDEC))
+        if (format_is_hwframes(Frame->codec))
         {
             ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (ref != nullptr)
@@ -841,7 +843,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     {
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
            .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
         return success;
     }

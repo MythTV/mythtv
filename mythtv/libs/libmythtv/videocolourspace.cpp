@@ -85,6 +85,11 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
     SetFullRange(m_dbSettings[kPictureAttribute_Range] != 0);
+
+    // This isn't working as intended (most notable on OSX internal display).
+    // Presumably the driver is expecting sRGB/Rec709 and handles any final
+    // conversion to the display's colourspace.
+    /*
     if (HasMythMainWindow())
     {
         MythDisplay* display = MythDisplay::AcquireRelease();
@@ -110,6 +115,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         }
         MythDisplay::AcquireRelease(false);
     }
+    */
     m_updatesDisabled = false;
     Update();
 }

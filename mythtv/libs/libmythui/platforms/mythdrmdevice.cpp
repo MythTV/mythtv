@@ -150,8 +150,11 @@ bool MythDRMDevice::Initialise(void)
 #endif
     if (serial.isEmpty())
     {
-        LOG(VB_GENERAL, m_verbose, LOC + "QScreen has no serial number");
-        return false;
+        // No serial number either means an older version of Qt or the EDID
+        // is not available for some reason - in which case there is no point
+        // in trying to use it anyway.
+        LOG(VB_GENERAL, m_verbose, LOC + "QScreen has no serial number.");
+        LOG(VB_GENERAL, m_verbose, LOC + "Will use first suitable connected device");
     }
 
     // Retrieve full details for the device
@@ -171,33 +174,41 @@ bool MythDRMDevice::Initialise(void)
             continue;
         if (connector->connection == DRM_MODE_CONNECTED)
         {
-            // Does the connected display have the serial number we are looking for?
-            drmModePropertyBlobPtr edidblob = GetBlobProperty(connector, "EDID");
-            if (edidblob)
+            if (serial.isEmpty())
             {
-                MythEDID edid(reinterpret_cast<const char *>(edidblob->data),
-                              static_cast<int>(edidblob->length));
-                drmModeFreePropertyBlob(edidblob);
-                if (edid.Valid() && edid.SerialNumbers().contains(serial))
-                {
-                    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched connector with serial '%1'")
-                        .arg(serial));
-                    m_connector = connector;
-                    m_physicalSize = QSize(static_cast<int>(connector->mmWidth),
-                                           static_cast<int>(connector->mmHeight));
-                    m_serialNumber = serial;
-                    m_edid = edid;
-                    break;
-                }
-                if (!edid.Valid())
-                    LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
-
-                if (m_connector && !m_serialNumber.isEmpty())
-                    break;
+                m_connector = connector;
+                break;
             }
             else
             {
-                LOG(VB_GENERAL, m_verbose, LOC + "Connected device has no EDID");
+                // Does the connected display have the serial number we are looking for?
+                drmModePropertyBlobPtr edidblob = GetBlobProperty(connector, "EDID");
+                if (edidblob)
+                {
+                    MythEDID edid(reinterpret_cast<const char *>(edidblob->data),
+                                  static_cast<int>(edidblob->length));
+                    drmModeFreePropertyBlob(edidblob);
+                    if (edid.Valid() && edid.SerialNumbers().contains(serial))
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched connector with serial '%1'")
+                            .arg(serial));
+                        m_connector = connector;
+                        m_physicalSize = QSize(static_cast<int>(connector->mmWidth),
+                                               static_cast<int>(connector->mmHeight));
+                        m_serialNumber = serial;
+                        m_edid = edid;
+                        break;
+                    }
+                    if (!edid.Valid())
+                        LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
+
+                    if (m_connector && !m_serialNumber.isEmpty())
+                        break;
+                }
+                else
+                {
+                    LOG(VB_GENERAL, m_verbose, LOC + "Connected device has no EDID");
+                }
             }
         }
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Ignoring disconnected connector %1")
@@ -299,6 +310,10 @@ QString MythDRMDevice::FindBestDevice(void)
             .arg(root + namefilters.first()));
         return QString();
     }
+
+    // Only one device - return it
+    if (devices.size() == 1)
+        return root + devices.first();
 
     // Use the serial number from the current QScreen to select a suitable device
     auto serial = QString();

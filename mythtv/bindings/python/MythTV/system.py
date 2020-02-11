@@ -131,7 +131,7 @@ class System( DBCache ):
             stderr will be available in the exception and this object
             as attributes 'returncode' and 'stderr'.
         """
-        if self.path is '':
+        if self.path == '':
             return ''
         cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
         return self._runcmd(cmd)
@@ -165,7 +165,7 @@ class System( DBCache ):
         self.path += ' '+' '.join(['%s' % a for a in args])
 
     def _runasync(self, *args):
-        if self.path is '':
+        if self.path == '':
             return ''
         cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
         return self.Process(cmd, self.useshell, self.log)
@@ -441,7 +441,7 @@ class SystemEvent( System ):
             stderr will be available in the exception and this object
             as attributes 'returncode' and 'stderr'.
         """
-        if self.path is '':
+        if self.path == '':
             return
         cmd = self.path
         if 'program' in eventdata:

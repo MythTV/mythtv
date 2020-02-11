@@ -2,7 +2,7 @@ CONFIG += $$CCONFIG
 # enable C++11 support, QT5.7 will be based on C++11 anyway
 CONFIG += c++11
 
-LIBVERSION = 31
+LIBVERSION = 32
 
 MY_INSTALL_INCLUDE = $${SYSROOT}$${PREFIX}/include
 !contains(MY_INSTALL_INCLUDE, /usr/include$) {

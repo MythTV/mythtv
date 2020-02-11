@@ -25,6 +25,7 @@ class MythNVDECContext : public MythCodecContext
 {
   public:
     MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID);
+   ~MythNVDECContext() override;
     void InitVideoCodec                  (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     int  HwDecoderInit                   (AVCodecContext *Context) override;
     bool RetrieveFrame                   (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
@@ -32,12 +33,13 @@ class MythNVDECContext : public MythCodecContext
                                           VideoDisplayProfile *Profile, bool DoubleRate) override;
     void PostProcessFrame                (AVCodecContext *Context, VideoFrame *Frame) override;
     bool IsDeinterlacing                 (bool &DoubleRate, bool StreamChange = false) override;
+    bool DecoderWillResetOnFlush         (void) override;
     static MythCodecID GetSupportedCodec (AVCodecContext **CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
                                           AVStream       *Stream,
                                           uint            StreamType);
-    static enum AVPixelFormat GetFormat  (AVCodecContext *Contextconst, const AVPixelFormat *PixFmt);
+    static enum AVPixelFormat GetFormat  (AVCodecContext *Context, const AVPixelFormat *PixFmt);
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame,
                                           AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
@@ -64,6 +66,9 @@ class MythNVDECContext : public MythCodecContext
     };
 
   private:
+    void          InitFramesContext(AVCodecContext *Context);
+    AVBufferRef*  m_framesContext { nullptr };
+
     static const std::vector<MythNVDECCaps>& GetProfiles(void);
     MythDeintType m_deinterlacer         { DEINT_NONE  };
     bool          m_deinterlacer2x       { false       };

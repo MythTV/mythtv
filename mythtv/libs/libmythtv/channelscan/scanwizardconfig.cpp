@@ -114,26 +114,49 @@ void ScanWizard::SetPaneDefaults(const QString &cardid_inputname)
 {
     const int sourceid = m_videoSource->getValue().toInt();
     uint scanfrequency = 0;
+    QString freqtable;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-            "SELECT scanfrequency "
+            "SELECT scanfrequency, freqtable "
             "FROM videosource "
             "WHERE videosource.sourceid = :SOURCEID ;");
     query.bindValue(":SOURCEID", sourceid);
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("ScanOptionalConfig::SetPaneDefaults", query);
+        return;
     }
     else if (query.next())
     {
         scanfrequency = query.value(0).toUInt();
+        freqtable = query.value(1).toString();
         LOG(VB_CHANSCAN, LOG_DEBUG,
-            QString("SetPaneDefaults cardid_inputname:%1 sourceid:%2 frequency:%3")
-                .arg(cardid_inputname).arg(sourceid).arg(scanfrequency));
+            QString("SetPaneDefaults cardid_inputname:%1 sourceid:%2 scanfrequency:%3 freqtable:%4")
+                .arg(cardid_inputname).arg(sourceid).arg(scanfrequency).arg(freqtable));
     }
 
-    // Set defaults only when a frequency has been entered.
+    // Channel Frequency Table for ATSC
+    // Use general setting if not defined in the videosource
+    {
+        if (freqtable == "default")
+        {
+            freqtable = gCoreContext->GetSetting("FreqTable");
+        }
+        QString table;
+        table = (freqtable == "us-bcast"    ) ? "us"      : table;
+        table = (freqtable == "us-cable"    ) ? "uscable" : table;
+        table = (freqtable == "us-cable-hrc") ? "ushrc"   : table;
+        table = (freqtable == "us-cable-irc") ? "usirc"   : table;
+        if (!table.isEmpty())
+        {
+            LOG(VB_CHANSCAN, LOG_DEBUG,
+                QString("SetPaneDefaults ATSC frequency table:'%1'").arg(table));
+            m_scanConfig->SetTuningPaneValuesATSC(table);
+        }
+    }
+
+    // Set "Full Scan (Tuned)" defaults only when a frequency has been entered.
     if (scanfrequency == 0)
         return;
 
@@ -634,5 +657,17 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
             pane->setModsys(mpx.m_modSys.toString());
             pane->setRolloff(mpx.m_rolloff.toString());
         }
+    }
+}
+
+void ScanOptionalConfig::SetTuningPaneValuesATSC(const QString &freqtable)
+{
+    const int st =  m_scanType->getValue().toInt();
+
+    if (st == ScanTypeSetting::FullScan_ATSC)
+    {
+        PaneATSC *pane = m_paneATSC;
+
+        pane->SetFrequencyTable(freqtable);
     }
 }

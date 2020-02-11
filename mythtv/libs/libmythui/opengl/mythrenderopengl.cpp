@@ -738,7 +738,7 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenu
     {
         if (framebuffer->isBound())
         {
-            m_activeFramebuffer = framebuffer;
+            m_activeFramebuffer = framebuffer->handle();
             BindFramebuffer(nullptr);
         }
         Flush();
@@ -773,16 +773,22 @@ void MythRenderOpenGL::DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 
 void MythRenderOpenGL::BindFramebuffer(QOpenGLFramebufferObject *Framebuffer)
 {
-    if (Framebuffer == m_activeFramebuffer)
+    if ((Framebuffer && Framebuffer->handle() == m_activeFramebuffer) ||
+        (!Framebuffer && defaultFramebufferObject() == m_activeFramebuffer))
         return;
 
     makeCurrent();
     if (Framebuffer == nullptr)
+    {
         QOpenGLFramebufferObject::bindDefault();
+        m_activeFramebuffer = defaultFramebufferObject();
+    }
     else
+    {
         Framebuffer->bind();
+        m_activeFramebuffer = Framebuffer->handle();
+    }
     doneCurrent();
-    m_activeFramebuffer = Framebuffer;
 }
 
 void MythRenderOpenGL::ClearFramebuffer(void)
@@ -1177,6 +1183,8 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_CULL_FACE);
     glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     glClear(GL_COLOR_BUFFER_BIT);
+    QOpenGLFramebufferObject::bindDefault();
+    m_activeFramebuffer = defaultFramebufferObject();
     Flush();
 }
 

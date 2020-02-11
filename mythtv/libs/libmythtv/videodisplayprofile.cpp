@@ -1296,6 +1296,8 @@ bool VideoDisplayProfile::IsFilterAllowed(const QString &VideoRenderer)
 QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
 {
     const QStringList dec_list = GetVideoRenderers(Decoder);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2")
+        .arg(Decoder).arg(dec_list.join(",")));
     QStringList new_list;
 
     foreach (const auto & dec, dec_list)

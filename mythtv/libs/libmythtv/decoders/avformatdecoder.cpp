@@ -83,8 +83,7 @@ __inline AVRational GetAVTimeBaseQ()
 // Maximum number of sequential invalid data packet errors before we try
 // switching to software decoder. Packet errors are often seen when using
 // hardware contexts and, for example, seeking. Hence this needs to be high and
-// is probably best removed as it is treating the symptoms and not the cause
-// (e.g. VAAPI2 does not currently do any hardware support checks).
+// is probably best removed as it is treating the symptoms and not the cause.
 // See also comment in MythCodecMap::freeCodecContext re trying to free an
 // active hardware context when it is errored.
 #define SEQ_PKT_ERR_MAX 50
@@ -1569,6 +1568,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream)
     {
+        // m_fps is now set 'correctly' in ScanStreams so this additional call
+        // to GetVideoFrameRate may now be redundant
         m_fps = GetVideoFrameRate(stream, enc, true);
         QSize dim    = get_video_dim(*enc);
         int   width  = m_currentWidth  = dim.width();
@@ -2335,10 +2336,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             QString codecName;
             if (enc->codec)
                 codecName = enc->codec->name;
+            // framerate appears to never be set - which is probably why
+            // GetVideoFrameRate never uses it:)
+            // So fallback to the GetVideoFrameRate call which should then ensure
+            // the video display profile gets an accurate frame rate - instead of 0
             if (enc->framerate.den && enc->framerate.num)
                 m_fps = float(enc->framerate.num) / float(enc->framerate.den);
             else
-                m_fps = 0;
+                m_fps = GetVideoFrameRate(stream, enc, true);
             if (!m_isDbIgnored)
             {
                 m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName);
@@ -3172,6 +3177,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                                          forceaspectchange, 2,
                                          decoderdeint ? kScan_Progressive : kScan_Ignore);
 
+                if (context->hw_frames_ctx)
+                    if (context->internal)
+                        avcodec_flush_buffers(context);
+
                 m_currentWidth   = width;
                 m_currentHeight  = height;
                 m_fps            = seqFPS;
@@ -3278,6 +3287,17 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_parent->SetVideoParams(width, height, seqFPS, m_currentAspect, forcechange,
                                      static_cast<int>(m_h264Parser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
+
+            // the SetVideoParams call above will have released all held frames
+            // when using a hardware frames context - but for H264 (as opposed to mpeg2)
+            // the codec will still hold references for reference frames (decoded picture buffer).
+            // Flushing the context will release these references and the old
+            // hardware context is released correctly before a new one is created.
+            // TODO check what is needed here when a device context is used
+            // TODO check whether any codecs need to be flushed for a frame rate change (e.g. mediacodec?)
+            if (context->hw_frames_ctx && (forcechange || res_changed))
+                if (context->internal)
+                    avcodec_flush_buffers(context);
 
             m_currentWidth  = width;
             m_currentHeight = height;

@@ -69,7 +69,9 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
 #endif // USING_OPENGL
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers: %1").arg(renderers.join(",")));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers for %1 %2 (Decoder: %3): '%4'")
+        .arg(get_encoding_type(CodecID)).arg(get_decoder_name(CodecID))
+        .arg(Decoder).arg(renderers.join(",")));
     renderers = VideoDisplayProfile::GetFilteredRenderers(Decoder, renderers);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers (filt: %1): %2")
         .arg(Decoder).arg(renderers.join(",")));
@@ -87,10 +89,27 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
             renderer = tmp;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preferred renderer: " + renderer);
         }
+        else
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("No preferred renderer for decoder '%1' - profile renderer: '%2'")
+                .arg(Decoder).arg(tmp));
+        }
     }
 
     if (renderer.isEmpty())
         renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+
+    if (renderer.isEmpty() && !(PlayerFlags & kVideoIsNull))
+    {
+        QString fallback;
+#ifdef USING_OPENGL
+        fallback = "opengl";
+#endif
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "No renderer found. This should not happen!.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'").arg(fallback));
+        renderer = fallback;
+    }
 
     while (!renderers.empty())
     {

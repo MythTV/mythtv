@@ -187,7 +187,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     bool                         m_ready { false };
 
     // Framebuffers
-    QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
+    GLuint                       m_activeFramebuffer { 0 };
 
     // Synchronisation
     GLuint                       m_fence { 0 };

@@ -29,6 +29,7 @@
 #include <mythsystemlegacy.h>
 #include <mythmiscutil.h>
 #include <exitcodes.h>
+#include <mythconfig.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -909,7 +910,8 @@ void MythBurn::runScript()
         QFile::remove(logDir + "/mythburncancel.lck");
 
     createConfigFile(configDir + "/mydata.xml");
-    commandline = "python " + GetShareDir() + "mytharchive/scripts/mythburn.py";
+    commandline = PYTHON_EXE;
+    commandline += " " + GetShareDir() + "mytharchive/scripts/mythburn.py";
     commandline += " -j " + configDir + "/mydata.xml";          // job file
     commandline += " -l " + logDir + "/progress.log";           // progress log
     commandline += " > "  + logDir + "/mythburn.log 2>&1 &";    // Logs
