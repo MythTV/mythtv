@@ -917,14 +917,16 @@ void MythPlayer::OpenDummy(void)
 
 void MythPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
-    if (NuppelDecoder::CanHandle(testbuf, testreadsize))
-        SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
-    else if (AvFormatDecoder::CanHandle(testbuf,
+    if (AvFormatDecoder::CanHandle(testbuf,
                                         player_ctx->buffer->GetFilename(),
                                         testreadsize))
     {
         SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
                                        playerFlags));
+    }
+    else if (NuppelDecoder::CanHandle(testbuf, testreadsize))
+    {
+        SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
     }
 }
 
