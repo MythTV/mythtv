@@ -26,6 +26,7 @@ MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
         return;
     }
 
+    m_valid = true;
     Authenticate();
     if (m_authenticated)
         LOG(VB_GENERAL, m_verbose, LOC + "Authenticated");
@@ -74,6 +75,11 @@ void MythDRMDevice::Close(void)
         LOG(VB_GENERAL, m_verbose, LOC + "Closed");
     }
     m_fd = 0;
+}
+
+bool MythDRMDevice::IsValid(void) const
+{
+    return m_valid;
 }
 
 QString MythDRMDevice::GetSerialNumber(void) const

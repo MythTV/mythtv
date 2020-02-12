@@ -21,6 +21,7 @@ class MythDRMDevice : public ReferenceCounter
     explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
    ~MythDRMDevice() override;
 
+    bool     IsValid        (void) const;
     QString  GetSerialNumber(void) const;
     QScreen* GetScreen      (void) const;
     QSize    GetResolution  (void) const;
@@ -42,6 +43,7 @@ class MythDRMDevice : public ReferenceCounter
     drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property);
 
   private:
+    bool               m_valid         { false };
     QScreen*           m_screen        { nullptr };
     QString            m_deviceName    { };
     int                m_fd            { -1 };
