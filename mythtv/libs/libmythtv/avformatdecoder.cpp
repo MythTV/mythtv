@@ -1684,6 +1684,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->get_buffer2     = get_avf_buffer_vaapi2;
         enc->get_format      = get_format_vaapi2;
+        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
 #endif
