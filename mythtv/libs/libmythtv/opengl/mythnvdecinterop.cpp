@@ -4,6 +4,10 @@
 #include "videocolourspace.h"
 #include "mythnvdecinterop.h"
 
+// Std
+#include <chrono>
+#include <thread>
+
 #define LOC QString("NVDECInterop: ")
 
 #define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
@@ -304,9 +308,10 @@ bool MythNVDECInterop::InitialiseCuda(void)
     return CreateCUDAContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
-bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                         CUcontext &CudaContext)
+bool MythNVDECInterop::CreateCUDAPriv(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                      CUcontext &CudaContext, bool &Retry)
 {
+    Retry = false;
     if (!GLContext)
         return false;
 
@@ -347,19 +352,47 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFuncti
     res = CudaFuncs->cuCtxCreate(&CudaContext, CU_CTX_SCHED_BLOCKING_SYNC, cudevice);
     if (res != CUDA_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create CUDA context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create CUDA context (Err: %1)")
+            .arg(res));
+        Retry = true;
         return false;
     }
 
     CudaFuncs->cuCtxPopCurrent(&dummy);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA context");
     return true;
+}
 
+bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                         CUcontext &CudaContext)
+{
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Must create CUDA context from main thread");
+        return false;
+    }
+
+    int retries = 0;
+    bool retry = false;
+    while (retries++ < 5)
+    {
+        if (CreateCUDAPriv(GLContext, CudaFuncs, CudaContext, retry))
+            return true;
+        CleanupContext(GLContext, CudaFuncs, CudaContext);
+        if (!retry)
+            break;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Will retry in 50ms");
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    return false;
 }
 
 void MythNVDECInterop::CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
                                       CUcontext &CudaContext)
 {
+    if (!GLContext)
+        return;
+
     OpenGLLocker locker(GLContext);
     if (CudaFuncs)
     {
