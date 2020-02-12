@@ -174,19 +174,21 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
             MythVideoTexture *tex = textures[plane];
             tex->m_allowGLSLDeint = true;
             m_context->glBindTexture(tex->m_target, tex->m_textureId);
+            QOpenGLTexture::PixelFormat format     = QOpenGLTexture::Red;
             QOpenGLTexture::PixelType   pixtype    = hdr ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
             QOpenGLTexture::TextureFormat internal = hdr ? QOpenGLTexture::R16_UNorm : QOpenGLTexture::R8_UNorm;
             int width = tex->m_size.width();
 
             if (plane)
             {
-                pixtype   = hdr ? QOpenGLTexture::UInt32 : QOpenGLTexture::UInt16;
-                internal  = hdr ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
+                pixtype  = hdr ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
+                internal = hdr ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
+                format   = QOpenGLTexture::RG;
                 width /= 2;
             }
 
             m_context->glTexImage2D(tex->m_target, 0, internal, width, tex->m_size.height(),
-                                    0, QOpenGLTexture::Red, pixtype, nullptr);
+                                    0, format, pixtype, nullptr);
 
             CUarray array = nullptr;
             CUgraphicsResource graphicsResource = nullptr;
