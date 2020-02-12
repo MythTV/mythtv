@@ -154,7 +154,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // create and map textures for a new buffer
     VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
                 PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
-    bool hdr = ColorDepth(type) > 8;
+    bool p010 = ColorDepth(type) > 8;
     if (!m_openglTextures.contains(cudabuffer))
     {
         vector<QSize> sizes;
@@ -171,18 +171,19 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         bool success = true;
         for (uint plane = 0; plane < textures.size(); ++plane)
         {
+            // N.B. I think the texture formats for P010 are not strictly compliant
+            // with OpenGL ES 3.X but the Nvidia driver does not complain.
             MythVideoTexture *tex = textures[plane];
             tex->m_allowGLSLDeint = true;
             m_context->glBindTexture(tex->m_target, tex->m_textureId);
             QOpenGLTexture::PixelFormat format     = QOpenGLTexture::Red;
-            QOpenGLTexture::PixelType   pixtype    = hdr ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
-            QOpenGLTexture::TextureFormat internal = hdr ? QOpenGLTexture::R16_UNorm : QOpenGLTexture::R8_UNorm;
+            QOpenGLTexture::PixelType   pixtype    = p010 ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
+            QOpenGLTexture::TextureFormat internal = p010 ? QOpenGLTexture::R16_UNorm : QOpenGLTexture::R8_UNorm;
             int width = tex->m_size.width();
 
             if (plane)
             {
-                pixtype  = hdr ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
-                internal = hdr ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
+                internal = p010 ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
                 format   = QOpenGLTexture::RG;
                 width /= 2;
             }
@@ -249,7 +250,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         cpy.srcPitch      = static_cast<size_t>(Frame->pitches[i]);
         cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
         cpy.dstArray      = data->first;
-        cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (hdr ? 2 : 1);
+        cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (p010 ? 2 : 1);
         cpy.Height        = static_cast<size_t>(result[i]->m_size.height());
         CUDA_CHECK(m_cudaFuncs, cuMemcpy2DAsync(&cpy, nullptr));
     }
