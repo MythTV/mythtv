@@ -152,11 +152,11 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
 
     // Is deinterlacing selected? Accept any value as RGB frames can only be deinterlaced here
     bool doublerate = false;
-    MythDeintType option = GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
+    MythDeintType option = GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER, DEINT_ALL);
     if (option != DEINT_NONE)
         doublerate = true;
     else
-        option = GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
+        option = GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER, DEINT_ALL);
     interlaced &= option != DEINT_NONE;
 
     // Clear redundant frame caches
