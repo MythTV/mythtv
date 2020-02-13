@@ -110,7 +110,7 @@ class VideoPerformanceTest
         VideoFrame *frame = nullptr;
         while (true)
         {
-            QCoreApplication::processEvents();
+            mp->ProcessCallbacks();
             int duration = start.msecsTo(QTime::currentTime());
             if (duration < 0 || duration > ms)
             {
