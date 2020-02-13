@@ -606,6 +606,10 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     bool hwframes = false;
     bool useframebufferimage = false;
 
+    // for tiled renderers (e.g. Pi), enable scissoring to try and improve performance
+    // when not full screen and avoid the resize stage unless absolutely necessary
+    bool tiled = m_extraFeatures & kGLTiled;
+
     // We lose the pause frame when seeking and using VDPAU/VAAPI/NVDEC direct rendering.
     // As a workaround, we always use the resize stage so the last displayed frame
     // should be retained in the Framebuffer used for resizing. If there is
@@ -703,7 +707,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
             resize |= Sampling;
 
-        if (!resize)
+        if (!resize && !tiled)
         {
             // improve performance. This is an educated guess on the relative cost
             // of render to texture versus straight rendering.
@@ -845,9 +849,22 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (Frame)
         m_lastRotation = Frame->rotation;
 
+    // apply scissoring
+    if (tiled)
+    {
+        // N.B. It's not obvious whether this helps
+        m_render->glEnable(GL_SCISSOR_TEST);
+        m_render->glScissor(m_displayVideoRect.left() - 1, m_displayVideoRect.top() - 1,
+                            m_displayVideoRect.width() + 2, m_displayVideoRect.height() + 2);
+    }
+
     // draw
     m_render->DrawBitmap(textures, numtextures, nullptr, trect,
                          m_displayVideoRect, m_shaders[program], m_lastRotation);
+
+    // disable scissoring
+    if (tiled)
+        m_render->glDisable(GL_SCISSOR_TEST);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREP_FRAME_END");
