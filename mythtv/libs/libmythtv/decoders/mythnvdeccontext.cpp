@@ -365,10 +365,10 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
     {
         if (*PixFmt == AV_PIX_FMT_CUDA)
         {
-            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+            auto * decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
             if (decoder)
             {
-                MythNVDECContext* me = dynamic_cast<MythNVDECContext*>(decoder->GetMythCodecContext());
+                auto * me = dynamic_cast<MythNVDECContext*>(decoder->GetMythCodecContext());
                 if (me)
                     me->InitFramesContext(Context);
             }
@@ -631,7 +631,7 @@ void MythNVDECContext::InitFramesContext(AVCodecContext *Context)
 
     if (m_framesContext)
     {
-        AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
+        auto *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
         if ((frames->sw_format == Context->sw_pix_fmt) && (frames->width == Context->coded_width) &&
             (frames->height == Context->coded_height))
         {
@@ -648,7 +648,7 @@ void MythNVDECContext::InitFramesContext(AVCodecContext *Context)
     av_buffer_unref(&m_framesContext);
 
     AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
-    AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
+    auto *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
     frames->free = MythCodecContext::FramesContextFinished;
     frames->user_opaque = nullptr;
     frames->sw_format = Context->sw_pix_fmt;
