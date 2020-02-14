@@ -43,6 +43,7 @@ class MythDeinterlacer
     AVFilterContext* m_sink       { nullptr };
     VideoFrame*      m_bobFrame   { nullptr };
     SwsContext*      m_swsContext { nullptr };
+    long long        m_discontinuityCounter { 0 };
 };
 
 #endif // MYTHDEINTERLACER_H
