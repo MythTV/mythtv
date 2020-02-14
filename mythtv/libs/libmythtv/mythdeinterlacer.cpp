@@ -115,7 +115,19 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
             Cleanup();
             return;
         }
+        Force = true;
     }
+    else if ((abs(Frame->frameCounter - m_discontinuityCounter) > 1) && (m_deintType != DEINT_BASIC))
+    {
+        if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst))
+        {
+            Cleanup();
+            return;
+        }
+        Force = true;
+    }
+
+    m_discontinuityCounter = Frame->frameCounter;
 
     // Set in use deinterlacer for debugging
     Frame->deinterlace_inuse = m_deintType | DEINT_CPU;
@@ -271,6 +283,7 @@ void MythDeinterlacer::Cleanup(void)
     avfilter_graph_free(&m_graph);
     sws_freeContext(m_swsContext);
     m_swsContext = nullptr;
+    m_discontinuityCounter = 0;
 
     if (m_bobFrame)
     {
