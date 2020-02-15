@@ -186,7 +186,7 @@ int BrowserApi::GetVolume(void)
 
     while (!timer.hasExpired(2000) && !m_gotAnswer)
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
@@ -230,7 +230,7 @@ QString BrowserApi::GetMetadata(void)
 
     while (!timer.hasExpired(2000)  && !m_gotAnswer)
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
@@ -325,7 +325,7 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
 
         QBuffer imageBuffer;
         imageBuffer.open(QBuffer::ReadWrite);
-        QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning,
+        QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning,
                                                  nullptr, nullptr);
         QPixmap pixmap = icon.pixmap(QSize(32, 32));
 
@@ -887,7 +887,7 @@ void MythUIWebBrowser::Init(void)
         m_actualBrowserArea = m_Area;
 
     m_browser = new MythWebView(GetMythMainWindow()->GetPaintWindow(), this);
-    m_browser->setPalette(qApp->style()->standardPalette());
+    m_browser->setPalette(QApplication::style()->standardPalette());
     m_browser->setGeometry(m_actualBrowserArea);
     m_browser->setFixedSize(m_actualBrowserArea.size());
     m_browser->move(m_actualBrowserArea.x(), m_actualBrowserArea.y());
@@ -1146,7 +1146,7 @@ void MythUIWebBrowser::SetActive(bool active)
         m_browser->setFocus();
         m_browser->show();
         m_browser->raise();
-        if (qApp->platformName().contains("egl"))
+        if (QGuiApplication::platformName().contains("egl"))
         {
             m_browser->setParent(nullptr);
             m_browser->setFocus();
@@ -1159,7 +1159,7 @@ void MythUIWebBrowser::SetActive(bool active)
     {
         m_browser->clearFocus();
         m_browser->hide();
-        if (qApp->platformName().contains("egl"))
+        if (QGuiApplication::platformName().contains("egl"))
             m_browser->setParent(GetMythMainWindow());
         UpdateBuffer();
     }

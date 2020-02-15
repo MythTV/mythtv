@@ -108,7 +108,7 @@ bool SourceManager::findScripts()
         busyPopup = nullptr;
     }
 
-    qApp->processEvents();
+    QCoreApplication::processEvents();
 
     recurseDirs(dir);
 
@@ -360,7 +360,7 @@ void SourceManager::recurseDirs( QDir dir )
 
     for (const auto & file : files)
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         if (file.isDir())
         {
             QDir recurseTo(file.filePath());

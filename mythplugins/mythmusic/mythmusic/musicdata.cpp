@@ -82,7 +82,7 @@ void MusicData::reloadMusic(void) const
     m_all_music->startLoading();
     while (!m_all_music->doneLoading())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(50000);
     }
 
@@ -102,7 +102,7 @@ void MusicData::loadMusic(void) const
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = qApp->translate("(MythMusicMain)",
+    QString message = QCoreApplication::translate("(MythMusicMain)",
                                       "Loading Music. Please wait ...");
 
     auto *busy = new MythUIBusyDialog(message, popupStack, "musicscanbusydialog");
@@ -128,7 +128,7 @@ void MusicData::loadMusic(void) const
     while (!gMusicData->m_all_playlists->doneLoading()
            || !gMusicData->m_all_music->doneLoading())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(50000);
     }
 

@@ -62,7 +62,7 @@ static void cleanup()
     delete gContext;
     gContext = nullptr;
 
-    delete qApp;
+    delete QCoreApplication::instance();
 
     SignalHandler::Done();
 }
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
                          // stuff needed for particular scans
                          /* mplexid   */ 0,
                          startChan, frequencyStandard, modulation, region);
-            ret = qApp->exec();
+            ret = QCoreApplication::exec();
         }
         return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
     }
@@ -612,7 +612,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    qApp->exec();
+    QCoreApplication::exec();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

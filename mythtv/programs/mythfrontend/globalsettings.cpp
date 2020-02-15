@@ -4553,14 +4553,14 @@ void GuiDimension::childChanged(StandardSetting * /*setting*/)
 
 void AppearanceSettings::applyChange()
 {
-    qApp->processEvents();
+    QCoreApplication::processEvents();
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
 void AppearanceSettings::PopulateScreens(int Screens)
 {
     m_screen->clearSelections();
-    foreach (QScreen *qscreen, qGuiApp->screens())
+    foreach (QScreen *qscreen, QGuiApplication::screens())
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
         m_screen->addSelection(qscreen->name() + extra, qscreen->name());

@@ -420,7 +420,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 begin");
     do
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     while (tv->m_isEmbedded);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 end");
 
@@ -1217,14 +1217,14 @@ bool TV::Init(bool createWindow)
         if (mainwindow->GetPaintWindow())
             mainwindow->GetPaintWindow()->update();
         mainwindow->installEventFilter(this);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     }
 
     {
         QMutexLocker locker(&m_initFromDBLock);
         while (!m_initFromDBDone)
         {
-            qApp->processEvents();
+            QCoreApplication::processEvents();
             m_initFromDBWait.wait(&m_initFromDBLock, 50);
         }
     }
@@ -1339,7 +1339,7 @@ void TV::PlaybackLoop(void)
 {
     while (true)
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         if (SignalHandler::IsExiting())
         {
             m_wantsToQuit = true;
@@ -7151,7 +7151,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
     // state of the new player e.g. when switching inputs from the guide grid,
     // "EPG_EXITING" may not be received until after the player is re-created
     // and we inadvertantly disable drawing...
-    qApp->processEvents();
+    QCoreApplication::processEvents();
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("(%1,'%2',%3)")
             .arg(chanid).arg(channum).arg(inputid));
@@ -8716,7 +8716,7 @@ void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
     auto* me = new MythEvent(message);
-    qApp->postEvent(this, me);
+    QCoreApplication::postEvent(this, me);
 }
 
 void TV::ChangeVolume(PlayerContext *ctx, bool up, int newvolume)
@@ -9719,7 +9719,7 @@ void TV::customEvent(QEvent *e)
             GetMythMainWindow()->PushDrawDisabled();
         }
 
-        qApp->processEvents();
+        QCoreApplication::processEvents();
 
         m_isEmbedded = false;
         m_ignoreKeyPresses = false;
@@ -10958,7 +10958,7 @@ QDomElement MenuBase::GetRoot(void) const
 
 QString MenuBase::Translate(const QString &text) const
 {
-    return qApp->translate(m_translationContext, text.toUtf8(), nullptr);
+    return QCoreApplication::translate(m_translationContext, text.toUtf8(), nullptr);
 }
 
 bool MenuBase::Show(const QDomNode &node,

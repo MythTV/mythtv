@@ -324,7 +324,7 @@ void DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url)
             m_state = STOPPED;
         }
 
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(500);
     }
 }

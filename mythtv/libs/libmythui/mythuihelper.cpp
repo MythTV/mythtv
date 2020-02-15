@@ -333,7 +333,7 @@ void MythUIHelper::LoadQtConfig(void)
     if (d->m_display->UsingVideoModes())
         d->m_display->SwitchToGUI(true);
 
-    qApp->setStyle("Windows");
+    QApplication::setStyle("Windows");
 
     QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = FindThemeDir(themename);

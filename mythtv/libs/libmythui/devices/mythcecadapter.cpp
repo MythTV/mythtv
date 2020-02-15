@@ -633,7 +633,7 @@ int MythCECAdapter::HandleKeyPress(const cec_keypress &Key)
 
     MythUIHelper::ResetScreensaver();
     auto* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
-    qApp->postEvent(GetMythMainWindow(), dynamic_cast<QEvent*>(ke));
+    QCoreApplication::postEvent(GetMythMainWindow(), dynamic_cast<QEvent*>(ke));
     return 1;
 }
 

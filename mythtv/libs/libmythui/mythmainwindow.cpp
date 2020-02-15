@@ -896,7 +896,7 @@ void MythMainWindow::doRemoteScreenShot(const QString& filename, int x, int y)
     args << filename;
 
     MythEvent me(MythEvent::MythEventMessage, ACTION_SCREENSHOT, args);
-    qApp->sendEvent(this, &me);
+    QCoreApplication::sendEvent(this, &me);
 }
 
 void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
@@ -1127,13 +1127,14 @@ void MythMainWindow::Init(bool mayReInit)
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
     // 2nd window (e.g. TVPlayback) is created before this is redrawn.
 #ifdef ANDROID
-    LOG(VB_GENERAL, LOG_INFO, QString("Platform name is %1").arg(qApp->platformName()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Platform name is %1")
+        .arg(QGuiApplication::platformName()));
 #   define EARLY_SHOW_PLATFORM_NAME_CHECK "android"
 #else
 #   define EARLY_SHOW_PLATFORM_NAME_CHECK "egl"
 #endif
-    if (qApp->platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
-        qApp->processEvents();
+    if (QGuiApplication::platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
+        QCoreApplication::processEvents();
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         d->m_paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -1378,7 +1379,7 @@ bool MythMainWindow::WindowIsAlwaysFullscreen(void)
     return true;
 #else
     // this may need to cover other platform plugins
-    return qApp->platformName().toLower().contains("eglfs");
+    return QGuiApplication::platformName().toLower().contains("eglfs");
 #endif
 }
 
@@ -2642,7 +2643,7 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 
     if (!key_target)
     {
-        QWidget *focus_widget = qApp->focusWidget();
+        QWidget *focus_widget = QApplication::focusWidget();
         if (focus_widget && focus_widget->isEnabled())
         {
             key_target = focus_widget;

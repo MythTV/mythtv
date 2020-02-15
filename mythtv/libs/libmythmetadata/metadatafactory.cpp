@@ -254,7 +254,7 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
     while (m_returnList.isEmpty() && m_sync)
     {
         sleep(1);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     }
 
     m_sync = false;

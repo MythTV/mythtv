@@ -2054,7 +2054,7 @@ void AlbumArtImages::scanForImages()
 
     while (scanThread->isRunning())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(1000);
     }
 
