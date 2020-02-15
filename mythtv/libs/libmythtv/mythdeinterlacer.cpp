@@ -161,7 +161,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
         if (!m_bobFrame->buf || (m_bobFrame->size != Frame->size))
         {
             av_free(m_bobFrame->buf);
-            m_bobFrame->buf = static_cast<unsigned char*>(av_malloc(Frame->size + 64));
+            m_bobFrame->buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(Frame->size + 64)));
             m_bobFrame->size = Frame->size;
         }
 
