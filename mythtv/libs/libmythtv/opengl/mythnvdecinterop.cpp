@@ -261,7 +261,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // GLSL deinterlacing. The decoder will pick up any CPU or driver preference
     // and return a stream of deinterlaced frames. Just check for GLSL here.
     bool needreferences = false;
-    if (is_interlaced(Scan))
+    if (is_interlaced(Scan) && !Frame->already_deinterlaced)
     {
         MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
         if (shader)

@@ -340,6 +340,7 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame 
         Frame->top_field_first = 0;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
+        Frame->already_deinterlaced = 1;
     }
 }
 
