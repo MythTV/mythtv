@@ -202,7 +202,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     // N.B. there should in theory be no situation in which shader deinterlacing is not
     // available for software formats, hence there should be no need to fallback to cpu
 
-    if (!is_interlaced(Scan))
+    if (!is_interlaced(Scan) || Frame->already_deinterlaced)
     {
         CleanupDeinterlacers();
         return false;
