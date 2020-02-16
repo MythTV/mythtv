@@ -1680,7 +1680,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     m_outputJmeter && m_outputJmeter->RecordCycleTime();
     m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 
-    bool decoderdeint = buffer && buffer->decoder_deinterlaced;
+    bool decoderdeint = buffer && buffer->already_deinterlaced;
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
     {

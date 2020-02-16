@@ -758,7 +758,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->top_field_first = m_lastTopFieldFirst;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->decoder_deinterlaced = 1;
+        Frame->already_deinterlaced = 1;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can

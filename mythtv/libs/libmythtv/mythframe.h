@@ -167,7 +167,7 @@ struct VideoFrame
     int colortransfer;
     int chromalocation;
     int colorshifted; ///< 0 for software decoded 10/12/16bit frames. 1 for hardware decoders.
-    int decoder_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
+    int already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
     int rotation;
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
@@ -259,7 +259,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->colortransfer    = 1; // BT.709
     vf->chromalocation   = 1; // default 4:2:0
     vf->colorshifted     = 0;
-    vf->decoder_deinterlaced = 0;
+    vf->already_deinterlaced = 0;
     vf->rotation         = 0;
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;

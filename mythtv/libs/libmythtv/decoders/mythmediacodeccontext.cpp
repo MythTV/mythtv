@@ -328,6 +328,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
     Frame->interlaced_reversed = 0;
     Frame->top_field_first = 0;
     Frame->deinterlace_allowed = DEINT_NONE;
+    Frame->already_deinterlaced = 1;
 }
 
 /*! /brief Say yes
