@@ -167,11 +167,33 @@ QSize MythOpenGLVideo::GetVideoSize(void) const
     return m_videoDim;
 }
 
+void MythOpenGLVideo::CleanupDeinterlacers(void)
+{
+    // If switching off/from basic deinterlacing, then we need to delete and
+    // recreate the input textures and sometimes the shaders as well - so start
+    // from scratch
+    if (m_deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+    {
+        // Note. Textures will be created with linear filtering - which matches
+        // no resizing - which should be the case for the basic deinterlacer - and
+        // the call to SetupFrameFormat will reset resizing anyway
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Removing single field textures");
+        // revert to YUY2 if preferred
+        if ((m_inputType == FMT_YV12) && (m_profile == "opengl"))
+            m_outputType = FMT_YUY2;
+        SetupFrameFormat(m_inputType, m_outputType, m_videoDim, m_textureTarget);
+        emit OutputChanged(m_videoDim, m_videoDim, -1.0f);
+    }
+    m_fallbackDeinterlacer = DEINT_NONE;
+    m_deinterlacer = DEINT_NONE;
+    m_deinterlacer2x = false;
+}
+
 bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
                                       MythDeintType Filter  /* = DEINT_SHADER */,
                                       bool CreateReferences /* = true */)
 {
-    if (!Frame || !is_interlaced(Scan))
+    if (!Frame)
         return false;
 
     // do we want an opengl shader?
@@ -180,13 +202,18 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     // N.B. there should in theory be no situation in which shader deinterlacing is not
     // available for software formats, hence there should be no need to fallback to cpu
 
+    if (!is_interlaced(Scan))
+    {
+        CleanupDeinterlacers();
+        return false;
+    }
+
     m_deinterlacer2x = true;
     MythDeintType deinterlacer = GetDoubleRateOption(Frame, Filter);
     MythDeintType other        = GetDoubleRateOption(Frame, DEINT_DRIVER);
     if (other) // another double rate deinterlacer is enabled
     {
-        m_deinterlacer = DEINT_NONE;
-        m_deinterlacer2x = false;
+        CleanupDeinterlacers();
         return false;
     }
 
@@ -197,7 +224,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
         other        = GetSingleRateOption(Frame, DEINT_DRIVER);
         if (!deinterlacer || other) // no shader deinterlacer needed
         {
-            m_deinterlacer = DEINT_NONE;
+            CleanupDeinterlacers();
             return false;
         }
     }
@@ -214,6 +241,42 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     // delete old reference textures
     MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
     MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
+
+    // For basic deinterlacing of software frames, we now create 2 sets of field
+    // based textures - which is the same approach taken by the CPU based onefield/bob
+    // deinterlacer and the EGL basic deinterlacer. The advantages of this
+    // approach are:-
+    //  - no dependent texturing in the samplers (it is just a basic YUV to RGB conversion
+    //    in the shader)
+    //  - better quality (the onefield shader line doubles but does not have the
+    //    implicit interpolation/smoothing of using separate textures directly,
+    //    which leads to 'blockiness').
+    //  - as we are not sampling other fields, there is no need to use an intermediate
+    //    framebuffer to ensure accurate sampling - so we can skip the resize stage.
+    //
+    // YUYV formats are currently not supported as it does not work correctly - force YV12 instead.
+
+    if (deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+    {
+        if (m_outputType == FMT_YUY2)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing OpenGL YV12 for basic deinterlacer");
+            m_outputType = FMT_YV12;
+        }
+        MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
+        QSize size(m_videoDim.width(), m_videoDim.height() >> 1);
+        vector<QSize> sizes;
+        sizes.emplace_back(size);
+        // N.B. If we are currently resizing, it will be turned off for this
+        // deinterlacer, so the default linear texture filtering is OK.
+        m_inputTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        // nextTextures will hold the other field
+        m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 single field textures")
+            .arg(m_inputTextures.size() * 2));
+        // Con VideoOutWindow into display the field only
+        emit OutputChanged(m_videoDim, size, -1.0F);
+    }
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
@@ -342,20 +405,27 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 #endif
         if (!progressive)
         {
+            bool basic = Deint == DEINT_BASIC && format_is_yuv(m_inputType);
             // Chroma upsampling filter
             if ((format_is_420(m_outputType) || format_is_nv12(m_outputType)) &&
-                m_chromaUpsamplingFilter)
+                m_chromaUpsamplingFilter && !basic)
             {
                 defines << "CUE";
             }
 
             // field
-            if (topfield)
+            if (topfield && !basic)
                 defines << "TOPFIELD";
 
             switch (Deint)
             {
-                case DEINT_BASIC:  cost *= 2;  defines << "ONEFIELD"; break;
+                case DEINT_BASIC:
+                if (!basic)
+                {
+                    cost *= 2;
+                    defines << "ONEFIELD";
+                }
+                break;
                 case DEINT_MEDIUM: cost *= 5;  defines << "LINEARBLEND"; break;
                 case DEINT_HIGH:   cost *= 15; defines << "KERNEL"; kernel = true; break;
                 default: break;
@@ -511,7 +581,7 @@ void MythOpenGLVideo::ResetFrameFormat(void)
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
-void MythOpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
+void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
 {
     if (Frame->codec == FMT_NONE)
         return;
@@ -568,7 +638,7 @@ void MythOpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
 
     // Rotate textures if necessary
     bool current = true;
-    if (m_deinterlacer != DEINT_NONE)
+    if (m_deinterlacer == DEINT_MEDIUM || m_deinterlacer == DEINT_HIGH)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
@@ -581,9 +651,32 @@ void MythOpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
             current = false;
         }
     }
+
     m_discontinuityCounter = Frame->frameCounter;
 
-    MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
+    if (m_deinterlacer == DEINT_BASIC)
+    {
+        // first field. Fake the pitches
+        int pitches[3];
+        memcpy(pitches, Frame->pitches, sizeof(int) * 3);
+        Frame->pitches[0] = Frame->pitches[0] << 1;
+        Frame->pitches[1] = Frame->pitches[1] << 1;
+        Frame->pitches[2] = Frame->pitches[2] << 1;
+        MythVideoTexture::UpdateTextures(m_render, Frame, m_inputTextures);
+        // second field. Fake the offsets as well.
+        int offsets[3];
+        memcpy(offsets, Frame->offsets, sizeof(int) * 3);
+        Frame->offsets[0] = Frame->offsets[0] + pitches[0];
+        Frame->offsets[1] = Frame->offsets[1] + pitches[1];
+        Frame->offsets[2] = Frame->offsets[2] + pitches[2];
+        MythVideoTexture::UpdateTextures(m_render, Frame, m_nextTextures);
+        memcpy(Frame->pitches, pitches, sizeof(int) * 3);
+        memcpy(Frame->offsets, offsets, sizeof(int) * 3);
+    }
+    else
+    {
+        MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
+    }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
@@ -672,6 +765,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
+    bool basicdeinterlacing = false;
     VideoShaderType program = format_is_yuv(m_outputType) ? Progressive :  Default;
     if (m_deinterlacer != DEINT_NONE)
     {
@@ -684,6 +778,14 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         {
             program = TopFieldFirst ? InterlacedBot : InterlacedTop;
             deinterlacing = true;
+        }
+
+        // select the correct field for the basic deinterlacer
+        if (deinterlacing && m_deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+        {
+            basicdeinterlacing = true;
+            if (program == InterlacedBot)
+                inputtextures = m_nextTextures;
         }
     }
 
@@ -698,7 +800,8 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (format_is_yuv(m_outputType) && !resize)
     {
         // ensure deinterlacing works correctly when down scaling in height
-        if ((m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing)
+        // N.B. not needed for the basic deinterlacer
+        if (deinterlacing && !basicdeinterlacing && (m_videoDispDim.height() > m_displayVideoRect.height()))
             resize |= Deinterlacer;
         // UYVY packed pixels must be sampled exactly
         if (FMT_YUY2 == m_outputType)
@@ -707,7 +810,11 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
             resize |= Sampling;
 
-        if (!resize && !tiled)
+        // don't enable resizing if the cost of a framebuffer switch may be
+        // prohibitive (e.g. Raspberry Pi/tiled renderers) or for basic deinterlacing,
+        // where we are trying to simplifiy/optimise rendering (and the framebuffer
+        // sizing gets confused by the change to m_videoDispDim)
+        if (!resize && !tiled && !basicdeinterlacing)
         {
             // improve performance. This is an educated guess on the relative cost
             // of render to texture versus straight rendering.
@@ -715,7 +822,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
             int blitcost     = m_displayVideoRect.width() * m_displayVideoRect.height() * m_shaderCost[Default];
             int noresizecost = m_displayVideoRect.width() * m_displayVideoRect.height() * m_shaderCost[program];
             if ((totexture + blitcost) < noresizecost)
-                resize = Performance;
+                resize |= Performance;
         }
     }
 

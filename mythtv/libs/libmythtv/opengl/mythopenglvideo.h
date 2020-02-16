@@ -53,7 +53,7 @@ class MythOpenGLVideo : public QObject
    ~MythOpenGLVideo() override;
 
     bool    IsValid(void) const;
-    void    ProcessFrame(const VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);
+    void    ProcessFrame(VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);
     void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
                          StereoscopicMode Stereo, bool DrawBorder = false);
     void    SetMasterViewport(QSize Size);
@@ -82,6 +82,7 @@ class MythOpenGLVideo : public QObject
     bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan,
                             MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
     QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
+    void    CleanupDeinterlacers(void);
 
     bool           m_valid      { false };
     QString        m_profile;
