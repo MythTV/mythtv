@@ -1590,7 +1590,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     QString chan_num = channelFormat
         .arg(chan.m_atscMajorChannel)
         .arg(chan.m_atscMinorChannel);
-    if (chan.m_atscMinorChannel)
+    if (chan.m_atscMajorChannel)
     {
         if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             return chan_num;
