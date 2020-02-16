@@ -1372,7 +1372,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             // Doc. A65/2013  7 August 2013  page 35
             if ((info.m_atscMajorChannel & 0x3F0) == 0x3F0)
             {
-                info.m_chanNum = (info.m_atscMajorChannel & 0x00F) << 10 + info.m_atscMinorChannel;
+                info.m_chanNum = ((info.m_atscMajorChannel & 0x00F) << 10) + info.m_atscMinorChannel;
             }
         }
     }
