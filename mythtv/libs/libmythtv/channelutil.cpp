@@ -606,7 +606,7 @@ uint ChannelUtil::GetMplexID(uint chanid)
  *  \return mplexid on success, -1 on failure.
  */
 
-// current_mplexid always exists in scanner, see ScanTranport()
+// current_mplexid always exists in scanner, see ScanTransport()
 //
 int ChannelUtil::GetBetterMplexID(int current_mplexid,
                                   int transport_id,

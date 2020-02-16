@@ -934,10 +934,16 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 QString("\n\t\t\tsd->HasCachedAllNIT():         %1").arg(sd->HasCachedAllNIT()) +
                 QString("\n\t\t\tsd->HasCachedAllSDT(%1):    %2").arg(tsid,5).arg(sd->HasCachedAllSDT(tsid)) +
                 QString("\n\t\t\tsd->HasCachedAllBATs():        %1").arg(sd->HasCachedAllBATs()) +
+                QString("\n\t\t\tsd->HasCachedMGT():            %1").arg(sd->HasCachedMGT()) +
+                QString("\n\t\t\tsd->HasCachedAnyVCTs():        %1").arg(sd->HasCachedAnyVCTs()) +
+                QString("\n\t\t\tsd->HasCachedAllCVCTs():       %1").arg(sd->HasCachedAllCVCTs()) +
+                QString("\n\t\t\tsd->HasCachedAllTVCTs():       %1").arg(sd->HasCachedAllTVCTs()) +
                 QString("\n\t\t\tcurrentInfo->m_pmts.empty():   %1").arg(m_currentInfo->m_pmts.empty()) +
                 QString("\n\t\t\tcurrentInfo->m_nits.empty():   %1").arg(m_currentInfo->m_nits.empty()) +
                 QString("\n\t\t\tcurrentInfo->m_sdts.empty():   %1").arg(m_currentInfo->m_sdts.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_bats.empty():   %1").arg(m_currentInfo->m_bats.empty()));
+                QString("\n\t\t\tcurrentInfo->m_bats.empty():   %1").arg(m_currentInfo->m_bats.empty()) +
+                QString("\n\t\t\tcurrentInfo->m_cvtcs.empty():  %1").arg(m_currentInfo->m_cvcts.empty()) +
+                QString("\n\t\t\tcurrentInfo->m_tvtcs.empty():  %1").arg(m_currentInfo->m_tvcts.empty()));
         }
     }
     if (!wait_until_complete)
@@ -1013,16 +1019,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
         if (!m_currentInfo->IsEmpty())
         {
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Adding %1, offset %2 to channelList.")
-                    .arg((*m_current).m_tuning.toString()).arg(m_current.offset()));
-
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
-
-            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-                QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
-                QString("m_mod_sys:%1 %2").arg(item.m_tuning.m_modSys).arg(item.m_tuning.m_modSys.toString()));
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
@@ -1031,6 +1029,16 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 else
                     item.m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
             }
+
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Adding %1 offset %2 to m_channelList.")
+                    .arg((*m_current).m_tuning.toString()).arg(m_current.offset()));
+
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
+                QString("tunerType:%1 %2 ").arg(m_scanDTVTunerType).arg(m_scanDTVTunerType.toString()) +
+                QString("m_modSys:%1 %2 ").arg(item.m_tuning.m_modSys).arg(item.m_tuning.m_modSys.toString()) +
+                QString("m_dvbt2Tried:%1").arg(m_dvbt2Tried));
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
             m_currentInfo = nullptr;
@@ -1111,7 +1119,7 @@ static void update_info(ChannelInsertInfo &info,
         vct->ServiceType(i)    == 0x01 /* Analog TV */)
     {
         info.m_siStandard = "ntsc";
-        info.m_format      = "ntsc";
+        info.m_format     = "ntsc";
     }
 
     info.m_callSign = vct->ShortChannelName(i);
