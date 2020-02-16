@@ -1366,6 +1366,14 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             uint pnum = cvct->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
             update_info(info, cvct, i);
+
+            // One-part channel number, as defined in the ATSC Standard:
+            // Program and System Information Protocol for Terrestrial Broadcast and Cable
+            // Doc. A65/2013  7 August 2013  page 35
+            if ((info.m_atscMajorChannel & 0x3F0) == 0x3F0)
+            {
+                info.m_chanNum = (info.m_atscMajorChannel & 0x00F) << 10 + info.m_atscMinorChannel;
+            }
         }
     }
 
@@ -1763,8 +1771,14 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 }
                 else if (info.m_atscMajorChannel > 0)
                 {
-                    info.m_callSign =
-                        QString("MPTS_%1").arg(info.m_atscMajorChannel);
+                    if (info.m_atscMajorChannel < 0x3F0)
+                    {
+                        info.m_callSign = QString("MPTS_%1").arg(info.m_atscMajorChannel);
+                    }
+                    else
+                    {
+                        info.m_callSign = QString("MPTS_%1").arg(info.m_freqId);
+                    }
                 }
                 else if (info.m_serviceId > 0)
                 {
