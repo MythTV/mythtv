@@ -49,7 +49,8 @@ MythDeinterlacer::~MythDeinterlacer()
  * \param Force Set to true to ensure a deinterlaced frame is always returned.
  * Used for preview images.
 */
-void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
+void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
+                              VideoDisplayProfile *Profile, bool Force)
 {
     // nothing to see here
     if (!Frame || (Scan != kScan_Interlaced && Scan != kScan_Intr2ndField))
@@ -110,7 +111,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
             .arg(m_doubleRate).arg(m_topFirst)
             .arg(Frame->width).arg(Frame->height).arg(format_description(Frame->codec))
             .arg(doublerate).arg(topfieldfirst));
-        if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst))
+        if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst, Profile))
         {
             Cleanup();
             return;
@@ -119,7 +120,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
     }
     else if ((abs(Frame->frameCounter - m_discontinuityCounter) > 1) && (m_deintType != DEINT_BASIC))
     {
-        if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst))
+        if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst, Profile))
         {
             Cleanup();
             return;
@@ -300,7 +301,7 @@ void MythDeinterlacer::Cleanup(void)
 
 ///\brief Initialise deinterlacing using the given MythDeintType
 bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
-                                  bool DoubleRate, bool TopFieldFirst)
+                                  bool DoubleRate, bool TopFieldFirst, VideoDisplayProfile *Profile)
 {
     Cleanup();
     m_source = nullptr;
@@ -343,6 +344,14 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     if (!m_graph)
         return false;
 
+    uint threads = 1;
+    if (Profile)
+    {
+        threads = Profile->GetMaxCPUs();
+        if (threads < 1 || threads > 8)
+            threads = 1;
+    }
+
     AVFilterInOut* inputs = nullptr;
     AVFilterInOut* outputs = nullptr;
 
@@ -350,10 +359,12 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     switch (Deinterlacer)
     {
         case DEINT_MEDIUM:
-            deint = QString("yadif=mode=%1:parity=%2").arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1);
+            deint = QString("yadif=mode=%1:parity=%2:threads=%3")
+                .arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1).arg(threads);
             break;
         case DEINT_HIGH:
-            deint = QString("bwdif=mode=%1:parity=%2").arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1);
+            deint = QString("bwdif=mode=%1:parity=%2:threads=%3")
+                .arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1).arg(threads);
             break;
         default: break;
     }
@@ -375,7 +386,8 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
 
             if (m_source && m_sink)
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1'").arg(name));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1' (%2 threads)")
+                    .arg(name).arg(threads));
                 m_deintType  = Deinterlacer;
                 m_doubleRate = DoubleRate;
                 m_topFirst   = TopFieldFirst;

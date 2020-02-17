@@ -250,5 +250,5 @@ void MythVideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD* /*Osd*/,
                                        const PIPMap & /*PipPlayers*/, FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
-        m_deinterlacer.Filter(Frame, Scan);
+        m_deinterlacer.Filter(Frame, Scan, nullptr);
 }

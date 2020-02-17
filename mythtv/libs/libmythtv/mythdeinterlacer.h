@@ -7,6 +7,7 @@
 // MythTV
 #include "videoouttypes.h"
 #include "mythavutil.h"
+#include "videodisplayprofile.h"
 
 extern "C" {
 #include "libavfilter/avfilter.h"
@@ -20,11 +21,12 @@ class MythDeinterlacer
    ~MythDeinterlacer();
 
     void             Filter       (VideoFrame *Frame, FrameScanType Scan,
-                                   bool Force = false);
+                                   VideoDisplayProfile *Profile, bool Force = false);
 
   private:
     bool             Initialise   (VideoFrame *Frame, MythDeintType Deinterlacer,
-                                   bool DoubleRate, bool TopFieldFirst);
+                                   bool DoubleRate, bool TopFieldFirst,
+                                   VideoDisplayProfile *Profile);
     inline void      Cleanup      (void);
 
   private:
