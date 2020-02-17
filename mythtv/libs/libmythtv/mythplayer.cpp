@@ -4417,7 +4417,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute,
         frame->deinterlace_double = DEINT_NONE;
         frame->deinterlace_allowed = frame->deinterlace_single = DEINT_CPU | DEINT_MEDIUM;
         MythDeinterlacer deinterlacer;
-        deinterlacer.Filter(frame, kScan_Interlaced, true);
+        deinterlacer.Filter(frame, kScan_Interlaced, nullptr, true);
     }
     unsigned char *result = CreateBuffer(FMT_RGB32, m_videoDim.width(), m_videoDim.height());
     MythAVCopy copyCtx;

@@ -459,7 +459,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
 
     // software deinterlacing
     if (!dummy && swframe)
-        m_deinterlacer.Filter(Frame, Scan);
+        m_deinterlacer.Filter(Frame, Scan, m_dbDisplayProfile);
 
     if (!m_window.IsEmbedding())
     {
