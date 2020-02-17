@@ -3660,7 +3660,7 @@ void Scheduler::UpdateManuals(uint recordid)
 
     query.prepare(QString("SELECT type,title,subtitle,description,"
                           "station,startdate,starttime,"
-                          "enddate,endtime,season,episode "
+                          "enddate,endtime,season,episode,inetref "
                   "FROM %1 WHERE recordid = :RECORDID").arg(m_recordTable));
     query.bindValue(":RECORDID", recordid);
     if (!query.exec() || query.size() != 1)
@@ -3685,6 +3685,7 @@ void Scheduler::UpdateManuals(uint recordid)
 
     int season = query.value(9).toInt();
     int episode = query.value(10).toInt();
+    QString inetref = query.value(11).toString();
 
     if (description.isEmpty())
         description = startdt.toLocalTime().toString();
@@ -3752,10 +3753,10 @@ void Scheduler::UpdateManuals(uint recordid)
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
                           " title, subtitle, description, manualid,"
-                          " season, episode, generic) "
+                          " season, episode, inetref, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, "
-                          " :SEASON, :EPISODE, 1)");
+                          " :SEASON, :EPISODE, :INETREF, 1)");
             query.bindValue(":CHANID", id);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
@@ -3764,6 +3765,7 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":DESCRIPTION", description);
             query.bindValue(":SEASON", season);
             query.bindValue(":EPISODE", episode);
+            query.bindValue(":INETREF", inetref);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
