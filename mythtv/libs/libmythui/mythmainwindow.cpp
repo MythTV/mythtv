@@ -1101,11 +1101,13 @@ void MythMainWindow::Init(bool mayReInit)
 #endif
 
     // NOLINTNEXTLINE(readability-misleading-indentation)
+    bool openglwarn = false;
     if (!d->m_painter && !d->m_paintwin)
     {
         LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter. Video playback will not work!");
         d->m_painter = new MythQtPainter();
         d->m_paintwin = new MythPainterWindowQt(this, d);
+        openglwarn = QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND;
     }
 
     if (!d->m_paintwin)
@@ -1152,6 +1154,12 @@ void MythMainWindow::Init(bool mayReInit)
     // that the window has been re-init'ed.
     d->m_cecAdapter.Open();
 #endif
+
+    if (openglwarn)
+    {
+        MythNotification notification(tr("Warning: OpenGL is not available."), "");
+        d->m_nc->Queue(notification);
+    }
 }
 
 void MythMainWindow::DelayedAction(void)
