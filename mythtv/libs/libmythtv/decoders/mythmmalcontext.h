@@ -26,6 +26,7 @@ class MythMMALContext : public MythCodecContext
     static enum AVPixelFormat GetFormat (AVCodecContext*, const AVPixelFormat *PixFmt);
     static void GetDecoderList          (QStringList &Decoders);
     static bool HaveMMAL                (void);
+    static bool CheckCodecSize          (int Width, int Height, MythCodecContext::CodecProfile Profile);
 
   protected:
     static const MMALProfiles& GetProfiles(void);

@@ -20,6 +20,22 @@ MythMMALContext::~MythMMALContext()
         DestroyInterop(m_interop);
 }
 
+bool MythMMALContext::CheckCodecSize(int Width, int Height, MythCodecContext::CodecProfile Profile)
+{
+    switch (Profile)
+    {
+        case MythCodecContext::MPEG2:
+        case MythCodecContext::MPEG4:
+        case MythCodecContext::VC1:
+        case MythCodecContext::H264:
+            if (Width > 1920 || Height > 1088)
+                return false;
+            break;
+        default: break;
+    }
+    return true;
+}
+
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
                                                AVCodec **Codec,
                                                const QString &Decoder,
@@ -51,6 +67,10 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     }
 
     if (mythprofile == MythCodecContext::NoProfile)
+        return failure;
+
+    // Check size
+    if (!MythMMALContext::CheckCodecSize((*Context)->width, (*Context)->height, mythprofile))
         return failure;
 
     // check actual decoder support
