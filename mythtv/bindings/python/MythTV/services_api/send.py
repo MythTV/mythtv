@@ -6,6 +6,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from os import fdopen
 
+from xml.etree import ElementTree
 import re
 import sys
 import tempfile
@@ -249,8 +250,12 @@ class Send(object):
         # TODO: Should handle redirects here (mostly for remote backends.)
         if response.status_code > 299:
             self.logger.debug('%s', response.text)
-            raise RuntimeError('Unexpected status returned: {}: URL was: {}'
-                               .format(response.status_code, url))
+            reason = (ElementTree.fromstring(response.text)
+                      .find('errorDescription').text)
+            raise RuntimeError('Unexpected status returned: {}: Reason: "{}" '
+                               'URL was: {}'
+                               .format(response.status_code,
+                                       reason, url))
 
         self._validate_header(response.headers['Server'])
 
