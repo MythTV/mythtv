@@ -22,6 +22,8 @@ using namespace std;
 #define DEINT_QUALITY_SHADER QString("shader")
 #define DEINT_QUALITY_DRIVER QString("driver")
 
+#define VIDEO_MAX_CPUS (16U)
+
 struct RenderOptions
 {
     QStringList               *renderers;
