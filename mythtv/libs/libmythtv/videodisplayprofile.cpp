@@ -407,7 +407,7 @@ QString VideoDisplayProfile::GetDoubleRatePreferences(void) const
 
 uint VideoDisplayProfile::GetMaxCPUs(void) const
 {
-    return GetPreference("pref_max_cpus").toUInt();
+    return qBound(1U, GetPreference("pref_max_cpus").toUInt(), VIDEO_MAX_CPUS);
 }
 
 bool VideoDisplayProfile::IsSkipLoopEnabled(void) const
