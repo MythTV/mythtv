@@ -514,16 +514,29 @@ void VideoDisplayProfile::LoadBestPreferences
     m_currentPreferences.clear();
     auto it = FindMatch(Size, Framerate, CodecName);
     if (it != m_allowedPreferences.end())
+    {
         m_currentPreferences = (*it).GetAll();
+    }
+    else
+    {
+        int threads = qBound(1, QThread::idealThreadCount(), 4);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No useable profile. Using defaults.");
+        SetPreference("pref_decoder", "ffmpeg");
+        SetPreference("pref_max_cpus", QString::number(threads));
+        SetPreference("pref_videorenderer", "opengl-yv12");
+        SetPreference("pref_deint0", DEINT_QUALITY_LOW);
+        SetPreference("pref_deint1", DEINT_QUALITY_LOW);
+    }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences Result "
-            "prio:%1, w:%2, h:%3, fps:%4,"
-            " codecs:%5, decoder:%6, renderer:%7, deint:%8")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences result: "
+            "priority:%1 width:%2 height:%3 fps:%4 codecs:%5")
             .arg(GetPreference("pref_priority")).arg(GetPreference("cond_width"))
             .arg(GetPreference("cond_height")).arg(GetPreference("cond_framerate"))
-            .arg(GetPreference("cond_codecs")).arg(GetPreference("pref_decoder"))
-            .arg(GetPreference("pref_videorenderer")).arg(GetPreference("pref_deint0"))
-            );
+            .arg(GetPreference("cond_codecs")));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5")
+            .arg(GetPreference("pref_decoder")).arg(GetPreference("pref_videorenderer"))
+            .arg(GetPreference("pref_deint0")).arg(GetPreference("pref_deint1"))
+            .arg(GetPreference("pref_max_cpus")));
 }
 
 vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
