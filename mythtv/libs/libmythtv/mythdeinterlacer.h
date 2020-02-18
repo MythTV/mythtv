@@ -46,6 +46,8 @@ class MythDeinterlacer
     VideoFrame*      m_bobFrame   { nullptr };
     SwsContext*      m_swsContext { nullptr };
     long long        m_discontinuityCounter { 0 };
+    bool             m_autoFieldOrder  { false };
+    long long        m_lastFieldChange { 0 };
 };
 
 #endif // MYTHDEINTERLACER_H

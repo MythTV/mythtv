@@ -100,10 +100,37 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
         return;
     }
 
+    // certain material (telecined?) continually changes the field order. This
+    // cripples performance as the libavfiler deinterlacer is continually
+    // destroyed and recreated. Using 'auto' for the field order breaks user
+    // override of the interlacing order - so track switches in the field order
+    // and switch to auto if it is too frequent
+    bool fieldorderchanged = topfieldfirst != m_topFirst;
+    bool otherchanged = Frame->width != m_width     || Frame->height  != m_height ||
+                        deinterlacer != m_deintType || doublerate     != m_doubleRate ||
+                        Frame->codec != m_inputType;
+
+    if ((deinterlacer != DEINT_BASIC) && fieldorderchanged)
+    {
+        bool alreadyauto = m_autoFieldOrder;
+        bool change = m_lastFieldChange && (qAbs(m_lastFieldChange - Frame->frameCounter) < 10);
+        if (change && !m_autoFieldOrder)
+        {
+            m_autoFieldOrder = true;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled 'auto' for field order");
+        }
+        else if (!change && m_autoFieldOrder)
+        {
+            m_autoFieldOrder = false;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled 'auto' for field order");
+        }
+        if (alreadyauto && m_autoFieldOrder)
+            fieldorderchanged = false;
+        m_lastFieldChange = Frame->frameCounter;
+    }
+
     // Check for a change in input or deinterlacer
-    if (Frame->width != m_width     || Frame->height  != m_height ||
-        deinterlacer != m_deintType || doublerate     != m_doubleRate ||
-        topfieldfirst != m_topFirst || Frame->codec   != m_inputType)
+    if (fieldorderchanged || otherchanged)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Deinterlacer change: %1x%2 %3 dr:%4 tff:%5 -> %6x%7 %8 dr:%9 tff:%10")
@@ -287,6 +314,8 @@ void MythDeinterlacer::Cleanup(void)
     sws_freeContext(m_swsContext);
     m_swsContext = nullptr;
     m_discontinuityCounter = 0;
+    m_autoFieldOrder = false;
+    m_lastFieldChange = 0;
 
     if (m_bobFrame)
     {
@@ -303,6 +332,8 @@ void MythDeinterlacer::Cleanup(void)
 bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
                                   bool DoubleRate, bool TopFieldFirst, VideoDisplayProfile *Profile)
 {
+    auto autofieldorder = m_autoFieldOrder;
+    auto lastfieldchange = m_lastFieldChange;
     Cleanup();
     m_source = nullptr;
     m_sink   = nullptr;
@@ -360,11 +391,11 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     {
         case DEINT_MEDIUM:
             deint = QString("yadif=mode=%1:parity=%2:threads=%3")
-                .arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1).arg(threads);
+                .arg(DoubleRate ? 1 : 0).arg(m_autoFieldOrder ? -1 : TopFieldFirst ? 0 : 1).arg(threads);
             break;
         case DEINT_HIGH:
             deint = QString("bwdif=mode=%1:parity=%2:threads=%3")
-                .arg(DoubleRate ? 1 : 0).arg(TopFieldFirst ? 0 : 1).arg(threads);
+                .arg(DoubleRate ? 1 : 0).arg(m_autoFieldOrder ? -1 : TopFieldFirst ? 0 : 1).arg(threads);
             break;
         default: break;
     }
@@ -391,6 +422,8 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
                 m_deintType  = Deinterlacer;
                 m_doubleRate = DoubleRate;
                 m_topFirst   = TopFieldFirst;
+                m_autoFieldOrder = autofieldorder;
+                m_lastFieldChange = lastfieldchange;
                 return true;
             }
         }
