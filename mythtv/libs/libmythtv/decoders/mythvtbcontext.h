@@ -18,6 +18,7 @@ class MythVTBContext : public MythCodecContext
 {
   public:
     MythVTBContext(DecoderBase *Parent, MythCodecID CodecID);
+   ~MythVTBContext() override;
 
     // Shared decode only and direct rendering
     void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
@@ -37,6 +38,8 @@ class MythVTBContext : public MythCodecContext
   private:
     static const VTBProfiles& GetProfiles(void);
     static int  InitialiseDecoder        (AVCodecContext *Context);
+    void        InitFramesContext        (AVCodecContext *Context);
+    AVBufferRef*  m_framesContext { nullptr };
 };
 
 #endif
