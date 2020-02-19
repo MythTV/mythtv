@@ -184,6 +184,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     // Deinterlacing
     bool needreferenceframes = false;
+    auto discontinuity = abs(Frame->frameCounter - m_discontinuityCounter) > 1;
 
     if (is_interlaced(Scan))
     {
@@ -222,7 +223,11 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
         // driver deinterlacing
         if (!glsldeint)
+        {
+            if (discontinuity)
+                DestroyDeinterlacer();
             id = Deinterlace(Frame, id, Scan);
+        }
 
         // fallback to shaders if VAAPI deints fail
         if (m_filterError)
@@ -235,7 +240,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     if (needreferenceframes)
     {
-        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+        if (discontinuity)
             CleanupReferenceFrames();
         RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
     }
