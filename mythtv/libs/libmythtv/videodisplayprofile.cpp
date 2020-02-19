@@ -558,12 +558,27 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
     }
 
     uint profileid = 0;
+
+    auto fixrenderer = [](ProfileItem &Item)
+    {
+        // Temporary workaround for vdpau/openglvaapi renderers that should have
+        // been updated as part of the render branch merge
+        // TODO another schema update to process this (and remove quartz-blit)
+        if (Item.Get("pref_decoder") == "ffmpeg")
+        {
+            QString render = Item.Get("pref_videorenderer");
+            if (render == "vdpau" || render == "vaapiopengl")
+                Item.Set("pref_videorenderer", "opengl-yv12");
+        }
+    };
+
     while (query.next())
     {
         if (query.value(0).toUInt() != profileid)
         {
             if (profileid)
             {
+                fixrenderer(tmp);
                 tmp.SetProfileID(profileid);
                 QString error;
                 bool valid = tmp.IsValid(&error);
@@ -578,8 +593,10 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
         }
         tmp.Set(query.value(1).toString(), query.value(2).toString());
     }
+
     if (profileid)
     {
+        fixrenderer(tmp);
         tmp.SetProfileID(profileid);
         QString error;
         bool valid = tmp.IsValid(&error);
