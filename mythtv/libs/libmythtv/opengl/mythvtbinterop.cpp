@@ -44,26 +44,27 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
-                                                  VideoColourSpace *ColourSpace,
-                                                  VideoFrame *Frame,
-                                                  FrameScanType)
+CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace, VideoFrame *Frame)
 {
-    vector<MythVideoTexture*> result;
     if (!Frame)
-        return result;
+        return nullptr;
 
     if (Context && (Context != m_context))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
-    // Lock
-    OpenGLLocker locker(m_context);
-
-    // There are only ever one set of textures which are updated on each pass.
-    // Hence we cannot use reference frames without significant additional work here -
-    // but MythVTBSurfaceInterop will almost certainly always be used - so just drop back
-    // to Linearblend
-    Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_HIGH) | DEINT_MEDIUM;
+    // Check size
+    QSize surfacesize(Frame->width, Frame->height);
+    if (m_openglTextureSize != surfacesize)
+    {
+        if (!m_openglTextureSize.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
+                .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
+                .arg(Frame->width).arg(Frame->height));
+        }
+        DeleteTextures();
+        m_openglTextureSize = surfacesize;
+    }
 
     // Update colourspace and initialise on first frame
     if (ColourSpace)
@@ -75,9 +76,26 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
 
     // Retrieve pixel buffer
     // N.B. Buffer was retained in MythVTBContext and will be released in VideoBuffers
-    CVPixelBufferRef buffer = reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+    return reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+}
+
+vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
+                                                  VideoColourSpace *ColourSpace,
+                                                  VideoFrame *Frame,
+                                                  FrameScanType)
+{
+    vector<MythVideoTexture*> result;
+    OpenGLLocker locker(m_context);
+
+    CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
     if (!buffer)
         return result;
+
+    // There are only ever one set of textures which are updated on each pass.
+    // Hence we cannot use reference frames without significant additional work here -
+    // but MythVTBSurfaceInterop will almost certainly always be used - so just drop back
+    // to Linearblend
+    Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_HIGH) | DEINT_MEDIUM;
 
     int planes = CVPixelBufferGetPlaneCount(buffer);
     CVPixelBufferLockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
@@ -100,8 +118,8 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
             {
                 texture->m_frameType = FMT_VTB;
                 texture->m_frameFormat = FMT_NV12;
-                texture->m_plane = plane;
-                texture->m_planeCount = planes;
+                texture->m_plane = static_cast<uint>(plane);
+                texture->m_planeCount = static_cast<uint>(planes);
                 texture->m_allowGLSLDeint = true;
                 result.push_back(texture);
             }
@@ -160,26 +178,9 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
                                                          FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
-    if (!Frame)
-        return result;
-
-    if (Context && (Context != m_context))
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
-
-    // Lock
     OpenGLLocker locker(m_context);
 
-    // Update colourspace and initialise on first frame
-    if (ColourSpace)
-    {
-        if (m_openglTextures.isEmpty())
-            ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
-        ColourSpace->UpdateColourSpace(Frame);
-    }
-
-    // Retrieve pixel buffer
-    // N.B. Buffer was retained in MythVTBContext and will be released in VideoBuffers
-    CVPixelBufferRef buffer = reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+    CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
     if (!buffer)
         return result;
 
