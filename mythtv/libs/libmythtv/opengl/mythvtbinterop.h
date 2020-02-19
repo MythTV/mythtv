@@ -19,6 +19,8 @@ class MythVTBInterop : public MythOpenGLInterop
                                       FrameScanType    Scan) override;
 
   protected:
+    CVPixelBufferRef Verify(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace,
+                            VideoFrame *Frame);
     static Type GetInteropType(VideoFrameType Format);
     MythVTBInterop(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type);
    ~MythVTBInterop() override;
