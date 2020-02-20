@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="47"/>
+        <location filename="../mythnews/main.cpp" line="44"/>
         <source>RSS News feed reader</source>
         <translation>Läs nyheter via RSS-flöden</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="51"/>
+        <location filename="../mythnews/main.cpp" line="48"/>
         <source>Update news items</source>
         <translation>Uppdatera nyheter</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="53"/>
+        <location filename="../mythnews/main.cpp" line="50"/>
         <source>Force update news items</source>
         <translation>Tvinga nyhetsuppdatering</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="55"/>
+        <location filename="../mythnews/main.cpp" line="52"/>
         <source>Cancel news item updating</source>
         <translation>Avbryt nyhetsuppdatering</translation>
     </message>
@@ -28,47 +27,47 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="393"/>
+        <location filename="../mythnews/mythnews.cpp" line="379"/>
         <source>Updated</source>
         <translation>Uppdaterad</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="400"/>
+        <location filename="../mythnews/mythnews.cpp" line="386"/>
         <source>Unknown</source>
         <translation>Okänd</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="668"/>
         <source>Manage Feeds</source>
         <translation>Hantera flöden</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="688"/>
+        <location filename="../mythnews/mythnews.cpp" line="669"/>
         <source>Add Feed</source>
         <translation>Lägg till flöde</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="691"/>
+        <location filename="../mythnews/mythnews.cpp" line="672"/>
         <source>Edit Feed</source>
         <translation>Redigera flöde</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="692"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Delete Feed</source>
         <translation>Ta bort flöde</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="674"/>
+        <location filename="../mythnews/mythnews.cpp" line="655"/>
         <source>Options</source>
         <translation>Valmöjligheter</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="121"/>
+        <location filename="../mythnews/mythnews.cpp" line="105"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Du har inte konfigurerat MythNyheter att använda några nyhetsplatser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="595"/>
+        <location filename="../mythnews/mythnews.cpp" line="579"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Inget webbläsarkommando angivet. MythNews kräver att MythBrowser är installerad.</translation>
     </message>
@@ -76,42 +75,42 @@
 <context>
     <name>MythNewsEditor</name>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="76"/>
         <source>Edit Site Details</source>
         <translation>Redigera nyhetsplatsen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="76"/>
         <source>Enter Site Details</source>
         <translation>Fyll i detaljer för nyhetsplatsen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="80"/>
         <source>Name:</source>
         <translation>Namn:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="82"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="84"/>
         <source>Icon:</source>
         <translation>Ikon:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="86"/>
         <source>Podcast:</source>
         <translation>Podd-tv:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="88"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -119,29 +118,29 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="227"/>
+        <location filename="../mythnews/newssite.cpp" line="228"/>
         <source>Retrieve Failed. </source>
         <translation>Hämtning misslyckades. </translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
-        <location filename="../mythnews/newssite.cpp" line="252"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="244"/>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Failed to retrieve news</source>
         <translation>Misslyckades med att hämta nyheter</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
         <source>No Cached News.</source>
         <translation>Inga hämtade nyheter.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="254"/>
+        <location filename="../mythnews/newssite.cpp" line="255"/>
         <source>Failed to read downloaded file.</source>
         <translation>Misslyckades med att läsa den hämtade filen.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="262"/>
+        <location filename="../mythnews/newssite.cpp" line="263"/>
         <source>Showing Cached News.</source>
         <translation>Visar hämtade nyheter.</translation>
     </message>

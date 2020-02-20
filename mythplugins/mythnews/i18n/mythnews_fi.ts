@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fi_FI" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="47"/>
+        <location filename="../mythnews/main.cpp" line="44"/>
         <source>RSS News feed reader</source>
         <translation>RSS Uutissyötteidenlukija</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="51"/>
+        <location filename="../mythnews/main.cpp" line="48"/>
         <source>Update news items</source>
         <translation>Päivitä uutiset</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="53"/>
+        <location filename="../mythnews/main.cpp" line="50"/>
         <source>Force update news items</source>
         <translation>Pakota uutisten päivitys</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="55"/>
+        <location filename="../mythnews/main.cpp" line="52"/>
         <source>Cancel news item updating</source>
         <translation>Peru uutisten päivitys</translation>
     </message>
@@ -28,58 +27,55 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="379"/>
         <source>Updated</source>
         <translation>Päivitetty</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="386"/>
         <source>Unknown</source>
         <translation>Tuntematon</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Ladataan uutisia...</translation>
+        <translation type="vanished">Ladataan uutisia...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="668"/>
         <source>Manage Feeds</source>
         <translation>Hallitse syötteitä</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="669"/>
         <source>Add Feed</source>
         <translation>Lisää syöte</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="672"/>
         <source>Edit Feed</source>
         <translation>Muokkaa syötettä</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Delete Feed</source>
         <translation>Poista syöte</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 of %2 (%3 prosenttia)</translation>
+        <translation type="vanished">%1 of %2 (%3 prosenttia)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="579"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Selainkomento asettamatta! MythNews vaatii että MythBrowser on asennettu.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="655"/>
         <source>Options</source>
         <translation>Asetukset</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="105"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Et ole asettanut MythNewsiä käyttämään mitään sivustoa.</translation>
     </message>
@@ -87,42 +83,42 @@
 <context>
     <name>MythNewsEditor</name>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="76"/>
         <source>Edit Site Details</source>
         <translation>Muokkaa lähteen yksityiskohtia</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="76"/>
         <source>Enter Site Details</source>
         <translation>Anna lähteen yksityiskohdat</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="80"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="82"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="84"/>
         <source>Icon:</source>
         <translation>Ikoni:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="86"/>
         <source>Podcast:</source>
         <translation>Podcast:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="88"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
@@ -130,29 +126,29 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
-        <location filename="../mythnews/newssite.cpp" line="252"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="244"/>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Failed to retrieve news</source>
         <translation>Ei saatu haettua uutisia</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
         <source>No Cached News.</source>
         <translation>Ei uutisia puskurissa.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="254"/>
+        <location filename="../mythnews/newssite.cpp" line="255"/>
         <source>Failed to read downloaded file.</source>
         <translation>Virhe luettaessa haettua tiedostoa.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="262"/>
+        <location filename="../mythnews/newssite.cpp" line="263"/>
         <source>Showing Cached News.</source>
         <translation>Näytetään puskuroitua uutista.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="227"/>
+        <location filename="../mythnews/newssite.cpp" line="228"/>
         <source>Retrieve Failed. </source>
         <translation>Haku Epäonnistui. </translation>
     </message>
@@ -234,7 +230,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
         <translation>Valitse uutispalvelut joita haluat lukea.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>Uutissyötteet</translation>
     </message>
@@ -244,32 +240,67 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
         <translation>Uutisten asetukset</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Kategoria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Nettisivusto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Muokkaa RSS uutissyötteitä</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Sisällöt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Toiminnot</translation>
     </message>

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_HK" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(ArchiveUtils)</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="80"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="77"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>找不到 MythArchive 工作目錄。
@@ -15,19 +14,19 @@ Have you set the correct path in the settings?</source>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="93"/>
+        <location filename="../mytharchive/main.cpp" line="94"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>發現鎖定檔案，但其進程(process)未有執行！
 會移除過時之鎖定檔案。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="212"/>
+        <location filename="../mytharchive/main.cpp" line="215"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>未能製作能播放之 DVD。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="219"/>
+        <location filename="../mytharchive/main.cpp" line="222"/>
         <source>Last run failed to create a DVD.</source>
         <translation>未能製作 DVD。</translation>
     </message>
@@ -35,12 +34,12 @@ Removing stale lock file.</source>
 <context>
     <name>ArchiveFileSelector</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="212"/>
+        <location filename="../mytharchive/importnative.cpp" line="205"/>
         <source>Find File To Import</source>
         <translation>要匯入之檔案</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="272"/>
+        <location filename="../mytharchive/importnative.cpp" line="265"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>所選項目並非有效封存檔！</translation>
     </message>
@@ -58,371 +57,373 @@ Removing stale lock file.</source>
         <translation>MythArchive 暫時存放檔案之地點。要＊很多＊空間。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="33"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="35"/>
         <source>MythArchive Share Directory</source>
         <translation>MythArchive 共享目錄</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="36"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="38"/>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
         <translation>MythArchive 存放 script、簡介影片及佈景主題檔之地點</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="46"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="50"/>
         <source>Video format</source>
         <translation>視訊格式</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="51"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="55"/>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
         <translation>DVD 使用之視訊格式：PAL 或 NTSC。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="60"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="64"/>
         <source>File Selector Filter</source>
         <translation>篩選檔案選擇</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="63"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="67"/>
         <source>The file name filter to use in the file selector.</source>
         <translation>選擇檔案時要如何篩選。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="72"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="76"/>
         <source>Location of DVD</source>
         <translation>DVD 位置</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="75"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="79"/>
         <source>Which DVD drive to use when burning discs.</source>
         <translation>燒錄 DVD 要用哪個光碟機。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="84"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="89"/>
         <source>DVD Drive Write Speed</source>
         <translation>DVD 燒錄速度</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="87"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="92"/>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
         <translation>燒錄 DVD 時使用之速度。設為 0 讓 growisofs 自動選擇最快速度。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="98"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="103"/>
         <source>Command to play DVD</source>
         <translation>播放 DVD 之指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="101"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="106"/>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
         <translation>試播 DVD 之指令。「內置」會用 MythTV 內置播放器。%f 則會以建立 DVD 之路徑代替，如「xine -pfhq --no-splash dvd:/%f」。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="114"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="119"/>
         <source>Copy remote files</source>
         <translation>複製遠端檔案</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="117"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="122"/>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
         <translation>如設置，遠端之檔案會先複製至本機才處理。可加快處理速度並節省網絡資源</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="129"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="134"/>
         <source>Always Use Mythtranscode</source>
         <translation>一定用 Mythtranscode</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="132"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="137"/>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
         <translation>如設置，mpeg2 檔一定會經過 mythtranscode 以清掃錯誤，對解決聲音問題可能有用。如已設定「用 ProjectX」的話則無效。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="144"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="149"/>
         <source>Use ProjectX</source>
         <translation>用 ProjectX</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="147"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="152"/>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
         <translation>如設置，會以 ProjectX 而非 mythtranscode 和 mythreplex 清除廣告及分拆 mpeg2 檔。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="158"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="163"/>
         <source>Use FIFOs</source>
         <translation>用 FIFO</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="161"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="166"/>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
         <translation>Script 會以「先進先出(FIFO)」方式將 mplex 的輸出傳給 dvdauthor，而毋須製作中間檔案。此舉在多路傳輸(multiplex)作業時可節省時間及磁碟空間，但不支援 Windows 平台</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="174"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="179"/>
         <source>Add Subtitles</source>
         <translation>添加字幕</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="177"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="182"/>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
         <translation>此選項會為最終之 DVD 添加字幕。要先設置「用 ProjectX」。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="187"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="192"/>
         <source>Main Menu Aspect Ratio</source>
         <translation>主選單寬高比</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="189"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="205"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="194"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="210"/>
         <source>4:3</source>
         <comment>Aspect ratio</comment>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="190"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="206"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="195"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="211"/>
         <source>16:9</source>
         <comment>Aspect ratio</comment>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="194"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="199"/>
         <source>Aspect ratio to use when creating the main menu.</source>
         <translation>製作主選單使用之寬高比。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="203"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="208"/>
         <source>Chapter Menu Aspect Ratio</source>
         <translation>章節選單寬高比</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="207"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="216"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="212"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="221"/>
         <source>Video</source>
         <translation>影片</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="212"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="217"/>
         <source>Aspect ratio to use when creating the chapter menu. &apos;%1&apos; means use the same aspect ratio as the associated video.</source>
         <extracomment>%1 is the translation of the &quot;Video&quot; combo box choice</extracomment>
         <translation>製作章節選單時要用的寬高比。「%1」代表使用和相關影片一樣的寬高比。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="223"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="228"/>
         <source>Date format</source>
         <translation>日期格式</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="226"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="231"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>會以今天日期舉例。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="232"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="237"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>會以明天日期舉例。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="250"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="255"/>
         <source>Your preferred date format to use on DVD menus. %1</source>
         <extracomment>%1 gives additional info on the date used</extracomment>
         <translation>用於 DVD 選單的首選日期格式。%1</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="259"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="264"/>
         <source>Time format</source>
         <translation>時間格式</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="266"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="271"/>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>DVD 選單要顯示之時間格式。除非選擇帶有「上午」或「下午」之格式，否則會以 24-小時格式顯示。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="277"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="282"/>
         <source>Default Encoder Profile</source>
         <translation>預設編碼設定組合</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="279"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="284"/>
         <source>HQ</source>
         <comment>Encoder profile</comment>
         <translation>HQ</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="280"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="285"/>
         <source>SP</source>
         <comment>Encoder profile</comment>
         <translation>SP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="281"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="286"/>
         <source>LP</source>
         <comment>Encoder profile</comment>
         <translation>LP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="282"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="287"/>
         <source>EP</source>
         <comment>Encoder profile</comment>
         <translation>EP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="286"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="291"/>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
         <translation>如檔案要重新編碼時使用之預設編碼設定組合。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="295"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="300"/>
         <source>mplex Command</source>
         <translation>mplex 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="299"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="304"/>
         <source>Command to run mplex</source>
         <translation>執行 mplex 之指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="308"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="313"/>
         <source>dvdauthor command</source>
         <translation>dvdauthor 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="312"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="317"/>
         <source>Command to run dvdauthor.</source>
         <translation>執行 dvdauthor 之指令。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="321"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="326"/>
         <source>mkisofs command</source>
         <translation>mkisofs 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="325"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="330"/>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
         <translation>執行 mkisofs 之指令（用來製作 ISO 映像檔）</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="334"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="339"/>
         <source>growisofs command</source>
         <translation>growisofs 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="338"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="343"/>
         <source>Command to run growisofs. (Used to burn DVDs)</source>
         <translation>執行 growisofs 之指令。(用來燒錄 DVD)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="347"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="352"/>
         <source>M2VRequantiser command</source>
         <translation>M2VRequantiser 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="351"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="356"/>
         <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
         <translation>執行 M2VRequantiser 之指令。可有可無 - 如無安裝 M2VRequantiser 則留空。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="361"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="366"/>
         <source>jpeg2yuv command</source>
         <translation>jpeg2yuv 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="365"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="370"/>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
         <translation>執行 jpeg2yuv 之指令。其為 mjpegtools 套件一部份</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="374"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="379"/>
         <source>spumux command</source>
         <translation>spumux 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="378"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="383"/>
         <source>Command to run spumux. Part of dvdauthor package</source>
         <translation>執行 spumux 之指令。其為 dvdauthor 套件一部份</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="387"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="392"/>
         <source>mpeg2enc command</source>
         <translation>mpeg2enc 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="391"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="396"/>
         <source>Command to run mpeg2enc. Part of mjpegtools package</source>
         <translation>執行 mpeg2enc 之指令。其為 mjpegtools 套件一部份</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="400"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="405"/>
         <source>projectx command</source>
         <translation>projectx 指令</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="404"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="409"/>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
         <translation>執行 ProjectX 之指令。取代 mythtranscode 和 mythreplex，用來清除廣告及分拆 mpeg 檔。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="414"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="418"/>
         <source>MythArchive Settings</source>
         <translation>MythArchive 設定</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="425"/>
-        <source>MythArchive Settings (2)</source>
-        <translation>MythArchive 設定 (2)</translation>
+        <location filename="../mytharchive/archivesettings.cpp" line="442"/>
+        <source>MythArchive External Commands</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="435"/>
+        <source>MythArchive Settings (2)</source>
+        <translation type="vanished">MythArchive 設定 (2)</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="434"/>
         <source>DVD Menu Settings</source>
         <translation>DVD 選單設定</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="443"/>
         <source>MythArchive External Commands (1)</source>
-        <translation>MythArchive 外部指令 (1)</translation>
+        <translation type="vanished">MythArchive 外部指令 (1)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="451"/>
         <source>MythArchive External Commands (2)</source>
-        <translation>MythArchive 外部指令 (2)</translation>
+        <translation type="vanished">MythArchive 外部指令 (2)</translation>
     </message>
 </context>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1095"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>無法燒錄 DVD。
 未能製作 DVD。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1101"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
         <source>Burn DVD</source>
         <translation>燒錄 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1102"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 放入空白 DVD 然後選擇以下選項。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1114"/>
         <source>Burn DVD Rewritable</source>
         <translation>燒錄可重寫式 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1115"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>燒錄可重寫式 DVD (先清掃)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1170"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>不能執行 mytharchivehelper 以燒錄 DVD。</translation>
     </message>
@@ -478,18 +479,18 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>DVDThemeSelector</name>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="219"/>
-        <location filename="../mytharchive/themeselector.cpp" line="230"/>
+        <location filename="../mytharchive/themeselector.cpp" line="201"/>
+        <location filename="../mytharchive/themeselector.cpp" line="212"/>
         <source>No theme description file found!</source>
         <translation>找不到佈景主題說明檔！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="243"/>
+        <location filename="../mytharchive/themeselector.cpp" line="225"/>
         <source>Empty theme description!</source>
         <translation>佈景主題說明無內容！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="248"/>
+        <location filename="../mytharchive/themeselector.cpp" line="230"/>
         <source>Unable to open theme description file!</source>
         <translation>無法開啟佈景主題說明檔！</translation>
     </message>
@@ -497,27 +498,27 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="242"/>
+        <location filename="../mytharchive/exportnative.cpp" line="199"/>
         <source>You need to add at least one item to archive!</source>
         <translation>至少要有一個項目才能進行封存！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="393"/>
+        <location filename="../mytharchive/exportnative.cpp" line="344"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="400"/>
+        <location filename="../mytharchive/exportnative.cpp" line="351"/>
         <source>Remove Item</source>
         <translation>移除項目</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="495"/>
+        <location filename="../mytharchive/exportnative.cpp" line="443"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>不能製作 DVD。執行 script 時發生錯誤</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="531"/>
+        <location filename="../mytharchive/exportnative.cpp" line="479"/>
         <source>You don&apos;t have any videos!</source>
         <translation>沒有影片！</translation>
     </message>
@@ -525,22 +526,22 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="81"/>
+        <location filename="../mytharchive/fileselector.cpp" line="60"/>
         <source>Find File</source>
         <translation>找檔案</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="84"/>
+        <location filename="../mytharchive/fileselector.cpp" line="63"/>
         <source>Find Directory</source>
         <translation>找目錄</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="87"/>
+        <location filename="../mytharchive/fileselector.cpp" line="66"/>
         <source>Find Files</source>
         <translation>找檔案</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="321"/>
+        <location filename="../mytharchive/fileselector.cpp" line="296"/>
         <source>The selected item is not a directory!</source>
         <translation>所選項目並非目錄！</translation>
     </message>
@@ -548,32 +549,32 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ImportNative</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="433"/>
+        <location filename="../mytharchive/importnative.cpp" line="389"/>
         <source>You need to select a valid channel id!</source>
         <translation>要選擇至少一個有效頻道ID！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="464"/>
+        <location filename="../mytharchive/importnative.cpp" line="420"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>無法匯入封存資料。執行 &apos;mytharchivehelper&apos; 時發生問題</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="594"/>
+        <location filename="../mytharchive/importnative.cpp" line="550"/>
         <source>Select a channel id</source>
         <translation>選擇頻道ID</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="620"/>
+        <location filename="../mytharchive/importnative.cpp" line="576"/>
         <source>Select a channel number</source>
         <translation>選擇頻道編號</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="646"/>
+        <location filename="../mytharchive/importnative.cpp" line="602"/>
         <source>Select a channel name</source>
         <translation>選擇頻道名稱</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="672"/>
+        <location filename="../mytharchive/importnative.cpp" line="628"/>
         <source>Select a Callsign</source>
         <translation>選擇稱呼</translation>
     </message>
@@ -581,39 +582,39 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="77"/>
+        <location filename="../mytharchive/logviewer.cpp" line="75"/>
         <source>Cannot find any logs to show!</source>
         <translation>無可顯示之記錄！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="216"/>
+        <location filename="../mytharchive/logviewer.cpp" line="197"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>已要求停止在背景進行製作。
 可能要幾分鐘。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="355"/>
+        <location filename="../mytharchive/logviewer.cpp" line="336"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="363"/>
+        <location filename="../mytharchive/logviewer.cpp" line="344"/>
         <source>Don&apos;t Auto Update</source>
         <translation>不自動更新</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="365"/>
+        <location filename="../mytharchive/logviewer.cpp" line="346"/>
         <source>Auto Update</source>
         <translation>自動更新</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="367"/>
+        <location filename="../mytharchive/logviewer.cpp" line="348"/>
         <source>Show Progress Log</source>
         <translation>顯示進度記錄</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="368"/>
+        <location filename="../mytharchive/logviewer.cpp" line="349"/>
         <source>Show Full Log</source>
         <translation>顯示完整記錄</translation>
     </message>
@@ -621,80 +622,80 @@ This may take a few minutes.</source>
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="345"/>
-        <location filename="../mytharchive/mythburn.cpp" line="469"/>
+        <location filename="../mytharchive/mythburn.cpp" line="321"/>
+        <location filename="../mytharchive/mythburn.cpp" line="441"/>
         <source>Using Cut List</source>
         <translation>使用 Cut List</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="350"/>
-        <location filename="../mytharchive/mythburn.cpp" line="474"/>
+        <location filename="../mytharchive/mythburn.cpp" line="326"/>
+        <location filename="../mytharchive/mythburn.cpp" line="446"/>
         <source>Not Using Cut List</source>
         <translation>不使用 Cut List</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="356"/>
-        <location filename="../mytharchive/mythburn.cpp" line="480"/>
+        <location filename="../mytharchive/mythburn.cpp" line="332"/>
+        <location filename="../mytharchive/mythburn.cpp" line="452"/>
         <source>No Cut List</source>
         <translation>無 Cut List</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="367"/>
+        <location filename="../mytharchive/mythburn.cpp" line="343"/>
         <source>You need to add at least one item to archive!</source>
         <translation>至少要有一個項目才能進行封存！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="413"/>
+        <location filename="../mytharchive/mythburn.cpp" line="389"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>正提取檔案資料。請稍候...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="483"/>
+        <location filename="../mytharchive/mythburn.cpp" line="455"/>
         <source>Encoder: </source>
         <translation>編碼器：</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="809"/>
+        <location filename="../mytharchive/mythburn.cpp" line="767"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="820"/>
+        <location filename="../mytharchive/mythburn.cpp" line="778"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>不使用 Cut List</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="823"/>
+        <location filename="../mytharchive/mythburn.cpp" line="783"/>
         <source>Use Cut List</source>
         <translation>使用 Cut List</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="827"/>
+        <location filename="../mytharchive/mythburn.cpp" line="788"/>
         <source>Remove Item</source>
         <translation>移除項目</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="828"/>
+        <location filename="../mytharchive/mythburn.cpp" line="789"/>
         <source>Edit Details</source>
         <translation>編輯詳情</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="829"/>
+        <location filename="../mytharchive/mythburn.cpp" line="790"/>
         <source>Change Encoding Profile</source>
         <translation>更改編碼設定組合</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="830"/>
+        <location filename="../mytharchive/mythburn.cpp" line="791"/>
         <source>Edit Thumbnails</source>
         <translation>編輯縮圖</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="965"/>
+        <location filename="../mytharchive/mythburn.cpp" line="926"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>無法製作 DVD。執行 script 時發生問題</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
+        <location filename="../mytharchive/mythburn.cpp" line="968"/>
         <source>You don&apos;t have any videos!</source>
         <translation>沒有影片！</translation>
     </message>
@@ -702,37 +703,37 @@ This may take a few minutes.</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="302"/>
+        <location filename="../mytharchive/main.cpp" line="335"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>為所選節目切換使用 cut list 狀態</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="305"/>
+        <location filename="../mytharchive/main.cpp" line="338"/>
         <source>Create DVD</source>
         <translation>製作 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="307"/>
+        <location filename="../mytharchive/main.cpp" line="340"/>
         <source>Create Archive</source>
         <translation>進行封存</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="309"/>
+        <location filename="../mytharchive/main.cpp" line="342"/>
         <source>Import Archive</source>
         <translation>匯入封存資料</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="311"/>
+        <location filename="../mytharchive/main.cpp" line="344"/>
         <source>View Archive Log</source>
         <translation>檢視封存記錄</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="313"/>
+        <location filename="../mytharchive/main.cpp" line="346"/>
         <source>Play Created DVD</source>
         <translation>播放已製作之 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="315"/>
+        <location filename="../mytharchive/main.cpp" line="348"/>
         <source>Burn DVD</source>
         <translation>燒錄 DVD</translation>
     </message>
@@ -1045,36 +1046,36 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="112"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="88"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="373"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="478"/>
         <source>All Recordings</source>
         <translation>全部錄影</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="109"/>
         <source>Retrieving Recording List.
 Please Wait...</source>
         <translation>正提取錄影清單。
 請稍候...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="157"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>一是根本沒有錄影，一是不在本機！</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="206"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="181"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="213"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="188"/>
         <source>Clear All</source>
         <translation>全部清除</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="214"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
         <source>Select All</source>
         <translation>全選</translation>
     </message>
@@ -1082,48 +1083,48 @@ Please Wait...</source>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
         <source>Single Layer DVD</source>
         <translation>單層 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="36"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="32"/>
         <source>Single Layer DVD (4,482 MB)</source>
         <translation>單層 DVD (4,482 MB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
         <source>Dual Layer DVD</source>
         <translation>雙層 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="40"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="36"/>
         <source>Dual Layer DVD (8,964 MB)</source>
         <translation>雙層 DVD (8,964 MB)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
         <source>DVD +/- RW</source>
         <translation>DVD +/- RW</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="44"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="40"/>
         <source>Rewritable DVD</source>
         <translation>可重寫式 DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="47"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
         <source>File</source>
         <translation>檔案</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="48"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="44"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>任何閣下檔案系統可存取之檔案。</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="294"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="350"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="261"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="317"/>
         <source>Unknown</source>
         <translation>不詳</translation>
     </message>
@@ -1729,17 +1730,17 @@ Please Wait...</source>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="868"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="875"/>
         <source>Exit, Save Thumbnails</source>
         <translation>結束，並儲存縮圖</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="876"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>結束，不儲存縮圖</translation>
     </message>
@@ -1747,28 +1748,28 @@ Please Wait...</source>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="141"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Clear All</source>
         <translation>全部清除</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="149"/>
         <source>Select All</source>
         <translation>全選</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="331"/>
+        <location filename="../mytharchive/videoselector.cpp" line="499"/>
         <source>All Videos</source>
         <translation>全部影片</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="552"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>要輸入密碼才能進入此家長分級</translation>
     </message>

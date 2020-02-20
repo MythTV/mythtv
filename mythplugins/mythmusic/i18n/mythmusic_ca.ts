@@ -1,307 +1,458 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ca_ES" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
-    <name>AlbumArtImages</name>
+    <name>(MythMusicMain)</name>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1590"/>
+        <location filename="../mythmusic/main.cpp" line="92"/>
+        <source>No directories found in the &apos;Music&apos; storage group. Please run mythtv-setup on the backend machine to add one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="115"/>
+        <source>No directories found in the &apos;MusicArt&apos; storage group. Please run mythtv-setup on the backend machine to add one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="140"/>
+        <source>No music has been found.
+Please select &apos;Scan For New Music&apos; to perform a scan for music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="221"/>
+        <source>MythMusic hasn&apos;t been built with libcdio support so ripping CDs is not possible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="543"/>
+        <source>Searching for music files...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="565"/>
+        <source>Loading music tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="725"/>
         <source>Unknown</source>
         <translation type="unfinished">Desconegut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1591"/>
-        <source>Front Cover</source>
+        <location filename="../mythmusic/musicdata.cpp" line="105"/>
+        <source>Loading Music. Please wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AlbumArt</name>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="1484"/>
+        <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AlbumArtImages</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="obsolete">Desconegut</translation>
+    </message>
+</context>
+<context>
+    <name>CDRipperThread</name>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="256"/>
+        <source>Importing %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CdDecoder</name>
+    <message>
+        <location filename="../mythmusic/cddecoder.cpp" line="744"/>
+        <source>Various Artists</source>
+        <translation type="unfinished">Varis artistes</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cddecoder.cpp" line="753"/>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CdDecoderFactory</name>
+    <message>
+        <location filename="../mythmusic/cddecoder.cpp" line="779"/>
+        <source>Audio CD parser</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CriteriaRowEditor</name>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1527"/>
+        <source>Select an Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1592"/>
-        <source>Back Cover</source>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1532"/>
+        <source>Select a Compilation Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1593"/>
-        <source>CD</source>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1537"/>
+        <source>Select an Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1594"/>
-        <source>Inlay</source>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1542"/>
+        <source>Select a Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1547"/>
+        <source>Select a Title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DatabaseBox</name>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="860"/>
         <source>Copy To New Playlist</source>
-        <translation>Copiar a una nova llista de reproducció</translation>
+        <translation type="vanished">Copiar a una nova llista de reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="863"/>
         <source>Clear the Active Play Queue</source>
-        <translation>Esborrar la llista a escoltar activa</translation>
+        <translation type="vanished">Esborrar la llista a escoltar activa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="866"/>
         <source>Save Back to Playlist Tree</source>
-        <translation>Guardar la llista</translation>
+        <translation type="vanished">Guardar la llista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="820"/>
         <source>Move to Active Play Queue</source>
-        <translation>Posar a la cua de llista de reproducció</translation>
+        <translation type="vanished">Posar a la cua de llista de reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="823"/>
         <source>Delete This Playlist</source>
-        <translation>Esborrar aquesta llista de reproducció</translation>
+        <translation type="vanished">Esborrar aquesta llista de reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="830"/>
         <source>Rename This Playlist</source>
-        <translation>Canviar de nom la llista</translation>
+        <translation type="vanished">Canviar de nom la llista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="118"/>
         <source>Active Play Queue</source>
-        <translation>Activar la cua de llistes</translation>
+        <translation type="vanished">Activar la cua de llistes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="117"/>
         <source>All My Playlists</source>
-        <translation>Totes les llistes</translation>
+        <translation type="vanished">Totes les llistes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="114"/>
-        <location filename="../mythmusic/databasebox.cpp" line="214"/>
         <source>All My Music</source>
-        <translation>Tota la música</translation>
+        <translation type="vanished">Tota la música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="116"/>
         <source>Blechy Blech Blah</source>
-        <translation>Bla bla bla</translation>
+        <translation type="vanished">Bla bla bla</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="187"/>
         <source>All My Music ~ Loading Music Data </source>
-        <translation>Tota la música ~ Carregant les dades</translation>
+        <translation type="vanished">Tota la música ~ Carregant les dades</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="195"/>
         <source>Loading Music Data</source>
-        <translation>Carregant la base de dades de música</translation>
+        <translation type="vanished">Carregant la base de dades de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="77"/>
-        <location filename="../mythmusic/databasebox.cpp" line="101"/>
-        <location filename="../mythmusic/databasebox.cpp" line="391"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="356"/>
-        <location filename="../mythmusic/databasebox.cpp" line="376"/>
-        <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="358"/>
-        <location filename="../mythmusic/databasebox.cpp" line="378"/>
-        <source>CD Created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="434"/>
-        <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="890"/>
-        <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="895"/>
-        <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="898"/>
-        <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="664"/>
-        <source>Artist:	</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="668"/>
-        <source>Album:	</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="672"/>
-        <source>Title:	</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="690"/>
-        <source>Length:	</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="695"/>
         <source>Genre: </source>
-        <translation type="unfinished">Gènere: </translation>
+        <translation type="obsolete">Gènere: </translation>
     </message>
+</context>
+<context>
+    <name>DecoderHandler</name>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="659"/>
-        <source>Compilation Artist:	</source>
+        <location filename="../mythmusic/decoderhandler.cpp" line="304"/>
+        <source>Retrieving playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditAlbumartDialog</name>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="999"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1058"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1150"/>
+        <source>Change Image Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="97"/>
-        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <location filename="../mythmusic/editmetadata.cpp" line="1001"/>
+        <source>What image type do you want to use for this image?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1034"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1048"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1144"/>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1049"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1146"/>
+        <source>Rescan For Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1052"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1148"/>
+        <source>Search Internet For Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1071"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1152"/>
+        <source>Copy Selected Image To Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1076"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1154"/>
+        <source>Remove Selected Image From Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1086"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1156"/>
+        <source>Copy Image To Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1264"/>
+        <source>Are you sure you want to permanently remove this image from the tag?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="1317"/>
+        <source>Copying image to tag...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditLyricsDialog</name>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="660"/>
+        <source>Save changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataCommon</name>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="163"/>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="178"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="180"/>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="182"/>
+        <source>Exit/Do Not Save</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="408"/>
-        <source>Done</source>
+        <location filename="../mythmusic/editmetadata.cpp" line="474"/>
+        <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="513"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="517"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="488"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="751"/>
+        <source>Edit Albumart Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="489"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="758"/>
+        <source>Search Internet For Artist Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="490"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="763"/>
+        <source>Search Internet For Album Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="491"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="753"/>
+        <source>Search Internet For Genre Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="492"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="768"/>
+        <source>Check Track Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="527"/>
         <source>Various Artists</source>
         <translation type="unfinished">Varis artistes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="551"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="534"/>
         <source>Select an Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="565"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="579"/>
         <source>Select a Compilation Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="579"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="604"/>
         <source>Select an Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="600"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="647"/>
         <source>Select a Genre</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="618"/>
-        <source>Save Changes?</source>
+        <location filename="../mythmusic/editmetadata.cpp" line="778"/>
+        <source>Asked the backend to check the tracks length</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GeneralSettings</name>
+    <message>
+        <location filename="../mythmusic/generalsettings.cpp" line="62"/>
+        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="629"/>
-        <source>Save to Database Only</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="64"/>
+        <source>MythTV can upconvert stereo tracks to 5.1 audio. Set this option to enable it by default. You can enable or disable the upconversion during playback at anytime.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="633"/>
-        <source>Save to File Only</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="68"/>
+        <source>CD-ROM device used for ripping/playback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="635"/>
-        <source>Save to File and Database</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="69"/>
+        <source>Directory and filename format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="640"/>
-        <source>Exit/Do Not Save</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="73"/>
+        <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
+        <translation type="unfinished">Si s&apos;activa, MythMusic no comprovarà les marques ID3 dels fitxers i intentarà determinar el Gènere, Artista, Àlbum, Pista i Títol en funció del nom de l&apos;arxiu.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/generalsettings.cpp" line="77"/>
+        <source>If set, MythMusic will be allowed to update the metadata in the file (e.g. ID3) to match the database. This means allowing MythTV to write to the file and permissions must be set accordingly. Features such as ID3 playcounts and ratings depend on this being enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="643"/>
-        <source>Cancel</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="85"/>
+        <source>This will clear all the MythMusic database tables allowing for a fresh start. NOTE: You may lose any manual or automatic changes made to a tracks metadata like rating or playcount unless you told MythMusic to write those to the tag.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="683"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="705"/>
-        <source>Are you sure you want to save the modified metadata to the file?</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="90"/>
+        <source>Exit without saving settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="387"/>
-        <source>Track Info.</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="91"/>
+        <source>Save settings and Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="394"/>
-        <source>Album Art</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="102"/>
+        <source>Are you sure you want to reset the music database?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="401"/>
-        <source>Statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="624"/>
-        <source>Save Changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="729"/>
-        <source>Change Image Type</source>
+        <location filename="../mythmusic/generalsettings.cpp" line="148"/>
+        <source>Music database has been cleared.
+You must now scan, rip or import some tracks.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="841"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1007"/>
+        <location filename="../mythmusic/importmusic.cpp" line="934"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1129"/>
         <source>Front Cover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="843"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1009"/>
+        <location filename="../mythmusic/importmusic.cpp" line="936"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1131"/>
         <source>Back Cover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="845"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1013"/>
+        <location filename="../mythmusic/importmusic.cpp" line="938"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1135"/>
         <source>CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="847"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1011"/>
+        <location filename="../mythmusic/importmusic.cpp" line="940"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1133"/>
         <source>Inlay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="849"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1015"/>
+        <location filename="../mythmusic/importmusic.cpp" line="942"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1137"/>
         <source>&lt;Unknown&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="982"/>
+        <location filename="../mythmusic/importmusic.cpp" line="980"/>
+        <source>Copy CoverArt Failed.
+Copying to %1</source>
+        <extracomment>%1 is the filename</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1061"/>
+        <source>%1 of %2</source>
+        <comment>Current file copied</comment>
+        <extracomment>%1 is the current position of the file being copied, %2 is the total number of files</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1104"/>
         <source>File Already Exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="984"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1106"/>
         <source>New File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -309,341 +460,941 @@
 <context>
     <name>ImportMusicDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="119"/>
+        <location filename="../mythmusic/importmusic.cpp" line="108"/>
         <source>New File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="376"/>
+        <location filename="../mythmusic/importmusic.cpp" line="410"/>
         <source>This track is already in the database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="124"/>
+        <location filename="../mythmusic/importmusic.cpp" line="113"/>
         <source>Already in Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="130"/>
+        <location filename="../mythmusic/importmusic.cpp" line="92"/>
+        <source>%1 of %2</source>
+        <comment>Current track position</comment>
+        <extracomment>%1 is the current track, %2 is the number of tracks</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="119"/>
         <source>Not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="347"/>
+        <location filename="../mythmusic/importmusic.cpp" line="181"/>
+        <source>You might have unsaved changes.
+Are you sure you want to exit this screen?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="386"/>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="405"/>
+        <location filename="../mythmusic/importmusic.cpp" line="439"/>
         <source>%1 new tracks were added to the database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="555"/>
+        <location filename="../mythmusic/importmusic.cpp" line="467"/>
+        <source>Copying music file to the &apos;Music&apos; storage group on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="508"/>
+        <source>Searching for music files</source>
+        <translation type="unfinished">Cercant arxius de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="640"/>
+        <source>Select Where To Save Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="641"/>
         <source>Save Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="559"/>
+        <location filename="../mythmusic/importmusic.cpp" line="645"/>
         <source>Change Compilation Flag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="560"/>
+        <location filename="../mythmusic/importmusic.cpp" line="646"/>
         <source>Change Compilation Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="562"/>
+        <location filename="../mythmusic/importmusic.cpp" line="648"/>
         <source>Change Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="563"/>
+        <location filename="../mythmusic/importmusic.cpp" line="649"/>
         <source>Change Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="564"/>
+        <location filename="../mythmusic/importmusic.cpp" line="650"/>
         <source>Change Genre</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="565"/>
+        <location filename="../mythmusic/importmusic.cpp" line="651"/>
         <source>Change Year</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="566"/>
+        <location filename="../mythmusic/importmusic.cpp" line="652"/>
         <source>Change Rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="569"/>
-        <source>Cancel</source>
+        <location filename="../mythmusic/importmusic.cpp" line="681"/>
+        <source>Select where to save tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImportSettings</name>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="34"/>
+        <source>Full</source>
+        <translation type="unfinished">Complert</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="35"/>
+        <source>Faster</source>
+        <translation type="unfinished">Rápid</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="50"/>
+        <source>Ogg Vorbis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="51"/>
+        <source>Lame (MP3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="54"/>
+        <source>Low</source>
+        <translation type="unfinished">Baixa</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="55"/>
+        <source>Medium</source>
+        <translation type="unfinished">Mitjana</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="56"/>
+        <source>High</source>
+        <translation type="unfinished">Alta</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="57"/>
+        <source>Perfect</source>
+        <translation type="unfinished">Perfecte</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="67"/>
+        <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
+        <translation type="unfinished">Nivell Paranoia del volcador de CD. Si no li preocupen els errors en els volcats, posi el rápid.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="70"/>
+        <source>Defines the location/name for new songs. Valid tokens are:
+GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="73"/>
+        <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
+        <translation type="unfinished">Quan està actiu, els blancs en els noms dels arxius es substitueixen pel subratllat.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="75"/>
+        <source>If present this script will be executed after a CD Rip is completed.</source>
+        <translation type="unfinished">Si es trova present, s&apos;executa al finalitzar un volcat de CD.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="77"/>
+        <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
+        <translation type="unfinished">Quan s&apos;activa, el CD s&apos;expulsa automàticament quan finalitza el volcat.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="79"/>
+        <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
+        <translation type="unfinished">Còdec d&apos;àudio per al volcat de CD. El nivell &apos;Perfecte&apos; util.litzarà el còdec FLAC.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="82"/>
+        <source>Default quality for new CD rips.</source>
+        <translation type="unfinished">Qualitat de volcat per a CDs nous.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="83"/>
+        <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="86"/>
+        <source>Exit without saving settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importsettings.cpp" line="87"/>
+        <source>Save settings and Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LyricsView</name>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="150"/>
+        <location filename="../mythmusic/lyricsview.cpp" line="238"/>
+        <source>Save Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="154"/>
+        <location filename="../mythmusic/lyricsview.cpp" line="233"/>
+        <source>Edit Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="155"/>
+        <location filename="../mythmusic/lyricsview.cpp" line="235"/>
+        <source>Add Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="159"/>
+        <location filename="../mythmusic/lyricsview.cpp" line="242"/>
+        <source>Auto Scroll Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="222"/>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="228"/>
+        <location filename="../mythmusic/lyricsview.cpp" line="259"/>
+        <source>Find Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="245"/>
+        <source>Other Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="262"/>
+        <source>Search All Grabbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="268"/>
+        <source>Search %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="448"/>
+        <source>Syncronized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="448"/>
+        <source>Unsyncronized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/lyricsview.cpp" line="449"/>
+        <source>** Lyrics from %1 (%2) **</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MiniPlayer</name>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="92"/>
-        <source>Stopped</source>
+        <source>Artist</source>
+        <translation type="obsolete">Artista</translation>
+    </message>
+</context>
+<context>
+    <name>MusicCommon</name>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1196"/>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Reproduint.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1225"/>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Carregant reproducció.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1229"/>
+        <source>Stream paused.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="199"/>
-        <source>Mute: On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="201"/>
-        <source>Mute: Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="304"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1298"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1302"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1310"/>
         <source>kbps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="304"/>
-        <location filename="../mythmusic/miniplayer.cpp" line="310"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1298"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1302"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1310"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1314"/>
         <source>kHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="304"/>
-        <location filename="../mythmusic/miniplayer.cpp" line="310"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1298"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1302"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1310"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1314"/>
         <source>ch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="413"/>
-        <source>%1  by  %2</source>
-        <comment>Music track &apos;title by artist&apos;</comment>
+        <location filename="../mythmusic/musiccommon.cpp" line="1333"/>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Reproducció parada.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1368"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2239"/>
+        <location filename="../mythmusic/streamview.cpp" line="90"/>
+        <source>Fullscreen Visualizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="562"/>
-        <source>Shuffle Mode: </source>
+        <location filename="../mythmusic/musiccommon.cpp" line="1370"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2225"/>
+        <source>Playlist Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="566"/>
-        <source>Smart</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="1377"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2236"/>
+        <source>Search for Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="571"/>
-        <source>Rand</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="1379"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2221"/>
+        <source>Switch To Gallery View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="576"/>
-        <source>Album</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="1381"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2223"/>
+        <source>Switch To Tree View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="581"/>
-        <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <location filename="../mythmusic/musiccommon.cpp" line="1383"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2242"/>
+        <location filename="../mythmusic/streamview.cpp" line="91"/>
+        <source>Lyrics</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="586"/>
-        <location filename="../mythmusic/miniplayer.cpp" line="617"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1388"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2257"/>
+        <source>Search List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1393"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2285"/>
+        <source>Sync List With Current Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1397"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2286"/>
+        <source>Remove Selected Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1407"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2289"/>
+        <source>Remove All Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1415"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2293"/>
+        <source>Save To New Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1417"/>
+        <source>Enter new playlist name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1431"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2294"/>
+        <source>Save To Existing Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1433"/>
+        <source>Select the playlist to save to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1446"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2299"/>
+        <source>Switch To Move Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1454"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2297"/>
+        <source>Switch To Select Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1485"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2322"/>
+        <source>No - Exit, Stop Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1491"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2323"/>
+        <source>Yes - Exit, Continue Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1498"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2335"/>
+        <source>Change Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1500"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2336"/>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1502"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2337"/>
+        <source>Previous Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1504"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2338"/>
+        <source>Next Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1506"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2342"/>
+        <source>Jump Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1508"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2343"/>
+        <source>Jump Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1510"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2346"/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1512"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2347"/>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1514"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2350"/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1519"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2393"/>
+        <source>All Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1521"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2396"/>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1523"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2400"/>
+        <source>Tracks By Current Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1525"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2402"/>
+        <source>Tracks From Current Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1527"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2401"/>
+        <source>Tracks From Current Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1529"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2403"/>
+        <source>Tracks From Current Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1531"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2404"/>
+        <source>Tracks With Same Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1536"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2430"/>
+        <source>Replace Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1541"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2431"/>
+        <source>Add Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2123"/>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2132"/>
+        <source>Default Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2134"/>
+        <source>Stream Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2216"/>
+        <source>View Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2244"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2543"/>
+        <source>More Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2251"/>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2261"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2279"/>
+        <source>Playlist Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2262"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2372"/>
+        <source>Set Shuffle Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2263"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2357"/>
+        <source>Set Repeat Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2266"/>
+        <source>Player Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2269"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2389"/>
+        <source>Quick Playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2272"/>
+        <source>Change Visualizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2307"/>
+        <source>Exiting Music Player.
+
+Do you want to continue playing in the background?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2324"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2331"/>
+        <source>Player Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2361"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2376"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="603"/>
-        <source>Repeat Mode: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="607"/>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="612"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2362"/>
         <source>Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="634"/>
-        <source>Auto Show Player: </source>
+        <location filename="../mythmusic/musiccommon.cpp" line="2363"/>
+        <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="636"/>
-        <source>On</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="2377"/>
+        <source>Random</source>
+        <translation type="unfinished">Aleatori</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2378"/>
+        <source>Smart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="638"/>
-        <source>Off</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="2379"/>
+        <source>Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="654"/>
-        <source>Volume: </source>
+        <location filename="../mythmusic/musiccommon.cpp" line="2380"/>
+        <source>Artist</source>
+        <translation type="unfinished">Artista</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2412"/>
+        <source>Choose Visualizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="657"/>
-        <source>(muted)</source>
+        <location filename="../mythmusic/musiccommon.cpp" line="2426"/>
+        <source>Add to Playlist Options</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>MusicData</name>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="692"/>
-        <source>Speed: </source>
+        <location filename="../mythmusic/musicdata.cpp" line="63"/>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MusicPlayer</name>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="623"/>
         <source>playlist root</source>
-        <translation type="unfinished">Llista arrel</translation>
+        <translation type="obsolete">Llista arrel</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="317"/>
+        <source>Got too many track unavailable errors. Maybe the host with the music on is off-line?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="325"/>
+        <source>Track Unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="325"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="807"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="829"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="851"/>
+        <source>MythMusic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="746"/>
+        <source>A music file scan has started on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="747"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="767"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="784"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="790"/>
+        <source>Music File Scanner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="748"/>
+        <source>This may take a while I&apos;ll give a shout when finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="766"/>
+        <source>A music file scan has finished on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="785"/>
+        <source>Can&apos;t run the music file scanner because it is already running on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="791"/>
+        <source>The music file scanner has been running for more than 60 minutes on %1.
+Resetting and trying again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="807"/>
+        <source>Audio Output Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="829"/>
+        <source>Decoder Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="851"/>
+        <source>Decoder Handler Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="1414"/>
+        <source>%1% (Muted)</source>
+        <comment>Zero Audio Volume</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musicplayer.cpp" line="1418"/>
+        <source>Muted</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythmusic/main.cpp" line="376"/>
+        <location filename="../mythmusic/main.cpp" line="793"/>
         <source>Play music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="378"/>
+        <location filename="../mythmusic/main.cpp" line="795"/>
         <source>Select music playlists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="380"/>
+        <location filename="../mythmusic/main.cpp" line="797"/>
+        <source>Play radio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="799"/>
         <source>Rip CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="382"/>
+        <location filename="../mythmusic/main.cpp" line="801"/>
         <source>Scan music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="384"/>
+        <location filename="../mythmusic/main.cpp" line="803"/>
         <source>Show Music Miniplayer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="387"/>
+        <location filename="../mythmusic/main.cpp" line="806"/>
         <source>Move to the next track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="389"/>
+        <location filename="../mythmusic/main.cpp" line="808"/>
         <source>Move to the previous track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="391"/>
+        <location filename="../mythmusic/main.cpp" line="810"/>
         <source>Fast forward</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="393"/>
+        <location filename="../mythmusic/main.cpp" line="812"/>
         <source>Rewind</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="395"/>
+        <location filename="../mythmusic/main.cpp" line="814"/>
         <source>Pause/Start playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="397"/>
+        <location filename="../mythmusic/main.cpp" line="816"/>
         <source>Start playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="399"/>
+        <location filename="../mythmusic/main.cpp" line="818"/>
         <source>Stop playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="401"/>
+        <location filename="../mythmusic/main.cpp" line="820"/>
         <source>Volume down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="403"/>
+        <location filename="../mythmusic/main.cpp" line="822"/>
         <source>Volume up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="405"/>
+        <location filename="../mythmusic/main.cpp" line="824"/>
         <source>Mute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="407"/>
+        <location filename="../mythmusic/main.cpp" line="826"/>
+        <source>Toggle audio upmixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="828"/>
         <source>Cycle visualizer mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="409"/>
+        <location filename="../mythmusic/main.cpp" line="830"/>
         <source>Blank screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="411"/>
+        <location filename="../mythmusic/main.cpp" line="832"/>
         <source>Increase rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="413"/>
+        <location filename="../mythmusic/main.cpp" line="834"/>
         <source>Decrease rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="415"/>
+        <location filename="../mythmusic/main.cpp" line="836"/>
         <source>Refresh music tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="417"/>
-        <source>Filter All My Music</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/main.cpp" line="419"/>
-        <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/main.cpp" line="421"/>
-        <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/main.cpp" line="423"/>
+        <location filename="../mythmusic/main.cpp" line="838"/>
         <source>Increase Play Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="425"/>
+        <location filename="../mythmusic/main.cpp" line="840"/>
         <source>Decrease Play Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="428"/>
+        <location filename="../mythmusic/main.cpp" line="842"/>
+        <source>Toggle track selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="844"/>
+        <source>Toggle shuffle mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="846"/>
+        <source>Toggle repeat mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="848"/>
+        <source>Switch to previous radio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="852"/>
+        <source>Switch to the current playlist view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="854"/>
+        <source>Switch to the playlist editor tree view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="856"/>
+        <source>Switch to the playlist editor gallery view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="858"/>
+        <source>Switch to the search view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="860"/>
+        <source>Switch to the fullscreen visualiser view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="862"/>
+        <source>Switch to the radio stream view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="865"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="431"/>
+        <location filename="../mythmusic/main.cpp" line="871"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -651,1124 +1402,701 @@ Could not copy file to: %1</source>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="123"/>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Editar la llista</translation>
+        <translation type="obsolete">Editar la llista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="125"/>
         <source>Visualize</source>
-        <translation type="unfinished">Visualitzar</translation>
+        <translation type="obsolete">Visualitzar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="136"/>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Editar Llista</translation>
+        <translation type="obsolete">3 Editar Llista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="138"/>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualitzar</translation>
+        <translation type="obsolete">4 Visualitzar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1912"/>
         <source>Playing stream.</source>
-        <translation type="unfinished">Reproduint.</translation>
+        <translation type="obsolete">Reproduint.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1918"/>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Carregant reproducció.</translation>
+        <translation type="obsolete">Carregant reproducció.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1989"/>
         <source>Output error.</source>
-        <translation type="unfinished">Error de sortida.</translation>
+        <translation type="obsolete">Error de sortida.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2005"/>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Reproducció parada.</translation>
+        <translation type="obsolete">Reproducció parada.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2011"/>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Reproducció finalitzada.</translation>
+        <translation type="obsolete">Reproducció finalitzada.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2021"/>
         <source>Decoder error.</source>
-        <translation type="unfinished">Error de decodificació.</translation>
+        <translation type="obsolete">Error de decodificació.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1924"/>
-        <source>Stream paused.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1961"/>
-        <source>kbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1961"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1967"/>
-        <source>kHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1961"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1967"/>
-        <source>ch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="612"/>
-        <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="626"/>
-        <source>All Tracks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="630"/>
-        <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="632"/>
-        <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="634"/>
-        <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="636"/>
-        <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="622"/>
-        <source>Search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="624"/>
-        <source>From CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="608"/>
-        <source>Change Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2344"/>
-        <source>Update Playlist Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2347"/>
-        <source>Replace</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2348"/>
-        <source>Insert after current track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2349"/>
-        <source>Append to end</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2364"/>
-        <source>Continue playing current track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2365"/>
-        <source>Play first track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2366"/>
-        <source>Play first new track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2372"/>
-        <source>Remove Duplicates</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="354"/>
-        <source>Visualization: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="412"/>
-        <source>Exiting Music Player
-Do you want to continue playing in the background?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="414"/>
-        <source>No - Exit, Stop Playing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="415"/>
-        <source>Yes - Exit, Continue Playing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="416"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="638"/>
-        <source>Tracks with same Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1289"/>
-        <source>Speed: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1588"/>
-        <source>Smart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1593"/>
-        <source>Rand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1598"/>
-        <source>Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1603"/>
         <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <translation type="obsolete">Artista</translation>
     </message>
+</context>
+<context>
+    <name>PlayerSettings</name>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1608"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1697"/>
-        <source>None</source>
+        <location filename="../mythmusic/playersettings.cpp" line="34"/>
+        <location filename="../mythmusic/playersettings.cpp" line="40"/>
+        <location filename="../mythmusic/playersettings.cpp" line="46"/>
+        <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1620"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1623"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1627"/>
-        <source>Shuffle</source>
+        <location filename="../mythmusic/playersettings.cpp" line="35"/>
+        <location filename="../mythmusic/playersettings.cpp" line="41"/>
+        <source>First</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1687"/>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1692"/>
+        <location filename="../mythmusic/playersettings.cpp" line="36"/>
+        <location filename="../mythmusic/playersettings.cpp" line="42"/>
         <source>Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1710"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1713"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1717"/>
-        <source>Repeat</source>
+        <location filename="../mythmusic/playersettings.cpp" line="37"/>
+        <location filename="../mythmusic/playersettings.cpp" line="43"/>
+        <source>Exact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="47"/>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="50"/>
+        <source>Prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="51"/>
+        <location filename="../mythmusic/playersettings.cpp" line="55"/>
+        <source>Stop playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="52"/>
+        <location filename="../mythmusic/playersettings.cpp" line="56"/>
+        <source>Continue Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="66"/>
+        <source>Playback screen - Resume playback at either the beginning of the active play queue, the beginning of the last track played, or an exact point within the last track played or not at all.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="69"/>
+        <source>Playlist Editor screen - Resume playback at either the beginning of the active play queue, the beginning of the last track played, or an exact point within the last track played or not at all.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="72"/>
+        <source>Radio screen - Resume playback at the previous station or not at all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="73"/>
+        <source>Specify what action to take when exiting MythMusic plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="74"/>
+        <source>Specify what action to take when exiting MythMusic plugin due to a jumppoint being executed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="75"/>
+        <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
+        <translation type="unfinished">Automàticament mira si hi ha un CD d&apos;àudio i visualitza la seva informació en l&apos;arbre de sel·lecció de música.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="78"/>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="80"/>
+        <source>Exit without saving settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playersettings.cpp" line="81"/>
+        <source>Save settings and Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Playlist</name>
+    <message>
+        <location filename="../mythmusic/playlist.cpp" line="145"/>
+        <source>oops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <source>Default Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <source>Creating CD File System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <source>Burning CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PlaylistContainer</name>
+    <message>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="273"/>
+        <source>Something is Wrong</source>
+        <translation type="unfinished">Alguna cosa va malament</translation>
+    </message>
+</context>
+<context>
+    <name>PlaylistEditorView</name>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="246"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="716"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="726"/>
+        <source>New Smart Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="268"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="727"/>
+        <source>Remove Smart Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="273"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="454"/>
+        <source>Are you sure you want to delete this Smart Playlist?
+Category: %1 - Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="277"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="725"/>
+        <source>Edit Smart Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="298"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="332"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="690"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="722"/>
+        <source>Replace Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="304"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="338"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="691"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="723"/>
+        <source>Add Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="324"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="692"/>
+        <source>Remove Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="328"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="463"/>
+        <source>Are you sure you want to delete this Playlist?
+Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="658"/>
+        <source>More Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="689"/>
+        <source>Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="712"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="720"/>
+        <source>Smart Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="739"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1319"/>
+        <source>All Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="743"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1325"/>
+        <source>Albums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="747"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1332"/>
+        <source>Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="751"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1380"/>
+        <source>Genres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="755"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1387"/>
+        <source>Tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="759"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1394"/>
+        <source>Ratings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="763"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1401"/>
+        <source>Years</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="767"/>
+        <source>Compilations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="787"/>
+        <source>CD - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="792"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1246"/>
+        <source>Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="796"/>
+        <source>Playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="799"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1712"/>
+        <source>Smart Playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="935"/>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1175"/>
+        <source>%n Star(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1372"/>
+        <source>Compilation Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1569"/>
+        <source>** No matching tracks **</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1629"/>
+        <source>** Empty Playlist!! **</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="559"/>
-        <location filename="../mythmusic/importmusic.cpp" line="430"/>
         <source>Searching for music files</source>
-        <translation type="unfinished">Cercant arxius de música</translation>
+        <translation type="obsolete">Cercant arxius de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="577"/>
         <source>Updating music database</source>
-        <translation type="unfinished">Actualitzant la base de dades de música</translation>
+        <translation type="obsolete">Actualitzant la base de dades de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cddecoder.cpp" line="424"/>
         <source>Various Artists</source>
-        <translation>Varis artistes</translation>
+        <translation type="vanished">Varis artistes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cddecoder.cpp" line="573"/>
-        <source>Ogg Vorbis Audio</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="1353"/>
-        <location filename="../mythmusic/metadata.cpp" line="1133"/>
         <source>Unknown</source>
-        <translation>Desconegut</translation>
+        <translation type="vanished">Desconegut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="39"/>
         <source>Directory to hold music</source>
-        <translation>Directori on es guarda la música</translation>
+        <translation type="vanished">Directori on es guarda la música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="45"/>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Aquest directori (carpeta) ha d&apos;existir, i l&apos;usuari que fa servir el MythMusic n&apos;ha de tenir permís d&apos;escriptura.</translation>
+        <translation type="vanished">Aquest directori (carpeta) ha d&apos;existir, i l&apos;usuari que fa servir el MythMusic n&apos;ha de tenir permís d&apos;escriptura.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="54"/>
         <source>Audio device</source>
-        <translation>Dispositiu de sò</translation>
+        <translation type="vanished">Dispositiu de sò</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="73"/>
         <source>CD device</source>
-        <translation>Dispositiu de CD</translation>
+        <translation type="vanished">Dispositiu de CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="75"/>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>CDRom que es farà servir per a la reproducció/volcat.</translation>
+        <translation type="vanished">CDRom que es farà servir per a la reproducció/volcat.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="82"/>
         <source>Tree Sorting</source>
-        <translation>Ordenació per arbre</translation>
+        <translation type="vanished">Ordenació per arbre</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="95"/>
         <source>Script Path</source>
-        <translation>Fitxer de comandes</translation>
+        <translation type="vanished">Fitxer de comandes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="97"/>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Si es trova present, s&apos;executa al finalitzar un volcat de CD.</translation>
+        <translation type="vanished">Si es trova present, s&apos;executa al finalitzar un volcat de CD.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="105"/>
         <source>Filename Format</source>
-        <translation>Format del nom de fitxer</translation>
+        <translation type="vanished">Format del nom de fitxer</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="118"/>
         <source>Ignore ID3 Tags</source>
-        <translation>Ignorar les marques ID3</translation>
+        <translation type="vanished">Ignorar les marques ID3</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="120"/>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Si s&apos;activa, MythMusic no comprovarà les marques ID3 dels fitxers i intentarà determinar el Gènere, Artista, Àlbum, Pista i Títol en funció del nom de l&apos;arxiu.</translation>
+        <translation type="vanished">Si s&apos;activa, MythMusic no comprovarà les marques ID3 dels fitxers i intentarà determinar el Gènere, Artista, Àlbum, Pista i Títol en funció del nom de l&apos;arxiu.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="141"/>
         <source>Automatically lookup CDs</source>
-        <translation>Automàticament mira els CDs</translation>
+        <translation type="vanished">Automàticament mira els CDs</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="143"/>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Automàticament mira si hi ha un CD d&apos;àudio i visualitza la seva informació en l&apos;arbre de sel·lecció de música.</translation>
+        <translation type="vanished">Automàticament mira si hi ha un CD d&apos;àudio i visualitza la seva informació en l&apos;arbre de sel·lecció de música.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="162"/>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation>Dreceres de tecles de comandament</translation>
+        <translation type="vanished">Dreceres de tecles de comandament</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="164"/>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation>Si no s&apos;activa, necessitará les fletxes per a sel·leccionar i activar vàries funcions.</translation>
+        <translation type="vanished">Si no s&apos;activa, necessitará les fletxes per a sel·leccionar i activar vàries funcions.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="175"/>
         <source>Encoding</source>
-        <translation>Codificació</translation>
+        <translation type="vanished">Codificació</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="176"/>
-        <source>Ogg Vorbis</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="177"/>
-        <source>Lame (MP3)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="178"/>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Còdec d&apos;àudio per al volcat de CD. El nivell &apos;Perfecte&apos; util.litzarà el còdec FLAC.</translation>
+        <translation type="vanished">Còdec d&apos;àudio per al volcat de CD. El nivell &apos;Perfecte&apos; util.litzarà el còdec FLAC.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="210"/>
         <source>File storage location</source>
-        <translation>On es guarden els arxius</translation>
+        <translation type="vanished">On es guarden els arxius</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="221"/>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
-        <translation>Substitueix &apos; &apos; amb &apos;_&apos;</translation>
+        <translation type="vanished">Substitueix &apos; &apos; amb &apos;_&apos;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="223"/>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation>Quan està actiu, els blancs en els noms dels arxius es substitueixen pel subratllat.</translation>
+        <translation type="vanished">Quan està actiu, els blancs en els noms dels arxius es substitueixen pel subratllat.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="231"/>
         <source>Paranoia Level</source>
-        <translation>Nivell de Paranoia</translation>
+        <translation type="vanished">Nivell de Paranoia</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="232"/>
         <source>Full</source>
-        <translation>Complert</translation>
+        <translation type="vanished">Complert</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="233"/>
         <source>Faster</source>
-        <translation>Rápid</translation>
+        <translation type="vanished">Rápid</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="234"/>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation>Nivell Paranoia del volcador de CD. Si no li preocupen els errors en els volcats, posi el rápid.</translation>
+        <translation type="vanished">Nivell Paranoia del volcador de CD. Si no li preocupen els errors en els volcats, posi el rápid.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="243"/>
         <source>Automatically eject CDs after ripping</source>
-        <translation>Expulsa automàticament el CD després del volcat</translation>
+        <translation type="vanished">Expulsa automàticament el CD després del volcat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="245"/>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Quan s&apos;activa, el CD s&apos;expulsa automàticament quan finalitza el volcat.</translation>
+        <translation type="vanished">Quan s&apos;activa, el CD s&apos;expulsa automàticament quan finalitza el volcat.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="253"/>
         <source>Rating Weight</source>
-        <translation>Pes de puntuació</translation>
+        <translation type="vanished">Pes de puntuació</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="255"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Es fa servir en la reproducció segons &quot;Preferit&quot;. És el pès assignat en el moment d&apos;ordenar grups de cançons.</translation>
+        <translation type="vanished">Es fa servir en la reproducció segons &quot;Preferit&quot;. És el pès assignat en el moment d&apos;ordenar grups de cançons.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="265"/>
         <source>Play Count Weight</source>
-        <translation>Pes del comptador de reproduccions</translation>
+        <translation type="vanished">Pes del comptador de reproduccions</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="267"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor afecta a la puntuació atorgada segons el nombre de reproduccions de la cançó.</translation>
+        <translation type="vanished">En el mode de reproducció &apos;Preferit&apos;. Aquest valor afecta a la puntuació atorgada segons el nombre de reproduccions de la cançó.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="277"/>
         <source>Last Play Weight</source>
-        <translation>Pes per la última reproducció</translation>
+        <translation type="vanished">Pes per la última reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="279"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor puntúa segons el temps que fa que ha estat reproduida la cançó.</translation>
+        <translation type="vanished">En el mode de reproducció &apos;Preferit&apos;. Aquest valor puntúa segons el temps que fa que ha estat reproduida la cançó.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="289"/>
         <source>Random Weight</source>
-        <translation>Puntuació aleatoria</translation>
+        <translation type="vanished">Puntuació aleatoria</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="291"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor és el que s&apos;assigna al reproduïr aleatòriament les cançons.</translation>
+        <translation type="vanished">En el mode de reproducció &apos;Preferit&apos;. Aquest valor és el que s&apos;assigna al reproduïr aleatòriament les cançons.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="325"/>
         <source>Show Song Ratings</source>
-        <translation>Visualitzar puntuacions</translation>
+        <translation type="vanished">Visualitzar puntuacions</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="327"/>
         <source>Show song ratings on the playback screen.</source>
-        <translation>Visualitzar puntuacions en la pantalla de reproducció.</translation>
+        <translation type="vanished">Visualitzar puntuacions en la pantalla de reproducció.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="334"/>
         <source>List as Shuffled</source>
-        <translation>Llista barrejat</translation>
+        <translation type="vanished">Llista barrejat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="336"/>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation>Llistar les cançons en l&apos;ordre que seran reproduides.</translation>
+        <translation type="vanished">Llistar les cançons en l&apos;ordre que seran reproduides.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="344"/>
         <source>Show entire music tree</source>
-        <translation>Visualitzar l&apos;arbre complert</translation>
+        <translation type="vanished">Visualitzar l&apos;arbre complert</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="357"/>
         <source>Play mode</source>
-        <translation>Mode de reproducció</translation>
+        <translation type="vanished">Mode de reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="358"/>
-        <source>Normal</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="359"/>
         <source>Random</source>
-        <translation>Aleatori</translation>
+        <translation type="vanished">Aleatori</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="360"/>
         <source>Intelligent</source>
-        <translation>Intel·ligent</translation>
+        <translation type="vanished">Intel·ligent</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="394"/>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation>Espera avans d&apos;iniciar les visualitzacions (segons)</translation>
+        <translation type="vanished">Espera avans d&apos;iniciar les visualitzacions (segons)</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="396"/>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation>So s&apos;hi posa 0, les visualitzacions no s&apos;inicien mai.</translation>
+        <translation type="vanished">So s&apos;hi posa 0, les visualitzacions no s&apos;inicien mai.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="404"/>
         <source>Change Visualizer on each song</source>
-        <translation>Canviar la visualització en cada cançó</translation>
+        <translation type="vanished">Canviar la visualització en cada cançó</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="434"/>
         <source>Width for Visual Scaling</source>
-        <translation>Amplada per la visualització</translation>
+        <translation type="vanished">Amplada per la visualització</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="436"/>
-        <location filename="../mythmusic/globalsettings.cpp" line="448"/>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Amb valor &quot;2&quot; les visualtzacions són redimensionades a la meitat. Disponible només amb la visualització &apos;goom&apos;. Redueix l&apos;ús de processador en sistemes antics i lents.</translation>
+        <translation type="vanished">Amb valor &quot;2&quot; les visualtzacions són redimensionades a la meitat. Disponible només amb la visualització &apos;goom&apos;. Redueix l&apos;ús de processador en sistemes antics i lents.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="446"/>
         <source>Height for Visual Scaling</source>
-        <translation>Alçada de la visualització</translation>
+        <translation type="vanished">Alçada de la visualització</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="458"/>
         <source>Visualizations</source>
-        <translation>Visualitzacions</translation>
+        <translation type="vanished">Visualitzacions</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="187"/>
         <source>Default Rip Quality</source>
-        <translation>Qualitat de volcat per omisió</translation>
+        <translation type="vanished">Qualitat de volcat per omisió</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="188"/>
         <source>Low</source>
-        <translation>Baixa</translation>
+        <translation type="vanished">Baixa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="189"/>
         <source>Medium</source>
-        <translation>Mitjana</translation>
+        <translation type="vanished">Mitjana</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="190"/>
         <source>High</source>
-        <translation>Alta</translation>
+        <translation type="vanished">Alta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="191"/>
         <source>Perfect</source>
-        <translation>Perfecte</translation>
+        <translation type="vanished">Perfecte</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="192"/>
         <source>Default quality for new CD rips.</source>
-        <translation>Qualitat de volcat per a CDs nous.</translation>
+        <translation type="vanished">Qualitat de volcat per a CDs nous.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="577"/>
         <source>Playback Settings</source>
-        <translation>Configuració de Reproducció</translation>
+        <translation type="vanished">Configuració de Reproducció</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="596"/>
         <source>Visualization Settings</source>
-        <translation>Configuració de visualització</translation>
+        <translation type="vanished">Configuració de visualització</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="628"/>
         <source>CD Ripper Settings</source>
-        <translation>Configuració de volcat</translation>
+        <translation type="vanished">Configuració de volcat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="544"/>
-        <location filename="../mythmusic/metadata.cpp" line="836"/>
-        <location filename="../mythmusic/metadata.cpp" line="1008"/>
         <source>Unknown Artist</source>
-        <translation>Artista desconegut</translation>
+        <translation type="vanished">Artista desconegut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="548"/>
-        <location filename="../mythmusic/metadata.cpp" line="840"/>
-        <location filename="../mythmusic/metadata.cpp" line="1012"/>
         <source>Unknown Album</source>
-        <translation>Àlbum desconegut</translation>
+        <translation type="vanished">Àlbum desconegut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="552"/>
         <source>Unknown Genre</source>
-        <translation>Gènere desconegut</translation>
+        <translation type="vanished">Gènere desconegut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="892"/>
-        <location filename="../mythmusic/metadata.cpp" line="1243"/>
         <source>CD -- none</source>
-        <translation>CD - cap CD</translation>
+        <translation type="vanished">CD - cap CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="897"/>
         <source>All My Music</source>
-        <translation>Tota la música</translation>
+        <translation type="vanished">Tota la música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1369"/>
-        <location filename="../mythmusic/metadata.cpp" line="1399"/>
-        <source>%1 - %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1605"/>
-        <source>front</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1607"/>
-        <source>back</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1609"/>
-        <source>inlay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1611"/>
-        <source>cd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1613"/>
-        <source>cover</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="1136"/>
-        <location filename="../mythmusic/metadata.cpp" line="1371"/>
         <source>title</source>
-        <translation>títol</translation>
+        <translation type="vanished">títol</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1151"/>
         <source>Missing database entry: %1</source>
-        <translation>Falta entrada a la basde de dades: %1</translation>
+        <translation type="vanished">Falta entrada a la basde de dades: %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1163"/>
-        <source>Ooops</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playlist.cpp" line="36"/>
         <source>Not Initialized</source>
-        <translation>No inicialitzat</translation>
+        <translation type="vanished">No inicialitzat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="308"/>
-        <source>oops</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="184"/>
         <source>All My Playlists</source>
-        <translation>Totes les llistes</translation>
+        <translation type="vanished">Totes les llistes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="191"/>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="282"/>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="315"/>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="563"/>
         <source>Active Play Queue</source>
-        <translation>Llista de reproducció activa</translation>
+        <translation type="vanished">Llista de reproducció activa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="293"/>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="330"/>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="358"/>
         <source>Active Play Queue (%1)</source>
-        <translation>Llista de reproducció activa (%1)</translation>
+        <translation type="vanished">Llista de reproducció activa (%1)</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="424"/>
         <source>Something is Wrong</source>
-        <translation>Alguna cosa va malament</translation>
+        <translation type="vanished">Alguna cosa va malament</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualize.cpp" line="279"/>
-        <location filename="../mythmusic/visualize.cpp" line="577"/>
         <source>Visualization requires FFT library</source>
-        <translation>La visualització requereix la llibreria FFT</translation>
+        <translation type="vanished">La visualització requereix la llibreria FFT</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualize.cpp" line="280"/>
-        <location filename="../mythmusic/visualize.cpp" line="578"/>
         <source>Did you run configure?</source>
-        <translation>Ha executat configure?</translation>
+        <translation type="vanished">Ha executat configure?</translation>
     </message>
+</context>
+<context>
+    <name>RatingSettings</name>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="199"/>
-        <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="201"/>
-        <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="637"/>
-        <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="480"/>
-        <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="482"/>
-        <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="490"/>
-        <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="500"/>
-        <source>Disk Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="501"/>
-        <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="502"/>
-        <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="503"/>
-        <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="510"/>
-        <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="519"/>
-        <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="520"/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="526"/>
-        <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="534"/>
-        <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="535"/>
-        <source>Fast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="536"/>
-        <source>Complete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="537"/>
-        <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="564"/>
-        <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playlist.cpp" line="1288"/>
-        <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playlist.cpp" line="1345"/>
-        <source>Burning CD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/visualize.cpp" line="419"/>
-        <source>?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/cddecoder.cpp" line="448"/>
-        <source>Track %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="84"/>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="152"/>
-        <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="154"/>
-        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="491"/>
-        <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/main.cpp" line="219"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1024"/>
-        <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1149"/>
-        <source>Loading Music</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="55"/>
-        <source>default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="66"/>
-        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/metadata.cpp" line="844"/>
-        <location filename="../mythmusic/metadata.cpp" line="1016"/>
-        <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/cdrip.cpp" line="185"/>
-        <source>Importing </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="107"/>
-        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="130"/>
-        <source>Tag Encoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="131"/>
-        <source>UTF-16</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="132"/>
-        <source>UTF-8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="133"/>
-        <source>ASCII</source>
-        <translation type="unfinished"></translation>
+        <location filename="../mythmusic/ratingsettings.cpp" line="39"/>
+        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
+        <translation type="unfinished">Es fa servir en la reproducció segons &quot;Preferit&quot;. És el pès assignat en el moment d&apos;ordenar grups de cançons.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="134"/>
-        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="212"/>
-        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="301"/>
-        <source>Maximum Search Results</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="303"/>
-        <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="370"/>
-        <source>Resume mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="371"/>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="372"/>
-        <source>Track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="373"/>
-        <source>Exact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="374"/>
-        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="588"/>
-        <source>Playback Settings (2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/databasebox.cpp" line="69"/>
-        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="311"/>
-        <source>Number of Artists Tree Groups</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="312"/>
-        <source>Few</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="313"/>
-        <source>Average</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="314"/>
-        <source>Many</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="315"/>
-        <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="346"/>
-        <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="361"/>
-        <source>Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="362"/>
-        <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="406"/>
-        <source>Change the visualizer when the song changes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="414"/>
-        <source>Show Album Art at the start of each song</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="416"/>
-        <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="424"/>
-        <source>Randomize Visualizer order</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="426"/>
-        <source>On changing the visualizer pick a new one at random.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="461"/>
-        <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="470"/>
-        <source>Edit Visualizations</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="471"/>
-        <source>Edit the list of visualizations to use during playback.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="492"/>
-        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="545"/>
-        <source>General Settings (1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="555"/>
-        <source>General Settings (2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/cddecoder-darwin.cpp" line="424"/>
-        <source>OSX Audio CD mount parser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/cddecoder-windows.cpp" line="108"/>
-        <source>Windows CD parser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/filescanner.cpp" line="330"/>
-        <source>Cleaning music database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/filescanner.cpp" line="648"/>
-        <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/filescanner.cpp" line="720"/>
-        <source>Scanning Album Artwork</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="383"/>
-        <source>Action on exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="384"/>
-        <source>Prompt</source>
-        <translation type="unfinished"></translation>
+        <location filename="../mythmusic/ratingsettings.cpp" line="43"/>
+        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
+        <translation type="unfinished">En el mode de reproducció &apos;Preferit&apos;. Aquest valor afecta a la puntuació atorgada segons el nombre de reproduccions de la cançó.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="385"/>
-        <source>Stop Playing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="386"/>
-        <source>Keep Playing</source>
-        <translation type="unfinished"></translation>
+        <location filename="../mythmusic/ratingsettings.cpp" line="47"/>
+        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
+        <translation type="unfinished">En el mode de reproducció &apos;Preferit&apos;. Aquest valor puntúa segons el temps que fa que ha estat reproduida la cançó.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="387"/>
-        <source>Specify what action to take when exiting mythmusic plugin.</source>
+        <location filename="../mythmusic/ratingsettings.cpp" line="51"/>
+        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (pseudo-)randomness when ordering a group of songs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/treebuilders.cpp" line="213"/>
-        <location filename="../mythmusic/treebuilders.cpp" line="228"/>
-        <location filename="../mythmusic/treebuilders.cpp" line="245"/>
-        <location filename="../mythmusic/treebuilders.cpp" line="261"/>
-        <location filename="../mythmusic/treebuilders.cpp" line="273"/>
-        <source>Artists</source>
+        <location filename="../mythmusic/ratingsettings.cpp" line="55"/>
+        <source>Exit without saving settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="480"/>
-        <source>Internal Decoder</source>
+        <location filename="../mythmusic/ratingsettings.cpp" line="56"/>
+        <source>Save settings and Exit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RipStatus</name>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1454"/>
-        <source>Are you sure you want to cancel ripping the CD?</source>
+        <location filename="../mythmusic/cdrip.cpp" line="1522"/>
+        <source>Cancel ripping the CD?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1551"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1591"/>
+        <source>Copying Track ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1620"/>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
         <translation type="unfinished"></translation>
@@ -1777,782 +2105,1941 @@ Do you have write permissions for the music directory?</source>
 <context>
     <name>Ripper</name>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="512"/>
+        <location filename="../mythmusic/cdrip.cpp" line="626"/>
         <source>Low</source>
         <translation>Baixa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="513"/>
+        <location filename="../mythmusic/cdrip.cpp" line="627"/>
         <source>Medium</source>
         <translation>Mitjana</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="514"/>
+        <location filename="../mythmusic/cdrip.cpp" line="628"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="515"/>
+        <location filename="../mythmusic/cdrip.cpp" line="629"/>
         <source>Perfect</source>
         <translation>Perfecte</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="637"/>
-        <source>Artist: %1
-Album: %2
-Track: %3
-
-This track is already in the database. 
-Do you want to remove the existing track?</source>
+        <location filename="../mythmusic/cdrip.cpp" line="683"/>
+        <source>Select Where To Save Tracks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1120"/>
+        <location filename="../mythmusic/cdrip.cpp" line="684"/>
+        <source>Edit Track Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="717"/>
+        <source>Select where to save tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="747"/>
+        <source>Scanning CD. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1101"/>
         <source>There are no tracks to rip?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1148"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1128"/>
         <source>Rip completed successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1161"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1143"/>
         <source>Ejecting CD. Please Wait ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1273"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1244"/>
         <source>Select an Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1286"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1268"/>
         <source>Select an Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1303"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1292"/>
         <source>Select a Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1395"/>
+        <source>This track has been disabled because it is already present in the database.
+Do you want to permanently delete the existing file(s)?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1410"/>
+        <source>No, Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1411"/>
+        <source>Yes, Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/cdrip.cpp" line="1412"/>
+        <source>Yes, Delete All</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SearchDialog</name>
+    <name>SearchStream</name>
     <message>
-        <location filename="../mythmusic/search.cpp" line="19"/>
-        <source>Search Music Database</source>
+        <location filename="../mythmusic/streamview.cpp" line="884"/>
+        <location filename="../mythmusic/streamview.cpp" line="901"/>
+        <location filename="../mythmusic/streamview.cpp" line="1012"/>
+        <source>&lt;All Broadcasters&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/search.cpp" line="49"/>
-        <source>OK</source>
+        <location filename="../mythmusic/streamview.cpp" line="908"/>
+        <location filename="../mythmusic/streamview.cpp" line="925"/>
+        <location filename="../mythmusic/streamview.cpp" line="1013"/>
+        <source>&lt;All Genres&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/search.cpp" line="50"/>
-        <source>Cancel</source>
+        <location filename="../mythmusic/streamview.cpp" line="934"/>
+        <location filename="../mythmusic/streamview.cpp" line="951"/>
+        <location filename="../mythmusic/streamview.cpp" line="998"/>
+        <location filename="../mythmusic/streamview.cpp" line="1015"/>
+        <source>&lt;All Countries&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/search.cpp" line="222"/>
-        <source>Search Music Database (%1 matches)</source>
+        <location filename="../mythmusic/streamview.cpp" line="961"/>
+        <location filename="../mythmusic/streamview.cpp" line="978"/>
+        <location filename="../mythmusic/streamview.cpp" line="997"/>
+        <location filename="../mythmusic/streamview.cpp" line="1014"/>
+        <source>&lt;All Languages&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="1102"/>
+        <source>Updating stream list. Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SearchView</name>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="52"/>
+        <source>All Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="54"/>
+        <source>Artist</source>
+        <translation type="unfinished">Artista</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="56"/>
+        <source>Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="58"/>
+        <source>Title</source>
+        <translation type="unfinished">Títol</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="60"/>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="169"/>
+        <location filename="../mythmusic/searchview.cpp" line="276"/>
+        <source>Add To Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="169"/>
+        <location filename="../mythmusic/searchview.cpp" line="273"/>
+        <source>Remove From Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="181"/>
+        <location filename="../mythmusic/searchview.cpp" line="277"/>
+        <source>Add To Playlist And Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="193"/>
+        <location filename="../mythmusic/searchview.cpp" line="283"/>
+        <source>Search List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="262"/>
+        <source>Search Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/searchview.cpp" line="285"/>
+        <source>More Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="669"/>
-        <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="695"/>
-        <source>Select an Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="708"/>
-        <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="721"/>
-        <source>Select a Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="682"/>
-        <source>Select a Compilation Artist</source>
+        <location filename="../mythmusic/smartplaylist.cpp" line="342"/>
+        <source>and</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2425"/>
-        <source>Edit Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2442"/>
-        <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2449"/>
-        <source>Day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2462"/>
-        <source>Month</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2475"/>
-        <source>Year</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2500"/>
-        <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2514"/>
-        <source>+/- Days</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2539"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2544"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2749"/>
-        <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SmartPLOrderByDialog</name>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2088"/>
-        <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2120"/>
-        <source>1 Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2122"/>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2127"/>
-        <source>2 Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2129"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2135"/>
-        <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2137"/>
-        <source>Move Up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2143"/>
-        <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2145"/>
-        <source>Move Down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2151"/>
-        <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2153"/>
-        <source>Ascending</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2158"/>
-        <source>6 Descending</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2160"/>
-        <source>Descending</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2166"/>
-        <source>7 OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2168"/>
-        <source>OK</source>
+        <source>Invalid Date</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1684"/>
-        <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1708"/>
-        <source>Exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1693"/>
-        <source>ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1694"/>
         <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <translation type="obsolete">Artista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1695"/>
-        <source>Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1696"/>
         <source>Title</source>
-        <translation type="unfinished">Títol</translation>
+        <translation type="obsolete">Títol</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1697"/>
-        <source>Genre</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1698"/>
-        <source>Year</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1699"/>
-        <source>Track No.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SmartPlaylistDialog</name>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1769"/>
-        <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1801"/>
-        <source>1 Select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1803"/>
-        <source>Select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1808"/>
-        <source>2 New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1810"/>
-        <source>New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1816"/>
-        <source>3 Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1818"/>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1823"/>
-        <source>4 Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1825"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1969"/>
-        <source>Are you sure you want to delete this SmartPlaylist?</source>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1702"/>
+        <source>%1 of %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="908"/>
-        <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="922"/>
-        <source>Category:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="947"/>
-        <source>Title:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="959"/>
-        <source>Match</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="966"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1157"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1258"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="396"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="726"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="832"/>
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="967"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1260"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1491"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="397"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="834"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1000"/>
         <source>Any</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="971"/>
-        <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1000"/>
-        <source>Order By:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1029"/>
-        <source>Matches:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1048"/>
-        <source>Limit:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1071"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1346"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1079"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1087"/>
-        <source>Show Results</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1331"/>
-        <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1340"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="469"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="650"/>
         <source>New Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1342"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="472"/>
+        <source>Enter Name Of New Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="484"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="651"/>
         <source>Delete Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1344"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="486"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="652"/>
         <source>Rename Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1412"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="489"/>
+        <source>Enter New Name For Category: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="546"/>
+        <source>Delete Criteria?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="636"/>
+        <source>Category Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="659"/>
+        <source>Criteria Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="676"/>
+        <source>Edit Criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="678"/>
+        <source>Add Criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="681"/>
+        <source>Delete Criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="918"/>
         <source>Are you sure you want to delete this Category?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1414"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="920"/>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StreamView</name>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="81"/>
+        <source>Stream Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="82"/>
+        <location filename="../mythmusic/streamview.cpp" line="302"/>
+        <source>Add Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="86"/>
+        <location filename="../mythmusic/streamview.cpp" line="316"/>
+        <source>Edit Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="87"/>
+        <location filename="../mythmusic/streamview.cpp" line="312"/>
+        <source>Remove Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="93"/>
+        <source>More Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="401"/>
+        <source>Are you sure you want to delete this Stream?
+Broadcaster: %1 - Channel: %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="230"/>
         <source>Please Wait...</source>
         <translation type="unfinished">Esperi uns moments...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="231"/>
         <source>Track Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Album:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Title:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Genre:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Year:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Track No.:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Rating:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="232"/>
         <source>Play Count:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="233"/>
         <source>Last Play:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Compilation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Filename:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Already in database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Cover Art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Next New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Add All New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
-        <source>Please Wait ...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Comp. Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Album Art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>%TITLE%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>%ALBUM%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>%ARTIST%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>%GENRE%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>%1 -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Played %1 times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Repeat Mode: Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Repeat Mode: Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Repeat Mode: All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Shuffle Mode: Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Shuffle Mode: Random</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="17"/>
-        <source>No Album Art Found</source>
+        <source>Shuffle Mode: Intelligent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
-        <source>Type:</source>
+        <source>Shuffle Mode: Album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Metadata</source>
+        <source>Shuffle Mode: Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
-        <source>Done</source>
+        <source>%VOLUMEPERCENT% %|(MUTE|)%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>Quality:</source>
+        <source>Next: %NEXTTITLE% by %NEXTARTIST%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
-        <source>Multi-Artist:</source>
+        <source>You haven&apos;t selected any tracks to play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
-        <source>Switch Titles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="24"/>
-        <source>Track</source>
+        <source>%TITLE% by %ARTIST% on %ALBUM%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
-        <source>Title</source>
-        <translation type="unfinished">Títol</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="26"/>
-        <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <source>No Album Art Found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
-        <source>Length</source>
-        <translation type="unfinished">Duració</translation>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
-        <source>Scan CD</source>
+        <source>Metadata</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
-        <source>Rip CD</source>
+        <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
-        <source>Importing CD</source>
+        <source>Matches:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
-        <source>Encoding Track</source>
+        <source>Quality:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
-        <source>Import Music</source>
+        <location filename="themestrings.h" line="35"/>
+        <source>Multi-Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Location:</source>
+        <location filename="themestrings.h" line="37"/>
+        <source>Switch Titles</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Title</source>
+        <translation type="unfinished">Títol</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Artist</source>
+        <translation type="unfinished">Artista</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
-        <source>Import Cover Art</source>
-        <translation type="unfinished"></translation>
+        <source>Length</source>
+        <translation type="unfinished">Duració</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
-        <source>File:</source>
+        <source>Scan CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
-        <source>Destination:</source>
+        <source>Rip CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
-        <source>Image Type:</source>
+        <source>Importing CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Encoding Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Import Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
+        <source>Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Import Cover Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>File:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Destination:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="62"/>
+        <source>Image Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="64"/>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="65"/>
+        <source>%VOLUMEPERCENT%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="66"/>
+        <source>Edit Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="68"/>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="69"/>
+        <source>Smart Playlist Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="70"/>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="71"/>
+        <source>Match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
+        <source>Of The Following Conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="73"/>
+        <source>Order By:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="74"/>
+        <source>Limit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="75"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="76"/>
+        <source>Show Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="77"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="78"/>
+        <source>Edit Criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="79"/>
+        <source>Edit Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="80"/>
+        <source>Fixed Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="81"/>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="82"/>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="83"/>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="84"/>
+        <source>Use Current Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="85"/>
+        <source>+/- Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="86"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="87"/>
+        <source>Order By Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="88"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="89"/>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="90"/>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="91"/>
+        <source>Ascending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="92"/>
+        <source>Descending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="93"/>
+        <source>Smart Playlist Result Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="94"/>
+        <source>Length:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="95"/>
+        <source>Date Added:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="96"/>
+        <source>Last Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="97"/>
+        <source>Last Played:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="98"/>
+        <source>Played:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="99"/>
+        <source>%playcount% times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="100"/>
         <source>General Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="101"/>
+        <source>CD device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="102"/>
+        <source>Audio device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="103"/>
+        <source>Convert stereo to 5.1 sound:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="104"/>
+        <source>Filename Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="105"/>
+        <source>Ignore ID3 Tags:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="106"/>
+        <source>Allow metadata to be written to tags:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="107"/>
         <source>Player Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="108"/>
+        <source>Resume mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="109"/>
+        <source>Action on exit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="110"/>
+        <source>Automatically lookup CDs:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="111"/>
+        <source>Automatically Play CDs:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="112"/>
+        <source>Rating Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="113"/>
+        <source>Rating Weight:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="114"/>
+        <source>Play Count Weight:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="115"/>
+        <source>Last Play Weight:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="116"/>
+        <source>Random Weight:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="117"/>
         <source>Ripper Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="118"/>
+        <source>Paranoia Level:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="119"/>
+        <source>File storage location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="120"/>
+        <source>Replace space with underscore:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="121"/>
+        <source>Encoding Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="122"/>
+        <source>Default Rip Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="123"/>
+        <source>Use variable bitrates:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="124"/>
+        <source>Automatically eject CDs after ripping:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="125"/>
+        <source>Script Path:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="126"/>
+        <source>Burn Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="127"/>
+        <source>Enable CD Writing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="128"/>
+        <source>CD-Writer Device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="129"/>
+        <source>Disk Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="130"/>
+        <source>CD Write Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="131"/>
+        <source>CD Blanking Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="132"/>
+        <source>Enable directories on MP3 Creation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="133"/>
+        <source>Visualiser Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="134"/>
+        <source>Change Visualizer on each song:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="135"/>
+        <source>Randomize Visualizer order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="136"/>
+        <source>Width for Visual Scaling:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="137"/>
+        <source>Height for Visual Scaling:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="138"/>
+        <source>Repeat: Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="139"/>
+        <source>Repeat: Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="140"/>
+        <source>Repeat: All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="141"/>
+        <source>Shuffle: Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="142"/>
+        <source>Shuffle: Random</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="143"/>
+        <source>Shuffle: Intelligent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="144"/>
+        <source>Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="145"/>
+        <source>Shuffle: Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="146"/>
+        <source>%DATE%, %TIME%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="147"/>
+        <source>Press MENU to add some radio streams to play.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="148"/>
+        <source>%STATION% - %CHANNEL%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Add/Edit Station and Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="150"/>
+        <source>Station:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="151"/>
+        <source>Channel:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="152"/>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="153"/>
+        <source>Logo URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="154"/>
+        <source>Metadata Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="155"/>
+        <source>Search Radio Station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="156"/>
+        <source>Found:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="157"/>
+        <source>Album: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="158"/>
+        <source>Genre: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="159"/>
+        <source>Track: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="160"/>
+        <source>Year: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="161"/>
+        <source>Last played: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="162"/>
+        <source>Played: %1 times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="163"/>
+        <source>Repeat Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="166"/>
+        <source>Shuffle Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="167"/>
+        <source>Random</source>
+        <translation type="unfinished">Aleatori</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="168"/>
+        <source>Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="169"/>
+        <source>Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="170"/>
+        <source>Playlist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="171"/>
+        <source>Next song:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="172"/>
+        <source>%NEXTTITLE% by %NEXTARTIST%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="173"/>
+        <source>By %ARTIST%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="174"/>
+        <source>On %ALBUM%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="175"/>
+        <source>Playing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="176"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="177"/>
+        <source>%TITLE%  by  %ARTIST%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="178"/>
+        <source>Directory to hold music:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="179"/>
+        <source>Resume mode (Playlist Editor):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="180"/>
+        <source>Resume mode (Radio):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="181"/>
+        <source>Action on jumppoint:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="182"/>
+        <source>Burning Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="183"/>
+        <source>Visualization Settings</source>
+        <translation type="unfinished">Configuració de visualització</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="184"/>
+        <source>Internet Stream View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="185"/>
+        <source>Add/Edit Music Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="186"/>
+        <source>Genres:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="187"/>
+        <source>Search for Music Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="188"/>
+        <source>%STATION% - %Channel%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="189"/>
+        <source>Play List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="190"/>
+        <source>Play List Editor (tree)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="191"/>
+        <source>Play List Editor (gallery)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="192"/>
+        <source>Play List Editor (search)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="193"/>
+        <source>Track Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="194"/>
+        <source>Add/Edit Lyrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="195"/>
+        <source>Grabber:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="196"/>
+        <source>Syncronized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="197"/>
+        <source>Lyrics:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="198"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="199"/>
+        <source>Match:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="200"/>
+        <source>of the following conditions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="201"/>
+        <source>Compilation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="202"/>
+        <source>Album Artwork</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="203"/>
+        <source>Look Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="204"/>
+        <source>Rip a CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="205"/>
+        <source>Multi-Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="206"/>
+        <source>Ripping CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="207"/>
+        <source>Importing CD:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="208"/>
+        <source>Encoding Track:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="209"/>
+        <source>Clears the entire database:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="210"/>
+        <source>Visualizer Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="211"/>
+        <source>Search for Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="212"/>
+        <source>Playlist View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="213"/>
+        <source>From the album %ALBUM% by the artist %ARTIST%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="214"/>
+        <source>Playlist Tree View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="215"/>
+        <source>Playlist Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="216"/>
+        <source>Search View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="217"/>
+        <source>Track Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="218"/>
+        <source>Compilation Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="219"/>
+        <source>Length: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="220"/>
+        <source>Track Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="221"/>
+        <source>Date added:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="222"/>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="223"/>
+        <source>: %VOLUMEPERCENT%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="224"/>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="225"/>
+        <source>CD Ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="226"/>
+        <source>Status:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="227"/>
+        <source>Search Term</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="228"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="229"/>
+        <source>Tag Encoding:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="235"/>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="237"/>
+        <source>Radio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="238"/>
+        <source>%channel% (%station%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="239"/>
+        <source>%CHANNEL% (%STATION%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="240"/>
+        <source>Convert stereo to 5.1 sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="241"/>
+        <source>Ignore ID3 Tags</source>
+        <translation type="unfinished">Ignorar les marques ID3</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="242"/>
+        <source>Allow metadata to be written to tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="243"/>
+        <source>Resume mode (Playlist):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="244"/>
+        <source>Automatically lookup CDs</source>
+        <translation type="unfinished">Automàticament mira els CDs</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="245"/>
+        <source>Automatically Play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="246"/>
+        <source>Replace space with underscore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="247"/>
+        <source>Use variable bitrates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="248"/>
+        <source>Automatically eject CDs after ripping</source>
+        <translation type="unfinished">Expulsa automàticament el CD després del volcat</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="249"/>
+        <source>Enable CD Writing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="250"/>
+        <source>Enable directories on MP3 Creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="251"/>
+        <source>Change Visualizer on each song</source>
+        <translation type="unfinished">Canviar la visualització en cada cançó</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="252"/>
+        <source>Randomize Visualizer order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="253"/>
+        <source>%BROADCASTER| - %%CHANNEL%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="254"/>
+        <source>Broadcaster:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="255"/>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="256"/>
+        <source>URL 1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="257"/>
+        <source>URL 2:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="258"/>
+        <source>URL 3:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="259"/>
+        <source>URL 4:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="260"/>
+        <source>URL 5:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="261"/>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="262"/>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="263"/>
+        <source>%BROADCASTER% - %Channel%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="264"/>
+        <source>Listen to Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="265"/>
+        <source>CD Ripper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="266"/>
+        <source>Matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="267"/>
+        <source>Syncronized:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="268"/>
+        <source>Allow writing metadata to tags:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="269"/>
+        <source>Reset Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="270"/>
+        <source>Broadcaster/Channel:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="271"/>
+        <source>URL1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="272"/>
+        <source>URL2:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="273"/>
+        <source>URL3:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="274"/>
+        <source>URL4:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="275"/>
+        <source>URL5:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="276"/>
+        <source>Genres/Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="277"/>
+        <source>Country/Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="278"/>
+        <source>Search For Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="279"/>
+        <source>%COUNTRY%/%LANGUAGE%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="280"/>
+        <source>Reset music database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="281"/>
+        <source>Music folders and general options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="282"/>
+        <source>Music playback options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="283"/>
+        <source>CD copying options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="284"/>
+        <source>Music rating options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="285"/>
+        <source>Music visualization options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="286"/>
         <source>Play Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="287"/>
+        <source>Play music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="288"/>
+        <source>Play Radio Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="289"/>
+        <source>Play an internet radio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="290"/>
         <source>Select Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="236"/>
         <source>Import CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="234"/>
         <source>Import Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="291"/>
+        <source>Choose which tracks to play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="292"/>
+        <source>Import new tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="293"/>
         <source>Scan for New Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="294"/>
+        <source>Look for new music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="295"/>
         <source>Eject media</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="296"/>
+        <source>Eject a CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="297"/>
         <source>Music Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="298"/>
         <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationSettings</name>
+    <message>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="42"/>
+        <source>Change the visualizer when the song changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="43"/>
+        <source>On changing the visualizer pick a new one at random.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="44"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="48"/>
+        <source>If set to &quot;2&quot;, visualizations will be scaled in half. Currently only used by the goom visualization. Reduces CPU load on slower machines.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="52"/>
+        <source>Exit without saving settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="53"/>
+        <source>Save settings and Exit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>VisualizationsEditor</name>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="656"/>
         <source>Visualizations</source>
-        <translation type="unfinished">Visualitzacions</translation>
+        <translation type="obsolete">Visualitzacions</translation>
     </message>
+</context>
+<context>
+    <name>VisualizerView</name>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="668"/>
-        <source>Selected Visualizations</source>
+        <location filename="../mythmusic/visualizerview.cpp" line="92"/>
+        <source>Actions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="673"/>
-        <source>Available Visualizations</source>
+        <location filename="../mythmusic/visualizerview.cpp" line="96"/>
+        <source>Change Visualizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="681"/>
-        <location filename="../mythmusic/globalsettings.cpp" line="696"/>
-        <source>Name</source>
+        <location filename="../mythmusic/visualizerview.cpp" line="97"/>
+        <source>Show Track Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="682"/>
-        <location filename="../mythmusic/globalsettings.cpp" line="697"/>
-        <source>Provider</source>
+        <location filename="../mythmusic/visualizerview.cpp" line="98"/>
+        <source>Other Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Visualizers</name>
+    <message>
+        <location filename="../mythmusic/bumpscope.cpp" line="530"/>
+        <source>BumpScope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="713"/>
-        <source>Move Up</source>
+        <location filename="../mythmusic/mythgoom.cpp" line="124"/>
+        <source>Goom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="720"/>
-        <source>Move Down</source>
+        <location filename="../mythmusic/synaesthesia.cpp" line="637"/>
+        <source>Synaesthesia</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="739"/>
-        <source>OK</source>
+        <location filename="../mythmusic/visualize.cpp" line="519"/>
+        <source>StereoScope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="747"/>
-        <source>Cancel</source>
+        <location filename="../mythmusic/visualize.cpp" line="545"/>
+        <source>MonoScope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="780"/>
+        <source>Spectrum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="867"/>
+        <source>Squares</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="1312"/>
+        <source>Piano</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="1505"/>
+        <source>AlbumArt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/visualize.cpp" line="1551"/>
+        <source>Blank</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>avfDecoderFactory</name>
+    <message>
+        <location filename="../mythmusic/avfdecoder.cpp" line="612"/>
+        <source>Internal Decoder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

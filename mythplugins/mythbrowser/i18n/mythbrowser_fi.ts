@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fi_FI" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="57"/>
         <source>Edit Bookmark Details</source>
         <translation>Muokkaa kirjainmerkin tietoja</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="59"/>
         <source>Enter Bookmark Details</source>
         <translation>Syötä kirjainmerkin tiedot</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="129"/>
         <source>Select a category</source>
         <translation>Valitse luokka</translation>
     </message>
@@ -23,7 +22,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="177"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="154"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -32,52 +31,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainmerkkejä</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="263"/>
         <source>Actions</source>
         <translation>Toiminnot</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="278"/>
+        <source>Set Homepage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="279"/>
         <source>Add Bookmark</source>
         <translation>Lisää kirjainmerkki</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Edit Bookmark</source>
         <translation>Muokkaa kirjainmerkkejä</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="306"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Delete Bookmark</source>
         <translation>Poista kirjainmerkki</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="307"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
         <source>Show Bookmark</source>
         <translation>Näytä kirjainmerkki</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="290"/>
         <source>Delete Marked</source>
         <translation>Poista merkityt</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="313"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
         <source>Show Marked</source>
         <translation>Näytä merkityt</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="314"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
         <source>Clear Marked</source>
         <translation>Poista valinnat</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="500"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Haluatko varmasti poistaa valitun kirjainmerkin?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="544"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Haluatko varmasti poistaa valitut kirjainmerkit?</translation>
     </message>
@@ -85,32 +94,32 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="111"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Tämä komento käynnistää selaimen. Aseta &apos;Internal&apos; käyttääksesi sisäistä selainta. %ZOO% ja %URL% korvataan zoom -arvolla ja URL listalla.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="135"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>Tämä on oletettu fontin koko, jota käytetään. Hyväksytyt arvot ovat 0.3 - 5.0. 1.0 on normaali koko, alle 1.0 ovat pienempiä kuin normaali koko ja yli 1.0 ovat suurempia kuin normaali koko.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="48"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="36"/>
         <source>MythBrowser Settings</source>
         <translation>MythBrowser asetukset</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="140"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation>Valinta sallii selaimen liitännäiset käytettäessä sisäistä selainta.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="143"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
         <source>Exit without saving settings</source>
         <translation>Poistu tallentamatta asetuksia</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="145"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
         <source>Save settings and Exit</source>
         <translation>Tallenna asetukset ja poistu</translation>
     </message>
@@ -118,53 +127,53 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="142"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Enter URL</source>
         <translation>Anna www -osoite</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="274"/>
         <source>Loading...</source>
         <translation>Lataa...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="343"/>
         <source>Actions</source>
         <translation>Toiminnot</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Back</source>
         <translation>Takaisin</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
         <source>Forward</source>
         <translation>Eteenpäin</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Zoom In</source>
         <translation>Suurenna</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Zoom Out</source>
         <translation>Loitonna</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>New Tab</source>
         <translation>Uusi välilehti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Delete Tab</source>
         <translation>Poista välilehti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Add Bookmark</source>
         <translation>Lisää kirjainmerkki</translation>
     </message>
@@ -172,17 +181,27 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="66"/>
+        <location filename="../mythbrowser/main.cpp" line="107"/>
         <source>Move to next browser tab</source>
         <translation>Siirry selaimen seuraavaan välilehteen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="68"/>
+        <location filename="../mythbrowser/main.cpp" line="109"/>
         <source>Move to previous browser tab</source>
         <translation>Siirry selaimen edelliseen välilehteen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="71"/>
+        <location filename="../mythbrowser/main.cpp" line="112"/>
+        <source>Show the bookmark manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="114"/>
+        <source>Show the webbrowser homepage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="117"/>
         <source>Internal Web Browser</source>
         <translation>Sisäinen nettiselain</translation>
     </message>
@@ -195,72 +214,77 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation>Kirjanmerkkien hallinta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Category</source>
         <translation>Luokka</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="7"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Name</source>
         <translation>Nimi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="9"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Category:</source>
         <translation>Luokka:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="14"/>
+        <source>Homepage:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
         <source>Web Page</source>
         <translation>Nettisivu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="24"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Web Bookmarks</source>
         <translation>Nettikirjanmerkit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Browse your favorite web sites.</source>
         <translation>Selaa suosikkinettisivujasi.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Browser:</source>
         <translation>Selain:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Käytä selaimen liitännäisiä (Flash, jne):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="16"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Configure Web Browser</source>
         <translation>Nettiselaimen asetukset</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="30"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -269,72 +293,105 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
         <source>Genre:</source>
-        <translation>Laji:</translation>
+        <translation type="vanished">Laji:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
         <source>Channel:</source>
-        <translation>Kanava:</translation>
+        <translation type="vanished">Kanava:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Click to choose from existing categories...</source>
         <translation>Paina valitaksesi olemassa olevista luokista...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Find...</source>
         <translation>Etsi...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Find</source>
         <translation>Etsi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
+        <source>Webbrowser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Url</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Homepage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Edit Bookmark</source>
+        <translation type="unfinished">Muokkaa kirjainmerkkejä</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Browser Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Käytä selaimen liitännäisiä (Flash, jne)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Enable plugins</source>
         <translation>Salli liitännäiset</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Enable plugins:</source>
         <translation>Salli liitännäiset:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
         <translation>Peru</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Browser Command:</source>
         <translation>Selainkomento:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Text Size:</source>
         <translation>Tekstin koko:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Rating Settings</source>
         <translation>Arvosteluasetukset</translation>
     </message>
@@ -342,7 +399,7 @@ Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tran
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="126"/>
+        <location filename="../mythbrowser/webpage.cpp" line="124"/>
         <source>Loading...</source>
         <translation>Lataa...</translation>
     </message>

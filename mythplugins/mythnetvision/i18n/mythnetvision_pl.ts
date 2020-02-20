@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="pl_PL" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="77"/>
+        <location filename="../mythnetvision/main.cpp" line="71"/>
         <source>Internet Television Client - Search</source>
         <translation>Wyszukiwanie Video</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="79"/>
+        <location filename="../mythnetvision/main.cpp" line="73"/>
         <source>Internet Television Client - Site/Tree View</source>
         <translation>Internetowe Video - Widok Strony/Drzewa</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="82"/>
+        <location filename="../mythnetvision/main.cpp" line="76"/>
         <source>Previous Page</source>
         <translation>Poprzednia Strona</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="84"/>
+        <location filename="../mythnetvision/main.cpp" line="78"/>
         <source>Next Page</source>
         <translation>Następna Strona</translation>
     </message>
@@ -28,29 +27,29 @@
 <context>
     <name>NetBase</name>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="58"/>
+        <location filename="../mythnetvision/netbase.cpp" line="55"/>
         <source>Downloading Video...</source>
         <translation>Ładuję Video...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="152"/>
+        <location filename="../mythnetvision/netbase.cpp" line="148"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Nie ustawiono przeglądarki !. MythNetVision wymaga zainstalowanego MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="189"/>
+        <location filename="../mythnetvision/netbase.cpp" line="185"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Czy napewno chcesz skasować plik ?</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="245"/>
+        <location filename="../mythnetvision/netbase.cpp" line="242"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Ładuję Video...
 (%1 z %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="275"/>
+        <location filename="../mythnetvision/netbase.cpp" line="272"/>
         <source>Error downloading video to backend.</source>
         <translation>Błąd ładowania Video na serwer Backend.</translation>
     </message>
@@ -58,7 +57,7 @@
 <context>
     <name>NetEditorBase</name>
     <message>
-        <location filename="../mythnetvision/neteditorbase.cpp" line="82"/>
+        <location filename="../mythnetvision/neteditorbase.cpp" line="76"/>
         <source>Querying Backend for Internet Content Sources...</source>
         <translation>Odpytuję Backend o dostępne źródła Internetowego Video...</translation>
     </message>
@@ -66,97 +65,97 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="177"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="171"/>
         <source>Search Options</source>
         <translation>Wszukiwanie</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="188"/>
         <source>Stream Video</source>
         <translation>Strumieniowe Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="196"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="190"/>
         <source>Open Web Link</source>
         <translation>Otwórz Link</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="211"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="206"/>
         <source>Play</source>
         <translation>Odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="211"/>
         <source>Save This Video</source>
         <translation>Zpisz Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="222"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="220"/>
         <source>Delete</source>
         <translation>Skasuj</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="228"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="226"/>
         <source>Previous Page</source>
         <translation>Poprzednia Strona</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="228"/>
         <source>Next Page</source>
         <translation>Następna Strona</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
         <source>Skip 10 Pages Back</source>
         <translation>10 Stron do Tyłu</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="236"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
         <source>Skip 10 Pages Forward</source>
         <translation>10 Stron do Przodu</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="239"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Manage Search Scripts</source>
         <translation>Zarządzaj Skryptami</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="289"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="285"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Wyszukuję %1 dla &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="313"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="309"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="328"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Przechodzę do %1 z wyszukanych &quot;%2&quot; ...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="405"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Przekroczono czas oczekiwania na odpowiedź. API strony moze być chwilowo niedostępne.</translation>
     </message>
     <message>
         <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
-        <translation>Nie ustawiono przeglądarki !. MythNetVision wymaga zainstalowania wtyczki MythBrowser.</translation>
+        <translation type="vanished">Nie ustawiono przeglądarki !. MythNetVision wymaga zainstalowania wtyczki MythBrowser.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this file?</source>
-        <translation>Czy napewno chcesz skasować plik ?</translation>
+        <translation type="vanished">Czy napewno chcesz skasować plik ?</translation>
     </message>
     <message>
         <source>Downloading Video...</source>
-        <translation>Zciągam Wideo...</translation>
+        <translation type="vanished">Zciągam Wideo...</translation>
     </message>
     <message>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
-        <translation>Zciągam Wideo...
+        <translation type="vanished">Zciągam Wideo...
 (%1 z %2 MB)</translation>
     </message>
     <message>
         <source>Error downloading video to backend.</source>
-        <translation>Błąd ładowania Wideo do serwera Backend.</translation>
+        <translation type="vanished">Błąd ładowania Wideo do serwera Backend.</translation>
     </message>
     <message>
         <source>This file already downloaded to:
@@ -167,150 +166,150 @@
 <context>
     <name>NetTree</name>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="31"/>
+        <location filename="../mythnetvision/nettree.cpp" line="32"/>
         <source>RSS Feeds</source>
         <translation>Kanały RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="32"/>
+        <location filename="../mythnetvision/nettree.cpp" line="33"/>
         <source>Searches</source>
         <translation>Wyniki Wyszukiwania</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="33"/>
+        <location filename="../mythnetvision/nettree.cpp" line="34"/>
         <source>Downloaded Files</source>
         <translation>Ładuję Pliki</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="405"/>
+        <location filename="../mythnetvision/nettree.cpp" line="399"/>
         <source>Playback/Download Options</source>
         <translation>Opcje Odtwarzania/Ładowania</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="429"/>
+        <location filename="../mythnetvision/nettree.cpp" line="423"/>
         <source>Stream Video</source>
         <translation>Strumieniowe Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="430"/>
+        <location filename="../mythnetvision/nettree.cpp" line="424"/>
         <source>Open Web Link</source>
         <translation>Otwórz Link</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="433"/>
+        <location filename="../mythnetvision/nettree.cpp" line="427"/>
         <source>Save This Video</source>
         <translation>Zpisz Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="436"/>
+        <location filename="../mythnetvision/nettree.cpp" line="430"/>
         <source>Scan/Manage Subscriptions</source>
         <translation>Zarządzaj Subskrypcjami</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="437"/>
+        <location filename="../mythnetvision/nettree.cpp" line="431"/>
         <source>Change View</source>
         <translation>Zmień Widok</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="450"/>
+        <location filename="../mythnetvision/nettree.cpp" line="444"/>
         <source>View Options</source>
         <translation>Opcje Wyświetlania</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="455"/>
+        <location filename="../mythnetvision/nettree.cpp" line="449"/>
         <source>Switch to List View</source>
         <translation>Widok Listy</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="457"/>
+        <location filename="../mythnetvision/nettree.cpp" line="451"/>
         <source>Switch to Gallery View</source>
         <translation>Widok Galerii</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="459"/>
+        <location filename="../mythnetvision/nettree.cpp" line="453"/>
         <source>Switch to Browse View</source>
         <translation>Widok Przeglądania</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="466"/>
+        <location filename="../mythnetvision/nettree.cpp" line="460"/>
         <source>Subscription Management</source>
         <translation>Zarządzanie Subskrypcjami</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="470"/>
+        <location filename="../mythnetvision/nettree.cpp" line="464"/>
         <source>Update Site Maps</source>
         <translation>Aktualizuj Mapy Portali</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="471"/>
+        <location filename="../mythnetvision/nettree.cpp" line="465"/>
         <source>Update RSS</source>
         <translation>Aktualizuj kanały RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="472"/>
+        <location filename="../mythnetvision/nettree.cpp" line="466"/>
         <source>Manage Site Subscriptions</source>
         <translation>Zarządzaj Subskrypcjami</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="473"/>
+        <location filename="../mythnetvision/nettree.cpp" line="467"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Zarządzaj Subskrypcjami RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="475"/>
+        <location filename="../mythnetvision/nettree.cpp" line="470"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Włącz Automatyczne Aktualizacje</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="478"/>
+        <location filename="../mythnetvision/nettree.cpp" line="475"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Wyłącz Automatyczne Aktualizacje</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="533"/>
-        <location filename="../mythnetvision/nettree.cpp" line="550"/>
-        <location filename="../mythnetvision/nettree.cpp" line="580"/>
-        <location filename="../mythnetvision/nettree.cpp" line="622"/>
+        <location filename="../mythnetvision/nettree.cpp" line="530"/>
+        <location filename="../mythnetvision/nettree.cpp" line="546"/>
+        <location filename="../mythnetvision/nettree.cpp" line="573"/>
+        <location filename="../mythnetvision/nettree.cpp" line="615"/>
         <source>Back</source>
         <translation>Wróć</translation>
     </message>
     <message>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
-        <translation>Nie ustawiono przeglądarki !. MythNetVision wymaga zainstalowanego MythBrowser.</translation>
+        <translation type="vanished">Nie ustawiono przeglądarki !. MythNetVision wymaga zainstalowanego MythBrowser.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this file?</source>
-        <translation>Czy napewno chcesz skasować plik?</translation>
+        <translation type="vanished">Czy napewno chcesz skasować plik?</translation>
     </message>
     <message>
         <source>Downloading Video...</source>
-        <translation>Ładuję Wideo...</translation>
+        <translation type="vanished">Ładuję Wideo...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="901"/>
+        <location filename="../mythnetvision/nettree.cpp" line="899"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Ładuję RSS. To może troczę potrwać...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="915"/>
+        <location filename="../mythnetvision/nettree.cpp" line="913"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Ładuję mapy portali. To może trochę potrwać...</translation>
     </message>
     <message>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
-        <translation>Ładuję Wideo...
+        <translation type="vanished">Ładuję Wideo...
 (%1 z %2 MB)</translation>
     </message>
     <message>
         <source>Error downloading video to backend.</source>
-        <translation>Błąd ładowania Wideo do Serwera Backend.</translation>
+        <translation type="vanished">Błąd ładowania Wideo do Serwera Backend.</translation>
     </message>
 </context>
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="504"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="468"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Czy checsz zakończyć subskrypcję tego kanału?</translation>
     </message>
@@ -319,7 +318,7 @@
     <name>SearchEditor</name>
     <message>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Odpytuję Serwer o dostępne źródła Internetowego Wideo...</translation>
+        <translation type="vanished">Odpytuję Serwer o dostępne źródła Internetowego Wideo...</translation>
     </message>
 </context>
 <context>
@@ -708,7 +707,7 @@ Autor: |AUTHOR%</translation>
     <name>TreeEditor</name>
     <message>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Odpytuję Serwer o dostępne źródła Internetowego Wideo...</translation>
+        <translation type="vanished">Odpytuję Serwer o dostępne źródła Internetowego Wideo...</translation>
     </message>
 </context>
 </TS>
