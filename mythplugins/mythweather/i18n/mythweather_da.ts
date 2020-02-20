@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="da_DK" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(Weather Screens)</name>
     <message>
@@ -43,7 +42,7 @@
 <context>
     <name>GlobalSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="56"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="42"/>
         <source>Finish</source>
         <translation>Færdig</translation>
     </message>
@@ -51,27 +50,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="959"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
         <source>Search</source>
         <translation>Søg</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="970"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="913"/>
         <source>Searching...</source>
         <translation>Søger...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="992"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="935"/>
         <source>Searching... Results: %1</source>
         <translation>Søger... Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1050"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="990"/>
         <source>Search Complete. Results: %1</source>
         <translation>Søgning fuldført. Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1071"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1011"/>
         <source>Source: %1</source>
         <translation>Kilde: %1</translation>
     </message>
@@ -99,116 +98,116 @@
 <context>
     <name>ScreenSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="126"/>
         <source>Active Screens</source>
         <translation>Aktive sider</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="155"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="130"/>
         <source>Inactive Screens</source>
         <translation>Inaktive sider</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="176"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
         <source>Finish</source>
         <translation>Færdig</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="233"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="207"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
         <translation>Tilføj de ønskede sider til listen af aktive sider ved at trykker ENTER.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="210"/>
         <source>Sources</source>
         <translation>Kilder</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="252"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="226"/>
         <source>Units: </source>
         <translation>Enheder:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="593"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="228"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="552"/>
         <source>English Units</source>
         <translation>Engelske enheder</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="594"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="228"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="553"/>
         <source>SI Units</source>
         <translation>SI enheder</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="260"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="234"/>
         <source>Location: </source>
         <translation>Lokationer:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="261"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="264"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="235"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="238"/>
         <source>Not Defined</source>
         <translation>Ikke defineret</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="263"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="237"/>
         <source>Source: </source>
         <translation>Kilde:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="267"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="241"/>
         <source>Press SELECT to </source>
         <translation>Tryk ENTER for at </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="269"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="243"/>
         <source>change location; </source>
         <translation>skift lokation;</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="271"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="245"/>
         <source>change units; </source>
         <translation>skift enheder;</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="272"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="246"/>
         <source>move screen up or down; or remove screen.</source>
         <translation>flyt siderne op og ned; eller slet siden.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="500"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="460"/>
         <source>Manipulate Screen</source>
         <translation>Ændre siden</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="514"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="474"/>
         <source>Move Up</source>
         <translation>Flyt op</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="515"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="475"/>
         <source>Move Down</source>
         <translation>Flyt ned</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="516"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="476"/>
         <source>Remove</source>
         <translation>Slet</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="517"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="477"/>
         <source>Change Location</source>
         <translation>Skift lokation</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="519"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="580"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="479"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="540"/>
         <source>Change Units</source>
         <translation>Skift enheder</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="520"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="480"/>
         <source>Cancel</source>
         <translation>Annuller</translation>
     </message>
@@ -224,22 +223,22 @@
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="785"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="735"/>
         <source>Finish</source>
         <translation>Færdig</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="899"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="847"/>
         <source>Author: </source>
         <translation>Forfatter:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="901"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="849"/>
         <source>Email: </source>
         <translation>Email:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="850"/>
         <source>Version: </source>
         <translation>Version:</translation>
     </message>
@@ -1232,12 +1231,12 @@ Når du er færdig med at foretage ændringer, så tryk &quot;Færdig&quot; for 
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="99"/>
+        <location filename="../mythweather/weather.cpp" line="86"/>
         <source>Paused</source>
         <translation>Pauset</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="211"/>
+        <location filename="../mythweather/weather.cpp" line="197"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Ingen af de konfigurerede skærme er komplette i dette tema (mangler copyright information).</translation>
     </message>
@@ -1245,37 +1244,37 @@ Når du er færdig med at foretage ændringer, så tryk &quot;Færdig&quot; for 
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="202"/>
         <source>Sunday</source>
         <translation>Søndag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="221"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="205"/>
         <source>Monday</source>
         <translation>Mandag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="224"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="208"/>
         <source>Tuesday</source>
         <translation>Tirsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="227"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="211"/>
         <source>Wednesday</source>
         <translation>Onsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="230"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="214"/>
         <source>Thursday</source>
         <translation>Torsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="233"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="217"/>
         <source>Friday</source>
         <translation>Fredag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="236"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="220"/>
         <source>Saturday</source>
         <translation>Lørdag</translation>
     </message>

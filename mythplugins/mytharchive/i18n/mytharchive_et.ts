@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="et_EE" sourcelanguage="en_US">
-<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(ArchiveUtils)</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="76"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="77"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Ei leia MythArchive töökataloogi
@@ -22,12 +21,12 @@ Removing stale lock file.</source>
 Eemaldan faili.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="213"/>
+        <location filename="../mytharchive/main.cpp" line="215"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>Viimane käivitus ei loonud esitatavat DVD-d.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="220"/>
+        <location filename="../mytharchive/main.cpp" line="222"/>
         <source>Last run failed to create a DVD.</source>
         <translation>Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
     </message>
@@ -35,12 +34,12 @@ Eemaldan faili.</translation>
 <context>
     <name>ArchiveFileSelector</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="209"/>
+        <location filename="../mytharchive/importnative.cpp" line="205"/>
         <source>Find File To Import</source>
         <translation>Vali importimiseks fail</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="269"/>
+        <location filename="../mytharchive/importnative.cpp" line="265"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>Valitud fail pole arhiivifail!</translation>
     </message>
@@ -382,37 +381,37 @@ Eemaldan faili.</translation>
 <context>
     <name>BurnMenu</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1149"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1095"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Ei saa DVD-d kirjutada.
 Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1167"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1101"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1113"/>
         <source>Burn DVD</source>
         <translation>Kirjuta DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1156"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1102"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Aseta DVD toorik seadmesseja tee allpool valik.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1168"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1114"/>
         <source>Burn DVD Rewritable</source>
         <translation>Kirjuta ülekirjutatav DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1169"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1115"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Kirjuta ülekirjutatav DVD (kustuta enne)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1225"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1170"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Pole võimalik  mytharchivehelper-it DVD kirjutamiseks käivitada.</translation>
     </message>
@@ -468,18 +467,18 @@ Aseta DVD toorik seadmesseja tee allpool valik.</translation>
 <context>
     <name>DVDThemeSelector</name>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="213"/>
-        <location filename="../mytharchive/themeselector.cpp" line="224"/>
+        <location filename="../mytharchive/themeselector.cpp" line="201"/>
+        <location filename="../mytharchive/themeselector.cpp" line="212"/>
         <source>No theme description file found!</source>
         <translation>Teema kirjeldusfaili ei leitud!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="237"/>
+        <location filename="../mytharchive/themeselector.cpp" line="225"/>
         <source>Empty theme description!</source>
         <translation>Tühi teema kirjeldus!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="242"/>
+        <location filename="../mytharchive/themeselector.cpp" line="230"/>
         <source>Unable to open theme description file!</source>
         <translation>Ei suuda teema kirjeldusfaili avada!</translation>
     </message>
@@ -487,27 +486,27 @@ Aseta DVD toorik seadmesseja tee allpool valik.</translation>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="233"/>
+        <location filename="../mytharchive/exportnative.cpp" line="199"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Pead arhiveerimiseks midagi valima!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="389"/>
+        <location filename="../mytharchive/exportnative.cpp" line="351"/>
         <source>Remove Item</source>
         <translation>Eemalda element</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="483"/>
+        <location filename="../mytharchive/exportnative.cpp" line="443"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>DVD-d ei olnud võimalik luua. Skripti töös ilmnesid vead</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="519"/>
+        <location filename="../mytharchive/exportnative.cpp" line="479"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Sul pole ühtegi videot!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="382"/>
+        <location filename="../mytharchive/exportnative.cpp" line="344"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
@@ -515,22 +514,22 @@ Aseta DVD toorik seadmesseja tee allpool valik.</translation>
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="317"/>
+        <location filename="../mytharchive/fileselector.cpp" line="296"/>
         <source>The selected item is not a directory!</source>
         <translation>valitud element pole kataloog!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="78"/>
+        <location filename="../mytharchive/fileselector.cpp" line="60"/>
         <source>Find File</source>
         <translation>Otsi faili</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="81"/>
+        <location filename="../mytharchive/fileselector.cpp" line="63"/>
         <source>Find Directory</source>
         <translation>Otsi kataloogi</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="84"/>
+        <location filename="../mytharchive/fileselector.cpp" line="66"/>
         <source>Find Files</source>
         <translation>Otsi faile</translation>
     </message>
@@ -538,32 +537,32 @@ Aseta DVD toorik seadmesseja tee allpool valik.</translation>
 <context>
     <name>ImportNative</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="426"/>
+        <location filename="../mytharchive/importnative.cpp" line="389"/>
         <source>You need to select a valid channel id!</source>
         <translation>Sa pead valima sobiva kanali!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="457"/>
+        <location filename="../mytharchive/importnative.cpp" line="420"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Arhiivi importimine pole võimalik. mytharchivehelper-i töös tekkis viga</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="587"/>
+        <location filename="../mytharchive/importnative.cpp" line="550"/>
         <source>Select a channel id</source>
         <translation>Vali kanali ID</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="613"/>
+        <location filename="../mytharchive/importnative.cpp" line="576"/>
         <source>Select a channel number</source>
         <translation>Vali kanali number</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="639"/>
+        <location filename="../mytharchive/importnative.cpp" line="602"/>
         <source>Select a channel name</source>
         <translation>Vali kanali nimi</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="665"/>
+        <location filename="../mytharchive/importnative.cpp" line="628"/>
         <source>Select a Callsign</source>
         <translation>Vali kanali kutsung</translation>
     </message>
@@ -571,39 +570,39 @@ Aseta DVD toorik seadmesseja tee allpool valik.</translation>
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="363"/>
+        <location filename="../mytharchive/logviewer.cpp" line="348"/>
         <source>Show Progress Log</source>
         <translation>Näita toimingu logi</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="364"/>
+        <location filename="../mytharchive/logviewer.cpp" line="349"/>
         <source>Show Full Log</source>
         <translation>Näita kogu logi</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="359"/>
+        <location filename="../mytharchive/logviewer.cpp" line="344"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Ära uuenda automaatselt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="77"/>
+        <location filename="../mytharchive/logviewer.cpp" line="75"/>
         <source>Cannot find any logs to show!</source>
         <translation>Ei leia ühtegi logi mida näidata!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="212"/>
+        <location filename="../mytharchive/logviewer.cpp" line="197"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Tausta loomine paluti peatada.
 Selleks võib kuluda mõni minut.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="361"/>
+        <location filename="../mytharchive/logviewer.cpp" line="346"/>
         <source>Auto Update</source>
         <translation>Uuenda automaatselt</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="351"/>
+        <location filename="../mytharchive/logviewer.cpp" line="336"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
@@ -611,80 +610,80 @@ Selleks võib kuluda mõni minut.</translation>
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="340"/>
-        <location filename="../mytharchive/mythburn.cpp" line="463"/>
+        <location filename="../mytharchive/mythburn.cpp" line="321"/>
+        <location filename="../mytharchive/mythburn.cpp" line="441"/>
         <source>Using Cut List</source>
         <translation>Kasutan lõikeloendit</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="345"/>
-        <location filename="../mytharchive/mythburn.cpp" line="468"/>
+        <location filename="../mytharchive/mythburn.cpp" line="326"/>
+        <location filename="../mytharchive/mythburn.cpp" line="446"/>
         <source>Not Using Cut List</source>
         <translation>Ei kasuta lõikeloendit</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="351"/>
-        <location filename="../mytharchive/mythburn.cpp" line="474"/>
+        <location filename="../mytharchive/mythburn.cpp" line="332"/>
+        <location filename="../mytharchive/mythburn.cpp" line="452"/>
         <source>No Cut List</source>
         <translation>Lõikeloendit pole</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="362"/>
+        <location filename="../mytharchive/mythburn.cpp" line="343"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Pead midagi arhiveerimiseks valima!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="408"/>
+        <location filename="../mytharchive/mythburn.cpp" line="389"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Uuendan faili infot. Palun oota...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="477"/>
+        <location filename="../mytharchive/mythburn.cpp" line="455"/>
         <source>Encoder: </source>
         <translation>Enkooder:</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="803"/>
+        <location filename="../mytharchive/mythburn.cpp" line="767"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="814"/>
+        <location filename="../mytharchive/mythburn.cpp" line="778"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Ära kasuta lõikeloendit</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="817"/>
+        <location filename="../mytharchive/mythburn.cpp" line="783"/>
         <source>Use Cut List</source>
         <translation>Kasuta lõikeloendit</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="821"/>
+        <location filename="../mytharchive/mythburn.cpp" line="788"/>
         <source>Remove Item</source>
         <translation>Eemalda element</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="822"/>
+        <location filename="../mytharchive/mythburn.cpp" line="789"/>
         <source>Edit Details</source>
         <translation>Muuda üksikasju</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="823"/>
+        <location filename="../mytharchive/mythburn.cpp" line="790"/>
         <source>Change Encoding Profile</source>
         <translation>Muuda kodeerimisprofiili</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="824"/>
+        <location filename="../mytharchive/mythburn.cpp" line="791"/>
         <source>Edit Thumbnails</source>
         <translation>Muuda pisipilte</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="959"/>
+        <location filename="../mytharchive/mythburn.cpp" line="926"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>DVD valmistamine pole võimalik. Skriptide töös tekkis viga</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1002"/>
+        <location filename="../mytharchive/mythburn.cpp" line="968"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Sul pole ühtegi videot!</translation>
     </message>
@@ -692,37 +691,37 @@ Selleks võib kuluda mõni minut.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="337"/>
+        <location filename="../mytharchive/main.cpp" line="335"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Vaheta lõikeloendi kasutamise valikut valitud saate jaoks</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="340"/>
+        <location filename="../mytharchive/main.cpp" line="338"/>
         <source>Create DVD</source>
         <translation>Loo DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="342"/>
+        <location filename="../mytharchive/main.cpp" line="340"/>
         <source>Create Archive</source>
         <translation>Loo arhiiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="344"/>
+        <location filename="../mytharchive/main.cpp" line="342"/>
         <source>Import Archive</source>
         <translation>Impordi arhiiv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="346"/>
+        <location filename="../mytharchive/main.cpp" line="344"/>
         <source>View Archive Log</source>
         <translation>Vaata arhiivi logi</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="348"/>
+        <location filename="../mytharchive/main.cpp" line="346"/>
         <source>Play Created DVD</source>
         <translation>Esita loodud DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="350"/>
+        <location filename="../mytharchive/main.cpp" line="348"/>
         <source>Burn DVD</source>
         <translation>Kirjuta DVD</translation>
     </message>
@@ -730,36 +729,36 @@ Selleks võib kuluda mõni minut.</translation>
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="129"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="109"/>
         <source>Retrieving Recording List.
 Please Wait...</source>
         <translation>Hangin salvestiste loendit.
 Palun oota...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="208"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="188"/>
         <source>Clear All</source>
         <translation>Puhasta kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="209"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="189"/>
         <source>Select All</source>
         <translation>Vali kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="108"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="410"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="514"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="88"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="373"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="478"/>
         <source>All Recordings</source>
         <translation>Kõik salvestised</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="153"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Sul pole kas ühtegi salvestist või pole need lokaalselt kätte saadavad!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="201"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="181"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
@@ -807,8 +806,8 @@ Palun oota...</translation>
         <translation>Suvaline fail failisüsteemist.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="287"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="343"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="261"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="317"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
     </message>
@@ -1414,17 +1413,17 @@ Palun oota...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="900"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="875"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Välju, salvesta pisipildid</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="901"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="876"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Välju, ära salvesta pisipilte</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="893"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="868"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
@@ -1432,28 +1431,28 @@ Palun oota...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="157"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Clear All</source>
         <translation>Puhasta kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="158"/>
+        <location filename="../mytharchive/videoselector.cpp" line="149"/>
         <source>Select All</source>
         <translation>Vali kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="357"/>
-        <location filename="../mytharchive/videoselector.cpp" line="526"/>
+        <location filename="../mytharchive/videoselector.cpp" line="331"/>
+        <location filename="../mytharchive/videoselector.cpp" line="499"/>
         <source>All Videos</source>
         <translation>Kõik videod</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="581"/>
+        <location filename="../mytharchive/videoselector.cpp" line="552"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Selle vanemliku taseme jaoks on vajalik sisestada salasõna</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="150"/>
+        <location filename="../mytharchive/videoselector.cpp" line="141"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
