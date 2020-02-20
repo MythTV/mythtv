@@ -11,17 +11,17 @@
     <message>
         <location filename="../mythnews/main.cpp" line="48"/>
         <source>Update news items</source>
-        <translation>Aggiorna le notizie</translation>
+        <translation>Aggiorna le news</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="50"/>
         <source>Force update news items</source>
-        <translation>Forzare l&apos;aggiornamento delle notizie</translation>
+        <translation>Forza l&apos;aggiornamento news</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="52"/>
         <source>Cancel news item updating</source>
-        <translation>Annullare l&apos;aggiornamento delle notizie</translation>
+        <translation>Annulla l&apos;aggiornamento news</translation>
     </message>
 </context>
 <context>
@@ -47,7 +47,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="105"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation>Non si ha configurato MythNews ad utilizzare altri siti.</translation>
+        <translation>Non hai configurato MythNews ad utilizzare altri siti.</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 percent)</source>
@@ -65,7 +65,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="668"/>
         <source>Manage Feeds</source>
-        <translation>Gestire feed</translation>
+        <translation>Gestisci feed</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="669"/>
@@ -80,7 +80,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="673"/>
         <source>Delete Feed</source>
-        <translation>Cancella feed</translation>
+        <translation>Elimina feed</translation>
     </message>
     <message>
         <source>Add News Site</source>
@@ -106,7 +106,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="76"/>
         <source>Enter Site Details</source>
-        <translation>Immissione dettagli sito</translation>
+        <translation>Introduci dettagli sito</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="80"/>
@@ -131,7 +131,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="88"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -150,12 +150,12 @@
         <location filename="../mythnews/newssite.cpp" line="244"/>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Failed to retrieve news</source>
-        <translation>Impossibile recuperare le notizie</translation>
+        <translation>Impossibile recuperare news</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="236"/>
         <source>No Cached News.</source>
-        <translation>Nessuna notizia in cache.</translation>
+        <translation>Nessuna notizia nella cache.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="255"/>
@@ -165,7 +165,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="263"/>
         <source>Showing Cached News.</source>
-        <translation>Mostrare le notizie in cache.</translation>
+        <translation>Vista news nella cache.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="283"/>
@@ -190,16 +190,16 @@
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Modifica i Feed RSS</translation>
+        <translation>Modifica Feed RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>Si può modificare il nome, la URL, il persorso all&apos;icona per il feed RSS. Si può anche segnare l&apos;oggetto come podcast
+        <translation>Puoi modificare il nome, la URL, il persorso dell&apos;icona dei feed RSS. Puoi anche stabilire che l&apos;oggetto è un podcast
 
-Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot; per continuare.</translation>
+Al termine della modifica, per continuare seleziona &quot;Ok&quot; o &quot;Annulla&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
@@ -234,7 +234,7 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>Cancel</source>
-        <translation>Anulla</translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -244,12 +244,12 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
-        <translation>Impostazioni notizie</translation>
+        <translation>Impostazioni news</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -259,12 +259,12 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>News Subscriptions</source>
-        <translation>Nuove sottoscrizioni</translation>
+        <translation>Sottoscrizioni news</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
-        <translation>Scegliere il sito di news che si desidera leggere.</translation>
+        <translation>Sceglie il sito di news che desideri leggere.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -274,12 +274,12 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
-        <translation>Non è stata specificata nessuna News Feeds.</translation>
+        <translation>Non hai specificato nessun Feed News.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Edit News</source>
-        <translation>Modificare feed</translation>
+        <translation>Modifica News</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
@@ -314,7 +314,7 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
-        <translation>Modificare il feed RSS</translation>
+        <translation>Modifica feed RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
@@ -329,7 +329,7 @@ Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
-        <translation>Siti</translation>
+        <translation>Azioni</translation>
     </message>
     <message>
         <source>RSS Feeds</source>

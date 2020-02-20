@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="57"/>
         <source>Edit Bookmark Details</source>
-        <translation>Modificare dettagli segnalibro</translation>
+        <translation>Modifica dettagli segnalibro</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="59"/>
@@ -16,7 +16,7 @@
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="129"/>
         <source>Select a category</source>
-        <translation>Selezionare una categoria</translation>
+        <translation>Seleziona una categoria</translation>
     </message>
 </context>
 <context>
@@ -28,7 +28,7 @@
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Nessun segnalibro definito.
 
-Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere nuovi segnalibri</translation>
+Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi segnalibri</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="263"/>
@@ -43,37 +43,37 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="279"/>
         <source>Add Bookmark</source>
-        <translation>Aggiungere segnalibro</translation>
+        <translation>Aggiungi segnalibro</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Edit Bookmark</source>
-        <translation>Modificare segnalibro</translation>
+        <translation>Modifica segnalibro</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Delete Bookmark</source>
-        <translation>Eliminare segnalibro</translation>
+        <translation>Elimina segnalibro</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
         <source>Show Bookmark</source>
-        <translation>Mostrare segnalibro</translation>
+        <translation>Mostra segnalibro</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="290"/>
         <source>Delete Marked</source>
-        <translation>Eliminare marcato</translation>
+        <translation>Elimina marcati</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
         <source>Show Marked</source>
-        <translation>Mostrare marcato</translation>
+        <translation>Mostra marcati</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
         <source>Clear Marked</source>
-        <translation>Pulire marcato</translation>
+        <translation>Pulisci marcati</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
@@ -83,12 +83,12 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="500"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
-        <translation>Essere sicuri di eliminare il segnalibro selezionato?</translation>
+        <translation>Elimino il segnalibro selezionato?</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="544"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
-        <translation>Essere sicuri di eliminare il segnalibro marcato?</translation>
+        <translation>Elimino il segnalibro marcato?</translation>
     </message>
 </context>
 <context>
@@ -106,22 +106,22 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation>Questo è la dimensione predefinita del testo che sarà utilizzata. Valori validi per il browser interno sono da 0.3 a 5.0 con 1.0 sia di dimensione normale minore di 1 è più piccolo e più grande di 1 è più largo della dimensione normale.</translation>
+        <translation>Questa è la dimensione testo predefinita che verrà utilizzata. Valori validi per il browser interno sono da 0.3 a 5.0, dove 1.0 è la dimensione normale. inferore di 1 è più piccolo della dimensione normale e maggiore di 1 è più grande.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
-        <translation>Se verificato questo abiliterà i plugin browser se il browser &quot;Interno&quot; viene utilizzato.</translation>
+        <translation>Se impostato questo abiliterà i plugin del browser se viene utilizzato il browser &quot;Interno&quot;.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
         <source>Exit without saving settings</source>
-        <translation>Uscire senza salvare le impostazioni</translation>
+        <translation>Esci senza salvare le impostazioni</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
         <source>Save settings and Exit</source>
-        <translation>Salvare le impostazioni e uscire</translation>
+        <translation>Salva le impostazioni e esci</translation>
     </message>
 </context>
 <context>
@@ -130,7 +130,7 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
         <location filename="../mythbrowser/mythbrowser.cpp" line="142"/>
         <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Enter URL</source>
-        <translation>Inserire URL</translation>
+        <translation>Inserisci URL</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="274"/>
@@ -155,12 +155,12 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Zoom In</source>
-        <translation>Ingrandire</translation>
+        <translation>Ingrandisci</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Zoom Out</source>
-        <translation>Ridurre</translation>
+        <translation>Riduci</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
@@ -170,12 +170,12 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Delete Tab</source>
-        <translation>Eliminare scheda</translation>
+        <translation>Elimina scheda</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Add Bookmark</source>
-        <translation>Aggiungere segnalibro</translation>
+        <translation>Aggiungi segnalibro</translation>
     </message>
 </context>
 <context>
@@ -183,12 +183,12 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/main.cpp" line="107"/>
         <source>Move to next browser tab</source>
-        <translation>Muovere alla prossima scheda del browser</translation>
+        <translation>Sposta alla successiva scheda del browser</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="109"/>
         <source>Move to previous browser tab</source>
-        <translation>Muovere alla precedente scheda del browser</translation>
+        <translation>Sposta alla precedente scheda del browser</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="112"/>
@@ -198,7 +198,7 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="../mythbrowser/main.cpp" line="114"/>
         <source>Show the webbrowser homepage</source>
-        <translation>Mostra la pagina iniziale del webbrowser</translation>
+        <translation>Mostra homepage browser web</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="117"/>
@@ -216,7 +216,7 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Browse your favorite web sites.</source>
-        <translation>Sfogliare i siti web favoriti.</translation>
+        <translation>Sfoglia siti web preferiti.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
@@ -231,12 +231,12 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enable browser plugins (Flash, etc):</source>
-        <translation>Abilitare i plugin del browser (Flash, ecc):</translation>
+        <translation>Abilita plugin del browser (Flash, ecc):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
-        <translation>Annullare</translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
@@ -251,16 +251,16 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Configure Web Browser</source>
-        <translation>Configurare browser web</translation>
+        <translation>Configura browser web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>È possibile modificare il nome, URL e la categoria per il sito web selezionato su questo schermo.
+        <translation>È possibile modificare il nome, l&apos;URL e la categoria del sito web selezionato su questo schermo.
 
-Quando si è finito di modificare, selezionare &quot;OK&quot; o &quot;Annulla&quot; per continuare.</translation>
+Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per continuare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
@@ -318,7 +318,7 @@ Quando si è finito di modificare, selezionare &quot;OK&quot; o &quot;Annulla&qu
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Edit Bookmark</source>
-        <translation>Modificare segnalibro</translation>
+        <translation>Modifica segnalibro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
@@ -328,7 +328,7 @@ Quando si è finito di modificare, selezionare &quot;OK&quot; o &quot;Annulla&qu
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Save</source>
-        <translation>Salvare</translation>
+        <translation>Salva</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -338,7 +338,7 @@ Quando si è finito di modificare, selezionare &quot;OK&quot; o &quot;Annulla&qu
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Enable browser plugins (Flash, etc)</source>
-        <translation>Abilitare i plugin del browser (flash, ecc)</translation>
+        <translation>Abilita plugin del browser (flash, ecc)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
