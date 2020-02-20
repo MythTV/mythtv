@@ -33,24 +33,24 @@
         <translation>Laen videot alla...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="152"/>
+        <location filename="../mythnetvision/netbase.cpp" line="151"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Veebilehitseja käsku pole sisestatud! MythNetVision vajab MythBrowser-it videote näitamiseks.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="189"/>
+        <location filename="../mythnetvision/netbase.cpp" line="188"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Oled kindel, et soovid selle faili kustutada?</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="245"/>
+        <location filename="../mythnetvision/netbase.cpp" line="244"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Laen videot alla...
 (%1 %2 MB-st)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="275"/>
+        <location filename="../mythnetvision/netbase.cpp" line="274"/>
         <source>Error downloading video to backend.</source>
         <translation>Video taustaserverisse laadimine ebaõnnestus.</translation>
     </message>
@@ -140,6 +140,21 @@
 <context>
     <name>NetTree</name>
     <message>
+        <location filename="../mythnetvision/nettree.cpp" line="31"/>
+        <source>RSS Feeds</source>
+        <translation>RSS voog</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/nettree.cpp" line="32"/>
+        <source>Searches</source>
+        <translation>Otsingud</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/nettree.cpp" line="33"/>
+        <source>Downloaded Files</source>
+        <translation>Allalaetud failid</translation>
+    </message>
+    <message>
         <location filename="../mythnetvision/nettree.cpp" line="405"/>
         <source>Playback/Download Options</source>
         <translation>Esitus/allalaadimis valikud</translation>
@@ -228,17 +243,17 @@
         <location filename="../mythnetvision/nettree.cpp" line="533"/>
         <location filename="../mythnetvision/nettree.cpp" line="550"/>
         <location filename="../mythnetvision/nettree.cpp" line="580"/>
-        <location filename="../mythnetvision/nettree.cpp" line="622"/>
+        <location filename="../mythnetvision/nettree.cpp" line="621"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="901"/>
+        <location filename="../mythnetvision/nettree.cpp" line="900"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Uuendan RSS-i. See võib natuke aega võtta...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="915"/>
+        <location filename="../mythnetvision/nettree.cpp" line="914"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Uuendan allikaid. See võib natuke aega võtta...</translation>
     </message>
@@ -246,7 +261,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="504"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="507"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Oled kindel, et ei soov seda voogu enam jälgida?</translation>
     </message>
