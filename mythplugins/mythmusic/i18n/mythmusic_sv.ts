@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sv">
+<TS version="2.1" language="sv_SE" sourcelanguage="en_US">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(MythMusicMain)</name>
     <message>

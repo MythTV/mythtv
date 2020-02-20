@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_CA">
+<TS version="2.1" language="en_CA" sourcelanguage="en_US">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>(ArchiveUtils)</name>
     <message>
