@@ -1789,7 +1789,7 @@ void MythPlayer::RefreshPauseFrame(void)
     {
         if (m_videoOutput->ValidVideoFrames())
         {
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
+            m_videoOutput->UpdatePauseFrame(m_dispTimecode, m_scan);
             m_needNewPauseFrame = false;
 
             if (m_deleteMap.IsEditing())

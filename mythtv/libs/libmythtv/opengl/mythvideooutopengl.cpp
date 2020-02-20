@@ -831,16 +831,22 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
     return allowed;
 }
 
-void MythVideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
+void MythVideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode, FrameScanType Scan)
 {
     m_videoBuffers.BeginLock(kVideoBuffer_used);
     VideoFrame *used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
         if (format_is_hw(used->codec))
+        {
             DoneDisplayingFrame(used);
+        }
         else
-            m_openGLVideo->ProcessFrame(used);
+        {
+            Scan = (is_interlaced(Scan) && !used->already_deinterlaced) ? kScan_Interlaced : kScan_Progressive;
+            m_deinterlacer.Filter(used, Scan, m_dbDisplayProfile, true);
+            m_openGLVideo->ProcessFrame(used, Scan);
+        }
         DisplayTimecode = used->disp_timecode;
     }
     else

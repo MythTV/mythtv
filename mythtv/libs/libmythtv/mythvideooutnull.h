@@ -28,7 +28,7 @@ class MythVideoOutputNull : public MythVideoOutput
                       bool ForceChange) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
-    void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
+    void UpdatePauseFrame(int64_t &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       const PIPMap &pipPlayers,
                       FrameScanType scan) override; // VideoOutput

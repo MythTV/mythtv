@@ -223,7 +223,7 @@ void MythVideoOutputNull::Show(FrameScanType  /*scan*/)
 {
 }
 
-void MythVideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
+void MythVideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType)
 {
     QMutexLocker locker(&m_globalLock);
 
