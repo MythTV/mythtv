@@ -112,7 +112,7 @@ class MythVideoOutput
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
     QString      GetFrameStatus(void) const;
-    virtual void UpdatePauseFrame(int64_t &DisplayTimecode) = 0;
+    virtual void UpdatePauseFrame(int64_t &DisplayTimecode, FrameScanType Scan = kScan_Progressive) = 0;
 
     void         SetVideoResize(const QRect &VideoRect);
     void         SetVideoScalingAllowed(bool Allow);
