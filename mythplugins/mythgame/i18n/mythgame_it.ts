@@ -86,7 +86,7 @@
         <location filename="../mythgame/gamehandler.cpp" line="428"/>
         <source>Unknown</source>
         <comment>Unknown country</comment>
-        <translation>Sconosciuto</translation>
+        <translation>Sconosciuta</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="157"/>
@@ -137,7 +137,7 @@
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <extracomment>%1 is the file name</extracomment>
-        <translation>%1 appare mancante.
+        <translation>%1 sembra mancante.
 Rimuoverlo dal database?</translation>
     </message>
     <message>
@@ -155,36 +155,36 @@ Rimuoverlo dal database?</translation>
         <location filename="../mythgame/gamehandler.cpp" line="238"/>
         <location filename="../mythgame/gamehandler.cpp" line="624"/>
         <source>Yes</source>
-        <translation>Si</translation>
+        <translation>Sì</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="239"/>
         <source>Yes to all</source>
-        <translation>Si a tutto</translation>
+        <translation>Sì a tutto</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="384"/>
         <source>Updating %1 (%2) ROM database</source>
         <extracomment>%1 is the system name, %2 is the game type</extracomment>
-        <translation>Aggiornamento %1 (%2) ROM database</translation>
+        <translation>Aggiornamento ROM database %1 (%2)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="526"/>
         <source>Verifying %1 files...</source>
         <extracomment>%1 is the system name</extracomment>
-        <translation>Verificando %1 file...</translation>
+        <translation>Verifica file %1...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="617"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
-        <translation>Questo cancellerà tutti i metadati del gioco dal database. Essere sicuri di volerlo fare?</translation>
+        <translation>Questo cancellerà dal database tutti i metadati del gioco. Sei sicuro di volerlo fare?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="713"/>
         <location filename="../mythgame/gamehandler.cpp" line="741"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
-        <translation>Scansione per %1 giochi...</translation>
+        <translation>Scansione giochi su %1...</translation>
     </message>
 </context>
 <context>
@@ -217,17 +217,17 @@ Rimuoverlo dal database?</translation>
     <message>
         <location filename="../mythgame/gamescan.cpp" line="64"/>
         <source>Verifying game files...</source>
-        <translation>Verifica in corso dei file di gioco...</translation>
+        <translation>Verifica dei file del gioco...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamescan.cpp" line="105"/>
         <source>Updating game database...</source>
-        <translation>Aggiornamento database di gioco...</translation>
+        <translation>Aggiornamento database giochi...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamescan.cpp" line="138"/>
         <source>Searching for games...</source>
-        <translation>Ricerca in corso per giochi...</translation>
+        <translation>Ricerca giochi...</translation>
     </message>
 </context>
 <context>
@@ -270,7 +270,7 @@ Rimuoverlo dal database?</translation>
         <location filename="../mythgame/gameui.cpp" line="435"/>
         <location filename="../mythgame/gameui.cpp" line="514"/>
         <source>Show Information</source>
-        <translation>Mostrare informazioni</translation>
+        <translation>Mostra informazioni</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="135"/>
@@ -282,48 +282,48 @@ Rimuoverlo dal database?</translation>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
-        <translation>Scegliere sistema per
+        <translation>Scegli sistema per:
 %1</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="429"/>
         <location filename="../mythgame/gameui.cpp" line="510"/>
         <source>Scan For Changes</source>
-        <translation>Scansione per cambiamenti</translation>
+        <translation>Scansione cambiamenti</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="437"/>
         <location filename="../mythgame/gameui.cpp" line="519"/>
         <source>Remove Favorite</source>
-        <translation>Rimuovere favoriti</translation>
+        <translation>Rimuovi favoriti</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="439"/>
         <location filename="../mythgame/gameui.cpp" line="518"/>
         <source>Make Favorite</source>
-        <translation>Rendere favorito</translation>
+        <translation>Rendi preferito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="440"/>
         <location filename="../mythgame/gameui.cpp" line="523"/>
         <source>Retrieve Details</source>
-        <translation>Recupero dettagli</translation>
+        <translation>Recupera dettagli</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="441"/>
         <location filename="../mythgame/gameui.cpp" line="506"/>
         <source>Edit Details</source>
-        <translation>Modificare dettagli</translation>
+        <translation>Modifica dettagli</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="631"/>
         <source>Failed to retrieve image(s)</source>
-        <translation>Fallito il recupero delle immagini</translation>
+        <translation>Recupero immagini fallito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="633"/>
         <source>Check logs</source>
-        <translation>Verificare i registri log</translation>
+        <translation>Verifica registri log</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="922"/>
@@ -338,7 +338,7 @@ Rimuoverlo dal database?</translation>
     <message>
         <location filename="../mythgame/gameui.cpp" line="469"/>
         <source>Game Search</source>
-        <translation>Ricerca gioco</translation>
+        <translation>Cerca gioco</translation>
     </message>
 </context>
 <context>
@@ -346,46 +346,46 @@ Rimuoverlo dal database?</translation>
     <message>
         <location filename="../mythgame/main.cpp" line="112"/>
         <source>Game frontend</source>
-        <translation>Game frontend</translation>
+        <translation>Interfaccia gioco</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="115"/>
         <source>Toggle the current game as a favorite</source>
-        <translation>Imposta/Rimuovi il gioco corrente come un favorito</translation>
+        <translation>Commuta preferito per gioco corrente</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="117"/>
         <source>Show incremental search dialog</source>
-        <translation>Mostrare finestra di ricerca incrementale</translation>
+        <translation>Mostra finestra di ricerca incrementale</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="119"/>
         <source>Incremental search find next match</source>
-        <translation>Ricerca incrementale trovare prosssima associazione</translation>
+        <translation>Ricerca incrementale trova corrisp. successiva</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="121"/>
         <source>Download metadata for current item</source>
-        <translation>Scaricamento metadati per l&apos;oggetto corrente</translation>
+        <translation>Scaricamento metadati per l&apos;elemento corrente</translation>
     </message>
 </context>
 <context>
     <name>MythGameGeneralSettings</name>
     <message>
         <source>Game display order</source>
-        <translation type="vanished">Ordine di visualizzazione gioco</translation>
+        <translation type="vanished">Ordine visualizzazione gioco</translation>
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="vanished">Ordine in cui ordinare i giochi - questo è per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
+        <translation type="vanished">Modalità ordinamento giochi - valido per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
     </message>
     <message>
         <source>Favorite display order</source>
-        <translation type="vanished">Ordinedi visualizzazione favorito</translation>
+        <translation type="vanished">Ordine visualizzazione preferito</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="vanished">Ordine in cui ordinare i giochi segnati come favoriti - questo è per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
+        <translation type="vanished">Modalità ordinamento giochi marcati come preferiti - questo è valido per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
     </message>
     <message>
         <source>Indepth Game Scan</source>
@@ -393,23 +393,23 @@ Rimuoverlo dal database?</translation>
     </message>
     <message>
         <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation type="vanished">Abilitare questo causa una scansione del gioco per raccogliere valori crc e attendere di trovare maggiori informazioni dettagliate a rigurdo del gioco. Nota questo può aumentare il tempo che si prende la scansione del gioco sul totale dei giochi scansionati.</translation>
+        <translation type="vanished">La sua abilitazione causa una scansione del gioco per acquisire il CRC e la ricerca di informazioni più dettagliate a riguardo. NOTA ciò può aumentare di molto il tempo della scansione del gioco dipendente dal numero di giochi scansionati.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted ROM(s)</source>
-        <translation type="vanished">Prompt per la rimozione delle rom eliminate</translation>
+        <translation type="vanished">Chiede se rimuovere le ROM eliminate</translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted ROMs from the database during a game scan</source>
-        <translation type="vanished">Questo abilita un prompt per la rimozione dell rom eliminate dal database durante la scansione del gioco</translation>
+        <translation type="vanished">Abilita il messaggio di richiesta rimozione delle ROM eliminate dal database durante la scansione giochi</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
-        <translation type="vanished">Visualizzazare i nome dei file nella struttura Game</translation>
+        <translation type="vanished">Visualizza i nomi file nell&apos;albero Giochi</translation>
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
-        <translation type="vanished">Abilitare questo causa che i nime dei file saranno visualizzati nella struttura game piuttosto che nome del gioco ridotto/ricercato</translation>
+        <translation type="vanished">L&apos;abilitazione causa che i nomi dei file siano visualizzati nell&apos;albero giochi piuttosto che nome gioco ridotto/cercato</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
@@ -933,12 +933,12 @@ di volerlo fare?</translation>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Play</source>
-        <translation>Giocare</translation>
+        <translation>Gioca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Play Games</source>
-        <translation>Giocare ai giochi</translation>
+        <translation>Giochi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
