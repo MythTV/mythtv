@@ -5,17 +5,17 @@
 <context>
     <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="66"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="62"/>
         <source>Edit Bookmark Details</source>
         <translation>Muuda järjehoidja üksikasju</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="68"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="64"/>
         <source>Enter Bookmark Details</source>
         <translation>Sisesta järjehoidja üksikasjad</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="139"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="134"/>
         <source>Select a category</source>
         <translation>Vali kategooria</translation>
     </message>
@@ -23,7 +23,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="177"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="162"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -32,62 +32,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="272"/>
         <source>Actions</source>
         <translation>Tegevus</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Set Homepage</source>
         <translation>Koduleht</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Add Bookmark</source>
         <translation>Lisa järjehoidja</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="308"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
         <source>Edit Bookmark</source>
         <translation>Muuda järjehoidjat</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="309"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
         <source>Delete Bookmark</source>
         <translation>Kustuta järjehoidja</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
         <source>Show Bookmark</source>
         <translation>Näita järjehoidjat</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
         <source>Delete Marked</source>
         <translation>Kustuta märgitud</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="316"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="300"/>
         <source>Show Marked</source>
         <translation>Näita markerit</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
         <source>Clear Marked</source>
         <translation>Puhasta marker</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="320"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
         <source>Settings</source>
         <translation>Seaded</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="526"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="510"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Oled kindel, et tahad järjehoidja kustutada?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="570"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="554"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Oled kindel, et tahad märgitud järjehoidjad kustutada?</translation>
     </message>
@@ -95,32 +95,32 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="48"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="45"/>
         <source>MythBrowser Settings</source>
         <translation>MythBrowser-i seaded</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Veebilehitseja käivitamise käsk. Kasuta &apos;Internal&apos; sisseehitatud lehitseja jaoks. %ZOOM% ja %URL% asendatakse suurendusväärtuse ja URL-ga.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="135"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>See on vaikimisi teksti suurus. Sisemise lehitseja jaoks sobivad väärtused 0.3 kuni 5,0. 1,0 on tavaline suurus.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="140"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="128"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation>Valides lubatakse sisemise veebilehitseja puhul pluginad.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="143"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
         <source>Exit without saving settings</source>
         <translation>Välju seadeid salvestamata</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="145"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
         <source>Save settings and Exit</source>
         <translation>Salvesta seaded ja välju</translation>
     </message>
@@ -129,7 +129,7 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
     <name>MythBrowser</name>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="148"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
         <source>Enter URL</source>
         <translation>Sisesta URL</translation>
     </message>
@@ -139,42 +139,42 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
         <translation>Laadin...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="350"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Actions</source>
         <translation>Tegevus</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Forward</source>
         <translation>Edasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="368"/>
         <source>Zoom In</source>
         <translation>Suurenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Zoom Out</source>
         <translation>Vähenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="371"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
         <source>New Tab</source>
         <translation>Uus tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="373"/>
         <source>Delete Tab</source>
         <translation>Kustuta tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="375"/>
         <source>Add Bookmark</source>
         <translation>Lisa järjehoidja</translation>
     </message>

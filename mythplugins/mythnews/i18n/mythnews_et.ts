@@ -28,47 +28,47 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="392"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Uuendatud</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="399"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="121"/>
+        <location filename="../mythnews/mythnews.cpp" line="118"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Uudiste lugeja on konfigureerimata.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="594"/>
+        <location filename="../mythnews/mythnews.cpp" line="598"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Veebilehitseja käsku pole! MythNews vajab MythBrowser-it.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="686"/>
+        <location filename="../mythnews/mythnews.cpp" line="690"/>
         <source>Manage Feeds</source>
         <translation>Halda uudisvooge</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Add Feed</source>
         <translation>Lisa voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="690"/>
+        <location filename="../mythnews/mythnews.cpp" line="694"/>
         <source>Edit Feed</source>
         <translation>Muuda voogu</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="691"/>
+        <location filename="../mythnews/mythnews.cpp" line="695"/>
         <source>Delete Feed</source>
         <translation>Kustuta voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="673"/>
+        <location filename="../mythnews/mythnews.cpp" line="677"/>
         <source>Options</source>
         <translation>Valikud</translation>
     </message>
@@ -76,42 +76,42 @@
 <context>
     <name>MythNewsEditor</name>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="84"/>
         <source>Edit Site Details</source>
         <translation>Saidi üksikasjade muutmine</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="84"/>
         <source>Enter Site Details</source>
         <translation>Saidi üksikasjade sisestamine</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="88"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="90"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="92"/>
         <source>Icon:</source>
         <translation>Ikoon:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Podcast:</source>
         <translation>Taskuhääling:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="96"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <location filename="../mythnews/mythnewseditor.cpp" line="97"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
@@ -119,34 +119,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="227"/>
+        <location filename="../mythnews/newssite.cpp" line="225"/>
         <source>Retrieve Failed. </source>
         <translation>Tõmbamine ebaõnnestus. </translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
-        <location filename="../mythnews/newssite.cpp" line="252"/>
+        <location filename="../mythnews/newssite.cpp" line="232"/>
+        <location filename="../mythnews/newssite.cpp" line="241"/>
+        <location filename="../mythnews/newssite.cpp" line="250"/>
         <source>Failed to retrieve news</source>
         <translation>Uudiste tõmbamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="233"/>
         <source>No Cached News.</source>
         <translation>Puhverdatud uudiseid pole.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="254"/>
+        <location filename="../mythnews/newssite.cpp" line="252"/>
         <source>Failed to read downloaded file.</source>
         <translation>Viga alla laaditud faili lugemisel.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="262"/>
+        <location filename="../mythnews/newssite.cpp" line="260"/>
         <source>Showing Cached News.</source>
         <translation>Näitan puhverdatud uudiseid.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="283"/>
+        <location filename="../mythnews/newssite.cpp" line="281"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-fail pole korrektne RSS-voog</translation>
     </message>
