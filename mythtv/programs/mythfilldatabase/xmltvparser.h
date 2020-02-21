@@ -17,10 +17,6 @@ class XMLTVParser
 {
   public:
     XMLTVParser();
-    void lateInit();
-
-    static ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
-    ProgInfo *parseProgram(QDomElement &element);
     bool parseFile(const QString& filename, ChannelInfoList *chanlist,
                    QMap<QString, QList<ProgInfo> > *proglist);
 
