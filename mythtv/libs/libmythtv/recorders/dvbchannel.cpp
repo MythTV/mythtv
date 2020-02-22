@@ -82,7 +82,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
     s_master_map[key].push_back(this); // == RegisterForMaster
-    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
         m_dvbCam = new DVBCam(m_device);
@@ -107,7 +107,7 @@ DVBChannel::~DVBChannel()
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
         s_master_map[key].pop_front();

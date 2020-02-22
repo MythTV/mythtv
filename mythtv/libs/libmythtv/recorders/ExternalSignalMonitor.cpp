@@ -20,8 +20,7 @@
 #include "ExternalRecorder.h"
 #include "ExternalStreamHandler.h"
 
-#define LOC QString("ExternSigMon[%1](%2): ") \
-    .arg(m_inputid).arg(static_cast<ExternalChannel *>(m_channel)->GetDescription())
+#define LOC QString("ExternSigMon[%1](%2): ").arg(m_inputid).arg(m_loc)
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -53,6 +52,9 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
     else
         m_lock_timeout = GetLockTimeout() * 1000;
+
+    auto * ec = dynamic_cast<ExternalChannel *>(m_channel);
+    m_loc = ec ? ec->GetDescription() : "unknown";
 }
 
 /** \fn ExternalSignalMonitor::~ExternalSignalMonitor()

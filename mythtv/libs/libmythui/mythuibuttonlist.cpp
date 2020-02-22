@@ -2741,7 +2741,7 @@ void MythUIButtonList::customEvent(QEvent *event)
 {
     if (event->type() == NextButtonListPageEvent::kEventType)
     {
-        auto *npe = static_cast<NextButtonListPageEvent*>(event);
+        auto *npe = dynamic_cast<NextButtonListPageEvent*>(event);
         int cur = npe->m_start;
         for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
         {

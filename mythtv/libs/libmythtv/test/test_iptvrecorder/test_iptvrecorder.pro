@@ -1,6 +1,6 @@
 include ( ../../../../settings.pro )
 
-QT += xml sql network testlib
+QT += xml sql network testlib widgets
 
 TEMPLATE = app
 TARGET = test_iptvrecorder

@@ -143,13 +143,13 @@ Checks: '-*,
         # Haven''t checked recently. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
 
-        # The qapplication.h header file includes a static_cast. ,
-       -cppcoreguidelines-pro-type-static-cast-downcast,
+        # Good. ,
+        cppcoreguidelines-pro-type-static-cast-downcast,
 
         # Recommends using boost:: to access unions. ,
        -cppcoreguidelines-pro-type-union-access,
 
-        # Warns on every LogPrintLine. ,
+        # Warns on every (*)printf, sscanf,open, ioctl, etc. ,
        -cppcoreguidelines-pro-type-vararg,
 
        -cppcoreguidelines-slicing,

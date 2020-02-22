@@ -3365,17 +3365,26 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = static_cast<DialogCompletionEvent *>(levent);
-        QString id = dce->GetId();
-
-        if (id == "scanprompt")
+        auto *dce = dynamic_cast<DialogCompletionEvent *>(levent);
+        if (dce != nullptr)
         {
-            int result = dce->GetResult();
-            if (result == 1)
-                doVideoScan();
+            QString id = dce->GetId();
+
+            if (id == "scanprompt")
+            {
+                int result = dce->GetResult();
+                if (result == 1)
+                    doVideoScan();
+            }
+            else
+            {
+                m_menuPopup = nullptr;
+            }
         }
         else
+        {
             m_menuPopup = nullptr;
+        }
     }
     else if (levent->type() == ImageDLFailureEvent::kEventType)
     {

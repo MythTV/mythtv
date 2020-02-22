@@ -1072,7 +1072,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 
 void MythUIType::UpdateDependState(bool isDefault)
 {
-    auto *dependee = static_cast<MythUIType*>(sender());
+    auto *dependee = dynamic_cast<MythUIType*>(sender());
 
     UpdateDependState(dependee, isDefault);
 }
