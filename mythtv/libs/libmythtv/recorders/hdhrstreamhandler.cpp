@@ -475,8 +475,12 @@ QString HDHRStreamHandler::TunerSet(
     {
         if (print_error)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                    .arg(name).arg(val).arg(error));
+            // Skip error messages from MPTS recordings
+            if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
+                        .arg(name).arg(val).arg(error));
+            }
         }
 
         return QString();
