@@ -2127,7 +2127,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
 
     if (m_channelsFound)
     {
-        QString progress = QObject::tr(": Found %n", "", m_channelsFound);
+        QString progress = QObject::tr("Found %n", "", m_channelsFound);
         m_scanMonitor->ScanUpdateStatusTitleText(progress);
     }
 
