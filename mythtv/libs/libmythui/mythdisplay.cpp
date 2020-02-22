@@ -185,10 +185,14 @@ MythDisplay::MythDisplay()
     if (m_screen)
         connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
 
-    connect(qGuiApp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
-    connect(qGuiApp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
+    auto *guiapp = qobject_cast<QGuiApplication *>(QCoreApplication::instance());
+    if (guiapp == nullptr)
+        return;
+
+    connect(guiapp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
+    connect(guiapp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    connect(qGuiApp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
+    connect(guiapp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
 #endif
 }
 

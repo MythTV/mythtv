@@ -3,6 +3,7 @@
 #define IPTV_TUNING_DATA_H
 
 // Qt headers
+#include <QApplication>
 #include <QString>
 #include <QUrl>
 
@@ -225,7 +226,7 @@ class MTV_PUBLIC IPTVTuningData
   protected:
     bool IsHLSPlaylist(void) const
     {
-        if (!qApp)
+        if (qobject_cast<QApplication*>(QCoreApplication::instance()) == nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - No QApplication!!"));
             return false;

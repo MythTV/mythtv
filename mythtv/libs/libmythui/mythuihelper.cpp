@@ -1384,7 +1384,7 @@ QFont MythUIHelper::GetSmallFont(void)
 
 void MythUIHelper::DisableScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),
@@ -1394,7 +1394,7 @@ void MythUIHelper::DisableScreensaver(void)
 
 void MythUIHelper::RestoreScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),
@@ -1404,7 +1404,7 @@ void MythUIHelper::RestoreScreensaver(void)
 
 void MythUIHelper::ResetScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),
