@@ -520,7 +520,7 @@ void ChannelScanner::PreScanCommon(
                                       sourceid, signal_timeout, channel_timeout,
                                       inputname, do_test_decryption);
 
-    // If we know the channel types we can give the signal montior a hint.
+    // If we know the channel types we can give the signal monitor a hint.
     // Since we unfortunately do not record this info in the DB, we cannot
     // do this for the other scan types and have to guess later on...
     switch (scantype)
