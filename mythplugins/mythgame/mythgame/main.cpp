@@ -1,7 +1,7 @@
 #include "gameui.h"
 #include "gamehandler.h"
 #include "gamesettings.h"
-#include "dbcheck.h"
+#include "gamedbcheck.h"
 
 #include <mythcontext.h>
 #include <mythdbcon.h>

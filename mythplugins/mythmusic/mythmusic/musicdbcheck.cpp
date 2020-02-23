@@ -10,7 +10,7 @@ using namespace std;
 #include <mythtv/mythdb.h>
 #include <mythtv/schemawizard.h>
 
-#include "dbcheck.h"
+#include "musicdbcheck.h"
 
 const QString currentDatabaseVersion = "1024";
 

@@ -6,7 +6,7 @@
 #include <mythcontext.h>
 #include <mythdb.h>
 
-#include "dbcheck.h"
+#include "weatherdbcheck.h"
 
 const QString currentDatabaseVersion = "1006";
 

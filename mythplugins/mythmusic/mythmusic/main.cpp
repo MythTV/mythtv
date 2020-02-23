@@ -35,7 +35,7 @@
 #include "playlistview.h"
 #include "streamview.h"
 #include "playlistcontainer.h"
-#include "dbcheck.h"
+#include "musicdbcheck.h"
 #include "musicplayer.h"
 #include "config.h"
 #include "mainvisual.h"

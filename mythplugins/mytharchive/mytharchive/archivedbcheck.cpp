@@ -10,7 +10,7 @@ using namespace std;
 #include <mythdb.h>
 
 // mytharchive
-#include "dbcheck.h"
+#include "archivedbcheck.h"
 
 const QString currentDatabaseVersion = "1005";
 

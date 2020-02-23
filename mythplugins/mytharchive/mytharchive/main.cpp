@@ -34,7 +34,7 @@ using namespace std;
 #include "fileselector.h"
 #include "recordingselector.h"
 #include "videoselector.h"
-#include "dbcheck.h"
+#include "archivedbcheck.h"
 #include "archiveutil.h"
 #include "selectdestination.h"
 #include "exportnative.h"

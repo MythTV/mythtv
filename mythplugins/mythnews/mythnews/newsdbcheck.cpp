@@ -10,7 +10,7 @@
 #include <mythdb.h>
 
 // MythNews headers
-#include "dbcheck.h"
+#include "newsdbcheck.h"
 
 const QString currentDatabaseVersion = "1001";
 

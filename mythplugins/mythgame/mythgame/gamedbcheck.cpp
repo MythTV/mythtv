@@ -7,7 +7,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythdb.h>
 
-#include "dbcheck.h"
+#include "gamedbcheck.h"
 #include "gamesettings.h"
 
 const QString currentDatabaseVersion = "1019";
