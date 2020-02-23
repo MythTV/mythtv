@@ -386,8 +386,10 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     }
                     else
                     {
-                        album_order = Ialbum->second * 1000;
+                        album_order = Ialbum->second * 10000;
                     }
+                    if (mdata->DiscNumber() != -1)
+                        album_order += mdata->DiscNumber()*100;
                     album_order += mdata->Track();
 
                     songMap.insert(album_order, m_songs.at(x));
