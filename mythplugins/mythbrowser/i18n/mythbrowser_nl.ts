@@ -245,137 +245,260 @@ Gebruik de  &apos;Bladwijzer toevoegen&apos; menuoptie om nieuwe bladwijzers toe
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Bookmark Manager</source>
         <translation>Bladwijzermanager</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Category</source>
         <translation>Categorie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="60"/>
+        <source>Website Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Website URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="63"/>
+        <source>Zoom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="64"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="52"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Category:</source>
         <translation>Categorie:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Homepage:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Enable plugins:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location filename="themestrings.h" line="6"/>
+        <source>%name% (%url%)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>Enable plugins</source>
+        <location filename="themestrings.h" line="8"/>
+        <source>Bookmark Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
-        <source>Web Page</source>
+        <location filename="themestrings.h" line="9"/>
+        <source>Bookmark URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
-        <source>Rating Settings</source>
+        <location filename="themestrings.h" line="11"/>
+        <source>Browse the web</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
-        <source>%DATE%, %TIME%</source>
-        <translation>%DATE%, %TIME%</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="25"/>
-        <source>Web Bookmarks</source>
-        <translation>Webbladwijzers</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="26"/>
-        <source>Browse your favorite web sites.</source>
-        <translation>Blader door favoriete websites.</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="27"/>
-        <source>Browser:</source>
-        <translation>Browser:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="32"/>
-        <source>Webbrowser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="34"/>
-        <source>Url</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Homepage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="36"/>
-        <source>Edit Bookmark</source>
-        <translation type="unfinished">Bladwijzer bewerken</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="37"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="38"/>
-        <source>Browser Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="39"/>
-        <source>Enable browser plugins (Flash, etc)</source>
+        <location filename="themestrings.h" line="13"/>
+        <source>Browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
-        <source>OK</source>
-        <translation>OK</translation>
+        <source>Browser command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Choose a bookmark to open in the webbrowser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Configure web browser settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>Edit your bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
-        <source>Enable browser plugins (Flash, etc):</source>
+        <source>Enable Plugins:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>Enable browser plugins:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>Enable plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Find category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Myth Web Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Select bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>Select bookmark or add a new one</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Select bookmark:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>Text size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>URL Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>WEB BROWSER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Rating Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Web Bookmarks</source>
+        <translation>Webbladwijzers</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Browse your favorite web sites.</source>
+        <translation>Blader door favoriete websites.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Browser:</source>
+        <translation>Browser:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Webbrowser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>Url</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Homepage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Edit Bookmark</source>
+        <translation type="unfinished">Bladwijzer bewerken</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Browser Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
+        <source>Enable browser plugins (Flash, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Enable browser plugins (Flash, etc):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
         <source>Configure Web Browser</source>
         <translation>Webbrowser configureren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="62"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -386,52 +509,48 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation type="vanished">Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Cancel</source>
         <oldsource>Channel:</oldsource>
         <translation type="unfinished">Kanaal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Click to choose from existing categories...</source>
         <translation>Klik om te kiezen uit bestaande categorieën...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Find...</source>
         <translation>Zoeken...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Find</source>
         <translation>Zoeken</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Name:</source>
         <translation>Naam:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="54"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
-        <source>Cancel</source>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
+        <location filename="themestrings.h" line="43"/>
         <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
+        <translation type="unfinished">Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Browser Command:</source>
         <translation>Browseropdracht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Text Size:</source>
         <translation>Tekstgrootte:</translation>
     </message>
