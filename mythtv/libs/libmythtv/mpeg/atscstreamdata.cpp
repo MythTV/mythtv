@@ -113,6 +113,7 @@ void ATSCStreamData::Reset(int desiredProgram)
 {
     MPEGStreamData::Reset(desiredProgram);
     AddListeningPID(ATSC_PSIP_PID);
+    AddListeningPID(SCTE_PSIP_PID);
 }
 
 void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
@@ -146,6 +147,7 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
     }
 
     AddListeningPID(ATSC_PSIP_PID);
+    AddListeningPID(SCTE_PSIP_PID);
 }
 
 /** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&) const
@@ -686,11 +688,21 @@ bool ATSCStreamData::HasCachedAllTVCTs(bool current) const
         return false;
 
     m_cacheLock.lock();
-    bool ret = true;
-    for (uint i = 0; ret && (i < m_cachedMgt->TableCount()); ++i)
+    bool ret = false;
+    for (uint i = 0; (i < m_cachedMgt->TableCount()); ++i)
     {
         if (TableClass::TVCTc == m_cachedMgt->TableClass(i))
-            ret &= HasCachedTVCT(m_cachedMgt->TablePID(i));
+        {
+            if (HasCachedTVCT(m_cachedMgt->TablePID(i)))
+            {
+                ret = true;
+            }
+            else
+            {
+                ret = false;
+                break;
+            }
+        }
     }
     m_cacheLock.unlock();
 
@@ -707,11 +719,21 @@ bool ATSCStreamData::HasCachedAllCVCTs(bool current) const
         return false;
 
     m_cacheLock.lock();
-    bool ret = true;
-    for (uint i = 0; ret && (i < m_cachedMgt->TableCount()); ++i)
+    bool ret = false;
+    for (uint i = 0; (i < m_cachedMgt->TableCount()); ++i)
     {
         if (TableClass::CVCTc == m_cachedMgt->TableClass(i))
-            ret &= HasCachedCVCT(m_cachedMgt->TablePID(i));
+        {
+            if (HasCachedCVCT(m_cachedMgt->TablePID(i)))
+            {
+                ret = true;
+            }
+            else
+            {
+                ret = false;
+                break;
+            }
+        }
     }
     m_cacheLock.unlock();
 
