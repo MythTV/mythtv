@@ -1,16 +1,20 @@
 #!/bin/bash
 #
-# This script uses the themestringstool to automate the generation of
-# themestrings.
+# This script uses the themestrings tool to automate the generation of
+# translatable strings found in MythTV themes ("themestrings").
 #
-# The themes are downloaded from the internet and the strings are extracted
-# from specific themes or from all of the available themes.
+# Themes for the current MythTV development "trunk" are downloaded from
+# the internet at runtime. Strings are extracted into themestrings
+# files, which are processed whenever translation files are updated using
+# the Qt lupdate utility.
 #
-# Strings related to the frontend or the backend goes into the "mythtv"
-# translation. Strings related to a plugin goes into the respective plugin.
+# Strings related to core applications found in mythtv/ will be placed
+# into the "mythfrontend_xx.ts" translation files. Strings related to
+# separate plugins found in mythplugins/ will be placed into the respective
+# plugin's translation file (e.g. mytharchive_xx.ts).
 #
-# It should be sufficient to run this script once without any arguments, to
-# update all themestrings for mythfrontend and the plugins.
+# It should be sufficient to run this script once (without arguments) to
+# update all themestrings for mythfrontend/backend/setup and core plugins.
 #
 
 set -e
