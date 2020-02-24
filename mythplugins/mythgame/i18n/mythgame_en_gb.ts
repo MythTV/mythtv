@@ -69,7 +69,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="181"/>
         <source>MythGame Settings -- General</source>
-        <translation type="unfinished">MythGame Settings (General)</translation>
+        <translation>MythGame Settings (General)</translation>
     </message>
 </context>
 <context>
@@ -192,24 +192,24 @@ Remove it from the database?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="359"/>
         <source>Game Players</source>
-        <translation type="unfinished">Game Players</translation>
+        <translation>Game Players</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="366"/>
         <source>(New Game Player)</source>
-        <translation type="unfinished">(New Game Player)</translation>
+        <translation>(New Game Player)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="372"/>
         <source>%1 (%2)</source>
         <comment>Game player/emulator display</comment>
         <extracomment>%1 is the player/emulator name, %2 is the type of player/emulator</extracomment>
-        <translation type="unfinished">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="404"/>
         <source>Player Name</source>
-        <translation type="unfinished">Player Name</translation>
+        <translation>Player Name</translation>
     </message>
 </context>
 <context>
@@ -362,190 +362,6 @@ Remove it from the database?</translation>
     </message>
 </context>
 <context>
-    <name>MythGameGeneralSettings</name>
-    <message>
-        <source>Game display order</source>
-        <translation type="vanished">Game display order</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="vanished">Order in which to sort the games - this is for all systems. Available choices: system, year, genre and game name</translation>
-    </message>
-    <message>
-        <source>Favorite display order</source>
-        <translation type="vanished">Favourite display order</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="vanished">Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</translation>
-    </message>
-    <message>
-        <source>Indepth Game Scan</source>
-        <translation type="vanished">Indepth Game Scan</translation>
-    </message>
-    <message>
-        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation type="vanished">Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</translation>
-    </message>
-    <message>
-        <source>Prompt for removal of deleted ROM(s)</source>
-        <translation type="vanished">Prompt for removal of deleted ROM(s)</translation>
-    </message>
-    <message>
-        <source>This enables a prompt for removing deleted ROMs from the database during a game scan</source>
-        <translation type="vanished">This enables a prompt for removing deleted ROMs from the database during a game scan</translation>
-    </message>
-    <message>
-        <source>Display Files Names in Game Tree</source>
-        <translation type="vanished">Display Files Names in Game Tree</translation>
-    </message>
-    <message>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
-        <translation type="vanished">Enabling this causes the filenames to be displayed in the game tree, rather than the trimmed/looked-up game name</translation>
-    </message>
-    <message>
-        <source>Hash filenames in display</source>
-        <translation type="vanished">Hash filenames in display</translation>
-    </message>
-    <message>
-        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="vanished">Enable hashing of names in the display tree. This can make navigating long lists a little faster</translation>
-    </message>
-    <message>
-        <source>Directory where Game Screenshots are stored</source>
-        <translation type="vanished">Directory where Game Screenshots are stored</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="vanished">This directory will be the default browse location when assigning screenshots.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Fanart is stored</source>
-        <translation type="vanished">Directory where Game Fanart is stored</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="vanished">This directory will be the default browse location when assigning fanart.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Boxart is stored</source>
-        <translation type="vanished">Directory where Game Boxart is stored</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="vanished">This directory will be the default browse location when assigning boxart.</translation>
-    </message>
-    <message>
-        <source>MythGame Settings -- General</source>
-        <translation type="vanished">MythGame Settings (General)</translation>
-    </message>
-</context>
-<context>
-    <name>MythGamePlayerEditor</name>
-    <message>
-        <source>Game Players</source>
-        <translation type="vanished">Game Players</translation>
-    </message>
-    <message>
-        <source>(New Game Player)</source>
-        <translation type="vanished">(New Game Player)</translation>
-    </message>
-    <message>
-        <source>Game Player Menu</source>
-        <translation type="vanished">Game Player Menu</translation>
-    </message>
-    <message>
-        <source>Edit...</source>
-        <translation type="vanished">Edit...</translation>
-    </message>
-    <message>
-        <source>Delete...</source>
-        <translation type="vanished">Delete...</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this item?</source>
-        <translation type="vanished">Are you sure you want to delete this item?</translation>
-    </message>
-    <message>
-        <source>Yes, delete It</source>
-        <translation type="vanished">Yes, delete It</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="vanished">No, don&apos;t</translation>
-    </message>
-</context>
-<context>
-    <name>MythGamePlayerSettings</name>
-    <message>
-        <source>Allow games to span multiple ROMs/disks</source>
-        <translation type="vanished">Allow games to span multiple ROMs/disks</translation>
-    </message>
-    <message>
-        <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="vanished">This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</translation>
-    </message>
-    <message>
-        <source>Command</source>
-        <translation type="vanished">Command</translation>
-    </message>
-    <message>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="vanished">Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <extracomment>Game type</extracomment>
-        <translation type="vanished">Type</translation>
-    </message>
-    <message>
-        <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="vanished">Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</translation>
-    </message>
-    <message>
-        <source>ROM Path</source>
-        <translation type="vanished">ROM Path</translation>
-    </message>
-    <message>
-        <source>Location of the ROM files for this emulator</source>
-        <translation type="vanished">Location of the ROM files for this emulator</translation>
-    </message>
-    <message>
-        <source>Working Directory</source>
-        <translation type="vanished">Working Directory</translation>
-    </message>
-    <message>
-        <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="vanished">Directory to change to before launching emulator. Blank is usually fine</translation>
-    </message>
-    <message>
-        <source>File Extensions</source>
-        <translation type="vanished">File Extensions</translation>
-    </message>
-    <message>
-        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="vanished">A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</translation>
-    </message>
-    <message>
-        <source>Game Player Setup</source>
-        <translation type="vanished">Game Player Setup</translation>
-    </message>
-    <message>
-        <source>%1 (%2)</source>
-        <comment>Game player/emulator display</comment>
-        <extracomment>%1 is the player/emulator name, %2 is the type of player/emulator</extracomment>
-        <translation type="vanished">%1 (%2)</translation>
-    </message>
-    <message>
-        <source>Player Name</source>
-        <translation type="vanished">Player Name</translation>
-    </message>
-    <message>
-        <source>Name of this Game and or Emulator</source>
-        <translation type="vanished">Name of this Game and or Emulator</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="66"/>
@@ -656,109 +472,112 @@ Remove it from the database?</translation>
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>%Published by |publisher|%%, |YEAR%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Published by |publisher|%%, |YEAR%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%cast%</source>
-        <translation type="unfinished"></translation>
+        <translation>%cast%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%playcount% times</source>
-        <translation type="unfinished"></translation>
+        <translation>%playcount% times</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>%romname%%, |(rompath)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%romname%%, |(rompath)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Add game to Favorites:</source>
-        <translation type="unfinished"></translation>
+        <translation>Add game to favourites:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Add games to your</source>
-        <translation type="unfinished"></translation>
+        <translation>Add games to your</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Add to favorites:</source>
-        <translation type="unfinished"></translation>
+        <translation>Add to favourites:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>CRC</source>
-        <translation type="unfinished"></translation>
+        <translation>CRC</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Clear data of all your games</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear data of all your games</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Clear your game</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear your game</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Configure game emulators</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure game emulators</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Configure your game</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure your game</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation>Country</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation>Coverart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Coverart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Coverart:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Customize meta data of your games</source>
-        <translation type="unfinished"></translation>
+        <translation>Customize metadata of your games</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Description: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Description: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Detailed information about your game</source>
-        <translation type="unfinished"></translation>
+        <translation>Detailed information about your game</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -768,72 +587,72 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation>File:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Filename</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>GAMES</source>
-        <translation type="unfinished"></translation>
+        <translation>GAMES</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Game Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Game Type:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Game details</source>
-        <translation type="unfinished"></translation>
+        <translation>Game details</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Game folders and general</source>
-        <translation type="unfinished"></translation>
+        <translation>Game folders and general</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>Game folders and general settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Game folders and general settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
         <source>Game plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Game plot:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigation</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Path:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
@@ -843,77 +662,77 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Players</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>Publisher</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>ROM path</source>
-        <translation type="unfinished"></translation>
+        <translation>ROM path</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>ROM:</source>
-        <translation type="unfinished"></translation>
+        <translation>ROM:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rompath:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Save</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Screenshot</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Search</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Search Boxart</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Boxart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="97"/>
         <source>Search Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Fanart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Search Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Screenshot</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Select Game</source>
-        <translation type="unfinished"></translation>
+        <translation>Select Game</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
         <source>Starring:</source>
-        <translation type="unfinished"></translation>
+        <translation>Starring:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="102"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>System</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="104"/>
@@ -923,17 +742,17 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>_</source>
-        <translation type="unfinished"></translation>
+        <translation>_</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="114"/>
         <source>genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>genre:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="115"/>
         <source>system:</source>
-        <translation type="unfinished"></translation>
+        <translation>system:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
@@ -948,7 +767,7 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Year: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Year: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
@@ -983,12 +802,12 @@ Remove it from the database?</translation>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Systems:</source>
-        <translation type="unfinished"></translation>
+        <translation>Systems:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="109"/>

@@ -926,12 +926,12 @@
     <message>
         <location filename="themestrings.h" line="97"/>
         <source>Wind Direction: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wind Direction: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Wind(Dir)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wind(Dir)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
@@ -1080,17 +1080,17 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="67"/>
         <source>Source setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Source setup</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Sources</source>
-        <translation type="unfinished">Sources</translation>
+        <translation>Sources</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Temp: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="73"/>
@@ -1100,47 +1100,47 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Visibility: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Visibility: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>Visibilty</source>
-        <translation type="unfinished"></translation>
+        <translation>Visibility</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>WEATHER</source>
-        <translation type="unfinished"></translation>
+        <translation>WEATHER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Weather</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Weather Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather Global Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Weather Report</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather Report</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Weather Source Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather Source Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Weather forecasts to</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather forecasts to</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>Weather forecasts to display on screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Weather forecasts to display on screen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
@@ -1190,17 +1190,17 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Configure your global weather settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure your global weather settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Configure your weather</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure your weather</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Display</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
@@ -1210,47 +1210,47 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Enter location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter location:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported. Hit the right or down arrow to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter your current location, nearest large town or city. In some countries postal codes are also supported. Hit the right or down arrow to continue.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Feels Like: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Feels Like: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>General Mythweather options</source>
-        <translation type="unfinished"></translation>
+        <translation>General MythWeather options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>General weather</source>
-        <translation type="unfinished"></translation>
+        <translation>General weather</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>High: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>High: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Humidity: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Humidity: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Low: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Low: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -1260,22 +1260,22 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Precip: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Precip: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Pressure: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pressure: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Results</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Save</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
@@ -1285,22 +1285,22 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Screen setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Screen setup</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Search locations for your weather forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Search locations for your weather forecast</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>Setup sources for your weather forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Setup sources for your weather forecast</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>
@@ -1310,22 +1310,22 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Wind(Gust):</source>
-        <translation type="unfinished"></translation>
+        <translation>Wind(Gust):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
         <source>Wind(Gust): %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wind(Gust): %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="102"/>
         <source>dddd,  MMMM dd,  yyyy  |  hh:mm AP</source>
-        <translation type="unfinished"></translation>
+        <translation>dddd,  MMMM dd,  yyyy  |  hh:mm AP</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>updating</source>
-        <translation type="unfinished"></translation>
+        <translation>updating</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>

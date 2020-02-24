@@ -1330,17 +1330,9 @@ Resetting and trying again</translation>
         <translation>MythMusic Media Handler (1/2)</translation>
     </message>
     <message>
-        <source>MythMusic audio CD</source>
-        <translation type="vanished">MythMusic audio CD</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/main.cpp" line="871"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>MythMusic Media Handler (2/2)</translation>
-    </message>
-    <message>
-        <source>MythMusic audio files</source>
-        <translation type="vanished">MythMusic audio files</translation>
     </message>
 </context>
 <context>
@@ -2542,12 +2534,12 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="518"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unknown</translation>
+        <translation>Unknown</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="520"/>
         <source>Use Current Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Use Current Date:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="523"/>
@@ -2557,12 +2549,12 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="525"/>
         <source>Visualizer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualiser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="528"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="529"/>
@@ -3352,242 +3344,242 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%1 Matches found:</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Matches found:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%ARTIST% ~ %TITLE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%ARTIST% ~ %TITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%ARTIST% ~ %TITLE% ~ %ALBUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%ARTIST% ~ %TITLE% ~ %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>%BROADCASTER% ~ %CHANNEL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%BROADCASTER% ~ %CHANNEL%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>%BROADCASTER% ~ %CHANNEL% ~ %GENRE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%BROADCASTER% ~ %CHANNEL% ~ %GENRE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>%CD Track #: |TRACKNUM%%, |YEAR%%, |GENRE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%CD Track #: |TRACKNUM%%, |YEAR%%, |GENRE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>%PLAYCOUNT%x ~ %LASTPLAYED%</source>
-        <translation type="unfinished"></translation>
+        <translation>%PLAYCOUNT%x ~ %LASTPLAYED%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>%STATION% - %Channel%  | %genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION% - %Channel%  | %genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>%STATION% - %Channel% - %genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION% - %Channel% - %genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>%STATION| - %%CHANNEL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION| - %%CHANNEL%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>%TITLE% - %ARTIST% - %ALBUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% - %ARTIST% - %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>%TITLE% by %ARTIST% on %ALBUM% (%length%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% by %ARTIST% on %ALBUM% (%length%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>%TITLE% ~ %ARTIST%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% ~ %ARTIST%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>%TRACKNUM% - %TITLE% %(|LENGTH|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM% - %TITLE% %(|LENGTH|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>%TRACKNUM% - %TITLE% - %ARTIST% %(|LENGTH|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM% - %TITLE% - %ARTIST% %(|LENGTH|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>%TRACKNUM| %%TITLE% by %ARTIST% of %ALBUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM| %%TITLE% by %ARTIST% of %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>%artist| - %%title%</source>
-        <translation type="unfinished"></translation>
+        <translation>%artist| - %%title%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>%genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>%genre%%, |year%</source>
-        <translation type="unfinished"></translation>
+        <translation>%genre%%, |year%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>%lastplayed% (played: %playcount% times)</source>
-        <translation type="unfinished"></translation>
+        <translation>%lastplayed% (played: %playcount% times)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>%length%</source>
-        <translation type="unfinished"></translation>
+        <translation>%length%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>%length% minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>%length% minutes</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>%playlistplayedtime% of %playlisttotaltime%</source>
-        <translation type="unfinished"></translation>
+        <translation>%playlistplayedtime% of %playlisttotaltime%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>%title% - %artist%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title% - %artist%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>%title% by %artist%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title% by %artist%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>%title%% - |artist%% - |album%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title%% - |artist%% - |album%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>%title| - %%artist%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title| - %%artist%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>%track% - %title% - %artist% (%length%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%track% - %title% - %artist% (%length%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>+/- Days:</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- Days:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>0%</source>
-        <translation type="unfinished"></translation>
+        <translation>0%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>0000</source>
-        <translation type="unfinished"></translation>
+        <translation>0000</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation>10</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>3:45</source>
-        <translation type="unfinished"></translation>
+        <translation>3:45</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>&gt;&gt; %NEXTARTIST% ~ %NEXTTITLE%</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; %NEXTARTIST% ~ %NEXTTITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Action</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>Action on Exit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Action on Exit:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Actions</source>
-        <translation type="unfinished">Actions</translation>
+        <translation>Actions</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Add All New files</source>
-        <translation type="unfinished"></translation>
+        <translation>Add All New files</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Add Current</source>
-        <translation type="unfinished"></translation>
+        <translation>Add Current</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Add New</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Add file</source>
-        <translation type="unfinished"></translation>
+        <translation>Add file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>Album Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Album Image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>All ready in database</source>
-        <translation type="unfinished"></translation>
+        <translation>Already in database</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>Artist Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Artist Image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
         <source>Automatically eject CD after Ripping:</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatically eject CD after Ripping:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Automatically play CDs:</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatically play CDs:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Bitte Warten ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Please Wait...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="102"/>
@@ -3597,122 +3589,122 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>Buffer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Buffer:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>CD</source>
-        <translation type="unfinished">CD</translation>
+        <translation>CD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>CD burning options</source>
-        <translation type="unfinished"></translation>
+        <translation>CD burning options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="120"/>
         <source>Channel Logo:</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Logo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="124"/>
         <source>Comp. Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Comp. Artist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="129"/>
         <source>Configure CD copying options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure CD copying options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="130"/>
         <source>Configure Music Burn options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure Music Burn options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="131"/>
         <source>Configure Music folders and general options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure Music folders and general options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="132"/>
         <source>Configure Music playback options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure Music playback options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="133"/>
         <source>Configure Music rating options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure Music rating options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="134"/>
         <source>Configure Music visualization options</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure Music visualisation options</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>Configure settings for</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure settings for</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="137"/>
         <source>Configure your CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure your CD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="141"/>
         <source>Copy your CD into the Music Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Copy your CD into the Music Library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="145"/>
         <source>Covert Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Covert Art</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="146"/>
         <source>Create playlists with favorite music</source>
-        <translation type="unfinished"></translation>
+        <translation>Create playlists with favourite music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="147"/>
         <source>Create your</source>
-        <translation type="unfinished"></translation>
+        <translation>Create your</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="148"/>
         <source>Criteria:</source>
-        <translation type="unfinished"></translation>
+        <translation>Criteria:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="149"/>
         <source>Current Play List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Current Play List View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="150"/>
         <source>Current Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Current Playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="151"/>
         <source>Current Streamlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Current Streamlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="155"/>
         <source>Day:</source>
-        <translation type="unfinished"></translation>
+        <translation>Day:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="156"/>
         <source>Decrease</source>
-        <translation type="unfinished"></translation>
+        <translation>Decrease</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="158"/>
         <source>Default Rip quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Default Rip quality:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="161"/>
@@ -3722,800 +3714,800 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="166"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Duration</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="168"/>
         <source>Edit Album Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Album Art</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="171"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished">Edit Metadata</translation>
+        <translation>Edit Metadata</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="172"/>
         <source>Edit Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Order</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="174"/>
         <source>Edit meta data of your music</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit metadata of your music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="175"/>
         <source>Edit meta data of your radio streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit metadata of your radio streams</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="176"/>
         <source>Edit metadata of the radio stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit metadata of the radio stream</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="177"/>
         <source>Edit your playlists with your favorite music</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit your playlists with your favourite music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="178"/>
         <source>Edit your smart playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit your smart playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="181"/>
         <source>Eject your</source>
-        <translation type="unfinished"></translation>
+        <translation>Eject your</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="189"/>
         <source>Enter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="190"/>
         <source>Field:</source>
-        <translation type="unfinished"></translation>
+        <translation>Field:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="191"/>
         <source>Fields:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fields:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="192"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="193"/>
         <source>File Already Exists</source>
-        <translation type="unfinished">File Already Exists</translation>
+        <translation>File Already Exists</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="194"/>
         <source>File Information</source>
-        <translation type="unfinished"></translation>
+        <translation>File Information</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="195"/>
         <source>File Storage location:</source>
-        <translation type="unfinished"></translation>
+        <translation>File Storage location:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="198"/>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Filename</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="201"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Files</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="202"/>
         <source>Find Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Find Location</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="203"/>
         <source>Find your radio streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Find your radio streams</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="204"/>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Finish</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="205"/>
         <source>First Value</source>
-        <translation type="unfinished"></translation>
+        <translation>First Value</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="206"/>
         <source>First Value:</source>
-        <translation type="unfinished"></translation>
+        <translation>First Value:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="208"/>
         <source>Fixed Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixed Date:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="211"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>General</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="213"/>
         <source>General music</source>
-        <translation type="unfinished"></translation>
+        <translation>General music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="215"/>
         <source>Genre Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre Image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="225"/>
         <source>Image selected:</source>
-        <translation type="unfinished"></translation>
+        <translation>Image selected:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="226"/>
         <source>Imagetype:</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagetype:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="227"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Import</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="230"/>
         <source>Import Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation>Import Coverart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="231"/>
         <source>Import Coverart into your Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import Coverart into your Library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="234"/>
         <source>Import Music files into your Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import Music files into your Library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="235"/>
         <source>Import Music into your library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import Music into your library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="236"/>
         <source>Import music</source>
-        <translation type="unfinished"></translation>
+        <translation>Import music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="238"/>
         <source>Import your</source>
-        <translation type="unfinished"></translation>
+        <translation>Import your</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="239"/>
         <source>Import your CD into the music library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import your CD into the music library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="240"/>
         <source>Import your Cover Art into the music library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import your Cover Art into the music library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="241"/>
         <source>Import your Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Import your Music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="242"/>
         <source>Import your music into the music library</source>
-        <translation type="unfinished"></translation>
+        <translation>Import your music into the music library</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="245"/>
         <source>Increase</source>
-        <translation type="unfinished"></translation>
+        <translation>Increase</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="246"/>
         <source>Information about your music Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Information about your music Track</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="247"/>
         <source>Intelligent</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligent</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="250"/>
         <source>Last</source>
-        <translation type="unfinished"></translation>
+        <translation>Last</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="253"/>
         <source>Last Played</source>
-        <translation type="unfinished"></translation>
+        <translation>Last Played</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="256"/>
         <source>Last played Weight:</source>
-        <translation type="unfinished"></translation>
+        <translation>Last played Weight:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="268"/>
         <source>MUSIC PLAYER</source>
-        <translation type="unfinished"></translation>
+        <translation>MUSIC PLAYER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="269"/>
         <source>MUSIC Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>MUSIC Playlist Editor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="274"/>
         <source>Matches: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Matches: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="275"/>
         <source>Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="279"/>
         <source>Month:</source>
-        <translation type="unfinished"></translation>
+        <translation>Month:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="282"/>
         <source>Multi Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Multi Artist:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="285"/>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="286"/>
         <source>Music Directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Music Directory:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="287"/>
         <source>Music Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Music Playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="289"/>
         <source>Music Stream Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Music Stream Search</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="290"/>
         <source>Music Stream Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Music Stream Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="291"/>
         <source>Music Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Music Tools</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="296"/>
         <source>Mute:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mute:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="298"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigation</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="299"/>
         <source>New Field:</source>
-        <translation type="unfinished"></translation>
+        <translation>New Field:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="300"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Next</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="302"/>
         <source>Next Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Next Playing</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="303"/>
         <source>Next new file</source>
-        <translation type="unfinished"></translation>
+        <translation>Next new file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="307"/>
         <source>No Album Art Found!</source>
-        <translation type="unfinished"></translation>
+        <translation>No Album Art Found!</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="308"/>
         <source>No volume control configured</source>
-        <translation type="unfinished"></translation>
+        <translation>No volume control configured</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="310"/>
         <source>Not muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Not muted</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="311"/>
         <source>Now Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Now Playing</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="312"/>
         <source>Now Playing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Now Playing:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="314"/>
         <source>Now playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Now playing</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="315"/>
         <source>Number of songs found: %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Number of songs found: %n</numerusform>
+            <numerusform>Number of songs found: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="318"/>
         <source>Of The Following Conditions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Of The Following Conditions:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="322"/>
         <source>Operator:</source>
-        <translation type="unfinished"></translation>
+        <translation>Operator:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="325"/>
         <source>Order by Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Order by Fields</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="326"/>
         <source>Order by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Order by:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="327"/>
         <source>Overall Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Overall Progress</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="328"/>
         <source>PAUSED</source>
-        <translation type="unfinished"></translation>
+        <translation>PAUSED</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="329"/>
         <source>PLAYING</source>
-        <translation type="unfinished"></translation>
+        <translation>PLAYING</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="331"/>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Paused</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="335"/>
         <source>Play Internet Radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Play Internet Radio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="340"/>
         <source>Play List Editor Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Play List Editor Gallery View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="341"/>
         <source>Play List Editor Tree View</source>
-        <translation type="unfinished"></translation>
+        <translation>Play List Editor Tree View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="345"/>
         <source>Play count</source>
-        <translation type="unfinished"></translation>
+        <translation>Play count</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="346"/>
         <source>Play count Weight:</source>
-        <translation type="unfinished"></translation>
+        <translation>Play count Weight:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="347"/>
         <source>Play file</source>
-        <translation type="unfinished"></translation>
+        <translation>Play file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="349"/>
         <source>Play radio streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Play radio streams</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="350"/>
         <source>Playcount:</source>
-        <translation type="unfinished"></translation>
+        <translation>Playcount:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="352"/>
         <source>Played track:</source>
-        <translation type="unfinished"></translation>
+        <translation>Played track:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="355"/>
         <source>Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Player</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="357"/>
         <source>Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Playing</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="359"/>
         <source>Playlist Editor</source>
-        <translation type="unfinished">Playlist Editor</translation>
+        <translation>Playlist Editor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="360"/>
         <source>Playlist Editor Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist Editor Gallery</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="361"/>
         <source>Playlist Editor Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist Editor Tree</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="362"/>
         <source>Playlist Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist Gallery</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="364"/>
         <source>Playlist Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist Position:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="365"/>
         <source>Playlist Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist Tree</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="369"/>
         <source>Playlists</source>
-        <translation type="unfinished">Playlists</translation>
+        <translation>Playlists</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="370"/>
         <source>Please Wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Please Wait...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="372"/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Position</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="374"/>
         <source>Position: %position%</source>
-        <translation type="unfinished"></translation>
+        <translation>Position: %position%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="375"/>
         <source>Post processing scripts:</source>
-        <translation type="unfinished"></translation>
+        <translation>Post processing scripts:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="377"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Previous</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="378"/>
         <source>Quality   :</source>
-        <translation type="unfinished"></translation>
+        <translation>Quality   :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="380"/>
         <source>RADIO STREAM PLAYER</source>
-        <translation type="unfinished"></translation>
+        <translation>RADIO STREAM PLAYER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="386"/>
         <source>Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="390"/>
         <source>Ratings</source>
-        <translation type="unfinished">Ratings</translation>
+        <translation>Ratings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="402"/>
         <source>Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Result:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="403"/>
         <source>Results of the smartplaylist criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Results of the smartplaylist criteria</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="404"/>
         <source>Resume Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Resume Mode:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="411"/>
         <source>Rip quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rip quality:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="412"/>
         <source>Ripper</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripper</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="415"/>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Runtime:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="416"/>
         <source>STOPPED</source>
-        <translation type="unfinished"></translation>
+        <translation>STOPPED</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="420"/>
         <source>Scan Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Location</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="421"/>
         <source>Scan current location</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan current location</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="423"/>
         <source>Scan for new</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan for new</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="424"/>
         <source>Scan for new Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan for new Music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="427"/>
         <source>Search Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Album</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="428"/>
         <source>Search Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Artist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="429"/>
         <source>Search Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Category</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="430"/>
         <source>Search Comp Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Comp Artist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="431"/>
         <source>Search First Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Search First Value</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="433"/>
         <source>Search Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Genre</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="434"/>
         <source>Search Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="435"/>
         <source>Search Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Order</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="437"/>
         <source>Search Second Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Second Value</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="438"/>
         <source>Search Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Stream</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="439"/>
         <source>Search String</source>
-        <translation type="unfinished"></translation>
+        <translation>Search String</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="443"/>
         <source>Search for Music Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Search for Music Streams</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="444"/>
         <source>Search for Radio Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Search for Radio Streams</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="446"/>
         <source>Search for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Search for:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="447"/>
         <source>Search library for your favorite music</source>
-        <translation type="unfinished"></translation>
+        <translation>Search library for your favourite music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="448"/>
         <source>Search string</source>
-        <translation type="unfinished"></translation>
+        <translation>Search string</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="449"/>
         <source>Second Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Second Value</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="450"/>
         <source>Second Value:</source>
-        <translation type="unfinished"></translation>
+        <translation>Second Value:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="452"/>
         <source>Select folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Select folder</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="453"/>
         <source>Select tracks to rip:</source>
-        <translation type="unfinished"></translation>
+        <translation>Select tracks to rip:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="454"/>
         <source>Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Selected</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="455"/>
         <source>Selected Field:</source>
-        <translation type="unfinished"></translation>
+        <translation>Selected Field:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="456"/>
         <source>Selected Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Selected Image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="457"/>
         <source>Set</source>
-        <translation type="unfinished"></translation>
+        <translation>Set</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="458"/>
         <source>Set the quality and then edit the artist,album,genre and year if needed. Then select the tracks below to rip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Set the quality and then edit the artist,album,genre and year if needed. Then select the tracks below to rip.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="459"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="460"/>
         <source>Setup you music</source>
-        <translation type="unfinished"></translation>
+        <translation>Setup you music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="461"/>
         <source>Setup your music</source>
-        <translation type="unfinished"></translation>
+        <translation>Setup your music</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="475"/>
         <source>Smart Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="478"/>
         <source>Smart Playlist Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playlist Results</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="479"/>
         <source>Smartlist order fields:</source>
-        <translation type="unfinished"></translation>
+        <translation>Smartlist order fields:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="480"/>
         <source>Song title</source>
-        <translation type="unfinished"></translation>
+        <translation>Song title</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="483"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopped</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="484"/>
         <source>Stream Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Stream Metadata</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="485"/>
         <source>Streaming Radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Streaming Radio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="486"/>
         <source>Switch Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch Title</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="496"/>
         <source>Track Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Track Info</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="499"/>
         <source>Track NO</source>
-        <translation type="unfinished"></translation>
+        <translation>Track NO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="501"/>
         <source>Track Number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Track Number:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="502"/>
         <source>Track:</source>
-        <translation type="unfinished"></translation>
+        <translation>Track:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="504"/>
         <source>Tracks Lyrics View</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracks Lyrics View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="506"/>
@@ -4545,7 +4537,7 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="535"/>
         <source>storage location:</source>
-        <translation type="unfinished"></translation>
+        <translation>storage location:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="143"/>
@@ -4590,7 +4582,7 @@ Broadcaster: %1 - Channel: %2</translation>
     <message>
         <location filename="themestrings.h" line="511"/>
         <source>URL Logo:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Logo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="512"/>
