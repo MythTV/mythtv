@@ -56,9 +56,9 @@ fi
 [ -d ${DOWNLOAD_DIR}/themes ] && rm -rf temp_download/themes/*
 [ -d ${DOWNLOAD_DIR}/trunk ] && rm -rf temp_download/trunk/*
 [ ! -d ${DOWNLOAD_DIR}/themes ] && mkdir -p temp_download/themes
-echo "Downloading list of themes.."
+echo "Downloading list of themes..."
 wget -q ${MYTHTHEMES_DL} -O ${DOWNLOAD_DIR}/themes.zip
-echo "Extracting list of themes.."
+echo "Extracting list of themes..."
 unzip -q -o ${DOWNLOAD_DIR}/themes.zip -d temp_download/
 
 # Download the themes
@@ -69,7 +69,7 @@ for i in $(ls ${DOWNLOAD_DIR}/trunk/); do
     THEME_URL=$(cat ${DOWNLOAD_DIR}/trunk/${i}/themeinfo.xml |grep "</*url>"|sed -e "s/ *<\/*url>//g")
     THEME_FILENAME=$(basename ${THEME_URL})
     [ ! -f ${DOWNLOAD_DIR}/${THEME_FILENAME} ] && echo "Downloading theme ${THEME_FILENAME}.." && wget -q ${THEME_URL} -P temp_download/
-    echo "Extracting theme ${THEME_FILENAME}.."
+    echo "Extracting theme ${THEME_FILENAME}..."
     unzip -q -o ${DOWNLOAD_DIR}/${THEME_FILENAME} -d temp_download/themes/
 done
 
@@ -84,7 +84,7 @@ done
 TRANSLATABLE_THEMES="Arclight Childish Graphite Mythbuntu Mythbuntu-classic MythCenter MythCenter-wide MythCenterXMAS-wide Steppes Steppes-narrow Terra A-Forest blue-abstract-wide"
 #TRANSLATABLE_THEMES=$(ls ${DOWNLOAD_DIR}/themes/ --file-type |grep "/$"|tr '/' ' ') #All themes
 
-#Remove the extracted themes which shouldn't be translatable
+# Remove the extracted themes which shouldn't be translatable
 echo ""
 echo "Strings will be extracted from the following themes:"
 echo ${TRANSLATABLE_THEMES} | tr ' ' '\n'
@@ -122,7 +122,7 @@ popd > /dev/null
 # Generate themestrings.h file for mythtv
 pushd ../mythtv/themes  > /dev/null
     echo ""
-    echo "Generating themestrings.h file for mythtv.."
+    echo "Generating themestrings.h file for mythtv..."
     ${TS} ../.. . &> /dev/null
     ls -l themestrings.h
     echo "Number of strings: $(( $(cat themestrings.h|wc -l)-2 ))"
@@ -170,13 +170,13 @@ function updateplugin {
     done
 
     echo ""
-    echo "Generating themestrings.h file for ${1}.."
+    echo "Generating themestrings.h file for ${1}..."
     ${TS} . $(pwd)/i18n > /dev/null
     ls -l i18n/themestrings.h
     echo "Number of strings: $(( $(cat i18n/themestrings.h|wc -l)-2 ))"
-    
+
     rm -rf temp_themestrings
-    
+
     popd > /dev/null
 }
 
