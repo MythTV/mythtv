@@ -23,18 +23,46 @@ TS=$(pwd)/themestrings
 DOWNLOAD_DIR="temp_download"
 MYTHTHEMES_CORE=$(ls ../mythtv/themes/ --file-type |grep "/$")
 MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
-REAL_XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
-    mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
-    news-ui.xml zoneminder-ui.xml weather-ui.xml \
-    mythnative-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml \
-    base_archive.xml image-ui.xml base_music.xml stream-ui.xml \
-    base_netvision.xml"
 
-BOGUS_XMLPLUGINS="dvd-ui.xml gallery2-ui.xml" # dvd-ui.xml (DVD ripper) needs
-    # to be in this list to be excluded from mythtv. It isn't used anymore,
-    # but some themes still contains it.
-    # gallery2-ui.xml is a bogus file in the blue-abstract theme.
+# Theme files for active plugins. Note that some separate plugins may
+# eventually be incorporated into the core mythtv/ codebase, at which
+# point the relevant theme files should be removed from this list.
+REAL_XMLPLUGINS="\
+base_archive.xml mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml archivemenu.xml archiveutils.xml \
+browser-ui.xml \
+game-ui.xml game_settings.xml \
+base_music.xml music-base.xml music-ui.xml musicsettings-ui.xml stream-ui.xml steppes-music.xml music_settings.xml musicmenu.xml \
+base_netvision.xml netvision-ui.xml \
+news-ui.xml \
+weather-ui.xml weather_settings.xml \
+zoneminder-ui.xml zonemindermenu.xml"
 
+# Theme files for deleted plugins (or plugins that have migrated into core)
+# may still be present (but no longer used) in some themes and require
+# manual exclusion:
+#
+# DVD Ripper: plugin removed prior to 0.24 release
+# - dvd-ui.xml
+#
+# MythGallery: plugin removed prior to v31 release
+# - gallery-ui.xml
+# - gallery-base.xml (Arclight)
+# - ORIGgallery-ui.xml (Childish)
+#
+# MythFlix: plugin removed prior to 0.23 release
+# - netflix-ui.xml
+#
+# MythMovies: plugin removed prior to 0.24 release
+# - movies-ui.xml
+#
+BOGUS_XMLPLUGINS="\
+dvd-ui.xml \
+gallery-base.xml gallery-ui.xml ORIGgallery-ui.xml \
+netflix-ui.xml \
+movies-ui.xml"
+
+# Theme files not in the superset of real and bogus plugin files are
+# considered to be included for use with the core mythtv/ applications
 XMLPLUGINS="${REAL_XMLPLUGINS} ${BOGUS_XMLPLUGINS}"
 
 if [ ! -e ${TS} ]; then
@@ -180,13 +208,11 @@ function updateplugin {
     popd > /dev/null
 }
 
-updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml base_archive.xml
+updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml base_archive.xml archivemenu.xml archiveutils.xml
 updateplugin mythbrowser browser-ui.xml
-updateplugin mythgallery gallery-ui.xml image-ui.xml
-updateplugin mythgame game-ui.xml
-updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml base_music.xml stream-ui.xml
+updateplugin mythgame game-ui.xml game_settings.xml
+updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml base_music.xml stream-ui.xml music_settings.xml musicmenu.xml
 updateplugin mythnetvision netvision-ui.xml base_netvision.xml
 updateplugin mythnews news-ui.xml
-updateplugin mythweather weather-ui.xml
-updateplugin mythzoneminder zoneminder-ui.xml
-
+updateplugin mythweather weather-ui.xml weather_settings.xml
+updateplugin mythzoneminder zoneminder-ui.xml zonemindermenu.xml
