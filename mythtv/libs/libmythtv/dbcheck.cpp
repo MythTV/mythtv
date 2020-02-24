@@ -3715,6 +3715,77 @@ nullptr
             return false;
     }
 
+    if (dbver == "1360")
+    {
+        // missed in 1357 - convert old vdpau and openglvaapi renderers to opengl
+        // convert ancient quartz-blit to opengl as well
+        ProfileItem temp;
+        vector<ProfileItem> profiles;
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT profileid, value, data FROM displayprofiles "
+                      "ORDER BY profileid");
+
+        for (;;)
+        {
+            if (!query.exec())
+                break;
+
+            uint currentprofile = 0;
+            while (query.next())
+            {
+                if (query.value(0).toUInt() != currentprofile)
+                {
+                    if (currentprofile)
+                    {
+                        temp.SetProfileID(currentprofile);
+                        profiles.push_back(temp);
+                    }
+                    temp.Clear();
+                    currentprofile = query.value(0).toUInt();
+                }
+                temp.Set(query.value(1).toString(), query.value(2).toString());
+            }
+
+            if (currentprofile)
+            {
+                temp.SetProfileID(currentprofile);
+                profiles.push_back(temp);
+            }
+
+            foreach(ProfileItem profile, profiles)
+            {
+                // the old deinterlacers will have been converted already
+                QString oldrender  = profile.Get("pref_videorenderer");
+                if (oldrender == "quartz-blit" || oldrender == "openglvaapi" ||
+                    oldrender == "vdpau")
+                {
+                    auto UpdateData = [](uint ProfileID, const QString &Value, const QString &Data)
+                    {
+                        MSqlQuery update(MSqlQuery::InitCon());
+                        update.prepare(
+                            "UPDATE displayprofiles SET data = :DATA "
+                            "WHERE profileid = :PROFILEID AND value = :VALUE");
+                        update.bindValue(":PROFILEID", ProfileID);
+                        update.bindValue(":VALUE",     Value);
+                        update.bindValue(":DATA",      Data);
+                        if (!update.exec())
+                            LOG(VB_GENERAL, LOG_ERR,
+                                QString("Error updating display profile id %1").arg(ProfileID));
+                    };
+
+                    uint id = profile.GetProfileID();
+                    UpdateData(id, "pref_decoder", "ffmpeg");
+                    UpdateData(id, "pref_videorenderer", "opengl-yv12");
+                }
+            }
+            break;
+        }
+
+        if (!UpdateDBVersionNumber("1361", dbver))
+            return false;
+    }
+
     return true;
 }
 
