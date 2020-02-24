@@ -221,6 +221,7 @@ int main(int argc, char *argv[])
 #if 0
     int lineCount = 2;
 #endif
+    strings.sort();
     QStringList::const_iterator strit;
     for (strit = strings.begin(); strit != strings.end(); ++strit)
     {
