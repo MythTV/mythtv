@@ -261,7 +261,9 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
@@ -276,7 +278,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Categories</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -286,147 +288,147 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Choose sites you want to receive news from</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose sites you want to receive news from</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Choose which news channels interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose which news channels interest you</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Date:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Enclosures:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enclosures:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Is Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Is Podcast:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>NEWS</source>
-        <translation type="unfinished"></translation>
+        <translation>NEWS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Name site:</source>
-        <translation type="unfinished"></translation>
+        <translation>Name site:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Needs Download:</source>
-        <translation type="unfinished"></translation>
+        <translation>Needs Download:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>News Feeds Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>News Feeds Settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>News catagories</source>
-        <translation type="unfinished"></translation>
+        <translation>News catagories</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>News settings</source>
-        <translation type="unfinished"></translation>
+        <translation>News settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>No news sites available, please configure your subscriptions using the configuration menu</source>
-        <translation type="unfinished"></translation>
+        <translation>No news sites available, please configure your subscriptions using the configuration menu</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Not Applicable</source>
-        <translation type="unfinished"></translation>
+        <translation>Not Applicable</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>RSS Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Editor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>RSS Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Icon:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>RSS Newsfeeds</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Newsfeeds</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>RSS URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>RSS feed is podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS feed is podcast:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>RSS feed name:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS feed name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Save</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Select a feed to views</source>
-        <translation type="unfinished"></translation>
+        <translation>Select a feed to view</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Site icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Site icon:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Subscribe to News Feeds</source>
-        <translation type="unfinished"></translation>
+        <translation>Subscribe to News Feeds</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Title:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>URL site:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL site:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unknown</translation>
+        <translation>Unknown</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Update</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>

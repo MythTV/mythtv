@@ -226,22 +226,22 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Search</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Select bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Select bookmark</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Select bookmark or add a new one</source>
-        <translation type="unfinished"></translation>
+        <translation>Select bookmark or add a new one</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Select bookmark:</source>
-        <translation type="unfinished"></translation>
+        <translation>Select bookmark:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
@@ -276,27 +276,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</translation>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Text size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Text size:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>URL Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>WEB BROWSER</source>
-        <translation type="unfinished"></translation>
+        <translation>WEB BROWSER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Website Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Website Name</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Website URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Website URL</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
@@ -321,14 +321,6 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <location filename="themestrings.h" line="54"/>
         <source>URL:</source>
         <translation>URL:</translation>
-    </message>
-    <message>
-        <source>Genre:</source>
-        <translation type="vanished">Genre:</translation>
-    </message>
-    <message>
-        <source>Channel:</source>
-        <translation type="vanished">Channel:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -368,7 +360,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Find category</source>
-        <translation type="unfinished"></translation>
+        <translation>Find category</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -378,12 +370,12 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Myth Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Web Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -398,60 +390,60 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message numerus="yes">
         <location filename="themestrings.h" line="6"/>
         <source>%name% (%url%)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%name% (%url%)</numerusform>
+            <numerusform>%name% (%url%)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Bookmark Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Bookmark URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Browse the web</source>
-        <translation type="unfinished"></translation>
+        <translation>Browse the web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Browser command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser command:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Choose a bookmark to open in the webbrowser</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose a bookmark to open in the web browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Command:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Configure web browser settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configure web browser settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Edit your bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit your bookmarks</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enable Plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable Plugins:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -461,7 +453,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Enable browser plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable browser plugins:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -501,7 +493,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Zoom:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>

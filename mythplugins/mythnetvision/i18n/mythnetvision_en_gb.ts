@@ -355,127 +355,133 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|RATING| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%TITLE%% |SUBTITLE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE%% |SUBTITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%TITLE| %%~ |AUTHOR%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE| %%~ |AUTHOR%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>%Userrating: |RATING|
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%Userrating: |RATING|
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>%author%%, |date%</source>
-        <translation type="unfinished"></translation>
+        <translation>%author%%, |date%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>%resolution%%, |filesize_str%% (|length|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%resolution%%, |filesize_str%% (|length|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>%resolution|, %%filesize_str| %</source>
-        <translation type="unfinished"></translation>
+        <translation>%resolution|, %%filesize_str| %</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>%|(RATING)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|(RATING)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Browse Internet video</source>
-        <translation type="unfinished"></translation>
+        <translation>Browse Internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisities.  Try running a script from the command line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Can&apos;t find any search scripts! This usually indicates missing search script prerequisites. Try running a script from the command line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Can&apos;t find any search scripts! This usually indicates missing search script prerequisites. Try running a script from the command line.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Created by %author%%, |date%</source>
-        <translation type="unfinished"></translation>
+        <translation>Created by %author%%, |date%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Date Posted:</source>
-        <translation type="unfinished"></translation>
+        <translation>Date Posted:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Date:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Edit RSS Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit RSS Subscriptions</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Episode %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Episode %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Episode:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Feed Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Feed Description:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>File Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>File Size:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>INTERNET VIDEO BROWSER</source>
-        <translation type="unfinished"></translation>
+        <translation>INTERNET VIDEO BROWSER</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>INTERNET VIDEOS LIST</source>
-        <translation type="unfinished"></translation>
+        <translation>INTERNET VIDEOS LIST</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
@@ -485,32 +491,32 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Manage RSS Subscribtions</source>
-        <translation type="unfinished"></translation>
+        <translation>Manage RSS Subscriptions</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Netvision Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Netvision Browse View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Netvision Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Netvision Gallery View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Netvision List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Netvision List View</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Netvision Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Netvision Search</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="72"/>
         <source>Netvision Site Grabbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Netvision Site Grabbers</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
@@ -520,157 +526,157 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Not applicable</source>
-        <translation type="unfinished"></translation>
+        <translation>Not applicable</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>Not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Not available</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Page</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Posted:</source>
-        <translation type="unfinished"></translation>
+        <translation>Posted:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Preview</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>RSS Author:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Author:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>RSS Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Editor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>RSS Feed Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Feed Name:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>RSS Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Overview</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>RSS Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Subscriptions</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>RSS URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolution</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolution:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Runtime:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>SEARCH INTERNET VIDEOS</source>
-        <translation type="unfinished"></translation>
+        <translation>SEARCH INTERNET VIDEOS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>Search Internet Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Internet Videos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
         <source>Search Site:</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Site:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Search String:</source>
-        <translation type="unfinished"></translation>
+        <translation>Search String:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Season and Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Season and Episode:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Select icon image</source>
-        <translation type="unfinished"></translation>
+        <translation>Select icon image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Size:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="118"/>
         <source>Stream type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Stream type:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unknown</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
         <source>VIDEO GALLERY</source>
-        <translation type="unfinished"></translation>
+        <translation>VIDEO GALLERY</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>Video Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Gallery</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="128"/>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Video List</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="129"/>
         <source>Video Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Search</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="130"/>
         <source>Video length:</source>
-        <translation type="unfinished"></translation>
+        <translation>Video length:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="131"/>
@@ -685,7 +691,7 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>rating</source>
-        <translation type="unfinished"></translation>
+        <translation>rating</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
