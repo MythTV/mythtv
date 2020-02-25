@@ -385,6 +385,8 @@ bool MythRenderOpenGL::Init(void)
     if (hasExtension("GL_NVX_gpu_memory_info"))
         m_extraFeatures |= kGLNVMemory;
 
+    Check16BitFBO();
+
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;
@@ -437,6 +439,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     //LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
     //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))));
@@ -720,17 +723,17 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
     doneCurrent();
 }
 
-QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenum InternalFormat)
+QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, bool SixteenBit)
 {
     if (!(m_features & Framebuffers))
         return nullptr;
 
     OpenGLLocker locker(this);
     QOpenGLFramebufferObject *framebuffer = nullptr;
-    if (InternalFormat)
+    if (SixteenBit)
     {
         framebuffer = new QOpenGLFramebufferObject(Size, QOpenGLFramebufferObject::NoAttachment,
-                                                   GL_TEXTURE_2D, InternalFormat);
+                                                   GL_TEXTURE_2D, QOpenGLTexture::RGBA16_UNorm);
     }
     else
     {
@@ -1655,4 +1658,26 @@ bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Total)
         return true;
     }
     return false;
+}
+
+/*! \brief Check for 16bit framebufferobject support
+ *
+ * We don't restrict this test based on OpenGL type or version to try and give as
+ * much support as possible. It will likely fail on all GL/ES 2.X versions.
+ *
+ * \note Qt support for 16bit framebuffers is broken until Qt5.12 on OpenGL ES3.X.
+ * \note Qt only supports GL_RGBA16, GL_RGB16, GL_RGB10_A2 and GL_RGB10 but we
+ * only test for RGBA16 as it should be widely supported and will not restrict
+ * the use of alpha blending.
+*/
+void MythRenderOpenGL::Check16BitFBO(void)
+{
+    OpenGLLocker locker(this);
+    QSize size{256, 256};
+    QOpenGLFramebufferObject *fbo = CreateFramebuffer(size, true);
+    if (fbo)
+    {
+        m_extraFeatures |= kGL16BitFBO;
+        delete fbo;
+    }
 }
