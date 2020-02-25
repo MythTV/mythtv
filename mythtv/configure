@@ -7300,7 +7300,7 @@ if enabled x86; then
 
 fi
 if enabled aarch64; then
-    echo "NEON enabled              ${neon-no}"
+    echo "NEON enabled              ${neon-no} (Intrinsics ${intrinsics_neon-no})"
     echo "VFP enabled               ${vfp-no}"
 fi
 if enabled arm; then
@@ -7308,7 +7308,7 @@ if enabled arm; then
     echo "ARMv6 enabled             ${armv6-no}"
     echo "ARMv6T2 enabled           ${armv6t2-no}"
     echo "VFP enabled               ${vfp-no}"
-    echo "NEON enabled              ${neon-no}"
+    echo "NEON enabled              ${neon-no} (Intrinsics ${intrinsics_neon-no})"
     echo "THUMB enabled             ${thumb-no}"
 fi
 if enabled mips; then
