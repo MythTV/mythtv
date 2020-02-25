@@ -1054,14 +1054,9 @@ QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType
     // and all return RGB formats anyway. The MediaCoded texture format is an unknown but resizing will
     // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
     // will be preserved.
-
-    // GLES3.0 needs specific texture formats - needs more work and it
-    // is currently unclear whether QOpenGLFrameBufferObject has the
-    // requisite flexibility for those formats.
-    bool sixteenbitfb = !m_gles;
+    bool sixteenbitfb  = m_extraFeatures & kGL16BitFBO;
     bool sixteenbitvid = ColorDepth(OutputType) > 8;
-    GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16_UNorm : 0;
-    if (format)
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using 16bit framebuffer texture");
-    return m_render->CreateFramebuffer(Size, format);
+    if (sixteenbitfb && sixteenbitvid)
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Requesting 16bit framebuffer texture");
+    return m_render->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
 }

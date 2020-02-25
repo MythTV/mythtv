@@ -32,11 +32,12 @@ enum GLFeatures
     kGLFeatNone       = 0x0000,
     kGLBufferMap      = 0x0001,
     kGLExtRects       = 0x0002,
-    kGLExtRGBA16      = 0x0004,
+    kGLExtRGBA16      = 0x0004, // TODO remove
     kGLExtSubimage    = 0x0008,
     kGLTiled          = 0x0010,
     kGLLegacyTextures = 0x0020,
-    kGLNVMemory       = 0x0040
+    kGLNVMemory       = 0x0040,
+    kGL16BitFBO       = 0x0080
 };
 
 #define TEX_OFFSET 8
@@ -128,7 +129,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteTexture(MythGLTexture *Texture);
     static int GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
-    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, GLenum InternalFormat = 0);
+    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, bool SixteenBit = false);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
     void  DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);
@@ -177,6 +178,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  ExpireVBOS(int Max = 0);
     bool  CreateDefaultShaders(void);
     void  DeleteDefaultShaders(void);
+    void  Check16BitFBO(void);
 
   protected:
     // Prevent compiler complaints about using 0 as a null pointer.
