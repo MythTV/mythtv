@@ -1,9 +1,6 @@
 #ifndef MYTHDEINTERLACER_H
 #define MYTHDEINTERLACER_H
 
-// Qt
-#include <QSize>
-
 // MythTV
 #include "videoouttypes.h"
 #include "mythavutil.h"
@@ -28,6 +25,9 @@ class MythDeinterlacer
                                    bool DoubleRate, bool TopFieldFirst,
                                    VideoDisplayProfile *Profile);
     inline void      Cleanup      (void);
+    void             OneField     (VideoFrame *Frame, FrameScanType Scan);
+    void             Blend        (VideoFrame *Frame, FrameScanType Scan);
+    bool             SetUpCache   (VideoFrame *Frame);
 
   private:
     Q_DISABLE_COPY(MythDeinterlacer)
@@ -48,6 +48,7 @@ class MythDeinterlacer
     long long        m_discontinuityCounter { 0 };
     bool             m_autoFieldOrder  { false };
     long long        m_lastFieldChange { 0 };
+    static bool      s_haveSIMD;
 };
 
 #endif // MYTHDEINTERLACER_H
