@@ -6,6 +6,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "mythdbcheck.h"
 #include "videodbcheck.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
@@ -17,68 +18,6 @@
 const QString minimumVideoDatabaseVersion = "1016";
 const QString finalVideoDatabaseVersion = "1038";
 const QString MythVideoVersionName = "mythvideo.DBSchemaVer";
-
-static bool UpdateDBVersionNumber(const QString &field_name,
-                                  const QString &newnumber)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (!query.exec(QString("DELETE FROM settings WHERE value='%1';")
-                    .arg(field_name)))
-    {
-        MythDB::DBError("UpdateDBVersionNumber - delete", query);
-        return false;
-    }
-
-    if (!query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                            "VALUES ('%1', %2, NULL);")
-                    .arg(field_name).arg(newnumber)))
-    {
-        MythDB::DBError("UpdateDBVersionNumber - insert", query);
-        return false;
-    }
-
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Upgraded to MythVideo schema version %1") .arg(newnumber));
-    return true;
-}
-
-static bool performActualUpdate(const QStringList &updates,
-                                const QString &version,
-                                QString &dbver, const QString &field_name)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Upgrading to MythVideo schema version %1") .arg(version));
-
-    foreach (const auto & update, updates)
-    {
-        if (!query.exec(update))
-        {
-            MythDB::DBError("performActualUpdate", query);
-            return false;
-        }
-    }
-
-    if (!UpdateDBVersionNumber(field_name, version))
-        return false;
-    dbver = version;
-    return true;
-}
-
-static bool performActualUpdate(const QString updates[], const QString &version,
-                                QString &dbver, const QString &field_name)
-{
-    QStringList upQuery;
-    for (int i = 0; ; ++i)
-    {
-        QString q = updates[i];
-        if (q == "") break;
-        upQuery.append(q);
-    }
-    return performActualUpdate(upQuery, version, dbver, field_name);
-}
 
 static void AddFileType(const QString &extension,
                         const QString &playCommand = QString("Internal"),
@@ -156,7 +95,7 @@ static bool InitializeVideoSchema(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Inserting initial video database information.");
 
-    const QString updates[] = {
+    DBUpdates updates {
 "CREATE TABLE dvdinput ("
 "  intid int(10) unsigned NOT NULL,"
 "  hsize int(10) unsigned DEFAULT NULL,"
@@ -336,13 +275,12 @@ static bool InitializeVideoSchema(void)
 "INSERT INTO videotypes VALUES (29,'ts','Internal',0,0);",
 "INSERT INTO videotypes VALUES (30,'swf','Internal',0,0);",
 "INSERT INTO videotypes VALUES (31,'f4v','Internal',0,0);",
-"INSERT INTO videotypes VALUES (32,'nuv','Internal',0,0);",
-nullptr
+"INSERT INTO videotypes VALUES (32,'nuv','Internal',0,0);"
 };
 
     QString dbver = "";
-    return performActualUpdate(updates, finalVideoDatabaseVersion, dbver,
-                               MythVideoVersionName);
+    return performActualUpdate("MythVideo", MythVideoVersionName,
+                               updates, finalVideoDatabaseVersion, dbver);
 }
 
 bool doUpgradeVideoDatabaseSchema(void)
@@ -375,7 +313,7 @@ bool doUpgradeVideoDatabaseSchema(void)
 
     if (dbver == "1016")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE dvdbookmark"
 "  MODIFY serialid varbinary(16) NOT NULL default '',"
@@ -408,19 +346,18 @@ bool doUpgradeVideoDatabaseSchema(void)
 "  MODIFY playcommand varbinary(255) default NULL;",
 "ALTER TABLE videotypes"
 "  MODIFY extension varbinary(128) NOT NULL,"
-"  MODIFY playcommand varbinary(255) NOT NULL;",
-""
+"  MODIFY playcommand varbinary(255) NOT NULL;"
 };
 
-        if (!performActualUpdate(updates, "1017", dbver,
-                                 MythVideoVersionName))
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1017", dbver))
             return false;
     }
 
 
     if (dbver == "1017")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE dvdbookmark"
 "  DEFAULT CHARACTER SET default,"
@@ -469,35 +406,36 @@ bool doUpgradeVideoDatabaseSchema(void)
 "ALTER TABLE videotypes"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY extension varchar(128) CHARACTER SET utf8 NOT NULL,"
-"  MODIFY playcommand varchar(255) CHARACTER SET utf8 NOT NULL;",
-""
+"  MODIFY playcommand varchar(255) CHARACTER SET utf8 NOT NULL;"
 };
 
-        if (!performActualUpdate(updates, "1018", dbver,
-                                 MythVideoVersionName))
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1018", dbver))
             return false;
     }
 
     if (dbver == "1018")
     {
-        QStringList updates;
-        updates += "DELETE FROM settings WHERE value="
-                   "'MovieListCommandLine' AND data LIKE '%imdb%';";
-        updates += "DELETE FROM settings WHERE value="
-                   "'MovieDataCommandLine' AND data LIKE '%imdb%';";
-        updates += "DELETE FROM settings WHERE value="
-                   "'MoviePosterCommandLine' AND data LIKE '%imdb%';";
-        if (!performActualUpdate(updates, "1019", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "DELETE FROM settings WHERE value="
+            "'MovieListCommandLine' AND data LIKE '%imdb%';",
+            "DELETE FROM settings WHERE value="
+            "'MovieDataCommandLine' AND data LIKE '%imdb%';",
+            "DELETE FROM settings WHERE value="
+            "'MoviePosterCommandLine' AND data LIKE '%imdb%';"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1019", dbver))
             return false;
     }
 
     if (dbver == "1019")
     {
-        QStringList updates(
-                "ALTER TABLE videometadata ADD `trailer` TEXT;");
-        if (!performActualUpdate(updates, "1020", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `trailer` TEXT;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1020", dbver))
             return false;
     }
 
@@ -520,74 +458,78 @@ bool doUpgradeVideoDatabaseSchema(void)
         AddFileType("ogm");
         AddFileType("flv");
 
-        if (!UpdateDBVersionNumber(MythVideoVersionName, "1021"))
+        if (!UpdateDBVersionNumber("MythVideo", MythVideoVersionName, "1021", dbver))
             return false;
-
-        dbver = "1021";
     }
 
     if (dbver == "1021")
     {
-         QStringList updates;
-         updates += "ALTER TABLE videometadata ADD host text CHARACTER SET utf8 NOT NULL;";
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD host text CHARACTER SET utf8 NOT NULL;"
+        };
 
-         if (!performActualUpdate(updates, "1022", dbver,
-                                  MythVideoVersionName))
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1022", dbver))
             return false;
      }
 
     if (dbver == "1022")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `screenshot` TEXT;";
-        updates += "ALTER TABLE videometadata ADD `banner` TEXT;";
-        updates += "ALTER TABLE videometadata ADD `fanart` TEXT;";
-        if (!performActualUpdate(updates, "1023", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `screenshot` TEXT;",
+            "ALTER TABLE videometadata ADD `banner` TEXT;",
+            "ALTER TABLE videometadata ADD `fanart` TEXT;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1023", dbver))
             return false;
     }
 
     if (dbver == "1023")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `subtitle` TEXT "
-                   "NOT NULL AFTER `title`;";
-        updates += "ALTER TABLE videometadata ADD `season` SMALLINT "
-                   "UNSIGNED NOT NULL DEFAULT '0' AFTER `length`;";
-        updates += "ALTER TABLE videometadata ADD `episode` SMALLINT "
-                   "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;";
-        if (!performActualUpdate(updates, "1024", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `subtitle` TEXT "
+            "NOT NULL AFTER `title`;",
+            "ALTER TABLE videometadata ADD `season` SMALLINT "
+            "UNSIGNED NOT NULL DEFAULT '0' AFTER `length`;",
+            "ALTER TABLE videometadata ADD `episode` SMALLINT "
+            "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1024", dbver))
             return false;
     }
 
     if (dbver == "1024")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD watched BOOL "
-                   "NOT NULL DEFAULT 0 AFTER browse;";
-        if (!performActualUpdate(updates, "1025", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD watched BOOL "
+            "NOT NULL DEFAULT 0 AFTER browse;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1025", dbver))
             return false;
     }
 
     if (dbver == "1025")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `insertdate` TIMESTAMP "
-                   "NULL DEFAULT CURRENT_TIMESTAMP AFTER `fanart`;";
-        if (!performActualUpdate(updates, "1026", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `insertdate` TIMESTAMP "
+            "NULL DEFAULT CURRENT_TIMESTAMP AFTER `fanart`;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1026", dbver))
             return false;
     }
 
     if (dbver == "1026")
     {
-        QStringList updates;
-        updates += "DELETE FROM keybindings "
-                   " WHERE action = 'DELETE' AND context = 'Video';";
-        if (!performActualUpdate(updates, "1027", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "DELETE FROM keybindings "
+            " WHERE action = 'DELETE' AND context = 'Video';"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1027", dbver))
             return false;
     }
 
@@ -640,41 +582,39 @@ bool doUpgradeVideoDatabaseSchema(void)
         if (!ok)
             return false;
 
-        if (!UpdateDBVersionNumber(MythVideoVersionName, "1028"))
+        if (!UpdateDBVersionNumber("MythVideo", MythVideoVersionName, "1028", dbver))
             return false;
-
-        dbver = "1028";
     }
 
     if (dbver == "1028")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `releasedate` DATE "
-                   "NOT NULL AFTER `year`;";
-        updates += "ALTER TABLE videometadata ADD `homepage` TEXT "
-                   "NOT NULL AFTER `inetref`;";
-        if (!performActualUpdate(updates, "1029", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `releasedate` DATE "
+            "NOT NULL AFTER `year`;",
+            "ALTER TABLE videometadata ADD `homepage` TEXT "
+            "NOT NULL AFTER `inetref`;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1029", dbver))
             return false;
     }
 
     if (dbver == "1029")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `hash` VARCHAR(128) "
-                   "NOT NULL AFTER `filename`;";
-        if (!performActualUpdate(updates, "1030", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `hash` VARCHAR(128) "
+            "NOT NULL AFTER `filename`;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1030", dbver))
             return false;
     }
 
     if (dbver == "1030")
     {
         UpdateHashes();
-        if (!UpdateDBVersionNumber(MythVideoVersionName, "1031"))
+        if (!UpdateDBVersionNumber("MythVideo", MythVideoVersionName, "1031", dbver))
             return false;
-
-        dbver = "1031";
     }
 
     if (dbver == "1031")
@@ -710,38 +650,37 @@ bool doUpgradeVideoDatabaseSchema(void)
             }
         }
 
-        if (!UpdateDBVersionNumber(MythVideoVersionName, "1032"))
+        if (!UpdateDBVersionNumber("MythVideo", MythVideoVersionName, "1032", dbver))
             return false;
-
-        dbver = "1032";
     }
 
     if (dbver == "1032")
     {
-        QStringList updates;
-        updates += "CREATE TEMPORARY TABLE bad_videometadatacast"
-                    "       AS SELECT * FROM videometadatacast;";
-        updates += "CREATE TEMPORARY TABLE bad_videometadatagenre"
-                   "       AS SELECT * FROM videometadatagenre;";
-        updates += "CREATE TEMPORARY TABLE bad_videometadatacountry"
-                   "       AS SELECT * FROM videometadatacountry;";
-        updates += "TRUNCATE TABLE videometadatacast;";
-        updates += "TRUNCATE TABLE videometadatagenre;";
-        updates += "TRUNCATE TABLE videometadatacountry;";
-        updates += "INSERT videometadatacast SELECT idvideo,idcast"
-                   "       FROM bad_videometadatacast GROUP BY idvideo,idcast;";
-        updates += "INSERT videometadatagenre SELECT idvideo,idgenre"
-                   "       FROM bad_videometadatagenre GROUP BY idvideo,idgenre;";
-        updates += "INSERT videometadatacountry SELECT idvideo,idcountry"
-                   "       FROM bad_videometadatacountry GROUP BY idvideo,idcountry;";
-        updates += "DROP TEMPORARY TABLE bad_videometadatacast;";
-        updates += "DROP TEMPORARY TABLE bad_videometadatagenre;";
-        updates += "DROP TEMPORARY TABLE bad_videometadatacountry;";
-        updates += "ALTER TABLE videometadatacast ADD UNIQUE INDEX (`idvideo`,`idcast`);";
-        updates += "ALTER TABLE videometadatagenre ADD UNIQUE INDEX (`idvideo`,`idgenre`);";
-        updates +="ALTER TABLE videometadatacountry ADD UNIQUE INDEX (`idvideo`,`idcountry`);";
-        if (!performActualUpdate(updates, "1033", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "CREATE TEMPORARY TABLE bad_videometadatacast"
+            "       AS SELECT * FROM videometadatacast,",
+            "CREATE TEMPORARY TABLE bad_videometadatagenre"
+            "       AS SELECT * FROM videometadatagenre,",
+            "CREATE TEMPORARY TABLE bad_videometadatacountry"
+            "       AS SELECT * FROM videometadatacountry,",
+            "TRUNCATE TABLE videometadatacast,",
+            "TRUNCATE TABLE videometadatagenre,",
+            "TRUNCATE TABLE videometadatacountry,",
+            "INSERT videometadatacast SELECT idvideo,idcast"
+            "       FROM bad_videometadatacast GROUP BY idvideo,idcast,",
+            "INSERT videometadatagenre SELECT idvideo,idgenre"
+            "       FROM bad_videometadatagenre GROUP BY idvideo,idgenre,",
+            "INSERT videometadatacountry SELECT idvideo,idcountry"
+            "       FROM bad_videometadatacountry GROUP BY idvideo,idcountry,",
+            "DROP TEMPORARY TABLE bad_videometadatacast,",
+            "DROP TEMPORARY TABLE bad_videometadatagenre,",
+            "DROP TEMPORARY TABLE bad_videometadatacountry,",
+            "ALTER TABLE videometadatacast ADD UNIQUE INDEX (`idvideo`,`idcast`),",
+            "ALTER TABLE videometadatagenre ADD UNIQUE INDEX (`idvideo`,`idgenre`),",
+            "ALTER TABLE videometadatacountry ADD UNIQUE INDEX (`idvideo`,`idcountry`);"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1033", dbver))
             return false;
 
         dbver = "1033";
@@ -760,50 +699,52 @@ bool doUpgradeVideoDatabaseSchema(void)
         AddFileType("f4v");
         AddFileType("nuv");
 
-        if (!UpdateDBVersionNumber(MythVideoVersionName, "1034"))
+        if (!UpdateDBVersionNumber("MythVideo", MythVideoVersionName, "1034", dbver))
             return false;
-
-        dbver = "1034";
     }
 
     if (dbver == "1034")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD `tagline` VARCHAR (255) "
-                   "AFTER `subtitle`;";
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD `tagline` VARCHAR (255) "
+            "AFTER `subtitle`;"
+        };
 
-        if (!performActualUpdate(updates, "1035", dbver,
-                                 MythVideoVersionName))
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1035", dbver))
             return false;
     }
 
     if (dbver == "1035")
     {
-        QStringList updates;
-        updates += "ALTER TABLE videometadata ADD processed BOOL "
-                   "NOT NULL DEFAULT 0 AFTER watched;";
-        if (!performActualUpdate(updates, "1036", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE videometadata ADD processed BOOL "
+            "NOT NULL DEFAULT 0 AFTER watched;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1036", dbver))
             return false;
     }
 
     if (dbver == "1036")
     {
-        QStringList updates;
-        updates += "ALTER TABLE  videometadata ADD  `studio` VARCHAR( 128 ) "
-                   "AFTER `director`;";
-        if (!performActualUpdate(updates, "1037", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "ALTER TABLE  videometadata ADD  `studio` VARCHAR( 128 ) "
+            "AFTER `director`;"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1037", dbver))
             return false;
     }
 
     if (dbver == "1037")
     {
-        QStringList updates;
-        updates += "DELETE FROM videotypes WHERE extension = 'VIDEO_TS';";
-        updates += "DELETE FROM videotypes WHERE extension = 'BDMV';";
-        if (!performActualUpdate(updates, "1038", dbver,
-                                 MythVideoVersionName))
+        DBUpdates updates {
+            "DELETE FROM videotypes WHERE extension = 'VIDEO_TS';",
+            "DELETE FROM videotypes WHERE extension = 'BDMV';"
+        };
+        if (!performActualUpdate("MythVideo", MythVideoVersionName,
+                                 updates, "1038", dbver))
             return false;
     }
 

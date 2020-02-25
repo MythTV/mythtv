@@ -7,65 +7,16 @@ using namespace std;
 
 #include <musicmetadata.h>
 #include <mythcontext.h>
+#include <mythdbcheck.h>
 #include <mythtv/mythdb.h>
 #include <mythtv/schemawizard.h>
 
 #include "musicdbcheck.h"
 
 const QString currentDatabaseVersion = "1024";
+const QString MythMusicVersionName = "MusicDBSchemaVer";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
-
-static bool UpdateDBVersionNumber(const QString &newnumber)
-{
-
-    if (!gCoreContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,nullptr))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("DB Error (Setting new DB version number): %1\n")
-                .arg(newnumber));
-
-        return false;
-    }
-
-    return true;
-}
-
-static bool performActualUpdate(const QString updates[], const QString& version,
-                                QString &dbver)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Upgrading to MythMusic schema version ") + version);
-
-    int counter = 0;
-    QString thequery = updates[counter];
-
-    while (!thequery.isEmpty())
-    {
-        if (!query.exec(thequery))
-        {
-            QString msg =
-                QString("DB Error (Performing database upgrade): \n"
-                        "Query was: %1 \nError was: %2 \nnew version: %3")
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()))
-                .arg(version);
-            LOG(VB_GENERAL, LOG_ERR, msg);
-            return false;
-        }
-
-        counter++;
-        thequery = updates[counter];
-    }
-
-    if (!UpdateDBVersionNumber(version))
-        return false;
-
-    dbver = version;
-    return true;
-}
 
 bool UpgradeMusicDatabaseSchema(void)
 {
@@ -158,7 +109,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         LOG(VB_GENERAL, LOG_NOTICE,
             "Inserting MythMusic initial database information.");
 
-        const QString updates[] =
+        DBUpdates updates
         {
             "CREATE TABLE IF NOT EXISTS musicmetadata ("
             "    intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
@@ -184,11 +135,11 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    name VARCHAR(128) NOT NULL,"
             "    hostname VARCHAR(255),"
             "    songlist TEXT NOT NULL"
-            ");",
-            ""
+            ");"
         };
 
-        if (!performActualUpdate(updates, "1000", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1000", dbver))
             return false;
     }
 
@@ -230,15 +181,13 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                 QString("Modified %1 entries for db schema 1001").arg(i));
         }
 
-        const QString updates[] = {""};
-
-        if (!performActualUpdate(updates, "1001", dbver))
+        if (!UpdateDBVersionNumber("MythMusic", MythMusicVersionName, "1001", dbver))
             return false;
     }
 
     if (dbver == "1001")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE musicmetadata ADD mythdigest      VARCHAR(255);",
             "ALTER TABLE musicmetadata ADD size            BIGINT UNSIGNED;",
@@ -258,11 +207,11 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE musicmetadata ADD relative_volume TINYINT DEFAULT 0;",
             "ALTER TABLE musicmetadata ADD sample_rate     INT UNSIGNED;",
             "ALTER TABLE musicmetadata ADD bpm             SMALLINT UNSIGNED;",
-            "ALTER TABLE musicmetadata ADD INDEX (mythdigest);",
-            ""
+            "ALTER TABLE musicmetadata ADD INDEX (mythdigest);"
         };
 
-        if (!performActualUpdate(updates, "1002", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1002", dbver))
             return false;
     }
 
@@ -327,15 +276,13 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 
         LOG(VB_GENERAL, LOG_NOTICE, "Done updating music metadata to UTF-8");
 
-        const QString updates[] = {""};
-
-        if (!performActualUpdate(updates, "1003", dbver))
+        if (!UpdateDBVersionNumber("MythMusic", MythMusicVersionName, "1003", dbver))
             return false;
     }
 
     if (dbver == "1003")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DROP TABLE IF EXISTS smartplaylistcategory;",
             "CREATE TABLE smartplaylistcategory ("
@@ -419,32 +366,31 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    categoryid = 3, matchtype = \"All\", orderby = \"Artist (A), Album (A)\","
             "    limitto = 0;",
             "INSERT INTO smartplaylistitem SET smartplaylistid = 8, field = \"Play Count\","
-            "    operator = \"is equal to\", value1 = \"0\", value2 = \"0\";",
-
-            ""
+            "    operator = \"is equal to\", value1 = \"0\", value2 = \"0\";"
         };
 
-        if (!performActualUpdate(updates, "1004", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1004", dbver))
             return false;
     }
 
     if (dbver == "1004")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE musicmetadata ADD compilation_artist VARCHAR(128) NOT NULL AFTER artist;",
-            "ALTER TABLE musicmetadata ADD INDEX (compilation_artist);",
-            ""
+            "ALTER TABLE musicmetadata ADD INDEX (compilation_artist);"
         };
 
-        if (!performActualUpdate(updates, "1005", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1005", dbver))
             return false;
     }
 
 
     if (dbver == "1005")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "CREATE TABLE music_albums ("
             "    album_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
@@ -554,29 +500,29 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "UPDATE music_playlists"
             "  SET hostname=''"
             "  WHERE playlist_name<>'default_playlist_storage'"
-            "    AND playlist_name<>'backup_playlist_storage';",
-            ""
+            "    AND playlist_name<>'backup_playlist_storage';"
         };
 
-        if (!performActualUpdate(updates, "1006", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1006", dbver))
             return false;
     }
 
     if (dbver == "1006")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
-            "ALTER TABLE music_genres MODIFY genre VARCHAR(255) NOT NULL default '';",
-            ""
+            "ALTER TABLE music_genres MODIFY genre VARCHAR(255) NOT NULL default '';"
         };
 
-        if (!performActualUpdate(updates, "1007", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1007", dbver))
             return false;
     }
 
     if (dbver == "1007")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_songs MODIFY lastplay DATETIME DEFAULT NULL;",
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
@@ -594,37 +540,37 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "DELETE FROM music_songs;",
             "ALTER TABLE music_songs ADD COLUMN directory_id int(20) NOT NULL DEFAULT '0';",
             "INSERT INTO music_songs SELECT * FROM tmp_songs;",
-            "ALTER TABLE music_songs ADD INDEX (directory_id);",
-            ""
+            "ALTER TABLE music_songs ADD INDEX (directory_id);"
         };
 
-        if (!performActualUpdate(updates, "1008", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1008", dbver))
             return false;
     }
 
     if (dbver == "1008")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "CREATE TABLE music_albumart (albumart_id int(20) NOT NULL AUTO_INCREMENT "
             "PRIMARY KEY, filename VARCHAR(255) NOT NULL DEFAULT '', directory_id INT(20) "
-            "NOT NULL DEFAULT '0');",
-            ""
+            "NOT NULL DEFAULT '0');"
         };
 
-        if (!performActualUpdate(updates, "1009", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1009", dbver))
             return false;
     }
 
     if (dbver == "1009")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
-            "ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';",
-            ""
+            "ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';"
         };
 
-        if (!performActualUpdate(updates, "1010", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1010", dbver))
             return false;
 
         // scan though the music_albumart table and make a guess at what
@@ -675,67 +621,65 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 
     if (dbver == "1010")
     {
-        const QString updates[] = {"", ""};
-
         // update the VisualMode setting to the new format
         QString setting = gCoreContext->GetSetting("VisualMode");
         setting = setting.simplified();
         setting = setting.replace(' ', ";");
         gCoreContext->SaveSetting("VisualMode", setting);
 
-        if (!performActualUpdate(updates, "1011", dbver))
+        if (!UpdateDBVersionNumber("MythMusic", MythMusicVersionName, "1011", dbver))
             return false;
 
     }
 
     if (dbver == "1011")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_albumart ADD COLUMN song_id int(11) NOT NULL DEFAULT '0', "
-            " ADD COLUMN embedded TINYINT(1) NOT NULL DEFAULT '0';",
-            ""
+            " ADD COLUMN embedded TINYINT(1) NOT NULL DEFAULT '0';"
         };
 
-        if (!performActualUpdate(updates, "1012", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1012", dbver))
             return false;
 
     }
 
     if (dbver == "1012")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_songs ADD INDEX album_id (album_id);",
             "ALTER TABLE music_songs ADD INDEX genre_id (genre_id);",
-            "ALTER TABLE music_songs ADD INDEX artist_id (artist_id);",
-            ""
+            "ALTER TABLE music_songs ADD INDEX artist_id (artist_id);"
         };
 
-        if (!performActualUpdate(updates, "1013", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1013", dbver))
             return false;
 
     }
 
     if (dbver == "1013")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DROP TABLE musicmetadata;",
-            "DROP TABLE musicplaylist;",
-            ""
+            "DROP TABLE musicplaylist;"
         };
 
-        if (!performActualUpdate(updates, "1014", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1014", dbver))
             return false;
     }
 
     if (dbver == "1014")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
-            QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-                    .arg(gContext->GetDatabaseParams().m_dbName),
+            qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+                       .arg(gContext->GetDatabaseParams().m_dbName)),
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  MODIFY filename varbinary(255) NOT NULL default '';",
@@ -771,21 +715,21 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "  MODIFY eq_preset varbinary(255) default NULL;",
             "ALTER TABLE music_stats"
             "  MODIFY total_time varbinary(12) NOT NULL default '0',"
-            "  MODIFY total_size varbinary(10) NOT NULL default '0';",
-            ""
+            "  MODIFY total_size varbinary(10) NOT NULL default '0';"
         };
 
-        if (!performActualUpdate(updates, "1015", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1015", dbver))
             return false;
     }
 
 
     if (dbver == "1015")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
-            QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                    .arg(gContext->GetDatabaseParams().m_dbName),
+            qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+                    .arg(gContext->GetDatabaseParams().m_dbName)),
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  DEFAULT CHARACTER SET default,"
@@ -832,58 +776,58 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE music_stats"
             "  DEFAULT CHARACTER SET default,"
             "  MODIFY total_time varchar(12) CHARACTER SET utf8 NOT NULL default '0',"
-            "  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';",
-            ""
+            "  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';"
         };
 
-        if (!performActualUpdate(updates, "1016", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1016", dbver))
             return false;
     }
 
     if (dbver == "1016")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETE' AND context = 'Music';",
-            ""
+            " WHERE action = 'DELETE' AND context = 'Music';"
         };
 
-        if (!performActualUpdate(updates, "1017", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1017", dbver))
             return false;
     }
 
     if (dbver == "1017")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_playlists MODIFY COLUMN last_accessed "
-            "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;",
-            ""
+            "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;"
         };
 
-        if (!performActualUpdate(updates, "1018", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1018", dbver))
             return false;
     }
 
     if (dbver == "1018")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "CREATE TEMPORARY TABLE arttype_tmp ( type INT, name VARCHAR(30) );",
             "INSERT INTO arttype_tmp VALUES (0,'unknown'),(1,'front'),(2,'back'),(3,'cd'),(4,'inlay');",
             "UPDATE music_albumart LEFT JOIN arttype_tmp ON type = imagetype "
-            "SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;",
-            ""
+            "SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;"
         };
 
-        if (!performActualUpdate(updates, "1019", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1019", dbver))
             return false;
     }
 
     if (dbver == "1019")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DROP TABLE IF EXISTS music_radios;",
             "CREATE TABLE music_radios ("
@@ -897,56 +841,58 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    format VARCHAR(10) NOT NULL,"
             "    INDEX (station),"
             "    INDEX (channel)"
-            ");",
-            ""
+            ");"
         };
 
-        if (!performActualUpdate(updates, "1020", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1020", dbver))
             return false;
     }
 
     if (dbver == "1020")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_songs ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
-            QString("UPDATE music_songs SET hostname = '%1';").arg(gCoreContext->GetMasterHostName()),
-            ""
+            qPrintable(QString("UPDATE music_songs SET hostname = '%1';")
+                       .arg(gCoreContext->GetMasterHostName()))
         };
 
-        if (!performActualUpdate(updates, "1021", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1021", dbver))
             return false;
     }
 
     if (dbver == "1021")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "ALTER TABLE music_albumart ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
-            QString("UPDATE music_albumart SET hostname = '%1';").arg(gCoreContext->GetMasterHostName()),
-            ""
+            qPrintable(QString("UPDATE music_albumart SET hostname = '%1';")
+                       .arg(gCoreContext->GetMasterHostName()))
         };
 
-        if (!performActualUpdate(updates, "1022", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1022", dbver))
             return false;
     }
 
     if (dbver == "1022")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "CREATE INDEX `song_id` ON music_albumart (song_id);",
-            "CREATE INDEX `artist_id` ON music_albums (artist_id);",
-            ""
+            "CREATE INDEX `artist_id` ON music_albums (artist_id);"
         };
 
-        if (!performActualUpdate(updates, "1023", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1023", dbver))
             return false;
     }
 
     if (dbver == "1023")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DROP INDEX station ON music_radios;",
             "ALTER TABLE music_radios CHANGE COLUMN station broadcaster VARCHAR(100) NOT NULL default '';",
@@ -982,11 +928,11 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    INDEX (channel),"
             "    INDEX (country),"
             "    INDEX (language)"
-            ");",
-            ""
+            ");"
         };
 
-        if (!performActualUpdate(updates, "1024", dbver))
+        if (!performActualUpdate("MythMusic", MythMusicVersionName,
+                                 updates, "1024", dbver))
             return false;
     }
 
