@@ -686,7 +686,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
         // N.B. There is no 10bit support here - but it shouldn't be necessary
         // as everything should be 16byte aligned and 10/12bit interlaced video
         // is virtually unheard of.
-        if (width4 && height4)
+        if (width4 && height4 && !hidepth)
         {
             BlendC4x4(src->buf + src->offsets[plane],
                       width_for_plane(src->codec, src->width, plane),
