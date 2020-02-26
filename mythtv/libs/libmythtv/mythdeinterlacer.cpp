@@ -604,7 +604,7 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if HAVE_SSE2
+#if HAVE_SSE2 && ARCH_X86_64
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu16(*reinterpret_cast<__m128i*>(&above[col]), mid);
