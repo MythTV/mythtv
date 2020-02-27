@@ -537,11 +537,20 @@ int MusicMetadata::getArtistId()
             }
             m_artistId = query.lastInsertId().toInt();
         }
+    }
+
+    return m_artistId;
+}
+
+int MusicMetadata::getCompilationArtistId()
+{
+    if (m_compartistId < 0) {
+        MSqlQuery query(MSqlQuery::InitCon());
 
         // Compilation Artist
         if (m_artist == m_compilationArtist)
         {
-            m_compartistId = m_artistId;
+            m_compartistId = getArtistId();
         }
         else
         {
@@ -572,7 +581,7 @@ int MusicMetadata::getArtistId()
         }
     }
 
-    return m_artistId;
+    return m_compartistId;
 }
 
 int MusicMetadata::getAlbumId()
@@ -672,6 +681,9 @@ void MusicMetadata::dumpToDatabase()
 
     if (m_artistId < 0)
         getArtistId();
+
+    if (m_compartistId < 0)
+        getCompilationArtistId();
 
     if (m_albumId < 0)
         getAlbumId();
@@ -1537,6 +1549,7 @@ void AllMusic::resync()
 
             dbMeta->setDirectoryId(query.value(11).toInt());
             dbMeta->setArtistId(query.value(1).toInt());
+            dbMeta->setCompilationArtistId(query.value(3).toInt());
             dbMeta->setAlbumId(query.value(4).toInt());
             dbMeta->setTrackCount(query.value(19).toInt());
             dbMeta->setFileSize(query.value(20).toULongLong());

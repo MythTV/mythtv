@@ -179,6 +179,9 @@ class META_PUBLIC MusicMetadata
     void setArtistId(int lartistid) { m_artistId = lartistid; }
     int getArtistId();
 
+    void setCompilationArtistId(int lartistid) { m_compartistId = lartistid; }
+    int getCompilationArtistId();
+
     void setAlbumId(int lalbumid) { m_albumId = lalbumid; }
     int getAlbumId();
 
