@@ -13,7 +13,7 @@
 #include <metaio.h>
 #include <musicfilescanner.h>
 
-MusicFileScanner::MusicFileScanner()
+MusicFileScanner::MusicFileScanner(bool force) : m_forceupdate{force}
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -803,7 +803,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                if (HasFileChanged(name, query.value(1).toString()))
+                if (m_forceupdate || HasFileChanged(name, query.value(1).toString()))
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
                 else
                 {

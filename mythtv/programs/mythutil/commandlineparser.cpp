@@ -232,6 +232,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("notification");
 
     // musicmetautils.cpp
+    add("--force", "musicforce", false, "Ignore file timestamps", "")
+        ->SetChildOf("scanmusic");
     add("--songid", "songid", "", "ID of track to update", "")
         ->SetChildOf("updatemeta");
     add("--title", "title", "", "(optional) Title of track", "")

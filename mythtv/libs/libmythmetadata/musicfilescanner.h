@@ -29,7 +29,7 @@ class META_PUBLIC MusicFileScanner
 
     using MusicLoadedMap = QMap <QString, MusicFileData>;
     public:
-        MusicFileScanner(void);
+        MusicFileScanner(bool force = false);
         ~MusicFileScanner(void) = default;
 
         void SearchDirs(const QStringList &dirList);
@@ -69,6 +69,8 @@ class META_PUBLIC MusicFileScanner
         uint m_coverartAdded     {0};
         uint m_coverartRemoved   {0};
         uint m_coverartUpdated   {0};
+
+        bool m_forceupdate;
 };
 
 #endif // _MUSICFILESCANNER_H_
