@@ -866,17 +866,24 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    auto flags = (PlayerFlags)(kAudioMuted   |
-                               kVideoIsNull  |
-                               kDecodeLowRes |
-                               kDecodeSingleThreaded |
-                               kDecodeNoLoopFilter |
-                               kNoITV);
-    /* blank detector needs to be only sample center for this optimization. */
-    if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
-        (COMM_DETECT_2_BLANK == commDetectMethod))
+    auto flags = static_cast<PlayerFlags>(kAudioMuted | kVideoIsNull | kNoITV);
+
+    int flagfast = gCoreContext->GetNumSetting("CommFlagFast", 0);
+    if (flagfast)
     {
-        flags = (PlayerFlags) (flags | kDecodeFewBlocks);
+        // Note: These additional flags replicate the intent of the original
+        // commit that enabled lowres support - but I'm not sure why it requires
+        // single threaded decoding - which surely slows everything down? Though
+        // there is probably no profile to enable multi-threaded decoding anyway.
+        LOG(VB_GENERAL, LOG_INFO, "Enabling experimental flagging speedup (low resolution)");
+        flags = static_cast<PlayerFlags>(flags | kDecodeLowRes | kDecodeSingleThreaded | kDecodeNoLoopFilter);
+    }
+
+    // blank detector needs to be only sample center for this optimization.
+    if (flagfast && ((COMM_DETECT_BLANKS  == commDetectMethod) ||
+                     (COMM_DETECT_2_BLANK == commDetectMethod)))
+    {
+        flags = static_cast<PlayerFlags>(flags | kDecodeFewBlocks);
     }
 
     auto *cfp = new MythCommFlagPlayer(flags);
