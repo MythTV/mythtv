@@ -19,7 +19,7 @@ ScreenSaverAndroid::ScreenSaverAndroid()
 
 ScreenSaverAndroid::~ScreenSaverAndroid()
 {
-    Restore();
+    ScreenSaverAndroid::Restore();
 }
 
 void ScreenSaverAndroid::Disable(void)

@@ -22,7 +22,7 @@ ScreenSaverOSX::ScreenSaverOSX()
 
 ScreenSaverOSX::~ScreenSaverOSX()
 {
-    Restore();
+    ScreenSaverOSX::Restore();
     delete d;
 }
 
