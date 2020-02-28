@@ -1531,38 +1531,27 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         m_mythCodecCtx->SetDeinterlacing(enc, &m_videoDisplayProfile, doublerate);
     }
 
-    if (FlagIsSet(kDecodeLowRes)    || FlagIsSet(kDecodeSingleThreaded) ||
-        FlagIsSet(kDecodeFewBlocks) || FlagIsSet(kDecodeNoLoopFilter)   ||
-        FlagIsSet(kDecodeNoDecode))
+    if (codec1 && ((AV_CODEC_ID_MPEG2VIDEO == codec1->id) ||
+                   (AV_CODEC_ID_MPEG1VIDEO == codec1->id)))
     {
-        if (codec1 &&
-            ((AV_CODEC_ID_MPEG2VIDEO == codec1->id) ||
-            (AV_CODEC_ID_MPEG1VIDEO == codec1->id)))
+        if (FlagIsSet(kDecodeFewBlocks))
         {
-            if (FlagIsSet(kDecodeFewBlocks))
-            {
-                uint total_blocks = (enc->height+15) / 16;
-                enc->skip_top     = (total_blocks+3) / 4;
-                enc->skip_bottom  = (total_blocks+3) / 4;
-            }
-
-            if (FlagIsSet(kDecodeLowRes))
-                enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
-        }
-        else if (codec1 && (AV_CODEC_ID_H264 == codec1->id))
-        {
-            if (FlagIsSet(kDecodeNoLoopFilter))
-            {
-                enc->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
-                enc->skip_loop_filter = AVDISCARD_ALL;
-            }
+            int total_blocks = (enc->height + 15) / 16;
+            enc->skip_top    = (total_blocks + 3) / 4;
+            enc->skip_bottom = (total_blocks + 3) / 4;
         }
 
-        if (FlagIsSet(kDecodeNoDecode))
-        {
-            enc->skip_idct = AVDISCARD_ALL;
-        }
+        if (FlagIsSet(kDecodeLowRes))
+            enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
     }
+    else if (codec1 && (AV_CODEC_ID_H264 == codec1->id) && FlagIsSet(kDecodeNoLoopFilter))
+    {
+        enc->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
+        enc->skip_loop_filter = AVDISCARD_ALL;
+    }
+
+    if (FlagIsSet(kDecodeNoDecode))
+        enc->skip_idct = AVDISCARD_ALL;
 
     if (selectedStream)
     {
