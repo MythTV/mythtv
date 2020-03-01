@@ -39,7 +39,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     using MPEGStreamData::Reset;
     void Reset(void) override // MPEGStreamData
         { Reset(0, 0, -1); }
-    void Reset(uint desired_netid, uint desired_tsid, int desired_serviceid);
+    virtual void Reset(uint desired_netid, uint desired_tsid, int desired_serviceid);
 
     // DVB table monitoring
     void SetDesiredService(uint netid, uint tsid, int serviceid);

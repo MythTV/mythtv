@@ -436,7 +436,7 @@ void DTVSignalMonitor::HandleTVCT(
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Could not find channel %1_%2 in TVCT")
                 .arg(m_majorChannel).arg(m_minorChannel));
-            LOG(VB_GENERAL, LOG_ERR, LOC + tvct->toString());
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + tvct->toString());
         }
         GetATSCStreamData()->SetVersionTVCT(tvct->TransportStreamID(),-1);
         return;
@@ -461,7 +461,7 @@ void DTVSignalMonitor::HandleCVCT(uint /*pid*/, const CableVirtualChannelTable* 
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Could not find channel %1_%2 in CVCT")
                 .arg(m_majorChannel).arg(m_minorChannel));
-            LOG(VB_GENERAL, LOG_ERR, LOC + cvct->toString());
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + cvct->toString());
         }
         GetATSCStreamData()->SetVersionCVCT(cvct->TransportStreamID(),-1);
         return;
