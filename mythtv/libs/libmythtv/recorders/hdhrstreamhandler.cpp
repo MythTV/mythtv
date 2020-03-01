@@ -460,6 +460,9 @@ QString HDHRStreamHandler::TunerSet(
     char *value = nullptr;
     char *error = nullptr;
 
+#if 0
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC + valname + " " + val);
+#endif
     if (hdhomerun_device_set_var(
             m_hdhomerunDevice, valname.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
