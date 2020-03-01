@@ -913,7 +913,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             transport_tune_complete &=
                 (!m_currentInfo->m_tvcts.empty() || !m_currentInfo->m_cvcts.empty());
         }
-        if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
+        else if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
         {
             transport_tune_complete &= !m_currentInfo->m_nits.empty();
             transport_tune_complete &= !m_currentInfo->m_sdts.empty();
@@ -1389,6 +1389,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // SDTs
+    QString siStandard = (scan_info->m_mgt == nullptr) ? "dvb" : "atsc";
     foreach (auto sdt_list, scan_info->m_sdts)
     {
         for (const auto *sdt_it : sdt_list)
@@ -1396,7 +1397,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             for (uint i = 0; i < sdt_it->ServiceCount(); ++i)
             {
                 uint pnum = sdt_it->ServiceID(i);
-                PCM_INFO_INIT("dvb");
+                PCM_INFO_INIT(siStandard);
                 update_info(info, sdt_it, i, m_defAuthorities);
             }
         }
