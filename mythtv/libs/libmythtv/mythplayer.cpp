@@ -519,9 +519,29 @@ FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
 
 void MythPlayer::SetKeyframeDistance(int keyframedistance)
 {
-    m_keyframeDist = (keyframedistance > 0) ? keyframedistance : m_keyframeDist;
+    m_keyframeDist = (keyframedistance > 0) ? static_cast<uint>(keyframedistance) : m_keyframeDist;
 }
 
+/*! \brief Check whether deinterlacing should be enabled
+ *
+ * If the user has triggered an override, this will always be used (until 'detect'
+ * is requested to turn it off again).
+ *
+ * For H264 material, the decoder will signal when the current frame is on a new
+ * GOP boundary and if the frame's interlaced flag does not match the current
+ * scan type, the scan type is unlocked. This works well for all test clips
+ * with mixed progressive/interlaced sequences.
+ *
+ * For all other material, we lock the scan type to interlaced when interlaced
+ * frames are seen - and do not unlock if we see progressive frames. This is
+ * primarily targetted at MPEG2 material where there is a lot of content where
+ * the scan type changes frequently - and for no obvious reason. This will result
+ * in 'false positives' in some cases but there is no clear approach that works
+ * for all cases. The previous behaviour is preserved (i.e. lock to interlaced
+ * if interlaced frames are seen) which results in less erratic playback (as the
+ * deinterlacers are not continually switched on and off) and correctly deinterlaces
+ * material that is not otherwise flagged correctly.
+*/
 void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
     if (!frame)
@@ -532,6 +552,18 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Locking scan override to '%1'")
             .arg(ScanTypeToString(m_scanOverride, true)));
         SetScanType(m_scanOverride);
+    }
+
+    // This is currently only signalled for H264 content
+    if (frame->new_gop)
+    {
+        if (m_scanOverride < kScan_Interlaced &&
+            ((frame->interlaced_frame && !is_interlaced(m_scan)) ||
+            (!frame->interlaced_frame && is_interlaced(m_scan))))
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Unlocking frame scan");
+            m_scanLocked = false;
+        }
     }
 
     if (m_scanLocked)

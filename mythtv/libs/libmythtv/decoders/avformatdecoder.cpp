@@ -3249,6 +3249,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             continue;
         }
 
+        m_nextDecodedFrameIsKeyFrame = true;
         float aspect = get_aspect(*m_h264Parser);
         int width  = static_cast<int>(m_h264Parser->pictureWidthCropped());
         int height = static_cast<int>(m_h264Parser->pictureHeightCropped());
@@ -3666,6 +3667,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
             oldframe->interlaced_frame = AvFrame->interlaced_frame;
             oldframe->top_field_first = AvFrame->top_field_first;
             oldframe->interlaced_reversed = 0;
+            oldframe->new_gop = 0;
             oldframe->colorspace = AvFrame->colorspace;
             oldframe->colorrange = AvFrame->color_range;
             oldframe->colorprimaries = AvFrame->color_primaries;
@@ -3749,6 +3751,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         frame->interlaced_frame = AvFrame->interlaced_frame;
         frame->top_field_first  = AvFrame->top_field_first;
         frame->interlaced_reversed = 0;
+        frame->new_gop          = m_nextDecodedFrameIsKeyFrame;
         frame->repeat_pict      = AvFrame->repeat_pict;
         frame->disp_timecode    = NormalizeVideoTimecode(Stream, temppts);
         frame->frameNumber      = m_framesPlayed;
@@ -3770,6 +3773,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         m_mythCodecCtx->PostProcessFrame(context, frame);
     }
 
+    m_nextDecodedFrameIsKeyFrame = false;
     m_decodedVideoFrame = frame;
     m_gotVideoFrame = true;
     if (++m_fpsSkip >= m_fpsMultiplier)
@@ -5181,6 +5185,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->interlaced_frame = 0; // not interlaced
         frame->top_field_first  = 1; // top field first
         frame->interlaced_reversed = 0;
+        frame->new_gop          = 0;
         frame->repeat_pict      = 0; // not a repeated picture
         frame->frameNumber      = m_framesPlayed;
         frame->frameCounter     = m_frameCounter++;
