@@ -524,7 +524,17 @@ void MythPlayer::SetKeyframeDistance(int keyframedistance)
 
 void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
-    if (!frame || m_scanLocked)
+    if (!frame)
+        return;
+
+    if ((m_scanOverride > kScan_Detect) && (m_scan != m_scanOverride))
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Locking scan override to '%1'")
+            .arg(ScanTypeToString(m_scanOverride, true)));
+        SetScanType(m_scanOverride);
+    }
+
+    if (m_scanLocked)
         return;
 
     if (frame->interlaced_frame)
@@ -564,40 +574,67 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
     m_scanLocked  = false;
 }
 
-void MythPlayer::SetScanType(FrameScanType scan)
+FrameScanType MythPlayer::NextScanOverride(void)
+{
+    int next = m_scanOverride + 1;
+    if (next > kScan_Progressive)
+        next = kScan_Detect;
+    return static_cast<FrameScanType>(next);
+}
+
+void MythPlayer::SetScanOverride(FrameScanType Scan)
+{
+    if (m_scanOverride == Scan)
+        return;
+    m_scanOverride = Scan;
+    if (m_scanOverride == kScan_Detect)
+    {
+        m_scanLocked = false;
+        m_scanInitialized = false;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Reverting to auto detection of scan");
+    }
+}
+
+FrameScanType MythPlayer::GetScanType(void) const
+{
+    if (m_scanOverride > kScan_Detect)
+        return m_scanOverride;
+    return m_scan;
+}
+
+void MythPlayer::SetScanType(FrameScanType Scan)
 {
     if (!is_current_thread(m_playerThread))
     {
-        m_resetScan = scan;
+        m_resetScan = Scan;
         return;
     }
 
     if (!m_videoOutput)
-        return; // hopefully this will be called again later...
+        return;
 
     m_resetScan = kScan_Ignore;
 
-    if (m_scanInitialized && m_scan == scan && m_frameIntervalPrev == m_frameInterval)
+    if (m_scanInitialized && m_scan == Scan && m_frameIntervalPrev == m_frameInterval)
         return;
 
-    m_scanLocked = (scan != kScan_Detect);
-
+    m_scanLocked = (Scan != kScan_Detect);
     m_scanInitialized = true;
     m_frameIntervalPrev = m_frameInterval;
 
-    if (is_interlaced(scan))
+    if (is_interlaced(Scan))
     {
         bool normal = m_playSpeed > 0.99F && m_playSpeed < 1.01F && m_normalSpeed;
         m_doubleFramerate = CanSupportDoubleRate() && normal;
         m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
     }
-    else if (kScan_Progressive == scan)
+    else if (kScan_Progressive == Scan)
     {
         m_doubleFramerate = false;
         m_videoOutput->SetDeinterlacing(false, false);
     }
 
-    m_scan = scan;
+    m_scan = Scan;
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
