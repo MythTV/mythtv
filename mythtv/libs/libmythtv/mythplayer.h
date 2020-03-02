@@ -416,16 +416,16 @@ class MTV_PUBLIC MythPlayer
     virtual void SetBookmark(bool clear = false);
     bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc);
     bool RemovePIPPlayer(MythPlayer *pip);
-    void NextScanType(void)
-        { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
-    void SetScanType(FrameScanType scan);
-    FrameScanType GetScanType(void) const { return m_scan; }
-    bool IsScanTypeLocked(void) const { return m_scanLocked; }
+
+    FrameScanType NextScanOverride(void);
+    void          SetScanOverride(FrameScanType Scan);
+    void          SetScanType(FrameScanType Scan);
+    FrameScanType GetScanType(void) const;
+
     void Zoom(ZoomDirection direction);
     void ToggleMoveBottomLine(void);
     void SaveBottomLine(void);
     void FileChanged(void);
-
 
     // Windowing stuff
     void EmbedInWidget(QRect rect);
@@ -751,16 +751,14 @@ class MTV_PUBLIC MythPlayer
     double   m_videoFrameRate            {29.97};///< Video (input) Frame Rate (often inaccurate)
     float    m_videoAspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
     float    m_forcedVideoAspect         {-1};
-    /// Tell the player thread to set the scan type (and hence deinterlacers)
-    FrameScanType m_resetScan            {kScan_Ignore};
-    /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
-    FrameScanType m_scan                 {kScan_Interlaced};
-    /// Set when the user selects a scan type, overriding the detected one
-    bool     m_scanLocked                {false};
-    /// Used for tracking of scan type for auto-detection of interlacing
-    int      m_scanTracker               {0};
-    /// Set when SetScanType runs the first time
-    bool     m_scanInitialized           {false};
+
+    FrameScanType m_resetScan            { kScan_Ignore     };
+    FrameScanType m_scan                 { kScan_Interlaced };
+    FrameScanType m_scanOverride         { kScan_Detect     };
+    bool          m_scanLocked           { false };
+    bool          m_scanInitialized      { false };
+    long long     m_scanTracker          { 0 };
+
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     m_keyframeDist              {30};
     /// Codec Name - used by playback profile

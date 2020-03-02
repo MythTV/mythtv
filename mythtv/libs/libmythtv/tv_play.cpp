@@ -4425,17 +4425,10 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         SetAutoCommercialSkip(ctx, kCommSkipIncr);
     else if (has_action("NEXTSCAN", actions))
     {
-        QString msg;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->m_player)
-        {
-            ctx->m_player->NextScanType();
-            msg = toString(ctx->m_player->GetScanType());
-        }
+        FrameScanType scan = ctx->m_player->NextScanOverride();
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (!msg.isEmpty())
-            SetOSDMessage(ctx, msg);
+        OverrideScan(ctx, scan);
     }
     else if (has_action(ACTION_SEEKARB, actions) && !isDVD)
     {
@@ -10518,16 +10511,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         ChangeTimeStretch(actx, 0, !floatRead);   // just display
     }
     else if (action.startsWith("SELECTSCAN_"))
-    {
-        QString msg;
-        actx->LockDeletePlayer(__FILE__, __LINE__);
-        actx->m_player->SetScanType((FrameScanType) action.right(1).toInt());
-        actx->UnlockDeletePlayer(__FILE__, __LINE__);
-        msg = toString(actx->m_player->GetScanType());
-
-        if (!msg.isEmpty())
-            SetOSDMessage(actx, msg);
-    }
+        OverrideScan(actx, static_cast<FrameScanType>(action.right(1).toInt()));
     else if (action.startsWith(ACTION_TOGGELAUDIOSYNC))
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLESUBTITLEZOOM)
@@ -11318,16 +11302,17 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
         }
     }
-    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix))
+    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix) && ctx->m_player)
     {
-        active = (m_tvmScanTypeUnlocked == kScan_Detect);
-        BUTTON("SELECTSCAN_0", tr("Detect") + m_tvmCurMode);
-        active = (m_tvmScanTypeUnlocked == kScan_Progressive);
-        BUTTON("SELECTSCAN_3", tr("Progressive"));
-        active = (m_tvmScanTypeUnlocked == kScan_Interlaced);
-        BUTTON("SELECTSCAN_1", tr("Interlaced (Normal)"));
-        active = (m_tvmScanTypeUnlocked == kScan_Intr2ndField);
-        BUTTON("SELECTSCAN_2", tr("Interlaced (Reversed)"));
+        FrameScanType scan = ctx->m_player->GetScanType();
+        active = (scan == kScan_Detect);
+        BUTTON("SELECTSCAN_0", ScanTypeToString(kScan_Detect));
+        active = (scan == kScan_Progressive);
+        BUTTON("SELECTSCAN_3", ScanTypeToString(kScan_Progressive));
+        active = (scan == kScan_Interlaced);
+        BUTTON("SELECTSCAN_1", ScanTypeToString(kScan_Interlaced));
+        active = (scan == kScan_Intr2ndField);
+        BUTTON("SELECTSCAN_2", ScanTypeToString(kScan_Intr2ndField));
     }
     else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
              matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
@@ -11915,10 +11900,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmSup               = kPictureAttributeSupported_None;
     m_tvmStereoAllowed     = false;
     m_tvmStereoMode        = kStereoscopicModeNone;
-    m_tvmScanType          = kScan_Ignore;
-    m_tvmScanTypeUnlocked  = kScan_Ignore;
-    m_tvmScanTypeLocked    = false;
-    m_tvmCurMode           = "";
     m_tvmDoubleRate        = false;
 
     m_tvmSpeedX100         = (int)(round(ctx->m_tsNormal * 100));
@@ -11995,9 +11976,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         m_tvmCanUpmix         = ctx->m_player->GetAudio()->CanUpmix();
         m_tvmAspectOverride   = ctx->m_player->GetAspectOverride();
         m_tvmAdjustFill       = ctx->m_player->GetAdjustFill();
-        m_tvmScanType         = ctx->m_player->GetScanType();
-        m_tvmScanTypeUnlocked = m_tvmScanType;
-        m_tvmScanTypeLocked   = ctx->m_player->IsScanTypeLocked();
         m_tvmDoubleRate       = ctx->m_player->CanSupportDoubleRate();
         m_tvmCurSkip          = ctx->m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = ctx->m_player->IsPaused();
@@ -12021,17 +11999,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
             m_tvmStereoAllowed  = vo->StereoscopicModesAllowed();
             m_tvmStereoMode     = vo->GetStereoscopicMode();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
-        }
-        if (!m_tvmScanTypeLocked)
-        {
-            if (kScan_Interlaced == m_tvmScanType)
-                m_tvmCurMode = tr("(I)", "Interlaced (Normal)");
-            else if (kScan_Intr2ndField == m_tvmScanType)
-                m_tvmCurMode = tr("(i)", "Interlaced (Reversed)");
-            else if (kScan_Progressive == m_tvmScanType)
-                m_tvmCurMode = tr("(P)", "Progressive");
-            m_tvmCurMode = " " + m_tvmCurMode;
-            m_tvmScanTypeUnlocked = kScan_Detect;
         }
     }
     ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -12287,6 +12254,22 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
     //if (ctx->m_player)
     //    ctx->m_player->ForceDeinterlacer(deint);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
+void TV::OverrideScan(PlayerContext *Context, FrameScanType Scan)
+{
+    QString message;
+    Context->LockDeletePlayer(__FILE__, __LINE__);
+    if (Context->m_player)
+    {
+        Context->m_player->SetScanOverride(Scan);
+        message = ScanTypeToString(Scan == kScan_Detect ? kScan_Detect :
+                    Context->m_player->GetScanType(), Scan > kScan_Detect);
+    }
+    Context->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    if (!message.isEmpty())
+        SetOSDMessage(Context, message);
 }
 
 void TV::ToggleAutoExpire(PlayerContext *ctx)
