@@ -1938,25 +1938,26 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         // for the jerking is detected.
 
         bool watchingTV = IsWatchingInprogress();
-        if ( (m_liveTV || watchingTV) && !FlagIsSet(kMusicChoice))
+        if ((m_liveTV || watchingTV) && !FlagIsSet(kMusicChoice))
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - m_framesPlayed;
-            auto margin = (uint64_t) (m_videoFrameRate * 3);
+            auto margin = static_cast<uint64_t>(m_videoFrameRate * 3);
             if (framesLeft < margin)
             {
                 if (m_rtcBase)
                 {
-                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                        QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
-                        .arg(m_framesPlayed).arg(frameCount));
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + "Pause to allow live tv catch up");
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Played: %1 Avail: %2 Buffered: %3 Margin: %4")
+                        .arg(m_framesPlayed).arg(frameCount)
+                        .arg(m_videoOutput->ValidVideoFrames()).arg(margin));
                 }
                 m_audio.Pause(true);
                 m_avsyncAudioPaused = true;
                 m_rtcBase = 0;
             }
         }
-        usleep(m_frameInterval >> 3);
+        usleep(static_cast<uint>(m_frameInterval >> 3));
         int waited_for = m_bufferingStart.msecsTo(QTime::currentTime());
         int last_msg = m_bufferingLastMsg.msecsTo(QTime::currentTime());
         if (last_msg > 100 && !FlagIsSet(kMusicChoice))
@@ -1980,7 +1981,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             if (m_audio.IsBufferAlmostFull() && m_framesPlayed < 5
                 && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
             {
-                m_playerFlags = (PlayerFlags)(m_playerFlags | kMusicChoice);
+                m_playerFlags = static_cast<PlayerFlags>(m_playerFlags | kMusicChoice);
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     "Music Choice program detected - disabling AV Sync.");
                 m_avsyncAudioPaused = false;
