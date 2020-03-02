@@ -152,6 +152,7 @@ struct VideoFrame
     int interlaced_frame; ///< 1 if interlaced.
     int top_field_first; ///< 1 if top field is first.
     int interlaced_reversed; /// 1 for user override of scan
+    int new_gop; /// used to unlock the scan type
     int repeat_pict;
     int forcekey; ///< hardware encoded .nuv
     int dummy;
@@ -245,6 +246,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->timecode     = 0;
     vf->interlaced_frame = 1;
     vf->interlaced_reversed = 0;
+    vf->new_gop          = 0;
     vf->top_field_first  = 1;
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;

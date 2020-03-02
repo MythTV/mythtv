@@ -308,6 +308,7 @@ class DecoderBase
     unsigned long long   m_frameCounter            {0};
     AVRational           m_totalDuration;
     long long            m_lastKey                 {0};
+    bool                 m_nextDecodedFrameIsKeyFrame { false };
     int                  m_keyframeDist            {-1};
     long long            m_indexOffset             {0};
     MythAVCopy           m_copyFrame;
