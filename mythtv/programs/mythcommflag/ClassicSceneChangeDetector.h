@@ -16,7 +16,7 @@ class ClassicSceneChangeDetector : public SceneChangeDetectorBase
     void processFrame(VideoFrame* frame) override; // SceneChangeDetectorBase
 
   private:
-    ~ClassicSceneChangeDetector() override = default;
+    ~ClassicSceneChangeDetector() override;
 
   private:
     Histogram    *m_histogram                   {nullptr};
