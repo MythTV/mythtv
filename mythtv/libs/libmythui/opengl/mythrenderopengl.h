@@ -37,7 +37,8 @@ enum GLFeatures
     kGLTiled          = 0x0010,
     kGLLegacyTextures = 0x0020,
     kGLNVMemory       = 0x0040,
-    kGL16BitFBO       = 0x0080
+    kGL16BitFBO       = 0x0080,
+    kGLComputeShaders = 0x0100
 };
 
 #define TEX_OFFSET 8
@@ -136,6 +137,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  ClearFramebuffer(void);
 
     QOpenGLShaderProgram* CreateShaderProgram(const QString &Vertex, const QString &Fragment);
+    QOpenGLShaderProgram* CreateComputeShader(const QString &Source);
     void  DeleteShaderProgram(QOpenGLShaderProgram* Program);
     bool  EnableShaderProgram(QOpenGLShaderProgram* Program);
     void  SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
