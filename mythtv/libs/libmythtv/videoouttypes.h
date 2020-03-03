@@ -181,15 +181,16 @@ inline bool is_progressive(FrameScanType Scan)
     return (kScan_Progressive == Scan);
 }
 
-inline QString ScanTypeToString(FrameScanType Scan, bool Forced = false)
+// Note - minor tweak to avoid late translation changes for fixes/31
+inline QString ScanTypeToString(FrameScanType Scan, bool /*Forced*/ = false)
 {
     switch (Scan)
     {
         case kScan_Ignore:       return QObject::tr("Ignore");
         case kScan_Detect:       return QObject::tr("Detect");
-        case kScan_Progressive:  return Forced ? QObject::tr("Progressive (Forced)") : QObject::tr("Progressive");
-        case kScan_Interlaced:   return Forced ? QObject::tr("Interlaced (Forced)") : QObject::tr("Interlaced");
-        case kScan_Intr2ndField: return Forced ? QObject::tr("Interlaced (Reversed, Forced)") : QObject::tr("Interlaced (Reversed)");
+        case kScan_Progressive:  return QObject::tr("Progressive");
+        case kScan_Interlaced:   return QObject::tr("Interlaced");
+        case kScan_Intr2ndField: return QObject::tr("Interlaced (Reversed)");
     }
     return QObject::tr("Unknown");
 }
