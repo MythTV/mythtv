@@ -586,6 +586,13 @@ void AudioConfigSettings::UpdateAudioTest()
     m_audioTest->UpdateCapabilities(out, passthrough, channels, settings);
 }
 
+ChannelChangedEvent::ChannelChangedEvent(QString  channame, bool fulltest)
+  : QEvent(kEventType),
+    m_channel(std::move(channame)),
+    m_fulltest(fulltest)
+{
+}
+
 AudioTestThread::AudioTestThread(QObject *parent,
                                  QString main, QString passthrough,
                                  int channels,
@@ -610,7 +617,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
 }
 
 QEvent::Type ChannelChangedEvent::kEventType =
-    (QEvent::Type) QEvent::registerEventType();
+    static_cast<QEvent::Type>(QEvent::registerEventType());
 
 AudioTestThread::~AudioTestThread()
 {
@@ -655,8 +662,8 @@ void AudioTestThread::run()
 
     if (m_audioOutput)
     {
-        char *frames_in = new char[m_channels * 1024 * sizeof(int32_t) + 15];
-        char *frames = (char *)(((long)frames_in + 15) & ~0xf);
+        char *frames_in = new char[static_cast<unsigned long>(m_channels) * 1024 * sizeof(int32_t) + 15];
+        char *frames = reinterpret_cast<char *>(reinterpret_cast<long>(frames_in + 15) & ~0xf);
 
         m_audioOutput->Pause(false);
 
@@ -959,7 +966,7 @@ bool AudioTest::event(QEvent *event)
     if (event->type() != ChannelChangedEvent::kEventType)
         return QObject::event(event); //not handled
 
-    auto *cce = (ChannelChangedEvent*)(event);
+    auto *cce = static_cast<ChannelChangedEvent*>(event);
     QString channel = cce->m_channel;
 
     if (!cce->m_fulltest)
