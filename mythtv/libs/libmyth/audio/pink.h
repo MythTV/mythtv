@@ -3,7 +3,7 @@
 
 #include "mythexp.h"
 
-#define PINK_MAX_RANDOM_ROWS   (30)
+#define PINK_MAX_RANDOM_ROWS   (32)
 #define PINK_RANDOM_BITS       (24)
 #define PINK_RANDOM_SHIFT      ((sizeof(long)*8)-PINK_RANDOM_BITS)
 
