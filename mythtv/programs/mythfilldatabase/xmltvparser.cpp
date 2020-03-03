@@ -236,7 +236,10 @@ bool XMLTVParser::parseFile(
                 do
                 {
                     if (!readNextWithErrorCheck(xml))
+                    {
+                        delete chaninfo;
                         return false;
+                    }
                     if (xml.name() == "icon")
                     {
                         if (chaninfo->m_icon.isEmpty())
@@ -715,6 +718,7 @@ bool XMLTVParser::parseFile(
                         }
                         else {
                             LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, program out of order at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+                            delete pginfo;
                             return false;
                         }
                     }
