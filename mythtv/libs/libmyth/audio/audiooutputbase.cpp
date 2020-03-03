@@ -1026,7 +1026,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
         obpf = 448000 * 10 / m_sourceSampleRate;
     }
     else
-        obpf = m_outputBytesPerFrame * 80;
+        obpf = static_cast<int64_t>(m_outputBytesPerFrame) * 80;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
        Which is leaving the sound card at this instant.
