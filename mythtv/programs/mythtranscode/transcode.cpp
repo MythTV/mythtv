@@ -463,6 +463,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     SetPlayerContext(nullptr);
                     delete avfw;
                     delete avfw2;
+                    delete hls;
                     return REENCODE_ERROR;
                 }
             }
