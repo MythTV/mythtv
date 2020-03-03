@@ -385,7 +385,12 @@ bool MythRenderOpenGL::Init(void)
     if (hasExtension("GL_NVX_gpu_memory_info"))
         m_extraFeatures |= kGLNVMemory;
 
+    // Check 16 bit FBOs
     Check16BitFBO();
+
+    // Check for compute shaders
+    if (QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))
+        m_extraFeatures |= kGLComputeShaders;
 
     DebugFeatures();
 
@@ -442,7 +447,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
-    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))));
+    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(m_extraFeatures & kGLComputeShaders)));
 
     // warnings
     if (m_maxTextureUnits < 3)
@@ -760,9 +765,9 @@ MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObje
         return nullptr;
 
     auto *texture = new MythGLTexture(Framebuffer->texture());
-    texture->m_size        = texture->m_totalSize = Framebuffer->size();
-    texture->m_vbo         = CreateVBO(kVertexSize);
-    texture->m_flip        = false;
+    texture->m_size = texture->m_totalSize = Framebuffer->size();
+    texture->m_vbo  = CreateVBO(kVertexSize);
+    texture->m_flip = false;
     return texture;
 }
 
@@ -1545,6 +1550,28 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     program->bindAttributeLocation("a_position",  VERTEX_INDEX);
     program->bindAttributeLocation("a_color",     COLOR_INDEX);
     program->bindAttributeLocation("a_texcoord0", TEXTURE_INDEX);
+    if (!program->link())
+        return ShaderError(program, "");
+    return program;
+}
+
+QOpenGLShaderProgram* MythRenderOpenGL::CreateComputeShader(const QString &Source)
+{
+    if (!(m_extraFeaturesUsed & kGLComputeShaders) || Source.isEmpty())
+        return nullptr;
+
+    OpenGLLocker locker(this);
+    auto *program = new QOpenGLShaderProgram();
+    if (!program->addShaderFromSourceCode(QOpenGLShader::Compute, Source))
+        return ShaderError(program, Source);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
+    {
+        QList<QOpenGLShader*> shaders = program->shaders();
+        foreach (QOpenGLShader* shader, shaders)
+            LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
+    }
+
     if (!program->link())
         return ShaderError(program, "");
     return program;
