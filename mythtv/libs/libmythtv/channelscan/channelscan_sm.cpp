@@ -907,6 +907,12 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     if (transport_tune_complete)
     {
         transport_tune_complete &= !m_currentInfo->m_pmts.empty();
+
+        if (!(sd->HasCachedMGT() || sd->HasCachedAnyNIT()))
+        {
+            transport_tune_complete = false;
+        }
+
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
         {
             transport_tune_complete &= sd->HasCachedMGT();
@@ -926,7 +932,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         {
             uint tsid = dtv_sm->GetTransportID();
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("transport_tune_complete: ") +
+                QString("transport_tune_complete: wait_until_complete %1").arg(wait_until_complete) +
                 QString("\n\t\t\tsd->HasCachedAnyNIT():         %1").arg(sd->HasCachedAnyNIT()) +
                 QString("\n\t\t\tsd->HasCachedAnySDTs():        %1").arg(sd->HasCachedAnySDTs()) +
                 QString("\n\t\t\tsd->HasCachedAnyBATs():        %1").arg(sd->HasCachedAnyBATs()) +
@@ -951,8 +957,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     if (transport_tune_complete)
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("transport_tune_complete: wait_until_complete %1")
-                .arg(wait_until_complete));
+            QString("transport_tune_complete: wait_until_complete %1").arg(wait_until_complete));
     }
 
     if (transport_tune_complete &&
