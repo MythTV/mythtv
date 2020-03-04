@@ -2045,7 +2045,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             QString("adding: %1(%2) as a file transfer")
                                       .arg(commands[2])
                                       .arg(quintptr(socket),0,16));
-        fileTransferList.push_back(ft);
+        m_sockListLock.lockForWrite();
+        m_fileTransferList.push_back(ft);
+        m_sockListLock.unlock();
 
         retlist << QString::number(socket->GetSocketDescriptor());
         retlist << QString::number(ft->GetFileSize());
