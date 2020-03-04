@@ -447,10 +447,10 @@ class Frequency : public MythUITextEditSetting, public MuxDBStorage
     };
 };
 
-class DVBSymbolRate : public MythUIComboBoxSetting, public MuxDBStorage
+class DVBSSymbolRate : public MythUIComboBoxSetting, public MuxDBStorage
 {
   public:
-    explicit DVBSymbolRate(const MultiplexID *id) :
+    explicit DVBSSymbolRate(const MultiplexID *id) :
         MythUIComboBoxSetting(this, true), MuxDBStorage(this, id, "symbolrate")
     {
         setLabel(QObject::tr("Symbol Rate"));
@@ -469,6 +469,27 @@ class DVBSymbolRate : public MythUIComboBoxSetting, public MuxDBStorage
         addSelection("29500000");
         addSelection("29700000");
         addSelection("29900000");
+    };
+};
+
+class DVBCSymbolRate : public MythUIComboBoxSetting, public MuxDBStorage
+{
+  public:
+    explicit DVBCSymbolRate(const MultiplexID *id) :
+        MythUIComboBoxSetting(this, true), MuxDBStorage(this, id, "symbolrate")
+    {
+        setLabel(QObject::tr("Symbol Rate"));
+        setHelpText(
+             QObject::tr(
+                "Symbol Rate (symbols/second).\n"
+                "Most DVB-C transports transmit at 6.9 or 6.875 "
+                "million symbols per second."));
+        addSelection("3450000");
+        addSelection("5000000");
+        addSelection("5900000");
+        addSelection("6875000");
+        addSelection("6900000", "6900000", true);
+        addSelection("6950000");
     };
 };
 
@@ -704,6 +725,20 @@ class DVBSModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
     }
 };
 
+class DVBCModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
+{
+  public:
+    explicit DVBCModulationSystem(const MultiplexID *id) :
+        MythUIComboBoxSetting(this), MuxDBStorage(this, id, "mod_sys")
+    {
+        setLabel(QObject::tr("Modulation System"));
+        setHelpText(QObject::tr("Modulation System (Default: DVB-C/A)"));
+        addSelection(QObject::tr("DVB-C/A"), "DVB-C/A", true);
+        addSelection(QObject::tr("DVB-C/B"), "DVB-C/B");
+        addSelection(QObject::tr("DVB-C/C"), "DVB-C/C");
+    }
+};
+
 class RollOff : public MythUIComboBoxSetting, public MuxDBStorage
 {
   public:
@@ -764,8 +799,7 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid, true));
-        addChild(new DVBSymbolRate(m_mplexid));
-
+        addChild(new DVBSSymbolRate(m_mplexid));
         addChild(new DVBInversion(m_mplexid));
         addChild(new Modulation(m_mplexid, cardtype));
         addChild(new DVBSModulationSystem(m_mplexid));
@@ -779,9 +813,9 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid));
-        addChild(new DVBSymbolRate(m_mplexid));
-
+        addChild(new DVBCSymbolRate(m_mplexid));
         addChild(new Modulation(m_mplexid, cardtype));
+        addChild(new DVBCModulationSystem(m_mplexid));
         addChild(new DVBInversion(m_mplexid));
         addChild(new DVBForwardErrorCorrection(m_mplexid));
     }
