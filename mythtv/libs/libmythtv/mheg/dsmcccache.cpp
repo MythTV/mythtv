@@ -237,7 +237,7 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 }
 
 // Find File, Directory or Gateway by reference.
-DSMCCCacheFile *DSMCCCache::FindFileData(DSMCCCacheReference &ref)
+DSMCCCacheFile *DSMCCCache::FindFileData(const DSMCCCacheReference &ref)
 {
     // Find a file.
     QMap<DSMCCCacheReference, DSMCCCacheFile*>::Iterator fil =
@@ -249,7 +249,7 @@ DSMCCCacheFile *DSMCCCache::FindFileData(DSMCCCacheReference &ref)
     return *fil;
 }
 
-DSMCCCacheDir *DSMCCCache::FindDir(DSMCCCacheReference &ref)
+DSMCCCacheDir *DSMCCCache::FindDir(const DSMCCCacheReference &ref)
 {
     // Find a directory.
     QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
@@ -261,7 +261,7 @@ DSMCCCacheDir *DSMCCCache::FindDir(DSMCCCacheReference &ref)
     return *dir;
 }
 
-DSMCCCacheDir *DSMCCCache::FindGateway(DSMCCCacheReference &ref)
+DSMCCCacheDir *DSMCCCache::FindGateway(const DSMCCCacheReference &ref)
 {
     // Find a gateway.
     QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
