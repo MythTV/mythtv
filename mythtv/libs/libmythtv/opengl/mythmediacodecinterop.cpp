@@ -83,7 +83,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
 
     // Set the texture type
     MythVideoTexture *texture = textures[0];
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
+    m_context->glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface
     m_surfaceTexture = QAndroidJniObject("android/graphics/SurfaceTexture", "(I)V", texture->m_textureId);
