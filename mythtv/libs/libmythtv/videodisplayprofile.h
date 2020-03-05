@@ -55,7 +55,8 @@ class MTV_PUBLIC ProfileItem
     bool CheckRange(const QString& Key, float Value, bool *Ok = nullptr) const;
     bool CheckRange(const QString& Key, int Value, bool *Ok = nullptr) const;
     bool CheckRange(const QString& Key, float FValue, int IValue, bool IsFloat, bool *Ok = nullptr) const;
-    bool IsMatch(const QSize &Size, float Framerate, const QString &CodecName) const;
+    bool IsMatch(const QSize &Size, float Framerate, const QString &CodecName,
+                 const QStringList &DisallowedDecoders = QStringList()) const;
     bool IsValid(QString *Reason = nullptr) const;
     bool operator<(const ProfileItem &Other) const;
     QString toString(void) const;
@@ -71,7 +72,8 @@ class MTV_PUBLIC VideoDisplayProfile
     VideoDisplayProfile();
    ~VideoDisplayProfile() = default;
 
-    void    SetInput(const QSize &Size, float Framerate = 0, const QString &CodecName = QString());
+    void    SetInput(const QSize &Size, float Framerate = 0, const QString &CodecName = QString(),
+                     const QStringList &DisallowedDecoders = QStringList());
     void    SetOutput(float Framerate);
     float   GetOutput(void) const;
     void    SetVideoRenderer(const QString &VideoRenderer);
@@ -117,8 +119,10 @@ class MTV_PUBLIC VideoDisplayProfile
 
   private:
     vector<ProfileItem>::const_iterator
-            FindMatch(const QSize &Size, float Framerate, const QString &CodecName);
-    void    LoadBestPreferences(const QSize &Size, float Framerate, const QString &CodecName);
+            FindMatch(const QSize &Size, float Framerate, const QString &CodecName,
+                      const QStringList DisallowedDecoders = QStringList());
+    void    LoadBestPreferences(const QSize &Size, float Framerate, const QString &CodecName,
+                                const QStringList &DisallowedDecoders = QStringList());
     QString GetPreference(const QString &Key) const;
     void    SetPreference(const QString &Key, const QString &Value);
 
