@@ -36,7 +36,7 @@ MythOpenGLInterop::Type MythMMALInterop::GetInteropType(VideoFrameType Format)
         return Unsupported;
 
     // MMAL interop only works with the closed source driver
-    QString renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    QString renderer = reinterpret_cast<const char*>(context->glGetString(GL_RENDERER));
     if (!renderer.contains("VideoCore", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
