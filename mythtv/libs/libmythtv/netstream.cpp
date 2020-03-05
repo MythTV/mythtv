@@ -319,16 +319,14 @@ static qlonglong inline ContentLength(const QNetworkReply *reply)
 }
 
 static qlonglong inline ContentRange(const QNetworkReply *reply,
-    qlonglong &first, qlonglong &last)
+                                     qulonglong &first, qulonglong &last)
 {
-    first = last = -1;
-
     QByteArray range = reply->rawHeader("Content-Range");
     if (range.isEmpty())
         return -1;
 
     // See RFC 2616 14.16: 'bytes begin-end/size'
-    qlonglong len = 0;
+    qulonglong len = 0;
     if (3 != std::sscanf(range.constData(), " bytes %20lld - %20lld / %20lld", &first, &last, &len))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Content-Range:'%1'")
@@ -336,7 +334,7 @@ static qlonglong inline ContentRange(const QNetworkReply *reply,
         return -1;
     }
 
-    return len;
+    return static_cast<qlonglong>(len);
 }
 
 #if 0
@@ -375,8 +373,8 @@ void NetStream::slotReadyRead()
 
         if (m_size < 0 || m_state < kReady)
         {
-            qlonglong first = 0;
-            qlonglong last = 0;
+            qulonglong first = 0;
+            qulonglong last = 0;
             qlonglong len = ContentRange(m_reply, first, last);
             if (len >= 0)
             {
