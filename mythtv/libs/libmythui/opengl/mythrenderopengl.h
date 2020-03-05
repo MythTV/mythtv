@@ -1,9 +1,6 @@
 #ifndef MYTHRENDER_OPENGL_H_
 #define MYTHRENDER_OPENGL_H_
 
-// Std
-#include <cstdint>
-
 // Qt
 #include <QObject>
 #include <QtGlobal>
@@ -110,20 +107,20 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int   GetExtraFeatures(void) const;
     QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
-    void  SetViewPort(const QRect &rect, bool viewportonly = false);
+    void  SetViewPort(const QRect &Rect, bool ViewportOnly = false);
     QRect GetViewPort(void) { return m_viewport; }
-    void  PushTransformation(const UIEffects &fx, QPointF &center);
+    void  PushTransformation(const UIEffects &Fx, QPointF &Center);
     void  PopTransformation(void);
     void  Flush(void);
-    void  SetBlend(bool enable);
-    void  SetBackground(int r, int g, int b, int a);
+    void  SetBlend(bool Enable);
+    void  SetBackground(int Red, int Green, int Blue, int Alpha);
     QFunctionPointer GetProcAddress(const QString &Proc) const;
 
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
-    QSize GetTextureSize(const QSize &size, bool Normalised);
+    QSize GetTextureSize(const QSize &Size, bool Normalised);
     static int GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
@@ -198,7 +195,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     GLuint                       m_fence { 0 };
 
     // Shaders
-    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] {};
+    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] { nullptr };
     QOpenGLShaderProgram*        m_activeProgram { nullptr };
 
     // Vertices
