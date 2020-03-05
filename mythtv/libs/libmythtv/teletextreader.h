@@ -61,7 +61,9 @@ using int_to_page_t = map<int, TeletextPage>;
 class TeletextMagazine
 {
   public:
-    mutable QMutex    lock;
+    TeletextMagazine() = default;
+   ~TeletextMagazine() { delete lock; }
+    QMutex*           lock            { new QMutex };
     int               current_page    {0};
     int               current_subpage {0};
     TeletextSubPage   loadingpage     {};
@@ -100,7 +102,6 @@ class TeletextReader
                          const uint8_t* buf, int vbimode);
 
   protected:
-    void NewsFlash(void) {};
     virtual void PageUpdated(int page, int subpage);
     virtual void HeaderUpdated(
         int page, int subpage, uint8_t *page_ptr, int lang);
@@ -133,7 +134,7 @@ class TeletextReader
     uint8_t          m_header[40]         {0};
     bool             m_header_changed     {false};
     bool             m_page_changed       {false};
-    TeletextMagazine m_magazines[8];
+    TeletextMagazine m_magazines[8]       { };
     unsigned char    m_bitswap[256]       {};
     int              m_fetchpage          {0};
     int              m_fetchsubpage       {0};
