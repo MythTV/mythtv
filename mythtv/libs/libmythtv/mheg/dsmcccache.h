@@ -109,9 +109,9 @@ class DSMCCCache
 
   protected:
     // Find File, Directory or Gateway by reference.
-    DSMCCCacheFile *FindFileData(DSMCCCacheReference &ref);
-    DSMCCCacheDir *FindDir(DSMCCCacheReference &ref);
-    DSMCCCacheDir *FindGateway(DSMCCCacheReference &ref);
+    DSMCCCacheFile *FindFileData(const DSMCCCacheReference &ref);
+    DSMCCCacheDir *FindDir(const DSMCCCacheReference &ref);
+    DSMCCCacheDir *FindGateway(const DSMCCCacheReference &ref);
 
     DSMCCCacheReference m_GatewayRef; // Reference to the gateway
 

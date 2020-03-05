@@ -1,5 +1,5 @@
-#ifndef _HLS_Stream_h_
-#define _HLS_Stream_h_
+#ifndef HLS_STREAM_
+#define HLS_STREAM_
 
 #ifdef USING_LIBCRYPTO
 // encryption related stuff
@@ -33,7 +33,7 @@ class HLSRecStream
     void SetVersion(int x)          { m_version = x; }
     int TargetDuration(void) const  { return m_targetDuration; }
     void SetTargetDuration(int x)   { m_targetDuration = x; }
-    uint64_t AverageBandwidth(void) { return m_bandwidth; }
+    uint64_t AverageBandwidth(void) { return static_cast<uint64_t>(m_bandwidth); }
     uint64_t Bitrate(void) const    { return m_bitrate; }
     void SetBitrate(uint64_t bitrate) { m_bitrate = bitrate; }
     uint64_t CurrentByteRate(void) const { return m_curByteRate; }
@@ -44,7 +44,7 @@ class HLSRecStream
     void SetLive(bool x)            { m_live = x; }
     QString M3U8Url(void) const     { return m_m3u8Url; }
     QString SegmentBaseUrl(void) const { return m_segmentBaseUrl; }
-    void SetSegmentBaseUrl(QString &n) { m_segmentBaseUrl = n; }
+    void SetSegmentBaseUrl(const QString &n) { m_segmentBaseUrl = n; }
 
     uint Duration(void) const;
     uint NumCachedSegments(void) const;
