@@ -1165,8 +1165,8 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
                       "vaapi", 2, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 1, true, "opengl-yv12",
-                      "shader:high", "shader:high");
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1178,6 +1178,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "vdpau", 1, true, "opengl-hw",
                       "driver:medium", "driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1190,6 +1193,10 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec-dec", 4, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
+
     }
 #endif
 
@@ -1201,6 +1208,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "nvdec", 1, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:high", "shader:high");
     }
 #endif
 
@@ -1211,6 +1221,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "vtb", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1222,6 +1235,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "mmal", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1230,12 +1246,12 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     {
         (void) QObject::tr("V4L2 Codecs", "Sample: V4L2");
         uint groupid = CreateProfileGroup("V4L2 Codecs", HostName);
-        CreateProfile(groupid, 1, "", "", "",
-                      "v4l2-dec", 1, true, "opengl-yv12",
-                      "shader:driver:medium", "shader:driver:medium");
         CreateProfile(groupid, 2, "", "", "",
                       "v4l2", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 }
