@@ -692,7 +692,7 @@ class _HardwareProfile:
         #first find out the server desired protocol
         try:
             current_url = smoonURL + 'tokens/token_json?uuid=%s' % self.host.UUID
-            token = self.session.post(current_url, proxies=proxies, timeout=timeout)
+            token = self.session.get(current_url, proxies=proxies, timeout=timeout)
         except EXCEPTIONS as e:
             error(_('Error contacting Server (tokens): {}'.format(e)))
             self.session.close()
