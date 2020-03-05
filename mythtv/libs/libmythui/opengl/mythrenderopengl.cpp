@@ -134,7 +134,6 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QWidget *Widget
     MythRender(kRenderOpenGL),
     m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true))
 {
-    memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
     m_projection.fill(0);
     m_parameters.fill(0);
     m_transforms.push(QMatrix4x4());
@@ -576,15 +575,15 @@ void MythRenderOpenGL::doneCurrent()
     m_lock.unlock();
 }
 
-void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
+void MythRenderOpenGL::SetViewPort(const QRect &Rect, bool ViewportOnly)
 {
-    if (rect == m_viewport)
+    if (Rect == m_viewport)
         return;
     makeCurrent();
-    m_viewport = rect;
+    m_viewport = Rect;
     glViewport(m_viewport.left(), m_viewport.top(),
                m_viewport.width(), m_viewport.height());
-    if (!viewportonly)
+    if (!ViewportOnly)
         SetMatrixView();
     doneCurrent();
 }
@@ -599,26 +598,26 @@ void MythRenderOpenGL::Flush(void)
     doneCurrent();
 }
 
-void MythRenderOpenGL::SetBlend(bool enable)
+void MythRenderOpenGL::SetBlend(bool Enable)
 {
     makeCurrent();
-    if (enable && !m_blend)
+    if (Enable && !m_blend)
         glEnable(GL_BLEND);
-    else if (!enable && m_blend)
+    else if (!Enable && m_blend)
         glDisable(GL_BLEND);
-    m_blend = enable;
+    m_blend = Enable;
     doneCurrent();
 }
 
-void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
+void MythRenderOpenGL::SetBackground(int Red, int Green, int Blue, int Alpha)
 {
-    int32_t tmp = (r << 24) + (g << 16) + (b << 8) + a;
+    int32_t tmp = (Red << 24) + (Green << 16) + (Blue << 8) + Alpha;
     if (tmp == m_background)
         return;
 
     m_background = tmp;
     makeCurrent();
-    glClearColor(r / 255.0F, g / 255.0F, b / 255.0F, a / 255.0F);
+    glClearColor(Red / 255.0F, Green / 255.0F, Blue / 255.0F, Alpha / 255.0F);
     doneCurrent();
 }
 
@@ -650,16 +649,16 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     return result;
 }
 
-QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
+QSize MythRenderOpenGL::GetTextureSize(const QSize &Size, bool Normalised)
 {
     if ((m_features & NPOTTextures) || !Normalised)
-        return size;
+        return Size;
 
     int w = 64;
     int h = 64;
-    while (w < size.width())
+    while (w < Size.width())
         w *= 2;
-    while (h < size.height())
+    while (h < Size.height())
         h *= 2;
     return {w, h};
 }
@@ -877,12 +876,11 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     SetShaderProjection(Program);
 
     GLenum textarget = first->m_target;
-    uint active_tex = 0;
     for (uint i = 0; i < TextureCount; i++)
     {
-        QString uniform = QString("s_texture%1").arg(active_tex);
-        Program->setUniformValue(qPrintable(uniform), active_tex);
-        ActiveTexture(GL_TEXTURE0 + active_tex++);
+        QString uniform = QString("s_texture%1").arg(i);
+        Program->setUniformValue(qPrintable(uniform), i);
+        ActiveTexture(GL_TEXTURE0 + i);
         if (Textures[i]->m_texture)
             Textures[i]->m_texture->bind();
         else
@@ -1490,15 +1488,15 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
     return Size.width() * Size.height() * bpp * bytes;
 }
 
-void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
+void MythRenderOpenGL::PushTransformation(const UIEffects &Fx, QPointF &Center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.m_hzoom != 1.0F || fx.m_vzoom != 1.0F || fx.m_angle != 0.0F)
+    if (Fx.m_hzoom != 1.0F || Fx.m_vzoom != 1.0F || Fx.m_angle != 0.0F)
     {
-        newtop.translate(static_cast<GLfloat>(center.x()), static_cast<GLfloat>(center.y()));
-        newtop.scale(fx.m_hzoom, fx.m_vzoom);
-        newtop.rotate(fx.m_angle, 0, 0, 1);
-        newtop.translate(static_cast<GLfloat>(-center.x()), static_cast<GLfloat>(-center.y()));
+        newtop.translate(static_cast<GLfloat>(Center.x()), static_cast<GLfloat>(Center.y()));
+        newtop.scale(Fx.m_hzoom, Fx.m_vzoom);
+        newtop.rotate(Fx.m_angle, 0, 0, 1);
+        newtop.translate(static_cast<GLfloat>(-Center.x()), static_cast<GLfloat>(-Center.y()));
     }
     m_transforms.push(newtop);
 }
