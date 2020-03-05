@@ -1,6 +1,7 @@
-#include <fcntl.h>
 #include <cmath>
+#include <fcntl.h>
 #include <iostream>
+#include <memory>
 
 #include <QStringList>
 #include <QMap>
@@ -204,10 +205,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     QDateTime curtime = MythDate::current();
     QDateTime statustime = curtime;
     int audioFrame = 0;
-    Cutter *cutter = nullptr;
-    AVFormatWriter *avfw = nullptr;
-    AVFormatWriter *avfw2 = nullptr;
-    HTTPLiveStream *hls = nullptr;
+    std::unique_ptr<Cutter> cutter = nullptr;
+    std::unique_ptr<AVFormatWriter> avfw = nullptr;
+    std::unique_ptr<AVFormatWriter> avfw2 = nullptr;
+    std::unique_ptr<HTTPLiveStream> hls = nullptr;
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
 
@@ -224,7 +225,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (m_hlsStreamID != -1)
         {
-            hls = new HTTPLiveStream(m_hlsStreamID);
+            hls = std::make_unique<HTTPLiveStream>(m_hlsStreamID);
             hls->UpdateStatus(kHLSStatusStarting);
             hls->UpdateStatusMessage("Transcoding Starting");
             m_cmdWidth = hls->GetWidth();
@@ -257,7 +258,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             QString("Transcoding aborted, error: '%1'")
             .arg(rb? rb->GetLastError() : ""));
         delete player_ctx;
-        delete hls;
         return REENCODE_ERROR;
     }
     player_ctx->SetRingBuffer(rb);
@@ -285,7 +285,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         SetPlayerContext(nullptr);
-        delete hls;
         return REENCODE_ERROR;
     }
 
@@ -344,7 +343,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
             SetPlayerContext(nullptr);
-            delete hls;
             return REENCODE_CUTLIST_CHANGE;
         }
         m_proginfo->ClearMarkupFlag(MARK_UPDATED_CUT);
@@ -428,13 +426,12 @@ int Transcode::TranscodeFile(const QString &inputname,
         newHeight = (newHeight + 15) & ~0xF;
         newWidth  = (newWidth  + 15) & ~0xF;
 
-        avfw = new AVFormatWriter();
+        avfw = std::make_unique<AVFormatWriter>();
         if (!avfw)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "Transcoding aborted, error creating AVFormatWriter.");
             SetPlayerContext(nullptr);
-            delete hls;
             return REENCODE_ERROR;
         }
 
@@ -452,7 +449,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (m_hlsStreamID == -1)
             {
-                hls = new HTTPLiveStream(inputname, newWidth, newHeight,
+                hls = std::make_unique<HTTPLiveStream>(inputname, newWidth, newHeight,
                                          m_cmdBitrate, m_cmdAudioBitrate,
                                          m_hlsMaxSegments, 0, 0);
 
@@ -461,9 +458,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
                     SetPlayerContext(nullptr);
-                    delete avfw;
-                    delete avfw2;
-                    delete hls;
                     return REENCODE_ERROR;
                 }
             }
@@ -478,7 +472,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 int audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
-                avfw2 = new AVFormatWriter();
+                avfw2 = std::make_unique<AVFormatWriter>();
                 avfw2->SetContainer("mpegts");
                 avfw2->SetAudioCodec("aac");
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
@@ -498,9 +492,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
                 SetPlayerContext(nullptr);
-                delete hls;
-                delete avfw;
-                delete avfw2;
                 return REENCODE_ERROR;
             }
 
@@ -562,9 +553,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
             SetPlayerContext(nullptr);
-            delete hls;
-            delete avfw;
-            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -572,9 +560,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
             SetPlayerContext(nullptr);
-            delete hls;
-            delete avfw;
-            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -582,9 +567,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
             SetPlayerContext(nullptr);
-            delete hls;
-            delete avfw;
-            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -592,9 +574,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
             SetPlayerContext(nullptr);
-            delete hls;
-            delete avfw;
-            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -837,7 +816,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             // Have the player seek only part of the way
             // through a cut, and then use the cutter to
             // discard the rest
-            cutter = new Cutter();
+            cutter = std::make_unique<Cutter>();
             cutter->SetCutList(deleteMap, m_ctx);
             GetPlayer()->SetCutList(cutter->AdjustedCutList());
         }
@@ -854,9 +833,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_ERR,
             "Unable to initialize MythPlayer for Transcode");
         SetPlayerContext(nullptr);
-        delete hls;
-        delete avfw;
-        delete avfw2;
         return REENCODE_ERROR;
     }
 
@@ -894,7 +870,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!newFrame)
         {
             // OOM
-            delete hls;
             return REENCODE_ERROR;
         }
         if (nonAligned)
@@ -988,7 +963,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 av_freep(&frame.buf);
             }
-            delete hls;
             return REENCODE_OK;
         }
 
@@ -1011,7 +985,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 av_freep(&frame.buf);
             }
-            delete hls;
             return REENCODE_ERROR;
         }
         LOG(VB_GENERAL, LOG_INFO,
@@ -1243,7 +1216,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     hls->UpdateStatus(kHLSStatusErrored);
                     hls->UpdateStatusMessage("Transcoding Errored");
-                    delete hls;
                 }
                 return REENCODE_ERROR;
             }
@@ -1436,7 +1408,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                         if (videoBuffer)
                             videoBuffer->stop();
                         delete ab;
-                        delete hls; // HLS isn't actually going to be running here
                         return REENCODE_ERROR;
                     }
                 }
@@ -1558,14 +1529,13 @@ int Transcode::TranscodeFile(const QString &inputname,
                     {
                         hls->UpdateStatus(kHLSStatusStopped);
                         hls->UpdateStatusMessage("Transcoding Stopped");
-                        delete hls;
                     }
                     return REENCODE_STOPPED;
                 }
 
                 float flagFPS = 0.0;
                 float elapsed = flagTime.elapsed() / 1000.0;
-                if (elapsed)
+                if (elapsed != 0.0F)
                     flagFPS = curFrameNum / elapsed;
 
                 total_frame_count = GetPlayer()->GetCurrentFrameCount();
@@ -1627,10 +1597,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         m_fifow->FIFODrain();
     }
 
-    delete cutter;
-    delete avfw;
-    delete avfw2;
-
     if (hls)
     {
         if (!stopSignalled)
@@ -1644,7 +1610,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             hls->UpdateStatus(kHLSStatusStopped);
             hls->UpdateStatusMessage("Transcoding Stopped");
         }
-        delete hls;
     }
 
     if (videoBuffer)
