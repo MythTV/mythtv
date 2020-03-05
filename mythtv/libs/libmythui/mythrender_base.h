@@ -39,11 +39,11 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
-    virtual void ReleaseResources(void) { }
     virtual QStringList GetDescription(void) { return QStringList(); }
 
   protected:
-     ~MythRender() override = default;
+   ~MythRender() override = default;
+    virtual void ReleaseResources(void) { }
 
     RenderType  m_type;
     QSize       m_size;
