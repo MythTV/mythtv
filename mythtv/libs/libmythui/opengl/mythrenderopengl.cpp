@@ -9,7 +9,6 @@ using std::min;
 #include <QWindow>
 #include <QWidget>
 #include <QGuiApplication>
-#include <QOpenGLExtraFunctions>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -151,7 +150,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
         return;
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     if (m_ready)
-        MythRenderOpenGL::ReleaseResources();
+        ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
@@ -350,17 +349,13 @@ bool MythRenderOpenGL::Init(void)
     if (!isOpenGLES() || (isOpenGLES() && ((fmt.majorVersion() >= 3) || hasExtension("GL_EXT_unpack_subimage"))))
         m_extraFeatures |= kGLExtSubimage;
 
-    // check for core profile
-    m_coreProfile = fmt.profile() == QSurfaceFormat::OpenGLContextProfile::CoreProfile;
-
-    // if we have a core profile then we need a VAO bound - this is just a
-    // workaround for the time being
-    if (m_coreProfile)
+    // check for core profile N.B. not OpenGL ES
+    if (fmt.profile() == QSurfaceFormat::OpenGLContextProfile::CoreProfile)
     {
-        QOpenGLExtraFunctions extra(nullptr);
-        extra.initializeOpenGLFunctions();
-        extra.glGenVertexArrays(1, &m_vao);
-        extra.glBindVertexArray(m_vao);
+        // if we have a core profile then we need a VAO bound - this is just a
+        // workaround for the time being
+        extraFunctions()->glGenVertexArrays(1, &m_vao);
+        extraFunctions()->glBindVertexArray(m_vao);
     }
 
     // For (embedded) GPUs that use tile based rendering, it is faster to use
@@ -1238,12 +1233,12 @@ void MythRenderOpenGL::ReleaseResources(void)
     DeleteDefaultShaders();
     ExpireVertices();
     ExpireVBOS();
-    if (m_coreProfile && m_vao)
+    if (m_vao)
     {
-        QOpenGLExtraFunctions extra(nullptr);
-        extra.initializeOpenGLFunctions();
-        extra.glDeleteVertexArrays(1, &m_vao);
+        extraFunctions()->glDeleteVertexArrays(1, &m_vao);
+        m_vao = 0;
     }
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_RELEASE_END");
     delete m_openglDebugger;
