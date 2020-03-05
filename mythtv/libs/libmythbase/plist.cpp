@@ -431,12 +431,14 @@ QVariant PList::ParseBinaryReal(quint8 *data)
     if (count == sizeof(float))
     {
         convert_float(data, static_cast<quint8>(count));
-        result = static_cast<double>((*(reinterpret_cast<float*>(data))));
+        float temp;
+        std::copy(data, data + sizeof(float), reinterpret_cast<quint8*>(&temp));
+        result = static_cast<double>(temp);
     }
     else if (count == sizeof(double))
     {
         convert_float(data, static_cast<quint8>(count));
-        result = *(reinterpret_cast<double*>(data));
+        std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&result));
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Real: %1").arg(result, 0, 'f', 6));
@@ -454,7 +456,9 @@ QVariant PList::ParseBinaryDate(quint8 *data)
         return result;
 
     convert_float(data, 8);
-    quint64 msec = static_cast<quint64>(*(reinterpret_cast<double*>(data)) * 1000.0);
+    double temp;
+    std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&temp));
+    quint64 msec = static_cast<quint64>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);
