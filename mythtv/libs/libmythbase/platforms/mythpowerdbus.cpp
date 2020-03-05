@@ -126,8 +126,10 @@ void MythPowerDBus::Init(void)
     {
         QDBusReply<QList<QDBusObjectPath> > devices = m_upowerInterface->call(QLatin1String("EnumerateDevices"));
         if (devices.isValid())
+        {
             foreach (QDBusObjectPath device, devices.value())
                 DeviceAdded(device);
+        }
 
         if (!m_bus.connect(UPOWER_SERVICE, UPOWER_PATH, UPOWER_SERVICE, "Changed", this, SLOT(Changed())))
         {

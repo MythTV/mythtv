@@ -11,6 +11,8 @@
 LC_ALL=C
 export LC_ALL
 
+CPP_STANDARD=c++17
+
 # make sure we are running under a compatible shell
 # try to make this part work with most shells
 
@@ -4570,7 +4572,7 @@ fi
 
 add_cppflags -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
 #add_cxxflags -D__STDC_CONSTANT_MACROS
-check_cxxflags -std=c++11 || check_cxxflags -std=c++0x
+check_cxxflags -std=$CPP_STANDARD -faligned-new
 
 # some compilers silently accept -std=c11, so we also need to check that the
 # version macro is defined properly
@@ -6918,7 +6920,6 @@ elif enabled icpc; then
     # 10181: ignore warning about -fomit-frame-pointer being ignored
     # 13200: ignore EMMS instruction required, RTjpegN.cpp does the right thing
     check_cxxflags -wd177,192,592,913,10181,13200
-    check_cxxflags -std=c++11
 elif enabled clangxx; then
     # The constant-logical-operand only gives use false positives
     # for constant logical operands meant to be optimized away.
@@ -7478,6 +7479,7 @@ echo "libdav1d (AV1)            ${libdav1d-no}"
 echo ""
 
 echo "# Compilation Options"
+echo "C++ standard supported    ${CPP_STANDARD}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""

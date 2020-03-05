@@ -25,8 +25,7 @@ win32-msvc* {
 }
 
 CONFIG += $$CCONFIG
-# enable C++11 support, QT5.7 will be based on C++11 anyway
-CONFIG += c++11
+CONFIG += c++17
 
 defineReplace(avLibName) {
         NAME = $$1

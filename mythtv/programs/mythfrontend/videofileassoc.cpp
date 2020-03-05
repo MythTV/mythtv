@@ -89,19 +89,19 @@ namespace
         void SetDefault(bool yes_or_no)
         {
             assign_if_changed_notify(m_fa.use_default, yes_or_no, this,
-                    std::mem_fun(&FileAssociationWrap::SetChanged));
+                    std::mem_fn(&FileAssociationWrap::SetChanged));
         }
 
         void SetIgnore(bool yes_or_no)
         {
             assign_if_changed_notify(m_fa.ignore, yes_or_no, this,
-                    std::mem_fun(&FileAssociationWrap::SetChanged));
+                    std::mem_fn(&FileAssociationWrap::SetChanged));
         }
 
         void SetCommand(const QString &new_command)
         {
             assign_if_changed_notify(m_fa.playcommand, new_command, this,
-                    std::mem_fun(&FileAssociationWrap::SetChanged));
+                    std::mem_fn(&FileAssociationWrap::SetChanged));
         }
 
       private:

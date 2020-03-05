@@ -40,6 +40,7 @@ class MPUBLIC ELD
 {
   public:
     ELD(const char *buf, int size);
+    ELD(const ELD&);
     ELD();
     ~ELD()= default;
     ELD& operator=(const ELD& /*rhs*/);
