@@ -9,6 +9,7 @@
 #include <QtGlobal>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLTexture>
@@ -217,7 +218,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_maxTextureSize { 0 };
     int        m_maxTextureUnits { 0 };
     int        m_colorDepth { 0 };
-    bool       m_coreProfile { false };
 
     // State
     QRect      m_viewport;
