@@ -197,7 +197,7 @@ QString TeletextReader::GetPage(void)
     const TeletextPage *page = FindPage(m_curpage);
     if (page)
     {
-        m_magazines[mag - 1].lock.lock();
+        m_magazines[mag - 1].lock->lock();
         int_to_subpage_t::const_iterator subpageIter;
         subpageIter = page->subpages.begin();
         while (subpageIter != page->subpages.end())
@@ -217,7 +217,7 @@ QString TeletextReader::GetPage(void)
             ++subpageIter;
             ++count;
         }
-        m_magazines[mag - 1].lock.unlock();
+        m_magazines[mag - 1].lock->unlock();
     }
 
     if (str.isEmpty())
@@ -262,7 +262,7 @@ void TeletextReader::Reset(void)
 {
     for (auto & mag : m_magazines)
     {
-        QMutexLocker lock(&mag.lock);
+        QMutexLocker lock(mag.lock);
 
         // clear all sub pages in page
         int_to_page_t::iterator iter;
@@ -534,7 +534,7 @@ const TeletextPage *TeletextReader::FindPageInternal(
     if (mag > 8 || mag < 1)
         return nullptr;
 
-    QMutexLocker lock(&m_magazines[mag - 1].lock);
+    QMutexLocker lock(m_magazines[mag - 1].lock);
 
     int_to_page_t::const_iterator pageIter;
     pageIter = m_magazines[mag - 1].pages.find(page);
@@ -578,7 +578,7 @@ const TeletextSubPage *TeletextReader::FindSubPageInternal(
     if (mag > 8 || mag < 1)
         return nullptr;
 
-    QMutexLocker lock(&m_magazines[mag - 1].lock);
+    QMutexLocker lock(m_magazines[mag - 1].lock);
 
     int_to_page_t::const_iterator pageIter;
     pageIter = m_magazines[mag - 1].pages.find(page);
