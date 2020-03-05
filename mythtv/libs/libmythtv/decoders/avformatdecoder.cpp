@@ -2331,23 +2331,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 m_fps = float(enc->framerate.num) / float(enc->framerate.den);
             else
                 m_fps = GetVideoFrameRate(stream, enc, true);
-            if (!m_isDbIgnored)
-            {
-                m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName);
-                dec = m_videoDisplayProfile.GetDecoder();
-                thread_count = m_videoDisplayProfile.GetMaxCPUs();
-                bool skip_loop_filter = m_videoDisplayProfile.IsSkipLoopEnabled();
-                if  (!skip_loop_filter)
-                    enc->skip_loop_filter = AVDISCARD_NONKEY;
-            }
 
-            m_videoCodecId = kCodec_NONE;
-            uint version = mpeg_version(enc->codec_id);
-            if (version)
-                m_videoCodecId = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
+            bool foundgpudecoder = false;
+            QStringList unavailabledecoders;
+            bool allowgpu = FlagIsSet(kDecodeAllowGPU);
 
             if (m_averrorCount > SEQ_PKT_ERR_MAX)
             {
+                // TODO this could be improved by appending the decoder that has
+                // failed to the unavailable list - but that could lead to circular
+                // failures if there are 2 or more hardware decoders that fail
                 if (FlagIsSet(kDecodeAllowGPU) && (dec != "ffmpeg"))
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
@@ -2355,37 +2348,67 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         .arg(dec));
                 }
                 m_averrorCount = 0;
-                dec = "ffmpeg";
+                allowgpu = false;
             }
 
-            bool foundgpudecoder = false;
-            if (version && FlagIsSet(kDecodeAllowGPU))
+            while (unavailabledecoders.size() < 10)
             {
-                // We need to set this so that MythyCodecContext can callback
-                // to the player in use to check interop support.
-                enc->opaque = static_cast<void*>(this);
-                MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
-                if (hwcodec != kCodec_NONE)
+                if (!m_isDbIgnored)
                 {
-                    // the context may have changed
-                    enc->opaque = static_cast<void*>(this);
-                    m_videoCodecId = hwcodec;
-                    foundgpudecoder = true;
+                    if (!unavailabledecoders.isEmpty())
+                    {
+                        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Unavailable decoders: %1")
+                            .arg(unavailabledecoders.join(",")));
+                    }
+                    m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName, unavailabledecoders);
+                    dec = m_videoDisplayProfile.GetDecoder();
+                    thread_count = m_videoDisplayProfile.GetMaxCPUs();
+                    bool skip_loop_filter = m_videoDisplayProfile.IsSkipLoopEnabled();
+                    if  (!skip_loop_filter)
+                        enc->skip_loop_filter = AVDISCARD_NONKEY;
                 }
-            }
 
-            // default to mpeg2
-            if (m_videoCodecId == kCodec_NONE)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown video codec - defaulting to MPEG2");
-                m_videoCodecId = kCodec_MPEG2;
-            }
+                m_videoCodecId = kCodec_NONE;
+                uint version = mpeg_version(enc->codec_id);
+                if (version)
+                    m_videoCodecId = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
 
-            // Use a PrivateDecoder if allowed in playerFlags AND matched
-            // via the decoder name
-            m_privateDec = PrivateDecoder::Create(dec, m_playerFlags, enc);
-            if (m_privateDec)
-                thread_count = 1;
+                if (version && allowgpu && dec != "ffmpeg")
+                {
+                    // We need to set this so that MythyCodecContext can callback
+                    // to the player in use to check interop support.
+                    enc->opaque = static_cast<void*>(this);
+                    MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
+                    if (hwcodec != kCodec_NONE)
+                    {
+                        // the context may have changed
+                        enc->opaque = static_cast<void*>(this);
+                        m_videoCodecId = hwcodec;
+                        foundgpudecoder = true;
+                    }
+                    else
+                    {
+                        // hardware decoder is not available - try the next best profile
+                        unavailabledecoders.append(dec);
+                        continue;
+                    }
+                }
+
+                // default to mpeg2
+                if (m_videoCodecId == kCodec_NONE)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown video codec - defaulting to MPEG2");
+                    m_videoCodecId = kCodec_MPEG2;
+                }
+
+                // Use a PrivateDecoder if allowed in playerFlags AND matched
+                // via the decoder name
+                //m_privateDec = PrivateDecoder::Create(dec, m_playerFlags, enc);
+                //if (m_privateDec)
+                //    thread_count = 1;
+
+                break;
+            }
 
             // N.B. MediaCodec and NVDEC require frame timing
             m_useFrameTiming = false;
