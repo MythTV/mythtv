@@ -656,9 +656,10 @@ void MythPlayer::SetScanType(FrameScanType Scan)
 
     if (is_interlaced(Scan))
     {
+        MythDeintType forced = m_playerCtx->IsPiPOrSecondaryPBP() ? (DEINT_CPU | DEINT_MEDIUM) : DEINT_NONE;
         bool normal = m_playSpeed > 0.99F && m_playSpeed < 1.01F && m_normalSpeed;
-        m_doubleFramerate = CanSupportDoubleRate() && normal;
-        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
+        m_doubleFramerate = CanSupportDoubleRate() && normal && !forced;
+        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate, forced);
     }
     else if (kScan_Progressive == Scan)
     {
@@ -1895,7 +1896,7 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     m_osdLock.lock();
-    m_videoOutput->ProcessFrame(nullptr, m_osd, m_pipPlayers);
+    m_videoOutput->ProcessFrame(nullptr, m_osd, m_pipPlayers, scan);
     m_videoOutput->PrepareFrame(nullptr, scan, m_osd);
     m_osdLock.unlock();
     m_videoOutput->Show(scan);
@@ -2082,9 +2083,18 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
+    if (m_playerCtx->IsPiPOrSecondaryPBP())
+    {
+        // PiPs can only be deinterlaced in software and must be handled here
+        frame->deinterlace_allowed = frame->deinterlace_allowed & ~(DEINT_SHADER | DEINT_DRIVER);
+        static const PIPMap dummy;
+        m_videoOutput->ProcessFrame(frame, nullptr, dummy, m_scan);
+    }
     // We only need AV sync for primary PBP or standard player
-    if (m_playerCtx->IsAudioNeeded())
+    else if (m_playerCtx->IsAudioNeeded())
+    {
         AVSync(frame);
+    }
 
     // Update details for debug OSD
     m_lastDeinterlacer = frame->deinterlace_inuse;

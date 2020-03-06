@@ -130,6 +130,8 @@ class MTV_PUBLIC PlayerContext
         { return (kPBPLeft == m_pipState); }
     bool IsAudioNeeded(void) const
         { return (kPIPOff  == m_pipState) || (kPBPLeft       == m_pipState); }
+    bool IsPiPOrSecondaryPBP(void) const
+        { return IsPIP() || (IsPBP() && !IsPrimaryPBP()); }
     bool IsNullVideoDesired(void)   const { return m_useNullVideo; }
     bool IsPlayerChangingBuffers(void) const { return m_playerUnsafe; }
     bool IsEmbedding(void) const;
