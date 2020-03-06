@@ -1363,12 +1363,12 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
 QString VideoDisplayProfile::toString(void) const
 {
-    QString renderer  = GetPreference("pref_videorenderer");
-    QString osd       = GetPreference("pref_osdrenderer");
-    QString deint0    = GetPreference("pref_deint0");
-    QString deint1    = GetPreference("pref_deint1");
-    return QString("rend(%4) osd(%5) deint(%6,%7) filt(%8)")
-        .arg(renderer).arg(osd).arg(deint0).arg(deint1);
+    QString renderer = GetPreference("pref_videorenderer");
+    QString deint0   = GetPreference("pref_deint0");
+    QString deint1   = GetPreference("pref_deint1");
+    QString cpus     = GetPreference("pref_max_cpus");
+    return QString("rend:%1 deint:%2/%3 CPUs: %4")
+        .arg(renderer).arg(deint0).arg(deint1).arg(cpus);
 }
 
 QList<QPair<QString,QString> > VideoDisplayProfile::GetDeinterlacers(void)
