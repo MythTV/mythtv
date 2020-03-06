@@ -2082,18 +2082,20 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    AVSync(frame);
+    // We only need AV sync for primary PBP or standard player
+    if (m_playerCtx->IsAudioNeeded())
+        AVSync(frame);
+
+    // Update details for debug OSD
+    m_lastDeinterlacer = frame->deinterlace_inuse;
+    m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
+    // We use the underlying pix_fmt as it retains the distinction between hardware
+    // and software frames for decode only decoders.
+    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
 
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!m_playerCtx->IsPIP())
-    {
-        m_lastDeinterlacer = frame->deinterlace_inuse;
-        m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
-        // We use the underlying pix_fmt as it retains the distinction between hardware
-        // and software frames for decode only decoders.
-        m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
         m_videoOutput->DoneDisplayingFrame(frame);
-    }
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
