@@ -27,6 +27,21 @@ const double DEFAULT_WEIGHT = std::pow(0.5, TRAILING_BETA_SHAPE - 1) *
 //! The edges of the distribution get clipped to avoid a singularity.
 const qint64 BETA_CLIP = 60 * 60 * 24;
 
+void MarkedFiles::Add(const ImageIdList& newIds)
+{
+    for (int newid : newIds)
+        insert(newid);
+}
+
+void MarkedFiles::Invert(const ImageIdList &all)
+{
+    QSet tmp;
+    for (int tmpint : all)
+        tmp.insert(tmpint);
+    for (int tmpint : *this)
+        tmp.remove(tmpint);
+    swap(tmp);
+}
 
 /*!
  \brief Get all images/dirs in view
