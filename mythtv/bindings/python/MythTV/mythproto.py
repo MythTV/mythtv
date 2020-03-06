@@ -12,7 +12,7 @@ from MythTV.altdict import DictData
 from MythTV.connections import BEConnection, BEEventConnection
 from MythTV.database import DBCache
 from MythTV.utility import CMPRecord, datetime, ParseEnum, \
-                           CopyData, CopyData2, check_ipv6, py23_repr
+                           CopyData, CopyData2, check_ipv6, py23_repr, resolve_ip
 
 from datetime import date
 from time import sleep
@@ -75,32 +75,33 @@ class BECache( object ):
         self.receiveevents = events
 
         if backend is None:
-            # no backend given, use master
-            self.host = self.db.settings.NULL.MasterServerIP
-            self.hostname = self.db._gethostfromaddr(self.host)
-
+            # use master backend
+            backend = self.db.getMasterBackend()
         else:
             backend = backend.strip('[]')
-            if self._reip.match(backend):
-                # given backend is IP address
-                self.host = backend
-                self.hostname = self.db._gethostfromaddr(
-                                            backend, 'BackendServerAddr')
-            elif check_ipv6(backend):
-                # given backend is IPv6 address
-                self.host = backend
-                self.hostname = self.db._gethostfromaddr(
-                                            backend, 'BackendServerAddr')
-            else:
-                # given backend is hostname, pull address from database
-                self.hostname = backend
-                self.host = self.db._getpreferredaddr(backend)
 
-        # lookup port from database
-        self.port = int(self.db.settings[self.hostname].BackendServerPort)
-        if not self.port:
-            raise MythDBError(MythError.DB_SETTING, 'BackendServerPort',
-                                            self.port)
+        # assume backend is hostname from settings
+        host = self.db._getpreferredaddr(backend)
+        if host:
+            port = int(self.db.settings[backend].BackendServerPort)
+            self.hostname = backend
+        else:
+            # assume ip address
+            self.hostname = self.db._gethostfromaddr(backend)
+            host = backend
+            port = int(self.db.settings[self.hostname].BackendServerPort)
+
+        # resolve ip address from name
+        reshost, resport = resolve_ip(host,port)
+        if not reshost:
+            raise MythDBError(MythError.DB_SETTING,
+                                backend+': BackendServerAddr')
+        if not resport:
+            raise MythDBError(MythError.DB_SETTING,
+                                backend+': BackendServerPort')
+
+        self.host = host
+        self.port = port
 
         self._ident = '%s:%d' % (self.host, self.port)
         if self._ident in self._shared:
@@ -241,9 +242,11 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     else:
         raise MythError('Invalid FileTransfer input string: '+file)
 
-    # get full system name
+    # prefer hostname from settings over IP address
     host = host.strip('[]')
-    if reip.match(host) or check_ipv6(host):
+    if ( not db._getpreferredaddr(host) and \
+                            resolve_ip(host, None)[0] ):
+        # host is either IPv4, IPv6 or an (aliased) name
         host = db._gethostfromaddr(host)
 
     # select the correct transfer function:
