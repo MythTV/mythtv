@@ -8,7 +8,7 @@ from MythTV.static import *
 from MythTV.exceptions import *
 from MythTV.logging import MythLog
 from MythTV.connections import FEConnection, XMLConnection, BEEventConnection
-from MythTV.utility import databaseSearch, datetime, check_ipv6, _donothing
+from MythTV.utility import databaseSearch, datetime, check_ipv6, _donothing, resolve_ip
 from MythTV.database import DBCache, DBData
 from MythTV.system import SystemEvent
 from MythTV.mythproto import BECache, FileOps, Program, FreeSpace, EventLock
@@ -1131,6 +1131,8 @@ class MythVideo( MythDB ):
 class MythXML( XMLConnection ):
     """
     Provides convenient methods to access the backend XML server.
+    Parameter 'backend' is either a hostname from 'settings',
+    an ip address or a hostname in ip-notation.
     """
     def __init__(self, backend=None, port=None, db=None):
         if backend and port:
@@ -1142,24 +1144,28 @@ class MythXML( XMLConnection ):
         self.log = MythLog('Python XML Connection')
         if backend is None:
             # use master backend
-            backend = self.db.settings.NULL.MasterServerIP
-        if re.match(r'(?:\d{1,3}\.){3}\d{1,3}',backend) or \
-                    check_ipv6(backend):
-            # process ip address
-            host = self.db._gethostfromaddr(backend)
-            self.host = backend
-            self.port = int(self.db.settings[host].BackendStatusPort)
+            backend = self.db.getMasterBackend()
+
+        # assume hostname from settings
+        host = self.db._getpreferredaddr(backend)
+        if host:
+            port = int(self.db.settings[backend].BackendStatusPort)
         else:
-            # assume given a hostname
-            self.host = backend
-            self.port = int(self.db.settings[self.host].BackendStatusPort)
-            if not self.port:
-                # try a truncated hostname
-                self.host = backend.split('.')[0]
-                self.port = int(self.db.setting[self.host].BackendStatusPort)
-                if not self.port:
-                    raise MythDBError(MythError.DB_SETTING,
-                                        backend+': BackendStatusPort')
+            # assume ip address
+            hostname = self.db._gethostfromaddr(backend)
+            host = backend
+            port = int(self.db.settings[hostname].BackendStatusPort)
+
+        # resolve ip address from name
+        reshost, resport = resolve_ip(host,port)
+        if not reshost:
+            raise MythDBError(MythError.DB_SETTING,
+                                backend+': BackendServerAddr')
+        if not resport:
+            raise MythDBError(MythError.DB_SETTING,
+                                backend+': BackendStatusPort')
+        self.host = host
+        self.port = port
 
     def getHosts(self):
         """Returns a list of unique hostnames found in the settings table."""
