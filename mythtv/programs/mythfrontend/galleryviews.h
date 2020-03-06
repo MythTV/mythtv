@@ -38,9 +38,9 @@ public:
     void Initialise(int id)      { m_valid = true; m_parent = id; clear();}
     void Clear()                 { m_valid = false; clear(); }
     bool IsFor(int id)           { return m_valid && m_parent == id; }
-    void Add(const ImageIdList& newIds) { unite(newIds.toSet()); }
+    void Add(const ImageIdList& newIds);
     void Add(int id)             { insert(id); }
-    void Invert(const ImageIdList& all) { QSet tmp(all.toSet() - *this); swap(tmp); }
+    void Invert(const ImageIdList& all);
 
 private:
     bool m_valid  {false};
