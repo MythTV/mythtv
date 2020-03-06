@@ -41,7 +41,8 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     void InitPictureAttributes(void) override;
     void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;
     void RemovePIP(MythPlayer *PiPPlayer) override;
-    bool IsPIPSupported(void) const override  { return true; }
+    bool IsPIPSupported(void) const override { return true; }
+    bool IsPBPSupported(void) const override { return true; }
     MythPainter *GetOSDPainter(void) override;
     bool CanVisualise(AudioPlayer *Audio, MythRender *Render) override;
     bool SetupVisualisation(AudioPlayer *Audio, MythRender *Render, const QString &Name) override;
