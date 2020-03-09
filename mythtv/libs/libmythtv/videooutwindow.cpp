@@ -68,10 +68,6 @@ void VideoOutWindow::PopulateGeometry(void)
     if (!m_display)
         return;
 
-    qApp->processEvents();
-    if (not qobject_cast<QApplication*>(qApp))
-        return;
-
     QScreen *screen = m_display->GetCurrentScreen();
     if (!screen)
         return;
