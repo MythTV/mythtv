@@ -1834,7 +1834,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             m_videoOutput->Show(ps);
         }
     }
-    else
+    else if (!m_playerCtx->IsPiPOrSecondaryPBP())
     {
         WaitForTime(framedue);
     }
@@ -2083,18 +2083,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    if (m_playerCtx->IsPiPOrSecondaryPBP())
-    {
-        // PiPs can only be deinterlaced in software and must be handled here
-        frame->deinterlace_allowed = frame->deinterlace_allowed & ~(DEINT_SHADER | DEINT_DRIVER);
-        static const PIPMap dummy;
-        m_videoOutput->ProcessFrame(frame, nullptr, dummy, m_scan);
-    }
-    // We only need AV sync for primary PBP or standard player
-    else if (m_playerCtx->IsAudioNeeded())
-    {
-        AVSync(frame);
-    }
+    AVSync(frame);
 
     // Update details for debug OSD
     m_lastDeinterlacer = frame->deinterlace_inuse;
