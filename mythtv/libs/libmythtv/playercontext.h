@@ -105,7 +105,7 @@ class MTV_PUBLIC PlayerContext
     void SetPIPLocation(int loc) { m_pipLocation = loc; }
     void SetPIPState(PIPState change) { m_pipState = change; }
     void SetPlayerChangingBuffers(bool val) { m_playerUnsafe = val; }
-    void SetNoHardwareDecoders(void) { m_nohardwaredecoders = true; }
+    void SetNoHardwareDecoders(bool Disallow = true) { m_nohardwaredecoders = Disallow; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
