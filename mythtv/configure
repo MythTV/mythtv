@@ -6544,7 +6544,7 @@ case $target_os in
         ;;
     linux)
         . /etc/os-release
-        if test $ID = "centos"; then
+        if test $ID = "centos" && test $VERSION_ID -le 7; then
             disable enforce_wshadow
         fi
         ;;
