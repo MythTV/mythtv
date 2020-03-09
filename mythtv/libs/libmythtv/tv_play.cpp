@@ -6110,6 +6110,8 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             mctx->m_buffer->Unpause();
     }
 
+    mctx->SetNullVideo(false);
+    mctx->SetNoHardwareDecoders(false);
     bool ok = StartPlayer(mctx, mctx, mctx->GetState());
 
     if (ok)
@@ -6137,6 +6139,20 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
                 pipctx->m_buffer->Unpause();
         }
 
+        pipctx->SetNullVideo(true);
+        pipctx->SetNoHardwareDecoders(true);
+
+        // if the main context is using a hardware decoder, it will callback to
+        // the main thread at some point while holding avcodeclock, which causes
+        // a deadlock. If we can't obtain the lock, try and process the callback.
+        while (!avcodeclock->tryLock(10))
+        {
+            mctx->LockDeletePlayer(__FILE__, __LINE__);
+            if (mctx->m_player)
+                mctx->m_player->ProcessCallbacks();
+            mctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        }
+
         ok = StartPlayer(mctx, pipctx, pipctx->GetState());
 
         if (ok)
@@ -6155,6 +6171,8 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
                 "Failed to restart new pip context (was main context)");
             ForceNextStateNone(pipctx);
         }
+
+        avcodeclock->unlock();
     }
 
     // If old main player had a kMuteAll | kMuteOff setting,
