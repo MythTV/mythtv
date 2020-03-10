@@ -15,10 +15,4 @@
 # define MTV_PUBLIC
 #endif
 
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-# define MALIGN32    __attribute__ ((aligned (32)))
-#else
-# define MALIGN32
-#endif
-
 #endif // MYTHTVEXP_H_

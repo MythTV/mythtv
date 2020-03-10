@@ -282,7 +282,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     // All actual buffers
     SRC_DATA          m_srcData                           {};
     uint              m_memoryCorruptionTest0             {0xdeadbeef};
-    float             m_srcInBuf[kAudioSRCInputSize + 16] {};
+    alignas(16) float m_srcInBuf[kAudioSRCInputSize]      {};
     uint              m_memoryCorruptionTest1             {0xdeadbeef};;
     float            *m_srcOut                            {nullptr};
     int               m_kAudioSRCOutputSize               {0};

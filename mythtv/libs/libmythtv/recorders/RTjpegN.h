@@ -110,12 +110,12 @@ private:
     static int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
 #endif
     
-    int16_t   m_block[64] MALIGN32 {0};
-    int32_t   m_ws[64*4]  MALIGN32 {0};
-    int32_t   m_lqt[64]   MALIGN32 {0};
-    int32_t   m_cqt[64]   MALIGN32 {0};
-    int32_t   m_liqt[64]  MALIGN32 {0};
-    int32_t   m_ciqt[64]  MALIGN32 {0};
+    alignas(32) int16_t   m_block[64] {0};
+    alignas(32) int32_t   m_ws[64*4]  {0};
+    alignas(32) int32_t   m_lqt[64]   {0};
+    alignas(32) int32_t   m_cqt[64]   {0};
+    alignas(32) int32_t   m_liqt[64]  {0};
+    alignas(32) int32_t   m_ciqt[64]  {0};
     int32_t   m_lB8                {0};
     int32_t   m_cB8                {0};
     int32_t   m_yWidth             {0};

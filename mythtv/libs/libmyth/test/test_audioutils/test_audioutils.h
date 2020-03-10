@@ -23,8 +23,6 @@
 #include "mythcorecontext.h"
 #include "audiooutpututil.h"
 
-#define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
-
 #define SSEALIGN 16     // for 16 bytes memory alignment
 
 #define ISIZEOF(type) ((int)sizeof(type))
