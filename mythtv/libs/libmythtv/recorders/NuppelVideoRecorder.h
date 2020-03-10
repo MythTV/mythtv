@@ -287,7 +287,9 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     bool                m_skipBtAudio            {false};
 
+#ifdef USING_V4L2
     bool                m_correctBttv            {false};
+#endif
 
     int                 m_volume                 {100};
 
