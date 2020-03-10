@@ -70,12 +70,14 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
                               VideoDisplayProfile *Profile, bool Force)
 {
     // nothing to see here
-    if (!Frame || (Scan != kScan_Interlaced && Scan != kScan_Intr2ndField) ||
-        (Frame && Frame->already_deinterlaced))
+    if (!Frame || (Scan != kScan_Interlaced && Scan != kScan_Intr2ndField))
     {
         Cleanup();
         return;
     }
+
+    if (Frame && Frame->already_deinterlaced)
+        return;
 
     // Sanity check frame format
     if (!format_is_yuv(Frame->codec))
