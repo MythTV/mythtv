@@ -749,12 +749,12 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         {
             if ((resize == Framebuffer) && m_frameBuffer && m_frameBufferTexture)
             {
-                LOG(VB_PLAYBACK, LOG_INFO, "Using existing framebuffer");
+                LOG(VB_PLAYBACK, LOG_DEBUG, "Using existing framebuffer");
                 useframebufferimage = true;
             }
             else
             {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Nothing to display");
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Nothing to display");
                 // if this is live tv startup and the window rect has changed we
                 // must set the viewport
                 m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
