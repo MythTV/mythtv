@@ -250,8 +250,11 @@ class Send(object):
         # TODO: Should handle redirects here (mostly for remote backends.)
         if response.status_code > 299:
             self.logger.debug('%s', response.text)
-            reason = (ElementTree.fromstring(response.text)
-                      .find('errorDescription').text)
+            try:
+                reason = (ElementTree.fromstring(response.text)
+                          .find('errorDescription').text)
+            except ElementTree.ParseError:
+                reason = 'N/A'
             raise RuntimeError('Unexpected status returned: {}: Reason: "{}" '
                                'URL was: {}'
                                .format(response.status_code,
@@ -410,13 +413,14 @@ class Send(object):
                 if self.postdata:
                     saved_endpoint = self.endpoint
                     saved_postdata = self.postdata
-                    # Need to adjust this if a service other than Frontend is
-                    # added.
+                    saved_opts = self.opts
                     self.send(endpoint='{}/version'.format(
-                        'Myth' if self.endpoint[:8] != 'Frontend'
-                        else 'Frontend'), opts=self.opts)
+                        self.endpoint[:self.endpoint.find('/')],
+                        opts=self.opts))
                     self.endpoint = saved_endpoint
                     self.postdata = saved_postdata
+                    self.opts = saved_opts
+
         except KeyError:
             # Proceed without authentication.
             pass
