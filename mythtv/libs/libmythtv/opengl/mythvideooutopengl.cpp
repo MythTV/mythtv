@@ -612,7 +612,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     }
 
     // PiPs/PBPs
-    if (!m_openGLVideoPiPs.empty())
+    if (!m_openGLVideoPiPs.empty() && !m_window.IsEmbedding())
     {
         for (auto it = m_openGLVideoPiPs.begin(); it != m_openGLVideoPiPs.end(); ++it)
         {
