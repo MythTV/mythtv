@@ -648,6 +648,7 @@ class MTV_PUBLIC MythPlayer
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     virtual void AVSync(VideoFrame *buffer);
+    bool  PipSync(void);
     void  ResetAVSync(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
     void  WaitForTime(int64_t framedue);
@@ -846,7 +847,6 @@ class MTV_PUBLIC MythPlayer
 
     // Audio and video synchronization stuff
     int        m_avsyncAvg                {0};
-    int        m_avsyncPredictor          {0};
     int64_t    m_dispTimecode             {0};
     bool       m_avsyncAudioPaused        {false};
     int64_t    m_rtcBase                  {0}; // real time clock base for presentation time (microsecs)
