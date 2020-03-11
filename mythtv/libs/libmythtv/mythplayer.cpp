@@ -1611,6 +1611,51 @@ void MythPlayer::WaitForTime(int64_t framedue)
         QThread::usleep(static_cast<unsigned long>(delay));
 }
 
+/*! \brief Keep PiP frame rate in sync with master framerate
+ *
+ * This is a simple frame rate tracker. If a frame is not due, then just keep
+ * the last displayed frame. Otherwise discard frame(s) that are too old.
+*/
+bool MythPlayer::PipSync(void)
+{
+    int maxtries = 6;
+    int64_t timenow    = m_avTimer.nsecsElapsed() / 1000;
+    auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
+
+    while (maxtries--)
+    {
+        if (!m_videoOutput->ValidVideoFrames())
+            return false;
+
+        m_videoOutput->StartDisplayingFrame();
+        VideoFrame *last = m_videoOutput->GetLastShownFrame();
+        if (!last)
+            return false;
+
+        m_videoOutput->ProcessFrame(last, nullptr, m_pipPlayers, m_scan);
+
+        int64_t videotimecode = last->timecode & 0x0000ffffffffffff;
+        if (videotimecode != last->timecode)
+            videotimecode = m_maxTcVal;
+        if (videotimecode == 0)
+        {
+            m_videoOutput->DoneDisplayingFrame(last);
+            return true;
+        }
+        m_maxTcVal = videotimecode;
+
+        if (m_rtcBase == 0)
+            m_rtcBase = timenow - (videotimecode * playspeed1000);
+
+        int64_t framedue = m_rtcBase + (videotimecode * playspeed1000);
+        if (framedue > timenow)
+            return true;
+
+        m_videoOutput->DoneDisplayingFrame(last);
+    }
+    return true;
+}
+
 #define AVSYNC_MAX_LATE 10000000
 void MythPlayer::AVSync(VideoFrame *buffer)
 {
@@ -2062,9 +2107,13 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // clear the buffering state
     SetBuffering(false);
 
+    // NB no PBP support currently
+    bool ispip = m_playerCtx->IsPIP();
+
     // If PiP then release the last shown frame to the decoding queue
-    if (m_playerCtx->IsPIP())
-        m_videoOutput->DoneDisplayingFrame(m_videoOutput->GetLastShownFrame());
+    if (ispip)
+        if (!PipSync())
+            return;
 
     // retrieve the next frame
     m_videoOutput->StartDisplayingFrame();
@@ -2083,7 +2132,8 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    AVSync(frame);
+    if (!ispip)
+        AVSync(frame);
 
     // Update details for debug OSD
     m_lastDeinterlacer = frame->deinterlace_inuse;
@@ -2093,7 +2143,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
 
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
-    if (!m_playerCtx->IsPIP())
+    if (!ispip)
         m_videoOutput->DoneDisplayingFrame(frame);
 }
 
