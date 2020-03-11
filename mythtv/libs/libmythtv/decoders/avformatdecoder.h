@@ -16,7 +16,7 @@
 #include "audiooutpututil.h"
 #include "spdifencoder.h"
 #include "vbilut.h"
-#include "H264Parser.h"
+#include "AVCParser.h"
 #include "videodisplayprofile.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
@@ -108,7 +108,7 @@ class AvFormatDecoder : public DecoderBase
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
-    static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
+    static bool CanHandle(char testbuf[kDecoderProbeBufferSize],
                           const QString &filename,
                           int testbufsize = kDecoderProbeBufferSize);
 
@@ -162,7 +162,7 @@ class AvFormatDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
-        { m_h264Parser->use_I_forKeyframes(!value); }
+        { m_AVCParser->use_I_forKeyframes(!value); }
 
     int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
@@ -266,7 +266,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool               m_isDbIgnored;
 
-    H264Parser        *m_h264Parser                   {nullptr};
+    AVCParser         *m_AVCParser                    {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
     MythCodecMap       m_codecMap                     { };

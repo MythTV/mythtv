@@ -76,7 +76,6 @@ void ExternalRecorder::run(void)
 
     StartNewFile();
 
-    m_h264Parser.Reset();
     m_waitForKeyframeOption = true;
     m_seenSps = false;
 
@@ -192,6 +191,9 @@ bool ExternalRecorder::PauseAndWait(int timeout)
         LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait unpause");
 
         // The SignalMonitor will StartStreaming
+
+        if (m_h2645Parser != nullptr)
+            m_h2645Parser->Reset();
 
         if (m_streamData)
             m_streamData->Reset(m_streamData->DesiredProgram());

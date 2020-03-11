@@ -121,7 +121,7 @@ static float get_aspect(const AVCodecContext &ctx)
 
     return aspect_ratio;
 }
-static float get_aspect(H264Parser &p)
+static float get_aspect(AVCParser &p)
 {
     static constexpr float kDefaultAspect = 4.0F / 3.0F;
     int asp = p.aspectRatio();
@@ -321,7 +321,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  PlayerFlags flags)
     : DecoderBase(parent, pginfo),
       m_isDbIgnored(gCoreContext->IsDatabaseIgnored()),
-      m_h264Parser(new H264Parser()),
+      m_AVCParser(new AVCParser()),
       m_playerFlags(flags),
       // Closed Caption & Teletext decoders
       m_ccd608(new CC608Decoder(parent->GetCC608Reader())),
@@ -362,7 +362,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete m_ccd708;
     delete m_ttd;
     delete m_privateDec;
-    delete m_h264Parser;
+    delete m_AVCParser;
     delete m_mythCodecCtx;
 
     sws_freeContext(m_swsCtx);
@@ -416,7 +416,7 @@ void AvFormatDecoder::CloseContext()
 
     delete m_privateDec;
     m_privateDec = nullptr;
-    m_h264Parser->Reset();
+    m_AVCParser->Reset();
 }
 
 static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
@@ -1447,7 +1447,7 @@ int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
 
                 if (offset)
                 {
-                    H264Parser parser;
+                    AVCParser parser;
                     bool dummy = false;
                     parser.parse_SPS(Context->extradata + offset,
                                      static_cast<uint>(Context->extradata_size - offset), dummy, result);
@@ -2318,7 +2318,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             delete m_privateDec;
             m_privateDec = nullptr;
-            m_h264Parser->Reset();
+            m_AVCParser->Reset();
 
             QSize dim = get_video_dim(*enc);
             int width  = max(dim.width(),  16);
@@ -3236,16 +3236,16 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (buf < buf_end)
     {
-        buf += m_h264Parser->addBytes(buf, static_cast<unsigned int>(buf_end - buf), 0);
+        buf += m_AVCParser->addBytes(buf, static_cast<unsigned int>(buf_end - buf), 0);
 
-        if (m_h264Parser->stateChanged())
+        if (m_AVCParser->stateChanged())
         {
-            if (m_h264Parser->FieldType() != H264Parser::FIELD_BOTTOM)
+            if (m_AVCParser->getFieldType() != AVCParser::FIELD_BOTTOM)
             {
-                if (m_h264Parser->onFrameStart())
+                if (m_AVCParser->onFrameStart())
                     ++num_frames;
 
-                if (!m_h264Parser->onKeyFrameStart())
+                if (!m_AVCParser->onKeyFrameStart())
                     continue;
             }
             else
@@ -3259,10 +3259,10 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         }
 
         m_nextDecodedFrameIsKeyFrame = true;
-        float aspect = get_aspect(*m_h264Parser);
-        int width  = static_cast<int>(m_h264Parser->pictureWidthCropped());
-        int height = static_cast<int>(m_h264Parser->pictureHeightCropped());
-        double seqFPS = m_h264Parser->frameRate();
+        float aspect = get_aspect(*m_AVCParser);
+        int width  = static_cast<int>(m_AVCParser->pictureWidthCropped());
+        int height = static_cast<int>(m_AVCParser->pictureHeightCropped());
+        double seqFPS = m_AVCParser->frameRate();
 
         bool res_changed = ((width  != m_currentWidth) || (height != m_currentHeight));
         bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
@@ -3282,7 +3282,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             bool doublerate = false;
             bool decoderdeint = m_mythCodecCtx ? m_mythCodecCtx->IsDeinterlacing(doublerate, true) : false;
             m_parent->SetVideoParams(width, height, seqFPS, m_currentAspect, forcechange,
-                                     static_cast<int>(m_h264Parser->getRefFrames()),
+                                     static_cast<int>(m_AVCParser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
 
             // the SetVideoParams call above will have released all held frames

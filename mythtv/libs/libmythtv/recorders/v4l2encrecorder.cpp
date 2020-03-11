@@ -265,7 +265,7 @@ bool V4L2encRecorder::Open(void)
         return false;
     }
 
-    m_h264Parser.use_I_forKeyframes(false);
+    m_useIForKeyframe = false;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- Success.");
     return true;
@@ -321,7 +321,8 @@ bool V4L2encRecorder::PauseAndWait(int timeout)
 bool V4L2encRecorder::StartEncoding(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "V4L2encRecorder::StartEncoding() -- begin");
-    m_h264Parser.Reset();
+    if (m_h2645Parser != nullptr)
+        m_h2645Parser->Reset();
     m_waitForKeyframeOption = true;
     m_seenSps = false;
 

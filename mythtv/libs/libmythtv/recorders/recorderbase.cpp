@@ -790,7 +790,7 @@ void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
     }
 }
 
-void RecorderBase::FrameRateChange(uint framerate, long long frame)
+void RecorderBase::FrameRateChange(uint framerate, uint64_t frame)
 {
     if (m_curRecording)
     {

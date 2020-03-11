@@ -377,7 +377,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         if (m_driver == "hdpvr")
         {
             m_bufferSize = 1500 * TSPacket::kSize;
-            m_h264Parser.use_I_forKeyframes(false);
+            m_useIForKeyframe = false;
         }
     }
 
@@ -1214,6 +1214,9 @@ void MpegRecorder::Reset(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Reset(void)");
     ResetForNewFile();
 
+    if (m_h2645Parser != nullptr)
+        m_h2645Parser->Reset();
+
     m_startCode = 0xffffffff;
 
     if (m_curRecording)
@@ -1259,9 +1262,6 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
         if (m_driver == "hdpvr")
         {
-            m_h264Parser.Reset();
-            m_waitForKeyframeOption = true;
-            m_seenSps = false;
             // HD-PVR will sometimes reset to defaults
             SetV4L2DeviceOptions(m_chanfd);
         }
@@ -1319,10 +1319,12 @@ bool MpegRecorder::StartEncoding(void)
         }
     }
 
+    if (m_h2645Parser != nullptr)
+        m_h2645Parser->Reset();
+
     bool good_res = true;
     if (m_driver == "hdpvr")
     {
-        m_h264Parser.Reset();
         m_waitForKeyframeOption = true;
         m_seenSps = false;
         good_res = HandleResolutionChanges();

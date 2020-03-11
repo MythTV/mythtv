@@ -18,7 +18,7 @@ using namespace std;
 
 #include "streamlisteners.h"
 #include "recorderbase.h"
-#include "H264Parser.h"
+#include "H2645Parser.h"
 
 class MPEGStreamData;
 class TSPacket;
@@ -111,8 +111,8 @@ class DTVRecorder :
     bool FindMPEG2Keyframes(const TSPacket* tspacket);
 
     // MPEG4 AVC / H.264 TS support
-    bool FindH264Keyframes(const TSPacket* tspacket);
-    void HandleH264Keyframe(void);
+    bool FindH2645Keyframes(const TSPacket* tspacket);
+    void HandleH2645Keyframe(void);
 
     // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
     void FindPSKeyFrames(const uint8_t *buffer, uint len) override; // PSStreamListener
@@ -149,7 +149,7 @@ class DTVRecorder :
     // H.264 support
     bool                     m_pesSynced                  {false};
     bool                     m_seenSps                    {false};
-    H264Parser               m_h264Parser;
+    H2645Parser             *m_h2645Parser                {nullptr};
 
     /// Wait for the a GOP/SEQ-start before sending data
     bool                     m_waitForKeyframeOption      {true};
@@ -203,6 +203,8 @@ class DTVRecorder :
     // Music Choice
     // Comcast Music Choice uses 3 frames every 6 seconds and no key frames
     bool                     m_musicChoice                {false};
+
+    bool                     m_useIForKeyframe            {true};
 
     // constants
     /// If the number of regular frames detected since the last

@@ -1,5 +1,5 @@
 // MythTV headers
-#include "H264Parser.h"
+#include "AVCParser.h"
 #include <iostream>
 
 #include "mythlogging.h"
@@ -91,96 +91,56 @@ static const float eps = 1E-5;
 
 */
 
-H264Parser::H264Parser(void)
+AVCParser::AVCParser(void)
 {
-    m_rbspBuffer = new uint8_t[m_rbspBufferSize];
-    if (m_rbspBuffer == nullptr)
-        m_rbspBufferSize = 0;
-
     Reset();
 }
 
-void H264Parser::Reset(void)
+void AVCParser::Reset(void)
 {
-    m_stateChanged = false;
-    m_seenSps = false;
-    m_isKeyframe = false;
-    m_spsOffset = 0;
+    H2645Parser::Reset();
 
-    m_syncAccumulator = 0xffffffff;
-    m_auPending = false;
-
-    m_frameNum = -1;
-    m_prevFrameNum = -1;
-    m_sliceType = SLICE_UNDEF;
-    m_prevPicParameterSetId = -1;
-    m_picParameterSetId = -1;
-    m_prevFieldPicFlag = -1;
-    m_fieldPicFlag     = -1;
-    m_prevBottomFieldFlag = -1;
     m_bottomFieldFlag     = -1;
-    m_prevNALRefIdc = 111;  //  != [0|1|2|3]
-    m_nalRefIdc     = 111;  //  != [0|1|2|3]
-    m_prevPicOrderCntType = 0;
-    m_picOrderCntType     = 0;
-    m_prevPicOrderCntType = 0;
-    m_picOrderCntType     = 0;
-    m_prevPicOrderCntLsb = 0;
-    m_picOrderCntLsb     = 0;
-    m_prevDeltaPicOrderCntBottom = 0;
+    m_deltaPicOrderAlwaysZeroFlag = 0;
     m_deltaPicOrderCntBottom     = 0;
-    m_prevDeltaPicOrderCnt[0] = 0;
     m_deltaPicOrderCnt[0]     = 0;
-    m_prevDeltaPicOrderCnt[1] = 0;
     m_deltaPicOrderCnt[1]     = 0;
-    m_prevNalUnitType = UNKNOWN;
-    m_nalUnitType     = UNKNOWN;
-
+    m_fieldPicFlag     = -1;
+    m_frameMbsOnlyFlag = -1;
+    m_frameNum = -1;
     // The value of m_idrPicId shall be in the range of 0 to 65535, inclusive.
-    m_prevIdrPicId = 65536;
     m_idrPicId = 65536;
-
     m_log2MaxFrameNum = 0;
     m_log2MaxPicOrderCntLsb = 0;
-    m_seqParameterSetId = 0;
-
-    m_deltaPicOrderAlwaysZeroFlag = 0;
-    m_separateColourPlaneFlag = false;
-    m_chromaFormatIdc = 1;
-    m_frameMbsOnlyFlag = -1;
+    m_nalRefIdc     = 111;  //  != [0|1|2|3]
+    m_nalUnitType     = UNKNOWN;
+    m_numRefFrames    = 0;
+    m_picOrderCntLsb     = 0;
+    m_picOrderCntType     = 0;
     m_picOrderPresentFlag = -1;
-    m_redundantPicCntPresentFlag = 0;
-
-    m_numRefFrames = 0;
+    m_picParameterSetId = -1;
+    m_prevBottomFieldFlag = -1;
+    m_prevDeltaPicOrderCntBottom = 0;
+    m_prevDeltaPicOrderCnt[0] = 0;
+    m_prevDeltaPicOrderCnt[1] = 0;
+    m_prevFieldPicFlag = -1;
+    m_prevFrameNum = -1;
+    m_prevIdrPicId = 65536;
+    m_prevNALRefIdc = 111;  //  != [0|1|2|3]
+    m_prevNalUnitType = UNKNOWN;
+    m_prevPicOrderCntLsb = 0;
+    m_prevPicOrderCntType = 0;
+    m_prevPicParameterSetId = -1;
     m_redundantPicCnt = 0;
-
-//  m_picWidthInMbs = 0;
-//  m_picHeightInMapUnits = 0;
-    m_picWidth = 0;
-    m_picHeight = 0;
-    m_frameCropLeftOffset = 0;
-    m_frameCropRightOffset = 0;
-    m_frameCropTopOffset = 0;
-    m_frameCropBottomOffset = 0;
-    m_aspectRatioIdc = 0;
-    m_sarWidth = 0;
-    m_sarHeight = 0;
-    m_unitsInTick = 0;
-    m_timeScale = 0;
-    m_fixedRate = false;
-
-    m_pktOffset = 0;
-    m_auOffset = 0;
-    m_frameStartOffset = 0;
-    m_keyframeStartOffset = 0;
-    m_onFrame = false;
-    m_onKeyFrame = false;
+    m_redundantPicCntPresentFlag = 0;
+    m_seqParameterSetId = 0;
+    m_sliceType = SLICE_UNDEF;
 
     resetRBSP();
 }
 
 
-QString H264Parser::NAL_type_str(uint8_t type)
+QString AVCParser::NAL_type_str(int8_t type)
 {
     switch (type)
     {
@@ -216,7 +176,7 @@ QString H264Parser::NAL_type_str(uint8_t type)
     return "OTHER";
 }
 
-bool H264Parser::new_AU(void)
+bool AVCParser::new_AU(void)
 {
     /*
       An access unit consists of one primary coded picture, zero or more
@@ -335,91 +295,7 @@ bool H264Parser::new_AU(void)
     return result;
 }
 
-void H264Parser::resetRBSP(void)
-{
-    m_rbspIndex = 0;
-    m_consecutiveZeros = 0;
-    m_haveUnfinishedNAL = false;
-}
-
-bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
-                          bool found_start_code)
-{
-    /*
-      bitstream buffer, must be AV_INPUT_BUFFER_PADDING_SIZE
-      bytes larger then the actual data
-    */
-    uint32_t required_size = m_rbspIndex + byte_count +
-                             AV_INPUT_BUFFER_PADDING_SIZE;
-    if (m_rbspBufferSize < required_size)
-    {
-        // Round up to packet size
-        required_size = ((required_size / 188) + 1) * 188;
-
-        /* Need a bigger buffer */
-        auto *new_buffer = new uint8_t[required_size];
-
-        if (new_buffer == nullptr)
-        {
-            /* Allocation failed. Discard the new bytes */
-            LOG(VB_GENERAL, LOG_ERR,
-                "H264Parser::fillRBSP: FAILED to allocate RBSP buffer!");
-            return false;
-        }
-
-        /* Copy across bytes from old buffer */
-        memcpy(new_buffer, m_rbspBuffer, m_rbspIndex);
-        delete [] m_rbspBuffer;
-        m_rbspBuffer = new_buffer;
-        m_rbspBufferSize = required_size;
-    }
-
-    /* Fill rbsp while we have data */
-    while (byte_count)
-    {
-        /* Copy the byte into the rbsp, unless it
-         * is the 0x03 in a 0x000003 */
-        if (m_consecutiveZeros < 2 || *byteP != 0x03)
-            m_rbspBuffer[m_rbspIndex++] = *byteP;
-
-        if (*byteP == 0)
-            ++m_consecutiveZeros;
-        else
-            m_consecutiveZeros = 0;
-
-        ++byteP;
-        --byte_count;
-    }
-
-    /* If we've found the next start code then that, plus the first byte of
-     * the next NAL, plus the preceding zero bytes will all be in the rbsp
-     * buffer. Move rbsp_index++ back to the end of the actual rbsp data. We
-     * need to know the correct size of the rbsp to decode some NALs.
-     */
-    if (found_start_code)
-    {
-        if (m_rbspIndex >= 4)
-        {
-            m_rbspIndex -= 4;
-            while (m_rbspIndex > 0 && m_rbspBuffer[m_rbspIndex-1] == 0)
-                --m_rbspIndex;
-        }
-        else
-        {
-            /* This should never happen. */
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("H264Parser::fillRBSP: Found start code, rbsp_index "
-                        "is %1 but it should be >4")
-                    .arg(m_rbspIndex));
-        }
-    }
-
-    /* Stick some 0xff on the end for get_bits to run into */
-    memset(&m_rbspBuffer[m_rbspIndex], 0xff, AV_INPUT_BUFFER_PADDING_SIZE);
-    return true;
-}
-
-uint32_t H264Parser::addBytes(const uint8_t  *bytes,
+uint32_t AVCParser::addBytes(const uint8_t  *bytes,
                               const uint32_t  byte_count,
                               const uint64_t  stream_offset)
 {
@@ -432,7 +308,8 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
     while (startP < bytes + byte_count && !m_onFrame)
     {
         const uint8_t *endP = avpriv_find_start_code(startP,
-                                  bytes + byte_count, &m_syncAccumulator);
+                                                     bytes + byte_count,
+                                                     &m_syncAccumulator);
 
         bool found_start_code = ((m_syncAccumulator & 0xffffff00) == 0x00000100);
 
@@ -463,7 +340,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                  * problem with the stream or with this parser.
                  */
                 LOG(VB_GENERAL, LOG_ERR,
-                    "H264Parser::addBytes: Found new start "
+                    "AVCParser::addBytes: Found new start "
                     "code, but previous NAL is incomplete!");
             }
 
@@ -533,16 +410,14 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                      */
                       m_haveUnfinishedNAL = true;
                 }
-                else if (m_nalUnitType == AU_DELIMITER ||
-                        (m_nalUnitType > SPS_EXT &&
-                         m_nalUnitType < AUXILIARY_SLICE))
+                else if (m_nalUnitType == AU_DELIMITER)
                 {
                     set_AU_pending();
                 }
             }
             else
                 LOG(VB_GENERAL, LOG_ERR,
-                    "H264Parser::addbytes: malformed NAL units");
+                    "AVCParser::addbytes: malformed NAL units");
         } //found start code
     }
 
@@ -550,7 +425,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 }
 
 
-void H264Parser::processRBSP(bool rbsp_complete)
+void AVCParser::processRBSP(bool rbsp_complete)
 {
     GetBitContext gb;
 
@@ -577,7 +452,7 @@ void H264Parser::processRBSP(bool rbsp_complete)
 
         set_AU_pending();
 
-        if (!m_seenSps)
+        if (!m_seenSPS)
             m_spsOffset = m_pktOffset;
 
         decode_SPS(&gb);
@@ -615,7 +490,7 @@ void H264Parser::processRBSP(bool rbsp_complete)
          * determine if it is a keyframe or just a frame
          */
         m_auPending = false;
-        m_stateChanged = m_seenSps;
+        m_stateChanged = m_seenSPS;
 
         m_onFrame = true;
         m_frameStartOffset = m_auOffset;
@@ -631,7 +506,7 @@ void H264Parser::processRBSP(bool rbsp_complete)
 /*
   7.4.3 Slice header semantics
 */
-bool H264Parser::decode_Header(GetBitContext *gb)
+bool AVCParser::decode_Header(GetBitContext *gb)
 {
     m_isKeyframe = false;
 
@@ -728,6 +603,8 @@ bool H264Parser::decode_Header(GetBitContext *gb)
         m_fieldPicFlag = 0;
         m_bottomFieldFlag = -1;
     }
+
+    m_scanType = m_fieldPicFlag ? SCAN_t::INTERLACED : SCAN_t::PROGRESSIVE;
 
     /*
       m_idrPicId identifies an IDR picture. The values of m_idrPicId
@@ -827,9 +704,9 @@ bool H264Parser::decode_Header(GetBitContext *gb)
 /*
  * libavcodec used for example
  */
-void H264Parser::decode_SPS(GetBitContext * gb)
+void AVCParser::decode_SPS(GetBitContext * gb)
 {
-    m_seenSps = true;
+    m_seenSPS = true;
 
     int profile_idc = get_bits(gb, 8);
     get_bits1(gb);      // constraint_set0_flag
@@ -1023,10 +900,10 @@ void H264Parser::decode_SPS(GetBitContext * gb)
       is not present.
      */
     if (get_bits1(gb)) // vui_parameters_present_flag
-        vui_parameters(gb);
+        vui_parameters(gb, false);
 }
 
-void H264Parser::parse_SPS(uint8_t *sps, uint32_t sps_size,
+void AVCParser::parse_SPS(uint8_t *sps, uint32_t sps_size,
                            bool& interlaced, int32_t& max_ref_frames)
 {
     GetBitContext gb;
@@ -1036,7 +913,7 @@ void H264Parser::parse_SPS(uint8_t *sps, uint32_t sps_size,
     max_ref_frames = m_numRefFrames;
 }
 
-void H264Parser::decode_PPS(GetBitContext * gb)
+void AVCParser::decode_PPS(GetBitContext * gb)
 {
     /*
       m_picParameterSetId identifies the picture parameter set that
@@ -1111,7 +988,7 @@ void H264Parser::decode_PPS(GetBitContext * gb)
 #endif
 }
 
-void H264Parser::decode_SEI(GetBitContext *gb)
+void AVCParser::decode_SEI(GetBitContext *gb)
 {
     int   recovery_frame_cnt = -1;
 #if 0
@@ -1157,273 +1034,8 @@ void H264Parser::decode_SEI(GetBitContext *gb)
     }
 }
 
-void H264Parser::vui_parameters(GetBitContext * gb)
-{
-    /*
-      aspect_ratio_info_present_flag equal to 1 specifies that
-      m_aspectRatioIdc is present. aspect_ratio_info_present_flag
-      equal to 0 specifies that m_aspectRatioIdc is not present.
-     */
-    if (get_bits1(gb)) //aspect_ratio_info_present_flag
-    {
-        /*
-          m_aspectRatioIdc specifies the value of the sample aspect
-          ratio of the luma samples. Table E-1 shows the meaning of
-          the code. When m_aspectRatioIdc indicates Extended_SAR, the
-          sample aspect ratio is represented by m_sarWidth and
-          m_sarHeight. When the m_aspectRatioIdc syntax element is not
-          present, m_aspectRatioIdc value shall be inferred to be
-          equal to 0.
-         */
-        m_aspectRatioIdc = get_bits(gb, 8);
-
-        switch (m_aspectRatioIdc)
-        {
-          case 0: // NOLINT(bugprone-branch-clone)
-            // Unspecified
-            break;
-          case 1:
-            // 1:1
-            /*
-              1280x720 16:9 frame without overscan
-              1920x1080 16:9 frame without overscan (cropped from 1920x1088)
-              640x480 4:3 frame without overscan
-             */
-            break;
-          case 2:
-            // 12:11
-            /*
-              720x576 4:3 frame with horizontal overscan
-              352x288 4:3 frame without overscan
-             */
-            break;
-          case 3:
-            // 10:11
-            /*
-              720x480 4:3 frame with horizontal overscan
-              352x240 4:3 frame without overscan
-             */
-            break;
-          case 4:
-            // 16:11
-            /*
-              720x576 16:9 frame with horizontal overscan
-              540x576 4:3 frame with horizontal overscan
-             */
-            break;
-          case 5:
-            // 40:33
-            /*
-              720x480 16:9 frame with horizontal overscan
-              540x480 4:3 frame with horizontal overscan
-             */
-            break;
-          case 6:
-            // 24:11
-            /*
-              352x576 4:3 frame without overscan
-              540x576 16:9 frame with horizontal overscan
-             */
-            break;
-          case 7:
-            // 20:11
-            /*
-              352x480 4:3 frame without overscan
-              480x480 16:9 frame with horizontal overscan
-             */
-            break;
-          case 8:
-            // 32:11
-            /*
-              352x576 16:9 frame without overscan
-             */
-            break;
-          case 9:
-            // 80:33
-            /*
-              352x480 16:9 frame without overscan
-             */
-            break;
-          case 10:
-            // 18:11
-            /*
-              480x576 4:3 frame with horizontal overscan
-             */
-            break;
-          case 11:
-            // 15:11
-            /*
-              480x480 4:3 frame with horizontal overscan
-             */
-            break;
-          case 12:
-            // 64:33
-            /*
-              540x576 16:9 frame with horizontal overscan
-             */
-            break;
-          case 13:
-            // 160:99
-            /*
-              540x576 16:9 frame with horizontal overscan
-             */
-            break;
-          case EXTENDED_SAR:
-            m_sarWidth  = get_bits(gb, 16);
-            m_sarHeight = get_bits(gb, 16);
-            break;
-        }
-    }
-    else
-        m_sarWidth = m_sarHeight = 0;
-
-    if (get_bits1(gb)) //overscan_info_present_flag
-        get_bits1(gb); //overscan_appropriate_flag
-
-    if (get_bits1(gb)) //video_signal_type_present_flag
-    {
-        get_bits(gb, 3); //video_format
-        get_bits1(gb);   //video_full_range_flag
-        if (get_bits1(gb)) // colour_description_present_flag
-        {
-            get_bits(gb, 8); // colour_primaries
-            get_bits(gb, 8); // transfer_characteristics
-            get_bits(gb, 8); // matrix_coefficients
-        }
-    }
-
-    if (get_bits1(gb)) //chroma_loc_info_present_flag
-    {
-        get_ue_golomb(gb); //chroma_sample_loc_type_top_field ue(v)
-        get_ue_golomb(gb); //chroma_sample_loc_type_bottom_field ue(v)
-    }
-
-    if (get_bits1(gb)) //timing_info_present_flag
-    {
-        m_unitsInTick = get_bits_long(gb, 32); //num_units_in_tick
-        m_timeScale = get_bits_long(gb, 32);   //time_scale
-        m_fixedRate = (get_bits1(gb) != 0U);
-    }
-}
-
-double H264Parser::frameRate(void) const
-{
-    uint64_t num   = 500 * (uint64_t)m_timeScale; /* 1000 * 0.5 */
-    double   fps   = ( m_unitsInTick != 0 ? num / (double)m_unitsInTick : 0 ) / 1000;
-
-    return fps;
-}
-
-void H264Parser::getFrameRate(FrameRate &result) const
-{
-    if (m_unitsInTick == 0)
-        result = FrameRate(0);
-    else if (m_timeScale & 0x1)
-        result = FrameRate(m_timeScale, m_unitsInTick * 2);
-    else
-        result = FrameRate(m_timeScale / 2, m_unitsInTick);
-}
-
-uint H264Parser::getRefFrames(void) const
-{
-    return m_numRefFrames;
-}
-
-uint H264Parser::aspectRatio(void) const
-{
-
-    double aspect = 0.0;
-
-    if (m_picHeight)
-        aspect = pictureWidthCropped() / (double)pictureHeightCropped();
-
-    switch (m_aspectRatioIdc)
-    {
-        case 0: // Unspecified
-        case 1: // 1:1
-            break;
-        case 2:
-            // 12:11
-            aspect *= 1.0909090909090908;
-            break;
-        case 3:
-            // 10:11
-            aspect *= 0.90909090909090906;
-            break;
-        case 4:
-            // 16:11
-            aspect *= 1.4545454545454546;
-            break;
-        case 5:
-            // 40:33
-            aspect *= 1.2121212121212122;
-            break;
-        case 6:
-            // 24:11
-            aspect *= 2.1818181818181817;
-            break;
-        case 7:
-            // 20:11
-            aspect *= 1.8181818181818181;
-            break;
-        case 8:
-            // 32:11
-            aspect *= 2.9090909090909092;
-            break;
-        case 9:
-            // 80:33
-            aspect *= 2.4242424242424243;
-            break;
-        case 10:
-            // 18:11
-            aspect *= 1.6363636363636365;
-            break;
-        case 11:
-            // 15:11
-            aspect *= 1.3636363636363635;
-            break;
-        case 12:
-            // 64:33
-            aspect *= 1.9393939393939394;
-            break;
-        case 13:
-            // 160:99
-            aspect *= 1.6161616161616161;
-            break;
-        case 14:
-            // 4:3
-            aspect *= 1.3333333333333333;
-            break;
-        case 15:
-            // 3:2
-            aspect *= 1.5;
-            break;
-        case 16:
-            // 2:1
-            aspect *= 2.0;
-            break;
-        case EXTENDED_SAR:
-            if (m_sarHeight)
-                aspect *= m_sarWidth / (double)m_sarHeight;
-            else
-                aspect = 0.0;
-            break;
-    }
-
-    if (aspect == 0.0)
-        return 0;
-    if (fabs(aspect - 1.3333333333333333) < static_cast<double>(eps))
-        return 2;
-    if (fabs(aspect - 1.7777777777777777) < static_cast<double>(eps))
-        return 3;
-    if (fabs(aspect - 2.21) < static_cast<double>(eps))
-        return 4;
-
-    return aspect * 1000000;
-}
-
 // Following the lead of libavcodec, ignore the left cropping.
-uint H264Parser::pictureWidthCropped(void) const
+uint AVCParser::pictureWidthCropped(void) const
 {
     uint ChromaArrayType = m_separateColourPlaneFlag ? 0 : m_chromaFormatIdc;
     uint CropUnitX = 1;
@@ -1435,7 +1047,7 @@ uint H264Parser::pictureWidthCropped(void) const
 }
 
 // Following the lead of libavcodec, ignore the top cropping.
-uint H264Parser::pictureHeightCropped(void) const
+uint AVCParser::pictureHeightCropped(void) const
 {
     uint ChromaArrayType = m_separateColourPlaneFlag ? 0 : m_chromaFormatIdc;
     uint CropUnitY = 2 - m_frameMbsOnlyFlag;
@@ -1444,4 +1056,41 @@ uint H264Parser::pictureHeightCropped(void) const
         CropUnitY *= SubHeightC;
     uint crop = CropUnitY * m_frameCropBottomOffset;
     return m_picHeight - crop;
+}
+
+H2645Parser::field_type AVCParser::getFieldType(void) const
+{
+    if (m_bottomFieldFlag == -1)
+        return FRAME;
+    return m_bottomFieldFlag ? FIELD_BOTTOM : FIELD_TOP;
+}
+
+/* H.264
+
+   num_units_in_tick is the number of time units of a clock operating
+   at the frequency time_scale Hz that corresponds to one increment
+   (called a clock tick) of a clock tick counter. num_units_in_tick
+   shall be greater than 0. A clock tick is the minimum interval of
+   time that can be represented in the coded data. For example, when
+   the frame rate of a video signal is 30 000 ÷ 1001 Hz, time_scale
+   may be equal to 60 000 and num_units_in_tick may be equal to
+   1001. See Equation C-1.
+*/
+
+double AVCParser::frameRate(void) const
+{
+    uint64_t num   = 500 * (uint64_t)m_timeScale; /* 1000 * 0.5 */
+    double   fps   = ( m_unitsInTick != 0 ? num / (double)m_unitsInTick : 0 ) / 1000;
+
+    return fps;
+}
+
+void AVCParser::getFrameRate(FrameRate &result) const
+{
+    if (m_unitsInTick == 0)
+        result = FrameRate(0);
+    else if (m_timeScale & 0x1)
+        result = FrameRate(m_timeScale, m_unitsInTick * 2);
+    else
+        result = FrameRate(m_timeScale / 2, m_unitsInTick);
 }
