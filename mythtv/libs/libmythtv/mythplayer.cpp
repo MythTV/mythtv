@@ -207,7 +207,8 @@ MythPlayer::~MythPlayer(void)
     delete m_detectLetterBox;
     m_detectLetterBox = nullptr;
 
-    MythDisplay::AcquireRelease(false);
+    if (m_display)
+        MythDisplay::AcquireRelease(false);
 }
 
 void MythPlayer::SetWatchingRecording(bool mode)
