@@ -1360,6 +1360,47 @@ void TV::PlaybackLoop(void)
             const PlayerContext *mctx = GetPlayerReadLock(i, __FILE__, __LINE__);
             if (mctx)
             {
+                // If the master player is using hardware decoding then it may
+                // callback to the UI thread at any point when creating or destroying
+                // a hardware context and may be holding avcodeclock. If this happens
+                // the secondary players will almost certainly block so try and
+                // catch callbacks before we enter EventLoop and VideoLoop for
+                // the secondary players.
+                // NOTE this is not perfect. It should catch most cases but if
+                // the master player calls back during EventLoop or VideoLoop
+                // it may still deadlock. This needs a complete re-work of avcodeclock
+                // which is now ubiquitous throughout the decoding code - and is
+                // probably now used inappropriately (avcodeclock is a global static).
+                if (i > 0)
+                {
+                    // ensure we don't introduce another lockup. If we fail to get
+                    // the lock, just continue. We will miss a pip frame but that
+                    // is not fatal.
+                    int tries = 10;
+                    while (--tries && !avcodeclock->tryLock(10))
+                    {
+                        PlayerContext *master = GetPlayerReadLock(0, __FILE__, __LINE__);
+                        if (master && master->m_player)
+                        {
+                            master->LockDeletePlayer(__FILE__, __LINE__);
+                            master->m_player->ProcessCallbacks();
+                            master->UnlockDeletePlayer(__FILE__, __LINE__);
+                        }
+                        ReturnPlayerLock(master);
+                    }
+
+                    if (tries)
+                    {
+                        avcodeclock->unlock();
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to get PiP lock");
+                        ReturnPlayerLock(mctx);
+                        continue;
+                    }
+                }
+
                 mctx->LockDeletePlayer(__FILE__, __LINE__);
                 if (mctx->m_player && !mctx->m_player->IsErrored())
                 {
