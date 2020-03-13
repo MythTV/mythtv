@@ -707,8 +707,8 @@ class DVBTModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
     {
         setLabel(QObject::tr("Modulation System"));
         setHelpText(QObject::tr("Modulation System (Default: DVB-T2)"));
-        addSelection(QObject::tr("DVB-T"),  "DVB-T");
-        addSelection(QObject::tr("DVB-T2"), "DVB-T2", true);
+        addSelection("DVB-T",  "DVB-T");
+        addSelection("DVB-T2", "DVB-T2", true);
     };
 };
 
@@ -720,8 +720,8 @@ class DVBSModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
     {
         setLabel(QObject::tr("Modulation System"));
         setHelpText(QObject::tr("Modulation System (Default: DVB-S2)"));
-        addSelection(QObject::tr("DVB-S"),  "DVB-S");
-        addSelection(QObject::tr("DVB-S2"), "DVB-S2", true);
+        addSelection("DVB-S",  "DVB-S");
+        addSelection("DVB-S2", "DVB-S2", true);
     }
 };
 
@@ -733,9 +733,9 @@ class DVBCModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
     {
         setLabel(QObject::tr("Modulation System"));
         setHelpText(QObject::tr("Modulation System (Default: DVB-C/A)"));
-        addSelection(QObject::tr("DVB-C/A"), "DVB-C/A", true);
-        addSelection(QObject::tr("DVB-C/B"), "DVB-C/B");
-        addSelection(QObject::tr("DVB-C/C"), "DVB-C/C");
+        addSelection("DVB-C/A", "DVB-C/A", true);
+        addSelection("DVB-C/B", "DVB-C/B");
+        addSelection("DVB-C/C", "DVB-C/C");
     }
 };
 
