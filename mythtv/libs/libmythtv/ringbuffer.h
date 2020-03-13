@@ -310,7 +310,6 @@ class MTV_PUBLIC RingBuffer : protected MThread
     static QStringList s_subExtNoCheck;
 
   private:
-    static bool gAVformat_net_initialised;
     bool m_bitrateInitialized {false};
 };
 

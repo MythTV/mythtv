@@ -48,7 +48,6 @@ QStringList RingBuffer::s_subExtNoCheck;
 extern "C" {
 #include "libavformat/avformat.h"
 }
-bool        RingBuffer::gAVformat_net_initialised = false;
 
 /*
   Locking relations:
@@ -1941,12 +1940,13 @@ BDRingBuffer  *RingBuffer::BD(void)
 
 void RingBuffer::AVFormatInitNetwork(void)
 {
-    QMutexLocker lock(avcodeclock);
-
-    if (!gAVformat_net_initialised)
+    static QMutex s_avnetworkLock(QMutex::Recursive);
+    static bool s_avnetworkInitialised = false;
+    QMutexLocker lock(&s_avnetworkLock);
+    if (!s_avnetworkInitialised)
     {
         avformat_network_init();
-        gAVformat_net_initialised = true;
+        s_avnetworkInitialised = true;
     }
 }
 
