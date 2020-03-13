@@ -49,10 +49,6 @@ RecorderBase::RecorderBase(TVRec *rec)
     : m_tvrec(rec)
 {
     RecorderBase::ClearStatistics();
-    QMutexLocker locker(avcodeclock);
-#if 0
-    avcodec_init(); // init CRC's
-#endif
 }
 
 RecorderBase::~RecorderBase(void)
