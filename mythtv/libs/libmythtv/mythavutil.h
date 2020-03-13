@@ -81,10 +81,7 @@ private:
  * an AVStream and its AVCodecContext. The codec member
  * of AVStream was previously used for this but is now
  * deprecated.
- *
- * This is a singeton class - only 1 instance gets created.
  */
-
 class MTV_PUBLIC MythCodecMap
 {
   public:
@@ -99,10 +96,6 @@ class MTV_PUBLIC MythCodecMap
     QMap<const AVStream*, AVCodecContext*> m_streamMap;
     QMutex m_mapLock {QMutex::Recursive};
 };
-
-/// This global variable contains the MythCodecMap instance for the app
-extern MTV_PUBLIC MythCodecMap *gCodecMap;
-
 
 class MythAVCopyPrivate;
 

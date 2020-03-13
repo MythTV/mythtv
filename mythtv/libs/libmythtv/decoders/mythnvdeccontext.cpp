@@ -95,8 +95,9 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
             .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
             .arg((*Context)->width).arg((*Context)->height);
 
+    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     // and finally try and retrieve the actual FFmpeg decoder
-    if (supported)
+    if (supported && decoder)
     {
         for (int i = 0; ; i++)
         {
@@ -115,8 +116,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
                     *Codec = codec;
-                    gCodecMap->freeCodecContext(Stream);
-                    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+                    decoder->CodecMap()->freeCodecContext(Stream);
+                    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
                     return success;
                 }
                 break;

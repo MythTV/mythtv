@@ -100,6 +100,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SetEof(bool eof) override; // DecoderBase
 
+    MythCodecMap* CodecMap(void);
     void CloseCodecs();
     void CloseContext();
     void Reset(bool reset_video_data, bool seek_reset,
@@ -268,6 +269,8 @@ class AvFormatDecoder : public DecoderBase
     H264Parser        *m_h264Parser                   {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
+    MythCodecMap       m_codecMap                     { };
+
     // AVFormatParameters params;
 
     URLContext         m_readContext                  {};

@@ -4,6 +4,7 @@
 #include "mythconfig.h"
 #include "filewriterbase.h"
 #include "avfringbuffer.h"
+#include "mythavutil.h"
 
 #include <QList>
 
@@ -16,7 +17,7 @@ extern "C" {
 class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 {
   public:
-    AVFormatWriter() = default;;
+    AVFormatWriter() = default;
    ~AVFormatWriter() override;
 
     bool Init(void) override; // FileWriterBase
@@ -47,6 +48,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 
     AVOutputFormat         m_fmt           {};
     AVFormatContext       *m_ctx           {nullptr};
+    MythCodecMap           m_codecMap      {};
     AVStream              *m_videoStream   {nullptr};
     AVCodec               *m_avVideoCodec  {nullptr};
     AVStream              *m_audioStream   {nullptr};

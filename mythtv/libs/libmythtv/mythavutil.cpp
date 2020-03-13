@@ -504,9 +504,6 @@ MythPictureDeinterlacer::~MythPictureDeinterlacer()
     }
 }
 
-
-MythCodecMap *gCodecMap = new MythCodecMap();
-
 MythCodecMap::~MythCodecMap()
 {
     freeAllCodecContexts();

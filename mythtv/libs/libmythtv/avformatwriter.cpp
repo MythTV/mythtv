@@ -239,7 +239,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     av_init_packet(&pkt);
     pkt.data = nullptr;
     pkt.size = 0;
-    AVCodecContext *avctx = gCodecMap->getCodecContext(m_videoStream);
+    AVCodecContext *avctx = m_codecMap.getCodecContext(m_videoStream);
     {
         QMutexLocker locker(avcodeclock);
         ret = avcodec_encode_video2(avctx, &pkt,
@@ -310,7 +310,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     bool got_packet = false;
     int ret = 0;
-    AVCodecContext *avctx = gCodecMap->getCodecContext(m_audioStream);
+    AVCodecContext *avctx = m_codecMap.getCodecContext(m_audioStream);
     int samples_per_avframe  = m_audioFrameSize * m_audioChannels;
     int sampleSizeIn   = AudioOutputSettings::SampleSize(FORMAT_S16);
     AudioFormat format =
@@ -455,8 +455,8 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         return nullptr;
     }
 
-    gCodecMap->freeCodecContext(st);
-    AVCodecContext *c = gCodecMap->getCodecContext(st, codec);
+    m_codecMap.freeCodecContext(st);
+    AVCodecContext *c = m_codecMap.getCodecContext(st, codec);
 
     c->codec                      = codec;
     c->codec_id                   = m_ctx->oformat->video_codec;
@@ -565,7 +565,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
 
 bool AVFormatWriter::OpenVideo(void)
 {
-    AVCodecContext *c = gCodecMap->getCodecContext(m_videoStream);
+    AVCodecContext *c = m_codecMap.getCodecContext(m_videoStream);
 
     if (!m_width || !m_height)
         return false;
@@ -606,7 +606,7 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     }
     st->id = 1;
 
-    AVCodecContext *c = gCodecMap->getCodecContext(st, nullptr, true);
+    AVCodecContext *c = m_codecMap.getCodecContext(st, nullptr, true);
 
     c->codec_id     = m_ctx->oformat->audio_codec;
     c->codec_type   = AVMEDIA_TYPE_AUDIO;
@@ -649,7 +649,7 @@ bool AVFormatWriter::FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFo
 
 bool AVFormatWriter::OpenAudio(void)
 {
-    AVCodecContext *c = gCodecMap->getCodecContext(m_audioStream);
+    AVCodecContext *c = m_codecMap.getCodecContext(m_audioStream);
 
     c->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
