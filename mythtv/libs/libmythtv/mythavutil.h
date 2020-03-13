@@ -90,7 +90,6 @@ class MTV_PUBLIC MythCodecMap
   public:
     MythCodecMap() = default;
     ~MythCodecMap();
-    static MythCodecMap *getInstance();
     AVCodecContext *getCodecContext(const AVStream *stream,
         const AVCodec *pCodec = nullptr, bool nullCodec = false);
     AVCodecContext *hasCodecContext(const AVStream *stream);
