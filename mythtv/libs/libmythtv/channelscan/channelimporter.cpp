@@ -109,6 +109,16 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Channels not found in scan but only in DB are returned in db_trans
     sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (!db_trans.empty())
+        {
+            cout << endl;
+            cout << "Transport list of transports with channels in DB but not in scan (";
+            cout << db_trans.size() << "):" << endl;
+            cout << FormatTransports(db_trans).toLatin1().constData() << endl;
+        }
+    }
 
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
@@ -411,6 +421,17 @@ void ChannelImporter::InsertChannels(
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, inserted, skipped_inserts);
+        }
+    }
+
+    // Updated transports
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (!updated.empty())
+        {
+            cout << endl;
+            cout << "Transport list (updated) (" << updated.size() << "):" << endl;
+            cout << FormatTransports(updated).toLatin1().constData() << endl;
         }
     }
 
@@ -928,6 +949,8 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
                 if (!found_same)
                     transports[i].m_channels.push_back(transports[j].m_channels[k]);
             }
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Duplicate transport ") + FormatTransport(transports[j]));
             ignore[j] = true;
         }
         no_dups.push_back(transports[i]);
@@ -1567,9 +1590,12 @@ int ChannelImporter::SimpleCountChannels(
 /**
  * \fn ChannelImporter::ComputeSuggestedChannelNum
  *
- * Compute a suggested channel number based on various aspects of the
- * channel information. Check to see if this channel number conflicts
- * with an existing channel number. If so, fall back to incrementing a
+ * Compute a suggested channel number that is unique in the video source.
+ * Check first to see if the existing channel number conflicts
+ * with an existing channel number. If so, try adding a suffix
+ * starting with 'A' to make the number unique while still being
+ * recognizable. For instance, the second "7-2" channel will be called "7-2A".
+ * If this fails then fall back to incrementing a
  * per-source number to find an unused value.
  *
  * \param chan       Info describing a channel
@@ -1580,49 +1606,18 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
 {
     static QMutex          s_lastFreeLock;
     static QMap<uint,uint> s_lastFreeChanNumMap;
+    QString chanNum;
 
     // Suggest existing channel number if non-conflicting
     if (!ChannelUtil::IsConflicting(chan.m_chanNum, chan.m_sourceId))
         return chan.m_chanNum;
 
-    // ATSC major-minor channel number
-    QString channelFormat = "%1_%2";
-    QString chan_num = channelFormat
-        .arg(chan.m_atscMajorChannel)
-        .arg(chan.m_atscMinorChannel);
-    if (chan.m_atscMajorChannel)
+    // Add a suffix to make it unique
+    for (char suffix = 'A'; suffix <= 'Z'; ++suffix)
     {
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-    }
-
-    // DVB
-    if (chan.m_siStandard == "dvb")
-    {
-        // Service ID
-        chan_num = QString("%1").arg(chan.m_serviceId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-
-        // Frequency ID (channel) - Service ID
-        if (!chan.m_freqId.isEmpty())
-        {
-            chan_num = QString("%1-%2")
-                          .arg(chan.m_freqId)
-                          .arg(chan.m_serviceId);
-            if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-                return chan_num;
-        }
-
-        // Service ID - Network ID
-        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_netId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-
-        // Service ID - Transport ID
-        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_patTsId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
+        chanNum = chan.m_chanNum + suffix;
+        if (!ChannelUtil::IsConflicting(chanNum, chan.m_sourceId))
+            return chanNum;
     }
 
     // Find unused channel number
@@ -1630,14 +1625,14 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     uint last_free_chan_num = s_lastFreeChanNumMap[chan.m_sourceId];
     for (last_free_chan_num++; ; ++last_free_chan_num)
     {
-        chan_num = QString::number(last_free_chan_num);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
+        chanNum = QString::number(last_free_chan_num);
+        if (!ChannelUtil::IsConflicting(chanNum, chan.m_sourceId))
             break;
     }
     // cppcheck-suppress unreadVariable
     s_lastFreeChanNumMap[chan.m_sourceId] = last_free_chan_num;
 
-    return chan_num;
+    return chanNum;
 }
 
 ChannelImporter::DeleteAction
