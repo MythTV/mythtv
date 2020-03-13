@@ -289,10 +289,7 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt, boo
     if (Retry)
         return ret;
 
-    if( ret &&
-        m_curContext &&
-        pts != AV_NOPTS_VALUE &&
-        pts + pkt->duration == m_curContext->GetSeqEndPTS())
+    if (ret && m_curContext && (pts != AV_NOPTS_VALUE) && (pts + pkt->duration == m_curContext->GetSeqEndPTS()))
     {
         // If this video frame is the last in the sequence,
         // make a copy of it so we can 'generate' more
@@ -411,15 +408,16 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     if (!m_ringBuffer->IsDVD())
         return;
 
+    QWriteLocker locker(&m_trackLock);
+
     if (m_tracks[kTrackTypeAudio].size() > 1)
     {
-        stable_sort(m_tracks[kTrackTypeAudio].begin(),
-                    m_tracks[kTrackTypeAudio].end());
+        stable_sort(m_tracks[kTrackTypeAudio].begin(), m_tracks[kTrackTypeAudio].end());
 
         int trackNo = -1;
         int dvdTrack = m_ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
 
-        for (uint i = 0; i < GetTrackCount(kTrackTypeAudio); i++)
+        for (uint i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("DVD Audio Track Map Stream id #%1, av_stream_idx %2, MPEG stream 0x%3, lang %4")
@@ -433,10 +431,10 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
             // list should be in the same order but can have gaps,
             // so we look for the track with the same index)
             if (m_tracks[kTrackTypeAudio][i].m_stream_id == dvdTrack)
-                trackNo = i;
+                trackNo = static_cast<int>(i);
         }
 
-        if (trackNo < 0 && GetTrackCount(kTrackTypeAudio) > 0)
+        if (trackNo < 0 && (m_tracks[kTrackTypeAudio].size() > 0))
         {
             // Take the first track
             trackNo = 0;
@@ -453,11 +451,10 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
 
         // First, create a map containing stream id -> track index
         // of the subtitle streams that have been found so far.
-        for (uint n = 0; n < GetTrackCount(kTrackTypeSubtitle); n++)
+        for (uint n = 0; n < m_tracks[kTrackTypeSubtitle].size(); n++)
         {
             int stream_id = m_tracks[kTrackTypeSubtitle][n].m_stream_id & 0x1f;
-
-            stream2idx[stream_id] = n;
+            stream2idx[stream_id] = static_cast<int>(n);
         }
 
         // Get all subtitle tracks from the DVD and filter out any that
@@ -472,8 +469,8 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
                 if (streamid >= 0)
                 {
                     // This stream is mapped in the current program chain
-                    int lang = m_ringBuffer->DVD()->GetSubtitleLanguage(i);
-                    int lang_indx = lang_sub_cnt[lang]++;
+                    int lang = static_cast<int>(m_ringBuffer->DVD()->GetSubtitleLanguage(static_cast<int>(i)));
+                    int lang_indx = static_cast<int>(lang_sub_cnt[lang]++);
                     int trackNo = -1;
 
                     if (stream2idx.count(streamid) != 0)
@@ -483,16 +480,16 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
                     {
                         // Create a dummy track if the physical stream has not
                         // yet been seen.
-                        filteredTracks.push_back(StreamInfo(-1, lang, lang_indx,
+                        filteredTracks.push_back(StreamInfo(-1, lang, static_cast<uint>(lang_indx),
                                                             streamid, 0, 0, false, false, false));
                     }
                     else
                     {
                         // Otherwise use the real data
-                        filteredTracks.push_back(m_tracks[kTrackTypeSubtitle][trackNo]);
+                        filteredTracks.push_back(m_tracks[kTrackTypeSubtitle][static_cast<uint>(trackNo)]);
                         filteredTracks.back().m_stream_id &= 0x1f;
                         filteredTracks.back().m_language = lang;
-                        filteredTracks.back().m_language_index = lang_indx;
+                        filteredTracks.back().m_language_index = static_cast<uint>(lang_indx);
                     }
                 }
             }
@@ -507,7 +504,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
 
         // Now iterate over the sorted list and try to find the index of the
         // currently selected track.
-        for (uint idx = 0; idx < GetTrackCount(kTrackTypeSubtitle); idx++)
+        for (uint idx = 0; idx < m_tracks[kTrackTypeSubtitle].size(); idx++)
         {
             const StreamInfo& stream = m_tracks[kTrackTypeSubtitle][idx];
             int avidx = stream.m_av_stream_index;
@@ -526,11 +523,11 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
                     .arg(iso639_key_toName(stream. m_language)));
 
             if ((selectedStream != -1) && (stream.m_stream_id == selectedStream))
-                trackNo = (int)idx;
+                trackNo = static_cast<int>(idx);
         }
 
         uint captionmode = m_parent->GetCaptionMode();
-        int trackcount = (int)GetTrackCount(kTrackTypeSubtitle);
+        int trackcount = static_cast<int>(m_tracks[kTrackTypeSubtitle].size());
 
         if (captionmode == kDisplayAVSubtitle &&
             (trackNo < 0 || trackNo >= trackcount))
@@ -575,15 +572,14 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
     if (m_streamsChanged)
     {
         // This was originally in HandleDVDStreamChange
-        QMutexLocker locker(avcodeclock);
+        m_trackLock.lockForWrite();
         ScanStreams(true);
-        avcodeclock->unlock();
+        m_trackLock.unlock();
         m_streamsChanged=false;
     }
 
     // Update the title length
-    if (m_parent->AtNormalSpeed() &&
-        m_ringBuffer->DVD()->PGCLengthChanged())
+    if (m_parent->AtNormalSpeed() && m_ringBuffer->DVD()->PGCLengthChanged())
     {
         ResetPosMap();
         SyncPositionMap();
@@ -601,7 +597,9 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
         AVStream *st = m_ic->streams[i];
         if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            m_selectedTrack[kTrackTypeVideo].m_av_stream_index = i;
+            m_trackLock.lockForWrite();
+            m_selectedTrack[kTrackTypeVideo].m_av_stream_index = static_cast<int>(i);
+            m_trackLock.unlock();
             break;
         }
     }
@@ -613,8 +611,8 @@ int AvFormatDecoderDVD::GetAudioLanguage(uint audio_index, uint stream_index)
     if ((m_ic->streams[stream_index]->id >= 0) &&
         m_ringBuffer && m_ringBuffer->IsDVD())
     {
-        return m_ringBuffer->DVD()->GetAudioLanguage(
-            m_ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[stream_index]->id));
+        auto track = m_ringBuffer->DVD()->GetAudioTrackNum(static_cast<uint>(m_ic->streams[stream_index]->id));
+        return static_cast<int>(m_ringBuffer->DVD()->GetAudioLanguage(track));
     }
     return iso639_str3_to_key("und");
 }
@@ -659,20 +657,17 @@ AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
         type = m_ringBuffer->DVD()->GetAudioTrackType(logical_idx);
     }
 
-    if (type > 0 && type < 5) // These are the only types defined in unofficial documentation
+     // These are the only types defined in unofficial documentation
+    if (type > 0 && type < 5)
     {
         AudioTrackType ret = kAudioTypeNormal;
         switch (type)
         {
-            case 1:
-                ret = kAudioTypeNormal;
-                break;
-            case 2:
-                ret = kAudioTypeAudioDescription;
-                break;
-            case 3: case 4:
-                ret = kAudioTypeCommentary;
-                break;
+            case 1: return kAudioTypeNormal;
+            case 2: return kAudioTypeAudioDescription;
+            case 3:
+            case 4: return kAudioTypeCommentary;
+            default: break;
         }
         return ret;
     }

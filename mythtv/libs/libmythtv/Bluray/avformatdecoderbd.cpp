@@ -66,12 +66,11 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
     {
         // This was originally in HandleBDStreamChange
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
-        QMutexLocker locker(avcodeclock);
+        QReadLocker locker(&m_trackLock);
         Reset(true, false, false);
         CloseCodecs();
         FindStreamInfo();
         ScanStreams(false);
-        avcodeclock->unlock();
         m_streamsChanged=false;
     }
 

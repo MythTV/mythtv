@@ -148,8 +148,8 @@ class AvFormatDecoder : public DecoderBase
     void ForceSetupAudioStream(void) override; // DecoderBase
     void AddTextData(unsigned char *buf, int len, int64_t timecode, char type);
 
-    QString GetTrackDesc(uint type, uint trackNo) const override; // DecoderBase
-    int SetTrack(uint type, int trackNo) override; // DecoderBase
+    QString GetTrackDesc(uint Type, uint TrackNo) override;
+    int SetTrack(uint Type, int TrackNo) override;
 
     int ScanStreams(bool novideo);
     int FindStreamInfo(void);
@@ -168,21 +168,20 @@ class AvFormatDecoder : public DecoderBase
 
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
-    QString GetXDS(const QString &key) const override; // DecoderBase
-    QByteArray GetSubHeader(uint trackNo) const override; // DecoderBase
-    void GetAttachmentData(uint trackNo, QByteArray &filename,
-                           QByteArray &data) override; // DecoderBase
+    QString GetXDS(const QString &Key) const override; // DecoderBase
+    QByteArray GetSubHeader(uint TrackNo) override;
+    void GetAttachmentData(uint TrackNo, QByteArray &Dilename, QByteArray &Data) override; // DecoderBase
 
     // MHEG stuff
-    bool SetAudioByComponentTag(int tag) override; // DecoderBase
-    bool SetVideoByComponentTag(int tag) override; // DecoderBase
+    bool SetAudioByComponentTag(int Tag) override; // DecoderBase
+    bool SetVideoByComponentTag(int Tag) override; // DecoderBase
 
     // Stream language info
-    virtual int GetTeletextLanguage(uint lang_idx) const;
-    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetCaptionLanguage(TrackType trackType, int service_num);
-    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
-    virtual AudioTrackType GetAudioTrackType(uint stream_index);
+    virtual int GetTeletextLanguage(uint Index);
+    virtual int GetSubtitleLanguage(uint, uint StreamIndex);
+    virtual int GetCaptionLanguage(TrackType TrackType, int ServiceNum);
+    virtual int GetAudioLanguage(uint AudioIndex, uint StreamIndex);
+    virtual AudioTrackType GetAudioTrackType(uint StreamIndex);
 
     static int GetMaxReferenceFrames(AVCodecContext *Context);
 
