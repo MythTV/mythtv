@@ -405,7 +405,6 @@ void AvFormatDecoder::CloseCodecs()
     {
         for (uint i = 0; i < m_ic->nb_streams; i++)
         {
-            QMutexLocker locker(avcodeclock);
             AVStream *st = m_ic->streams[i];
             m_codecMap.freeCodecContext(st);
         }
@@ -706,8 +705,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
-    QMutexLocker locker(avcodeclock);
-
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
@@ -934,7 +931,6 @@ extern "C" void HandleStreamChange(void *data)
 
 int AvFormatDecoder::FindStreamInfo(void)
 {
-    QMutexLocker lock(avcodeclock);
     int retval = avformat_find_stream_info(m_ic, nullptr);
     silence_ffmpeg_logging = false;
     // ffmpeg 3.0 is returning -1 code when there is a channel
@@ -2456,16 +2452,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             ScanATSCCaptionStreams(selTrack);
             UpdateATSCCaptionTracks();
 
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
+            m_mythCodecCtx->SetDecoderOptions(enc, codec);
+            if (!OpenAVCodec(enc, codec))
             {
-                QMutexLocker locker(avcodeclock);
-                m_mythCodecCtx->SetDecoderOptions(enc, codec);
-                if (!OpenAVCodec(enc, codec))
-                {
-                    scanerror = -1;
-                    break;
-                }
+                scanerror = -1;
+                break;
             }
             break;
         }
@@ -2522,8 +2514,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
 bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
-    QMutexLocker locker(avcodeclock);
-
 #ifdef USING_MEDIACODEC
     if (QString("mediacodec") == codec->wrapper_name)
         av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
@@ -2726,7 +2716,6 @@ void AvFormatDecoder::RemoveAudioStreams()
     if (!m_audio->HasAudioIn())
         return;
 
-    QMutexLocker locker(avcodeclock);
     for (uint i = 0; i < m_ic->nb_streams;)
     {
         AVStream *st = m_ic->streams[i];
@@ -3415,7 +3404,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 
     bool sentPacket = false;
     int ret2 = 0;
-    avcodeclock->lock();
     if (m_privateDec)
     {
         if (QString(m_ic->iformat->name).contains("avi") || !m_ptsDetected)
@@ -3464,7 +3452,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
             }
         }
     }
-    avcodeclock->unlock();
 
     if (ret < 0 || ret2 < 0)
     {
@@ -3958,7 +3945,8 @@ void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pk
     int dataBroadcastId = 0;
     unsigned carouselId = 0;
     {
-        QMutexLocker locker(avcodeclock);
+        // TODO does this still need locking?
+        //QMutexLocker locker(avcodeclock);
         componentTag    = str->component_tag;
         dataBroadcastId = str->data_id;
         carouselId  = (unsigned) str->carousel_id;
@@ -4012,7 +4000,6 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         {
             if (pkt->stream_index == subIdx)
             {
-                QMutexLocker locker(avcodeclock);
                 m_ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
                                                    pkt->data, pkt->size, pts);
             }
@@ -4021,7 +4008,6 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     else if (m_decodeAllSubtitles || pkt->stream_index == subIdx)
     {
         AVCodecContext *ctx = m_codecMap.getCodecContext(curstream);
-        QMutexLocker locker(avcodeclock);
         avcodec_decode_subtitle2(ctx, &subtitle, &gotSubtitles,
             pkt);
 
@@ -4646,8 +4632,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         bool already_decoded = false;
         if (!ctx->channels)
         {
-            QMutexLocker locker(avcodeclock);
-
             if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(ctx))
             {
                 // for passthru or codecs for which the decoder won't downmix
@@ -4707,8 +4691,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             }
         }
         m_firstVPtsInuse = false;
-
-        avcodeclock->lock();
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
@@ -4767,7 +4749,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 decoded_size = data_size;
             }
         }
-        avcodeclock->unlock();
 
         if (ret < 0)
         {
@@ -5138,17 +5119,13 @@ void AvFormatDecoder::StreamChangeCheck(void)
     if (m_streamsChanged)
     {
         SeekReset(0, 0, true, true);
-        avcodeclock->lock();
         ScanStreams(false);
-        avcodeclock->unlock();
         m_streamsChanged = false;
     }
 }
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
-    QMutexLocker locker(avcodeclock);
-
     return av_read_frame(ctx, pkt);
 }
 

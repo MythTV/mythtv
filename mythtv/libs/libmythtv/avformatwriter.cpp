@@ -40,8 +40,6 @@ extern "C" {
 
 AVFormatWriter::~AVFormatWriter()
 {
-    QMutexLocker locker(avcodeclock);
-
     if (m_ctx)
     {
         (void)av_write_trailer(m_ctx);
@@ -240,11 +238,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     pkt.data = nullptr;
     pkt.size = 0;
     AVCodecContext *avctx = m_codecMap.getCodecContext(m_videoStream);
-    {
-        QMutexLocker locker(avcodeclock);
-        ret = avcodec_encode_video2(avctx, &pkt,
-                                    m_picture, &got_pkt);
-    }
+    ret = avcodec_encode_video2(avctx, &pkt, m_picture, &got_pkt);
 
     if (ret < 0)
     {
@@ -354,24 +348,21 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     m_bufferedAudioFrameTimes.push_back(timecode);
 
-    {
-        QMutexLocker locker(avcodeclock);
-        //  SUGGESTION
-        //  Now that avcodec_encode_audio2 is deprecated and replaced
-        //  by 2 calls, this could be optimized
-        //  into separate routines or separate threads.
-        got_packet = false;
-        ret = avcodec_receive_packet(avctx, &pkt);
-        if (ret == 0)
-            got_packet = true;
-        if (ret == AVERROR(EAGAIN))
-            ret = 0;
-        if (ret == 0)
-            ret = avcodec_send_frame(avctx, m_audPicture);
-        // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
-        // there are 2 packets to be received while only 1 frame to be
-        // sent. The code does not cater for this. Hopefully it will not happen.
-    }
+    //  SUGGESTION
+    //  Now that avcodec_encode_audio2 is deprecated and replaced
+    //  by 2 calls, this could be optimized
+    //  into separate routines or separate threads.
+    got_packet = false;
+    ret = avcodec_receive_packet(avctx, &pkt);
+    if (ret == 0)
+        got_packet = true;
+    if (ret == AVERROR(EAGAIN))
+        ret = 0;
+    if (ret == 0)
+        ret = avcodec_send_frame(avctx, m_audPicture);
+    // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
+    // there are 2 packets to be received while only 1 frame to be
+    // sent. The code does not cater for this. Hopefully it will not happen.
 
     if (ret < 0)
     {

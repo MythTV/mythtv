@@ -160,9 +160,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                     m_ringBuffer->DVD()->UnblockReading();
                 }
 
-                avcodeclock->lock();
                 result = av_read_frame(ctx, pkt);
-                avcodeclock->unlock();
 
                 // Make sure we yield.  Otherwise other threads may not
                 // get chance to take the lock.  Shouldn't be necessary
