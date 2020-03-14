@@ -2102,14 +2102,22 @@ void MythPlayer::CheckAspectRatio(VideoFrame* frame)
 
 void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
-    if (m_allPaused || (check_prebuffer && !PrebufferEnoughFrames()))
+    if (m_allPaused)
         return;
+   
+    bool ispip = m_playerCtx->IsPIP();
+    if (ispip)
+    {
+        if (!m_videoOutput->ValidVideoFrames())
+            return;
+    }
+    else if (check_prebuffer && !PrebufferEnoughFrames())
+    {
+        return;
+    }
 
     // clear the buffering state
     SetBuffering(false);
-
-    // NB no PBP support currently
-    bool ispip = m_playerCtx->IsPIP();
 
     // If PiP then release the last shown frame to the decoding queue
     if (ispip)
