@@ -6,7 +6,7 @@
 #include <QObject>
 
 #include "decoder.h"
-
+#include "mythavutil.h"
 #include <audiooutputsettings.h>
 #include "remoteavformatcontext.h"
 
@@ -49,6 +49,7 @@ class avfDecoder : public QObject, public Decoder
     AVInputFormat *m_inputFormat          {nullptr};
     RemoteAVFormatContext *m_inputContext {nullptr};
     AVCodecContext *m_audioDec            {nullptr};
+    MythCodecMap m_codecMap               {};
 
     bool m_inputIsFile                    {false};
 

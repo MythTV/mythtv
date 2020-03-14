@@ -352,7 +352,7 @@ bool avfDecoder::initialize()
     }
 
     // Store the audio codec of the stream
-    m_audioDec = gCodecMap->getCodecContext
+    m_audioDec = m_codecMap.getCodecContext
         (m_inputContext->getContext()->streams[selTrack]);
 
     // Store the input format of the context
@@ -422,7 +422,7 @@ void avfDecoder::deinit()
         for (uint i = 0; i < m_inputContext->getContext()->nb_streams; i++)
         {
             AVStream *st = m_inputContext->getContext()->streams[i];
-            gCodecMap->freeCodecContext(st);
+            m_codecMap.freeCodecContext(st);
         }
     }
 
