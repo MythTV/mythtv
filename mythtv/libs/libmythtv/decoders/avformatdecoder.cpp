@@ -4552,10 +4552,8 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         if (wtrack.m_av_stream_index < 0)
             wtrack = strack;
 
-        LOG(VB_AUDIO, LOG_INFO, LOC +
-            QString("Selected track %1 (A/V Stream #%2)")
-                .arg(GetTrackDesc(kTrackTypeAudio, ctrack))
-                .arg(strack.m_av_stream_index));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Selected track %1 (A/V Stream #%2)")
+                .arg(static_cast<uint>(ctrack)).arg(strack.m_av_stream_index));
     }
 
     SetupAudioStream();
