@@ -136,6 +136,7 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
     DTVTunerType          m_tuner_type {DTVTunerType::kTunerTypeUnknown};
     uint                  m_cardid     {0};
     ChannelInsertInfoList m_channels;
+    int                   m_signalStrength {0};
 };
 using ScanDTVTransportList = vector<ScanDTVTransport>;
 

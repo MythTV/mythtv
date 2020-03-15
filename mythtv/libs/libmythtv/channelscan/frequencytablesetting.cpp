@@ -87,5 +87,6 @@ ScanNetwork::ScanNetwork()
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Germany"),        "de", country == "de");
+    addSelection(QObject::tr("Netherlands"),    "nl", country == "nl");
     addSelection(QObject::tr("United Kingdom"), "gb", country == "gb");
 }

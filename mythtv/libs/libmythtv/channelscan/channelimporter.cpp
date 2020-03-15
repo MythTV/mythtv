@@ -1447,6 +1447,7 @@ QString ChannelImporter::FormatTransport(
     QString msg;
     QTextStream ssMsg(&msg);
     ssMsg << transport.toString();
+    ssMsg << QString(" ss:%1").arg(transport.m_signalStrength);
     return msg;
 }
 
