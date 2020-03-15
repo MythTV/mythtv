@@ -1987,6 +1987,7 @@ MYTHTV_CONFIG_LIST='
     v4l1
     valgrind
     x11
+    libexiv2_external
     libbluray_external
     xrandr
     profiletype
@@ -2782,9 +2783,9 @@ enable xrandr
 disable indevs
 enable libfftw3
 enable taglib
-enable exiv2
 enable systemd_notify
 enable systemd_journal
+enable libexiv2_external
 enable libbluray_external
 
 # mythtv paths
@@ -5892,6 +5893,15 @@ fi
 # Attempt to use libudev for mediamonitor
 enabled libudev && check_lib udev libudev.h udev_new  || disable libudev
 
+# libexiv2
+if enabled libexiv2_external ; then
+    if $(pkg-config --atleast-version="0.27.99" exiv2); then
+        use_pkg_config exiv2 exiv2 exiv2/exiv2.hpp versionNumber
+    elif [ $target_os != "android" ] ; then
+        disable libexiv2_external
+    fi
+fi
+
 # libmythbluray!
 if enabled libbluray_external; then
     if $(pkg-config --atleast-version="0.9.3" libbluray); then
@@ -6427,8 +6437,11 @@ if enabled systemd_journal ; then
 fi
 
 # Check that all MythTV build "requirements" are met:
-enabled exiv2 && $(pkg-config --exists exiv2) ||
-    die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
+if enabled libexiv2_external ; then
+    if ! $(pkg-config --exists exiv2) ; then
+       die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
+    fi
+fi
 
 # Qt dependency checks
 if test $target_os = mingw32 ; then
@@ -7448,6 +7461,11 @@ if enabled frontend; then
 fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "libcrypto                 ${libcrypto-no}"
+if enabled libexiv2_external; then
+    echo "exiv2 support             yes (system)"
+else
+    echo "exiv2 support             yes (internal)"
+fi
 if enabled libbluray_external; then
     echo "bluray support            yes (system)"
 else
@@ -7926,6 +7944,11 @@ fi
 if ! enabled libbluray_external; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \
+           ${qmakeconf} -o Makefile)
+fi
+if ! enabled libexiv2_external; then
+    echo "Configuring libexiv2..."
+    (cd external/libexiv2 ; \
            ${qmakeconf} -o Makefile)
 fi
 echo "Configuring libmythdvdnav..."
