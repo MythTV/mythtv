@@ -108,7 +108,6 @@ class META_PUBLIC MusicMetadata
                    m_filename(std::move(lfilename))
     {
         checkEmptyFields();
-        ensureSortFields();
     }
 
     MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription, UrlList lurls, QString llogourl,
