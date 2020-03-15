@@ -1949,7 +1949,10 @@ def initialize_override_dictionary(useroptions, language):
     massage = {}
     overrides = {}
     overrides_id = {}
-    cfg = ConfigParser.SafeConfigParser()
+    if IS_PY2:
+        cfg = ConfigParser.SafeConfigParser()
+    else:
+        cfg = ConfigParser.ConfigParser()
     cfg.read(useroptions)
 
     for section in cfg.sections():
