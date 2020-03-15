@@ -2576,7 +2576,9 @@ int AvFormatDecoder::GetSubtitleLanguage(uint, uint StreamIndex)
 /// Return ATSC Closed Caption Language
 int AvFormatDecoder::GetCaptionLanguage(TrackType TrackType, int ServiceNum)
 {
-    QReadLocker locker(&m_trackLock);
+    // This doesn't strictly need write lock but it is called internally while
+    // write lock is held. All other (external) uses are safe
+    QWriteLocker locker(&m_trackLock);
 
     int ret = -1;
     for (int i = 0; i < m_pmtTrackTypes.size(); i++)
