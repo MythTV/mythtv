@@ -70,6 +70,7 @@ class SignalMonitor : protected MThread
     /// \brief Returns milliseconds between signal monitoring events.
     int GetUpdateRate() const { return m_update_rate; }
     virtual QStringList GetStatusList(void) const;
+    int GetSignalStrength(void) { return m_signalStrength.GetNormalizedValue(0,100); }
 
     /// \brief Returns true iff scriptStatus.IsGood() and signalLock.IsGood()
     ///        return true

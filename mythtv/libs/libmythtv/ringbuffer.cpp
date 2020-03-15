@@ -344,7 +344,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
 }
 
 /** \fn RingBuffer::SetBufferSizeFactors(bool, bool)
- *  \brief Tells RingBuffer that the raw bitrate may be innacurate and the
+ *  \brief Tells RingBuffer that the raw bitrate may be inaccurate and the
  *         underlying container is matroska, both of which may require a larger
  *         buffer size.
  */
