@@ -776,10 +776,14 @@ void MusicMetadata::dumpToDatabase()
     if (m_albumArt)
         m_albumArt->dumpToDatabase();
 
-    // make sure the compilation flag is updated
-    query.prepare("UPDATE music_albums SET compilation = :COMPILATION, year = :YEAR "
+    // update the album
+    query.prepare("UPDATE music_albums SET album_name = :ALBUM_NAME, "
+                  "artist_id = :COMP_ARTIST_ID, compilation = :COMPILATION, "
+                  "year = :YEAR "
                   "WHERE music_albums.album_id = :ALBUMID");
     query.bindValue(":ALBUMID", m_albumId);
+    query.bindValue(":ALBUM_NAME", m_album);
+    query.bindValue(":COMP_ARTIST_ID", m_compartistId);
     query.bindValue(":COMPILATION", m_compilation);
     query.bindValue(":YEAR", m_year);
 
