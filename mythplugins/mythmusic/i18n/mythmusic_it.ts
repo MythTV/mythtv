@@ -41,14 +41,6 @@ Seleziona &quot;Ricerca nuovi brani&quot; per eseguire una nuova scansione.</tra
         <translation>Caricamento tracce audio</translation>
     </message>
     <message>
-        <source>You need to tell me where to find your music on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages.</source>
-        <translation type="obsolete">Si deve dire dove trovare la musica sulla pagina &apos;Impostazioni generali&apos; nelle pagini di impostazioni MythMusic.</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
-        <translation type="obsolete">Impossibile trovare la directory musica. Si è impostato correttamente nella pagina &apos;Impostazioni generali&apos; nelle pagini di impostazioni MythMusic?</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/main.cpp" line="725"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
@@ -60,57 +52,6 @@ Seleziona &quot;Ricerca nuovi brani&quot; per eseguire una nuova scansione.</tra
         <location filename="../mythmusic/visualize.cpp" line="1484"/>
         <source>?</source>
         <translation>?</translation>
-    </message>
-</context>
-<context>
-    <name>AlbumArtImages</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Sconosciuto</translation>
-    </message>
-    <message>
-        <source>Front Cover</source>
-        <translation type="obsolete">Copertina anteriore</translation>
-    </message>
-    <message>
-        <source>Back Cover</source>
-        <translation type="obsolete">Copertina posteriore</translation>
-    </message>
-    <message>
-        <source>CD</source>
-        <translation type="obsolete">CD</translation>
-    </message>
-    <message>
-        <source>Inlay</source>
-        <translation type="obsolete">Inlay</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation type="obsolete">sconosciuto</translation>
-    </message>
-    <message>
-        <source>front</source>
-        <translation type="obsolete">anteriore</translation>
-    </message>
-    <message>
-        <source>back</source>
-        <translation type="obsolete">posteriore</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
-    </message>
-    <message>
-        <source>inlay</source>
-        <translation type="obsolete">Inlay</translation>
-    </message>
-    <message>
-        <source>artist</source>
-        <translation type="obsolete">artista</translation>
     </message>
 </context>
 <context>
@@ -171,164 +112,11 @@ Seleziona &quot;Ricerca nuovi brani&quot; per eseguire una nuova scansione.</tra
     </message>
 </context>
 <context>
-    <name>DatabaseBox</name>
-    <message>
-        <source>Copy To New Playlist</source>
-        <translation type="obsolete">Copiare in una nuova playlist</translation>
-    </message>
-    <message>
-        <source>Clear the Active Play Queue</source>
-        <translation type="obsolete">Cancellare la coda di riproduzione attiva</translation>
-    </message>
-    <message>
-        <source>Save Back to Playlist Tree</source>
-        <translation type="obsolete">Salvare di nuovo nella struttura della playlist</translation>
-    </message>
-    <message>
-        <source>Move to Active Play Queue</source>
-        <translation type="obsolete">Spostare nella coda di riproduzione attiva</translation>
-    </message>
-    <message>
-        <source>Delete This Playlist</source>
-        <translation type="obsolete">Eliminare questa playlist</translation>
-    </message>
-    <message>
-        <source>Rename This Playlist</source>
-        <translation type="obsolete">Rinominare questa playlist</translation>
-    </message>
-    <message>
-        <source>Active Play Queue</source>
-        <translation type="obsolete">Coda di riproduzione attiva</translation>
-    </message>
-    <message>
-        <source>All My Playlists</source>
-        <translation type="obsolete">Tutte le playlist</translation>
-    </message>
-    <message>
-        <source>All My Music</source>
-        <translation type="obsolete">Tutta la musica</translation>
-    </message>
-    <message>
-        <source>Blechy Blech Blah</source>
-        <translation type="obsolete">Blechy Blech Blah</translation>
-    </message>
-    <message>
-        <source>All My Music ~ Loading Music Data </source>
-        <translation type="obsolete">Tutta la musica ~ caricamento dei dati musicali</translation>
-    </message>
-    <message>
-        <source>Loading Music Data</source>
-        <translation type="obsolete">Caricamento dei dati musicali</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t create CD</source>
-        <translation type="obsolete">Impossibile creare il CD</translation>
-    </message>
-    <message>
-        <source>CD Created</source>
-        <translation type="obsolete">CD creato</translation>
-    </message>
-    <message>
-        <source>CD-RW Blanking Progress</source>
-        <translation type="obsolete">CD-RW progresso cancellazione</translation>
-    </message>
-    <message>
-        <source>Create Audio CD from Playlist</source>
-        <translation type="obsolete">Creare CD audio dalla playlist</translation>
-    </message>
-    <message>
-        <source>Create MP3 CD from Playlist</source>
-        <translation type="obsolete">Creare CD MP3 dalla playlist</translation>
-    </message>
-    <message>
-        <source>Clear CD-RW Disk</source>
-        <translation type="obsolete">Cancellare disco CD-RW</translation>
-    </message>
-    <message>
-        <source>Artist:	</source>
-        <translation type="obsolete">Artista:  </translation>
-    </message>
-    <message>
-        <source>Album:	</source>
-        <translation type="obsolete">Album:</translation>
-    </message>
-    <message>
-        <source>Title:	</source>
-        <translation type="obsolete">Titolo:</translation>
-    </message>
-    <message>
-        <source>Length:	</source>
-        <translation type="obsolete">Lunghezza:</translation>
-    </message>
-    <message>
-        <source>Genre: </source>
-        <translation type="obsolete">Genere:</translation>
-    </message>
-    <message>
-        <source>Compilation Artist:	</source>
-        <translation type="obsolete">Raccolta artista:</translation>
-    </message>
-    <message>
-        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation type="obsolete">Il tema che è in uso non contiene nessune righe informative nell&apos;elemento musciale. Contattare il creatore del tema e chiedere se è possibile aggiornare il tema. </translation>
-    </message>
-</context>
-<context>
     <name>DecoderHandler</name>
     <message>
         <location filename="../mythmusic/decoderhandler.cpp" line="304"/>
         <source>Retrieving playlist</source>
         <translation>Recupero playlist</translation>
-    </message>
-</context>
-<context>
-    <name>DecoderIOFactoryShoutCast</name>
-    <message>
-        <source>Connecting</source>
-        <translation type="obsolete">Connessione</translation>
-    </message>
-    <message>
-        <source>Unsupported content type for ShoutCast stream: %1</source>
-        <translation type="obsolete">Tipo di contenuto non supportato per il flusso ShoutCast: %1</translation>
-    </message>
-    <message>
-        <source>Finding radio stream</source>
-        <translation type="obsolete">Ritrovamento flusso radio</translation>
-    </message>
-    <message>
-        <source>Cannot find radio.
-Check the URL is correct.</source>
-        <translation type="obsolete">Impossibile trovare la radio.
-Verificare se l&apos;URL è corretto.</translation>
-    </message>
-    <message>
-        <source>Connecting to radio stream</source>
-        <translation type="obsolete">Connessione al flusso radio</translation>
-    </message>
-    <message>
-        <source>Cannot connect to radio.
-Check the URL is correct.</source>
-        <translation type="obsolete">Impossibile connettersi alla radio.
-Verificare se l&apos;URL è corretto.</translation>
-    </message>
-    <message>
-        <source>Connected to radio stream</source>
-        <translation type="obsolete">Connesso al flusso radio</translation>
-    </message>
-    <message>
-        <source>Buffering</source>
-        <translation type="obsolete">Riempimento buffer</translation>
-    </message>
-</context>
-<context>
-    <name>DecoderIOFactoryUrl</name>
-    <message>
-        <source>Fetching remote file</source>
-        <translation type="obsolete">Passare in rassegna il file remoto</translation>
     </message>
 </context>
 <context>
@@ -427,10 +215,6 @@ Verificare se l&apos;URL è corretto.</translation>
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <source>Done</source>
-        <translation type="obsolete">Fatto</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/editmetadata.cpp" line="474"/>
         <source>Options</source>
         <translation>Opzioni</translation>
@@ -495,96 +279,9 @@ Verificare se l&apos;URL è corretto.</translation>
         <source>Asked the backend to check the tracks length</source>
         <translation>Chiesto al backend di verificare la lunghezza della traccia</translation>
     </message>
-    <message>
-        <source>Save Changes?</source>
-        <translation type="obsolete">Salvare i cambiamenti?</translation>
-    </message>
-    <message>
-        <source>Save to Database Only</source>
-        <translation type="obsolete">Salvare solo nel database</translation>
-    </message>
-    <message>
-        <source>Save to File Only</source>
-        <translation type="obsolete">Salvare solo il file</translation>
-    </message>
-    <message>
-        <source>Save to File and Database</source>
-        <translation type="obsolete">Salvare il file e il database</translation>
-    </message>
-    <message>
-        <source>Exit/Do Not Save</source>
-        <translation type="obsolete">Uscire/non salvare</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="obsolete">Essere veramente sicuri di salvare i metadati modificati nel file?</translation>
-    </message>
-    <message>
-        <source>Track Info.</source>
-        <translation type="obsolete">Info traccia.</translation>
-    </message>
-    <message>
-        <source>Album Art</source>
-        <translation type="obsolete">Copertina album</translation>
-    </message>
-    <message>
-        <source>Statistics</source>
-        <translation type="obsolete">Statistiche</translation>
-    </message>
-    <message>
-        <source>Save Changes</source>
-        <translation type="obsolete">Salvare i cambiamenti</translation>
-    </message>
-    <message>
-        <source>Change Image Type</source>
-        <translation type="obsolete">Cambiare tipo di immagine</translation>
-    </message>
-</context>
-<context>
-    <name>FileScanner</name>
-    <message>
-        <source>Cleaning music database</source>
-        <translation type="obsolete">Cancellazione database musica</translation>
-    </message>
-    <message>
-        <source>Searching for music files</source>
-        <translation type="obsolete">Ricerca dei file musicali</translation>
-    </message>
-    <message>
-        <source>Updating music database</source>
-        <translation type="obsolete">Aggiornamento del database musicale</translation>
-    </message>
-    <message>
-        <source>Scanning music files</source>
-        <translation type="obsolete">Scansione file musicali</translation>
-    </message>
-    <message>
-        <source>Scanning Album Artwork</source>
-        <translation type="obsolete">Scansione album artwork</translation>
-    </message>
 </context>
 <context>
     <name>GeneralSettings</name>
-    <message>
-        <source>UTF-16</source>
-        <translation type="obsolete">UTF-16</translation>
-    </message>
-    <message>
-        <source>UTF-8</source>
-        <translation type="obsolete">UTF-8</translation>
-    </message>
-    <message>
-        <source>ASCII</source>
-        <translation type="obsolete">ASCII</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation type="obsolete">Questa directory deve esistere e l&apos;utente che esegue MythMusic ha bisogno di avere i permessi di scrittura sulla directory.</translation>
-    </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="62"/>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
@@ -621,10 +318,6 @@ Verificare se l&apos;URL è corretto.</translation>
 You must now scan, rip or import some tracks.</source>
         <translation>Il databse musicale è stato azzerato.
 Ora dovresti scansionare, estrarre o importare qualche traccia.</translation>
-    </message>
-    <message>
-        <source>Some MP3 players don&apos;t understand tags encoded in UTF-8 or UTF-16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="obsolete">Molti lettori mp3 non capiscono etichette codificate in UTF8 o UTF16, questa impostazione permette di cambiare il formato di codifica usato. Attualmente applicato solo per etichette ID3.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="77"/>
@@ -813,10 +506,6 @@ Impossibile copiare file in: %1</translation>
         <source>Select where to save tracks</source>
         <translation>Seleziona dove salvare le tracce</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
 </context>
 <context>
     <name>ImportSettings</name>
@@ -982,98 +671,6 @@ GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
     </message>
 </context>
 <context>
-    <name>MiniPlayer</name>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Fermato</translation>
-    </message>
-    <message>
-        <source>Mute: On</source>
-        <translation type="obsolete">Muto: attivo</translation>
-    </message>
-    <message>
-        <source>Mute: Off</source>
-        <translation type="obsolete">Muto: disattivo</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">ch</translation>
-    </message>
-    <message>
-        <source>%1  by  %2</source>
-        <comment>Music track &apos;title by artist&apos;</comment>
-        <translation type="obsolete">%1  di  %2</translation>
-    </message>
-    <message>
-        <source>Shuffle Mode: </source>
-        <translation type="obsolete">Modalità riproduzione casuale:</translation>
-    </message>
-    <message>
-        <source>Smart</source>
-        <translation type="obsolete">Veloce</translation>
-    </message>
-    <message>
-        <source>Rand</source>
-        <translation type="obsolete">Casuale</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Album</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista  </translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Nessuno</translation>
-    </message>
-    <message>
-        <source>Repeat Mode: </source>
-        <translation type="obsolete">Modalità ripetizone:</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Tutti</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation type="obsolete">Traccia</translation>
-    </message>
-    <message>
-        <source>Auto Show Player: </source>
-        <translation type="obsolete">Mostrare riproduttore automaticamente:</translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation type="obsolete">Attivo</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="obsolete">Disattivo</translation>
-    </message>
-    <message>
-        <source>Volume: </source>
-        <translation type="obsolete">Volume:</translation>
-    </message>
-    <message>
-        <source>(muted)</source>
-        <translation type="obsolete">(escluso)</translation>
-    </message>
-    <message>
-        <source>Speed: </source>
-        <translation type="obsolete">Velocità:</translation>
-    </message>
-</context>
-<context>
     <name>MusicCommon</name>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1196"/>
@@ -1114,27 +711,9 @@ GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
         <translation>ch</translation>
     </message>
     <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Errore in uscita.</translation>
-    </message>
-    <message>
-        <source>MythMusic has encountered the following error:
-%1</source>
-        <translation type="obsolete">MythMusic ha incontrato il seguente errore:
-%1</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1333"/>
         <source>Stream stopped.</source>
         <translation>Stream fermato.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Errore di decodifica.</translation>
-    </message>
-    <message>
-        <source>Decoder Handler error.</source>
-        <translation type="obsolete">Errore gestore di decodifica.</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1388"/>
@@ -1222,13 +801,13 @@ GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
         <location filename="../mythmusic/musiccommon.cpp" line="1502"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2337"/>
         <source>Previous Track</source>
-        <translation>Traccia prec.</translation>
+        <translation>Traccia prec</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1504"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2338"/>
         <source>Next Track</source>
-        <translation>Traccia succ.</translation>
+        <translation>Traccia succ</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1506"/>
@@ -1340,10 +919,6 @@ GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
         <translation>Azioni</translation>
     </message>
     <message>
-        <source>Switch View</source>
-        <translation type="obsolete">Cambiare vista</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musiccommon.cpp" line="2261"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2279"/>
         <source>Playlist Options</source>
@@ -1378,26 +953,10 @@ GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
         <translation>Cambia effetto grafico</translation>
     </message>
     <message>
-        <source>Current Playlist</source>
-        <translation type="obsolete">playlist corrente</translation>
-    </message>
-    <message>
-        <source>Playlist Editor - Tree</source>
-        <translation type="obsolete">Editor playlist- struttura</translation>
-    </message>
-    <message>
-        <source>Playlist Editor - Gallery</source>
-        <translation type="obsolete">Editor playlist- galleria</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1377"/>
         <location filename="../mythmusic/musiccommon.cpp" line="2236"/>
         <source>Search for Music</source>
         <translation>Cerca brani</translation>
-    </message>
-    <message>
-        <source>Play Radio Stream</source>
-        <translation type="obsolete">Riproduzione flusso radio</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1368"/>
@@ -1514,10 +1073,6 @@ Continuo la riproduzione in sottofondo?</translation>
 <context>
     <name>MusicPlayer</name>
     <message>
-        <source>playlist root</source>
-        <translation type="obsolete">Radice principale dell&apos;playlist</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musicplayer.cpp" line="807"/>
         <source>Audio Output Error</source>
         <translation>Errore uscita audio</translation>
@@ -1529,10 +1084,6 @@ Continuo la riproduzione in sottofondo?</translation>
         <location filename="../mythmusic/musicplayer.cpp" line="851"/>
         <source>MythMusic</source>
         <translation>MythMusic</translation>
-    </message>
-    <message>
-        <source>Got to many track unavailable errors. Maybe the host with the music on is off-line?</source>
-        <translation type="vanished">Ho avuto molti errori traccia non disponibile. Può essere che L&apos;host con la musica sia off-line?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="317"/>
@@ -1714,22 +1265,6 @@ Resetta e riprova</translation>
         <translation>Aggiorna albero musica</translation>
     </message>
     <message>
-        <source>MythMusic audio files</source>
-        <translation type="vanished">MythMusic file audio</translation>
-    </message>
-    <message>
-        <source>Filter All My Music</source>
-        <translation type="obsolete">Filtrare tutta la musica</translation>
-    </message>
-    <message>
-        <source>Show incremental search dialog</source>
-        <translation type="obsolete">Mostrare finestra di dialogo di ricerca incrementale</translation>
-    </message>
-    <message>
-        <source>Incremental search find next match</source>
-        <translation type="obsolete">Ricerca incrementale trovare prossima associazione</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/main.cpp" line="838"/>
         <source>Increase Play Speed</source>
         <translation>Aumenta velocità riproduzione</translation>
@@ -1795,206 +1330,9 @@ Resetta e riprova</translation>
         <translation>Gestore multimediale MythMusic 1/2</translation>
     </message>
     <message>
-        <source>MythMusic audio CD</source>
-        <translation type="vanished">MythMusic CD audio</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/main.cpp" line="871"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>Gestore multimediale MythMusic 2/2</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Modificare l&apos;playlistmusicale</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualizzare</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 modificare l&apos;playlist</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 visualizzare</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Esecuzione flusso.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Buffering del flusso.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Flusso in pausa.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">ch</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Errore in uscita.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Flusso fermato.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Riproduzione del flusso terminata.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Errore di decodifica.</translation>
-    </message>
-    <message>
-        <source>Smart playlists</source>
-        <translation type="obsolete">Playlist veloce</translation>
-    </message>
-    <message>
-        <source>All Tracks</source>
-        <translation type="obsolete">Tutte le traccie</translation>
-    </message>
-    <message>
-        <source>Tracks by current Artist</source>
-        <translation type="obsolete">Traccie dell&apos;artista corrente</translation>
-    </message>
-    <message>
-        <source>Tracks from current Album</source>
-        <translation type="obsolete">Traccie dal corrente album</translation>
-    </message>
-    <message>
-        <source>Tracks from current Genre</source>
-        <translation type="obsolete">Traccie dal corrente genere</translation>
-    </message>
-    <message>
-        <source>Tracks from current Year</source>
-        <translation type="obsolete">Traccie dal corrente anno</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="obsolete">Ricerca</translation>
-    </message>
-    <message>
-        <source>From CD</source>
-        <translation type="obsolete">Dal CD</translation>
-    </message>
-    <message>
-        <source>Change Filter</source>
-        <translation type="obsolete">Cambiare filtro</translation>
-    </message>
-    <message>
-        <source>Update Playlist Options</source>
-        <translation type="obsolete">Aggiornare opzioni dell&apos;playlist</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation type="obsolete">Sostituire</translation>
-    </message>
-    <message>
-        <source>Insert after current track</source>
-        <translation type="obsolete">Inserire dopo la traccia corrente</translation>
-    </message>
-    <message>
-        <source>Append to end</source>
-        <translation type="obsolete">Aggiungere alla fine</translation>
-    </message>
-    <message>
-        <source>Continue playing current track</source>
-        <translation type="obsolete">Continuare riproducendo la traccia corrente</translation>
-    </message>
-    <message>
-        <source>Play first track</source>
-        <translation type="obsolete">Suonare prima traccia</translation>
-    </message>
-    <message>
-        <source>Play first new track</source>
-        <translation type="obsolete">Suonare la prima nuova traccia</translation>
-    </message>
-    <message>
-        <source>Remove Duplicates</source>
-        <translation type="obsolete">Rimuove duplicati</translation>
-    </message>
-    <message>
-        <source>Visualization: </source>
-        <translation type="obsolete">Visualizzazione:</translation>
-    </message>
-    <message>
-        <source>Exiting Music Player
-Do you want to continue playing in the background?</source>
-        <translation type="obsolete">Uscita dal riproduttore musicale
-Continuare la riproduzione in background?</translation>
-    </message>
-    <message>
-        <source>No - Exit, Stop Playing</source>
-        <translation type="obsolete">No, - Uscire, fermare riproduzione</translation>
-    </message>
-    <message>
-        <source>Yes - Exit, Continue Playing</source>
-        <translation type="obsolete">Si, - Uscire, continuare riproduzione</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
-    <message>
-        <source>Tracks with same Title</source>
-        <translation type="obsolete">Traccie con lo stesso titolo</translation>
-    </message>
-    <message>
-        <source>Speed: </source>
-        <translation type="obsolete">Velocità:</translation>
-    </message>
-    <message>
-        <source>Smart</source>
-        <translation type="obsolete">Veloce</translation>
-    </message>
-    <message>
-        <source>Rand</source>
-        <translation type="obsolete">Casuale</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Album</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista  </translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Nessuno</translation>
-    </message>
-    <message>
-        <source>Shuffle</source>
-        <translation type="obsolete">Mischiare</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Tutti</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation type="obsolete">Traccia</translation>
-    </message>
-    <message>
-        <source>Repeat</source>
-        <translation type="obsolete">Ripetere</translation>
     </message>
 </context>
 <context>
@@ -2060,10 +1398,6 @@ Continuare la riproduzione in background?</translation>
         <location filename="../mythmusic/playersettings.cpp" line="72"/>
         <source>Radio screen - Resume playback at the previous station or not at all</source>
         <translation>Schermata radio - Riprendi la riproduzione dalla precedente stazione o non fare nulla</translation>
-    </message>
-    <message>
-        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, or an exact point within the last track.</source>
-        <translation type="obsolete">Riprendere la riproduzione o l&apos;inizio della coda di riproduzione attiva, l&apos;inizio dell&apos;ultima traccia, o un punto esatto compresa l&apos;ultima traccia.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="73"/>
@@ -2301,717 +1635,6 @@ Nome: %1</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Searching for music files</source>
-        <translation type="obsolete">Ricerca dei file musicali</translation>
-    </message>
-    <message>
-        <source>Updating music database</source>
-        <translation type="obsolete">Aggiornamento del database musicale</translation>
-    </message>
-    <message>
-        <source>Various Artists</source>
-        <translation type="obsolete">Artisti vari</translation>
-    </message>
-    <message>
-        <source>Audio CD parser</source>
-        <translation type="obsolete">Analizzatore CD audio</translation>
-    </message>
-    <message>
-        <source>Ogg Vorbis Audio</source>
-        <translation type="obsolete">Audio Ogg Vorbis</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Sconosciuto</translation>
-    </message>
-    <message>
-        <source>Directory to hold music</source>
-        <translation type="obsolete">Cartella che contiene i file musicali</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation type="obsolete">Questa directory deve esistere e l&apos;utente che esegue MythMusic ha bisogno di avere i permessi di scrittura sulla directory.</translation>
-    </message>
-    <message>
-        <source>Audio device</source>
-        <translation type="obsolete">Dispositivo audio</translation>
-    </message>
-    <message>
-        <source>CD device</source>
-        <translation type="obsolete">Dispositivo CD</translation>
-    </message>
-    <message>
-        <source>CDRom device used for ripping/playback.</source>
-        <translation type="obsolete">Dispositivo CDRom usato per l&apos;estrazione/riproduzione.</translation>
-    </message>
-    <message>
-        <source>Tree Sorting</source>
-        <translation type="obsolete">Ordinamento della struttura</translation>
-    </message>
-    <message>
-        <source>Script Path</source>
-        <translation type="obsolete">Percorso Script</translation>
-    </message>
-    <message>
-        <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation type="obsolete">Se presente questo script sarà eseguito dopo che l&apos;estrazione CD è completata.</translation>
-    </message>
-    <message>
-        <source>Filename Format</source>
-        <translation type="obsolete">Formatodel nome del file</translation>
-    </message>
-    <message>
-        <source>Ignore ID3 Tags</source>
-        <translation type="obsolete">Ignorare etichette ID3</translation>
-    </message>
-    <message>
-        <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="obsolete">Se impostato, MythMusic salterà controllo delle etichette ID3 nei file eproverà solo a determinare genere, album , numero di traccia e titolo dal nome del file.</translation>
-    </message>
-    <message>
-        <source>Automatically lookup CDs</source>
-        <translation type="obsolete">Ricerca automatica dei CD</translation>
-    </message>
-    <message>
-        <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation type="obsolete">Ricerca automatica di un CD audio se è presente e mostra le sue informazioni nella struttura di selezione musica.</translation>
-    </message>
-    <message>
-        <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation type="obsolete">Usare pulsanti di accelerezione tastiera/remoto</translation>
-    </message>
-    <message>
-        <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation type="obsolete">Se questo non è impostato, è necessario usare i tasti freccia e attivare le varie funzioni.</translation>
-    </message>
-    <message>
-        <source>Encoding</source>
-        <translation type="obsolete">Codifica</translation>
-    </message>
-    <message>
-        <source>Ogg Vorbis</source>
-        <translation type="obsolete">Ogg Vorbis</translation>
-    </message>
-    <message>
-        <source>Lame (MP3)</source>
-        <translation type="obsolete">Lame (MP3)</translation>
-    </message>
-    <message>
-        <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation type="obsolete">Codifica audio usata per l&apos;estrazione CD. Nota che la qualità del livello &quot;Perfetto&quot; userà il codificatore FLAC.</translation>
-    </message>
-    <message>
-        <source>File storage location</source>
-        <translation type="obsolete">Posizione del file di archiviazione</translation>
-    </message>
-    <message>
-        <source>Replace &apos; &apos; with &apos;_&apos;</source>
-        <translation type="obsolete">Sostituire &apos; &apos; con &apos;_&apos;</translation>
-    </message>
-    <message>
-        <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation type="obsolete">Se impostato,gli spazi nei nomi dei file saranno sostituiti con trattino basso.</translation>
-    </message>
-    <message>
-        <source>Paranoia Level</source>
-        <translation type="obsolete">Livello paranoia</translation>
-    </message>
-    <message>
-        <source>Full</source>
-        <translation type="obsolete">Completo</translation>
-    </message>
-    <message>
-        <source>Faster</source>
-        <translation type="obsolete">Veloce</translation>
-    </message>
-    <message>
-        <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation type="obsolete">Livello di paranoia dell&apos;estrazione del CD. Impostare veloce se non interessano pressapoco possibili errori nell&apos;audio.</translation>
-    </message>
-    <message>
-        <source>Automatically eject CDs after ripping</source>
-        <translation type="obsolete">Espulsione automatica dei CD dopo l&apos;estrazione</translation>
-    </message>
-    <message>
-        <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation type="obsolete">Se impostato, il carrello CD sarà automaticamente aperto dopo cge il CD è stato estratto.</translation>
-    </message>
-    <message>
-        <source>Rating Weight</source>
-        <translation type="obsolete">Peso della valutazione</translation>
-    </message>
-    <message>
-        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation type="obsolete">Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data alla valutazione di una data traccia quando si ordina un gruppo di canzoni.</translation>
-    </message>
-    <message>
-        <source>Play Count Weight</source>
-        <translation type="obsolete">Peso del contatore ascolti</translation>
-    </message>
-    <message>
-        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation type="obsolete">Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data al tempo di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
-    </message>
-    <message>
-        <source>Last Play Weight</source>
-        <translation type="obsolete">Peso dell&apos;ultima riproduzione</translation>
-    </message>
-    <message>
-        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation type="obsolete">Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data alla lunghezza di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
-    </message>
-    <message>
-        <source>Random Weight</source>
-        <translation type="obsolete">Peso casuale</translation>
-    </message>
-    <message>
-        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation type="obsolete">Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data al buon vecchio (pseudo-)casualità quando si ordina un gruppo di canzoni.</translation>
-    </message>
-    <message>
-        <source>Show Song Ratings</source>
-        <translation type="obsolete">Mostrare le valutazioni delle canzoni</translation>
-    </message>
-    <message>
-        <source>Show song ratings on the playback screen.</source>
-        <translation type="obsolete">Mostrare le valutazioni delle canzoni nella schermata di riproduzione.</translation>
-    </message>
-    <message>
-        <source>List as Shuffled</source>
-        <translation type="obsolete">Elenco come mischiato</translation>
-    </message>
-    <message>
-        <source>List songs on the playback screen in the order they will be played.</source>
-        <translation type="obsolete">Elenco delle canzoni sulla schermata di riproduzione nell&apos;ordine come vengono riprodotte.</translation>
-    </message>
-    <message>
-        <source>Show entire music tree</source>
-        <translation type="obsolete">Mostrare l&apos;intera struttura musicale</translation>
-    </message>
-    <message>
-        <source>Play mode</source>
-        <translation type="obsolete">Mdalità di riproduzione</translation>
-    </message>
-    <message>
-        <source>Normal</source>
-        <translation type="obsolete">Normale</translation>
-    </message>
-    <message>
-        <source>Random</source>
-        <translation type="obsolete">Casuale</translation>
-    </message>
-    <message>
-        <source>Intelligent</source>
-        <translation type="obsolete">Intelligente</translation>
-    </message>
-    <message>
-        <source>Delay before Visualizations start (seconds)</source>
-        <translation type="obsolete">Ritardo prima dell&apos;inizio degli effetti grafici (secondi)</translation>
-    </message>
-    <message>
-        <source>If set to 0, visualizations will never automatically start.</source>
-        <translation type="obsolete">Se impostato a 0, gli effetti grafici non partiranno automaticamente.</translation>
-    </message>
-    <message>
-        <source>Change Visualizer on each song</source>
-        <translation type="obsolete">Cambiare effetto grafico su ogni canzone</translation>
-    </message>
-    <message>
-        <source>Width for Visual Scaling</source>
-        <translation type="obsolete">Larghezza per la proporzione visiva</translation>
-    </message>
-    <message>
-        <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation type="obsolete">Se impostato a &quot;2&quot;, gli effetti grafici saranno scalati a metà. Attualmente è usato solo dall&apos;effetto grafico gloom. Riduce il carico sulla CPU su computer lenti.</translation>
-    </message>
-    <message>
-        <source>Height for Visual Scaling</source>
-        <translation type="obsolete">Altezza per la proporzione visiva</translation>
-    </message>
-    <message>
-        <source>Visualizations</source>
-        <translation type="obsolete">Effetti grafici</translation>
-    </message>
-    <message>
-        <source>Default Rip Quality</source>
-        <translation type="obsolete">Qualità predefinita di estrazione</translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation type="obsolete">Bassa</translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation type="obsolete">Media</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation type="obsolete">Alta</translation>
-    </message>
-    <message>
-        <source>Perfect</source>
-        <translation type="obsolete">Perfetto</translation>
-    </message>
-    <message>
-        <source>Default quality for new CD rips.</source>
-        <translation type="obsolete">Qualità predefinta per nuove estrazioni di CD.</translation>
-    </message>
-    <message>
-        <source>Playback Settings</source>
-        <translation type="obsolete">Impostazioni di riproduzione</translation>
-    </message>
-    <message>
-        <source>Visualization Settings</source>
-        <translation type="obsolete">Impostazioni effetti grafici</translation>
-    </message>
-    <message>
-        <source>CD Ripper Settings</source>
-        <translation type="obsolete">Impostazioni estrazione CD</translation>
-    </message>
-    <message>
-        <source>Unknown Artist</source>
-        <translation type="obsolete">Artista sconosciuto</translation>
-    </message>
-    <message>
-        <source>Unknown Album</source>
-        <translation type="obsolete">Album sconosciuto</translation>
-    </message>
-    <message>
-        <source>Unknown Genre</source>
-        <translation type="obsolete">Genere sconosciuto</translation>
-    </message>
-    <message>
-        <source>Never Played</source>
-        <translation type="obsolete">Mai riprodotta</translation>
-    </message>
-    <message>
-        <source>CD -- none</source>
-        <translation type="obsolete">CD -- nessuno</translation>
-    </message>
-    <message>
-        <source>All My Music</source>
-        <translation type="obsolete">Tutta la musica</translation>
-    </message>
-    <message>
-        <source>%1 - %2</source>
-        <translation type="obsolete">%1 - %2</translation>
-    </message>
-    <message>
-        <source>front</source>
-        <translation type="obsolete">anteriore</translation>
-    </message>
-    <message>
-        <source>back</source>
-        <translation type="obsolete">posteriore</translation>
-    </message>
-    <message>
-        <source>inlay</source>
-        <translation type="obsolete">Inlay</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
-    </message>
-    <message>
-        <source>cover</source>
-        <translation type="obsolete">copertina</translation>
-    </message>
-    <message>
-        <source>title</source>
-        <translation type="obsolete">titolo</translation>
-    </message>
-    <message>
-        <source>Missing database entry: %1</source>
-        <translation type="obsolete">Voce del database mancante: %1</translation>
-    </message>
-    <message>
-        <source>Ooops</source>
-        <translation type="obsolete">Ooops</translation>
-    </message>
-    <message>
-        <source>Not Initialized</source>
-        <translation type="obsolete">Non inizializzato</translation>
-    </message>
-    <message>
-        <source>oops</source>
-        <translation type="obsolete">oops</translation>
-    </message>
-    <message>
-        <source>All My Playlists</source>
-        <translation type="obsolete">Tutti gli elenchi di riproduzione</translation>
-    </message>
-    <message>
-        <source>Active Play Queue</source>
-        <translation type="obsolete">Coda di riproduzione attiva</translation>
-    </message>
-    <message>
-        <source>Active Play Queue (%1)</source>
-        <translation type="obsolete">Coda di riproduzione attiva (%1)</translation>
-    </message>
-    <message>
-        <source>Something is Wrong</source>
-        <translation type="obsolete">Qualche volta è sbagliato</translation>
-    </message>
-    <message>
-        <source>Visualization requires FFT library</source>
-        <translation type="obsolete">Gli effetti grafici richiedono la libreria FFT</translation>
-    </message>
-    <message>
-        <source>Did you run configure?</source>
-        <translation type="obsolete">Eseguire la configurazione?</translation>
-    </message>
-    <message>
-        <source>Use variable bitrates</source>
-        <translation type="obsolete">Usare bitrate variabile</translation>
-    </message>
-    <message>
-        <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="obsolete">Se impostato, il codificatore MP£ userà un bitrate variabile (VBR) eccetto per le impostazioni di bassa qualità, Il codificatore Ogg userà sempre un bitrate variabile.</translation>
-    </message>
-    <message>
-        <source>CD Ripper Settings (part 2)</source>
-        <translation type="obsolete">Impostazioni estrazione CD (parte 2)</translation>
-    </message>
-    <message>
-        <source>Enable CD Writing.</source>
-        <translation type="obsolete">Abilitare la scrittura su CD.</translation>
-    </message>
-    <message>
-        <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="obsolete">Richiede un masterizzatore CD SCSI o un IDE SCSI.</translation>
-    </message>
-    <message>
-        <source>CD-Writer Device</source>
-        <translation type="obsolete">Dispositivo masterizzatore CD</translation>
-    </message>
-    <message>
-        <source>Disk Size</source>
-        <translation type="obsolete">Dimensione disco</translation>
-    </message>
-    <message>
-        <source>650MB/75min</source>
-        <translation type="obsolete">650MB/75min</translation>
-    </message>
-    <message>
-        <source>700MB/80min</source>
-        <translation type="obsolete">700MB/80min</translation>
-    </message>
-    <message>
-        <source>Default CD Capacity.</source>
-        <translation type="obsolete">Capacità CD predefinita.</translation>
-    </message>
-    <message>
-        <source>Enable directories on MP3 Creation</source>
-        <translation type="obsolete">Abilitare le directori di creazione MP3</translation>
-    </message>
-    <message>
-        <source>CD Write Speed</source>
-        <translation type="obsolete">Velocità di scrittura CD</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation type="obsolete">Auto</translation>
-    </message>
-    <message>
-        <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="obsolete">Velocità di scrittura CD. Auto userà la velocità raccomandata.</translation>
-    </message>
-    <message>
-        <source>CD Blanking Type</source>
-        <translation type="obsolete">Tipo di cancellazione CD</translation>
-    </message>
-    <message>
-        <source>Fast</source>
-        <translation type="obsolete">Veloce</translation>
-    </message>
-    <message>
-        <source>Complete</source>
-        <translation type="obsolete">Completo</translation>
-    </message>
-    <message>
-        <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="obsolete">Metodo di cancellazione. Veloce prende 1 minuto. Completo può prendere più di 20 minuti.</translation>
-    </message>
-    <message>
-        <source>CD Recording Settings</source>
-        <translation type="obsolete">Impostazioni di registrazione CD</translation>
-    </message>
-    <message>
-        <source>Default Playlist</source>
-        <translation type="obsolete">Playlist predefinito</translation>
-    </message>
-    <message>
-        <source>Creating CD File System</source>
-        <translation type="obsolete">Creazione del filesystem CD</translation>
-    </message>
-    <message>
-        <source>Burning CD</source>
-        <translation type="obsolete">Masterizzare CD</translation>
-    </message>
-    <message>
-        <source>?</source>
-        <translation type="obsolete">?</translation>
-    </message>
-    <message>
-        <source>Track %1</source>
-        <translation type="obsolete">Traccia %1</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Ordine nella quale ordinare la struttura musica. Possibili valori sono un elenco separata da spazi di genere, splitartist, splitartist1, artista, album e titolo o la parola chiave &quot;directory&quot; per indicare la struttura sullo schermo dei mirror nel filesystem.</translation>
-    </message>
-    <message>
-        <source>Automatically play CDs</source>
-        <translation type="obsolete">Riproduzione automatica dei CD</translation>
-    </message>
-    <message>
-        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="obsolete">Inserimento automatico di un nuovo CD nell&apos;playliste avvio riproduzione del CD.</translation>
-    </message>
-    <message>
-        <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="obsolete">Selezionare il dispositivo SCSI o IDE per la scrittura su CD.</translation>
-    </message>
-    <message>
-        <source>Rebuilding music tree</source>
-        <translation type="obsolete">Aggiornamento struttura musica</translation>
-    </message>
-    <message>
-        <source>Loading Music</source>
-        <translation type="obsolete">Caricamento musica</translation>
-    </message>
-    <message>
-        <source>default</source>
-        <translation type="obsolete">predefinito</translation>
-    </message>
-    <message>
-        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="obsolete">Dispositivo audio usato per la riprdoduziione. &quot;predefinito&quot; userà il dispositivo specificato in MythTV</translation>
-    </message>
-    <message>
-        <source>Unknown Title</source>
-        <translation type="obsolete">Titolo sconosciuto</translation>
-    </message>
-    <message>
-        <source>Importing </source>
-        <translation type="obsolete">Importazione</translation>
-    </message>
-    <message>
-        <source>Scanning CD. Please Wait ...</source>
-        <translation type="obsolete">Scansione CD. Attendere ...</translation>
-    </message>
-    <message>
-        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation type="obsolete">Formato della directory e nome del file usato per prendere le informazioni se informazioni ID3 non sono trovate. Acettaro GENERE, ARTISTA, ALBUM, TITOLO, ARTIST_TITLE e TRACK_TITLE.</translation>
-    </message>
-    <message>
-        <source>Tag Encoding</source>
-        <translation type="obsolete">Codifica etichetta</translation>
-    </message>
-    <message>
-        <source>UTF-16</source>
-        <translation type="obsolete">UTF-16</translation>
-    </message>
-    <message>
-        <source>UTF-8</source>
-        <translation type="obsolete">UTF-8</translation>
-    </message>
-    <message>
-        <source>ASCII</source>
-        <translation type="obsolete">ASCII</translation>
-    </message>
-    <message>
-        <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="obsolete">Molti lettori mp3 non capiscono etichette codificate in UTF8 o UTF16, questa impopstazione permette di cambiare il formato di codifica usato. Attualmente applicato solo per etichette ID3.</translation>
-    </message>
-    <message>
-        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
-        <translation type="obsolete">Definisce la posizione/nome  delle nuove canzoni. Elementi validi sono: GENERE, ARTISTA, ALBUM, TRACCIA, TITOLO, ANNO</translation>
-    </message>
-    <message>
-        <source>Maximum Search Results</source>
-        <translation type="obsolete">Risultati della ricerca massimo</translation>
-    </message>
-    <message>
-        <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation type="obsolete">Usato per limitare il numero di risultati ritornati quando si sta usando funzionalità di ricerca.</translation>
-    </message>
-    <message>
-        <source>Resume mode</source>
-        <translation type="obsolete">Modalità ripresa</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="obsolete">Disattivo</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation type="obsolete">Traccia</translation>
-    </message>
-    <message>
-        <source>Exact</source>
-        <translation type="obsolete">Esatto</translation>
-    </message>
-    <message>
-        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation type="obsolete">Riprendere la riproduzione o l&apos;inizio della coda di riproduzione attiva, l&apos;inizio dell&apos;ultima traccia, un punto esatto compresa l&apos;ultima traccia.</translation>
-    </message>
-    <message>
-        <source>Playback Settings (2)</source>
-        <translation type="obsolete">Impostazioni di riproduzione (2)</translation>
-    </message>
-    <message>
-        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="obsolete">Il tema in uso non contiene l&apos;elemento %1. Contattare l&apos;autore e chiedere se può aggiornarlo.&lt;br&gt;&lt;br&gt; la prossima schermata potrebbe essere vuota. Uscire fuori e ritornare al menù.</translation>
-    </message>
-    <message>
-        <source>Number of Artists Tree Groups</source>
-        <translation type="obsolete">Numero dei gruppi della struttura artista</translation>
-    </message>
-    <message>
-        <source>Few</source>
-        <translation type="obsolete">Pochi</translation>
-    </message>
-    <message>
-        <source>Average</source>
-        <translation type="obsolete">Media</translation>
-    </message>
-    <message>
-        <source>Many</source>
-        <translation type="obsolete">Molti</translation>
-    </message>
-    <message>
-        <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
-        <translation type="obsolete">Determina quanti gruppi si hanno  nella struttura artisti. Pochi dare &quot;A B C D&quot; come per il vecchio comportamento, medio dare due lettere per gruppo, molti dare una lettera per gruppo.</translation>
-    </message>
-    <message>
-        <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation type="obsolete">Se selezionato, è consentito navigare nell&apos;intera struttura musica dalla schermata di riproduzione. Non opera con i tasti accelleratori disabilitati</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Album</translation>
-    </message>
-    <message>
-        <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
-        <translation type="obsolete">Avviamento della modalità casuale per il lettore. Può essere o normale, casuale, intelligente (casuale) o album.</translation>
-    </message>
-    <message>
-        <source>Change the visualizer when the song changes.</source>
-        <translation type="obsolete">Cambiare l&apos;effetto grafico quando la canzone cambia.</translation>
-    </message>
-    <message>
-        <source>Show Album Art at the start of each song</source>
-        <translation type="obsolete">Mostrare copertina album all&apos;avvio di ogni canzone</translation>
-    </message>
-    <message>
-        <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation type="obsolete">Quando la canzone cambia e la nuova canzone ha un immagine della copertina dell&apos;album visualizzare l&apos;effettografico per un perido breve.</translation>
-    </message>
-    <message>
-        <source>Randomize Visualizer order</source>
-        <translation type="obsolete">Ordine effetto grafico casuale</translation>
-    </message>
-    <message>
-        <source>On changing the visualizer pick a new one at random.</source>
-        <translation type="obsolete">Sull cambiamendo dell&apos;effetto grafico prendere uno nuovo a caso.</translation>
-    </message>
-    <message>
-        <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation type="obsolete">Elenco di effetti grafici da usare durante la riproduzione. Clic sul tasto dietro per modificare questo elenco</translation>
-    </message>
-    <message>
-        <source>Edit Visualizations</source>
-        <translation type="obsolete">Modificare effetti grafici</translation>
-    </message>
-    <message>
-        <source>Edit the list of visualizations to use during playback.</source>
-        <translation type="obsolete">Elenco di effetti grafici da usare durante la riproduzione.</translation>
-    </message>
-    <message>
-        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="obsolete"> &quot;predefinito&quot; lascerà che il MediaMonitor sceglierà un dispositivo.</translation>
-    </message>
-    <message>
-        <source>General Settings (1)</source>
-        <translation type="obsolete">Impostazioni generali (1)</translation>
-    </message>
-    <message>
-        <source>General Settings (2)</source>
-        <translation type="obsolete">Impostazioni generali (2)</translation>
-    </message>
-    <message>
-        <source>OSX Audio CD mount parser</source>
-        <translation type="obsolete">OSX audio CD analizzatore di montaggio</translation>
-    </message>
-    <message>
-        <source>Windows CD parser</source>
-        <translation type="obsolete">Analizzatore Windows CD</translation>
-    </message>
-    <message>
-        <source>Cleaning music database</source>
-        <translation type="obsolete">Cancellazione database musica</translation>
-    </message>
-    <message>
-        <source>Scanning music files</source>
-        <translation type="obsolete">Scansione file musicali</translation>
-    </message>
-    <message>
-        <source>Scanning Album Artwork</source>
-        <translation type="obsolete">Scansione album artwork</translation>
-    </message>
-    <message>
-        <source>Action on exit</source>
-        <translation type="obsolete">Azione all&apos;uscita</translation>
-    </message>
-    <message>
-        <source>Prompt</source>
-        <translation type="obsolete">Prompt</translation>
-    </message>
-    <message>
-        <source>Stop Playing</source>
-        <translation type="obsolete">Stop riproduzione</translation>
-    </message>
-    <message>
-        <source>Keep Playing</source>
-        <translation type="obsolete">Tenere riproduzione</translation>
-    </message>
-    <message>
-        <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation type="obsolete">Specificare quale azione da prendere quando si esce dal plugin mythmusic.</translation>
-    </message>
-    <message>
-        <source>Artists</source>
-        <translation type="obsolete">Artisti</translation>
-    </message>
-    <message>
-        <source>Internal Decoder</source>
-        <translation type="obsolete">Decodificare interno</translation>
-    </message>
-    <message>
-        <source>Loading Music. Please wait ...</source>
-        <translation type="obsolete">Caricamento musica. Attendere ...</translation>
-    </message>
-    <message>
-        <source>You need to tell me where to find your music on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages.</source>
-        <translation type="obsolete">Si deve dire dove trovare la musica sulla pagina &apos;Impostazioni generali&apos; nelle pagini di impostazioni MythMusic.</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
-        <translation type="obsolete">Impossibile trovare la directory musica. Si è impostato correttamente nella pagina &apos;Impostazioni generali&apos; nelle pagini di impostazioni MythMusic?</translation>
-    </message>
-    <message>
-        <source>Unsupported content type for ShoutCast stream: %1</source>
-        <translation type="obsolete">Tipo di contenuto non supportato per il flusso ShoutCast: %1</translation>
-    </message>
-    <message>
-        <source>and</source>
-        <translation type="obsolete">e</translation>
-    </message>
-</context>
-<context>
     <name>RatingSettings</name>
     <message>
         <location filename="../mythmusic/ratingsettings.cpp" line="39"/>
@@ -3046,10 +1669,6 @@ Nome: %1</translation>
 </context>
 <context>
     <name>RipStatus</name>
-    <message>
-        <source>Are you sure you want to cancel ripping the CD?</source>
-        <translation type="obsolete">Essere sicuri di cancellare veramente l&apos;estrazione del CD?</translation>
-    </message>
     <message>
         <location filename="../mythmusic/cdrip.cpp" line="1522"/>
         <source>Cancel ripping the CD?</source>
@@ -3089,20 +1708,6 @@ Hai i permessi di scrittura sulla directory musica?</translation>
         <location filename="../mythmusic/cdrip.cpp" line="629"/>
         <source>Perfect</source>
         <translation>Perfetta</translation>
-    </message>
-    <message>
-        <source>Artist: %1
-Album: %2
-Track: %3
-
-This track is already in the database. 
-Do you want to remove the existing track?</source>
-        <translation type="obsolete">Artista: %1
-Album: %2
-Traccia: %3
-
-Questa traccia è gia presente nel database. 
-Essere sicuri di rimuovere la traccia esistente?</translation>
     </message>
     <message>
         <location filename="../mythmusic/cdrip.cpp" line="683"/>
@@ -3178,30 +1783,7 @@ Vuoi eliminare definitivamente il/i file?</translation>
     </message>
 </context>
 <context>
-    <name>SearchDialog</name>
-    <message>
-        <source>Search Music Database</source>
-        <translation type="obsolete">Ricerca database musica</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
-    <message>
-        <source>Search Music Database (%1 matches)</source>
-        <translation type="obsolete">Ricerca database musica (%1 associazioni)</translation>
-    </message>
-</context>
-<context>
     <name>SearchStream</name>
-    <message>
-        <source>&lt;All Stations&gt;</source>
-        <translation type="vanished">&lt;Tutte le stazioni&gt;</translation>
-    </message>
     <message>
         <location filename="../mythmusic/streamview.cpp" line="884"/>
         <location filename="../mythmusic/streamview.cpp" line="901"/>
@@ -3303,26 +1885,6 @@ Vuoi eliminare definitivamente il/i file?</translation>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
-        <source>Select an Artist</source>
-        <translation type="obsolete">Selezionare un artista</translation>
-    </message>
-    <message>
-        <source>Select an Album</source>
-        <translation type="obsolete">Selezionare un album</translation>
-    </message>
-    <message>
-        <source>Select a Genre</source>
-        <translation type="obsolete">Selezionare un genere</translation>
-    </message>
-    <message>
-        <source>Select a Title</source>
-        <translation type="obsolete">Selezionare un genere</translation>
-    </message>
-    <message>
-        <source>Select a Compilation Artist</source>
-        <translation type="obsolete">Selezionare una raccolta di artista</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="342"/>
         <source>and</source>
         <translation>e</translation>
@@ -3331,148 +1893,13 @@ Vuoi eliminare definitivamente il/i file?</translation>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
-        <source>Edit Date</source>
-        <translation type="obsolete">Modificare data</translation>
-    </message>
-    <message>
-        <source>Fixed Date</source>
-        <translation type="obsolete">Data fissa</translation>
-    </message>
-    <message>
-        <source>Day</source>
-        <translation type="obsolete">Giorno</translation>
-    </message>
-    <message>
-        <source>Month</source>
-        <translation type="obsolete">Mese</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="obsolete">Anno</translation>
-    </message>
-    <message>
-        <source>Use Current Date</source>
-        <translation type="obsolete">Usare data corrente</translation>
-    </message>
-    <message>
-        <source>+/- Days</source>
-        <translation type="obsolete">+/- Giorni</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2151"/>
         <source>Invalid Date</source>
         <translation>Data non valida</translation>
     </message>
 </context>
 <context>
-    <name>SmartPLOrderByDialog</name>
-    <message>
-        <source>Order By Fields</source>
-        <translation type="obsolete">Ordinare per campi</translation>
-    </message>
-    <message>
-        <source>1 Add</source>
-        <translation type="obsolete">1 Aggiungere</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">Aggiungere</translation>
-    </message>
-    <message>
-        <source>2 Delete</source>
-        <translation type="obsolete">2 Eliminare</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Eliminare</translation>
-    </message>
-    <message>
-        <source>3 Move Up</source>
-        <translation type="obsolete">3 Spostare in alto</translation>
-    </message>
-    <message>
-        <source>Move Up</source>
-        <translation type="obsolete">Spostare in alto</translation>
-    </message>
-    <message>
-        <source>4 Move Down</source>
-        <translation type="obsolete">4 Spostare in basso</translation>
-    </message>
-    <message>
-        <source>Move Down</source>
-        <translation type="obsolete">Spostare in basso</translation>
-    </message>
-    <message>
-        <source>5 Ascending</source>
-        <translation type="obsolete">5 Ascendente</translation>
-    </message>
-    <message>
-        <source>Ascending</source>
-        <translation type="obsolete">Ascendente</translation>
-    </message>
-    <message>
-        <source>6 Descending</source>
-        <translation type="obsolete">6 Discendente</translation>
-    </message>
-    <message>
-        <source>Descending</source>
-        <translation type="obsolete">Discendente</translation>
-    </message>
-    <message>
-        <source>7 OK</source>
-        <translation type="obsolete">7 Ok</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-</context>
-<context>
     <name>SmartPLResultViewer</name>
-    <message>
-        <source>Smart Playlist Result Viewer</source>
-        <translation type="obsolete">Visualizzatore risultati playlist intelligente</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="obsolete">Uscire</translation>
-    </message>
-    <message>
-        <source>ID</source>
-        <translation type="obsolete">ID</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Album</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Titolo</translation>
-    </message>
-    <message>
-        <source>Genre</source>
-        <translation type="obsolete">Genere</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="obsolete">Anno</translation>
-    </message>
-    <message>
-        <source>Track No.</source>
-        <translation type="obsolete">Traccia n.</translation>
-    </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1702"/>
         <source>%1 of %2</source>
@@ -3480,66 +1907,7 @@ Vuoi eliminare definitivamente il/i file?</translation>
     </message>
 </context>
 <context>
-    <name>SmartPlaylistDialog</name>
-    <message>
-        <source>Smart Playlists</source>
-        <translation type="obsolete">playlistveloce</translation>
-    </message>
-    <message>
-        <source>1 Select</source>
-        <translation type="obsolete">1 Selezionare</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation type="obsolete">Selezionare</translation>
-    </message>
-    <message>
-        <source>2 New</source>
-        <translation type="obsolete">2 Nuovo</translation>
-    </message>
-    <message>
-        <source>New</source>
-        <translation type="obsolete">Nuovo</translation>
-    </message>
-    <message>
-        <source>3 Edit</source>
-        <translation type="obsolete">3 Modificare</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Modificare</translation>
-    </message>
-    <message>
-        <source>4 Delete</source>
-        <translation type="obsolete">4 Eliminare</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Cancellare</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="obsolete">Essere veramente sicuri di cancellare veramente questo playlistveloce?</translation>
-    </message>
-</context>
-<context>
     <name>SmartPlaylistEditor</name>
-    <message>
-        <source>Smart Playlist Editor</source>
-        <translation type="obsolete">Editor di playlistveloce</translation>
-    </message>
-    <message>
-        <source>Category:</source>
-        <translation type="obsolete">Categoria:</translation>
-    </message>
-    <message>
-        <source>Title:</source>
-        <translation type="obsolete">Titolo:</translation>
-    </message>
-    <message>
-        <source>Match</source>
-        <translation type="obsolete">Corrispondenza</translation>
-    </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="396"/>
         <location filename="../mythmusic/smartplaylist.cpp" line="726"/>
@@ -3553,38 +1921,6 @@ Vuoi eliminare definitivamente il/i file?</translation>
         <location filename="../mythmusic/smartplaylist.cpp" line="1000"/>
         <source>Any</source>
         <translation>Ogni</translation>
-    </message>
-    <message>
-        <source>Of The Following Conditions</source>
-        <translation type="obsolete">alle seguenti condiozioni</translation>
-    </message>
-    <message>
-        <source>Order By:</source>
-        <translation type="obsolete">Ordinare per:</translation>
-    </message>
-    <message>
-        <source>Matches:</source>
-        <translation type="obsolete">Corrispondenze:</translation>
-    </message>
-    <message>
-        <source>Limit:</source>
-        <translation type="obsolete">Limite:</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="obsolete">Salvare</translation>
-    </message>
-    <message>
-        <source>Show Results</source>
-        <translation type="obsolete">Mostrare risultati</translation>
-    </message>
-    <message>
-        <source>Smart Playlist Categories</source>
-        <translation type="obsolete">Categorie playlistveloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="469"/>
@@ -3691,12 +2027,6 @@ Vuoi eliminare definitivamente il/i file?</translation>
 Broadcaster: %1 - Channel: %2</source>
         <translation>Sei sicuro di voler cancellare questo flusso?
 Broadcaster:%1 - canale:%2</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this Stream?
-Station: %1 - Channel: %2</source>
-        <translation type="vanished">Sei sicuro di voler cancellare questo flusso?
-Stazione:%1 - canale:%2</translation>
     </message>
 </context>
 <context>
@@ -3809,7 +2139,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="370"/>
         <source>Please Wait ...</source>
-        <translation type="unfinished">Attendere...</translation>
+        <translation>Attendere...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
@@ -3914,7 +2244,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="528"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="533"/>
@@ -4194,7 +2524,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Add/Edit Station and Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi/Edita Stazione e Canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="436"/>
@@ -4474,7 +2804,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="518"/>
         <source>Unknown</source>
-        <translation type="unfinished">Sconosciuto</translation>
+        <translation>Sconosciutob</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="520"/>
@@ -4632,10 +2962,6 @@ Stazione:%1 - canale:%2</translation>
         <translation>Importa copertina</translation>
     </message>
     <message>
-        <source>Browse cover images on your system.</source>
-        <translation type="vanished">Cerca immagini copertine sul sistema.</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="377"/>
         <source>Previous</source>
         <translation>Precedente</translation>
@@ -4646,89 +2972,9 @@ Stazione:%1 - canale:%2</translation>
         <translation>Successivo</translation>
     </message>
     <message>
-        <source>Import local music files.</source>
-        <translation type="vanished">Importa brani musicali locali.</translation>
-    </message>
-    <message>
-        <source>Track is part of a compilation</source>
-        <translation type="vanished">La traccia è parte di una compilation</translation>
-    </message>
-    <message>
-        <source>Click to browse directories...</source>
-        <translation type="vanished">Clic per navigare nelle directory...</translation>
-    </message>
-    <message>
-        <source>Choose Coverart</source>
-        <translation type="vanished">Scegli copertina</translation>
-    </message>
-    <message>
-        <source>Rip A CD</source>
-        <translation type="vanished">Estrai CD</translation>
-    </message>
-    <message>
-        <source>Input metadata for the CD you have inserted.</source>
-        <translation type="vanished">Introduci i metadati per il CD inserito.</translation>
-    </message>
-    <message>
-        <source>Album Name:</source>
-        <translation type="vanished">Nome album:</translation>
-    </message>
-    <message>
-        <source>Album Year:</source>
-        <translation type="vanished">Anno album:</translation>
-    </message>
-    <message>
-        <source>Album is a compilation</source>
-        <translation type="vanished">L&apos;album è una compilation</translation>
-    </message>
-    <message>
-        <source>Click here to search existing artists...</source>
-        <translation type="vanished">Clic qui per cercare artisti esistenti...</translation>
-    </message>
-    <message>
-        <source>Click here to search existing albums...</source>
-        <translation type="vanished">Clic qui per cercare album esistenti...</translation>
-    </message>
-    <message>
-        <source>Click here to search existing genres...</source>
-        <translation type="vanished">Clic qui per cercare generi esistenti...</translation>
-    </message>
-    <message>
-        <source>Track Title:</source>
-        <translation type="vanished">Traccia titolo:</translation>
-    </message>
-    <message>
-        <source>Track Artist:</source>
-        <translation type="vanished">Traccia artista:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="502"/>
         <source>Track:</source>
         <translation>Traccia:</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Artist</source>
-        <translation type="vanished">Clic qui per selezionare l&apos;artista</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Compilation</source>
-        <translation type="vanished">Clic qui per selezionare la Compilation</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Album</source>
-        <translation type="vanished">Clic qui per selezionare l&apos;album</translation>
-    </message>
-    <message>
-        <source>Click Here to Select Genre</source>
-        <translation type="vanished">Clic qui per selezionare il genere</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <translation type="vanished">-</translation>
-    </message>
-    <message>
-        <source>+</source>
-        <translation type="vanished">+</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="367"/>
@@ -5013,22 +3259,22 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%ARTIST% ~ %TITLE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%ARTIST% ~ %TITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%ARTIST% ~ %TITLE% ~ %ALBUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%ARTIST% ~ %TITLE% ~ %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>%BROADCASTER% ~ %CHANNEL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%BROADCASTER% ~ %CHANNEL%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>%BROADCASTER% ~ %CHANNEL% ~ %GENRE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%BROADCASTER% ~ %CHANNEL% ~ %GENRE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
@@ -5038,47 +3284,47 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>%PLAYCOUNT%x ~ %LASTPLAYED%</source>
-        <translation type="unfinished"></translation>
+        <translation>%PLAYCOUNT%x ~ %LASTPLAYED%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>%STATION% - %Channel%  | %genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION% - %Channel%  | %genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>%STATION% - %Channel% - %genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION% - %Channel% - %genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>%STATION| - %%CHANNEL%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STATION| - %%CHANNEL%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>%TITLE% - %ARTIST% - %ALBUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% - %ARTIST% - %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>%TITLE% by %ARTIST% on %ALBUM% (%length%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% by %ARTIST% on %ALBUM% (%length%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>%TITLE% ~ %ARTIST%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE% ~ %ARTIST%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>%TRACKNUM% - %TITLE% %(|LENGTH|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM% - %TITLE% %(|LENGTH|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>%TRACKNUM% - %TITLE% - %ARTIST% %(|LENGTH|)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TRACKNUM% - %TITLE% - %ARTIST% %(|LENGTH|)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
@@ -5088,17 +3334,17 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>%artist| - %%title%</source>
-        <translation type="unfinished"></translation>
+        <translation>%artist| - %%title%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>%genre%</source>
-        <translation type="unfinished"></translation>
+        <translation>%genre%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>%genre%%, |year%</source>
-        <translation type="unfinished"></translation>
+        <translation>%genre%%, |year%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
@@ -5108,7 +3354,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>%length%</source>
-        <translation type="unfinished"></translation>
+        <translation>%length%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -5123,7 +3369,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>%title% - %artist%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title% - %artist%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
@@ -5133,17 +3379,17 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>%title%% - |artist%% - |album%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title%% - |artist%% - |album%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>%title| - %%artist%</source>
-        <translation type="unfinished"></translation>
+        <translation>%title| - %%artist%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>%track% - %title% - %artist% (%length%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%track% - %title% - %artist% (%length%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -5153,32 +3399,32 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>0%</source>
-        <translation type="unfinished"></translation>
+        <translation>0%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>0000</source>
-        <translation type="unfinished"></translation>
+        <translation>0000</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation>10</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>3:45</source>
-        <translation type="unfinished"></translation>
+        <translation>3:45</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>&gt;&gt; %NEXTARTIST% ~ %NEXTTITLE%</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; %NEXTARTIST% ~ %NEXTTITLE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
@@ -5193,7 +3439,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Actions</source>
-        <translation type="unfinished">Azioni</translation>
+        <translation>Azionib</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
@@ -5258,7 +3504,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>CD</source>
-        <translation type="unfinished">CD</translation>
+        <translation>CD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
@@ -5348,7 +3594,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="150"/>
         <source>Current Playlist</source>
-        <translation type="unfinished">playlist corrente</translation>
+        <translation>Playlist corrente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="151"/>
@@ -5388,7 +3634,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="171"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished">Modifica metadati</translation>
+        <translation>Modifica metadati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="172"/>
@@ -5448,7 +3694,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="193"/>
         <source>File Already Exists</source>
-        <translation type="unfinished">Il file esiste già</translation>
+        <translation>Il file esiste già</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="194"/>
@@ -5588,7 +3834,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="247"/>
         <source>Intelligent</source>
-        <translation type="unfinished">Intelligente</translation>
+        <translation>Intelligente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="250"/>
@@ -5826,7 +4072,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="359"/>
         <source>Playlist Editor</source>
-        <translation type="unfinished">Editor Playlist</translation>
+        <translation>Editor Playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="360"/>
@@ -5856,7 +4102,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="369"/>
         <source>Playlists</source>
-        <translation type="unfinished">Playlist</translation>
+        <translation>Playlist</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="372"/>
@@ -5891,7 +4137,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="390"/>
         <source>Ratings</source>
-        <translation type="unfinished">Valutazioni</translation>
+        <translation>Valutazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="402"/>
@@ -6111,7 +4357,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="483"/>
         <source>Stopped</source>
-        <translation type="unfinished">Fermato</translation>
+        <translation>Fermato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="484"/>
@@ -6271,7 +4517,7 @@ Stazione:%1 - canale:%2</translation>
     <message>
         <location filename="themestrings.h" line="292"/>
         <source>Music folders and general options</source>
-        <translation>Cartelle musica e opzioni generali</translation>
+        <translation>Cartelle brani e opzioni generali</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="293"/>
@@ -6471,45 +4717,6 @@ Stazione:%1 - canale:%2</translation>
         <location filename="../mythmusic/visualizationsettings.cpp" line="53"/>
         <source>Save settings and Exit</source>
         <translation>Salva le impostazioni e esci</translation>
-    </message>
-</context>
-<context>
-    <name>VisualizationsEditor</name>
-    <message>
-        <source>Visualizations</source>
-        <translation type="obsolete">Effetti grafici</translation>
-    </message>
-    <message>
-        <source>Selected Visualizations</source>
-        <translation type="obsolete">Effetti grafici selezionati</translation>
-    </message>
-    <message>
-        <source>Available Visualizations</source>
-        <translation type="obsolete">Effetti grafici disponibili</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="obsolete">Nome</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Fornitore</translation>
-    </message>
-    <message>
-        <source>Move Up</source>
-        <translation type="obsolete">Spostare in alto</translation>
-    </message>
-    <message>
-        <source>Move Down</source>
-        <translation type="obsolete">Spostare in basso</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulare</translation>
     </message>
 </context>
 <context>
