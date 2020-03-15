@@ -595,6 +595,18 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
+QString T2TerrestrialDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("T2TerrestrialDeliverySystemDescriptor: ");
+    str.append(QString("plp_id(%1) T2_system_id(%2)")
+        .arg(PlpID())
+        .arg(T2SystemID()));
+    //
+    // TBD
+    //
+    return str;
+}
+
 QString DVBLogicalChannelDescriptor::toString() const
 {
     QString ret = "UKChannelListDescriptor sid->chan_num: ";
