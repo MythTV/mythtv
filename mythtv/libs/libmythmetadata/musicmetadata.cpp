@@ -676,6 +676,8 @@ QString MusicMetadata::Url(uint index)
 
 void MusicMetadata::dumpToDatabase()
 {
+    checkEmptyFields();
+
     if (m_directoryId < 0)
         getDirectoryId();
 
