@@ -865,16 +865,28 @@ inline QString MusicMetadata::formatReplaceSymbols(const QString &format)
 void MusicMetadata::checkEmptyFields()
 {
     if (m_artist.isEmpty())
+    {
         m_artist = tr("Unknown Artist", "Default artist if no artist");
+        m_artistId = -1;
+    }
     // This should be the same as Artist if it's a compilation track or blank
     if (!m_compilation || m_compilationArtist.isEmpty())
+    {
         m_compilationArtist = m_artist;
+        m_compartistId = -1;
+    }
     if (m_album.isEmpty())
+    {
         m_album = tr("Unknown Album", "Default album if no album");
+        m_albumId = -1;
+    }
     if (m_title.isEmpty())
         m_title = m_filename;
     if (m_genre.isEmpty())
+    {
         m_genre = tr("Unknown Genre", "Default genre if no genre");
+        m_genreId = -1;
+    }
     ensureSortFields();
 }
 
