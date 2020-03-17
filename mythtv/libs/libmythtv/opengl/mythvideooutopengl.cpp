@@ -312,10 +312,7 @@ bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &Vid
 
     // delete and recreate the buffers and flag that the input has changed
     m_maxReferenceFrames = ReferenceFrames;
-    m_videoBuffers.BeginLock(kVideoBuffer_all);
-    DestroyBuffers();
-    m_buffersCreated = CreateBuffers(CodecId, VideoDim);
-    m_videoBuffers.EndLock();
+    m_buffersCreated = m_videoBuffers.DiscardAndRecreate(CodecId, VideoDim, m_maxReferenceFrames);
     if (!m_buffersCreated)
         return false;
 
@@ -691,13 +688,14 @@ void MythVideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
         return;
 
     bool retain = format_is_hw(Frame->codec);
+    QVector<VideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
     while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
         VideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (retain && (frame != Frame)))
-            MythVideoOutput::DoneDisplayingFrame(frame);
+            release.append(frame);
     }
 
     if (retain)
@@ -708,9 +706,12 @@ void MythVideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     }
     else
     {
-        m_videoBuffers.DoneDisplayingFrame(Frame);
+        release.append(Frame);
     }
     m_videoBuffers.EndLock();
+
+    for (auto * frame : release)
+        m_videoBuffers.DoneDisplayingFrame(frame);
 }
 
 /*! \brief Discard video frames
@@ -723,13 +724,9 @@ void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
 {
     if (Flushed)
     {
-        m_videoBuffers.BeginLock(kVideoBuffer_pause);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("(%1): %2").arg(KeyFrame).arg(m_videoBuffers.GetStatus()));
-        while (m_videoBuffers.Size(kVideoBuffer_pause))
-            m_videoBuffers.DiscardFrame(m_videoBuffers.Tail(kVideoBuffer_pause));
-        m_videoBuffers.EndLock();
+        m_videoBuffers.DiscardPauseFrames();
     }
-
     MythVideoOutput::DiscardFrames(KeyFrame, Flushed);
 }
 
@@ -833,13 +830,14 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
 
 void MythVideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode, FrameScanType Scan)
 {
+    VideoFrame* release = nullptr;
     m_videoBuffers.BeginLock(kVideoBuffer_used);
     VideoFrame *used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
         if (format_is_hw(used->codec))
         {
-            DoneDisplayingFrame(used);
+            release = m_videoBuffers.Dequeue(kVideoBuffer_used);
         }
         else
         {
@@ -854,6 +852,9 @@ void MythVideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode, FrameScan
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Could not update pause frame");
     }
     m_videoBuffers.EndLock();
+
+    if (release)
+        DoneDisplayingFrame(release);
 }
 
 void MythVideoOutputOpenGL::InitPictureAttributes(void)
