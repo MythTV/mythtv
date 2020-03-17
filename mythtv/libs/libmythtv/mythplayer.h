@@ -136,9 +136,11 @@ class DecoderCallback
   public:
     using Callback = void (*)(void*, void*, void*);
     DecoderCallback() = default;
-    DecoderCallback(QString &Debug, Callback Function, void *Opaque1, void *Opaque2, void *Opaque3)
+    DecoderCallback(QString &Debug, Callback Function, QAtomicInt *Ready,
+                    void *Opaque1, void *Opaque2, void *Opaque3)
       : m_debug(std::move(Debug)),
         m_function(Function),
+        m_ready(Ready),
         m_opaque1(Opaque1),
         m_opaque2(Opaque2),
         m_opaque3(Opaque3)
@@ -147,6 +149,7 @@ class DecoderCallback
 
     QString m_debug;
     Callback m_function { nullptr };
+    QAtomicInt *m_ready { nullptr };
     void* m_opaque1     { nullptr };
     void* m_opaque2     { nullptr };
     void* m_opaque3     { nullptr };
@@ -310,7 +313,7 @@ class MTV_PUBLIC MythPlayer
                                       DecoderCallback::Callback Function,
                                       void *Opaque1, void *Opaque2);
     void ProcessCallbacks(void);
-    void QueueCallback(QString Debug, DecoderCallback::Callback Function,
+    void QueueCallback(QString Debug, DecoderCallback::Callback Function, QAtomicInt *Ready,
                        void *Opaque1, void *Opaque2, void *Opaque3);
 
     // Reinit

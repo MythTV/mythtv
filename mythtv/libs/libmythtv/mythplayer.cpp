@@ -3082,12 +3082,13 @@ void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
     if (!Function)
         return;
 
+    QAtomicInt ready{0};
     QWaitCondition wait;
     QMutex lock;
     lock.lock();
-    Player->QueueCallback(Debug, Function, &wait, Opaque1, Opaque2);
+    Player->QueueCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2);
     int count = 0;
-    while (!wait.wait(&lock, 100) && (count += 100))
+    while (!ready && !wait.wait(&lock, 100) && (count += 100))
         LOG(VB_GENERAL, LOG_WARNING, QString("Waited %1ms for %2").arg(count).arg(Debug));
     lock.unlock();
 }
@@ -3095,24 +3096,27 @@ void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
 void MythPlayer::ProcessCallbacks(void)
 {
     m_decoderCallbackLock.lock();
-    for (const auto *it = m_decoderCallbacks.cbegin(); it != m_decoderCallbacks.cend(); ++it)
+    for (auto *it = m_decoderCallbacks.begin(); it != m_decoderCallbacks.end(); ++it)
     {
         if (it->m_function)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(it->m_debug));
             it->m_function(it->m_opaque1, it->m_opaque2, it->m_opaque3);
         }
+        if (it->m_ready)
+            it->m_ready->ref();
     }
     m_decoderCallbacks.clear();
     m_decoderCallbackLock.unlock();
 }
 
 void MythPlayer::QueueCallback(QString Debug, DecoderCallback::Callback Function,
+                               QAtomicInt *Ready,
                                void *Opaque1, void *Opaque2, void *Opaque3)
 {
     m_decoderCallbackLock.lock();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
-    m_decoderCallbacks.append(DecoderCallback(Debug, Function, Opaque1, Opaque2, Opaque3));
+    m_decoderCallbacks.append(DecoderCallback(Debug, Function, Ready, Opaque1, Opaque2, Opaque3));
     m_decoderCallbackLock.unlock();
 }
 
