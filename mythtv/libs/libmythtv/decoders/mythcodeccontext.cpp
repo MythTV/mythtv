@@ -467,8 +467,8 @@ void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot destroy interop - no player");
         return;
     }
-    MythPlayer::HandleDecoderCallback(Interop->GetPlayer(), "Destroy OpenGL interop",
-                                      destroy, Interop, nullptr);
+    Interop->GetPlayer()->HandleDecoderCallback("Destroy OpenGL interop",
+                                                destroy, Interop, nullptr);
 }
 
 void MythCodecContext::CreateDecoderCallback(void *Wait, void *Context, void *Callback)
@@ -497,7 +497,8 @@ int MythCodecContext::InitialiseDecoder(AVCodecContext *Context, CreateHWDecoder
     auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
     if (decoder)
         player = decoder->GetPlayer();
-    MythPlayer::HandleDecoderCallback(player, Debug, MythCodecContext::CreateDecoderCallback,
+    if (player)
+        player->HandleDecoderCallback(Debug, MythCodecContext::CreateDecoderCallback,
                                       Context, reinterpret_cast<void*>(Callback));
     return Context->hw_frames_ctx ? 0 : -1;
 }
@@ -516,7 +517,8 @@ int MythCodecContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecode
     auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
     if (decoder)
         player = decoder->GetPlayer();
-    MythPlayer::HandleDecoderCallback(player, Debug, MythCodecContext::CreateDecoderCallback,
+    if (player)
+        player->HandleDecoderCallback(Debug, MythCodecContext::CreateDecoderCallback,
                                       Context, reinterpret_cast<void*>(Callback));
     return Context->hw_device_ctx ? 0 : -1;
 }
