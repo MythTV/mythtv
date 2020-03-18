@@ -3077,16 +3077,10 @@ void MythPlayer::AudioEnd(void)
  * This is used by hardware decoders to ensure certain resources are created
  * and destroyed in the UI (render) thread.
 */
-void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
+void MythPlayer::HandleDecoderCallback(const QString &Debug,
                                        DecoderCallback::Callback Function,
                                        void *Opaque1, void *Opaque2)
 {
-    if (!Player)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "No player to call back");
-        return;
-    }
-
     if (!Function)
         return;
 
@@ -3094,7 +3088,7 @@ void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
     QWaitCondition wait;
     QMutex lock;
     lock.lock();
-    Player->QueueCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2);
+    QueueCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2);
     int count = 0;
     while (!ready && !wait.wait(&lock, 100) && (count += 100))
         LOG(VB_GENERAL, LOG_WARNING, QString("Waited %1ms for %2").arg(count).arg(Debug));

@@ -104,9 +104,9 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
             }
             else
             {
-                MythPlayer::HandleDecoderCallback(Player, "interop check",
-                                                  MythOpenGLInterop::GetInteropTypeCallback,
-                                                  &Format, &supported);
+                Player->HandleDecoderCallback("interop check",
+                                              MythOpenGLInterop::GetInteropTypeCallback,
+                                              &Format, &supported);
             }
             return supported;
         }
