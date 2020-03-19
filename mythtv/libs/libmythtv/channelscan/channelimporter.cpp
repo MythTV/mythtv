@@ -76,6 +76,18 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         cout << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
         cout << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
         cout << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
+        cout << "Remove duplicate channels   : " << (m_removeDuplicates  ? "yes" : "no") << endl;
+    }
+
+    // List of transports
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (transports.size() > 0)
+        {
+            cout << endl;
+            cout << "Transport list before processing (" << transports.size() << "):" << endl;
+            cout << FormatTransports(transports).toLatin1().constData() << endl;
+        }
     }
 
     // Print out each channel
@@ -92,17 +104,50 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     if (m_doSave)
         saved_scan = SaveScan(transports);
 
-    CleanupDuplicates(transports);
+    // Merge transports with the same frequency into one
+    MergeSameFrequency(transports);
 
+    // Remove duplicate transports with a lower signal strength.
+    ScanDTVTransportList duplicateTransports;
+    if (m_removeDuplicates)
+    {
+        ScanDTVTransportList duplicates;
+        RemoveDuplicateTransports(transports, duplicates);
+        if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+        {
+            if (duplicates.size() > 0)
+            {
+                cout << endl;
+                cout << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
+                cout << FormatTransports(duplicates).toLatin1().constData() << endl;
+            }
+        }
+    }
+
+    // Remove the channels that do not pass various criteria.
     FilterServices(transports);
 
-    // Print out each transport
-    uint transports_scanned_size = transports.size();
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    // When there are duplicate channels remove the channels that are received
+    // on the transport with the lowest signal strength.
+    if (m_removeDuplicates)
     {
-        cout << endl;
-        cout << "Transport list (" << transports_scanned_size << "):" << endl;
-        cout << FormatTransports(transports).toLatin1().constData() << endl;
+        ScanDTVTransportList duplicates;
+        RemoveDuplicateChannels(transports, duplicates);
+        if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+        {
+            if (duplicates.size() > 0)
+            {
+                cout << endl;
+                cout << "Transports with discarded duplicate channels (" << duplicates.size() << "):" << endl;
+                cout << FormatTransports(duplicates).toLatin1().constData() << endl;
+                cout << endl;
+                cout << "Discarded duplicate channels (";
+                cout << SimpleCountChannels(duplicates) << "):" << endl;
+                ChannelImporterBasicStats infoA = CollectStats(duplicates);
+                cout << FormatChannels(transports, &infoA).toLatin1().constData() << endl;
+                cout << endl;
+            }
+        }
     }
 
     // Pull in DB info in transports
@@ -114,7 +159,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         if (!db_trans.empty())
         {
             cout << endl;
-            cout << "Transport list of transports with channels in DB but not in scan (";
+            cout << "Transports with channels in DB but not in scan (";
             cout << db_trans.size() << "):" << endl;
             cout << FormatTransports(db_trans).toLatin1().constData() << endl;
         }
@@ -124,7 +169,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     FixUpOpenCable(transports);
 
     // All channels in the scan after comparing with the database
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
     {
         cout << endl << "Channel list after compare with database (";
         cout << SimpleCountChannels(transports) << "):" << endl;
@@ -158,7 +203,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     cout << FormatChannels(transports, &info).toLatin1().constData() << endl;
 
     // Create summary
-    QString msg = GetSummary(transports_scanned_size, info, stats);
+    QString msg = GetSummary(transports.size(), info, stats);
     cout << msg.toLatin1().constData() << endl << endl;
 
     if (m_doInsert)
@@ -905,7 +950,12 @@ void ChannelImporter::AddChanToCopy(
     transport_copy.m_channels.push_back(chan);
 }
 
-void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
+// ChannelImporter::MergeSameFrequency
+//
+// Merge transports that are on the same frequency by
+// combining all channels of both transports into one transport
+//
+void ChannelImporter::MergeSameFrequency(ScanDTVTransportList &transports)
 {
     ScanDTVTransportList no_dups;
 
@@ -950,13 +1000,171 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
                     transports[i].m_channels.push_back(transports[j].m_channels[k]);
             }
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Duplicate transport ") + FormatTransport(transports[j]));
+                QString("Transport on same frequency:") + FormatTransport(transports[j]));
             ignore[j] = true;
         }
         no_dups.push_back(transports[i]);
     }
+    transports = no_dups;
+}
+
+// ChannelImporter::RemoveDuplicateTransports
+//
+// When there are two transports that have the same list of channels
+// but that are received on different frequencies then remove
+// the transport with the weakest signal.
+//
+void ChannelImporter::RemoveDuplicateTransports(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates)
+{
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Number of transports:%1").arg(transports.size()));
+
+    ScanDTVTransportList no_dups;
+    vector<bool> ignore;
+    ignore.resize(transports.size());
+    for (size_t i = 0; i < transports.size(); ++i)
+    {
+        ScanDTVTransport &ta = transports[i];
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport " +
+            FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()));
+
+        if (!ignore[i])
+        {
+            for (size_t j = i+1; j < transports.size(); ++j)
+            {
+                ScanDTVTransport &tb = transports[j];
+                bool found_same = true;
+                bool found_diff = true;
+                if (ta.m_channels.size() == tb.m_channels.size())
+                {
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Comparing transports " +
+                        FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()) +
+                        FormatTransport(tb) + QString(" size(%1)").arg(tb.m_channels.size()));
+
+                    for (size_t k = 0; found_same && k < tb.m_channels.size(); ++k)
+                    {
+                        if (tb.m_channels[k].IsSameChannel(ta.m_channels[k]), 0)
+                        {
+                            found_diff = false;
+                        }
+                        else
+                        {
+                            found_same = false;
+                        }
+                    }
+                }
+
+                // Transport with the lowest signal strength is duplicate
+                if (found_same && !found_diff)
+                {
+                    size_t lowss = transports[i].m_signalStrength < transports[j].m_signalStrength ? i : j;
+                    ignore[lowss] = true;
+                    duplicates.push_back(transports[lowss]);
+
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Duplicate transports found");
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport A " + FormatTransport(transports[i]));
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport B " + FormatTransport(transports[j]));
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Discarding  " + FormatTransport(transports[lowss]));
+                }
+            }
+        }
+        if (!ignore[i])
+        {
+            no_dups.push_back(transports[i]);
+        }
+    }
 
     transports = no_dups;
+}
+
+// ChannelImporter::RemoveDuplicateChannels
+//
+// When there are identical channels that are present on different transports
+// then remove the channel that is received on the transport with the weakest signal.
+//
+void ChannelImporter::RemoveDuplicateChannels(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates)
+{
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("%1 for %2 transports").arg(__func__).arg(transports.size()));
+
+    // Flag the duplicate channels in this map.
+    // The key is transport index (16 bits, shifted to the left) plus channel index (16 bits).
+    // This works if there are max 65536 transports and max 65535 channels per transport.
+    QMap<uint,bool> dup_chan;
+
+    // Compare each channel with every channel in the other transports.
+    // We do not compare against channels in the same transport as it is unlikely
+    // to find a duplicate in the same transport and also we cannot make a selection
+    // based on the signal strength when there is a duplicate in the same transport.
+    for (size_t ita = 0; ita < transports.size(); ++ita)                // All transports in the list
+    {
+        ScanDTVTransport &ta = transports[ita];                         // Transport A is one transport from the list
+        for (size_t ica = 0; ica < ta.m_channels.size(); ++ica)         // All channels in transport A
+        {
+            ChannelInsertInfo &ca = ta.m_channels[ica];                 // Channel A is one channel from transport A
+            for (size_t itb = ita + 1; itb < transports.size(); ++itb)  // All transports above transport A
+            {
+                ScanDTVTransport &tb = transports[itb];                 // Transport B is one transport from the list
+                for (size_t icb = 0; icb < tb.m_channels.size(); ++icb) // All channels in transport B
+                {
+                    ChannelInsertInfo &cb = tb.m_channels[icb];         // Channel B is one channel from transport B
+                    if (ca.IsSameChannel(cb, 1))                        // Are Channel A and Channel B duplicate?
+                    {
+                        LOG(VB_CHANSCAN, LOG_INFO, LOC + "Duplicate channels: " +
+                            "\n\t" + FormatTransport(ta) + " " + FormatChannel(ta, ca) +
+                            "\n\t" + FormatTransport(tb) + " " + FormatChannel(tb, cb));
+                        if (ta.m_signalStrength < tb.m_signalStrength)  // Yes, compare signal strength of transports
+                        {
+                            dup_chan[(ita<<16)+ica] = true;             // Flag Channel A as duplicate
+                        }
+                        else
+                        {
+                            dup_chan[(itb<<16)+icb] = true;             // Flag Channel B as duplicate
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Go throught the list and copy the channels we keep to no_duplicates and
+    // copy the channels that are discarded to the duplicates.
+    ScanDTVTransportList no_duplicates;
+    for (size_t ita = 0; ita < transports.size(); ++ita)                // All transports in the list
+    {
+        ScanDTVTransport &ta = transports[ita];                         // One transport from the list
+        ChannelInsertInfoList ch_dup;
+        ChannelInsertInfoList ch_nodup;
+        for (size_t ica = 0; ica < ta.m_channels.size(); ++ica)         // All channels in this transport
+        {
+            ChannelInsertInfo &ca = ta.m_channels[ica];                 // One channel from this transport
+            if (dup_chan[(ita<<16)+ica])                                // Channel flagged as duplicate?
+            {
+                ch_dup.push_back(ca);                                   // Copy the channel to the duplicates list
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    "Discard duplicate channel " +
+                    FormatChannel(ta, ca));
+            }
+            else
+            {
+                ch_nodup.push_back(ca);                                 // Copy the channel to the no_duplicates list
+            }
+        }
+        if (ch_dup.size() > 0)                                          // At least one channel in this transport?
+        {
+            ScanDTVTransport tmp = ta;                                  // Yes, put the transport with the
+            ta.m_channels = ch_dup;                                     // duplicate channels in the list.
+            duplicates.push_back(tmp);
+        }
+        if (ch_nodup.size() > 0)                                        // At leat one non-duplicate channel in this transport?
+        {
+            ScanDTVTransport tmp = ta;                                  // Yes, put the transport with the
+            ta.m_channels = ch_nodup;                                   // non-duplicate channels in the list
+            no_duplicates.push_back(tmp);
+        }
+    }
+
+    transports = no_duplicates;
 }
 
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const

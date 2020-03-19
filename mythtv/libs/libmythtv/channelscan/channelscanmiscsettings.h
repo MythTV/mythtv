@@ -171,6 +171,22 @@ class FullChannelSearch : public TransMythUICheckBoxSetting
     };
 };
 
+class RemoveDuplicates : public TransMythUICheckBoxSetting
+{
+  public:
+    RemoveDuplicates()
+    {
+        setLabel(QObject::tr("Remove duplicate channels"));
+        setHelpText(
+            QObject::tr(
+                "If set, select the channel with the strongest signal when "
+                "there are duplicate transports and channels. "
+                "This option is useful for DVB-T2 and ATSC/OTA when the same channel "
+                "can sometimes be received from different transmitters."));
+        setValue(false);
+    };
+};
+
 class AddFullTS : public TransMythUICheckBoxSetting
 {
   public:
