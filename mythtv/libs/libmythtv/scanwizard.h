@@ -92,6 +92,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     bool    DoChannelNumbersOnly(void)   const;
     bool    DoCompleteChannelsOnly(void) const;
     bool    DoFullChannelSearch(void)    const;
+    bool    DoRemoveDuplicates(void)     const;
     bool    DoAddFullTS(void)            const;
     bool    DoTestDecryption(void)       const;
     bool    DoScanOpenTV(void)           const;
@@ -106,6 +107,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     ChannelNumbersOnly   *m_lcnOnly       {nullptr};
     CompleteChannelsOnly *m_completeOnly  {nullptr};
     FullChannelSearch    *m_fullSearch    {nullptr};
+    RemoveDuplicates     *m_removeDuplicates {nullptr};
     AddFullTS            *m_addFullTS     {nullptr};
     TrustEncSISetting    *m_trustEncSI    {nullptr};
   // End of members moved from ScanWizardConfig
