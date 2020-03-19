@@ -3069,22 +3069,21 @@ void MythPlayer::AudioEnd(void)
  * This is used by hardware decoders to ensure certain resources are created
  * and destroyed in the UI (render) thread.
 */
-void MythPlayer::HandleDecoderCallback(const QString &Debug,
-                                       DecoderCallback::Callback Function,
+void MythPlayer::HandleDecoderCallback(const QString &Debug, DecoderCallback::Callback Function,
                                        void *Opaque1, void *Opaque2)
 {
     if (!Function)
         return;
 
+    m_decoderCallbackLock.lock();
     QAtomicInt ready{0};
     QWaitCondition wait;
-    QMutex lock;
-    lock.lock();
-    QueueCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2);
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
+    m_decoderCallbacks.append(DecoderCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2));
     int count = 0;
-    while (!ready && !wait.wait(&lock, 100) && (count += 100))
+    while (!ready && !wait.wait(&m_decoderCallbackLock, 100) && (count += 100))
         LOG(VB_GENERAL, LOG_WARNING, QString("Waited %1ms for %2").arg(count).arg(Debug));
-    lock.unlock();
+    m_decoderCallbackLock.unlock();
 }
 
 void MythPlayer::ProcessCallbacks(void)
@@ -3101,16 +3100,6 @@ void MythPlayer::ProcessCallbacks(void)
             it->m_ready->ref();
     }
     m_decoderCallbacks.clear();
-    m_decoderCallbackLock.unlock();
-}
-
-void MythPlayer::QueueCallback(QString Debug, DecoderCallback::Callback Function,
-                               QAtomicInt *Ready,
-                               void *Opaque1, void *Opaque2, void *Opaque3)
-{
-    m_decoderCallbackLock.lock();
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
-    m_decoderCallbacks.append(DecoderCallback(Debug, Function, Ready, Opaque1, Opaque2, Opaque3));
     m_decoderCallbackLock.unlock();
 }
 
