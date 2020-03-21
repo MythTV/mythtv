@@ -11,6 +11,8 @@ darwin {
 } else {
     INCLUDEPATH += . ./include ./include/exiv2 ./src ./xmpsdk/include
 }
+QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-missing-declarations -Wno-shadow
+QMAKE_CXXFLAGS += -Wno-zero-as-null-pointer-constant -Wno-double-promotion
 
 DEFINES += exiv2lib_EXPORTS
 
