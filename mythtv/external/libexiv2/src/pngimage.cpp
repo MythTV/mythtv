@@ -612,7 +612,7 @@ namespace Exiv2
 
                 if (iptcData_.count() > 0) {
                     // Update IPTC data to a new PNG chunk
-                    DataBuf newPsData = Photoshop::setIptcIrb(0, 0, iptcData_);
+                    DataBuf newPsData = Photoshop::setIptcIrb(nullptr, 0, iptcData_);
                     if (newPsData.size_ > 0) {
                         std::string rawIptc((const char*)newPsData.pData_, newPsData.size_);
                         std::string chunk = PngChunk::makeMetadataChunk(rawIptc, mdIptc);
@@ -633,7 +633,7 @@ namespace Exiv2
                         ul2Data(length, chunkLength, bigEndian);
 
                         // calculate CRC
-                        uLong tmp = crc32(0L, Z_NULL, 0);
+                        uLong tmp = crc32(0L, nullptr, 0);
                         tmp = crc32(tmp, (const Bytef*)type, 4);
                         tmp = crc32(tmp, (const Bytef*)profileName_.data(), nameLength);
                         tmp = crc32(tmp, (const Bytef*)nullComp, 2);

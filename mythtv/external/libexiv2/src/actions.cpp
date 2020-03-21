@@ -1406,7 +1406,7 @@ namespace Action
         Exiv2::ExifData& exifData = pImage->exifData();
         Exiv2::IptcData& iptcData = pImage->iptcData();
         Exiv2::XmpData& xmpData = pImage->xmpData();
-        Exiv2::Metadatum* metadatum = 0;
+        Exiv2::Metadatum* metadatum = nullptr;
         if (modifyCmd.metadataId_ == exif) {
             auto pos = exifData.findKey(Exiv2::ExifKey(modifyCmd.key_));
             if (pos != exifData.end()) {
@@ -1432,7 +1432,7 @@ namespace Action
         if (metadatum) {
             value = metadatum->getValue();
         }
-        if (value.get() == 0 || (modifyCmd.explicitType_ && modifyCmd.typeId_ != value->typeId())) {
+        if (value.get() == nullptr || (modifyCmd.explicitType_ && modifyCmd.typeId_ != value->typeId())) {
             value = Exiv2::Value::create(modifyCmd.typeId_);
         }
         int rc = value->read(modifyCmd.value_);
@@ -1808,7 +1808,7 @@ namespace
             return 2;
         if (timeStr[4] != ':' || timeStr[7] != ':' || timeStr[10] != ' ' || timeStr[13] != ':' || timeStr[16] != ':')
             return 3;
-        if (0 == tm)
+        if (nullptr == tm)
             return 4;
         std::memset(tm, 0x0, sizeof(struct tm));
         tm->tm_isdst = -1;
@@ -1848,7 +1848,7 @@ namespace
 
     std::string tm2Str(const struct tm* tm)
     {
-        if (0 == tm)
+        if (nullptr == tm)
             return "";
 
         std::ostringstream os;

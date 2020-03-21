@@ -526,7 +526,7 @@ constexpr size_t operator"" _z(unsigned long long n)
     class EXIV2API RemoteIo : public BasicIo {
     public:
         //! Destructor. Releases all managed memory.
-        virtual ~RemoteIo();
+        ~RemoteIo() override;
         //@}
 
         //! @name Manipulators
@@ -670,7 +670,7 @@ constexpr size_t operator"" _z(unsigned long long n)
         //! @name Creators
         //@{
         //! Default Destructor
-        virtual ~HttpIo(){}
+        ~HttpIo() override{}
         //@}
     };
 

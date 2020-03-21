@@ -303,7 +303,7 @@ namespace Exiv2
                 DataBuf psData = readRawProfile(arr, false);
                 if (psData.size_ > 0) {
                     Blob iptcBlob;
-                    const byte* record = 0;
+                    const byte* record = nullptr;
                     uint32_t sizeIptc = 0;
                     uint32_t sizeHdr = 0;
 
@@ -517,7 +517,7 @@ namespace Exiv2
             ul2Data(length, static_cast<uint32_t>(chunkData.size()), bigEndian);
             // Calculate CRC on chunk type and chunk data
             std::string crcData = chunkType + chunkData;
-            uLong tmp = crc32(0L, Z_NULL, 0);
+            uLong tmp = crc32(0L, nullptr, 0);
             tmp = crc32(tmp, (const Bytef*)crcData.data(), static_cast<uInt>(crcData.size()));
             byte crc[4];
             ul2Data(crc, tmp, bigEndian);
@@ -551,7 +551,7 @@ namespace Exiv2
             // Calculate CRC on chunk type and chunk data
             std::string chunkType = "iTXt";
             std::string crcData = chunkType + chunkData;
-            uLong tmp = crc32(0L, Z_NULL, 0);
+            uLong tmp = crc32(0L, nullptr, 0);
             tmp = crc32(tmp, (const Bytef*)crcData.data(), static_cast<uInt>(crcData.size()));
             byte crc[4];
             ul2Data(crc, tmp, bigEndian);
