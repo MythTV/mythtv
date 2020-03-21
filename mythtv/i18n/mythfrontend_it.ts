@@ -11953,60 +11953,60 @@ database. Disabilitandolo si può velocizzare ulteriormente il caricamento dell&
         <translation>Non marcato</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3989"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3976"/>
         <source>Searching</source>
         <translation>Ricerca</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4087"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4074"/>
         <source>No Seektable</source>
         <translation>Nessuna tabella di ricerca</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4117"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4104"/>
         <source>Using previously auto-saved cuts</source>
         <translation>Uso tagli auto-salvati in precedenza</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4166"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4153"/>
         <source>Paused</source>
         <translation>In pausa</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4267"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4303"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4254"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4290"/>
         <source>New cut added.</source>
         <translation>Aggiunto nuovo taglio.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4272"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4259"/>
         <source>Delete</source>
         <translation>Elimina</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4277"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4264"/>
         <source>Undo Changes</source>
         <translation>Annulla modifiche</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4308"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4295"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation>Annulla - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4314"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4301"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation>Ripeti - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4844"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4831"/>
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5095"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5082"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n secondo</numerusform>
@@ -12014,32 +12014,32 @@ database. Disabilitandolo si può velocizzare ulteriormente il caricamento dell&
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5099"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5086"/>
         <source>Still Frame</source>
         <translation>Fermo fotogramma</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5100"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5087"/>
         <source>%1 of %2</source>
         <translation>%1 di %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5330"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5317"/>
         <source>Error opening remote stream buffer</source>
         <translation>Errore aperture buffer stream remoto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5343"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5330"/>
         <source>Error opening remote stream</source>
         <translation>Errore apertura stream remoto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5507"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5494"/>
         <source>Enabled Night Mode</source>
         <translation>Abilita modalità notte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5513"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5500"/>
         <source>Disabled Night Mode</source>
         <translation>Disabilita modalità notte</translation>
     </message>

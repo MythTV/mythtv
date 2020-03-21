@@ -11946,60 +11946,60 @@ Please wait...</translation>
         <translation>Not Flagged</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3989"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3976"/>
         <source>Searching</source>
         <translation>Searching</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4087"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4074"/>
         <source>No Seektable</source>
         <translation>No Seektable</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4117"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4104"/>
         <source>Using previously auto-saved cuts</source>
         <translation>Using previously auto-saved cuts</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4166"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4153"/>
         <source>Paused</source>
         <translation>Paused</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4267"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4303"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4254"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4290"/>
         <source>New cut added.</source>
         <translation>New cut added.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4272"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4259"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4277"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4264"/>
         <source>Undo Changes</source>
         <translation>Undo Changes</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4308"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4295"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation>Undo - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4314"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4301"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation>Redo - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4844"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4831"/>
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5095"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5082"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n second</numerusform>
@@ -12007,32 +12007,32 @@ Please wait...</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5099"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5086"/>
         <source>Still Frame</source>
         <translation>Still Frame</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5100"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5087"/>
         <source>%1 of %2</source>
         <translation>%1 of %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5330"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5317"/>
         <source>Error opening remote stream buffer</source>
         <translation>Error opening remote stream buffer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5343"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5330"/>
         <source>Error opening remote stream</source>
         <translation>Error opening remote stream</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5507"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5494"/>
         <source>Enabled Night Mode</source>
         <translation>Enabled Night Mode</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5513"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5500"/>
         <source>Disabled Night Mode</source>
         <translation>Disabled Night Mode</translation>
     </message>
