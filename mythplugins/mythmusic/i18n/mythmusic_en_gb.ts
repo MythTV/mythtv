@@ -1438,17 +1438,17 @@ Resetting and trying again</translation>
         <translation>oops</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <location filename="../mythmusic/playlist.cpp" line="616"/>
         <source>Default Playlist</source>
         <translation>Default Playlist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <location filename="../mythmusic/playlist.cpp" line="1344"/>
         <source>Creating CD File System</source>
         <translation>Creating CD File System</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <location filename="../mythmusic/playlist.cpp" line="1393"/>
         <source>Burning CD</source>
         <translation>Burning CD</translation>
     </message>

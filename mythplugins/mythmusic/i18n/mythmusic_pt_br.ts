@@ -1829,17 +1829,17 @@ Você quer continuar tocando em segundo plano?</translation>
         <translation type="unfinished">oops</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <location filename="../mythmusic/playlist.cpp" line="616"/>
         <source>Default Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <location filename="../mythmusic/playlist.cpp" line="1344"/>
         <source>Creating CD File System</source>
         <translation type="unfinished">Criando sistema de arquivos do CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <location filename="../mythmusic/playlist.cpp" line="1393"/>
         <source>Burning CD</source>
         <translation type="unfinished">Gravando CD</translation>
     </message>

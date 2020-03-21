@@ -1871,17 +1871,17 @@ Wilt u de muziek op de achtergrond door laten spelen?</translation>
         <translation type="unfinished">oeps</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <location filename="../mythmusic/playlist.cpp" line="616"/>
         <source>Default Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <location filename="../mythmusic/playlist.cpp" line="1344"/>
         <source>Creating CD File System</source>
         <translation type="unfinished">Bezig met maken van CD-bestandssysteem</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <location filename="../mythmusic/playlist.cpp" line="1393"/>
         <source>Burning CD</source>
         <translation type="unfinished">Bezig met branden van CD</translation>
     </message>

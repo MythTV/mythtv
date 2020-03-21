@@ -2304,17 +2304,17 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="868"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="866"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="875"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="873"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Exit, Save Thumbnails</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="876"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="874"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Exit, Don&apos;t Save Thumbnails</translation>
     </message>

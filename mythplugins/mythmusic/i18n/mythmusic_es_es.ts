@@ -1450,17 +1450,17 @@ Reiniciando y reintentando</translation>
         <translation>uups</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <location filename="../mythmusic/playlist.cpp" line="616"/>
         <source>Default Playlist</source>
         <translation>Lista de reproducción predeterminada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <location filename="../mythmusic/playlist.cpp" line="1344"/>
         <source>Creating CD File System</source>
         <translation>Creando sistema de archivos en el CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <location filename="../mythmusic/playlist.cpp" line="1393"/>
         <source>Burning CD</source>
         <translation>Grabando CD</translation>
     </message>
