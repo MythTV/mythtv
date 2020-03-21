@@ -1691,29 +1691,29 @@ Wordt niet gebruikt bij hardware-encoder TV-kaarten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1861"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1930"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2080"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2149"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1863"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1933"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2030"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2108"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2082"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2152"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2249"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2327"/>
         <source>Cancel</source>
         <translation type="unfinished">Annuleren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1864"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1934"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2032"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2109"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2083"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2153"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2251"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2328"/>
         <source>Cancel All</source>
         <translation type="unfinished">Annuleer alle</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1931"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2150"/>
         <source>OK All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3835,7 +3835,7 @@ Device supports up to %1</source>
         <translation type="unfinished">Geen kanalen gevonden.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="234"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="277"/>
         <source>Found %n off-air channel(s).</source>
         <extracomment>%n is the number of channels</extracomment>
         <translation type="unfinished">
@@ -3844,7 +3844,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="311"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="354"/>
         <source>Found %n unused transport(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3852,7 +3852,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="373"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="416"/>
         <source>Found %n old %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
         <translation type="unfinished">
@@ -3861,7 +3861,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="382"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="425"/>
         <source>Found %n new %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
         <translation type="unfinished">
@@ -3870,7 +3870,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="410"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="453"/>
         <source>Found %n conflicting old %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
         <translation type="unfinished">
@@ -3879,7 +3879,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="419"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="462"/>
         <source>Found %n new conflicting %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
         <translation type="unfinished">
@@ -3888,7 +3888,7 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1481"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1700"/>
         <source>Found %n transport(s):
 </source>
         <extracomment>%n is the number of transports</extracomment>
@@ -3898,160 +3898,160 @@ Device supports up to %1</source>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1482"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1701"/>
         <source>Channels: FTA Enc Dec
 </source>
         <translation type="unfinished">Kanalen: FTA Enc Dec</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1496"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1715"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
         <translation type="unfinished">Uniek: prog %1 atsc %2 atsc minor %3 channum %4</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1499"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1718"/>
         <source>Max atsc major count: %1</source>
         <translation type="unfinished">Max atsc major count: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1654"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1873"/>
         <source>Delete All</source>
         <translation type="unfinished">Alles verwijderen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1655"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1874"/>
         <source>Set all invisible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1657"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1731"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1800"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1876"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1950"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2019"/>
         <source>Ignore All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1680"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1752"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1820"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1899"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1971"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2039"/>
         <source>Do you want to:</source>
         <translation type="unfinished">Wilt u:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1682"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1901"/>
         <source>1. Delete All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1684"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1903"/>
         <source>2. Set all invisible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1687"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1906"/>
         <source>4. Ignore All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1705"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1924"/>
         <source>Please enter either 1, 2 or 4:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1729"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1948"/>
         <source>Insert All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1730"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1949"/>
         <source>Insert Manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1754"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1973"/>
         <source>1. Insert All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1756"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1975"/>
         <source>2. Insert Manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1758"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1826"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1977"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2045"/>
         <source>3. Ignore All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1774"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1842"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1993"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2061"/>
         <source>Please enter either 1, 2, or 3:</source>
         <translation type="unfinished">Voer alstublieft hetzij 1,2 of 3 in:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1799"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2018"/>
         <source>Update All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1822"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2041"/>
         <source>1. Update All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1824"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2043"/>
         <source>2. Update Manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1862"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1932"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2081"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2151"/>
         <source>Edit</source>
         <translation type="unfinished">Bewerken</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1885"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1955"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2006"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2083"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2104"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2174"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2225"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2302"/>
         <source>Please enter a unique channel number.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1994"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2213"/>
         <source>Channel %1 has channel number %2 but that is already in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2010"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2229"/>
         <source>Default value is %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2012"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2089"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2231"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2308"/>
         <source>Channel Importer</source>
         <translation type="unfinished">Zender importeerder</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2034"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2253"/>
         <source>Please enter a non-conflicting channel number (or type &apos;%1&apos; to skip, &apos;%2&apos; to skip all):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2072"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2291"/>
         <source>You chose to manually insert channel %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2087"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2306"/>
         <source>Default value is %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2112"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="2331"/>
         <source>Please enter a non-conflicting channel number (or type &apos;%1&apos; to skip, &apos;%2&apos; to skip all): </source>
         <extracomment>%1 is the translation of &quot;Cancel&quot;, %2 of &quot;Cancel All&quot;</extracomment>
         <translation type="unfinished"></translation>
@@ -4073,48 +4073,48 @@ Device supports up to %1</source>
 <context>
     <name>ChannelScanner</name>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="203"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="236"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="205"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="238"/>
         <source>Error tuning to transport</source>
         <translation type="unfinished">Fout tijdens afstemmen op transport</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="255"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="257"/>
         <source>Error scanning MPTS in IPTV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="284"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="286"/>
         <source>Programmer Error: Failed to handle tune complete.</source>
         <translation type="unfinished">Plan fout: Afstemming mislukt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="319"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="321"/>
         <source>Failed to parse &apos;%1&apos;</source>
         <translation type="unfinished">Behandelen van &apos;%1&apos; mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="321"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="323"/>
         <source>Programmer Error : incorrect card type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="322"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="324"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation type="unfinished">Openen van &apos;%1&apos; mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="420"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="422"/>
         <source>Programmer Error: No Device</source>
         <translation type="unfinished">Plan fout: Geen apparaat</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="502"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="504"/>
         <source>Programmer Error: Channel not created</source>
         <translation type="unfinished">Plan fout: Zender niet gecreëerd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="513"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="515"/>
         <source>Channel could not be opened.</source>
         <translation type="unfinished">Kanaal kon niet geopend worden.</translation>
     </message>
@@ -12320,60 +12320,60 @@ Error: %1</source>
         <translation type="unfinished">Reclameblokken zijn niet gemarkeerd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3997"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3984"/>
         <source>Searching</source>
         <translation type="unfinished">Zoeken</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4095"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4082"/>
         <source>No Seektable</source>
         <translation type="unfinished">Geen Zoek Tabel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4125"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4112"/>
         <source>Using previously auto-saved cuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4174"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4161"/>
         <source>Paused</source>
         <translation type="unfinished">Gepauzeerd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4275"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4311"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4262"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4298"/>
         <source>New cut added.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4280"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4267"/>
         <source>Delete</source>
         <translation type="unfinished">Verwijderen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4285"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4272"/>
         <source>Undo Changes</source>
         <translation type="unfinished">Veranderingen ongedaan maken</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4316"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4303"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4322"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4309"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4852"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4839"/>
         <source>%1 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5103"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5090"/>
         <source>%n second(s)</source>
         <translation type="unfinished">
             <numerusform>%n seconde</numerusform>
@@ -12381,32 +12381,32 @@ Error: %1</source>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5107"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5094"/>
         <source>Still Frame</source>
         <translation type="unfinished">Stilstaand beeld</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5108"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5095"/>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 van %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5338"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5325"/>
         <source>Error opening remote stream buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5351"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5338"/>
         <source>Error opening remote stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5515"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5502"/>
         <source>Enabled Night Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5521"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5508"/>
         <source>Disabled Night Mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16281,8 +16281,8 @@ mag niet leeg zijn.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="224"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="320"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="401"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="336"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="417"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="605"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="695"/>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1415"/>
@@ -16344,7 +16344,7 @@ mag niet leeg zijn.</translation>
         <translation type="vanished">Ander</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="296"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="312"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="579"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="235"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="281"/>
@@ -17185,27 +17185,37 @@ mag niet leeg zijn.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="179"/>
-        <source>Add full Transport Stream channels</source>
+        <source>Remove duplicate channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="181"/>
-        <source>If set, create MPTS channels, which allow recording of the full, unaltered, transport stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="193"/>
-        <source>Test Decryptability</source>
+        <source>If set, select the channel with the strongest signal when there are duplicate transports and channels. This option is useful for DVB-T2 and ATSC/OTA when the same channel can sometimes be received from different transmitters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="195"/>
-        <source>Test all channels to see if they can be decrypted with installed CAM/smartcard. Sometimes the encrypted flag is set spuriously. Attention: Enabling this option increases the scan time for each encrypted channel by a couple of seconds.</source>
+        <source>Add full Transport Stream channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="197"/>
+        <source>If set, create MPTS channels, which allow recording of the full, unaltered, transport stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="209"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="220"/>
+        <source>Test Decryptability</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="211"/>
+        <source>Test all channels to see if they can be decrypted with installed CAM/smartcard. Sometimes the encrypted flag is set spuriously. Attention: Enabling this option increases the scan time for each encrypted channel by a couple of seconds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="225"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="236"/>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="361"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="443"/>
         <source>Frequency</source>
@@ -17224,34 +17234,34 @@ The frequency for this channel in Hz.</source>
 De frequentie van deze zender in Hz.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="210"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="226"/>
         <source>Frequency (Option has no default)
 The frequency for this transport (multiplex) in kHz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="221"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="237"/>
         <source>Frequency (Option has no default)
 The frequency for this transport (multiplex) in Hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="231"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="255"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="247"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="271"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="456"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="481"/>
         <source>Symbol Rate</source>
         <translation>Symboolsnelheid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="233"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="249"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-S transponders transmit at 27.5 million symbols per second.</source>
         <translation>Symboolsnelheid (symbolen/seconde).
 De meeste DVD-S transponders versturen op 27,5 miljoen symbolen per seconde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="257"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="273"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="483"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</source>
@@ -17259,49 +17269,49 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
 De meeste DVD-C transponders versturen op 6,9 of 6,875 miljoen symbolen per seconde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="275"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="291"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="502"/>
         <source>Polarity</source>
         <translation>Polariteit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="277"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="293"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="504"/>
         <source>Horizontal</source>
         <translation>Horizontaal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="278"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="294"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="505"/>
         <source>Vertical</source>
         <translation>Vertikaal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="279"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="295"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="506"/>
         <source>Right Circular</source>
         <translation>Rechts circulair</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="280"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="296"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="507"/>
         <source>Left Circular</source>
         <translation>Links circulair</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="289"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="305"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="573"/>
         <source>Inversion</source>
         <translation>Inversie</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="294"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="307"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="319"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="372"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="387"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="400"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="442"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="310"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="323"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="335"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="388"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="403"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="416"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="458"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1288"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1315"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="577"/>
@@ -17317,41 +17327,41 @@ De meeste DVD-C transponders versturen op 6,9 of 6,875 miljoen symbolen per seco
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="295"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="311"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="578"/>
         <source>On</source>
         <translation>Aan</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="305"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="321"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="589"/>
         <source>Bandwidth</source>
         <translation>Bandbreedte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="413"/>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="425"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="429"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="441"/>
         <source>Mod Sys</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="414"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="430"/>
         <source>Modulation system (Default: DVB-S)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="426"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="442"/>
         <source>Modulation system (Default: DVB-T)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="437"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="453"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="748"/>
         <source>Roll-off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="438"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="454"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="749"/>
         <source>Roll-off factor (Default: 0.35)</source>
         <translation type="unfinished"></translation>
@@ -17382,37 +17392,37 @@ De meeste DVD-C transponders versturen op 6,9 of 6,875 miljoen symbolen per seco
         <translation type="vanished">Modulatie, QPSK, 8PSK, QAM-16</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="339"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="355"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="625"/>
         <source>FEC</source>
         <translation>FEC</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="350"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="366"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="638"/>
         <source>LP Coderate</source>
         <translation>LP coderate</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="360"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="376"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="651"/>
         <source>HP Coderate</source>
         <translation>HP coderate</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="370"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="386"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="662"/>
         <source>Guard Interval</source>
         <translation>Guard interval</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="385"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="401"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="678"/>
         <source>Trans. Mode</source>
         <translation>Trans. Modus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="398"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="414"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="692"/>
         <source>Hierarchy</source>
         <translation>Hiërarchie</translation>
@@ -18791,19 +18801,19 @@ Wordt niet gebruikt bij hardware-encoder TV-kaarten.</translation>
         <translation>dit opnameschema in niet actief.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="308"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="324"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="592"/>
         <source>6 MHz</source>
         <translation>6 MHz</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="309"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="325"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="593"/>
         <source>7 MHz</source>
         <translation>7 MHz</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="310"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="326"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="594"/>
         <source>8 MHz</source>
         <translation>8 MHz</translation>
@@ -18954,13 +18964,13 @@ Wordt niet gebruikt bij hardware-encoder TV-kaarten.</translation>
         <translation>400Mbps</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="276"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="292"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="503"/>
         <source>Polarity (Option has no default)</source>
         <translation>Polariteit (Optie heeft geen standaard waarde)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="290"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="306"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="574"/>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
@@ -18968,43 +18978,43 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, tenzij dit niet werkt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="306"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="322"/>
         <source>Bandwidth (Default: Auto)
 </source>
         <translation>Bandbreedte (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="340"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="356"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="626"/>
         <source>Forward Error Correction (Default: Auto)</source>
         <translation>Voorwaartse foutcorrectie (FEC) (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="351"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="367"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="639"/>
         <source>Low Priority Code Rate (Default: Auto)</source>
         <translation>Lage Prioriteit Code Snelheid (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="361"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="377"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="652"/>
         <source>High Priority Code Rate (Default: Auto)</source>
         <translation>Hoge Prioriteit Code Snelheid (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="371"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="387"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="663"/>
         <source>Guard Interval (Default: Auto)</source>
         <translation>Guard interval (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="386"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="402"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="679"/>
         <source>Transmission Mode (Default: Auto)</source>
         <translation>Transmissie modus (standaard: auto)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="399"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="415"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="693"/>
         <source>Hierarchy (Default: Auto)</source>
         <translation>Hiërarchie (standaard: auto)</translation>
@@ -19164,7 +19174,7 @@ The frequency for this transport (multiplex) in</source>
         <translation>Niet in de lijst</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2469"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2471"/>
         <source>ATSC Channel %1</source>
         <translation>ATSC kanaal %1</translation>
     </message>
@@ -19224,6 +19234,7 @@ The frequency for this transport (multiplex) in</source>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="75"/>
+        <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="90"/>
         <source>Netherlands</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19234,7 +19245,7 @@ The frequency for this transport (multiplex) in</source>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="79"/>
-        <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="90"/>
+        <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="91"/>
         <source>United Kingdom</source>
         <translation>Verenigd Koninkrijk</translation>
     </message>
@@ -21213,7 +21224,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Fout, compileer met DVB support om ingangen aan te spreken</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2908"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2910"/>
         <source>The VBox software version is too old (%1), we require %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -21255,8 +21266,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="vanished">Slechte verbinding met de backend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1275"/>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2118"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1279"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2120"/>
         <source> offset %2</source>
         <translation> offset %2</translation>
     </message>
@@ -23117,77 +23128,77 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
         <translation type="vanished">Voer alstublieft hetzij 1,2 of 3 in:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="262"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="263"/>
         <source>Updated Channel %1</source>
         <translation>Kanaal %1 bijgewerkt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="286"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="287"/>
         <source>Added Channel %1</source>
         <translation>Kanaal %1 toegevoegd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="287"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="288"/>
         <source>Failed to add channel %1</source>
         <translation>Toevoegen van kanaal %1 is mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="655"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="658"/>
         <source>%1 -- Testing decryption of program %2</source>
         <translation>%1 -- Testen van ontcijfering van programma %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="978"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="980"/>
         <source>Program %1</source>
         <translation>Programma %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="979"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="981"/>
         <source>Unknown decryption status</source>
         <translation>Onbekende ontcijferingsstatus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="981"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="983"/>
         <source>Encrypted</source>
         <translation>Versleuteld</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="983"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="985"/>
         <source>Decrypted</source>
         <translation>Ontcijferd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1020"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1022"/>
         <source>%1 -- Timed out</source>
         <translation>%1  Tiem out</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1061"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1065"/>
         <source>%1 possible channels</source>
         <translation>%1 mogelijke kanalen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1062"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1066"/>
         <source>no channels</source>
         <translation>geen kanalen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1073"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1077"/>
         <source>%1, no signal</source>
         <translation>%1, geen signaal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1078"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1082"/>
         <source>%1 -- Found %2 probable channels</source>
         <translation>%1 -- %2 mogelijke kanalen gevonden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2122"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2124"/>
         <source>ScanTransport Tuning to %1 mplexid(%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2136"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2138"/>
         <source>Found %n</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -23202,17 +23213,17 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2406"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2408"/>
         <source>Frequency %1</source>
         <translation>Frequentie %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2568"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2570"/>
         <source>as</source>
         <translation>als</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2573"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2575"/>
         <source>Skipping %1, not in imported channel map</source>
         <translation>%1 overslaan, niet aanwezig in geimporteerde kanaal map</translation>
     </message>
@@ -23992,7 +24003,7 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/main.cpp" line="559"/>
+        <location filename="../programs/mythtv-setup/main.cpp" line="566"/>
         <source>MythTV Setup</source>
         <translation>MythTV Setup</translation>
     </message>
@@ -24068,18 +24079,18 @@ mag niet leeg zijn.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2836"/>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2893"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2838"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2895"/>
         <source>Unable to connect to device.</source>
         <translation>Kan geen verbinding met apparaat maken.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2849"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2851"/>
         <source>Invalid Device ID</source>
         <translation>Ongeldig apparaat ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2859"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2861"/>
         <source>Invalid Device ID or address.</source>
         <translation>Ongeldig apparaat ID of adres.</translation>
     </message>
@@ -24445,7 +24456,7 @@ mag niet leeg zijn.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2874"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2876"/>
         <source>, firmware: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -24524,7 +24535,7 @@ mag niet leeg zijn.</translation>
         <translation type="vanished">onverwerkt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.h" line="106"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.h" line="107"/>
         <source>Scan Type</source>
         <translation>Scantype</translation>
     </message>
@@ -25525,12 +25536,12 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
 <context>
     <name>ScanOptionalConfig</name>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="354"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="361"/>
         <source>Failed to open the card</source>
         <translation type="unfinished">Openen van de kaart is mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="356"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="363"/>
         <source>Failed to probe the card</source>
         <translation type="unfinished">Zoeken naar de kaart is mislukt</translation>
     </message>
@@ -25538,25 +25549,25 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
 <context>
     <name>ScanTypeSetting</name>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="213"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="219"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="229"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="257"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="265"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="277"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="282"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="288"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="220"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="226"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="236"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="264"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="272"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="284"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="289"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="295"/>
         <source>Full Scan</source>
         <translation>Volledige scan</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="221"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="231"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="239"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="247"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="255"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="275"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="284"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="228"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="238"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="246"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="254"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="262"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="282"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="291"/>
         <source>Full Scan (Tuned)</source>
         <translation>Volledige scan (afgestemd)</translation>
     </message>
@@ -25565,64 +25576,64 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
         <translation type="vanished">Channels.conf importeren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="302"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="309"/>
         <source>M3U Import</source>
         <translation>M3U Importeren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="215"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="225"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="235"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="243"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="251"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="261"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="269"/>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="292"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="222"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="232"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="242"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="250"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="258"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="268"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="276"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="299"/>
         <source>Import existing scan</source>
         <translation>Bestaande scan inporteren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="296"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="303"/>
         <source>VBox Channel Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="300"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="307"/>
         <source>M3U Import with MPTS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="306"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="313"/>
         <source>ASI Scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="310"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="317"/>
         <source>MPTS Scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="312"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="319"/>
         <source>Import from ExternalRecorder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="316"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="323"/>
         <source>Failed to probe the card</source>
         <translation type="unfinished">Zoeken naar de kaart is mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="320"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="327"/>
         <source>Failed to open the card</source>
         <translation type="unfinished">Openen van de kaart is mislukt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="325"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="332"/>
         <source>Scan of all existing transports</source>
         <translation>Scan van alle bestaande transporten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="327"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="334"/>
         <source>Scan of single existing transport</source>
         <translation>Scan van enkele bestaande transport</translation>
     </message>
@@ -25639,17 +25650,17 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
         <translation type="unfinished">Scan</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/scanwizard.cpp" line="153"/>
+        <location filename="../libs/libmythtv/scanwizard.cpp" line="154"/>
         <source>Programmer Error, see console</source>
         <translation>Plan fout: zie console</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/scanwizard.cpp" line="170"/>
+        <location filename="../libs/libmythtv/scanwizard.cpp" line="171"/>
         <source>Error parsing parameters</source>
         <translation>Fout tijdens behandelen van parameters</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="41"/>
+        <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="42"/>
         <source>Channel Scan</source>
         <translation type="unfinished">Zender scan</translation>
     </message>
