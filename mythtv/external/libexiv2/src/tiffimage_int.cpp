@@ -1036,7 +1036,7 @@ namespace Exiv2 {
       Each entry of the table defines for a particular tag and group combination
       the corresponding TIFF component create function.
      */
-#define ignoreTiffComponent 0
+#define ignoreTiffComponent nullptr
     const TiffGroupStruct TiffCreator::tiffGroupStruct_[] = {
         // ext. tag  group             create function
         //---------  ----------------- -----------------------------------------

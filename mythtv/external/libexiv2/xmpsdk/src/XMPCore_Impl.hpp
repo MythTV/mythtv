@@ -106,13 +106,13 @@ extern WXMP_Result		void_wResult;
 #endif
 
 #define WtoXMPMeta_Ref(xmpRef)	*((const XMPMeta *)(xmpRef))
-#define WtoXMPMeta_Ptr(xmpRef)	(((xmpRef) == 0) ? 0 : (XMPMeta *)(xmpRef))
+#define WtoXMPMeta_Ptr(xmpRef)	(((xmpRef) == nullptr) ? nullptr : (XMPMeta *)(xmpRef))
 
 #define WtoXMPIterator_Ref(iterRef)	*((const XMPIterator *)(iterRef))
-#define WtoXMPIterator_Ptr(iterRef)	(((iterRef) == 0) ? 0 : (XMPIterator *)(iterRef))
+#define WtoXMPIterator_Ptr(iterRef)	(((iterRef) == nullptr) ? nullptr : (XMPIterator *)(iterRef))
 
 #define WtoXMPDocOps_Ref(docRef)	*((const XMPDocOps *)(docRef))
-#define WtoXMPDocOps_Ptr(docRef)	(((docRef) == 0) ? 0 : (XMPDocOps *)(docRef))
+#define WtoXMPDocOps_Ptr(docRef)	(((docRef) == nullptr) ? nullptr : (XMPDocOps *)(docRef))
 
 #define IgnoreParam(p)	voidVoidPtr = (void*)&p
 
@@ -235,7 +235,7 @@ private:
 	AnnounceNoLock ( proc );								\
 	XMP_Assert ( (0 <= sLockCount) && (sLockCount <= 1) );	\
 	try {													\
-		wResult->errMessage = 0;
+		wResult->errMessage = nullptr;
 
 #define XMP_ENTER_WRAPPER(proc)								\
 	AnnounceEntry ( proc );									\
@@ -243,7 +243,7 @@ private:
 	XMP_Assert ( (0 <= sLockCount) && (sLockCount <= 1) );	\
 	try {													\
 		XMP_AutoMutex mutex;								\
-		wResult->errMessage = 0;
+		wResult->errMessage = nullptr;
 
 #define XMP_EXIT_WRAPPER	\
 	XMP_CATCH_EXCEPTIONS	\
@@ -266,12 +266,12 @@ private:
 		wResult->int32Result = xmpErr.GetID(); 						\
 		wResult->ptrResult   = (void*)"XMP";						\
 		wResult->errMessage  = xmpErr.GetErrMsg();					\
-		if ( wResult->errMessage == 0 ) wResult->errMessage = "";	\
+		if ( wResult->errMessage == nullptr ) wResult->errMessage = "";	\
 		AnnounceCatch ( wResult->errMessage );						\
 	} catch ( std::exception & stdErr ) {							\
 		wResult->int32Result = kXMPErr_StdException; 				\
 		wResult->errMessage  = stdErr.what(); 						\
-		if ( wResult->errMessage == 0 ) wResult->errMessage = "";	\
+		if ( wResult->errMessage == nullptr ) wResult->errMessage = "";	\
 		AnnounceCatch ( wResult->errMessage );						\
 	} catch ( ... ) {												\
 		wResult->int32Result = kXMPErr_UnknownException; 			\
@@ -295,10 +295,10 @@ private:
 #define kXMP_CreateNodes	true
 #define kXMP_ExistingOnly	false
 
-#define FindConstSchema(t,u)	FindSchemaNode ( const_cast<XMP_Node*>(t), u, kXMP_ExistingOnly, 0 )
-#define FindConstChild(p,c)		FindChildNode ( const_cast<XMP_Node*>(p), c, kXMP_ExistingOnly, 0 )
-#define FindConstQualifier(p,c)	FindQualifierNode ( const_cast<XMP_Node*>(p), c, kXMP_ExistingOnly, 0 )
-#define FindConstNode(t,p)		FindNode ( const_cast<XMP_Node*>(t), p, kXMP_ExistingOnly, 0 )
+#define FindConstSchema(t,u)    FindSchemaNode ( const_cast<XMP_Node*>(t), u, kXMP_ExistingOnly, nullptr )
+#define FindConstChild(p,c)     FindChildNode ( const_cast<XMP_Node*>(p), c, kXMP_ExistingOnly, nullptr )
+#define FindConstQualifier(p,c) FindQualifierNode ( const_cast<XMP_Node*>(p), c, kXMP_ExistingOnly, nullptr )
+#define FindConstNode(t,p)      FindNode ( const_cast<XMP_Node*>(t), p, kXMP_ExistingOnly, 0 )
 
 extern XMP_OptionBits
 VerifySetOptions ( XMP_OptionBits options, XMP_StringPtr propValue );

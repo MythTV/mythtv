@@ -187,7 +187,7 @@ namespace Action
     std::unique_ptr<Task> TaskFactory::create(TaskType type)
     {
         auto i = registry_.find(type);
-        if (i != registry_.end() && i->second != 0) {
+        if (i != registry_.end() && i->second != nullptr) {
             Task* t = i->second;
             return t->clone();
         }

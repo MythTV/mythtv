@@ -659,7 +659,7 @@ XMPUtils::Initialize()
 // Terminate
 // ---------
 
-#define EliminateGlobal(g) delete ( g ); g = 0
+#define EliminateGlobal(g) delete ( g ); g = nullptr
 
 /* class static */ void
 XMPUtils::Terminate() RELEASE_NO_THROW
