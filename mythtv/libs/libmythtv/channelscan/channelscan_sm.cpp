@@ -2428,8 +2428,8 @@ bool ChannelScanSM::AddToList(uint mplexid)
     if (query.value(4).toString() == "8vsb")
     {
         QString chan = QString("%1 Hz").arg(query.value(3).toInt());
-        struct CHANLIST *curList = chanlists[0].list;
-        int totalChannels = chanlists[0].count;
+        struct CHANLIST *curList = gChanLists[0].list;
+        int totalChannels = gChanLists[0].count;
         int findFrequency = (query.value(3).toInt() / 1000) - 1750;
         for (int x = 0 ; x < totalChannels ; ++x)
         {
