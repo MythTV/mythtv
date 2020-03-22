@@ -1029,6 +1029,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
             item.m_signalStrength = m_signalMonitor->GetSignalStrength();
+            item.m_networkID = dtv_sm->GetNetworkID();
+            item.m_transportID = dtv_sm->GetTransportID();
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
@@ -1747,6 +1749,8 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
         ScanDTVTransport item((*it.first).m_tuning, tuner_type, cardid);
         item.m_iptvTuning = (*(it.first)).m_iptvTuning;
         item.m_signalStrength = (*(it.first)).m_signalStrength;
+        item.m_networkID = (*(it.first)).m_networkID;
+        item.m_transportID = (*(it.first)).m_transportID;
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
         for (dbchan_it = pnum_to_dbchan.begin();

@@ -487,7 +487,7 @@ bool ChannelInsertInfo::IsSameChannel(
     if (relaxed > 1)
     {
         if (("mpeg" == m_siStandard || "mpeg" == other.m_siStandard ||
-             "dvb" == m_siStandard || "dvb" == other.m_siStandard ||
+             "dvb"  == m_siStandard || "dvb"  == other.m_siStandard ||
              m_siStandard.isEmpty() || other.m_siStandard.isEmpty()) &&
             (m_serviceId == other.m_serviceId))
         {
