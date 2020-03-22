@@ -179,13 +179,16 @@ class TransportScanItem
     bool               m_scanning    {false}; ///< Probably Unnecessary
     int                m_freqOffsets[3] {0,0,0}; ///< Frequency offsets
     unsigned           m_timeoutTune {1000};  ///< Timeout to tune to a frequency
-    int                m_signalStrength {0};
 
     DTVMultiplex       m_tuning;              ///< Tuning info
     IPTVTuningData     m_iptvTuning;          ///< IPTV Tuning info
     QString            m_iptvChannel;         ///< IPTV base channel
 
     DTVChannelInfoList m_expectedChannels;
+
+    int                m_signalStrength {0};
+    uint               m_networkID      {0};
+    uint               m_transportID    {0};
 };
 
 class transport_scan_items_it_t

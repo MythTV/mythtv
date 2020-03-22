@@ -176,14 +176,14 @@ class RemoveDuplicates : public TransMythUICheckBoxSetting
   public:
     RemoveDuplicates()
     {
-        setLabel(QObject::tr("Remove duplicate channels"));
+        setLabel(QObject::tr("Remove duplicates"));
         setHelpText(
             QObject::tr(
-                "If set, select the channel with the strongest signal when "
-                "there are duplicate transports and channels. "
-                "This option is useful for DVB-T2 and ATSC/OTA when the same channel "
+                "If set, select the transport stream multiplex with the best signal "
+                "when identical transports are received on different frequencies. "
+                "This option is useful for DVB-T2 and ATSC/OTA when a transport "
                 "can sometimes be received from different transmitters."));
-        setValue(false);
+        setValue(true);
     };
 };
 
