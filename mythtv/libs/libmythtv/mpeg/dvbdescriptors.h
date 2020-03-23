@@ -1041,6 +1041,37 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
+// DVB Bluebook A038 (Feb 2019) p 104
+class T2TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit T2TerrestrialDeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::t2_terrestrial_delivery_system) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x7f
+    // descriptor_length        8   1.0
+    // descriptor_tag_extension 8   2.0       0x4
+
+    // plp_id                   8   3.0
+    uint PlpID(void) const
+    {
+        return m_data[3];
+    }
+
+    // T2_system_id            16   4.0
+    uint T2SystemID(void) const
+    {
+        return ((m_data[4]<<8) | (m_data[5]));
+    }
+
+    //
+    // TBD
+    //
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
 // DVB Bluebook A038 (Sept 2011) p 58
 class DSNGDescriptor : public MPEGDescriptor
 {

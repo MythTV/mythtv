@@ -142,10 +142,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     }
 
     if (m_mpaVidCodec)
-    {
-        QMutexLocker locker(avcodeclock);
         avcodec_free_context(&m_mpaVidCtx);
-    }
 
     delete m_ccd;
 }
@@ -386,10 +383,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
         m_useAvCodec = true;
 
     if (m_mpaVidCodec)
-    {
-        QMutexLocker locker(avcodeclock);
         avcodec_free_context(&m_mpaVidCtx);
-    }
 
     QByteArray vcodec = m_videocodec.toLatin1();
     m_mpaVidCodec = avcodec_find_encoder_by_name(vcodec.constData());
@@ -476,8 +470,6 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     if (m_videocodec.toLower() == "huffyuv" || m_videocodec.toLower() == "mjpeg")
         m_mpaVidCtx->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
     m_mpaVidCtx->thread_count = m_encodingThreadCount;
-
-    QMutexLocker locker(avcodeclock);
 
     if (avcodec_open2(m_mpaVidCtx, m_mpaVidCodec, &opts) < 0)
     {
@@ -2757,10 +2749,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             packet.size = frame->size;
 
             int got_packet = 0;
-
-            QMutexLocker locker(avcodeclock);
-            tmp = avcodec_encode_video2(m_mpaVidCtx, &packet, mpa_picture,
-                                        &got_packet);
+            tmp = avcodec_encode_video2(m_mpaVidCtx, &packet, mpa_picture, &got_packet);
 
             if (tmp < 0 || !got_packet)
             {

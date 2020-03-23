@@ -6110,6 +6110,8 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             mctx->m_buffer->Unpause();
     }
 
+    mctx->SetNullVideo(false);
+    mctx->SetNoHardwareDecoders(false);
     bool ok = StartPlayer(mctx, mctx, mctx->GetState());
 
     if (ok)
@@ -6136,6 +6138,9 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             if (StateIsLiveTV(pipctx->GetState()))
                 pipctx->m_buffer->Unpause();
         }
+
+        pipctx->SetNullVideo(true);
+        pipctx->SetNoHardwareDecoders(true);
 
         ok = StartPlayer(mctx, pipctx, pipctx->GetState());
 
@@ -8466,7 +8471,7 @@ QSet<uint> TV::IsTunableOn(
 
 bool TV::StartEmbedding(const QRect &embedRect)
 {
-    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (!ctx)
         return false;
 
@@ -8503,7 +8508,7 @@ bool TV::StartEmbedding(const QRect &embedRect)
 
 void TV::StopEmbedding(void)
 {
-    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (!ctx)
         return;
 
@@ -8567,7 +8572,7 @@ void TV::DoEditSchedule(int editType)
         return;
     }
 
-    PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *actx = GetPlayerReadLock(0, __FILE__, __LINE__);
 
     actx->LockPlayingInfo(__FILE__, __LINE__);
     if (!actx->m_playingInfo)
@@ -9675,7 +9680,7 @@ void TV::customEvent(QEvent *e)
         message.startsWith("SCHEDULEEDITOR_EXITING"))
     {
         // Resize the window back to the MythTV Player size
-        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        PlayerContext *actx = GetPlayerReadLock(0, __FILE__, __LINE__);
         MythMainWindow *mwnd = GetMythMainWindow();
 
         StopEmbedding();

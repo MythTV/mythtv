@@ -120,6 +120,7 @@ void ChannelScanner::Scan(
     bool           do_lcn_only,
     bool           do_complete_only,
     bool           do_full_channel_search,
+    bool           do_remove_duplicates,
     bool           do_add_full_ts,
     ServiceRequirements service_requirements,
     // stuff needed for particular scans
@@ -135,6 +136,7 @@ void ChannelScanner::Scan(
     m_channelNumbersOnly = do_lcn_only;
     m_completeOnly = do_complete_only;
     m_fullSearch = do_full_channel_search;
+    m_removeDuplicates = do_remove_duplicates;
     m_addFullTS = do_add_full_ts;
     m_serviceRequirements = service_requirements;
     m_sourceid = sourceid;

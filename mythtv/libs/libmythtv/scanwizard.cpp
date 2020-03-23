@@ -140,6 +140,7 @@ void ScanWizard::Scan()
                            DoChannelNumbersOnly(),
                            DoCompleteChannelsOnly(),
                            DoFullChannelSearch(),
+                           DoRemoveDuplicates(),
                            GetServiceRequirements());
         ci.Process(transports, sourceid);
     }
@@ -185,6 +186,7 @@ void ScanWizard::Scan()
             DoTestDecryption(),       DoFreeToAirOnly(),
             DoChannelNumbersOnly(),   DoCompleteChannelsOnly(),
             DoFullChannelSearch(),
+            DoRemoveDuplicates(),
             DoAddFullTS(),
             GetServiceRequirements(),
 

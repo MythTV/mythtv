@@ -55,7 +55,6 @@ using namespace std;
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
 MythCoreContext *gCoreContext = nullptr;
-QMutex *avcodeclock = new QMutex(QMutex::Recursive);
 
 class MythCoreContextPrivate : public QObject
 {

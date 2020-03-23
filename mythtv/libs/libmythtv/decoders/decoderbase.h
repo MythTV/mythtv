@@ -232,26 +232,23 @@ class DecoderBase
     void SetReadAdjust(long long adjust);
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    void SetDecodeAllSubtitles(bool val) { m_decodeAllSubtitles = val; }
-    virtual QStringList GetTracks(uint type) const;
-    virtual uint GetTrackCount(uint type) const
-        { return m_tracks[type].size(); }
+    void         SetDecodeAllSubtitles(bool DecodeAll);
+    virtual QStringList GetTracks(uint Type);
+    virtual uint GetTrackCount(uint Type);
 
-    virtual int  GetTrackLanguageIndex(uint type, uint trackNo) const;
-    virtual QString GetTrackDesc(uint type, uint trackNo) const;
-    virtual int  SetTrack(uint type, int trackNo);
-    int          GetTrack(uint type) const { return m_currentTrack[type]; }
-    StreamInfo   GetTrackInfo(uint type, uint trackNo) const;
-    inline  int  IncrementTrack(uint type);
-    inline  int  DecrementTrack(uint type);
-    inline  int  ChangeTrack(uint type, int dir);
-    virtual bool InsertTrack(uint type, const StreamInfo &info);
-    inline int   NextTrack(uint type);
+    virtual int  GetTrackLanguageIndex(uint Type, uint TrackNo);
+    virtual QString GetTrackDesc(uint Type, uint TrackNo);
+    virtual int  SetTrack(uint Type, int TrackNo);
+    int          GetTrack(uint Type);
+    StreamInfo   GetTrackInfo(uint Type, uint TrackNo);
+    int          ChangeTrack(uint Type, int Dir);
+    virtual bool InsertTrack(uint Type, const StreamInfo &Info);
+    int          NextTrack(uint Type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
     virtual QString GetXDS(const QString &/*key*/) const { return QString(); }
-    virtual QByteArray GetSubHeader(uint /*trackNo*/) const { return QByteArray(); }
+    virtual QByteArray GetSubHeader(uint /*trackNo*/) { return QByteArray(); }
     virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
                                    QByteArray &/*data*/) {}
 
@@ -269,12 +266,10 @@ class DecoderBase
     AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);
 
   protected:
-    virtual int  AutoSelectTrack(uint type);
-    inline  void AutoSelectTracks(void);
-    inline  void ResetTracks(void);
-
-    void FileChanged(void);
-
+    virtual int  AutoSelectTrack(uint Type);
+    void         AutoSelectTracks(void);
+    void         ResetTracks(void);
+    void         FileChanged(void);
     virtual bool DoRewindSeek(long long desiredFrame);
     virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
@@ -351,60 +346,16 @@ class DecoderBase
     int                  m_videoRotation           {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    bool                 m_decodeAllSubtitles      {false};
-    int                  m_currentTrack[kTrackTypeCount] {};
-    sinfo_vec_t          m_tracks[kTrackTypeCount];
+    QReadWriteLock       m_trackLock                     { QReadWriteLock::Recursive };
+    bool                 m_decodeAllSubtitles            { false };
+    int                  m_currentTrack[kTrackTypeCount] { -1    };
+    vector<StreamInfo>   m_tracks[kTrackTypeCount];
     StreamInfo           m_wantedTrack[kTrackTypeCount];
-    StreamInfo           m_selectedTrack[(uint)kTrackTypeCount];
+    StreamInfo           m_selectedTrack[kTrackTypeCount];
+
     /// language preferences for auto-selection of streams
-    vector<int>  m_languagePreference;
-    MythCodecContext    *m_mythCodecCtx            {nullptr};
+    vector<int>          m_languagePreference;
+    MythCodecContext    *m_mythCodecCtx         { nullptr };
     VideoDisplayProfile  m_videoDisplayProfile;
 };
-
-inline int DecoderBase::IncrementTrack(uint type)
-{
-    int next_track = -1;
-    int size = m_tracks[type].size();
-    if (size)
-        next_track = (max(-1, m_currentTrack[type]) + 1) % size;
-    return SetTrack(type, next_track);
-}
-
-inline int DecoderBase::DecrementTrack(uint type)
-{
-    int next_track = -1;
-    int size = m_tracks[type].size();
-    if (size)
-        next_track = (max(+0, m_currentTrack[type]) + size - 1) % size;
-    return SetTrack(type, next_track);
-}
-
-inline int DecoderBase::ChangeTrack(uint type, int dir)
-{
-    if (dir > 0)
-        return IncrementTrack(type);
-    return DecrementTrack(type);
-}
-
-inline void DecoderBase::AutoSelectTracks(void)
-{
-    for (uint i = 0; i < kTrackTypeCount; i++)
-        AutoSelectTrack(i);
-}
-
-inline void DecoderBase::ResetTracks(void)
-{
-    for (int & i : m_currentTrack)
-        i = -1;
-}
-
-inline int DecoderBase::NextTrack(uint type)
-{
-    int next_track = -1;
-    int size = m_tracks[type].size();
-    if (size)
-        next_track = (max(0, m_currentTrack[type]) + 1) % size;
-    return next_track;
-}
 #endif

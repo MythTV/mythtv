@@ -207,7 +207,8 @@ MythPlayer::~MythPlayer(void)
     delete m_detectLetterBox;
     m_detectLetterBox = nullptr;
 
-    MythDisplay::AcquireRelease(false);
+    if (m_display)
+        MythDisplay::AcquireRelease(false);
 }
 
 void MythPlayer::SetWatchingRecording(bool mode)
@@ -656,9 +657,10 @@ void MythPlayer::SetScanType(FrameScanType Scan)
 
     if (is_interlaced(Scan))
     {
+        MythDeintType forced = m_playerCtx->IsPiPOrSecondaryPBP() ? (DEINT_CPU | DEINT_MEDIUM) : DEINT_NONE;
         bool normal = m_playSpeed > 0.99F && m_playSpeed < 1.01F && m_normalSpeed;
-        m_doubleFramerate = CanSupportDoubleRate() && normal;
-        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
+        m_doubleFramerate = CanSupportDoubleRate() && normal && !forced;
+        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate, forced);
     }
     else if (kScan_Progressive == Scan)
     {
@@ -1610,6 +1612,51 @@ void MythPlayer::WaitForTime(int64_t framedue)
         QThread::usleep(static_cast<unsigned long>(delay));
 }
 
+/*! \brief Keep PiP frame rate in sync with master framerate
+ *
+ * This is a simple frame rate tracker. If a frame is not due, then just keep
+ * the last displayed frame. Otherwise discard frame(s) that are too old.
+*/
+bool MythPlayer::PipSync(void)
+{
+    int maxtries = 6;
+    int64_t timenow    = m_avTimer.nsecsElapsed() / 1000;
+    auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
+
+    while (maxtries--)
+    {
+        if (!m_videoOutput->ValidVideoFrames())
+            return false;
+
+        m_videoOutput->StartDisplayingFrame();
+        VideoFrame *last = m_videoOutput->GetLastShownFrame();
+        if (!last)
+            return false;
+
+        m_videoOutput->ProcessFrame(last, nullptr, m_pipPlayers, m_scan);
+
+        int64_t videotimecode = last->timecode & 0x0000ffffffffffff;
+        if (videotimecode != last->timecode)
+            videotimecode = m_maxTcVal;
+        if (videotimecode == 0)
+        {
+            m_videoOutput->DoneDisplayingFrame(last);
+            return true;
+        }
+        m_maxTcVal = videotimecode;
+
+        if (m_rtcBase == 0)
+            m_rtcBase = timenow - (videotimecode * playspeed1000);
+
+        int64_t framedue = m_rtcBase + (videotimecode * playspeed1000);
+        if (framedue > timenow)
+            return true;
+
+        m_videoOutput->DoneDisplayingFrame(last);
+    }
+    return true;
+}
+
 #define AVSYNC_MAX_LATE 10000000
 void MythPlayer::AVSync(VideoFrame *buffer)
 {
@@ -1833,7 +1880,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             m_videoOutput->Show(ps);
         }
     }
-    else
+    else if (!m_playerCtx->IsPiPOrSecondaryPBP())
     {
         WaitForTime(framedue);
     }
@@ -1895,7 +1942,7 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     m_osdLock.lock();
-    m_videoOutput->ProcessFrame(nullptr, m_osd, m_pipPlayers);
+    m_videoOutput->ProcessFrame(nullptr, m_osd, m_pipPlayers, scan);
     m_videoOutput->PrepareFrame(nullptr, scan, m_osd);
     m_osdLock.unlock();
     m_videoOutput->Show(scan);
@@ -2055,15 +2102,27 @@ void MythPlayer::CheckAspectRatio(VideoFrame* frame)
 
 void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
-    if (m_allPaused || (check_prebuffer && !PrebufferEnoughFrames()))
+    if (m_allPaused)
         return;
+   
+    bool ispip = m_playerCtx->IsPIP();
+    if (ispip)
+    {
+        if (!m_videoOutput->ValidVideoFrames())
+            return;
+    }
+    else if (check_prebuffer && !PrebufferEnoughFrames())
+    {
+        return;
+    }
 
     // clear the buffering state
     SetBuffering(false);
 
     // If PiP then release the last shown frame to the decoding queue
-    if (m_playerCtx->IsPIP())
-        m_videoOutput->DoneDisplayingFrame(m_videoOutput->GetLastShownFrame());
+    if (ispip)
+        if (!PipSync())
+            return;
 
     // retrieve the next frame
     m_videoOutput->StartDisplayingFrame();
@@ -2082,18 +2141,19 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    AVSync(frame);
+    if (!ispip)
+        AVSync(frame);
+
+    // Update details for debug OSD
+    m_lastDeinterlacer = frame->deinterlace_inuse;
+    m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
+    // We use the underlying pix_fmt as it retains the distinction between hardware
+    // and software frames for decode only decoders.
+    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
 
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
-    if (!m_playerCtx->IsPIP())
-    {
-        m_lastDeinterlacer = frame->deinterlace_inuse;
-        m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
-        // We use the underlying pix_fmt as it retains the distinction between hardware
-        // and software frames for decode only decoders.
-        m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
+    if (!ispip)
         m_videoOutput->DoneDisplayingFrame(frame);
-    }
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
@@ -3017,50 +3077,37 @@ void MythPlayer::AudioEnd(void)
  * This is used by hardware decoders to ensure certain resources are created
  * and destroyed in the UI (render) thread.
 */
-void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
-                                       DecoderCallback::Callback Function,
+void MythPlayer::HandleDecoderCallback(const QString &Debug, DecoderCallback::Callback Function,
                                        void *Opaque1, void *Opaque2)
 {
-    if (!Player)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "No player to call back");
-        return;
-    }
-
     if (!Function)
         return;
 
+    m_decoderCallbackLock.lock();
+    QAtomicInt ready{0};
     QWaitCondition wait;
-    QMutex lock;
-    lock.lock();
-    Player->QueueCallback(Debug, Function, &wait, Opaque1, Opaque2);
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
+    m_decoderCallbacks.append(DecoderCallback(Debug, Function, &ready, &wait, Opaque1, Opaque2));
     int count = 0;
-    while (!wait.wait(&lock, 100) && (count += 100))
+    while (!ready && !wait.wait(&m_decoderCallbackLock, 100) && (count += 100))
         LOG(VB_GENERAL, LOG_WARNING, QString("Waited %1ms for %2").arg(count).arg(Debug));
-    lock.unlock();
+    m_decoderCallbackLock.unlock();
 }
 
 void MythPlayer::ProcessCallbacks(void)
 {
     m_decoderCallbackLock.lock();
-    for (const auto *it = m_decoderCallbacks.cbegin(); it != m_decoderCallbacks.cend(); ++it)
+    for (auto *it = m_decoderCallbacks.begin(); it != m_decoderCallbacks.end(); ++it)
     {
         if (it->m_function)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(it->m_debug));
             it->m_function(it->m_opaque1, it->m_opaque2, it->m_opaque3);
         }
+        if (it->m_ready)
+            it->m_ready->ref();
     }
     m_decoderCallbacks.clear();
-    m_decoderCallbackLock.unlock();
-}
-
-void MythPlayer::QueueCallback(QString Debug, DecoderCallback::Callback Function,
-                               void *Opaque1, void *Opaque2, void *Opaque3)
-{
-    m_decoderCallbackLock.lock();
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
-    m_decoderCallbacks.append(DecoderCallback(Debug, Function, Opaque1, Opaque2, Opaque3));
     m_decoderCallbackLock.unlock();
 }
 

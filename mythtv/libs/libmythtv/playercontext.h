@@ -105,7 +105,7 @@ class MTV_PUBLIC PlayerContext
     void SetPIPLocation(int loc) { m_pipLocation = loc; }
     void SetPIPState(PIPState change) { m_pipState = change; }
     void SetPlayerChangingBuffers(bool val) { m_playerUnsafe = val; }
-    void SetNoHardwareDecoders(void) { m_nohardwaredecoders = true; }
+    void SetNoHardwareDecoders(bool Disallow = true) { m_nohardwaredecoders = Disallow; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
@@ -130,6 +130,8 @@ class MTV_PUBLIC PlayerContext
         { return (kPBPLeft == m_pipState); }
     bool IsAudioNeeded(void) const
         { return (kPIPOff  == m_pipState) || (kPBPLeft       == m_pipState); }
+    bool IsPiPOrSecondaryPBP(void) const
+        { return IsPIP() || (IsPBP() && !IsPrimaryPBP()); }
     bool IsNullVideoDesired(void)   const { return m_useNullVideo; }
     bool IsPlayerChangingBuffers(void) const { return m_playerUnsafe; }
     bool IsEmbedding(void) const;

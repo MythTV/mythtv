@@ -173,28 +173,25 @@ int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
     return false;                                   \
 } while (false)
 
-static bool StreamHasRequiredParameters(AVStream *Stream)
+static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Stream)
 {
-    AVCodecContext *avctx = nullptr;
     switch (Stream->codecpar->codec_type)
     {
         // We fail on video first as this is generally the most serious error
         // and if we have video, we usually have everything else
         case AVMEDIA_TYPE_VIDEO:
-            avctx = gCodecMap->getCodecContext(Stream);
-            if (!avctx)
+            if (!Context)
                 FAIL("No codec for video stream");
             if (!Stream->codecpar->width || !Stream->codecpar->height)
                 FAIL("Unspecified video size");
             if (Stream->codecpar->format == AV_PIX_FMT_NONE)
                 FAIL("Unspecified video pixel format");
-            if (avctx->codec_id == AV_CODEC_ID_RV30 || avctx->codec_id == AV_CODEC_ID_RV40)
-                if (!Stream->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
+            if (Context->codec_id == AV_CODEC_ID_RV30 || Context->codec_id == AV_CODEC_ID_RV40)
+                if (!Stream->sample_aspect_ratio.num && !Context->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
                     FAIL("No frame in rv30/40 and no sar");
             break;
         case AVMEDIA_TYPE_AUDIO:
-            avctx = gCodecMap->getCodecContext(Stream);
-            if (!avctx)
+            if (!Context)
                 FAIL("No codec for audio stream");
 
             // These checks are currently disabled as they continually fail but
@@ -209,7 +206,7 @@ static bool StreamHasRequiredParameters(AVStream *Stream)
             //    FAIL("Unspecified audio sample rate");
             //if (!Stream->codecpar->channels)
             //    FAIL("Unspecified number of audio channels");
-            if (!Stream->nb_decoded_frames && avctx->codec_id == AV_CODEC_ID_DTS)
+            if (!Stream->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
                 FAIL("No decodable DTS frames");
             break;
 
@@ -397,15 +394,19 @@ AvFormatDecoder::~AvFormatDecoder()
     }
 }
 
+MythCodecMap* AvFormatDecoder::CodecMap(void)
+{
+    return &m_codecMap;
+}
+
 void AvFormatDecoder::CloseCodecs()
 {
     if (m_ic)
     {
         for (uint i = 0; i < m_ic->nb_streams; i++)
         {
-            QMutexLocker locker(avcodeclock);
             AVStream *st = m_ic->streams[i];
-            gCodecMap->freeCodecContext(st);
+            m_codecMap.freeCodecContext(st);
         }
     }
 }
@@ -704,8 +705,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
-    QMutexLocker locker(avcodeclock);
-
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
@@ -741,7 +740,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekReset() flushing");
         for (uint i = 0; i < m_ic->nb_streams; i++)
         {
-            AVCodecContext *enc = gCodecMap->hasCodecContext(m_ic->streams[i]);
+            AVCodecContext *enc = m_codecMap.hasCodecContext(m_ic->streams[i]);
             // note that contexts that have not been opened have
             // enc->internal = nullptr and cause a segfault in
             // avcodec_flush_buffers
@@ -932,7 +931,6 @@ extern "C" void HandleStreamChange(void *data)
 
 int AvFormatDecoder::FindStreamInfo(void)
 {
-    QMutexLocker lock(avcodeclock);
     int retval = avformat_find_stream_info(m_ic, nullptr);
     silence_ffmpeg_logging = false;
     // ffmpeg 3.0 is returning -1 code when there is a channel
@@ -1101,7 +1099,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         scancomplete = true;
         for (uint i = 0; m_livetv && (i < m_ic->nb_streams); i++)
         {
-            if (!StreamHasRequiredParameters(m_ic->streams[i]))
+            if (!StreamHasRequiredParameters(m_codecMap.getCodecContext(m_ic->streams[i]), m_ic->streams[i]))
             {
                 scancomplete = false;
                 if (remainingscans)
@@ -1667,6 +1665,8 @@ static int cc608_good_parity(const int *parity_table, uint16_t data)
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
+    QWriteLocker locker(&m_trackLock);
+
     memset(m_ccX08InPmt, 0, sizeof(m_ccX08InPmt));
     m_pmtTracks.clear();
     m_pmtTrackTypes.clear();
@@ -1738,6 +1738,8 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
 void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 {
+    QWriteLocker locker(&m_trackLock);
+
     m_tracks[kTrackTypeCC608].clear();
     m_tracks[kTrackTypeCC708].clear();
     memset(m_ccX08InTracks, 0, sizeof(m_ccX08InTracks));
@@ -1803,6 +1805,8 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 {
+    QWriteLocker locker(&m_trackLock);
+
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
     if (!m_ic->cur_pmt_sect || !m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
@@ -1856,11 +1860,12 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 
 void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
 {
+    QWriteLocker locker(&m_trackLock);
+
     AVDictionaryEntry *metatag =
         av_dict_get(m_ic->streams[av_stream_index]->metadata, "language", nullptr,
                     0);
-    bool forced =
-      (m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED) != 0;
+    bool forced = (m_ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED) != 0;
     int lang = metatag ? get_canonical_lang(metatag->value) :
                          iso639_str3_to_key("und");
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -1941,6 +1946,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
+    QWriteLocker locker(&m_trackLock);
+
     bool unknownbitrate = false;
     int scanerror = 0;
     m_bitrate     = 0;
@@ -1991,11 +1998,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 // reset any potentially errored hardware decoders
                 if (m_resetHardwareDecoders)
                 {
-                    if (gCodecMap->hasCodecContext(m_ic->streams[strm]))
+                    if (m_codecMap.hasCodecContext(m_ic->streams[strm]))
                     {
-                        AVCodecContext* ctx = gCodecMap->getCodecContext(m_ic->streams[strm]);
+                        AVCodecContext* ctx = m_codecMap.getCodecContext(m_ic->streams[strm]);
                         if (ctx && (ctx->hw_frames_ctx || ctx->hw_device_ctx))
-                            gCodecMap->freeCodecContext(m_ic->streams[strm]);
+                            m_codecMap.freeCodecContext(m_ic->streams[strm]);
                     }
                 }
 
@@ -2021,7 +2028,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case AVMEDIA_TYPE_AUDIO:
             {
-                enc = gCodecMap->hasCodecContext(m_ic->streams[strm]);
+                enc = m_codecMap.hasCodecContext(m_ic->streams[strm]);
                 if (enc && enc->internal)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -2101,7 +2108,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
 
         if (!enc)
-            enc = gCodecMap->getCodecContext(m_ic->streams[strm]);
+            enc = m_codecMap.getCodecContext(m_ic->streams[strm]);
 
         const AVCodec *codec = nullptr;
         if (enc)
@@ -2148,7 +2155,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
             }
             if (codec)
-                enc = gCodecMap->getCodecContext(m_ic->streams[strm], codec);
+                enc = m_codecMap.getCodecContext(m_ic->streams[strm], codec);
             else
                 continue;
         }
@@ -2161,8 +2168,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString("Already opened codec not matching (%1 vs %2). Reopening")
                 .arg(ff_codec_id_string(enc->codec_id))
                 .arg(ff_codec_id_string(enc->codec->id)));
-            gCodecMap->freeCodecContext(m_ic->streams[strm]);
-            enc = gCodecMap->getCodecContext(m_ic->streams[strm]);
+            m_codecMap.freeCodecContext(m_ic->streams[strm]);
+            enc = m_codecMap.getCodecContext(m_ic->streams[strm]);
         }
         if (!OpenAVCodec(enc, codec))
             continue;
@@ -2280,8 +2287,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             AVStream *stream = m_ic->streams[selTrack];
             if (m_averrorCount > SEQ_PKT_ERR_MAX)
-                gCodecMap->freeCodecContext(stream);
-            AVCodecContext *enc = gCodecMap->getCodecContext(stream, codec);
+                m_codecMap.freeCodecContext(stream);
+            AVCodecContext *enc = m_codecMap.getCodecContext(stream, codec);
             StreamInfo si(selTrack, 0, 0, 0, 0);
 
             m_tracks[kTrackTypeVideo].push_back(si);
@@ -2445,16 +2452,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             ScanATSCCaptionStreams(selTrack);
             UpdateATSCCaptionTracks();
 
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
+            m_mythCodecCtx->SetDecoderOptions(enc, codec);
+            if (!OpenAVCodec(enc, codec))
             {
-                QMutexLocker locker(avcodeclock);
-                m_mythCodecCtx->SetDecoderOptions(enc, codec);
-                if (!OpenAVCodec(enc, codec))
-                {
-                    scanerror = -1;
-                    break;
-                }
+                scanerror = -1;
+                break;
             }
             break;
         }
@@ -2511,8 +2514,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
 bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
-    QMutexLocker locker(avcodeclock);
-
 #ifdef USING_MEDIACODEC
     if (QString("mediacodec") == codec->wrapper_name)
         av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
@@ -2556,36 +2557,33 @@ void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 }
 
 ///Returns TeleText language
-int AvFormatDecoder::GetTeletextLanguage(uint lang_idx) const
+int AvFormatDecoder::GetTeletextLanguage(uint Index)
 {
+    QReadLocker locker(&m_trackLock);
     for (const auto & si : m_tracks[kTrackTypeTeletextCaptions])
-    {
-        if (si.m_language_index == lang_idx)
-        {
+        if (si.m_language_index == Index)
              return si.m_language;
-        }
-    }
-
     return iso639_str3_to_key("und");
 }
+
 /// Returns DVD Subtitle language
-int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
+int AvFormatDecoder::GetSubtitleLanguage(uint, uint StreamIndex)
 {
-    (void)subtitle_index;
-    AVDictionaryEntry *metatag =
-        av_dict_get(m_ic->streams[stream_index]->metadata, "language", nullptr, 0);
-    return metatag ? get_canonical_lang(metatag->value) :
-                     iso639_str3_to_key("und");
+    AVDictionaryEntry *metatag = av_dict_get(m_ic->streams[StreamIndex]->metadata, "language", nullptr, 0);
+    return metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
 }
 
 /// Return ATSC Closed Caption Language
-int AvFormatDecoder::GetCaptionLanguage(TrackType trackType, int service_num)
+int AvFormatDecoder::GetCaptionLanguage(TrackType TrackType, int ServiceNum)
 {
+    // This doesn't strictly need write lock but it is called internally while
+    // write lock is held. All other (external) uses are safe
+    QWriteLocker locker(&m_trackLock);
+
     int ret = -1;
-    for (uint i = 0; i < (uint) m_pmtTrackTypes.size(); i++)
+    for (int i = 0; i < m_pmtTrackTypes.size(); i++)
     {
-        if ((m_pmtTrackTypes[i] == trackType) &&
-            (m_pmtTracks[i].m_stream_id == service_num))
+        if ((m_pmtTrackTypes[i] == TrackType) && (m_pmtTracks[i].m_stream_id == ServiceNum))
         {
             ret = m_pmtTracks[i].m_language;
             if (!iso639_is_key_undefined(ret))
@@ -2593,10 +2591,9 @@ int AvFormatDecoder::GetCaptionLanguage(TrackType trackType, int service_num)
         }
     }
 
-    for (uint i = 0; i < (uint) m_streamTrackTypes.size(); i++)
+    for (int i = 0; i < m_streamTrackTypes.size(); i++)
     {
-        if ((m_streamTrackTypes[i] == trackType) &&
-            (m_streamTracks[i].m_stream_id == service_num))
+        if ((m_streamTrackTypes[i] == TrackType) && (m_streamTracks[i].m_stream_id == ServiceNum))
         {
             ret = m_streamTracks[i].m_language;
             if (!iso639_is_key_undefined(ret))
@@ -2607,33 +2604,26 @@ int AvFormatDecoder::GetCaptionLanguage(TrackType trackType, int service_num)
     return ret;
 }
 
-int AvFormatDecoder::GetAudioLanguage(uint audio_index, uint stream_index)
+int AvFormatDecoder::GetAudioLanguage(uint AudioIndex, uint StreamIndex)
 {
-    return GetSubtitleLanguage(audio_index, stream_index);
+    return GetSubtitleLanguage(AudioIndex, StreamIndex);
 }
 
-AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
+AudioTrackType AvFormatDecoder::GetAudioTrackType(uint StreamIndex)
 {
     AudioTrackType type = kAudioTypeNormal;
-    AVStream *stream = m_ic->streams[stream_index];
+    AVStream *stream = m_ic->streams[StreamIndex];
 
     if (m_ic->cur_pmt_sect) // mpeg-ts
     {
         const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
-        switch (pmt.GetAudioType(stream_index))
+        switch (pmt.GetAudioType(StreamIndex))
         {
-            case 0x01 :
-                type = kAudioTypeCleanEffects;
-                break;
-            case 0x02 :
-                type = kAudioTypeHearingImpaired;
-                break;
-            case 0x03 :
-                type = kAudioTypeAudioDescription;
-                break;
+            case 0x01 : type = kAudioTypeCleanEffects;     break;
+            case 0x02 : type = kAudioTypeHearingImpaired;  break;
+            case 0x03 : type = kAudioTypeAudioDescription; break;
             case 0x00 :
-            default:
-                type = kAudioTypeNormal;
+            default:    type = kAudioTypeNormal;
         }
     }
     else // all other containers
@@ -2666,7 +2656,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
  */
 void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
 {
-    QMutexLocker locker(avcodeclock);
+    QWriteLocker locker(&m_trackLock);
 
     // Find the position of the streaminfo in m_tracks[kTrackTypeAudio]
     auto current = m_tracks[kTrackTypeAudio].begin();
@@ -2728,14 +2718,13 @@ void AvFormatDecoder::RemoveAudioStreams()
     if (!m_audio->HasAudioIn())
         return;
 
-    QMutexLocker locker(avcodeclock);
     for (uint i = 0; i < m_ic->nb_streams;)
     {
         AVStream *st = m_ic->streams[i];
-        AVCodecContext *avctx = gCodecMap->hasCodecContext(st);
+        AVCodecContext *avctx = m_codecMap.hasCodecContext(st);
         if (avctx && avctx->codec_type == AVMEDIA_TYPE_AUDIO)
         {
-            gCodecMap->freeCodecContext(st);
+            m_codecMap.freeCodecContext(st);
             av_remove_stream(m_ic, st->id, 0);
             i--;
         }
@@ -2970,6 +2959,8 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     if (!need_change_608 && !need_change_708)
         return;
 
+    m_trackLock.lockForWrite();
+
     ScanATSCCaptionStreams(m_selectedTrack[kTrackTypeVideo].m_av_stream_index);
 
     m_streamTracks.clear();
@@ -2980,8 +2971,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     {
         if (seen_708[i] && !m_ccX08InPmt[i+4])
         {
-            StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i, 0, false/*easy*/, true/*wide*/);
+            StreamInfo si(av_index, lang, 0/*lang_idx*/, i, 0, false/*easy*/, true/*wide*/);
             m_streamTracks.push_back(si);
             m_streamTrackTypes.push_back(kTrackTypeCC708);
         }
@@ -2997,12 +2987,12 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
             else
                 lang = iso639_str3_to_key("und");
 
-            StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                          i+1, 0, false/*easy*/, false/*wide*/);
+            StreamInfo si(av_index, lang, 0/*lang_idx*/, i+1, 0, false/*easy*/, false/*wide*/);
             m_streamTracks.push_back(si);
             m_streamTrackTypes.push_back(kTrackTypeCC608);
         }
     }
+    m_trackLock.unlock();
     UpdateATSCCaptionTracks();
 }
 
@@ -3128,7 +3118,7 @@ void AvFormatDecoder::HandleGopStart(
 
 void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
-    AVCodecContext *context = gCodecMap->getCodecContext(stream);
+    AVCodecContext *context = m_codecMap.getCodecContext(stream);
     const uint8_t *bufptr = pkt->data;
     const uint8_t *bufend = pkt->data + pkt->size;
 
@@ -3234,7 +3224,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 // Returns the number of frame starts identified in the packet.
 int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
-    AVCodecContext *context = gCodecMap->getCodecContext(stream);
+    AVCodecContext *context = m_codecMap.getCodecContext(stream);
     const uint8_t  *buf     = pkt->data;
     const uint8_t  *buf_end = pkt->data + pkt->size;
     int num_frames = 0;
@@ -3344,7 +3334,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
 bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
-    AVCodecContext *context = gCodecMap->getCodecContext(curstream);
+    AVCodecContext *context = m_codecMap.getCodecContext(curstream);
     int num_frames = 1;
 
     if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
@@ -3405,7 +3395,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 {
     int ret = 0;
     int gotpicture = 0;
-    AVCodecContext *context = gCodecMap->getCodecContext(curstream);
+    AVCodecContext *context = m_codecMap.getCodecContext(curstream);
     MythAVFrame mpa_pic;
     if (!mpa_pic)
         return false;
@@ -3416,7 +3406,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 
     bool sentPacket = false;
     int ret2 = 0;
-    avcodeclock->lock();
     if (m_privateDec)
     {
         if (QString(m_ic->iformat->name).contains("avi") || !m_ptsDetected)
@@ -3465,7 +3454,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
             }
         }
     }
-    avcodeclock->unlock();
 
     if (ret < 0 || ret2 < 0)
     {
@@ -3594,7 +3582,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 {
 
-    AVCodecContext *context = gCodecMap->getCodecContext(Stream);
+    AVCodecContext *context = m_codecMap.getCodecContext(Stream);
 
     // We need to mediate between ATSC and SCTE data when both are present.  If
     // both are present, we generally want to prefer ATSC.  However, there may
@@ -3861,11 +3849,15 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 // SECAM lines  6-23
                 // PAL   lines  6-22
                 // NTSC  lines 10-21 (rare)
+                m_trackLock.lockForRead();
                 if (m_tracks[kTrackTypeTeletextMenu].empty())
                 {
                     StreamInfo si(pkt->stream_index, 0, 0, 0, 0);
+                    m_trackLock.lockForWrite();
                     m_tracks[kTrackTypeTeletextMenu].push_back(si);
+                    m_trackLock.unlock();
                 }
+                m_trackLock.unlock();
                 m_ttd->Decode(buf+1, VBI_IVTV);
                 break;
             case VBI_TYPE_CC:
@@ -3942,8 +3934,7 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 /** \fn AvFormatDecoder::ProcessDSMCCPacket(const AVStream*, const AVPacket*)
  *  \brief Process DSMCC object carousel packet.
  */
-void AvFormatDecoder::ProcessDSMCCPacket(
-    const AVStream *str, const AVPacket *pkt)
+void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pkt)
 {
 #ifdef USING_MHEG
     if (!m_itv && ! (m_itv = m_parent->GetInteractiveTV()))
@@ -3956,7 +3947,8 @@ void AvFormatDecoder::ProcessDSMCCPacket(
     int dataBroadcastId = 0;
     unsigned carouselId = 0;
     {
-        QMutexLocker locker(avcodeclock);
+        // TODO does this still need locking?
+        //QMutexLocker locker(avcodeclock);
         componentTag    = str->component_tag;
         dataBroadcastId = str->data_id;
         carouselId  = (unsigned) str->carousel_id;
@@ -3990,10 +3982,10 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     if (pkt->dts != AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
-    avcodeclock->lock();
+    m_trackLock.lockForRead();
     int subIdx = m_selectedTrack[kTrackTypeSubtitle].m_av_stream_index;
     bool isForcedTrack = m_selectedTrack[kTrackTypeSubtitle].m_forced;
-    avcodeclock->unlock();
+    m_trackLock.unlock();
 
     int gotSubtitles = 0;
     AVSubtitle subtitle;
@@ -4010,7 +4002,6 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         {
             if (pkt->stream_index == subIdx)
             {
-                QMutexLocker locker(avcodeclock);
                 m_ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
                                                    pkt->data, pkt->size, pts);
             }
@@ -4018,8 +4009,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     }
     else if (m_decodeAllSubtitles || pkt->stream_index == subIdx)
     {
-        AVCodecContext *ctx = gCodecMap->getCodecContext(curstream);
-        QMutexLocker locker(avcodeclock);
+        AVCodecContext *ctx = m_codecMap.getCodecContext(curstream);
         avcodec_decode_subtitle2(ctx, &subtitle, &gotSubtitles,
             pkt);
 
@@ -4048,13 +4038,10 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 {
-    if (!(m_decodeAllSubtitles ||
-        m_selectedTrack[kTrackTypeRawText].m_av_stream_index == pkt->stream_index))
-    {
+    if (!(m_decodeAllSubtitles || m_selectedTrack[kTrackTypeRawText].m_av_stream_index == pkt->stream_index))
         return false;
-    }
 
-    if (!m_parent->GetSubReader(pkt->stream_index+0x2000))
+    if (!m_parent->GetSubReader(pkt->stream_index + 0x2000))
         return false;
 
     QTextCodec *codec = QTextCodec::codecForName("utf-8");
@@ -4063,9 +4050,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
     QStringList list  = text.split('\n', QString::SkipEmptyParts);
     delete dec;
 
-    m_parent->GetSubReader(pkt->stream_index+0x2000)->
-        AddRawTextSubtitle(list, pkt->duration);
-
+    m_parent->GetSubReader(pkt->stream_index + 0x2000)->AddRawTextSubtitle(list, pkt->duration);
     return true;
 }
 
@@ -4102,42 +4087,42 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
     return true;
 }
 
-int AvFormatDecoder::SetTrack(uint type, int trackNo)
+int AvFormatDecoder::SetTrack(uint Type, int TrackNo)
 {
-    int ret = DecoderBase::SetTrack(type, trackNo);
-
-    if (kTrackTypeAudio == type)
+    QWriteLocker locker(&m_trackLock);
+    int ret = DecoderBase::SetTrack(Type, TrackNo);
+    if (kTrackTypeAudio == Type)
     {
         QString msg = SetupAudioStream() ? "" : "not ";
-        LOG(VB_AUDIO, LOG_INFO, LOC + "Audio stream type "+msg+"changed.");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Audio stream type " + msg + "changed.");
     }
-
     return ret;
 }
 
-QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
+QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
 {
-    if (!m_ic || trackNo >= m_tracks[type].size())
+    QReadLocker locker(&m_trackLock);
+
+    if (!m_ic || TrackNo >= m_tracks[type].size())
         return "";
 
-    bool forced = m_tracks[type][trackNo].m_forced;
-    int lang_key = m_tracks[type][trackNo].m_language;
+    bool forced = m_tracks[type][TrackNo].m_forced;
+    int lang_key = m_tracks[type][TrackNo].m_language;
     QString forcedString = forced ? QObject::tr(" (forced)") : "";
     if (kTrackTypeAudio == type)
     {
         QString msg = iso639_key_toName(lang_key);
 
-        switch (m_tracks[type][trackNo].m_audio_type)
+        switch (m_tracks[type][TrackNo].m_audio_type)
         {
             case kAudioTypeNormal :
             {
-                int av_index = m_tracks[kTrackTypeAudio][trackNo].m_av_stream_index;
-                AVStream *s = m_ic->streams[av_index];
-
-                if (s)
+                int av_index = m_tracks[kTrackTypeAudio][TrackNo].m_av_stream_index;
+                AVStream *stream = m_ic->streams[av_index];
+                if (stream)
                 {
-                    AVCodecParameters *par = s->codecpar;
-                    AVCodecContext *ctx = gCodecMap->getCodecContext(s);
+                    AVCodecParameters *par = stream->codecpar;
+                    AVCodecContext *ctx = m_codecMap.getCodecContext(stream);
                     if (par->codec_id == AV_CODEC_ID_MP3)
                         msg += QString(" MP3");
                     else if (ctx && ctx->codec)
@@ -4145,7 +4130,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
                     int channels = 0;
                     if (m_ringBuffer->IsDVD() || par->channels)
-                        channels = m_tracks[kTrackTypeAudio][trackNo].m_orig_num_channels;
+                        channels = m_tracks[kTrackTypeAudio][TrackNo].m_orig_num_channels;
 
                     if (channels == 0)
                         msg += QString(" ?ch");
@@ -4154,7 +4139,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
                     else
                         msg += QString(" %1ch").arg(channels);
                 }
-
                 break;
             }
             case kAudioTypeAudioDescription :
@@ -4164,23 +4148,20 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
             case kAudioTypeSpokenSubs :
             default :
                 msg += QString(" (%1)")
-                            .arg(toString(m_tracks[type][trackNo].m_audio_type));
+                            .arg(toString(m_tracks[type][TrackNo].m_audio_type));
                 break;
         }
-
-        return QString("%1: %2").arg(trackNo + 1).arg(msg);
+        return QString("%1: %2").arg(TrackNo + 1).arg(msg);
     }
     if (kTrackTypeSubtitle == type)
     {
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
-            .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
+            .arg(TrackNo + 1).arg(iso639_key_toName(lang_key))
             .arg(forcedString);
     }
     if (forced && kTrackTypeRawText == type)
-    {
-        return DecoderBase::GetTrackDesc(type, trackNo) + forcedString;
-    }
-    return DecoderBase::GetTrackDesc(type, trackNo);
+        return DecoderBase::GetTrackDesc(type, TrackNo) + forcedString;
+    return DecoderBase::GetTrackDesc(type, TrackNo);
 }
 
 int AvFormatDecoder::GetTeletextDecoderType(void) const
@@ -4188,67 +4169,61 @@ int AvFormatDecoder::GetTeletextDecoderType(void) const
     return m_ttd->GetDecoderType();
 }
 
-QString AvFormatDecoder::GetXDS(const QString &key) const
+QString AvFormatDecoder::GetXDS(const QString &Key) const
 {
-    return m_ccd608->GetXDS(key);
+    return m_ccd608->GetXDS(Key);
 }
 
-QByteArray AvFormatDecoder::GetSubHeader(uint trackNo) const
+QByteArray AvFormatDecoder::GetSubHeader(uint TrackNo)
 {
-    if (trackNo >= m_tracks[kTrackTypeSubtitle].size())
+    QReadLocker locker(&m_trackLock);
+    if (TrackNo >= m_tracks[kTrackTypeSubtitle].size())
         return QByteArray();
 
-    int index = m_tracks[kTrackTypeSubtitle][trackNo].m_av_stream_index;
-    AVCodecContext *ctx = gCodecMap->getCodecContext(m_ic->streams[index]);
-    if (!ctx)
-        return QByteArray();
-
-    return QByteArray((char *)ctx->subtitle_header,
-                      ctx->subtitle_header_size);
+    int index = m_tracks[kTrackTypeSubtitle][TrackNo].m_av_stream_index;
+    AVCodecContext *ctx = m_codecMap.getCodecContext(m_ic->streams[index]);
+    return ctx ? QByteArray(reinterpret_cast<char*>(ctx->subtitle_header), ctx->subtitle_header_size) :
+                 QByteArray();
 }
 
-void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
-                                        QByteArray &data)
+void AvFormatDecoder::GetAttachmentData(uint TrackNo, QByteArray &Filename, QByteArray &Data)
 {
-    if (trackNo >= m_tracks[kTrackTypeAttachment].size())
+    QReadLocker locker(&m_trackLock);
+    if (TrackNo >= m_tracks[kTrackTypeAttachment].size())
         return;
 
-    int index = m_tracks[kTrackTypeAttachment][trackNo].m_av_stream_index;
-    AVDictionaryEntry *tag = av_dict_get(m_ic->streams[index]->metadata,
-                                         "filename", nullptr, 0);
+    int index = m_tracks[kTrackTypeAttachment][TrackNo].m_av_stream_index;
+    AVDictionaryEntry *tag = av_dict_get(m_ic->streams[index]->metadata, "filename", nullptr, 0);
     if (tag)
-        filename  = QByteArray(tag->value);
+        Filename = QByteArray(tag->value);
     AVCodecParameters *par = m_ic->streams[index]->codecpar;
-    data = QByteArray((char *)par->extradata, par->extradata_size);
+    Data = QByteArray(reinterpret_cast<char*>(par->extradata), par->extradata_size);
 }
 
-bool AvFormatDecoder::SetAudioByComponentTag(int tag)
+bool AvFormatDecoder::SetAudioByComponentTag(int Tag)
 {
+    QReadLocker locker(&m_trackLock);
     for (size_t i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
     {
-        AVStream *s  = m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index];
-        if (s)
-        {
-            if ((s->component_tag == tag) ||
-                ((tag <= 0) && s->component_tag <= 0))
-            {
-                return SetTrack(kTrackTypeAudio, i) != -1;
-            }
-        }
+        AVStream *stream = m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index];
+        if (stream)
+            if ((stream->component_tag == Tag) || ((Tag <= 0) && stream->component_tag <= 0))
+                return SetTrack(kTrackTypeAudio, static_cast<int>(i)) != -1;
     }
     return false;
 }
 
-bool AvFormatDecoder::SetVideoByComponentTag(int tag)
+bool AvFormatDecoder::SetVideoByComponentTag(int Tag)
 {
+    QWriteLocker locker(&m_trackLock);
     for (uint i = 0; i < m_ic->nb_streams; i++)
     {
-        AVStream *s  = m_ic->streams[i];
-        if (s)
+        AVStream *stream  = m_ic->streams[i];
+        if (stream)
         {
-            if (s->component_tag == tag)
+            if (stream->component_tag == Tag)
             {
-                StreamInfo si(i, 0, 0, 0, 0);
+                StreamInfo si(static_cast<int>(i), 0, 0, 0, 0);
                 m_selectedTrack[kTrackTypeVideo] = si;
                 return true;
             }
@@ -4374,6 +4349,8 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
  */
 int AvFormatDecoder::AutoSelectAudioTrack(void)
 {
+    QWriteLocker locker(&m_trackLock);
+
     const sinfo_vec_t &atracks = m_tracks[kTrackTypeAudio];
     StreamInfo        &wtrack  = m_wantedTrack[kTrackTypeAudio];
     StreamInfo        &strack  = m_selectedTrack[kTrackTypeAudio];
@@ -4398,7 +4375,6 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.m_language;
-
 
     if ((selTrack < 0) && (wtrack.m_av_substream_index >= 0))
     {
@@ -4578,10 +4554,8 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         if (wtrack.m_av_stream_index < 0)
             wtrack = strack;
 
-        LOG(VB_AUDIO, LOG_INFO, LOC +
-            QString("Selected track %1 (A/V Stream #%2)")
-                .arg(GetTrackDesc(kTrackTypeAudio, ctrack))
-                .arg(strack.m_av_stream_index));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Selected track %1 (A/V Stream #%2)")
+                .arg(static_cast<uint>(ctrack)).arg(strack.m_av_stream_index));
     }
 
     SetupAudioStream();
@@ -4615,16 +4589,16 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
 bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                          DecodeType decodetype)
 {
-    AVCodecContext *ctx = gCodecMap->getCodecContext(curstream);
+    AVCodecContext *ctx = m_codecMap.getCodecContext(curstream);
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true;
     int decoded_size    = -1;
 
-    avcodeclock->lock();
+    m_trackLock.lockForRead();
     int audIdx = m_selectedTrack[kTrackTypeAudio].m_av_stream_index;
     int audSubIdx = m_selectedTrack[kTrackTypeAudio].m_av_substream_index;
-    avcodeclock->unlock();
+    m_trackLock.unlock();
 
     AVPacket tmp_pkt;
     av_init_packet(&tmp_pkt);
@@ -4658,8 +4632,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         bool already_decoded = false;
         if (!ctx->channels)
         {
-            QMutexLocker locker(avcodeclock);
-
             if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(ctx))
             {
                 // for passthru or codecs for which the decoder won't downmix
@@ -4683,7 +4655,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (reselectAudioTrack)
         {
-            QMutexLocker locker(avcodeclock);
+            QWriteLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
             AutoSelectAudioTrack();
@@ -4719,8 +4691,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             }
         }
         m_firstVPtsInuse = false;
-
-        avcodeclock->lock();
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
@@ -4735,6 +4705,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
                     .arg(m_audioOut.m_channels).arg(ctx->channels));
             }
+            QWriteLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
             audIdx = -1;
@@ -4778,7 +4749,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 decoded_size = data_size;
             }
         }
-        avcodeclock->unlock();
 
         if (ret < 0)
         {
@@ -4843,9 +4813,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
     m_allowedQuit = false;
     bool storevideoframes = false;
 
-    avcodeclock->lock();
     AutoSelectTracks();
-    avcodeclock->unlock();
 
     m_skipAudio = (m_lastVPts == 0);
 
@@ -5060,7 +5028,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             continue;
         }
 
-        AVCodecContext *ctx = gCodecMap->getCodecContext(curstream);
+        AVCodecContext *ctx = m_codecMap.getCodecContext(curstream);
         if (!ctx)
         {
             if (codec_type != AVMEDIA_TYPE_VIDEO)
@@ -5151,17 +5119,13 @@ void AvFormatDecoder::StreamChangeCheck(void)
     if (m_streamsChanged)
     {
         SeekReset(0, 0, true, true);
-        avcodeclock->lock();
         ScanStreams(false);
-        avcodeclock->unlock();
         m_streamsChanged = false;
     }
 }
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
-    QMutexLocker locker(avcodeclock);
-
     return av_read_frame(ctx, pkt);
 }
 
@@ -5267,8 +5231,7 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 void AvFormatDecoder::ForceSetupAudioStream(void)
 {
-    QMutexLocker locker(avcodeclock);
-
+    QWriteLocker locker(&m_trackLock);
     SetupAudioStream();
 }
 
@@ -5317,8 +5280,6 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfi
 /** \fn AvFormatDecoder::SetupAudioStream(void)
  *  \brief Reinitializes audio if it needs to be reinitialized.
  *
- *   NOTE: The avcodeclock must be held when this is called.
- *
  *  \return true if audio changed, false otherwise
  */
 bool AvFormatDecoder::SetupAudioStream(void)
@@ -5334,7 +5295,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
          (int) m_ic->nb_streams) &&
         (curstream = m_ic->streams[m_selectedTrack[kTrackTypeAudio]
                                  .m_av_stream_index]) &&
-        (ctx = gCodecMap->getCodecContext(curstream)))
+        (ctx = m_codecMap.getCodecContext(curstream)))
     {
         AudioFormat fmt =
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
@@ -5382,9 +5343,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (!ctx)
     {
-        if (GetTrackCount(kTrackTypeAudio))
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "No codec context. Returning false");
+        if (m_tracks[kTrackTypeAudio].size())
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "No codec context. Returning false");
         return false;
     }
 

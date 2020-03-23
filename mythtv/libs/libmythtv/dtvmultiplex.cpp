@@ -41,8 +41,8 @@ QString DTVMultiplex::toString() const
         .arg(m_bandwidth.toString()).arg(m_transMode.toString())
         .arg(m_guardInterval.toString()).arg(m_hierarchy.toString())
         .arg(m_polarity.toString());
-    ret += QString(" fec: %1 msys: %2 rolloff: %3")
-        .arg(m_fec.toString()).arg(m_modSys.toString()).arg(m_rolloff.toString());
+    ret += QString(" fec:%1 msys:%2 rolloff:%3")
+        .arg(m_fec.toString(),-4).arg(m_modSys.toString(),-6).arg(m_rolloff.toString());
 
     return ret;
 }

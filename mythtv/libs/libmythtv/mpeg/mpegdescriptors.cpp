@@ -491,6 +491,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(DefaultAuthorityDescriptor);
     }
+    else if (DescriptorID::t2_terrestrial_delivery_system == DescriptorTag())
+    {
+        SET_STRING(T2TerrestrialDeliverySystemDescriptor);
+    }
     //
     // User Defined DVB descriptors, range 0x80-0xFE
     else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&

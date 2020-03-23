@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="it_IT" sourcelanguage="en_US">
 <context>
-    <name>FunctionDialog</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-</context>
-<context>
     <name>MythControls</name>
     <message>
         <location filename="../mythzoneminder/main.cpp" line="177"/>
@@ -29,53 +22,6 @@
         <location filename="../mythzoneminder/main.cpp" line="183"/>
         <source>ZoneMinder Mini Live View</source>
         <translation>ZoneMinder Mini Live Vista</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation type="obsolete">Indirizzo IP del server MythZoneMinder</translation>
-    </message>
-    <message>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation type="obsolete">Inserire l&apos;indirizzo IP del server MythZoneMinder la quale questo frontend dovrebbe connettersi.</translation>
-    </message>
-    <message>
-        <source>Port the server runs on</source>
-        <translation type="obsolete">Porta del server in eseguzione su</translation>
-    </message>
-    <message>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="obsolete">Almeno che non si abbia una buona ragione, non cambiarlo.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Formato data</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">I campioni sono visualizzati usando la data di oggi.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">I campioni sono visualizzati usando la data di domani.</translation>
-    </message>
-    <message>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation type="obsolete">Formata di data preferito da usare sulle schermate degli eventi.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Formato ora</translation>
-    </message>
-    <message>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation type="obsolete">Formata di ora preferito da visualizzare sulle schermate degli eventi.</translation>
-    </message>
-    <message>
-        <source>MythZoneMinder Settings</source>
-        <translation type="obsolete">Impostazioni MythZoneMinder</translation>
     </message>
 </context>
 <context>
@@ -178,7 +124,7 @@
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>Stopped</source>
-        <translation type="unfinished">Fermato</translation>
+        <translation>Fermato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
@@ -369,12 +315,12 @@
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>0.12</source>
-        <translation type="unfinished">0.12</translation>
+        <translation>0.12</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>100%</source>
-        <translation type="unfinished">100%</translation>
+        <translation>100%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -627,13 +573,9 @@
 <context>
     <name>ZMClient</name>
     <message>
-        <source>Cannot connect to the mythzmserver - Is it running? Have you set the correct IP and port in the settings?</source>
-        <translation type="obsolete">Impossibile connettersi al server mythzmserve - È in esecuzione? È stato impostato correttamente l&apos;IP e la porta nelle impostazioni?</translation>
-    </message>
-    <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="105"/>
         <source>Can&apos;t connect to the mythzmserver</source>
-        <translation>Impossibile connettersi a mythzmserver </translation>
+        <translation>Impossibile connettersi a mythzmserver</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="106"/>
@@ -695,10 +637,6 @@
         <translation>Nascondi eventi continui</translation>
     </message>
     <message>
-        <source>Don&apos;t Show Continuous Events</source>
-        <translation type="obsolete">Non mostrare eventi continui</translation>
-    </message>
-    <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="442"/>
         <source>Show Continuous Events</source>
         <translation>Mostra eventi continui</translation>
@@ -739,47 +677,47 @@
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="248"/>
         <source>Change View</source>
-        <translation type="unfinished">Cambiare visualizzazione</translation>
+        <translation>Cambia vista</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="249"/>
         <source>Change Camera 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 1</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="252"/>
         <source>Change Camera 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 2</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="256"/>
         <source>Change Camera 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 3</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="257"/>
         <source>Change Camera 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 4</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="262"/>
         <source>Change Camera 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 5</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="263"/>
         <source>Change Camera 6</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 6</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="268"/>
         <source>Change Camera 7</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 7</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="269"/>
         <source>Change Camera 8</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia Camera 8</translation>
     </message>
 </context>
 <context>

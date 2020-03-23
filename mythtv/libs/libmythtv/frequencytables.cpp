@@ -194,8 +194,11 @@ QString TransportScanItem::toString() const
             .arg(m_tuning.m_transMode)
             .arg(m_tuning.m_guardInterval)
             .arg(m_tuning.m_hierarchy);
+        str += QString("\t  symbol_rate(%1) fec(%2)\n")
+            .arg(m_tuning.m_symbolRate)
+            .arg(m_tuning.m_fec);
     }
-    str += QString("\t offset[0..2]: %1 %2 %3")
+    str += QString("\toffset[0..2]: %1 %2 %3")
         .arg(m_freqOffsets[0]).arg(m_freqOffsets[1]).arg(m_freqOffsets[2]);
     return str;
 }
@@ -525,6 +528,12 @@ static void init_freq_tables(freq_table_map_t &fmap)
         474000000, 858000000, 8000000, "Channel %1", 21,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         6900000, 0, 0);
+
+    // DVB-C Netherlands
+    fmap["dvbc_qam_nl0"] = new FrequencyTable(
+         474000000,  474000000, 8000000, "Channel %1", 21,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
+        6875000, 0, 0);
 
     // DVB-C United Kingdom
     fmap["dvbc_qam_gb0"] = new FrequencyTable(

@@ -185,6 +185,10 @@ class TransportScanItem
     QString            m_iptvChannel;         ///< IPTV base channel
 
     DTVChannelInfoList m_expectedChannels;
+
+    int                m_signalStrength {0};
+    uint               m_networkID      {0};
+    uint               m_transportID    {0};
 };
 
 class transport_scan_items_it_t

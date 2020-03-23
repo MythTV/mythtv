@@ -76,6 +76,18 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         cout << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
         cout << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
         cout << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
+        cout << "Remove duplicate channels   : " << (m_removeDuplicates  ? "yes" : "no") << endl;
+    }
+
+    // List of transports
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (transports.size() > 0)
+        {
+            cout << endl;
+            cout << "Transport list before processing (" << transports.size() << "):" << endl;
+            cout << FormatTransports(transports).toLatin1().constData() << endl;
+        }
     }
 
     // Print out each channel
@@ -92,29 +104,53 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     if (m_doSave)
         saved_scan = SaveScan(transports);
 
-    CleanupDuplicates(transports);
+    // Merge transports with the same frequency into one
+    MergeSameFrequency(transports);
 
-    FilterServices(transports);
-
-    // Print out each transport
-    uint transports_scanned_size = transports.size();
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    // Remove duplicate transports with a lower signal strength.
+    if (m_removeDuplicates)
     {
-        cout << endl;
-        cout << "Transport list (" << transports_scanned_size << "):" << endl;
-        cout << FormatTransports(transports).toLatin1().constData() << endl;
+        ScanDTVTransportList duplicates;
+        RemoveDuplicates(transports, duplicates);
+        if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+        {
+            if (duplicates.size() > 0)
+            {
+                cout << endl;
+                cout << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
+                cout << FormatTransports(duplicates).toLatin1().constData() << endl;
+                cout << endl;
+                cout << "With channels (";
+                cout << SimpleCountChannels(duplicates) << "):" << endl;
+                cout << FormatChannels(duplicates).toLatin1().constData() << endl;
+                cout << endl;
+            }
+        }
     }
+
+    // Remove the channels that do not pass various criteria.
+    FilterServices(transports);
 
     // Pull in DB info in transports
     // Channels not found in scan but only in DB are returned in db_trans
     sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (!db_trans.empty())
+        {
+            cout << endl;
+            cout << "Transports with channels in DB but not in scan (";
+            cout << db_trans.size() << "):" << endl;
+            cout << FormatTransports(db_trans).toLatin1().constData() << endl;
+        }
+    }
 
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
 
     // All channels in the scan after comparing with the database
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
     {
         cout << endl << "Channel list after compare with database (";
         cout << SimpleCountChannels(transports) << "):" << endl;
@@ -145,10 +181,10 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Print out each channel
     cout << endl;
     cout << "Channel list (" << SimpleCountChannels(transports) << "):" << endl;
-    cout << FormatChannels(transports, &info).toLatin1().constData() << endl;
+    cout << FormatChannels(transports).toLatin1().constData() << endl;
 
     // Create summary
-    QString msg = GetSummary(transports_scanned_size, info, stats);
+    QString msg = GetSummary(transports.size(), info, stats);
     cout << msg.toLatin1().constData() << endl << endl;
 
     if (m_doInsert)
@@ -411,6 +447,17 @@ void ChannelImporter::InsertChannels(
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, inserted, skipped_inserts);
+        }
+    }
+
+    // Updated transports
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        if (!updated.empty())
+        {
+            cout << endl;
+            cout << "Transport list (updated) (" << updated.size() << "):" << endl;
+            cout << FormatTransports(updated).toLatin1().constData() << endl;
         }
     }
 
@@ -884,7 +931,12 @@ void ChannelImporter::AddChanToCopy(
     transport_copy.m_channels.push_back(chan);
 }
 
-void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
+// ChannelImporter::MergeSameFrequency
+//
+// Merge transports that are on the same frequency by
+// combining all channels of both transports into one transport
+//
+void ChannelImporter::MergeSameFrequency(ScanDTVTransportList &transports)
 {
     ScanDTVTransportList no_dups;
 
@@ -928,9 +980,84 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
                 if (!found_same)
                     transports[i].m_channels.push_back(transports[j].m_channels[k]);
             }
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Transport on same frequency:") + FormatTransport(transports[j]));
             ignore[j] = true;
         }
         no_dups.push_back(transports[i]);
+    }
+    transports = no_dups;
+}
+
+// ChannelImporter::RemoveDuplicates
+//
+// When there are two transports that have the same list of channels
+// but that are received on different frequencies then remove
+// the transport with the weakest signal.
+//
+// In DVB two transports are duplicates when the original network ID and the
+// transport ID are the same. This is possibly different in ATSC.
+// Here all channels of both transports are compared.
+//
+void ChannelImporter::RemoveDuplicates(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates)
+{
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Number of transports:%1").arg(transports.size()));
+
+    ScanDTVTransportList no_dups;
+    vector<bool> ignore;
+    ignore.resize(transports.size());
+    for (size_t i = 0; i < transports.size(); ++i)
+    {
+        ScanDTVTransport &ta = transports[i];
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport " +
+            FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()));
+
+        if (!ignore[i])
+        {
+            for (size_t j = i+1; j < transports.size(); ++j)
+            {
+                ScanDTVTransport &tb = transports[j];
+                bool found_same = true;
+                bool found_diff = true;
+                if (ta.m_channels.size() == tb.m_channels.size())
+                {
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Comparing transports " +
+                        FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()) +
+                        FormatTransport(tb) + QString(" size(%1)").arg(tb.m_channels.size()));
+
+                    for (size_t k = 0; found_same && k < tb.m_channels.size(); ++k)
+                    {
+                        if (tb.m_channels[k].IsSameChannel(ta.m_channels[k], 0))
+                        {
+                            found_diff = false;
+                        }
+                        else
+                        {
+                            found_same = false;
+                        }
+                    }
+                }
+
+                // Transport with the lowest signal strength is duplicate
+                if (found_same && !found_diff)
+                {
+                    size_t lowss = transports[i].m_signalStrength < transports[j].m_signalStrength ? i : j;
+                    ignore[lowss] = true;
+                    duplicates.push_back(transports[lowss]);
+
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                        "Duplicate transports found:" +
+                        "\n\t" + "Transport A " + FormatTransport(transports[i]) +
+                        "\n\t" + "Transport B " + FormatTransport(transports[j]) +
+                        "\n\t" + "Discarding  " + FormatTransport(transports[lowss]));
+                }
+            }
+        }
+        if (!ignore[i])
+        {
+            no_dups.push_back(transports[i]);
+        }
     }
 
     transports = no_dups;
@@ -1052,6 +1179,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         return not_in_scan;
     }
 
+    QMap<uint,bool> found_in_scan;
     while (query.next())
     {
         ScanDTVTransport db_transport;
@@ -1065,31 +1193,35 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         }
 
         bool found_transport = false;
-        QMap<uint,bool> found_chan;
+        QMap<uint,bool> found_in_database;
 
         // Search for old channels in the same transport of the scan.
-        for (auto & transport : transports)                                                 // All transports in scan
-        {                                                                                   // Scanned transport
-            if (transport.IsEqual(tuner_type, db_transport, 500 * freq_mult, true))         // Same transport?
+        for (size_t ist = 0; ist < transports.size(); ++ist)                                // All transports in scan
+        {
+            ScanDTVTransport &scan_transport = transports[ist];                             // Transport from the scan
+            if (scan_transport.IsEqual(tuner_type, db_transport, 500 * freq_mult, true))    // Same transport?
             {
-                found_transport = true;
-                transport.m_mplex = db_transport.m_mplex;                                   // Found multiplex
-
+                found_transport = true;                                                     // Yes
+                scan_transport.m_mplex = db_transport.m_mplex;                              // Found multiplex
                 for (size_t jdc = 0; jdc < db_transport.m_channels.size(); ++jdc)           // All channels in database transport
                 {
-                    if (!found_chan[jdc])                                                   // Channel not found yet?
+                    if (!found_in_database[jdc])                                            // Channel not found yet?
                     {
                         ChannelInsertInfo &db_chan = db_transport.m_channels[jdc];          // Channel in database transport
-
-                        for (auto & chan : transport.m_channels)                            // All channels in scanned transport
+                        for (size_t ksc = 0; ksc < scan_transport.m_channels.size(); ++ksc) // All channels in scanned transport
                         {                                                                   // Channel in scanned transport
-                            if (db_chan.IsSameChannel(chan, 2))                             // Same transport, relaxed check
+                            if (!found_in_scan[(ist<<16)+ksc])                              // Scanned channel not yet found?
                             {
-                                found_in_same_transport++;
-                                found_chan[jdc] = true;                                     // Found channel from database in scan
-                                chan.m_dbMplexId = mplexid;                                 // Found multiplex
-                                chan.m_channelId = db_chan.m_channelId;                     // This is the crucial field
-                                break;                                                      // Ready with scanned transport
+                                ChannelInsertInfo &scan_chan = scan_transport.m_channels[ksc];
+                                if (db_chan.IsSameChannel(scan_chan, 2))                    // Same transport, relaxed check
+                                {
+                                    found_in_same_transport++;
+                                    found_in_database[jdc] = true;                          // Channel from db found in scan
+                                    found_in_scan[(ist<<16)+ksc] = true;                    // Channel from scan found in db
+                                    scan_chan.m_dbMplexId = db_transport.m_mplex;           // Found multiplex
+                                    scan_chan.m_channelId = db_chan.m_channelId;            // This is the crucial field
+                                    break;                                                  // Ready with scanned transport
+                                }
                             }
                         }
                     }
@@ -1102,22 +1234,28 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         // This can identify the channels that have moved to another transport.
         if (m_fullChannelSearch)
         {
-            for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)               // All channels in database transport
+            for (size_t ist = 0; ist < transports.size(); ++ist)                            // All transports in scan
             {
-                ChannelInsertInfo &db_chan = db_transport.m_channels[idc];                  // Channel in database transport
-
-                for (size_t jst = 0; jst < transports.size() && !found_chan[idc]; ++jst)    // All transports in scan until found
+                ScanDTVTransport &scan_transport = transports[ist];                         // Scanned transport
+                for (size_t jdc = 0; jdc < db_transport.m_channels.size(); ++jdc)           // All channels in database transport
                 {
-                    ScanDTVTransport &transport = transports[jst];                          // Scanned transport
-                    for (auto & chan : transport.m_channels)                                // All channels in scanned transport
+                    if (!found_in_database[jdc])                                            // Channel not found yet?
                     {
-                        // Channel in scanned transport
-                        if (db_chan.IsSameChannel(chan, 1))                                 // Different transport, check
-                        {                                                                   // network id and service id
-                            found_in_other_transport++;
-                            found_chan[idc] = true;                                         // Found channel from database in scan
-                            chan.m_channelId = db_chan.m_channelId;                         // This is the crucial field
-                            break;                                                          // Ready with scanned transport
+                        ChannelInsertInfo &db_chan = db_transport.m_channels[jdc];          // Channel in database transport
+                        for (size_t ksc = 0; ksc < scan_transport.m_channels.size(); ++ksc) // All channels in scanned transport
+                        {
+                            if (!found_in_scan[(ist<<16)+ksc])                              // Scanned channel not yet found?
+                            {
+                                ChannelInsertInfo &scan_chan = scan_transport.m_channels[ksc];
+                                if (db_chan.IsSameChannel(scan_chan, 1))                    // Other transport, check
+                                {                                                           // network id and service id
+                                    found_in_other_transport++;
+                                    found_in_database[jdc] = true;                          // Channel from db found in scan
+                                    found_in_scan[(ist<<16)+ksc] = true;                    // Channel from scan found in db
+                                    scan_chan.m_channelId = db_chan.m_channelId;            // This is the crucial field
+                                    break;                                                  // Ready with scanned transport
+                                }
+                            }
                         }
                     }
                 }
@@ -1134,7 +1272,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
             for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)
             {
-                if (!found_chan[idc])
+                if (!found_in_database[idc])
                 {
                     tmp.m_channels.push_back(db_transport.m_channels[idc]);
                     found_nowhere++;
@@ -1256,8 +1394,7 @@ QString ChannelImporter::FormatChannel(
     QString msg;
     QTextStream ssMsg(&msg);
 
-    ssMsg << transport.m_modulation.toString().toLatin1().constData()
-          << ":";
+    ssMsg << transport.m_modulation.toString().toLatin1().constData() << ":";
     ssMsg << transport.m_frequency << ":";
 
     QString si_standard = (chan.m_siStandard=="opencable") ?
@@ -1424,6 +1561,9 @@ QString ChannelImporter::FormatTransport(
     QString msg;
     QTextStream ssMsg(&msg);
     ssMsg << transport.toString();
+    ssMsg << QString(" onid:%1").arg(transport.m_networkID);
+    ssMsg << QString(" tsid:%1").arg(transport.m_transportID);
+    ssMsg << QString(" ss:%1").arg(transport.m_signalStrength);
     return msg;
 }
 
@@ -1567,9 +1707,12 @@ int ChannelImporter::SimpleCountChannels(
 /**
  * \fn ChannelImporter::ComputeSuggestedChannelNum
  *
- * Compute a suggested channel number based on various aspects of the
- * channel information. Check to see if this channel number conflicts
- * with an existing channel number. If so, fall back to incrementing a
+ * Compute a suggested channel number that is unique in the video source.
+ * Check first to see if the existing channel number conflicts
+ * with an existing channel number. If so, try adding a suffix
+ * starting with 'A' to make the number unique while still being
+ * recognizable. For instance, the second "7-2" channel will be called "7-2A".
+ * If this fails then fall back to incrementing a
  * per-source number to find an unused value.
  *
  * \param chan       Info describing a channel
@@ -1580,49 +1723,18 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
 {
     static QMutex          s_lastFreeLock;
     static QMap<uint,uint> s_lastFreeChanNumMap;
+    QString chanNum;
 
     // Suggest existing channel number if non-conflicting
     if (!ChannelUtil::IsConflicting(chan.m_chanNum, chan.m_sourceId))
         return chan.m_chanNum;
 
-    // ATSC major-minor channel number
-    QString channelFormat = "%1_%2";
-    QString chan_num = channelFormat
-        .arg(chan.m_atscMajorChannel)
-        .arg(chan.m_atscMinorChannel);
-    if (chan.m_atscMajorChannel)
+    // Add a suffix to make it unique
+    for (char suffix = 'A'; suffix <= 'Z'; ++suffix)
     {
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-    }
-
-    // DVB
-    if (chan.m_siStandard == "dvb")
-    {
-        // Service ID
-        chan_num = QString("%1").arg(chan.m_serviceId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-
-        // Frequency ID (channel) - Service ID
-        if (!chan.m_freqId.isEmpty())
-        {
-            chan_num = QString("%1-%2")
-                          .arg(chan.m_freqId)
-                          .arg(chan.m_serviceId);
-            if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-                return chan_num;
-        }
-
-        // Service ID - Network ID
-        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_netId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
-
-        // Service ID - Transport ID
-        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_patTsId);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
-            return chan_num;
+        chanNum = chan.m_chanNum + suffix;
+        if (!ChannelUtil::IsConflicting(chanNum, chan.m_sourceId))
+            return chanNum;
     }
 
     // Find unused channel number
@@ -1630,14 +1742,14 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     uint last_free_chan_num = s_lastFreeChanNumMap[chan.m_sourceId];
     for (last_free_chan_num++; ; ++last_free_chan_num)
     {
-        chan_num = QString::number(last_free_chan_num);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
+        chanNum = QString::number(last_free_chan_num);
+        if (!ChannelUtil::IsConflicting(chanNum, chan.m_sourceId))
             break;
     }
     // cppcheck-suppress unreadVariable
     s_lastFreeChanNumMap[chan.m_sourceId] = last_free_chan_num;
 
-    return chan_num;
+    return chanNum;
 }
 
 ChannelImporter::DeleteAction

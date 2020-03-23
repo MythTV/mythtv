@@ -1554,17 +1554,17 @@ Resetter og prøver igjen</translation>
         <translation>oisann</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="614"/>
+        <location filename="../mythmusic/playlist.cpp" line="616"/>
         <source>Default Playlist</source>
         <translation>Standard spilleliste</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1342"/>
+        <location filename="../mythmusic/playlist.cpp" line="1344"/>
         <source>Creating CD File System</source>
         <translation>Lager CD-filsystem</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1391"/>
+        <location filename="../mythmusic/playlist.cpp" line="1393"/>
         <source>Burning CD</source>
         <translation>Brenner CD</translation>
     </message>

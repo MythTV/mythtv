@@ -79,6 +79,7 @@ class MTV_PUBLIC ChannelImporter
                     bool _delete, bool insert, bool save,
                     bool fta_only, bool lcn_only, bool complete_only,
                     bool full_channel_search,
+                    bool remove_duplicates,
                     ServiceRequirements service_requirements,
                     bool success = false) :
         m_useGui(gui),
@@ -90,6 +91,7 @@ class MTV_PUBLIC ChannelImporter
         m_lcnOnly(lcn_only),
         m_completeOnly(complete_only),
         m_fullChannelSearch(full_channel_search),
+        m_removeDuplicates(remove_duplicates),
         m_success(success),
         m_serviceRequirements(service_requirements) { }
 
@@ -140,7 +142,8 @@ class MTV_PUBLIC ChannelImporter
 
     static QString toString(ChannelType type);
 
-    static void CleanupDuplicates(ScanDTVTransportList &transports);
+    static void MergeSameFrequency(ScanDTVTransportList &transports);
+    static void RemoveDuplicates(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates);
     void FilterServices(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList &transports) const;
@@ -252,26 +255,20 @@ class MTV_PUBLIC ChannelImporter
         const ChannelInsertInfo &chan);
 
   private:
-    bool                m_useGui;
-    bool                m_isInteractive;
-    bool                m_doDelete;
-    bool                m_doInsert;
-    bool                m_doSave;
-    /// Only FreeToAir (non-encrypted) channels desired post scan?
-    bool                m_ftaOnly;
-    /// Only services with logical channel numbers desired post scan?
-    bool                m_lcnOnly;
-    /// Only services with complete scandata desired post scan?
-    bool                m_completeOnly;
-    /// Keep existing channel numbers on channel update
-    bool                m_keepChannelNumbers      {true};
-    /// Full search for old channels
-    bool                m_fullChannelSearch       {false};
-    /// To pass information IPTV channel scan succeeded
-    bool                m_success {false};
-    /// Services desired post scan
-    ServiceRequirements m_serviceRequirements;
+    bool m_useGui;
+    bool m_isInteractive;
+    bool m_doDelete;
+    bool m_doInsert;
+    bool m_doSave;
+    bool m_ftaOnly                      {true};     // Only FreeToAir (non-encrypted) channels desired post scan?
+    bool m_lcnOnly                      {false};    // Only services with logical channel numbers desired post scan?
+    bool m_completeOnly                 {true};     // Only services with complete scandata desired post scan?
+    bool m_keepChannelNumbers           {true};     // Keep existing channel numbers on channel update
+    bool m_fullChannelSearch            {false};    // Full search for old channels across transports in database
+    bool m_removeDuplicates             {false};    // Remove duplicate transports and channels in scan
+    bool m_success                      {false};    // To pass information IPTV channel scan succeeded
 
+    ServiceRequirements m_serviceRequirements;  // Services desired post scan
     QEventLoop          m_eventLoop;
 };
 

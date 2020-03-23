@@ -100,7 +100,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     if (name == "mpeg2video_mmal")
         name = "mpeg2_mmal";
     AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-    if (!codec)
+    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    if (!codec || !decoder)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find %1").arg(name));
         return failure;
@@ -108,8 +109,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found MMAL/FFmpeg decoder '%1'").arg(name));
     *Codec = codec;    
-    gCodecMap->freeCodecContext(Stream);
-    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+    decoder->CodecMap()->freeCodecContext(Stream);
+    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
     (*Context)->pix_fmt = decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_MMAL;
     return success;
 }

@@ -66,12 +66,11 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
     {
         // This was originally in HandleBDStreamChange
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
-        QMutexLocker locker(avcodeclock);
+        QReadLocker locker(&m_trackLock);
         Reset(true, false, false);
         CloseCodecs();
         FindStreamInfo();
         ScanStreams(false);
-        avcodeclock->unlock();
         m_streamsChanged=false;
     }
 
@@ -112,8 +111,6 @@ int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
 
 int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& /*storePacket*/)
 {
-    QMutexLocker locker(avcodeclock);
-
     int result = av_read_frame(ctx, pkt);
 
     /* If we seem to have hit the end of the file, the ringbuffer may

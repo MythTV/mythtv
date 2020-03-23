@@ -48,7 +48,6 @@ QStringList RingBuffer::s_subExtNoCheck;
 extern "C" {
 #include "libavformat/avformat.h"
 }
-bool        RingBuffer::gAVformat_net_initialised = false;
 
 /*
   Locking relations:
@@ -344,7 +343,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
 }
 
 /** \fn RingBuffer::SetBufferSizeFactors(bool, bool)
- *  \brief Tells RingBuffer that the raw bitrate may be innacurate and the
+ *  \brief Tells RingBuffer that the raw bitrate may be inaccurate and the
  *         underlying container is matroska, both of which may require a larger
  *         buffer size.
  */
@@ -1941,12 +1940,13 @@ BDRingBuffer  *RingBuffer::BD(void)
 
 void RingBuffer::AVFormatInitNetwork(void)
 {
-    QMutexLocker lock(avcodeclock);
-
-    if (!gAVformat_net_initialised)
+    static QMutex s_avnetworkLock(QMutex::Recursive);
+    static bool s_avnetworkInitialised = false;
+    QMutexLocker lock(&s_avnetworkLock);
+    if (!s_avnetworkInitialised)
     {
         avformat_network_init();
-        gAVformat_net_initialised = true;
+        s_avnetworkInitialised = true;
     }
 }
 

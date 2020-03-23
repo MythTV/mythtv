@@ -276,9 +276,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 /// This global variable contains the MythCoreContext instance for the app
 extern MBASE_PUBLIC MythCoreContext *gCoreContext;
 
-/// This global variable is used to makes certain calls to avlib threadsafe.
-extern MBASE_PUBLIC QMutex *avcodeclock;
-
 #endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

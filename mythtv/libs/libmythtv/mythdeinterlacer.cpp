@@ -76,6 +76,9 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
         return;
     }
 
+    if (Frame && Frame->already_deinterlaced)
+        return;
+
     // Sanity check frame format
     if (!format_is_yuv(Frame->codec))
     {

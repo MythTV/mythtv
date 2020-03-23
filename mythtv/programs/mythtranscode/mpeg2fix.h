@@ -199,7 +199,7 @@ class MPEG2fixup
     {
         if (id >= m_inputFC->nb_streams)
             return nullptr;
-        return gCodecMap->getCodecContext(m_inputFC->streams[id]);
+        return m_codecMap.getCodecContext(m_inputFC->streams[id]);
     }
     AVCodecParserContext *getCodecParserContext(uint id)
     {
@@ -229,6 +229,7 @@ class MPEG2fixup
 
     pthread_t     m_thread          {};
 
+    MythCodecMap     m_codecMap     {};
     AVFormatContext *m_inputFC      {nullptr};
     AVFrame         *m_picture      {nullptr};
 

@@ -49,7 +49,8 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
     if (name.startsWith("mpeg2video"))
         name = "mpeg2_" + CodecName;
     AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-    if (!codec)
+    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    if (!codec || !decoder)
     {
         // this shouldn't happen!
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find %1").arg(name));
@@ -58,8 +59,8 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found FFmpeg decoder '%1'").arg(name));
     *Codec = codec;
-    gCodecMap->freeCodecContext(Stream);
-    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+    decoder->CodecMap()->freeCodecContext(Stream);
+    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
     (*Context)->pix_fmt = Format;
     return Successs;
 }
