@@ -11,7 +11,11 @@ darwin {
 } else {
     INCLUDEPATH += . ./include ./include/exiv2 ./src ./xmpsdk/include
 }
-QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-missing-declarations -Wno-shadow
+
+contains(CC, gcc) {
+    QMAKE_CXXFLAGS += -Wno-deprecated-copy
+}
+QMAKE_CXXFLAGS += -Wno-missing-declarations -Wno-shadow
 QMAKE_CXXFLAGS += -Wno-zero-as-null-pointer-constant -Wno-double-promotion
 
 DEFINES += exiv2lib_EXPORTS
@@ -148,7 +152,7 @@ SOURCES += xmpsdk/src/XMPMeta.cpp
 SOURCES += xmpsdk/src/XMPUtils-FileInfo.cpp
 SOURCES += xmpsdk/src/XMPUtils.cpp
 
-inc_exiv2.path = $${PREFIX}/include/exiv2
+inc_exiv2.path = $${PREFIX}/include/mythtv/exiv2
 inc_exiv2.files = $${HEADERS}
 
 INSTALLS += inc_exiv2
