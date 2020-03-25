@@ -807,7 +807,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
         // If any pending recordings are affected, set them to
         // future conflicting and force a reschedule by marking
         // reclist as changed.
-        RecConstIter j = m_recList.begin();
+        auto j = m_recList.cbegin();
         while (FindNextConflict(m_recList, foundp, j, openEndNever, nullptr))
         {
             RecordingInfo *recp = *j;
@@ -1179,7 +1179,7 @@ const RecordingInfo *Scheduler::FindConflict(
     bool checkAll) const
 {
     RecList &conflictlist = *m_sinputInfoMap[p->GetInputID()].m_conflictList;
-    RecConstIter k = conflictlist.begin();
+    auto k = conflictlist.cbegin();
     if (FindNextConflict(conflictlist, p, k, openend, affinity))
     {
         RecordingInfo *firstConflict = *k;
@@ -1317,7 +1317,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         {
             // It is pointless to preempt another livetv session.
             // (the livetvlist contains dummy livetv pginfo's)
-            RecConstIter k = m_livetvList.begin();
+            auto k = m_livetvList.cbegin();
             if (FindNextConflict(m_livetvList, q, k))
             {
                 PrintRec(q, "    #");
@@ -1538,7 +1538,7 @@ void Scheduler::SchedNewRetryPass(const RecIter& start, const RecIter& end,
         // Try to move each conflict.  Restore the old status if we
         // can't.
         RecList &conflictlist = *m_sinputInfoMap[p->GetInputID()].m_conflictList;
-        RecConstIter k = conflictlist.begin();
+        auto k = conflictlist.cbegin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
             if (!TryAnotherShowing(*k, samePriority, livetv))
@@ -1726,7 +1726,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     QMutexLocker lockit(&m_schedLock);
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    RecConstIter i = m_recList.begin();
+    auto i = m_recList.cbegin();
     for (; FindNextConflict(m_recList, pginfo, i); ++i)
     {
         const RecordingInfo *p = *i;

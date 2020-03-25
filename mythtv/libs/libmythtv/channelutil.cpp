@@ -925,7 +925,7 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     query.bindValue(":CHANID", chanid);
 
     bool ok = true;
-    pid_cache_t::const_iterator ito = old_cache.begin();
+    auto ito = old_cache.begin();
     for (auto itn : pid_cache)
     {
         // if old pid smaller than current new pid, skip this old pid

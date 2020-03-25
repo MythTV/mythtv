@@ -771,7 +771,7 @@ void UPnpCDS::HandleGetServiceResetToken(HTTPRequest* pRequest)
         QString("UPnpCDS::ProcessRequest : %1 : %2")
             .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
 
-    QString sToken = GetValue<QString>("ServiceResetToken");
+    auto sToken = GetValue<QString>("ServiceResetToken");
 
     list.push_back(NameValue("ResetToken", sToken));
 

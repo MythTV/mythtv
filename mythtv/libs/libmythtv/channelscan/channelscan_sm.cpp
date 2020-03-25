@@ -1004,7 +1004,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         !m_currentInfo->m_nits.empty())
     {
         // Update transport with delivery system descriptors from the NIT
-        nit_vec_t::const_iterator it = m_currentInfo->m_nits.begin();
+        auto it = m_currentInfo->m_nits.begin();
         while (it != m_currentInfo->m_nits.end())
         {
             UpdateScanTransports(*it);

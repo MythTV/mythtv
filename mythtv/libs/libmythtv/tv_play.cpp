@@ -9277,7 +9277,7 @@ void TV::customEvent(QEvent *e)
         auto *dce = reinterpret_cast<DialogCompletionEvent*>(e);
         if (dce->GetData().userType() == qMetaTypeId<MenuNodeTuple>())
         {
-            MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
+            auto data = dce->GetData().value<MenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
             {
                 PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),

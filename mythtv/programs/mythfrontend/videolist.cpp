@@ -547,7 +547,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         return;
     }
 
-    for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
+    for (auto dir = src->dirs_begin();
          dir != src->dirs_end(); ++dir)
     {
         if ((*dir)->has_entries())
@@ -566,7 +566,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         }
     }
 
-    for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
+    for (auto entry = src->entries_begin();
          entry != src->entries_end(); ++entry)
     {
         if (((*entry)->getData()->GetSeason() > 0) ||

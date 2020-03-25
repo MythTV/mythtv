@@ -131,7 +131,7 @@ static HostTextEditSetting *VAAPIDevice()
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFMPEGTS");
+    auto *gc = new HostCheckBoxSetting("FFMPEGTS");
 
     gc->setLabel(PlaybackSettings::tr("Use FFmpeg's original MPEG-TS demuxer"));
 

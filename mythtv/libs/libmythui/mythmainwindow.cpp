@@ -2419,7 +2419,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
-            Qt::KeyboardModifiers mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
+            auto mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
             int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
             QString text;
 

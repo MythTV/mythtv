@@ -850,7 +850,7 @@ void SearchStream::streamClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata mdata = item->GetData().value<MusicMetadata>();
+    auto mdata = item->GetData().value<MusicMetadata>();
     m_parent->changeStreamMetadata(&mdata);
 
     Close();
@@ -861,7 +861,7 @@ void SearchStream::streamVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MusicMetadata mdata =  item->GetData().value<MusicMetadata>();
+    auto mdata =  item->GetData().value<MusicMetadata>();
     if (!mdata.LogoUrl().isEmpty() && mdata.LogoUrl() != "-")
     {
         if (item->GetText("dummy") == " ")

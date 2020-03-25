@@ -401,7 +401,7 @@ void GalleryThumbView::customEvent(QEvent *event)
                 MythUIButtonListItem *button = location.first;
                 int                   index  = location.second;
 
-                ImagePtrK im = button->GetData().value<ImagePtrK>();
+                auto im = button->GetData().value<ImagePtrK>();
                 if (im)
                     UpdateThumbnail(button, im, url, index);
             }
@@ -691,7 +691,7 @@ void GalleryThumbView::BuildImageList()
  */
 void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
 {
-    ImagePtrK im = item->GetData().value<ImagePtrK >();
+    auto im = item->GetData().value<ImagePtrK >();
     if (!im)
         return;
 
@@ -956,7 +956,7 @@ void GalleryThumbView::ResetUiSelection()
  */
 void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
 {
-    ImagePtrK im = item->GetData().value<ImagePtrK >();
+    auto im = item->GetData().value<ImagePtrK >();
     if (im)
     {
         // update the position in the node list
@@ -1366,7 +1366,7 @@ void GalleryThumbView::ItemClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ImagePtrK im = item->GetData().value<ImagePtrK>();
+    auto im = item->GetData().value<ImagePtrK>();
     if (!im)
         return;
 

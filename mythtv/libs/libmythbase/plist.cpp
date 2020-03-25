@@ -218,7 +218,7 @@ void PList::ParseBinaryPList(const QByteArray &data)
     m_result = QVariant();
 
     // check minimum size
-    quint32 size = static_cast<quint32>(data.size());
+    auto size = static_cast<quint32>(data.size());
     if (size < MIN_SIZE)
         return;
 
@@ -458,7 +458,7 @@ QVariant PList::ParseBinaryDate(quint8 *data)
     convert_float(data, 8);
     double temp;
     std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&temp));
-    quint64 msec = static_cast<quint64>(temp * 1000.0);
+    auto msec = static_cast<quint64>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);

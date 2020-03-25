@@ -366,7 +366,7 @@ void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
     if (!item || m_recList.empty())
         return;
 
-    QDate group = item->GetData().value<QDate>();
+    auto group = item->GetData().value<QDate>();
 
     m_currentGroup = group;
 

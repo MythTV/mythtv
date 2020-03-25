@@ -4478,7 +4478,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         // Set by the "Guide Data" language prefs in Appearance.
         if (selTrack < 0)
         {
-            vector<int>::const_iterator it = m_languagePreference.begin();
+            auto it = m_languagePreference.begin();
             for (; it !=  m_languagePreference.end() && selTrack < 0; ++it)
             {
                 flang = filter_lang(atracks, *it, ftype);

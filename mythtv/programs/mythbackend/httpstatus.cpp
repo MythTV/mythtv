@@ -265,7 +265,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     unsigned int iNum = 10;
     unsigned int iNumRecordings = 0;
 
-    RecConstIter itProg = recordingList.begin();
+    auto itProg = recordingList.begin();
     for (; (itProg != recordingList.end()) && iNumRecordings < iNum; ++itProg)
     {
         if (((*itProg)->GetRecordingStatus() <= RecStatus::WillRecord) &&

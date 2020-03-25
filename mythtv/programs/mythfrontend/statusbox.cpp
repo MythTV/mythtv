@@ -247,7 +247,7 @@ void StatusBox::setHelpText(MythUIButtonListItem *item)
     if (!item || GetFocusWidget() != m_logList)
         return;
 
-    LogLine logline = item->GetData().value<LogLine>();
+    auto logline = item->GetData().value<LogLine>();
     if (m_helpText)
         m_helpText->SetText(logline.m_helpdetail);
     if (m_justHelpText)
@@ -272,7 +272,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    LogLine logline = item->GetData().value<LogLine>();
+    auto logline = item->GetData().value<LogLine>();
 
     MythUIButtonListItem *currentButton = m_categoryList->GetItemCurrent();
     QString currentItem;

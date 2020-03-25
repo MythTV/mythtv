@@ -228,7 +228,7 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
 
     if (!gradientStart.isEmpty())
     {
-        QColor startColor = QColor(gradientStart);
+        auto startColor = QColor(gradientStart);
         startColor.setAlpha(gradientAlpha);
         QGradientStop stop(0.0, startColor);
         stops.append(stop);
@@ -245,7 +245,7 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
             int alpha = childElem.attribute("alpha", "-1").toInt();
             if (alpha < 0)
                 alpha = gradientAlpha;
-            QColor stopColor = QColor(color);
+            auto stopColor = QColor(color);
             stopColor.setAlpha(alpha);
             QGradientStop stop((position / 100), stopColor);
             stops.append(stop);
@@ -254,7 +254,7 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
 
     if (!gradientEnd.isEmpty())
     {
-        QColor endColor = QColor(gradientEnd);
+        auto endColor = QColor(gradientEnd);
         endColor.setAlpha(gradientAlpha);
         QGradientStop stop(1.0, endColor);
         stops.append(stop);

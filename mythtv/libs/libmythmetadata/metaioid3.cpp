@@ -313,7 +313,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         if (!compilation && !musicbrainz->fieldList().isEmpty())
         {
             TagLib::StringList l = musicbrainz->fieldList();
-            for (TagLib::StringList::ConstIterator it = l.begin(); it != l.end(); it++)
+            for (auto it = l.begin(); it != l.end(); it++)
             {
                 QString ID = TStringToQString((*it));
 

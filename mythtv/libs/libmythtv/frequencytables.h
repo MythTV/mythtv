@@ -273,10 +273,7 @@ class transport_scan_items_it_t
 inline bool operator==(const transport_scan_items_it_t& A,
                        const transport_scan_items_it_t& B)
 {
-    list<TransportScanItem>::const_iterator A_it = A.m_it;
-    list<TransportScanItem>::const_iterator B_it = B.m_it;
-
-    return (A_it == B_it) && (A.m_offset == B.m_offset);
+    return (A.m_it == B.m_it) && (A.m_offset == B.m_offset);
 }
 
 inline bool operator!=(const transport_scan_items_it_t &A,
@@ -288,10 +285,7 @@ inline bool operator!=(const transport_scan_items_it_t &A,
 inline bool operator==(const transport_scan_items_it_t& A,
                        const list<TransportScanItem>::iterator& B)
 {
-    list<TransportScanItem>::const_iterator A_it = A.m_it;
-    list<TransportScanItem>::const_iterator B_it = B;
-
-    return (A_it == B_it) && (0 == A.offset());
+    return (A.m_it == B) && (0 == A.offset());
 }
 
 using transport_scan_items_t = list<TransportScanItem>;

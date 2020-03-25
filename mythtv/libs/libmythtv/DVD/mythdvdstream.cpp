@@ -259,7 +259,7 @@ long long MythDVDStream::SeekInternal(long long Position, int Whence)
         return -1;
     }
 
-    uint32_t block = static_cast<uint32_t>(Position / DVD_VIDEO_LB_LEN);
+    auto block = static_cast<uint32_t>(Position / DVD_VIDEO_LB_LEN);
     if (static_cast<int64_t>(block) * DVD_VIDEO_LB_LEN != Position)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Seek not block aligned");

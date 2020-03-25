@@ -105,7 +105,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
     }
 
-    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     // and finally try and retrieve the actual FFmpeg decoder
     QString name = QString((*Codec)->name) + "_cuvid";
     if (name == "mpeg2video_cuvid")

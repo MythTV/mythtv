@@ -60,7 +60,7 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
 
 void UPnpCMGR::AddSourceProtocol( const QString &sProtocol )
 {
-    QString sValue = GetValue< QString >( "SourceProtocolInfo" );
+    auto sValue = GetValue< QString >( "SourceProtocolInfo" );
     
     if (sValue.length() > 0 )
         sValue += ',';
@@ -76,7 +76,7 @@ void UPnpCMGR::AddSourceProtocol( const QString &sProtocol )
 
 void UPnpCMGR::AddSinkProtocol( const QString &sProtocol )
 {
-    QString sValue = GetValue< QString >( "SinkProtocolInfo" );
+    auto sValue = GetValue< QString >( "SinkProtocolInfo" );
     
     if (sValue.length() > 0 )
         sValue += ',';

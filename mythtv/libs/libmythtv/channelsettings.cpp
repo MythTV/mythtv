@@ -714,7 +714,7 @@ void ChannelOptionsRawTS::Load(void)
     if (!ChannelUtil::GetCachedPids(chanid, pid_cache))
         return;
 
-    pid_cache_t::const_iterator it = pid_cache.begin();
+    auto it = pid_cache.begin();
     for (uint i = 0; i < kMaxPIDs && it != pid_cache.end(); )
     {
         if (!(it->IsPermanent()))

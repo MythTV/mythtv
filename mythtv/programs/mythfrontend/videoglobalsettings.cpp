@@ -276,9 +276,7 @@ HostCheckBoxSetting *RatingsToPL()
                                                   "Level %1.")
                          .arg(pl.GetLevel()));
 
-        r2pl_map::const_iterator def_setting =
-            r2pl_defaults.find(pl.GetLevel());
-
+        auto def_setting = r2pl_defaults.find(pl.GetLevel());
         if (def_setting != r2pl_defaults.end())
         {
             hle->setValue(def_setting->second);

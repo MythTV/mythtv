@@ -1515,8 +1515,8 @@ QString MythMediaBuffer::BitrateToString(uint64_t Rate, bool Hz)
         return QObject::tr(">1Gbps");
 
     QString msg;
-    double bitrate = static_cast<double>(NAN);
-    double rate = static_cast<double>(Rate);
+    auto bitrate = static_cast<double>(NAN);
+    auto rate = static_cast<double>(Rate);
     int range = 0;
 
     if (Rate >= 1000000)

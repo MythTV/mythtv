@@ -1038,8 +1038,8 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
             {
                 if (m_currentPlayitem != static_cast<int>(Event.param))
                 {
-                    int64_t out = static_cast<int64_t>(m_currentTitleInfo->clips[m_currentPlayitem].out_time);
-                    int64_t in  = static_cast<int64_t>(m_currentTitleInfo->clips[Event.param].in_time);
+                    auto out = static_cast<int64_t>(m_currentTitleInfo->clips[m_currentPlayitem].out_time);
+                    auto in  = static_cast<int64_t>(m_currentTitleInfo->clips[Event.param].in_time);
                     int64_t diff = in - out;
                     if (diff != 0 && m_processState == PROCESS_NORMAL)
                     {

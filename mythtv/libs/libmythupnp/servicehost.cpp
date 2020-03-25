@@ -510,7 +510,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QVariant& vValue 
 
     if ( vValue.canConvert< QFileInfo >()) 
     {
-        const QFileInfo oFileInfo = vValue.value< QFileInfo >(); 
+        const auto oFileInfo = vValue.value< QFileInfo >();
 
         return FormatResponse( pRequest, oFileInfo );
     }
