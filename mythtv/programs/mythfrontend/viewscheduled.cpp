@@ -59,7 +59,7 @@ ViewScheduled::~ViewScheduled()
     if (m_player)
     {
         QString message = QString("VIEWSCHEDULED_EXITING");
-        qApp->postEvent(m_player, new MythEvent(message));
+        QCoreApplication::postEvent(m_player, new MythEvent(message));
     }
 }
 

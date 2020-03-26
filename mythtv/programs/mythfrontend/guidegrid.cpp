@@ -448,7 +448,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
             if (player && allowFinder)
             {
                 message = QString("EPG_EXITING");
-                qApp->postEvent(player, new MythEvent(message));
+                QCoreApplication::postEvent(player, new MythEvent(message));
             }
         }
 
@@ -644,7 +644,7 @@ GuideGrid::~GuideGrid()
     if (m_player && m_allowFinder)
     {
         QString message = QString("EPG_EXITING");
-        qApp->postEvent(m_player, new MythEvent(message));
+        QCoreApplication::postEvent(m_player, new MythEvent(message));
     }
 
     // maybe the user selected a different channel group,
@@ -2652,7 +2652,7 @@ void GuideGrid::HideTVWindow(void)
 void GuideGrid::EmbedTVWindow(void)
 {
     auto *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
-    qApp->postEvent(this, me);
+    QCoreApplication::postEvent(this, me);
 
     m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
     if (!m_usingNullVideo)
@@ -2664,7 +2664,7 @@ void GuideGrid::EmbedTVWindow(void)
     else
     {
         me = new MythEvent("START_VIDEO_REFRESH_TIMER");
-        qApp->postEvent(this, me);
+        QCoreApplication::postEvent(this, me);
     }
 }
 
