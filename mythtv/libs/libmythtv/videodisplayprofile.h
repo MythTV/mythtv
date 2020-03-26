@@ -120,7 +120,7 @@ class MTV_PUBLIC VideoDisplayProfile
   private:
     vector<ProfileItem>::const_iterator
             FindMatch(const QSize &Size, float Framerate, const QString &CodecName,
-                      const QStringList DisallowedDecoders = QStringList());
+                      QStringList DisallowedDecoders = QStringList());
     void    LoadBestPreferences(const QSize &Size, float Framerate, const QString &CodecName,
                                 const QStringList &DisallowedDecoders = QStringList());
     QString GetPreference(const QString &Key) const;

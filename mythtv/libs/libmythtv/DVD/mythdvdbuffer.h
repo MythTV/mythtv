@@ -63,7 +63,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     bool      PGCLengthChanged     (void);
     bool      CellChanged          (void);
     bool      IsStillFramePending  (void) const;
-    bool      AudioStreamsChanged  (void);
+    bool      AudioStreamsChanged  (void) const;
     bool      IsWaiting            (void) const;
     int       NumPartsInTitle      (void) const;
     void      GetMenuSPUPkt        (uint8_t *Buffer, int Size, int StreamID, uint32_t StartTime);

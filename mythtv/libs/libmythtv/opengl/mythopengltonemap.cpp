@@ -22,7 +22,6 @@
 #endif
 
 MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace)
-  : QObject()
 {
     if (Render)
     {

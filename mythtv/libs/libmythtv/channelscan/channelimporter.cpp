@@ -84,7 +84,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // List of transports
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
     {
-        if (transports.size() > 0)
+        if (!transports.empty())
         {
             cout << endl;
             cout << "Transport list before processing (" << transports.size() << "):" << endl;
@@ -116,7 +116,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         RemoveDuplicates(transports, duplicates);
         if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
         {
-            if (duplicates.size() > 0)
+            if (!duplicates.empty())
             {
                 cout << endl;
                 cout << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;

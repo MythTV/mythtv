@@ -179,11 +179,12 @@ Checks: '-*,
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
-        ## C++14 modernize-make-unique,
-        ## C++14 modernize-use-transparent-functors,
-        ## C++17 modernize-concat-nested-namespaces,
-        ## C++17 modernize-unary-static-assert,
-        ## C++17 modernize-use-nodiscard,
+        # Disable new tests for now. ,
+       -modernize-make-unique,
+       -modernize-use-transparent-functors,
+       -modernize-concat-nested-namespaces,
+       -modernize-unary-static-assert,
+       -modernize-use-nodiscard,
 
     performance-*,
 

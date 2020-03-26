@@ -40,7 +40,7 @@ MythDVDBuffer::MythDVDBuffer(const QString &Filename)
 {
     m_seekSpeedMap = { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
                        { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
-    OpenFile(Filename);
+    MythDVDBuffer::OpenFile(Filename);
 }
 
 MythDVDBuffer::~MythDVDBuffer()
@@ -1163,7 +1163,7 @@ bool MythDVDBuffer::IsStillFramePending(void) const
     return dvdnav_get_next_still_flag(m_dvdnav) > 0;
 }
 
-bool MythDVDBuffer::AudioStreamsChanged(void)
+bool MythDVDBuffer::AudioStreamsChanged(void) const
 {
     return m_audioStreamsChanged;
 }

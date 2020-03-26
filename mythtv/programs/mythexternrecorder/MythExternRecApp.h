@@ -81,7 +81,7 @@ class MythExternRecApp : public QObject
 
   protected:
     void GetChannel(const QString & serial, const QString & func);
-    void TerminateProcess(QProcess & proc, const QString & desc);
+    void TerminateProcess(QProcess & proc, const QString & desc) const;
 
   private:
     bool config(void);

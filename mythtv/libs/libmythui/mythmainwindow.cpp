@@ -129,10 +129,7 @@ struct MPData {
 class MythMainWindowPrivate
 {
   public:
-    MythMainWindowPrivate() :
-        m_gesture(MythGesture())
-    {
-    }
+    MythMainWindowPrivate() = default;
 
     static int TranslateKeyNum(QKeyEvent *e);
 

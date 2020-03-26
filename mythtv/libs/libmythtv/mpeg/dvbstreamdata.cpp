@@ -32,7 +32,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
 
 DVBStreamData::~DVBStreamData()
 {
-    Reset(m_desiredNetId, m_desiredTsId, m_desiredProgram);
+    DVBStreamData::Reset(m_desiredNetId, m_desiredTsId, m_desiredProgram);
 
     QMutexLocker locker(&m_listenerLock);
     m_dvbMainListeners.clear();

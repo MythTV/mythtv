@@ -22,7 +22,7 @@ extern "C" {
 #define LOC QString("AOS: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_invalid(invalid), m_eld(ELD())
+    m_invalid(invalid)
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));

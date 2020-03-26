@@ -63,8 +63,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_specSched(master_sched),
     m_tvList(tvList),
     m_doRun(runthread),
-    m_livetvTime(QDateTime()),
-    m_lastPrepareTime(QDateTime()),
     m_openEnd(openEndNever)
 {
     char *debug = getenv("DEBUG_CONFLICTS");

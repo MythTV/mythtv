@@ -19,7 +19,7 @@ MythMediaBuffer* MythAVFormatBuffer::GetBuffer(void)
     return m_buffer;
 }
 
-int MythAVFormatBuffer::Open(URLContext *Context, const char*, int)
+int MythAVFormatBuffer::Open(URLContext *Context, const char* /*Filename*/, int /*Flags*/)
 {
     Context->priv_data = nullptr;
     return 0;
@@ -38,9 +38,9 @@ int MythAVFormatBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
     return ret;
 }
 
-int MythAVFormatBuffer::Write(URLContext *h, const uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::Write(URLContext *Context, const uint8_t *Buffer, int Size)
 {
-    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(h->priv_data);
+    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
     if (!avfr)
         return 0;
 
@@ -62,7 +62,7 @@ int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence
     return avfr->GetBuffer()->Seek(Offset, Whence);
 }
 
-int MythAVFormatBuffer::Close(URLContext*)
+int MythAVFormatBuffer::Close(URLContext* /*Context*/)
 {
     return 0;
 }

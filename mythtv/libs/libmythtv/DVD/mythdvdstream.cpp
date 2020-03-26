@@ -66,7 +66,7 @@ inline uint32_t Len2Blocks(uint32_t Length)
 MythDVDStream::MythDVDStream(const QString& Filename)
   : MythMediaBuffer(kMythBufferFile)
 {
-    OpenFile(Filename);
+    MythDVDStream::OpenFile(Filename);
 }
 
 MythDVDStream::~MythDVDStream()

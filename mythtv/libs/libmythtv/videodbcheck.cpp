@@ -657,6 +657,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1032")
     {
         DBUpdates updates {
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "CREATE TEMPORARY TABLE bad_videometadatacast"
             "       AS SELECT * FROM videometadatacast,",
             "CREATE TEMPORARY TABLE bad_videometadatagenre"

@@ -3,7 +3,7 @@
 InteractiveScreen::InteractiveScreen(MythPlayer *player,
                                      const QString &name) :
     MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player),  m_safeArea(QRect())
+    m_player(player)
 {
     UpdateArea();
 }

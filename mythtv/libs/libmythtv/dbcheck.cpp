@@ -1081,6 +1081,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "UPDATE powerpriority SET selectclause = '' WHERE selectclause IS NULL;",
 "UPDATE customexample SET fromclause = '' WHERE fromclause IS NULL;",
 "UPDATE customexample SET whereclause = '' WHERE whereclause IS NULL;",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE program MODIFY COLUMN description VARCHAR(16000) "
 "    NOT NULL default '';",
 "ALTER TABLE record MODIFY COLUMN description VARCHAR(16000) "
@@ -1134,6 +1135,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1264")
     {
         DBUpdates updates {
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "DELETE FROM displayprofiles WHERE profilegroupid IN "
 "  (SELECT profilegroupid FROM displayprofilegroups "
 "    WHERE name IN ('CPU++', 'CPU+', 'CPU--'))",
@@ -1283,6 +1285,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1274")
     {
         DBUpdates updates {
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "UPDATE cardinput SET tunechan=NULL"
 "  WHERE inputname='DVBInput' OR inputname='MPEG2TS';"
 "UPDATE dtv_multiplex SET symbolrate = NULL"
@@ -1346,6 +1349,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    description VARCHAR(64) DEFAULT NULL,"
 "    clause VARCHAR(256) DEFAULT NULL,"
 "    newruledefault TINYINT(1) DEFAULT 0) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
 "    VALUES (0, 'New episode', 'program.previouslyshown = 0', 0);",
 "INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
@@ -2253,6 +2257,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         DBUpdates updates {
 // Add this time filter
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
 "  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
 "  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
@@ -2375,6 +2380,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         // Make sure channel timeouts are long enough.  No actual
         // schema change.
         DBUpdates updates {
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "UPDATE capturecard SET channel_timeout = 3000 WHERE "
             "cardtype = \"DVB\" AND channel_timeout < 3000;",
             "UPDATE capturecard SET channel_timeout = 30000 WHERE "
@@ -2821,6 +2827,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             "DELETE FROM inputgroup WHERE inputgroupname LIKE 'CETON_%'",
             "DELETE FROM inputgroup WHERE inputgroupname LIKE 'HDHOMERUN_%'",
             // Increase the size of inputgroup.inputgroupname.
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE inputgroup "
             "    MODIFY COLUMN inputgroupname VARCHAR(48)",
             // Rename remaining inputgroups to have 'user:' prefix.
@@ -3001,6 +3008,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         DBUpdates updates {
             // All next_record, last_record and last_delete to be NULL.
             "ALTER TABLE record MODIFY next_record DATETIME NULL",
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "UPDATE record SET next_record = NULL "
             "    WHERE next_record = '0000-00-00 00:00:00'",
             "ALTER TABLE record MODIFY last_record DATETIME NULL",

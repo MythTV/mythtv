@@ -26,6 +26,8 @@
  *  Support for importing Xml formatted property lists will be added.
  */
 
+#include <cmath>
+
 // TODO
 // parse uid (and use QPair to differentiate?)
 
@@ -431,7 +433,7 @@ QVariant PList::ParseBinaryReal(quint8 *data)
     if (count == sizeof(float))
     {
         convert_float(data, static_cast<quint8>(count));
-        float temp;
+        float temp = NAN;
         std::copy(data, data + sizeof(float), reinterpret_cast<quint8*>(&temp));
         result = static_cast<double>(temp);
     }
@@ -456,7 +458,7 @@ QVariant PList::ParseBinaryDate(quint8 *data)
         return result;
 
     convert_float(data, 8);
-    double temp;
+    double temp = NAN;
     std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&temp));
     auto msec = static_cast<quint64>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);

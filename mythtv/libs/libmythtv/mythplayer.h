@@ -2,6 +2,7 @@
 #define MYTHPLAYER_H
 
 #include <cstdint>
+#include <utility>
 
 #include <QCoreApplication>
 #include <QList>
@@ -136,7 +137,7 @@ class DecoderCallback
   public:
     using Callback = void (*)(void*, void*, void*);
     DecoderCallback() = default;
-    DecoderCallback(const QString &Debug, Callback Function, QAtomicInt *Ready,
+    DecoderCallback(QString Debug, Callback Function, QAtomicInt *Ready,
                     void *Opaque1, void *Opaque2, void *Opaque3)
       : m_debug(std::move(Debug)),
         m_function(Function),

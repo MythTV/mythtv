@@ -681,9 +681,7 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
         }
         // this leave S24 -> U8/S16.
         // TODO: native handling of those ; use internal temp buffer in the mean time
-
-        // cppcheck-suppress unassignedVariable
-        alignas(16) uint8_t buffer[65536];
+        alignas(16) uint8_t buffer[65536] {0};
         int left        = bytes;
 
         while (left > 0)

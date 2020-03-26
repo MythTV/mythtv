@@ -419,7 +419,7 @@ void MythDVDDecoder::PostProcessTracks(void)
                 trackNo = static_cast<int>(i);
         }
 
-        if (trackNo < 0 && (m_tracks[kTrackTypeAudio].size() > 0))
+        if (trackNo < 0 && (!m_tracks[kTrackTypeAudio].empty()))
         {
             // Take the first track
             trackNo = 0;

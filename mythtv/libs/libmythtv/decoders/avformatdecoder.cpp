@@ -2085,8 +2085,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case AVMEDIA_TYPE_ATTACHMENT:
             {
                 if (par->codec_id == AV_CODEC_ID_TTF)
-                   m_tracks[kTrackTypeAttachment].push_back(
-                       StreamInfo(static_cast<int>(strm), 0, 0, m_ic->streams[strm]->id, 0));
+                   m_tracks[kTrackTypeAttachment].emplace_back(
+                       static_cast<int>(strm), 0, 0, m_ic->streams[strm]->id, 0);
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Attachment codec (%1)")
@@ -2212,8 +2212,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             uint lang_indx = lang_sub_cnt[lang]++;
             subtitleStreamCount++;
 
-            m_tracks[kTrackTypeSubtitle].push_back(
-                StreamInfo(static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, 0, 0, false, false, forced));
+            m_tracks[kTrackTypeSubtitle].emplace_back(
+                static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, 0, 0, false, false, forced);
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Subtitle track #%1 is A/V stream #%2 "
@@ -2232,13 +2232,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             if (enc->avcodec_dual_language)
             {
-                m_tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
-                               false, false, false, type));
+                m_tracks[kTrackTypeAudio].emplace_back(
+                    static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
+                               false, false, false, type);
                 lang_indx = lang_aud_cnt[lang]++;
-                m_tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
-                               true, false, false, type));
+                m_tracks[kTrackTypeAudio].emplace_back(
+                    static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
+                               true, false, false, type);
             }
             else
             {
@@ -2257,9 +2257,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     continue;
                 }
 
-                m_tracks[kTrackTypeAudio].push_back(
-                   StreamInfo(static_cast<int>(strm), lang, lang_indx, logical_stream_id, channels,
-                              false, false, false, type));
+                m_tracks[kTrackTypeAudio].emplace_back(
+                    static_cast<int>(strm), lang, lang_indx, logical_stream_id, channels,
+                              false, false, false, type);
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
@@ -2583,7 +2583,7 @@ int AvFormatDecoder::GetTeletextLanguage(uint Index)
 }
 
 /// Returns DVD Subtitle language
-int AvFormatDecoder::GetSubtitleLanguage(uint, uint StreamIndex)
+int AvFormatDecoder::GetSubtitleLanguage(uint /*unused*/, uint StreamIndex)
 {
     AVDictionaryEntry *metatag = av_dict_get(m_ic->streams[StreamIndex]->metadata, "language", nullptr, 0);
     return metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
@@ -5361,7 +5361,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (!ctx)
     {
-        if (m_tracks[kTrackTypeAudio].size())
+        if (!m_tracks[kTrackTypeAudio].empty())
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "No codec context. Returning false");
         return false;
     }

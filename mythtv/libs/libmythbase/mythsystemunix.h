@@ -32,7 +32,7 @@ class MythSystemLegacyIOHandler: public MThread
     public:
         explicit MythSystemLegacyIOHandler(bool read)
             : MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-              m_pMap(PMap_t()), m_read(read) {};
+              m_read(read) {};
         ~MythSystemLegacyIOHandler() override { wait(); }
         void   run(void) override; // MThread
 

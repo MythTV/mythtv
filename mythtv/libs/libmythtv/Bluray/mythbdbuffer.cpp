@@ -77,7 +77,7 @@ MythBDBuffer::MythBDBuffer(const QString &Filename)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
-    OpenFile(Filename);
+    MythBDBuffer::OpenFile(Filename);
 }
 
 MythBDBuffer::~MythBDBuffer()

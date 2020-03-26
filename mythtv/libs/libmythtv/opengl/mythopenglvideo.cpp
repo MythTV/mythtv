@@ -184,7 +184,7 @@ void MythOpenGLVideo::CleanupDeinterlacers(void)
         if ((m_inputType == FMT_YV12) && (m_profile == "opengl"))
             m_outputType = FMT_YUY2;
         SetupFrameFormat(m_inputType, m_outputType, m_videoDim, m_textureTarget);
-        emit OutputChanged(m_videoDim, m_videoDim, -1.0f);
+        emit OutputChanged(m_videoDim, m_videoDim, -1.0F);
     }
     m_fallbackDeinterlacer = DEINT_NONE;
     m_deinterlacer = DEINT_NONE;

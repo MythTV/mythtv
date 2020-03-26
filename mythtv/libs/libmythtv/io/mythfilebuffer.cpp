@@ -82,7 +82,7 @@ MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseRead
     }
     else if (Timeout >= 0)
     {
-        OpenFile(m_filename, static_cast<uint>(Timeout));
+        MythFileBuffer::OpenFile(m_filename, static_cast<uint>(Timeout));
     }
 }
 
