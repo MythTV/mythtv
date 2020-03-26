@@ -966,7 +966,10 @@ bool AudioTest::event(QEvent *event)
     if (event->type() != ChannelChangedEvent::kEventType)
         return QObject::event(event); //not handled
 
-    auto *cce = static_cast<ChannelChangedEvent*>(event);
+    auto *cce = dynamic_cast<ChannelChangedEvent*>(event);
+    if (cce == nullptr)
+        return false;
+
     QString channel = cce->m_channel;
 
     if (!cce->m_fulltest)

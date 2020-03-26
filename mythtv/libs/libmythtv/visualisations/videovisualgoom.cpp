@@ -34,7 +34,7 @@ VideoVisualGoom::~VideoVisualGoom()
 #ifdef USING_OPENGL
     if (m_glSurface && m_render && (m_render->Type() == kRenderOpenGL))
     {
-        auto *glrender = static_cast<MythRenderOpenGL*>(m_render);
+        auto *glrender = dynamic_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
             glrender->DeleteTexture(m_glSurface);
         m_glSurface = nullptr;

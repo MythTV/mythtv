@@ -501,7 +501,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     m_Interacting = nullptr;
 
     // Switch to the new scene.
-    CurrentApp()->m_pCurrentScene = static_cast< MHScene* >(pProgram);
+    CurrentApp()->m_pCurrentScene = dynamic_cast< MHScene* >(pProgram);
     SetInputRegister(CurrentScene()->m_nEventReg);
     m_redrawRegion = QRegion(0, 0, CurrentScene()->m_nSceneCoordX, CurrentScene()->m_nSceneCoordY); // Redraw the whole screen
 
