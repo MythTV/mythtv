@@ -141,6 +141,12 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 
 void MythCodecContext::GetDecoders(RenderOptions &Opts)
 {
+    if (!HasMythMainWindow())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "No window: Ignoring hardware decoders");
+        return;
+    }
+
 #ifdef USING_VDPAU
     // Only enable VDPAU support if it is actually present
     if (MythVDPAUHelper::HaveVDPAU())
