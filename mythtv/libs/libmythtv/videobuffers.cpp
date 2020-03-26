@@ -531,10 +531,10 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
     frame_queue_t discards(m_used);
     discards.insert(discards.end(), m_limbo.begin(), m_limbo.end());
     discards.insert(discards.end(), m_finished.begin(), m_finished.end());
-    for (auto it = discards.begin(); it != discards.end(); ++it)
+    for (auto & discard : discards)
     {
-        ReleaseDecoderResources(*it, refs);
-        SafeEnqueue(kVideoBuffer_avail, *it);
+        ReleaseDecoderResources(discard, refs);
+        SafeEnqueue(kVideoBuffer_avail, discard);
     }
 
     if (m_available.count() + m_pause.count() + m_displayed.count() != Size())
@@ -555,10 +555,10 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
         }
     }
 
-    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
-        Remove(kVideoBuffer_all, *it);
-    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
-        m_available.enqueue(*it);
+    for (auto & it : m_decode)
+        Remove(kVideoBuffer_all, it);
+    for (auto & it : m_decode)
+        m_available.enqueue(it);
     m_decode.clear();
 
     DeleteBuffers();

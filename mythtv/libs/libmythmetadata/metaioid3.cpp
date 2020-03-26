@@ -312,10 +312,9 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         // then compilation is TRUE
         if (!compilation && !musicbrainz->fieldList().isEmpty())
         {
-            TagLib::StringList l = musicbrainz->fieldList();
-            for (auto it = l.begin(); it != l.end(); it++)
+            for (auto & field : musicbrainz->fieldList())
             {
-                QString ID = TStringToQString((*it));
+                QString ID = TStringToQString(field);
 
                 if (ID == MYTH_MUSICBRAINZ_ALBUMARTIST_UUID)
                 {
