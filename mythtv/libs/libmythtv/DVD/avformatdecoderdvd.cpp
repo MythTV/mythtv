@@ -406,7 +406,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     if (!m_ringBuffer->IsDVD())
         return;
 
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     if (m_tracks[kTrackTypeAudio].size() > 1)
     {
@@ -570,7 +570,7 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
     if (m_streamsChanged)
     {
         // This was originally in HandleDVDStreamChange
-        m_trackLock.lockForWrite();
+        m_trackLock.lock();
         ScanStreams(true);
         m_trackLock.unlock();
         m_streamsChanged=false;
@@ -595,7 +595,7 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
         AVStream *st = m_ic->streams[i];
         if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            m_trackLock.lockForWrite();
+            m_trackLock.lock();
             m_selectedTrack[kTrackTypeVideo].m_av_stream_index = static_cast<int>(i);
             m_trackLock.unlock();
             break;

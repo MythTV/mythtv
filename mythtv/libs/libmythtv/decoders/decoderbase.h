@@ -346,7 +346,7 @@ class DecoderBase
     int                  m_videoRotation           {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    QReadWriteLock       m_trackLock                     { QReadWriteLock::Recursive };
+    QMutex               m_trackLock                     { QMutex::Recursive };
     bool                 m_decodeAllSubtitles            { false };
     int                  m_currentTrack[kTrackTypeCount] { -1    };
     vector<StreamInfo>   m_tracks[kTrackTypeCount];

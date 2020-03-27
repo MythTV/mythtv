@@ -1665,7 +1665,7 @@ static int cc608_good_parity(const int *parity_table, uint16_t data)
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     memset(m_ccX08InPmt, 0, sizeof(m_ccX08InPmt));
     m_pmtTracks.clear();
@@ -1738,7 +1738,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
 void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     m_tracks[kTrackTypeCC608].clear();
     m_tracks[kTrackTypeCC708].clear();
@@ -1805,7 +1805,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
     if (!m_ic->cur_pmt_sect || !m_tracks[kTrackTypeTeletextCaptions].empty())
@@ -1860,7 +1860,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 
 void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     AVDictionaryEntry *metatag =
         av_dict_get(m_ic->streams[av_stream_index]->metadata, "language", nullptr,
@@ -1946,7 +1946,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     bool unknownbitrate = false;
     int scanerror = 0;
@@ -2559,7 +2559,7 @@ void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 ///Returns TeleText language
 int AvFormatDecoder::GetTeletextLanguage(uint Index)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     for (const auto & si : m_tracks[kTrackTypeTeletextCaptions])
         if (si.m_language_index == Index)
              return si.m_language;
@@ -2578,7 +2578,7 @@ int AvFormatDecoder::GetCaptionLanguage(TrackType TrackType, int ServiceNum)
 {
     // This doesn't strictly need write lock but it is called internally while
     // write lock is held. All other (external) uses are safe
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     int ret = -1;
     for (int i = 0; i < m_pmtTrackTypes.size(); i++)
@@ -2656,7 +2656,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint StreamIndex)
  */
 void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     // Find the position of the streaminfo in m_tracks[kTrackTypeAudio]
     auto current = m_tracks[kTrackTypeAudio].begin();
@@ -2959,7 +2959,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     if (!need_change_608 && !need_change_708)
         return;
 
-    m_trackLock.lockForWrite();
+    m_trackLock.lock();
 
     ScanATSCCaptionStreams(m_selectedTrack[kTrackTypeVideo].m_av_stream_index);
 
@@ -3849,11 +3849,11 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 // SECAM lines  6-23
                 // PAL   lines  6-22
                 // NTSC  lines 10-21 (rare)
-                m_trackLock.lockForRead();
+                m_trackLock.lock();
                 if (m_tracks[kTrackTypeTeletextMenu].empty())
                 {
                     StreamInfo si(pkt->stream_index, 0, 0, 0, 0);
-                    m_trackLock.lockForWrite();
+                    m_trackLock.lock();
                     m_tracks[kTrackTypeTeletextMenu].push_back(si);
                     m_trackLock.unlock();
                 }
@@ -3982,7 +3982,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     if (pkt->dts != AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
-    m_trackLock.lockForRead();
+    m_trackLock.lock();
     int subIdx = m_selectedTrack[kTrackTypeSubtitle].m_av_stream_index;
     bool isForcedTrack = m_selectedTrack[kTrackTypeSubtitle].m_forced;
     m_trackLock.unlock();
@@ -4089,7 +4089,7 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 
 int AvFormatDecoder::SetTrack(uint Type, int TrackNo)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     int ret = DecoderBase::SetTrack(Type, TrackNo);
     if (kTrackTypeAudio == Type)
     {
@@ -4101,7 +4101,7 @@ int AvFormatDecoder::SetTrack(uint Type, int TrackNo)
 
 QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     if (!m_ic || TrackNo >= m_tracks[type].size())
         return "";
@@ -4176,7 +4176,7 @@ QString AvFormatDecoder::GetXDS(const QString &Key) const
 
 QByteArray AvFormatDecoder::GetSubHeader(uint TrackNo)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[kTrackTypeSubtitle].size())
         return QByteArray();
 
@@ -4188,7 +4188,7 @@ QByteArray AvFormatDecoder::GetSubHeader(uint TrackNo)
 
 void AvFormatDecoder::GetAttachmentData(uint TrackNo, QByteArray &Filename, QByteArray &Data)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[kTrackTypeAttachment].size())
         return;
 
@@ -4202,7 +4202,7 @@ void AvFormatDecoder::GetAttachmentData(uint TrackNo, QByteArray &Filename, QByt
 
 bool AvFormatDecoder::SetAudioByComponentTag(int Tag)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     for (size_t i = 0; i < m_tracks[kTrackTypeAudio].size(); i++)
     {
         AVStream *stream = m_ic->streams[m_tracks[kTrackTypeAudio][i].m_av_stream_index];
@@ -4215,7 +4215,7 @@ bool AvFormatDecoder::SetAudioByComponentTag(int Tag)
 
 bool AvFormatDecoder::SetVideoByComponentTag(int Tag)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     for (uint i = 0; i < m_ic->nb_streams; i++)
     {
         AVStream *stream  = m_ic->streams[i];
@@ -4349,7 +4349,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
  */
 int AvFormatDecoder::AutoSelectAudioTrack(void)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     const sinfo_vec_t &atracks = m_tracks[kTrackTypeAudio];
     StreamInfo        &wtrack  = m_wantedTrack[kTrackTypeAudio];
@@ -4595,7 +4595,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     bool firstloop      = true;
     int decoded_size    = -1;
 
-    m_trackLock.lockForRead();
+    m_trackLock.lock();
     int audIdx = m_selectedTrack[kTrackTypeAudio].m_av_stream_index;
     int audSubIdx = m_selectedTrack[kTrackTypeAudio].m_av_substream_index;
     m_trackLock.unlock();
@@ -4655,7 +4655,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (reselectAudioTrack)
         {
-            QWriteLocker locker(&m_trackLock);
+            QMutexLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
             AutoSelectAudioTrack();
@@ -4705,7 +4705,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
                     .arg(m_audioOut.m_channels).arg(ctx->channels));
             }
-            QWriteLocker locker(&m_trackLock);
+            QMutexLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
             audIdx = -1;
@@ -5231,7 +5231,7 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 void AvFormatDecoder::ForceSetupAudioStream(void)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     SetupAudioStream();
 }
 

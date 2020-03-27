@@ -907,20 +907,20 @@ bool DecoderBase::GetWaitForChange(void) const
 
 uint DecoderBase::GetTrackCount(uint Type)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     return static_cast<uint>(m_tracks[Type].size());
 }
 
 void DecoderBase::SetDecodeAllSubtitles(bool DecodeAll)
 {
-    m_trackLock.lockForWrite();
+    m_trackLock.lock();
     m_decodeAllSubtitles = DecodeAll;
     m_trackLock.unlock();
 }
 
 QStringList DecoderBase::GetTracks(uint Type)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     QStringList list;
     for (size_t i = 0; i < m_tracks[Type].size(); i++)
         list += GetTrackDesc(Type, static_cast<uint>(i));
@@ -929,7 +929,7 @@ QStringList DecoderBase::GetTracks(uint Type)
 
 int DecoderBase::GetTrackLanguageIndex(uint Type, uint TrackNo)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[Type].size())
         return 0;
     return static_cast<int>(m_tracks[Type][TrackNo].m_language_index);
@@ -937,7 +937,7 @@ int DecoderBase::GetTrackLanguageIndex(uint Type, uint TrackNo)
 
 QString DecoderBase::GetTrackDesc(uint Type, uint TrackNo)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[Type].size())
         return "";
 
@@ -955,13 +955,13 @@ QString DecoderBase::GetTrackDesc(uint Type, uint TrackNo)
 
 int DecoderBase::GetTrack(uint Type)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     return m_currentTrack[Type];
 }
 
 int DecoderBase::SetTrack(uint Type, int TrackNo)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= static_cast<int>(m_tracks[Type].size()))
         return -1;
 
@@ -981,7 +981,7 @@ int DecoderBase::SetTrack(uint Type, int TrackNo)
 
 StreamInfo DecoderBase::GetTrackInfo(uint Type, uint TrackNo)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     if (TrackNo >= m_tracks[Type].size())
     {
         StreamInfo si;
@@ -992,7 +992,7 @@ StreamInfo DecoderBase::GetTrackInfo(uint Type, uint TrackNo)
 
 int DecoderBase::ChangeTrack(uint Type, int Dir)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     int next_track = -1;
     int size = static_cast<int>(m_tracks[Type].size());
@@ -1008,7 +1008,7 @@ int DecoderBase::ChangeTrack(uint Type, int Dir)
 
 int DecoderBase::NextTrack(uint Type)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     int next_track = -1;
     int size = static_cast<int>(m_tracks[Type].size());
@@ -1019,7 +1019,7 @@ int DecoderBase::NextTrack(uint Type)
 
 bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     for (auto & i : m_tracks[Type])
         if (Info.m_stream_id == i.m_stream_id)
@@ -1050,7 +1050,7 @@ bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
  */
 int DecoderBase::AutoSelectTrack(uint Type)
 {
-    QReadLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
 
     uint numStreams = static_cast<uint>(m_tracks[Type].size());
 
@@ -1146,7 +1146,7 @@ void DecoderBase::AutoSelectTracks(void)
 
 void DecoderBase::ResetTracks(void)
 {
-    QWriteLocker locker(&m_trackLock);
+    QMutexLocker locker(&m_trackLock);
     for (int & i : m_currentTrack)
         i = -1;
 }
