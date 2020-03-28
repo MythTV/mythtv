@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.19';
+    $VERSION        = '1.0.20';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -925,6 +925,7 @@ EOF
             }
         }
         $connect_string .= ":host=$temp_host";
+        $connect_string .= ":port=$mysql_conf{'db_port'}";
         if ($use_db)
         {
             $connect_string .= ":database=$mysql_conf{'db_name'}";
