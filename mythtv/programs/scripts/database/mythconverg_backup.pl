@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.13';
+    $VERSION        = '1.0.14';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -710,6 +710,7 @@ EOF
             }
             $dbh = DBI->connect("dbi:mysql:".
                                 "host=$temp_host:".
+                                "port=$mysql_conf{'db_port'}:".
                                 "database=$mysql_conf{'db_name'}",
                                 "$mysql_conf{'db_user'}",
                                 "$mysql_conf{'db_pass'}",
