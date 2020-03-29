@@ -89,9 +89,6 @@ LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
-#define TIMESTAMP_MAX 30
-#define MAX_STRING_LENGTH (LOGLINE_MAX+120)
-
 LogLevel_t logLevel = LOG_INFO;
 
 bool verboseInitialized = false;
@@ -151,15 +148,10 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
 LoggingItem::~LoggingItem()
 {
     free(m_file);
-
     free(m_function);
-
     free(m_threadName);
-
     free(m_appName);
-
     free(m_table);
-
     free(m_logFile);
 }
 
@@ -177,7 +169,7 @@ QByteArray LoggingItem::toByteArray(void)
 /// \return C-string of the thread name
 char *LoggingItem::getThreadName(void)
 {
-    static constexpr char kSUnknown[] = "thread_unknown";
+    static constexpr char const *kSUnknown = "thread_unknown";
 
     if( m_threadName )
         return m_threadName;
@@ -227,6 +219,35 @@ void LoggingItem::setThreadTid(void)
 #endif
         logThreadTidHash[m_threadId] = m_tid;
     }
+}
+
+/// \brief Convert numerical timestamp to a readable date and time.
+QString LoggingItem::getTimestamp (void) const
+{
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+    QDateTime epoch = QDateTime::fromTime_t(m_epoch).toUTC();
+#else
+    QDateTime epoch = QDateTime::fromSecsSinceEpoch(m_epoch);
+#endif
+    QString timestamp = epoch.toString("yyyy-MM-dd HH:mm:ss");
+    return timestamp;
+}
+
+QString LoggingItem::getTimestampUs (void) const
+{
+    QString timestamp = getTimestamp();
+    timestamp += QString(".%1").arg(m_usec,6,10,QChar('0'));
+    return timestamp;
+}
+
+/// \brief Get the message log level as a single character.
+char LoggingItem::getLevelChar (void)
+{
+    QMutexLocker locker(&loglevelMapMutex);
+    LoglevelMap::iterator it = loglevelMap.find(m_level);
+    if (it != loglevelMap.end())
+        return (*it)->shortname;
+    return '-';
 }
 
 /// \brief LoggerThread constructor.  Enables debugging of thread registration
@@ -344,11 +365,9 @@ void LoggerThread::handleItem(LoggingItem *item)
 
         if (debugRegistration)
         {
-            snprintf(item->m_message, LOGLINE_MAX,
-                     "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                     "d) registered as \'%s\'",
-                     item->m_threadId,
-                     item->m_tid,
+            item->m_message = QString("Thread 0x%1 (%2) registered as \'%3\'")
+                .arg(QString::number(item->m_threadId,16),
+                     QString::number(item->m_tid),
                      logThreadHash[item->m_threadId]);
         }
     }
@@ -370,11 +389,9 @@ void LoggerThread::handleItem(LoggingItem *item)
         {
             if (debugRegistration)
             {
-                snprintf(item->m_message, LOGLINE_MAX,
-                         "Thread 0x%" PREFIX64 "X (%" PREFIX64
-                         "d) deregistered as \'%s\'",
-                         item->m_threadId,
-                         (long long int)tid,
+                item->m_message = QString("Thread 0x%1 (%2) deregistered as \'%3\'")
+                    .arg(QString::number(item->m_threadId,16),
+                         QString::number(tid),
                          logThreadHash[item->m_threadId]);
             }
             char *threadName = logThreadHash.take(item->m_threadId);
@@ -382,7 +399,7 @@ void LoggerThread::handleItem(LoggingItem *item)
         }
     }
 
-    if (item->m_message[0] != '\0')
+    if (!item->m_message.isEmpty())
     {
         /// TODO: This converts the LoggingItem to json for sending to
         /// the log server.  Now that the log server is gone, it just
@@ -400,7 +417,7 @@ void LoggerThread::handleItem(LoggingItem *item)
 
 /// \brief Process a log message, writing to the console
 /// \param item LoggingItem containing the log message to process
-bool LoggerThread::logConsole(LoggingItem *item)
+bool LoggerThread::logConsole(LoggingItem *item) const
 {
     if (m_quiet || (m_progress && item->m_level > LOG_ERR))
         return false;
@@ -411,52 +428,49 @@ bool LoggerThread::logConsole(LoggingItem *item)
     item->IncrRef();
 
 #ifndef Q_OS_ANDROID
-    char                line[MAX_STRING_LENGTH];
+    std::string line;
 
     if (item->m_type & kStandardIO)
     {
-        snprintf(line, MAX_STRING_LENGTH, "%s", item->m_message);
+        line = qPrintable(item->m_message);
     }
     else
     {
-        char usPart[9];
-        char timestamp[TIMESTAMP_MAX];
-        time_t epoch = item->epoch();
-        struct tm tm {};
-        localtime_r(&epoch, &tm);
-        strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
-                 static_cast<const struct tm *>(&tm));
-        snprintf(usPart, 9, ".%06d", static_cast<int>(item->m_usec));
-        strcat(timestamp, usPart);
-        char shortname = '-';
-
-        {
-            QMutexLocker locker(&loglevelMapMutex);
-            LoglevelDef *lev = loglevelMap.value(item->m_level, nullptr);
-            if (lev != nullptr)
-                shortname = lev->shortname;
-        }
+        QString timestamp = item->getTimestampUs();
+        char shortname = item->getLevelChar();
 
 #if CONFIG_DEBUGTYPE
-        if(item->tid())
+        if (item->tid())
         {
-            snprintf(line, MAX_STRING_LENGTH, "%s %c [%d/%" PREFIX64 "d] %s %s:%d:%s  %s\n", timestamp,
-                     shortname, item->pid(), item->tid(), item->rawThreadName(),
-                     item->m_file, item->m_line, item->m_function, item->m_message);
+            line = QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
+                .arg(timestamp, QString(shortname),
+                     QString::number(item->pid()),
+                     QString::number(item->tid()),
+                     item->rawThreadName(),
+                     item->m_file,
+                     QString::number(item->m_line),
+                     item->m_function,
+                     item->m_message);
         }
         else
         {
-            snprintf(line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d:%s  %s\n", timestamp,
-                     shortname, item->pid(), item->rawThreadName(),
-                     item->m_file, item->m_line, item->m_function, item->m_message);
+            line = QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
+                .arg(timestamp, QString(shortname),
+                     QString::number(item->pid()),
+                     item->rawThreadName(),
+                     item->m_file,
+                     QString::number(item->m_line),
+                     item->m_function,
+                     item->m_message);
         }
 #else
-        snprintf(line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
-                  shortname, item->m_message);
+        line = qPrintable(QString("%1 %2  %3\n")
+                          .arg(timestamp, QString(shortname),
+                               item->m_message));
 #endif
     }
 
-    (void)write(1, line, strlen(line));
+    (void)write(1, line.data(), line.size());
 
 #else // Q_OS_ANDROID
 
@@ -487,9 +501,9 @@ bool LoggerThread::logConsole(LoggingItem *item)
     }
 #if CONFIG_DEBUGTYPE
     __android_log_print(aprio, "mfe", "%s:%d:%s  %s", item->m_file,
-                        item->m_line, item->m_function, item->m_message);
+                        item->m_line, item->m_function, qPrintable(item->m_message));
 #else
-    __android_log_print(aprio, "mfe", "%s", item->m_message);
+    __android_log_print(aprio, "mfe", "%s", qPrintable(item->m_message));
 #endif
 #endif
 
@@ -577,16 +591,10 @@ LoggingItem *LoggingItem::create(QByteArray &buf)
 /// \param  file    Filename of source code logging the message
 /// \param  line    Line number within the source of log message source
 /// \param  function    Function name of the log message source
-/// \param  fromQString true if this message originated from QString
-/// \param  format  printf format string (when not from QString), log message
-///                 (when from QString)
-/// \param  ...     printf arguments (when not from QString)
+/// \param  message     log message
 void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
-                   const char *function, int fromQString,
-                   const char *format, ... )
+                   const char *function, QString message)
 {
-    va_list         arguments;
-
     int type = kMessage;
     type |= (mask & VB_FLUSH) ? kFlush : 0;
     type |= (mask & VB_STDIO) ? kStandardIO : 0;
@@ -595,26 +603,12 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if (!item)
         return;
 
-    char *formatcopy = nullptr;
-    if( fromQString && strchr(format, '%') )
-    {
-        QString string(format);
-        format = strdup(string.replace(logRegExp, "%%").toLocal8Bit()
-                              .constData());
-        formatcopy = (char *)format;
-    }
-
-    va_start(arguments, format);
-    vsnprintf(item->m_message, LOGLINE_MAX, format, arguments);
-    va_end(arguments);
-
-    if (formatcopy)
-        free(formatcopy);
+    item->m_message = message;
 
     QMutexLocker qLock(&logQueueMutex);
 
 #if defined( _MSC_VER ) && defined( _DEBUG )
-        OutputDebugStringA( item->m_message );
+        OutputDebugStringA( qPrintable(item->m_message) );
         OutputDebugStringA( "\n" );
 #endif
 
@@ -636,6 +630,27 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     {
         logThread->flush();
     }
+}
+
+/// \brief  Format and send a log message into the queue.  This is called from
+///         the LOG() macro.  The intention is minimal blocking of the caller.
+/// \param  mask    Verbosity mask of the message (VB_*)
+/// \param  level   Log level of this message (LOG_* - matching syslog levels)
+/// \param  file    Filename of source code logging the message
+/// \param  line    Line number within the source of log message source
+/// \param  function    Function name of the log message source
+/// \param  format  printf format string (when not from QString), log message
+///                 (when from QString)
+/// \param  ...     printf arguments (when not from QString)
+void LogPrintLineC( uint64_t mask, LogLevel_t level, const char *file, int line,
+                    const char *function, const char *format, ...)
+{
+    va_list arguments;
+
+    va_start(arguments, format);
+    LogPrintLine(mask, level, file, line, function,
+                 QString::asprintf(format, arguments));
+    va_end(arguments);
 }
 
 

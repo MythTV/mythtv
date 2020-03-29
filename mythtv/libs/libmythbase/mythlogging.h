@@ -38,13 +38,13 @@ extern "C" {
 // Neither of them will lock the calling thread other than momentarily to put
 // the log message onto a queue.
 #ifdef __cplusplus
-#define LOG(_MASK_, _LEVEL_, _STRING_)                                  \
+#define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
             LogPrintLine(_MASK_, _LEVEL_,                               \
-                         __FILE__, __LINE__, __FUNCTION__, 1,           \
-                         qPrintable(_STRING_));                         \
+                         __FILE__, __LINE__, __FUNCTION__,              \
+                         _QSTRING_);                                    \
         }                                                               \
     } while (false)
 #else
@@ -52,18 +52,28 @@ extern "C" {
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
-            LogPrintLine(_MASK_, _LEVEL_,                               \
-                         __FILE__, __LINE__, __FUNCTION__, 0,           \
+            LogPrintLineC(_MASK_, _LEVEL_,                              \
+                         __FILE__, __LINE__, __FUNCTION__,              \
                          (const char *)_FORMAT_, ##__VA_ARGS__);        \
         }                                                               \
     } while (0)
 #endif
 
 /* Define the external prototype */
+#ifdef __cplusplus
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
                                 const char *file, int line,
-                                const char *function, int fromQString,
-                                const char *format, ... );
+                                const char *function,
+                                QString message);
+extern "C" {
+#endif
+MBASE_PUBLIC void LogPrintLineC( uint64_t mask, LogLevel_t level,
+                                 const char *file, int line,
+                                 const char *function,
+                                 const char *format, ...);
+#ifdef __cplusplus
+}
+#endif
 
 extern MBASE_PUBLIC LogLevel_t logLevel;
 extern MBASE_PUBLIC uint64_t   verboseMask;

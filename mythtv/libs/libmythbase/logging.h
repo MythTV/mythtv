@@ -81,7 +81,7 @@ class LoggingItem: public QObject, public ReferenceCounter
 
     friend class LoggerThread;
     friend void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
-                             const char *function, int fromQString, const char *format, ... );
+                             const char *function, QString message);
 
   public:
     char *getThreadName(void);
@@ -91,6 +91,9 @@ class LoggingItem: public QObject, public ReferenceCounter
                                LoggingType _type);
     static LoggingItem *create(QByteArray &buf);
     QByteArray toByteArray(void);
+    QString getTimestamp(void) const;
+    QString getTimestampUs(void) const;
+    char getLevelChar(void);
 
     int                 pid() const         { return m_pid; };
     qlonglong           tid() const         { return m_tid; };
@@ -107,7 +110,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     QString             appName() const     { return QString(m_appName); };
     QString             table() const       { return QString(m_table); };
     QString             logFile() const     { return QString(m_logFile); };
-    QString             message() const     { return QString(m_message); };
+    QString             message() const     { return m_message; };
 
     void setPid(const int val)              { m_pid = val; };
     void setTid(const qlonglong val)        { m_tid = val; };
@@ -124,11 +127,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setAppName(const QString &val)     SET_LOGGING_ARG(m_appName)
     void setTable(const QString &val)       SET_LOGGING_ARG(m_table)
     void setLogFile(const QString &val)     SET_LOGGING_ARG(m_logFile)
-    void setMessage(const QString &val)
-    {
-        strncpy(m_message, val.toLocal8Bit().constData(), LOGLINE_MAX);
-        m_message[LOGLINE_MAX] = '\0';
-    };
+    void setMessage(const QString &val)     { m_message = val; };
 
     const char *rawFile() const        { return m_file; };
     const char *rawFunction() const    { return m_function; };
@@ -136,7 +135,6 @@ class LoggingItem: public QObject, public ReferenceCounter
     const char *rawAppName() const     { return m_appName; };
     const char *rawTable() const       { return m_table; };
     const char *rawLogFile() const     { return m_logFile; };
-    const char *rawMessage() const     { return m_message; };
 
   protected:
     int                 m_pid        {-1};
@@ -154,7 +152,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     char               *m_appName    {nullptr};
     char               *m_table      {nullptr};
     char               *m_logFile    {nullptr};
-    char                m_message[LOGLINE_MAX+1] {0};
+    QString             m_message    {};
 
   private:
     LoggingItem()
@@ -171,8 +169,8 @@ class LoggerThread : public QObject, public MThread
 {
     Q_OBJECT
 
-    friend void LogPrintLine(uint64_t mask, LogLevel_t lavel, const char *file, int line,
-                             const char *funcion, int fromQString, const char *format, ... );
+    friend void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
+                             const char *function, QString message);
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
                  int facility);
@@ -204,7 +202,7 @@ class LoggerThread : public QObject, public MThread
     pid_t   m_pid;         ///< Cached pid value
 
   protected:
-    bool logConsole(LoggingItem *item);
+    bool logConsole(LoggingItem *item) const;
 };
 
 #endif
