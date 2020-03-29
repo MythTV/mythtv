@@ -2015,11 +2015,25 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 // ffmpeg does not return a bitrate for several codecs and
-                // formats. Forcing it to 500000 ensures the ringbuffer does not
-                // use optimisations for low bitrate (audio and data) streams.
+                // formats. Typically the same streams do not have a duration either
+                // - so we cannot estimate a bitrate (which would be subject
+                // to significant error anyway if there were multiple video streams).
+                // So we need to guesstimate a value that avoids low bitrate optimisations
+                // (which typically kick in around 500,000) and provides a read
+                // chunk size large enough to avoid starving the decoder of data.
+                // Trying to read a 20Mbs stream with a 16KB chunk size does not work:)
                 if (par->bit_rate == 0)
                 {
-                    par->bit_rate = 500000;
+                    static const int s_baseBitrate = 1000000;
+                    int multiplier = 1;
+                    if (par->width && par->height)
+                    {
+                        static const int s_baseSize = 1920 * 1080;
+                        multiplier = ((par->width * par->height) + s_baseSize - 1) / s_baseSize;
+                        if (multiplier < 1)
+                            multiplier = 1;
+                    }
+                    par->bit_rate = s_baseBitrate * multiplier;
                     unknownbitrate = true;
                 }
                 m_bitrate += par->bit_rate;
