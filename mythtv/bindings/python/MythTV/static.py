@@ -119,6 +119,8 @@ class JOBTYPE( object ):
     SYSTEMJOB    = 0x00ff
     TRANSCODE    = 0x0001
     COMMFLAG     = 0x0002
+    METADATA     = 0x0004
+    PREVIEW      = 0x0008
     USERJOB      = 0xff00
     USERJOB1     = 0x0100
     USERJOB2     = 0x0200
