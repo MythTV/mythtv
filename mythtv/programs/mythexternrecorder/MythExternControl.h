@@ -106,6 +106,7 @@ class Commands : public QObject
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
+    void Cleanup(void);
 
   private:
     std::thread m_thread;
@@ -148,6 +149,7 @@ class MythExternControl : public QObject
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
+    void Cleanup(void);
 
   public slots:
     void SetDescription(const QString & desc) { m_desc = desc; }
