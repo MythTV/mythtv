@@ -27,6 +27,7 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QtCore/QtCore>
+#include <unistd.h>
 
 #define LOC Desc()
 
@@ -42,8 +43,7 @@ MythExternRecApp::MythExternRecApp(QString command,
     if (m_configIni.isEmpty() || !config())
         m_recDesc = m_recCommand;
 
-    if (m_tuneCommand.isEmpty())
-        m_command = m_recCommand;
+    m_command = m_recCommand;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Channels in '%1', Tuner: '%2', Scanner: '%3'")
@@ -424,56 +424,62 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
         return;
     }
 
-    if (m_channelsIni.isEmpty())
+    if (m_tuneCommand.isEmpty())
     {
-        LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
-        emit SendMessage("TuneChannel", serial, "ERR:No channels configured.");
+        LOG(VB_CHANNEL, LOG_ERR, LOC + ": No 'tuner' configured.");
+        emit SendMessage("TuneChannel", serial, "ERR:No 'tuner' configured.");
         return;
     }
 
-    QSettings settings(m_channelsIni, QSettings::IniFormat);
-    settings.beginGroup(channum);
-
-    QString url(settings.value("URL").toString());
-
-    if (url.isEmpty())
-    {
-        QString msg = QString("Channel number [%1] is missing a URL.")
-                      .arg(channum);
-
-        LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + msg);
-
-        emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(msg));
-        return;
-    }
-
-    if (!m_tuneCommand.isEmpty())
-    {
-        // Repalce URL in command and execute it
-        QString tune = m_tuneCommand;
-        tune.replace("%URL%", url);
-
-        if (system(tune.toUtf8().constData()) != 0)
-        {
-            QString errmsg = QString("'%1' failed: ").arg(tune) + ENO;
-            LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
-            emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(errmsg));
-            return;
-        }
-        LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString(": TuneChannel, ran '%1'").arg(tune));
-    }
-
-    // Replace URL in recorder command
+    m_desc    = m_recDesc;
     m_command = m_recCommand;
 
-    if (!url.isEmpty() && m_command.indexOf("%URL%") >= 0)
+    QString tune = m_tuneCommand;
+    QString url;
+
+    if (!m_channelsIni.isEmpty())
     {
-        m_command.replace("%URL%", url);
-        LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-            QString(": '%URL%' replaced with '%1' in cmd: '%2'")
-            .arg(url).arg(m_command));
+        QSettings settings(m_channelsIni, QSettings::IniFormat);
+        settings.beginGroup(channum);
+
+        url = settings.value("URL").toString();
+
+        if (url.isEmpty())
+        {
+            QString msg = QString("Channel number [%1] is missing a URL.")
+                          .arg(channum);
+
+            LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + msg);
+        }
+        else
+            tune.replace("%URL%", url);
+
+        if (!url.isEmpty() && m_command.indexOf("%URL%") >= 0)
+        {
+            m_command.replace("%URL%", url);
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                QString(": '%URL%' replaced with '%1' in cmd: '%2'")
+                .arg(url).arg(m_command));
+        }
+
+        m_desc.replace("%CHANNAME%", settings.value("NAME").toString());
+        m_desc.replace("%CALLSIGN%", settings.value("CALLSIGN").toString());
+
+        settings.endGroup();
     }
+
+    tune.replace("%CHANNUM%", channum);
+    m_command.replace("%CHANNUM%", channum);
+
+    if (system(tune.toUtf8().constData()) != 0)
+    {
+        QString errmsg = QString("'%1' failed: ").arg(tune) + ENO;
+        LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
+        emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(errmsg));
+        return;
+    }
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString(": TuneChannel, ran '%1'").arg(tune));
 
     if (!m_logFile.isEmpty() && m_command.indexOf("%LOGFILE%") >= 0)
     {
@@ -491,13 +497,8 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
             .arg(m_logging).arg(m_command));
     }
 
-    m_desc = m_recDesc;
     m_desc.replace("%URL%", url);
     m_desc.replace("%CHANNUM%", channum);
-    m_desc.replace("%CHANNAME%", settings.value("NAME").toString());
-    m_desc.replace("%CALLSIGN%", settings.value("CALLSIGN").toString());
-
-    settings.endGroup();
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString(": TuneChannel %1: URL '%2'").arg(channum).arg(url));
@@ -505,17 +506,29 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     emit SetDescription(Desc());
     emit SendMessage("TuneChannel", serial,
-                     QString("OK:Tunned to %1").arg(channum));
+                     QString("OK:Tuned to %1").arg(channum));
 }
 
 Q_SLOT void MythExternRecApp::LockTimeout(const QString & serial)
 {
     if (!Open())
+    {
+        LOG(VB_CHANNEL, LOG_WARNING, LOC +
+            "Cannot read LockTimeout from config file.");
+        emit SendMessage("LockTimeout", serial, "ERR: Not open");
         return;
+    }
 
     if (m_lockTimeout > 0)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Using configured LockTimeout of %1").arg(m_lockTimeout));
         emit SendMessage("LockTimeout", serial,
                          QString("OK:%1").arg(m_lockTimeout));
+        return;
+    }
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        "No LockTimeout defined in config, defaulting to 12000ms");
     emit SendMessage("LockTimeout", serial, QString("OK:%1")
                      .arg(m_scanCommand.isEmpty() ? 12000 : 120000));
 }
@@ -523,7 +536,7 @@ Q_SLOT void MythExternRecApp::LockTimeout(const QString & serial)
 Q_SLOT void MythExternRecApp::HasTuner(const QString & serial)
 {
     emit SendMessage("HasTuner", serial, QString("OK:%1")
-                     .arg(m_channelsIni.isEmpty() ? "No" : "Yes"));
+                     .arg(m_tuneCommand.isEmpty() ? "No" : "Yes"));
 }
 
 Q_SLOT void MythExternRecApp::HasPictureAttributes(const QString & serial)
