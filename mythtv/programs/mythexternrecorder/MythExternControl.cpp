@@ -314,7 +314,7 @@ bool Commands::ProcessCommand(const QString & cmd)
         else
             SendStatus(cmd, tokens[0], "OK:20");
     }
-    else if (tokens[1].startsWith("LockTimeout"))
+    else if (tokens[1].startsWith("LockTimeout?"))
     {
         LockTimeout(tokens[0]);
     }
@@ -357,7 +357,7 @@ bool Commands::ProcessCommand(const QString & cmd)
     }
     else if (tokens[1].startsWith("TuneChannel"))
     {
-        if (tokens.size() > 1)
+        if (tokens.size() > 2)
             TuneChannel(tokens[0], tokens[2]);
         else
             SendStatus(cmd, tokens[0], "ERR:Missing channum");
