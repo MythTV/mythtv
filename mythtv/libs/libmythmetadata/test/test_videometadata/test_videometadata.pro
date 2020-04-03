@@ -50,9 +50,9 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 !using_libexiv_external {
     LIBS += -L../../../../external/libexiv2 -lmythexiv2-0.28
-    QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libexiv2
-    freebsd: LIBS += -lexpat -lprocstat
-    darwin: LIBS += -lexpat -liconv -lz
+    QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libexiv2 -lexpat
+    freebsd: LIBS += -lprocstat
+    darwin: LIBS += -liconv -lz
 }
 
 # Input
