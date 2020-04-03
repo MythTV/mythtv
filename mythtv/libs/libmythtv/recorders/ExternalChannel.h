@@ -52,6 +52,7 @@ class ExternalChannel : public DTVChannel
         { return true; }
 
   private:
+    int                      m_tuneTimeout { -1 };
     QString                  m_device;
     QStringList              m_args;
     ExternalStreamHandler   *m_streamHandler {nullptr};
