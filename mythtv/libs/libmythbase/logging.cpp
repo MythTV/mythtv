@@ -479,6 +479,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     {
     case LOG_EMERG:
         aprio = ANDROID_LOG_FATAL;
+        break;
     case LOG_ALERT:
     case LOG_CRIT:
     case LOG_ERR:
