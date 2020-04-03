@@ -14,6 +14,12 @@
 #ifndef GL_SHADER_IMAGE_ACCESS_BARRIER_BIT
 #define GL_SHADER_IMAGE_ACCESS_BARRIER_BIT 0x00000020
 #endif
+#ifndef GL_STREAM_COPY
+#define GL_STREAM_COPY                    0x88E2
+#endif
+#ifndef GL_WRITE_ONLY
+#define GL_WRITE_ONLY                     0x88B9
+#endif
 
 MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace)
   : QObject()
