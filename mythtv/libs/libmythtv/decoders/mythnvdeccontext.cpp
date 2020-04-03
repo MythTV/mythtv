@@ -91,7 +91,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
     for (auto cap : profiles)
     {
-        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->width))
+        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->height))
         {
             supported = true;
             break;
