@@ -103,6 +103,7 @@ class Commands : public QObject
     void HasPictureAttributes(const QString & serial) const;
     void SetBlockSize(const QString & serial, int blksz);
     void TuneChannel(const QString & serial, const QString & channum);
+    void TuneStatus(const QString & serial);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
@@ -146,6 +147,7 @@ class MythExternControl : public QObject
     void HasPictureAttributes(const QString & serial) const;
     void SetBlockSize(const QString & serial, int blksz);
     void TuneChannel(const QString & serial, const QString & channum);
+    void TuneStatus(const QString & serial);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);

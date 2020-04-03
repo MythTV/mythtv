@@ -75,12 +75,13 @@ class MythExternRecApp : public QObject
     void NextChannel(const QString & serial);
 
     void TuneChannel(const QString & serial, const QString & channum);
+    void TuneStatus(const QString & serial);
     void HasPictureAttributes(const QString & serial);
     void SetBlockSize(const QString & serial, int blksz);
 
   protected:
     void GetChannel(const QString & serial, const QString & func);
-    void TerminateProcess(void);
+    void TerminateProcess(QProcess & proc, const QString & desc);
 
   private:
     bool config(void);
@@ -105,6 +106,7 @@ class MythExternRecApp : public QObject
 
     QMap<QString, QString>  m_appEnv;
 
+    QProcess                m_tuneProc;
     QString                 m_tuneCommand;
     QString                 m_channelsIni;
     uint                    m_lockTimeout  { 0 };
@@ -117,6 +119,7 @@ class MythExternRecApp : public QObject
     QString                 m_configIni;
     QString                 m_desc;
 
+    QString                 m_tuningChannel;
     QString                 m_tunedChannel;
 
     // Channel scanning

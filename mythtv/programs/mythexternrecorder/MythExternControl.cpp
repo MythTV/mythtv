@@ -173,6 +173,11 @@ void Commands::TuneChannel(const QString & serial, const QString & channum)
     emit m_parent->TuneChannel(serial, channum);
 }
 
+void Commands::TuneStatus(const QString & serial)
+{
+    emit m_parent->TuneStatus(serial);
+}
+
 void Commands::LoadChannels(const QString & serial)
 {
     emit m_parent->LoadChannels(serial);
@@ -361,6 +366,10 @@ bool Commands::ProcessCommand(const QString & cmd)
             TuneChannel(tokens[0], tokens[2]);
         else
             SendStatus(cmd, tokens[0], "ERR:Missing channum");
+    }
+    else if (tokens[1].startsWith("TuneStatus?"))
+    {
+        TuneStatus(tokens[0]);
     }
     else if (tokens[1].startsWith("LoadChannels"))
     {

@@ -46,6 +46,8 @@ class ExternalChannel : public DTVChannel
 
     QString UpdateDescription(void);
     QString GetDescription(void);
+    bool IsBackgroundTuning(void) const { return m_backgroundTuning; }
+    uint GetTuneStatus(void);
 
   protected:
     bool IsExternalChannelChangeSupported(void) override // ChannelBase
@@ -53,6 +55,7 @@ class ExternalChannel : public DTVChannel
 
   private:
     int                      m_tuneTimeout { -1 };
+    bool                     m_backgroundTuning {false};
     QString                  m_device;
     QStringList              m_args;
     ExternalStreamHandler   *m_streamHandler {nullptr};

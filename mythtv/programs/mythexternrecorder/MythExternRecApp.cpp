@@ -178,28 +178,28 @@ bool MythExternRecApp::Open(void)
     return true;
 }
 
-void MythExternRecApp::TerminateProcess(void)
+void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc)
 {
-    if (m_proc.state() == QProcess::Running)
+    if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGINT to %1").arg(m_proc.pid()));
-        kill(m_proc.pid(), SIGINT);
-        m_proc.waitForFinished(5000);
+            QString("Sending SIGINT to %1(%2)").arg(desc).arg(proc.pid()));
+        kill(proc.pid(), SIGINT);
+        proc.waitForFinished(5000);
     }
-    if (m_proc.state() == QProcess::Running)
+    if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGTERM to %1").arg(m_proc.pid()));
-        m_proc.terminate();
-        m_proc.waitForFinished();
+            QString("Sending SIGTERM to %1(%2)").arg(desc).arg(proc.pid()));
+        proc.terminate();
+        proc.waitForFinished();
     }
-    if (m_proc.state() == QProcess::Running)
+    if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGKILL to %1").arg(m_proc.pid()));
-        m_proc.kill();
-        m_proc.waitForFinished();
+            QString("Sending SIGKILL to %1(%2)").arg(desc).arg(proc.pid()));
+        proc.kill();
+        proc.waitForFinished();
     }
 
     return;
@@ -215,10 +215,16 @@ Q_SLOT void MythExternRecApp::Close(void)
         std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
 
+    if (m_tuneProc.state() == QProcess::Running)
+    {
+        m_tuneProc.closeReadChannel(QProcess::StandardOutput);
+        TerminateProcess(m_tuneProc, "App");
+    }
+
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.closeReadChannel(QProcess::StandardOutput);
-        TerminateProcess();
+        TerminateProcess(m_proc, "App");
         std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
 
@@ -252,7 +258,7 @@ void MythExternRecApp::Run(void)
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.closeReadChannel(QProcess::StandardOutput);
-        TerminateProcess();
+        TerminateProcess(m_proc, "App");
     }
 
     emit Done();
@@ -415,19 +421,19 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
                                           const QString & channum)
 {
+    if (m_tuneCommand.isEmpty())
+    {
+        LOG(VB_CHANNEL, LOG_ERR, LOC + ": No 'tuner' configured.");
+        emit SendMessage("TuneChannel", serial, "ERR:No 'tuner' configured.");
+        return;
+    }
+
     if (m_tunedChannel == channum)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("TuneChanne: Already on %1").arg(channum));
         emit SendMessage("TuneChannel", serial,
                          QString("OK:Tunned to %1").arg(channum));
-        return;
-    }
-
-    if (m_tuneCommand.isEmpty())
-    {
-        LOG(VB_CHANNEL, LOG_ERR, LOC + ": No 'tuner' configured.");
-        emit SendMessage("TuneChannel", serial, "ERR:No 'tuner' configured.");
         return;
     }
 
@@ -468,18 +474,20 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
         settings.endGroup();
     }
 
+    if (m_tuneProc.state() == QProcess::Running)
+        TerminateProcess(m_tuneProc, "Tune");
+
     tune.replace("%CHANNUM%", channum);
     m_command.replace("%CHANNUM%", channum);
 
-    if (system(tune.toUtf8().constData()) != 0)
+    m_tuneProc.start(tune);
+    if (!m_tuneProc.waitForStarted())
     {
-        QString errmsg = QString("'%1' failed: ").arg(tune) + ENO;
+        QString errmsg = QString("Tune `%1` failed: ").arg(tune) + ENO;
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
         emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(errmsg));
         return;
     }
-    LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString(": TuneChannel, ran '%1'").arg(tune));
 
     if (!m_logFile.isEmpty() && m_command.indexOf("%LOGFILE%") >= 0)
     {
@@ -499,14 +507,41 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     m_desc.replace("%URL%", url);
     m_desc.replace("%CHANNUM%", channum);
+    m_tuningChannel = channum;
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString(": TuneChannel %1: URL '%2'").arg(channum).arg(url));
-    m_tunedChannel = channum;
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString(": Started `%1` URL '%2'")
+        .arg(tune).arg(url));
+    emit SendMessage("TuneChannel", serial,
+                     QString("OK:Started `%1`").arg(tune));
+}
 
+Q_SLOT void MythExternRecApp::TuneStatus(const QString & serial)
+{
+    if (m_tuneProc.state() == QProcess::Running)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString(": Tune process(%1) still running").arg(m_tuneProc.pid()));
+        emit SendMessage("TuneStatus", serial, "OK:Running");
+        return;
+    }
+
+    if (m_tuneProc.exitStatus() != QProcess::NormalExit)
+    {
+        QString errmsg = QString("'%1' failed: ")
+                         .arg(m_tuneProc.program()) + ENO;
+        LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
+        emit SendMessage("TuneStatus", serial,
+                         QString("ERR:%1").arg(errmsg));
+        return;
+    }
+
+    m_tunedChannel = m_tuningChannel;
+    m_tuningChannel.clear();
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString(": Tuned %1").arg(m_tunedChannel));
     emit SetDescription(Desc());
     emit SendMessage("TuneChannel", serial,
-                     QString("OK:Tuned to %1").arg(channum));
+                     QString("OK:Tuned to %1").arg(m_tunedChannel));
 }
 
 Q_SLOT void MythExternRecApp::LockTimeout(const QString & serial)
@@ -607,7 +642,7 @@ Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
     m_streaming = false;
     if (m_proc.state() == QProcess::Running)
     {
-        TerminateProcess();
+        TerminateProcess(m_proc, "App");
 
         LOG(VB_RECORD, LOG_INFO, LOC + ": External application terminated.");
         if (silent)
