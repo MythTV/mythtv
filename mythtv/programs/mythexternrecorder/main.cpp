@@ -122,6 +122,8 @@ int main(int argc, char *argv[])
                      process, &MythExternRecApp::NextChannel);
     QObject::connect(control, &MythExternControl::TuneChannel,
                      process, &MythExternRecApp::TuneChannel);
+    QObject::connect(control, &MythExternControl::TuneStatus,
+                     process, &MythExternRecApp::TuneStatus);
     QObject::connect(control, &MythExternControl::HasPictureAttributes,
                      process, &MythExternRecApp::HasPictureAttributes);
     QObject::connect(control, &MythExternControl::SetBlockSize,

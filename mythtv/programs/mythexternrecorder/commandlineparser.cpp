@@ -9,7 +9,7 @@ MythExternRecorderCommandLineParser::MythExternRecorderCommandLineParser() :
 
 QString MythExternRecorderCommandLineParser::GetHelpHeader(void) const
 {
-    return "MythFileRecorder is a go-between app which interfaces "
+    return "mythexternrecorder is a go-between app which interfaces "
         "between a recording device and mythbackend.";
 }
 
