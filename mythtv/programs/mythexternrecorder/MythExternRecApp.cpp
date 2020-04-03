@@ -85,6 +85,7 @@ bool MythExternRecApp::config(void)
 
     m_recCommand  = settings.value("RECORDER/command").toString();
     m_recDesc     = settings.value("RECORDER/desc").toString();
+    m_cleanup     = settings.value("RECORDER/cleanup").toString();
     m_tuneCommand = settings.value("TUNER/command", "").toString();
     m_channelsIni = settings.value("TUNER/channels", "").toString();
     m_lockTimeout = settings.value("TUNER/timeout", "").toInt();
@@ -200,6 +201,8 @@ void MythExternRecApp::TerminateProcess(void)
         m_proc.kill();
         m_proc.waitForFinished();
     }
+
+    return;
 }
 
 Q_SLOT void MythExternRecApp::Close(void)
@@ -253,6 +256,36 @@ void MythExternRecApp::Run(void)
     }
 
     emit Done();
+}
+
+Q_SLOT void MythExternRecApp::Cleanup(void)
+{
+    if (m_cleanup.isEmpty())
+        return;
+
+    QString cmd = m_cleanup;
+
+    LOG(VB_RECORD, LOG_WARNING, LOC +
+        QString(" Beginning cleanup: '%1'").arg(cmd));
+
+    QProcess cleanup;
+    cleanup.start(cmd);
+    if (!cleanup.waitForStarted())
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start cleanup process: " + ENO);
+        return;
+    }
+    cleanup.waitForFinished(5000);
+    if (cleanup.state() == QProcess::NotRunning)
+    {
+        if (cleanup.exitStatus() != QProcess::NormalExit)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + ": Cleanup process failed: " + ENO);
+            return;
+        }
+    }
+
+    LOG(VB_RECORD, LOG_INFO, LOC + ": Cleanup finished.");
 }
 
 Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)

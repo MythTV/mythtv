@@ -69,6 +69,7 @@ class MythExternRecApp : public QObject
     void StopStreaming(const QString & serial, bool silent);
     void LockTimeout(const QString & serial);
     void HasTuner(const QString & serial);
+    void Cleanup(void);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
@@ -97,6 +98,7 @@ class MythExternRecApp : public QObject
 
     QProcess                m_proc;
     QString                 m_command;
+    QString                 m_cleanup;
 
     QString                 m_recCommand;
     QString                 m_recDesc;

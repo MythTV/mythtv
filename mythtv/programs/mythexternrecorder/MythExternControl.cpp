@@ -188,6 +188,11 @@ void Commands::NextChannel(const QString & serial)
     emit m_parent->NextChannel(serial);
 }
 
+void Commands::Cleanup(void)
+{
+    emit m_parent->Cleanup();
+}
+
 bool Commands::SendStatus(const QString & command, const QString & status)
 {
     int len = write(2, status.toUtf8().constData(), status.size());
@@ -385,6 +390,7 @@ bool Commands::ProcessCommand(const QString & cmd)
             StopStreaming(tokens[0], true);
         m_parent->Terminate();
         SendStatus(cmd, tokens[0], "OK:Terminating");
+        Cleanup();
     }
     else if (tokens[1].startsWith("FlowControl?"))
     {
