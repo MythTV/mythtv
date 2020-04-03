@@ -467,10 +467,13 @@ using_frontend {
         HEADERS += opengl/mythopenglvideoshaders.h
         HEADERS += opengl/mythopenglinterop.h
         HEADERS += opengl/mythvideotexture.h
+        HEADERS += opengl/mythopengltonemap.h
+        HEADERS += opengl/mythopenglcomputeshaders.h
         SOURCES += opengl/mythopenglvideo.cpp
         SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp
         SOURCES += opengl/mythvideotexture.cpp
+        SOURCES += opengl/mythopengltonemap.cpp
 
         using_vaapi {
             HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h
