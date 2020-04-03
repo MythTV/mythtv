@@ -117,7 +117,7 @@ class MythExternRecApp : public QObject
     QString                 m_configIni;
     QString                 m_desc;
 
-    bool                    m_tuned        { false };
+    QString                 m_tunedChannel;
 
     // Channel scanning
     QSettings              *m_chanSettings { nullptr };

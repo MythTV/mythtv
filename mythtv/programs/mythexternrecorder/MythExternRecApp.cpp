@@ -260,6 +260,8 @@ void MythExternRecApp::Run(void)
 
 Q_SLOT void MythExternRecApp::Cleanup(void)
 {
+    m_tunedChannel.clear();
+
     if (m_cleanup.isEmpty())
         return;
 
@@ -272,7 +274,8 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
     cleanup.start(cmd);
     if (!cleanup.waitForStarted())
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start cleanup process: " + ENO);
+        LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start cleanup process: "
+            + ENO);
         return;
     }
     cleanup.waitForFinished(5000);
@@ -412,6 +415,15 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
                                           const QString & channum)
 {
+    if (m_tunedChannel == channum)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("TuneChanne: Already on %1").arg(channum));
+        emit SendMessage("TuneChannel", serial,
+                         QString("OK:Tunned to %1").arg(channum));
+        return;
+    }
+
     if (m_channelsIni.isEmpty())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
@@ -489,7 +501,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString(": TuneChannel %1: URL '%2'").arg(channum).arg(url));
-    m_tuned = true;
+    m_tunedChannel = channum;
 
     emit SetDescription(Desc());
     emit SendMessage("TuneChannel", serial,
@@ -528,7 +540,7 @@ Q_SLOT void MythExternRecApp::SetBlockSize(const QString & serial, int blksz)
 Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
 {
     m_streaming = true;
-    if (!m_tuned && !m_channelsIni.isEmpty())
+    if (m_tunedChannel.isEmpty() && !m_channelsIni.isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": No channel has been tuned");
         emit SendMessage("StartStreaming", serial,
