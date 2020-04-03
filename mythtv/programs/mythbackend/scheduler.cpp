@@ -3660,7 +3660,7 @@ void Scheduler::UpdateManuals(uint recordid)
 
     query.prepare(QString("SELECT type,title,subtitle,description,"
                           "station,startdate,starttime,"
-                          "enddate,endtime,season,episode,inetref "
+                          "enddate,endtime,season,episode,inetref,last_record "
                   "FROM %1 WHERE recordid = :RECORDID").arg(m_recordTable));
     query.bindValue(":RECORDID", recordid);
     if (!query.exec() || query.size() != 1)
@@ -3686,6 +3686,10 @@ void Scheduler::UpdateManuals(uint recordid)
     int season = query.value(9).toInt();
     int episode = query.value(10).toInt();
     QString inetref = query.value(11).toString();
+
+    // A bit of a hack: mythconverg.record.last_record can be used by
+    // the services API to propegate originalairdate information.
+    QDate originalairdate = QDate(query.value(12).toDate());
 
     if (description.isEmpty())
         description = startdt.toLocalTime().toString();
@@ -3753,10 +3757,10 @@ void Scheduler::UpdateManuals(uint recordid)
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
                           " title, subtitle, description, manualid,"
-                          " season, episode, inetref, generic) "
+                          " season, episode, inetref, originalairdate, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, "
-                          " :SEASON, :EPISODE, :INETREF, 1)");
+                          " :SEASON, :EPISODE, :INETREF, :ORIGINALAIRDATE, 1)");
             query.bindValue(":CHANID", id);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
@@ -3766,6 +3770,7 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":SEASON", season);
             query.bindValue(":EPISODE", episode);
             query.bindValue(":INETREF", inetref);
+            query.bindValue(":ORIGINALAIRDATE", originalairdate);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
