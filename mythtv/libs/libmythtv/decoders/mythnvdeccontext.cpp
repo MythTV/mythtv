@@ -65,6 +65,11 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
 
     cudaVideoChromaFormat cudaformat = cudaVideoChromaFormat_Monochrome;
     VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
+    uint depth = static_cast<uint>(ColorDepth(type) - 8);
+    QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
+            .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
+            .arg((*Context)->width).arg((*Context)->height);
+
     // N.B. on stream changes format is set to CUDA/NVDEC. This may break if the new
     // stream has an unsupported chroma but the decoder should fail gracefully - just later.
     if ((FMT_NVDEC == type) || (format_is_420(type)))
@@ -74,58 +79,60 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     else if (format_is_444(type))
         cudaformat = cudaVideoChromaFormat_444;
 
-    uint depth = static_cast<uint>(ColorDepth(type) - 8);
-    bool supported = false;
-
     if ((cudacodec == cudaVideoCodec_NumCodecs) || (cudaformat == cudaVideoChromaFormat_Monochrome))
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Unknown codec or format");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));
         return failure;
+    }
 
     // iterate over known decoder capabilities
+    bool supported = false;
     const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
     for (auto cap : profiles)
     {
-        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->width))
+        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->height))
         {
             supported = true;
             break;
         }
     }
 
-    QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
-            .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
-            .arg((*Context)->width).arg((*Context)->height);
+    if (!supported)
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "No matching profile support");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));
+        return failure;
+    }
 
     AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     // and finally try and retrieve the actual FFmpeg decoder
-    if (supported && decoder)
+    QString name = QString((*Codec)->name) + "_cuvid";
+    if (name == "mpeg2video_cuvid")
+        name = "mpeg2_cuvid";
+    for (int i = 0; ; i++)
     {
-        for (int i = 0; ; i++)
-        {
-            const AVCodecHWConfig *config = avcodec_get_hw_config(*Codec, i);
-            if (!config)
-                break;
+        const AVCodecHWConfig *config = avcodec_get_hw_config(*Codec, i);
+        if (!config)
+            break;
 
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
-                (config->device_type == AV_HWDEVICE_TYPE_CUDA))
+        if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
+            (config->device_type == AV_HWDEVICE_TYPE_CUDA))
+        {
+            AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+            if (codec)
             {
-                QString name = QString((*Codec)->name) + "_cuvid";
-                if (name == "mpeg2video_cuvid")
-                    name = "mpeg2_cuvid";
-                AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-                if (codec)
-                {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
-                    *Codec = codec;
-                    decoder->CodecMap()->freeCodecContext(Stream);
-                    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
-                    return success;
-                }
-                break;
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
+                *Codec = codec;
+                decoder->CodecMap()->freeCodecContext(Stream);
+                *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
+                return success;
             }
+            break;
         }
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find decoder '%1'").arg(name));
     return failure;
 }
 
@@ -498,10 +505,23 @@ bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoCh
                                                uint Depth, int Width, int Height)
 {
     uint mblocks = static_cast<uint>((Width * Height) / 256);
-    return (Codec == m_codec) && (Format == m_format) && (Depth == m_depth) &&
-           (m_maximum.width() >= Width) && (m_maximum.height() >= Height) &&
-           (m_minimum.width() <= Width) && (m_minimum.height() <= Height) &&
-           (m_macroBlocks >= mblocks);
+
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("Trying to match: Codec %1 Format %2 Depth %3 Width %4 Height %5 MBs %6")
+            .arg(Codec).arg(Format).arg(Depth).arg(Width).arg(Height).arg(mblocks));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("to this profile: Codec %1 Format %2 Depth %3 Width %4<->%5 Height %6<->%7 MBs %8")
+            .arg(m_codec).arg(m_format).arg(m_depth)
+            .arg(m_minimum.width()).arg(m_maximum.width())
+            .arg(m_minimum.height()).arg(m_maximum.height()).arg(m_macroBlocks));
+
+    bool result = (Codec == m_codec) && (Format == m_format) && (Depth == m_depth) &&
+                  (m_maximum.width() >= Width) && (m_maximum.height() >= Height) &&
+                  (m_minimum.width() <= Width) && (m_minimum.height() <= Height) &&
+                  (m_macroBlocks >= mblocks);
+
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1 Match").arg(result ? "" : "NO"));
+    return result;
 }
 
 bool MythNVDECContext::HaveNVDEC(void)
@@ -525,9 +545,9 @@ bool MythNVDECContext::HaveNVDEC(void)
                 LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available NVDEC decoders:");
                 for (auto profile : profiles)
                 {
-                    LOG(VB_GENERAL, LOG_INFO, LOC +
-                        MythCodecContext::GetProfileDescription(profile.m_profile,profile.m_maximum,
-                                                                profile.m_type, profile.m_depth + 8));
+                    QString desc = MythCodecContext::GetProfileDescription(profile.m_profile,profile.m_maximum,
+                                                                           profile.m_type, profile.m_depth + 8);
+                    LOG(VB_GENERAL, LOG_INFO, LOC + desc + QString(" MBs: %1").arg(profile.m_macroBlocks));
                 }
             }
         }

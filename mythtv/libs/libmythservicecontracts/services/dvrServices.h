@@ -210,6 +210,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            uint      PreferredInput,
                                                            int       StartOffset,
                                                            int       EndOffset,
+                                                           QDateTime LastRecorded,
                                                            QString   DupMethod,
                                                            QString   DupIn,
                                                            uint      Filter,

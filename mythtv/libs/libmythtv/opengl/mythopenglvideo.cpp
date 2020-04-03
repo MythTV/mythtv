@@ -1,13 +1,14 @@
-// C/C++
-#include <utility>
-
 // MythTV
 #include "mythcontext.h"
 #include "tv.h"
 #include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "mythopenglvideoshaders.h"
+#include "mythopengltonemap.h"
 #include "mythopenglvideo.h"
+
+// std
+#include <utility>
 
 #define LOC QString("GLVid: ")
 #define MAX_VIDEO_TEXTURES 10 // YV12 Kernel deinterlacer + 1
@@ -68,6 +69,7 @@ MythOpenGLVideo::~MythOpenGLVideo()
 
     m_render->makeCurrent();
     ResetFrameFormat();
+    delete m_toneMap;
     m_render->doneCurrent();
     m_render->DecrRef();
 }
@@ -796,6 +798,10 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
     }
 
+    // Tonemapping can only render to a texture
+    if (m_toneMap)
+        resize |= ToneMap;
+
     // Decide whether to use render to texture - for performance or quality
     if (format_is_yuv(m_outputType) && !resize)
     {
@@ -850,9 +856,10 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     else if (!m_resizing && resize)
     {
         // framebuffer will be created as needed below
-        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Nearest);
-        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
-        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
+        QOpenGLTexture::Filter filter = m_toneMap ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest;
+        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, filter);
+        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, filter);
+        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, filter);
         m_resizing = resize;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Resizing from %1x%2 to %3x%4 for %5")
             .arg(m_videoDispDim.width()).arg(m_videoDispDim.height())
@@ -863,15 +870,39 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     // check hardware frames have the correct filtering
     if (hwframes)
     {
-        QOpenGLTexture::Filter filter = resize ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = (resize && !m_toneMap) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
             MythVideoTexture::SetTextureFilters(m_render, inputtextures, filter);
     }
 
+    // texture coordinates
+    QRect trect(m_videoRect);
+
     if (resize)
     {
+        MythVideoTexture* nexttexture = nullptr;
+
         // only render to the framebuffer if there is something to update
-        if (!useframebufferimage)
+        if (useframebufferimage)
+        {
+            if (m_toneMap)
+            {
+                nexttexture = m_toneMap->GetTexture();
+                trect = QRect(QPoint(0, 0), m_displayVideoRect.size());
+            }
+            else
+            {
+                nexttexture = m_frameBufferTexture;
+            }
+        }
+        else if (m_toneMap)
+        {
+            if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+                m_render->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
+            nexttexture = m_toneMap->Map(inputtextures, m_displayVideoRect.size());
+            trect = QRect(QPoint(0, 0), m_displayVideoRect.size());
+        }
+        else
         {
             // render to texture stage
             if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -896,9 +927,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 
             // coordinates
             QRect vrect(QPoint(0, 0), m_videoDispDim);
-            QRect trect = vrect;
+            QRect trect2 = vrect;
             if (FMT_YUY2 == m_outputType)
-                trect.setWidth(m_videoDispDim.width() >> 1);
+                trect2.setWidth(m_videoDispDim.width() >> 1);
 
             // framebuffer
             m_render->BindFramebuffer(m_frameBuffer);
@@ -911,12 +942,13 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 
             // render
             m_render->DrawBitmap(textures, numtextures, m_frameBuffer,
-                                 trect, vrect, m_shaders[program], 0);
+                                 trect2, vrect, m_shaders[program], 0);
+            nexttexture = m_frameBufferTexture;
         }
 
         // reset for next stage
         inputtextures.clear();
-        inputtextures.push_back(m_frameBufferTexture);
+        inputtextures.push_back(nexttexture);
         program = Default;
         deinterlacing = false;
     }
@@ -925,13 +957,10 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "RENDER_TO_SCREEN");
 
-    // texture coordinates
-    QRect trect(m_videoRect);
-
     // discard stereoscopic fields
     if (kStereoscopicModeSideBySideDiscard == Stereo)
         trect = QRect(trect.left() >> 1, trect.top(), trect.width() >> 1, trect.height());
-    if (kStereoscopicModeTopAndBottomDiscard == Stereo)
+    else if (kStereoscopicModeTopAndBottomDiscard == Stereo)
         trect = QRect(trect.left(), trect.top() >> 1, trect.width(), trect.height() >> 1);
 
     // bind default framebuffer
