@@ -512,7 +512,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString(": Started `%1` URL '%2'")
         .arg(tune).arg(url));
     emit SendMessage("TuneChannel", serial,
-                     QString("OK:Started `%1`").arg(tune));
+                     QString("OK:InProgress `%1`").arg(tune));
 }
 
 Q_SLOT void MythExternRecApp::TuneStatus(const QString & serial)
@@ -521,7 +521,7 @@ Q_SLOT void MythExternRecApp::TuneStatus(const QString & serial)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString(": Tune process(%1) still running").arg(m_tuneProc.pid()));
-        emit SendMessage("TuneStatus", serial, "OK:Running");
+        emit SendMessage("TuneStatus", serial, "OK:InProgress");
         return;
     }
 
