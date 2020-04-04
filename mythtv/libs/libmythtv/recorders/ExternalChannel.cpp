@@ -128,7 +128,7 @@ bool ExternalChannel::Tune(const QString &channum)
         }
 
         UpdateDescription();
-        m_backgroundTuning = result.startsWith("OK:Start");
+        m_backgroundTuning = result.startsWith("OK:InProgress");
     }
 
     return true;
@@ -166,14 +166,14 @@ uint ExternalChannel::GetTuneStatus(void)
     }
     else
     {
-        if (result.startsWith("OK:Running"))
+        if (result.startsWith("OK:InProgress"))
             ret = 1;
         else
         {
             ret = 3;
             m_backgroundTuning = false;
+            UpdateDescription();
         }
-        UpdateDescription();
     }
 
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("GetScriptStatus() %1 -> %2")
