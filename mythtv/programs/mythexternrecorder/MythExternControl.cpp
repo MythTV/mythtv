@@ -173,6 +173,11 @@ void Commands::TuneChannel(const QString & serial, const QString & channum)
     emit m_parent->TuneChannel(serial, channum);
 }
 
+void Commands::TuneStatus(const QString & serial)
+{
+    emit m_parent->TuneStatus(serial);
+}
+
 void Commands::LoadChannels(const QString & serial)
 {
     emit m_parent->LoadChannels(serial);
@@ -186,6 +191,11 @@ void Commands::FirstChannel(const QString & serial)
 void Commands::NextChannel(const QString & serial)
 {
     emit m_parent->NextChannel(serial);
+}
+
+void Commands::Cleanup(void)
+{
+    emit m_parent->Cleanup();
 }
 
 bool Commands::SendStatus(const QString & command, const QString & status)
@@ -309,7 +319,7 @@ bool Commands::ProcessCommand(const QString & cmd)
         else
             SendStatus(cmd, tokens[0], "OK:20");
     }
-    else if (tokens[1].startsWith("LockTimeout"))
+    else if (tokens[1].startsWith("LockTimeout?"))
     {
         LockTimeout(tokens[0]);
     }
@@ -352,10 +362,14 @@ bool Commands::ProcessCommand(const QString & cmd)
     }
     else if (tokens[1].startsWith("TuneChannel"))
     {
-        if (tokens.size() > 1)
+        if (tokens.size() > 2)
             TuneChannel(tokens[0], tokens[2]);
         else
             SendStatus(cmd, tokens[0], "ERR:Missing channum");
+    }
+    else if (tokens[1].startsWith("TuneStatus?"))
+    {
+        TuneStatus(tokens[0]);
     }
     else if (tokens[1].startsWith("LoadChannels"))
     {
@@ -385,6 +399,7 @@ bool Commands::ProcessCommand(const QString & cmd)
             StopStreaming(tokens[0], true);
         m_parent->Terminate();
         SendStatus(cmd, tokens[0], "OK:Terminating");
+        Cleanup();
     }
     else if (tokens[1].startsWith("FlowControl?"))
     {

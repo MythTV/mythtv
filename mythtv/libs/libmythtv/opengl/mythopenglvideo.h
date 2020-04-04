@@ -18,6 +18,8 @@
 using std::vector;
 using std::map;
 
+class MythOpenGLTonemap;
+
 class MythOpenGLVideo : public QObject
 {
     Q_OBJECT
@@ -38,7 +40,8 @@ class MythOpenGLVideo : public QObject
         Deinterlacer = 0x001,
         Sampling     = 0x002,
         Performance  = 0x004,
-        Framebuffer  = 0x008
+        Framebuffer  = 0x008,
+        ToneMap      = 0x010
     };
 
     Q_DECLARE_FLAGS(VideoResizing, VideoResize)
@@ -115,5 +118,6 @@ class MythOpenGLVideo : public QObject
     long long      m_discontinuityCounter   { 0 }; ///< Check when to release reference frames after a skip
     int            m_lastRotation           { 0 }; ///< Track rotation for pause frame
     bool           m_chromaUpsamplingFilter { false }; /// Attempt to fix Chroma Upsampling Error in shaders
+    MythOpenGLTonemap* m_toneMap            { nullptr };
 };
 #endif // MYTH_OPENGL_VIDEO_H_

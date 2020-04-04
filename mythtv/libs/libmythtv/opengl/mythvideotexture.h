@@ -20,6 +20,7 @@ class QMatrix4x4;
 class MythVideoTexture : public MythGLTexture
 {
   public:
+    explicit MythVideoTexture(GLuint Texture);
     static vector<MythVideoTexture*> CreateTextures(MythRenderOpenGL* Context,
                                                     VideoFrameType Type,
                                                     VideoFrameType Format,
@@ -57,7 +58,6 @@ class MythVideoTexture : public MythGLTexture
 
   protected:
     explicit MythVideoTexture(QOpenGLTexture* Texture);
-    explicit MythVideoTexture(GLuint Texture);
 
   private:
     static vector<MythVideoTexture*> CreateHardwareTextures(MythRenderOpenGL* Context,
