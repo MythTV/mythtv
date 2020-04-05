@@ -442,7 +442,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 #if CONFIG_DEBUGTYPE
         if (item->tid())
         {
-            line = QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
+            line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
                 .arg(timestamp, QString(shortname),
                      QString::number(item->pid()),
                      QString::number(item->tid()),
@@ -450,18 +450,18 @@ bool LoggerThread::logConsole(LoggingItem *item) const
                      item->m_file,
                      QString::number(item->m_line),
                      item->m_function,
-                     item->m_message);
+                     item->m_message));
         }
         else
         {
-            line = QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
+            line = qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
                 .arg(timestamp, QString(shortname),
                      QString::number(item->pid()),
                      item->rawThreadName(),
                      item->m_file,
                      QString::number(item->m_line),
                      item->m_function,
-                     item->m_message);
+                     item->m_message));
         }
 #else
         line = qPrintable(QString("%1 %2  %3\n")
