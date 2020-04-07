@@ -2810,7 +2810,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
     else
     {
         TVRec::s_inputsLock.lockForRead();
-        for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
+        for (auto iter = m_encoderList->constBegin(); iter != m_encoderList->constEnd(); ++iter)
         {
             EncoderLink *elink = *iter;
 
@@ -2909,7 +2909,7 @@ void MainServer::DoHandleStopRecording(
     int recnum = -1;
 
     TVRec::s_inputsLock.lockForRead();
-    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
+    for (auto iter = m_encoderList->constBegin(); iter != m_encoderList->constEnd(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -4315,8 +4315,8 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
     EncoderLink *encoder = nullptr;
 
     TVRec::s_inputsLock.lockForRead();
-    auto iter = m_encoderList->find(cardid);
-    if (iter == m_encoderList->end())
+    auto iter = m_encoderList->constFind(cardid);
+    if (iter == m_encoderList->constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleFreeTuner() " +
             QString("Unknown encoder: %1").arg(cardid));
@@ -4479,8 +4479,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     int recnum = commands[1].toInt();
 
     TVRec::s_inputsLock.lockForRead();
-    auto iter = m_encoderList->find(recnum);
-    if (iter == m_encoderList->end())
+    auto iter = m_encoderList->constFind(recnum);
+    if (iter == m_encoderList->constEnd())
     {
         TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleRecorderQuery() " +
@@ -4855,8 +4855,8 @@ void MainServer::HandleSetNextLiveTVDir(QStringList &commands,
     int recnum = commands[1].toInt();
 
     TVRec::s_inputsLock.lockForRead();
-    auto iter = m_encoderList->find(recnum);
-    if (iter == m_encoderList->end())
+    auto iter = m_encoderList->constFind(recnum);
+    if (iter == m_encoderList->constEnd())
     {
         TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC + "MainServer::HandleSetNextLiveTVDir() " +
@@ -4918,8 +4918,8 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     QStringList retlist;
 
     TVRec::s_inputsLock.lockForRead();
-    auto iter = m_encoderList->find(recnum);
-    if (iter == m_encoderList->end())
+    auto iter = m_encoderList->constFind(recnum);
+    if (iter == m_encoderList->constEnd())
     {
         TVRec::s_inputsLock.unlock();
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -7157,7 +7157,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     EncoderLink *encoder = nullptr;
 
     TVRec::s_inputsLock.lockForRead();
-    for (auto iter = m_encoderList->begin(); iter != m_encoderList->end(); ++iter)
+    for (auto iter = m_encoderList->constBegin(); iter != m_encoderList->constEnd(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -7203,8 +7203,8 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     QStringList strlist;
 
     TVRec::s_inputsLock.lockForRead();
-    auto iter = m_encoderList->find(recordernum);
-    if (iter != m_encoderList->end())
+    auto iter = m_encoderList->constFind(recordernum);
+    if (iter != m_encoderList->constEnd())
         encoder =  (*iter);
     TVRec::s_inputsLock.unlock();
 

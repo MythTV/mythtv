@@ -190,7 +190,7 @@ void AutoExpire::CalcParams()
 
             foreach (auto cardid, fsEncoderMap[fsit->getFSysID()])
             {
-                EncoderLink *enc = *(m_encoderList->find(cardid));
+                EncoderLink *enc = *(m_encoderList->constFind(cardid));
 
                 if (!enc->IsConnected() || !enc->IsBusy())
                 {
@@ -541,9 +541,8 @@ void AutoExpire::ExpireRecordings(void)
                 if (!p->IsLocal())
                 {
                     bool foundFile = false;
-                    QMap<int, EncoderLink *>::Iterator eit =
-                         m_encoderList->begin();
-                    while (eit != m_encoderList->end())
+                    auto eit = m_encoderList->constBegin();
+                    while (eit != m_encoderList->constEnd())
                     {
                         EncoderLink *el = *eit;
                         eit++;
@@ -555,7 +554,7 @@ void AutoExpire::ExpireRecordings(void)
                             if (el->IsConnected())
                                 foundFile = el->CheckFile(p);
 
-                            eit = m_encoderList->end();
+                            eit = m_encoderList->constEnd();
                         }
                     }
 
