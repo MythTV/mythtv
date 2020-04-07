@@ -2513,7 +2513,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
+    QMap<int, EncoderLink*>::const_iterator tvit = m_tvList->constFind(ri.GetInputID());
     if (tvit == m_tvList->end())
         return;
 
@@ -2671,7 +2671,7 @@ bool Scheduler::HandleRecording(
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
+    QMap<int, EncoderLink*>::const_iterator tvit = m_tvList->constFind(ri.GetInputID());
     if (tvit == m_tvList->end())
     {
         QString msg = QString("Invalid cardid [%1] for %2")
@@ -3078,8 +3078,8 @@ void Scheduler::HandleIdleShutdown(
         bool recording = false;
         m_schedLock.unlock();
         TVRec::s_inputsLock.lockForRead();
-        QMap<int, EncoderLink *>::Iterator it;
-        for (it = m_tvList->begin(); (it != m_tvList->end()) &&
+        QMap<int, EncoderLink *>::const_iterator it;
+        for (it = m_tvList->constBegin(); (it != m_tvList->constEnd()) &&
                  !recording; ++it)
         {
             if ((*it)->IsBusy())
@@ -3478,7 +3478,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         if (secsleft > sleepThreshold)
             continue;
 
-        if (m_tvList->find(pginfo->GetInputID()) != m_tvList->end())
+        if (m_tvList->constFind(pginfo->GetInputID()) != m_tvList->constEnd())
         {
             EncoderLink *enc = (*m_tvList)[pginfo->GetInputID()];
             if ((!enc->IsLocal()) &&
