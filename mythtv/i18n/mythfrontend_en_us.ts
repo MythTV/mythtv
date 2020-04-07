@@ -12365,7 +12365,7 @@ Error: %1</translation>
         <location filename="../libs/libmythbase/mythsorthelper.cpp" line="16"/>
         <source>^(The |A |An )</source>
         <comment>Regular Expression for what to ignore when sorting</comment>
-        <translation>^(The |A |An)</translation>
+        <translation>^(The |A |An )</translation>
     </message>
 </context>
 <context>
