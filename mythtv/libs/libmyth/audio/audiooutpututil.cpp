@@ -201,7 +201,7 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
 {
     pink_noise_t pink{};
 
-    initialize_pink_noise(&pink, bits);
+    initialize_pink_noise(&pink);
 
     auto *samp16 = (int16_t*) frames;
     auto *samp32 = (int32_t*) frames;

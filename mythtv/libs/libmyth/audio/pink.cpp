@@ -41,13 +41,9 @@ static uint32_t generate_random_number( void )
 void initialize_pink_noise( pink_noise_t *pink, int num_rows )
 {
     pink->pink_index = 0;
-    // Caller wants to pass in 32 for num_rows.  On a 32bit system,
-    // 1<<32 is undefined and Intel and Arm produce different values
-    // for (1<<32)-1.  Calculating with an intermediate uint64_t
-    // solves the problem when num_rows=32, but this will still fail
-    // for larger values.
-    uint64_t tmp = (1ULL << num_rows) - 1;
-    pink->pink_index_mask = (int)tmp;
+    if (num_rows > PINK_MAX_RANDOM_ROWS)
+        num_rows = PINK_MAX_RANDOM_ROWS;
+    pink->pink_index_mask = (1ULL << num_rows) - 1;
 /* Calculate maximum possible signed random value. Extra 1 for white noise always added. */
     int32_t pmax = (num_rows + 1) * (1<<(PINK_RANDOM_BITS-1));
     pink->pink_scalar = 1.0F / pmax;

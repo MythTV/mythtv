@@ -3,6 +3,7 @@
 
 #include "mythexp.h"
 
+#define PINK_DEFAULT_ROWS      (12)
 #define PINK_MAX_RANDOM_ROWS   (30)
 #define PINK_RANDOM_BITS       (24)
 #define PINK_RANDOM_SHIFT      ((sizeof(int32_t)*8)-PINK_RANDOM_BITS)
@@ -16,7 +17,7 @@ struct pink_noise_t
   float     pink_scalar;       /* Used to scale within range of -1.0 to +1.0 */
 };
 
-MPUBLIC void initialize_pink_noise( pink_noise_t *pink, int num_rows );
+MPUBLIC void initialize_pink_noise( pink_noise_t *pink, int num_rows = PINK_DEFAULT_ROWS);
 MPUBLIC float generate_pink_noise_sample( pink_noise_t *pink );
 
 #endif
