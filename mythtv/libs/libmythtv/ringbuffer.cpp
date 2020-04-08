@@ -185,16 +185,16 @@ RingBuffer *RingBuffer::Create(const QString &Filename, bool Write,
     if (!mythurl && imgext && filename.startsWith("dvd:"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD image at " + filename);
-        return new DVDStream(filename);
+        return new MythDVDStream(filename);
     }
 
     if (!mythurl && lower.endsWith(".vob") && filename.contains("/VIDEO_TS/"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD VOB at " + filename);
-        auto *s = new DVDStream(filename);
-        if (s && s->IsOpen())
-            return s;
-        delete s;
+        auto *dvdstream = new MythDVDStream(filename);
+        if (dvdstream && dvdstream->IsOpen())
+            return dvdstream;
+        delete dvdstream;
     }
 
     return new FileRingBuffer(filename, Write, UseReadAhead, Timeout);

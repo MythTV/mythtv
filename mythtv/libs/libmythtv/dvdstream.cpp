@@ -1,4 +1,4 @@
-/* DVD stream
+/* MythDVDStream
  * Copyright 2011 Lawrence Rust <lvr at softsystem dot co dot uk>
  */
 
@@ -25,7 +25,7 @@ extern "C" {
 #define LOC QString("DVDStream: ")
 
 /// \class DVDStream::BlockRange A range of block numbers
-class DVDStream::BlockRange
+class MythDVDStream::BlockRange
 {
   public:
     BlockRange(uint32_t Start, uint32_t Count, int Title)
@@ -63,13 +63,13 @@ inline uint32_t Len2Blocks(uint32_t Length)
 }
 
 /// \class DVDStream Stream content from a DVD image file
-DVDStream::DVDStream(const QString& Filename)
+MythDVDStream::MythDVDStream(const QString& Filename)
   : RingBuffer(kRingBuffer_File)
 {
     OpenFile(Filename);
 }
 
-DVDStream::~DVDStream()
+MythDVDStream::~MythDVDStream()
 {
     KillReadAheadThread();
     m_rwLock.lockForWrite();
@@ -84,7 +84,7 @@ DVDStream::~DVDStream()
  *  \param Filename   Path of the dvd device to read.
  *  \return Returns true if the dvd was opened.
  */
-bool DVDStream::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythDVDStream::OpenFile(const QString &Filename, uint /*Retry*/)
 {
     m_rwLock.lockForWrite();
 
@@ -162,7 +162,7 @@ bool DVDStream::OpenFile(const QString &Filename, uint /*Retry*/)
     return true;
 }
 
-bool DVDStream::IsOpen(void) const
+bool MythDVDStream::IsOpen(void) const
 {
     m_rwLock.lockForRead();
     bool ret = m_reader != nullptr;
@@ -170,7 +170,7 @@ bool DVDStream::IsOpen(void) const
     return ret;
 }
 
-int DVDStream::SafeRead(void *Buffer, uint Size)
+int MythDVDStream::SafeRead(void *Buffer, uint Size)
 {
     uint32_t block = Size / DVD_VIDEO_LB_LEN;
     if (block < 1)
@@ -248,7 +248,7 @@ int DVDStream::SafeRead(void *Buffer, uint Size)
     return ret * DVD_VIDEO_LB_LEN;
 }
 
-long long DVDStream::SeekInternal(long long Position, int Whence)
+long long MythDVDStream::SeekInternal(long long Position, int Whence)
 {
     if (!m_reader)
         return -1;
@@ -273,7 +273,7 @@ long long DVDStream::SeekInternal(long long Position, int Whence)
     return Position;
 }
 
-long long DVDStream::GetReadPosition(void)  const
+long long MythDVDStream::GetReadPosition(void)  const
 {
     m_posLock.lockForRead();
     long long ret = static_cast<long long>(m_pos) * DVD_VIDEO_LB_LEN;

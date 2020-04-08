@@ -16,13 +16,13 @@
 
 using dvd_reader_t = struct dvd_reader_s;
 
-class MTV_PUBLIC DVDStream : public RingBuffer
+class MTV_PUBLIC MythDVDStream : public RingBuffer
 {
   public:
     class BlockRange;
 
-    explicit DVDStream(const QString &Filename);
-    ~DVDStream() override;
+    explicit MythDVDStream(const QString &Filename);
+    ~MythDVDStream() override;
 
     long long GetReadPosition (void) const override;
     bool      IsOpen          (void) const override;
@@ -33,7 +33,7 @@ class MTV_PUBLIC DVDStream : public RingBuffer
     long long SeekInternal    (long long Position, int Whence) override;
 
   private:
-    Q_DISABLE_COPY(DVDStream)
+    Q_DISABLE_COPY(MythDVDStream)
 
     dvd_reader_t     *m_reader { nullptr };
     uint32_t          m_start  { 0       };
