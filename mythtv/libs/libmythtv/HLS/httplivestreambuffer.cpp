@@ -2657,7 +2657,7 @@ void HLSRingBuffer::WaitUntilBuffered(void)
     m_streamworker->Unlock();
 }
 
-int HLSRingBuffer::safe_read(void *data, uint sz)
+int HLSRingBuffer::SafeRead(void *data, uint sz)
 {
     if (m_error)
         return -1;

@@ -898,7 +898,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
 {
     int buf_size                  = m_ringBuffer->BestBufferSize();
     int streamed                  = m_ringBuffer->IsStreamed();
-    m_readContext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    m_readContext.prot            = AVFRingBuffer::GetURLProtocol();
     m_readContext.flags           = AVIO_FLAG_READ;
     m_readContext.is_streamed     = streamed;
     m_readContext.max_packet_size = 0;
@@ -906,9 +906,9 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
     auto *buffer                  = (unsigned char *)av_malloc(buf_size);
     m_ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
                                                       &m_readContext,
-                                                      AVFRingBuffer::AVF_Read_Packet,
-                                                      AVFRingBuffer::AVF_Write_Packet,
-                                                      AVFRingBuffer::AVF_Seek_Packet);
+                                                      AVFRingBuffer::ReadPacket,
+                                                      AVFRingBuffer::WritePacket,
+                                                      AVFRingBuffer::SeekPacket);
 
     // We can always seek during LiveTV
     m_ic->pb->seekable            = !streamed || forceseek;

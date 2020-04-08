@@ -1,8 +1,10 @@
 #ifndef STREAMINGRINGBUFFER_H
 #define STREAMINGRINGBUFFER_H
 
+// MythTV
 #include "ringbuffer.h"
 
+// FFmpeg
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavformat/url.h"
@@ -11,27 +13,25 @@ extern "C" {
 class StreamingRingBuffer : public RingBuffer
 {
   public:
-    explicit StreamingRingBuffer(const QString &lfilename);
+    explicit StreamingRingBuffer(const QString &Filename);
     ~StreamingRingBuffer() override;
 
-    // RingBuffer implementation
-    bool IsOpen(void) const override; // RingBuffer
-    long long GetReadPosition(void) const override; // RingBuffer
-    bool OpenFile(const QString &lfilename,
-                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
-    bool IsStreamed(void) override      { return m_streamed;   } // RingBuffer
-    bool IsSeekingAllowed(void) override { return m_allowSeeks; } // RingBuffer
-    bool IsBookmarkAllowed(void) override { return false; } // RingBuffer
+    bool      IsOpen            (void) const override;
+    long long GetReadPosition   (void) const override;
+    bool      OpenFile          (const QString &Filename, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+    bool      IsStreamed        (void) override { return m_streamed;   }
+    bool      IsSeekingAllowed  (void) override { return m_allowSeeks; }
+    bool      IsBookmarkAllowed (void) override { return false;        }
 
   protected:
-    int safe_read(void *data, uint sz) override; // RingBuffer
-    long long GetRealFileSizeInternal(void) const override; // RingBuffer
-    long long SeekInternal(long long pos, int whence) override; // RingBuffer
+    int       SafeRead          (void *Buffer, uint Size) override;
+    long long GetRealFileSizeInternal(void) const override;
+    long long SeekInternal      (long long Position, int Whence) override;
 
   private:
-    URLContext *m_context    {nullptr};
-    bool        m_streamed   {true};
-    bool        m_allowSeeks {false};
+    URLContext *m_context    { nullptr };
+    bool        m_streamed   { true    };
+    bool        m_allowSeeks { false   };
 };
 
 #endif // STREAMINGRINGBUFFER_H

@@ -4,48 +4,41 @@
 #ifndef DVDSTREAM_H
 #define DVDSTREAM_H
 
-#include <cstdint>
-
+// Qt
 #include <QString>
 #include <QList>
 
+// MythTV
 #include "ringbuffer.h"
+
+// Std
+#include <cstdint>
 
 using dvd_reader_t = struct dvd_reader_s;
 
-
-/**
- * Stream content from a DVD image file
- */
 class MTV_PUBLIC DVDStream : public RingBuffer
 {
-    Q_DISABLE_COPY(DVDStream);
+  public:
+    class BlockRange;
 
-public:
-    explicit DVDStream(const QString &filename);
+    explicit DVDStream(const QString &Filename);
     ~DVDStream() override;
 
-public:
-    // RingBuffer methods
-    long long GetReadPosition(void) const override; // RingBuffer
-    bool IsOpen(void) const override; // RingBuffer
-    bool OpenFile(const QString &lfilename, uint retry_ms = 0) override; // RingBuffer
+    long long GetReadPosition (void) const override;
+    bool      IsOpen          (void) const override;
+    bool      OpenFile        (const QString &Filename, uint Retry = 0) override;
 
-protected:
-    int safe_read(void *data, uint size) override; // RingBuffer
-    long long SeekInternal(long long pos, int whence) override; // RingBuffer
+  protected:
+    int       SafeRead        (void *Buffer, uint Size) override;
+    long long SeekInternal    (long long Position, int Whence) override;
 
-    // Implementation
-private:
-    dvd_reader_t *m_reader {nullptr};
-    uint32_t      m_start  {0};
+  private:
+    Q_DISABLE_COPY(DVDStream)
 
-    class BlockRange;
-    using list_t = QList<BlockRange>;
-    list_t        m_list;   // List of possibly encryoted block ranges
-
-    uint32_t      m_pos    {0};     // Current read position (blocks)
-    int           m_title  {-1};    // Last title decrypted
+    dvd_reader_t     *m_reader { nullptr };
+    uint32_t          m_start  { 0       };
+    QList<BlockRange> m_blocks;             // List of possibly encrypted block ranges
+    uint32_t          m_pos    { 0       }; // Current read position (blocks)
+    int               m_title  { -1      }; // Last title decrypted
 };
-
-#endif /* ndef DVDSTREAM_H */
+#endif

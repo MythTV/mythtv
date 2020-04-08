@@ -2462,12 +2462,12 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-    if (m_playerCtx->m_buffer->GetType() == ICRingBuffer::kRingBufferType)
+    if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
     {
         // Restore original ringbuffer
-        auto *ic = dynamic_cast< ICRingBuffer* >(m_playerCtx->m_buffer);
-        if (ic) // should always be true
-            m_playerCtx->m_buffer = ic->Take();
+        auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
+        if (ic)
+            m_playerCtx->m_buffer = ic->TakeRingBuffer();
         delete ic;
     }
 
@@ -2623,17 +2623,16 @@ void MythPlayer::JumpToProgram(void)
 
     SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
-    if (m_playerCtx->m_buffer->GetType() == ICRingBuffer::kRingBufferType)
+    if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
     {
         // Restore original ringbuffer
-        auto *ic = dynamic_cast< ICRingBuffer* >(m_playerCtx->m_buffer);
-        if (ic) // should always be true
-            m_playerCtx->m_buffer = ic->Take();
+        auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
+        if (ic)
+            m_playerCtx->m_buffer = ic->TakeRingBuffer();
         delete ic;
     }
 
-    m_playerCtx->m_buffer->OpenFile(
-        pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
     QString subfn = m_playerCtx->m_buffer->GetSubtitleFilename();
     TVState desiredState = m_playerCtx->GetState();
     bool isInProgress = (desiredState == kState_WatchingRecording ||
@@ -5288,7 +5287,7 @@ bool MythPlayer::SetStream(const QString &stream)
     // If successful will call m_interactiveTV->StreamStarted();
 
     if (stream.isEmpty() && m_playerCtx->m_tvchain &&
-        m_playerCtx->m_buffer->GetType() == ICRingBuffer::kRingBufferType)
+        m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
     {
         // Restore livetv
         SetEof(kEofStateDelayed);
@@ -5313,7 +5312,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     ProgramInfo pginfo(stream);
     SetPlayingInfo(pginfo);
 
-    if (m_playerCtx->m_buffer->GetType() != ICRingBuffer::kRingBufferType)
+    if (m_playerCtx->m_buffer->GetType() != kRingBuffer_MHEG)
         m_playerCtx->m_buffer = new ICRingBuffer(stream, m_playerCtx->m_buffer);
     else
         m_playerCtx->m_buffer->OpenFile(stream);

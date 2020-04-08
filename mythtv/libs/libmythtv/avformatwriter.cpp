@@ -168,7 +168,7 @@ bool AVFormatWriter::OpenFile(void)
 
     m_avfRingBuffer     = new AVFRingBuffer(m_ringBuffer);
     auto *uc            = (URLContext *)m_ctx->pb->opaque;
-    uc->prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    uc->prot            = AVFRingBuffer::GetURLProtocol();
     uc->priv_data       = (void *)m_avfRingBuffer;
 
     if (avformat_write_header(m_ctx, nullptr) < 0)

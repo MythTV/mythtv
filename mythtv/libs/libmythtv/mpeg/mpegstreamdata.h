@@ -20,7 +20,6 @@ using namespace std;
 
 class EITHelper;
 class PSIPTable;
-class RingBuffer;
 
 using uint_vec_t = vector<uint>;
 

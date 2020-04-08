@@ -1,6 +1,7 @@
 #ifndef ICRINGBUFFER_H
 #define ICRINGBUFFER_H
 
+// MythTV
 #include "ringbuffer.h"
 
 class NetStream;
@@ -8,33 +9,25 @@ class NetStream;
 class ICRingBuffer : public RingBuffer
 {
   public:
-    static enum RingBufferType const kRingBufferType = kRingBuffer_MHEG;
-
-    explicit ICRingBuffer(const QString &url, RingBuffer *parent = nullptr);
+    explicit ICRingBuffer(const QString &Url, RingBuffer *Parent = nullptr);
     ~ICRingBuffer() override;
 
-    // RingBuffer implementation
-    bool IsOpen(void) const override; // RingBuffer
-    long long GetReadPosition(void) const override; // RingBuffer
-    bool OpenFile(const QString &url,
-                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
-    bool IsStreamed(void) override      { return false;  } // RingBuffer
-    bool IsSeekingAllowed(void) override { return true; } // RingBuffer
-    bool IsBookmarkAllowed(void) override { return false; } // RingBuffer
+    bool      IsOpen            (void) const override;
+    long long GetReadPosition   (void) const override;
+    bool      OpenFile          (const QString &Url, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+    bool      IsStreamed        (void) override { return false;  }
+    bool      IsSeekingAllowed  (void) override { return true; }
+    bool      IsBookmarkAllowed (void) override { return false; }
+
+    RingBuffer* TakeRingBuffer(void);
 
   protected:
-    int safe_read(void *data, uint sz) override; // RingBuffer
-    long long GetRealFileSizeInternal(void) const override; // RingBuffer
-    long long SeekInternal(long long pos, int whence) override; // RingBuffer
-
-    // Operations
-  public:
-    // Take ownership of parent RingBuffer
-    RingBuffer *Take();
+    int       SafeRead          (void *Buffer, uint Size) override;
+    long long GetRealFileSizeInternal(void) const override;
+    long long SeekInternal      (long long Position, int Whence) override;
 
   private:
-    NetStream  *m_stream {nullptr};
-    RingBuffer *m_parent {nullptr}; // parent RingBuffer
+    NetStream  *m_stream { nullptr };
+    RingBuffer *m_parent { nullptr };
 };
-
-#endif // ICRINGBUFFER_H
+#endif

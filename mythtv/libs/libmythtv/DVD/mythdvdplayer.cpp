@@ -573,7 +573,7 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
         }
     }
 
-    bool success = m_playerCtx->m_buffer->DVD()->playTrack(Chapter);
+    bool success = m_playerCtx->m_buffer->DVD()->PlayTrack(Chapter);
     if (success)
     {
         if (m_decoder)
@@ -715,7 +715,7 @@ bool MythDVDPlayer::SwitchAngle(int Angle)
     if (Angle < 1 || Angle > total)
         Angle = 1;
 
-    return m_playerCtx->m_buffer->DVD()->SwitchAngle(static_cast<uint>(Angle));
+    return m_playerCtx->m_buffer->DVD()->SwitchAngle(Angle);
 }
 
 void MythDVDPlayer::ResetStillFrameTimer(void)

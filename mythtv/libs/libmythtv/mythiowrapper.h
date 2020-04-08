@@ -1,5 +1,5 @@
-#ifndef __MYTHIOWRAPPER__
-#define __MYTHIOWRAPPER__
+#ifndef MYTHIOWRAPPER_H
+#define MYTHIOWRAPPER_H
 
 #ifdef __cplusplus
 #include <cstring>
@@ -45,6 +45,5 @@ MTV_PUBLIC char   *mythdir_readdir(int dirID);
 #ifdef __cplusplus
 }
 #endif
-
 #endif
 

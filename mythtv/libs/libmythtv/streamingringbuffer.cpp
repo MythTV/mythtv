@@ -1,16 +1,18 @@
+// Qt
 #include <QUrl>
+
+// MythTV
 #include "mythcorecontext.h"
 #include "mythlogging.h"
-
 #include "streamingringbuffer.h"
 
 #define LOC QString("StreamRingBuf(%1): ").arg(m_filename)
 
-StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
+StreamingRingBuffer::StreamingRingBuffer(const QString &Filename)
   : RingBuffer(kRingBuffer_HTTP)
 {
     m_startReadAhead = false;
-    StreamingRingBuffer::OpenFile(lfilename);
+    StreamingRingBuffer::OpenFile(Filename);
 }
 
 StreamingRingBuffer::~StreamingRingBuffer()
@@ -26,7 +28,7 @@ StreamingRingBuffer::~StreamingRingBuffer()
 bool StreamingRingBuffer::IsOpen(void) const
 {
     m_rwLock.lockForRead();
-    bool result = (bool)m_context;
+    bool result = m_context;
     m_rwLock.unlock();
     return result;
 }
@@ -44,27 +46,23 @@ long long StreamingRingBuffer::GetReadPosition(void) const
  *                     inherited from the parent class.
  *  \return Returns true if the stream was opened.
  */
-bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
+bool StreamingRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
 {
     RingBuffer::AVFormatInitNetwork();
 
     m_rwLock.lockForWrite();
 
-    m_safeFilename = lfilename;
-    m_filename = lfilename;
+    m_safeFilename = Filename;
+    m_filename = Filename;
 
     // TODO check whether local area file
 
     QUrl url = m_filename;
     if (url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive))
-    {
         url.setScheme("hls+http");
-    }
 
-    int res = ffurl_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ,
-                         nullptr, nullptr);
-    if (res >=0 && m_context &&
-        !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)
+    int res = ffurl_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ, nullptr, nullptr);
+    if (res >= 0 && m_context && !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)
     {
         m_streamed   = false;
         m_allowSeeks = true;
@@ -75,25 +73,23 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     if (res < 0 || !m_context)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to open stream (error %1)") .arg(res));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open stream (error %1)") .arg(res));
         m_lastError = QObject::tr("Failed to open stream (%1)").arg(res);
         m_rwLock.unlock();
         return false;
     }
 
     m_rwLock.unlock();
-
     return true;
 }
 
-long long StreamingRingBuffer::SeekInternal(long long pos, int whence)
+long long StreamingRingBuffer::SeekInternal(long long Position, int Whence)
 {
     if (!m_context)
         return 0;
 
     m_posLock.lockForWrite();
-    int seek = ffurl_seek(m_context, pos, whence);
+    int seek = static_cast<int>(ffurl_seek(m_context, Position, Whence));
     m_posLock.unlock();
 
     if (seek < 0)
@@ -101,24 +97,23 @@ long long StreamingRingBuffer::SeekInternal(long long pos, int whence)
         m_ateof = true;
         return 0;
     }
-    return pos;
+    return Position;
 }
 
-int StreamingRingBuffer::safe_read(void *data, uint sz)
+int StreamingRingBuffer::SafeRead(void *Buffer, uint Size)
 {
-    uint len = 0;
+    int len = 0;
 
     if (m_context)
     {
-        while (len < sz)
+        while (len < static_cast<int>(Size))
         {
-            int ret = ffurl_read(m_context, (unsigned char*)data + len, sz - len);
+            int ret = ffurl_read(m_context, static_cast<unsigned char*>(Buffer) + len,
+                                 static_cast<int>(Size) - len);
             if (ret < 0)
             {
                 if (ret == AVERROR_EOF)
-                {
                     m_ateof = true;
-                }
                 errno = ret;
                 break;
             }

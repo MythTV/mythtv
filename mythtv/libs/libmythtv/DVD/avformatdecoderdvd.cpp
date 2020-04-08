@@ -247,7 +247,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t pts)
 
                     if (lastVideoSector != INVALID_LBA)
                     {
-                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString( "Missing video.  Jumping to sector %1")
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Missing video.  Jumping to sector %1")
                             .arg(lastVideoSector));
 
                         m_ringBuffer->DVD()->SectorSeek(lastVideoSector);

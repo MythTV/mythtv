@@ -1,33 +1,30 @@
-#include "icringbuffer.h"
-
-#include <cstdio> // SEEK_SET
-
+// Qt
 #include <QScopedPointer>
 #include <QWriteLocker>
 
+// Mythtv
 #include "netstream.h"
 #include "mythlogging.h"
+#include "icringbuffer.h"
 
+// Std
+#include <cstdio>
 
-#define LOC QString("ICRingBuf ")
+#define LOC QString("ICRingBuf: ")
 
-
-ICRingBuffer::ICRingBuffer(const QString &url, RingBuffer *parent)
-  : RingBuffer(kRingBufferType), m_parent(parent)
+ICRingBuffer::ICRingBuffer(const QString &Url, RingBuffer *Parent)
+  : RingBuffer(kRingBuffer_MHEG),
+    m_parent(Parent)
 {
     m_startReadAhead = true;
-    ICRingBuffer::OpenFile(url);
+    OpenFile(Url);
 }
 
 ICRingBuffer::~ICRingBuffer()
 {
     KillReadAheadThread();
-
     delete m_stream;
-    m_stream = nullptr;
-
     delete m_parent;
-    m_parent = nullptr;
 }
 
 bool ICRingBuffer::IsOpen(void) const
@@ -38,29 +35,27 @@ bool ICRingBuffer::IsOpen(void) const
 /** \fn ICRingBuffer::OpenFile(const QString &, uint)
  *  \brief Opens a BBC NetStream for reading.
  *
- *  \param url         Url of the stream to read.
- *  \param retry_ms    Ignored. This value is part of the API
- *                     inherited from the parent class.
+ *  \param Url   Url of the stream to read.
  *  \return Returns true if the stream was opened.
  */
-bool ICRingBuffer::OpenFile(const QString &url, uint /*retry_ms*/)
+bool ICRingBuffer::OpenFile(const QString &Url, uint /*Retry*/)
 {
-    if (!NetStream::IsSupported(url))
+    if (!NetStream::IsSupported(Url))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported URL %1").arg(url) );
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported URL '%1'").arg(Url));
         return false;
     }
 
-    QScopedPointer<NetStream> stream(new NetStream(url, NetStream::kNeverCache));
-    if (!stream || !stream->IsOpen())
+    QScopedPointer<NetStream> stream(new NetStream(Url, NetStream::kNeverCache));
+    if (!stream || (stream && !stream->IsOpen()))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open %1").arg(url) );
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'").arg(Url));
         return false;
     }
 
     if (!stream->WaitTillReady(30000))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Stream not ready%1").arg(url) );
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Stream not ready '%1'").arg(Url));
         return false;
     }
 
@@ -69,8 +64,8 @@ bool ICRingBuffer::OpenFile(const QString &url, uint /*retry_ms*/)
 
     QWriteLocker locker(&m_rwLock);
 
-    m_safeFilename = url;
-    m_filename = url;
+    m_safeFilename = Url;
+    m_filename = Url;
 
     delete m_stream;
     m_stream = stream.take();
@@ -85,7 +80,7 @@ bool ICRingBuffer::OpenFile(const QString &url, uint /*retry_ms*/)
     locker.unlock();
     Reset(true, false, true);
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened %1").arg(url));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened '%1'").arg(Url));
     return true;
 }
 
@@ -94,67 +89,57 @@ long long ICRingBuffer::GetReadPosition(void) const
     return m_stream ? m_stream->GetReadPosition() : 0;
 }
 
-long long ICRingBuffer::SeekInternal(long long pos, int whence)
+long long ICRingBuffer::SeekInternal(long long Position, int Whence)
 {
+    long long result = -1;
     if (!m_stream)
-        return -1;
+        return result;
 
-    m_posLock.lockForWrite();
-
-    long long ret = 0;
+    QWriteLocker locker(&m_posLock);
 
     // Optimize no-op seeks
-    if (m_readAheadRunning &&
-        ((whence == SEEK_SET && pos == m_readPos) ||
-         (whence == SEEK_CUR && pos == 0)))
+    if (m_readAheadRunning && ((Whence == SEEK_SET && Position == m_readPos) ||
+                               (Whence == SEEK_CUR && Position == 0)))
     {
-        ret = m_readPos;
-
-        m_posLock.unlock();
-
-        return ret;
+        result = m_readPos;
+        return result;
     }
 
-    switch (whence)
+    switch (Whence)
     {
-        case SEEK_SET:
-            break;
+        case SEEK_SET: break;
         case SEEK_CUR:
-            pos += m_stream->GetReadPosition();
+            Position += m_stream->GetReadPosition();
             break;
         case SEEK_END:
-            pos += m_stream->GetSize();
+            Position += m_stream->GetSize();
             break;
         default:
             errno = EINVAL;
-            ret = -1;
-            goto err;
+            m_generalWait.wakeAll();
+            return result;
     }
 
-    ret = m_stream->Seek(pos);
-    if (ret >= 0)
+    result = m_stream->Seek(Position);
+    if (result >= 0)
     {
-        m_readPos = ret;
-
+        m_readPos = result;
         m_ignoreReadPos = -1;
-
         if (m_readAheadRunning)
             ResetReadAhead(m_readPos);
-
         m_readAdjust = 0;
     }
 
-err:
-    m_posLock.unlock();
-
     m_generalWait.wakeAll();
-
-    return ret;
+    return result;
 }
 
-int ICRingBuffer::safe_read(void *data, uint sz)
+int ICRingBuffer::SafeRead(void *Buffer, uint Size)
 {
-    return m_stream ? m_stream->safe_read(data, sz, 1000) : (m_ateof = true, 0);
+    if (m_stream)
+        return m_stream->safe_read(Buffer, Size, 1000);
+    m_ateof = true;
+    return 0;
 }
 
 long long ICRingBuffer::GetRealFileSizeInternal(void) const
@@ -162,8 +147,7 @@ long long ICRingBuffer::GetRealFileSizeInternal(void) const
     return m_stream ? m_stream->GetSize() : -1;
 }
 
-// Take ownership of parent RingBuffer
-RingBuffer *ICRingBuffer::Take()
+RingBuffer *ICRingBuffer::TakeRingBuffer(void)
 {
     RingBuffer *parent = m_parent;
     if (parent && IsOpen())
@@ -171,5 +155,3 @@ RingBuffer *ICRingBuffer::Take()
     m_parent = nullptr;
     return parent;
 }
-
-// End of file
