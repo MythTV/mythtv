@@ -9,7 +9,7 @@
 
 // MythTV
 #include "mythlogging.h"
-#include "dvdstream.h"
+#include "mythdvdstream.h"
 
 // Std
 #include <algorithm>

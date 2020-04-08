@@ -243,9 +243,6 @@ HEADERS += channelscan/iptvchannelfetcher.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 SOURCES += channelscan/iptvchannelfetcher.cpp
 
-HEADERS += dvdstream.h
-SOURCES += dvdstream.cpp
-
 # subtitles: srt
 HEADERS += srtwriter.h
 SOURCES += srtwriter.cpp
@@ -292,9 +289,11 @@ win32-msvc*|freebsd {
 HEADERS += DVD/mythdvdbuffer.h
 HEADERS += DVD/mythdvdcontext.h
 HEADERS += DVD/mythdvdinfo.h
+HEADERS += DVD/mythdvdstream.h
 SOURCES += DVD/mythdvdbuffer.cpp
 SOURCES += DVD/mythdvdcontext.cpp
 SOURCES += DVD/mythdvdinfo.cpp
+SOURCES += DVD/mythdvdstream.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
     SOURCES += DVD/mythdvdplayer.cpp
