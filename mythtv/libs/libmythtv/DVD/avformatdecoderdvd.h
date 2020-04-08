@@ -11,11 +11,11 @@
 
 class MythDVDContext;
 
-class AvFormatDecoderDVD : public AvFormatDecoder
+class MythDVDDecoder : public AvFormatDecoder
 {
   public:
-    AvFormatDecoderDVD(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags);
-    ~AvFormatDecoderDVD() override;
+    MythDVDDecoder(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags);
+    ~MythDVDDecoder() override;
 
     void Reset             (bool ResetVideoData, bool SeekReset, bool ResetFile) override;
     void UpdateFramesPlayed(void) override;

@@ -758,10 +758,6 @@ void MythDVDPlayer::StillFrameCheck(void)
 
 void MythDVDPlayer::CreateDecoder(char *Testbuf, int TestReadSize)
 {
-    if (AvFormatDecoderDVD::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename(),
-                                      TestReadSize))
-    {
-        SetDecoder(new AvFormatDecoderDVD(this, *m_playerCtx->m_playingInfo,
-                                          m_playerFlags));
-    }
+    if (MythDVDDecoder::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename(), TestReadSize))
+        SetDecoder(new MythDVDDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }

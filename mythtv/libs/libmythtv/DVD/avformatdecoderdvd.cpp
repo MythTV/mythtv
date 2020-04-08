@@ -14,12 +14,12 @@ extern "C" {
 
 #define LOC QString("DVDDec: ")
 
-AvFormatDecoderDVD::AvFormatDecoderDVD(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags)
+MythDVDDecoder::MythDVDDecoder(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags)
   : AvFormatDecoder(Parent, PGInfo, Flags)
 {
 }
 
-AvFormatDecoderDVD::~AvFormatDecoderDVD()
+MythDVDDecoder::~MythDVDDecoder()
 {
     ReleaseContext(m_curContext);
     ReleaseContext(m_returnContext);
@@ -30,7 +30,7 @@ AvFormatDecoderDVD::~AvFormatDecoderDVD()
     ReleaseLastVideoPkt();
 }
 
-void AvFormatDecoderDVD::ReleaseLastVideoPkt(void)
+void MythDVDDecoder::ReleaseLastVideoPkt(void)
 {
     if (m_lastVideoPkt)
     {
@@ -41,7 +41,7 @@ void AvFormatDecoderDVD::ReleaseLastVideoPkt(void)
     }
 }
 
-void AvFormatDecoderDVD::ReleaseContext(MythDVDContext *&Context)
+void MythDVDDecoder::ReleaseContext(MythDVDContext *&Context)
 {
     if (Context)
     {
@@ -50,14 +50,14 @@ void AvFormatDecoderDVD::ReleaseContext(MythDVDContext *&Context)
     }
 }
 
-void AvFormatDecoderDVD::Reset(bool ResetVideoData, bool SeekReset, bool ResetFile)
+void MythDVDDecoder::Reset(bool ResetVideoData, bool SeekReset, bool ResetFile)
 {
     AvFormatDecoder::Reset(ResetVideoData, SeekReset, ResetFile);
     SyncPositionMap();
 }
 
 
-void AvFormatDecoderDVD::UpdateFramesPlayed(void)
+void MythDVDDecoder::UpdateFramesPlayed(void)
 {
     if (!m_ringBuffer->IsDVD())
         return;
@@ -67,13 +67,13 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(static_cast<uint64_t>(currentpos + 1));
 }
 
-bool AvFormatDecoderDVD::GetFrame(DecodeType /*Type*/, bool &Retry)
+bool MythDVDDecoder::GetFrame(DecodeType /*Type*/, bool &Retry)
 {
     // Always try to decode audio and video for DVDs
     return AvFormatDecoder::GetFrame(kDecodeAV, Retry);
 }
 
-int AvFormatDecoderDVD::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StorePacket)
+int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StorePacket)
 {
     int result = 0;
 
@@ -195,7 +195,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& St
     return result;
 }
 
-void AvFormatDecoderDVD::CheckContext(int64_t Pts)
+void MythDVDDecoder::CheckContext(int64_t Pts)
 {
     if (Pts != AV_NOPTS_VALUE)
     {
@@ -263,7 +263,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t Pts)
 }
 
 
-bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &Retry)
+bool MythDVDDecoder::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &Retry)
 {
     int64_t pts = Pkt->pts;
 
@@ -326,7 +326,7 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, boo
     return ret;
 }
 
-bool AvFormatDecoderDVD::ProcessVideoFrame(AVStream *Stream, AVFrame *Frame)
+bool MythDVDDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *Frame)
 {
     bool ret = true;
 
@@ -340,7 +340,7 @@ bool AvFormatDecoderDVD::ProcessVideoFrame(AVStream *Stream, AVFrame *Frame)
     return ret;
 }
 
-bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *Curstream, AVPacket *Pkt,
+bool MythDVDDecoder::ProcessDataPacket(AVStream *Curstream, AVPacket *Pkt,
                                            DecodeType Decodetype)
 {
     bool ret = true;
@@ -386,7 +386,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *Curstream, AVPacket *Pkt,
     return ret;
 }
 
-void AvFormatDecoderDVD::PostProcessTracks(void)
+void MythDVDDecoder::PostProcessTracks(void)
 {
     if (!m_ringBuffer)
         return;
@@ -525,7 +525,7 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     }
 }
 
-bool AvFormatDecoderDVD::DoRewindSeek(long long DesiredFrame)
+bool MythDVDDecoder::DoRewindSeek(long long DesiredFrame)
 {
     if (!m_ringBuffer->IsDVD())
         return false;
@@ -536,7 +536,7 @@ bool AvFormatDecoderDVD::DoRewindSeek(long long DesiredFrame)
     return true;
 }
 
-void AvFormatDecoderDVD::DoFastForwardSeek(long long DesiredFrame, bool &NeedFlush)
+void MythDVDDecoder::DoFastForwardSeek(long long DesiredFrame, bool &NeedFlush)
 {
     if (!m_ringBuffer->IsDVD())
         return;
@@ -547,7 +547,7 @@ void AvFormatDecoderDVD::DoFastForwardSeek(long long DesiredFrame, bool &NeedFlu
     m_frameCounter += 100;
 }
 
-void AvFormatDecoderDVD::StreamChangeCheck(void)
+void MythDVDDecoder::StreamChangeCheck(void)
 {
     if (!m_ringBuffer->IsDVD())
         return;
@@ -588,7 +588,7 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
     }
 }
 
-int AvFormatDecoderDVD::GetAudioLanguage(uint /*AudioIndex*/, uint StreamIndex)
+int MythDVDDecoder::GetAudioLanguage(uint /*AudioIndex*/, uint StreamIndex)
 {
     if ((m_ic->streams[StreamIndex]->id >= 0) && (m_ringBuffer && m_ringBuffer->IsDVD()))
     {
@@ -598,7 +598,7 @@ int AvFormatDecoderDVD::GetAudioLanguage(uint /*AudioIndex*/, uint StreamIndex)
     return iso639_str3_to_key("und");
 }
 
-long long AvFormatDecoderDVD::DVDFindPosition(long long DesiredFrame)
+long long MythDVDDecoder::DVDFindPosition(long long DesiredFrame)
 {
     if (!m_ringBuffer->IsDVD())
         return 0;
@@ -628,7 +628,7 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long DesiredFrame)
     return current_speed;
 }
 
-AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint Index)
+AudioTrackType MythDVDDecoder::GetAudioTrackType(uint Index)
 {
     int type = 0;
 
