@@ -168,7 +168,7 @@ RingBuffer *RingBuffer::Create(const QString &Filename, bool Write,
         if (!(mythurl || QFile::exists(filename)))
             filename = "/dev/dvd";
         LOG(VB_PLAYBACK, LOG_INFO, "Trying DVD at " + filename);
-        return new DVDRingBuffer(filename);
+        return new MythDVDBuffer(filename);
     }
 
     if (!StreamOnly && (bdurl || bddir))
@@ -1846,9 +1846,9 @@ bool RingBuffer::IsBD(void) const
     return m_type == kRingBuffer_BD;
 }
 
-const DVDRingBuffer *RingBuffer::DVD(void) const
+const MythDVDBuffer *RingBuffer::DVD(void) const
 {
-    return dynamic_cast<const DVDRingBuffer*>(this);
+    return dynamic_cast<const MythDVDBuffer*>(this);
 }
 
 const BDRingBuffer  *RingBuffer::BD(void) const
@@ -1856,9 +1856,9 @@ const BDRingBuffer  *RingBuffer::BD(void) const
     return dynamic_cast<const BDRingBuffer*>(this);
 }
 
-DVDRingBuffer *RingBuffer::DVD(void)
+MythDVDBuffer *RingBuffer::DVD(void)
 {
-    return dynamic_cast<DVDRingBuffer*>(this);
+    return dynamic_cast<MythDVDBuffer*>(this);
 }
 
 BDRingBuffer  *RingBuffer::BD(void)

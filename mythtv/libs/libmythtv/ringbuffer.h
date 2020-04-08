@@ -30,7 +30,7 @@ extern "C" {
 #define DEFAULT_CHUNK_SIZE 32768
 
 class ThreadedFileWriter;
-class DVDRingBuffer;
+class MythDVDBuffer;
 class BDRingBuffer;
 class LiveTVChain;
 class RemoteFile;
@@ -87,8 +87,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     bool      IsDisc               (void) const;
     bool      IsDVD                (void) const;
     bool      IsBD                 (void) const;
-    const DVDRingBuffer *DVD       (void) const;
-    DVDRingBuffer       *DVD       (void);
+    const MythDVDBuffer *DVD       (void) const;
+    MythDVDBuffer       *DVD       (void);
     const BDRingBuffer  *BD        (void) const;
     BDRingBuffer        *BD        (void);
     int       Read                 (void *Buffer, int Count);

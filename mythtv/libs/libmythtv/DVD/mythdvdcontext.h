@@ -15,7 +15,7 @@
  */
 class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 {
-    friend class DVDRingBuffer;
+    friend class MythDVDBuffer;
 
   public:
     MythDVDContext() = delete;

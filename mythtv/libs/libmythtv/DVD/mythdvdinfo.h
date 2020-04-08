@@ -12,7 +12,7 @@
 
 class MTV_PUBLIC MythDVDInfo
 {
-    friend class DVDRingBuffer;
+    friend class MythDVDBuffer;
     Q_DECLARE_TR_FUNCTIONS(DVDInfo)
 
   public:

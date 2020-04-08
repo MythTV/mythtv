@@ -8349,7 +8349,7 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
         return;
     }
 
-    DVDRingBuffer *dvd = ctx->m_buffer->DVD();
+    MythDVDBuffer *dvd = ctx->m_buffer->DVD();
     QString dvdName;
     QString dvdSerial;
     QString mainStatus;
@@ -12696,22 +12696,22 @@ void TV::DoSeekRWND(PlayerContext *ctx)
 */
 void TV::DVDJumpBack(PlayerContext *ctx)
 {
-    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
-    if (!ctx->HasPlayer() || !dvdrb)
+    auto *dvd = dynamic_cast<MythDVDBuffer*>(ctx->m_buffer);
+    if (!ctx->HasPlayer() || !dvd)
         return;
 
     if (ctx->m_buffer->IsInDiscMenuOrStillFrame())
     {
         UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), kOSDTimeout_Med);
     }
-    else if (!dvdrb->StartOfTitle())
+    else if (!dvd->StartOfTitle())
     {
         DoJumpChapter(ctx, -1);
     }
     else
     {
-        uint titleLength = dvdrb->GetTotalTimeOfTitle();
-        uint chapterLength = dvdrb->GetChapterLength();
+        uint titleLength = dvd->GetTotalTimeOfTitle();
+        uint chapterLength = dvd->GetChapterLength();
         if ((titleLength == chapterLength) && chapterLength > 300)
         {
             DoSeek(ctx, -ctx->m_jumptime * 60, tr("Jump Back"),
@@ -12735,26 +12735,26 @@ void TV::DVDJumpBack(PlayerContext *ctx)
  */
 void TV::DVDJumpForward(PlayerContext *ctx)
 {
-    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
-    if (!ctx->HasPlayer() || !dvdrb)
+    auto *dvd = dynamic_cast<MythDVDBuffer*>(ctx->m_buffer);
+    if (!ctx->HasPlayer() || !dvd)
         return;
 
-    bool in_still = dvdrb->IsInStillFrame();
-    bool in_menu  = dvdrb->IsInMenu();
-    if (in_still && !dvdrb->NumMenuButtons())
+    bool in_still = dvd->IsInStillFrame();
+    bool in_menu  = dvd->IsInMenu();
+    if (in_still && !dvd->NumMenuButtons())
     {
-        dvdrb->SkipStillFrame();
+        dvd->SkipStillFrame();
         UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), kOSDTimeout_Med);
     }
-    else if (!dvdrb->EndOfTitle() && !in_still && !in_menu)
+    else if (!dvd->EndOfTitle() && !in_still && !in_menu)
     {
         DoJumpChapter(ctx, 9999);
     }
     else if (!in_still && !in_menu)
     {
-        uint titleLength = dvdrb->GetTotalTimeOfTitle();
-        uint chapterLength = dvdrb->GetChapterLength();
-        uint currentTime = (uint)dvdrb->GetCurrentTime();
+        uint titleLength = dvd->GetTotalTimeOfTitle();
+        uint chapterLength = dvd->GetChapterLength();
+        uint currentTime = (uint)dvd->GetCurrentTime();
         if ((titleLength == chapterLength) &&
              (currentTime < (chapterLength - (ctx->m_jumptime * 60))) &&
              chapterLength > 300)

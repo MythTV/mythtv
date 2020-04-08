@@ -31,13 +31,13 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MTV_PUBLIC DVDRingBuffer : public RingBuffer
+class MTV_PUBLIC MythDVDBuffer : public RingBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
 
   public:
-    explicit DVDRingBuffer(const QString &Filename);
-    ~DVDRingBuffer() override;
+    explicit MythDVDBuffer(const QString &Filename);
+    ~MythDVDBuffer() override;
 
     bool      IsOpen               (void) const override;
     bool      IsBookmarkAllowed    (void) override;
