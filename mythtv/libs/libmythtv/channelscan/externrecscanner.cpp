@@ -120,9 +120,10 @@ void ExternRecChannelScanner::run(void)
     QString name;
     QString callsign;
     QString xmltvid;
+    QString icon;
     int     cnt = 0;
 
-    if (!fetch.FirstChannel(channum, name, callsign, xmltvid))
+    if (!fetch.FirstChannel(channum, name, callsign, xmltvid, icon))
     {
         LOG(VB_CHANNEL, LOG_WARNING, LOC + "No channels found.");
         QMutexLocker locker(&m_lock);
@@ -156,7 +157,7 @@ void ExternRecChannelScanner::run(void)
             ChannelUtil::CreateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, kChannelVisible, QString(),
-                                       QString(), "Default", xmltvid);
+                                       icon, "Default", xmltvid);
         }
         else
         {
@@ -166,7 +167,7 @@ void ExternRecChannelScanner::run(void)
             ChannelUtil::UpdateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, kChannelVisible, QString(),
-                                       QString(), "Default", xmltvid);
+                                       icon, "Default", xmltvid);
         }
 
         SetNumChannelsInserted(cnt);
@@ -178,7 +179,7 @@ void ExternRecChannelScanner::run(void)
         }
 
         if (++idx < m_channelTotal)
-            fetch.NextChannel(channum, name, callsign, xmltvid);
+            fetch.NextChannel(channum, name, callsign, xmltvid, icon);
         else
             break;
     }

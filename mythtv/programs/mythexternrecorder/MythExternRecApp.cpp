@@ -396,15 +396,17 @@ void MythExternRecApp::GetChannel(const QString & serial, const QString & func)
     QString name     = m_chanSettings->value("NAME").toString();
     QString callsign = m_chanSettings->value("CALLSIGN").toString();
     QString xmltvid  = m_chanSettings->value("XMLTVID").toString();
+    QString icon     = m_chanSettings->value("ICON").toString();
 
     m_chanSettings->endGroup();
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString(": NextChannel Name:'%1',Callsign:'%2',xmltvid:%3")
-        .arg(name).arg(callsign).arg(xmltvid));
+        QString(": NextChannel Name:'%1',Callsign:'%2',xmltvid:%3,Icon:%4")
+        .arg(name).arg(callsign).arg(xmltvid).arg(icon));
 
-    emit SendMessage(func, serial, QString("OK:%1,%2,%3,%4")
-                     .arg(channum).arg(name).arg(callsign).arg(xmltvid));
+    emit SendMessage(func, serial, QString("OK:%1,%2,%3,%4,%5")
+                     .arg(channum).arg(name).arg(callsign)
+                     .arg(xmltvid).arg(icon));
 }
 
 Q_SLOT void MythExternRecApp::FirstChannel(const QString & serial)

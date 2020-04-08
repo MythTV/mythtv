@@ -35,18 +35,22 @@ class ExternalRecChannelFetcher
     bool FirstChannel(QString & channum,
                       QString & name,
                       QString & callsign,
-                      QString & xmltvid)
+                      QString & xmltvid,
+                      QString & icon)
     {
-        return FetchChannel("FirstChannel", channum, name, callsign, xmltvid);
+        return FetchChannel("FirstChannel", channum, name, callsign,
+                            xmltvid, icon);
     }
     bool NextChannel(QString & channum,
                      QString & name,
                      QString & callsign,
-                     QString & xmltvid)
+                     QString & xmltvid,
+                     QString & icon)
     {
-        return FetchChannel("NextChannel", channum, name, callsign, xmltvid);
-    }
+        return FetchChannel("NextChannel", channum, name, callsign,
+                            xmltvid, icon);
 
+    }
 
   protected:
     void Close(void);
@@ -54,7 +58,8 @@ class ExternalRecChannelFetcher
                       QString & channum,
                       QString & name,
                       QString & callsign,
-                      QString & xmltvid);
+                      QString & xmltvid,
+                      QString & icon);
 
 
   private:
