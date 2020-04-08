@@ -298,8 +298,8 @@ SOURCES += DVD/mythdvdinfo.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
     SOURCES += DVD/mythdvdplayer.cpp
-    HEADERS += DVD/avformatdecoderdvd.h
-    SOURCES += DVD/avformatdecoderdvd.cpp
+    HEADERS += DVD/mythdvddecoder.h
+    SOURCES += DVD/mythdvddecoder.cpp
 }
 LIBS += -L../../external/libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION

@@ -2,7 +2,7 @@
 #include "mythdvdbuffer.h"
 #include "DetectLetterbox.h"
 #include "audiooutput.h"
-#include "avformatdecoderdvd.h"
+#include "mythdvddecoder.h"
 #include "mythdvdplayer.h"
 
 // Std

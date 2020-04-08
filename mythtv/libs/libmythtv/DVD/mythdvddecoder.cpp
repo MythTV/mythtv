@@ -2,7 +2,7 @@
 #include "iso639.h"
 #include "mythdvdbuffer.h"
 #include "mythdvdplayer.h"
-#include "avformatdecoderdvd.h"
+#include "mythdvddecoder.h"
 
 // FFmpeg
 extern "C" {
