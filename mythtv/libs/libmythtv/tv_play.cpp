@@ -51,7 +51,7 @@ using namespace std;
 #include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
 
 // libmythtv
-#include "DVD/dvdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
 #include "Bluray/bdringbuffer.h"
 #include "remoteencoder.h"
 #include "tvremoteutil.h"

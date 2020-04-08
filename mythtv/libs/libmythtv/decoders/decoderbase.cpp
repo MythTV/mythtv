@@ -9,7 +9,7 @@ using namespace std;
 #include "decoderbase.h"
 #include "programinfo.h"
 #include "iso639.h"
-#include "DVD/dvdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
 #include "Bluray/bdringbuffer.h"
 #include "mythcodeccontext.h"
 

@@ -1,5 +1,5 @@
-#ifndef DVD_RING_BUFFER_H_
-#define DVD_RING_BUFFER_H_
+#ifndef MYTH_DVD_BUFFER_H_
+#define MYTH_DVD_BUFFER_H_
 
 // Qt
 #include <QMap>
@@ -23,17 +23,11 @@ extern "C" {
 #define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
-/** \class DVDRingBufferPriv
- *  \brief RingBuffer class for DVD's
- *
- *   A spiffy little class to allow a RingBuffer to read from DVDs.
- */
-
 class MythDVDPlayer;
 
 class MTV_PUBLIC MythDVDBuffer : public RingBuffer
 {
-    Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
+    Q_DECLARE_TR_FUNCTIONS(MythDVDBuffer)
 
   public:
     explicit MythDVDBuffer(const QString &Filename);

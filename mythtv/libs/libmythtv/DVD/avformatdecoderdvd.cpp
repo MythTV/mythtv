@@ -1,5 +1,5 @@
 
-#include "dvdringbuffer.h"
+#include "mythdvdbuffer.h"
 #include "mythdvdplayer.h"
 #include "avformatdecoderdvd.h"
 

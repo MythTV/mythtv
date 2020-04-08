@@ -34,7 +34,7 @@ using namespace std;
 #include "interactivetv.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
-#include "DVD/dvdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
 #include "Bluray/bdringbuffer.h"
 #include "mythavutil.h"
 

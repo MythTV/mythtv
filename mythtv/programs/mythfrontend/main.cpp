@@ -103,7 +103,7 @@ using namespace std;
 #include "gallerythumbview.h"
 
 // DVD & Bluray
-#include "DVD/dvdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
 #include "Bluray/bdringbuffer.h"
 
 // AirPlay

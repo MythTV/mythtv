@@ -18,7 +18,7 @@
 #include "mythdate.h"
 #include "mythtimer.h"
 #include "mythlogging.h"
-#include "DVD/dvdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
 #include "Bluray/bdringbuffer.h"
 #include "HLS/httplivestreambuffer.h"
 #include "mythcdrom.h"

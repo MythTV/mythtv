@@ -12,7 +12,7 @@
 #include "mythuihelper.h"
 #include "mythuiactions.h"
 #include "tv_actions.h"
-#include "dvdringbuffer.h"
+#include "mythdvdbuffer.h"
 
 // Std
 #include <cstdlib>
@@ -250,7 +250,7 @@ void MythDVDBuffer::GetDescForPos(QString &Description)
     }
 }
 
-/** \fn DVDRingBuffer::OpenFile(const QString &, uint)
+/** \fn MythDVDBuffer::OpenFile(const QString &, uint)
  *  \brief Opens a dvd device for reading.
  *
  *  \param lfilename   Path of the dvd device to read.
@@ -1870,7 +1870,7 @@ void MythDVDBuffer::SetTrack(uint Type, int TrackNo)
 }
 
 /** \brief get the track the dvd should be playing.
- * can either be set by the user using DVDRingBuffer::SetTrack
+ * can either be set by the user using MythDVDBuffer::SetTrack
  * or determined from the dvd IFO.
  * \param type: use either kTrackTypeSubtitle or kTrackTypeAudio
  */

@@ -1,5 +1,5 @@
 // MythTV
-#include "dvdringbuffer.h"
+#include "mythdvdbuffer.h"
 #include "DetectLetterbox.h"
 #include "audiooutput.h"
 #include "avformatdecoderdvd.h"
