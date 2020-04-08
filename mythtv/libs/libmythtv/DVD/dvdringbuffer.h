@@ -12,47 +12,16 @@
 #include "ringbuffer.h"
 #include "mythdate.h"
 #include "referencecounter.h"
+#include "mythdvdcontext.h"
+#include "mythdvdinfo.h"
 
 // FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-// libdvd
-#include "dvdnav/dvdnav.h"
-
 #define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
-
-/** \class MythDVDContext
- *  \brief Encapsulates playback context at any given moment.
- *
- * This class mainly represents a single VOBU (video object unit) on a DVD
- */
-class MTV_PUBLIC MythDVDContext : public ReferenceCounter
-{
-    friend class DVDRingBuffer;
-
-  public:
-    MythDVDContext() = delete;
-    ~MythDVDContext() override = default;
-
-    int64_t  GetStartPTS          (void) const;
-    int64_t  GetEndPTS            (void) const;
-    int64_t  GetSeqEndPTS         (void) const;
-    uint32_t GetLBA               (void) const;
-    uint32_t GetLBAPrevVideoFrame (void) const;
-    int      GetNumFrames         (void) const;
-    int      GetNumFramesPresent  (void) const;
-    int      GetFPS               (void) const;
-
-  protected:
-    MythDVDContext(const dsi_t& DSI, const pci_t& PCI);
-
-  protected:
-    dsi_t          m_dsi;
-    pci_t          m_pci;
-};
 
 /** \class DVDRingBufferPriv
  *  \brief RingBuffer class for DVD's
@@ -61,30 +30,6 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
  */
 
 class MythDVDPlayer;
-
-class MTV_PUBLIC DVDInfo
-{
-    friend class DVDRingBuffer;
-    Q_DECLARE_TR_FUNCTIONS(DVDInfo)
-
-  public:
-    explicit DVDInfo(const QString &Filename);
-   ~DVDInfo(void);
-
-    bool IsValid             (void) const;
-    bool GetNameAndSerialNum (QString &Name, QString &SerialNumber);
-    QString GetLastError     (void) const;
-
-  protected:
-    static void GetNameAndSerialNum(dvdnav_t* Nav, QString &Name,
-                                    QString &Serialnum, const QString &Filename,
-                                    const QString &LogPrefix);
-
-    dvdnav_t   *m_nav { nullptr };
-    QString     m_name;
-    QString     m_serialnumber;
-    QString     m_lastError;
-};
 
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {

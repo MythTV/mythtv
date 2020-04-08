@@ -1304,7 +1304,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->IsVideoDVD())
     {
-        auto *dvd = new DVDInfo(pginfo->GetPlaybackURL());
+        auto *dvd = new MythDVDInfo(pginfo->GetPlaybackURL());
         if (dvd->IsValid())
         {
             QString name;

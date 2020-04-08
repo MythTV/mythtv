@@ -290,7 +290,11 @@ win32-msvc*|freebsd {
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
 HEADERS += DVD/dvdringbuffer.h
+HEADERS += DVD/mythdvdcontext.h
+HEADERS += DVD/mythdvdinfo.h
 SOURCES += DVD/dvdringbuffer.cpp
+SOURCES += DVD/mythdvdcontext.cpp
+SOURCES += DVD/mythdvdinfo.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
     SOURCES += DVD/mythdvdplayer.cpp

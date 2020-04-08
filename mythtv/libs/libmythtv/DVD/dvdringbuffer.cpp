@@ -1,12 +1,10 @@
 ﻿// Qt
 #include <QCoreApplication>
-#include <QDir>
 
 // MythTV
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythmediamonitor.h"
-#include "mythiowrapper.h"
 #include "iso639.h"
 #include "mythdvdplayer.h"
 #include "compat.h"
@@ -18,11 +16,7 @@
 
 // Std
 #include <cstdlib>
-#include <fcntl.h>
 #include <unistd.h>
-#include <zlib.h>
-#undef Z_NULL
-#define Z_NULL nullptr
 
 #define LOC QString("DVDRB: ")
 
@@ -41,192 +35,6 @@ static const char *DVDMenuTable[] =
     //: DVD part/chapter menu
     QT_TRANSLATE_NOOP("(DVD menu)", "Part Menu")
 };
-
-DVDInfo::DVDInfo(const QString &Filename)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Trying %1").arg(Filename));
-    QString name = Filename;
-    if (name.startsWith("dvd:"))
-    {
-        name.remove(0,4);
-        while (name.startsWith("//"))
-            name.remove(0,1);
-    }
-
-    QByteArray fname = name.toLocal8Bit();
-    dvdnav_status_t res = dvdnav_open(&m_nav, fname.constData());
-    if (res == DVDNAV_STATUS_ERR)
-    {
-        m_lastError = tr("Failed to open device at %1").arg(fname.constData());
-        LOG(VB_GENERAL, LOG_ERR, QString("DVDInfo: ") + m_lastError);
-        return;
-    }
-
-    GetNameAndSerialNum(m_nav, m_name, m_serialnumber, name, QString("DVDInfo: "));
-}
-
-DVDInfo::~DVDInfo(void)
-{
-    if (m_nav)
-        dvdnav_close(m_nav);
-    LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Finishing."));
-}
-
-bool DVDInfo::IsValid(void) const
-{
-    return m_nav != nullptr;
-}
-
-void DVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
-                                  QString &Name,
-                                  QString &Serialnum,
-                                  const QString &Filename,
-                                  const QString &LogPrefix)
-{
-    const char* dvdname = nullptr;
-    const char* dvdserial = nullptr;
-
-    if (dvdnav_get_title_string(Nav, &dvdname) == DVDNAV_STATUS_ERR)
-        LOG(VB_GENERAL, LOG_ERR, LogPrefix + "Failed to get name.");
-    if (dvdnav_get_serial_string(Nav, &dvdserial) == DVDNAV_STATUS_ERR)
-        LOG(VB_GENERAL, LOG_ERR, LogPrefix + "Failed to get serial number.");
-
-    Name = QString(dvdname);
-    Serialnum = QString(dvdserial);
-
-    if (Name.isEmpty() && Serialnum.isEmpty())
-    {
-        struct stat stat {};
-        if ((mythfile_stat(Filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
-        {
-            // Name and serial number are empty because we're reading
-            // from a directory (and not a device or image).
-
-            // Use the directory name for the DVD name
-            QDir dir(Filename);
-            Name = dir.dirName();
-            LOG(VB_PLAYBACK, LOG_DEBUG, LogPrefix + QString("Generated dvd name '%1'")
-                .arg(Name));
-
-            // And use the CRC of VTS_01_0.IFO as a serial number
-            QString ifo = Filename + QString("/VIDEO_TS/VTS_01_0.IFO");
-            int fd = mythfile_open(ifo.toLocal8Bit(), O_RDONLY);
-
-            if (fd > 0)
-            {
-                uint8_t buf[2048];
-                ssize_t read = 0;
-                uint32_t crc = static_cast<uint32_t>(crc32(0L, Z_NULL, 0));
-
-                while((read = mythfile_read(fd, buf, sizeof(buf))) > 0)
-                    crc = static_cast<uint32_t>(crc32(crc, buf, static_cast<uint>(read)));
-
-                mythfile_close(fd);
-                Serialnum = QString("%1__gen").arg(crc, 0, 16, QChar('0'));
-                LOG(VB_PLAYBACK, LOG_DEBUG, LogPrefix + QString("Generated serial number '%1'")
-                    .arg(Serialnum));
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, LogPrefix + QString("Unable to open %2 to generate serial number")
-                    .arg(ifo));
-            }
-        }
-    }
-}
-
-bool DVDInfo::GetNameAndSerialNum(QString &Name, QString &SerialNumber)
-{
-    Name         = m_name;
-    SerialNumber = m_serialnumber;
-    return !(Name.isEmpty() && SerialNumber.isEmpty());
-}
-
-QString DVDInfo::GetLastError(void) const
-{
-    return m_lastError;
-}
-
-MythDVDContext::MythDVDContext(const dsi_t& DSI, const pci_t& PCI)
-  : ReferenceCounter("MythDVDContext"),
-    m_dsi(DSI),
-    m_pci(PCI)
-{
-}
-
-int64_t MythDVDContext::GetStartPTS(void) const
-{
-    return static_cast<int64_t>(m_pci.pci_gi.vobu_s_ptm);
-}
-
-int64_t MythDVDContext::GetEndPTS(void) const
-{
-    return static_cast<int64_t>(m_pci.pci_gi.vobu_e_ptm);
-}
-
-int64_t MythDVDContext::GetSeqEndPTS(void) const
-{
-    return static_cast<int64_t>(m_pci.pci_gi.vobu_se_e_ptm);
-}
-
-uint32_t MythDVDContext::GetLBA(void) const
-{
-    return m_pci.pci_gi.nv_pck_lbn;
-}
-
-/** \brief Returns the duration of this VOBU in frames
- *  \sa GetNumFramesPresent
- */
-int MythDVDContext::GetNumFrames() const
-{
-    return static_cast<int>(((GetEndPTS() - GetStartPTS()) * GetFPS()) / 90000);
-}
-
-/** \brief Returns the number of video frames present in this VOBU
- *  \sa GetNumFrames
- */
-int MythDVDContext::GetNumFramesPresent() const
-{
-    int frames = 0;
-
-    if (GetSeqEndPTS())
-    {
-        // Sequence end PTS is set.  This means that video frames
-        // are not present all the way to 'End PTS'
-        frames = static_cast<int>(((GetSeqEndPTS() - GetStartPTS()) * GetFPS()) / 90000);
-    }
-    else if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
-    {
-        // At least one video frame is present
-        frames = GetNumFrames();
-    }
-
-    return frames;
-}
-
-int MythDVDContext::GetFPS(void) const
-{
-    return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25;
-}
-
-/** \brief Returns the logical block address of the previous
- * VOBU containing video.
- * \return LBA or 0xbfffffff if no previous VOBU with video exists
- */
-uint32_t MythDVDContext::GetLBAPrevVideoFrame() const
-{
-    uint32_t lba = m_dsi.vobu_sri.prev_video;
-
-    if (lba != 0xbfffffff)
-    {
-        // If there is a previous video frame in this
-        // cell, calculate the absolute LBA from the
-        // offset
-        lba = GetLBA() - (lba & 0x7ffffff);
-    }
-
-    return lba;
-}
 
 DVDRingBuffer::DVDRingBuffer(const QString &Filename)
   : RingBuffer(kRingBuffer_DVD)
@@ -499,7 +307,7 @@ bool DVDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
             "http://code.mythtv.org/trac");
     }
 
-    DVDInfo::GetNameAndSerialNum(m_dvdnav, m_dvdname, m_serialnumber, Filename, LOC);
+    MythDVDInfo::GetNameAndSerialNum(m_dvdnav, m_dvdname, m_serialnumber, Filename, LOC);
 
     SetDVDSpeed();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DVD Serial Number %1").arg(m_serialnumber));
