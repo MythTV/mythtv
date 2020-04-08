@@ -70,7 +70,8 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
                                              QString & channum,
                                              QString & name,
                                              QString & callsign,
-                                             QString & xmltvid)
+                                             QString & xmltvid,
+                                             QString & icon)
 {
     if (!Valid())
         return false;
@@ -95,13 +96,14 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
         return false;
     }
 
-    // Expect csv:  channum, name, callsign, xmltvid
+    // Expect csv:  channum, name, callsign, xmltvid, icon
     QStringList fields = result.mid(3).split(",");
 
-    if (fields.size() != 4)
+    if (fields.size() != 4 && fields.size() != 5)
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC +
-            QString("Expecting channum, name, callsign, xmltvid; "
+            QString("Expecting channum, name, callsign, xmltvid and "
+                    "optionally icon; "
                     "Received '%1").arg(result));
         return false;
     }
@@ -110,6 +112,8 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
     name     = fields[1];
     callsign = fields[2];
     xmltvid  = fields[3];
+    if (fields.size() == 5)
+        icon     = fields[4];
 
     return true;
 }
