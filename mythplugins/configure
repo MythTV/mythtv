@@ -571,6 +571,7 @@ CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
 CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
 OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
 OPENGLES=$(cat mythconfig.mak | grep -e "^HAVE_GLES2_GL2_H=yes")
+WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
@@ -629,6 +630,13 @@ fi
 
 if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
     disable exif
+fi
+
+if enabled browser; then
+    if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+        disable browser
+        echo "MythBrowser requires QtWebkit."
+    fi
 fi
 
 if enabled game; then
@@ -701,6 +709,11 @@ if test x"$icc" != x ; then
 fi
 
 if enabled music ; then
+    if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+       disable music
+       echo "MythMusic requires QtWebkit."
+    fi
+
     if ! check_lib vorbis/codec.h vorbis_info_init -lvorbis || ! check_lib vorbis/vorbisenc.h vorbis_encode_setup_vbr -lvorbisenc -lvorbis -logg ; then
         disable vorbis
         echo "MythMusic requires vorbis."
