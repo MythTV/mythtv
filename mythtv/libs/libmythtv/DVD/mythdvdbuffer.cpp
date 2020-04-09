@@ -15,8 +15,7 @@
 #include "mythdvdbuffer.h"
 
 // Std
-#include <cstdlib>
-#include <unistd.h>
+#include <algorithm>
 
 #define LOC QString("DVDRB: ")
 
