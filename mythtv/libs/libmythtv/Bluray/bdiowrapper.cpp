@@ -26,7 +26,7 @@ static void dir_close_mythiowrapper(BD_DIR_H *dir)
 {
     if (dir)
     {
-        mythdir_closedir((int)(intptr_t)dir->internal);
+        MythDirClose((int)(intptr_t)dir->internal);
 
         LOG(VB_FILE, LOG_DEBUG, LOC + "Closed mythdir dir");
 
@@ -36,7 +36,7 @@ static void dir_close_mythiowrapper(BD_DIR_H *dir)
 
 static int dir_read_mythiowrapper(BD_DIR_H *dir, BD_DIRENT *entry)
 {
-    char *filename = mythdir_readdir((int)(intptr_t)dir->internal);
+    char *filename = MythDirRead((int)(intptr_t)dir->internal);
     if (filename)
     {
         entry->d_name[255] = '\0';
@@ -64,7 +64,7 @@ static BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
     dir->read = dir_read_mythiowrapper;
 
     int dirID = 0;
-    if ((dirID = mythdir_opendir(dirname)))
+    if ((dirID = MythDirOpen(dirname)))
     {
         dir->internal = (void *)(intptr_t)dirID;
         return dir;
@@ -82,7 +82,7 @@ static void file_close_mythiowrapper(BD_FILE_H *file)
 {
     if (file)
     {
-        mythfile_close((int)(intptr_t)file->internal);
+        MythfileClose((int)(intptr_t)file->internal);
 
         LOG(VB_FILE, LOG_DEBUG, LOC + "Closed mythfile file");
 
@@ -92,22 +92,22 @@ static void file_close_mythiowrapper(BD_FILE_H *file)
 
 static int64_t file_seek_mythiowrapper(BD_FILE_H *file, int64_t offset, int32_t origin)
 {
-    return mythfile_seek((int)(intptr_t)file->internal, offset, origin);
+    return MythFileSeek((int)(intptr_t)file->internal, offset, origin);
 }
 
 static int64_t file_tell_mythiowrapper(BD_FILE_H *file)
 {
-    return mythfile_tell((int)(intptr_t)file->internal);
+    return MythFileTell((int)(intptr_t)file->internal);
 }
 
 static int64_t file_read_mythiowrapper(BD_FILE_H *file, uint8_t *buf, int64_t size)
 {
-    return mythfile_read((int)(intptr_t)file->internal, buf, size);
+    return MythFileRead((int)(intptr_t)file->internal, buf, size);
 }
 
 static int64_t file_write_mythiowrapper(BD_FILE_H *file, const uint8_t *buf, int64_t size)
 {
-    return mythfile_write((int)(intptr_t)file->internal, (void *)buf, size);
+    return MythFileWrite((int)(intptr_t)file->internal, (void *)buf, size);
 }
 
 static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmode)
@@ -134,7 +134,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
     if (strcasecmp(cmode, "wb") == 0)
         intMode = O_WRONLY;
 
-    if ((fd = mythfile_open(filename, intMode)) >= 0)
+    if ((fd = MythFileOpen(filename, intMode)) >= 0)
     {
         file->internal = (void*)(intptr_t)fd;
 

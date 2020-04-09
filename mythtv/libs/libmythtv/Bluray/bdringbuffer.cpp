@@ -127,8 +127,8 @@ static void BDLogger(const char* Message)
 
 static int BDRead(void *Handle, void *Buf, int LBA, int NumBlocks)
 {
-    if (mythfile_seek(*(static_cast<int*>(Handle)), LBA * 2048LL, SEEK_SET) != -1)
-        return static_cast<int>(mythfile_read(*(static_cast<int*>(Handle)), Buf,
+    if (MythFileSeek(*(static_cast<int*>(Handle)), LBA * 2048LL, SEEK_SET) != -1)
+        return static_cast<int>(MythFileRead(*(static_cast<int*>(Handle)), Buf,
                                               static_cast<size_t>(NumBlocks * 2048)) / 2048);
     return -1;
 }
@@ -172,7 +172,7 @@ BDInfo::BDInfo(const QString &Filename)
         // Since a local device (which is likely to be encrypted) can be
         // opened directly, only use streaming for remote images, which
         // presumably won't be encrypted.
-        bdhandle = mythfile_open(Filename.toLocal8Bit().data(), O_RDONLY);
+        bdhandle = MythFileOpen(Filename.toLocal8Bit().data(), O_RDONLY);
         if (bdhandle >= 0)
         {
             bdnav = bd_init();
@@ -199,7 +199,7 @@ BDInfo::BDInfo(const QString &Filename)
     }
 
     if (bdhandle >= 0)
-        mythfile_close(bdhandle);
+        MythfileClose(bdhandle);
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Done"));
 }
@@ -303,7 +303,7 @@ void BDRingBuffer::Close(void)
 
     if (m_imgHandle > 0)
     {
-        mythfile_close(m_imgHandle);
+        MythfileClose(m_imgHandle);
         m_imgHandle = -1;
     }
 
@@ -491,7 +491,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     // several minutes when the disc structure is remote. The callback allows
     // us to 'kick' the main UI - as the 'please wait' widget is still visible
     // at this stage
-    mythfile_open_register_callback(filename.toLocal8Bit().data(), this, FileOpenedCallback);
+    MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, FileOpenedCallback);
 
     QMutexLocker locker(&m_infoLock);
     m_rwLock.lockForWrite();
@@ -510,7 +510,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         // Since a local device (which is likely to be encrypted) can be
         // opened directly, only use streaming for remote images, which
         // presumably won't be encrypted.
-        m_imgHandle = mythfile_open(filename.toLocal8Bit().data(), O_RDONLY);
+        m_imgHandle = MythFileOpen(filename.toLocal8Bit().data(), O_RDONLY);
         if (m_imgHandle >= 0)
         {
             m_bdnav = bd_init();
@@ -527,7 +527,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     {
         m_lastError = tr("Could not open Blu-ray device: %1").arg(filename);
         m_rwLock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
+        MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -557,7 +557,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         m_bdnav = nullptr;
         m_lastError = tr("Could not open Blu-ray device %1, failed to decrypt").arg(filename);
         m_rwLock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
+        MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -597,7 +597,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         m_bdnav = nullptr;
         m_lastError = tr("Unable to find any Blu-ray compatible titles");
         m_rwLock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
+        MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -701,7 +701,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
             m_bdnav = nullptr;
             m_lastError = tr("Unable to find any usable Blu-ray titles");
             m_rwLock.unlock();
-            mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
+            MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
             return false;
         }
         SwitchTitle(m_mainTitle);
@@ -715,7 +715,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     m_rawBitrate      = 8000;
     CalcReadAheadThresh();
     m_rwLock.unlock();
-    mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
+    MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
     return true;
 }
 

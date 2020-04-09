@@ -68,7 +68,7 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
     if (Name.isEmpty() && Serialnum.isEmpty())
     {
         struct stat stat {};
-        if ((mythfile_stat(Filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
+        if ((MythFileStat(Filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
         {
             // Name and serial number are empty because we're reading
             // from a directory (and not a device or image).
@@ -81,7 +81,7 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
 
             // And use the CRC of VTS_01_0.IFO as a serial number
             QString ifo = Filename + QString("/VIDEO_TS/VTS_01_0.IFO");
-            int fd = mythfile_open(ifo.toLocal8Bit(), O_RDONLY);
+            int fd = MythFileOpen(ifo.toLocal8Bit(), O_RDONLY);
 
             if (fd > 0)
             {
@@ -89,10 +89,10 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
                 ssize_t read = 0;
                 uint32_t crc = static_cast<uint32_t>(crc32(0L, Z_NULL, 0));
 
-                while((read = mythfile_read(fd, buf, sizeof(buf))) > 0)
+                while((read = MythFileRead(fd, buf, sizeof(buf))) > 0)
                     crc = static_cast<uint32_t>(crc32(crc, buf, static_cast<uint>(read)));
 
-                mythfile_close(fd);
+                MythfileClose(fd);
                 Serialnum = QString("%1__gen").arg(crc, 0, 16, QChar('0'));
                 LOG(VB_PLAYBACK, LOG_DEBUG, LogPrefix + QString("Generated serial number '%1'")
                     .arg(Serialnum));

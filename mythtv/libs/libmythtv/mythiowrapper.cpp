@@ -1,3 +1,19 @@
+// Qt
+#include <QFile>
+#include <QMap>
+#include <QUrl>
+#include <QReadWriteLock>
+
+// MythTV
+#include "mythconfig.h"
+#include "compat.h"
+#include "mythcorecontext.h"
+#include "mythlogging.h"
+#include "remotefile.h"
+#include "ringbuffer.h"
+#include "mythiowrapper.h"
+
+// Std
 #if defined(_WIN32)
 #include <windows.h>
 #else
@@ -10,181 +26,142 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <QFile>
-#include <QMap>
-#include <QUrl>
-#include <QReadWriteLock>
-
-#include "mythconfig.h"
-#include "compat.h"
-#include "mythcorecontext.h"
-#include "mythlogging.h"
-#include "remotefile.h"
-#include "ringbuffer.h"
-
-#include "mythiowrapper.h"
-
-const int maxID = 1024 * 1024;
-
-QReadWriteLock            m_fileWrapperLock;
-QHash <int, RingBuffer *> m_ringbuffers;
-QHash <int, RemoteFile *> m_remotefiles;
-QHash <int, int>          m_localfiles;
-QHash <int, QString>      m_filenames;
-
-QReadWriteLock            m_dirWrapperLock;
-QHash <int, QStringList>  m_remotedirs;
-QHash <int, int>          m_remotedirPositions;
-QHash <int, QString>      m_dirnames;
-QHash <int, DIR *>        m_localdirs;
-
 class Callback
 {
   public:
-    Callback(void* object, callback_t callback)
-      : m_object(object), m_callback(callback) { }
+    Callback(void* Object, callback_t Callback)
+      : m_object(Object),
+        m_callback(Callback)
+    {
+    }
+
     void       *m_object;
     callback_t  m_callback;
 };
 
-QMutex                        m_callbackLock;
-QMultiHash<QString, Callback> m_fileOpenCallbacks;
+static const int s_maxID = 1024 * 1024;
 
-#define LOC     QString("mythiowrapper: ")
+static QReadWriteLock          s_fileWrapperLock;
+static QHash<int, RingBuffer*> s_ringbuffers;
+static QHash<int, RemoteFile*> s_remotefiles;
+static QHash<int, int>         s_localfiles;
+static QHash<int, QString>     s_filenames;
 
-/////////////////////////////////////////////////////////////////////////////
+static QReadWriteLock          s_dirWrapperLock;
+static QHash<int, QStringList> s_remotedirs;
+static QHash<int, int>         s_remotedirPositions;
+static QHash<int, QString>     s_dirnames;
+static QHash<int, DIR*>        s_localdirs;
+
+static QMutex                        s_callbackLock;
+static QMultiHash<QString, Callback> s_fileOpenCallbacks;
+
+#define LOC QString("MythIOWrap: ")
 
 extern "C" {
 
-static int getNextFileID(void)
+static int GetNextFileID(void)
 {
     int id = 100000;
 
-    for (; id < maxID; ++id)
-    {
-        if ((!m_localfiles.contains(id)) &&
-            (!m_remotefiles.contains(id)) &&
-            (!m_ringbuffers.contains(id)))
+    for (; id < s_maxID; ++id)
+        if (!s_localfiles.contains(id) && !s_remotefiles.contains(id) && !s_ringbuffers.contains(id))
             break;
-    }
 
-    if (id == maxID)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            LOC + "getNextFileID(), too many files are open.");
-    }
+    if (id == s_maxID)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Too many files are open.");
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("getNextFileID() = %1").arg(id));
-
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetNextFileID: '%1'").arg(id));
     return id;
 }
 
-void mythfile_open_register_callback(const char *pathname, void* object,
-                                     callback_t func)
+void MythFileOpenRegisterCallback(const char *Pathname, void* Object, callback_t Func)
 {
-    m_callbackLock.lock();
-    QString path(pathname);
-    if (m_fileOpenCallbacks.contains(path))
+    QMutexLocker locker(&s_callbackLock);
+    QString path(Pathname);
+    if (s_fileOpenCallbacks.contains(path))
     {
         // if we already have a callback registered for this path with this
         // object then remove the callback and return (i.e. end callback)
-        QMutableHashIterator<QString,Callback> it(m_fileOpenCallbacks);
+        QMutableHashIterator<QString,Callback> it(s_fileOpenCallbacks);
         while (it.hasNext())
         {
             it.next();
-            if (object == it.value().m_object)
+            if (Object == it.value().m_object)
             {
                 it.remove();
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Removing fileopen callback for %1").arg(path));
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("%1 callbacks remaining")
-                        .arg(m_fileOpenCallbacks.size()));
-                m_callbackLock.unlock();
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Removing fileopen callback for %1").arg(path));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 callbacks remaining").arg(s_fileOpenCallbacks.size()));
                 return;
             }
         }
     }
 
-    Callback new_callback(object, func);
-    m_fileOpenCallbacks.insert(path, new_callback);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Added fileopen callback for %1").arg(path));
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 callbacks open")
-        .arg(m_fileOpenCallbacks.size()));
-
-    m_callbackLock.unlock();
+    s_fileOpenCallbacks.insert(path, { Object, Func });
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Added fileopen callback for %1").arg(path));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 callbacks open").arg(s_fileOpenCallbacks.size()));
 }
 
-int mythfile_check(int id)
+int MythFileCheck(int Id)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_check(%1)").arg(id));
-    int result = 0;
-
-    m_fileWrapperLock.lockForWrite();
-    if ((m_localfiles.contains(id))  ||
-        (m_remotefiles.contains(id)) ||
-        (m_ringbuffers.contains(id)))
-        result = 1;
-    m_fileWrapperLock.unlock();
-
-    return result;
+    LOG(VB_FILE, LOG_DEBUG, QString("MythFileCheck: '%1')").arg(Id));
+    QWriteLocker locker(&s_fileWrapperLock);
+    return (s_localfiles.contains(Id) || s_remotefiles.contains(Id) || s_ringbuffers.contains(Id)) ? 1 : 0;
 }
 
-int mythfile_open(const char *pathname, int flags)
+int MythFileOpen(const char *Pathname, int Flags)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_open('%1', %2)")
-            .arg(pathname).arg(flags));
+    LOG(VB_FILE, LOG_DEBUG, QString("MythFileOpen('%1', %2)").arg(Pathname).arg(Flags));
 
     struct stat fileinfo {};
-    if (mythfile_stat(pathname, &fileinfo))
+    if (MythFileStat(Pathname, &fileinfo))
         return -1;
 
-    if (S_ISDIR( fileinfo.st_mode )) // libmythdvdnav tries to open() a dir
-        return errno = EISDIR, -1;
+    // libmythdvdnav tries to open() a dir
+    if (S_ISDIR(fileinfo.st_mode))
+    {
+        errno = EISDIR;
+        return -1;
+    }
 
     int fileID = -1;
-    if (strncmp(pathname, "myth://", 7) != 0)
+    if (strncmp(Pathname, "myth://", 7) != 0)
     {
-        int lfd = open(pathname, flags);
+        int lfd = open(Pathname, Flags);
         if (lfd < 0)
             return -1;
 
-        m_fileWrapperLock.lockForWrite();
-        fileID = getNextFileID();
-        m_localfiles[fileID] = lfd;
-        m_filenames[fileID] = pathname;
-        m_fileWrapperLock.unlock();
+        s_fileWrapperLock.lockForWrite();
+        fileID = GetNextFileID();
+        s_localfiles[fileID] = lfd;
+        s_filenames[fileID] = Pathname;
+        s_fileWrapperLock.unlock();
     }
     else
     {
         RingBuffer *rb = nullptr;
         RemoteFile *rf = nullptr;
 
-        if ((fileinfo.st_size < 512) &&
-            (fileinfo.st_mtime < (time(nullptr) - 300)))
+        if ((fileinfo.st_size < 512) && (fileinfo.st_mtime < (time(nullptr) - 300)))
         {
-            if (flags & O_WRONLY)
-                rf = new RemoteFile(pathname, true, false); // Writeable
+            if (Flags & O_WRONLY)
+                rf = new RemoteFile(Pathname, true, false); // Writeable
             else
-                rf = new RemoteFile(pathname, false, true); // Read-Only
-
+                rf = new RemoteFile(Pathname, false, true); // Read-Only
             if (!rf)
                 return -1;
         }
         else
         {
-            if (flags & O_WRONLY)
+            if (Flags & O_WRONLY)
             {
-                rb = RingBuffer::Create(
-                    pathname, true, false,
-                    RingBuffer::kDefaultOpenTimeout, true); // Writeable
+                rb = RingBuffer::Create(Pathname, true, false,
+                                        RingBuffer::kDefaultOpenTimeout, true); // Writeable
             }
             else
             {
-                rb = RingBuffer::Create(
-                    pathname, false, true,
-                    RingBuffer::kDefaultOpenTimeout, true); // Read-Only
+                rb = RingBuffer::Create(Pathname, false, true,
+                                        RingBuffer::kDefaultOpenTimeout, true); // Read-Only
             }
 
             if (!rb)
@@ -193,23 +170,23 @@ int mythfile_open(const char *pathname, int flags)
             rb->Start();
         }
 
-        m_fileWrapperLock.lockForWrite();
-        fileID = getNextFileID();
+        s_fileWrapperLock.lockForWrite();
+        fileID = GetNextFileID();
 
         if (rf)
-            m_remotefiles[fileID] = rf;
+            s_remotefiles[fileID] = rf;
         else if (rb)
-            m_ringbuffers[fileID] = rb;
+            s_ringbuffers[fileID] = rb;
 
-        m_filenames[fileID] = pathname;
-        m_fileWrapperLock.unlock();
+        s_filenames[fileID] = Pathname;
+        s_fileWrapperLock.unlock();
     }
 
-    m_callbackLock.lock();
-    if (!m_fileOpenCallbacks.isEmpty())
+    s_callbackLock.lock();
+    if (!s_fileOpenCallbacks.isEmpty())
     {
-        QString path(pathname);
-        QHashIterator<QString,Callback> it(m_fileOpenCallbacks);
+        QString path(Pathname);
+        QHashIterator<QString,Callback> it(s_fileOpenCallbacks);
         while (it.hasNext())
         {
             it.next();
@@ -217,43 +194,41 @@ int mythfile_open(const char *pathname, int flags)
                 it.value().m_callback(it.value().m_object);
         }
     }
-    m_callbackLock.unlock();
+    s_callbackLock.unlock();
 
     return fileID;
 }
 
-int mythfile_close(int fileID)
+int MythfileClose(int FileID)
 {
-    int result = -1;
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythfileClose: '%1").arg(FileID));
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_close(%1)").arg(fileID));
-
-    m_fileWrapperLock.lockForRead();
-    if (m_ringbuffers.contains(fileID))
+    // FIXME - surely this needs to hold write lock?
+    QReadLocker locker(&s_fileWrapperLock);
+    if (s_ringbuffers.contains(FileID))
     {
-        RingBuffer *rb = m_ringbuffers[fileID];
-        m_ringbuffers.remove(fileID);
+        RingBuffer *rb = s_ringbuffers[FileID];
+        s_ringbuffers.remove(FileID);
         delete rb;
-
-        result = 0;
+        return 0;
     }
-    else if (m_remotefiles.contains(fileID))
+
+    if (s_remotefiles.contains(FileID))
     {
-        RemoteFile *rf = m_remotefiles[fileID];
-        m_remotefiles.remove(fileID);
+        RemoteFile *rf = s_remotefiles[FileID];
+        s_remotefiles.remove(FileID);
         delete rf;
-
-        result = 0;
+        return 0;
     }
-    else if (m_localfiles.contains(fileID))
+
+    if (s_localfiles.contains(FileID))
     {
-        close(m_localfiles[fileID]);
-        m_localfiles.remove(fileID);
-        result = 0;
+        close(s_localfiles[FileID]);
+        s_localfiles.remove(FileID);
+        return 0;
     }
-    m_fileWrapperLock.unlock();
 
-    return result;
+    return -1;
 }
 
 #ifdef _WIN32
@@ -262,278 +237,258 @@ int mythfile_close(int fileID)
 #   undef  off_t
 #   define off_t off64_t
 #endif
-off_t mythfile_seek(int fileID, off_t offset, int whence)
+off_t MythFileSeek(int FileID, off_t Offset, int Whence)
 {
     off_t result = -1;
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_seek(%1, %2, %3)")
-                                      .arg(fileID).arg(offset).arg(whence));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileSeek(%1, %2, %3)")
+        .arg(FileID).arg(Offset).arg(Whence));
 
-    m_fileWrapperLock.lockForRead();
-    if (m_ringbuffers.contains(fileID))
-        result = m_ringbuffers[fileID]->Seek(offset, whence);
-    else if (m_remotefiles.contains(fileID))
-        result = m_remotefiles[fileID]->Seek(offset, whence);
-    else if (m_localfiles.contains(fileID))
-        result = lseek(m_localfiles[fileID], offset, whence);
-    m_fileWrapperLock.unlock();
+    s_fileWrapperLock.lockForRead();
+    if (s_ringbuffers.contains(FileID))
+        result = s_ringbuffers[FileID]->Seek(Offset, Whence);
+    else if (s_remotefiles.contains(FileID))
+        result = s_remotefiles[FileID]->Seek(Offset, Whence);
+    else if (s_localfiles.contains(FileID))
+        result = lseek(s_localfiles[FileID], Offset, Whence);
+    s_fileWrapperLock.unlock();
 
     return result;
 }
 
-off_t mythfile_tell(int fileID)
+off_t MythFileTell(int FileID)
 {
     off_t result = -1;
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_tell(%1)").arg(fileID));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileTell(%1)").arg(FileID));
 
-    m_fileWrapperLock.lockForRead();
-    if (m_ringbuffers.contains(fileID))
-        result = m_ringbuffers[fileID]->Seek(0, SEEK_CUR);
-    else if (m_remotefiles.contains(fileID))
-        result = m_remotefiles[fileID]->Seek(0, SEEK_CUR);
-    else if (m_localfiles.contains(fileID))
-        result = lseek(m_localfiles[fileID], 0, SEEK_CUR);
-    m_fileWrapperLock.unlock();
+    s_fileWrapperLock.lockForRead();
+    if (s_ringbuffers.contains(FileID))
+        result = s_ringbuffers[FileID]->Seek(0, SEEK_CUR);
+    else if (s_remotefiles.contains(FileID))
+        result = s_remotefiles[FileID]->Seek(0, SEEK_CUR);
+    else if (s_localfiles.contains(FileID))
+        result = lseek(s_localfiles[FileID], 0, SEEK_CUR);
+    s_fileWrapperLock.unlock();
 
     return result;
 }
+
 #ifdef _WIN32
 #   undef  lseek
 #   undef  off_t
 #endif
 
-ssize_t mythfile_read(int fileID, void *buf, size_t count)
+ssize_t MythFileRead(int FileID, void *Buffer, size_t Count)
 {
     ssize_t result = -1;
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_read(%1, %2, %3)")
-            .arg(fileID) .arg((long long)buf).arg(count));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileRead(%1, %2, %3)")
+        .arg(FileID).arg(reinterpret_cast<long long>(Buffer)).arg(Count));
 
-    m_fileWrapperLock.lockForRead();
-    if (m_ringbuffers.contains(fileID))
-        result = m_ringbuffers[fileID]->Read(buf, count);
-    else if (m_remotefiles.contains(fileID))
-        result = m_remotefiles[fileID]->Read(buf, count);
-    else if (m_localfiles.contains(fileID))
-        result = read(m_localfiles[fileID], buf, count);
-    m_fileWrapperLock.unlock();
+    s_fileWrapperLock.lockForRead();
+    if (s_ringbuffers.contains(FileID))
+        result = s_ringbuffers[FileID]->Read(Buffer, static_cast<int>(Count));
+    else if (s_remotefiles.contains(FileID))
+        result = s_remotefiles[FileID]->Read(Buffer, static_cast<int>(Count));
+    else if (s_localfiles.contains(FileID))
+        result = read(s_localfiles[FileID], Buffer, Count);
+    s_fileWrapperLock.unlock();
 
     return result;
 }
 
-ssize_t mythfile_write(int fileID, void *buf, size_t count)
+ssize_t MythFileWrite(int FileID, void *Buffer, size_t Count)
 {
     ssize_t result = -1;
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythfile_write(%1, %2, %3)")
-            .arg(fileID) .arg((long long)buf).arg(count));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileWrite(%1, %2, %3)")
+        .arg(FileID).arg(reinterpret_cast<long long>(Buffer)).arg(Count));
 
-    m_fileWrapperLock.lockForRead();
-    if (m_ringbuffers.contains(fileID))
-        result = m_ringbuffers[fileID]->Write(buf, count);
-    else if (m_remotefiles.contains(fileID))
-        result = m_remotefiles[fileID]->Write(buf, count);
-    else if (m_localfiles.contains(fileID))
-        result = write(m_localfiles[fileID], buf, count);
-    m_fileWrapperLock.unlock();
+    s_fileWrapperLock.lockForRead();
+    if (s_ringbuffers.contains(FileID))
+        result = s_ringbuffers[FileID]->Write(Buffer, static_cast<uint>(Count));
+    else if (s_remotefiles.contains(FileID))
+        result = s_remotefiles[FileID]->Write(Buffer, static_cast<int>(Count));
+    else if (s_localfiles.contains(FileID))
+        result = write(s_localfiles[FileID], Buffer, Count);
+    s_fileWrapperLock.unlock();
 
     return result;
 }
 
-int mythfile_stat(const char *path, struct stat *buf)
+int MythFileStat(const char *Path, struct stat *Buf)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat('%1', %2)")
-            .arg(path).arg((long long)buf));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythfileStat('%1', %2)")
+        .arg(Path).arg(reinterpret_cast<long long>(Buf)));
 
-    if (strncmp(path, "myth://", 7) == 0)
+    if (strncmp(Path, "myth://", 7) == 0)
     {
-        bool res = RemoteFile::Exists(path, buf);
+        bool res = RemoteFile::Exists(Path, Buf);
         if (res)
             return 0;
     }
 
-    return stat(path, buf);
+    return stat(Path, Buf);
 }
 
-int mythfile_stat_fd(int fileID, struct stat *buf)
+int MythFileStatFD(int FileID, struct stat *Buf)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_stat_fd(%1, %2)")
-            .arg(fileID).arg((long long)buf));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileStatFD(%1, %2)")
+        .arg(FileID).arg(reinterpret_cast<long long>(Buf)));
 
-    m_fileWrapperLock.lockForRead();
-    if (!m_filenames.contains(fileID))
+    s_fileWrapperLock.lockForRead();
+    if (!s_filenames.contains(FileID))
     {
-        m_fileWrapperLock.unlock();
+        s_fileWrapperLock.unlock();
         return -1;
     }
-    QString filename = m_filenames[fileID];
-    m_fileWrapperLock.unlock();
+    QString filename = s_filenames[FileID];
+    s_fileWrapperLock.unlock();
 
-    return mythfile_stat(filename.toLocal8Bit().constData(), buf);
+    return MythFileStat(filename.toLocal8Bit().constData(), Buf);
 }
 
 /*
  * This function exists for the use of dvd_reader.c, thus the return
  * value of int instead of bool.  C doesn't have a bool type.
  */
-int mythfile_exists(const char *path, const char *file)
+int MythFileExists(const char *Path, const char *File)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythfile_exists('%1', '%2')")
-            .arg(path).arg(file));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileExists('%1', '%2')")
+        .arg(Path).arg(File));
 
-    if (strncmp(path, "myth://", 7) == 0)
-        return RemoteFile::Exists(QString("%1/%2").arg(path).arg(file));
+    if (strncmp(Path, "myth://", 7) == 0)
+        return RemoteFile::Exists(QString("%1/%2").arg(Path).arg(File));
 
-    return QFile::exists(QString("%1/%2").arg(path).arg(file));
+    return QFile::exists(QString("%1/%2").arg(Path).arg(File));
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
-static int getNextDirID(void)
+static int GetNextDirID(void)
 {
     int id = 100000;
-
-    for (; id < maxID; ++id)
-    {
-        if (!m_localdirs.contains(id) && !m_remotedirs.contains(id))
+    for (; id < s_maxID; ++id)
+        if (!s_localdirs.contains(id) && !s_remotedirs.contains(id))
             break;
-    }
 
-    if (id == maxID)
-        LOG(VB_GENERAL, LOG_ERR, "ERROR: mythiowrapper getNextDirID(), too "
-                                 "many files are open.");
-
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("getNextDirID() = %1").arg(id));
+    if (id == s_maxID)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Too many directories are open.");
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetNextDirID: '%1'").arg(id));
 
     return id;
 }
 
-int mythdir_check(int id)
+int MythDirCheck(int DirID)
 {
-    LOG(VB_FILE, LOG_DEBUG, QString("mythdir_check(%1)").arg(id));
-    int result = 0;
-
-    m_dirWrapperLock.lockForWrite();
-    if ((m_localdirs.contains(id)) ||
-        (m_remotedirs.contains(id)))
-        result = 1;
-    m_dirWrapperLock.unlock();
-
+    LOG(VB_FILE, LOG_DEBUG, QString("MythDirCheck: '%1'").arg(DirID));
+    s_dirWrapperLock.lockForWrite();
+    int result = ((s_localdirs.contains(DirID) || s_remotedirs.contains(DirID))) ? 1 : 0;
+    s_dirWrapperLock.unlock();
     return result;
 }
 
-int mythdir_opendir(const char *dirname)
+int MythDirOpen(const char *DirName)
 {
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_opendir(%1)").arg(dirname));
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythDirOpen: '%1'").arg(DirName));
 
-    int id = 0;
-    if (strncmp(dirname, "myth://", 7) != 0)
+    if (strncmp(DirName, "myth://", 7) != 0)
     {
-        DIR *dir = opendir(dirname);
-        if (dir) {
-            m_dirWrapperLock.lockForWrite();
-            id = getNextDirID();
-            m_localdirs[id] = dir;
-            m_dirnames[id] = dirname;
-            m_dirWrapperLock.unlock();
+        DIR *dir = opendir(DirName);
+        if (dir)
+        {
+            s_dirWrapperLock.lockForWrite();
+            int id = GetNextDirID();
+            s_localdirs[id] = dir;
+            s_dirnames[id] = DirName;
+            s_dirWrapperLock.unlock();
+            return id;
         }
     }
     else
     {
         QStringList list;
-        QUrl qurl(dirname);
+        QUrl qurl(DirName);
         QString storageGroup = qurl.userName();
 
         list.clear();
-
         if (storageGroup.isEmpty())
             storageGroup = "Default";
 
-        list << "QUERY_SG_GETFILELIST";
-        list << qurl.host();
-        list << storageGroup;
+        list << "QUERY_SG_GETFILELIST" << qurl.host() << storageGroup;
 
         QString path = qurl.path();
         if (!qurl.fragment().isEmpty())
             path += "#" + qurl.fragment();
 
-        list << path;
-        list << "1";
+        list << path << "1";
 
         bool ok = gCoreContext->SendReceiveStringList(list);
 
-        if ((!ok) ||
-            ((list.size() == 1) && (list[0] == "EMPTY LIST")))
+        if ((!ok) || ((list.size() == 1) && (list[0] == "EMPTY LIST")))
             list.clear();
 
-        m_dirWrapperLock.lockForWrite();
-        id = getNextDirID();
-        m_remotedirs[id] = list;
-        m_remotedirPositions[id] = 0;
-        m_dirnames[id] = dirname;
-        m_dirWrapperLock.unlock();
+        s_dirWrapperLock.lockForWrite();
+        int id = GetNextDirID();
+        s_remotedirs[id] = list;
+        s_remotedirPositions[id] = 0;
+        s_dirnames[id] = DirName;
+        s_dirWrapperLock.unlock();
+        return id;
     }
 
-    return id;
+    return 0;
 }
 
-int mythdir_closedir(int dirID)
+int MythDirClose(int DirID)
 {
-    int result = -1;
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythDirClose: '%1'").arg(DirID));
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_closedir(%1)").arg(dirID));
-
-    m_dirWrapperLock.lockForRead();
-    if (m_remotedirs.contains(dirID))
+    QReadLocker locker(&s_dirWrapperLock);
+    if (s_remotedirs.contains(DirID))
     {
-        m_remotedirs.remove(dirID);
-        m_remotedirPositions.remove(dirID);
-        result = 0;
+        s_remotedirs.remove(DirID);
+        s_remotedirPositions.remove(DirID);
+        return 0;
     }
-    else if (m_localdirs.contains(dirID))
-    {
-        result = closedir(m_localdirs[dirID]);
 
+    if (s_localdirs.contains(DirID))
+    {
+        int result = closedir(s_localdirs[DirID]);
         if (result == 0)
-            m_localdirs.remove(dirID);
+            s_localdirs.remove(DirID);
+        return result;
     }
-    m_dirWrapperLock.unlock();
 
-    return result;
+    return -1;
 }
 
-char *mythdir_readdir(int dirID)
+char *MythDirRead(int DirID)
 {
-    char *result = nullptr;
+    LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythDirRead: '%1'").arg(DirID));
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_readdir(%1)").arg(dirID));
-
-    m_dirWrapperLock.lockForRead();
-    if (m_remotedirs.contains(dirID))
+    QReadLocker locker(&s_dirWrapperLock);
+    if (s_remotedirs.contains(DirID))
     {
-        int pos = m_remotedirPositions[dirID];
-        if (m_remotedirs[dirID].size() >= (pos+1))
+        int pos = s_remotedirPositions[DirID];
+        if (s_remotedirs[DirID].size() >= (pos + 1))
         {
-            result = strdup(m_remotedirs[dirID][pos].toLocal8Bit().constData());
+            char* result = strdup(s_remotedirs[DirID][pos].toLocal8Bit().constData());
             pos++;
-            m_remotedirPositions[dirID] = pos;
+            s_remotedirPositions[DirID] = pos;
+            return result;
         }
     }
-    else if (m_localdirs.contains(dirID))
+    else if (s_localdirs.contains(DirID))
     {
-        struct dirent *r = nullptr;
+        struct dirent *dir = nullptr;
         // glibc deprecated readdir_r in version 2.24,
         // cppcheck-suppress readdirCalled
-        if ((r = readdir(m_localdirs[dirID])) != nullptr)
-            result = strdup(r->d_name);
+        if ((dir = readdir(s_localdirs[DirID])) != nullptr)
+            return strdup(dir->d_name);
     }
-    m_dirWrapperLock.unlock();
 
-    return result;
+    return nullptr;
 }
+
 } // extern "C"
 
-/////////////////////////////////////////////////////////////////////////////
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
