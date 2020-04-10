@@ -154,10 +154,10 @@ bool MythAVFormatWriter::OpenFile(void)
         return false;
     }
 
-    m_avfRingBuffer = new AVFRingBuffer(m_ringBuffer);
-    auto *url       = reinterpret_cast<URLContext*>(m_ctx->pb->opaque);
-    url->prot       = AVFRingBuffer::GetURLProtocol();
-    url->priv_data  = static_cast<void*>(m_avfRingBuffer);
+    m_avfBuffer    = new MythAVFormatBuffer(m_ringBuffer);
+    auto *url      = reinterpret_cast<URLContext*>(m_ctx->pb->opaque);
+    url->prot      = MythAVFormatBuffer::GetURLProtocol();
+    url->priv_data = static_cast<void*>(m_avfBuffer);
 
     if (avformat_write_header(m_ctx, nullptr) < 0)
     {
@@ -172,8 +172,8 @@ void MythAVFormatWriter::Cleanup(void)
 {
     if (m_ctx && m_ctx->pb)
         avio_closep(&m_ctx->pb);
-    delete m_avfRingBuffer;
-    m_avfRingBuffer = nullptr;
+    delete m_avfBuffer;
+    m_avfBuffer = nullptr;
     delete m_ringBuffer;
     m_ringBuffer = nullptr;
 }

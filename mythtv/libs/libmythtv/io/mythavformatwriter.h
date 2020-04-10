@@ -8,7 +8,7 @@
 #include "mythconfig.h"
 #include "mythavutil.h"
 #include "io/mythmediawriter.h"
-#include "io/avfringbuffer.h"
+#include "io/mythavformatbuffer.h"
 
 #undef HAVE_AV_CONFIG_H
 extern "C" {
@@ -45,7 +45,7 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     AVRational  GetCodecTimeBase (void);
     static bool FindAudioFormat  (AVCodecContext *Ctx, AVCodec *Codec, AVSampleFormat Format);
 
-    AVFRingBuffer         *m_avfRingBuffer { nullptr };
+    MythAVFormatBuffer    *m_avfBuffer     { nullptr };
     RingBuffer            *m_ringBuffer    { nullptr };
     AVOutputFormat         m_fmt           { };
     AVFormatContext       *m_ctx           { nullptr };

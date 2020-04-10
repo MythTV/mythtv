@@ -10,12 +10,10 @@ extern "C" {
 #include "libavformat/url.h"
 }
 
-extern URLProtocol AVF_RingBuffer_Protocol;
-
-class AVFRingBuffer
+class MythAVFormatBuffer
 {
   public:
-    explicit AVFRingBuffer(RingBuffer *Buffer = nullptr);
+    explicit MythAVFormatBuffer(RingBuffer *Buffer = nullptr);
     void                SetRingBuffer  (RingBuffer *Buffer);
     RingBuffer*         GetRingBuffer  (void);
     static URLProtocol* GetURLProtocol (void);
@@ -31,7 +29,7 @@ class AVFRingBuffer
     bool                IsInInit       (void);
 
   private:
-    RingBuffer         *m_ringBuffer   { nullptr };
+    RingBuffer         *m_buffer       { nullptr };
     bool                m_initState    { true    };
     static URLProtocol  s_avfrURL;
 };

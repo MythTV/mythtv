@@ -1,33 +1,33 @@
 // MythTV
-#include "io/avfringbuffer.h"
+#include "io/mythavformatbuffer.h"
 #include "mythcorecontext.h"
 
-URLProtocol AVFRingBuffer::s_avfrURL;
+URLProtocol MythAVFormatBuffer::s_avfrURL;
 
-AVFRingBuffer::AVFRingBuffer(RingBuffer *Buffer)
-  : m_ringBuffer(Buffer)
+MythAVFormatBuffer::MythAVFormatBuffer(RingBuffer *Buffer)
+  : m_buffer(Buffer)
 {
 }
 
-void AVFRingBuffer::SetRingBuffer(RingBuffer *Buffer)
+void MythAVFormatBuffer::SetRingBuffer(RingBuffer *Buffer)
 {
-    m_ringBuffer = Buffer;
+    m_buffer = Buffer;
 }
 
-RingBuffer* AVFRingBuffer::GetRingBuffer(void)
+RingBuffer* MythAVFormatBuffer::GetRingBuffer(void)
 {
-    return m_ringBuffer;
+    return m_buffer;
 }
 
-int AVFRingBuffer::Open(URLContext *Context, const char*, int)
+int MythAVFormatBuffer::Open(URLContext *Context, const char*, int)
 {
     Context->priv_data = nullptr;
     return 0;
 }
 
-int AVFRingBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
 {
-    auto *avfr = reinterpret_cast<AVFRingBuffer*>(Context->priv_data);
+    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
     if (!avfr)
         return 0;
 
@@ -38,18 +38,18 @@ int AVFRingBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
     return ret;
 }
 
-int AVFRingBuffer::Write(URLContext *h, const uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::Write(URLContext *h, const uint8_t *Buffer, int Size)
 {
-    auto *avfr = reinterpret_cast<AVFRingBuffer*>(h->priv_data);
+    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(h->priv_data);
     if (!avfr)
         return 0;
 
     return avfr->GetRingBuffer()->Write(Buffer, static_cast<uint>(Size));
 }
 
-int64_t AVFRingBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
+int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
 {
-    auto *avfr = reinterpret_cast<AVFRingBuffer*>(Context->priv_data);
+    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
     if (!avfr)
         return 0;
 
@@ -62,33 +62,33 @@ int64_t AVFRingBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
     return avfr->GetRingBuffer()->Seek(Offset, Whence);
 }
 
-int AVFRingBuffer::Close(URLContext*)
+int MythAVFormatBuffer::Close(URLContext*)
 {
     return 0;
 }
 
-int AVFRingBuffer::WritePacket(void *Context, uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::WritePacket(void *Context, uint8_t *Buffer, int Size)
 {
     if (!Context)
         return 0;
     return ffurl_write(reinterpret_cast<URLContext*>(Context), Buffer, Size);
 }
 
-int AVFRingBuffer::ReadPacket(void *Context, uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::ReadPacket(void *Context, uint8_t *Buffer, int Size)
 {
     if (!Context)
         return 0;
     return ffurl_read(reinterpret_cast<URLContext*>(Context), Buffer, Size);
 }
 
-int64_t AVFRingBuffer::SeekPacket(void *Context, int64_t Offset, int Whence)
+int64_t MythAVFormatBuffer::SeekPacket(void *Context, int64_t Offset, int Whence)
 {
     if (!Context)
         return 0;
     return ffurl_seek(reinterpret_cast<URLContext*>(Context), Offset, Whence);
 }
 
-URLProtocol *AVFRingBuffer::GetURLProtocol(void)
+URLProtocol *MythAVFormatBuffer::GetURLProtocol(void)
 {
     static QMutex s_avringbufferLock(QMutex::Recursive);
     static bool   s_avringbufferInitialised = false;
@@ -111,13 +111,13 @@ URLProtocol *AVFRingBuffer::GetURLProtocol(void)
     return &s_avfrURL;
 }
 
-void AVFRingBuffer::SetInInit(bool State)
+void MythAVFormatBuffer::SetInInit(bool State)
 {
     m_initState = State;
     GetRingBuffer()->SetReadInternalMode(State);
 }
 
-bool AVFRingBuffer::IsInInit(void)
+bool MythAVFormatBuffer::IsInInit(void)
 {
     return m_initState;
 }

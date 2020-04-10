@@ -27,7 +27,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-#include "io/avfringbuffer.h"
+#include "io/mythavformatbuffer.h"
 
 class TeletextDecoder;
 class CC608Decoder;
@@ -277,7 +277,7 @@ class AvFormatDecoder : public DecoderBase
 
     int                m_frameDecoded                 {0};
     VideoFrame        *m_decodedVideoFrame            {nullptr};
-    AVFRingBuffer     *m_avfRingBuffer                {nullptr};
+    MythAVFormatBuffer *m_avfRingBuffer               {nullptr};
 
     struct SwsContext *m_swsCtx                       {nullptr};
     bool               m_directRendering              {false};

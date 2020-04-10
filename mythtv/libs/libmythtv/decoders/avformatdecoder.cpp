@@ -898,7 +898,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
 {
     int buf_size                  = m_ringBuffer->BestBufferSize();
     int streamed                  = m_ringBuffer->IsStreamed();
-    m_readContext.prot            = AVFRingBuffer::GetURLProtocol();
+    m_readContext.prot            = MythAVFormatBuffer::GetURLProtocol();
     m_readContext.flags           = AVIO_FLAG_READ;
     m_readContext.is_streamed     = streamed;
     m_readContext.max_packet_size = 0;
@@ -906,9 +906,9 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
     auto *buffer                  = (unsigned char *)av_malloc(buf_size);
     m_ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
                                                       &m_readContext,
-                                                      AVFRingBuffer::ReadPacket,
-                                                      AVFRingBuffer::WritePacket,
-                                                      AVFRingBuffer::SeekPacket);
+                                                      MythAVFormatBuffer::ReadPacket,
+                                                      MythAVFormatBuffer::WritePacket,
+                                                      MythAVFormatBuffer::SeekPacket);
 
     // We can always seek during LiveTV
     m_ic->pb->seekable            = !streamed || forceseek;
@@ -970,7 +970,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     m_processFrames = !m_ringBuffer->IsDVD();
 
     delete m_avfRingBuffer;
-    m_avfRingBuffer = new AVFRingBuffer(rbuffer);
+    m_avfRingBuffer = new MythAVFormatBuffer(rbuffer);
 
     AVInputFormat *fmt      = nullptr;
     QString        fnames   = m_ringBuffer->GetFilename();
