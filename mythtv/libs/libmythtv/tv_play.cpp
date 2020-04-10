@@ -2239,9 +2239,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     .arg(playbackURL).arg(ctx->m_tvchain->GetInputType(-1)));
 
             ctx->SetRingBuffer(
-                RingBuffer::Create(
+                MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
 
             if (ctx->m_buffer)
                 ctx->m_buffer->SetLiveMode(ctx->m_tvchain);
@@ -2292,7 +2292,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         QString playbackURL = ctx->m_playingInfo->GetPlaybackURL(true);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-        RingBuffer *buffer = RingBuffer::Create(playbackURL, false);
+        MythMediaBuffer *buffer = MythMediaBuffer::Create(playbackURL, false);
         if (buffer && !buffer->GetLastError().isEmpty())
         {
             ShowNotificationError(tr("Can't start playback"),
@@ -7240,9 +7240,9 @@ void TV::SwitchInputs(PlayerContext *ctx,
             QString playbackURL = ctx->m_playingInfo->GetPlaybackURL(true);
             bool opennow = (ctx->m_tvchain->GetInputType(-1) != "DUMMY");
             ctx->SetRingBuffer(
-                RingBuffer::Create(
+                MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
 
             ctx->m_tvchain->SetProgram(*ctx->m_playingInfo);
             if (ctx->m_buffer)

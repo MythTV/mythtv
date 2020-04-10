@@ -6,10 +6,10 @@
 
 class NetStream;
 
-class ICRingBuffer : public RingBuffer
+class ICRingBuffer : public MythMediaBuffer
 {
   public:
-    explicit ICRingBuffer(const QString &Url, RingBuffer *Parent = nullptr);
+    explicit ICRingBuffer(const QString &Url, MythMediaBuffer *Parent = nullptr);
     ~ICRingBuffer() override;
 
     bool      IsOpen            (void) const override;
@@ -19,7 +19,7 @@ class ICRingBuffer : public RingBuffer
     bool      IsSeekingAllowed  (void) override { return true; }
     bool      IsBookmarkAllowed (void) override { return false; }
 
-    RingBuffer* TakeRingBuffer(void);
+    MythMediaBuffer* TakeBuffer (void);
 
   protected:
     int       SafeRead          (void *Buffer, uint Size) override;
@@ -27,7 +27,7 @@ class ICRingBuffer : public RingBuffer
     long long SeekInternal      (long long Position, int Whence) override;
 
   private:
-    NetStream  *m_stream { nullptr };
-    RingBuffer *m_parent { nullptr };
+    NetStream       *m_stream { nullptr };
+    MythMediaBuffer *m_parent { nullptr };
 };
 #endif

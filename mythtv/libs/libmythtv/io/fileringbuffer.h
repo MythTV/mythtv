@@ -4,11 +4,11 @@
 // MythTV
 #include "ringbuffer.h"
 
-class MTV_PUBLIC FileRingBuffer : public RingBuffer
+class MTV_PUBLIC FileRingBuffer : public MythMediaBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(FileRingBuffer)
 
-    friend class RingBuffer;
+    friend class MythMediaBuffer;
 
   public:
     ~FileRingBuffer() override;

@@ -40,7 +40,7 @@ class HLSPlayback;
 
 using StreamsList = QList<HLSStream*>;
 
-class HLSRingBuffer : public RingBuffer
+class HLSRingBuffer : public MythMediaBuffer
 {
 public:
     explicit HLSRingBuffer(const QString &lfilename);

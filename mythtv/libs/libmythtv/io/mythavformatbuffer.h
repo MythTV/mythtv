@@ -13,9 +13,9 @@ extern "C" {
 class MythAVFormatBuffer
 {
   public:
-    explicit MythAVFormatBuffer(RingBuffer *Buffer = nullptr);
-    void                SetRingBuffer  (RingBuffer *Buffer);
-    RingBuffer*         GetRingBuffer  (void);
+    explicit MythAVFormatBuffer(MythMediaBuffer *Buffer = nullptr);
+    void                SetBuffer      (MythMediaBuffer *Buffer);
+    MythMediaBuffer*    GetBuffer      (void);
     static URLProtocol* GetURLProtocol (void);
     static int          WritePacket    (void* Context, uint8_t *Buffer, int Size);
     static int          ReadPacket     (void* Context, uint8_t *Buffer, int Size);
@@ -29,7 +29,7 @@ class MythAVFormatBuffer
     bool                IsInInit       (void);
 
   private:
-    RingBuffer         *m_buffer       { nullptr };
+    MythMediaBuffer    *m_buffer       { nullptr };
     bool                m_initState    { true    };
     static URLProtocol  s_avfrURL;
 };

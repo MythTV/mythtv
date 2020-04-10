@@ -59,7 +59,7 @@ class VideoPerformanceTest
     void Test(void)
     {
         PIPMap dummy;
-        RingBuffer *rb  = RingBuffer::Create(m_file, false, true, 2000);
+        MythMediaBuffer *rb  = MythMediaBuffer::Create(m_file, false, true, 2000);
         auto       *mp  = new MythPlayer(
             (PlayerFlags)(kAudioMuted | (m_allowGpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);

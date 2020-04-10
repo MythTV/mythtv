@@ -42,7 +42,7 @@ using namespace std;
 
 struct video_audio;
 class RTjpeg;
-class RingBuffer;
+class MythMediaBuffer;
 class ChannelBase;
 class AudioInput;
 class NuppelVideoRecorder;

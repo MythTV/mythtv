@@ -61,7 +61,7 @@ Transcode::~Transcode()
     delete m_nvr;
 #endif
     SetPlayerContext(nullptr);
-    delete m_outRingBuffer;
+    delete m_outBuffer;
     delete m_fifow;
     delete m_kfaTable;
     delete m_recProfile;
@@ -249,9 +249,9 @@ int Transcode::TranscodeFile(const QString &inputname,
     // Input setup
     auto *player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
-    RingBuffer *rb = (hls && (m_hlsStreamID != -1)) ?
-        RingBuffer::Create(hls->GetSourceFile(), false, false) :
-        RingBuffer::Create(inputname, false, false);
+    MythMediaBuffer *rb = (hls && (m_hlsStreamID != -1)) ?
+        MythMediaBuffer::Create(hls->GetSourceFile(), false, false) :
+        MythMediaBuffer::Create(inputname, false, false);
     if (!rb || !rb->GetLastError().isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,

@@ -34,48 +34,48 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Copying %1 to %2").arg(src).arg(dest));
-    RingBuffer *srcRB = RingBuffer::Create(src, false);
-    if (!srcRB)
+    MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
+    if (!srcbuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Read RingBuffer");
         delete[] buf;
         return GENERIC_EXIT_NOT_OK;
     }
 
-    if (!srcRB->IsOpen())
+    if (!srcbuffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, srcRB is not open");
         delete[] buf;
-        delete srcRB;
+        delete srcbuffer;
         return GENERIC_EXIT_NOT_OK;
     }
 
-    RingBuffer *destRB = RingBuffer::Create(dest, true);
-    if (!destRB)
+    MythMediaBuffer *destbuffer = MythMediaBuffer::Create(dest, true);
+    if (!destbuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, couldn't create Write RingBuffer");
         delete[] buf;
-        delete srcRB;
+        delete srcbuffer;
         return GENERIC_EXIT_NOT_OK;
     }
 
-    if (!destRB->IsOpen())
+    if (!destbuffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, destRB is not open");
         delete[] buf;
-        delete srcRB;
-        delete destRB;
+        delete srcbuffer;
+        delete destbuffer;
         return GENERIC_EXIT_NOT_OK;
     }
-    destRB->WriterSetBlocking(true);
+    destbuffer->WriterSetBlocking(true);
 
-    long long totalBytes = srcRB->GetRealFileSize();
+    long long totalBytes = srcbuffer->GetRealFileSize();
     long long totalBytesCopied = 0;
     bool ok = true;
     int r = 0;
-    while (ok && ((r = srcRB->Read(buf, readSize)) > 0))
+    while (ok && ((r = srcbuffer->Read(buf, readSize)) > 0))
     {
-        int ret = destRB->Write(buf, r);
+        int ret = destbuffer->Write(buf, r);
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -101,8 +101,8 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     LOG(VB_GENERAL, LOG_INFO, "Waiting for write buffer to flush");
 
     delete[] buf;
-    delete srcRB;
-    delete destRB;
+    delete srcbuffer;
+    delete destbuffer;
 
     if (!ok)
         result = GENERIC_EXIT_NOT_OK;

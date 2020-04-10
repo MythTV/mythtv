@@ -44,7 +44,7 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #define LOC QString("FileRingBuf(%1): ").arg(m_filename)
 
 FileRingBuffer::FileRingBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
-  : RingBuffer(kRingBuffer_File)
+  : MythMediaBuffer(kRingBuffer_File)
 {
     m_startReadAhead = UseReadAhead;
     m_safeFilename = Filename;
@@ -121,11 +121,11 @@ static bool CheckPermissions(const QString &Filename)
 
 static bool IsSubtitlePossible(const QString &Extension)
 {
-    QMutexLocker locker(&RingBuffer::s_subExtLock);
+    QMutexLocker locker(&MythMediaBuffer::s_subExtLock);
     bool nosubtitle = false;
-    for (int i = 0; i < RingBuffer::s_subExtNoCheck.size(); i++)
+    for (int i = 0; i < MythMediaBuffer::s_subExtNoCheck.size(); i++)
     {
-        if (Extension.contains(RingBuffer::s_subExtNoCheck[i].right(3)))
+        if (Extension.contains(MythMediaBuffer::s_subExtNoCheck[i].right(3)))
         {
             nosubtitle = true;
             break;
@@ -154,8 +154,8 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
                                              .replace("(", "?")
                                              .replace(")", "?");
 
-        QMutexLocker locker(&RingBuffer::s_subExtLock);
-        for (const auto & ext : RingBuffer::s_subExt)
+        QMutexLocker locker(&MythMediaBuffer::s_subExtLock);
+        for (const auto & ext : MythMediaBuffer::s_subExt)
             list += findBaseName + ext;
     }
 

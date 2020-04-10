@@ -14,12 +14,12 @@ class DummyDecoder : public DecoderBase
     ~DummyDecoder() override = default;
 
     // DecoderBase
-    int         OpenFile(RingBuffer */*rbuffer*/, bool /*novideo*/, char */*testbuf*/, int /*testbufsize*/) override
+    int         OpenFile(MythMediaBuffer* /*Buffer*/, bool /*novideo*/, char */*testbuf*/, int /*testbufsize*/) override
                     { return 0; }
     bool        GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override
                     { usleep(10000); return false; }
     bool        IsLastFrameKey(void) const override       { return true; }
-    void        WriteStoredData(RingBuffer */*rb*/, bool /*storevid*/, long /*timecodeOffset*/) override {}
+    void        WriteStoredData(MythMediaBuffer* /*Buffer*/, bool /*storevid*/, long /*timecodeOffset*/) override {}
     long        UpdateStoredFrameNum(long /*frame*/) override { return 0; }
     QString     GetCodecDecoderName(void) const override  { return "dummy"; }
     MythCodecID GetVideoCodecID(void) const override      { return kCodec_NONE; }

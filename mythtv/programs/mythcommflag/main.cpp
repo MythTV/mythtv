@@ -846,7 +846,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
     QString filename = get_filename(program_info);
 
-    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    MythMediaBuffer *tmprbuf = MythMediaBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1024,7 +1024,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
     // scripts after transcoding or other size-changing operations
     UpdateFileSize(pginfo);
 
-    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    MythMediaBuffer *tmprbuf = MythMediaBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         LOG(VB_GENERAL, LOG_ERR,

@@ -50,7 +50,7 @@ static int RunCCExtract(ProgramInfo &program_info, const QString & destdir)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    MythMediaBuffer *tmprbuf = MythMediaBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         cerr << qPrintable(QString("Unable to create RingBuffer for %1")

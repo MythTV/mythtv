@@ -25,7 +25,7 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MTV_PUBLIC MythDVDBuffer : public RingBuffer
+class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(MythDVDBuffer)
 

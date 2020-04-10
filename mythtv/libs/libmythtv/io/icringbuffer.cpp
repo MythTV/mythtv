@@ -12,8 +12,8 @@
 
 #define LOC QString("ICRingBuf: ")
 
-ICRingBuffer::ICRingBuffer(const QString &Url, RingBuffer *Parent)
-  : RingBuffer(kRingBuffer_MHEG),
+ICRingBuffer::ICRingBuffer(const QString &Url, MythMediaBuffer *Parent)
+  : MythMediaBuffer(kRingBuffer_MHEG),
     m_parent(Parent)
 {
     m_startReadAhead = true;
@@ -147,9 +147,9 @@ long long ICRingBuffer::GetRealFileSizeInternal(void) const
     return m_stream ? m_stream->GetSize() : -1;
 }
 
-RingBuffer *ICRingBuffer::TakeRingBuffer(void)
+MythMediaBuffer *ICRingBuffer::TakeBuffer(void)
 {
-    RingBuffer *parent = m_parent;
+    MythMediaBuffer *parent = m_parent;
     if (parent && IsOpen())
         parent->Unpause();
     m_parent = nullptr;

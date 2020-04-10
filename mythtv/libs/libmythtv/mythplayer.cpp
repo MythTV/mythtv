@@ -2467,12 +2467,12 @@ void MythPlayer::SwitchToProgram(void)
         // Restore original ringbuffer
         auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
         if (ic)
-            m_playerCtx->m_buffer = ic->TakeRingBuffer();
+            m_playerCtx->m_buffer = ic->TakeBuffer();
         delete ic;
     }
 
     m_playerCtx->m_buffer->OpenFile(
-        pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
+        pginfo->GetPlaybackURL(), MythMediaBuffer::kLiveTVOpenTimeout);
 
     if (!m_playerCtx->m_buffer->IsOpen())
     {
@@ -2628,11 +2628,11 @@ void MythPlayer::JumpToProgram(void)
         // Restore original ringbuffer
         auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
         if (ic)
-            m_playerCtx->m_buffer = ic->TakeRingBuffer();
+            m_playerCtx->m_buffer = ic->TakeBuffer();
         delete ic;
     }
 
-    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), MythMediaBuffer::kLiveTVOpenTimeout);
     QString subfn = m_playerCtx->m_buffer->GetSubtitleFilename();
     TVState desiredState = m_playerCtx->GetState();
     bool isInProgress = (desiredState == kState_WatchingRecording ||
@@ -4792,15 +4792,15 @@ void MythPlayer::SetCutList(const frm_dir_map_t &newCutList)
     m_deleteMap.SetMap(newCutList);
 }
 
-bool MythPlayer::WriteStoredData(RingBuffer *outRingBuffer,
-                                 bool writevideo, long timecodeOffset)
+bool MythPlayer::WriteStoredData(MythMediaBuffer *OutBuffer,
+                                 bool Writevideo, long TimecodeOffset)
 {
     if (!m_decoder)
         return false;
-    if (writevideo && !m_decoder->GetRawVideoState())
-        writevideo = false;
-    m_decoder->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
-    return writevideo;
+    if (Writevideo && !m_decoder->GetRawVideoState())
+        Writevideo = false;
+    m_decoder->WriteStoredData(OutBuffer, Writevideo, TimecodeOffset);
+    return Writevideo;
 }
 
 void MythPlayer::SetCommBreakMap(frm_dir_map_t &newMap)
@@ -4827,7 +4827,7 @@ int MythPlayer::GetStatusbarPos(void) const
 
 void MythPlayer::GetPlaybackData(InfoMap &infoMap)
 {
-    QString samplerate = RingBuffer::BitrateToString(m_audio.GetSampleRate(), true);
+    QString samplerate = MythMediaBuffer::BitrateToString(m_audio.GetSampleRate(), true);
     infoMap.insert("samplerate",  samplerate);
     infoMap.insert("filename",    m_playerCtx->m_buffer->GetSafeFilename());
     infoMap.insert("decoderrate", m_playerCtx->m_buffer->GetDecoderRate());

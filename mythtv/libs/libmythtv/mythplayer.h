@@ -50,7 +50,7 @@ class MythPlayer;
 class Jitterometer;
 class QThread;
 class QWidget;
-class RingBuffer;
+class MythMediaBuffer;
 
 using StatusCallback = void (*)(int, void*);
 
@@ -288,8 +288,7 @@ class MTV_PUBLIC MythPlayer
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
     bool TranscodeGetNextFrame(int &did_ff, bool &is_key, bool honorCutList);
-    bool WriteStoredData(
-        RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
+    bool WriteStoredData(MythMediaBuffer *OutBuffer, bool WriteVideo, long TimecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
     void SetCutList(const frm_dir_map_t &newCutList);
 

@@ -46,7 +46,7 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     static bool FindAudioFormat  (AVCodecContext *Ctx, AVCodec *Codec, AVSampleFormat Format);
 
     MythAVFormatBuffer    *m_avfBuffer     { nullptr };
-    RingBuffer            *m_ringBuffer    { nullptr };
+    MythMediaBuffer       *m_buffer        { nullptr };
     AVOutputFormat         m_fmt           { };
     AVFormatContext       *m_ctx           { nullptr };
     MythCodecMap           m_codecMap;

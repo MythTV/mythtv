@@ -40,14 +40,14 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-const int  RingBuffer::kDefaultOpenTimeout = 2000; // ms
-const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
+const int  MythMediaBuffer::kDefaultOpenTimeout = 2000; // ms
+const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
 
 #define LOC      QString("RingBuf(%1): ").arg(m_filename)
 
-QMutex      RingBuffer::s_subExtLock;
-QStringList RingBuffer::s_subExt;
-QStringList RingBuffer::s_subExtNoCheck;
+QMutex      MythMediaBuffer::s_subExtLock;
+QStringList MythMediaBuffer::s_subExt;
+QStringList MythMediaBuffer::s_subExtNoCheck;
 
 
 /*
@@ -101,7 +101,7 @@ QStringList RingBuffer::s_subExtNoCheck;
  *                      milliseconds before giving up.
  *  \param StreamOnly   If true disallow DVD and Bluray (used by FileTransfer)
 */
-RingBuffer *RingBuffer::Create(const QString &Filename, bool Write,
+MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
                                bool UseReadAhead, int Timeout, bool StreamOnly)
 {
     QString filename = Filename;
@@ -200,7 +200,7 @@ RingBuffer *RingBuffer::Create(const QString &Filename, bool Write,
     return new FileRingBuffer(filename, Write, UseReadAhead, Timeout);
 }
 
-RingBuffer::RingBuffer(RingBufferType Type)
+MythMediaBuffer::MythMediaBuffer(RingBufferType Type)
   : MThread("RingBuffer"),
     m_type(Type)
 {
@@ -223,7 +223,7 @@ RingBuffer::RingBuffer(RingBufferType Type)
     s_subExtLock.unlock();
 }
 
-RingBufferType RingBuffer::GetType(void) const
+RingBufferType MythMediaBuffer::GetType(void) const
 {
     return m_type;
 }
@@ -238,7 +238,7 @@ RingBufferType RingBuffer::GetType(void) const
  *        pure virtual functions without implementations
  *        during destruction.
  */
-RingBuffer::~RingBuffer(void)
+MythMediaBuffer::~MythMediaBuffer(void)
 {
     assert(!isRunning());
     wait();
@@ -257,7 +257,7 @@ RingBuffer::~RingBuffer(void)
 /** \fn RingBuffer::Reset(bool, bool, bool)
  *  \brief Resets the read-ahead thread and our position in the file
  */
-void RingBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
+void MythMediaBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("Reset(%1,%2,%3)")
             .arg(Full).arg(ToAdjust).arg(ResetInternal));
@@ -298,7 +298,7 @@ void RingBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
  *  \brief Set the raw bit rate, to allow RingBuffer adjust effective bitrate.
  *  \param RawBitrate Streams average number of kilobits per second when playspeed is 1.0
  */
-void RingBuffer::UpdateRawBitrate(uint RawBitrate)
+void MythMediaBuffer::UpdateRawBitrate(uint RawBitrate)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("UpdateRawBitrate(%1Kb)").arg(RawBitrate));
 
@@ -326,7 +326,7 @@ void RingBuffer::UpdateRawBitrate(uint RawBitrate)
  *  \brief Set the play speed, to allow RingBuffer adjust effective bitrate.
  *  \param play_speed Speed to set. (1.0 for normal speed)
  */
-void RingBuffer::UpdatePlaySpeed(float PlaySpeed)
+void MythMediaBuffer::UpdatePlaySpeed(float PlaySpeed)
 {
     m_rwLock.lockForWrite();
     m_playSpeed = PlaySpeed;
@@ -334,12 +334,12 @@ void RingBuffer::UpdatePlaySpeed(float PlaySpeed)
     m_rwLock.unlock();
 }
 
-void RingBuffer::EnableBitrateMonitor(bool Enable)
+void MythMediaBuffer::EnableBitrateMonitor(bool Enable)
 {
     m_bitrateMonitorEnabled = Enable;
 }
 
-void RingBuffer::SetWaitForWrite(void)
+void MythMediaBuffer::SetWaitForWrite(void)
 {
     m_waitForWrite = true;
 }
@@ -349,7 +349,7 @@ void RingBuffer::SetWaitForWrite(void)
  *         underlying container is matroska, both of which may require a larger
  *         buffer size.
  */
-void RingBuffer::SetBufferSizeFactors(bool EstBitrate, bool Matroska)
+void MythMediaBuffer::SetBufferSizeFactors(bool EstBitrate, bool Matroska)
 {
     m_rwLock.lockForWrite();
     m_unknownBitrate = EstBitrate;
@@ -365,7 +365,7 @@ void RingBuffer::SetBufferSizeFactors(bool EstBitrate, bool Matroska)
  *  \warning Must be called with rwlock in write lock state.
  *
  */
-void RingBuffer::CalcReadAheadThresh(void)
+void MythMediaBuffer::CalcReadAheadThresh(void)
 {
     uint estbitrate = 0;
 
@@ -426,7 +426,7 @@ void RingBuffer::CalcReadAheadThresh(void)
             .arg(m_fillMin/1024).arg(m_readBlockSize/1024));
 }
 
-bool RingBuffer::IsNearEnd(double /*Framerate*/, uint Frames) const
+bool MythMediaBuffer::IsNearEnd(double /*Framerate*/, uint Frames) const
 {
     QReadLocker lock(&m_rwLock);
 
@@ -465,7 +465,7 @@ bool RingBuffer::IsNearEnd(double /*Framerate*/, uint Frames) const
 
 /// \brief Returns number of bytes available for reading into buffer.
 /// \warning Must be called with rwlock in locked state.
-int RingBuffer::ReadBufFree(void) const
+int MythMediaBuffer::ReadBufFree(void) const
 {
     m_rbrLock.lockForRead();
     m_rbwLock.lockForRead();
@@ -476,13 +476,13 @@ int RingBuffer::ReadBufFree(void) const
 }
 
 /// \brief Returns number of bytes available for reading from buffer.
-int RingBuffer::GetReadBufAvail(void) const
+int MythMediaBuffer::GetReadBufAvail(void) const
 {
     QReadLocker lock(&m_rwLock);
     return ReadBufAvail();
 }
 
-long long RingBuffer::GetRealFileSize(void) const
+long long MythMediaBuffer::GetRealFileSize(void) const
 {
     {
         QReadLocker lock(&m_rwLock);
@@ -493,7 +493,7 @@ long long RingBuffer::GetRealFileSize(void) const
     return GetRealFileSizeInternal();
 }
 
-long long RingBuffer::Seek(long long Position, int Whence, bool HasLock)
+long long MythMediaBuffer::Seek(long long Position, int Whence, bool HasLock)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("Seek: Position:%1 Type: %2 Locked: %3)")
         .arg(Position)
@@ -537,7 +537,7 @@ long long RingBuffer::Seek(long long Position, int Whence, bool HasLock)
     return ret;
 }
 
-bool RingBuffer::SetReadInternalMode(bool Mode)
+bool MythMediaBuffer::SetReadInternalMode(bool Mode)
 {
     QWriteLocker lock(&m_rwLock);
     bool old = m_readInternalMode;
@@ -562,14 +562,14 @@ bool RingBuffer::SetReadInternalMode(bool Mode)
     return old;
 }
 
-bool RingBuffer::IsReadInternalMode(void)
+bool MythMediaBuffer::IsReadInternalMode(void)
 {
     return m_readInternalMode;
 }
 
 /// \brief Returns number of bytes available for reading from buffer.
 /// \warning Must be called with rwlock in locked state.
-int RingBuffer::ReadBufAvail(void) const
+int MythMediaBuffer::ReadBufAvail(void) const
 {
     m_rbrLock.lockForRead();
     m_rbwLock.lockForRead();
@@ -589,7 +589,7 @@ int RingBuffer::ReadBufAvail(void) const
  *  \warning Must be called with rwlock and poslock in write lock state.
  *  \param NewInternal Position in file to start reading data from
  */
-void RingBuffer::ResetReadAhead(long long NewInternal)
+void MythMediaBuffer::ResetReadAhead(long long NewInternal)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("ResetReadAhead(internalreadpos = %1->%2)")
             .arg(m_internalReadPos).arg(NewInternal));
@@ -631,7 +631,7 @@ void RingBuffer::ResetReadAhead(long long NewInternal)
  *   and the read ahead thread will not be started.
  *
  */
-void RingBuffer::Start(void)
+void MythMediaBuffer::Start(void)
 {
     bool dostart = true;
 
@@ -667,7 +667,7 @@ void RingBuffer::Start(void)
 /** \fn RingBuffer::KillReadAheadThread(void)
  *  \brief Stops the read-ahead thread, and waits for it to stop.
  */
-void RingBuffer::KillReadAheadThread(void)
+void MythMediaBuffer::KillReadAheadThread(void)
 {
     while (isRunning())
     {
@@ -683,7 +683,7 @@ void RingBuffer::KillReadAheadThread(void)
 /** \fn RingBuffer::StopReads(void)
  *  \sa StartReads(void), Pause(void)
  */
-void RingBuffer::StopReads(void)
+void MythMediaBuffer::StopReads(void)
 {
     LOG(VB_FILE, LOG_INFO, LOC + "StopReads()");
     m_stopReads = true;
@@ -693,7 +693,7 @@ void RingBuffer::StopReads(void)
 /** \fn RingBuffer::StartReads(void)
  *  \sa StopReads(void), Unpause(void)
  */
-void RingBuffer::StartReads(void)
+void MythMediaBuffer::StartReads(void)
 {
     LOG(VB_FILE, LOG_INFO, LOC + "StartReads()");
     m_stopReads = false;
@@ -704,7 +704,7 @@ void RingBuffer::StartReads(void)
  *  \brief Pauses the read-ahead thread. Calls StopReads(void).
  *  \sa Unpause(void), WaitForPause(void)
  */
-void RingBuffer::Pause(void)
+void MythMediaBuffer::Pause(void)
 {
     LOG(VB_FILE, LOG_INFO, LOC + "Pausing read ahead thread");
     StopReads();
@@ -718,7 +718,7 @@ void RingBuffer::Pause(void)
  *  \brief Unpauses the read-ahead thread. Calls StartReads(void).
  *  \sa Pause(void)
  */
-void RingBuffer::Unpause(void)
+void MythMediaBuffer::Unpause(void)
 {
     LOG(VB_FILE, LOG_INFO, LOC + "Unpausing readahead thread");
     StartReads();
@@ -732,7 +732,7 @@ void RingBuffer::Unpause(void)
 /** \fn RingBuffer::WaitForPause(void)
  *  \brief Waits for Pause(void) to take effect.
  */
-void RingBuffer::WaitForPause(void)
+void MythMediaBuffer::WaitForPause(void)
 {
     MythTimer t;
     t.start();
@@ -747,7 +747,7 @@ void RingBuffer::WaitForPause(void)
     m_rwLock.unlock();
 }
 
-bool RingBuffer::PauseAndWait(void)
+bool MythMediaBuffer::PauseAndWait(void)
 {
     const uint timeout = 500; // ms
 
@@ -790,7 +790,7 @@ bool RingBuffer::PauseAndWait(void)
     return m_requestPause || m_paused;
 }
 
-void RingBuffer::CreateReadAheadBuffer(void)
+void MythMediaBuffer::CreateReadAheadBuffer(void)
 {
     m_rwLock.lockForWrite();
     m_posLock.lockForWrite();
@@ -838,7 +838,7 @@ void RingBuffer::CreateReadAheadBuffer(void)
         .arg(newsize >> 20));
 }
 
-void RingBuffer::run(void)
+void MythMediaBuffer::run(void)
 {
     RunProlog();
 
@@ -1176,7 +1176,7 @@ void RingBuffer::run(void)
     RunEpilog();
 }
 
-long long RingBuffer::SetAdjustFilesize(void)
+long long MythMediaBuffer::SetAdjustFilesize(void)
 {
     m_rwLock.lockForWrite();
     m_posLock.lockForRead();
@@ -1188,7 +1188,7 @@ long long RingBuffer::SetAdjustFilesize(void)
 }
 
 /// \note Only works with readahead
-int RingBuffer::Peek(void *Buffer, int Count)
+int MythMediaBuffer::Peek(void *Buffer, int Count)
 {
     int result = ReadPriv(Buffer, Count, true);
     if (result != Count)
@@ -1199,7 +1199,7 @@ int RingBuffer::Peek(void *Buffer, int Count)
     return result;
 }
 
-bool RingBuffer::WaitForReadsAllowed(void)
+bool MythMediaBuffer::WaitForReadsAllowed(void)
 {
     // Wait up to 30000 ms for reads allowed (or readsdesired if post seek/open)
     bool &check = (m_recentSeek || m_readInternalMode) ? m_readsDesired : m_readsAllowed;
@@ -1227,7 +1227,7 @@ bool RingBuffer::WaitForReadsAllowed(void)
     return check;
 }
 
-int RingBuffer::WaitForAvail(int Count, int Timeout)
+int MythMediaBuffer::WaitForAvail(int Count, int Timeout)
 {
     int available = ReadBufAvail();
     if (available >= Count)
@@ -1262,7 +1262,7 @@ int RingBuffer::WaitForAvail(int Count, int Timeout)
     return available;
 }
 
-int RingBuffer::ReadDirect(void *Buffer, int Count, bool Peek)
+int MythMediaBuffer::ReadDirect(void *Buffer, int Count, bool Peek)
 {
     long long oldposition = 0;
     if (Peek)
@@ -1337,7 +1337,7 @@ int RingBuffer::ReadDirect(void *Buffer, int Count, bool Peek)
  *  \param  Peek   If true, don't increment read count
  *  \return Returns number of bytes read
  */
-int RingBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
+int MythMediaBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
 {
     QString desc = QString("ReadPriv(..%1, %2)").arg(Count).arg(Peek ? "peek" : "normal");
     LOG(VB_FILE, LOG_DEBUG, LOC + desc + QString(" @%1 -- begin").arg(m_rbrPos));
@@ -1492,7 +1492,7 @@ int RingBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
  *  \param count Number of bytes to read
  *  \return Returns number of bytes read
  */
-int RingBuffer::Read(void *Buffer, int Count)
+int MythMediaBuffer::Read(void *Buffer, int Count)
 {
     int ret = ReadPriv(Buffer, Count, false);
     if (ret > 0)
@@ -1506,7 +1506,7 @@ int RingBuffer::Read(void *Buffer, int Count)
     return ret;
 }
 
-QString RingBuffer::BitrateToString(uint64_t Rate, bool Hz)
+QString MythMediaBuffer::BitrateToString(uint64_t Rate, bool Hz)
 {
     if (Rate < 1)
         return "-";
@@ -1539,17 +1539,17 @@ QString RingBuffer::BitrateToString(uint64_t Rate, bool Hz)
     return msg.arg(bitrate, 0, 'f', range);
 }
 
-QString RingBuffer::GetDecoderRate(void)
+QString MythMediaBuffer::GetDecoderRate(void)
 {
     return BitrateToString(UpdateDecoderRate());
 }
 
-QString RingBuffer::GetStorageRate(void)
+QString MythMediaBuffer::GetStorageRate(void)
 {
     return BitrateToString(UpdateStorageRate());
 }
 
-QString RingBuffer::GetAvailableBuffer(void)
+QString MythMediaBuffer::GetAvailableBuffer(void)
 {
     if (m_type == kRingBuffer_DVD || m_type == kRingBuffer_BD)
         return "N/A";
@@ -1559,12 +1559,12 @@ QString RingBuffer::GetAvailableBuffer(void)
     return QString("%1%").arg(lroundf((static_cast<float>(avail) / static_cast<float>(m_bufferSize) * 100.0F)));
 }
 
-uint RingBuffer::GetBufferSize(void)
+uint MythMediaBuffer::GetBufferSize(void)
 {
     return m_bufferSize;
 }
 
-uint64_t RingBuffer::UpdateDecoderRate(uint64_t Latest)
+uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
 {
     if (!m_bitrateMonitorEnabled)
         return 0;
@@ -1595,7 +1595,7 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t Latest)
     return average;
 }
 
-uint64_t RingBuffer::UpdateStorageRate(uint64_t Latest)
+uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
 {
     if (!m_bitrateMonitorEnabled)
         return 0;
@@ -1630,7 +1630,7 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t Latest)
  *  \brief Writes buffer to ThreadedFileWriter::Write(const void*,uint)
  *  \return Bytes written, or -1 on error.
  */
-int RingBuffer::Write(const void *Buffer, uint Count)
+int MythMediaBuffer::Write(const void *Buffer, uint Count)
 {
     m_rwLock.lockForRead();
     int result = -1;
@@ -1667,7 +1667,7 @@ int RingBuffer::Write(const void *Buffer, uint Count)
 /** \fn RingBuffer::Sync(void)
  *  \brief Calls ThreadedFileWriter::Sync(void)
  */
-void RingBuffer::Sync(void)
+void MythMediaBuffer::Sync(void)
 {
     m_rwLock.lockForRead();
     if (m_tfw)
@@ -1677,7 +1677,7 @@ void RingBuffer::Sync(void)
 
 /** \brief Calls ThreadedFileWriter::Seek(long long,int).
  */
-long long RingBuffer::WriterSeek(long long Position, int Whence, bool HasLock)
+long long MythMediaBuffer::WriterSeek(long long Position, int Whence, bool HasLock)
 {
     long long result = -1;
 
@@ -1703,7 +1703,7 @@ long long RingBuffer::WriterSeek(long long Position, int Whence, bool HasLock)
 /** \fn RingBuffer::WriterFlush(void)
  *  \brief Calls ThreadedFileWriter::Flush(void)
  */
-void RingBuffer::WriterFlush(void)
+void MythMediaBuffer::WriterFlush(void)
 {
     m_rwLock.lockForRead();
     if (m_tfw)
@@ -1714,7 +1714,7 @@ void RingBuffer::WriterFlush(void)
 /** \fn RingBuffer::WriterSetBlocking(bool)
  *  \brief Calls ThreadedFileWriter::SetBlocking(bool)
  */
-bool RingBuffer::WriterSetBlocking(bool Lock)
+bool MythMediaBuffer::WriterSetBlocking(bool Lock)
 {
     QReadLocker lock(&m_rwLock);
     if (m_tfw)
@@ -1737,7 +1737,7 @@ bool RingBuffer::WriterSetBlocking(bool Lock)
  *  the file is growing it can also cause the RingBuffer to
  *  report an end-of-file condition prematurely.
  */
-void RingBuffer::SetOldFile(bool Old)
+void MythMediaBuffer::SetOldFile(bool Old)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("SetOldFile: %1)").arg(Old));
     m_rwLock.lockForWrite();
@@ -1745,7 +1745,7 @@ void RingBuffer::SetOldFile(bool Old)
     m_rwLock.unlock();
 }
 
-QString RingBuffer::GetFilename(void) const
+QString MythMediaBuffer::GetFilename(void) const
 {
     m_rwLock.lockForRead();
     QString tmp = m_filename;
@@ -1753,12 +1753,12 @@ QString RingBuffer::GetFilename(void) const
     return tmp;
 }
 
-QString RingBuffer::GetSafeFilename(void)
+QString MythMediaBuffer::GetSafeFilename(void)
 {
     return m_safeFilename;
 }
 
-QString RingBuffer::GetSubtitleFilename(void) const
+QString MythMediaBuffer::GetSubtitleFilename(void) const
 {
     m_rwLock.lockForRead();
     QString tmp = m_subtitleFilename;
@@ -1766,7 +1766,7 @@ QString RingBuffer::GetSubtitleFilename(void) const
     return tmp;
 }
 
-QString RingBuffer::GetLastError(void) const
+QString MythMediaBuffer::GetLastError(void) const
 {
     m_rwLock.lockForRead();
     QString tmp = m_lastError;
@@ -1774,17 +1774,17 @@ QString RingBuffer::GetLastError(void) const
     return tmp;
 }
 
-bool RingBuffer::GetCommsError() const
+bool MythMediaBuffer::GetCommsError() const
 {
     return m_commsError;
 }
 
-void RingBuffer::ResetCommsError(void)
+void MythMediaBuffer::ResetCommsError(void)
 {
     m_commsError = false;
 }
 
-bool RingBuffer::GetStopReads(void) const
+bool MythMediaBuffer::GetStopReads(void) const
 {
     return m_stopReads;
 }
@@ -1792,7 +1792,7 @@ bool RingBuffer::GetStopReads(void) const
 /** \fn RingBuffer::GetWritePosition(void) const
  *  \brief Returns how far into a ThreadedFileWriter file we have written.
  */
-long long RingBuffer::GetWritePosition(void) const
+long long MythMediaBuffer::GetWritePosition(void) const
 {
     m_posLock.lockForRead();
     long long ret = m_writePos;
@@ -1804,7 +1804,7 @@ long long RingBuffer::GetWritePosition(void) const
  *  \brief Returns true if this RingBuffer has been assigned a LiveTVChain.
  *  \sa SetLiveMode(LiveTVChain*)
  */
-bool RingBuffer::LiveMode(void) const
+bool MythMediaBuffer::LiveMode(void) const
 {
     m_rwLock.lockForRead();
     bool ret = (m_liveTVChain);
@@ -1816,7 +1816,7 @@ bool RingBuffer::LiveMode(void) const
  *  \brief Assigns a LiveTVChain to this RingBuffer
  *  \sa LiveMode(void)
  */
-void RingBuffer::SetLiveMode(LiveTVChain *Chain)
+void MythMediaBuffer::SetLiveMode(LiveTVChain *Chain)
 {
     m_rwLock.lockForWrite();
     m_liveTVChain = Chain;
@@ -1824,49 +1824,49 @@ void RingBuffer::SetLiveMode(LiveTVChain *Chain)
 }
 
 /// Tells RingBuffer whether to ignore the end-of-file
-void RingBuffer::IgnoreLiveEOF(bool Ignore)
+void MythMediaBuffer::IgnoreLiveEOF(bool Ignore)
 {
     m_rwLock.lockForWrite();
     m_ignoreLiveEOF = Ignore;
     m_rwLock.unlock();
 }
 
-bool RingBuffer::IsDisc(void) const
+bool MythMediaBuffer::IsDisc(void) const
 {
     return IsDVD() || IsBD();
 }
 
-bool RingBuffer::IsDVD(void) const
+bool MythMediaBuffer::IsDVD(void) const
 {
     return m_type == kRingBuffer_DVD;
 }
 
-bool RingBuffer::IsBD(void) const
+bool MythMediaBuffer::IsBD(void) const
 {
     return m_type == kRingBuffer_BD;
 }
 
-const MythDVDBuffer *RingBuffer::DVD(void) const
+const MythDVDBuffer *MythMediaBuffer::DVD(void) const
 {
     return dynamic_cast<const MythDVDBuffer*>(this);
 }
 
-const BDRingBuffer  *RingBuffer::BD(void) const
+const BDRingBuffer  *MythMediaBuffer::BD(void) const
 {
     return dynamic_cast<const BDRingBuffer*>(this);
 }
 
-MythDVDBuffer *RingBuffer::DVD(void)
+MythDVDBuffer *MythMediaBuffer::DVD(void)
 {
     return dynamic_cast<MythDVDBuffer*>(this);
 }
 
-BDRingBuffer  *RingBuffer::BD(void)
+BDRingBuffer  *MythMediaBuffer::BD(void)
 {
     return dynamic_cast<BDRingBuffer*>(this);
 }
 
-void RingBuffer::AVFormatInitNetwork(void)
+void MythMediaBuffer::AVFormatInitNetwork(void)
 {
     static QMutex s_avnetworkLock(QMutex::Recursive);
     static bool s_avnetworkInitialised = false;

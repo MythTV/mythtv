@@ -67,7 +67,7 @@ class BDOverlay
  *
  *   A class to allow a RingBuffer to read from BDs.
  */
-class MTV_PUBLIC BDRingBuffer : public RingBuffer
+class MTV_PUBLIC BDRingBuffer : public MythMediaBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
 

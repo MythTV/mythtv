@@ -46,17 +46,16 @@ enum RingBufferType
     kRingBuffer_MHEG
 };
 
-class MTV_PUBLIC RingBuffer : protected MThread
+class MTV_PUBLIC MythMediaBuffer : protected MThread
 {
     friend class ICRingBuffer;
 
   public:
-    static RingBuffer *Create(const QString &Filename,
-                              bool Write,
-                              bool UseReadAhead = true,
-                              int  Timeout = kDefaultOpenTimeout,
-                              bool StreamOnly = false);
-    ~RingBuffer() override = 0;
+    static MythMediaBuffer *Create(const QString &Filename, bool Write,
+                                   bool UseReadAhead = true,
+                                   int  Timeout = kDefaultOpenTimeout,
+                                   bool StreamOnly = false);
+    ~MythMediaBuffer() override = 0;
     RingBufferType GetType() const;
 
     static const int kDefaultOpenTimeout;
@@ -135,7 +134,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool      ReOpen            (const QString& /*Filename*/ = "") { return false; }
 
   protected:
-    explicit RingBuffer(RingBufferType Type);
+    explicit MythMediaBuffer(RingBufferType Type);
 
     void     run(void) override;
     void     CreateReadAheadBuffer (void);

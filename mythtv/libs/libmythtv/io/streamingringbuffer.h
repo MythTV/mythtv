@@ -10,7 +10,7 @@ extern "C" {
 #include "libavformat/url.h"
 }
 
-class StreamingRingBuffer : public RingBuffer
+class StreamingRingBuffer : public MythMediaBuffer
 {
   public:
     explicit StreamingRingBuffer(const QString &Filename);

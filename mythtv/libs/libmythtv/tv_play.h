@@ -43,7 +43,7 @@ class OSD;
 class RemoteEncoder;
 class MythPlayer;
 class DetectLetterbox;
-class RingBuffer;
+class MythMediaBuffer;
 class ProgramInfo;
 class PlayerContext;
 class TvPlayWindow;

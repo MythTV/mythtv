@@ -9,7 +9,7 @@
 #define LOC QString("StreamRingBuf(%1): ").arg(m_filename)
 
 StreamingRingBuffer::StreamingRingBuffer(const QString &Filename)
-  : RingBuffer(kRingBuffer_HTTP)
+  : MythMediaBuffer(kRingBuffer_HTTP)
 {
     m_startReadAhead = false;
     StreamingRingBuffer::OpenFile(Filename);
@@ -48,7 +48,7 @@ long long StreamingRingBuffer::GetReadPosition(void) const
  */
 bool StreamingRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
 {
-    RingBuffer::AVFormatInitNetwork();
+    MythMediaBuffer::AVFormatInitNetwork();
 
     m_rwLock.lockForWrite();
 

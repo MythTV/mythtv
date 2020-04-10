@@ -1131,10 +1131,10 @@ void TVRec::TeardownRecorder(uint request_flags)
         m_recorder = nullptr;
     }
 
-    if (m_ringBuffer)
+    if (m_buffer)
     {
         LOG(VB_FILE, LOG_INFO, LOC + "calling StopReads()");
-        m_ringBuffer->StopReads();
+        m_buffer->StopReads();
     }
 
     if (m_curRecording)
@@ -2580,8 +2580,8 @@ long long TVRec::GetFilePosition(void)
 {
     QMutexLocker lock(&m_stateChangeLock);
 
-    if (m_ringBuffer)
-        return m_ringBuffer->GetWritePosition();
+    if (m_buffer)
+        return m_buffer->GetWritePosition();
     return -1;
 }
 
@@ -3363,25 +3363,24 @@ bool TVRec::SetChannelInfo(uint chanid, uint sourceid,
 /** \fn TVRec::SetRingBuffer(RingBuffer*)
  *  \brief Sets "ringBuffer", deleting any existing RingBuffer.
  */
-void TVRec::SetRingBuffer(RingBuffer *rb)
+void TVRec::SetRingBuffer(MythMediaBuffer* Buffer)
 {
     QMutexLocker lock(&m_stateChangeLock);
 
-    RingBuffer *rb_old = m_ringBuffer;
-    m_ringBuffer = rb;
+    MythMediaBuffer *oldbuffer = m_buffer;
+    m_buffer = Buffer;
 
-    if (rb_old && (rb_old != rb))
+    if (oldbuffer && (oldbuffer != Buffer))
     {
         if (HasFlags(kFlagDummyRecorderRunning))
             ClearFlags(kFlagDummyRecorderRunning, __FILE__, __LINE__);
-        delete rb_old;
+        delete oldbuffer;
     }
 
     m_switchingBuffer = false;
 }
 
-void TVRec::RingBufferChanged(
-    RingBuffer *rb, RecordingInfo *pginfo, RecordingQuality *recq)
+void TVRec::RingBufferChanged(MythMediaBuffer *Buffer, RecordingInfo *pginfo, RecordingQuality *recq)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "RingBufferChanged()");
 
@@ -3399,7 +3398,7 @@ void TVRec::RingBufferChanged(
         m_curRecording->SetRecordingStatus(RecStatus::Recording);
     }
 
-    SetRingBuffer(rb);
+    SetRingBuffer(Buffer);
 }
 
 QString TVRec::TuningGetChanNum(const TuningRequest &request,
@@ -3629,7 +3628,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         // At this point the channel is shut down
     }
 
-    if (m_ringBuffer && (request.m_flags & kFlagKillRingBuffer))
+    if (m_buffer && (request.m_flags & kFlagKillRingBuffer))
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Tearing down RingBuffer");
         SetRingBuffer(nullptr);
@@ -3775,7 +3774,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         m_tvChain->SetInputType("DUMMY");
 
-        if (!m_ringBuffer)
+        if (!m_buffer)
             ok2 = CreateLiveTVRingBuffer(channum);
         else
             ok2 = SwitchLiveTVRingBuffer(channum, true, false);
@@ -3869,7 +3868,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             }
         }
 
-        if (has_dummy && m_ringBuffer)
+        if (has_dummy && m_buffer)
         {
             // Make sure recorder doesn't point to bogus ringbuffer before
             // it is potentially restarted without a new ringbuffer, if
@@ -4187,7 +4186,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     if (m_tvChain)
     {
         bool ok = false;
-        if (!m_ringBuffer)
+        if (!m_buffer)
         {
             ok = CreateLiveTVRingBuffer(m_channel->GetChannelName());
             SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
@@ -4208,8 +4207,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         bool write = m_genOpt.m_inputType != "IMPORT";
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("rec->GetPathname(): '%1'")
                 .arg(rec->GetPathname()));
-        SetRingBuffer(RingBuffer::Create(rec->GetPathname(), write));
-        if (!m_ringBuffer->IsOpen() && write)
+        SetRingBuffer(MythMediaBuffer::Create(rec->GetPathname(), write));
+        if (!m_buffer->IsOpen() && write)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("RingBuffer '%1' not open...")
@@ -4220,7 +4219,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         }
     }
 
-    if (!m_ringBuffer)
+    if (!m_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to start recorder!  ringBuffer is NULL\n"
@@ -4244,7 +4243,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (m_recorder)
     {
-        m_recorder->SetRingBuffer(m_ringBuffer);
+        m_recorder->SetRingBuffer(m_buffer);
         m_recorder->Initialize();
         if (m_recorder->IsErrored())
         {
@@ -4374,7 +4373,7 @@ void TVRec::TuningRestartRecorder(void)
 
     if (had_dummyrec)
     {
-        m_recorder->SetRingBuffer(m_ringBuffer);
+        m_recorder->SetRingBuffer(m_buffer);
         ProgramInfo *progInfo = m_tvChain->GetProgramAt(-1);
         RecordingInfo recinfo(*progInfo);
         delete progInfo;
@@ -4538,11 +4537,11 @@ void TVRec::SetNextLiveTVDir(QString dir)
 }
 
 bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
-                                          RingBuffer **rb,
+                                          MythMediaBuffer **Buffer,
                                           const QString & channum)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "GetProgramRingBufferForLiveTV()");
-    if (!m_channel || !m_tvChain || !pginfo || !rb)
+    if (!m_channel || !m_tvChain || !pginfo || !Buffer)
         return false;
 
     m_nextLiveTVDirLock.lock();
@@ -4619,13 +4618,13 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     StartedRecording(prog);
 
-    *rb = RingBuffer::Create(prog->GetPathname(), true);
-    if (!(*rb) || !(*rb)->IsOpen())
+    *Buffer = MythMediaBuffer::Create(prog->GetPathname(), true);
+    if (!(*Buffer) || !(*Buffer)->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("RingBuffer '%1' not open...")
                 .arg(prog->GetPathname()));
 
-        delete *rb;
+        delete *Buffer;
         delete prog;
 
         return false;
@@ -4641,7 +4640,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
             .arg(channum));
 
     RecordingInfo *pginfo = nullptr;
-    RingBuffer    *rb = nullptr;
+    MythMediaBuffer *buffer = nullptr;
     QString        inputName;
 
     if (!m_channel ||
@@ -4651,7 +4650,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
         return false;
     }
 
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum))
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &buffer, channum))
     {
         ClearFlags(kFlagPendingActions, __FILE__, __LINE__);
         ChangeState(kState_None);
@@ -4660,7 +4659,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
         return false;
     }
 
-    SetRingBuffer(rb);
+    SetRingBuffer(buffer);
 
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     if (!m_pseudoLiveTVRecording)
@@ -4697,7 +4696,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         .arg(discont).arg(set_rec) + msg);
 
     RecordingInfo *pginfo = nullptr;
-    RingBuffer    *rb = nullptr;
+    MythMediaBuffer *buffer = nullptr;
     QString        inputName;
 
     if (!m_channel ||
@@ -4707,7 +4706,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         return false;
     }
 
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum))
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &buffer, channum))
     {
         ChangeState(kState_None);
         return false;
@@ -4724,7 +4723,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
 
     if (set_rec && m_recorder)
     {
-        m_recorder->SetNextRecording(pginfo, rb);
+        m_recorder->SetNextRecording(pginfo, buffer);
         if (discont)
             m_recorder->CheckForRingBufferSwitch();
         delete pginfo;
@@ -4741,11 +4740,11 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
             delete m_curRecording;
         }
         m_curRecording = pginfo;
-        SetRingBuffer(rb);
+        SetRingBuffer(buffer);
     }
     else
     {
-        delete rb;
+        delete buffer;
     }
 
     return true;
@@ -4803,10 +4802,10 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
     StartedRecording(ri);
 
     bool write = m_genOpt.m_inputType != "IMPORT";
-    RingBuffer *rb = RingBuffer::Create(ri->GetPathname(), write);
-    if (!rb || !rb->IsOpen())
+    MythMediaBuffer *buffer = MythMediaBuffer::Create(ri->GetPathname(), write);
+    if (!buffer || !buffer->IsOpen())
     {
-        delete rb;
+        delete buffer;
         ri->SetRecordingStatus(RecStatus::Failed);
         FinishedRecording(ri, nullptr);
         ri->MarkAsInUse(false, kRecorderInUseID);
@@ -4816,7 +4815,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         return nullptr;
     }
 
-    m_recorder->SetNextRecording(ri, rb);
+    m_recorder->SetNextRecording(ri, buffer);
     SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
     m_recordEndTime = GetRecordEndTime(ri);
     m_switchingBuffer = true;

@@ -598,7 +598,7 @@ void NuppelVideoRecorder::Initialize(void)
     if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning, old RingBuffer creation");
-        m_ringBuffer = RingBuffer::Create("output.nuv", true);
+        m_ringBuffer = MythMediaBuffer::Create("output.nuv", true);
         m_weMadeBuffer = true;
         m_livetv = false;
         if (!m_ringBuffer || !m_ringBuffer->IsOpen())

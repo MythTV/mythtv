@@ -42,7 +42,7 @@ class MythIOCallback
 static const int s_maxID = 1024 * 1024;
 
 static QReadWriteLock          s_fileWrapperLock;
-static QHash<int, RingBuffer*> s_ringbuffers;
+static QHash<int, MythMediaBuffer*> s_buffers;
 static QHash<int, RemoteFile*> s_remotefiles;
 static QHash<int, int>         s_localfiles;
 static QHash<int, QString>     s_filenames;
@@ -65,7 +65,7 @@ static int GetNextFileID(void)
     int id = 100000;
 
     for (; id < s_maxID; ++id)
-        if (!s_localfiles.contains(id) && !s_remotefiles.contains(id) && !s_ringbuffers.contains(id))
+        if (!s_localfiles.contains(id) && !s_remotefiles.contains(id) && !s_buffers.contains(id))
             break;
 
     if (id == s_maxID)
@@ -106,7 +106,7 @@ int MythFileCheck(int Id)
 {
     LOG(VB_FILE, LOG_DEBUG, QString("MythFileCheck: '%1')").arg(Id));
     QWriteLocker locker(&s_fileWrapperLock);
-    return (s_localfiles.contains(Id) || s_remotefiles.contains(Id) || s_ringbuffers.contains(Id)) ? 1 : 0;
+    return (s_localfiles.contains(Id) || s_remotefiles.contains(Id) || s_buffers.contains(Id)) ? 1 : 0;
 }
 
 int MythFileOpen(const char *Pathname, int Flags)
@@ -139,7 +139,7 @@ int MythFileOpen(const char *Pathname, int Flags)
     }
     else
     {
-        RingBuffer *rb = nullptr;
+        MythMediaBuffer *buffer = nullptr;
         RemoteFile *rf = nullptr;
 
         if ((fileinfo.st_size < 512) && (fileinfo.st_mtime < (time(nullptr) - 300)))
@@ -155,19 +155,19 @@ int MythFileOpen(const char *Pathname, int Flags)
         {
             if (Flags & O_WRONLY)
             {
-                rb = RingBuffer::Create(Pathname, true, false,
-                                        RingBuffer::kDefaultOpenTimeout, true); // Writeable
+                buffer = MythMediaBuffer::Create(Pathname, true, false,
+                                                 MythMediaBuffer::kDefaultOpenTimeout, true); // Writeable
             }
             else
             {
-                rb = RingBuffer::Create(Pathname, false, true,
-                                        RingBuffer::kDefaultOpenTimeout, true); // Read-Only
+                buffer = MythMediaBuffer::Create(Pathname, false, true,
+                                                 MythMediaBuffer::kDefaultOpenTimeout, true); // Read-Only
             }
 
-            if (!rb)
+            if (!buffer)
                 return -1;
 
-            rb->Start();
+            buffer->Start();
         }
 
         s_fileWrapperLock.lockForWrite();
@@ -175,8 +175,8 @@ int MythFileOpen(const char *Pathname, int Flags)
 
         if (rf)
             s_remotefiles[fileID] = rf;
-        else if (rb)
-            s_ringbuffers[fileID] = rb;
+        else if (buffer)
+            s_buffers[fileID] = buffer;
 
         s_filenames[fileID] = Pathname;
         s_fileWrapperLock.unlock();
@@ -205,11 +205,11 @@ int MythfileClose(int FileID)
 
     // FIXME - surely this needs to hold write lock?
     QReadLocker locker(&s_fileWrapperLock);
-    if (s_ringbuffers.contains(FileID))
+    if (s_buffers.contains(FileID))
     {
-        RingBuffer *rb = s_ringbuffers[FileID];
-        s_ringbuffers.remove(FileID);
-        delete rb;
+        MythMediaBuffer *buffer = s_buffers[FileID];
+        s_buffers.remove(FileID);
+        delete buffer;
         return 0;
     }
 
@@ -245,8 +245,8 @@ off_t MythFileSeek(int FileID, off_t Offset, int Whence)
         .arg(FileID).arg(Offset).arg(Whence));
 
     s_fileWrapperLock.lockForRead();
-    if (s_ringbuffers.contains(FileID))
-        result = s_ringbuffers[FileID]->Seek(Offset, Whence);
+    if (s_buffers.contains(FileID))
+        result = s_buffers[FileID]->Seek(Offset, Whence);
     else if (s_remotefiles.contains(FileID))
         result = s_remotefiles[FileID]->Seek(Offset, Whence);
     else if (s_localfiles.contains(FileID))
@@ -263,8 +263,8 @@ off_t MythFileTell(int FileID)
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileTell(%1)").arg(FileID));
 
     s_fileWrapperLock.lockForRead();
-    if (s_ringbuffers.contains(FileID))
-        result = s_ringbuffers[FileID]->Seek(0, SEEK_CUR);
+    if (s_buffers.contains(FileID))
+        result = s_buffers[FileID]->Seek(0, SEEK_CUR);
     else if (s_remotefiles.contains(FileID))
         result = s_remotefiles[FileID]->Seek(0, SEEK_CUR);
     else if (s_localfiles.contains(FileID))
@@ -287,8 +287,8 @@ ssize_t MythFileRead(int FileID, void *Buffer, size_t Count)
         .arg(FileID).arg(reinterpret_cast<long long>(Buffer)).arg(Count));
 
     s_fileWrapperLock.lockForRead();
-    if (s_ringbuffers.contains(FileID))
-        result = s_ringbuffers[FileID]->Read(Buffer, static_cast<int>(Count));
+    if (s_buffers.contains(FileID))
+        result = s_buffers[FileID]->Read(Buffer, static_cast<int>(Count));
     else if (s_remotefiles.contains(FileID))
         result = s_remotefiles[FileID]->Read(Buffer, static_cast<int>(Count));
     else if (s_localfiles.contains(FileID))
@@ -306,8 +306,8 @@ ssize_t MythFileWrite(int FileID, void *Buffer, size_t Count)
         .arg(FileID).arg(reinterpret_cast<long long>(Buffer)).arg(Count));
 
     s_fileWrapperLock.lockForRead();
-    if (s_ringbuffers.contains(FileID))
-        result = s_ringbuffers[FileID]->Write(Buffer, static_cast<uint>(Count));
+    if (s_buffers.contains(FileID))
+        result = s_buffers[FileID]->Write(Buffer, static_cast<uint>(Count));
     else if (s_remotefiles.contains(FileID))
         result = s_remotefiles[FileID]->Write(Buffer, static_cast<int>(Count));
     else if (s_localfiles.contains(FileID))

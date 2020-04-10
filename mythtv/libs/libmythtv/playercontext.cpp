@@ -820,7 +820,7 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
     }
 }
 
-void PlayerContext::SetRingBuffer(RingBuffer *buf)
+void PlayerContext::SetRingBuffer(MythMediaBuffer *Buffer)
 {
     if (m_buffer)
     {
@@ -828,7 +828,7 @@ void PlayerContext::SetRingBuffer(RingBuffer *buf)
         m_buffer = nullptr;
     }
 
-    m_buffer = buf;
+    m_buffer = Buffer;
 }
 
 /**

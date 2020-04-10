@@ -113,7 +113,7 @@ class AvFormatDecoder : public DecoderBase
                           int testbufsize = kDecoderProbeBufferSize);
 
     /// Open our file and set up or audio and video parameters.
-    int OpenFile(RingBuffer *rbuffer, bool novideo, 
+    int OpenFile(MythMediaBuffer *Buffer, bool novideo,
                  char testbuf[kDecoderProbeBufferSize],
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
@@ -122,9 +122,9 @@ class AvFormatDecoder : public DecoderBase
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
     /// This is a No-op for this class.
-    void WriteStoredData(RingBuffer *rb, bool storevid,
+    void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
                          long timecodeOffset) override // DecoderBase
-        { (void)rb; (void)storevid; (void)timecodeOffset;}
+        { (void)Buffer; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
     void SetRawAudioState(bool state) override { (void)state; } // DecoderBase

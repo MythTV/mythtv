@@ -152,7 +152,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
     return true;
 }
 
-int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
+int NuppelDecoder::OpenFile(MythMediaBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
                             int /*testbufsize*/)
 {
@@ -984,7 +984,7 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
     return 0;
 }
 
-void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
+void NuppelDecoder::WriteStoredData(MythMediaBuffer *rb, bool storevid,
                                     long timecodeOffset)
 {
     while (!m_storedData.empty())

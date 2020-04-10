@@ -828,17 +828,17 @@ char *PreviewGenerator::GetScreenGrab(
         }
     }
 
-    RingBuffer *rbuf = RingBuffer::Create(filename, false, false, 0);
-    if (!rbuf || !rbuf->IsOpen())
+    MythMediaBuffer* buffer = MythMediaBuffer::Create(filename, false, false, 0);
+    if (!buffer || !buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not open file: " +
                 QString("'%1'").arg(filename));
-        delete rbuf;
+        delete buffer;
         return nullptr;
     }
 
     auto *ctx = new PlayerContext(kPreviewGeneratorInUseID);
-    ctx->SetRingBuffer(rbuf);
+    ctx->SetRingBuffer(buffer);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV)));
     ctx->m_player->SetPlayerInfo(nullptr, nullptr, ctx);

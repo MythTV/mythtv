@@ -64,7 +64,7 @@ inline uint32_t Len2Blocks(uint32_t Length)
 
 /// \class DVDStream Stream content from a DVD image file
 MythDVDStream::MythDVDStream(const QString& Filename)
-  : RingBuffer(kRingBuffer_File)
+  : MythMediaBuffer(kRingBuffer_File)
 {
     OpenFile(Filename);
 }

@@ -72,17 +72,17 @@ RecorderBase::~RecorderBase(void)
     }
 }
 
-void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
+void RecorderBase::SetRingBuffer(MythMediaBuffer *Buffer)
 {
     if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
     {
         QString msg("");
-        if (rbuf)
-            msg = " '" + rbuf->GetFilename() + "'";
+        if (Buffer)
+            msg = " '" + Buffer->GetFilename() + "'";
         LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRingBuffer(0x%1)")
-                .arg((uint64_t)rbuf,0,16) + msg);
+                .arg((uint64_t)Buffer,0,16) + msg);
     }
-    m_ringBuffer = rbuf;
+    m_ringBuffer = Buffer;
     m_weMadeBuffer = false;
 }
 
@@ -121,11 +121,11 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
     delete oldrec;
 }
 
-void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
+void RecorderBase::SetNextRecording(const RecordingInfo *ri, MythMediaBuffer *Buffer)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetNextRecording(0x%1, 0x%2)")
         .arg(reinterpret_cast<intptr_t>(ri),0,16)
-        .arg(reinterpret_cast<intptr_t>(rb),0,16));
+        .arg(reinterpret_cast<intptr_t>(Buffer),0,16));
 
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
@@ -147,7 +147,7 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
         m_nextRecording = new RecordingInfo(*ri);
 
     delete m_nextRingBuffer;
-    m_nextRingBuffer = rb;
+    m_nextRingBuffer = Buffer;
 }
 
 void RecorderBase::SetOption(const QString &name, const QString &value)

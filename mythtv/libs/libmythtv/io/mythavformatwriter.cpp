@@ -144,17 +144,17 @@ bool MythAVFormatWriter::OpenFile(void)
         }
     }
 
-    m_ringBuffer = RingBuffer::Create(m_filename, true);
+    m_buffer = MythMediaBuffer::Create(m_filename, true);
 
-    if (!m_ringBuffer || !m_ringBuffer->GetLastError().isEmpty())
+    if (!m_buffer || !m_buffer->GetLastError().isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("OpenFile(): RingBuffer::Create() failed: '%1'")
-            .arg(m_ringBuffer ? m_ringBuffer->GetLastError() : ""));
+            .arg(m_buffer ? m_buffer->GetLastError() : ""));
         Cleanup();
         return false;
     }
 
-    m_avfBuffer    = new MythAVFormatBuffer(m_ringBuffer);
+    m_avfBuffer    = new MythAVFormatBuffer(m_buffer);
     auto *url      = reinterpret_cast<URLContext*>(m_ctx->pb->opaque);
     url->prot      = MythAVFormatBuffer::GetURLProtocol();
     url->priv_data = static_cast<void*>(m_avfBuffer);
@@ -174,8 +174,8 @@ void MythAVFormatWriter::Cleanup(void)
         avio_closep(&m_ctx->pb);
     delete m_avfBuffer;
     m_avfBuffer = nullptr;
-    delete m_ringBuffer;
-    m_ringBuffer = nullptr;
+    delete m_buffer;
+    m_buffer = nullptr;
 }
 
 bool MythAVFormatWriter::CloseFile(void)
@@ -383,7 +383,7 @@ bool MythAVFormatWriter::SwitchToNextFile(void)
 
 bool MythAVFormatWriter::ReOpen(const QString& Filename)
 {
-    bool result = m_ringBuffer->ReOpen(Filename);
+    bool result = m_buffer->ReOpen(Filename);
     if (result)
         m_filename = Filename;
     return result;

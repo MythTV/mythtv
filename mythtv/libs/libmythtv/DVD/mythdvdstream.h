@@ -16,7 +16,7 @@
 
 using dvd_reader_t = struct dvd_reader_s;
 
-class MTV_PUBLIC MythDVDStream : public RingBuffer
+class MTV_PUBLIC MythDVDStream : public MythMediaBuffer
 {
   public:
     class BlockRange;

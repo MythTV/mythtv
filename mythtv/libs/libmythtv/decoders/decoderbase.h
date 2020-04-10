@@ -125,7 +125,7 @@ class DecoderBase
 
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
-    virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
+    virtual int OpenFile(MythMediaBuffer *Buffer, bool novideo,
                          char testbuf[kDecoderProbeBufferSize],
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
@@ -185,7 +185,7 @@ class DecoderBase
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
 
     virtual bool IsLastFrameKey(void) const = 0;
-    virtual void WriteStoredData(RingBuffer *rb, bool storevid,
+    virtual void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
                                  long timecodeOffset) = 0;
     virtual void ClearStoredData(void) { }
     virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
@@ -287,7 +287,7 @@ class DecoderBase
     MythPlayer          *m_parent                  {nullptr};
     ProgramInfo         *m_playbackInfo            {nullptr};
     AudioPlayer         *m_audio                   {nullptr};
-    RingBuffer          *m_ringBuffer              {nullptr};
+    MythMediaBuffer     *m_ringBuffer              {nullptr};
 
     int                  m_currentWidth            {640};
     int                  m_currentHeight           {480};

@@ -4,17 +4,17 @@
 
 URLProtocol MythAVFormatBuffer::s_avfrURL;
 
-MythAVFormatBuffer::MythAVFormatBuffer(RingBuffer *Buffer)
+MythAVFormatBuffer::MythAVFormatBuffer(MythMediaBuffer *Buffer)
   : m_buffer(Buffer)
 {
 }
 
-void MythAVFormatBuffer::SetRingBuffer(RingBuffer *Buffer)
+void MythAVFormatBuffer::SetBuffer(MythMediaBuffer *Buffer)
 {
     m_buffer = Buffer;
 }
 
-RingBuffer* MythAVFormatBuffer::GetRingBuffer(void)
+MythMediaBuffer* MythAVFormatBuffer::GetBuffer(void)
 {
     return m_buffer;
 }
@@ -31,7 +31,7 @@ int MythAVFormatBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
     if (!avfr)
         return 0;
 
-    int ret = avfr->GetRingBuffer()->Read(Buffer, Size);
+    int ret = avfr->GetBuffer()->Read(Buffer, Size);
 
     if (ret == 0)
         ret = AVERROR_EOF;
@@ -44,7 +44,7 @@ int MythAVFormatBuffer::Write(URLContext *h, const uint8_t *Buffer, int Size)
     if (!avfr)
         return 0;
 
-    return avfr->GetRingBuffer()->Write(Buffer, static_cast<uint>(Size));
+    return avfr->GetBuffer()->Write(Buffer, static_cast<uint>(Size));
 }
 
 int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
@@ -54,12 +54,12 @@ int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence
         return 0;
 
     if (Whence == AVSEEK_SIZE)
-        return avfr->GetRingBuffer()->GetRealFileSize();
+        return avfr->GetBuffer()->GetRealFileSize();
 
     if (Whence == SEEK_END)
-        return avfr->GetRingBuffer()->GetRealFileSize() + Offset;
+        return avfr->GetBuffer()->GetRealFileSize() + Offset;
 
-    return avfr->GetRingBuffer()->Seek(Offset, Whence);
+    return avfr->GetBuffer()->Seek(Offset, Whence);
 }
 
 int MythAVFormatBuffer::Close(URLContext*)
@@ -114,7 +114,7 @@ URLProtocol *MythAVFormatBuffer::GetURLProtocol(void)
 void MythAVFormatBuffer::SetInInit(bool State)
 {
     m_initState = State;
-    GetRingBuffer()->SetReadInternalMode(State);
+    GetBuffer()->SetReadInternalMode(State);
 }
 
 bool MythAVFormatBuffer::IsInInit(void)

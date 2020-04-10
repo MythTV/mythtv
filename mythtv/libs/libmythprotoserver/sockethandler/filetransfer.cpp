@@ -12,7 +12,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent,
                            bool usereadahead, int timeout_ms) :
     SocketHandler(remote, parent, ""),
-    m_rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms))
+    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout_ms))
 {
     m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -21,7 +21,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent, bool write) :
     SocketHandler(remote, parent, ""),
-    m_rbuffer(RingBuffer::Create(filename, write)),
+    m_rbuffer(MythMediaBuffer::Create(filename, write)),
     m_writemode(write)
 {
     m_pginfo = new ProgramInfo(filename);

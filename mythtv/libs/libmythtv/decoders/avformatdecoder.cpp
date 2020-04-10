@@ -956,13 +956,13 @@ int AvFormatDecoder::FindStreamInfo(void)
  *  \param testbufsize The size of the test buffer. The minimum of this value
  *                     or kDecoderProbeBufferSize will be used.
  */
-int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
+int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                               char testbuf[kDecoderProbeBufferSize],
                               int testbufsize)
 {
     CloseContext();
 
-    m_ringBuffer = rbuffer;
+    m_ringBuffer = Buffer;
 
     // Process frames immediately unless we're decoding
     // a DVD, in which case don't so that we don't show
@@ -970,7 +970,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     m_processFrames = !m_ringBuffer->IsDVD();
 
     delete m_avfRingBuffer;
-    m_avfRingBuffer = new MythAVFormatBuffer(rbuffer);
+    m_avfRingBuffer = new MythAVFormatBuffer(Buffer);
 
     AVInputFormat *fmt      = nullptr;
     QString        fnames   = m_ringBuffer->GetFilename();
