@@ -21,14 +21,14 @@
         <description>Information and Communications</description>
         <action>MENU info_menu.xml</action>
     </button>
-
+<!--
     <button>
         <type>MENU_OPTICAL_DISKS</type>
         <text>Optical Disks</text>
         <description>Play or import Blu-ray, DVD, and CDs</description>
         <action>MENU optical_menu.xml</action>
     </button>
-
+-->
     <button>
         <type>TV_WATCH_TV</type>
         <text>Watch TV</text>

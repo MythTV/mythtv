@@ -7,14 +7,14 @@
         <description>Pick and prioritize shows to record</description>
         <action>MENU manage_recordings.xml</action>
     </button>
-
+<!--
     <button>
         <type>MENU_OPTICAL_DISKS</type>
         <text>Optical Disks</text>
         <description>Play or import Blu-ray, DVD, and CDs</description>
         <action>MENU optical_menu.xml</action>
     </button>
-
+-->
     <button>
         <type>TV_STATUS</type>
         <text>System Status</text>
