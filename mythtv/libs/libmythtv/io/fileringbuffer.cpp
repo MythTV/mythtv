@@ -43,7 +43,7 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 
 #define LOC QString("FileRingBuf(%1): ").arg(m_filename)
 
-FileRingBuffer::FileRingBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
+MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
   : MythMediaBuffer(kRingBuffer_File)
 {
     m_startReadAhead = UseReadAhead;
@@ -86,7 +86,7 @@ FileRingBuffer::FileRingBuffer(const QString &Filename, bool Write, bool UseRead
     }
 }
 
-FileRingBuffer::~FileRingBuffer()
+MythFileBuffer::~MythFileBuffer()
 {
     KillReadAheadThread();
 
@@ -174,7 +174,7 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
     return QString();
 }
 
-bool FileRingBuffer::OpenFile(const QString &Filename, uint Retry)
+bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OpenFile(%1, %2 ms)")
             .arg(Filename).arg(Retry));
@@ -366,7 +366,7 @@ bool FileRingBuffer::OpenFile(const QString &Filename, uint Retry)
     return ok;
 }
 
-bool FileRingBuffer::ReOpen(const QString& Filename)
+bool MythFileBuffer::ReOpen(const QString& Filename)
 {
     if (!m_writeMode)
     {
@@ -393,7 +393,7 @@ bool FileRingBuffer::ReOpen(const QString& Filename)
     return result;
 }
 
-bool FileRingBuffer::IsOpen(void) const
+bool MythFileBuffer::IsOpen(void) const
 {
     m_rwLock.lockForRead();
     bool ret = m_tfw || (m_fd2 > -1) || m_remotefile;
@@ -401,7 +401,7 @@ bool FileRingBuffer::IsOpen(void) const
     return ret;
 }
 
-int FileRingBuffer::SafeRead(void *Buffer, uint Size)
+int MythFileBuffer::SafeRead(void *Buffer, uint Size)
 {
     if (m_remotefile)
         return SafeRead(m_remotefile, Buffer, Size);
@@ -423,7 +423,7 @@ int FileRingBuffer::SafeRead(void *Buffer, uint Size)
  *  \param sz   Number of bytes to read
  *  \return Returns number of bytes read
  */
-int FileRingBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
+int MythFileBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
 {
     uint tot = 0;
     uint errcnt = 0;
@@ -533,7 +533,7 @@ int FileRingBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
  *  \param sz   Number of bytes to read
  *  \return Returns number of bytes read
  */
-int FileRingBuffer::SafeRead(RemoteFile *Remote, void *Buffer, uint Size)
+int MythFileBuffer::SafeRead(RemoteFile *Remote, void *Buffer, uint Size)
 {
     int ret = Remote->Read(Buffer, static_cast<int>(Size));
     if (ret < 0)
@@ -552,7 +552,7 @@ int FileRingBuffer::SafeRead(RemoteFile *Remote, void *Buffer, uint Size)
     return ret;
 }
 
-long long FileRingBuffer::GetReadPosition(void) const
+long long MythFileBuffer::GetReadPosition(void) const
 {
     m_posLock.lockForRead();
     long long ret = m_readPos;
@@ -560,7 +560,7 @@ long long FileRingBuffer::GetReadPosition(void) const
     return ret;
 }
 
-long long FileRingBuffer::GetRealFileSizeInternal(void) const
+long long MythFileBuffer::GetRealFileSizeInternal(void) const
 {
     m_rwLock.lockForRead();
     long long result = -1;
@@ -587,7 +587,7 @@ long long FileRingBuffer::GetRealFileSizeInternal(void) const
     return result;
 }
 
-long long FileRingBuffer::SeekInternal(long long Position, int Whence)
+long long MythFileBuffer::SeekInternal(long long Position, int Whence)
 {
     long long ret = -1;
 

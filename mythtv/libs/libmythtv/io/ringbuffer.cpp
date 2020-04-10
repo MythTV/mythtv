@@ -108,7 +108,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
     QString lower = filename.toLower();
 
     if (Write)
-        return new FileRingBuffer(filename, Write, UseReadAhead, Timeout);
+        return new MythFileBuffer(filename, Write, UseReadAhead, Timeout);
 
     bool dvddir  = false;
     bool bddir   = false;
@@ -197,7 +197,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
         delete dvdstream;
     }
 
-    return new FileRingBuffer(filename, Write, UseReadAhead, Timeout);
+    return new MythFileBuffer(filename, Write, UseReadAhead, Timeout);
 }
 
 MythMediaBuffer::MythMediaBuffer(RingBufferType Type)
