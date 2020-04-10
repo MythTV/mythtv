@@ -972,7 +972,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         // framecontrol is true if we want to enforce fifo sync.
         if (framecontrol)
             LOG(VB_GENERAL, LOG_INFO, "Enforcing sync on fifos");
-        m_fifow = new FIFOWriter(2, framecontrol);
+        m_fifow = new MythFIFOWriter(2, framecontrol);
 
         if (!m_fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
             !m_fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))

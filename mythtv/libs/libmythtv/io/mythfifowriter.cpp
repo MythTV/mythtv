@@ -5,7 +5,7 @@
 #if CONFIG_DARWIN
 #include <sys/aio.h>
 #endif
-#include "io/fifowriter.h"
+#include "io/mythfifowriter.h"
 
 // Std
 #include <cstdio>
@@ -22,29 +22,29 @@
 #include <iostream>
 using namespace std;
 
-FIFOThread::FIFOThread()
+MythFIFOThread::MythFIFOThread()
   : MThread("FIFOThread")
 {
 }
 
-FIFOThread::~FIFOThread()
+MythFIFOThread::~MythFIFOThread()
 {
     wait();
     m_parent = nullptr;
     m_id = -1;
 }
 
-void FIFOThread::SetId(int Id)
+void MythFIFOThread::SetId(int Id)
 {
     m_id = Id;
 }
 
-void FIFOThread::SetParent(FIFOWriter *Parent)
+void MythFIFOThread::SetParent(MythFIFOWriter *Parent)
 {
     m_parent = Parent;
 }
 
-void FIFOThread::run(void)
+void MythFIFOThread::run(void)
 {
     RunProlog();
     if (m_parent && m_id != -1)
@@ -52,17 +52,17 @@ void FIFOThread::run(void)
     RunEpilog();
 }
 
-FIFOWriter::FIFOWriter(uint Count, bool Sync)
+MythFIFOWriter::MythFIFOWriter(uint Count, bool Sync)
   : m_numFifos(Count),
     m_useSync(Sync)
 {
     if (Count < 1)
         return;
 
-    m_fifoBuf    = new MythFifoBuffer *[Count];
-    m_fbInptr    = new MythFifoBuffer *[Count];
-    m_fbOutptr   = new MythFifoBuffer *[Count];
-    m_fifoThrds  = new FIFOThread[Count];
+    m_fifoBuf    = new MythFifoBuffer*[Count];
+    m_fbInptr    = new MythFifoBuffer*[Count];
+    m_fbOutptr   = new MythFifoBuffer*[Count];
+    m_fifoThrds  = new MythFIFOThread[Count];
     m_fifoLock   = new QMutex[Count];
     m_fullCond   = new QWaitCondition[Count];
     m_emptyCond  = new QWaitCondition[Count];
@@ -74,7 +74,7 @@ FIFOWriter::FIFOWriter(uint Count, bool Sync)
     m_fbMaxCount = new int[Count];
 }
 
-FIFOWriter::~FIFOWriter()
+MythFIFOWriter::~MythFIFOWriter()
 {
     if (m_numFifos < 1)
         return;
@@ -106,7 +106,7 @@ FIFOWriter::~FIFOWriter()
     delete [] m_fbMaxCount;
 }
 
-bool FIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
+bool MythFIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
                           long Size, int NumBufs)
 {
     if (Id >= m_numFifos)
@@ -152,7 +152,7 @@ bool FIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
     return m_fifoThrds[Id].isRunning();
 }
 
-void FIFOWriter::FIFOWriteThread(int Id)
+void MythFIFOWriter::FIFOWriteThread(int Id)
 {
     int fd = -1;
 
@@ -207,7 +207,7 @@ void FIFOWriter::FIFOWriteThread(int Id)
     delete m_fifoBuf[Id];
 }
 
-void FIFOWriter::FIFOWrite(uint Id, void *Buffer, long Size)
+void MythFIFOWriter::FIFOWrite(uint Id, void *Buffer, long Size)
 {
     QMutexLocker flock(&m_fifoLock[Id]);
     while (m_fbInptr[Id]->m_next == m_fbOutptr[Id])
@@ -252,7 +252,7 @@ void FIFOWriter::FIFOWrite(uint Id, void *Buffer, long Size)
     m_emptyCond[Id].wakeAll();
 }
 
-void FIFOWriter::FIFODrain(void)
+void MythFIFOWriter::FIFODrain(void)
 {
     uint count = 0;
     while (count < m_numFifos)

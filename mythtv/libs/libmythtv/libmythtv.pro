@@ -186,10 +186,10 @@ SOURCES += diseqc.cpp               diseqcsettings.cpp
 # File/FIFO Writer classes
 HEADERS += io/filewriterbase.h
 HEADERS += io/avformatwriter.h
-HEADERS += io/fifowriter.h
+HEADERS += io/mythfifowriter.h
 SOURCES += io/filewriterbase.cpp
 SOURCES += io/avformatwriter.cpp
-SOURCES += io/fifowriter.cpp
+SOURCES += io/mythfifowriter.cpp
 
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h

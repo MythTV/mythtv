@@ -12,38 +12,38 @@
 
 using namespace std;
 
-class FIFOWriter;
+class MythFIFOWriter;
 
-class FIFOThread : public MThread
+class MythFIFOThread : public MThread
 {
   public:
-    FIFOThread();
-   ~FIFOThread() override;
+    MythFIFOThread();
+   ~MythFIFOThread() override;
 
     void SetId(int Id);
-    void SetParent(FIFOWriter *Parent);
+    void SetParent(MythFIFOWriter *Parent);
 
     void run(void) override;
 
   private:
-    FIFOWriter *m_parent { nullptr };
+    MythFIFOWriter *m_parent { nullptr };
     int         m_id     { -1      };
 };
 
-class MTV_PUBLIC FIFOWriter
+class MTV_PUBLIC MythFIFOWriter
 {
-    friend class FIFOThread;
+    friend class MythFIFOThread;
 
   public:
-    FIFOWriter(uint Count, bool Sync);
-    FIFOWriter(const FIFOWriter& rhs);
-   ~FIFOWriter(void);
+    MythFIFOWriter(uint Count, bool Sync);
+   ~MythFIFOWriter(void);
 
-    bool FIFOInit(uint Id, const QString& Desc, const QString& Name, long Size, int NumBufs);
+    bool FIFOInit (uint Id, const QString& Desc, const QString& Name, long Size, int NumBufs);
     void FIFOWrite(uint Id, void *Buffer, long Size);
     void FIFODrain(void);
 
   private:
+    Q_DISABLE_COPY(MythFIFOWriter)
     void FIFOWriteThread(int Id);
 
     struct MythFifoBuffer
@@ -57,7 +57,7 @@ class MTV_PUBLIC FIFOWriter
     MythFifoBuffer **m_fbInptr    { nullptr };
     MythFifoBuffer **m_fbOutptr   { nullptr };
 
-    FIFOThread      *m_fifoThrds  { nullptr };
+    MythFIFOThread  *m_fifoThrds  { nullptr };
     QMutex          *m_fifoLock   { nullptr };
     QWaitCondition  *m_fullCond   { nullptr };
     QWaitCondition  *m_emptyCond  { nullptr };

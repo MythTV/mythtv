@@ -1,5 +1,5 @@
 #include "recordingprofile.h"
-#include "io/fifowriter.h"
+#include "io/mythfifowriter.h"
 #include "transcodedefs.h"
 #include "programtypes.h"
 #include "playercontext.h"
@@ -55,7 +55,7 @@ class Transcode : public QObject
 #endif
     PlayerContext       *m_ctx                 { nullptr };
     RingBuffer          *m_outRingBuffer       { nullptr };
-    FIFOWriter          *m_fifow               { nullptr };
+    MythFIFOWriter      *m_fifow               { nullptr };
     KFATable            *m_kfaTable            { nullptr };
     bool                 m_showProgress        { false };
     QString              m_recorderOptions;
