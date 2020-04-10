@@ -8,11 +8,11 @@
 #include "mythframe.h"
 #include "audiooutputsettings.h"
 
-class MTV_PUBLIC FileWriterBase
+class MTV_PUBLIC MythMediaWriter
 {
  public:
-                 FileWriterBase() = default;
-    virtual     ~FileWriterBase() = default;
+                 MythMediaWriter() = default;
+    virtual     ~MythMediaWriter() = default;
 
     virtual bool Init              (void) = 0;
     virtual bool OpenFile          (void) = 0;

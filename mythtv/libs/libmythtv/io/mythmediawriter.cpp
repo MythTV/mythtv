@@ -19,109 +19,109 @@
  */
 
 // MythTV
-#include "io/filewriterbase.h"
+#include "io/mythmediawriter.h"
 
-void FileWriterBase::SetFilename(const QString &FileName)
+void MythMediaWriter::SetFilename(const QString &FileName)
 {
     m_filename = FileName;
 }
 
-void FileWriterBase::SetContainer(const QString &Cont)
+void MythMediaWriter::SetContainer(const QString &Cont)
 {
     m_container = Cont;
 }
 
-void FileWriterBase::SetVideoCodec(const QString &Codec)
+void MythMediaWriter::SetVideoCodec(const QString &Codec)
 {
     m_videoCodec = Codec;
 }
 
-void FileWriterBase::SetVideoBitrate(int Bitrate)
+void MythMediaWriter::SetVideoBitrate(int Bitrate)
 {
     m_videoBitrate = Bitrate;
 }
 
-void FileWriterBase::SetWidth(int Width)
+void MythMediaWriter::SetWidth(int Width)
 {
     m_width = Width;
 }
 
-void FileWriterBase::SetHeight(int Height)
+void MythMediaWriter::SetHeight(int Height)
 {
     m_height = Height;
 }
 
-void FileWriterBase::SetAspect(float Aspect)
+void MythMediaWriter::SetAspect(float Aspect)
 {
     m_aspect = Aspect;
 }
 
-void FileWriterBase::SetFramerate(double Rate)
+void MythMediaWriter::SetFramerate(double Rate)
 {
     m_frameRate = Rate;
 }
 
-void FileWriterBase::SetKeyFrameDist(int Dist)
+void MythMediaWriter::SetKeyFrameDist(int Dist)
 {
     m_keyFrameDist = Dist;
 }
 
-void FileWriterBase::SetAudioCodec(const QString &Codec)
+void MythMediaWriter::SetAudioCodec(const QString &Codec)
 {
     m_audioCodec = Codec;
 }
 
-void FileWriterBase::SetAudioBitrate(int Bitrate)
+void MythMediaWriter::SetAudioBitrate(int Bitrate)
 {
     m_audioBitrate = Bitrate;
 }
 
-void FileWriterBase::SetAudioChannels(int Channels)
+void MythMediaWriter::SetAudioChannels(int Channels)
 {
     m_audioChannels = Channels;
 }
 
-void FileWriterBase::SetAudioFrameRate(int Rate)
+void MythMediaWriter::SetAudioFrameRate(int Rate)
 {
     m_audioFrameRate = Rate;
 }
 
-void FileWriterBase::SetAudioFormat(AudioFormat Format)
+void MythMediaWriter::SetAudioFormat(AudioFormat Format)
 {
     m_audioFormat = Format;
 }
 
-void FileWriterBase::SetThreadCount(int Count)
+void MythMediaWriter::SetThreadCount(int Count)
 {
     m_encodingThreadCount = Count;
 }
 
-void FileWriterBase::SetTimecodeOffset(long long Offset)
+void MythMediaWriter::SetTimecodeOffset(long long Offset)
 {
     m_startingTimecodeOffset = Offset;
 }
 
-void FileWriterBase::SetEncodingPreset(const QString &Preset)
+void MythMediaWriter::SetEncodingPreset(const QString &Preset)
 {
     m_encodingPreset = Preset;
 }
 
-void FileWriterBase::SetEncodingTune(const QString &Tune)
+void MythMediaWriter::SetEncodingTune(const QString &Tune)
 {
     m_encodingTune = Tune;
 }
 
-long long FileWriterBase::GetFramesWritten(void) const
+long long MythMediaWriter::GetFramesWritten(void) const
 {
     return m_framesWritten;
 }
 
-long long FileWriterBase::GetTimecodeOffset(void) const
+long long MythMediaWriter::GetTimecodeOffset(void) const
 {
     return m_startingTimecodeOffset;
 }
 
-int FileWriterBase::GetAudioFrameSize(void) const
+int MythMediaWriter::GetAudioFrameSize(void) const
 {
     return m_audioFrameSize;
 }

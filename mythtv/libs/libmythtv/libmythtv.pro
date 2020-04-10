@@ -184,10 +184,10 @@ HEADERS += diseqc.h                 diseqcsettings.h
 SOURCES += diseqc.cpp               diseqcsettings.cpp
 
 # File/FIFO Writer classes
-HEADERS += io/filewriterbase.h
+HEADERS += io/mythmediawriter.h
 HEADERS += io/avformatwriter.h
 HEADERS += io/mythfifowriter.h
-SOURCES += io/filewriterbase.cpp
+SOURCES += io/mythmediawriter.cpp
 SOURCES += io/avformatwriter.cpp
 SOURCES += io/mythfifowriter.cpp
 
