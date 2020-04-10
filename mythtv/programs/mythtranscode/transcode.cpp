@@ -30,7 +30,7 @@
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
-#include "io/avformatwriter.h"
+#include "io/mythavformatwriter.h"
 #include "HLS/httplivestream.h"
 
 #include "videodecodebuffer.h"
@@ -206,8 +206,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     QDateTime statustime = curtime;
     int audioFrame = 0;
     std::unique_ptr<Cutter> cutter = nullptr;
-    std::unique_ptr<AVFormatWriter> avfw = nullptr;
-    std::unique_ptr<AVFormatWriter> avfw2 = nullptr;
+    std::unique_ptr<MythAVFormatWriter> avfw = nullptr;
+    std::unique_ptr<MythAVFormatWriter> avfw2 = nullptr;
     std::unique_ptr<HTTPLiveStream> hls = nullptr;
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
@@ -426,7 +426,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         newHeight = (newHeight + 15) & ~0xF;
         newWidth  = (newWidth  + 15) & ~0xF;
 
-        avfw = std::make_unique<AVFormatWriter>();
+        avfw = std::make_unique<MythAVFormatWriter>();
         if (!avfw)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -472,7 +472,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 int audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
-                avfw2 = std::make_unique<AVFormatWriter>();
+                avfw2 = std::make_unique<MythAVFormatWriter>();
                 avfw2->SetContainer("mpegts");
                 avfw2->SetAudioCodec("aac");
                 avfw2->SetAudioBitrate(audioOnlyBitrate);

@@ -23,7 +23,7 @@
 #include "mythcorecontext.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
-#include "io/avformatwriter.h"
+#include "io/mythavformatwriter.h"
 
 // FFmpeg
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
 #define LOC_ERR QString("AVFW(%1) Error: ").arg(m_filename)
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
-AVFormatWriter::~AVFormatWriter()
+MythAVFormatWriter::~MythAVFormatWriter()
 {
     if (m_ctx)
     {
@@ -58,7 +58,7 @@ AVFormatWriter::~AVFormatWriter()
     av_frame_free(&m_picture);
 }
 
-bool AVFormatWriter::Init(void)
+bool MythAVFormatWriter::Init(void)
 {
     AVOutputFormat *fmt = av_guess_format(m_container.toLatin1().constData(), nullptr, nullptr);
     if (!fmt)
@@ -133,7 +133,7 @@ bool AVFormatWriter::Init(void)
     return true;
 }
 
-bool AVFormatWriter::OpenFile(void)
+bool MythAVFormatWriter::OpenFile(void)
 {
     if (!(m_fmt.flags & AVFMT_NOFILE))
     {
@@ -168,7 +168,7 @@ bool AVFormatWriter::OpenFile(void)
     return true;
 }
 
-void AVFormatWriter::Cleanup(void)
+void MythAVFormatWriter::Cleanup(void)
 {
     if (m_ctx && m_ctx->pb)
         avio_closep(&m_ctx->pb);
@@ -178,7 +178,7 @@ void AVFormatWriter::Cleanup(void)
     m_ringBuffer = nullptr;
 }
 
-bool AVFormatWriter::CloseFile(void)
+bool MythAVFormatWriter::CloseFile(void)
 {
     if (m_ctx)
     {
@@ -191,13 +191,13 @@ bool AVFormatWriter::CloseFile(void)
     return true;
 }
 
-bool AVFormatWriter::NextFrameIsKeyFrame(void)
+bool MythAVFormatWriter::NextFrameIsKeyFrame(void)
 {
     return (m_bufferedVideoFrameTypes.isEmpty()) ||
            (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
-int AVFormatWriter::WriteVideoFrame(VideoFrame *Frame)
+int MythAVFormatWriter::WriteVideoFrame(VideoFrame *Frame)
 {
     long long framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
@@ -267,7 +267,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-int AVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, long long &Timecode)
+int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, long long &Timecode)
 {
 #if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
@@ -365,23 +365,23 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, 
     return 1;
 }
 
-int AVFormatWriter::WriteTextFrame(int /*VBIMode*/, unsigned char* /*Buffer*/, int /*Length*/,
+int MythAVFormatWriter::WriteTextFrame(int /*VBIMode*/, unsigned char* /*Buffer*/, int /*Length*/,
                                    long long /*Timecode*/, int /*PageNumber*/)
 {
     return 1;
 }
 
-int AVFormatWriter::WriteSeekTable(void)
+int MythAVFormatWriter::WriteSeekTable(void)
 {
     return 1;
 }
 
-bool AVFormatWriter::SwitchToNextFile(void)
+bool MythAVFormatWriter::SwitchToNextFile(void)
 {
     return false;
 }
 
-bool AVFormatWriter::ReOpen(const QString& Filename)
+bool MythAVFormatWriter::ReOpen(const QString& Filename)
 {
     bool result = m_ringBuffer->ReOpen(Filename);
     if (result)
@@ -389,7 +389,7 @@ bool AVFormatWriter::ReOpen(const QString& Filename)
     return result;
 }
 
-AVStream* AVFormatWriter::AddVideoStream(void)
+AVStream* MythAVFormatWriter::AddVideoStream(void)
 {
     AVStream *stream = avformat_new_stream(m_ctx, nullptr);
     if (!stream)
@@ -509,7 +509,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     return stream;
 }
 
-bool AVFormatWriter::OpenVideo(void)
+bool MythAVFormatWriter::OpenVideo(void)
 {
     if (!m_width || !m_height)
         return false;
@@ -538,7 +538,7 @@ bool AVFormatWriter::OpenVideo(void)
     return true;
 }
 
-AVStream* AVFormatWriter::AddAudioStream(void)
+AVStream* MythAVFormatWriter::AddAudioStream(void)
 {
     AVStream *stream = avformat_new_stream(m_ctx, nullptr);
     if (!stream)
@@ -573,7 +573,7 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     return stream;
 }
 
-bool AVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, AVCodec *Codec, AVSampleFormat Format)
+bool MythAVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, AVCodec *Codec, AVSampleFormat Format)
 {
     if (Codec->sample_fmts)
     {
@@ -589,7 +589,7 @@ bool AVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, AVCodec *Codec, AVSamp
     return false;
 }
 
-bool AVFormatWriter::OpenAudio(void)
+bool MythAVFormatWriter::OpenAudio(void)
 {
     AVCodecContext *context = m_codecMap.getCodecContext(m_audioStream);
     context->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
@@ -640,7 +640,7 @@ bool AVFormatWriter::OpenAudio(void)
     return true;
 }
 
-AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat PixFmt)
+AVFrame* MythAVFormatWriter::AllocPicture(enum AVPixelFormat PixFmt)
 {
     AVFrame *picture = av_frame_alloc();
     if (!picture)
@@ -662,7 +662,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat PixFmt)
     return picture;
 }
 
-AVRational AVFormatWriter::GetCodecTimeBase(void)
+AVRational MythAVFormatWriter::GetCodecTimeBase(void)
 {
     AVRational result;
     result.den = static_cast<int>(floor(m_frameRate * 100));

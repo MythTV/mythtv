@@ -16,11 +16,11 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-class MTV_PUBLIC AVFormatWriter : public MythMediaWriter
+class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
 {
   public:
-    AVFormatWriter() = default;
-   ~AVFormatWriter() override;
+    MythAVFormatWriter() = default;
+   ~MythAVFormatWriter() override;
 
     bool Init                (void) override;
     bool OpenFile            (void) override;
