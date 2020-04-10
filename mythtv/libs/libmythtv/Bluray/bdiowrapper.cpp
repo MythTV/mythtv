@@ -12,7 +12,7 @@
 #include "file/filesystem.h"
 #endif
 
-#include "mythiowrapper.h"
+#include "io/mythiowrapper.h"
 #include "bdiowrapper.h"
 
 #include "mythlogging.h"

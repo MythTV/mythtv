@@ -2,8 +2,8 @@
 #define AVFORMATWRITER_H_
 
 #include "mythconfig.h"
-#include "filewriterbase.h"
-#include "avfringbuffer.h"
+#include "io/filewriterbase.h"
+#include "io/avfringbuffer.h"
 #include "mythavutil.h"
 
 #include <QList>

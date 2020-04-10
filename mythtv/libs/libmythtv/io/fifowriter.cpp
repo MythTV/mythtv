@@ -1,3 +1,13 @@
+// MythTV
+#include "compat.h"
+#include "mythlogging.h"
+#include "mythconfig.h"
+#if CONFIG_DARWIN
+#include <sys/aio.h>
+#endif
+#include "io/fifowriter.h"
+
+// Std
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
@@ -9,16 +19,6 @@
 #include <sys/stat.h>
 #include <ctime>
 #include <cmath>
-
-#include "fifowriter.h"
-#include "compat.h"
-#include "mythlogging.h"
-
-#include "mythconfig.h"
-#if CONFIG_DARWIN
-    #include <sys/aio.h>    // O_SYNC
-#endif
-
 #include <iostream>
 using namespace std;
 

@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "ringbuffer.h"
+#include "io/ringbuffer.h"
 #include "mythdate.h"
 #include "referencecounter.h"
 #include "mythdvdcontext.h"

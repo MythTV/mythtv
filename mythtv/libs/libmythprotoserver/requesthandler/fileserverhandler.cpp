@@ -10,7 +10,7 @@
 
 #include "mythmiscutil.h"
 #include "mythdb.h"
-#include "ringbuffer.h"
+#include "io/ringbuffer.h"
 #include "mythsocket.h"
 #include "mythlogging.h"
 #include "programinfo.h"

@@ -5,12 +5,11 @@
 
 // MythTV
 #include "threadedfilewriter.h"
-#include "fileringbuffer.h"
-#include "streamingringbuffer.h"
+#include "io/fileringbuffer.h"
+#include "io/streamingringbuffer.h"
 #include "mythmiscutil.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
-#include "ringbuffer.h"
 #include "mythconfig.h"
 #include "remotefile.h"
 #include "compat.h"
@@ -22,6 +21,7 @@
 #include "Bluray/bdringbuffer.h"
 #include "HLS/httplivestreambuffer.h"
 #include "mythcdrom.h"
+#include "io/ringbuffer.h"
 
 // Std
 #include <cmath>

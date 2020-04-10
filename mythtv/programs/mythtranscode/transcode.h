@@ -1,5 +1,5 @@
 #include "recordingprofile.h"
-#include "fifowriter.h"
+#include "io/fifowriter.h"
 #include "transcodedefs.h"
 #include "programtypes.h"
 #include "playercontext.h"

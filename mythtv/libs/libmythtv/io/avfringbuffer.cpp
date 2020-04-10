@@ -1,5 +1,5 @@
 // MythTV
-#include "avfringbuffer.h"
+#include "io/avfringbuffer.h"
 #include "mythcorecontext.h"
 
 URLProtocol AVFRingBuffer::s_avfrURL;

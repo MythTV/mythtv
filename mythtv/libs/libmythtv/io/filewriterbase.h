@@ -1,8 +1,10 @@
 #ifndef FILEWRITERBASE_H
 #define FILEWRITERBASE_H
 
+// QT
 #include <QString>
 
+// MythTV
 #include "mythframe.h"
 #include "audiooutputsettings.h"
 
@@ -74,6 +76,4 @@ class MTV_PUBLIC FileWriterBase
 };
 
 #endif
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
 

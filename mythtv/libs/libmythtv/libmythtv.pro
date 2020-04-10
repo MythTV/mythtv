@@ -28,7 +28,7 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl ./io
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -138,10 +138,12 @@ HEADERS += transporteditor.h        listingsources.h
 HEADERS += channelgroup.h
 HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
-HEADERS += avfringbuffer.h
-HEADERS += ringbuffer.h             fileringbuffer.h
-HEADERS += streamingringbuffer.h    metadataimagehelper.h
-HEADERS += icringbuffer.h
+HEADERS += io/ringbuffer.h
+HEADERS += io/avfringbuffer.h
+HEADERS += io/fileringbuffer.h
+HEADERS += io/streamingringbuffer.h
+HEADERS += io/icringbuffer.h
+HEADERS += metadataimagehelper.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
@@ -168,10 +170,12 @@ SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp
 SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
-SOURCES += avfringbuffer.cpp
-SOURCES += ringbuffer.cpp           fileringbuffer.cpp
-SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
-SOURCES += icringbuffer.cpp
+SOURCES += io/ringbuffer.cpp
+SOURCES += io/avfringbuffer.cpp
+SOURCES += io/fileringbuffer.cpp
+SOURCES += io/streamingringbuffer.cpp
+SOURCES += io/icringbuffer.cpp
+SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp            mythavutil.cpp
 SOURCES += recordingfile.cpp
 
@@ -180,10 +184,12 @@ HEADERS += diseqc.h                 diseqcsettings.h
 SOURCES += diseqc.cpp               diseqcsettings.cpp
 
 # File/FIFO Writer classes
-HEADERS += filewriterbase.h         avformatwriter.h
-HEADERS += fifowriter.h
-SOURCES += filewriterbase.cpp       avformatwriter.cpp
-SOURCES += fifowriter.cpp
+HEADERS += io/filewriterbase.h
+HEADERS += io/avformatwriter.h
+HEADERS += io/fifowriter.h
+SOURCES += io/filewriterbase.cpp
+SOURCES += io/avformatwriter.cpp
+SOURCES += io/fifowriter.cpp
 
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
@@ -350,7 +356,7 @@ using_frontend {
     HEADERS += playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
-    HEADERS += mythiowrapper.h          tvbrowsehelper.h
+    HEADERS += tvbrowsehelper.h
     HEADERS += netstream.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += audioplayer.cpp
@@ -358,8 +364,12 @@ using_frontend {
     SOURCES += playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
-    SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
+    SOURCES += tvbrowsehelper.cpp
     SOURCES += netstream.cpp
+
+    # Input/output
+    HEADERS += io/mythiowrapper.h
+    SOURCES += io/mythiowrapper.cpp
 
     win32-msvc*:SOURCES += ../../../platform/win32/msvc/src/posix/dirent.c
 

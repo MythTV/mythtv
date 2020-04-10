@@ -1,5 +1,4 @@
-/*  -*- Mode: c++ -*-
- *
+/*
  *   Class AVFormatWriter
  *
  *   Copyright (C) Chris Pinkham 2011
@@ -19,12 +18,14 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+// MythTV
 #include "mythlogging.h"
 #include "mythcorecontext.h"
-#include "avformatwriter.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
+#include "io/avformatwriter.h"
 
+// FFmpeg
 extern "C" {
 #if HAVE_BIGENDIAN
 #include "bswap.h"

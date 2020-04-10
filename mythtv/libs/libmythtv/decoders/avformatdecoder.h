@@ -27,7 +27,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-#include "avfringbuffer.h"
+#include "io/avfringbuffer.h"
 
 class TeletextDecoder;
 class CC608Decoder;

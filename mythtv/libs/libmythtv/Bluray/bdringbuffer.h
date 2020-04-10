@@ -10,7 +10,7 @@
 
 // MythTV
 #include "config.h"
-#include "ringbuffer.h"
+#include "io/ringbuffer.h"
 
 // BluRay
 #include "libbluray/bluray.h"

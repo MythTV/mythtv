@@ -30,7 +30,7 @@
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
-#include "avformatwriter.h"
+#include "io/avformatwriter.h"
 #include "HLS/httplivestream.h"
 
 #include "videodecodebuffer.h"

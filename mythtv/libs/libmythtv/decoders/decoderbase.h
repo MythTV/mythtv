@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-#include "ringbuffer.h"
+#include "io/ringbuffer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -14,7 +14,6 @@ using namespace std;
 #include "mythavutil.h"
 #include "videodisplayprofile.h"
 
-class RingBuffer;
 class TeletextViewer;
 class MythPlayer;
 class AudioPlayer;

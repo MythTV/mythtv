@@ -40,15 +40,15 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
-#include "icringbuffer.h"
+#include "io/icringbuffer.h"
 #include "audiooutput.h"
 #include "cardutil.h"
 #include "mythavutil.h"
-#include "jitterometer.h"               // for Jitterometer
-#include "mythtimer.h"                  // for MythTimer
-#include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
-#include "ringbuffer.h"                 // for RingBuffer, etc
-#include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
+#include "jitterometer.h"
+#include "mythtimer.h"
+#include "mythuiactions.h"
+#include "io/ringbuffer.h"
+#include "tv_actions.h"
 #include "mythcodeccontext.h"
 
 // MythUI headers

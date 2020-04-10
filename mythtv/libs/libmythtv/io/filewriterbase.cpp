@@ -1,5 +1,4 @@
-/*  -*- Mode: c++ -*-
- *
+/*
  *   Class FileWriterBase
  *
  *   Copyright (C) Chris Pinkham 2011
@@ -19,8 +18,9 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+// MythTV
 #include "mythlogging.h"
-#include "filewriterbase.h"
+#include "io/filewriterbase.h"
 
 #define LOC QString("FWB(%1): ").arg(m_filename)
 #define LOC_ERR QString("FWB(%1) Error: ").arg(m_filename)
@@ -38,5 +38,3 @@ int FileWriterBase::WriteAudioFrame(unsigned char */*buf*/, int /*fnum*/, long l
 
     return 1;
 }
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */

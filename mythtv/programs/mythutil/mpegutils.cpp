@@ -27,7 +27,7 @@
 #include "mythlogging.h"
 #include "atsctables.h"
 #include "sctetables.h"
-#include "ringbuffer.h"
+#include "io/ringbuffer.h"
 #include "dvbtables.h"
 #include "exitcodes.h"
 
