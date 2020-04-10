@@ -2465,7 +2465,7 @@ void MythPlayer::SwitchToProgram(void)
     if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
     {
         // Restore original ringbuffer
-        auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
+        auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
         if (ic)
             m_playerCtx->m_buffer = ic->TakeBuffer();
         delete ic;
@@ -2626,7 +2626,7 @@ void MythPlayer::JumpToProgram(void)
     if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
     {
         // Restore original ringbuffer
-        auto *ic = dynamic_cast<ICRingBuffer*>(m_playerCtx->m_buffer);
+        auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
         if (ic)
             m_playerCtx->m_buffer = ic->TakeBuffer();
         delete ic;
@@ -5313,7 +5313,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     SetPlayingInfo(pginfo);
 
     if (m_playerCtx->m_buffer->GetType() != kRingBuffer_MHEG)
-        m_playerCtx->m_buffer = new ICRingBuffer(stream, m_playerCtx->m_buffer);
+        m_playerCtx->m_buffer = new MythInteractiveBuffer(stream, m_playerCtx->m_buffer);
     else
         m_playerCtx->m_buffer->OpenFile(stream);
 

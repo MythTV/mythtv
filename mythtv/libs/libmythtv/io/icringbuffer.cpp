@@ -10,9 +10,9 @@
 // Std
 #include <cstdio>
 
-#define LOC QString("ICRingBuf: ")
+#define LOC QString("ICBuffer: ")
 
-ICRingBuffer::ICRingBuffer(const QString &Url, MythMediaBuffer *Parent)
+MythInteractiveBuffer::MythInteractiveBuffer(const QString &Url, MythMediaBuffer *Parent)
   : MythMediaBuffer(kRingBuffer_MHEG),
     m_parent(Parent)
 {
@@ -20,14 +20,14 @@ ICRingBuffer::ICRingBuffer(const QString &Url, MythMediaBuffer *Parent)
     OpenFile(Url);
 }
 
-ICRingBuffer::~ICRingBuffer()
+MythInteractiveBuffer::~MythInteractiveBuffer()
 {
     KillReadAheadThread();
     delete m_stream;
     delete m_parent;
 }
 
-bool ICRingBuffer::IsOpen(void) const
+bool MythInteractiveBuffer::IsOpen(void) const
 {
     return m_stream ? m_stream->IsOpen() : false;
 }
@@ -38,7 +38,7 @@ bool ICRingBuffer::IsOpen(void) const
  *  \param Url   Url of the stream to read.
  *  \return Returns true if the stream was opened.
  */
-bool ICRingBuffer::OpenFile(const QString &Url, uint /*Retry*/)
+bool MythInteractiveBuffer::OpenFile(const QString &Url, uint /*Retry*/)
 {
     if (!NetStream::IsSupported(Url))
     {
@@ -84,12 +84,12 @@ bool ICRingBuffer::OpenFile(const QString &Url, uint /*Retry*/)
     return true;
 }
 
-long long ICRingBuffer::GetReadPosition(void) const
+long long MythInteractiveBuffer::GetReadPosition(void) const
 {
     return m_stream ? m_stream->GetReadPosition() : 0;
 }
 
-long long ICRingBuffer::SeekInternal(long long Position, int Whence)
+long long MythInteractiveBuffer::SeekInternal(long long Position, int Whence)
 {
     long long result = -1;
     if (!m_stream)
@@ -134,7 +134,7 @@ long long ICRingBuffer::SeekInternal(long long Position, int Whence)
     return result;
 }
 
-int ICRingBuffer::SafeRead(void *Buffer, uint Size)
+int MythInteractiveBuffer::SafeRead(void *Buffer, uint Size)
 {
     if (m_stream)
         return m_stream->safe_read(Buffer, Size, 1000);
@@ -142,12 +142,12 @@ int ICRingBuffer::SafeRead(void *Buffer, uint Size)
     return 0;
 }
 
-long long ICRingBuffer::GetRealFileSizeInternal(void) const
+long long MythInteractiveBuffer::GetRealFileSizeInternal(void) const
 {
     return m_stream ? m_stream->GetSize() : -1;
 }
 
-MythMediaBuffer *ICRingBuffer::TakeBuffer(void)
+MythMediaBuffer *MythInteractiveBuffer::TakeBuffer(void)
 {
     MythMediaBuffer *parent = m_parent;
     if (parent && IsOpen())

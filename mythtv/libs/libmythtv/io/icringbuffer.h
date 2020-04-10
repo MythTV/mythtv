@@ -6,11 +6,11 @@
 
 class NetStream;
 
-class ICRingBuffer : public MythMediaBuffer
+class MythInteractiveBuffer : public MythMediaBuffer
 {
   public:
-    explicit ICRingBuffer(const QString &Url, MythMediaBuffer *Parent = nullptr);
-    ~ICRingBuffer() override;
+    explicit MythInteractiveBuffer(const QString &Url, MythMediaBuffer *Parent = nullptr);
+    ~MythInteractiveBuffer() override;
 
     bool      IsOpen            (void) const override;
     long long GetReadPosition   (void) const override;
