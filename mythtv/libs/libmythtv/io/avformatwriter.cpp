@@ -418,6 +418,16 @@ int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int 
     return 1;
 }
 
+int AVFormatWriter::WriteSeekTable(void)
+{
+    return 1;
+}
+
+bool AVFormatWriter::SwitchToNextFile(void)
+{
+    return false;
+}
+
 bool AVFormatWriter::ReOpen(const QString& filename)
 {
     bool result = m_ringBuffer->ReOpen(filename);

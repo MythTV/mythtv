@@ -19,22 +19,109 @@
  */
 
 // MythTV
-#include "mythlogging.h"
 #include "io/filewriterbase.h"
 
-#define LOC QString("FWB(%1): ").arg(m_filename)
-#define LOC_ERR QString("FWB(%1) Error: ").arg(m_filename)
-
-int FileWriterBase::WriteVideoFrame(VideoFrame */*frame*/)
+void FileWriterBase::SetFilename(const QString &FileName)
 {
-    LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): Shouldn't be here!");
-
-    return 1;
+    m_filename = FileName;
 }
 
-int FileWriterBase::WriteAudioFrame(unsigned char */*buf*/, int /*fnum*/, long long &/*timecode*/)
+void FileWriterBase::SetContainer(const QString &Cont)
 {
-    LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): Shouldn't be here!");
+    m_container = Cont;
+}
 
-    return 1;
+void FileWriterBase::SetVideoCodec(const QString &Codec)
+{
+    m_videoCodec = Codec;
+}
+
+void FileWriterBase::SetVideoBitrate(int Bitrate)
+{
+    m_videoBitrate = Bitrate;
+}
+
+void FileWriterBase::SetWidth(int Width)
+{
+    m_width = Width;
+}
+
+void FileWriterBase::SetHeight(int Height)
+{
+    m_height = Height;
+}
+
+void FileWriterBase::SetAspect(float Aspect)
+{
+    m_aspect = Aspect;
+}
+
+void FileWriterBase::SetFramerate(double Rate)
+{
+    m_frameRate = Rate;
+}
+
+void FileWriterBase::SetKeyFrameDist(int Dist)
+{
+    m_keyFrameDist = Dist;
+}
+
+void FileWriterBase::SetAudioCodec(const QString &Codec)
+{
+    m_audioCodec = Codec;
+}
+
+void FileWriterBase::SetAudioBitrate(int Bitrate)
+{
+    m_audioBitrate = Bitrate;
+}
+
+void FileWriterBase::SetAudioChannels(int Channels)
+{
+    m_audioChannels = Channels;
+}
+
+void FileWriterBase::SetAudioFrameRate(int Rate)
+{
+    m_audioFrameRate = Rate;
+}
+
+void FileWriterBase::SetAudioFormat(AudioFormat Format)
+{
+    m_audioFormat = Format;
+}
+
+void FileWriterBase::SetThreadCount(int Count)
+{
+    m_encodingThreadCount = Count;
+}
+
+void FileWriterBase::SetTimecodeOffset(long long Offset)
+{
+    m_startingTimecodeOffset = Offset;
+}
+
+void FileWriterBase::SetEncodingPreset(const QString &Preset)
+{
+    m_encodingPreset = Preset;
+}
+
+void FileWriterBase::SetEncodingTune(const QString &Tune)
+{
+    m_encodingTune = Tune;
+}
+
+long long FileWriterBase::GetFramesWritten(void) const
+{
+    return m_framesWritten;
+}
+
+long long FileWriterBase::GetTimecodeOffset(void) const
+{
+    return m_startingTimecodeOffset;
+}
+
+int FileWriterBase::GetAudioFrameSize(void) const
+{
+    return m_audioFrameSize;
 }
