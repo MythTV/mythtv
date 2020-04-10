@@ -6,7 +6,7 @@
 // MythTV
 #include "threadedfilewriter.h"
 #include "io/mythfilebuffer.h"
-#include "io/streamingringbuffer.h"
+#include "io/mythstreamingbuffer.h"
 #include "mythmiscutil.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
