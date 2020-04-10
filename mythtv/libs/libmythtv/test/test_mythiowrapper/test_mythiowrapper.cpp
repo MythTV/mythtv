@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
-#include "mythiowrapper.h"
+#include "io/mythiowrapper.h"
 #include "test_mythiowrapper.h"
 
 using namespace std;
@@ -35,20 +35,20 @@ void TestMythIOWrapper::local_directory_test(void)
     QSet<QString> known = QSet<QString> { "foo", "baz", "bar" };
 
     QString dirname = QString(QT_TESTCASE_BUILDDIR) + "/testfiles";
-    int dirid = mythdir_opendir(qPrintable(dirname));
-    QVERIFY2(dirid != 0, "mythdir_opendir failed");
+    int dirid = MythDirOpen(qPrintable(dirname));
+    QVERIFY2(dirid != 0, "MythDirOpen failed");
 
     char *name = nullptr;
     QSet<QString> found;
-    while ((name = mythdir_readdir(dirid)) != nullptr) {
+    while ((name = MythDirRead(dirid)) != nullptr) {
         if (name[0] != '.')
             found += name;
         free(name);
     }
     QVERIFY(known == found);
 
-    int res =  mythdir_closedir(dirid);
-    QVERIFY2(res == 0, "mythdir_closedir failed");
+    int res =  MythDirClose(dirid);
+    QVERIFY2(res == 0, "MythDirClose failed");
 }
 
 void TestMythIOWrapper::cleanupTestCase(void)
