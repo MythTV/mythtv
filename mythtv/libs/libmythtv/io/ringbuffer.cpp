@@ -138,7 +138,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
     {
         if (!iptvurl && HLSRingBuffer::TestForHTTPLiveStreaming(filename))
             return new HLSRingBuffer(filename);
-        return new StreamingRingBuffer(filename);
+        return new MythStreamingBuffer(filename);
     }
     if (!StreamOnly && mythurl)
     {

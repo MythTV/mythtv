@@ -8,14 +8,14 @@
 
 #define LOC QString("StreamRingBuf(%1): ").arg(m_filename)
 
-StreamingRingBuffer::StreamingRingBuffer(const QString &Filename)
+MythStreamingBuffer::MythStreamingBuffer(const QString &Filename)
   : MythMediaBuffer(kRingBuffer_HTTP)
 {
     m_startReadAhead = false;
-    StreamingRingBuffer::OpenFile(Filename);
+    MythStreamingBuffer::OpenFile(Filename);
 }
 
-StreamingRingBuffer::~StreamingRingBuffer()
+MythStreamingBuffer::~MythStreamingBuffer()
 {
     KillReadAheadThread();
 
@@ -25,7 +25,7 @@ StreamingRingBuffer::~StreamingRingBuffer()
     m_rwLock.unlock();
 }
 
-bool StreamingRingBuffer::IsOpen(void) const
+bool MythStreamingBuffer::IsOpen(void) const
 {
     m_rwLock.lockForRead();
     bool result = m_context;
@@ -33,7 +33,7 @@ bool StreamingRingBuffer::IsOpen(void) const
     return result;
 }
 
-long long StreamingRingBuffer::GetReadPosition(void) const
+long long MythStreamingBuffer::GetReadPosition(void) const
 {
     return 0;
 }
@@ -46,7 +46,7 @@ long long StreamingRingBuffer::GetReadPosition(void) const
  *                     inherited from the parent class.
  *  \return Returns true if the stream was opened.
  */
-bool StreamingRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythStreamingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
 {
     MythMediaBuffer::AVFormatInitNetwork();
 
@@ -83,7 +83,7 @@ bool StreamingRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     return true;
 }
 
-long long StreamingRingBuffer::SeekInternal(long long Position, int Whence)
+long long MythStreamingBuffer::SeekInternal(long long Position, int Whence)
 {
     if (!m_context)
         return 0;
@@ -100,7 +100,7 @@ long long StreamingRingBuffer::SeekInternal(long long Position, int Whence)
     return Position;
 }
 
-int StreamingRingBuffer::SafeRead(void *Buffer, uint Size)
+int MythStreamingBuffer::SafeRead(void *Buffer, uint Size)
 {
     int len = 0;
 
@@ -125,7 +125,7 @@ int StreamingRingBuffer::SafeRead(void *Buffer, uint Size)
     return len;
 }
 
-long long StreamingRingBuffer::GetRealFileSizeInternal(void) const
+long long MythStreamingBuffer::GetRealFileSizeInternal(void) const
 {
     long long result = -1;
     m_rwLock.lockForRead();

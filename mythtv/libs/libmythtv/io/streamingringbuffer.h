@@ -10,11 +10,11 @@ extern "C" {
 #include "libavformat/url.h"
 }
 
-class StreamingRingBuffer : public MythMediaBuffer
+class MythStreamingBuffer : public MythMediaBuffer
 {
   public:
-    explicit StreamingRingBuffer(const QString &Filename);
-    ~StreamingRingBuffer() override;
+    explicit MythStreamingBuffer(const QString &Filename);
+    ~MythStreamingBuffer() override;
 
     bool      IsOpen            (void) const override;
     long long GetReadPosition   (void) const override;
