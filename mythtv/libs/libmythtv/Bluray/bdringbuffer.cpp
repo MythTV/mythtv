@@ -271,7 +271,7 @@ QString BDInfo::GetLastError(void) const
 }
 
 BDRingBuffer::BDRingBuffer(const QString &Filename)
-  : MythMediaBuffer(kRingBuffer_BD),
+  : MythMediaBuffer(kMythBufferBD),
     m_overlayPlanes(2, nullptr)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");

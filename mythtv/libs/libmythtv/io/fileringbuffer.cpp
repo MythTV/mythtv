@@ -44,7 +44,7 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 #define LOC QString("FileRingBuf(%1): ").arg(m_filename)
 
 MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
-  : MythMediaBuffer(kRingBuffer_File)
+  : MythMediaBuffer(kMythBufferFile)
 {
     m_startReadAhead = UseReadAhead;
     m_safeFilename = Filename;

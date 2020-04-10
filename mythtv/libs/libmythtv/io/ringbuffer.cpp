@@ -200,7 +200,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
     return new MythFileBuffer(filename, Write, UseReadAhead, Timeout);
 }
 
-MythMediaBuffer::MythMediaBuffer(RingBufferType Type)
+MythMediaBuffer::MythMediaBuffer(MythBufferType Type)
   : MThread("RingBuffer"),
     m_type(Type)
 {
@@ -223,7 +223,7 @@ MythMediaBuffer::MythMediaBuffer(RingBufferType Type)
     s_subExtLock.unlock();
 }
 
-RingBufferType MythMediaBuffer::GetType(void) const
+MythBufferType MythMediaBuffer::GetType(void) const
 {
     return m_type;
 }
@@ -1551,7 +1551,7 @@ QString MythMediaBuffer::GetStorageRate(void)
 
 QString MythMediaBuffer::GetAvailableBuffer(void)
 {
-    if (m_type == kRingBuffer_DVD || m_type == kRingBuffer_BD)
+    if (m_type == kMythBufferDVD || m_type == kMythBufferBD)
         return "N/A";
 
     int avail = (m_rbwPos >= m_rbrPos) ? m_rbwPos - m_rbrPos
@@ -1838,12 +1838,12 @@ bool MythMediaBuffer::IsDisc(void) const
 
 bool MythMediaBuffer::IsDVD(void) const
 {
-    return m_type == kRingBuffer_DVD;
+    return m_type == kMythBufferDVD;
 }
 
 bool MythMediaBuffer::IsBD(void) const
 {
-    return m_type == kRingBuffer_BD;
+    return m_type == kMythBufferBD;
 }
 
 const MythDVDBuffer *MythMediaBuffer::DVD(void) const

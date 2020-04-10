@@ -35,15 +35,15 @@ class BDRingBuffer;
 class LiveTVChain;
 class RemoteFile;
 
-enum RingBufferType
+enum MythBufferType
 {
-    kRingBuffer_Unknown = 0,
-    kRingBuffer_File,
-    kRingBuffer_DVD,
-    kRingBuffer_BD,
-    kRingBuffer_HTTP,
-    kRingBuffer_HLS,
-    kRingBuffer_MHEG
+    kMythBufferUnknown = 0,
+    kMythBufferFile,
+    kMythBufferDVD,
+    kMythBufferBD,
+    kMythBufferHTTP,
+    kMythBufferHLS,
+    kMythBufferMHEG
 };
 
 class MTV_PUBLIC MythMediaBuffer : protected MThread
@@ -56,7 +56,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
                                    int  Timeout = kDefaultOpenTimeout,
                                    bool StreamOnly = false);
     ~MythMediaBuffer() override = 0;
-    RingBufferType GetType() const;
+    MythBufferType GetType() const;
 
     static const int kDefaultOpenTimeout;
     static const int kLiveTVOpenTimeout;
@@ -134,7 +134,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     virtual bool      ReOpen            (const QString& /*Filename*/ = "") { return false; }
 
   protected:
-    explicit MythMediaBuffer(RingBufferType Type);
+    explicit MythMediaBuffer(MythBufferType Type);
 
     void     run(void) override;
     void     CreateReadAheadBuffer (void);
@@ -157,7 +157,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
 
 
   protected:
-    RingBufferType         m_type;
+    MythBufferType         m_type;
 
     mutable QReadWriteLock m_posLock;
     long long              m_readPos         { 0 };

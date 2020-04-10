@@ -36,7 +36,7 @@ static const char *DVDMenuTable[] =
 };
 
 MythDVDBuffer::MythDVDBuffer(const QString &Filename)
-  : MythMediaBuffer(kRingBuffer_DVD)
+  : MythMediaBuffer(kMythBufferDVD)
 {
     m_seekSpeedMap = { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
                        { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };

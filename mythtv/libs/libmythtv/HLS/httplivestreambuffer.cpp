@@ -1536,7 +1536,7 @@ private:
 };
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
-    MythMediaBuffer(kRingBuffer_HLS),
+    MythMediaBuffer(kMythBufferHLS),
     m_playback(new HLSPlayback())
 {
     m_startReadAhead = false;
@@ -1544,7 +1544,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
 }
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
-    MythMediaBuffer(kRingBuffer_HLS),
+    MythMediaBuffer(kMythBufferHLS),
     m_playback(new HLSPlayback())
 {
     m_startReadAhead = false;

@@ -2462,7 +2462,7 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-    if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
+    if (m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
     {
         // Restore original ringbuffer
         auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
@@ -2623,7 +2623,7 @@ void MythPlayer::JumpToProgram(void)
 
     SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
-    if (m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
+    if (m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
     {
         // Restore original ringbuffer
         auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
@@ -5287,7 +5287,7 @@ bool MythPlayer::SetStream(const QString &stream)
     // If successful will call m_interactiveTV->StreamStarted();
 
     if (stream.isEmpty() && m_playerCtx->m_tvchain &&
-        m_playerCtx->m_buffer->GetType() == kRingBuffer_MHEG)
+        m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
     {
         // Restore livetv
         SetEof(kEofStateDelayed);
@@ -5312,7 +5312,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     ProgramInfo pginfo(stream);
     SetPlayingInfo(pginfo);
 
-    if (m_playerCtx->m_buffer->GetType() != kRingBuffer_MHEG)
+    if (m_playerCtx->m_buffer->GetType() != kMythBufferMHEG)
         m_playerCtx->m_buffer = new MythInteractiveBuffer(stream, m_playerCtx->m_buffer);
     else
         m_playerCtx->m_buffer->OpenFile(stream);

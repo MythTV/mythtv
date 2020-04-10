@@ -13,7 +13,7 @@
 #define LOC QString("ICBuffer: ")
 
 MythInteractiveBuffer::MythInteractiveBuffer(const QString &Url, MythMediaBuffer *Parent)
-  : MythMediaBuffer(kRingBuffer_MHEG),
+  : MythMediaBuffer(kMythBufferMHEG),
     m_parent(Parent)
 {
     m_startReadAhead = true;

@@ -9,7 +9,7 @@
 #define LOC QString("StreamRingBuf(%1): ").arg(m_filename)
 
 MythStreamingBuffer::MythStreamingBuffer(const QString &Filename)
-  : MythMediaBuffer(kRingBuffer_HTTP)
+  : MythMediaBuffer(kMythBufferHTTP)
 {
     m_startReadAhead = false;
     MythStreamingBuffer::OpenFile(Filename);
