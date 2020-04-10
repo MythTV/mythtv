@@ -22,44 +22,72 @@
 #include <iostream>
 using namespace std;
 
-FIFOWriter::FIFOWriter(int count, bool sync) :
-    m_numFifos(count),
-    m_useSync(sync)
+FIFOThread::FIFOThread()
+  : MThread("FIFOThread")
 {
-    if (count <= 0)
+}
+
+FIFOThread::~FIFOThread()
+{
+    wait();
+    m_parent = nullptr;
+    m_id = -1;
+}
+
+void FIFOThread::SetId(int Id)
+{
+    m_id = Id;
+}
+
+void FIFOThread::SetParent(FIFOWriter *Parent)
+{
+    m_parent = Parent;
+}
+
+void FIFOThread::run(void)
+{
+    RunProlog();
+    if (m_parent && m_id != -1)
+        m_parent->FIFOWriteThread(m_id);
+    RunEpilog();
+}
+
+FIFOWriter::FIFOWriter(uint Count, bool Sync)
+  : m_numFifos(Count),
+    m_useSync(Sync)
+{
+    if (Count < 1)
         return;
 
-    m_fifoBuf    = new fifo_buf *[count];
-    m_fbInptr    = new fifo_buf *[count];
-    m_fbOutptr   = new fifo_buf *[count];
-    m_fifoThrds  = new FIFOThread[count];
-    m_fifoLock   = new QMutex[count];
-    m_fullCond   = new QWaitCondition[count];
-    m_emptyCond  = new QWaitCondition[count];
-    m_filename   = new QString [count];
-    m_fbDesc     = new QString [count];
-    m_maxBlkSize = new long[count];
-    m_killWr     = new int[count];
-    m_fbCount    = new int[count];
-    m_fbMaxCount = new int[count];
+    m_fifoBuf    = new MythFifoBuffer *[Count];
+    m_fbInptr    = new MythFifoBuffer *[Count];
+    m_fbOutptr   = new MythFifoBuffer *[Count];
+    m_fifoThrds  = new FIFOThread[Count];
+    m_fifoLock   = new QMutex[Count];
+    m_fullCond   = new QWaitCondition[Count];
+    m_emptyCond  = new QWaitCondition[Count];
+    m_filename   = new QString [Count];
+    m_fbDesc     = new QString [Count];
+    m_maxBlkSize = new long[Count];
+    m_killWr     = new int[Count];
+    m_fbCount    = new int[Count];
+    m_fbMaxCount = new int[Count];
 }
 
 FIFOWriter::~FIFOWriter()
 {
-    if (m_numFifos <= 0)
+    if (m_numFifos < 1)
         return;
 
-    for (int i = 0; i < m_numFifos; i++)
+    for (uint i = 0; i < m_numFifos; i++)
     {
         QMutexLocker flock(&m_fifoLock[i]);
         m_killWr[i] = 1;
         m_emptyCond[i].wakeAll();
     }
 
-    for (int i = 0; i < m_numFifos; i++)
-    {
+    for (uint i = 0; i < m_numFifos; i++)
         m_fifoThrds[i].wait();
-    }
 
     m_numFifos = 0;
 
@@ -78,89 +106,80 @@ FIFOWriter::~FIFOWriter()
     delete [] m_fbMaxCount;
 }
 
-bool FIFOWriter::FIFOInit(int id, const QString& desc, const QString& name, long size,
-                         int num_bufs)
+bool FIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
+                          long Size, int NumBufs)
 {
-    if (id < 0 || id >= m_numFifos)
+    if (Id >= m_numFifos)
         return false;
 
-    QByteArray  fname = name.toLatin1();
+    QByteArray  fname = Name.toLatin1();
     const char *aname = fname.constData();
     if (mkfifo(aname, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH) == -1)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't create fifo for file: '%1'")
-                .arg(name) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't create fifo for file: '%1'").arg(Name) + ENO);
         return false;
     }
-    LOG(VB_GENERAL, LOG_INFO, QString("Created %1 fifo: %2")
-            .arg(desc).arg(name));
-    m_maxBlkSize[id] = size;
-    m_filename[id]   = name;
-    m_fbDesc[id]     = desc;
-    m_killWr[id]     = 0;
-    m_fbCount[id]    = (m_useSync) ? 2 : num_bufs;
-    m_fbMaxCount[id] = 512;
-    m_fifoBuf[id]   = new fifo_buf;
-    struct fifo_buf *fifoptr = m_fifoBuf[id];
-    for (int i = 0; i < m_fbCount[id]; i++)
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Created %1 fifo: %2").arg(Desc).arg(Name));
+
+    m_maxBlkSize[Id] = Size;
+    m_filename[Id]   = Name;
+    m_fbDesc[Id]     = Desc;
+    m_killWr[Id]     = 0;
+    m_fbCount[Id]    = (m_useSync) ? 2 : NumBufs;
+    m_fbMaxCount[Id] = 512;
+    m_fifoBuf[Id]    = new MythFifoBuffer;
+    struct MythFifoBuffer *fifoptr = m_fifoBuf[Id];
+    for (int i = 0; i < m_fbCount[Id]; i++)
     {
-        fifoptr->data = new unsigned char[m_maxBlkSize[id]];
-        if (i == m_fbCount[id] - 1)
-            fifoptr->next = m_fifoBuf[id];
+        fifoptr->m_data = new unsigned char[static_cast<unsigned long>(m_maxBlkSize[Id])];
+        if (i == m_fbCount[Id] - 1)
+            fifoptr->m_next = m_fifoBuf[Id];
         else
-            fifoptr->next = new struct fifo_buf;
-        fifoptr = fifoptr->next;
+            fifoptr->m_next = new struct MythFifoBuffer;
+        fifoptr = fifoptr->m_next;
     }
-    m_fbInptr[id]  = m_fifoBuf[id];
-    m_fbOutptr[id] = m_fifoBuf[id];
+    m_fbInptr[Id]  = m_fifoBuf[Id];
+    m_fbOutptr[Id] = m_fifoBuf[Id];
 
-    m_fifoThrds[id].SetParent(this);
-    m_fifoThrds[id].SetId(id);
-    m_fifoThrds[id].start();
+    m_fifoThrds[Id].SetParent(this);
+    m_fifoThrds[Id].SetId(static_cast<int>(Id));
+    m_fifoThrds[Id].start();
 
-    while (0 == m_killWr[id] && !m_fifoThrds[id].isRunning())
+    while (0 == m_killWr[Id] && !m_fifoThrds[Id].isRunning())
         usleep(1000);
 
-    return m_fifoThrds[id].isRunning();
+    return m_fifoThrds[Id].isRunning();
 }
 
-void FIFOThread::run(void)
-{
-    RunProlog();
-    if (m_parent && m_id != -1)
-        m_parent->FIFOWriteThread(m_id);
-    RunEpilog();
-}
-
-void FIFOWriter::FIFOWriteThread(int id)
+void FIFOWriter::FIFOWriteThread(int Id)
 {
     int fd = -1;
 
-    QMutexLocker flock(&m_fifoLock[id]);
+    QMutexLocker flock(&m_fifoLock[Id]);
     while (true)
     {
-        if ((m_fbInptr[id] == m_fbOutptr[id]) && (0 == m_killWr[id]))
-            m_emptyCond[id].wait(flock.mutex());
+        if ((m_fbInptr[Id] == m_fbOutptr[Id]) && (0 == m_killWr[Id]))
+            m_emptyCond[Id].wait(flock.mutex());
         flock.unlock();
-        if (m_killWr[id])
+        if (m_killWr[Id])
             break;
         if (fd < 0)
         {
-            QByteArray fname = m_filename[id].toLatin1();
+            QByteArray fname = m_filename[Id].toLatin1();
             fd = open(fname.constData(), O_WRONLY| O_SYNC);
         }
         if (fd >= 0)
         {
             int written = 0;
-            while (written < m_fbOutptr[id]->blksize)
+            while (written < m_fbOutptr[Id]->m_blockSize)
             {
-                int ret = write(fd, m_fbOutptr[id]->data+written,
-                                m_fbOutptr[id]->blksize-written);
+                int ret = static_cast<int>(write(fd, m_fbOutptr[Id]->m_data + written,
+                                                 static_cast<size_t>(m_fbOutptr[Id]->m_blockSize-written)));
                 if (ret < 0)
                 {
-                    LOG(VB_GENERAL, LOG_ERR,
-                        QString("FIFOW: write failed with %1")
-                            .arg(strerror(errno)));
+                    LOG(VB_GENERAL, LOG_ERR, QString("FIFOW: write failed with %1")
+                        .arg(strerror(errno)));
                     ///FIXME: proper error propagation
                     break;
                 }
@@ -168,76 +187,78 @@ void FIFOWriter::FIFOWriteThread(int id)
             }
         }
         flock.relock();
-        m_fbOutptr[id] = m_fbOutptr[id]->next;
-        m_fullCond[id].wakeAll();
+        m_fbOutptr[Id] = m_fbOutptr[Id]->m_next;
+        m_fullCond[Id].wakeAll();
     }
 
     if (fd != -1)
         close(fd);
 
-    unlink(m_filename[id].toLocal8Bit().constData());
+    unlink(m_filename[Id].toLocal8Bit().constData());
 
-    while (m_fifoBuf[id]->next != m_fifoBuf[id])
+    while (m_fifoBuf[Id]->m_next != m_fifoBuf[Id])
     {
-        struct fifo_buf *tmpfifo = m_fifoBuf[id]->next->next;
-        delete [] m_fifoBuf[id]->next->data;
-        delete m_fifoBuf[id]->next;
-        m_fifoBuf[id]->next = tmpfifo;
+        struct MythFifoBuffer *tmpfifo = m_fifoBuf[Id]->m_next->m_next;
+        delete [] m_fifoBuf[Id]->m_next->m_data;
+        delete m_fifoBuf[Id]->m_next;
+        m_fifoBuf[Id]->m_next = tmpfifo;
     }
-    delete [] m_fifoBuf[id]->data;
-    delete m_fifoBuf[id];
+    delete [] m_fifoBuf[Id]->m_data;
+    delete m_fifoBuf[Id];
 }
 
-void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
+void FIFOWriter::FIFOWrite(uint Id, void *Buffer, long Size)
 {
-    QMutexLocker flock(&m_fifoLock[id]);
-    while (m_fbInptr[id]->next == m_fbOutptr[id])
+    QMutexLocker flock(&m_fifoLock[Id]);
+    while (m_fbInptr[Id]->m_next == m_fbOutptr[Id])
     {
         bool blocking = false;
         if (!m_useSync)
         {
-            for(int i = 0; i < m_numFifos; i++)
+            for (uint i = 0; i < m_numFifos; i++)
             {
-                if (i == id)
+                if (i == Id)
                     continue;
                 if (m_fbInptr[i] == m_fbOutptr[i])
                     blocking = true;
             }
         }
 
-        if (blocking && m_fbCount[id] < m_fbMaxCount[id])
+        if (blocking && m_fbCount[Id] < m_fbMaxCount[Id])
         {
-            struct fifo_buf *tmpfifo = m_fbInptr[id]->next;
-            m_fbInptr[id]->next = new struct fifo_buf;
-            m_fbInptr[id]->next->data = new unsigned char[m_maxBlkSize[id]];
-            m_fbInptr[id]->next->next = tmpfifo;
+            struct MythFifoBuffer *tmpfifo = m_fbInptr[Id]->m_next;
+            m_fbInptr[Id]->m_next = new struct MythFifoBuffer;
+            m_fbInptr[Id]->m_next->m_data = new unsigned char[static_cast<unsigned long>(m_maxBlkSize[Id])];
+            m_fbInptr[Id]->m_next->m_next = tmpfifo;
             QString msg = QString("allocating additonal buffer for : %1(%2)")
-                          .arg(m_fbDesc[id]).arg(++m_fbCount[id]);
+                          .arg(m_fbDesc[Id]).arg(++m_fbCount[Id]);
             LOG(VB_FILE, LOG_INFO, msg);
         }
         else
         {
-            m_fullCond[id].wait(flock.mutex(), 1000);
+            m_fullCond[Id].wait(flock.mutex(), 1000);
         }
     }
-    if (blksize > m_maxBlkSize[id])
+
+    if (Size > m_maxBlkSize[Id])
     {
-        delete [] m_fbInptr[id]->data;
-        m_fbInptr[id]->data = new unsigned char[blksize];
+        delete [] m_fbInptr[Id]->m_data;
+        m_fbInptr[Id]->m_data = new unsigned char[static_cast<unsigned long>(Size)];
     }
-    memcpy(m_fbInptr[id]->data,buffer,blksize);
-    m_fbInptr[id]->blksize = blksize;
-    m_fbInptr[id] = m_fbInptr[id]->next;
-    m_emptyCond[id].wakeAll();
+
+    memcpy(m_fbInptr[Id]->m_data,Buffer, static_cast<size_t>(Size));
+    m_fbInptr[Id]->m_blockSize = Size;
+    m_fbInptr[Id] = m_fbInptr[Id]->m_next;
+    m_emptyCond[Id].wakeAll();
 }
 
 void FIFOWriter::FIFODrain(void)
 {
-    int count = 0;
+    uint count = 0;
     while (count < m_numFifos)
     {
         count = 0;
-        for (int i = 0; i < m_numFifos; i++)
+        for (uint i = 0; i < m_numFifos; i++)
         {
             QMutexLocker flock(&m_fifoLock[i]);
             if (m_fbInptr[i] == m_fbOutptr[i])

@@ -1,12 +1,12 @@
 #ifndef FIFOWRITER
 #define FIFOWRITER
 
-// Qt headers
+// Qt
 #include <QWaitCondition>
 #include <QString>
 #include <QMutex>
 
-// MythTV headers
+// MythTV
 #include "mythtvexp.h"
 #include "mthread.h"
 
@@ -17,54 +17,59 @@ class FIFOWriter;
 class FIFOThread : public MThread
 {
   public:
-    FIFOThread() : MThread("FIFOThread") {}
-    ~FIFOThread() override { wait(); m_parent = nullptr; m_id = -1; }
-    void SetId(int id) { m_id = id; }
-    void SetParent(FIFOWriter *parent) { m_parent = parent; }
-    void run(void) override; // MThread
+    FIFOThread();
+   ~FIFOThread() override;
+
+    void SetId(int Id);
+    void SetParent(FIFOWriter *Parent);
+
+    void run(void) override;
+
   private:
-    FIFOWriter *m_parent {nullptr};
-    int         m_id     {-1};
+    FIFOWriter *m_parent { nullptr };
+    int         m_id     { -1      };
 };
 
 class MTV_PUBLIC FIFOWriter
 {
     friend class FIFOThread;
+
   public:
-    FIFOWriter(int count, bool sync);
+    FIFOWriter(uint Count, bool Sync);
     FIFOWriter(const FIFOWriter& rhs);
    ~FIFOWriter(void);
 
-    bool FIFOInit(int id, const QString& desc, const QString& name, long size, int num_bufs);
-    void FIFOWrite(int id, void *buf, long size);
+    bool FIFOInit(uint Id, const QString& Desc, const QString& Name, long Size, int NumBufs);
+    void FIFOWrite(uint Id, void *Buffer, long Size);
     void FIFODrain(void);
 
   private:
-    void FIFOWriteThread(int id);
+    void FIFOWriteThread(int Id);
 
-    struct fifo_buf
+    struct MythFifoBuffer
     {
-        struct fifo_buf *next;
-        unsigned char *data;
-        long blksize;
+        struct MythFifoBuffer *m_next;
+        unsigned char         *m_data;
+        long                   m_blockSize;
     };
-    fifo_buf       **m_fifoBuf    {nullptr};
-    fifo_buf       **m_fbInptr    {nullptr};
-    fifo_buf       **m_fbOutptr   {nullptr};
 
-    FIFOThread      *m_fifoThrds  {nullptr};
-    QMutex          *m_fifoLock   {nullptr};
-    QWaitCondition  *m_fullCond   {nullptr};
-    QWaitCondition  *m_emptyCond  {nullptr};
+    MythFifoBuffer **m_fifoBuf    { nullptr };
+    MythFifoBuffer **m_fbInptr    { nullptr };
+    MythFifoBuffer **m_fbOutptr   { nullptr };
 
-    QString         *m_filename   {nullptr};
-    QString         *m_fbDesc     {nullptr};
+    FIFOThread      *m_fifoThrds  { nullptr };
+    QMutex          *m_fifoLock   { nullptr };
+    QWaitCondition  *m_fullCond   { nullptr };
+    QWaitCondition  *m_emptyCond  { nullptr };
 
-    long            *m_maxBlkSize {nullptr};
-    int             *m_killWr     {nullptr};
-    int             *m_fbCount    {nullptr};
-    int             *m_fbMaxCount {nullptr};
-    int              m_numFifos   {0};
+    QString         *m_filename   { nullptr };
+    QString         *m_fbDesc     { nullptr };
+
+    long            *m_maxBlkSize { nullptr };
+    int             *m_killWr     { nullptr };
+    int             *m_fbCount    { nullptr };
+    int             *m_fbMaxCount { nullptr };
+    uint             m_numFifos   { 0       };
     bool             m_useSync;
 };
 
