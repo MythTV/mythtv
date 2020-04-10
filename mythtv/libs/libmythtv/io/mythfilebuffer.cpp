@@ -4,7 +4,6 @@
 
 // MythTV
 #include "threadedfilewriter.h"
-#include "fileringbuffer.h"
 #include "mythcontext.h"
 #include "remotefile.h"
 #include "mythconfig.h"
@@ -12,6 +11,7 @@
 #include "mythdate.h"
 #include "compat.h"
 #include "mythcorecontext.h"
+#include "io/mythfilebuffer.h"
 
 // Std
 #include <cstdlib>
