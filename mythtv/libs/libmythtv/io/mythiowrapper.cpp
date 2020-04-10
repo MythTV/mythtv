@@ -26,10 +26,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-class Callback
+class MythIOCallback
 {
   public:
-    Callback(void* Object, callback_t Callback)
+    MythIOCallback(void* Object, callback_t Callback)
       : m_object(Object),
         m_callback(Callback)
     {
@@ -54,7 +54,7 @@ static QHash<int, QString>     s_dirnames;
 static QHash<int, DIR*>        s_localdirs;
 
 static QMutex                        s_callbackLock;
-static QMultiHash<QString, Callback> s_fileOpenCallbacks;
+static QMultiHash<QString, MythIOCallback> s_fileOpenCallbacks;
 
 #define LOC QString("MythIOWrap: ")
 
@@ -83,7 +83,7 @@ void MythFileOpenRegisterCallback(const char *Pathname, void* Object, callback_t
     {
         // if we already have a callback registered for this path with this
         // object then remove the callback and return (i.e. end callback)
-        QMutableHashIterator<QString,Callback> it(s_fileOpenCallbacks);
+        QMutableHashIterator<QString,MythIOCallback> it(s_fileOpenCallbacks);
         while (it.hasNext())
         {
             it.next();
@@ -186,7 +186,7 @@ int MythFileOpen(const char *Pathname, int Flags)
     if (!s_fileOpenCallbacks.isEmpty())
     {
         QString path(Pathname);
-        QHashIterator<QString,Callback> it(s_fileOpenCallbacks);
+        QHashIterator<QString,MythIOCallback> it(s_fileOpenCallbacks);
         while (it.hasNext())
         {
             it.next();
