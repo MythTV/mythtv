@@ -40,7 +40,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
-#include "io/icringbuffer.h"
+#include "io/mythinteractivebuffer.h"
 #include "audiooutput.h"
 #include "cardutil.h"
 #include "mythavutil.h"

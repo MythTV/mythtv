@@ -5,12 +5,12 @@
 // Mythtv
 #include "netstream.h"
 #include "mythlogging.h"
-#include "icringbuffer.h"
+#include "io/mythinteractivebuffer.h"
 
 // Std
 #include <cstdio>
 
-#define LOC QString("ICBuffer: ")
+#define LOC QString("InteractiveBuf: ")
 
 MythInteractiveBuffer::MythInteractiveBuffer(const QString &Url, MythMediaBuffer *Parent)
   : MythMediaBuffer(kMythBufferMHEG),
@@ -32,7 +32,7 @@ bool MythInteractiveBuffer::IsOpen(void) const
     return m_stream ? m_stream->IsOpen() : false;
 }
 
-/** \fn ICRingBuffer::OpenFile(const QString &, uint)
+/** \fn MythInteractiveBuffer::OpenFile(const QString &, uint)
  *  \brief Opens a BBC NetStream for reading.
  *
  *  \param Url   Url of the stream to read.
