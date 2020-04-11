@@ -21,7 +21,7 @@
 #include "Bluray/bdringbuffer.h"
 #include "HLS/httplivestreambuffer.h"
 #include "mythcdrom.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 // Std
 #include <cmath>
@@ -56,7 +56,7 @@ QStringList MythMediaBuffer::s_subExtNoCheck;
 
   A child should never lock any of the parents without locking
   the parent lock before the child lock.
-  void RingBuffer::Example1()
+  void MythMediaBuffer::Example1()
   {
       poslock.lockForWrite();
       rwlock.lockForRead(); // error!
@@ -64,7 +64,7 @@ QStringList MythMediaBuffer::s_subExtNoCheck;
       rwlock.unlock();
       poslock.unlock();
   }
-  void RingBuffer::Example2()
+  void MythMediaBuffer::Example2()
   {
       rwlock.lockForRead();
       rbrlock.lockForWrite(); // ok!
@@ -254,7 +254,7 @@ MythMediaBuffer::~MythMediaBuffer(void)
     }
 }
 
-/** \fn RingBuffer::Reset(bool, bool, bool)
+/** \fn MythMediaBuffer::Reset(bool, bool, bool)
  *  \brief Resets the read-ahead thread and our position in the file
  */
 void MythMediaBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
@@ -275,7 +275,7 @@ void MythMediaBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
     if (m_readPos != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("RingBuffer::Reset() nonzero readpos.  toAdjust: %1 "
+            QString("MythMediaBuffer::Reset() nonzero readpos.  toAdjust: %1 "
                     "readpos: %2 readAdjust: %3")
                 .arg(ToAdjust).arg(m_readPos).arg(m_readAdjust));
     }
@@ -322,7 +322,7 @@ void MythMediaBuffer::UpdateRawBitrate(uint RawBitrate)
     m_rwLock.unlock();
 }
 
-/** \fn RingBuffer::UpdatePlaySpeed(float)
+/** \fn MythMediaBuffer::UpdatePlaySpeed(float)
  *  \brief Set the play speed, to allow RingBuffer adjust effective bitrate.
  *  \param play_speed Speed to set. (1.0 for normal speed)
  */
@@ -344,7 +344,7 @@ void MythMediaBuffer::SetWaitForWrite(void)
     m_waitForWrite = true;
 }
 
-/** \fn RingBuffer::SetBufferSizeFactors(bool, bool)
+/** \fn MythMediaBuffer::SetBufferSizeFactors(bool, bool)
  *  \brief Tells RingBuffer that the raw bitrate may be inaccurate and the
  *         underlying container is matroska, both of which may require a larger
  *         buffer size.
@@ -358,7 +358,7 @@ void MythMediaBuffer::SetBufferSizeFactors(bool EstBitrate, bool Matroska)
     CreateReadAheadBuffer();
 }
 
-/** \fn RingBuffer::CalcReadAheadThresh(void)
+/** \fn MythMediaBuffer::CalcReadAheadThresh(void)
  *  \brief Calculates m_fillMin, m_fillThreshold, and m_readBlockSize
  *         from the estimated effective bitrate of the stream.
  *
@@ -579,7 +579,7 @@ int MythMediaBuffer::ReadBufAvail(void) const
     return ret;
 }
 
-/** \fn RingBuffer::ResetReadAhead(long long)
+/** \fn MythMediaBuffer::ResetReadAhead(long long)
  *  \brief Restart the read-ahead thread at the 'newinternal' position.
  *
  *   This is called after a Seek(long long, int) so that the read-ahead
@@ -664,7 +664,7 @@ void MythMediaBuffer::Start(void)
     m_rwLock.unlock();
 }
 
-/** \fn RingBuffer::KillReadAheadThread(void)
+/** \fn MythMediaBuffer::KillReadAheadThread(void)
  *  \brief Stops the read-ahead thread, and waits for it to stop.
  */
 void MythMediaBuffer::KillReadAheadThread(void)
@@ -680,7 +680,7 @@ void MythMediaBuffer::KillReadAheadThread(void)
     }
 }
 
-/** \fn RingBuffer::StopReads(void)
+/** \fn MythMediaBuffer::StopReads(void)
  *  \sa StartReads(void), Pause(void)
  */
 void MythMediaBuffer::StopReads(void)
@@ -690,7 +690,7 @@ void MythMediaBuffer::StopReads(void)
     m_generalWait.wakeAll();
 }
 
-/** \fn RingBuffer::StartReads(void)
+/** \fn MythMediaBuffer::StartReads(void)
  *  \sa StopReads(void), Unpause(void)
  */
 void MythMediaBuffer::StartReads(void)
@@ -700,7 +700,7 @@ void MythMediaBuffer::StartReads(void)
     m_generalWait.wakeAll();
 }
 
-/** \fn RingBuffer::Pause(void)
+/** \fn MythMediaBuffer::Pause(void)
  *  \brief Pauses the read-ahead thread. Calls StopReads(void).
  *  \sa Unpause(void), WaitForPause(void)
  */
@@ -714,7 +714,7 @@ void MythMediaBuffer::Pause(void)
     m_rwLock.unlock();
 }
 
-/** \fn RingBuffer::Unpause(void)
+/** \fn MythMediaBuffer::Unpause(void)
  *  \brief Unpauses the read-ahead thread. Calls StartReads(void).
  *  \sa Pause(void)
  */
@@ -729,7 +729,7 @@ void MythMediaBuffer::Unpause(void)
     m_rwLock.unlock();
 }
 
-/** \fn RingBuffer::WaitForPause(void)
+/** \fn MythMediaBuffer::WaitForPause(void)
  *  \brief Waits for Pause(void) to take effect.
  */
 void MythMediaBuffer::WaitForPause(void)
@@ -988,7 +988,7 @@ void MythMediaBuffer::run(void)
 
             int rbwposcopy = m_rbwPos;
 
-            // FileRingBuffer::safe_read(RemoteFile*...) acquires poslock;
+            // MythFileBuffer::SafeRead(RemoteFile*...) acquires poslock;
             // so we need to unlock this here to preserve locking order.
             m_rbwLock.unlock();
 
@@ -1484,7 +1484,7 @@ int MythMediaBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
     return Count;
 }
 
-/** \fn RingBuffer::Read(void*, int)
+/** \fn MythMediaBuffer::Read(void*, int)
  *  \brief This is the public method for reading from a file,
  *         it calls the appropriate read method if the file
  *         is remote or buffered, or a BD/DVD.
@@ -1626,7 +1626,7 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     return average;
 }
 
-/** \fn RingBuffer::Write(const void*, uint)
+/** \fn MythMediaBuffer::Write(const void*, uint)
  *  \brief Writes buffer to ThreadedFileWriter::Write(const void*,uint)
  *  \return Bytes written, or -1 on error.
  */
@@ -1664,7 +1664,7 @@ int MythMediaBuffer::Write(const void *Buffer, uint Count)
     return result;
 }
 
-/** \fn RingBuffer::Sync(void)
+/** \fn MythMediaBuffer::Sync(void)
  *  \brief Calls ThreadedFileWriter::Sync(void)
  */
 void MythMediaBuffer::Sync(void)
@@ -1700,7 +1700,7 @@ long long MythMediaBuffer::WriterSeek(long long Position, int Whence, bool HasLo
     return result;
 }
 
-/** \fn RingBuffer::WriterFlush(void)
+/** \fn MythMediaBuffer::WriterFlush(void)
  *  \brief Calls ThreadedFileWriter::Flush(void)
  */
 void MythMediaBuffer::WriterFlush(void)
@@ -1711,7 +1711,7 @@ void MythMediaBuffer::WriterFlush(void)
     m_rwLock.unlock();
 }
 
-/** \fn RingBuffer::WriterSetBlocking(bool)
+/** \fn MythMediaBuffer::WriterSetBlocking(bool)
  *  \brief Calls ThreadedFileWriter::SetBlocking(bool)
  */
 bool MythMediaBuffer::WriterSetBlocking(bool Lock)
@@ -1789,7 +1789,7 @@ bool MythMediaBuffer::GetStopReads(void) const
     return m_stopReads;
 }
 
-/** \fn RingBuffer::GetWritePosition(void) const
+/** \fn MythMediaBuffer::GetWritePosition(void) const
  *  \brief Returns how far into a ThreadedFileWriter file we have written.
  */
 long long MythMediaBuffer::GetWritePosition(void) const
@@ -1800,7 +1800,7 @@ long long MythMediaBuffer::GetWritePosition(void) const
     return ret;
 }
 
-/** \fn RingBuffer::LiveMode(void) const
+/** \fn MythMediaBuffer::LiveMode(void) const
  *  \brief Returns true if this RingBuffer has been assigned a LiveTVChain.
  *  \sa SetLiveMode(LiveTVChain*)
  */
@@ -1812,7 +1812,7 @@ bool MythMediaBuffer::LiveMode(void) const
     return ret;
 }
 
-/** \fn RingBuffer::SetLiveMode(LiveTVChain*)
+/** \fn MythMediaBuffer::SetLiveMode(LiveTVChain*)
  *  \brief Assigns a LiveTVChain to this RingBuffer
  *  \sa LiveMode(void)
  */

@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"

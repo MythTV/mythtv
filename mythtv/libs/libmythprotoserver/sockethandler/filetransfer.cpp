@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "filetransfer.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "programinfo.h"
 #include "mythsocket.h"
 #include "mythlogging.h"

@@ -25,7 +25,7 @@
 #include "programinfo.h"
 #include "mythlogging.h"
 #include "mpegtables.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 #include "mythsystemevent.h"
 

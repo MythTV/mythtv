@@ -73,7 +73,7 @@ using namespace std;
 #include "tvbrowsehelper.h"
 #include "playercontext.h"              // for PlayerContext, osdInfo, etc
 #include "programtypes.h"
-#include "ringbuffer.h"                 // for RingBuffer, etc
+#include "io/mythmediabuffer.h"
 #include "tv_actions.h"                 // for ACTION_TOGGLESLEEP, etc
 #include "mythcodeccontext.h"
 

@@ -60,7 +60,7 @@ extern "C" {
 
 #endif // USING_V4L2
 
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "RTjpegN.h"
 
 #include "programinfo.h"

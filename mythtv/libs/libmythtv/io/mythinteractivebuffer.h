@@ -2,7 +2,7 @@
 #define ICRINGBUFFER_H
 
 // MythTV
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 class NetStream;
 

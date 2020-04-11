@@ -47,7 +47,7 @@ using namespace std;
 #include "jitterometer.h"
 #include "mythtimer.h"
 #include "mythuiactions.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_actions.h"
 #include "mythcodeccontext.h"
 

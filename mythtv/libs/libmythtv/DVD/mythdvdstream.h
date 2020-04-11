@@ -9,7 +9,7 @@
 #include <QList>
 
 // MythTV
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 // Std
 #include <cstdint>

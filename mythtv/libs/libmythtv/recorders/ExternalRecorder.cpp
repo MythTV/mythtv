@@ -25,7 +25,7 @@
 #include "ExternalStreamHandler.h"
 #include "ExternalRecorder.h"
 #include "ExternalChannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 
 #define LOC QString("ExternalRec[%1](%2): ") \

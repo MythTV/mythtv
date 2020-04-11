@@ -14,7 +14,7 @@
 #include "tsstreamdata.h"
 #include "hdhrrecorder.h"
 #include "hdhrchannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 #include "mythlogging.h"
 

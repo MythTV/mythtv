@@ -13,7 +13,6 @@ using namespace std;
 // MythTV headers
 #include "mpegstreamdata.h"
 #include "mpegtables.h"
-#include "ringbuffer.h"
 #include "mpegtables.h"
 
 #include "atscstreamdata.h"

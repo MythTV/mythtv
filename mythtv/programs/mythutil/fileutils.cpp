@@ -1,7 +1,7 @@
 // libmyth* headers
 #include "exitcodes.h"
 #include "mythlogging.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythdownloadmanager.h"
 
 // local headers

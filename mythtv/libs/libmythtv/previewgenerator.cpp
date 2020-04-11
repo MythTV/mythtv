@@ -20,8 +20,7 @@
 
 // MythTV headers
 #include "mythconfig.h"
-
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythplayer.h"
 #include "previewgenerator.h"
 #include "tv_rec.h"

@@ -1,5 +1,5 @@
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef MYTHMEDIABUFFER_H
+#define MYTHMEDIABUFFER_H
 
 // Qt
 #include <QReadWriteLock>
@@ -48,7 +48,7 @@ enum MythBufferType
 
 class MTV_PUBLIC MythMediaBuffer : protected MThread
 {
-    friend class ICRingBuffer;
+    friend class MythInteractiveBuffer;
 
   public:
     static MythMediaBuffer *Create(const QString &Filename, bool Write,
@@ -215,7 +215,6 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     LiveTVChain           *m_liveTVChain      { nullptr };
     bool                   m_ignoreLiveEOF    { false };
     long long              m_readAdjust       { 0 };
-    // Internal RingBuffer Method
     int                    m_readOffset       { 0 };
     bool                   m_readInternalMode { false };
     // End of section protected by rwLock

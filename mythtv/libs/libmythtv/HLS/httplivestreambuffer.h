@@ -24,7 +24,7 @@
 #define MythXCode_hlsbuffer_h
 
 #include "mythcorecontext.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 extern "C" {
 #include "libavformat/avformat.h"

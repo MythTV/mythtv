@@ -9,7 +9,6 @@ using namespace std;
 #include "atscstreamdata.h"
 #include "atsctables.h"
 #include "sctetables.h"
-#include "ringbuffer.h"
 #include "eithelper.h"
 
 #define LOC QString("ATSCStream[%1]: ").arg(m_cardId)

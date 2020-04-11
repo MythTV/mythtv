@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 class MTV_PUBLIC MythFileBuffer : public MythMediaBuffer
 {

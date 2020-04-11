@@ -31,7 +31,7 @@
 #include "eitscanner.h"
 #include "mythconfig.h"
 #include "remoteutil.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "v4lchannel.h"
 #include "cardutil.h"
 #include "jobqueue.h"

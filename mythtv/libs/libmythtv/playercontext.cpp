@@ -9,7 +9,7 @@
 #include "mythplayer.h"
 #include "remoteencoder.h"
 #include "livetvchain.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "playgroup.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"

@@ -2,7 +2,7 @@
 #define STREAMINGRINGBUFFER_H
 
 // MythTV
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 // FFmpeg
 extern "C" {

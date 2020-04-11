@@ -35,7 +35,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "remoteencoder.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "commandlineparser.h"
 #include "mythtranslation.h"
 #include "loggingserver.h"

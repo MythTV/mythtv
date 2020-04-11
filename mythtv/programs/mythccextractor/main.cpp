@@ -16,7 +16,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "programinfo.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
 #include "loggingserver.h"

@@ -17,7 +17,7 @@ using namespace std;
 #include "privatedecoder.h"
 #include "audiooutput.h"
 #include "audiooutpututil.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythplayer.h"
 #include "remoteencoder.h"
 #include "programinfo.h"

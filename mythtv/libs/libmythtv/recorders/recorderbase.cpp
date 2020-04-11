@@ -25,7 +25,7 @@ using namespace std;
 #include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "ExternalChannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
 #include "mythdate.h"

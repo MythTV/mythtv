@@ -10,7 +10,7 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "remotefile.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythiowrapper.h"
 
 // Std

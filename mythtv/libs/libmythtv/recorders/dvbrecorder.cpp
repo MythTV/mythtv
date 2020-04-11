@@ -27,7 +27,7 @@
 #include "tsstreamdata.h"
 #include "dvbrecorder.h"
 #include "dvbchannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 #include "mythlogging.h"
 

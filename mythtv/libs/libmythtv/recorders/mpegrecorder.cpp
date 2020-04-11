@@ -24,7 +24,7 @@ using namespace std;
 
 // MythTV headers
 #include "mpegrecorder.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythcorecontext.h"
 #include "programinfo.h"
 #include "recordingprofile.h"

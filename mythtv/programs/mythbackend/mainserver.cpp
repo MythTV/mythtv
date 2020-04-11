@@ -63,7 +63,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "storagegroup.h"
 #include "compat.h"
-#include "io/ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "remotefile.h"
 #include "mythsystemevent.h"
 #include "tv.h"
