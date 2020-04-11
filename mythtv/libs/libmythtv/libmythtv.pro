@@ -115,7 +115,7 @@ HEADERS += mythframe.h
 # Misc. needed by backend/frontend
 HEADERS += mythtvexp.h
 HEADERS += recordinginfo.h
-HEADERS += dbcheck.h                mythdbcheck.h
+HEADERS += dbcheck.h
 HEADERS += videodbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
@@ -249,7 +249,7 @@ HEADERS += srtwriter.h
 SOURCES += srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = playgroup.h            mythdbcheck.h
+inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
 inc.files += mythavutil.h           mythframe.h
 
