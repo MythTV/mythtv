@@ -21,7 +21,7 @@ GITREPOPATH="exported"
 
 cd ${GITTREEDIR}
 
-# if we have a mythtv/DECRIBE file use that to get the branch and version
+# if we have a mythtv/DESCRIBE file use that to get the branch and version
 if test -e $GITTREEDIR/DESCRIBE ; then
     echo "Using $GITTREEDIR/DESCRIBE"
     . $GITTREEDIR/DESCRIBE
