@@ -284,7 +284,7 @@ ImageAdapterBase::ImageAdapterBase() :
     // Apply filters to only detect image files
     m_dirFilter.setNameFilters(glob);
     m_dirFilter.setFilter(QDir::AllDirs | QDir::Files | QDir::Readable |
-                          QDir::NoDotAndDotDot | QDir::NoSymLinks);
+                          QDir::NoDotAndDotDot);
 
     // Sync files before dirs to improve thumb generation response
     // Order by time (oldest first) - this determines the order thumbs appear
