@@ -4,8 +4,8 @@
 // MythTV
 #include "mythuiimage.h"
 #include "mythpainter.h"
-#include "bdringbuffer.h"
-#include "bdoverlayscreen.h"
+#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdoverlayscreen.h"
 
 #define LOC QString("BDScreen: ")
 

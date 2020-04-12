@@ -325,8 +325,8 @@ using_frontend {
     SOURCES += Bluray/mythbdplayer.cpp
     HEADERS += Bluray/mythbddecoder.h
     SOURCES += Bluray/mythbddecoder.cpp
-    HEADERS += Bluray/bdoverlayscreen.h
-    SOURCES += Bluray/bdoverlayscreen.cpp
+    HEADERS += Bluray/mythbdoverlayscreen.h
+    SOURCES += Bluray/mythbdoverlayscreen.cpp
 }
 !using_libbluray_external {
     INCLUDEPATH += ../../external/libmythbluray/src

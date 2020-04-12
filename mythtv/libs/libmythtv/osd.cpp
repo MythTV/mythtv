@@ -25,7 +25,7 @@
 #include "interactivescreen.h"
 #include "osd.h"
 #include "Bluray/bdringbuffer.h"
-#include "Bluray/bdoverlayscreen.h"
+#include "Bluray/mythbdoverlayscreen.h"
 #include "tv_actions.h"
 
 #define LOC     QString("OSD: ")
