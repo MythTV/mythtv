@@ -104,6 +104,7 @@ using namespace std;
 
 // DVD & Bluray
 #include "DVD/mythdvdbuffer.h"
+#include "Bluray/mythbdinfo.h"
 #include "Bluray/bdringbuffer.h"
 
 // AirPlay
