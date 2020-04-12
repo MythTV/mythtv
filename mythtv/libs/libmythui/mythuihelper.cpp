@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <unistd.h>
-#include <iostream>
 
 #include <QImage>
 #include <QPixmap>
@@ -93,40 +92,26 @@ class MythUIHelperPrivate
 {
 public:
     explicit MythUIHelperPrivate(MythUIHelper *p)
-        : m_parent(p), m_cacheLock(new QMutex(QMutex::Recursive)),
-          m_imageThreadPool(new MThreadPool("MythUIHelper")) {}
+    : m_cacheLock(new QMutex(QMutex::Recursive)),
+      m_imageThreadPool(new MThreadPool("MythUIHelper")),
+      m_parent(p) {}
     ~MythUIHelperPrivate();
 
     void Init();
     void StoreGUIsettings(void);
 
-    MythUIHelper *m_parent                   {nullptr};
-
+    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to the full drawable area.
-    QRect m_screenRect                       { 0, 0, 0, 0};
-
-    // Command-line GUI size, which overrides both the above sets of sizes
-    static int x_override;
-    static int y_override;
-    static int w_override;
-    static int h_override;
-
     float m_wmult                            {1.0F};
     float m_hmult                            {1.0F};
-
-    int m_fontStretch                        {100};
 
     // Dimensions of the theme
     QSize m_baseSize                         { 800, 600 };
     bool m_isWide                            {false};
-
-    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
 
     QMap<QString, MythImage *> m_imageCache;
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
@@ -146,20 +131,34 @@ public:
     QAtomicInteger<qint64> m_maxCacheSize    {30 * 1024 * 1024};
 #endif
 
+    // The part of the screen(s) allocated for the GUI. Unless
+    // overridden by the user, defaults to the full drawable area.
+    QRect m_screenRect                       { 0, 0, 0, 0};
+
+    // Command-line GUI size, which overrides both the above sets of sizes
+    static int x_override;
+    static int y_override;
+    static int w_override;
+    static int h_override;
+
     QString m_themecachedir;
     QString m_userThemeDir;
 
+    ScreenSaverControl *m_screensaver        {nullptr};
+    bool                m_screensaverEnabled {false};
+
     MythDisplay *m_display                   {nullptr};
+    bool         m_screenSetup               {false};
 
     MThreadPool *m_imageThreadPool           {nullptr};
 
     MythUIMenuCallbacks m_callbacks          {nullptr,nullptr,nullptr,nullptr,nullptr};
 
-    QStringList m_searchPaths;
+    MythUIHelper *m_parent                   {nullptr};
 
-    ScreenSaverControl *m_screensaver        {nullptr};
-    bool                m_screensaverEnabled {false};
-    bool                m_screenSetup        {false};
+    int m_fontStretch                        {100};
+
+    QStringList m_searchPaths;
 };
 
 int MythUIHelperPrivate::x_override = -1;
