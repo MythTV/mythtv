@@ -162,9 +162,8 @@ bool MythRAOPDevice::RegisterForBonjour(void)
 
     QByteArray name = m_hardwareId.toHex();
     name.append("@");
+    name.append("CAN ");
     name.append(m_name);
-    name.append(" on ");
-    name.append(gCoreContext->GetHostName());
     QByteArray type = "_raop._tcp";
     QByteArray txt;
     txt.append(6); txt.append("tp=UDP");
