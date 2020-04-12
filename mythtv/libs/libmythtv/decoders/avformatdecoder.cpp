@@ -35,7 +35,7 @@ using namespace std;
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
 #include "DVD/mythdvdbuffer.h"
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "mythavutil.h"
 
 #include "lcddevice.h"

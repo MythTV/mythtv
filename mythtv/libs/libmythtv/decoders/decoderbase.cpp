@@ -10,7 +10,7 @@ using namespace std;
 #include "programinfo.h"
 #include "iso639.h"
 #include "DVD/mythdvdbuffer.h"
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "mythcodeccontext.h"
 
 #define LOC QString("Dec: ")

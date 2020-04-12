@@ -18,7 +18,7 @@
 #include "tv_actions.h"
 #include "Bluray/mythbdiowrapper.h"
 #include "Bluray/mythbdinfo.h"
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 
 // Std
 #include <fcntl.h>
@@ -35,7 +35,7 @@
 #endif
 #include "libbluray/keys.h"
 
-#define LOC QString("BDRingBuf: ")
+#define LOC QString("BDBuffer: ")
 
 static void HandleOverlayCallback(void *Data, const bd_overlay_s *const Overlay)
 {

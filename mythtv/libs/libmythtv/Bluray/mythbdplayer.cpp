@@ -1,4 +1,4 @@
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbddecoder.h"
 #include "Bluray/mythbdplayer.h"
 

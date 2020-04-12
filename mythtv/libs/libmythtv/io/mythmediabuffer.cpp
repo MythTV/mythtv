@@ -18,7 +18,7 @@
 #include "mythlogging.h"
 #include "DVD/mythdvdbuffer.h"
 #include "DVD/mythdvdstream.h"
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "HLS/httplivestreambuffer.h"
 #include "mythcdrom.h"
 #include "io/mythmediabuffer.h"

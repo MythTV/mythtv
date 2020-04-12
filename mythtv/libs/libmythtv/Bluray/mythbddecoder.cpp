@@ -1,7 +1,7 @@
 // MythTV
 #include "iso639.h"
-#include "mythbdplayer.h"
-#include "bdringbuffer.h"
+#include "Bluray/mythbdplayer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbddecoder.h"
 
 #define LOC QString("BDDecoder: ")

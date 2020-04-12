@@ -52,7 +52,7 @@ using namespace std;
 
 // libmythtv
 #include "DVD/mythdvdbuffer.h"
-#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
