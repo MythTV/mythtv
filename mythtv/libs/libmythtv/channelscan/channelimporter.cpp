@@ -655,7 +655,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 int chanid = ChannelUtil::CreateChanID(
                     chan.m_sourceId, chan.m_chanNum);
 
-                chan.m_channelId = (chanid > 0) ? chanid : chan.m_channelId;
+                chan.m_channelId = (chanid > 0) ? chanid : 0;
 
                 if (chan.m_channelId)
                 {
@@ -664,21 +664,8 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                     tsid = (tsid) ? tsid : chan.m_patTsId;
                     tsid = (tsid) ? tsid : chan.m_vctChanTsId;
 
-                    if (!chan.m_dbMplexId)
-                    {
-                        chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
-                            chan.m_sourceId, transport, tsid, chan.m_origNetId);
-                    }
-                    else
-                    {
-                        // Find the matching multiplex. This updates the
-                        // transport and network ID's in case the transport
-                        // was created manually
-                        int id = ChannelUtil::GetBetterMplexID(chan.m_dbMplexId,
-                                    tsid, chan.m_origNetId);
-                        if (id >= 0)
-                            chan.m_dbMplexId = id;
-                    }
+                    chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
+                        chan.m_sourceId, transport, tsid, chan.m_origNetId);
                 }
 
                 if (chan.m_channelId && chan.m_dbMplexId)
