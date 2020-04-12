@@ -36,7 +36,7 @@ static const char *DVDMenuTable[] =
 };
 
 MythDVDBuffer::MythDVDBuffer(const QString &Filename)
-  : MythMediaBuffer(kMythBufferDVD)
+  : MythOpticalBuffer(kMythBufferDVD)
 {
     m_seekSpeedMap = { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
                        { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
@@ -221,11 +221,6 @@ bool MythDVDBuffer::IsInStillFrame(void) const
     return m_still > 0;
 }
 
-bool MythDVDBuffer::IsInMenu(void) const
-{
-    return m_inMenu;
-}
-
 bool MythDVDBuffer::IsSeekingAllowed(void)
 {
     // Don't allow seeking when the ringbuffer is
@@ -306,10 +301,10 @@ bool MythDVDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
             "http://code.mythtv.org/trac");
     }
 
-    MythDVDInfo::GetNameAndSerialNum(m_dvdnav, m_dvdname, m_serialnumber, Filename, LOC);
+    MythDVDInfo::GetNameAndSerialNum(m_dvdnav, m_discName, m_discSerialNumber, Filename, LOC);
 
     SetDVDSpeed();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DVD Serial Number %1").arg(m_serialnumber));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DVD Serial Number %1").arg(m_discSerialNumber));
     m_readBlockSize   = DVD_BLOCK_SIZE * 62;
     m_setSwitchToNext = false;
     m_ateof           = false;
@@ -809,9 +804,6 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                                 m_context->DecrRef();
 
                             m_context = new MythDVDContext(*dsi, pci_copy);
-
-                            // get the latest nav
-                            m_lastNav = reinterpret_cast<dvdnav_t*>(blockBuf);
 
                             if (m_inMenu != lastInMenu)
                             {
@@ -1903,8 +1895,8 @@ void MythDVDBuffer::AudioStreamsChanged(bool Change)
  */
 bool MythDVDBuffer::GetNameAndSerialNum(QString& Name, QString& SerialNumber)
 {
-    Name = m_dvdname;
-    SerialNumber = m_serialnumber;
+    Name = m_discName;
+    SerialNumber = m_discSerialNumber;
     return !(Name.isEmpty() && SerialNumber.isEmpty());
 }
 

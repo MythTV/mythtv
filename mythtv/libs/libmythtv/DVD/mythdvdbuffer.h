@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "io/mythmediabuffer.h"
+#include "io/mythopticalbuffer.h"
 #include "mythdate.h"
 #include "referencecounter.h"
 #include "mythdvdcontext.h"
@@ -25,7 +25,7 @@ extern "C" {
 
 class MythDVDPlayer;
 
-class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
+class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(MythDVDBuffer)
 
@@ -36,16 +36,15 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     bool      IsOpen               (void) const override;
     bool      IsBookmarkAllowed    (void) override;
     bool      IsSeekingAllowed     (void) override;
-    bool      IsStreamed           (void) override { return true; }
     int       BestBufferSize       (void) override { return 2048; }
     bool      IsInStillFrame       (void) const override;
     bool      OpenFile             (const QString &Filename,
                                     uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
-    bool      IsInMenu             (void) const override;
     bool      HandleAction         (const QStringList &Actions, int64_t Pts) override;
     void      IgnoreWaitStates     (bool Ignore) override;
     bool      StartFromBeginning   (void) override;
     long long GetReadPosition      (void) const override;
+    bool      GetNameAndSerialNum  (QString& Name, QString& SerialNumber) override;
 
     int       GetTitle             (void) const;
     bool      DVDWaitingForPlayer  (void);
@@ -83,7 +82,6 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     uint      GetAudioLanguage     (int Index);
     int       GetAudioTrackNum     (uint StreamId);
     int       GetAudioTrackType    (uint Index);
-    bool      GetNameAndSerialNum  (QString& Name, QString& SerialNumber);
     bool      GetDVDStateSnapshot  (QString& State);
     bool      RestoreDVDStateSnapshot(QString& State);
     double    GetFrameRate         (void);
@@ -117,13 +115,6 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     void      SetParent            (MythDVDPlayer *Parent);
 
   protected:
-    enum processState_t
-    {
-        PROCESS_NORMAL,
-        PROCESS_REPROCESS,
-        PROCESS_WAIT
-    };
-
     int       SafeRead          (void *Buffer, uint Size) override;
     long long SeekInternal      (long long Position, int Whence) override;
 
@@ -161,7 +152,6 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     bool           m_pgcLengthChanged       { false   };
     long long      m_pgStart                { 0       };
     long long      m_currentpos             { 0       };
-    dvdnav_t      *m_lastNav                { nullptr }; // This really belongs in the player.
     int32_t        m_part                   { 0       };
     int32_t        m_lastPart               { 0       };
     int32_t        m_title                  { 0       };
@@ -169,7 +159,6 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     bool           m_playerWait             { false   };
     int32_t        m_titleParts             { 0       };
     bool           m_gotStop                { false   };
-    int            m_currentAngle           { 0       };
     int            m_currentTitleAngleCount { 0       };
     int64_t        m_endPts                 { 0       };
     int64_t        m_timeDiff               { 0       };
@@ -192,8 +181,6 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     int            m_curAudioTrack          { 0       };
     int8_t         m_curSubtitleTrack       { 0       };
     bool           m_autoselectsubtitle     { true    };
-    QString        m_dvdname;
-    QString        m_serialnumber;
     bool           m_seeking                { false   };
     int64_t        m_seektime               { 0       };
     int64_t        m_currentTime            { 0       };
@@ -203,11 +190,9 @@ class MTV_PUBLIC MythDVDBuffer : public MythMediaBuffer
     float           m_forcedAspect          { -1.0F   };
     QMutex          m_contextLock           { QMutex::Recursive };
     MythDVDContext *m_context               { nullptr };
-    processState_t  m_processState          { PROCESS_NORMAL };
     dvdnav_status_t m_dvdStat               { DVDNAV_STATUS_OK };
     int32_t         m_dvdEvent              { 0       };
     int32_t         m_dvdEventSize          { 0       };
-    bool            m_inMenu                { false   };
     uint            m_buttonVersion         { 1       };
     int             m_buttonStreamID        { 0       };
     uint32_t        m_clut[16]              { 0       };

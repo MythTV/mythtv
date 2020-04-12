@@ -10,7 +10,7 @@
 
 // MythTV
 #include "config.h"
-#include "io/mythmediabuffer.h"
+#include "io/mythopticalbuffer.h"
 
 // BluRay
 #include "libbluray/bluray.h"
@@ -66,7 +66,7 @@ class MythBDOverlay
 /** \class MythBDBuffer
  *   A class to allow a MythMediaBuffer to read from BDs.
  */
-class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
+class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(MythBDBuffer)
 
@@ -74,12 +74,11 @@ class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
     explicit MythBDBuffer(const QString &Filename);
     ~MythBDBuffer() override;
 
-    bool      IsStreamed         (void) override { return true; }
+    bool      GetNameAndSerialNum(QString& Name, QString& SerialNum) override;
     void      IgnoreWaitStates   (bool Ignore) override;
     bool      StartFromBeginning (void) override;
     long long GetReadPosition    (void) const override;
     bool      IsOpen             (void) const override;
-    bool      IsInMenu           (void) const override;
     bool      IsInStillFrame     (void) const override;
     bool      HandleAction       (const QStringList &Actions, int64_t Pts) override;
     bool      OpenFile           (const QString &Filename,
@@ -88,7 +87,7 @@ class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
     void      ProgressUpdate     (void);
     bool      BDWaitingForPlayer (void);
     void      SkipBDWaitingForPlayer(void);
-    bool      GetNameAndSerialNum(QString& Name, QString& SerialNum);
+
     bool      GetBDStateSnapshot (QString& State);
     bool      RestoreBDStateSnapshot(const QString &State);
     void      ClearOverlays      (void);
@@ -143,13 +142,6 @@ class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
                                                 BLURAY_STREAM_INFO* Streams,
                                                 int StreamCount);
 
-    enum processState_t
-    {
-        PROCESS_NORMAL,
-        PROCESS_REPROCESS,
-        PROCESS_WAIT
-    };
-
     BLURAY            *m_bdnav                       { nullptr };
     bool               m_isHDMVNavigation            { false   };
     bool               m_tryHDMVNavigation           { false   };
@@ -163,7 +155,6 @@ class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
     uint64_t           m_currentTitleAngleCount      { 0       };
     uint64_t           m_currentTime                 { 0       };
     int                m_imgHandle                   { -1      };
-    int                m_currentAngle                { 0       };
     int                m_currentTitle                { -1      };
     int                m_currentPlaylist             { 0       };
     int                m_currentPlayitem             { 0       };
@@ -185,16 +176,12 @@ class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
     QVector<MythBDOverlay*> m_overlayPlanes;
     int                m_stillTime                   { 0       };
     int                m_stillMode                   { BLURAY_STILL_NONE};
-    volatile bool      m_inMenu                      { false   };
     BD_EVENT           m_lastEvent                   { BD_EVENT_NONE, 0};
-    processState_t     m_processState                { PROCESS_NORMAL};
     QByteArray         m_pendingData;
     int64_t            m_timeDiff                    { 0       };
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;
     QMutex             m_infoLock                    { QMutex::Recursive };
-    QString            m_name;
-    QString            m_serialNumber;
     QThread           *m_mainThread                  { nullptr };
 };
 #endif

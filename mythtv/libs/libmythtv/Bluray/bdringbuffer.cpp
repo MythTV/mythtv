@@ -271,7 +271,7 @@ QString MythBDInfo::GetLastError(void) const
 }
 
 MythBDBuffer::MythBDBuffer(const QString &Filename)
-  : MythMediaBuffer(kMythBufferBD),
+  : MythOpticalBuffer(kMythBufferBD),
     m_overlayPlanes(2, nullptr)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
@@ -543,7 +543,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
             .arg(metaDiscLibrary->di_set_number).arg(metaDiscLibrary->di_num_sets));
     }
 
-    MythBDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, m_safeFilename, LOC);
+    MythBDInfo::GetNameAndSerialNum(m_bdnav, m_discName, m_discSerialNumber, m_safeFilename, LOC);
 
     // Check disc to see encryption status, menu and navigation types.
     m_topMenuSupported   = false;
@@ -729,11 +729,6 @@ long long MythBDBuffer::GetReadPosition(void) const
 bool MythBDBuffer::IsOpen(void) const
 {
     return m_bdnav;
-}
-
-bool MythBDBuffer::IsInMenu(void) const
-{
-    return m_inMenu;
 }
 
 uint32_t MythBDBuffer::GetNumChapters(void)
@@ -1023,7 +1018,7 @@ int MythBDBuffer::SafeRead(void *Buffer, uint Size)
     {
         if (m_processState != PROCESS_WAIT)
         {
-            processState_t lastState = m_processState;
+            MythOpticalState lastState = m_processState;
 
             if (m_processState == PROCESS_NORMAL)
                 result = bd_read(m_bdnav, static_cast<unsigned char*>(Buffer), static_cast<int>(Size));
@@ -1445,8 +1440,8 @@ bool MythBDBuffer::GetNameAndSerialNum(QString &Name, QString &SerialNum)
 {
     if (!m_bdnav)
         return false;
-    Name      = m_name;
-    SerialNum = m_serialNumber;
+    Name      = m_discName;
+    SerialNum = m_discSerialNumber;
     return !SerialNum.isEmpty();
 }
 
