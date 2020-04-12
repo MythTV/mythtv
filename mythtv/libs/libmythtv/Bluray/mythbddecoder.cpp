@@ -2,7 +2,7 @@
 #include "iso639.h"
 #include "mythbdplayer.h"
 #include "bdringbuffer.h"
-#include "avformatdecoderbd.h"
+#include "Bluray/mythbddecoder.h"
 
 #define LOC QString("BDDecoder: ")
 

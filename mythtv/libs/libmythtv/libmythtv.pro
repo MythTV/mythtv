@@ -323,8 +323,8 @@ SOURCES += Bluray/mythbdoverlay.cpp
 using_frontend {
     HEADERS += Bluray/mythbdplayer.h
     SOURCES += Bluray/mythbdplayer.cpp
-    HEADERS += Bluray/avformatdecoderbd.h
-    SOURCES += Bluray/avformatdecoderbd.cpp
+    HEADERS += Bluray/mythbddecoder.h
+    SOURCES += Bluray/mythbddecoder.cpp
     HEADERS += Bluray/bdoverlayscreen.h
     SOURCES += Bluray/bdoverlayscreen.cpp
 }

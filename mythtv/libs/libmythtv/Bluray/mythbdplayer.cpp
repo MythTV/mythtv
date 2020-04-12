@@ -1,6 +1,6 @@
-#include "bdringbuffer.h"
-#include "avformatdecoderbd.h"
-#include "mythbdplayer.h"
+#include "Bluray/bdringbuffer.h"
+#include "Bluray/mythbddecoder.h"
+#include "Bluray/mythbdplayer.h"
 
 #include <unistd.h> // for usleep()
 
