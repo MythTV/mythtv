@@ -6,7 +6,7 @@
     </specVersion>
     <device>
         <!-- UDN auto generated -->
-        <friendlyName>MythTV AV Media Server</friendlyName>
+        <friendlyName>CAN MythTV</friendlyName>
         <deviceType>urn:schemas-upnp-org:device:MediaServer:4</deviceType>
         <manufacturer>MythTV</manufacturer>
         <manufacturerURL>http://www.mythtv.org/</manufacturerURL>

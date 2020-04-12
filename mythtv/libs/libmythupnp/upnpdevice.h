@@ -284,7 +284,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
             QString sName = pDevice->m_rootDevice.m_sFriendlyName;
 
-            if (sName == "mythtv: MythTV AV Media Server")
+            if (sName == "mythtv: CAN MythTV")
                 return sName + " (" + pDevice->m_sHostName + ")";
 
             return sName;
