@@ -16,7 +16,7 @@
 #include "io/mythiowrapper.h"
 #include "mythuiactions.h"
 #include "tv_actions.h"
-#include "Bluray/bdiowrapper.h"
+#include "Bluray/mythbdiowrapper.h"
 #include "Bluray/mythbdinfo.h"
 #include "Bluray/bdringbuffer.h"
 
@@ -285,7 +285,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     bd_set_debug_mask(DBG_CRIT | DBG_NAV | DBG_BLURAY);
 
     // Use our own wrappers for file and directory access
-    redirectBDIO();
+    MythBDIORedirect();
 
     // Ask mythiowrapper to update this object on file open progress. Opening
     // a bluray disc can involve opening several hundred files which can take

@@ -312,11 +312,11 @@ LIBS += -L../../external/libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
-HEADERS += Bluray/bdiowrapper.h
+HEADERS += Bluray/mythbdiowrapper.h
 HEADERS += Bluray/bdringbuffer.h
 HEADERS += Bluray/mythbdinfo.h
 HEADERS += Bluray/mythbdoverlay.h
-SOURCES += Bluray/bdiowrapper.cpp
+SOURCES += Bluray/mythbdiowrapper.cpp
 SOURCES += Bluray/bdringbuffer.cpp
 SOURCES += Bluray/mythbdinfo.cpp
 SOURCES += Bluray/mythbdoverlay.cpp

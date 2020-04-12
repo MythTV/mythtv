@@ -8,7 +8,7 @@
 #include "mythdirs.h"
 #include "mythcdrom.h"
 #include "io/mythiowrapper.h"
-#include "Bluray/bdiowrapper.h"
+#include "Bluray/mythbdiowrapper.h"
 #include "Bluray/mythbdinfo.h"
 
 // Std
@@ -53,7 +53,7 @@ MythBDInfo::MythBDInfo(const QString &Filename)
     bd_set_debug_mask(DBG_CRIT | DBG_NAV | DBG_BLURAY);
 
     // Use our own wrappers for file and directory access
-    redirectBDIO();
+    MythBDIORedirect();
 
     int bdhandle = -1;
     BLURAY* bdnav = nullptr;
