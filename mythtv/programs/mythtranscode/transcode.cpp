@@ -794,8 +794,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         else if (vidsetting == "RTjpeg")
             m_nvr->SetupRTjpeg();
 
-        m_outRingBuffer = RingBuffer::Create(outputname, true, false);
-        m_nvr->SetRingBuffer(m_outRingBuffer);
+        m_outBuffer = RingBuffer::Create(outputname, true, false);
+        m_nvr->SetRingBuffer(m_outBuffer);
         m_nvr->WriteHeader();
         m_nvr->StreamAllocate();
     }
@@ -1255,8 +1255,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 // from here on the timecode is on the output time base
             frame.timecode -= timecodeOffset;
 
-            if (!GetPlayer()->WriteStoredData(
-                    m_outRingBuffer, (did_ff == 0), timecodeOffset))
+            if (!GetPlayer()->WriteStoredData(m_outBuffer, (did_ff == 0), timecodeOffset))
             {
                 if (video_aspect != new_aspect)
                 {
