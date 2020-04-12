@@ -315,9 +315,11 @@ LIBS += -lmythdvdnav-$$LIBVERSION
 HEADERS += Bluray/bdiowrapper.h
 HEADERS += Bluray/bdringbuffer.h
 HEADERS += Bluray/mythbdinfo.h
+HEADERS += Bluray/mythbdoverlay.h
 SOURCES += Bluray/bdiowrapper.cpp
 SOURCES += Bluray/bdringbuffer.cpp
 SOURCES += Bluray/mythbdinfo.cpp
+SOURCES += Bluray/mythbdoverlay.cpp
 using_frontend {
     HEADERS += Bluray/mythbdplayer.h
     SOURCES += Bluray/mythbdplayer.cpp
