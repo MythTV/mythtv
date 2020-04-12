@@ -1,28 +1,29 @@
 #ifndef AVFORMATDECODERBD_H
 #define AVFORMATDECODERBD_H
 
+// MythTV
 #include "avformatdecoder.h"
 
-class AvFormatDecoderBD : public AvFormatDecoder
+class MythBDDecoder : public AvFormatDecoder
 {
   public:
-    AvFormatDecoderBD(MythPlayer *parent, const ProgramInfo &pginfo,
-                      PlayerFlags flags);
-    void Reset(bool reset_video_data, bool seek_reset, bool reset_file) override; // AvFormatDecoder
-    void UpdateFramesPlayed(void) override; // AvFormatDecoder
-    int ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket) override; // AvFormatDecoder
+    MythBDDecoder(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags);
+
+    void      Reset               (bool ResetVideoData, bool SeekReset, bool ResetFile) override;
+    void      UpdateFramesPlayed  (void) override;
+    int       ReadPacket          (AVFormatContext *Ctx, AVPacket* Pkt, bool& StorePacket) override;
 
   protected:
-    bool IsValidStream(int streamid) override; // AvFormatDecoder
+    bool      IsValidStream       (int StreamId) override;
 
   private:
-    bool DoRewindSeek(long long desiredFrame) override; // AvFormatDecoder
-    void DoFastForwardSeek(long long desiredFrame, bool &needflush) override; // AvFormatDecoder
-    void StreamChangeCheck(void) override; // AvFormatDecoder
-    int GetSubtitleLanguage(uint subtitle_index, uint stream_index) override; // AvFormatDecoder
-    int GetAudioLanguage(uint audio_index, uint stream_index) override; // AvFormatDecoder
+    bool      DoRewindSeek        (long long DesiredFrame) override;
+    void      DoFastForwardSeek   (long long DesiredFrame, bool &Needflush) override;
+    void      StreamChangeCheck   (void) override;
+    int       GetSubtitleLanguage (uint SubtitleIndex, uint StreamIndex) override;
+    int       GetAudioLanguage    (uint AudioIndex, uint StreamIndex) override;
 
-    long long BDFindPosition(long long desiredFrame);
+    long long BDFindPosition      (long long DesiredFrame);
 };
 
-#endif // AVFORMATDECODERBD_H
+#endif

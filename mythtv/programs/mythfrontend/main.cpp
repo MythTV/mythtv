@@ -1329,7 +1329,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     }
     else if (pginfo->IsVideoBD())
     {
-        BDInfo bd(pginfo->GetPlaybackURL());
+        MythBDInfo bd(pginfo->GetPlaybackURL());
         if (bd.IsValid())
         {
             QString name;

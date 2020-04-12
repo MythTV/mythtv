@@ -1,63 +1,62 @@
-#include "bdringbuffer.h"
+// MythTV
+#include "iso639.h"
 #include "mythbdplayer.h"
+#include "bdringbuffer.h"
 #include "avformatdecoderbd.h"
 
-#include "iso639.h"
+#define LOC QString("BDDecoder: ")
 
-#define LOC QString("AFD_BD: ")
-
-AvFormatDecoderBD::AvFormatDecoderBD(
-    MythPlayer *parent, const ProgramInfo &pginfo, PlayerFlags flags)
-  : AvFormatDecoder(parent, pginfo, flags)
+MythBDDecoder::MythBDDecoder(MythPlayer *Parent, const ProgramInfo &PGInfo, PlayerFlags Flags)
+  : AvFormatDecoder(Parent, PGInfo, Flags)
 {
 }
 
-bool AvFormatDecoderBD::IsValidStream(int streamid)
+bool MythBDDecoder::IsValidStream(int StreamId)
 {
     if (m_ringBuffer && m_ringBuffer->IsBD())
-        return m_ringBuffer->BD()->IsValidStream(streamid);
-    return AvFormatDecoder::IsValidStream(streamid);
+        return m_ringBuffer->BD()->IsValidStream(static_cast<uint>(StreamId));
+    return AvFormatDecoder::IsValidStream(StreamId);
 }
 
-void AvFormatDecoderBD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
+void MythBDDecoder::Reset(bool ResetVideoData, bool SeekReset, bool ResetFile)
 {
-    AvFormatDecoder::Reset(reset_video_data, seek_reset, reset_file);
+    AvFormatDecoder::Reset(ResetVideoData, SeekReset, ResetFile);
     SyncPositionMap();
 }
 
-void AvFormatDecoderBD::UpdateFramesPlayed(void)
+void MythBDDecoder::UpdateFramesPlayed(void)
 {
     if (!m_ringBuffer->IsBD())
         return;
 
-    auto currentpos = (long long)(m_ringBuffer->BD()->GetCurrentTime() * m_fps);
+    auto currentpos = static_cast<long long>(m_ringBuffer->BD()->GetCurrentTime() * m_fps);
     m_framesPlayed = m_framesRead = currentpos ;
-    m_parent->SetFramesPlayed(currentpos + 1);
+    m_parent->SetFramesPlayed(static_cast<uint64_t>(currentpos + 1));
 }
 
-bool AvFormatDecoderBD::DoRewindSeek(long long desiredFrame)
+bool MythBDDecoder::DoRewindSeek(long long DesiredFrame)
 {
     if (!m_ringBuffer->IsBD())
         return false;
 
-    m_ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
-    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
+    m_ringBuffer->Seek(BDFindPosition(DesiredFrame), SEEK_SET);
+    m_framesPlayed = m_framesRead = m_lastKey = DesiredFrame + 1;
     m_frameCounter += 100;
     return true;
 }
 
-void AvFormatDecoderBD::DoFastForwardSeek(long long desiredFrame, bool &needflush)
+void MythBDDecoder::DoFastForwardSeek(long long DesiredFrame, bool &Needflush)
 {
     if (!m_ringBuffer->IsBD())
         return;
 
-    m_ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
-    needflush    = true;
-    m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
+    m_ringBuffer->Seek(BDFindPosition(DesiredFrame), SEEK_SET);
+    Needflush      = true;
+    m_framesPlayed = m_framesRead = m_lastKey = DesiredFrame + 1;
     m_frameCounter += 100;
 }
 
-void AvFormatDecoderBD::StreamChangeCheck(void)
+void MythBDDecoder::StreamChangeCheck(void)
 {
     if (!m_ringBuffer->IsBD())
         return;
@@ -82,36 +81,31 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
     }
 }
 
-int AvFormatDecoderBD::GetSubtitleLanguage(uint subtitle_index,
-                                           uint stream_index)
+int MythBDDecoder::GetSubtitleLanguage(uint /*SubtitleIndex*/, uint StreamIndex)
 {
-    (void)subtitle_index;
-    if (m_ringBuffer && m_ringBuffer->IsBD() &&
-        stream_index < m_ic->nb_streams &&
-        m_ic->streams[stream_index] != nullptr)
+    if (m_ringBuffer && m_ringBuffer->IsBD() && (StreamIndex < m_ic->nb_streams) &&
+        (m_ic->streams[StreamIndex] != nullptr))
     {
-        return m_ringBuffer->BD()->GetSubtitleLanguage(m_ic->streams[stream_index]->id);
+        return m_ringBuffer->BD()->GetSubtitleLanguage(static_cast<uint>(m_ic->streams[StreamIndex]->id));
     }
 
     return iso639_str3_to_key("und");
 }
 
-int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
+int MythBDDecoder::GetAudioLanguage(uint /*AudioIndex*/, uint StreamIndex)
 {
-    (void)audio_index;
-    if (m_ringBuffer && m_ringBuffer->IsBD() &&
-        stream_index < m_ic->nb_streams &&
-        m_ic->streams[stream_index] != nullptr)
+    if (m_ringBuffer && m_ringBuffer->IsBD() && (StreamIndex < m_ic->nb_streams) &&
+        (m_ic->streams[StreamIndex] != nullptr))
     {
-        return m_ringBuffer->BD()->GetAudioLanguage(m_ic->streams[stream_index]->id);
+        return m_ringBuffer->BD()->GetAudioLanguage(static_cast<uint>(m_ic->streams[StreamIndex]->id));
     }
 
     return iso639_str3_to_key("und");
 }
 
-int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& /*storePacket*/)
+int MythBDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& /*StorePacket*/)
 {
-    int result = av_read_frame(ctx, pkt);
+    int result = av_read_frame(Ctx, Pkt);
 
     /* If we seem to have hit the end of the file, the ringbuffer may
      * just be blocked in order to drain the ffmpeg buffers, so try
@@ -123,20 +117,19 @@ int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& /*s
     {
         if (m_ringBuffer->BD()->IsReadingBlocked())
             m_ringBuffer->BD()->UnblockReading();
-
-        result = av_read_frame(ctx, pkt);
+        result = av_read_frame(Ctx, Pkt);
     }
 
     if (result >= 0)
     {
-        pkt->dts = m_ringBuffer->BD()->AdjustTimestamp(pkt->dts);
-        pkt->pts = m_ringBuffer->BD()->AdjustTimestamp(pkt->pts);
+        Pkt->dts = m_ringBuffer->BD()->AdjustTimestamp(Pkt->dts);
+        Pkt->pts = m_ringBuffer->BD()->AdjustTimestamp(Pkt->pts);
     }
 
     return result;
 }
 
-long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
+long long MythBDDecoder::BDFindPosition(long long DesiredFrame)
 {
     if (!m_ringBuffer->IsBD())
         return 0;
@@ -146,7 +139,7 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
     if (m_parent)
     {
         ffrewSkip = m_parent->GetFFRewSkip();
-        current_speed = (int)m_parent->GetNextPlaySpeed();
+        current_speed = static_cast<int>(m_parent->GetNextPlaySpeed());
     }
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
@@ -163,7 +156,7 @@ long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
         if (desiredTimePos < 0)
             desiredTimePos = 0;
 #endif
-        return (desiredFrame * 90000LL / m_fps);
+        return static_cast<long long>(DesiredFrame * 90000.0F / m_fps);
     }
     return current_speed;
 }

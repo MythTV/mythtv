@@ -31,7 +31,7 @@ extern "C" {
 
 class ThreadedFileWriter;
 class MythDVDBuffer;
-class BDRingBuffer;
+class MythBDBuffer;
 class LiveTVChain;
 class RemoteFile;
 
@@ -88,8 +88,8 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     bool      IsBD                 (void) const;
     const MythDVDBuffer *DVD       (void) const;
     MythDVDBuffer       *DVD       (void);
-    const BDRingBuffer  *BD        (void) const;
-    BDRingBuffer        *BD        (void);
+    const MythBDBuffer  *BD        (void) const;
+    MythBDBuffer        *BD        (void);
     int       Read                 (void *Buffer, int Count);
     int       Peek                 (void *Buffer, int Count);
     void      Reset                (bool Full = false, bool ToAdjust = false, bool ResetInternal = false);

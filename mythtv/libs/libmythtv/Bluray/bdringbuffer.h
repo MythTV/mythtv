@@ -22,14 +22,14 @@
 
 #define BD_BLOCK_SIZE 6144LL
 
-class MTV_PUBLIC BDInfo
+class MTV_PUBLIC MythBDInfo
 {
-    friend class BDRingBuffer;
-    Q_DECLARE_TR_FUNCTIONS(BDInfo)
+    friend class MythBDBuffer;
+    Q_DECLARE_TR_FUNCTIONS(MythBDInfo)
 
   public:
-    explicit BDInfo(const QString &Filename);
-   ~BDInfo(void) = default;
+    explicit MythBDInfo(const QString &Filename);
+   ~MythBDInfo(void) = default;
     bool    IsValid      (void) const;
     QString GetLastError (void) const;
     bool    GetNameAndSerialNum(QString &Name, QString &SerialNum);
@@ -46,12 +46,13 @@ class MTV_PUBLIC BDInfo
     bool     m_isValid { true };
 };
 
-class BDOverlay
+class MythBDOverlay
 {
   public:
-    BDOverlay() = default;
-    explicit BDOverlay(const bd_overlay_s* Overlay);
-    explicit BDOverlay(const bd_argb_overlay_s* Overlay);
+    MythBDOverlay() = default;
+    explicit MythBDOverlay(const bd_overlay_s* Overlay);
+    explicit MythBDOverlay(const bd_argb_overlay_s* Overlay);
+
     void     SetPalette(const BD_PG_PALETTE_ENTRY* Palette);
     void     Wipe(void);
     void     Wipe(int Left, int Top, int Width, int Height);
@@ -62,18 +63,16 @@ class BDOverlay
     int      m_y     { 0  };
 };
 
-/** \class BDRingBufferPriv
- *  \brief RingBuffer class for Blu-rays
- *
- *   A class to allow a RingBuffer to read from BDs.
+/** \class MythBDBuffer
+ *   A class to allow a MythMediaBuffer to read from BDs.
  */
-class MTV_PUBLIC BDRingBuffer : public MythMediaBuffer
+class MTV_PUBLIC MythBDBuffer : public MythMediaBuffer
 {
-    Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
+    Q_DECLARE_TR_FUNCTIONS(MythBDBuffer)
 
   public:
-    explicit BDRingBuffer(const QString &Filename);
-    ~BDRingBuffer() override;
+    explicit MythBDBuffer(const QString &Filename);
+    ~MythBDBuffer() override;
 
     bool      IsStreamed         (void) override { return true; }
     void      IgnoreWaitStates   (bool Ignore) override;
@@ -93,7 +92,7 @@ class MTV_PUBLIC BDRingBuffer : public MythMediaBuffer
     bool      GetBDStateSnapshot (QString& State);
     bool      RestoreBDStateSnapshot(const QString &State);
     void      ClearOverlays      (void);
-    BDOverlay* GetOverlay        (void);
+    MythBDOverlay* GetOverlay    (void);
     void      SubmitOverlay      (const bd_overlay_s* Overlay);
     void      SubmitARGBOverlay  (const bd_argb_overlay_s* Overlay);
     uint32_t  GetNumTitles       (void) const;
@@ -182,8 +181,8 @@ class MTV_PUBLIC BDRingBuffer : public MythMediaBuffer
     bool               m_playerWait                  { false   };
     bool               m_ignorePlayerWait            { true    };
     QMutex             m_overlayLock;
-    QList<BDOverlay*>  m_overlayImages;
-    QVector<BDOverlay*> m_overlayPlanes;
+    QList<MythBDOverlay*>   m_overlayImages;
+    QVector<MythBDOverlay*> m_overlayPlanes;
     int                m_stillTime                   { 0       };
     int                m_stillMode                   { BLURAY_STILL_NONE};
     volatile bool      m_inMenu                      { false   };

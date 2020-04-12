@@ -874,7 +874,7 @@ MythScreenType *OSD::GetWindow(const QString &Window)
     }
     else if (Window == OSD_WIN_BDOVERLAY)
     {
-        new_window = new BDOverlayScreen(m_parent, Window);
+        new_window = new MythBDOverlayScreen(m_parent, Window);
     }
     else
     {
@@ -1231,12 +1231,12 @@ void OSD::DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos)
     }
 }
 
-void OSD::DisplayBDOverlay(BDOverlay* Overlay)
+void OSD::DisplayBDOverlay(MythBDOverlay* Overlay)
 {
     if (!Overlay)
         return;
 
-    BDOverlayScreen* bd = dynamic_cast<BDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
+    MythBDOverlayScreen* bd = dynamic_cast<MythBDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
     if (bd)
         bd->DisplayBDOverlay(Overlay);
 }

@@ -1,31 +1,30 @@
+// Qt
 #include <QPainter>
 
+// MythTV
 #include "mythuiimage.h"
 #include "mythpainter.h"
-
 #include "bdringbuffer.h"
 #include "bdoverlayscreen.h"
 
 #define LOC QString("BDScreen: ")
 
-BDOverlayScreen::BDOverlayScreen(MythPlayer *player, const QString &name)
-  : MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player)
+MythBDOverlayScreen::MythBDOverlayScreen(MythPlayer *Player, const QString &Name)
+  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
+    m_player(Player)
 {
 }
 
-BDOverlayScreen::~BDOverlayScreen()
+MythBDOverlayScreen::~MythBDOverlayScreen()
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "dtor");
 }
 
-void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
+void MythBDOverlayScreen::DisplayBDOverlay(MythBDOverlay *Overlay)
 {
-    if (!overlay || !m_player)
+    if (!Overlay || !m_player)
         return;
 
-    MythRect rect(overlay->m_x, overlay->m_y,
-                  overlay->m_image.width(), overlay->m_image.height());
+    MythRect rect(Overlay->m_x, Overlay->m_y, Overlay->m_image.width(), Overlay->m_image.height());
     SetArea(rect);
     DeleteAllChildren();
 
@@ -33,34 +32,30 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     if (!vo)
         return;
 
-    QImage& img = overlay->m_image;
+    QImage& img = Overlay->m_image;
 
     // add to screen
     QRect scaled = vo->GetImageRect(rect);
     if (scaled.size() != rect.size())
-    {
-        img = img.scaled(scaled.width(), scaled.height(),
-                         Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    }
+        img = img.scaled(scaled.width(), scaled.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     MythPainter *osd_painter = vo->GetOSDPainter();
-    MythImage* image = nullptr;
     if (osd_painter)
-         image = osd_painter->GetFormatImage();
-
-    if (image)
     {
-        image->Assign(img);
-        auto *uiimage = new MythUIImage(this, "bdoverlay");
-        if (uiimage)
+        MythImage* image = osd_painter->GetFormatImage();
+        if (image)
         {
-            uiimage->SetImage(image);
-            uiimage->SetArea(MythRect(scaled));
+            image->Assign(img);
+            auto *uiimage = new MythUIImage(this, "bdoverlay");
+            if (uiimage)
+            {
+                uiimage->SetImage(image);
+                uiimage->SetArea(MythRect(scaled));
+            }
+            image->DecrRef();
         }
-        image->DecrRef();
     }
 
     SetRedraw();
-
-    delete overlay;
+    delete Overlay;
 }

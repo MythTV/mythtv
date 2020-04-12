@@ -179,7 +179,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
         if (!(mythurl || QFile::exists(filename)))
             filename = "/dev/dvd";
         LOG(VB_PLAYBACK, LOG_INFO, "Trying BD at " + filename);
-        return new BDRingBuffer(filename);
+        return new MythBDBuffer(filename);
     }
 
     if (!mythurl && imgext && filename.startsWith("dvd:"))
@@ -1851,9 +1851,9 @@ const MythDVDBuffer *MythMediaBuffer::DVD(void) const
     return dynamic_cast<const MythDVDBuffer*>(this);
 }
 
-const BDRingBuffer  *MythMediaBuffer::BD(void) const
+const MythBDBuffer  *MythMediaBuffer::BD(void) const
 {
-    return dynamic_cast<const BDRingBuffer*>(this);
+    return dynamic_cast<const MythBDBuffer*>(this);
 }
 
 MythDVDBuffer *MythMediaBuffer::DVD(void)
@@ -1861,9 +1861,9 @@ MythDVDBuffer *MythMediaBuffer::DVD(void)
     return dynamic_cast<MythDVDBuffer*>(this);
 }
 
-BDRingBuffer  *MythMediaBuffer::BD(void)
+MythBDBuffer  *MythMediaBuffer::BD(void)
 {
-    return dynamic_cast<BDRingBuffer*>(this);
+    return dynamic_cast<MythBDBuffer*>(this);
 }
 
 void MythMediaBuffer::AVFormatInitNetwork(void)

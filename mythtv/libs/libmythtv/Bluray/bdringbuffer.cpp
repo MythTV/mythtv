@@ -38,7 +38,7 @@
 
 #define LOC QString("BDRingBuf: ")
 
-BDOverlay::BDOverlay(const bd_overlay_s* const Overlay)
+MythBDOverlay::MythBDOverlay(const bd_overlay_s* const Overlay)
   : m_image(Overlay->w, Overlay->h, QImage::Format_Indexed8),
     m_x(Overlay->x),
     m_y(Overlay->y)
@@ -46,14 +46,14 @@ BDOverlay::BDOverlay(const bd_overlay_s* const Overlay)
     Wipe();
 }
 
-BDOverlay::BDOverlay(const bd_argb_overlay_s* const Overlay)
+MythBDOverlay::MythBDOverlay(const bd_argb_overlay_s* const Overlay)
   : m_image(Overlay->w, Overlay->h, QImage::Format_ARGB32),
     m_x(Overlay->x),
     m_y(Overlay->y)
 {
 }
 
-void BDOverlay::SetPalette(const BD_PG_PALETTE_ENTRY *Palette)
+void MythBDOverlay::SetPalette(const BD_PG_PALETTE_ENTRY *Palette)
 {
     if (!Palette)
         return;
@@ -73,12 +73,12 @@ void BDOverlay::SetPalette(const BD_PG_PALETTE_ENTRY *Palette)
     m_image.setColorTable(rgbpalette);
 }
 
-void BDOverlay::Wipe(void)
+void MythBDOverlay::Wipe(void)
 {
     Wipe(0, 0, m_image.width(), m_image.height());
 }
 
-void BDOverlay::Wipe(int Left, int Top, int Width, int Height)
+void MythBDOverlay::Wipe(int Left, int Top, int Width, int Height)
 {
     if (m_image.format() == QImage::Format_Indexed8)
     {
@@ -101,21 +101,21 @@ void BDOverlay::Wipe(int Left, int Top, int Width, int Height)
 
 static void HandleOverlayCallback(void *Data, const bd_overlay_s *const Overlay)
 {
-    auto *bdrb = static_cast<BDRingBuffer*>(Data);
+    auto *bdrb = static_cast<MythBDBuffer*>(Data);
     if (bdrb)
         bdrb->SubmitOverlay(Overlay);
 }
 
 static void HandleARGBOverlayCallback(void *Data, const bd_argb_overlay_s *const Overlay)
 {
-    auto *bdrb = static_cast<BDRingBuffer*>(Data);
+    auto *bdrb = static_cast<MythBDBuffer*>(Data);
     if (bdrb)
         bdrb->SubmitARGBOverlay(Overlay);
 }
 
 static void FileOpenedCallback(void* Data)
 {
-    auto *obj = static_cast<BDRingBuffer*>(Data);
+    auto *obj = static_cast<MythBDBuffer*>(Data);
     if (obj)
         obj->ProgressUpdate();
 }
@@ -133,7 +133,7 @@ static int BDRead(void *Handle, void *Buf, int LBA, int NumBlocks)
     return -1;
 }
 
-BDInfo::BDInfo(const QString &Filename)
+MythBDInfo::MythBDInfo(const QString &Filename)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(Filename));
     QString name = Filename;
@@ -153,7 +153,7 @@ BDInfo::BDInfo(const QString &Filename)
         name = Filename;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("BDInfo: Opened BDRingBuffer device at %1").arg(name));
+    LOG(VB_GENERAL, LOG_INFO, QString("BDInfo: Opened MythBDBuffer device at %1").arg(name));
 
     // Make sure log messages from the Bluray library appear in our logs
     bd_set_debug_handler(BDLogger);
@@ -204,9 +204,9 @@ BDInfo::BDInfo(const QString &Filename)
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Done"));
 }
 
-void BDInfo::GetNameAndSerialNum(BLURAY* BluRay, QString &Name,
-                                 QString &SerialNum, const QString &Filename,
-                                 const QString &LogPrefix)
+void MythBDInfo::GetNameAndSerialNum(BLURAY* BluRay, QString &Name,
+                                     QString &SerialNum, const QString &Filename,
+                                     const QString &LogPrefix)
 {
     const meta_dl *metaDiscLibrary = bd_get_meta(BluRay);
 
@@ -253,24 +253,24 @@ void BDInfo::GetNameAndSerialNum(BLURAY* BluRay, QString &Name,
         LOG(VB_GENERAL, LOG_ERR, LogPrefix + "Unable to generate serial number");
 }
 
-bool BDInfo::IsValid(void) const
+bool MythBDInfo::IsValid(void) const
 {
     return m_isValid;
 }
 
-bool BDInfo::GetNameAndSerialNum(QString &Name, QString &SerialNum)
+bool MythBDInfo::GetNameAndSerialNum(QString &Name, QString &SerialNum)
 {
     Name      = m_name;
     SerialNum = m_serialnumber;
     return !(Name.isEmpty() && SerialNum.isEmpty());
 }
 
-QString BDInfo::GetLastError(void) const
+QString MythBDInfo::GetLastError(void) const
 {
     return m_lastError;
 }
 
-BDRingBuffer::BDRingBuffer(const QString &Filename)
+MythBDBuffer::MythBDBuffer(const QString &Filename)
   : MythMediaBuffer(kMythBufferBD),
     m_overlayPlanes(2, nullptr)
 {
@@ -279,13 +279,13 @@ BDRingBuffer::BDRingBuffer(const QString &Filename)
     OpenFile(Filename);
 }
 
-BDRingBuffer::~BDRingBuffer()
+MythBDBuffer::~MythBDBuffer()
 {
     KillReadAheadThread();
     Close();
 }
 
-void BDRingBuffer::Close(void)
+void MythBDBuffer::Close(void)
 {
     if (m_bdnav)
     {
@@ -310,7 +310,7 @@ void BDRingBuffer::Close(void)
     ClearOverlays();
 }
 
-long long BDRingBuffer::SeekInternal(long long Position, int Whence)
+long long MythBDBuffer::SeekInternal(long long Position, int Whence)
 {
     long long ret = -1;
 
@@ -364,7 +364,7 @@ long long BDRingBuffer::SeekInternal(long long Position, int Whence)
     return ret;
 }
 
-uint64_t BDRingBuffer::SeekInternal(uint64_t Position)
+uint64_t MythBDBuffer::SeekInternal(uint64_t Position)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to '%1'").arg(Position));
     m_processState = PROCESS_NORMAL;
@@ -373,7 +373,7 @@ uint64_t BDRingBuffer::SeekInternal(uint64_t Position)
     return 0;
 }
 
-void BDRingBuffer::GetDescForPos(QString &Desc)
+void MythBDBuffer::GetDescForPos(QString &Desc)
 {
     if (!m_infoLock.tryLock())
         return;
@@ -381,7 +381,7 @@ void BDRingBuffer::GetDescForPos(QString &Desc)
     m_infoLock.unlock();
 }
 
-bool BDRingBuffer::HandleAction(const QStringList &Actions, int64_t Pts)
+bool MythBDBuffer::HandleAction(const QStringList &Actions, int64_t Pts)
 {
     if (!m_isHDMVNavigation)
         return false;
@@ -432,7 +432,7 @@ bool BDRingBuffer::HandleAction(const QStringList &Actions, int64_t Pts)
     return handled;
 }
 
-void BDRingBuffer::ProgressUpdate(void)
+void MythBDBuffer::ProgressUpdate(void)
 {
     // This thread check is probably unnecessary as processEvents should
     // only handle events in the calling thread - and not all threads
@@ -444,17 +444,17 @@ void BDRingBuffer::ProgressUpdate(void)
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-bool BDRingBuffer::BDWaitingForPlayer(void)
+bool MythBDBuffer::BDWaitingForPlayer(void)
 {
     return m_playerWait;
 }
 
-void BDRingBuffer::SkipBDWaitingForPlayer(void)
+void MythBDBuffer::SkipBDWaitingForPlayer(void)
 {
     m_playerWait = false;
 }
 
-/** \fn BDRingBuffer::OpenFile(const QString &, uint)
+/** \fn MythBDBuffer::OpenFile(const QString &, uint)
  *  \brief Opens a bluray device for reading.
  *
  *  \param lfilename   Path of the bluray device to read.
@@ -462,7 +462,7 @@ void BDRingBuffer::SkipBDWaitingForPlayer(void)
  *                     inherited from the parent class.
  *  \return Returns true if the bluray was opened.
  */
-bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
 {
     m_safeFilename = Filename;
     m_filename = Filename;
@@ -476,7 +476,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     }
     m_safeFilename = filename;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened BDRingBuffer device at %1")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened MythBDBuffer device at %1")
             .arg(filename));
 
     // Make sure log messages from the Bluray library appear in our logs
@@ -543,7 +543,7 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
             .arg(metaDiscLibrary->di_set_number).arg(metaDiscLibrary->di_num_sets));
     }
 
-    BDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, m_safeFilename, LOC);
+    MythBDInfo::GetNameAndSerialNum(m_bdnav, m_name, m_serialNumber, m_safeFilename, LOC);
 
     // Check disc to see encryption status, menu and navigation types.
     m_topMenuSupported   = false;
@@ -719,24 +719,24 @@ bool BDRingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     return true;
 }
 
-long long BDRingBuffer::GetReadPosition(void) const
+long long MythBDBuffer::GetReadPosition(void) const
 {
     if (m_bdnav)
         return static_cast<long long>(bd_tell(m_bdnav));
     return 0;
 }
 
-bool BDRingBuffer::IsOpen(void) const
+bool MythBDBuffer::IsOpen(void) const
 {
     return m_bdnav;
 }
 
-bool BDRingBuffer::IsInMenu(void) const
+bool MythBDBuffer::IsInMenu(void) const
 {
     return m_inMenu;
 }
 
-uint32_t BDRingBuffer::GetNumChapters(void)
+uint32_t MythBDBuffer::GetNumChapters(void)
 {
     QMutexLocker locker(&m_infoLock);
     if (m_currentTitleInfo)
@@ -744,14 +744,14 @@ uint32_t BDRingBuffer::GetNumChapters(void)
     return 0;
 }
 
-uint32_t BDRingBuffer::GetCurrentChapter(void)
+uint32_t MythBDBuffer::GetCurrentChapter(void)
 {
     if (m_bdnav)
         return bd_get_current_chapter(m_bdnav);
     return 0;
 }
 
-uint64_t BDRingBuffer::GetChapterStartTime(uint32_t Chapter)
+uint64_t MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
 {
     if (Chapter >= GetNumChapters())
         return 0;
@@ -759,7 +759,7 @@ uint64_t BDRingBuffer::GetChapterStartTime(uint32_t Chapter)
     return static_cast<uint64_t>(static_cast<double>(m_currentTitleInfo->chapters[Chapter].start) / 90000.0);
 }
 
-uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t Chapter)
+uint64_t MythBDBuffer::GetChapterStartFrame(uint32_t Chapter)
 {
     if (Chapter >= GetNumChapters())
         return 0;
@@ -767,23 +767,23 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t Chapter)
     return static_cast<uint64_t>((m_currentTitleInfo->chapters[Chapter].start * GetFrameRate()) / 90000.0);
 }
 
-uint32_t BDRingBuffer::GetNumTitles(void) const
+uint32_t MythBDBuffer::GetNumTitles(void) const
 {
     return m_numTitles;
 }
 
-int BDRingBuffer::GetCurrentTitle(void)
+int MythBDBuffer::GetCurrentTitle(void)
 {
     QMutexLocker locker(&m_infoLock);
     return m_currentTitle;
 }
 
-uint64_t BDRingBuffer::GetCurrentAngle(void) const
+uint64_t MythBDBuffer::GetCurrentAngle(void) const
 {
     return static_cast<uint64_t>(m_currentAngle);
 }
 
-int BDRingBuffer::GetTitleDuration(int Title)
+int MythBDBuffer::GetTitleDuration(int Title)
 {
     QMutexLocker locker(&m_infoLock);
     auto numTitles = GetNumTitles();
@@ -797,22 +797,22 @@ int BDRingBuffer::GetTitleDuration(int Title)
     return static_cast<int>(static_cast<double>(info->duration) / 90000.0);
 }
 
-uint64_t BDRingBuffer::GetTitleSize(void) const
+uint64_t MythBDBuffer::GetTitleSize(void) const
 {
     return m_titlesize;
 }
 
-uint64_t BDRingBuffer::GetTotalTimeOfTitle(void) const
+uint64_t MythBDBuffer::GetTotalTimeOfTitle(void) const
 {
     return m_currentTitleLength / 90000;
 }
 
-uint64_t BDRingBuffer::GetCurrentTime(void)
+uint64_t MythBDBuffer::GetCurrentTime(void)
 {
     return m_currentTime / 90000;
 }
 
-bool BDRingBuffer::SwitchTitle(uint32_t Index)
+bool MythBDBuffer::SwitchTitle(uint32_t Index)
 {
     if (!m_bdnav)
         return false;
@@ -825,7 +825,7 @@ bool BDRingBuffer::SwitchTitle(uint32_t Index)
     return UpdateTitleInfo();
 }
 
-bool BDRingBuffer::SwitchPlaylist(uint32_t Index)
+bool MythBDBuffer::SwitchPlaylist(uint32_t Index)
 {
     if (!m_bdnav)
         return false;
@@ -842,7 +842,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t Index)
     return result;
 }
 
-BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t Index)
+BLURAY_TITLE_INFO* MythBDBuffer::GetTitleInfo(uint32_t Index)
 {
     if (!m_bdnav)
         return nullptr;
@@ -864,7 +864,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t Index)
     return nullptr;
 }
 
-BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t Index)
+BLURAY_TITLE_INFO* MythBDBuffer::GetPlaylistInfo(uint32_t Index)
 {
     if (!m_bdnav)
         return nullptr;
@@ -883,7 +883,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t Index)
     return nullptr;
 }
 
-bool BDRingBuffer::UpdateTitleInfo(void)
+bool MythBDBuffer::UpdateTitleInfo(void)
 {
     QMutexLocker locker(&m_infoLock);
     if (!m_currentTitleInfo)
@@ -963,14 +963,14 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     return true;
 }
 
-bool BDRingBuffer::TitleChanged(void)
+bool MythBDBuffer::TitleChanged(void)
 {
     bool ret = m_titleChanged;
     m_titleChanged = false;
     return ret;
 }
 
-bool BDRingBuffer::SwitchAngle(uint Angle)
+bool MythBDBuffer::SwitchAngle(uint Angle)
 {
     if (!m_bdnav)
         return false;
@@ -981,19 +981,19 @@ bool BDRingBuffer::SwitchAngle(uint Angle)
     return true;
 }
 
-uint64_t BDRingBuffer::GetNumAngles(void)
+uint64_t MythBDBuffer::GetNumAngles(void)
 {
     return m_currentTitleAngleCount;
 }
 
-uint64_t BDRingBuffer::GetTotalReadPosition(void)
+uint64_t MythBDBuffer::GetTotalReadPosition(void)
 {
     if (m_bdnav)
         return bd_get_title_size(m_bdnav);
     return 0;
 }
 
-int64_t BDRingBuffer::AdjustTimestamp(int64_t Timestamp)
+int64_t MythBDBuffer::AdjustTimestamp(int64_t Timestamp)
 {
     int64_t newTimestamp = Timestamp;
     if ((newTimestamp != AV_NOPTS_VALUE) && (newTimestamp >= m_timeDiff))
@@ -1001,7 +1001,7 @@ int64_t BDRingBuffer::AdjustTimestamp(int64_t Timestamp)
     return newTimestamp;
 }
 
-int BDRingBuffer::SafeRead(void *Buffer, uint Size)
+int MythBDBuffer::SafeRead(void *Buffer, uint Size)
 {
     int result = 0;
     if (m_isHDMVNavigation)
@@ -1056,7 +1056,7 @@ int BDRingBuffer::SafeRead(void *Buffer, uint Size)
     return result;
 }
 
-double BDRingBuffer::GetFrameRate(void)
+double MythBDBuffer::GetFrameRate(void)
 {
     QMutexLocker locker(&m_infoLock);
     if (m_bdnav && m_currentTitleInfo)
@@ -1075,7 +1075,7 @@ double BDRingBuffer::GetFrameRate(void)
     return 0;
 }
 
-int BDRingBuffer::GetAudioLanguage(uint StreamID)
+int MythBDBuffer::GetAudioLanguage(uint StreamID)
 {
     QMutexLocker locker(&m_infoLock);
 
@@ -1097,7 +1097,7 @@ int BDRingBuffer::GetAudioLanguage(uint StreamID)
     return code;
 }
 
-int BDRingBuffer::GetSubtitleLanguage(uint StreamID)
+int MythBDBuffer::GetSubtitleLanguage(uint StreamID)
 {
     QMutexLocker locker(&m_infoLock);
     int code = iso639_str3_to_key("und");
@@ -1117,7 +1117,7 @@ int BDRingBuffer::GetSubtitleLanguage(uint StreamID)
     return code;
 }
 
-void BDRingBuffer::PressButton(int32_t Key, int64_t Pts)
+void MythBDBuffer::PressButton(int32_t Key, int64_t Pts)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Key %1 (pts %2)").arg(Key).arg(Pts));
     // HACK for still frame menu navigation
@@ -1127,7 +1127,7 @@ void BDRingBuffer::PressButton(int32_t Key, int64_t Pts)
     bd_user_input(m_bdnav, Pts, static_cast<uint32_t>(Key));
 }
 
-void BDRingBuffer::ClickButton(int64_t Pts, uint16_t X, uint16_t Y)
+void MythBDBuffer::ClickButton(int64_t Pts, uint16_t X, uint16_t Y)
 {
     if (!m_bdnav)
         return;
@@ -1138,7 +1138,7 @@ void BDRingBuffer::ClickButton(int64_t Pts, uint16_t X, uint16_t Y)
 
 /** \brief jump to a Blu-ray root or popup menu
  */
-bool BDRingBuffer::GoToMenu(const QString &Menu, int64_t Pts)
+bool MythBDBuffer::GoToMenu(const QString &Menu, int64_t Pts)
 {
     if (!m_isHDMVNavigation || Pts < 0)
         return false;
@@ -1168,7 +1168,7 @@ bool BDRingBuffer::GoToMenu(const QString &Menu, int64_t Pts)
     return false;
 }
 
-bool BDRingBuffer::HandleBDEvents(void)
+bool MythBDBuffer::HandleBDEvents(void)
 {
     if (m_processState != PROCESS_WAIT)
     {
@@ -1189,7 +1189,7 @@ bool BDRingBuffer::HandleBDEvents(void)
     return true;
 }
 
-void BDRingBuffer::HandleBDEvent(BD_EVENT &Event)
+void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
 {
     switch (Event.event) {
         case BD_EVENT_NONE:
@@ -1352,7 +1352,7 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &Event)
       }
 }
 
-bool BDRingBuffer::IsInStillFrame(void) const
+bool MythBDBuffer::IsInStillFrame(void) const
 {
     return m_stillTime > 0 && m_stillMode != BLURAY_STILL_NONE;
 }
@@ -1364,7 +1364,7 @@ bool BDRingBuffer::IsInStillFrame(void) const
  * \param streamCount   Number of streams in the array
  * \return Pointer to the matching stream if found, otherwise nullptr.
  */
-const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(uint StreamID,
+const BLURAY_STREAM_INFO* MythBDBuffer::FindStream(uint StreamID,
                                                    BLURAY_STREAM_INFO* Streams,
                                                    int StreamCount)
 {
@@ -1375,7 +1375,7 @@ const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(uint StreamID,
     return stream;
 }
 
-bool BDRingBuffer::IsValidStream(uint StreamId)
+bool MythBDBuffer::IsValidStream(uint StreamId)
 {
     if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
     {
@@ -1394,22 +1394,22 @@ bool BDRingBuffer::IsValidStream(uint StreamId)
     return false;
 }
 
-void BDRingBuffer::UnblockReading(void)
+void MythBDBuffer::UnblockReading(void)
 {
     m_processState = PROCESS_REPROCESS;
 }
 
-bool BDRingBuffer::IsReadingBlocked(void)
+bool MythBDBuffer::IsReadingBlocked(void)
 {
     return m_processState == PROCESS_WAIT;
 }
 
-bool BDRingBuffer::IsHDMVNavigation(void) const
+bool MythBDBuffer::IsHDMVNavigation(void) const
 {
     return m_isHDMVNavigation;
 }
 
-void BDRingBuffer::WaitForPlayer(void)
+void MythBDBuffer::WaitForPlayer(void)
 {
     if (m_ignorePlayerWait)
         return;
@@ -1426,12 +1426,12 @@ void BDRingBuffer::WaitForPlayer(void)
     }
 }
 
-void BDRingBuffer::IgnoreWaitStates(bool Ignore)
+void MythBDBuffer::IgnoreWaitStates(bool Ignore)
 {
     m_ignorePlayerWait = Ignore;
 }
 
-bool BDRingBuffer::StartFromBeginning(void)
+bool MythBDBuffer::StartFromBeginning(void)
 {
     if (m_bdnav && m_isHDMVNavigation)
     {
@@ -1441,7 +1441,7 @@ bool BDRingBuffer::StartFromBeginning(void)
     return true;
 }
 
-bool BDRingBuffer::GetNameAndSerialNum(QString &Name, QString &SerialNum)
+bool MythBDBuffer::GetNameAndSerialNum(QString &Name, QString &SerialNum)
 {
     if (!m_bdnav)
         return false;
@@ -1452,7 +1452,7 @@ bool BDRingBuffer::GetNameAndSerialNum(QString &Name, QString &SerialNum)
 
 /** \brief Get a snapshot of the current BD state
  */
-bool BDRingBuffer::GetBDStateSnapshot(QString& State)
+bool MythBDBuffer::GetBDStateSnapshot(QString& State)
 {
     int      title = GetCurrentTitle();
     uint64_t time  = m_currentTime;
@@ -1466,7 +1466,7 @@ bool BDRingBuffer::GetBDStateSnapshot(QString& State)
 
 /** \brief Restore a BD snapshot
  */
-bool BDRingBuffer::RestoreBDStateSnapshot(const QString& State)
+bool MythBDBuffer::RestoreBDStateSnapshot(const QString& State)
 {
     QStringList states = State.split(",", QString::SkipEmptyParts);
     QHash<QString, uint64_t> settings;
@@ -1507,13 +1507,13 @@ bool BDRingBuffer::RestoreBDStateSnapshot(const QString& State)
 }
 
 
-void BDRingBuffer::ClearOverlays(void)
+void MythBDBuffer::ClearOverlays(void)
 {
     QMutexLocker lock(&m_overlayLock);
 
     while (!m_overlayImages.isEmpty())
     {
-        BDOverlay *overlay = m_overlayImages.takeFirst();
+        MythBDOverlay *overlay = m_overlayImages.takeFirst();
         delete overlay;
         overlay = nullptr;
     }
@@ -1521,7 +1521,7 @@ void BDRingBuffer::ClearOverlays(void)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_overlayPlanes.size(); i++)
     {
-        BDOverlay*& osd = m_overlayPlanes[i];
+        MythBDOverlay*& osd = m_overlayPlanes[i];
 
         if (osd)
         {
@@ -1531,7 +1531,7 @@ void BDRingBuffer::ClearOverlays(void)
     }
 }
 
-BDOverlay* BDRingBuffer::GetOverlay(void)
+MythBDOverlay* MythBDBuffer::GetOverlay(void)
 {
     QMutexLocker lock(&m_overlayLock);
     if (!m_overlayImages.isEmpty())
@@ -1539,7 +1539,7 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
     return nullptr;
 }
 
-void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
+void MythBDBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
 {
     if (!Overlay || (Overlay && (Overlay->plane > m_overlayPlanes.size())))
         return;
@@ -1554,7 +1554,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("update palette  = %1")
         .arg(Overlay->palette_update_flag ? "yes":"no"));
 
-    BDOverlay*& osd = m_overlayPlanes[Overlay->plane];
+    MythBDOverlay*& osd = m_overlayPlanes[Overlay->plane];
 
     switch(Overlay->cmd)
     {
@@ -1562,7 +1562,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
             // init overlay plane. Size and position of plane in x,y,w,h
             // init overlay plane. Size of plane in w,h
             delete osd;
-            osd = new BDOverlay(Overlay);
+            osd = new MythBDOverlay(Overlay);
             break;
         case BD_OVERLAY_CLOSE:
             // close overlay
@@ -1573,7 +1573,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
                     osd = nullptr;
                 }
                 QMutexLocker lock(&m_overlayLock);
-                m_overlayImages.append(new BDOverlay());
+                m_overlayImages.append(new MythBDOverlay());
             }
             break;
         /* following events can be processed immediately, but changes
@@ -1608,7 +1608,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
         case BD_OVERLAY_FLUSH:   /* all changes have been done, flush overlay to display at given pts */
             if (osd)
             {
-                auto* newOverlay = new BDOverlay(*osd);
+                auto* newOverlay = new MythBDOverlay(*osd);
                 newOverlay->m_image = osd->m_image.convertToFormat(QImage::Format_ARGB32);
                 newOverlay->m_pts = Overlay->pts;
                 QMutexLocker lock(&m_overlayLock);
@@ -1619,7 +1619,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
     }
 }
 
-void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
+void MythBDBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
 {
     if (!Overlay || (Overlay && (Overlay->plane > m_overlayPlanes.size())))
         return;
@@ -1631,13 +1631,13 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
         .arg(Overlay->x).arg(Overlay->y).arg(Overlay->w).arg(Overlay->h).arg(Overlay->stride));
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts       = %1").arg(Overlay->pts));
 
-    BDOverlay*& osd = m_overlayPlanes[Overlay->plane];
+    MythBDOverlay*& osd = m_overlayPlanes[Overlay->plane];
     switch(Overlay->cmd)
     {
         case BD_ARGB_OVERLAY_INIT:
             /* init overlay plane. Size of plane in w,h */
             delete osd;
-            osd = new BDOverlay(Overlay);
+            osd = new MythBDOverlay(Overlay);
             break;
         case BD_ARGB_OVERLAY_CLOSE:
             /* close overlay */
@@ -1648,7 +1648,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
                     osd = nullptr;
                 }
                 QMutexLocker lock(&m_overlayLock);
-                m_overlayImages.append(new BDOverlay());
+                m_overlayImages.append(new MythBDOverlay());
             }
             break;
         /* following events can be processed immediately, but changes
@@ -1674,7 +1674,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
             if (osd)
             {
                 QMutexLocker lock(&m_overlayLock);
-                auto* newOverlay = new BDOverlay(*osd);
+                auto* newOverlay = new MythBDOverlay(*osd);
                 newOverlay->m_pts = Overlay->pts;
                 m_overlayImages.append(newOverlay);
             }

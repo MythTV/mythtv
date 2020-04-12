@@ -38,7 +38,7 @@ void MythBDPlayer::DisplayMenu(void)
         return;
 
     m_osdLock.lock();
-    BDOverlay *overlay = nullptr;
+    MythBDOverlay *overlay = nullptr;
     while (m_osd && (nullptr != (overlay = m_playerCtx->m_buffer->BD()->GetOverlay())))
         m_osd->DisplayBDOverlay(overlay);
     m_osdLock.unlock();
@@ -444,10 +444,6 @@ uint64_t MythBDPlayer::GetBookmark(void)
 
 void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize)
 {
-    if (AvFormatDecoderBD::CanHandle(testbuf, m_playerCtx->m_buffer->GetFilename(),
-                                     testreadsize))
-    {
-        SetDecoder(new AvFormatDecoderBD(this, *m_playerCtx->m_playingInfo,
-                                         m_playerFlags));
-    }
+    if (MythBDDecoder::CanHandle(testbuf, m_playerCtx->m_buffer->GetFilename(), testreadsize))
+        SetDecoder(new MythBDDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }
