@@ -122,7 +122,8 @@ TransportScanItem::TransportScanItem(uint sourceid,
         m_tuning.m_fec            = ft.m_fecInner;
     }
 
-    m_mplexid = GetMultiplexIdFromDB();
+    // Do not use tuning information from database for the "Full Scan"
+    // m_mplexid = GetMultiplexIdFromDB();
 }
 
 TransportScanItem::TransportScanItem(uint _sourceid,
