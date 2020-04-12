@@ -97,13 +97,13 @@ static uint insert_dtv_multiplex(
         transport_id,  network_id, polarity);
 
     LOG(VB_CHANSCAN, LOG_INFO, QString(
-                "insert_dtv_multiplex(db_source_id: %1, sistandard: '%2', "
-                "frequency: %3, modulation: %4, transport_id: %5, "
-                "network_id: %6, polarity: %7...) mplexid:%8")
+                "insert_dtv_multiplex(db_source_id:%1, sistandard:'%2', "
+                "frequency:%3, modulation:%4, transport_id:%5, "
+                "network_id:%6, polarity:%7 ...) mplexid:%8")
             .arg(db_source_id).arg(sistandard)
             .arg(frequency).arg(modulation)
             .arg(transport_id).arg(network_id)
-            .arg(polarity).arg(mplex));
+            .arg(QChar(polarity)).arg(mplex));
 
     bool isDVB = (sistandard.toLower() == "dvb");
 
