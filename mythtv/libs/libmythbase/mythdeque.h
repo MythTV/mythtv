@@ -72,6 +72,7 @@ class MythDeque : public deque<T>
     }
 
     /// \brief Returns true if item is in list. O(n).
+    // cppcheck-suppress constParameter
     bool contains(T const &item) const
         { return find(item) != deque<T>::end(); }
 

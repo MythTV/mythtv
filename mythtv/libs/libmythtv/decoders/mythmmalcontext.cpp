@@ -20,6 +20,22 @@ MythMMALContext::~MythMMALContext()
         DestroyInterop(m_interop);
 }
 
+bool MythMMALContext::CheckCodecSize(int Width, int Height, MythCodecContext::CodecProfile Profile)
+{
+    switch (Profile)
+    {
+        case MythCodecContext::MPEG2:
+        case MythCodecContext::MPEG4:
+        case MythCodecContext::VC1:
+        case MythCodecContext::H264:
+            if (Width > 1920 || Height > 1088)
+                return false;
+            break;
+        default: break;
+    }
+    return true;
+}
+
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
                                                AVCodec **Codec,
                                                const QString &Decoder,
@@ -53,6 +69,10 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     if (mythprofile == MythCodecContext::NoProfile)
         return failure;
 
+    // Check size
+    if (!MythMMALContext::CheckCodecSize((*Context)->width, (*Context)->height, mythprofile))
+        return failure;
+
     // check actual decoder support
     const MMALProfiles& profiles = MythMMALContext::GetProfiles();
     if (!profiles.contains(mythprofile))
@@ -80,7 +100,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     if (name == "mpeg2video_mmal")
         name = "mpeg2_mmal";
     AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-    if (!codec)
+    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    if (!codec || !decoder)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find %1").arg(name));
         return failure;
@@ -88,8 +109,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found MMAL/FFmpeg decoder '%1'").arg(name));
     *Codec = codec;    
-    gCodecMap->freeCodecContext(Stream);
-    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+    decoder->CodecMap()->freeCodecContext(Stream);
+    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
     (*Context)->pix_fmt = decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_MMAL;
     return success;
 }

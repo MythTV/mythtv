@@ -48,6 +48,13 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
+!using_libexiv_external {
+    LIBS += -L../../../../external/libexiv2 -lmythexiv2-0.28
+    QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libexiv2 -lexpat
+    freebsd: LIBS += -lprocstat
+    darwin: LIBS += -liconv -lz
+}
+
 # Input
 HEADERS += test_videometadata.h
 SOURCES += test_videometadata.cpp

@@ -51,6 +51,16 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
         .toDouble();
 }
 
+ClassicLogoDetector::~ClassicLogoDetector()
+{
+    delete [] m_edgeMask;
+    delete [] m_logoFrame;
+    delete [] m_logoMask;
+    delete [] m_logoCheckMask;
+    delete [] m_logoMaxValues;
+    delete [] m_logoMinValues;
+}
+
 unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
 {
     return m_commDetectLogoSecondsNeeded;
@@ -59,13 +69,6 @@ unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
 void ClassicLogoDetector::deleteLater(void)
 {
     m_commDetector = nullptr;
-    delete [] m_edgeMask;
-    delete [] m_logoFrame;
-    delete [] m_logoMask;
-    delete [] m_logoCheckMask;
-    delete [] m_logoMaxValues;
-    delete [] m_logoMinValues;
-
     LogoDetectorBase::deleteLater();
 }
 

@@ -24,7 +24,7 @@
 #define MythXCode_hlsbuffer_h
 
 #include "mythcorecontext.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -40,7 +40,7 @@ class HLSPlayback;
 
 using StreamsList = QList<HLSStream*>;
 
-class HLSRingBuffer : public RingBuffer
+class HLSRingBuffer : public MythMediaBuffer
 {
 public:
     explicit HLSRingBuffer(const QString &lfilename);
@@ -58,13 +58,12 @@ public:
     static bool TestForHTTPLiveStreaming(const QString &filename);
     bool SaveToDisk(const QString &filename, int segstart = 0, int segend = -1);
     int NumStreams(void) const;
-    int Read(void *data, uint i_read) { return safe_read(data, i_read); }
     void Interrupt(void);
     void Continue(void);
     int DurationForBytes(uint size);
 
 protected:
-    int safe_read(void *data, uint sz) override; // RingBuffer
+    int SafeRead(void *data, uint sz) override; // RingBuffer
     long long GetRealFileSizeInternal(void) const override; // RingBuffer
     long long SeekInternal(long long pos, int whence) override; // RingBuffer
 

@@ -710,7 +710,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_codecs       = new TransMythUIComboBoxSetting(true);
     m_framerate    = new TransTextEditSetting();
     m_decoder      = new TransMythUIComboBoxSetting();
-    m_maxCpus      = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
+    m_maxCpus      = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? VIDEO_MAX_CPUS : 1, 1, 1);
     m_skipLoop     = new TransMythUICheckBoxSetting();
     m_vidRend      = new TransMythUIComboBoxSetting();
     m_singleDeint  = new TransMythUIComboBoxSetting();

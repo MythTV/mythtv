@@ -100,6 +100,7 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 
     if (!Value.isEmpty() && kValueActions.contains(Action))
     {
+        MythUIHelper::ResetScreensaver();
         auto* me = new MythEvent(Action, QStringList(Value));
         qApp->postEvent(GetMythMainWindow(), me);
         return true;
@@ -120,6 +121,7 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
         return true;
     }
 
+    MythUIHelper::ResetScreensaver();
     auto* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
     qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     return true;

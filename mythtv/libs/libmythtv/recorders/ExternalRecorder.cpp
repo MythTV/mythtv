@@ -25,7 +25,7 @@
 #include "ExternalStreamHandler.h"
 #include "ExternalRecorder.h"
 #include "ExternalChannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 
 #define LOC QString("ExternalRec[%1](%2): ") \
@@ -177,6 +177,7 @@ bool ExternalRecorder::PauseAndWait(int timeout)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait pause");
 
+            m_streamHandler->RemoveListener(m_streamData);
             StopStreaming();
 
             m_paused = true;
@@ -196,6 +197,8 @@ bool ExternalRecorder::PauseAndWait(int timeout)
             m_streamData->Reset(m_streamData->DesiredProgram());
 
         m_paused = false;
+        m_streamHandler->AddListener(m_streamData);
+        StartStreaming();
     }
 
     // Always wait a little bit, unless woken up

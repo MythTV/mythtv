@@ -270,7 +270,7 @@ void ChannelEditor::fillList(void)
     }
     else if (m_currentSortMode == tr("Channel Number"))
     {
-        querystr += " ORDER BY channum + 0";
+        querystr += " ORDER BY channum + 0, SUBSTRING_INDEX(channum, '_', -1) + 0";
     }
     else if (m_currentSortMode == tr("Multiplex Frequency"))
     {

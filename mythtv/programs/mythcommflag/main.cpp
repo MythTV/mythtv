@@ -35,7 +35,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "remoteencoder.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "commandlineparser.h"
 #include "mythtranslation.h"
 #include "loggingserver.h"
@@ -846,7 +846,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
     QString filename = get_filename(program_info);
 
-    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    MythMediaBuffer *tmprbuf = MythMediaBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -866,17 +866,24 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    auto flags = (PlayerFlags)(kAudioMuted   |
-                               kVideoIsNull  |
-                               kDecodeLowRes |
-                               kDecodeSingleThreaded |
-                               kDecodeNoLoopFilter |
-                               kNoITV);
-    /* blank detector needs to be only sample center for this optimization. */
-    if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
-        (COMM_DETECT_2_BLANK == commDetectMethod))
+    auto flags = static_cast<PlayerFlags>(kAudioMuted | kVideoIsNull | kNoITV);
+
+    int flagfast = gCoreContext->GetNumSetting("CommFlagFast", 0);
+    if (flagfast)
     {
-        flags = (PlayerFlags) (flags | kDecodeFewBlocks);
+        // Note: These additional flags replicate the intent of the original
+        // commit that enabled lowres support - but I'm not sure why it requires
+        // single threaded decoding - which surely slows everything down? Though
+        // there is probably no profile to enable multi-threaded decoding anyway.
+        LOG(VB_GENERAL, LOG_INFO, "Enabling experimental flagging speedup (low resolution)");
+        flags = static_cast<PlayerFlags>(flags | kDecodeLowRes | kDecodeSingleThreaded | kDecodeNoLoopFilter);
+    }
+
+    // blank detector needs to be only sample center for this optimization.
+    if (flagfast && ((COMM_DETECT_BLANKS  == commDetectMethod) ||
+                     (COMM_DETECT_2_BLANK == commDetectMethod)))
+    {
+        flags = static_cast<PlayerFlags>(flags | kDecodeFewBlocks);
     }
 
     auto *cfp = new MythCommFlagPlayer(flags);
@@ -1017,7 +1024,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
     // scripts after transcoding or other size-changing operations
     UpdateFileSize(pginfo);
 
-    RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
+    MythMediaBuffer *tmprbuf = MythMediaBuffer::Create(filename, false);
     if (!tmprbuf)
     {
         LOG(VB_GENERAL, LOG_ERR,

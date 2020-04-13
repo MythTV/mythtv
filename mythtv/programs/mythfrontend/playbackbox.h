@@ -34,7 +34,7 @@ class QEvent;
 class QTimer;
 
 class MythPlayer;
-class RingBuffer;
+class MythMediaBuffer;
 class ProgramInfo;
 
 class MythUIButtonList;

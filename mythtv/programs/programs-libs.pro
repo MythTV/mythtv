@@ -69,6 +69,12 @@ using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -lhdhomerun
 using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
+!using_libexiv2_external {
+    LIBS += -L../../external/libexiv2 -lmythexiv2-0.28 -lexpat
+    freebsd: LIBS += -lprocstat
+    darwin: LIBS += -liconv -lz
+}
+
 win32 {
     CONFIG += console
 }

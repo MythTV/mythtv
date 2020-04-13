@@ -9,8 +9,10 @@
 #include "mythvtbinterop.h"
 #include "mythvtbcontext.h"
 
+// FFmpeg
 extern "C" {
 #include "libavutil/hwcontext_videotoolbox.h"
+#include "libavcodec/videotoolbox.h"
 #include "libavutil/pixdesc.h"
 }
 
@@ -19,6 +21,11 @@ extern "C" {
 MythVTBContext::MythVTBContext(DecoderBase *Parent, MythCodecID CodecID)
   : MythCodecContext(Parent, CodecID)
 {
+}
+
+MythVTBContext::~MythVTBContext()
+{
+    av_buffer_unref(&m_framesContext);
 }
 
 void MythVTBContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
@@ -155,7 +162,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
-    
+
     // Add our interop class and set the callback for its release
     AVHWDeviceContext* devicectx = reinterpret_cast<AVHWDeviceContext*>(deviceref->data);
     devicectx->user_opaque = interop;
@@ -175,13 +182,22 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     return 0;
 }
 
-enum AVPixelFormat MythVTBContext::GetFormat(struct AVCodecContext*, const enum AVPixelFormat *PixFmt)
+enum AVPixelFormat MythVTBContext::GetFormat(struct AVCodecContext* Context, const enum AVPixelFormat *PixFmt)
 {
     enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VIDEOTOOLBOX)
+        {
+            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+            if (decoder)
+            {
+                MythVTBContext* me = dynamic_cast<MythVTBContext*>(decoder->GetMythCodecContext());
+                if (me)
+                    me->InitFramesContext(Context);
+            }
             return *PixFmt;
+        }
         PixFmt++;
     }
     return ret;
@@ -262,3 +278,72 @@ void MythVTBContext::GetDecoderList(QStringList &Decoders)
         Decoders.append(MythCodecContext::GetProfileDescription(profile, size));
 }
 
+/*! \brief Create a hardware frames context if needed.
+ *
+ * \note We now use our own frames context to ensure stream changes are handled
+ * properly. This still fails to recreate the hardware decoder context however
+ * as the code in videotoolbox.c returns kVTVideoDecoderNotAvailableNowErr (i.e.
+ * VideoToolbox takes an indeterminate amount of time to free the old decoder and does
+ * not allow a new one to be created until it has done so).
+ * This appears to be a common issue - though may work better on newer hardware that
+ * supports multiple decoders (tested on an ancient MacBook). So hardware decoding
+ * will fail ungracefully and we fall back to software decoding. It is possible
+ * to handle this more gracefully by patching videotoolbox.c to use
+ * kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder rather
+ * than kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder. In this
+ * case VideoToolbox will use software decoding instead and the switch is relatively
+ * seemless. BUT the decoder no longer uses reference counted buffers and MythVTBInterop
+ * will leak textures as it does not expect a unique CVPixelBufferRef for every new
+ * frame.
+ * Also note that the FFmpeg code does not 'require' hardware decoding for HEVC - so
+ * software decoding may be used for HEVC - which will break the interop class as noted,
+ * but I cannot test this with my current hardware (and I don't have an HEVC sample
+ * with a resolution change).
+*/
+void MythVTBContext::InitFramesContext(AVCodecContext *Context)
+{
+    if (!Context)
+        return;
+
+    AVPixelFormat format = AV_PIX_FMT_NV12;
+    if (ColorDepth(PixelFormatToFrameType(Context->sw_pix_fmt)) > 8)
+        format = AV_PIX_FMT_P010;
+
+    if (m_framesContext)
+    {
+        AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
+        if ((frames->sw_format == format) && (frames->width == Context->coded_width) &&
+            (frames->height == Context->coded_height))
+        {
+            Context->hw_frames_ctx = av_buffer_ref(m_framesContext);
+            return;
+        }
+    }
+
+    // If this is a 'spontaneous' callback from FFmpeg (i.e. not on a stream change)
+    // then we must release any direct render buffers.
+    if (codec_is_vtb(m_codecID) && m_parent->GetPlayer())
+        m_parent->GetPlayer()->DiscardVideoFrames(true, true);
+
+    av_videotoolbox_default_free(Context);
+    av_buffer_unref(&m_framesContext);
+
+    AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
+    AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
+    frames->free = MythCodecContext::FramesContextFinished;
+    frames->user_opaque = nullptr;
+    frames->sw_format = format;
+    frames->format    = AV_PIX_FMT_VIDEOTOOLBOX;
+    frames->width     = Context->coded_width;
+    frames->height    = Context->coded_height;
+    if (av_hwframe_ctx_init(framesref) < 0)
+    {
+        av_buffer_unref(&framesref);
+    }
+    else
+    {
+        Context->hw_frames_ctx = framesref;
+        m_framesContext = av_buffer_ref(framesref);
+        NewHardwareFramesContext();
+    }
+}

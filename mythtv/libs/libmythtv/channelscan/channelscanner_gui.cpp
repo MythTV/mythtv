@@ -136,7 +136,7 @@ void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports,
 {
     ChannelImporter ci(true, true, true, true, true,
                        m_freeToAirOnly, m_channelNumbersOnly, m_completeOnly,
-                       m_fullSearch, m_serviceRequirements, success);
+                       m_fullSearch, m_removeDuplicates, m_serviceRequirements, success);
     ci.Process(_transports, m_sourceid);
 }
 

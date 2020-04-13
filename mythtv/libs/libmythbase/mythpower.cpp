@@ -110,10 +110,7 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, uint Minimum
     if (s_instance)
     {
         // Update the maximum requested delay
-        uint max = 0;
-        foreach (uint delay, s_delays)
-            if (delay > max)
-                max = delay;
+        uint max = std::max_element(s_delays.cbegin(), s_delays.cend()).value();
         s_instance->SetRequestedDelay(max);
     }
     return s_instance;

@@ -43,7 +43,7 @@ class NuppelDecoder : public DecoderBase
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
                           int testbufsize = kDecoderProbeBufferSize);
 
-    int OpenFile(RingBuffer *rbuffer, bool novideo, 
+    int OpenFile(MythMediaBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize], 
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
@@ -52,7 +52,7 @@ class NuppelDecoder : public DecoderBase
     // lastFrame is really (m_framesPlayed - 1) since we increment after getting
     bool IsLastFrameKey(void) const override // DecoderBase
         { return (m_lastKey == m_framesPlayed); }
-    void WriteStoredData(RingBuffer *rb, bool storevid,
+    void WriteStoredData(MythMediaBuffer *rb, bool storevid,
                          long timecodeOffset) override; // DecoderBase
     void ClearStoredData(void) override; // DecoderBase
 

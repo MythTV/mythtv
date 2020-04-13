@@ -19,7 +19,7 @@ static OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend);
 MythPowerOSX::MythPowerOSX()
   : MythPower()
 {
-    Init();
+    MythPowerOSX::Init();
 }
 
 MythPowerOSX::~MythPowerOSX()

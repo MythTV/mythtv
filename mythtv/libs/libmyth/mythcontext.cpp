@@ -1659,10 +1659,12 @@ MythContext::~MythContext()
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
     MThreadPool::globalInstance()->waitForDone();
-    logStop();
-
     SSDP::Shutdown();
     TaskQueue::Shutdown();
+
+    LOG(VB_GENERAL, LOG_INFO, "Exiting");
+
+    logStop();
 
     delete gCoreContext;
     gCoreContext = nullptr;

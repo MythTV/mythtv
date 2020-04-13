@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs_CZ" sourcelanguage="en_US">
+<TS version="2.1" language="cs_CZ" sourcelanguage="en_US">
+<context>
+    <name>(Weather Screens)</name>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="16"/>
+        <source>Current Conditions</source>
+        <translation type="unfinished">Aktuální podmínky</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
+        <source>Three Day Forecast</source>
+        <translation type="unfinished">Třídenní předpověď</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="22"/>
+        <source>18 Hour Forecast</source>
+        <translation type="unfinished">18-cti hodinová předpověď</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
+        <source>Severe Weather Alerts</source>
+        <translation type="unfinished">Varování</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="28"/>
+        <source>Six Day Forecast</source>
+        <translation type="unfinished">Šestidenní předpověď</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="31"/>
+        <source>Static Map</source>
+        <translation type="unfinished">Statická mapa</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="34"/>
+        <source>Animated Map</source>
+        <translation type="unfinished">Animovaná mapa</translation>
+    </message>
+</context>
 <context>
     <name>GlobalSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="56"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="42"/>
         <source>Finish</source>
         <translation>Dokončit</translation>
     </message>
@@ -12,27 +50,35 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="964"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
         <source>Search</source>
         <translation>Vyhledat</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="975"/>
         <source>Searching ...</source>
-        <translation>Vyhledávám ...</translation>
+        <translation type="vanished">Vyhledávám ...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="997"/>
         <source>Searching ... Results: %1</source>
-        <translation>Vyhledávám ... Výsledky: %1</translation>
+        <translation type="vanished">Vyhledávám ... Výsledky: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1045"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="913"/>
+        <source>Searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="935"/>
+        <source>Searching... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="990"/>
         <source>Search Complete. Results: %1</source>
         <translation>Hledání dokončeno. Výsledky: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1066"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1011"/>
         <source>Source: %1</source>
         <translation>Zdroj: %1</translation>
     </message>
@@ -40,19 +86,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/main.cpp" line="31"/>
+        <location filename="../mythweather/main.cpp" line="47"/>
         <source>Weather forecasts</source>
         <translation>Předpověď počasí</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="33"/>
+        <location filename="../mythweather/main.cpp" line="49"/>
         <source>Pause current page</source>
         <translation>Pozastavit aktuální stránku</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="35"/>
-        <location filename="../mythweather/main.cpp" line="37"/>
-        <location filename="../mythweather/main.cpp" line="39"/>
+        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="53"/>
+        <location filename="../mythweather/main.cpp" line="55"/>
         <source>Search List</source>
         <translation>Prohledat seznam</translation>
     </message>
@@ -60,154 +106,147 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="15"/>
         <source>Current Conditions</source>
-        <translation>Aktuální podmínky</translation>
+        <translation type="vanished">Aktuální podmínky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="17"/>
         <source>Three Day Forecast</source>
-        <translation>Třídenní předpověď</translation>
+        <translation type="vanished">Třídenní předpověď</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
         <source>18 Hour Forecast</source>
-        <translation>18-cti hodinová předpověď</translation>
+        <translation type="vanished">18-cti hodinová předpověď</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="21"/>
         <source>Severe Weather Alerts</source>
-        <translation>Varování</translation>
+        <translation type="vanished">Varování</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="23"/>
         <source>Six Day Forecast</source>
-        <translation>Šestidenní předpověď</translation>
+        <translation type="vanished">Šestidenní předpověď</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
         <source>Static Map</source>
-        <translation>Statická mapa</translation>
+        <translation type="vanished">Statická mapa</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
-        <translation>Animovaná mapa</translation>
+        <translation type="vanished">Animovaná mapa</translation>
     </message>
 </context>
 <context>
     <name>ScreenSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="126"/>
         <source>Active Screens</source>
         <translation>Aktivní obrazovky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="155"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="130"/>
         <source>Inactive Screens</source>
         <translation>Neaktivní obrazovky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="176"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
         <source>Finish</source>
         <translation>Dokončit</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="233"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="207"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
         <translation>Přidejte požadované obrazovky mezi aktivní stisknutím VÝBĚR.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="210"/>
         <source>Sources</source>
         <translation>Zdroje</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="252"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="226"/>
         <source>Units: </source>
         <translation>Jednotky: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="600"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="228"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="552"/>
         <source>English Units</source>
         <translation>Anglické jednotky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="228"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="553"/>
         <source>SI Units</source>
         <translation>Mezinárodní jednotky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="260"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="234"/>
         <source>Location: </source>
         <translation>Lokace: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="261"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="264"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="235"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="238"/>
         <source>Not Defined</source>
         <translation>Nedefinováno</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="263"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="237"/>
         <source>Source: </source>
         <translation>Zdroj: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="267"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="241"/>
         <source>Press SELECT to </source>
         <translation>Stiskněte VÝBĚR ke </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="269"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="243"/>
         <source>change location; </source>
         <translation>Změně lokace; </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="271"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="245"/>
         <source>change units; </source>
         <translation>změně jednotek; </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="272"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="246"/>
         <source>move screen up or down; or remove screen.</source>
         <translation>přesunutí obrazovky nahoru, dolů nebo jejímu odstranění.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="507"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="460"/>
         <source>Manipulate Screen</source>
         <translation>Manipulace s obrazovkou</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="474"/>
         <source>Move Up</source>
         <translation>Přesunout nahoru</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="475"/>
         <source>Move Down</source>
         <translation>Přesunout dolů</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="476"/>
         <source>Remove</source>
         <translation>Odstranit</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="477"/>
         <source>Change Location</source>
         <translation>Změnit lokaci</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="526"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="587"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="479"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="540"/>
         <source>Change Units</source>
         <translation>Změnit jednotky</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="480"/>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
@@ -215,35 +254,34 @@
 <context>
     <name>SourceManager</name>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="91"/>
+        <location filename="../mythweather/sourceManager.cpp" line="92"/>
         <source>Searching for scripts</source>
         <translation>Vyhledávám skripty</translation>
     </message>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="301"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="unfinished">Skript %1 běží když se provádí pokus o aktualizaci. Ujistěte se, že se nezasekává, hodnoty timeoutu jsou dostatečné... Právě neběží</translation>
+        <translation type="obsolete">Skript %1 běží když se provádí pokus o aktualizaci. Ujistěte se, že se nezasekává, hodnoty timeoutu jsou dostatečné... Právě neběží</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="790"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="735"/>
         <source>Finish</source>
         <translation>Dokončit</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="904"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="847"/>
         <source>Author: </source>
         <translation>Autor: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="906"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="849"/>
         <source>Email: </source>
         <translation>Email: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="850"/>
         <source>Version: </source>
         <translation>Verze: </translation>
     </message>
@@ -919,131 +957,315 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Humidity</source>
         <translation>Vlhkost</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="41"/>
+        <source>Low: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Precip: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
         <source>Pressure</source>
         <translation>Tlak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="48"/>
+        <source>Pressure: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Screen setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Search locations for your weather forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="62"/>
+        <source>Setup sources for your weather forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="67"/>
+        <source>Source setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="68"/>
+        <source>Sources</source>
+        <translation type="unfinished">Zdroje</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="70"/>
+        <source>Temp: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="75"/>
         <source>Visibility</source>
         <translation>Viditelnost</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="77"/>
+        <source>Visibility: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="78"/>
+        <source>Visibilty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="79"/>
+        <source>WEATHER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="82"/>
+        <source>Weather Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="84"/>
+        <source>Weather Report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="89"/>
+        <source>Weather Source Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="91"/>
+        <source>Weather forecasts to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="92"/>
+        <source>Weather forecasts to display on screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="97"/>
+        <source>Wind Direction: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="98"/>
+        <source>Wind(Dir)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="99"/>
         <source>Wind(Gust)</source>
         <translation>Větrné poryvy</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="101"/>
+        <source>Wind(Gust): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="102"/>
+        <source>dddd,  MMMM dd,  yyyy  |  hh:mm AP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="103"/>
+        <source>updating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="95"/>
         <source>Wind Direction</source>
         <translation>Směr větru</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="13"/>
+        <source>Configure your global weather settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Configure your weather</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Enter location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported. Hit the right or down arrow to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
         <source>Feels Like</source>
         <translation>Subjektivní teplota</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="24"/>
+        <source>Feels Like: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>General Mythweather options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>General weather</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
         <source>High</source>
         <translation>Vysoká</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="33"/>
+        <source>High: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Humidity: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
         <source>Low</source>
         <translation>Nízká</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Global Settings</source>
         <translation>Globální nastavení</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Seconds to display each page:</source>
         <translation>Délka zobrazení každé stránky (s):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Retrieve data in the background:</source>
         <translation>Načítat data na pozadí:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Source Setup</source>
         <translation>Nastavení zdroje</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Interval načítání dat (minut):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="5"/>
+        <source>%DATE%, %TIME%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
         <source>Last Updated %1</source>
         <translation>Poslední aktualizace %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="32"/>
         <source>High Temperature:  %1</source>
         <translation>Vysoká teplota: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Low Temperature:  %1</source>
         <translation>Nízká teplota: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Temperature:  %1</source>
         <translation>Teplota: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Chance of Precipitation:  %1</source>
         <translation>Pravděpodobnost srážek: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
-        <translation>Tato obrazovka řídí chování obrazovek počasí. Můžete povolit aktualizaci na pozadí, který se bude spouštět bez ohledu na obrazovku počasí a nakofigurovat kolik sekund bude zobrazena každá obrazovka.
+        <translation type="vanished">Tato obrazovka řídí chování obrazovek počasí. Můžete povolit aktualizaci na pozadí, který se bude spouštět bez ohledu na obrazovku počasí a nakofigurovat kolik sekund bude zobrazena každá obrazovka.
 
 Pokud jste konfiguraci Pluginu počasí dokončili, klikněte na &quot;Dokončit&quot; pro pokračování.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="43"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Weather Setup</source>
         <translation>Nastavení počasí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Available Screens</source>
         <translation>Obrazovky k dispozici</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Active Screens</source>
         <translation>Aktivní obrazovky</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Weather Script Settings</source>
         <translation>Nastavení skriptů počasí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="74"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
@@ -1052,7 +1274,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 Pokud jste změny dokončili, klikněte na &quot;Dokončit&quot; pro pokračování.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Timeout aktualizace zdroje (sekund):</translation>
     </message>
@@ -1062,127 +1284,196 @@ Pokud jste změny dokončili, klikněte na &quot;Dokončit&quot; pro pokračová
         <translation>Dokončit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search</source>
         <translation>Vyhledat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Enter Current Location</source>
         <translation>Zadejte aktuální lokaci</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
         <source>As of</source>
-        <translation>Od </translation>
+        <translation type="vanished">Od </translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Weather Alerts</source>
         <translation>Varování</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Temp</source>
         <translation>Teplota</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Weather Location Search</source>
         <translation type="unfinished">Vyhledání lokace počasí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Weather</source>
         <translation>Počasí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Precip</source>
         <translation>Srážky</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
-        <source>Severe Weather Alerts</source>
-        <translation>Varování</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="40"/>
         <source>Global Setup</source>
-        <translation>Globální nastavení</translation>
+        <translation type="vanished">Globální nastavení</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Screen Setup</source>
         <translation>Nastavení obrazovky</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Location Search</source>
         <translation>Vyhledání lokace</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Zadejte Vaši lokaci, nejbližší velké město. V některých zemích jsou podporovány také PSČ.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Enter Location:</source>
         <translation>Zadejte lokaci:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="85"/>
+        <source>Weather Screen Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
+        <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Retrieve data in background:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="73"/>
+        <source>This screen governs the behavior of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="93"/>
+        <source>Weather settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="86"/>
+        <source>Weather Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="90"/>
+        <source>Weather Source Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="63"/>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
         <source>Humidity:</source>
         <translation>Vlhkost:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Pressure:</source>
         <translation>Tlak:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="94"/>
+        <source>Wind (Gust):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Global Weather Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Seconds to display each page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>Retrieve data in the background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>General weather options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="100"/>
         <source>Wind(Gust):</source>
         <translation>Větrné poryvy:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Wind Direction:</source>
         <translation>Směr větru:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Visibility:</source>
         <translation>Viditelnost:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Feels Like:</source>
         <translation>Subjektivní teplota:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
         <source>General weather plugin options</source>
-        <translation>Obecné možnosti pluginu počasí</translation>
+        <translation type="vanished">Obecné možnosti pluginu počasí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Screen Settings</source>
         <translation>Nastavení obrazovky</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Vyberte, které předpovědi chcete zobrazit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Source Settings</source>
         <translation>Nastavení zdroje</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Nastavte chování skriptů pro počasí</translation>
     </message>
@@ -1190,45 +1481,50 @@ Pokud jste změny dokončili, klikněte na &quot;Dokončit&quot; pro pokračová
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="88"/>
+        <location filename="../mythweather/weather.cpp" line="86"/>
         <source>Paused</source>
         <translation>Pozastaveno</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weather.cpp" line="197"/>
+        <source>None of the configured screens are complete in this theme (missing copyright information).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="195"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="202"/>
         <source>Sunday</source>
         <translation>Neděle</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="198"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="205"/>
         <source>Monday</source>
         <translation>Pondělí</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="201"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="208"/>
         <source>Tuesday</source>
         <translation>Úterý</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="204"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="211"/>
         <source>Wednesday</source>
         <translation>Středa</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="207"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="214"/>
         <source>Thursday</source>
         <translation>Čtvrtek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="210"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="217"/>
         <source>Friday</source>
         <translation>Pátek</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="213"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="220"/>
         <source>Saturday</source>
         <translation>Soboto</translation>
     </message>

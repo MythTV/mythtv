@@ -7,6 +7,11 @@
 MythDisplayDRM::MythDisplayDRM()
 {
     m_device = new MythDRMDevice(m_screen);
+    if (!m_device->IsValid())
+    {
+        delete m_device;
+        m_device = nullptr;
+    }
     Initialise();
 }
 
@@ -26,7 +31,14 @@ void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
     }
 
     if (!m_device)
+    {
         m_device = new MythDRMDevice(m_screen);
+        if (!m_device->IsValid())
+        {
+            delete m_device;
+            m_device = nullptr;
+        }
+    }
 }
 
 void MythDisplayDRM::UpdateCurrentMode(void)

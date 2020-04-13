@@ -1,16 +1,20 @@
 #!/bin/bash
 #
-# This script uses the themestringstool to automate the generation of
-# themestrings.
+# This script uses the themestrings tool to automate the generation of
+# translatable strings found in MythTV themes ("themestrings").
 #
-# The themes are downloaded from the internet and the strings are extracted
-# from specific themes or from all of the available themes.
+# Themes for the current MythTV development "trunk" are downloaded from
+# the internet at runtime. Strings are extracted into themestrings
+# files, which are processed whenever translation files are updated using
+# the Qt lupdate utility.
 #
-# Strings related to the frontend or the backend goes into the "mythtv"
-# translation. Strings related to a plugin goes into the respective plugin.
+# Strings related to core applications found in mythtv/ will be placed
+# into the "mythfrontend_xx.ts" translation files. Strings related to
+# separate plugins found in mythplugins/ will be placed into the respective
+# plugin's translation file (e.g. mytharchive_xx.ts).
 #
-# It should be sufficient to run this script once without any arguments, to
-# update all themestrings for mythfrontend and the plugins.
+# It should be sufficient to run this script once (without arguments) to
+# update all themestrings for mythfrontend/backend/setup and core plugins.
 #
 
 set -e
@@ -19,18 +23,46 @@ TS=$(pwd)/themestrings
 DOWNLOAD_DIR="temp_download"
 MYTHTHEMES_CORE=$(ls ../mythtv/themes/ --file-type |grep "/$")
 MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
-REAL_XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
-    mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
-    news-ui.xml zoneminder-ui.xml weather-ui.xml \
-    mythnative-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml \
-    base_archive.xml image-ui.xml base_music.xml stream-ui.xml \
-    base_netvision.xml"
 
-BOGUS_XMLPLUGINS="dvd-ui.xml gallery2-ui.xml" # dvd-ui.xml (DVD ripper) needs
-    # to be in this list to be excluded from mythtv. It isn't used anymore,
-    # but some themes still contains it.
-    # gallery2-ui.xml is a bogus file in the blue-abstract theme.
+# Theme files for active plugins. Note that some separate plugins may
+# eventually be incorporated into the core mythtv/ codebase, at which
+# point the relevant theme files should be removed from this list.
+REAL_XMLPLUGINS="\
+base_archive.xml mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml archivemenu.xml archiveutils.xml \
+browser-ui.xml \
+game-ui.xml game_settings.xml \
+base_music.xml music-base.xml music-ui.xml musicsettings-ui.xml stream-ui.xml steppes-music.xml music_settings.xml musicmenu.xml \
+base_netvision.xml netvision-ui.xml \
+news-ui.xml \
+weather-ui.xml weather_settings.xml \
+zoneminder-ui.xml zonemindermenu.xml"
 
+# Theme files for deleted plugins (or plugins that have migrated into core)
+# may still be present (but no longer used) in some themes and require
+# manual exclusion:
+#
+# DVD Ripper: plugin removed prior to 0.24 release
+# - dvd-ui.xml
+#
+# MythGallery: plugin removed prior to v31 release
+# - gallery-ui.xml
+# - gallery-base.xml (Arclight)
+# - ORIGgallery-ui.xml (Childish)
+#
+# MythFlix: plugin removed prior to 0.23 release
+# - netflix-ui.xml
+#
+# MythMovies: plugin removed prior to 0.24 release
+# - movies-ui.xml
+#
+BOGUS_XMLPLUGINS="\
+dvd-ui.xml \
+gallery-base.xml gallery-ui.xml ORIGgallery-ui.xml \
+netflix-ui.xml \
+movies-ui.xml"
+
+# Theme files not in the superset of real and bogus plugin files are
+# considered to be included for use with the core mythtv/ applications
 XMLPLUGINS="${REAL_XMLPLUGINS} ${BOGUS_XMLPLUGINS}"
 
 if [ ! -e ${TS} ]; then
@@ -52,9 +84,9 @@ fi
 [ -d ${DOWNLOAD_DIR}/themes ] && rm -rf temp_download/themes/*
 [ -d ${DOWNLOAD_DIR}/trunk ] && rm -rf temp_download/trunk/*
 [ ! -d ${DOWNLOAD_DIR}/themes ] && mkdir -p temp_download/themes
-echo "Downloading list of themes.."
+echo "Downloading list of themes..."
 wget -q ${MYTHTHEMES_DL} -O ${DOWNLOAD_DIR}/themes.zip
-echo "Extracting list of themes.."
+echo "Extracting list of themes..."
 unzip -q -o ${DOWNLOAD_DIR}/themes.zip -d temp_download/
 
 # Download the themes
@@ -65,7 +97,7 @@ for i in $(ls ${DOWNLOAD_DIR}/trunk/); do
     THEME_URL=$(cat ${DOWNLOAD_DIR}/trunk/${i}/themeinfo.xml |grep "</*url>"|sed -e "s/ *<\/*url>//g")
     THEME_FILENAME=$(basename ${THEME_URL})
     [ ! -f ${DOWNLOAD_DIR}/${THEME_FILENAME} ] && echo "Downloading theme ${THEME_FILENAME}.." && wget -q ${THEME_URL} -P temp_download/
-    echo "Extracting theme ${THEME_FILENAME}.."
+    echo "Extracting theme ${THEME_FILENAME}..."
     unzip -q -o ${DOWNLOAD_DIR}/${THEME_FILENAME} -d temp_download/themes/
 done
 
@@ -76,11 +108,37 @@ done
 #                                                                   #
 #####################################################################
 
-# Select the themes that should be translatable (theme name = directory name after extraction)
-TRANSLATABLE_THEMES="Arclight Childish Graphite Mythbuntu Mythbuntu-classic MythCenter MythCenter-wide MythCenterXMAS-wide Steppes Steppes-narrow Terra A-Forest blue-abstract-wide"
+# Select the themes that should be translatable (theme name = directory name
+# after extraction)
+TRANSLATABLE_THEMES="\
+A-Forest \
+Arclight \
+blootube-ng \
+blue-abstract-wide \
+Childish \
+Functionality \
+Graphite \
+LCARS \
+Monochrome \
+MythAeon \
+Mythbuntu \
+Mythbuntu-classic \
+MythCenter \
+MythCenter-wide \
+MythMediaStream \
+Readability \
+Retro-wide \
+Steppes \
+Steppes-large \
+Steppes-narrow \
+Terra \
+TintedGlass \
+TransBlue \
+Willi"
+
 #TRANSLATABLE_THEMES=$(ls ${DOWNLOAD_DIR}/themes/ --file-type |grep "/$"|tr '/' ' ') #All themes
 
-#Remove the extracted themes which shouldn't be translatable
+# Remove the extracted themes which shouldn't be translatable
 echo ""
 echo "Strings will be extracted from the following themes:"
 echo ${TRANSLATABLE_THEMES} | tr ' ' '\n'
@@ -118,7 +176,7 @@ popd > /dev/null
 # Generate themestrings.h file for mythtv
 pushd ../mythtv/themes  > /dev/null
     echo ""
-    echo "Generating themestrings.h file for mythtv.."
+    echo "Generating themestrings.h file for mythtv..."
     ${TS} ../.. . &> /dev/null
     ls -l themestrings.h
     echo "Number of strings: $(( $(cat themestrings.h|wc -l)-2 ))"
@@ -166,23 +224,21 @@ function updateplugin {
     done
 
     echo ""
-    echo "Generating themestrings.h file for ${1}.."
+    echo "Generating themestrings.h file for ${1}..."
     ${TS} . $(pwd)/i18n > /dev/null
     ls -l i18n/themestrings.h
     echo "Number of strings: $(( $(cat i18n/themestrings.h|wc -l)-2 ))"
-    
+
     rm -rf temp_themestrings
-    
+
     popd > /dev/null
 }
 
-updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml base_archive.xml
+updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml base_archive.xml archivemenu.xml archiveutils.xml
 updateplugin mythbrowser browser-ui.xml
-updateplugin mythgallery gallery-ui.xml image-ui.xml
-updateplugin mythgame game-ui.xml
-updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml base_music.xml stream-ui.xml
+updateplugin mythgame game-ui.xml game_settings.xml
+updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml base_music.xml stream-ui.xml music_settings.xml musicmenu.xml
 updateplugin mythnetvision netvision-ui.xml base_netvision.xml
 updateplugin mythnews news-ui.xml
-updateplugin mythweather weather-ui.xml
-updateplugin mythzoneminder zoneminder-ui.xml
-
+updateplugin mythweather weather-ui.xml weather_settings.xml
+updateplugin mythzoneminder zoneminder-ui.xml zonemindermenu.xml

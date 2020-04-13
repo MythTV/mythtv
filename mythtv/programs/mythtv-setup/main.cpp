@@ -258,6 +258,7 @@ int main(int argc, char *argv[])
     bool    scanLCNOnly = false;
     bool    scanCompleteOnly = false;
     bool    scanFullChannelSearch = false;
+    bool    scanRemoveDuplicates = false;
     bool    addFullTS = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
@@ -346,6 +347,8 @@ int main(int argc, char *argv[])
         scanCompleteOnly = true;
     if (cmdline.toBool("fullsearch"))
         scanFullChannelSearch = true;
+    if (cmdline.toBool("removeduplicates"))
+        scanRemoveDuplicates = true;
     if (cmdline.toBool("addfullts"))
         addFullTS = true;
     if (cmdline.toBool("servicetype"))
@@ -501,6 +504,7 @@ int main(int argc, char *argv[])
                          scanLCNOnly,
                          scanCompleteOnly,
                          scanFullChannelSearch,
+                         scanRemoveDuplicates,
                          addFullTS,
                          scanServiceRequirements,
                          // stuff needed for particular scans
@@ -535,8 +539,11 @@ int main(int argc, char *argv[])
         {
             ScanDTVTransportList list = LoadScan(scanImport);
             ChannelImporter ci(false, true, true, true, false,
-                               scanFTAOnly, scanLCNOnly, scanCompleteOnly,
-                               scanFullChannelSearch, scanServiceRequirements);
+                               scanFTAOnly, scanLCNOnly,
+                               scanCompleteOnly,
+                               scanFullChannelSearch,
+                               scanRemoveDuplicates,
+                               scanServiceRequirements);
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;

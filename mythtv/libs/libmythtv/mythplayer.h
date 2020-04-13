@@ -17,10 +17,10 @@
 #include "volumebase.h"
 #include "osd.h"
 #include "mythvideoout.h"
-#include "teletextreader.h"
-#include "subtitlereader.h"
-#include "cc608reader.h"
-#include "cc708reader.h"
+#include "captions/teletextreader.h"
+#include "captions/subtitlereader.h"
+#include "captions/cc608reader.h"
+#include "captions/cc708reader.h"
 #include "decoders/decoderbase.h"
 #include "deletemap.h"
 #include "commbreakmap.h"
@@ -50,7 +50,7 @@ class MythPlayer;
 class Jitterometer;
 class QThread;
 class QWidget;
-class RingBuffer;
+class MythMediaBuffer;
 
 using StatusCallback = void (*)(int, void*);
 
@@ -136,9 +136,11 @@ class DecoderCallback
   public:
     using Callback = void (*)(void*, void*, void*);
     DecoderCallback() = default;
-    DecoderCallback(QString &Debug, Callback Function, void *Opaque1, void *Opaque2, void *Opaque3)
+    DecoderCallback(const QString &Debug, Callback Function, QAtomicInt *Ready,
+                    void *Opaque1, void *Opaque2, void *Opaque3)
       : m_debug(std::move(Debug)),
         m_function(Function),
+        m_ready(Ready),
         m_opaque1(Opaque1),
         m_opaque2(Opaque2),
         m_opaque3(Opaque3)
@@ -147,6 +149,7 @@ class DecoderCallback
 
     QString m_debug;
     Callback m_function { nullptr };
+    QAtomicInt *m_ready { nullptr };
     void* m_opaque1     { nullptr };
     void* m_opaque2     { nullptr };
     void* m_opaque3     { nullptr };
@@ -285,8 +288,7 @@ class MTV_PUBLIC MythPlayer
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
     bool TranscodeGetNextFrame(int &did_ff, bool &is_key, bool honorCutList);
-    bool WriteStoredData(
-        RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
+    bool WriteStoredData(MythMediaBuffer *OutBuffer, bool WriteVideo, long TimecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
     void SetCutList(const frm_dir_map_t &newCutList);
 
@@ -306,12 +308,9 @@ class MTV_PUBLIC MythPlayer
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
-    static void HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
-                                      DecoderCallback::Callback Function,
-                                      void *Opaque1, void *Opaque2);
+    void HandleDecoderCallback(const QString &Debug, DecoderCallback::Callback Function,
+                               void *Opaque1, void *Opaque2);
     void ProcessCallbacks(void);
-    void QueueCallback(QString Debug, DecoderCallback::Callback Function,
-                       void *Opaque1, void *Opaque2, void *Opaque3);
 
     // Reinit
     void ReinitVideo(bool ForceUpdate);
@@ -416,16 +415,16 @@ class MTV_PUBLIC MythPlayer
     virtual void SetBookmark(bool clear = false);
     bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc);
     bool RemovePIPPlayer(MythPlayer *pip);
-    void NextScanType(void)
-        { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
-    void SetScanType(FrameScanType scan);
-    FrameScanType GetScanType(void) const { return m_scan; }
-    bool IsScanTypeLocked(void) const { return m_scanLocked; }
+
+    FrameScanType NextScanOverride(void);
+    void          SetScanOverride(FrameScanType Scan);
+    void          SetScanType(FrameScanType Scan);
+    FrameScanType GetScanType(void) const;
+
     void Zoom(ZoomDirection direction);
     void ToggleMoveBottomLine(void);
     void SaveBottomLine(void);
     void FileChanged(void);
-
 
     // Windowing stuff
     void EmbedInWidget(QRect rect);
@@ -648,6 +647,7 @@ class MTV_PUBLIC MythPlayer
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     virtual void AVSync(VideoFrame *buffer);
+    bool  PipSync(void);
     void  ResetAVSync(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
     void  WaitForTime(int64_t framedue);
@@ -751,16 +751,14 @@ class MTV_PUBLIC MythPlayer
     double   m_videoFrameRate            {29.97};///< Video (input) Frame Rate (often inaccurate)
     float    m_videoAspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
     float    m_forcedVideoAspect         {-1};
-    /// Tell the player thread to set the scan type (and hence deinterlacers)
-    FrameScanType m_resetScan            {kScan_Ignore};
-    /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
-    FrameScanType m_scan                 {kScan_Interlaced};
-    /// Set when the user selects a scan type, overriding the detected one
-    bool     m_scanLocked                {false};
-    /// Used for tracking of scan type for auto-detection of interlacing
-    int      m_scanTracker               {0};
-    /// Set when SetScanType runs the first time
-    bool     m_scanInitialized           {false};
+
+    FrameScanType m_resetScan            { kScan_Ignore     };
+    FrameScanType m_scan                 { kScan_Interlaced };
+    FrameScanType m_scanOverride         { kScan_Detect     };
+    bool          m_scanLocked           { false };
+    bool          m_scanInitialized      { false };
+    long long     m_scanTracker          { 0 };
+
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     m_keyframeDist              {30};
     /// Codec Name - used by playback profile
@@ -848,7 +846,6 @@ class MTV_PUBLIC MythPlayer
 
     // Audio and video synchronization stuff
     int        m_avsyncAvg                {0};
-    int        m_avsyncPredictor          {0};
     int64_t    m_dispTimecode             {0};
     bool       m_avsyncAudioPaused        {false};
     int64_t    m_rtcBase                  {0}; // real time clock base for presentation time (microsecs)

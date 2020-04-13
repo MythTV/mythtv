@@ -35,6 +35,7 @@ void ScanWizard::SetupConfig(
     m_lcnOnly = new ChannelNumbersOnly();
     m_completeOnly = new CompleteChannelsOnly();
     m_fullSearch = new FullChannelSearch();
+    m_removeDuplicates = new RemoveDuplicates();
     m_addFullTS = new AddFullTS();
     m_trustEncSI = new TrustEncSISetting();
 
@@ -45,6 +46,7 @@ void ScanWizard::SetupConfig(
     addChild(m_lcnOnly);
     addChild(m_completeOnly);
     addChild(m_fullSearch);
+    addChild(m_removeDuplicates);
     addChild(m_addFullTS);
     addChild(m_trustEncSI);
 
@@ -98,6 +100,11 @@ bool ScanWizard::DoCompleteChannelsOnly(void) const
 bool ScanWizard::DoFullChannelSearch(void) const
 {
     return m_fullSearch->boolValue();
+}
+
+bool ScanWizard::DoRemoveDuplicates(void) const
+{
+    return m_removeDuplicates->boolValue();
 }
 
 bool ScanWizard::DoAddFullTS(void) const

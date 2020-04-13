@@ -11,6 +11,8 @@
 LC_ALL=C
 export LC_ALL
 
+CPP_STANDARD=c++17
+
 # make sure we are running under a compatible shell
 # try to make this part work with most shells
 
@@ -154,6 +156,7 @@ Advanced options (experts only):
                            directory with parser.h [$libxml2_path_default]
   --disable-libdns-sd      disable DNS Service Discovery (Bonjour/Zeroconf/Avahi)
   --disable-libcrypto      disable use of the OpenSSL cryptographic library
+  --disable-gnutls         disable use of GnuTLS for SSL/TLS protocol support in ffmpeg
 
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
@@ -1967,6 +1970,7 @@ MYTHTV_CONFIG_LIST='
     joystick_menu
     libcec
     libcrypto
+    gnutls
     libdns_sd
     libfftw3
     libmpeg2external
@@ -1985,6 +1989,7 @@ MYTHTV_CONFIG_LIST='
     v4l1
     valgrind
     x11
+    libexiv2_external
     libbluray_external
     xrandr
     profiletype
@@ -2758,6 +2763,7 @@ enable libaom
 enable libass
 enable libcec
 enable libcrypto
+enable gnutls
 enable libdav1d
 enable libdns_sd
 enable libxml2
@@ -2780,9 +2786,9 @@ enable xrandr
 disable indevs
 enable libfftw3
 enable taglib
-enable exiv2
 enable systemd_notify
 enable systemd_journal
+enable libexiv2_external
 enable libbluray_external
 
 # mythtv paths
@@ -4568,7 +4574,7 @@ if test "$?" != 0; then
     die "C compiler test failed."
 fi
 
-check_cxxflags -std=c++11 || check_cxxflags -std=c++0x
+check_cxxflags -std=$CPP_STANDARD -faligned-new
 
 # some compilers silently accept -std=c11, so we also need to check that the
 # version macro is defined properly
@@ -5878,6 +5884,15 @@ fi
 # Attempt to use libudev for mediamonitor
 enabled libudev && check_lib udev libudev.h udev_new  || disable libudev
 
+# libexiv2
+if enabled libexiv2_external ; then
+    if $(pkg-config --atleast-version="0.27.99" exiv2); then
+        use_pkg_config exiv2 exiv2 exiv2/exiv2.hpp versionNumber
+    elif [ $target_os != "android" ] ; then
+        disable libexiv2_external
+    fi
+fi
+
 # libmythbluray!
 if enabled libbluray_external; then
     if $(pkg-config --atleast-version="0.9.3" libbluray); then
@@ -6410,8 +6425,11 @@ if enabled systemd_journal ; then
 fi
 
 # Check that all MythTV build "requirements" are met:
-enabled exiv2 && $(pkg-config --exists exiv2) ||
-    die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
+if enabled libexiv2_external ; then
+    if ! $(pkg-config --exists exiv2) ; then
+       die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
+    fi
+fi
 
 # Qt dependency checks
 if test $target_os = mingw32 ; then
@@ -6527,7 +6545,7 @@ case $target_os in
         ;;
     linux)
         . /etc/os-release
-        if test $ID = "centos"; then
+        if test $ID = "centos" && test $VERSION_ID -le 7; then
             disable enforce_wshadow
         fi
         ;;
@@ -6625,6 +6643,12 @@ EOF
 fi
 
 enabled libcrypto && check_lib crypto openssl/rsa.h RSA_new -lcrypto || disable libcrypto
+
+if enabled gnutls ; then
+    if ! $(pkg-config --exists gnutls) ; then
+       disable gnutls
+    fi
+fi
 
 if test $target_os != darwin ; then
     enabled libdns_sd && check_lib dns_sd dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
@@ -6903,7 +6927,6 @@ elif enabled icpc; then
     # 10181: ignore warning about -fomit-frame-pointer being ignored
     # 13200: ignore EMMS instruction required, RTjpegN.cpp does the right thing
     check_cxxflags -wd177,192,592,913,10181,13200
-    check_cxxflags -std=c++11
 elif enabled clangxx; then
     # The constant-logical-operand only gives use false positives
     # for constant logical operands meant to be optimized away.
@@ -7209,6 +7232,10 @@ if enabled libdav1d; then
     ffopts="$ffopts --enable-libdav1d"
 fi
 
+if enabled gnutls; then
+    ffopts="$ffopts --enable-gnutls"
+fi
+
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -7285,7 +7312,7 @@ if enabled x86; then
 
 fi
 if enabled aarch64; then
-    echo "NEON enabled              ${neon-no}"
+    echo "NEON enabled              ${neon-no} (Intrinsics ${intrinsics_neon-no})"
     echo "VFP enabled               ${vfp-no}"
 fi
 if enabled arm; then
@@ -7293,7 +7320,7 @@ if enabled arm; then
     echo "ARMv6 enabled             ${armv6-no}"
     echo "ARMv6T2 enabled           ${armv6t2-no}"
     echo "VFP enabled               ${vfp-no}"
-    echo "NEON enabled              ${neon-no}"
+    echo "NEON enabled              ${neon-no} (Intrinsics ${intrinsics_neon-no})"
     echo "THUMB enabled             ${thumb-no}"
 fi
 if enabled mips; then
@@ -7432,6 +7459,12 @@ if enabled frontend; then
 fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "libcrypto                 ${libcrypto-no}"
+echo "gnutls                    ${gnutls-no}"
+if enabled libexiv2_external; then
+    echo "exiv2 support             yes (system)"
+else
+    echo "exiv2 support             yes (internal)"
+fi
 if enabled libbluray_external; then
     echo "bluray support            yes (system)"
 else
@@ -7463,6 +7496,7 @@ echo "libdav1d (AV1)            ${libdav1d-no}"
 echo ""
 
 echo "# Compilation Options"
+echo "C++ standard supported    ${CPP_STANDARD}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""
@@ -7909,6 +7943,11 @@ fi
 if ! enabled libbluray_external; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \
+           ${qmakeconf} -o Makefile)
+fi
+if ! enabled libexiv2_external; then
+    echo "Configuring libexiv2..."
+    (cd external/libexiv2 ; \
            ${qmakeconf} -o Makefile)
 fi
 echo "Configuring libmythdvdnav..."

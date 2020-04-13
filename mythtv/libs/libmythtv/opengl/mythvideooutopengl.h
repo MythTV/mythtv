@@ -37,7 +37,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
                       float Aspect, MythCodecID CodecId, bool &AspectOnly,
                       MythMultiLocker* Locks, int ReferenceFrames,
                       bool ForceChange) override;
-    void UpdatePauseFrame(int64_t &DisplayTimecode) override;
+    void UpdatePauseFrame(int64_t &DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     void InitPictureAttributes(void) override;
     void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;
     void RemovePIP(MythPlayer *PiPPlayer) override;

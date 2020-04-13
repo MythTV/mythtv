@@ -389,12 +389,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
     }
 #endif
 
-#ifdef _WIN32
-#    define PREFIX64 "I64"
-#else
-#    define PREFIX64 "ll"
-#endif
-
 #ifdef ANDROID
 #ifndef S_IREAD
 #define S_IREAD S_IRUSR

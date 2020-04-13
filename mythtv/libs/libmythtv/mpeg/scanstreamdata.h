@@ -19,8 +19,10 @@ class MTV_PUBLIC ScanStreamData :
     bool IsRedundant(uint pid, const PSIPTable &psip) const override; // ATSCStreamData
     bool HandleTables(uint pid, const PSIPTable &psip) override; // ATSCStreamData
 
+    void AddAllListeningPIDs(void);
     using DVBStreamData::Reset;
     void Reset(void) override; // ATSCStreamData
+    void Reset(uint desired_netid, uint desired_tsid, int desired_serviceid) override; // DVBStreamData
 
     bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const override // ATSCStreamData
         { return false; }

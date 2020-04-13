@@ -2525,7 +2525,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
+    QMap<int, EncoderLink*>::const_iterator tvit = m_tvList->constFind(ri.GetInputID());
     if (tvit == m_tvList->end())
         return;
 
@@ -2683,7 +2683,7 @@ bool Scheduler::HandleRecording(
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
-    QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
+    QMap<int, EncoderLink*>::const_iterator tvit = m_tvList->constFind(ri.GetInputID());
     if (tvit == m_tvList->end())
     {
         QString msg = QString("Invalid cardid [%1] for %2")
@@ -3090,8 +3090,8 @@ void Scheduler::HandleIdleShutdown(
         bool recording = false;
         m_schedLock.unlock();
         TVRec::s_inputsLock.lockForRead();
-        QMap<int, EncoderLink *>::Iterator it;
-        for (it = m_tvList->begin(); (it != m_tvList->end()) &&
+        QMap<int, EncoderLink *>::const_iterator it;
+        for (it = m_tvList->constBegin(); (it != m_tvList->constEnd()) &&
                  !recording; ++it)
         {
             if ((*it)->IsBusy())
@@ -3490,7 +3490,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
         if (secsleft > sleepThreshold)
             continue;
 
-        if (m_tvList->find(pginfo->GetInputID()) != m_tvList->end())
+        if (m_tvList->constFind(pginfo->GetInputID()) != m_tvList->constEnd())
         {
             EncoderLink *enc = (*m_tvList)[pginfo->GetInputID()];
             if ((!enc->IsLocal()) &&
@@ -3672,7 +3672,7 @@ void Scheduler::UpdateManuals(uint recordid)
 
     query.prepare(QString("SELECT type,title,subtitle,description,"
                           "station,startdate,starttime,"
-                          "enddate,endtime,season,episode "
+                          "enddate,endtime,season,episode,inetref,last_record "
                   "FROM %1 WHERE recordid = :RECORDID").arg(m_recordTable));
     query.bindValue(":RECORDID", recordid);
     if (!query.exec() || query.size() != 1)
@@ -3697,6 +3697,11 @@ void Scheduler::UpdateManuals(uint recordid)
 
     int season = query.value(9).toInt();
     int episode = query.value(10).toInt();
+    QString inetref = query.value(11).toString();
+
+    // A bit of a hack: mythconverg.record.last_record can be used by
+    // the services API to propegate originalairdate information.
+    QDate originalairdate = QDate(query.value(12).toDate());
 
     if (description.isEmpty())
         description = startdt.toLocalTime().toString();
@@ -3764,10 +3769,10 @@ void Scheduler::UpdateManuals(uint recordid)
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
                           " title, subtitle, description, manualid,"
-                          " season, episode, generic) "
+                          " season, episode, inetref, originalairdate, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, "
-                          " :SEASON, :EPISODE, 1)");
+                          " :SEASON, :EPISODE, :INETREF, :ORIGINALAIRDATE, 1)");
             query.bindValue(":CHANID", id);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
@@ -3776,6 +3781,8 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":DESCRIPTION", description);
             query.bindValue(":SEASON", season);
             query.bindValue(":EPISODE", episode);
+            query.bindValue(":INETREF", inetref);
+            query.bindValue(":ORIGINALAIRDATE", originalairdate);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {

@@ -158,6 +158,11 @@ ELD::ELD(const char *buf, int size)
     update_eld(buf, size);
 }
 
+ELD::ELD(const ELD &rhs)
+{
+    m_e = rhs.m_e;
+}
+
 ELD::ELD()
 {
     m_e.formats = 0LL;

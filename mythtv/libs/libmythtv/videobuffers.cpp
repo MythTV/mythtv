@@ -25,6 +25,40 @@ extern "C" {
 
 int next_dbg_str = 0;
 
+/*! \brief Store AVBufferRef's for later disposal
+ *
+ * \note Releasing hardware buffer references will at some point trigger the
+ * deletion of AVBufferPool's, which in turn trigger the release of hardware
+ * contexts and OpenGL interops - which may trigger a blocking callback. We cannot
+ * hold the videobuffer lock while doing this as there are numerous playback paths
+ * that can request the video buffer lock while the decoder thread is blocking.
+ * So store the buffers and release once the master videobuffer lock is released.
+*/
+static inline void ReleaseDecoderResources(VideoFrame *Frame, vector<AVBufferRef *> &Discards)
+{
+    if (format_is_hw(Frame->codec))
+    {
+        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+        if (ref != nullptr)
+            Discards.push_back(ref);
+        Frame->buf = Frame->priv[0] = nullptr;
+
+        if (format_is_hwframes(Frame->codec))
+        {
+            ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            if (ref != nullptr)
+                Discards.push_back(ref);
+            Frame->priv[1] = nullptr;
+        }
+    }
+}
+
+static inline void DoDiscard(vector<AVBufferRef *> &Discards)
+{
+    for (auto * it : Discards)
+        av_buffer_unref(&it);
+}
+
 /**
  * \class VideoBuffers
  *  This class creates tracks the state of the buffers used by
@@ -277,26 +311,6 @@ void VideoBuffers::SetPrebuffering(bool Normal)
     m_needPrebufferFrames = (Normal) ? m_needPrebufferFramesNormal : m_needPrebufferFramesSmall;
 }
 
-void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
-{
-    if (format_is_hw(Frame->codec))
-    {
-        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
-        if (ref != nullptr)
-            av_buffer_unref(&ref);
-        Frame->buf = Frame->priv[0] = nullptr;
-
-        if (format_is_hwframes(Frame->codec))
-        {
-            ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-            if (ref != nullptr)
-                av_buffer_unref(&ref);
-            Frame->priv[1] = nullptr;
-        }
-    }
-    (void)Frame;
-}
-
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType EnqueueTo)
 {
     QMutexLocker locker(&m_globalLock);
@@ -389,7 +403,10 @@ void VideoBuffers::ReleaseFrame(VideoFrame *Frame)
  */
 void VideoBuffers::DeLimboFrame(VideoFrame *Frame)
 {
-    QMutexLocker locker(&m_globalLock);
+    vector<AVBufferRef*> discards;
+
+    m_globalLock.lock();
+
     if (m_limbo.contains(Frame))
         m_limbo.remove(Frame);
 
@@ -397,13 +414,17 @@ void VideoBuffers::DeLimboFrame(VideoFrame *Frame)
     // the decoder assume that the frame is lost and return to available
     if (!m_decode.contains(Frame))
     {
-        ReleaseDecoderResources(Frame);
+        ReleaseDecoderResources(Frame, discards);
         SafeEnqueue(kVideoBuffer_avail, Frame);
     }
 
     // remove from decode queue since the decoder is finished
     while (m_decode.contains(Frame))
         m_decode.remove(Frame);
+
+    m_globalLock.unlock();
+
+    DoDiscard(discards);
 }
 
 /**
@@ -422,7 +443,9 @@ void VideoBuffers::StartDisplayingFrame(void)
  */
 void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
 {
-    QMutexLocker locker(&m_globalLock);
+    vector<AVBufferRef*> discards;
+
+    m_globalLock.lock();
 
     if(m_used.contains(Frame))
         Remove(kVideoBuffer_used, Frame);
@@ -436,10 +459,14 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
         if (!m_decode.contains(it))
         {
             Remove(kVideoBuffer_finished, it);
-            ReleaseDecoderResources(it);
+            ReleaseDecoderResources(it, discards);
             Enqueue(kVideoBuffer_avail, it);
         }
     }
+
+    m_globalLock.unlock();
+
+    DoDiscard(discards);
 }
 
 /**
@@ -449,9 +476,139 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
  */
 void VideoBuffers::DiscardFrame(VideoFrame *Frame)
 {
-    QMutexLocker locker(&m_globalLock);
-    ReleaseDecoderResources(Frame);
+    vector<AVBufferRef*> discards;
+    m_globalLock.lock();
+    ReleaseDecoderResources(Frame, discards);
     SafeEnqueue(kVideoBuffer_avail, Frame);
+    m_globalLock.unlock();
+    DoDiscard(discards);
+}
+
+void VideoBuffers::DiscardPauseFrames(void)
+{
+    vector<AVBufferRef*> discards;
+
+    m_globalLock.lock();
+    while (Size(kVideoBuffer_pause))
+    {
+        VideoFrame* frame = Tail(kVideoBuffer_pause);
+        ReleaseDecoderResources(frame, discards);
+        SafeEnqueue(kVideoBuffer_avail, frame);
+    }
+    m_globalLock.unlock();
+
+    DoDiscard(discards);
+}
+
+/*! \brief Discard all buffers and recreate
+ *
+ * This is used to 'atomically' recreate VideoBuffers that may use hardware buffer
+ * references. It is only used by MythVideoOutputOpenGL (other MythVideoOutput
+ * classes currently do not support hardware frames).
+*/
+bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int References)
+{
+    bool result = false;
+    vector<AVBufferRef*> refs;
+
+    m_globalLock.lock();
+    LOG(VB_PLAYBACK, LOG_INFO, QString("DiscardAndRecreate: %1").arg(GetStatus()));
+
+    // Remove pause frames (cutdown version of DiscardPauseFrames)
+    while (Size(kVideoBuffer_pause))
+    {
+        VideoFrame* frame = Tail(kVideoBuffer_pause);
+        ReleaseDecoderResources(frame, refs);
+        SafeEnqueue(kVideoBuffer_avail, frame);
+    }
+
+    // See DiscardFrames
+    frame_queue_t ula(m_used);
+    ula.insert(ula.end(), m_limbo.begin(), m_limbo.end());
+    ula.insert(ula.end(), m_available.begin(), m_available.end());
+    ula.insert(ula.end(), m_finished.begin(), m_finished.end());
+
+    frame_queue_t discards(m_used);
+    discards.insert(discards.end(), m_limbo.begin(), m_limbo.end());
+    discards.insert(discards.end(), m_finished.begin(), m_finished.end());
+    for (auto it = discards.begin(); it != discards.end(); ++it)
+    {
+        ReleaseDecoderResources(*it, refs);
+        SafeEnqueue(kVideoBuffer_avail, *it);
+    }
+
+    if (m_available.count() + m_pause.count() + m_displayed.count() != Size())
+    {
+        for (uint i = 0; i < Size(); i++)
+        {
+            if (!m_available.contains(At(i)) && !m_pause.contains(At(i)) &&
+                !m_displayed.contains(At(i)))
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("VideoBuffers::DiscardFrames(): %1 (%2) not "
+                            "in available, pause, or displayed %3")
+                        .arg(DebugString(At(i), true)).arg(reinterpret_cast<long long>(At(i)))
+                        .arg(GetStatus()));
+                ReleaseDecoderResources(At(i), refs);
+                SafeEnqueue(kVideoBuffer_avail, At(i));
+            }
+        }
+    }
+
+    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
+        Remove(kVideoBuffer_all, *it);
+    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
+        m_available.enqueue(*it);
+    m_decode.clear();
+
+    DeleteBuffers();
+    Reset();
+
+    // Recreate - see MythVideoOutputOpenGL::CreateBuffers
+    if (codec_is_copyback(CodecID))
+    {
+        Init(VideoBuffers::GetNumBuffers(FMT_NONE), false, 1, 4, 2);
+        result = CreateBuffers(FMT_YV12, VideoDim.width(), VideoDim.height());
+    }
+    else if (codec_is_mediacodec(CodecID))
+    {
+        result = CreateBuffers(FMT_MEDIACODEC, VideoDim, false, 1, 2, 2);
+    }
+    else if (codec_is_vaapi(CodecID))
+    {
+        result = CreateBuffers(FMT_VAAPI, VideoDim, false, 2, 1, 4, References);
+    }
+    else if (codec_is_vtb(CodecID))
+    {
+        result = CreateBuffers(FMT_VTB, VideoDim, false, 1, 4, 2);
+    }
+    else if (codec_is_vdpau(CodecID))
+    {
+        result = CreateBuffers(FMT_VDPAU, VideoDim, false, 2, 1, 4, References);
+    }
+    else if (codec_is_nvdec(CodecID))
+    {
+        result = CreateBuffers(FMT_NVDEC, VideoDim, false, 2, 1, 4);
+    }
+    else if (codec_is_mmal(CodecID))
+    {
+        result = CreateBuffers(FMT_MMAL, VideoDim, false, 2, 1, 4);
+    }
+    else if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
+    {
+        result = CreateBuffers(FMT_DRMPRIME, VideoDim, false, 2, 1, 4);
+    }
+    else
+    {
+        result = CreateBuffers(FMT_YV12, VideoDim, false, 1, 8, 4, References);
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, QString("DiscardAndRecreate: %1").arg(GetStatus()));
+    m_globalLock.unlock();
+
+    // and finally release references now that the lock is released
+    DoDiscard(refs);
+    return result;
 }
 
 frame_queue_t *VideoBuffers::Queue(BufferType Type)
@@ -595,6 +752,11 @@ void VideoBuffers::SafeEnqueue(BufferType Type, VideoFrame* Frame)
     Enqueue(Type, Frame);
 }
 
+/*! \brief Lock the video buffers
+ *
+ * \note Use with caution. Holding this lock while releasing hardware buffers
+ * will almost certainly lead to deadlocks.
+*/
 frame_queue_t::iterator VideoBuffers::BeginLock(BufferType Type)
 {
     m_globalLock.lock();
@@ -710,7 +872,8 @@ uint VideoBuffers::Size(void) const
  */
 void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
 {
-    QMutexLocker locker(&m_globalLock);
+    vector<AVBufferRef*> refs;
+    m_globalLock.lock();
     LOG(VB_PLAYBACK, LOG_INFO, QString("VideoBuffers::DiscardFrames(%1): %2")
             .arg(NextFrameIsKeyFrame).arg(GetStatus()));
 
@@ -718,10 +881,15 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     {
         frame_queue_t ula(m_used);
         for (auto & it : ula)
-            DiscardFrame(it);
+        {
+            ReleaseDecoderResources(it, refs);
+            SafeEnqueue(kVideoBuffer_avail, it);
+        }
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
                 .arg(NextFrameIsKeyFrame).arg(GetStatus()));
+        m_globalLock.unlock();
+        DoDiscard(refs);
         return;
     }
 
@@ -737,15 +905,17 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     discards.insert(discards.end(), m_limbo.begin(), m_limbo.end());
     discards.insert(discards.end(), m_finished.begin(), m_finished.end());
     for (it = discards.begin(); it != discards.end(); ++it)
-        DiscardFrame(*it);
+    {
+        ReleaseDecoderResources(*it, refs);
+        SafeEnqueue(kVideoBuffer_avail, *it);
+    }
 
     // Verify that things are kosher
     if (m_available.count() + m_pause.count() + m_displayed.count() != Size())
     {
-        for (uint i=0; i < Size(); i++)
+        for (uint i = 0; i < Size(); i++)
         {
-            if (!m_available.contains(At(i)) &&
-                !m_pause.contains(At(i)) &&
+            if (!m_available.contains(At(i)) && !m_pause.contains(At(i)) &&
                 !m_displayed.contains(At(i)))
             {
                 // This message is DEBUG because it does occur
@@ -757,7 +927,8 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
                             "in available, pause, or displayed %3")
                         .arg(DebugString(At(i), true)).arg((long long)At(i))
                         .arg(GetStatus()));
-                DiscardFrame(At(i));
+                ReleaseDecoderResources(At(i), refs);
+                SafeEnqueue(kVideoBuffer_avail, At(i));
             }
         }
     }
@@ -773,6 +944,9 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
             .arg(NextFrameIsKeyFrame).arg(GetStatus()));
+
+    m_globalLock.unlock();
+    DoDiscard(refs);
 }
 
 /*! \brief Clear used frames after seeking.
@@ -785,6 +959,7 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
 */
 void VideoBuffers::ClearAfterSeek(void)
 {
+    vector<AVBufferRef*> discards;
     {
         QMutexLocker locker(&m_globalLock);
 
@@ -798,7 +973,7 @@ void VideoBuffers::ClearAfterSeek(void)
             {
                 m_used.remove(buffer);
                 m_available.enqueue(buffer);
-                ReleaseDecoderResources(buffer);
+                ReleaseDecoderResources(buffer, discards);
             }
         }
 
@@ -811,7 +986,7 @@ void VideoBuffers::ClearAfterSeek(void)
                 {
                     m_used.remove(buffer);
                     m_available.enqueue(buffer);
-                    ReleaseDecoderResources(buffer);
+                    ReleaseDecoderResources(buffer, discards);
                     m_vpos = m_vbufferMap[buffer];
                     m_rpos = m_vpos;
                     break;
@@ -823,6 +998,8 @@ void VideoBuffers::ClearAfterSeek(void)
             m_vpos = m_rpos = 0;
         }
     }
+
+    DoDiscard(discards);
 }
 
 bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,

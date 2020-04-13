@@ -30,7 +30,7 @@
 #include "v4l2encstreamhandler.h"
 #include "v4l2encrecorder.h"
 #include "v4lchannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 
 #define LOC QString("V4L2Rec[%1](%2): ") \

@@ -1,12 +1,10 @@
 #ifndef MYTHDEINTERLACER_H
 #define MYTHDEINTERLACER_H
 
-// Qt
-#include <QSize>
-
 // MythTV
 #include "videoouttypes.h"
 #include "mythavutil.h"
+#include "videodisplayprofile.h"
 
 extern "C" {
 #include "libavfilter/avfilter.h"
@@ -20,12 +18,16 @@ class MythDeinterlacer
    ~MythDeinterlacer();
 
     void             Filter       (VideoFrame *Frame, FrameScanType Scan,
-                                   bool Force = false);
+                                   VideoDisplayProfile *Profile, bool Force = false);
 
   private:
     bool             Initialise   (VideoFrame *Frame, MythDeintType Deinterlacer,
-                                   bool DoubleRate, bool TopFieldFirst);
+                                   bool DoubleRate, bool TopFieldFirst,
+                                   VideoDisplayProfile *Profile);
     inline void      Cleanup      (void);
+    void             OneField     (VideoFrame *Frame, FrameScanType Scan);
+    void             Blend        (VideoFrame *Frame, FrameScanType Scan);
+    bool             SetUpCache   (VideoFrame *Frame);
 
   private:
     Q_DISABLE_COPY(MythDeinterlacer)
@@ -43,6 +45,10 @@ class MythDeinterlacer
     AVFilterContext* m_sink       { nullptr };
     VideoFrame*      m_bobFrame   { nullptr };
     SwsContext*      m_swsContext { nullptr };
+    long long        m_discontinuityCounter { 0 };
+    bool             m_autoFieldOrder  { false };
+    long long        m_lastFieldChange { 0 };
+    static bool      s_haveSIMD;
 };
 
 #endif // MYTHDEINTERLACER_H

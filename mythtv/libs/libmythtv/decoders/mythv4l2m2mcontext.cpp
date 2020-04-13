@@ -12,6 +12,10 @@
 #endif
 #include "mythv4l2m2mcontext.h"
 
+#ifdef USING_MMAL
+#include "mythmmalcontext.h"
+#endif
+
 // Sys
 #include <sys/ioctl.h>
 
@@ -77,6 +81,22 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     const V4L2Profiles& profiles = MythV4L2M2MContext::GetProfiles();
     if (!profiles.contains(mythprofile))
         return failure;
+
+#ifdef USING_MMAL
+    // If MMAL is available, assume this is a Raspberry Pi and check the supported
+    // video sizes
+    if (!MythMMALContext::CheckCodecSize((*Context)->width, (*Context)->height, mythprofile))
+        return failure;
+    // As for MMAL, don't try and decode 10bit H264
+    if ((*Codec)->id == AV_CODEC_ID_H264)
+    {
+        if ((*Context)->profile == FF_PROFILE_H264_HIGH_10 ||
+            (*Context)->profile == FF_PROFILE_H264_HIGH_10_INTRA)
+        {
+            return failure;
+        }
+    }
+#endif
 
     if (s_useV4L2Request && !decodeonly)
     {

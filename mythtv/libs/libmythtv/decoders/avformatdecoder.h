@@ -27,7 +27,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-#include "avfringbuffer.h"
+#include "io/mythavformatbuffer.h"
 
 class TeletextDecoder;
 class CC608Decoder;
@@ -100,6 +100,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SetEof(bool eof) override; // DecoderBase
 
+    MythCodecMap* CodecMap(void);
     void CloseCodecs();
     void CloseContext();
     void Reset(bool reset_video_data, bool seek_reset,
@@ -112,7 +113,7 @@ class AvFormatDecoder : public DecoderBase
                           int testbufsize = kDecoderProbeBufferSize);
 
     /// Open our file and set up or audio and video parameters.
-    int OpenFile(RingBuffer *rbuffer, bool novideo, 
+    int OpenFile(MythMediaBuffer *Buffer, bool novideo,
                  char testbuf[kDecoderProbeBufferSize],
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
@@ -121,9 +122,9 @@ class AvFormatDecoder : public DecoderBase
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
     /// This is a No-op for this class.
-    void WriteStoredData(RingBuffer *rb, bool storevid,
+    void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
                          long timecodeOffset) override // DecoderBase
-        { (void)rb; (void)storevid; (void)timecodeOffset;}
+        { (void)Buffer; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
     void SetRawAudioState(bool state) override { (void)state; } // DecoderBase
@@ -148,8 +149,8 @@ class AvFormatDecoder : public DecoderBase
     void ForceSetupAudioStream(void) override; // DecoderBase
     void AddTextData(unsigned char *buf, int len, int64_t timecode, char type);
 
-    QString GetTrackDesc(uint type, uint trackNo) const override; // DecoderBase
-    int SetTrack(uint type, int trackNo) override; // DecoderBase
+    QString GetTrackDesc(uint Type, uint TrackNo) override;
+    int SetTrack(uint Type, int TrackNo) override;
 
     int ScanStreams(bool novideo);
     int FindStreamInfo(void);
@@ -168,21 +169,20 @@ class AvFormatDecoder : public DecoderBase
 
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
-    QString GetXDS(const QString &key) const override; // DecoderBase
-    QByteArray GetSubHeader(uint trackNo) const override; // DecoderBase
-    void GetAttachmentData(uint trackNo, QByteArray &filename,
-                           QByteArray &data) override; // DecoderBase
+    QString GetXDS(const QString &Key) const override; // DecoderBase
+    QByteArray GetSubHeader(uint TrackNo) override;
+    void GetAttachmentData(uint TrackNo, QByteArray &Dilename, QByteArray &Data) override; // DecoderBase
 
     // MHEG stuff
-    bool SetAudioByComponentTag(int tag) override; // DecoderBase
-    bool SetVideoByComponentTag(int tag) override; // DecoderBase
+    bool SetAudioByComponentTag(int Tag) override; // DecoderBase
+    bool SetVideoByComponentTag(int Tag) override; // DecoderBase
 
     // Stream language info
-    virtual int GetTeletextLanguage(uint lang_idx) const;
-    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetCaptionLanguage(TrackType trackType, int service_num);
-    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
-    virtual AudioTrackType GetAudioTrackType(uint stream_index);
+    virtual int GetTeletextLanguage(uint Index);
+    virtual int GetSubtitleLanguage(uint, uint StreamIndex);
+    virtual int GetCaptionLanguage(TrackType TrackType, int ServiceNum);
+    virtual int GetAudioLanguage(uint AudioIndex, uint StreamIndex);
+    virtual AudioTrackType GetAudioTrackType(uint StreamIndex);
 
     static int GetMaxReferenceFrames(AVCodecContext *Context);
 
@@ -269,13 +269,15 @@ class AvFormatDecoder : public DecoderBase
     H264Parser        *m_h264Parser                   {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
+    MythCodecMap       m_codecMap                     { };
+
     // AVFormatParameters params;
 
     URLContext         m_readContext                  {};
 
     int                m_frameDecoded                 {0};
     VideoFrame        *m_decodedVideoFrame            {nullptr};
-    AVFRingBuffer     *m_avfRingBuffer                {nullptr};
+    MythAVFormatBuffer *m_avfRingBuffer               {nullptr};
 
     struct SwsContext *m_swsCtx                       {nullptr};
     bool               m_directRendering              {false};

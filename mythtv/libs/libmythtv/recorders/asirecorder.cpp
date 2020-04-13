@@ -26,7 +26,7 @@
 #include "asistreamhandler.h"
 #include "asirecorder.h"
 #include "asichannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 
 #define LOC QString("ASIRec[%1](%2): ") \

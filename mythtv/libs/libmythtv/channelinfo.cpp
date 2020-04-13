@@ -451,11 +451,14 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
 bool ChannelInsertInfo::IsSameChannel(
     const ChannelInsertInfo &other, int relaxed) const
 {
-    if (m_atscMajorChannel &&
-        (m_atscMajorChannel == other.m_atscMajorChannel) &&
-        (m_atscMinorChannel == other.m_atscMinorChannel))
+    if (m_atscMajorChannel)
     {
-        return true;
+        if ((m_atscMajorChannel == other.m_atscMajorChannel &&
+             m_atscMinorChannel == other.m_atscMinorChannel))
+        {
+            return true;
+        }
+        return false;
     }
 
     if ((m_origNetId == other.m_origNetId) &&
@@ -484,7 +487,7 @@ bool ChannelInsertInfo::IsSameChannel(
     if (relaxed > 1)
     {
         if (("mpeg" == m_siStandard || "mpeg" == other.m_siStandard ||
-             "dvb" == m_siStandard || "dvb" == other.m_siStandard ||
+             "dvb"  == m_siStandard || "dvb"  == other.m_siStandard ||
              m_siStandard.isEmpty() || other.m_siStandard.isEmpty()) &&
             (m_serviceId == other.m_serviceId))
         {

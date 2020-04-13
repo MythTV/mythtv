@@ -30,7 +30,7 @@ class RecordingInfo;
 class DVBDBOptions;
 class RecorderBase;
 class ChannelBase;
-class RingBuffer;
+class MythMediaBuffer;
 class TVRec;
 
 class FrameRate
@@ -96,7 +96,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *   Initialize(), Open(), or StartRecorder() calls. Externally created
      *   RingBuffers are not deleted in the Recorder's destructor.
      */
-    void SetRingBuffer(RingBuffer *rbuf);
+    void SetRingBuffer(MythMediaBuffer *Buffer);
 
     /** \brief Set an specific option.
      *
@@ -148,7 +148,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *   This calls TVRec::RingBufferChanged() when the switch happens.
      */
-    void SetNextRecording(const RecordingInfo *ri, RingBuffer *rb);
+    void SetNextRecording(const RecordingInfo *ri, MythMediaBuffer *Buffer);
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         run() to initialize any devices, etc.
@@ -301,7 +301,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     void TryWriteProgStartMark(const frm_pos_map_t &durationDeltaCopy);
 
     TVRec         *m_tvrec                {nullptr};
-    RingBuffer    *m_ringBuffer           {nullptr};
+    MythMediaBuffer *m_ringBuffer         {nullptr};
     bool           m_weMadeBuffer         {true};
 
     AVContainer    m_containerFormat      {formatUnknown};
@@ -337,7 +337,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     // For RingBuffer switching
     QMutex         m_nextRingBufferLock;
-    RingBuffer    *m_nextRingBuffer       {nullptr};
+    MythMediaBuffer    *m_nextRingBuffer       {nullptr};
     RecordingInfo *m_nextRecording        {nullptr};
     MythTimer      m_ringBufferCheckTimer;
 

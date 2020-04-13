@@ -35,7 +35,7 @@
 // setChannelLock -> stateChangeLock -> triggerEventLoopLock
 //                                   -> pendingRecLock
 
-class RingBuffer;
+class MythMediaBuffer;
 class EITScanner;
 class RecordingProfile;
 class LiveTVChain;
@@ -237,7 +237,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
-    void RingBufferChanged(RingBuffer *rb, RecordingInfo *pginfo, RecordingQuality *recq);
+    void RingBufferChanged(MythMediaBuffer *Buffer, RecordingInfo *pginfo, RecordingQuality *recq);
     void RecorderPaused(void);
 
     void SetNextLiveTVDir(QString dir);
@@ -256,7 +256,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
 
   private:
-    void SetRingBuffer(RingBuffer *rb);
+    void SetRingBuffer(MythMediaBuffer* Buffer);
     void SetPseudoLiveTVRecording(RecordingInfo *pi);
     void TeardownAll(void);
     void WakeEventLoop(void);
@@ -309,7 +309,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void HandlePendingRecordings(void);
 
     bool WaitForNextLiveTVDir(void);
-    bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, RingBuffer **rb,
+    bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, MythMediaBuffer **Buffer,
                                        const QString &channum);
     bool CreateLiveTVRingBuffer(const QString & channum);
     bool SwitchLiveTVRingBuffer(const QString & channum,
@@ -419,7 +419,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     LiveTVChain       *m_tvChain                  {nullptr};
 
     // RingBuffer info
-    RingBuffer        *m_ringBuffer               {nullptr};
+    MythMediaBuffer   *m_buffer                   {nullptr};
     QString            m_rbFileExt                {"ts"};
 
   public:

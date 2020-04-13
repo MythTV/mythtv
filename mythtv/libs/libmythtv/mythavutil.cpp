@@ -120,9 +120,9 @@ QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Fo
         result += "CPU ";
         switch (deint)
         {
-            case DEINT_HIGH:   return result + "bwdif";
-            case DEINT_MEDIUM: return result + "yadif";
-            case DEINT_BASIC:  return result + "onefield";
+            case DEINT_HIGH:   return result + "Yadif";
+            case DEINT_MEDIUM: return result + "Linearblend";
+            case DEINT_BASIC:  return result + "Onefield";
             default: break;
         }
     }
@@ -503,9 +503,6 @@ MythPictureDeinterlacer::~MythPictureDeinterlacer()
         avfilter_graph_free(&m_filterGraph);
     }
 }
-
-
-MythCodecMap *gCodecMap = new MythCodecMap();
 
 MythCodecMap::~MythCodecMap()
 {

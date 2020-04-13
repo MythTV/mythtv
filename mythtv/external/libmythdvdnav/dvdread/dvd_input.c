@@ -27,7 +27,7 @@
 
 #include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
 #include "dvd_input.h"
-#include "mythiowrapper.h"
+#include "io/mythiowrapper.h"
 #include "mythdvdreadexp.h"
 
 /* The function pointers that is the exported interface of this file. */
@@ -176,7 +176,7 @@ static dvd_input_t file_open(const char *target,
 
   /* Open the device */
 #if !defined(WIN32) && !defined(__OS2__)
-  dev->fd = mythfile_open(target, O_RDONLY);
+  dev->fd = MythFileOpen(target, O_RDONLY);
 #else
   dev->fd = mythfile_open(target, O_RDONLY | O_BINARY);
 #endif
@@ -197,7 +197,7 @@ static int file_seek(dvd_input_t dev, int blocks, int flags)
   off_t pos;
   (void)flags;
 
-  pos = mythfile_seek(dev->fd, (off_t)blocks * (off_t)DVD_VIDEO_LB_LEN, SEEK_SET);
+  pos = MythFileSeek(dev->fd, (off_t)blocks * (off_t)DVD_VIDEO_LB_LEN, SEEK_SET);
   if(pos < 0) {
     return pos;
   }
@@ -225,7 +225,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
   bytes = 0;
 
   while(len > 0) {
-    ssize_t ret = mythfile_read(dev->fd, ((char*)buffer) + bytes, len);
+    ssize_t ret = MythFileRead(dev->fd, ((char*)buffer) + bytes, len);
 
     if(ret < 0) {
       /* One of the reads failed, too bad.  We won't even bother
@@ -238,7 +238,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
       /* Nothing more to read.  Return all of the whole blocks, if any.
        * Adjust the file position back to the previous block boundary. */
       off_t over_read = -(bytes % DVD_VIDEO_LB_LEN);
-      off_t pos = mythfile_seek(dev->fd, over_read, SEEK_CUR);
+      off_t pos = MythFileSeek(dev->fd, over_read, SEEK_CUR);
       if(pos % 2048 != 0)
         fprintf( stderr, "libdvdread: lseek not multiple of 2048! Something is wrong!\n" );
       return (int) (bytes / DVD_VIDEO_LB_LEN);
@@ -258,7 +258,7 @@ static int file_close(dvd_input_t dev)
 {
   int ret;
 
-  ret = mythfile_close(dev->fd);
+  ret = MythfileClose(dev->fd);
 
   free(dev);
 

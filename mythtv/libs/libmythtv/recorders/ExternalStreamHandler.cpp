@@ -119,7 +119,7 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
     if (m_bufSize < maxlen)
     {
         m_bufSize = maxlen;
-        delete m_buffer;
+        delete [] m_buffer;
         m_buffer = new char[m_bufSize];
     }
 

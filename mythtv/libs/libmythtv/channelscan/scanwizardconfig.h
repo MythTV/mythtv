@@ -47,6 +47,7 @@ class FreeToAirOnly;
 class ChannelNumbersOnly;
 class CompleteChannelsOnly;
 class FullChannelSearch;
+class RemoveDuplicates;
 class AddFullTS;
 class TrustEncSISetting;
 

@@ -63,6 +63,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
                                                                MythRenderOpenGL *Context,
                                                                VideoFrame *Frame, FrameScanType Scan) const
 {
+    Frame->already_deinterlaced = true;
     vector<MythVideoTexture*> result;
     for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
     {

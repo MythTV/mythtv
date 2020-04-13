@@ -1,14 +1,12 @@
 #ifndef MYTHRENDER_OPENGL_H_
 #define MYTHRENDER_OPENGL_H_
 
-// Std
-#include <cstdint>
-
 // Qt
 #include <QObject>
 #include <QtGlobal>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLTexture>
@@ -32,11 +30,13 @@ enum GLFeatures
     kGLFeatNone       = 0x0000,
     kGLBufferMap      = 0x0001,
     kGLExtRects       = 0x0002,
-    kGLExtRGBA16      = 0x0004,
+    kGLExtRGBA16      = 0x0004, // TODO remove
     kGLExtSubimage    = 0x0008,
     kGLTiled          = 0x0010,
     kGLLegacyTextures = 0x0020,
-    kGLNVMemory       = 0x0040
+    kGLNVMemory       = 0x0040,
+    kGL16BitFBO       = 0x0080,
+    kGLComputeShaders = 0x0100
 };
 
 #define TEX_OFFSET 8
@@ -107,20 +107,20 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int   GetExtraFeatures(void) const;
     QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
-    void  SetViewPort(const QRect &rect, bool viewportonly = false);
+    void  SetViewPort(const QRect &Rect, bool ViewportOnly = false);
     QRect GetViewPort(void) { return m_viewport; }
-    void  PushTransformation(const UIEffects &fx, QPointF &center);
+    void  PushTransformation(const UIEffects &Fx, QPointF &Center);
     void  PopTransformation(void);
     void  Flush(void);
-    void  SetBlend(bool enable);
-    void  SetBackground(int r, int g, int b, int a);
+    void  SetBlend(bool Enable);
+    void  SetBackground(int Red, int Green, int Blue, int Alpha);
     QFunctionPointer GetProcAddress(const QString &Proc) const;
 
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
-    QSize GetTextureSize(const QSize &size, bool Normalised);
+    QSize GetTextureSize(const QSize &Size, bool Normalised);
     static int GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
@@ -128,13 +128,14 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteTexture(MythGLTexture *Texture);
     static int GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
-    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, GLenum InternalFormat = 0);
+    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, bool SixteenBit = false);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
     void  DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  ClearFramebuffer(void);
 
     QOpenGLShaderProgram* CreateShaderProgram(const QString &Vertex, const QString &Fragment);
+    QOpenGLShaderProgram* CreateComputeShader(const QString &Source);
     void  DeleteShaderProgram(QOpenGLShaderProgram* Program);
     bool  EnableShaderProgram(QOpenGLShaderProgram* Program);
     void  SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
@@ -177,6 +178,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  ExpireVBOS(int Max = 0);
     bool  CreateDefaultShaders(void);
     void  DeleteDefaultShaders(void);
+    void  Check16BitFBO(void);
 
   protected:
     // Prevent compiler complaints about using 0 as a null pointer.
@@ -193,7 +195,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     GLuint                       m_fence { 0 };
 
     // Shaders
-    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] {};
+    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] { nullptr };
     QOpenGLShaderProgram*        m_activeProgram { nullptr };
 
     // Vertices
@@ -213,7 +215,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_maxTextureSize { 0 };
     int        m_maxTextureUnits { 0 };
     int        m_colorDepth { 0 };
-    bool       m_coreProfile { false };
 
     // State
     QRect      m_viewport;

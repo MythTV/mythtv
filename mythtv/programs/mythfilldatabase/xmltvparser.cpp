@@ -34,12 +34,6 @@ XMLTVParser::XMLTVParser()
     m_currentYear = MythDate::current().date().toString("yyyy").toUInt();
 }
 
-void XMLTVParser::lateInit()
-{
-    m_movieGrabberPath = MetadataDownload::GetMovieGrabber();
-    m_tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
-}
-
 static uint ELFHash(const QByteArray &ba)
 {
     const auto *k = (const uchar *)ba.data();
@@ -58,74 +52,6 @@ static uint ELFHash(const QByteArray &ba)
     }
 
     return h;
-}
-
-static QString getFirstText(const QDomElement& element)
-{
-    for (QDomNode dname = element.firstChild(); !dname.isNull();
-         dname = dname.nextSibling())
-    {
-        QDomText t = dname.toText();
-        if (!t.isNull())
-            return t.data();
-    }
-    return QString();
-}
-
-ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
-{
-    auto *chaninfo = new ChannelInfo;
-
-    QString xmltvid = element.attribute("id", "");
-
-    chaninfo->m_xmltvId = xmltvid;
-    chaninfo->m_tvFormat = "Default";
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "icon")
-            {
-                if (chaninfo->m_icon.isEmpty())
-                {
-                    QString path = info.attribute("src", "");
-                    if (!path.isEmpty() && !path.contains("://"))
-                    {
-                        QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                        chaninfo->m_icon = base +
-                            ((path.startsWith("/")) ? path : QString("/") + path);
-                    }
-                    else if (!path.isEmpty())
-                    {
-                        QUrl url(path);
-                        if (url.isValid())
-                            chaninfo->m_icon = url.toString();
-                    }
-                }
-            }
-            else if (info.tagName() == "display-name")
-            {
-                if (chaninfo->m_name.isEmpty())
-                {
-                    chaninfo->m_name = info.text();
-                }
-                else if (chaninfo->m_callSign.isEmpty())
-                {
-                    chaninfo->m_callSign = info.text();
-                }
-                else if (chaninfo->m_chanNum.isEmpty())
-                {
-                    chaninfo->m_chanNum = info.text();
-                }
-            }
-        }
-    }
-
-    chaninfo->m_freqId = chaninfo->m_chanNum;
-    return chaninfo;
 }
 
 static void fromXMLTVDate(QString &timestr, QDateTime &dt)
@@ -223,12 +149,12 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
 
     QDateTime tmpDT = QDateTime(tmpDate, tmpTime, Qt::UTC);
     if (!tmpDT.isValid())
-        {
-            LOG(VB_XMLTV, LOG_ERR,
-                QString("Invalid datetime (combination of date/time) "
+    {
+        LOG(VB_XMLTV, LOG_ERR,
+            QString("Invalid datetime (combination of date/time) "
                     "in XMLTV data, ignoring: %1").arg(timestr));
-            return;
-        }
+        return;
+    }
 
     // While this seems like a hack, it's better than what was done before
     QString isoDateString = tmpDT.toString(Qt::ISODate);
@@ -248,415 +174,24 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
-static void parseCredits(QDomElement &element, ProgInfo *pginfo)
+static int readNextWithErrorCheck(QXmlStreamReader &xml)
 {
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
+    xml.readNext();
+    if (xml.hasError())
     {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-            pginfo->AddPerson(info.tagName(), getFirstText(info));
+        LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+        return false;
     }
-}
-
-static void parseVideo(QDomElement &element, ProgInfo *pginfo)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "quality")
-            {
-                if (getFirstText(info) == "HDTV")
-                    pginfo->m_videoProps |= VID_HDTV;
-            }
-            else if (info.tagName() == "aspect")
-            {
-                if (getFirstText(info) == "16:9")
-                    pginfo->m_videoProps |= VID_WIDESCREEN;
-            }
-        }
-    }
-}
-
-static void parseAudio(QDomElement &element, ProgInfo *pginfo)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "stereo")
-            {
-                if (getFirstText(info) == "mono")
-                {
-                    pginfo->m_audioProps |= AUD_MONO;
-                }
-                else if (getFirstText(info) == "stereo")
-                {
-                    pginfo->m_audioProps |= AUD_STEREO;
-                }
-                else if (getFirstText(info) == "dolby" ||
-                        getFirstText(info) == "dolby digital")
-                {
-                    pginfo->m_audioProps |= AUD_DOLBY;
-                }
-                else if (getFirstText(info) == "surround")
-                {
-                    pginfo->m_audioProps |= AUD_SURROUND;
-                }
-            }
-        }
-    }
-}
-
-ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
-{
-    QString programid;
-    QString season;
-    QString episode;
-    QString totalepisodes;
-    auto *pginfo = new ProgInfo();
-
-    QString text = element.attribute("start", "");
-    fromXMLTVDate(text, pginfo->m_starttime);
-    pginfo->m_startts = text;
-
-    text = element.attribute("stop", "");
-    fromXMLTVDate(text, pginfo->m_endtime);
-    pginfo->m_endts = text;
-
-    text = element.attribute("channel", "");
-    QStringList split = text.split(" ");
-
-    pginfo->m_channel = split[0];
-
-    text = element.attribute("clumpidx", "");
-    if (!text.isEmpty())
-    {
-        split = text.split('/');
-        pginfo->m_clumpidx = split[0];
-        pginfo->m_clumpmax = split[1];
-    }
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "title")
-            {
-                if (info.attribute("lang") == "ja_JP")
-                {   // NOLINT(bugprone-branch-clone)
-                    pginfo->m_title = getFirstText(info);
-                }
-                else if (info.attribute("lang") == "ja_JP@kana")
-                {
-                    pginfo->m_title_pronounce = getFirstText(info);
-                }
-                else if (pginfo->m_title.isEmpty())
-                {
-                    pginfo->m_title = getFirstText(info);
-                }
-            }
-            else if (info.tagName() == "sub-title" &&
-                     pginfo->m_subtitle.isEmpty())
-            {
-                pginfo->m_subtitle = getFirstText(info);
-            }
-            else if (info.tagName() == "desc" && pginfo->m_description.isEmpty())
-            {
-                pginfo->m_description = getFirstText(info);
-            }
-            else if (info.tagName() == "category")
-            {
-                const QString cat = getFirstText(info);
-
-                if (ProgramInfo::kCategoryNone == pginfo->m_categoryType &&
-                    string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
-                {
-                    pginfo->m_categoryType = string_to_myth_category_type(cat);
-                }
-                else if (pginfo->m_category.isEmpty())
-                {
-                    pginfo->m_category = cat;
-                }
-
-                if ((cat.compare(QObject::tr("movie"),Qt::CaseInsensitive) == 0) ||
-                    (cat.compare(QObject::tr("film"),Qt::CaseInsensitive) == 0))
-                {
-                    // Hack for tv_grab_uk_rt
-                    pginfo->m_categoryType = ProgramInfo::kCategoryMovie;
-                }
-
-                pginfo->m_genres.append(cat);
-            }
-            else if (info.tagName() == "date" && (pginfo->m_airdate == 0U))
-            {
-                // Movie production year
-                QString date = getFirstText(info);
-                pginfo->m_airdate = date.left(4).toUInt();
-            }
-            else if (info.tagName() == "star-rating" && pginfo->m_stars == 0.0F)
-            {
-                QDomNodeList values = info.elementsByTagName("value");
-                QDomElement item;
-                QString stars;
-                float rating = 0.0;
-
-                // Use the first rating to appear in the xml, this should be
-                // the most important one.
-                //
-                // Averaging is not a good idea here, any subsequent ratings
-                // are likely to represent that days recommended programmes
-                // which on a bad night could given to an average programme.
-                // In the case of uk_rt it's not unknown for a recommendation
-                // to be given to programmes which are 'so bad, you have to
-                // watch!'
-                //
-                // XMLTV uses zero based ratings and signals no rating by absence.
-                // A rating from 1 to 5 is encoded as 0/4 to 4/4.
-                // MythTV uses zero to signal no rating!
-                // The same rating is encoded as 0.2 to 1.0 with steps of 0.2, it
-                // is not encoded as 0.0 to 1.0 with steps of 0.25 because
-                // 0 signals no rating!
-                // See http://xmltv.cvs.sourceforge.net/viewvc/xmltv/xmltv/xmltv.dtd?revision=1.47&view=markup#l539
-                item = values.item(0).toElement();
-                if (!item.isNull())
-                {
-                    stars = getFirstText(item);
-                    float num = stars.section('/', 0, 0).toFloat() + 1;
-                    float den = stars.section('/', 1, 1).toFloat() + 1;
-                    if (0.0F < den)
-                        rating = num/den;
-                }
-
-                pginfo->m_stars = rating;
-            }
-            else if (info.tagName() == "rating")
-            {
-                // again, the structure of ratings seems poorly represented
-                // in the XML.  no idea what we'd do with multiple values.
-                QDomNodeList values = info.elementsByTagName("value");
-                QDomElement item = values.item(0).toElement();
-                if (item.isNull())
-                    continue;
-                EventRating rating;
-                rating.m_system = info.attribute("system", "");
-                rating.m_rating = getFirstText(item);
-                pginfo->m_ratings.append(rating);
-            }
-            else if (info.tagName() == "previously-shown")
-            {
-                pginfo->m_previouslyshown = true;
-
-                QString prevdate = info.attribute("start");
-                if (!prevdate.isEmpty())
-                {
-                    QDateTime date;
-                    fromXMLTVDate(prevdate, date);
-                    pginfo->m_originalairdate = date.date();
-                }
-            }
-            else if (info.tagName() == "credits")
-            {
-                parseCredits(info, pginfo);
-            }
-            else if (info.tagName() == "subtitles")
-            {
-                if (info.attribute("type") == "teletext")
-                    pginfo->m_subtitleType |= SUB_NORMAL;
-                else if (info.attribute("type") == "onscreen")
-                    pginfo->m_subtitleType |= SUB_ONSCREEN;
-                else if (info.attribute("type") == "deaf-signed")
-                    pginfo->m_subtitleType |= SUB_SIGNED;
-            }
-            else if (info.tagName() == "audio")
-            {
-                parseAudio(info, pginfo);
-            }
-            else if (info.tagName() == "video")
-            {
-                parseVideo(info, pginfo);
-            }
-            else if (info.tagName() == "episode-num")
-            {
-                if (info.attribute("system") == "dd_progid")
-                {
-                    QString episodenum(getFirstText(info));
-                    // if this field includes a dot, strip it out
-                    int idx = episodenum.indexOf('.');
-                    if (idx != -1)
-                        episodenum.remove(idx, 1);
-                    programid = episodenum;
-                    /* Only EPisodes and SHows are part of a series for SD */
-                    if (programid.startsWith(QString("EP")) ||
-                        programid.startsWith(QString("SH")))
-                        pginfo->m_seriesId = QString("EP") + programid.mid(2,8);
-                }
-                else if (info.attribute("system") == "xmltv_ns")
-                {
-                    QString episodenum(getFirstText(info));
-                    episode = episodenum.section('.',1,1);
-                    totalepisodes = episode.section('/',1,1).trimmed();
-                    episode = episode.section('/',0,0).trimmed();
-                    season = episodenum.section('.',0,0).trimmed();
-                    season = season.section('/',0,0).trimmed();
-                    QString part(episodenum.section('.',2,2));
-                    QString partnumber(part.section('/',0,0).trimmed());
-                    QString parttotal(part.section('/',1,1).trimmed());
-
-                    pginfo->m_categoryType = ProgramInfo::kCategorySeries;
-
-                    if (!season.isEmpty())
-                    {
-                        int tmp = season.toUInt() + 1;
-                        pginfo->m_season = tmp;
-                        season = QString::number(tmp);
-                        pginfo->m_syndicatedepisodenumber = 'S' + season;
-                    }
-
-                    if (!episode.isEmpty())
-                    {
-                        int tmp = episode.toUInt() + 1;
-                        pginfo->m_episode = tmp;
-                        episode = QString::number(tmp);
-                        pginfo->m_syndicatedepisodenumber.append('E' + episode);
-                    }
-
-                    if (!totalepisodes.isEmpty())
-                    {
-                        pginfo->m_totalepisodes = totalepisodes.toUInt();
-                    }
-
-                    uint partno = 0;
-                    if (!partnumber.isEmpty())
-                    {
-                        bool ok = false;
-                        partno = partnumber.toUInt(&ok) + 1;
-                        partno = (ok) ? partno : 0;
-                    }
-
-                    if (!parttotal.isEmpty() && partno > 0)
-                    {
-                        bool ok = false;
-                        uint partto = parttotal.toUInt(&ok);
-                        if (ok && partnumber <= parttotal)
-                        {
-                            pginfo->m_parttotal  = partto;
-                            pginfo->m_partnumber = partno;
-                        }
-                    }
-                }
-                else if (info.attribute("system") == "onscreen")
-                {
-                    pginfo->m_categoryType = ProgramInfo::kCategorySeries;
-                    if (pginfo->m_subtitle.isEmpty())
-                    {
-                        pginfo->m_subtitle = getFirstText(info);
-                    }
-                }
-                else if ((info.attribute("system") == "themoviedb.org") &&
-                    (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
-                {
-                    /* text is movie/<inetref> */
-                    QString inetrefRaw(getFirstText(info));
-                    if (inetrefRaw.startsWith(QString("movie/"))) {
-                        QString inetref(QString ("tmdb3.py_") + inetrefRaw.section('/',1,1).trimmed());
-                        pginfo->m_inetref = inetref;
-                    }
-                }
-                else if ((info.attribute("system") == "thetvdb.com") &&
-                    (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
-                {
-                    /* text is series/<inetref> */
-                    QString inetrefRaw(getFirstText(info));
-                    if (inetrefRaw.startsWith(QString("series/"))) {
-                        QString inetref(QString ("ttvdb.py_") + inetrefRaw.section('/',1,1).trimmed());
-                        pginfo->m_inetref = inetref;
-                        /* ProgInfo does not have a collectionref, so we don't set any */
-                    }
-                }
-            }
-        }
-    }
-
-    if (pginfo->m_category.isEmpty() &&
-        pginfo->m_categoryType != ProgramInfo::kCategoryNone)
-        pginfo->m_category = myth_category_type_to_string(pginfo->m_categoryType);
-
-    if (!pginfo->m_airdate
-        && ProgramInfo::kCategorySeries != pginfo->m_categoryType)
-        pginfo->m_airdate = m_currentYear;
-
-    if (programid.isEmpty())
-    {
-
-        /* Let's build ourself a programid */
-
-        if (ProgramInfo::kCategoryMovie == pginfo->m_categoryType)
-            programid = "MV";
-        else if (ProgramInfo::kCategorySeries == pginfo->m_categoryType)
-            programid = "EP";
-        else if (ProgramInfo::kCategorySports == pginfo->m_categoryType)
-            programid = "SP";
-        else
-            programid = "SH";
-
-        QString seriesid = QString::number(ELFHash(pginfo->m_title.toUtf8()));
-        pginfo->m_seriesId = seriesid;
-        programid.append(seriesid);
-
-        if (!episode.isEmpty() && !season.isEmpty())
-        {
-            /* Append unpadded episode and season number to the seriesid (to
-               maintain consistency with historical encoding), but limit the
-               season number representation to a single base-36 character to
-               ensure unique programid generation. */
-            int season_int = season.toInt();
-            if (season_int > 35)
-            {
-                // Cannot represent season as a single base-36 character, so
-                // remove the programid and fall back to normal dup matching.
-                if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
-                    programid.clear();
-            }
-            else
-            {
-                programid.append(episode);
-                programid.append(QString::number(season_int, 36));
-                if (pginfo->m_partnumber && pginfo->m_parttotal)
-                {
-                    programid += QString::number(pginfo->m_partnumber);
-                    programid += QString::number(pginfo->m_parttotal);
-                }
-            }
-        }
-        else
-        {
-            /* No ep/season info? Well then remove the programid and rely on
-               normal dupchecking methods instead. */
-            if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
-                programid.clear();
-        }
-    }
-
-    pginfo->m_programId = programid;
-
-    return pginfo;
+    return true;
 }
 
 bool XMLTVParser::parseFile(
     const QString& filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
 {
-    QDomDocument doc;
+    m_movieGrabberPath = MetadataDownload::GetMovieGrabber();
+    m_tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
     QFile f;
-
     if (!dash_open(f, filename, QIODevice::ReadOnly))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -664,69 +199,530 @@ bool XMLTVParser::parseFile(
         return false;
     }
 
-    QString errorMsg = "unknown";
-    int errorLine = 0;
-    int errorColumn = 0;
-
-    if (!doc.setContent(&f, &errorMsg, &errorLine, &errorColumn))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Error in %1:%2: %3")
-            .arg(errorLine).arg(errorColumn).arg(errorMsg));
-
-        f.close();
-        return true;
-    }
-
-    f.close();
-
-    QDomElement docElem = doc.documentElement();
-
-    QUrl baseUrl(docElem.attribute("source-data-url", ""));
-    //QUrl sourceUrl(docElem.attribute("source-info-url", ""));
-
+    QXmlStreamReader xml(&f);
+    QUrl baseUrl;
+    QUrl sourceUrl;
     QString aggregatedTitle;
     QString aggregatedDesc;
-
-    QDomNode n = docElem.firstChild();
-    while (!n.isNull())
+    bool haveReadTV = false;
+    QString last_channel = ""; //xmltvId of the last program element we read
+    QDateTime last_starttime; //starttime of the last program element we read
+    while (!xml.atEnd() && !xml.hasError() && (! (xml.isEndElement() && xml.name() == "tv")))
     {
-        QDomElement e = n.toElement();
-        if (!e.isNull())
+        if (xml.readNextStartElement())
         {
-            if (e.tagName() == "channel")
+            if (xml.name() == "tv")
             {
-                ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                if (!chinfo->m_xmltvId.isEmpty())
-                    chanlist->push_back(*chinfo);
-                delete chinfo;
+                sourceUrl = QUrl(xml.attributes().value("source-info-url").toString());
+                baseUrl = QUrl(xml.attributes().value("source-data-url").toString());
+                haveReadTV = true;
             }
-            else if (e.tagName() == "programme")
+            if (xml.name() == "channel")
             {
-                ProgInfo *pginfo = parseProgram(e);
+                if (!haveReadTV)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, no <tv> element found, at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+                    return false;
+                }
 
+                //get id attribute
+                QString xmltvid;
+                xmltvid = xml.attributes().value( "id").toString();
+                auto *chaninfo = new ChannelInfo;
+                chaninfo->m_xmltvId = xmltvid;
+                chaninfo->m_tvFormat = "Default";
+
+                //readNextStartElement says it reads for the next start element WITHIN the current element; but it doesnt; so we use readNext()
+                do
+                {
+                    if (!readNextWithErrorCheck(xml))
+                    {
+                        delete chaninfo;
+                        return false;
+                    }
+                    if (xml.name() == "icon")
+                    {
+                        if (chaninfo->m_icon.isEmpty())
+                        {
+                            QString path = xml.attributes().value("src").toString();
+                            if (!path.isEmpty() && !path.contains("://"))
+                            {
+                                QString base = baseUrl.toString(QUrl::StripTrailingSlash);
+                                chaninfo->m_icon = base +
+                                                   ((path.startsWith("/")) ? path : QString("/") + path);
+                            }
+                            else if (!path.isEmpty())
+                            {
+                                QUrl url(path);
+                                if (url.isValid())
+                                    chaninfo->m_icon = url.toString();
+                            }
+                        }
+                    }
+                    else if (xml.name() == "display-name")
+                    {
+                        //now get text
+                        QString text;
+                        text = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                        if (!text.isEmpty())
+                        {
+                            if (chaninfo->m_name.isEmpty())
+                            {
+                                chaninfo->m_name = text;
+                            }
+                            else if (chaninfo->m_callSign.isEmpty())
+                            {
+                                chaninfo->m_callSign = text;
+                            }
+                            else if (chaninfo->m_chanNum.isEmpty())
+                            {
+                                chaninfo->m_chanNum = text;
+                            }
+                        }
+                    }
+                }
+                while (! (xml.isEndElement() && xml.name() == "channel"));
+                chaninfo->m_freqId = chaninfo->m_chanNum;
+                //TODO optimize this, no use to do al this parsing if xmltvid is empty; but make sure you will read until the next channel!!
+                if (!chaninfo->m_xmltvId.isEmpty())
+                    chanlist->push_back(*chaninfo);
+                delete chaninfo;
+            }//channel
+            else if (xml.name() == "programme")
+            {
+                if (!haveReadTV)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, no <tv> element found, at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+                    return false;
+                }
+
+                QString programid, season, episode, totalepisodes;
+                auto *pginfo = new ProgInfo();
+
+                QString text = xml.attributes().value("start").toString();
+                fromXMLTVDate(text, pginfo->m_starttime);
+                pginfo->m_startts = text;
+
+                text = xml.attributes().value("stop").toString();
+                //not a mandatory attribute according to XMLTV DTD https://github.com/XMLTV/xmltv/blob/master/xmltv.dtd
+                fromXMLTVDate(text, pginfo->m_endtime);
+                pginfo->m_endts = text;
+
+                text = xml.attributes().value("channel").toString();
+                QStringList split = text.split(" ");
+                pginfo->m_channel = split[0];
+
+                text = xml.attributes().value("clumpidx").toString();
+                if (!text.isEmpty())
+                {
+                    split = text.split('/');
+                    pginfo->m_clumpidx = split[0];
+                    pginfo->m_clumpmax = split[1];
+                }
+
+                do
+                {
+                    if (!readNextWithErrorCheck(xml))
+                        return false;
+                    if (xml.name() == "title")
+                    {
+                        QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                        if (xml.attributes().value("lang").toString() == "ja_JP")
+                        {
+                            pginfo->m_title = text2;
+                        }
+                        else if (xml.attributes().value("lang").toString() == "ja_JP@kana")
+                        {
+                            pginfo->m_title_pronounce = text2;
+                        }
+                        else if (pginfo->m_title.isEmpty())
+                        {
+                            pginfo->m_title = text2;
+                        }
+                    }
+                    else if (xml.name() == "sub-title" &&  pginfo->m_subtitle.isEmpty())
+                    {
+                        pginfo->m_subtitle = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                    }
+                    else if (xml.name() == "subtitles")
+                    {
+                        if (xml.attributes().value("type").toString() == "teletext")
+                            pginfo->m_subtitleType |= SUB_NORMAL;
+                        else if (xml.attributes().value("type").toString() == "onscreen")
+                            pginfo->m_subtitleType |= SUB_ONSCREEN;
+                        else if (xml.attributes().value("type").toString() == "deaf-signed")
+                            pginfo->m_subtitleType |= SUB_SIGNED;
+                    }
+                    else if (xml.name() == "desc" && pginfo->m_description.isEmpty())
+                    {
+                        pginfo->m_description = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                    }
+                    else if (xml.name() == "category")
+                    {
+                        const QString cat = xml.readElementText(QXmlStreamReader::SkipChildElements);
+
+                        if (ProgramInfo::kCategoryNone == pginfo->m_categoryType && string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
+                        {
+                            pginfo->m_categoryType = string_to_myth_category_type(cat);
+                        }
+                        else if (pginfo->m_category.isEmpty())
+                        {
+                            pginfo->m_category = cat;
+                        }
+                        if ((cat.compare(QObject::tr("movie"),Qt::CaseInsensitive) == 0) || (cat.compare(QObject::tr("film"),Qt::CaseInsensitive) == 0))
+                        {
+                            // Hack for tv_grab_uk_rt
+                            pginfo->m_categoryType = ProgramInfo::kCategoryMovie;
+                        }
+                        pginfo->m_genres.append(cat);
+                    }
+                    else if (xml.name() == "date" && (pginfo->m_airdate == 0U))
+                    {
+                        // Movie production year
+                        QString date = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                        pginfo->m_airdate = date.left(4).toUInt();
+                    }
+                    else if (xml.name() == "star-rating")
+                    {
+                        QString stars;
+                        float rating = 0.0;
+
+                        // Use the first rating to appear in the xml, this should be
+                        // the most important one.
+                        //
+                        // Averaging is not a good idea here, any subsequent ratings
+                        // are likely to represent that days recommended programmes
+                        // which on a bad night could given to an average programme.
+                        // In the case of uk_rt it's not unknown for a recommendation
+                        // to be given to programmes which are 'so bad, you have to
+                        // watch!'
+                        //
+                        // XMLTV uses zero based ratings and signals no rating by absence.
+                        // A rating from 1 to 5 is encoded as 0/4 to 4/4.
+                        // MythTV uses zero to signal no rating!
+                        // The same rating is encoded as 0.2 to 1.0 with steps of 0.2, it
+                        // is not encoded as 0.0 to 1.0 with steps of 0.25 because
+                        // 0 signals no rating!
+                        // See http://xmltv.cvs.sourceforge.net/viewvc/xmltv/xmltv/xmltv.dtd?revision=1.47&view=markup#l539
+                        stars = "0"; //no rating
+                        do
+                        {
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
+                            if (xml.isStartElement())
+                            {
+                                if (xml.name() == "value")
+                                {
+                                    stars=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                }
+                            }
+                        }
+                        while (! (xml.isEndElement() && xml.name() == "star-rating"));
+                        if (pginfo->m_stars == 0.0F)
+                        {
+                            float num = stars.section('/', 0, 0).toFloat() + 1;
+                            float den = stars.section('/', 1, 1).toFloat() + 1;
+                            if (0.0F < den)
+                                rating = num/den;
+                        }
+                        pginfo->m_stars = rating;
+                    }
+                    else if (xml.name() == "rating")
+                    {
+                        // again, the structure of ratings seems poorly represented
+                        // in the XML.  no idea what we'd do with multiple values.
+                        QString rat;
+                        QString rating_system = xml.attributes().value("system").toString();
+                        if (rating_system == nullptr)
+                            rating_system = "";
+
+                        do
+                        {
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
+                            if (xml.isStartElement())
+                            {
+                                if (xml.name() == "value")
+                                {
+                                    rat=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                }
+                            }
+                        }
+                        while (! (xml.isEndElement() && xml.name() == "rating"));
+
+                        if (!rat.isEmpty())
+                        {
+                            EventRating rating;
+                            rating.m_system = rating_system;
+                            rating.m_rating = rat;
+                            pginfo->m_ratings.append(rating);
+                        }
+                    }
+                    else if (xml.name() == "previously-shown")
+                    {
+                        pginfo->m_previouslyshown = true;
+                        QString prevdate = xml.attributes().value( "start").toString();
+                        if (!prevdate.isEmpty())
+                        {
+                            QDateTime date;
+                            fromXMLTVDate(prevdate, date);
+                            pginfo->m_originalairdate = date.date();
+                        }
+                    }
+                    else if (xml.name() == "credits")
+                    {
+                        do
+                        {
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
+                            if (xml.isStartElement())
+                            {
+                                QString tagname=xml.name().toString();
+                                QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                pginfo->AddPerson(tagname, text2);
+                            }
+                        }
+                        while (! (xml.isEndElement() && xml.name() == "credits"));
+                    }
+                    else if (xml.name() == "audio")
+                    {
+                        do
+                        {
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
+                            if (xml.isStartElement())
+                            {
+                                if (xml.name() == "stereo")
+                                {
+                                    QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                    if (text2 == "mono")
+                                    {
+                                        pginfo->m_audioProps |= AUD_MONO;
+                                    }
+                                    else if (text2 == "stereo")
+                                    {
+                                        pginfo->m_audioProps |= AUD_STEREO;
+                                    }
+                                    else if (text2 == "dolby" || text2 == "dolby digital")
+                                    {
+                                        pginfo->m_audioProps |= AUD_DOLBY;
+                                    }
+                                    else if (text2 == "surround")
+                                    {
+                                        pginfo->m_audioProps |= AUD_SURROUND;
+                                    }
+                                }
+                            }
+                        }
+                        while (! (xml.isEndElement() && xml.name() == "audio"));
+                    }
+                    else if (xml.name() == "video")
+                    {
+                        do
+                        {
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
+                            if (xml.isStartElement())
+                            {
+                                if (xml.name() == "quality")
+                                {
+                                    if (xml.readElementText(QXmlStreamReader::SkipChildElements) == "HDTV")
+                                        pginfo->m_videoProps |= VID_HDTV;
+                                }
+                                else if (xml.name() == "aspect")
+                                {
+                                    if (xml.readElementText(QXmlStreamReader::SkipChildElements) == "16:9")
+                                        pginfo->m_videoProps |= VID_WIDESCREEN;
+                                }
+                            }
+                        }
+                        while (! (xml.isEndElement() && xml.name() == "video"));
+                    }
+                    else if (xml.name() == "episode-num")
+                    {
+                        QString system = xml.attributes().value( "system").toString();
+                        if (system == "dd_progid")
+                        {
+                            QString episodenum(xml.readElementText(QXmlStreamReader::SkipChildElements));
+                            // if this field includes a dot, strip it out
+                            int idx = episodenum.indexOf('.');
+                            if (idx != -1)
+                                episodenum.remove(idx, 1);
+                            programid = episodenum;
+                            // Only EPisodes and SHows are part of a series for SD
+                            if (programid.startsWith(QString("EP")) ||
+                                    programid.startsWith(QString("SH")))
+                                pginfo->m_seriesId = QString("EP") + programid.mid(2,8);
+                        }
+                        else if (system == "xmltv_ns")
+                        {
+                            QString episodenum(xml.readElementText(QXmlStreamReader::SkipChildElements));
+                            episode = episodenum.section('.',1,1);
+                            totalepisodes = episode.section('/',1,1).trimmed();
+                            episode = episode.section('/',0,0).trimmed();
+                            season = episodenum.section('.',0,0).trimmed();
+                            season = season.section('/',0,0).trimmed();
+                            QString part(episodenum.section('.',2,2));
+                            QString partnumber(part.section('/',0,0).trimmed());
+                            QString parttotal(part.section('/',1,1).trimmed());
+                            pginfo->m_categoryType = ProgramInfo::kCategorySeries;
+                            if (!season.isEmpty())
+                            {
+                                int tmp = season.toUInt() + 1;
+                                pginfo->m_season = tmp;
+                                season = QString::number(tmp);
+                                pginfo->m_syndicatedepisodenumber = 'S' + season;
+                            }
+                            if (!episode.isEmpty())
+                            {
+                                int tmp = episode.toUInt() + 1;
+                                pginfo->m_episode = tmp;
+                                episode = QString::number(tmp);
+                                pginfo->m_syndicatedepisodenumber.append('E' + episode);
+                            }
+                            if (!totalepisodes.isEmpty())
+                            {
+                                pginfo->m_totalepisodes = totalepisodes.toUInt();
+                            }
+                            uint partno = 0;
+                            if (!partnumber.isEmpty())
+                            {
+                                bool ok = false;
+                                partno = partnumber.toUInt(&ok) + 1;
+                                partno = (ok) ? partno : 0;
+                            }
+                            if (!parttotal.isEmpty() && partno > 0)
+                            {
+                                bool ok = false;
+                                uint partto = parttotal.toUInt(&ok);
+                                if (ok && partnumber <= parttotal)
+                                {
+                                    pginfo->m_parttotal  = partto;
+                                    pginfo->m_partnumber = partno;
+                                }
+                            }
+                        }
+                        else if (system == "onscreen")
+                        {
+                            pginfo->m_categoryType = ProgramInfo::kCategorySeries;
+                            if (pginfo->m_subtitle.isEmpty())
+                            {
+                                pginfo->m_subtitle = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                            }
+                        }
+                        else if ((system == "themoviedb.org") &&  (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
+                        {
+                            // text is movie/<inetref>
+                            QString inetrefRaw(xml.readElementText(QXmlStreamReader::SkipChildElements));
+                            if (inetrefRaw.startsWith(QString("movie/")))
+                            {
+                                QString inetref(QString ("tmdb3.py_") + inetrefRaw.section('/',1,1).trimmed());
+                                pginfo->m_inetref = inetref;
+                            }
+                        }
+                        else if ((system == "thetvdb.com") && (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
+                        {
+                            // text is series/<inetref>
+                            QString inetrefRaw(xml.readElementText(QXmlStreamReader::SkipChildElements));
+                            if (inetrefRaw.startsWith(QString("series/")))
+                            {
+                                QString inetref(QString ("ttvdb.py_") + inetrefRaw.section('/',1,1).trimmed());
+                                pginfo->m_inetref = inetref;
+                                // ProgInfo does not have a collectionref, so we don't set any
+                            }
+                        }
+                    }//episode-num
+                }
+                while (! (xml.isEndElement() && xml.name() == "programme"));
+
+                if (pginfo->m_category.isEmpty() && pginfo->m_categoryType != ProgramInfo::kCategoryNone)
+                    pginfo->m_category = myth_category_type_to_string(pginfo->m_categoryType);
+
+                if (!pginfo->m_airdate && ProgramInfo::kCategorySeries != pginfo->m_categoryType)
+                    pginfo->m_airdate = m_currentYear;
+
+                if (programid.isEmpty())
+                {
+                    //Let's build ourself a programid
+                    if (ProgramInfo::kCategoryMovie == pginfo->m_categoryType)
+                        programid = "MV";
+                    else if (ProgramInfo::kCategorySeries == pginfo->m_categoryType)
+                        programid = "EP";
+                    else if (ProgramInfo::kCategorySports == pginfo->m_categoryType)
+                        programid = "SP";
+                    else
+                        programid = "SH";
+
+                    QString seriesid = QString::number(ELFHash(pginfo->m_title.toUtf8()));
+                    pginfo->m_seriesId = seriesid;
+                    programid.append(seriesid);
+
+                    if (!episode.isEmpty() && !season.isEmpty())
+                    {
+                        /* Append unpadded episode and season number to the seriesid (to
+                           maintain consistency with historical encoding), but limit the
+                           season number representation to a single base-36 character to
+                           ensure unique programid generation. */
+                        int season_int = season.toInt();
+                        if (season_int > 35)
+                        {
+                            // Cannot represent season as a single base-36 character, so
+                            // remove the programid and fall back to normal dup matching.
+                            if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
+                                programid.clear();
+                        }
+                        else
+                        {
+                            programid.append(episode);
+                            programid.append(QString::number(season_int, 36));
+                            if (pginfo->m_partnumber && pginfo->m_parttotal)
+                            {
+                                programid += QString::number(pginfo->m_partnumber);
+                                programid += QString::number(pginfo->m_parttotal);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        /* No ep/season info? Well then remove the programid and rely on
+                           normal dupchecking methods instead. */
+                        if (ProgramInfo::kCategoryMovie != pginfo->m_categoryType)
+                            programid.clear();
+                    }
+                }
+                pginfo->m_programId = programid;
                 if (!(pginfo->m_starttime.isValid()))
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
-                                                        "invalid start time, "
-                                                        "skipping")
-                                                        .arg(pginfo->m_title));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), " "invalid start time, " "skipping").arg(pginfo->m_title));
                 }
                 else if (pginfo->m_channel.isEmpty())
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
-                                                        "missing channel, "
-                                                        "skipping")
-                                                        .arg(pginfo->m_title));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), " "missing channel, " "skipping").arg(pginfo->m_title));
                 }
                 else if (pginfo->m_startts == pginfo->m_endts)
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
-                                                        "identical start and end "
-                                                        "times, skipping")
-                                                        .arg(pginfo->m_title));
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), " "identical start and end " "times, skipping").arg(pginfo->m_title));
                 }
                 else
                 {
+                    // so we have a (relatively) clean program element now, which is good enough to process or to store
+                    if (pginfo->m_channel != last_channel) {
+                        //we have a channel change here
+                        last_channel = pginfo->m_channel;
+                        last_starttime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)); //initialize it to a time far, far away ...
+                    }
+                    else {
+                        //we are still on the same channel
+                        if (pginfo->m_starttime >= last_starttime) {
+                            last_starttime = pginfo->m_starttime;
+                        }
+                        else {
+                            LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, program out of order at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+                            delete pginfo;
+                            return false;
+                        }
+                    }
+
                     if (pginfo->m_clumpidx.isEmpty())
                         (*proglist)[pginfo->m_channel].push_back(*pginfo);
                     else
@@ -737,22 +733,19 @@ bool XMLTVParser::parseFile(
                             aggregatedTitle.clear();
                             aggregatedDesc.clear();
                         }
-
                         if (!pginfo->m_title.isEmpty())
                         {
                             if (!aggregatedTitle.isEmpty())
                                 aggregatedTitle.append(" | ");
                             aggregatedTitle.append(pginfo->m_title);
                         }
-
                         if (!pginfo->m_description.isEmpty())
                         {
                             if (!aggregatedDesc.isEmpty())
                                 aggregatedDesc.append(" | ");
                             aggregatedDesc.append(pginfo->m_description);
                         }
-                        if (pginfo->m_clumpidx.toInt() ==
-                            pginfo->m_clumpmax.toInt() - 1)
+                        if (pginfo->m_clumpidx.toInt() == pginfo->m_clumpmax.toInt() - 1)
                         {
                             pginfo->m_title = aggregatedTitle;
                             pginfo->m_description = aggregatedDesc;
@@ -761,10 +754,16 @@ bool XMLTVParser::parseFile(
                     }
                 }
                 delete pginfo;
-            }
-        }
-        n = n.nextSibling();
+            }//if programme
+        }//if readNextStartElement
+    }//while loop
+    if (! (xml.isEndElement() && xml.name() == "tv"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, missing </tv> element, at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+        return false;
     }
+    //TODO add code for adding data on the run
+    f.close();
 
     return true;
 }

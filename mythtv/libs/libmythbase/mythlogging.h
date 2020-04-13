@@ -20,13 +20,13 @@
 
 // This doesn't lock the calling thread other than momentarily to put
 // the log message onto a queue.
-#define LOG(_MASK_, _LEVEL_, _STRING_)                                  \
+#define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
             LogPrintLine(_MASK_, _LEVEL_,                               \
                          __FILE__, __LINE__, __FUNCTION__,              \
-                         qPrintable(_STRING_));                         \
+                         _QSTRING_);                                    \
         }                                                               \
     } while (false)
 
@@ -34,7 +34,7 @@
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
                                 const char *file, int line,
                                 const char *function,
-                                const char *format);
+                                QString message);
 
 extern MBASE_PUBLIC LogLevel_t logLevel;
 extern MBASE_PUBLIC uint64_t   verboseMask;

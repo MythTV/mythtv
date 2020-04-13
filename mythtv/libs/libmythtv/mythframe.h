@@ -152,6 +152,7 @@ struct VideoFrame
     int interlaced_frame; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
     bool top_field_first; ///< true if top field is first.
     bool interlaced_reversed; /// true for user override of scan
+    bool new_gop; /// used to unlock the scan type
     bool repeat_pict;
     bool forcekey; ///< hardware encoded .nuv
     bool dummy;
@@ -167,7 +168,7 @@ struct VideoFrame
     int colortransfer;
     int chromalocation;
     bool colorshifted; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
-    bool decoder_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
+    bool already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
     int rotation;
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
@@ -245,6 +246,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->timecode     = 0;
     vf->interlaced_frame = 1;
     vf->interlaced_reversed = false;
+    vf->new_gop          = false;
     vf->top_field_first  = true;
     vf->repeat_pict      = false;
     vf->forcekey         = false;
@@ -259,7 +261,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->colortransfer    = 1; // BT.709
     vf->chromalocation   = 1; // default 4:2:0
     vf->colorshifted     = false;
-    vf->decoder_deinterlaced = false;
+    vf->already_deinterlaced = false;
     vf->rotation         = 0;
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;

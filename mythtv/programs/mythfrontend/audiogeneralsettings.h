@@ -43,8 +43,8 @@ class AudioConfigSettings : public GroupSetting
 
     using ADCMap = QMap<QString,AudioOutput::AudioDeviceConfig>;
 
-    ADCMap &AudioDeviceMap(void) { return m_audioDevs; };
-    AudioOutput::ADCVect &AudioDeviceVect(void) { return m_devices; };
+    ADCMap &AudioDeviceMap(void) { return m_audioDevs; }
+    AudioOutput::ADCVect &AudioDeviceVect(void) { return m_devices; }
 
     void CheckConfiguration(void);
 
@@ -133,8 +133,7 @@ class AudioDeviceComboBox : public HostComboBoxSetting
 class ChannelChangedEvent : public QEvent
 {
   public:
-    ChannelChangedEvent(QString  channame, bool fulltest) :
-        QEvent(kEventType), m_channel(std::move(channame)), m_fulltest(fulltest) {}
+    ChannelChangedEvent(QString  channame, bool fulltest);
     ~ChannelChangedEvent() override = default;
 
     QString m_channel;
@@ -145,7 +144,7 @@ class ChannelChangedEvent : public QEvent
 
 class AudioTestThread : public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(AudioTestThread);
+    Q_DECLARE_TR_FUNCTIONS(AudioTestThread)
 
   public:
 

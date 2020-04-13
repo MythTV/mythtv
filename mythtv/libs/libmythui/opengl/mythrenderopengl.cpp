@@ -9,7 +9,6 @@ using std::min;
 #include <QWindow>
 #include <QWidget>
 #include <QGuiApplication>
-#include <QOpenGLExtraFunctions>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -133,7 +132,6 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QWidget *Widget
     MythRender(kRenderOpenGL),
     m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true))
 {
-    memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
     m_projection.fill(0);
     m_parameters.fill(0);
     m_transforms.push(QMatrix4x4());
@@ -149,7 +147,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
         return;
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     if (m_ready)
-        MythRenderOpenGL::ReleaseResources();
+        ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
@@ -348,17 +346,13 @@ bool MythRenderOpenGL::Init(void)
     if (!isOpenGLES() || (isOpenGLES() && ((fmt.majorVersion() >= 3) || hasExtension("GL_EXT_unpack_subimage"))))
         m_extraFeatures |= kGLExtSubimage;
 
-    // check for core profile
-    m_coreProfile = fmt.profile() == QSurfaceFormat::OpenGLContextProfile::CoreProfile;
-
-    // if we have a core profile then we need a VAO bound - this is just a
-    // workaround for the time being
-    if (m_coreProfile)
+    // check for core profile N.B. not OpenGL ES
+    if (fmt.profile() == QSurfaceFormat::OpenGLContextProfile::CoreProfile)
     {
-        QOpenGLExtraFunctions extra(nullptr);
-        extra.initializeOpenGLFunctions();
-        extra.glGenVertexArrays(1, &m_vao);
-        extra.glBindVertexArray(m_vao);
+        // if we have a core profile then we need a VAO bound - this is just a
+        // workaround for the time being
+        extraFunctions()->glGenVertexArrays(1, &m_vao);
+        extraFunctions()->glBindVertexArray(m_vao);
     }
 
     // For (embedded) GPUs that use tile based rendering, it is faster to use
@@ -382,6 +376,13 @@ bool MythRenderOpenGL::Init(void)
     // Check for memory extensions
     if (hasExtension("GL_NVX_gpu_memory_info"))
         m_extraFeatures |= kGLNVMemory;
+
+    // Check 16 bit FBOs
+    Check16BitFBO();
+
+    // Check for compute shaders
+    if (QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))
+        m_extraFeatures |= kGLComputeShaders;
 
     DebugFeatures();
 
@@ -435,9 +436,10 @@ void MythRenderOpenGL::DebugFeatures(void)
     //LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
-    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))));
+    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(m_extraFeatures & kGLComputeShaders)));
 
     // warnings
     if (m_maxTextureUnits < 3)
@@ -571,15 +573,15 @@ void MythRenderOpenGL::doneCurrent()
     m_lock.unlock();
 }
 
-void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
+void MythRenderOpenGL::SetViewPort(const QRect &Rect, bool ViewportOnly)
 {
-    if (rect == m_viewport)
+    if (Rect == m_viewport)
         return;
     makeCurrent();
-    m_viewport = rect;
+    m_viewport = Rect;
     glViewport(m_viewport.left(), m_viewport.top(),
                m_viewport.width(), m_viewport.height());
-    if (!viewportonly)
+    if (!ViewportOnly)
         SetMatrixView();
     doneCurrent();
 }
@@ -594,26 +596,26 @@ void MythRenderOpenGL::Flush(void)
     doneCurrent();
 }
 
-void MythRenderOpenGL::SetBlend(bool enable)
+void MythRenderOpenGL::SetBlend(bool Enable)
 {
     makeCurrent();
-    if (enable && !m_blend)
+    if (Enable && !m_blend)
         glEnable(GL_BLEND);
-    else if (!enable && m_blend)
+    else if (!Enable && m_blend)
         glDisable(GL_BLEND);
-    m_blend = enable;
+    m_blend = Enable;
     doneCurrent();
 }
 
-void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
+void MythRenderOpenGL::SetBackground(int Red, int Green, int Blue, int Alpha)
 {
-    int32_t tmp = (r << 24) + (g << 16) + (b << 8) + a;
+    int32_t tmp = (Red << 24) + (Green << 16) + (Blue << 8) + Alpha;
     if (tmp == m_background)
         return;
 
     m_background = tmp;
     makeCurrent();
-    glClearColor(r / 255.0F, g / 255.0F, b / 255.0F, a / 255.0F);
+    glClearColor(Red / 255.0F, Green / 255.0F, Blue / 255.0F, Alpha / 255.0F);
     doneCurrent();
 }
 
@@ -645,16 +647,16 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     return result;
 }
 
-QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
+QSize MythRenderOpenGL::GetTextureSize(const QSize &Size, bool Normalised)
 {
     if (((m_features & NPOTTextures) != 0U) || !Normalised)
-        return size;
+        return Size;
 
     int w = 64;
     int h = 64;
-    while (w < size.width())
+    while (w < Size.width())
         w *= 2;
-    while (h < size.height())
+    while (h < Size.height())
         h *= 2;
     return {w, h};
 }
@@ -718,17 +720,17 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
     doneCurrent();
 }
 
-QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenum InternalFormat)
+QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, bool SixteenBit)
 {
     if (!(m_features & Framebuffers))
         return nullptr;
 
     OpenGLLocker locker(this);
     QOpenGLFramebufferObject *framebuffer = nullptr;
-    if (InternalFormat)
+    if (SixteenBit)
     {
         framebuffer = new QOpenGLFramebufferObject(Size, QOpenGLFramebufferObject::NoAttachment,
-                                                   GL_TEXTURE_2D, InternalFormat);
+                                                   GL_TEXTURE_2D, QOpenGLTexture::RGBA16_UNorm);
     }
     else
     {
@@ -755,9 +757,9 @@ MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObje
         return nullptr;
 
     auto *texture = new MythGLTexture(Framebuffer->texture());
-    texture->m_size        = texture->m_totalSize = Framebuffer->size();
-    texture->m_vbo         = CreateVBO(kVertexSize);
-    texture->m_flip        = false;
+    texture->m_size = texture->m_totalSize = Framebuffer->size();
+    texture->m_vbo  = CreateVBO(kVertexSize);
+    texture->m_flip = false;
     return texture;
 }
 
@@ -872,12 +874,11 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     SetShaderProjection(Program);
 
     GLenum textarget = first->m_target;
-    uint active_tex = 0;
     for (uint i = 0; i < TextureCount; i++)
     {
-        QString uniform = QString("s_texture%1").arg(active_tex);
-        Program->setUniformValue(qPrintable(uniform), active_tex);
-        ActiveTexture(GL_TEXTURE0 + active_tex++);
+        QString uniform = QString("s_texture%1").arg(i);
+        Program->setUniformValue(qPrintable(uniform), i);
+        ActiveTexture(GL_TEXTURE0 + i);
         if (Textures[i]->m_texture)
             Textures[i]->m_texture->bind();
         else
@@ -1228,12 +1229,12 @@ void MythRenderOpenGL::ReleaseResources(void)
     DeleteDefaultShaders();
     ExpireVertices();
     ExpireVBOS();
-    if (m_coreProfile && m_vao)
+    if (m_vao)
     {
-        QOpenGLExtraFunctions extra(nullptr);
-        extra.initializeOpenGLFunctions();
-        extra.glDeleteVertexArrays(1, &m_vao);
+        extraFunctions()->glDeleteVertexArrays(1, &m_vao);
+        m_vao = 0;
     }
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_RELEASE_END");
     delete m_openglDebugger;
@@ -1485,15 +1486,15 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
     return Size.width() * Size.height() * bpp * bytes;
 }
 
-void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
+void MythRenderOpenGL::PushTransformation(const UIEffects &Fx, QPointF &Center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.m_hzoom != 1.0F || fx.m_vzoom != 1.0F || fx.m_angle != 0.0F)
+    if (Fx.m_hzoom != 1.0F || Fx.m_vzoom != 1.0F || Fx.m_angle != 0.0F)
     {
-        newtop.translate(static_cast<GLfloat>(center.x()), static_cast<GLfloat>(center.y()));
-        newtop.scale(fx.m_hzoom, fx.m_vzoom);
-        newtop.rotate(fx.m_angle, 0, 0, 1);
-        newtop.translate(static_cast<GLfloat>(-center.x()), static_cast<GLfloat>(-center.y()));
+        newtop.translate(static_cast<GLfloat>(Center.x()), static_cast<GLfloat>(Center.y()));
+        newtop.scale(Fx.m_hzoom, Fx.m_vzoom);
+        newtop.rotate(Fx.m_angle, 0, 0, 1);
+        newtop.translate(static_cast<GLfloat>(-Center.x()), static_cast<GLfloat>(-Center.y()));
     }
     m_transforms.push(newtop);
 }
@@ -1540,6 +1541,28 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     program->bindAttributeLocation("a_position",  VERTEX_INDEX);
     program->bindAttributeLocation("a_color",     COLOR_INDEX);
     program->bindAttributeLocation("a_texcoord0", TEXTURE_INDEX);
+    if (!program->link())
+        return ShaderError(program, "");
+    return program;
+}
+
+QOpenGLShaderProgram* MythRenderOpenGL::CreateComputeShader(const QString &Source)
+{
+    if (!(m_extraFeaturesUsed & kGLComputeShaders) || Source.isEmpty())
+        return nullptr;
+
+    OpenGLLocker locker(this);
+    auto *program = new QOpenGLShaderProgram();
+    if (!program->addShaderFromSourceCode(QOpenGLShader::Compute, Source))
+        return ShaderError(program, Source);
+
+    if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
+    {
+        QList<QOpenGLShader*> shaders = program->shaders();
+        foreach (QOpenGLShader* shader, shaders)
+            LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
+    }
+
     if (!program->link())
         return ShaderError(program, "");
     return program;
@@ -1653,4 +1676,26 @@ bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Total)
         return true;
     }
     return false;
+}
+
+/*! \brief Check for 16bit framebufferobject support
+ *
+ * We don't restrict this test based on OpenGL type or version to try and give as
+ * much support as possible. It will likely fail on all GL/ES 2.X versions.
+ *
+ * \note Qt support for 16bit framebuffers is broken until Qt5.12 on OpenGL ES3.X.
+ * \note Qt only supports GL_RGBA16, GL_RGB16, GL_RGB10_A2 and GL_RGB10 but we
+ * only test for RGBA16 as it should be widely supported and will not restrict
+ * the use of alpha blending.
+*/
+void MythRenderOpenGL::Check16BitFBO(void)
+{
+    OpenGLLocker locker(this);
+    QSize size{256, 256};
+    QOpenGLFramebufferObject *fbo = CreateFramebuffer(size, true);
+    if (fbo)
+    {
+        m_extraFeatures |= kGL16BitFBO;
+        delete fbo;
+    }
 }

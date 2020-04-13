@@ -20,12 +20,12 @@
 
 // libmythtv
 #include "channelutil.h"
-#include "teletextscreen.h"
-#include "subtitlescreen.h"
+#include "captions/teletextscreen.h"
+#include "captions/subtitlescreen.h"
 #include "interactivescreen.h"
 #include "osd.h"
-#include "Bluray/bdringbuffer.h"
-#include "Bluray/bdoverlayscreen.h"
+#include "Bluray/mythbdbuffer.h"
+#include "Bluray/mythbdoverlayscreen.h"
 #include "tv_actions.h"
 
 #define LOC     QString("OSD: ")
@@ -365,7 +365,7 @@ void OSD::SetValues(const QString &Window, const QHash<QString,float> &Map,
         MythUIEditBar *edit = dynamic_cast<MythUIEditBar *> (win->GetChild("editbar"));
         if (edit)
         {
-            edit->SetEditPosition(static_cast<long long>(Map.value("position")));
+            edit->SetEditPosition(static_cast<double>(Map.value("position")));
             found = true;
         }
     }
@@ -874,7 +874,7 @@ MythScreenType *OSD::GetWindow(const QString &Window)
     }
     else if (Window == OSD_WIN_BDOVERLAY)
     {
-        new_window = new BDOverlayScreen(m_parent, Window);
+        new_window = new MythBDOverlayScreen(m_parent, Window);
     }
     else
     {
@@ -1231,12 +1231,12 @@ void OSD::DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos)
     }
 }
 
-void OSD::DisplayBDOverlay(BDOverlay* Overlay)
+void OSD::DisplayBDOverlay(MythBDOverlay* Overlay)
 {
     if (!Overlay)
         return;
 
-    BDOverlayScreen* bd = dynamic_cast<BDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
+    MythBDOverlayScreen* bd = dynamic_cast<MythBDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
     if (bd)
         bd->DisplayBDOverlay(Overlay);
 }

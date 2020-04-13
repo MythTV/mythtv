@@ -197,12 +197,10 @@ bool ProfileItem::CheckRange(const QString& Key,
     return match;
 }
 
-bool ProfileItem::IsMatch(const QSize &Size,
-    float Framerate, const QString &CodecName) const
+bool ProfileItem::IsMatch(const QSize &Size, float Framerate, const QString &CodecName,
+                          const QStringList &DisallowedDecoders) const
 {
-    bool    match = true;
-
-    QString cmp;
+    bool match = true;
 
     // cond_width, cond_height, cond_codecs, cond_framerate.
     // These replace old settings pref_cmp0 and pref_cmp1
@@ -210,7 +208,7 @@ bool ProfileItem::IsMatch(const QSize &Size,
     match &= CheckRange("cond_height",Size.height());
     match &= CheckRange("cond_framerate",Framerate);
     // codec
-    cmp = Get(QString("cond_codecs"));
+    QString cmp = Get(QString("cond_codecs"));
     if (!cmp.isEmpty())
     {
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
@@ -218,6 +216,9 @@ bool ProfileItem::IsMatch(const QSize &Size,
             match &= clist.contains(CodecName,Qt::CaseInsensitive);
     }
 
+    QString decoder = Get("pref_decoder");
+    if (DisallowedDecoders.contains(decoder))
+        match = false;
     return match;
 }
 
@@ -351,10 +352,11 @@ VideoDisplayProfile::VideoDisplayProfile()
     }
 }
 
-void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QString &CodecName)
+void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QString &CodecName,
+                                   const QStringList &DisallowedDecoders)
 {
     QMutexLocker locker(&m_lock);
-    bool change = false;
+    bool change = !DisallowedDecoders.isEmpty();
 
     if (Size != m_lastSize)
     {
@@ -372,7 +374,7 @@ void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QSt
         change = true;
     }
     if (change)
-        LoadBestPreferences(m_lastSize, m_lastRate, m_lastCodecName);
+        LoadBestPreferences(m_lastSize, m_lastRate, m_lastCodecName, DisallowedDecoders);
 }
 
 void VideoDisplayProfile::SetOutput(float Framerate)
@@ -407,7 +409,7 @@ QString VideoDisplayProfile::GetDoubleRatePreferences(void) const
 
 uint VideoDisplayProfile::GetMaxCPUs(void) const
 {
-    return GetPreference("pref_max_cpus").toUInt();
+    return qBound(1U, GetPreference("pref_max_cpus").toUInt(), VIDEO_MAX_CPUS);
 }
 
 bool VideoDisplayProfile::IsSkipLoopEnabled(void) const
@@ -496,34 +498,47 @@ void VideoDisplayProfile::SetPreference(const QString &Key, const QString &Value
 }
 
 vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
-    (const QSize &Size, float Framerate, const QString &CodecName)
+    (const QSize &Size, float Framerate, const QString &CodecName, const QStringList DisallowedDecoders)
 {
     for (auto it = m_allowedPreferences.cbegin(); it != m_allowedPreferences.cend(); ++it)
-        if ((*it).IsMatch(Size, Framerate, CodecName))
+        if ((*it).IsMatch(Size, Framerate, CodecName, DisallowedDecoders))
             return it;
     return m_allowedPreferences.end();
 }
 
 void VideoDisplayProfile::LoadBestPreferences
-    (const QSize &Size, float Framerate, const QString &CodecName)
+    (const QSize &Size, float Framerate, const QString &CodecName, const QStringList &DisallowedDecoders)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3, %4)")
         .arg(Size.width()).arg(Size.height())
         .arg(static_cast<double>(Framerate), 0, 'f', 3).arg(CodecName));
 
     m_currentPreferences.clear();
-    auto it = FindMatch(Size, Framerate, CodecName);
+    auto it = FindMatch(Size, Framerate, CodecName, DisallowedDecoders);
     if (it != m_allowedPreferences.end())
+    {
         m_currentPreferences = (*it).GetAll();
+    }
+    else
+    {
+        int threads = qBound(1, QThread::idealThreadCount(), 4);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No useable profile. Using defaults.");
+        SetPreference("pref_decoder", "ffmpeg");
+        SetPreference("pref_max_cpus", QString::number(threads));
+        SetPreference("pref_videorenderer", "opengl-yv12");
+        SetPreference("pref_deint0", DEINT_QUALITY_LOW);
+        SetPreference("pref_deint1", DEINT_QUALITY_LOW);
+    }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences Result "
-            "prio:%1, w:%2, h:%3, fps:%4,"
-            " codecs:%5, decoder:%6, renderer:%7, deint:%8")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences result: "
+            "priority:%1 width:%2 height:%3 fps:%4 codecs:%5")
             .arg(GetPreference("pref_priority")).arg(GetPreference("cond_width"))
             .arg(GetPreference("cond_height")).arg(GetPreference("cond_framerate"))
-            .arg(GetPreference("cond_codecs")).arg(GetPreference("pref_decoder"))
-            .arg(GetPreference("pref_videorenderer")).arg(GetPreference("pref_deint0"))
-            );
+            .arg(GetPreference("cond_codecs")));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5")
+            .arg(GetPreference("pref_decoder")).arg(GetPreference("pref_videorenderer"))
+            .arg(GetPreference("pref_deint0")).arg(GetPreference("pref_deint1"))
+            .arg(GetPreference("pref_max_cpus")));
 }
 
 vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
@@ -545,6 +560,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
     }
 
     uint profileid = 0;
+
     while (query.next())
     {
         if (query.value(0).toUInt() != profileid)
@@ -565,6 +581,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
         }
         tmp.Set(query.value(1).toString(), query.value(2).toString());
     }
+
     if (profileid)
     {
         tmp.SetProfileID(profileid);
@@ -1148,8 +1165,8 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
                       "vaapi", 2, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 1, true, "opengl-yv12",
-                      "shader:high", "shader:high");
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1161,6 +1178,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "vdpau", 1, true, "opengl-hw",
                       "driver:medium", "driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1173,6 +1193,10 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec-dec", 4, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
+
     }
 #endif
 
@@ -1184,6 +1208,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "nvdec", 1, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:high", "shader:high");
     }
 #endif
 
@@ -1194,6 +1221,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "vtb", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1205,6 +1235,9 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         CreateProfile(groupid, 1, "", "", "",
                       "mmal", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 
@@ -1213,12 +1246,12 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     {
         (void) QObject::tr("V4L2 Codecs", "Sample: V4L2");
         uint groupid = CreateProfileGroup("V4L2 Codecs", HostName);
-        CreateProfile(groupid, 1, "", "", "",
-                      "v4l2-dec", 1, true, "opengl-yv12",
-                      "shader:driver:medium", "shader:driver:medium");
         CreateProfile(groupid, 2, "", "", "",
                       "v4l2", 1, true, "opengl-hw",
                       "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 #endif
 }
@@ -1330,12 +1363,12 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
 QString VideoDisplayProfile::toString(void) const
 {
-    QString renderer  = GetPreference("pref_videorenderer");
-    QString osd       = GetPreference("pref_osdrenderer");
-    QString deint0    = GetPreference("pref_deint0");
-    QString deint1    = GetPreference("pref_deint1");
-    return QString("rend(%4) osd(%5) deint(%6,%7) filt(%8)")
-        .arg(renderer).arg(osd).arg(deint0).arg(deint1);
+    QString renderer = GetPreference("pref_videorenderer");
+    QString deint0   = GetPreference("pref_deint0");
+    QString deint1   = GetPreference("pref_deint1");
+    QString cpus     = GetPreference("pref_max_cpus");
+    return QString("rend:%1 deint:%2/%3 CPUs: %4")
+        .arg(renderer).arg(deint0).arg(deint1).arg(cpus);
 }
 
 QList<QPair<QString,QString> > VideoDisplayProfile::GetDeinterlacers(void)

@@ -118,7 +118,7 @@ SSDP::~SSDP()
 
     DisableNotifications();
 
-    m_bTermRequested = true;
+    RequestTerminate();
     wait();
 
     if (m_pNotifyTask != nullptr)
@@ -326,7 +326,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         LOG(VB_UPNP, LOG_WARNING, QString("SSDP: Received 0 byte UDP message"));
     }
 
-    while ((nBytes = pSocket->bytesAvailable()) > 0 || (nBytes == 0 && !didDoRead))
+    while (((nBytes = pSocket->bytesAvailable()) > 0 || (nBytes == 0 && !didDoRead)) && !m_bTermRequested)
     {
         buffer.resize(nBytes);
 

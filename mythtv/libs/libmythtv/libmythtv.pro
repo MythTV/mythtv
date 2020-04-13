@@ -28,7 +28,7 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl ./io ./captions
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -123,10 +123,13 @@ HEADERS += recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += videometadatautil.h
-HEADERS += vbi608extractor.h
-HEADERS += cc608decoder.h           cc608reader.h
-HEADERS += cc708decoder.h           cc708reader.h
-HEADERS += cc708window.h            subtitlereader.h
+HEADERS += captions/vbi608extractor.h
+HEADERS += captions/cc608decoder.h
+HEADERS += captions/cc608reader.h
+HEADERS += captions/cc708decoder.h
+HEADERS += captions/cc708reader.h
+HEADERS += captions/cc708window.h
+HEADERS += captions/subtitlereader.h
 HEADERS += scheduledrecording.h
 HEADERS += signalmonitorvalue.h     signalmonitorlistener.h
 HEADERS += livetvchain.h            playgroup.h
@@ -136,10 +139,13 @@ HEADERS += transporteditor.h        listingsources.h
 HEADERS += channelgroup.h
 HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
-HEADERS += avfringbuffer.h
-HEADERS += ringbuffer.h             fileringbuffer.h
-HEADERS += streamingringbuffer.h    metadataimagehelper.h
-HEADERS += icringbuffer.h
+HEADERS += io/mythmediabuffer.h
+HEADERS += io/mythavformatbuffer.h
+HEADERS += io/mythfilebuffer.h
+HEADERS += io/mythstreamingbuffer.h
+HEADERS += io/mythinteractivebuffer.h
+HEADERS += io/mythopticalbuffer.h
+HEADERS += metadataimagehelper.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
@@ -153,10 +159,13 @@ SOURCES += recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += videometadatautil.cpp
-SOURCES += vbi608extractor.cpp
-SOURCES += cc608decoder.cpp         cc608reader.cpp
-SOURCES += cc708decoder.cpp         cc708reader.cpp
-SOURCES += cc708window.cpp          subtitlereader.cpp
+SOURCES += captions/vbi608extractor.cpp
+SOURCES += captions/cc608decoder.cpp
+SOURCES += captions/cc608reader.cpp
+SOURCES += captions/cc708decoder.cpp
+SOURCES += captions/cc708reader.cpp
+SOURCES += captions/cc708window.cpp
+SOURCES += captions/subtitlereader.cpp
 SOURCES += scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += livetvchain.cpp          playgroup.cpp
@@ -166,10 +175,13 @@ SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp
 SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
-SOURCES += avfringbuffer.cpp
-SOURCES += ringbuffer.cpp           fileringBuffer.cpp
-SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
-SOURCES += icringbuffer.cpp
+SOURCES += io/mythmediabuffer.cpp
+SOURCES += io/mythavformatbuffer.cpp
+SOURCES += io/mythfilebuffer.cpp
+SOURCES += io/mythstreamingbuffer.cpp
+SOURCES += io/mythinteractivebuffer.cpp
+SOURCES += io/mythopticalbuffer.cpp
+SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp            mythavutil.cpp
 SOURCES += recordingfile.cpp
 
@@ -178,14 +190,20 @@ HEADERS += diseqc.h                 diseqcsettings.h
 SOURCES += diseqc.cpp               diseqcsettings.cpp
 
 # File/FIFO Writer classes
-HEADERS += filewriterbase.h         avformatwriter.h
-HEADERS += fifowriter.h
-SOURCES += filewriterbase.cpp       avformatwriter.cpp
-SOURCES += fifowriter.cpp
+HEADERS += io/mythmediawriter.h
+HEADERS += io/mythavformatwriter.h
+HEADERS += io/mythfifowriter.h
+SOURCES += io/mythmediawriter.cpp
+SOURCES += io/mythavformatwriter.cpp
+SOURCES += io/mythfifowriter.cpp
 
 # Teletext stuff
-HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
-SOURCES += teletextdecoder.cpp      teletextreader.cpp vbilut.cpp
+HEADERS += captions/teletextdecoder.h
+HEADERS += captions/teletextreader.h
+HEADERS += captions/vbilut.h
+SOURCES += captions/teletextdecoder.cpp
+SOURCES += captions/teletextreader.cpp
+SOURCES += captions/vbilut.cpp
 
 # MPEG parsing stuff
 HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
@@ -241,12 +259,9 @@ HEADERS += channelscan/iptvchannelfetcher.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 SOURCES += channelscan/iptvchannelfetcher.cpp
 
-HEADERS += dvdstream.h
-SOURCES += dvdstream.cpp
-
 # subtitles: srt
-HEADERS += srtwriter.h
-SOURCES += srtwriter.cpp
+HEADERS += captions/srtwriter.h
+SOURCES += captions/srtwriter.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
@@ -274,6 +289,8 @@ INSTALLS += inc2
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
 DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
+INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 
 win32-msvc*|freebsd {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
@@ -285,27 +302,39 @@ win32-msvc*|freebsd {
 
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
-HEADERS += DVD/dvdringbuffer.h
-SOURCES += DVD/dvdringbuffer.cpp
+HEADERS += DVD/mythdvdbuffer.h
+HEADERS += DVD/mythdvdcontext.h
+HEADERS += DVD/mythdvdinfo.h
+HEADERS += DVD/mythdvdstream.h
+SOURCES += DVD/mythdvdbuffer.cpp
+SOURCES += DVD/mythdvdcontext.cpp
+SOURCES += DVD/mythdvdinfo.cpp
+SOURCES += DVD/mythdvdstream.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
     SOURCES += DVD/mythdvdplayer.cpp
-    HEADERS += DVD/avformatdecoderdvd.h
-    SOURCES += DVD/avformatdecoderdvd.cpp
+    HEADERS += DVD/mythdvddecoder.h
+    SOURCES += DVD/mythdvddecoder.cpp
 }
 LIBS += -L../../external/libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
-HEADERS += Bluray/bdiowrapper.h Bluray/bdringbuffer.h
-SOURCES += Bluray/bdiowrapper.cpp Bluray/bdringbuffer.cpp
+HEADERS += Bluray/mythbdiowrapper.h
+HEADERS += Bluray/mythbdbuffer.h
+HEADERS += Bluray/mythbdinfo.h
+HEADERS += Bluray/mythbdoverlay.h
+SOURCES += Bluray/mythbdiowrapper.cpp
+SOURCES += Bluray/mythbdbuffer.cpp
+SOURCES += Bluray/mythbdinfo.cpp
+SOURCES += Bluray/mythbdoverlay.cpp
 using_frontend {
     HEADERS += Bluray/mythbdplayer.h
     SOURCES += Bluray/mythbdplayer.cpp
-    HEADERS += Bluray/avformatdecoderbd.h
-    SOURCES += Bluray/avformatdecoderbd.cpp
-    HEADERS += Bluray/bdoverlayscreen.h
-    SOURCES += Bluray/bdoverlayscreen.cpp
+    HEADERS += Bluray/mythbddecoder.h
+    SOURCES += Bluray/mythbddecoder.cpp
+    HEADERS += Bluray/mythbdoverlayscreen.h
+    SOURCES += Bluray/mythbdoverlayscreen.cpp
 }
 !using_libbluray_external {
     INCLUDEPATH += ../../external/libmythbluray/src
@@ -339,26 +368,34 @@ using_frontend {
     # Video playback
     HEADERS += tv_play.h                mythplayer.h
     HEADERS += audioplayer.h
-    HEADERS += mythccextractorplayer.h  teletextextractorreader.h
+    HEADERS += mythccextractorplayer.h
+    HEADERS += captions/teletextextractorreader.h
     HEADERS += playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
-    HEADERS += mythiowrapper.h          tvbrowsehelper.h
-    HEADERS += netstream.h
+    HEADERS += tvbrowsehelper.h
+    HEADERS += mheg/netstream.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += audioplayer.cpp
-    SOURCES += mythccextractorplayer.cpp teletextextractorreader.cpp
+    SOURCES += mythccextractorplayer.cpp
+    SOURCES += captions/teletextextractorreader.cpp
     SOURCES += playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
-    SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
-    SOURCES += netstream.cpp
+    SOURCES += tvbrowsehelper.cpp
+    SOURCES += mheg/netstream.cpp
+
+    # Input/output
+    HEADERS += io/mythiowrapper.h
+    SOURCES += io/mythiowrapper.cpp
 
     win32-msvc*:SOURCES += ../../../platform/win32/msvc/src/posix/dirent.c
 
     # Text subtitle parser
-    HEADERS += textsubtitleparser.h     xine_demux_sputext.h
-    SOURCES += textsubtitleparser.cpp   xine_demux_sputext.cpp
+    HEADERS += captions/textsubtitleparser.h
+    HEADERS += captions/xine_demux_sputext.h
+    SOURCES += captions/textsubtitleparser.cpp
+    SOURCES += captions/xine_demux_sputext.cpp
 
     # A/V decoders
     HEADERS += decoders/decoderbase.h
@@ -378,10 +415,14 @@ using_frontend {
     }
 
     # On screen display (video output overlay)
-    HEADERS += osd.h                    teletextscreen.h
-    HEADERS += subtitlescreen.h         interactivescreen.h
-    SOURCES += osd.cpp                  teletextscreen.cpp
-    SOURCES += subtitlescreen.cpp       interactivescreen.cpp
+    HEADERS += osd.h
+    HEADERS += captions/teletextscreen.h
+    HEADERS += captions/subtitlescreen.h
+    HEADERS += mheg/interactivescreen.h
+    SOURCES += osd.cpp
+    SOURCES += captions/teletextscreen.cpp
+    SOURCES += captions/subtitlescreen.cpp
+    SOURCES += mheg/interactivescreen.cpp
 
     # Video output
     HEADERS += mythvideoout.h           mythvideooutnull.h
@@ -465,10 +506,13 @@ using_frontend {
         HEADERS += opengl/mythopenglvideoshaders.h
         HEADERS += opengl/mythopenglinterop.h
         HEADERS += opengl/mythvideotexture.h
+        HEADERS += opengl/mythopengltonemap.h
+        HEADERS += opengl/mythopenglcomputeshaders.h
         SOURCES += opengl/mythopenglvideo.cpp
         SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp
         SOURCES += opengl/mythvideotexture.cpp
+        SOURCES += opengl/mythopengltonemap.cpp
 
         using_vaapi {
             HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h

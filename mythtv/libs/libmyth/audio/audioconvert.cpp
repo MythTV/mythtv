@@ -683,8 +683,7 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
         // TODO: native handling of those ; use internal temp buffer in the mean time
 
         // cppcheck-suppress unassignedVariable
-        uint8_t     buffer[65536+15];
-        auto*       tmp = (uint8_t*)(((long)buffer + 15) & ~0xf);
+        alignas(16) uint8_t buffer[65536];
         int left        = bytes;
 
         while (left > 0)
@@ -693,15 +692,15 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
 
             if (left >= 65536)
             {
-                s       = toFloat(m_in, tmp, in, 65536);
+                s       = toFloat(m_in, buffer, in, 65536);
                 in      = (void*)((long)in + s);
-                out     = (void*)((long)out + fromFloat(m_out, out, tmp, s));
+                out     = (void*)((long)out + fromFloat(m_out, out, buffer, s));
                 left   -= 65536;
                 continue;
             }
-            s       = toFloat(m_in, tmp, in, left);
+            s       = toFloat(m_in, buffer, in, left);
             in      = (void*)((long)in + s);
-            out     = (void*)((long)out + fromFloat(m_out, out, tmp, s));
+            out     = (void*)((long)out + fromFloat(m_out, out, buffer, s));
             left    = 0;
         }
         return bytes * AudioOutputSettings::SampleSize(m_out) / AudioOutputSettings::SampleSize(m_in);

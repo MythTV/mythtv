@@ -4,6 +4,10 @@
 #include "videocolourspace.h"
 #include "mythnvdecinterop.h"
 
+// Std
+#include <chrono>
+#include <thread>
+
 #define LOC QString("NVDECInterop: ")
 
 #define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
@@ -150,7 +154,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // create and map textures for a new buffer
     VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
                 PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
-    bool hdr = ColorDepth(type) > 8;
+    bool p010 = ColorDepth(type) > 8;
     if (!m_openglTextures.contains(cudabuffer))
     {
         vector<QSize> sizes;
@@ -167,22 +171,25 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         bool success = true;
         for (uint plane = 0; plane < textures.size(); ++plane)
         {
+            // N.B. I think the texture formats for P010 are not strictly compliant
+            // with OpenGL ES 3.X but the Nvidia driver does not complain.
             MythVideoTexture *tex = textures[plane];
             tex->m_allowGLSLDeint = true;
             m_context->glBindTexture(tex->m_target, tex->m_textureId);
-            QOpenGLTexture::PixelType   pixtype    = hdr ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
-            QOpenGLTexture::TextureFormat internal = hdr ? QOpenGLTexture::R16_UNorm : QOpenGLTexture::R8_UNorm;
+            QOpenGLTexture::PixelFormat format     = QOpenGLTexture::Red;
+            QOpenGLTexture::PixelType   pixtype    = p010 ? QOpenGLTexture::UInt16 : QOpenGLTexture::UInt8;
+            QOpenGLTexture::TextureFormat internal = p010 ? QOpenGLTexture::R16_UNorm : QOpenGLTexture::R8_UNorm;
             int width = tex->m_size.width();
 
             if (plane)
             {
-                pixtype   = hdr ? QOpenGLTexture::UInt32 : QOpenGLTexture::UInt16;
-                internal  = hdr ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
+                internal = p010 ? QOpenGLTexture::RG16_UNorm : QOpenGLTexture::RG8_UNorm;
+                format   = QOpenGLTexture::RG;
                 width /= 2;
             }
 
             m_context->glTexImage2D(tex->m_target, 0, internal, width, tex->m_size.height(),
-                                    0, QOpenGLTexture::Red, pixtype, nullptr);
+                                    0, format, pixtype, nullptr);
 
             CUarray array = nullptr;
             CUgraphicsResource graphicsResource = nullptr;
@@ -243,7 +250,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         cpy.srcPitch      = static_cast<size_t>(Frame->pitches[i]);
         cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
         cpy.dstArray      = data->first;
-        cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (hdr ? 2 : 1);
+        cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (p010 ? 2 : 1);
         cpy.Height        = static_cast<size_t>(result[i]->m_size.height());
         CUDA_CHECK(m_cudaFuncs, cuMemcpy2DAsync(&cpy, nullptr));
     }
@@ -254,7 +261,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // GLSL deinterlacing. The decoder will pick up any CPU or driver preference
     // and return a stream of deinterlaced frames. Just check for GLSL here.
     bool needreferences = false;
-    if (is_interlaced(Scan))
+    if (is_interlaced(Scan) && !Frame->already_deinterlaced)
     {
         MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
         if (shader)
@@ -304,9 +311,10 @@ bool MythNVDECInterop::InitialiseCuda(void)
     return CreateCUDAContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
-bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                         CUcontext &CudaContext)
+bool MythNVDECInterop::CreateCUDAPriv(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                      CUcontext &CudaContext, bool &Retry)
 {
+    Retry = false;
     if (!GLContext)
         return false;
 
@@ -347,19 +355,47 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFuncti
     res = CudaFuncs->cuCtxCreate(&CudaContext, CU_CTX_SCHED_BLOCKING_SYNC, cudevice);
     if (res != CUDA_SUCCESS)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create CUDA context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create CUDA context (Err: %1)")
+            .arg(res));
+        Retry = true;
         return false;
     }
 
     CudaFuncs->cuCtxPopCurrent(&dummy);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA context");
     return true;
+}
 
+bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
+                                         CUcontext &CudaContext)
+{
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Must create CUDA context from main thread");
+        return false;
+    }
+
+    int retries = 0;
+    bool retry = false;
+    while (retries++ < 5)
+    {
+        if (CreateCUDAPriv(GLContext, CudaFuncs, CudaContext, retry))
+            return true;
+        CleanupContext(GLContext, CudaFuncs, CudaContext);
+        if (!retry)
+            break;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Will retry in 50ms");
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    return false;
 }
 
 void MythNVDECInterop::CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
                                       CUcontext &CudaContext)
 {
+    if (!GLContext)
+        return;
+
     OpenGLLocker locker(GLContext);
     if (CudaFuncs)
     {

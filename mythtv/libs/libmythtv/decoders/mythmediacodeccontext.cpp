@@ -242,8 +242,9 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
         }
     }
 
+    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     QString profilestr = MythCodecContext::GetProfileDescription(mythprofile, QSize());
-    if (found)
+    if (found && decoder)
     {
         QString decodername = QString((*Codec)->name) + "_mediacodec";
         if (decodername == "mpeg2video_mediacodec")
@@ -254,8 +255,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
             *Codec = newCodec;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2' (%3)")
                     .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name).arg(profilestr));
-            gCodecMap->freeCodecContext(Stream);
-            *Context = gCodecMap->getCodecContext(Stream, *Codec);
+            decoder->CodecMap()->freeCodecContext(Stream);
+            *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
             (*Context)->pix_fmt = AV_PIX_FMT_MEDIACODEC;
             return success;
         }
@@ -328,6 +329,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
     Frame->interlaced_reversed = false;
     Frame->top_field_first = false;
     Frame->deinterlace_allowed = DEINT_NONE;
+    Frame->already_deinterlaced = true;
 }
 
 /*! /brief Say yes

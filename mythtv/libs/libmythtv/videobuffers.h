@@ -66,6 +66,8 @@ class MTV_PUBLIC VideoBuffers
     void StartDisplayingFrame(void);
     void DoneDisplayingFrame(VideoFrame *Frame);
     void DiscardFrame(VideoFrame *Frame);
+    void DiscardPauseFrames(void);
+    bool DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int References);
 
     VideoFrame *At(uint FrameNum);
     VideoFrame *Dequeue(BufferType Type);
@@ -105,7 +107,6 @@ class MTV_PUBLIC VideoBuffers
     frame_queue_t       *Queue(BufferType Type);
     const frame_queue_t *Queue(BufferType Type) const;
     VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
-    static void          ReleaseDecoderResources(VideoFrame *Frame);
     static void          SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
                                                MythDeintType Double, MythCodecID CodecID);
 

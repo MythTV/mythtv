@@ -51,12 +51,12 @@ using namespace std;
 #include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
 
 // libmythtv
-#include "DVD/dvdringbuffer.h"
-#include "Bluray/bdringbuffer.h"
+#include "DVD/mythdvdbuffer.h"
+#include "Bluray/mythbdbuffer.h"
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
-#include "subtitlescreen.h"
+#include "captions/subtitlescreen.h"
 #include "DetectLetterbox.h"
 #include "jobqueue.h"
 #include "livetvchain.h"
@@ -73,7 +73,7 @@ using namespace std;
 #include "tvbrowsehelper.h"
 #include "playercontext.h"              // for PlayerContext, osdInfo, etc
 #include "programtypes.h"
-#include "ringbuffer.h"                 // for RingBuffer, etc
+#include "io/mythmediabuffer.h"
 #include "tv_actions.h"                 // for ACTION_TOGGLESLEEP, etc
 #include "mythcodeccontext.h"
 
@@ -2239,9 +2239,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     .arg(playbackURL).arg(ctx->m_tvchain->GetInputType(-1)));
 
             ctx->SetRingBuffer(
-                RingBuffer::Create(
+                MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
 
             if (ctx->m_buffer)
                 ctx->m_buffer->SetLiveMode(ctx->m_tvchain);
@@ -2292,7 +2292,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         QString playbackURL = ctx->m_playingInfo->GetPlaybackURL(true);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-        RingBuffer *buffer = RingBuffer::Create(playbackURL, false);
+        MythMediaBuffer *buffer = MythMediaBuffer::Create(playbackURL, false);
         if (buffer && !buffer->GetLastError().isEmpty())
         {
             ShowNotificationError(tr("Can't start playback"),
@@ -4434,17 +4434,10 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         SetAutoCommercialSkip(ctx, kCommSkipIncr);
     else if (has_action("NEXTSCAN", actions))
     {
-        QString msg;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->m_player)
-        {
-            ctx->m_player->NextScanType();
-            msg = toString(ctx->m_player->GetScanType());
-        }
+        FrameScanType scan = ctx->m_player->NextScanOverride();
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (!msg.isEmpty())
-            SetOSDMessage(ctx, msg);
+        OverrideScan(ctx, scan);
     }
     else if (has_action(ACTION_SEEKARB, actions) && !isDVD)
     {
@@ -6126,6 +6119,8 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             mctx->m_buffer->Unpause();
     }
 
+    mctx->SetNullVideo(false);
+    mctx->SetNoHardwareDecoders(false);
     bool ok = StartPlayer(mctx, mctx, mctx->GetState());
 
     if (ok)
@@ -6152,6 +6147,9 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             if (StateIsLiveTV(pipctx->GetState()))
                 pipctx->m_buffer->Unpause();
         }
+
+        pipctx->SetNullVideo(true);
+        pipctx->SetNoHardwareDecoders(true);
 
         ok = StartPlayer(mctx, pipctx, pipctx->GetState());
 
@@ -7251,9 +7249,9 @@ void TV::SwitchInputs(PlayerContext *ctx,
             QString playbackURL = ctx->m_playingInfo->GetPlaybackURL(true);
             bool opennow = (ctx->m_tvchain->GetInputType(-1) != "DUMMY");
             ctx->SetRingBuffer(
-                RingBuffer::Create(
+                MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
 
             ctx->m_tvchain->SetProgram(*ctx->m_playingInfo);
             if (ctx->m_buffer)
@@ -8360,7 +8358,7 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
         return;
     }
 
-    DVDRingBuffer *dvd = ctx->m_buffer->DVD();
+    MythDVDBuffer *dvd = ctx->m_buffer->DVD();
     QString dvdName;
     QString dvdSerial;
     QString mainStatus;
@@ -8482,7 +8480,7 @@ QSet<uint> TV::IsTunableOn(
 
 bool TV::StartEmbedding(const QRect &embedRect)
 {
-    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (!ctx)
         return false;
 
@@ -8519,7 +8517,7 @@ bool TV::StartEmbedding(const QRect &embedRect)
 
 void TV::StopEmbedding(void)
 {
-    PlayerContext *ctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (!ctx)
         return;
 
@@ -8583,7 +8581,7 @@ void TV::DoEditSchedule(int editType)
         return;
     }
 
-    PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *actx = GetPlayerReadLock(0, __FILE__, __LINE__);
 
     actx->LockPlayingInfo(__FILE__, __LINE__);
     if (!actx->m_playingInfo)
@@ -9691,7 +9689,7 @@ void TV::customEvent(QEvent *e)
         message.startsWith("SCHEDULEEDITOR_EXITING"))
     {
         // Resize the window back to the MythTV Player size
-        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        PlayerContext *actx = GetPlayerReadLock(0, __FILE__, __LINE__);
         MythMainWindow *mwnd = GetMythMainWindow();
 
         StopEmbedding();
@@ -10527,16 +10525,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         ChangeTimeStretch(actx, 0, !floatRead);   // just display
     }
     else if (action.startsWith("SELECTSCAN_"))
-    {
-        QString msg;
-        actx->LockDeletePlayer(__FILE__, __LINE__);
-        actx->m_player->SetScanType((FrameScanType) action.right(1).toInt());
-        actx->UnlockDeletePlayer(__FILE__, __LINE__);
-        msg = toString(actx->m_player->GetScanType());
-
-        if (!msg.isEmpty())
-            SetOSDMessage(actx, msg);
-    }
+        OverrideScan(actx, static_cast<FrameScanType>(action.right(1).toInt()));
     else if (action.startsWith(ACTION_TOGGELAUDIOSYNC))
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLESUBTITLEZOOM)
@@ -11327,16 +11316,17 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
         }
     }
-    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix))
+    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix) && ctx->m_player)
     {
-        active = (m_tvmScanTypeUnlocked == kScan_Detect);
-        BUTTON("SELECTSCAN_0", tr("Detect") + m_tvmCurMode);
-        active = (m_tvmScanTypeUnlocked == kScan_Progressive);
-        BUTTON("SELECTSCAN_3", tr("Progressive"));
-        active = (m_tvmScanTypeUnlocked == kScan_Interlaced);
-        BUTTON("SELECTSCAN_1", tr("Interlaced (Normal)"));
-        active = (m_tvmScanTypeUnlocked == kScan_Intr2ndField);
-        BUTTON("SELECTSCAN_2", tr("Interlaced (Reversed)"));
+        FrameScanType scan = ctx->m_player->GetScanType();
+        active = (scan == kScan_Detect);
+        BUTTON("SELECTSCAN_0", ScanTypeToString(kScan_Detect));
+        active = (scan == kScan_Progressive);
+        BUTTON("SELECTSCAN_3", ScanTypeToString(kScan_Progressive));
+        active = (scan == kScan_Interlaced);
+        BUTTON("SELECTSCAN_1", ScanTypeToString(kScan_Interlaced));
+        active = (scan == kScan_Intr2ndField);
+        BUTTON("SELECTSCAN_2", ScanTypeToString(kScan_Intr2ndField));
     }
     else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
              matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
@@ -11924,10 +11914,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmSup               = kPictureAttributeSupported_None;
     m_tvmStereoAllowed     = false;
     m_tvmStereoMode        = kStereoscopicModeNone;
-    m_tvmScanType          = kScan_Ignore;
-    m_tvmScanTypeUnlocked  = kScan_Ignore;
-    m_tvmScanTypeLocked    = false;
-    m_tvmCurMode           = "";
     m_tvmDoubleRate        = false;
 
     m_tvmSpeedX100         = (int)(round(ctx->m_tsNormal * 100));
@@ -12004,9 +11990,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         m_tvmCanUpmix         = ctx->m_player->GetAudio()->CanUpmix();
         m_tvmAspectOverride   = ctx->m_player->GetAspectOverride();
         m_tvmAdjustFill       = ctx->m_player->GetAdjustFill();
-        m_tvmScanType         = ctx->m_player->GetScanType();
-        m_tvmScanTypeUnlocked = m_tvmScanType;
-        m_tvmScanTypeLocked   = ctx->m_player->IsScanTypeLocked();
         m_tvmDoubleRate       = ctx->m_player->CanSupportDoubleRate();
         m_tvmCurSkip          = ctx->m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = ctx->m_player->IsPaused();
@@ -12030,17 +12013,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
             m_tvmStereoAllowed  = vo->StereoscopicModesAllowed();
             m_tvmStereoMode     = vo->GetStereoscopicMode();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
-        }
-        if (!m_tvmScanTypeLocked)
-        {
-            if (kScan_Interlaced == m_tvmScanType)
-                m_tvmCurMode = tr("(I)", "Interlaced (Normal)");
-            else if (kScan_Intr2ndField == m_tvmScanType)
-                m_tvmCurMode = tr("(i)", "Interlaced (Reversed)");
-            else if (kScan_Progressive == m_tvmScanType)
-                m_tvmCurMode = tr("(P)", "Progressive");
-            m_tvmCurMode = " " + m_tvmCurMode;
-            m_tvmScanTypeUnlocked = kScan_Detect;
         }
     }
     ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -12296,6 +12268,22 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
     //if (ctx->m_player)
     //    ctx->m_player->ForceDeinterlacer(deint);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
+void TV::OverrideScan(PlayerContext *Context, FrameScanType Scan)
+{
+    QString message;
+    Context->LockDeletePlayer(__FILE__, __LINE__);
+    if (Context->m_player)
+    {
+        Context->m_player->SetScanOverride(Scan);
+        message = ScanTypeToString(Scan == kScan_Detect ? kScan_Detect :
+                    Context->m_player->GetScanType(), Scan > kScan_Detect);
+    }
+    Context->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    if (!message.isEmpty())
+        SetOSDMessage(Context, message);
 }
 
 void TV::ToggleAutoExpire(PlayerContext *ctx)
@@ -12717,22 +12705,22 @@ void TV::DoSeekRWND(PlayerContext *ctx)
 */
 void TV::DVDJumpBack(PlayerContext *ctx)
 {
-    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
-    if (!ctx->HasPlayer() || !dvdrb)
+    auto *dvd = dynamic_cast<MythDVDBuffer*>(ctx->m_buffer);
+    if (!ctx->HasPlayer() || !dvd)
         return;
 
     if (ctx->m_buffer->IsInDiscMenuOrStillFrame())
     {
         UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), kOSDTimeout_Med);
     }
-    else if (!dvdrb->StartOfTitle())
+    else if (!dvd->StartOfTitle())
     {
         DoJumpChapter(ctx, -1);
     }
     else
     {
-        uint titleLength = dvdrb->GetTotalTimeOfTitle();
-        uint chapterLength = dvdrb->GetChapterLength();
+        uint titleLength = dvd->GetTotalTimeOfTitle();
+        uint chapterLength = dvd->GetChapterLength();
         if ((titleLength == chapterLength) && chapterLength > 300)
         {
             DoSeek(ctx, -ctx->m_jumptime * 60, tr("Jump Back"),
@@ -12756,26 +12744,26 @@ void TV::DVDJumpBack(PlayerContext *ctx)
  */
 void TV::DVDJumpForward(PlayerContext *ctx)
 {
-    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
-    if (!ctx->HasPlayer() || !dvdrb)
+    auto *dvd = dynamic_cast<MythDVDBuffer*>(ctx->m_buffer);
+    if (!ctx->HasPlayer() || !dvd)
         return;
 
-    bool in_still = dvdrb->IsInStillFrame();
-    bool in_menu  = dvdrb->IsInMenu();
-    if (in_still && !dvdrb->NumMenuButtons())
+    bool in_still = dvd->IsInStillFrame();
+    bool in_menu  = dvd->IsInMenu();
+    if (in_still && !dvd->NumMenuButtons())
     {
-        dvdrb->SkipStillFrame();
+        dvd->SkipStillFrame();
         UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), kOSDTimeout_Med);
     }
-    else if (!dvdrb->EndOfTitle() && !in_still && !in_menu)
+    else if (!dvd->EndOfTitle() && !in_still && !in_menu)
     {
         DoJumpChapter(ctx, 9999);
     }
     else if (!in_still && !in_menu)
     {
-        uint titleLength = dvdrb->GetTotalTimeOfTitle();
-        uint chapterLength = dvdrb->GetChapterLength();
-        uint currentTime = (uint)dvdrb->GetCurrentTime();
+        uint titleLength = dvd->GetTotalTimeOfTitle();
+        uint chapterLength = dvd->GetChapterLength();
+        uint currentTime = (uint)dvd->GetCurrentTime();
         if ((titleLength == chapterLength) &&
              (currentTime < (chapterLength - (ctx->m_jumptime * 60))) &&
              chapterLength > 300)

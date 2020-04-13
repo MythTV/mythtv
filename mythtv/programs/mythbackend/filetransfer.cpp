@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "filetransfer.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "mythdate.h"
 #include "mythsocket.h"
 #include "programinfo.h"
@@ -13,7 +13,7 @@
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
     ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
-    m_rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
+    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
     m_sock(remote)
 {
     m_pginfo = new ProgramInfo(filename);
@@ -24,7 +24,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
-    m_rbuffer(RingBuffer::Create(filename, write)),
+    m_rbuffer(MythMediaBuffer::Create(filename, write)),
     m_sock(remote), m_writemode(write)
 {
     m_pginfo = new ProgramInfo(filename);

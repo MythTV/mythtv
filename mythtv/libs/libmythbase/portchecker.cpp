@@ -88,6 +88,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
 #endif
     if (linkLocalOnly)
     {
+        // cppcheck-suppress knownConditionTrueFalse
         if (islinkLocal)
         {
             // If we already know the scope, set it here and return

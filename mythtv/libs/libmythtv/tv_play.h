@@ -43,7 +43,7 @@ class OSD;
 class RemoteEncoder;
 class MythPlayer;
 class DetectLetterbox;
-class RingBuffer;
+class MythMediaBuffer;
 class ProgramInfo;
 class PlayerContext;
 class TvPlayWindow;
@@ -672,6 +672,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static PictureAttribute NextPictureAdjustType(
         PictureAdjustType type, MythPlayer *mp, PictureAttribute attr);
     static void HandleDeinterlacer(PlayerContext* ctx, const QString &action);
+    void OverrideScan(PlayerContext *Context, FrameScanType Scan);
 
     // Sundry on screen
     static void ITVRestart(PlayerContext *ctx, bool isLive);
@@ -996,10 +997,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     uint             m_tvmSup                 {kPictureAttributeSupported_None};
     bool             m_tvmStereoAllowed       {false};
     StereoscopicMode m_tvmStereoMode          {kStereoscopicModeNone};
-    FrameScanType    m_tvmScanType            {kScan_Ignore};
-    FrameScanType    m_tvmScanTypeUnlocked    {kScan_Ignore};
-    bool             m_tvmScanTypeLocked      {false};
-    QString          m_tvmCurMode             {};
     QStringList      m_tvmDeinterlacers       {};
     QString          m_tvmCurrentDeinterlacer {};
     bool             m_tvmDoubleRate          {false};

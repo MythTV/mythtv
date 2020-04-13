@@ -184,6 +184,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     // Deinterlacing
     bool needreferenceframes = false;
+    auto discontinuity = abs(Frame->frameCounter - m_discontinuityCounter) > 1;
 
     if (is_interlaced(Scan))
     {
@@ -222,7 +223,11 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
         // driver deinterlacing
         if (!glsldeint)
+        {
+            if (discontinuity)
+                DestroyDeinterlacer();
             id = Deinterlace(Frame, id, Scan);
+        }
 
         // fallback to shaders if VAAPI deints fail
         if (m_filterError)
@@ -235,7 +240,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     if (needreferenceframes)
     {
-        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+        if (discontinuity)
             CleanupReferenceFrames();
         RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
     }
@@ -345,8 +350,12 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
         case VA_FOURCC_NV12: return FMT_NV12;
         case VA_FOURCC_YUY2:
         case VA_FOURCC_UYVY: return FMT_YUY2;
+#if defined (VA_FOURCC_P010)
         case VA_FOURCC_P010: return FMT_P010;
+#endif
+#if defined (VA_FOURCC_P016)
         case VA_FOURCC_P016: return FMT_P016;
+#endif
         case VA_FOURCC_ARGB: return FMT_ARGB32;
         case VA_FOURCC_RGBA: return FMT_RGBA32;
     }

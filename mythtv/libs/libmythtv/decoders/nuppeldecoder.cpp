@@ -152,7 +152,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
     return true;
 }
 
-int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
+int NuppelDecoder::OpenFile(MythMediaBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
                             int /*testbufsize*/)
 {
@@ -702,7 +702,6 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         m_mpaVidCtx->extradata_size = m_ffmpegExtraDataSize;
     }
 
-    QMutexLocker locker(avcodeclock);
     if (avcodec_open2(m_mpaVidCtx, m_mpaVidCodec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc video codec");
@@ -714,8 +713,6 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
 
 void NuppelDecoder::CloseAVCodecVideo(void)
 {
-    QMutexLocker locker(avcodeclock);
-
     if (m_mpaVidCodec && m_mpaVidCtx)
         avcodec_free_context(&m_mpaVidCtx);
 }
@@ -758,7 +755,6 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     m_mpaAudCtx->codec_id = (enum AVCodecID)codec;
     m_mpaAudCtx->codec_type = AVMEDIA_TYPE_AUDIO;
 
-    QMutexLocker locker(avcodeclock);
     if (avcodec_open2(m_mpaAudCtx, m_mpaAudCodec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc audio codec");
@@ -770,8 +766,6 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
 
 void NuppelDecoder::CloseAVCodecAudio(void)
 {
-    QMutexLocker locker(avcodeclock);
-
     if (m_mpaAudCodec && m_mpaAudCtx)
         avcodec_free_context(&m_mpaAudCtx);
 }
@@ -881,42 +875,37 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         pkt.data = lstrm;
         pkt.size = frameheader->packetlength;
 
+        // if directrendering, writes into buf
+        bool gotpicture = false;
+        //  SUGGESTION
+        //  Now that avcodec_decode_video2 is deprecated and replaced
+        //  by 2 calls (receive frame and send packet), this could be optimized
+        //  into separate routines or separate threads.
+        //  Also now that it always consumes a whole buffer some code
+        //  in the caller may be able to be optimized.
+        int ret = avcodec_receive_frame(m_mpaVidCtx, mpa_pic);
+        if (ret == 0)
+            gotpicture = true;
+        if (ret == AVERROR(EAGAIN))
+            ret = 0;
+        if (ret == 0)
+            ret = avcodec_send_packet(m_mpaVidCtx, &pkt);
+        m_directFrame = nullptr;
+        // The code assumes that there is always space to add a new
+        // packet. This seems risky but has always worked.
+        // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
+        // the packet around and try it again after processing the frame
+        // received here.
+        if (ret < 0)
         {
-            QMutexLocker locker(avcodeclock);
-            // if directrendering, writes into buf
-            bool gotpicture = false;
-            //  SUGGESTION
-            //  Now that avcodec_decode_video2 is deprecated and replaced
-            //  by 2 calls (receive frame and send packet), this could be optimized
-            //  into separate routines or separate threads.
-            //  Also now that it always consumes a whole buffer some code
-            //  in the caller may be able to be optimized.
-            int ret = avcodec_receive_frame(m_mpaVidCtx, mpa_pic);
-            if (ret == 0)
-                gotpicture = true;
-            if (ret == AVERROR(EAGAIN))
-                ret = 0;
-            if (ret == 0)
-                ret = avcodec_send_packet(m_mpaVidCtx, &pkt);
-            m_directFrame = nullptr;
-            // The code assumes that there is always space to add a new
-            // packet. This seems risky but has always worked.
-            // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
-            // the packet around and try it again after processing the frame
-            // received here.
-            if (ret < 0)
-            {
-                char error[AV_ERROR_MAX_STRING_SIZE];
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("video decode error: %1 (%2)")
-                    .arg(av_make_error_string(error, sizeof(error), ret))
-                    .arg(gotpicture));
-            }
-            if (!gotpicture)
-            {
-                return false;
-            }
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("video decode error: %1 (%2)")
+                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(gotpicture));
         }
+        if (!gotpicture)
+            return false;
 
 /* XXX: Broken
         if (mpa_pic->qscale_table != nullptr && mpa_pic->qstride > 0)
@@ -994,7 +983,7 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
     return 0;
 }
 
-void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
+void NuppelDecoder::WriteStoredData(MythMediaBuffer *rb, bool storevid,
                                     long timecodeOffset)
 {
     while (!m_storedData.empty())
@@ -1241,8 +1230,6 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                 pkt.data = m_strm;
                 pkt.size = m_frameHeader.packetlength;
 
-                QMutexLocker locker(avcodeclock);
-
                 while (pkt.size > 0 && m_audio->HasAudioOut())
                 {
                     int data_size = 0;
@@ -1354,8 +1341,6 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
             .arg(newKey).arg(skipFrames)
             .arg((doFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
-
-    QMutexLocker locker(avcodeclock);
 
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 

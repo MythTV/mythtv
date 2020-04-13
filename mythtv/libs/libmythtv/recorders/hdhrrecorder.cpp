@@ -11,9 +11,10 @@
 // MythTV includes
 #include "hdhrstreamhandler.h"
 #include "atscstreamdata.h"
+#include "tsstreamdata.h"
 #include "hdhrrecorder.h"
 #include "hdhrchannel.h"
-#include "ringbuffer.h"
+#include "io/mythmediabuffer.h"
 #include "tv_rec.h"
 #include "mythlogging.h"
 
@@ -29,6 +30,15 @@ bool HDHRRecorder::Open(void)
     }
 
     ResetForNewFile();
+
+    if (m_channel->GetFormat().compare("MPTS") == 0)
+    {
+        // MPTS only.  Use TSStreamData to write out unfiltered data.
+        LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
+        SetStreamData(new TSStreamData(m_tvrec ? m_tvrec->GetInputId() : -1));
+        m_recordMptsOnly = true;
+        m_recordMpts = false;
+    }
 
     m_streamHandler = HDHRStreamHandler::Get(m_channel->GetDevice(),
                                              m_channel->GetInputID(),
@@ -52,12 +62,15 @@ void HDHRRecorder::Close(void)
 
 void HDHRRecorder::StartNewFile(void)
 {
-    if (m_recordMpts)
-        m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
+    if (!m_recordMptsOnly)
+    {
+        if (m_recordMpts)
+            m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
-    // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
-    HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
+        // Make sure the first things in the file are a PAT & PMT
+        HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
+    }
 }
 
 void HDHRRecorder::run(void)
@@ -78,6 +91,14 @@ void HDHRRecorder::run(void)
         m_recording = true;
         m_recordingWait.wakeAll();
     }
+
+    // Listen for time table on DVB standard streams
+    if (m_channel && (m_channel->GetSIStandard() == "dvb"))
+        m_streamData->AddListeningPID(DVB_TDT_PID);
+
+    // Gives errors about invalid PID but it does work...
+    if (m_recordMptsOnly)
+        m_streamData->AddListeningPID(0x2000);
 
     StartNewFile();
 
@@ -102,7 +123,7 @@ void HDHRRecorder::run(void)
             m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!m_inputPmt)
+        if (!m_inputPmt && !m_recordMptsOnly)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");

@@ -25,7 +25,7 @@ using namespace std;
 class TV;
 class RemoteEncoder;
 class MythPlayer;
-class RingBuffer;
+class MythMediaBuffer;
 class ProgramInfo;
 class LiveTVChain;
 class QPainter;
@@ -98,14 +98,14 @@ class MTV_PUBLIC PlayerContext
     void SetPlayer(MythPlayer *newplayer);
     void SetRecorder(RemoteEncoder *rec);
     void SetTVChain(LiveTVChain *chain);
-    void SetRingBuffer(RingBuffer *buf);
+    void SetRingBuffer(MythMediaBuffer *Buffer);
     void SetPlayingInfo(const ProgramInfo *info);
     void SetPlayGroup(const QString &group);
     void SetPseudoLiveTV(const ProgramInfo *pi, PseudoState new_state);
     void SetPIPLocation(int loc) { m_pipLocation = loc; }
     void SetPIPState(PIPState change) { m_pipState = change; }
     void SetPlayerChangingBuffers(bool val) { m_playerUnsafe = val; }
-    void SetNoHardwareDecoders(void) { m_nohardwaredecoders = true; }
+    void SetNoHardwareDecoders(bool Disallow = true) { m_nohardwaredecoders = Disallow; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
@@ -130,6 +130,8 @@ class MTV_PUBLIC PlayerContext
         { return (kPBPLeft == m_pipState); }
     bool IsAudioNeeded(void) const
         { return (kPIPOff  == m_pipState) || (kPBPLeft       == m_pipState); }
+    bool IsPiPOrSecondaryPBP(void) const
+        { return IsPIP() || (IsPBP() && !IsPrimaryPBP()); }
     bool IsNullVideoDesired(void)   const { return m_useNullVideo; }
     bool IsPlayerChangingBuffers(void) const { return m_playerUnsafe; }
     bool IsEmbedding(void) const;
@@ -150,7 +152,7 @@ class MTV_PUBLIC PlayerContext
     volatile bool       m_playerUnsafe       {false};
     RemoteEncoder      *m_recorder           {nullptr};
     LiveTVChain        *m_tvchain            {nullptr};
-    RingBuffer         *m_buffer             {nullptr};
+    MythMediaBuffer    *m_buffer             {nullptr};
     ProgramInfo        *m_playingInfo        {nullptr}; ///< Currently playing info
     long long           m_playingLen         {0};  ///< Initial CalculateLength()
     bool                m_nohardwaredecoders {false}; // < Disable use of VDPAU decoding

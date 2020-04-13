@@ -63,11 +63,22 @@ LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 LIBS += -L../../external/libudfread -lmythudfread-$${LIBVERSION}
 
+!using_libexiv2_external {
+    darwin {
+        QMAKE_CXXFLAGS = "-I../../external/libexiv2/include" $${QMAKE_CXXFLAGS}
+    } else {
+        INCLUDEPATH += ../../external/libexiv2/include
+    }
+    DEPENDPATH += ../../external/libexiv2
+    LIBS += -L../../external/libexiv2 -lmythexiv2-0.28
+}
+
 !using_libbluray_external {
     INCLUDEPATH += ../../external/libmythbluray/src
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
 }
+
 using_libbluray_external:android {
     LIBS += -lbluray -lxml2
 }
@@ -132,7 +143,10 @@ INCLUDEPATH += $$POSTINC
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$EXTRA_LIBS $$LATE_LIBS -lexiv2
+LIBS += $$EXTRA_LIBS $$LATE_LIBS
+using_libexiv2_external {
+    LIBS += -lexiv2
+}
 
 test_clean.commands = -cd test/ && $(MAKE) -f Makefile clean
 clean.depends = test_clean

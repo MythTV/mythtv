@@ -333,25 +333,38 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     // MPEG2 on Ironlake where it seems to return I420 labelled as NV12. I420 is
     // buggy on Sandybridge (stride?) and produces a mixture of I420/NV12 frames
     // for H.264 on Ironlake.
-    int  format    = VA_FOURCC_NV12;
-    QString vendor = interop->GetVendor();
-    if (vendor.contains("ironlake", Qt::CaseInsensitive))
-        if (CODEC_IS_MPEG(Context->codec_id))
-            format = VA_FOURCC_I420;
+    // This may need extending for AMD etc
 
-    if (format != VA_FOURCC_NV12)
+    QString vendor = interop->GetVendor();
+    // Intel NUC
+    if (vendor.contains("iHD", Qt::CaseInsensitive) && vendor.contains("Intel", Qt::CaseInsensitive))
     {
-        auto vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
-            .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
+        vaapi_frames_ctx->attributes = nullptr;
+        vaapi_frames_ctx->nb_attributes = 0;
+    }
+    // i965 series
+    else
+    {
+        int format = VA_FOURCC_NV12;
+        if (vendor.contains("ironlake", Qt::CaseInsensitive))
+            if (CODEC_IS_MPEG(Context->codec_id))
+                format = VA_FOURCC_I420;
+
+        if (format != VA_FOURCC_NV12)
+        {
+            auto vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
+                .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
+        }
+
+        VASurfaceAttrib prefs[3] = {
+            { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { format } } },
+            { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
+            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
+        vaapi_frames_ctx->attributes = prefs;
+        vaapi_frames_ctx->nb_attributes = 3;
     }
 
-    VASurfaceAttrib prefs[3] = {
-        { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { format } } },
-        { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
-        { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
-    vaapi_frames_ctx->attributes = prefs;
-    vaapi_frames_ctx->nb_attributes = 3;
     hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
     int referenceframes = AvFormatDecoder::GetMaxReferenceFrames(Context);
     hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, referenceframes, true));
@@ -758,7 +771,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->top_field_first = m_lastTopFieldFirst;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->decoder_deinterlaced = true;
+        Frame->already_deinterlaced = true;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can

@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="es_ES" sourcelanguage="en_US">
 <context>
     <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="66"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="57"/>
         <source>Edit Bookmark Details</source>
         <translation>Editar detalles del marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="68"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="59"/>
         <source>Enter Bookmark Details</source>
         <translation>Introducir detalles del marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="139"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="129"/>
         <source>Select a category</source>
         <translation>Seleccione una categoría</translation>
     </message>
@@ -23,7 +22,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="177"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="154"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -32,62 +31,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcadores</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="263"/>
         <source>Actions</source>
         <translation>Acciones</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="278"/>
         <source>Set Homepage</source>
         <translation>Establecer página de inicio</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="279"/>
         <source>Add Bookmark</source>
         <translation>Añadir marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="308"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Edit Bookmark</source>
         <translation>Editar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="309"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
         <source>Delete Bookmark</source>
         <translation>Eliminar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
         <source>Show Bookmark</source>
         <translation>Mostrar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="290"/>
         <source>Delete Marked</source>
         <translation>Eliminar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="316"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
         <source>Show Marked</source>
         <translation>Mostrar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
         <source>Clear Marked</source>
         <translation>Quitar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="320"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
         <source>Settings</source>
         <translation>Configuración</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="526"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="500"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>¿Seguro que desea eliminar el marcador seleccionado?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="570"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="544"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>¿Seguro que desea eliminar los marcadores indicados?</translation>
     </message>
@@ -95,32 +94,32 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="48"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="36"/>
         <source>MythBrowser Settings</source>
         <translation>Configuración de MythBrowser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="111"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Ésta es la orden que se usará para mostrar el navegador web. Use &apos;internal&apos; para utilizar el navegador web nativo. %ZOOM% y %URL% se sustituirán por el número de aumentos y la lista de URL.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="135"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>Éste es el tamaño del texto que se usará de forma predeterminada. Los valores válidos para el navegador interno van desde 0.3 a 5.0 siendo 1.0 el tamaño normal, menor que 1 es más pequeño y mayor que 1 es más grande que el tamaño normal.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="140"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation>Al marcarlo se activarán los complementos del navegador si se usa el interno.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="143"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="129"/>
         <source>Exit without saving settings</source>
         <translation>Salir sin guardar la configuración</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="145"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="133"/>
         <source>Save settings and Exit</source>
         <translation>Guardar la configuración y salir</translation>
     </message>
@@ -128,53 +127,53 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="148"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="142"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Enter URL</source>
         <translation>Introduzca el URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="280"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="274"/>
         <source>Loading...</source>
         <translation>Cargando...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="350"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="343"/>
         <source>Actions</source>
         <translation>Acciones</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Back</source>
         <translation>Atrás</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="360"/>
         <source>Forward</source>
         <translation>Adelante</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Zoom In</source>
         <translation>Aumentar</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Zoom Out</source>
         <translation>Disminuir</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="371"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>New Tab</source>
         <translation>Nueva pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Delete Tab</source>
         <translation>Eliminar pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Add Bookmark</source>
         <translation>Añadir marcador</translation>
     </message>
@@ -182,27 +181,27 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="106"/>
+        <location filename="../mythbrowser/main.cpp" line="107"/>
         <source>Move to next browser tab</source>
         <translation>Ir a la siguiente pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="108"/>
+        <location filename="../mythbrowser/main.cpp" line="109"/>
         <source>Move to previous browser tab</source>
         <translation>Ir a la pestaña anterior</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <location filename="../mythbrowser/main.cpp" line="112"/>
         <source>Show the bookmark manager</source>
         <translation>Mostrar el gestor de favoritos</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="113"/>
+        <location filename="../mythbrowser/main.cpp" line="114"/>
         <source>Show the webbrowser homepage</source>
         <translation>Mostrar la página de inicio del navegador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="116"/>
+        <location filename="../mythbrowser/main.cpp" line="117"/>
         <source>Internal Web Browser</source>
         <translation>Navegador web interno</translation>
     </message>
@@ -210,82 +209,102 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Bookmark Manager</source>
         <translation>Administrador de marcadores</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Category</source>
         <translation>Categoría</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="56"/>
+        <source>WEB BROWSER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>Website Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Website URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="63"/>
+        <source>Zoom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="64"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="52"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Category:</source>
         <translation>Categoría:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Web Page</source>
         <translation>Página web</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="5"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Web Bookmarks</source>
         <translation>Marcadores web</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Browse your favorite web sites.</source>
         <translation>Navegue por sus páginas favoritas.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Browser:</source>
         <translation>Navegador:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Activar complementos del navegador (Flash, etc.):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="42"/>
         <source>OK</source>
         <translation>Aceptar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Rating Settings</source>
         <translation>Configuración de la puntuación</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Configure Web Browser</source>
         <translation>Configurar navegador web</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="62"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -294,52 +313,50 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Cuando haya terminado de editar, seleccione &quot;Aceptar&quot; o &quot;Cancelar&quot; para continuar.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Genre:</source>
-        <translation>Género:</translation>
+        <translation type="vanished">Género:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
         <source>Channel:</source>
-        <translation>Canal:</translation>
+        <translation type="vanished">Canal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Click to choose from existing categories...</source>
         <translation>Pulse para seleccionar una categoría de las existentes...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Find...</source>
         <translation>Buscar...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Find</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Webbrowser</source>
         <translation>Navegador web</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Bookmarks</source>
         <translation>Marcadores</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Url</source>
         <translation>Url</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Homepage</source>
         <translation>Página de inicio</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Edit Bookmark</source>
         <translation>Editar marcador</translation>
     </message>
@@ -349,52 +366,160 @@ Cuando haya terminado de editar, seleccione &quot;Aceptar&quot; o &quot;Cancelar
         <translation>Página de inicio:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Save</source>
         <translation>Guardar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Browser Settings</source>
         <translation>Configuración del navegador</translation>
     </message>
+    <message numerus="yes">
+        <location filename="themestrings.h" line="6"/>
+        <source>%name% (%url%)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="8"/>
+        <source>Bookmark Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Bookmark URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Browse the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Browser command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Choose a bookmark to open in the webbrowser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Configure web browser settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>Edit your bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>Enable Plugins:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Activar complementos del navegador (Flash, etc.)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="31"/>
+        <source>Enable browser plugins:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
         <source>Enable plugins</source>
         <translation>Activar complementos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Enable plugins:</source>
         <translation>Activar complementos:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="35"/>
+        <source>Find category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Myth Web Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="43"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Select bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>Select bookmark or add a new one</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Select bookmark:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>Text size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>URL Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Browser Command:</source>
         <translation>Orden del navegador:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Text Size:</source>
         <translation>Tamaño del texto:</translation>
     </message>
@@ -402,7 +527,7 @@ Cuando haya terminado de editar, seleccione &quot;Aceptar&quot; o &quot;Cancelar
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="128"/>
+        <location filename="../mythbrowser/webpage.cpp" line="124"/>
         <source>Loading...</source>
         <translation>Cargando...</translation>
     </message>

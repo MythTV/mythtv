@@ -1,8 +1,8 @@
 // MythTV
-#include "dvdringbuffer.h"
+#include "mythdvdbuffer.h"
 #include "DetectLetterbox.h"
 #include "audiooutput.h"
-#include "avformatdecoderdvd.h"
+#include "mythdvddecoder.h"
 #include "mythdvdplayer.h"
 
 // Std
@@ -573,7 +573,7 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
         }
     }
 
-    bool success = m_playerCtx->m_buffer->DVD()->playTrack(Chapter);
+    bool success = m_playerCtx->m_buffer->DVD()->PlayTrack(Chapter);
     if (success)
     {
         if (m_decoder)
@@ -715,7 +715,7 @@ bool MythDVDPlayer::SwitchAngle(int Angle)
     if (Angle < 1 || Angle > total)
         Angle = 1;
 
-    return m_playerCtx->m_buffer->DVD()->SwitchAngle(static_cast<uint>(Angle));
+    return m_playerCtx->m_buffer->DVD()->SwitchAngle(Angle);
 }
 
 void MythDVDPlayer::ResetStillFrameTimer(void)
@@ -758,10 +758,6 @@ void MythDVDPlayer::StillFrameCheck(void)
 
 void MythDVDPlayer::CreateDecoder(char *Testbuf, int TestReadSize)
 {
-    if (AvFormatDecoderDVD::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename(),
-                                      TestReadSize))
-    {
-        SetDecoder(new AvFormatDecoderDVD(this, *m_playerCtx->m_playingInfo,
-                                          m_playerFlags));
-    }
+    if (MythDVDDecoder::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename(), TestReadSize))
+        SetDecoder(new MythDVDDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }

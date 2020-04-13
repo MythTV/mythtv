@@ -21,44 +21,64 @@ GITREPOPATH="exported"
 
 cd ${GITTREEDIR}
 
-git status > /dev/null 2>&1
-SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
+# if we have a mythtv/DESCRIBE file use that to get the branch and version
+if test -e $GITTREEDIR/DESCRIBE ; then
+    echo "Using $GITTREEDIR/DESCRIBE"
+    . $GITTREEDIR/DESCRIBE
+    echo "BRANCH: $BRANCH"
+    echo "SOURCE_VERSION: $SOURCE_VERSION"
+else
+    # get the branch and version from git or fall back to EXPORTED_VERSION then VERSION as last resort
+    git status > /dev/null 2>&1
+    SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
+    echo "SOURCE_VERSION: $SOURCE_VERSION"
 
-case "${SOURCE_VERSION}" in
-    exported|Unknown)
-        if ! grep -q Format $GITTREEDIR/EXPORTED_VERSION; then
-            . $GITTREEDIR/EXPORTED_VERSION
-            # This file has SOURCE_VERSION and BRANCH
-            # example SOURCE_VERSION="30d8a96"
-            # BRANCH examples from github
-            # BRANCH=" (HEAD -> master)"
-            # BRANCH=" (fixes/0.28)"
-            # BRANCH=" (tag: v0.28.1)"
-            # From a checkout they can be as follows:
-            # " (origin/fixes/0.28, fixes/0.28)"
-            # " (HEAD -> master, origin/master, origin/HEAD)"
-            # " (tag: v0.28.1)"
-            hash="$SOURCE_VERSION"
-            # This extracts after the last comma inside the parens:
-            BRANCH=$(echo "${BRANCH}" | sed -e 's/ (\(.*, \)\{0,1\}\(.*\))/\2/' -e 's,origin/,,')
-            # Create a suitable version (hash is no good)
-            SOURCE_VERSION="$BRANCH"
-            SOURCE_VERSION=`echo "$SOURCE_VERSION" | sed "s/tag: *//"`
-            if ! echo "$SOURCE_VERSION" | grep "^v[0-9]" ; then
+    case "${SOURCE_VERSION}" in
+        exported|Unknown)
+            if ! grep -q Format $GITTREEDIR/EXPORTED_VERSION; then
+                . $GITTREEDIR/EXPORTED_VERSION
+                echo "Using $GITTREEDIR/EXPORTED_VERSION"
+                echo "BRANCH: $BRANCH"
+                echo "SOURCE_VERSION: $SOURCE_VERSION"
+                # This file has SOURCE_VERSION and BRANCH
+                # example SOURCE_VERSION="30d8a96"
+                # BRANCH examples from github
+                # BRANCH=" (HEAD -> master)"
+                # BRANCH=" (fixes/0.28)"
+                # BRANCH=" (tag: v0.28.1)"
+                # From a checkout they can be as follows:
+                # " (origin/fixes/0.28, fixes/0.28)"
+                # " (HEAD -> master, origin/master, origin/HEAD)"
+                # " (tag: v0.28.1)"
+                hash="$SOURCE_VERSION"
+                # This extracts after the last comma inside the parens:
+                BRANCH=$(echo "${BRANCH}" | sed -e 's/ (\(.*, \)\{0,1\}\(.*\))/\2/' -e 's,origin/,,')
+                # Create a suitable version (hash is no good)
+                SOURCE_VERSION="$BRANCH"
+                SOURCE_VERSION=`echo "$SOURCE_VERSION" | sed "s/tag: *//"`
+                if ! echo "$SOURCE_VERSION" | grep "^v[0-9]" ; then
+                    . $GITTREEDIR/VERSION
+                fi
+                SOURCE_VERSION="${SOURCE_VERSION}-${hash}"
+                echo "Source Version created as $SOURCE_VERSION"
+                echo "Branch created as $BRANCH"
+            elif test -e $GITTREEDIR/VERSION ; then
+                echo "Using $GITTREEDIR/VERSION"
                 . $GITTREEDIR/VERSION
+                echo "BRANCH: $BRANCH"
+                echo "SOURCE_VERSION: $SOURCE_VERSION"
             fi
-            SOURCE_VERSION="${SOURCE_VERSION}-${hash}"
-            echo "Source Version created as $SOURCE_VERSION"
-        elif test -e $GITTREEDIR/VERSION ; then
-            . $GITTREEDIR/VERSION
-        fi
-    ;;
-    *)
-        if [ -z "${BRANCH}" ]; then
-            BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
-        fi
-    ;;
-esac
+        ;;
+        *)
+            if [ -z "${BRANCH}" ]; then
+                BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+                echo "Using git to get branch and version"
+                echo "BRANCH: $BRANCH"
+                echo "SOURCE_VERSION: $SOURCE_VERSION"
+            fi
+        ;;
+    esac
+fi
 
 if ! echo "${SOURCE_VERSION}" | egrep -i "v[0-9]+.*"   ; then
     # Invalid version - use VERSION file

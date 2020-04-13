@@ -576,6 +576,15 @@ def check_ipv6(n):
     except socket.error:
         return False
 
+def resolve_ip(host, port):
+    try:
+        res = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM)[0]
+        # (family, socktype, proto, canonname, sockaddr)
+        af, socktype, proto, canonname, sa = res
+        return(sa[0], sa[1])
+    except:
+        return (None, None)
+
 def py23_str(value, ignore_errors=False):
     error_methods = ('strict', 'ignore')
     error_method  = error_methods[ignore_errors]

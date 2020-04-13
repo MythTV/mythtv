@@ -139,14 +139,14 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     QString& GetCommand(void)        { return m_command; }
     // FIXME: Eliminate. We should not allow setting the command
     //        after construcion.
-    void SetCommand(QString &cmd)    { m_command = cmd; }
+    void SetCommand(const QString &cmd)    { m_command = cmd; }
 
     // FIXME: We should not return a reference here
     // FIXME: Rename "GetArguments"
     QStringList &GetArgs(void)       { return m_args; }
     // FIXME: Eliminate. We should not allow setting the arguements
     //        after construcion.
-    void SetArgs(QStringList &args)  { m_args = args; }
+    void SetArgs(const QStringList &args)  { m_args = args; }
 
     int GetNice(void) const          { return m_nice; }
     int GetIOPrio(void) const        { return m_ioprio; }

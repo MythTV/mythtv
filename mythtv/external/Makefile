@@ -3,6 +3,10 @@ include ../config.mak
 SUBDIRS = FFmpeg libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
 
+ifneq ($(CONFIG_LIBEXIV2_EXTERNAL),yes)
+    SUBDIRS += libexiv2
+endif
+
 ifneq ($(CONFIG_LIBBLURAY_EXTERNAL),yes)
     SUBDIRS += libmythbluray
 endif
@@ -23,6 +27,9 @@ distclean:	${SUBDIRS_DISTCLEAN}
 
 FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
 	${MAKE} -C FFmpeg ${@:FFmpeg-%=%} DESTDIR=${INSTALL_ROOT}
+
+libexiv2-all libexiv2-clean libexiv2-distclean libexiv2-install libexiv2-uninstall:
+	${MAKE} -C libexiv2 ${@:libexiv2-%=%}
 
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}

@@ -221,8 +221,9 @@ CheckOptions:
   - { key: modernize-make-shared.IgnoreMacros,             value: 0 }
   - { key: modernize-make-unique.IgnoreMacros,             value: 0 }
   - { key: modernize-use-bool-literals.IgnoreMacros,       value: 1 }
-  - { key: modernize-use-default-member-init.IgnoreMacros, value: 0 }
+  - { key: modernize-use-default-member-init.IgnoreMacros, value: 1 }
   - { key: modernize-use-equals-default.IgnoreMacros,      value: 0 }
+  - { key: modernize-use-nullptr.NullMacros,               value: 'Z_NULL' }
   - { key: modernize-use-using.IgnoreMacros,               value: 1 }
 
   - { key: performance-inefficient-vector-operation.VectorLikeClasses,

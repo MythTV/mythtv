@@ -14,7 +14,7 @@ using namespace std;
 #include "referencecounter.h"
 
 class ProgramInfo;
-class RingBuffer;
+class MythMediaBuffer;
 class MythSocket;
 class QString;
 
@@ -54,7 +54,7 @@ class FileTransfer : public ReferenceCounter
     QWaitCondition  m_readsUnlockedCond;
 
     ProgramInfo    *m_pginfo            {nullptr};
-    RingBuffer     *m_rbuffer           {nullptr};
+    MythMediaBuffer* m_rbuffer          {nullptr};
     MythSocket     *m_sock              {nullptr};
     bool            m_ateof             {false};
 

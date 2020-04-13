@@ -2704,7 +2704,9 @@ vector<uint> CardUtil::GetLiveTVInputList(void)
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {
     QString devname = QString(device);
+#if 0
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("DVB Device (%1)").arg(devname));
+#endif
     QString tmp = devname;
 
     if (DVB_DEV_FRONTEND == type)
