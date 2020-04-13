@@ -427,11 +427,12 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
-    foreach (auto & frame, m_drmFrames)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_drmFrames.begin() ; it != m_drmFrames.end(); ++it)
     {
-        for (int i = 0; i < frame->nb_objects; i++)
-            close(frame->objects[i].fd);
-        av_freep(frame);
+        for (int i = 0; i < (*it)->nb_objects; i++)
+            close((*it)->objects[i].fd);
+        av_freep(&(*it));
     }
     m_drmFrames.clear();
 }
