@@ -376,7 +376,7 @@ using_frontend {
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += tvbrowsehelper.h
-    HEADERS += netstream.h
+    HEADERS += mheg/netstream.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += audioplayer.cpp
     SOURCES += mythccextractorplayer.cpp
@@ -385,7 +385,7 @@ using_frontend {
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
     SOURCES += tvbrowsehelper.cpp
-    SOURCES += netstream.cpp
+    SOURCES += mheg/netstream.cpp
 
     # Input/output
     HEADERS += io/mythiowrapper.h
@@ -420,11 +420,11 @@ using_frontend {
     HEADERS += osd.h
     HEADERS += captions/teletextscreen.h
     HEADERS += captions/subtitlescreen.h
-    HEADERS += interactivescreen.h
+    HEADERS += mheg/interactivescreen.h
     SOURCES += osd.cpp
     SOURCES += captions/teletextscreen.cpp
     SOURCES += captions/subtitlescreen.cpp
-    SOURCES += interactivescreen.cpp
+    SOURCES += mheg/interactivescreen.cpp
 
     # Video output
     HEADERS += mythvideoout.h           mythvideooutnull.h

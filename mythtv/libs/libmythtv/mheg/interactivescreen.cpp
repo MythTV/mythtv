@@ -1,4 +1,4 @@
-#include "interactivescreen.h"
+#include "mheg/interactivescreen.h"
 
 InteractiveScreen::InteractiveScreen(MythPlayer *player,
                                      const QString &name) :
