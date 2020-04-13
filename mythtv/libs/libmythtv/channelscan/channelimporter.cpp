@@ -25,6 +25,8 @@ using namespace std;
 
 #define LOC QString("ChanImport: ")
 
+static const QString kATSCChannelFormat = "%1_%2";
+
 static QString map_str(QString str)
 {
     if (str.isEmpty())
@@ -515,8 +517,6 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
     ScanDTVTransportList &inserted_list,
     ScanDTVTransportList &skipped_list)
 {
-    QString channelFormat = "%1_%2";
-
     ScanDTVTransportList next_list;
 
     bool cancel_all = false;
@@ -580,7 +580,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                     if ((kATSCNonConflicting == type) ||
                         (kATSCConflicting == type))
                     {
-                        chan.m_chanNum = channelFormat
+                        chan.m_chanNum = kATSCChannelFormat
                             .arg(chan.m_atscMajorChannel)
                             .arg(chan.m_atscMinorChannel);
                     }
@@ -747,7 +747,6 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
     ScanDTVTransportList &updated_list,
     ScanDTVTransportList &skipped_list)
 {
-    QString channelFormat = "%1_%2";
     bool renameChannels = false;
 
     ScanDTVTransportList next_list;
@@ -790,7 +789,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 {
                     if (kATSCNonConflicting == type)
                     {
-                        chan.m_chanNum = channelFormat
+                        chan.m_chanNum = kATSCChannelFormat
                             .arg(chan.m_atscMajorChannel)
                             .arg(chan.m_atscMinorChannel);
                     }
@@ -1472,7 +1471,7 @@ QString ChannelImporter::SimpleFormatChannel(
 
         if (si_standard == "atsc")
         {
-            ssMsg << (QString("%1-%2")
+            ssMsg << (kATSCChannelFormat
                   .arg(chan.m_atscMajorChannel)
                   .arg(chan.m_atscMinorChannel)).toLatin1().constData();
         }
