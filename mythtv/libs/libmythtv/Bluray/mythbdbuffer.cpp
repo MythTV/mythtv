@@ -350,7 +350,18 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     m_topMenuSupported   = false;
     m_firstPlaySupported = false;
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(m_bdnav);
-    if (!discinfo || (discinfo->aacs_detected && !discinfo->aacs_handled) ||
+    if (!discinfo)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve disc info");
+        bd_close(m_bdnav);
+        m_bdnav = nullptr;
+        m_lastError = tr("Could not open Blu-ray device: %1").arg(filename);
+        m_rwLock.unlock();
+        MythFileOpenRegisterCallback(filename.toLocal8Bit().data(), this, nullptr);
+        return false;
+    }
+
+    if ((discinfo->aacs_detected && !discinfo->aacs_handled) ||
         (discinfo->bdplus_detected && !discinfo->bdplus_handled))
     {
         // couldn't decrypt bluray
@@ -363,8 +374,8 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     }
 
     // The following settings affect HDMV navigation
-    // (default audio track selection,
-    // parental controls, menu language, etc.  They are not yet used.
+    // (default audio track selection, parental controls, menu language, etc.)
+    // They are not yet used.
 
     // Set parental level "age" to 99 for now.  TODO: Add support for FE level
     bd_set_player_setting(m_bdnav, BLURAY_PLAYER_SETTING_PARENTAL, 99);
@@ -402,35 +413,37 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         return false;
     }
 
-    if (discinfo)
-    {
-        m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
-        m_firstPlaySupported = (discinfo->first_play_supported != 0U);
+    m_topMenuSupported   = (discinfo->top_menu_supported != 0U);
+    m_firstPlaySupported = (discinfo->first_play_supported != 0U);
 
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
-            .arg(discinfo->first_play_supported ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Top Menu Supported: %1")
-            .arg(discinfo->top_menu_supported ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of HDMV Titles: %1")
-            .arg(discinfo->num_hdmv_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of BD-J Titles: %1")
-            .arg(discinfo->num_bdj_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of Unsupported Titles: %1")
-            .arg(discinfo->num_unsupported_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS present on disc: %1")
-            .arg(discinfo->aacs_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libaacs used: %1")
-            .arg(discinfo->libaacs_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS handled: %1")
-            .arg(discinfo->aacs_handled ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ present on disc: %1")
-            .arg(discinfo->bdplus_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libbdplus used: %1")
-            .arg(discinfo->libbdplus_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ handled: %1")
-            .arg(discinfo->bdplus_handled ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
+        .arg(discinfo->first_play_supported ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Top Menu Supported: %1")
+        .arg(discinfo->top_menu_supported ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of HDMV Titles: %1")
+        .arg(discinfo->num_hdmv_titles));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of BD-J Titles: %1")
+        .arg(discinfo->num_bdj_titles));
+    if (discinfo->num_bdj_titles && discinfo->bdj_detected)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD-J Supported: %1")
+            .arg(discinfo->bdj_handled ? "yes" : "no"));
     }
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of Unsupported Titles: %1")
+        .arg(discinfo->num_unsupported_titles));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS present on disc: %1")
+        .arg(discinfo->aacs_detected ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libaacs used: %1")
+        .arg(discinfo->libaacs_detected ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS handled: %1")
+        .arg(discinfo->aacs_handled ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ present on disc: %1")
+        .arg(discinfo->bdplus_detected ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libbdplus used: %1")
+        .arg(discinfo->libbdplus_detected ? "yes" : "no"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ handled: %1")
+        .arg(discinfo->bdplus_handled ? "yes" : "no"));
 
     m_mainTitle = 0;
     m_currentTitleLength = 0;
@@ -482,7 +495,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         uint64_t titleLength = 0;
         BLURAY_TITLE_INFO *titleInfo = nullptr;
         bool found = false;
-        for( unsigned i = 0; i < m_numTitles; ++i)
+        for(uint32_t i = 0; i < m_numTitles; ++i)
         {
             titleInfo = GetTitleInfo(i);
             if (!titleInfo)
