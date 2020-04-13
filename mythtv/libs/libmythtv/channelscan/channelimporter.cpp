@@ -574,36 +574,22 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             {
                 bool conflicting = false;
 
-                if (chan.m_chanNum.isEmpty() ||
-                    ChannelUtil::IsConflicting(chan.m_chanNum, chan.m_sourceId))
+                if (chan.m_chanNum.isEmpty())
                 {
                     if ((kATSCNonConflicting == type) ||
-                        (kATSCConflicting == type))
+                        (kATSCConflicting    == type))
                     {
                         chan.m_chanNum = kATSCChannelFormat
                             .arg(chan.m_atscMajorChannel)
                             .arg(chan.m_atscMinorChannel);
                     }
-                    else if (chan.m_siStandard == "dvb")
+                    else
                     {
                         chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
                     }
-                    else if (chan.m_freqId.isEmpty())
-                    {
-                        chan.m_chanNum = QString("%1-%2")
-                                            .arg(chan.m_sourceId)
-                                            .arg(chan.m_serviceId);
-                    }
-                    else
-                    {
-                        chan.m_chanNum = QString("%1-%2")
-                                            .arg(chan.m_freqId)
-                                            .arg(chan.m_serviceId);
-                    }
-
-                    conflicting = ChannelUtil::IsConflicting(
-                        chan.m_chanNum, chan.m_sourceId);
                 }
+                conflicting = ChannelUtil::IsConflicting(
+                    chan.m_chanNum, chan.m_sourceId);
 
                 // Only ask if not already asked before with kInsertManual
                 if (m_isInteractive && !asked &&
@@ -747,8 +733,6 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
     ScanDTVTransportList &updated_list,
     ScanDTVTransportList &skipped_list)
 {
-    bool renameChannels = false;
-
     ScanDTVTransportList next_list;
 
     // update all channels with non-conflicting channum
@@ -783,36 +767,22 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 {
                     ChannelUtil::UpdateChannelNumberFromDB(chan);
                 }
-                if (chan.m_chanNum.isEmpty() || renameChannels ||
-                    ChannelUtil::IsConflicting(
-                        chan.m_chanNum, chan.m_sourceId, chan.m_channelId))
+                if (chan.m_chanNum.isEmpty())
                 {
-                    if (kATSCNonConflicting == type)
+                    if ((kATSCNonConflicting == type) ||
+                        (kATSCConflicting    == type))
                     {
                         chan.m_chanNum = kATSCChannelFormat
                             .arg(chan.m_atscMajorChannel)
                             .arg(chan.m_atscMinorChannel);
                     }
-                    else if (chan.m_siStandard == "dvb")
+                    else
                     {
                         chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
                     }
-                    else if (chan.m_freqId.isEmpty())
-                    {
-                        chan.m_chanNum = QString("%1-%2")
-                                            .arg(chan.m_sourceId)
-                                            .arg(chan.m_serviceId);
-                    }
-                    else
-                    {
-                        chan.m_chanNum = QString("%1-%2")
-                                            .arg(chan.m_freqId)
-                                            .arg(chan.m_serviceId);
-                    }
-
-                    conflicting = ChannelUtil::IsConflicting(
-                        chan.m_chanNum, chan.m_sourceId, chan.m_channelId);
                 }
+                conflicting = ChannelUtil::IsConflicting(
+                    chan.m_chanNum, chan.m_sourceId, chan.m_channelId);
 
                 if (conflicting)
                 {
