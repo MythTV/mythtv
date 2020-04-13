@@ -3,7 +3,7 @@
 #define _V4L_RECORDER_H_
 
 #include "dtvrecorder.h"
-#include "cc608decoder.h"
+#include "captions/cc608decoder.h"
 #include "vbitext/vt.h"
 #include "mthread.h"
 #include "tv.h" // for VBIMode

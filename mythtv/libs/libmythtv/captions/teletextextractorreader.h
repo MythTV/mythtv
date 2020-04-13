@@ -9,7 +9,7 @@
 #include <QSet>
 
 #include "mythtvexp.h"
-#include "teletextreader.h"
+#include "captions/teletextreader.h"
 
 QString decode_teletext(int codePage, const uint8_t data[40]);
 

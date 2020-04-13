@@ -4,7 +4,7 @@
 #include <QFont>
 
 #include "mythscreentype.h"
-#include "teletextreader.h"
+#include "captions/teletextreader.h"
 #include "mythplayer.h"
 
 class TeletextScreen: public MythScreenType

@@ -5,8 +5,8 @@
 #include <cstdlib>
 
 #include "mythlogging.h"
-#include "cc708reader.h"
-#include "cc708decoder.h"
+#include "captions/cc708reader.h"
+#include "captions/cc708decoder.h"
 
 #define LOC QString("CC708: ")
 

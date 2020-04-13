@@ -1,11 +1,11 @@
-#include "teletextreader.h"
+#include "captions/teletextreader.h"
 
 #include <cstring>
 
-#include "vbilut.h"
+#include "captions/vbilut.h"
 #include "tv.h"
-#include "mythuiactions.h" // for ACTION_0, ACTION_1, etc
-#include "tv_actions.h"    // for ACTION_MENUBLUE, etc
+#include "mythuiactions.h"
+#include "tv_actions.h"
 #include "mythlogging.h"
 
 #define MAGAZINE(page) ((page) / 256)

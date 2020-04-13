@@ -6,7 +6,7 @@ extern "C" {
 using namespace std;
 
 #include "mythplayer.h"
-#include "cc608reader.h"
+#include "captions/cc608reader.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)
   : m_parent(parent)

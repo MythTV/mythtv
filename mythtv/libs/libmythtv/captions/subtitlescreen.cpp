@@ -6,7 +6,7 @@
 #include "mythuishape.h"
 #include "mythuiimage.h"
 #include "mythpainter.h"
-#include "subtitlescreen.h"
+#include "captions/subtitlescreen.h"
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")

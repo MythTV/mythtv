@@ -26,10 +26,10 @@
 #include <cstdint>
 using namespace std;
 
-#include "vbi608extractor.h"
+#include "captions/vbi608extractor.h"
 #include "mythlogging.h"
 
-#define LOC      QString("VBI608Extractor: ")
+#define LOC QString("VBI608Extractor: ")
 
 static void print(
     const QList<uint>  &raw_minimas, const QList<uint>  &raw_maximas,

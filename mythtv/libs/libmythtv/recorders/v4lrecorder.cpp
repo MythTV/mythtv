@@ -13,7 +13,7 @@
 #include <unistd.h>         // for IO_NONBLOCK
 #include <fcntl.h>          // for IO_NONBLOCK
 
-#include "vbi608extractor.h"
+#include "captions/vbi608extractor.h"
 #include "mythcontext.h"
 #include "mythlogging.h"
 #include "v4lrecorder.h"

@@ -28,13 +28,12 @@ using namespace std;
 #include <QFileInfo>
 #include <QPainter>
 
-#include "teletextextractorreader.h"
-#include "mythccextractorplayer.h"
+#include "captions/teletextextractorreader.h"
 #include "avformatdecoder.h"
-#include "subtitlescreen.h"
-#include "srtwriter.h"
+#include "captions/subtitlescreen.h"
+#include "captions/srtwriter.h"
 #include "iso639.h"
-
+#include "mythccextractorplayer.h"
 
 const int OneSubtitle::kDefaultLength = 750; /* ms */
 

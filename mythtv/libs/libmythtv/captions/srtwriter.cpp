@@ -1,4 +1,4 @@
-#include "srtwriter.h"
+#include "captions/srtwriter.h"
 
 // SRTWriter implementation
 

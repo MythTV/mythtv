@@ -6,7 +6,7 @@
 #include "mythlogging.h"
 #include "decoderbase.h"
 #include "mythplayer.h"
-#include "cc708reader.h"
+#include "captions/cc708reader.h"
 
 #define LOC QString("CC708Reader: ")
 #define CHECKENABLED if (!m_enabled) return

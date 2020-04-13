@@ -22,8 +22,8 @@ using std::lower_bound;
 // MythTV
 #include "mythcorecontext.h"
 #include "remotefile.h"
-#include "textsubtitleparser.h"
-#include "xine_demux_sputext.h"
+#include "captions/textsubtitleparser.h"
+#include "captions/xine_demux_sputext.h"
 #include "mythlogging.h"
 #include "mthreadpool.h"
 

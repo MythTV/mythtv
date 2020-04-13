@@ -12,7 +12,7 @@
 
 #include "avformatdecoder.h"
 #include "mythplayer.h"
-#include "teletextextractorreader.h"
+#include "captions/teletextextractorreader.h"
 #include "format.h"
 
 #include "mythccextractorplayer.h"

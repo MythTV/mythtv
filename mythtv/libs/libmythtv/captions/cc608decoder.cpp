@@ -11,7 +11,7 @@ using namespace std;
 
 // MythTV headers
 #include "format.h"
-#include "cc608decoder.h"
+#include "captions/cc608decoder.h"
 #include "mythcontext.h"
 #include "mythlogging.h"
 #include "vbilut.h"

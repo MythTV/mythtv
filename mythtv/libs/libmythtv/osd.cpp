@@ -20,8 +20,8 @@
 
 // libmythtv
 #include "channelutil.h"
-#include "teletextscreen.h"
-#include "subtitlescreen.h"
+#include "captions/teletextscreen.h"
+#include "captions/subtitlescreen.h"
 #include "interactivescreen.h"
 #include "osd.h"
 #include "Bluray/mythbdbuffer.h"

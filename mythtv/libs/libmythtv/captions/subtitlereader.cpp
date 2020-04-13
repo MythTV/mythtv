@@ -1,5 +1,5 @@
 #include "mythlogging.h"
-#include "subtitlereader.h"
+#include "captions/subtitlereader.h"
 
 SubtitleReader::~SubtitleReader()
 {

@@ -5,7 +5,7 @@
 #include <algorithm>
 using namespace std;
 
-#include "cc708window.h"
+#include "captions/cc708window.h"
 #include "mythlogging.h"
 
 /************************************************************************

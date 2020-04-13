@@ -56,7 +56,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
-#include "subtitlescreen.h"
+#include "captions/subtitlescreen.h"
 #include "DetectLetterbox.h"
 #include "jobqueue.h"
 #include "livetvchain.h"

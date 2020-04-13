@@ -29,7 +29,7 @@
 class VBI608Extractor
 {
   public:
-    VBI608Extractor() = default;;
+    VBI608Extractor() = default;
 
     uint16_t GetCode1(void) const { return m_code[0]; }
     uint16_t GetCode2(void) const { return m_code[1]; }

@@ -29,8 +29,8 @@ extern "C" {
 using namespace std;
 
 #include "osd.h"
-#include "teletextdecoder.h"
-#include "teletextreader.h"
+#include "captions/teletextdecoder.h"
+#include "captions/teletextreader.h"
 #include "vbilut.h"
 #include "mythlogging.h"
 

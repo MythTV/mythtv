@@ -7,7 +7,7 @@
 #include <cstdint>
 #include "format.h"
 #include "compat.h"
-#include "cc708window.h"
+#include "captions/cc708window.h"
 
 class MythPlayer;
 

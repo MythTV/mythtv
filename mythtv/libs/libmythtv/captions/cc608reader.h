@@ -8,7 +8,7 @@
 #include <QMutex>
 
 // MythTV headers
-#include "cc608decoder.h"
+#include "captions/cc608decoder.h"
 
 #include "mythtvexp.h"
 
