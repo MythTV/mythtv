@@ -794,7 +794,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         else if (vidsetting == "RTjpeg")
             m_nvr->SetupRTjpeg();
 
-        m_outBuffer = RingBuffer::Create(outputname, true, false);
+        m_outBuffer = MythMediaBuffer::Create(outputname, true, false);
         m_nvr->SetRingBuffer(m_outBuffer);
         m_nvr->WriteHeader();
         m_nvr->StreamAllocate();
