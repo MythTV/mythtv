@@ -1,5 +1,5 @@
-#ifndef _HISTOGRAM_H_
-#define _HISTOGRAM_H_
+#ifndef HISTOGRAM_H
+#define HISTOGRAM_H
 
 #include "mythframe.h"
 
@@ -27,7 +27,6 @@ private:
     unsigned int m_numberOfSamples {1};
 };
 
-#endif
+#endif // HISTOGRAM_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

@@ -247,7 +247,7 @@ void StatusBox::setHelpText(MythUIButtonListItem *item)
     if (!item || GetFocusWidget() != m_logList)
         return;
 
-    LogLine logline = item->GetData().value<LogLine>();
+    auto logline = item->GetData().value<LogLine>();
     if (m_helpText)
         m_helpText->SetText(logline.m_helpdetail);
     if (m_justHelpText)
@@ -272,7 +272,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    LogLine logline = item->GetData().value<LogLine>();
+    auto logline = item->GetData().value<LogLine>();
 
     MythUIButtonListItem *currentButton = m_categoryList->GetItemCurrent();
     QString currentItem;
@@ -1300,7 +1300,7 @@ void StatusBox::doMachineStatus()
             continue;
         if (!(f & QNetworkInterface::IsRunning))
             continue;
-        if (f & QNetworkInterface::IsLoopBack)
+        if ((f & QNetworkInterface::IsLoopBack) != 0U)
             continue;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
@@ -1328,7 +1328,7 @@ void StatusBox::doMachineStatus()
     {
         auto UpdateUptime = [](StatusBoxItem* Item)
         {
-            time_t time;
+            time_t time = 0;
             getUptime(time);
             Item->SetText(uptimeStr(time));
         };
@@ -1403,7 +1403,7 @@ void StatusBox::doMachineStatus()
         {
             auto UpdateRemoteUptime = [](StatusBoxItem* Item)
             {
-                time_t time;
+                time_t time = 0;
                 RemoteGetUptime(time);
                 Item->SetText(uptimeStr(time));
             };
@@ -1558,8 +1558,8 @@ void StatusBox::doDisplayStatus()
         m_justHelpText->SetText(displayhelp);
 
     QStringList desc = MythDisplay::GetDescription();
-    for (auto it = desc.cbegin(); it != desc.cend(); ++it)
-        AddLogLine(*it);
+    foreach (const auto & line, desc)
+        AddLogLine(line);
     AddLogLine("");
 
     MythRender* render = GetMythMainWindow()->GetRenderDevice();
@@ -1589,8 +1589,8 @@ void StatusBox::doDisplayStatus()
         }
 
         desc = render->GetDescription();
-        for (auto it = desc.cbegin(); it != desc.cend(); ++it)
-            AddLogLine(*it);
+        foreach (const auto & line, desc)
+            AddLogLine(line);
     }
 }
 

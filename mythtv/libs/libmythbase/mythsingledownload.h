@@ -1,5 +1,5 @@
-#ifndef _Myth_Single_Download_h_
-#define _Myth_Single_Download_h_
+#ifndef MYTH_SINGLE_DOWNLOAD_H
+#define MYTH_SINGLE_DOWNLOAD_H
 
 //#include <QObject>
 #include <QString>
@@ -50,4 +50,4 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
     qint64                m_maxsize         {0};
 };
 
-#endif
+#endif // MYTH_SINGLE_DOWNLOAD_H

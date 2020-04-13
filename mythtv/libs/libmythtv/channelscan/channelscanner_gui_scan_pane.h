@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
-#define _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
+#ifndef CHANNEL_SCANNER_GUI_SCAN_PANE_H
+#define CHANNEL_SCANNER_GUI_SCAN_PANE_H
 
 // MythTV headers
 #include "mythscreentype.h"
@@ -85,4 +85,4 @@ class ChannelScannerGUIScanPane : public MythScreenType
     MythUIButtonList  *m_log                 {nullptr};
 };
 
-#endif // _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
+#endif // CHANNEL_SCANNER_GUI_SCAN_PANE_H

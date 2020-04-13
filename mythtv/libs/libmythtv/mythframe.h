@@ -1,5 +1,5 @@
-#ifndef _FRAME_H
-#define _FRAME_H
+#ifndef MYTHFRAME_H
+#define MYTHFRAME_H
 
 #ifdef __cplusplus
 #include <cstdint>
@@ -69,7 +69,7 @@ enum VideoFrameType
 
 const char* format_description(VideoFrameType Type);
 
-static inline int format_is_hw(VideoFrameType Type)
+static inline bool format_is_hw(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
            (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
@@ -77,41 +77,41 @@ static inline int format_is_hw(VideoFrameType Type)
            (Type == FMT_NVDEC) || (Type == FMT_DRMPRIME);
 }
 
-static inline int format_is_hwframes(VideoFrameType Type)
+static inline bool format_is_hwframes(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) || (Type == FMT_NVDEC);
 }
 
-static inline int format_is_420(VideoFrameType Type)
+static inline bool format_is_420(VideoFrameType Type)
 {
     return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||
            (Type == FMT_YUV420P12) || (Type == FMT_YUV420P14) || (Type == FMT_YUV420P16);
 }
 
-static inline int format_is_422(VideoFrameType Type)
+static inline bool format_is_422(VideoFrameType Type)
 {
     return (Type == FMT_YUV422P)   || (Type == FMT_YUV422P9) || (Type == FMT_YUV422P10) ||
            (Type == FMT_YUV422P12) || (Type == FMT_YUV422P14) || (Type == FMT_YUV422P16);
 }
 
-static inline int format_is_444(VideoFrameType Type)
+static inline bool format_is_444(VideoFrameType Type)
 {
     return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
            (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
 
 }
 
-static inline int format_is_nv12(VideoFrameType Type)
+static inline bool format_is_nv12(VideoFrameType Type)
 {
     return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
 }
 
-static inline int format_is_packed(VideoFrameType Type)
+static inline bool format_is_packed(VideoFrameType Type)
 {
     return Type == FMT_YUY2;
 }
 
-static inline int format_is_yuv(VideoFrameType Type)
+static inline bool format_is_yuv(VideoFrameType Type)
 {
     return format_is_420(Type)  || format_is_422(Type) || format_is_444(Type) ||
            format_is_nv12(Type) || format_is_packed(Type);
@@ -149,32 +149,32 @@ struct VideoFrame
     long long timecode;
     int64_t   disp_timecode;
     unsigned char *priv[4]; ///< random empty storage
-    int interlaced_frame; ///< 1 if interlaced.
-    int top_field_first; ///< 1 if top field is first.
-    int interlaced_reversed; /// 1 for user override of scan
-    int new_gop; /// used to unlock the scan type
-    int repeat_pict;
-    int forcekey; ///< hardware encoded .nuv
-    int dummy;
-    int pause_frame;
+    int interlaced_frame; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
+    bool top_field_first; ///< true if top field is first.
+    bool interlaced_reversed; /// true for user override of scan
+    bool new_gop; /// used to unlock the scan type
+    bool repeat_pict;
+    bool forcekey; ///< hardware encoded .nuv
+    bool dummy;
+    bool pause_frame;
     int pitches[3]; ///< Y, U, & V pitches
     int offsets[3]; ///< Y, U, & V offsets
     int pix_fmt;
     int sw_pix_fmt;
-    int directrendering; ///< 1 if managed by FFmpeg
+    bool directrendering; ///< true if managed by FFmpeg
     int colorspace;
     int colorrange;
     int colorprimaries;
     int colortransfer;
     int chromalocation;
-    int colorshifted; ///< 0 for software decoded 10/12/16bit frames. 1 for hardware decoders.
-    int already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
+    bool colorshifted; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
+    bool already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
     int rotation;
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
     MythDeintType deinterlace_allowed;
     MythDeintType deinterlace_inuse;
-    int           deinterlace_inuse2x;
+    bool          deinterlace_inuse2x;
 };
 
 #ifdef __cplusplus
@@ -245,29 +245,29 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->frameCounter = 0;
     vf->timecode     = 0;
     vf->interlaced_frame = 1;
-    vf->interlaced_reversed = 0;
-    vf->new_gop          = 0;
-    vf->top_field_first  = 1;
-    vf->repeat_pict      = 0;
-    vf->forcekey         = 0;
-    vf->dummy            = 0;
-    vf->pause_frame      = 0;
+    vf->interlaced_reversed = false;
+    vf->new_gop          = false;
+    vf->top_field_first  = true;
+    vf->repeat_pict      = false;
+    vf->forcekey         = false;
+    vf->dummy            = false;
+    vf->pause_frame      = false;
     vf->pix_fmt          = 0;
     vf->sw_pix_fmt       = -1; // AV_PIX_FMT_NONE
-    vf->directrendering  = 1;
+    vf->directrendering  = true;
     vf->colorspace       = 1; // BT.709
     vf->colorrange       = 1; // normal/mpeg
     vf->colorprimaries   = 1; // BT.709
     vf->colortransfer    = 1; // BT.709
     vf->chromalocation   = 1; // default 4:2:0
-    vf->colorshifted     = 0;
-    vf->already_deinterlaced = 0;
+    vf->colorshifted     = false;
+    vf->already_deinterlaced = false;
     vf->rotation         = 0;
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;
     vf->deinterlace_allowed = DEINT_NONE;
     vf->deinterlace_inuse = DEINT_NONE;
-    vf->deinterlace_inuse2x = 0;
+    vf->deinterlace_inuse2x = false;
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     int width_aligned = 0;
@@ -761,4 +761,4 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
 }
 #endif /* __cplusplus */
 
-#endif
+#endif /* MYTHFRAME_H */

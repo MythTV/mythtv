@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 // vim: set expandtab tabstop=4 shiftwidth=4:
 
-#ifndef _FREQUENCY_TABLE_SETTING_H_
-#define _FREQUENCY_TABLE_SETTING_H_
+#ifndef FREQUENCY_TABLE_SETTING_H
+#define FREQUENCY_TABLE_SETTING_H
 
 // MythTV headers
 #include "standardsettings.h"
@@ -25,4 +25,4 @@ class ScanNetwork : public TransMythUIComboBoxSetting
     ScanNetwork();
 };
 
-#endif // _FREQUENCY_TABLE_SETTING_H_
+#endif // FREQUENCY_TABLE_SETTING_H

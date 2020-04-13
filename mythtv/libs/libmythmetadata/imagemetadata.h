@@ -68,17 +68,17 @@ public:
     Orientation(int current, int file) : m_current(current), m_file(file) {}
 
     //! Encode original & current orientation to a single Db field
-    int Composite() { return m_current * 10 + m_file; }
+    int Composite() const { return m_current * 10 + m_file; }
     int Transform(int transform);
     int GetCurrent(bool compensate);
-    QString Description();
+    QString Description() const;
 
     static int FromRotation(const QString &degrees);
 
 private:
     static QString AsText(int orientation);
 
-    int Apply(int transform);
+    int Apply(int transform) const;
 
     using Matrix = QHash<int, QHash<int, int> >;
 

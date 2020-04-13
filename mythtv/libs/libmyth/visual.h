@@ -4,8 +4,8 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef __visual_h
-#define __visual_h
+#ifndef VISUAL_H
+#define VISUAL_H
 
 #include <QMutex>
 
@@ -30,4 +30,4 @@ private:
 };
 };
 
-#endif // __visual_h
+#endif // VISUAL_H

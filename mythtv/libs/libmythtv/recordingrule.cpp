@@ -852,7 +852,7 @@ QStringList RecordingRule::GetTemplateNames(void)
     return result;
 }
 
-bool RecordingRule::IsValid(QString &msg)
+bool RecordingRule::IsValid(QString &msg) const
 {
     bool isOverride = false;
     switch (m_type)

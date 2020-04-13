@@ -733,7 +733,7 @@ uint ProgramMapTable::FindPIDs(uint           type,
     return pids.size();
 }
 
-uint ProgramMapTable::FindUnusedPID(uint desired_pid)
+uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
 {
     uint pid = desired_pid;
     if (pid >= MPEG_NULL_PID)
@@ -767,7 +767,7 @@ QString PSIPTable::toString(void) const
                .arg(TableIDExtension(), 0, 16));
     str.append(QString("      version(%1) current(%2) "
                        "section(%3) last_section(%4)\n")
-               .arg(Version()).arg(IsCurrent())
+               .arg(Version()).arg(static_cast<int>(IsCurrent()))
                .arg(Section()).arg(LastSection()));
     if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
     {
@@ -788,13 +788,13 @@ QString PSIPTable::XMLValues(uint indent_level) const
     QString indent = xml_indent(indent_level);
 
     QString str = QString(
-        "table_id=\"0x%1\" length=\"%2\"")
+        R"(table_id="0x%1" length="%2")")
         .arg(TableID(), 2, 16, QChar('0'))
         .arg(Length());
 
     if (HasSectionNumber())
     {
-        str += QString(" section=\"%4\" last_section=\"%5\"")
+        str += QString(R"( section="%4" last_section="%5")")
             .arg(Section()).arg(LastSection());
     }
 

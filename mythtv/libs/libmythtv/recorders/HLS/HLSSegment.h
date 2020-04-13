@@ -1,5 +1,5 @@
-#ifndef _HLS_Segment_h_
-#define _HLS_Segment_h_
+#ifndef HLS_SEGMENT_H
+#define HLS_SEGMENT_H
 
 #include <cstdint>
 
@@ -53,4 +53,4 @@ class HLSRecSegment
 
 };
 
-#endif
+#endif // HLS_SEGMENT_H

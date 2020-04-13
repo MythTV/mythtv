@@ -12,10 +12,6 @@ extern "C"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 
-//replex
-#include "external/replex/ringbuffer.h"
-#include "external/replex/multiplex.h"
-
 //libmpeg2
 #include "config.h"
 #if CONFIG_LIBMPEG2EXTERNAL
@@ -24,6 +20,10 @@ extern "C"
 #include "mpeg2.h"
 #endif
 }
+
+//replex
+#include "external/replex/ringbuffer.h"
+#include "external/replex/multiplex.h"
 
 //Qt
 #include <QMap>
@@ -118,8 +118,8 @@ class MPEG2fixup
 {
   public:
     MPEG2fixup(const QString &inf, const QString &outf,
-               frm_dir_map_t *deleteMap, const char *fmt, int norp,
-               int fixPTS, int maxf, bool showprog, int otype,
+               frm_dir_map_t *deleteMap, const char *fmt, bool norp,
+               bool fixPTS, int maxf, bool showprog, int otype,
                void (*update_func)(float) = nullptr, int (*check_func)() = nullptr);
     ~MPEG2fixup();
     int Start();
@@ -170,7 +170,7 @@ class MPEG2fixup
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
     static FrameList ReorderDTStoPTS(FrameList *dtsOrder, int pos);
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
-                         int64_t &PTSdiscrep, int numframes, bool fix);
+                         int64_t &PTSdiscrep, int numframes, bool fix) const;
     static void SetFrameNum(uint8_t *ptr, int num);
     static int GetFrameNum(const MPEG2frame *frame)
     {
@@ -241,8 +241,8 @@ class MPEG2fixup
 
     bool            m_discard       {false};
     //control options
-    int             m_noRepeat;
-    int             m_fixPts;
+    bool            m_noRepeat;
+    bool            m_fixPts;
     int             m_maxFrames;
     QString         m_infile;
     const char     *m_format        {nullptr};

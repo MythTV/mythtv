@@ -1,5 +1,5 @@
-#ifndef _RECORDING_INFO_H_
-#define _RECORDING_INFO_H_
+#ifndef RECORDING_INFO_H
+#define RECORDING_INFO_H
 
 #include <QDateTime>
 #include <QString>
@@ -194,9 +194,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
   public:
     RecordingInfo &operator=(const RecordingInfo &other)
-        { RecordingInfo::clone(other); return *this; }
+        { if (this==&other) return *this; RecordingInfo::clone(other); return *this; }
     RecordingInfo &operator=(const ProgramInfo &other)
-        { RecordingInfo::clone(other); return *this; }
+        { if (this==&other) return *this; RecordingInfo::clone(other); return *this; }
     virtual void clone(const RecordingInfo &other,
                        bool ignore_non_serialized_data = false);
     void clone(const ProgramInfo &other,
@@ -296,6 +296,6 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 Q_DECLARE_METATYPE(RecordingInfo*)
 Q_DECLARE_METATYPE(RecordingInfo)
 
-#endif // _RECORDING_INFO_H_
+#endif // RECORDING_INFO_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

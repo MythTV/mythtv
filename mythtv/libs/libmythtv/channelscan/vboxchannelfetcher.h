@@ -1,5 +1,5 @@
-#ifndef _VBOXCHANNELFETCHER_H_
-#define _VBOXCHANNELFETCHER_H_
+#ifndef VBOXCHANNELFETCHER_H
+#define VBOXCHANNELFETCHER_H
 
 #include <utility>
 
@@ -98,4 +98,4 @@ class VBoxChannelFetcher : public QRunnable
     QMutex               m_lock;
 };
 
-#endif // _VBOXCHANNELFETCHER_H_
+#endif // VBOXCHANNELFETCHER_H

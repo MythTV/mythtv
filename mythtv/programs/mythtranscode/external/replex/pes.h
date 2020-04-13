@@ -3,10 +3,10 @@
 
 */
 
-#ifndef _PES_H_
-#define _PES_H_
+#ifndef PES_H
+#define PES_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "ringbuffer.h"
 
 #define TS_HEADER_MIN	4
@@ -52,8 +52,7 @@
 #define MAX_PTS (0x0000000200000000ULL)
 #define MAX_PTS2 (300* MAX_PTS)
 
-typedef
-struct ps_packet_{
+struct ps_packet {
 	uint8_t scr[6];
 	uint8_t mux_rate[3];
 	uint8_t stuff_length;
@@ -65,11 +64,10 @@ struct ps_packet_{
 	uint8_t video_bound;
 	uint8_t reserved;
 	int npes;
-} ps_packet;
+};
 
 
-typedef
-struct pes_in_s{
+struct pes_in_t {
 	int type;
 	unsigned int found;
 	int withbuf;
@@ -86,10 +84,10 @@ struct pes_in_s{
 	uint8_t pts[5];
 	uint8_t dts[5];
 	int mpeg;
-	int done;
+	bool done;
 	int which;
 	void *priv;
-} pes_in_t;
+};
 
 
 void init_pes_in(pes_in_t *p, int type, ringbuffer *rb, int wi);
@@ -131,7 +129,4 @@ static inline void ptsinc(uint64_t *pts1, uint64_t pts2)
 	*pts1 = (*pts1 + pts2)%MAX_PTS2;
 }
 
-
-
-
-#endif /*_PES_H_*/
+#endif /* PES_H */

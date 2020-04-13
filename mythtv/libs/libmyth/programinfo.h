@@ -468,20 +468,20 @@ class MPUBLIC ProgramInfo
         { return (ProgramInfoType)((m_programFlags & FL_TYPEMASK) >> 20); }
     QDateTime GetBookmarkUpdate(void) const { return m_bookmarkUpdate; }
     bool IsGeneric(void) const;
-    bool IsInUsePlaying(void)   const { return m_programFlags & FL_INUSEPLAYING;}
-    bool IsCommercialFree(void) const { return m_programFlags & FL_CHANCOMMFREE;}
-    bool HasCutlist(void)       const { return m_programFlags & FL_CUTLIST;     }
-    bool IsBookmarkSet(void)    const { return m_programFlags & FL_BOOKMARK;    }
-    bool IsWatched(void)        const { return m_programFlags & FL_WATCHED;     }
-    bool IsAutoExpirable(void)  const { return m_programFlags & FL_AUTOEXP;     }
-    bool IsPreserved(void)      const { return m_programFlags & FL_PRESERVED;   }
-    bool IsVideo(void)          const { return m_programFlags & FL_TYPEMASK;    }
+    bool IsInUsePlaying(void)   const { return (m_programFlags & FL_INUSEPLAYING) != 0U;}
+    bool IsCommercialFree(void) const { return (m_programFlags & FL_CHANCOMMFREE) != 0U;}
+    bool HasCutlist(void)       const { return (m_programFlags & FL_CUTLIST) != 0U;     }
+    bool IsBookmarkSet(void)    const { return (m_programFlags & FL_BOOKMARK) != 0U;    }
+    bool IsWatched(void)        const { return (m_programFlags & FL_WATCHED) != 0U;     }
+    bool IsAutoExpirable(void)  const { return (m_programFlags & FL_AUTOEXP) != 0U;     }
+    bool IsPreserved(void)      const { return (m_programFlags & FL_PRESERVED) != 0U;   }
+    bool IsVideo(void)          const { return (m_programFlags & FL_TYPEMASK) != 0U;    }
     bool IsRecording(void)      const { return !IsVideo();                    }
-    bool IsRepeat(void)         const { return m_programFlags & FL_REPEAT;      }
-    bool IsDuplicate(void)      const { return m_programFlags & FL_DUPLICATE;   }
-    bool IsReactivated(void)    const { return m_programFlags & FL_REACTIVATE;  }
+    bool IsRepeat(void)         const { return (m_programFlags & FL_REPEAT) != 0U;      }
+    bool IsDuplicate(void)      const { return (m_programFlags & FL_DUPLICATE) != 0U;   }
+    bool IsReactivated(void)    const { return (m_programFlags & FL_REACTIVATE) != 0U;  }
     bool IsDeletePending(void)  const
-        { return m_programFlags & FL_DELETEPENDING; }
+        { return (m_programFlags & FL_DELETEPENDING) != 0U; }
 
     uint GetSubtitleType(void)    const
         { return (m_properties&kSubtitlePropertyMask)>>kSubtitlePropertyOffset; }
@@ -681,7 +681,7 @@ class MPUBLIC ProgramInfo
                     const QVector<MarkupEntry> &mapSeek) const;
 
     /// Sends event out that the ProgramInfo should be reloaded.
-    void SendUpdateEvent(void);
+    void SendUpdateEvent(void) const;
     /// Sends event out that the ProgramInfo should be added to lists.
     void SendAddedEvent(void) const;
     /// Sends event out that the ProgramInfo should be delete from lists.

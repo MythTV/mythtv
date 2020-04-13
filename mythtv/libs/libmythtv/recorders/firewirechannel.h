@@ -4,8 +4,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _FIREWIRECHANNEL_H_
-#define _FIREWIRECHANNEL_H_
+#ifndef FIREWIRECHANNEL_H
+#define FIREWIRECHANNEL_H
 
 #include "tv_rec.h"
 #include "dtvchannel.h"
@@ -58,4 +58,4 @@ class FirewireChannel : public DTVChannel
     bool               m_isopen          {false};
 };
 
-#endif // _FIREWIRECHANNEL_H_
+#endif // FIREWIRECHANNEL_H

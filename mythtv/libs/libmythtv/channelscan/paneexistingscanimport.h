@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef _PANE_EXISTING_SCAN_IMPORT_H_
-#define _PANE_EXISTING_SCAN_IMPORT_H_
+#ifndef PANE_EXISTING_SCAN_IMPORT_H
+#define PANE_EXISTING_SCAN_IMPORT_H
 
 // Qt headers
 #include <QString>
@@ -87,4 +87,4 @@ class PaneExistingScanImport : public GroupSetting
     TransMythUIComboBoxSetting *m_scanSelect {nullptr};
 };
 
-#endif // _PANE_EXISTING_SCAN_IMPORT_H_
+#endif // PANE_EXISTING_SCAN_IMPORT_H

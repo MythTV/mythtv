@@ -26,8 +26,8 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "element.h"
 #include "mpg_common.h"
@@ -43,7 +43,7 @@ unsigned int bitrates[3][16] =
 
 uint32_t freq[4] = {441, 480, 320, 0};
 static uint64_t samples[4] = { 384, 1152, 1152, 1536};
-const char *frames[3] = {"I-Frame","P-Frame","B-Frame"};
+//const char *frames[3] = {"I-Frame","P-Frame","B-Frame"};
 
 unsigned int ac3_bitrates[32] =
     {32,40,48,56,64,80,96,112,128,160,192,224,256,320,384,448,512,576,640,
@@ -51,7 +51,7 @@ unsigned int ac3_bitrates[32] =
 static uint8_t ac3half[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
 uint32_t ac3_freq[4] = {480, 441, 320, 0};
 
-#define DEBUG 1
+#define DEBUG true
 
 uint64_t add_pts_audio(uint64_t pts, audio_frame_t *aframe, uint64_t frames)
 {
@@ -67,7 +67,8 @@ void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, 
 	uint64_t di = (samples [3-aframe->layer] * 27000000ULL);
 	int64_t diff = ptsdiff(origpts,pts);
 	int c=(aframe->frequency * diff+di/2)/di;
-	if (c) LOG(VB_GENERAL, LOG_INFO, "fix audio frames %d", c);
+	if (c)
+            LOG(VB_GENERAL, LOG_INFO, QString("fix audio frames %1").arg(c));
 	*acount += c;
 }
 
@@ -85,8 +86,8 @@ uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64
 	} else {
 		uint64_t extra_time = 0;
 #if 0
-		LOG(VB_GENERAL, LOG_INFO, "pulldown %d %d",
-		    (int)fcount-1, fnum-1);
+		LOG(VB_GENERAL, LOG_INFO, QString("pulldown %1 %2")
+		    .arg(fcount-1).arg(fnum-1));
 #endif
 
 		if ( s->pulldown == PULLDOWN32)
@@ -126,8 +127,8 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 
 	pdiff = ptsdiff(origpts,pts);
 	ddiff = ptsdiff(origdts,dts);
-	psig = pdiff > 0;
-	dsig = ddiff > 0;
+	psig = static_cast<int>(pdiff > 0);
+	dsig = static_cast<int>(ddiff > 0);
 	if (!psig) pdiff = -pdiff;
 	if (!dsig) ddiff = -ddiff;
 
@@ -144,7 +145,9 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 	if (!dsig) fr -= (int)dframe;
 	else fr += (int)dframe;
 	*frame = *frame + fr/2;
-	if (fr/2) LOG(VB_GENERAL, LOG_INFO, "fixed video frame %d", (int)fr/2);
+	if (fr/2)
+		LOG(VB_GENERAL, LOG_INFO,
+			QString("fixed video frame %1").arg(fr/2));
 }
 
 	
@@ -175,10 +178,10 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 #if 0
 			c+=4;
 			LOG(VB_GENERAL, LOG_INFO, "fixed time");
-			LOG(VB_GENERAL, LOG_INFO, "%02d:%02d:%02d",
-			    (int)((buf[c]>>2)& 0x1F),
-			    (int)(((buf[c]<<4)& 0x30)|((buf[c+1]>>4)& 0x0F)),
-			    (int)(((buf[c+1]<<3)& 0x38)|((buf[c+2]>>5)& 0x07)));
+			LOG(VB_GENERAL, LOG_INFO, QString("%1:%2:%3")
+			    .arg((int)((buf[c]>>2)& 0x1F), 2,10,QChar('0'))
+			    .arg((int)(((buf[c]<<4)& 0x30)|((buf[c+1]>>4)& 0x0F)),   2,10,QChar('0'))
+			    .arg((int)(((buf[c+1]<<3)& 0x38)|((buf[c+2]>>5)& 0x07)), 2,10,QChar('0')));
 #endif
 			c = len;
 
@@ -242,8 +245,8 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	}
 
         if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  size = %dx%d",
-		    s->h_size, s->v_size);
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("  size = %1x%2").arg(s->h_size).arg(s->v_size));
 
         sw = (int)(headr[3]&0x0F);
 
@@ -278,16 +281,16 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		break;
 	}
 	if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  frame rate: %2.3f fps",
-		    s->frame_rate/1000.0);
+            LOG(VB_GENERAL, LOG_DEBUG, QString("  frame rate: %1 fps")
+		    .arg(s->frame_rate/1000.0, 2,'f',3,QChar('0')));
 
 	s->bit_rate = (((headr[4] << 10) & 0x0003FC00UL) 
 		       | ((headr[5] << 2) & 0x000003FCUL) | 
 		       (((headr[6] & 0xC0) >> 6) & 0x00000003UL));
 	
         if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %.2f Mbit/s",
-		    400*(s->bit_rate)/1000000.0);
+            LOG(VB_GENERAL, LOG_DEBUG, QString("  bit rate: %1 Mbit/s")
+                .arg(400*(s->bit_rate)/1000000.0, 0,'f',2,QChar('0')));
 
         s->video_format = form;
 
@@ -296,8 +299,8 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	s->vbv_buffer_size = (( headr[7] & 0xF8) >> 3 ) | (( headr[6] & 0x1F )<< 5);	
 	s->flags	   = ( headr[7] & 0x06);	
 	if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  vbvbuffer %d",
-		    16*1024*(s->vbv_buffer_size));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("  vbvbuffer %1")
+                .arg(16*1024*(s->vbv_buffer_size)));
 
 	c += 8;
 	if ( !(s->flags & INTRAQ_FLAG) ) 
@@ -490,8 +493,8 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	af->layer = (headr[1] & 0x06) >> 1;
 
         if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "Audiostream: layer: %d",
-		    4-af->layer);
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Audiostream: layer: %1")
+                .arg(4-af->layer));
 
 
 	af->bit_rate = bitrates[(3-af->layer)][(headr[2] >> 4 )]*1000;
@@ -502,8 +505,8 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 		else if (af->bit_rate == 0xf)
 			LOG(VB_GENERAL, LOG_DEBUG, "  BRate: reserved");
 		else
-			LOG(VB_GENERAL, LOG_DEBUG, "  BRate: %d kb/s",
-			    af->bit_rate/1000);
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("  BRate: %1 kb/s")
+			    .arg(af->bit_rate/1000));
 	}
 
 	fr = (headr[2] & 0x0c ) >> 2;
@@ -513,15 +516,15 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 		if (af->frequency == 3)
 			LOG(VB_GENERAL, LOG_DEBUG, "  Freq: reserved");
 		else
-			LOG(VB_GENERAL, LOG_DEBUG, "  Freq: %2.1f kHz",
-			    af->frequency/1000.0);
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("  Freq: %1 kHz")
+			    .arg(af->frequency/1000.0, 2,'f',1,QChar('0')));
 	}
 	af->off = c;
 	af->set = 1;
 
 	af->frametime = ((samples [3-af->layer] * 27000000ULL) / af->frequency);
 	af->framesize = af->bit_rate *slots [3-af->layer]/ af->frequency;
-	LOG(VB_GENERAL, LOG_INFO, " frame size: %d", af->framesize);
+	LOG(VB_GENERAL, LOG_INFO, QString(" frame size: %1").arg(af->framesize));
 	printpts(af->frametime);
 
 	return c;
@@ -547,13 +550,14 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	af->bit_rate = ac3_bitrates[frame>>1]*1000;
 	int half = ac3half[headr[5] >> 3];
 	if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %d kb/s",
-		    af->bit_rate/1000);
+                LOG(VB_GENERAL, LOG_DEBUG, QString("  bit rate: %1 kb/s")
+		    .arg(af->bit_rate/1000));
 	int fr = (headr[4] & 0xc0) >> 6;
 	af->frequency = (ac3_freq[fr] *100) >> half;
 	
 	if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  freq: %d Hz", af->frequency);
+		LOG(VB_GENERAL, LOG_DEBUG,
+		    QString("  freq: %1 Hz").arg(af->frequency));
 
 	switch (headr[4] & 0xc0) {
 	case 0:
@@ -570,7 +574,8 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 	}
 
 	if (DEBUG)
-		LOG(VB_GENERAL, LOG_DEBUG, "  frame size %d", af->framesize);
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("  frame size %1").arg(af->framesize));
 
 	af->off = c;
 	af->set = 1;
@@ -631,29 +636,29 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		s->h_size	|= hsize;
 		s->v_size	|= vsize;
 		if (DEBUG)
-			LOG(VB_GENERAL, LOG_DEBUG, "  size = %dx%d",
-			    s->h_size, s->v_size);
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("  size = %1x%2")
+                            .arg(s->h_size).arg(s->v_size));
 		
 		uint32_t bitrate = ((headr[2]& 0x1F) << 25) | (( headr[3] & 0xFE ) << 17);
 		s->bit_rate |= bitrate;
 	
 		if (DEBUG)
-			LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %.2f Mbit/s",
-			    400.0*(s->bit_rate)/1000000.0);
+			LOG(VB_GENERAL, LOG_DEBUG, QString("  bit rate: %1 Mbit/s")
+			    .arg(400.0*(s->bit_rate)/1000000.0, 0,'f',2,QChar('0')));
 
 
 		uint32_t vbvb = (headr[4]<<10);
 		s->vbv_buffer_size |= vbvb;
 		if (DEBUG)
-			LOG(VB_GENERAL, LOG_DEBUG, "  vbvbuffer %d",
-			    16*1024*(s->vbv_buffer_size));
+			LOG(VB_GENERAL, LOG_DEBUG, QString("  vbvbuffer %1")
+			    .arg(16*1024*(s->vbv_buffer_size)));
 		uint8_t fr_n = (headr[5] & 0x60) >> 6;
 		uint8_t fr_d = (headr[5] & 0x1F);
 	
 		s->frame_rate = s->frame_rate * (fr_n+1) / (fr_d+1);
 		if (DEBUG)
-			LOG(VB_GENERAL, LOG_DEBUG, "  frame rate: %2.3f",
-			    s->frame_rate/1000.0);
+			LOG(VB_GENERAL, LOG_DEBUG, QString("  frame rate: %1")
+			    .arg(s->frame_rate/1000.0, 2,'f',3,QChar('0')));
 		s->ext_set=1;
 		break;
 	}

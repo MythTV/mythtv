@@ -21,7 +21,7 @@ extern "C" {
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-static QRegExp badChars = QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)");
+static QRegExp badChars = QRegExp(R"((/|\\|:|'|"|\?|\|))");
 
 QString fixFilename(const QString &filename)
 {
@@ -70,7 +70,7 @@ inline QString fixFileToken_sl(QString token)
 {
     // this version doesn't remove fwd-slashes so we can
     // pick them up later and create directories as required
-    token.replace(QRegExp("(\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
+    token.replace(QRegExp(R"((\\|:|'|"|\?|\|))"), QString("_"));
     return token;
 }
 
@@ -145,17 +145,17 @@ bool isNewTune(const QString& artist, const QString& album, const QString& title
 
     if (! matchartist.isEmpty())
     {
-        matchartist.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+        matchartist.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
     }
 
     if (! matchalbum.isEmpty())
     {
-        matchalbum.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+        matchalbum.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
     }
 
     if (! matchtitle.isEmpty())
     {
-        matchtitle.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("_"));
+        matchtitle.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

@@ -7,11 +7,10 @@
 
 #include "goomconfig.h"
 
-typedef struct _ifsPoint
+struct IFSPoint
 {
 	gint32  x, y;
-}
-IFSPoint;
+};
 
 // init ifs for a (width)x(height) output.
 void    init_ifs (int width, int height);

@@ -63,7 +63,7 @@ bool RemoteRecordPending(uint inputid, const ProgramInfo *pginfo,
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
     strlist << "RECORD_PENDING";
     strlist << QString::number(secsleft);
-    strlist << QString::number(hasLater);
+    strlist << QString::number(static_cast<int>(hasLater));
     pginfo->ToStringList(strlist);
 
     if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())

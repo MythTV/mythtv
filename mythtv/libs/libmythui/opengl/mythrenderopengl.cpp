@@ -128,9 +128,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(QWidget *Widget)
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QWidget *Widget)
-  : QOpenGLContext(),
-    QOpenGLFunctions(),
-    MythEGL(this),
+  : MythEGL(this),
     MythRender(kRenderOpenGL),
     m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true))
 {
@@ -149,13 +147,13 @@ MythRenderOpenGL::~MythRenderOpenGL()
         return;
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     if (m_ready)
-        ReleaseResources();
+        MythRenderOpenGL::ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
 {
     // filter unwanted messages
-    if (m_openGLDebuggerFilter & Message.type())
+    if ((m_openGLDebuggerFilter & Message.type()) != 0U)
         return;
 
     QString source("Unknown");
@@ -651,7 +649,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
 
 QSize MythRenderOpenGL::GetTextureSize(const QSize &Size, bool Normalised)
 {
-    if ((m_features & NPOTTextures) || !Normalised)
+    if (((m_features & NPOTTextures) != 0U) || !Normalised)
         return Size;
 
     int w = 64;
@@ -1611,7 +1609,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
         return;
 
     // Uniform value cacheing
-    QString tag = QStringLiteral("%1-%2").arg(Program->programId()).arg(Uniform);
+    QString tag = QString("%1-%2").arg(Program->programId()).arg(Uniform);
     QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
     if (it == m_cachedMatrixUniforms.end())
         m_cachedMatrixUniforms.insert(tag, Value);

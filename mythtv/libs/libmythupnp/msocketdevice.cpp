@@ -424,7 +424,7 @@ bool MSocketDevice::broadcast() const
 */
 void MSocketDevice::setBroadcast(bool enable)
 {
-    setOption(Broadcast, enable);
+    setOption(Broadcast, static_cast<int>(enable));
 }
 
 /*!
@@ -455,7 +455,7 @@ bool MSocketDevice::addressReusable() const
 */
 void MSocketDevice::setAddressReusable(bool enable)
 {
-    setOption(ReuseAddress, enable);
+    setOption(ReuseAddress, static_cast<int>(enable));
 }
 
 
@@ -476,7 +476,7 @@ bool MSocketDevice::keepalive() const
 */
 void MSocketDevice::setKeepalive(bool enable)
 {
-    setOption(Keepalive, enable);
+    setOption(Keepalive, static_cast<int>(enable));
 }
 
 

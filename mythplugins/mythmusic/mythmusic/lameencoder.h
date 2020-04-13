@@ -52,7 +52,7 @@ class LameEncoder : public Encoder
     int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:
-    int init_encoder(lame_global_flags *gf, int quality, bool vbr);
+    int init_encoder(lame_global_flags *gf, int quality, bool vbr) const;
     static void init_id3tags(lame_global_flags *gf);
 
     int m_bits                {16};

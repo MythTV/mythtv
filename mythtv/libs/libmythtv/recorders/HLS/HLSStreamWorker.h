@@ -1,5 +1,5 @@
-#ifndef _HLS_Segment_Worker_h_
-#define _HLS_Segment_Worker_h_
+#ifndef HLS_SEGMENT_WORKER_H
+#define HLS_SEGMENT_WORKER_H
 
 #include <QMap>
 #include <QWaitCondition>
@@ -35,4 +35,4 @@ class HLSStreamWorker : public MThread
     QWaitCondition      m_waitCond;
 };
 
-#endif
+#endif // HLS_SEGMENT_WORKER_H

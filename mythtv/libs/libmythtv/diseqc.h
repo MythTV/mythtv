@@ -4,8 +4,8 @@
  * \author Copyright (C) 2006, Yeasah Pell
  */
 
-#ifndef _DISEQC_H_
-#define _DISEQC_H_
+#ifndef DISEQC_H
+#define DISEQC_H
 
 // C++ headers
 #include <cinttypes>
@@ -93,7 +93,7 @@ class DiSEqCDevTree
     void SetRoot(DiSEqCDevDevice *root);
 
     bool SendCommand(uint adr, uint cmd, uint repeats = 0,
-                     uint data_len = 0, unsigned char *data = nullptr);
+                     uint data_len = 0, unsigned char *data = nullptr) const;
 
     bool ResetDiseqc(bool hard_reset, bool is_SCR);
 
@@ -103,7 +103,7 @@ class DiSEqCDevTree
     int  GetFD(void) const { return m_fdFrontend; }
 
     // Sets
-    bool SetTone(bool on);
+    bool SetTone(bool on) const;
     bool SetVoltage(uint voltage);
 
     // Gets
@@ -495,4 +495,4 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     static const TypeTable kLNBTypeTable[5];
 };
 
-#endif // _DISEQC_H_
+#endif // DISEQC_H

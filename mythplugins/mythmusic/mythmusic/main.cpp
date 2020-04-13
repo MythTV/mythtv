@@ -35,7 +35,7 @@
 #include "playlistview.h"
 #include "streamview.h"
 #include "playlistcontainer.h"
-#include "dbcheck.h"
+#include "musicdbcheck.h"
 #include "musicplayer.h"
 #include "config.h"
 #include "mainvisual.h"
@@ -89,7 +89,7 @@ static bool checkStorageGroup(void)
 
     if (hostList.isEmpty())
     {
-        ShowOkPopup(qApp->translate("(MythMusicMain)",
+        ShowOkPopup(QCoreApplication::translate("(MythMusicMain)",
                                     "No directories found in the 'Music' storage group. "
                                     "Please run mythtv-setup on the backend machine to add one."));
        return false;
@@ -112,7 +112,7 @@ static bool checkStorageGroup(void)
 
     if (hostList.isEmpty())
     {
-        ShowOkPopup(qApp->translate("(MythMusicMain)",
+        ShowOkPopup(QCoreApplication::translate("(MythMusicMain)",
                                     "No directories found in the 'MusicArt' storage group. "
                                     "Please run mythtv-setup on the backend machine to add one."));
        return false;
@@ -137,7 +137,7 @@ static bool checkMusicAvailable(void)
 
     if (!foundMusic)
     {
-        ShowOkPopup(qApp->translate("(MythMusicMain)",
+        ShowOkPopup(QCoreApplication::translate("(MythMusicMain)",
                                     "No music has been found.\n"
                                     "Please select 'Scan For New Music' "
                                     "to perform a scan for music."));
@@ -218,7 +218,7 @@ static void startRipper(void)
         delete rip;
 
 #else
-    ShowOkPopup(qApp->translate("(MythMusicMain)",
+    ShowOkPopup(QCoreApplication::translate("(MythMusicMain)",
                                 "MythMusic hasn't been built with libcdio "
                                 "support so ripping CDs is not possible"));
 #endif
@@ -475,7 +475,7 @@ static QStringList BuildFileList(const QString &dir, const QStringList &filters)
         if (fi.isDir())
         {
             ret += BuildFileList(fi.absoluteFilePath(), filters);
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
         else
         {
@@ -540,7 +540,7 @@ static void handleMedia(MythMediaDevice *cd)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = qApp->translate("(MythMusicMain)",
+    QString message = QCoreApplication::translate("(MythMusicMain)",
                                       "Searching for music files...");
     auto *busy = new MythUIBusyDialog( message, popupStack, "musicscanbusydialog");
     if (busy->Create())
@@ -562,7 +562,7 @@ static void handleMedia(MythMediaDevice *cd)
     if (trackList.isEmpty())
         return;
 
-    message = qApp->translate("(MythMusicMain)", "Loading music tracks");
+    message = QCoreApplication::translate("(MythMusicMain)", "Loading music tracks");
     auto *progress = new MythUIProgressDialog( message, popupStack,
                                                "scalingprogressdialog");
     if (progress->Create())
@@ -590,7 +590,7 @@ static void handleMedia(MythMediaDevice *cd)
         if (progress)
         {
             progress->SetProgress(track);
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
     }
     LOG(VB_MEDIA, LOG_INFO, QString("MythMusic: %1 tracks scanned").arg(track));
@@ -686,7 +686,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     while (!gMusicData->m_all_playlists->doneLoading()
            || !gMusicData->m_all_music->doneLoading())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(50000);
     }
 
@@ -722,7 +722,7 @@ static void handleCDMedia(MythMediaDevice *cd)
                     parenttitle += track->Album();
                 else
                 {
-                    parenttitle = " " + qApp->translate("(MythMusicMain)", 
+                    parenttitle = " " + QCoreApplication::translate("(MythMusicMain)",
                                                         "Unknown");
                     LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
                     " CD. It may not be in the freedb database.\n"

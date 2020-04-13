@@ -45,10 +45,10 @@ class MusicData : public QObject
     ~MusicData() override;
 
     static void scanMusic(void);
-    void loadMusic(void);
+    void loadMusic(void) const;
 
   public slots:
-    void reloadMusic(void);
+    void reloadMusic(void) const;
 
   public:
     PlaylistContainer  *m_all_playlists {nullptr};

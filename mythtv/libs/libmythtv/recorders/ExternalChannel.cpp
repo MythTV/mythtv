@@ -155,7 +155,7 @@ uint ExternalChannel::GetTuneStatus(void)
         .arg(m_systemStatus));
 
     QString result;
-    int     ret;
+    int     ret = 0;
 
     if (!m_streamHandler->ProcessCommand("TuneStatus?", result))
     {

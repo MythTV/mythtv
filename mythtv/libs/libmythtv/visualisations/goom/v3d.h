@@ -1,19 +1,19 @@
-#ifndef _V3D_H
-#define _V3D_H
+#ifndef V3D_H
+#define V3D_H
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #include "mathtools.h"
 
-typedef struct {
+struct v3d {
 	float x,y,z;
-} v3d;
+};
 
-typedef struct {
+struct v2d {
 	int x,y;
-} v2d;
+};
 
 /* 
  * projete le vertex 3D sur le plan d'affichage
@@ -57,4 +57,4 @@ typedef struct {
 
 #define MUL_V3D(lf,v) {(v).x*=(lf);(v).y*=(lf);(v).z*=(lf);}
 
-#endif
+#endif // V3D_H

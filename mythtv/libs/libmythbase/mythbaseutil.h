@@ -1,5 +1,5 @@
-#ifndef _MYTH_DB_UTIL_H_
-#define _MYTH_DB_UTIL_H_
+#ifndef MYTH_BASE_UTIL_H
+#define MYTH_BASE_UTIL_H
 
 // POSIX
 #include <cerrno>       // for checking errno
@@ -50,4 +50,4 @@ static inline void setup_pipe(int mypipe[2], long myflags[2])
 }
 #endif
 
-#endif // _MYTH_DB_UTIL_H_
+#endif // MYTH_BASE_UTIL_H

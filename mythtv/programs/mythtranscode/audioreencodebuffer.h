@@ -14,8 +14,8 @@ class AudioBuffer
     ~AudioBuffer();
 
     void appendData(unsigned char *buffer, int len, int frames, long long time);
-    char *data(void) { return (char *)m_buffer; }
-    int   size(void) { return m_size; }
+    char *data(void) const { return (char *)m_buffer; }
+    int   size(void) const { return m_size; }
 
     uint8_t    *m_buffer   {nullptr};
     int         m_size     {0};

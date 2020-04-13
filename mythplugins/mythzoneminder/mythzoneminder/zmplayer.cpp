@@ -35,7 +35,7 @@ using namespace std;
 #include "zmclient.h"
 
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
-                   vector<Event *> *eventList, int *currentEvent)
+                   vector<Event *> *eventList, size_t *currentEvent)
          :MythScreenType(parent, name),
           m_currentEvent(currentEvent),
           m_eventList(eventList), m_frameList(new vector<Frame*>),
@@ -128,7 +128,7 @@ void ZMPlayer::getEventInfo()
 {
     m_frameTimer->stop();
 
-    if (*m_currentEvent == -1)
+    if (*m_currentEvent == static_cast<size_t>(-1))
     {
         stopPlayer();
 
@@ -284,7 +284,7 @@ void ZMPlayer::playPressed()
 
 void ZMPlayer::deletePressed()
 {
-    if (m_eventList->empty() || *m_currentEvent > (int) m_eventList->size() - 1)
+    if (m_eventList->empty() || (*m_currentEvent > m_eventList->size() - 1))
         return;
 
     Event *event = m_eventList->at(*m_currentEvent);
@@ -296,8 +296,8 @@ void ZMPlayer::deletePressed()
             zm->deleteEvent(event->eventID());
 
         m_eventList->erase(m_eventList->begin() + *m_currentEvent);
-        if (*m_currentEvent > (int)m_eventList->size() - 1)
-            *m_currentEvent = m_eventList->size() - 1;
+        if (*m_currentEvent > (m_eventList->size() - 1))
+            *m_currentEvent = (m_eventList->size() - 1);
 
         getEventInfo();
 
@@ -314,7 +314,7 @@ void ZMPlayer::nextPressed()
     if (m_eventList->empty())
         return;
 
-    if (*m_currentEvent >= (int) m_eventList->size() - 1)
+    if (*m_currentEvent >= (m_eventList->size() - 1))
         return;
 
     (*m_currentEvent)++;
@@ -333,7 +333,7 @@ void ZMPlayer::prevPressed()
     if (*m_currentEvent <= 0)
         return;
 
-    if (*m_currentEvent > (int) m_eventList->size())
+    if (*m_currentEvent > m_eventList->size())
         *m_currentEvent = m_eventList->size();
 
     (*m_currentEvent)--;

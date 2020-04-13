@@ -59,7 +59,7 @@ class SERVICE_PUBLIC Enum : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            EnumItem *pObject = new EnumItem( this );
+            auto *pObject = new EnumItem( this );
             m_EnumItems.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

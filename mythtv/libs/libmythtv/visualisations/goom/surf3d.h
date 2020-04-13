@@ -1,17 +1,17 @@
-#ifndef _SURF3D_H
-#define _SURF3D_H
+#ifndef SURF3D_H
+#define SURF3D_H
 
 #include "v3d.h"
 
-typedef struct {
+struct surf3d {
 	v3d *vertex;
 	v3d *svertex;
 	int nbvertex;
 
 	v3d center;
-} surf3d;
+};
 
-typedef struct {
+struct grid3d {
 	surf3d surf;
 	
 	int defx;
@@ -19,7 +19,7 @@ typedef struct {
 	int defz;
 	int sizez;
 	int mode;
-} grid3d;
+};
 
 /* hi-level */
 
@@ -34,4 +34,4 @@ void grid3d_draw (grid3d *g, int color, int colorlow, int dist, int *buf, int *b
 void surf3d_rotate (surf3d *s, float angle);
 void surf3d_translate (surf3d *s);
 
-#endif
+#endif // SURF3D_H

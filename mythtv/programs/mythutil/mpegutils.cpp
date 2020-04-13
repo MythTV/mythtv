@@ -787,7 +787,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
 
     if (use_xml) {
         /* using a random instance of a sub class of PrintOutput */
-        pmsl->Output(QString("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"));
+        pmsl->Output(QString(R"(<?xml version="1.0" encoding="UTF-8" ?>)"));
         pmsl->Output(QString("<MPEGSections>"));
     }
 

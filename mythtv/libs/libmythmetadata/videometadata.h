@@ -90,7 +90,7 @@ class META_PUBLIC VideoMetadata
     bool sortBefore(const VideoMetadata &rhs) const;
 
     void toMap(InfoMap &metadataMap);
-    void GetStateMap(InfoMap &stateMap);
+    void GetStateMap(InfoMap &stateMap) const;
     void GetImageMap(InfoMap &imageMap);
 
     const QString &GetPrefix() const;

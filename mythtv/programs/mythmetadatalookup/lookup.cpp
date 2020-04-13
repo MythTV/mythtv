@@ -14,8 +14,7 @@
 
 #include "metadataimagehelper.h"
 
-LookerUpper::LookerUpper() :
-    m_busyRecList(QList<ProgramInfo*>())
+LookerUpper::LookerUpper()
 {
     m_metadataFactory = new MetadataFactory(this);
 }

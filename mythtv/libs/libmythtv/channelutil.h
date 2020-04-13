@@ -99,7 +99,8 @@ class MTV_PUBLIC ChannelUtil
         {
             uint m1 = 0;
             uint m2 = 0;
-            GetATSCChannel(sourceid, channum, m1,m2); return m2;
+            GetATSCChannel(sourceid, channum, m1,m2);
+            return m2 != 0U;
         }
 
     // Channel/Service Stuff

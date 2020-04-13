@@ -36,7 +36,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
   public slots:
     void  UpdateColourSpace(bool PrimariesChanged);
     void  DisplayPreempted(void);
-    bool  IsPreempted(void);
+    bool  IsPreempted(void) const;
 
   protected:
     static Type GetInteropType(VideoFrameType Format);

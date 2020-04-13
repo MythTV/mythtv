@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPTASKCACHE_H__
-#define __UPNPTASKCACHE_H__
+#ifndef UPNPTASKCACHE_H
+#define UPNPTASKCACHE_H
 
 #include <QString>
 
@@ -72,4 +72,4 @@ class SSDPCacheTask : public Task
 
 };
 
-#endif
+#endif // UPNPTASKCACHE_H

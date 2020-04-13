@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _INPUT_SELECTOR_SETTING_H_
-#define _INPUT_SELECTOR_SETTING_H_
+#ifndef INPUT_SELECTOR_SETTING_H
+#define INPUT_SELECTOR_SETTING_H
 
 #include "standardsettings.h"
 
@@ -58,4 +58,4 @@ class InputSelector : public TransMythUIComboBoxSetting
     QString m_defaultInputName;
 };
 
-#endif // _INPUT_SELECTOR_SETTING_H_
+#endif // INPUT_SELECTOR_SETTING_H

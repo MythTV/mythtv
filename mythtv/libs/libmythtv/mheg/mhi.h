@@ -1,5 +1,5 @@
-#ifndef _MHI_H_
-#define _MHI_H_
+#ifndef MHI_H
+#define MHI_H
 
 // Misc header
 #include <ft2build.h>
@@ -95,7 +95,7 @@ class MHIContext : public MHContext, public QRunnable
         { return m_stop; }
 
     /// Get the initial component tags.
-    void GetInitialStreams(int &audioTag, int &videoTag);
+    void GetInitialStreams(int &audioTag, int &videoTag) const;
 
     /// Creation functions for various visibles.
     MHDLADisplay *CreateDynamicLineArt(
@@ -161,9 +161,9 @@ class MHIContext : public MHContext, public QRunnable
     QRect ScaleVideo(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
-    bool IsFaceLoaded(void) { return m_faceLoaded; }
+    bool IsFaceLoaded(void) const { return m_faceLoaded; }
     bool LoadFont(const QString& name);
-    bool ImageUpdated(void) { return m_updated; }
+    bool ImageUpdated(void) const { return m_updated; }
 
     static const int kStdDisplayWidth = 720;
     static const int kStdDisplayHeight = 576;
@@ -390,4 +390,4 @@ class DSMCCPacket
     int            m_dataBroadcastId;
 };
 
-#endif // _MHI_H_
+#endif // MHI_H

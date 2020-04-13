@@ -49,9 +49,9 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     enum FillType { Alpha = 10, Dense, Eco, Solid };
 
-    bool isVerticalLayout(void) { return m_verticalLayout; }
-    int  getChannelCount(void) { return m_channelCount; }
-    int  getTimeCount(void) { return m_timeCount; }
+    bool isVerticalLayout(void) const { return m_verticalLayout; }
+    int  getChannelCount(void) const { return m_channelCount; }
+    int  getTimeCount(void) const { return m_timeCount; }
 
     void SetCategoryColors(const QMap<QString, QString> &catColors);
 

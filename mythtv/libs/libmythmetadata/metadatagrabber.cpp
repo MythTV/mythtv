@@ -263,8 +263,8 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
                                                  bool absolute)
 {
-    static QRegExp s_retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3})_(.*)");
-    static QRegExp s_retagref2("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
+    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
     QString tag;
@@ -291,8 +291,8 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
 
 QString MetaGrabberScript::CleanedInetref(const QString &inetref)
 {
-    static QRegExp s_retagref("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3})_(.*)");
-    static QRegExp s_retagref2("^([a-zA-Z0-9_\\-\\.]+\\.[a-zA-Z0-9]{1,3}):(.*)");
+    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
+    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
 

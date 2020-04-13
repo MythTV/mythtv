@@ -29,7 +29,7 @@ void XmlPListSerializer::BeginSerialize(QString &/*sName*/)
     m_pXmlWriter->setAutoFormatting(true);
     m_pXmlWriter->setAutoFormattingIndent(4);
     m_pXmlWriter->writeStartDocument("1.0");
-    m_pXmlWriter->writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+    m_pXmlWriter->writeDTD(R"(<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">)");
     m_pXmlWriter->writeStartElement("plist");
     m_pXmlWriter->writeAttribute("version", "1.0");
     m_pXmlWriter->writeStartElement("dict"); // top level node

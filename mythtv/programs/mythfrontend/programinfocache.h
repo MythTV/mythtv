@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // vim:set sw=4 ts=4 expandtab:
-#ifndef _PROGRAM_INFO_CACHE_H_
-#define _PROGRAM_INFO_CACHE_H_
+#ifndef PROGRAM_INFO_CACHE_H
+#define PROGRAM_INFO_CACHE_H
 
 // C++ headers
 #include <cstdint>
@@ -63,4 +63,4 @@ class ProgramInfoCache
     mutable QWaitCondition  m_loadWait;
 };
 
-#endif // _PROGRAM_INFO_CACHE_H_
+#endif // PROGRAM_INFO_CACHE_H

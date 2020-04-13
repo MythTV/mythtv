@@ -92,7 +92,7 @@ class SERVICE_PUBLIC Encoder : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            Input *pObject = new Input( this );
+            auto *pObject = new Input( this );
             Inputs().append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

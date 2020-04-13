@@ -133,7 +133,7 @@ void HttpStatus::GetStatusXML( HTTPRequest *pRequest )
     // UTF-8 is the default, but good practice to specify it anyway
     QDomProcessingInstruction encoding =
         doc.createProcessingInstruction("xml",
-                                        "version=\"1.0\" encoding=\"UTF-8\"");
+                                        R"(version="1.0" encoding="UTF-8")");
     doc.appendChild(encoding);
 
     FillStatusXML( &doc );
@@ -265,7 +265,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     unsigned int iNum = 10;
     unsigned int iNumRecordings = 0;
 
-    RecConstIter itProg = recordingList.begin();
+    auto itProg = recordingList.begin();
     for (; (itProg != recordingList.end()) && iNumRecordings < iNum; ++itProg)
     {
         if (((*itProg)->GetRecordingStatus() <= RecStatus::WillRecord) &&

@@ -62,7 +62,7 @@ bool FileTransfer::ReOpen(const QString& newFilename)
         return false;
 
     if (m_rbuffer)
-        return m_rbuffer->ReOpen(std::move(newFilename));
+        return m_rbuffer->ReOpen(newFilename);
 
     return false;
 }

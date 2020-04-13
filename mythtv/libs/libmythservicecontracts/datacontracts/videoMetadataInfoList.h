@@ -85,7 +85,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            VideoMetadataInfo *pObject = new VideoMetadataInfo( this );
+            auto *pObject = new VideoMetadataInfo( this );
             m_VideoMetadataInfos.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

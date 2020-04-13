@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _ATSC_DESCRIPTORS_H_
-#define _ATSC_DESCRIPTORS_H_
+#ifndef ATSC_DESCRIPTORS_H
+#define ATSC_DESCRIPTORS_H
 
 #include <vector>
 using namespace std;
@@ -100,7 +100,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
         { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   uimsbf cc_type         1  3.0
     bool Type(int i) const
-        { return ((Offset(i,-1)[3])>>7) & 1; }
+        { return (((Offset(i,-1)[3])>>7) & 1) != 0; }
     //   bslbf reserved         1  3.1           1
     //   if (cc_type==line21) {
     //      reserved            5  3.2        0x1f
@@ -349,4 +349,4 @@ class ExtendedChannelNameDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
-#endif
+#endif // ATSC_DESCRIPTORS_H

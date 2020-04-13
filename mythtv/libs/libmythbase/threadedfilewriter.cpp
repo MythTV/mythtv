@@ -352,7 +352,7 @@ void ThreadedFileWriter::Flush(void)
  *  designed with Linux in mind. Other OS's may benefit from
  *  revisiting this function.
  */
-void ThreadedFileWriter::Sync(void)
+void ThreadedFileWriter::Sync(void) const
 {
     if (m_fd >= 0)
     {

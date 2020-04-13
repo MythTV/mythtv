@@ -141,7 +141,7 @@ MythThemedMenu::~MythThemedMenu(void)
 
 /// \brief Returns true iff a theme has been
 ///        found by a previous call to SetMenuTheme().
-bool MythThemedMenu::foundTheme(void)
+bool MythThemedMenu::foundTheme(void) const
 {
     return m_foundtheme;
 }
@@ -174,7 +174,7 @@ QString MythThemedMenu::getSelection(void)
 
 void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
 {
-    ThemedButton button = item->GetData().value<ThemedButton>();
+    auto button = item->GetData().value<ThemedButton>();
     if (m_watermarkState)
     {
         if (!(m_watermarkState->DisplayState(button.type)))
@@ -412,7 +412,7 @@ void MythThemedMenu::customEvent(QEvent *event)
         {
             QString text = dce->GetResultText();
             MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-            ThemedButton button = item->GetData().value<ThemedButton>();
+            auto button = item->GetData().value<ThemedButton>();
             QString password = GetMythDB()->GetSetting(button.password);
             if (text == password)
             {
@@ -460,7 +460,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                 if (text.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
-                    text = qApp->translate("ThemeUI",
+                    text = QCoreApplication::translate("ThemeUI",
                                            parseText(info).toUtf8() );
                 }
                 else if ((info.attribute("lang","").toLower() ==
@@ -476,7 +476,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                 if (alttext.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
-                    alttext = qApp->translate("ThemeUI",
+                    alttext = QCoreApplication::translate("ThemeUI",
                                               parseText(info).toUtf8());
                 }
                 else if ((info.attribute("lang","").toLower() ==
@@ -522,7 +522,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                 if (description.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
-                    description = qApp->translate("ThemeUI",
+                    description = QCoreApplication::translate("ThemeUI",
                                                   getFirstText(info).toUtf8());
                 }
                 else if ((info.attribute("lang","").toLower() ==
@@ -700,7 +700,7 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
 
 void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
 {
-    ThemedButton button = item->GetData().value<ThemedButton>();
+    auto button = item->GetData().value<ThemedButton>();
 
     QString password;
     if (!skipPass)

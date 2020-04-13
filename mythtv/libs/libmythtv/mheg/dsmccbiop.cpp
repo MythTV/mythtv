@@ -572,7 +572,7 @@ int BiopIor::Process(const unsigned char *data)
 }
 
 // An IOR may refer to other streams.  We may have to add taps for them.
-void BiopIor::AddTap(Dsmcc *pStatus)
+void BiopIor::AddTap(Dsmcc *pStatus) const
 {
     DSMCCCacheReference *ref = m_profileBody->GetReference();
     if (ref != nullptr)

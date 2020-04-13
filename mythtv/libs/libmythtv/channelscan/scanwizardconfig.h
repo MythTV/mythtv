@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _SCAN_WIZARD_CONFIG_H_
-#define _SCAN_WIZARD_CONFIG_H_
+#ifndef SCAN_WIZARD_CONFIG_H
+#define SCAN_WIZARD_CONFIG_H
 
 // MythTV headers
 #include "standardsettings.h"
@@ -154,4 +154,4 @@ class ScanOptionalConfig : public GroupSetting
     PaneExistingScanImport *m_paneExistingScanImport   {nullptr};
 };
 
-#endif // _SCAN_WIZARD_CONFIG_H_
+#endif // SCAN_WIZARD_CONFIG_H

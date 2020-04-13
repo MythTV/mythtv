@@ -178,7 +178,7 @@ bool MythExternRecApp::Open(void)
     return true;
 }
 
-void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc)
+void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc) const
 {
     if (proc.state() == QProcess::Running)
     {
@@ -201,8 +201,6 @@ void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc)
         proc.kill();
         proc.waitForFinished();
     }
-
-    return;
 }
 
 Q_SLOT void MythExternRecApp::Close(void)

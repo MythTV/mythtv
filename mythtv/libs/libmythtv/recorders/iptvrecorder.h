@@ -6,8 +6,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _IPTV_RECORDER_H_
-#define _IPTV_RECORDER_H_
+#ifndef IPTV_RECORDER_H
+#define IPTV_RECORDER_H
 
 // MythTV includes
 #include "dtvrecorder.h"
@@ -35,6 +35,6 @@ class IPTVRecorder : public DTVRecorder
     IPTVChannel *m_channel {nullptr};
 };
 
-#endif // _IPTV_RECORDER_H_
+#endif // IPTV_RECORDER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

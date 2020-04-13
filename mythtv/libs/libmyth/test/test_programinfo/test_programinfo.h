@@ -42,7 +42,7 @@ class TestProgramInfo : public QObject
             "", /* syndicated episode */
             "", /* category */
 
-            (uint) -1, /* chanid */
+            UINT_MAX, /* chanid */
             "", /* channum */
             "", /* chansign */
             "", /* channame */
@@ -81,12 +81,12 @@ class TestProgramInfo : public QObject
 
             RecStatus::Unknown, /* rec status */
 
-            (uint) -1, /* record id */
+            UINT_MAX, /* record id */
 
             RecordingDupInType::kDupsUnset, /* dupin */
             RecordingDupMethodType::kDupCheckUnset, /* dupmethod */
 
-            (uint) -1, /* find id */
+            UINT_MAX, /* find id */
 
             (uint) 0, /* programflags */
             (uint) 0, /* audio props */

@@ -142,7 +142,7 @@ void handleSIGUSR2(void);
 static bool gLoaded = false;
 #endif
 
-static const QString _Location = qApp->translate("(Common)",
+static const QString sLocation = QCoreApplication::translate("(Common)",
                                                  "MythFrontend");
 
 namespace
@@ -276,7 +276,7 @@ namespace
 
     void cleanup()
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         DestroyMythMainWindow();
 #ifdef USING_AIRPLAY
         MythRAOPDevice::Cleanup();
@@ -313,7 +313,7 @@ namespace
 
         ReferenceCounter::PrintDebug();
 
-        delete qApp;
+        delete QCoreApplication::instance();
 
         SignalHandler::Done();
     }
@@ -333,7 +333,7 @@ static void startAppearWiz(void)
 
     if (isWindowed)
     {
-        ShowOkPopup(qApp->translate("(MythFrontendMain)",
+        ShowOkPopup(QCoreApplication::translate("(MythFrontendMain)",
                     "The ScreenSetupWizard cannot be used while "
                     "mythfrontend is operating in windowed mode."));
     }
@@ -611,10 +611,10 @@ static bool isLiveTVAvailable(void)
     if (RemoteGetFreeRecorderCount() > 0)
         return true;
 
-    QString msg = qApp->translate("(Common)", "All tuners are currently busy.");
+    QString msg = QCoreApplication::translate("(Common)", "All tuners are currently busy.");
 
     if (TV::ConfiguredTunerCards() < 1)
-        msg = qApp->translate("(Common)", "There are no configured tuners.");
+        msg = QCoreApplication::translate("(Common)", "There are no configured tuners.");
 
     ShowOkPopup(msg);
     return false;
@@ -675,7 +675,7 @@ static void standbyScreen(void)
 
 static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
 {
-    QString message = qApp->translate("(MythFrontendMain)",
+    QString message = QCoreApplication::translate("(MythFrontendMain)",
                                       "Loading videos ...");
 
     MythScreenStack *popupStack =
@@ -1194,7 +1194,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         if (g_settingsHelper)
         {
-            qApp->connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
+            QObject::connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
                           SIGNAL(Exiting()),
                           g_settingsHelper,
                           SLOT(RunEpilog()));
@@ -1211,7 +1211,7 @@ static void handleExit(bool prompt)
         g_exitPopup->HandleExit();
     }
     else
-        qApp->quit();
+        QCoreApplication::quit();
 }
 
 static bool RunMenu(const QString& themedir, const QString& themename)
@@ -1284,7 +1284,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
          && !mrl.startsWith("http://")
          && !mrl.startsWith("https://")))
     {
-        QString errorText = qApp->translate("(MythFrontendMain)",
+        QString errorText = QCoreApplication::translate("(MythFrontendMain)",
             "Failed to open \n '%1' in %2 \n"
             "Check if the video exists")
             .arg(mrl.section('/', -1))
@@ -1318,9 +1318,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         else
         {
-            ShowNotificationError(qApp->translate("(MythFrontendMain)",
+            ShowNotificationError(QCoreApplication::translate("(MythFrontendMain)",
                                                   "DVD Failure"),
-                                                  _Location,
+                                                  sLocation,
                                                   dvd->GetLastError());
             delete dvd;
             delete pginfo;
@@ -1344,9 +1344,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         else
         {
             // ToDo: Change string to "BD Failure" after 0.28 is released
-            ShowNotificationError(qApp->translate("(MythFrontendMain)",
+            ShowNotificationError(QCoreApplication::translate("(MythFrontendMain)",
                                                   "DVD Failure"),
-                                                  _Location,
+                                                  sLocation,
                                                   bd.GetLastError());
             delete pginfo;
             return res;
@@ -1970,7 +1970,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    qApp->setSetuidAllowed(true);
+    QCoreApplication::setSetuidAllowed(true);
 
     if (revokeRoot() != 0)
     {
@@ -2026,7 +2026,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init(false);
-    mainWindow->setWindowTitle(qApp->translate("(MythFrontendMain)",
+    mainWindow->setWindowTitle(QCoreApplication::translate("(MythFrontendMain)",
                                                "MythTV Frontend",
                                                "Main window title"));
 
@@ -2184,7 +2184,7 @@ int main(int argc, char **argv)
     fe_sd_notify("STATUS=");
     fe_sd_notify("READY=1");
 
-    int ret = qApp->exec();
+    int ret = QCoreApplication::exec();
 
     fe_sd_notify("STOPPING=1\nSTATUS=Exiting");
     if (ret==0)

@@ -17,11 +17,11 @@ class MPUBLIC SPDIFEncoder
     SPDIFEncoder(const QString& muxer, AVCodecID codec_id);
     ~SPDIFEncoder();
     void WriteFrame(unsigned char *data, int size);
-    int  GetData(unsigned char *buffer, int &dest_size);
-    int  GetProcessedSize() { return m_size; };
+    int  GetData(unsigned char *buffer, size_t &dest_size);
+    int  GetProcessedSize() const { return m_size; };
     unsigned char *GetProcessedBuffer() { return m_buffer; };
     void Reset();
-    bool Succeeded()  { return m_complete; };
+    bool Succeeded() const  { return m_complete; };
     bool SetMaxHDRate(int rate);
 
   private:

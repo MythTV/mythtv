@@ -1,5 +1,5 @@
-#ifndef _AVC_INFO_H_
-#define _AVC_INFO_H_
+#ifndef AVC_INFO_H
+#define AVC_INFO_H
 
 // C++ headers
 #include <cstdint>
@@ -46,4 +46,4 @@ class AVCInfo
     uint8_t  m_unit_table[32]    {};
 };
 
-#endif // _AVC_INFO_H_
+#endif // AVC_INFO_H

@@ -4,12 +4,12 @@
 
 #include <sys/ioctl.h>
 
-// ANSI C headers
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
+// ANSI C++ headers
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cstdarg>
 
 #ifdef USING_V4L2
 // HACK. Broken kernel headers < 2.6.25 fail compile in videodev2.h when
@@ -25,11 +25,11 @@
 // vbitext headers
 #include "vt.h"
 #include "vbi.h"
-#include "hamm.h"
+#include "vbilut.h"
 
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 
-static unsigned char *rawbuf;          // one common buffer for raw vbi data.
+static unsigned char *rawbuf = nullptr;// one common buffer for raw vbi data.
 #ifdef USING_V4L2
 static int rawbuf_size;                // its current size
 #endif // USING_V4L2
@@ -49,6 +49,22 @@ error(const char *str, ...)
     va_end(ap);
 }
 
+
+static int
+chk_parity(uint8_t *p, int n)
+{
+    int err = 0;
+
+    for (err = 0; n--; p++)
+    {
+       if (hamm24par[0][*p] & 32)
+           *p &= 0x7f;
+       else
+           *p = BAD_CHAR, err++;
+    }
+    return err;
+}
+
 static void
 out_of_sync(struct vbi *vbi)
 {
@@ -66,8 +82,8 @@ static void
 vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
 {
     struct vt_event ev[1];
-    struct vbi_client *cl = NULL;
-    struct vbi_client *cln = NULL;
+    struct vbi_client *cl = nullptr;
+    struct vbi_client *cln = nullptr;
 
     ev->resource = vbi;
     ev->type = type;
@@ -76,8 +92,9 @@ vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
     ev->i3 = i3;
     ev->p1 = p1;
 
-    for (cl = (void*)vbi->clients->first; (cln = (void*)cl->node->next); 
-         (cl = cln))
+    for (cl = static_cast<vbi_client *>((void*)vbi->clients[0].first);
+         (cln = static_cast<vbi_client *>((void*)cl->node->next)) != nullptr;
+         cl = cln)
        cl->handler(cl->data, ev);
 }
 
@@ -88,7 +105,7 @@ vbi_send_page(struct vbi *vbi, struct raw_page *rvtp, int page)
     {
        if (rvtp->page->pgno % 256 != page)
        {
-           struct vt_page *cvtp = 0;
+           struct vt_page *cvtp = nullptr;
            rvtp->page->flags &= ~PG_ACTIVE;
            do_enhancements(rvtp->enh, rvtp->page);
 //         if (vbi->cache)
@@ -146,7 +163,7 @@ pll_add(struct vbi *vbi, int n, int err)
 void
 vbi_pll_reset(struct vbi *vbi, int fine_tune)
 {
-    vbi->pll_fixed = fine_tune >= -PLL_ADJUST && fine_tune <= PLL_ADJUST;
+    vbi->pll_fixed = static_cast<int>(fine_tune >= -PLL_ADJUST && fine_tune <= PLL_ADJUST);
 
     vbi->pll_err = 0;
     vbi->pll_lerr = 0;
@@ -168,8 +185,8 @@ vbi_pll_reset(struct vbi *vbi, int fine_tune)
 static int
 vt_line(struct vbi *vbi, unsigned char *p)
 {
-    struct vt_page *cvtp = NULL;
-    struct raw_page *rvtp = NULL;
+    struct vt_page *cvtp = nullptr;
+    struct raw_page *rvtp = nullptr;
     int err = 0;
 
     int hdr = hamm16(p, &err);
@@ -442,11 +459,11 @@ vbi_handler(struct vbi *vbi, int fd)
 
 
 int
-vbi_add_handler(struct vbi *vbi, void *handler, void *data)
+vbi_add_handler(struct vbi *vbi, vbic_handler handler, void *data)
 {
-    struct vbi_client *cl = NULL;
+    struct vbi_client *cl = nullptr;
 
-    if (!(cl = malloc(sizeof(*cl))))
+    if (!(cl = new struct vbi_client))
        return -1;
     cl->handler = handler;
     cl->data = data;
@@ -460,15 +477,18 @@ vbi_add_handler(struct vbi *vbi, void *handler, void *data)
 
 
 void
-vbi_del_handler(struct vbi *vbi, void *handler, void *data)
+vbi_del_handler(struct vbi *vbi, vbic_handler handler, void *data)
 {
-    struct vbi_client *cl = NULL;
+    struct vbi_client *cl = nullptr;
 
-    for (cl = (void*) vbi->clients->first; cl->node->next; cl = (void*) cl->node->next)
+    for (cl = static_cast<vbi_client*>((void*)vbi->clients->first);
+         cl->node->next != nullptr;
+         cl = static_cast<vbi_client*>((void*)cl->node->next))
     {
        if (cl->handler == handler && cl->data == data)
        {
            dl_remove(cl->node);
+           delete cl;
            break;
        }
     }
@@ -535,7 +555,7 @@ static int
 setup_dev(struct vbi *vbi)
 {
 #ifdef USING_V4L2
-    struct v4l2_format v4l2_format;
+    struct v4l2_format v4l2_format {};
     struct v4l2_vbi_format *vbifmt = &v4l2_format.fmt.vbi;
 
     memset(&v4l2_format, 0, sizeof(v4l2_format));
@@ -586,10 +606,12 @@ setup_dev(struct vbi *vbi)
     // grow buffer if necessary
     if (rawbuf_size < vbi->bufsize)
     {
-       if (rawbuf)
-           free(rawbuf);
-       if (!(rawbuf = malloc(rawbuf_size = vbi->bufsize)))
-            error("malloc refused in setup_dev()\n");
+       delete [] rawbuf;
+       rawbuf_size = vbi->bufsize;
+       if (!(rawbuf = new u_char[rawbuf_size]))
+       {
+            error("unable to allocate in setup_dev()\n");
+       }
     }
 
     return 0;
@@ -605,7 +627,7 @@ struct vbi *
 vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 {
     static int s_inited = 0;
-    struct vbi *vbi = 0;
+    struct vbi *vbi = nullptr;
 
     (void)ca;
 
@@ -613,7 +635,8 @@ vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
        lang_init();
     s_inited = 1;
 
-    if (!(vbi = malloc(sizeof(*vbi))))
+    vbi = new struct vbi;
+    if (vbi == nullptr)
     {
        error("out of memory");
        goto fail1;
@@ -645,9 +668,9 @@ vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 fail3:
     close(vbi->fd);
 fail2:
-    free(vbi);
+    delete vbi;
 fail1:
-    return 0;
+    return nullptr;
 }
 
 
@@ -659,7 +682,7 @@ vbi_close(struct vbi *vbi)
 //    if (vbi->cache)
 //     vbi->cache->op->close(vbi->cache);
     close(vbi->fd);
-    free(vbi);
+    delete vbi;
 }
 
 
@@ -686,7 +709,7 @@ vbi_query_page(struct vbi *vbi, int pgno, int subno)
     (void)vbi;
     (void)pgno;
     (void)subno;
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -695,6 +718,6 @@ vbi_reset(struct vbi *vbi)
 {
 //    if (vbi->cache)
 //     vbi->cache->op->reset(vbi->cache);
-    vbi_send(vbi, EV_RESET, 0, 0, 0, 0);
+    vbi_send(vbi, EV_RESET, 0, 0, 0, nullptr);
 }
 

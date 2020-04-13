@@ -1,5 +1,5 @@
-#ifndef __VOLUME_BASE__
-#define __VOLUME_BASE__
+#ifndef VOLUME_BASE_H
+#define VOLUME_BASE_H
 
 #include "mythexp.h"
 
@@ -50,4 +50,4 @@ class MPUBLIC VolumeBase
 
 };
 
-#endif // __VOLUME_BASE__
+#endif // VOLUME_BASE_H

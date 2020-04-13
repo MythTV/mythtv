@@ -40,7 +40,7 @@ class GameScannerThread : public MThread
     void SetHandlers(QList<GameHandler*> handlers) { m_handlers = std::move(handlers); };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
 
-    bool getDataChanged() { return m_dbDataChanged; };
+    bool getDataChanged() const { return m_dbDataChanged; };
 
   private:
 

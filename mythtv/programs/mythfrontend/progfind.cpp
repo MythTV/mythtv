@@ -121,7 +121,7 @@ ProgFinder::~ProgFinder()
     if (m_player && m_allowEPG)
     {
         QString message = QString("PROGFINDER_EXITING");
-        qApp->postEvent(m_player, new MythEvent(message));
+        QCoreApplication::postEvent(m_player, new MythEvent(message));
     }
 }
 

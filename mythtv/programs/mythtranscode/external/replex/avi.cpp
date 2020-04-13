@@ -48,6 +48,7 @@ static uint32_t getle32(uint8_t *buf)
 	return (buf[3]<<24)|(buf[2]<<16)|(buf[1]<<8)|buf[0];
 }
 
+#if 0
 static uint32_t getbe32(uint8_t *buf)
 {
 	return (buf[0]<<24)|(buf[1]<<16)|(buf[2]<<8)|buf[3];
@@ -55,15 +56,17 @@ static uint32_t getbe32(uint8_t *buf)
 
 static void printhead(uint8_t *buf)
 {
-	LOG(VB_GENERAL, LOG_INFO, "%c%c%c%c ", buf[0], buf[1], buf[2], buf[3]);
+	LOG(VB_GENERAL, LOG_INFO, QString("%1%2%3%4 ")
+	    .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]));
 }
+#endif
 
 static uint32_t getsize(int fd)
 {
-	int len;
 	uint8_t buf[4];
 
-	len=read(fd, buf, 4);
+	int len=read(fd, buf, 4);
+        (void)len;
 	return getle32(buf);
 }
 
@@ -97,16 +100,16 @@ static
 int new_idx_frame( avi_context *ac, uint32_t pos, uint32_t len, 
 		   uint32_t fl, uint32_t id)
 {
-	int num = ac->num_idx_frames;
+	uint32_t num = ac->num_idx_frames;
 	if (ac->num_idx_alloc < num+1){
 		avi_index *idx;
 		uint32_t newnum = num + 1024;
 		
 		if (ac->idx){
-			idx = realloc(ac->idx, 
-						 newnum*sizeof(avi_index));
+                    idx = static_cast<avi_index*>(realloc(ac->idx,
+                                                newnum*sizeof(avi_index)));
 		} else {
-			idx = malloc(newnum*sizeof(avi_index));
+                    idx = static_cast<avi_index*>(malloc(newnum*sizeof(avi_index)));
 		}
 		if (!idx) return -1;
 		ac->idx = idx;
@@ -127,9 +130,13 @@ static void print_index(avi_context *ac, int num){
 	char *cc;
 	cc = (char *) &ac->idx[num].id;
 	LOG(VB_GENERAL, LOG_DEBUG,
-	    "%d chunkid: %c%c%c%c   chunkoff: 0x%04x   chunksize: 0x%04x "
-	    "  chunkflags: 0x%04x", num, *cc,*(cc+1),*(cc+2),*(cc+3),
-	    (int)ac->idx[num].off, ac->idx[num].len, ac->idx[num].flags);
+	    QString("%1 chunkid: %2%3%4%5   chunkoff: 0x%6   chunksize: 0x%7 "
+                    "  chunkflags: 0x%8")
+	    .arg(num)
+	    .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg(*(cc+3))
+	    .arg(ac->idx[num].off,   4,16,QChar('0'))
+	    .arg(ac->idx[num].len,   4,16,QChar('0'))
+	    .arg(ac->idx[num].flags, 4,16,QChar('0')));
 }
 
 int avi_read_index(avi_context *ac, int fd)
@@ -151,8 +158,8 @@ int avi_read_index(avi_context *ac, int fd)
 
 	if (tag != TAG_IT('i','d','x','1')){
 		cc = (char *) &tag;
-		LOG(VB_GENERAL, LOG_INFO, "  tag: %c%c%c%c\n ", *cc, *(cc+1),
-		    *(cc+2), *(cc+3));
+		LOG(VB_GENERAL, LOG_INFO, QString("  tag: %1%2%3%4\n ")
+		    .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg(*(cc+3)));
 
 		if (lseek(fd, start, SEEK_SET) < 0 ) return -5;
 		return -1;
@@ -193,11 +200,11 @@ int avi_read_index(avi_context *ac, int fd)
 		c+=16;
 	}
 #ifdef DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, "Found %d video (%d were empty) and %d "
-	                           "audio (%d were empty) chunks",
-	     (int)ac->vchunks, (int)ac->zero_vchunks, (int)ac->achunks,
-	     (int)ac->zero_achunks);
-
+	LOG(VB_GENERAL, LOG_DEBUG,
+	    QString("Found %1 video (%2 were empty) and %3 "
+		    "audio (%4 were empty) chunks")
+	    .arg(ac->vchunks).arg(ac->zero_vchunks)
+	    .arg(ac->achunks).arg(ac->zero_achunks));
 #endif	
 	lseek(fd, start, SEEK_SET);
 
@@ -223,8 +230,8 @@ int read_avi_header( avi_context *ac, int fd)
 
 #ifdef DEBUG
 		cc = (char *) &tag;
-		LOG(VB_GENERAL, LOG_DEBUG, "tag: %c%c%c%c",
-		    *cc, *(cc+1), *(cc+2), *(cc+3));
+		LOG(VB_GENERAL, LOG_DEBUG, QString("tag: %1%2%3%4")
+		    .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg(*(cc+3)));
 #endif
 		switch(tag){
 		case TAG_IT('L','I','S','T'):
@@ -237,8 +244,8 @@ int read_avi_header( avi_context *ac, int fd)
 			ac->movi_start = lseek(fd, 0, SEEK_CUR);
 			ac->movi_length = size-8;
 #ifdef DEBUG
-			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d header done",
-			    size);
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    QString("  size: %1 header done").arg(size));
 #endif
 			return 0;
 			break;
@@ -278,9 +285,11 @@ int read_avi_header( avi_context *ac, int fd)
 
 
 #ifdef DEBUG
-			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
-			LOG(VB_GENERAL, LOG_DEBUG, "    microsecs per frame %d",
-				ac->msec_per_frame);
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    QString("  size: %1").arg(size));
+			LOG(VB_GENERAL, LOG_DEBUG,
+			    QString("    microsecs per frame %1")
+                            .arg(ac->msec_per_frame));
 			if (ac->avih_flags & AVI_HASINDEX)
 				LOG(VB_GENERAL, LOG_DEBUG, "    AVI has index");
 			if (ac->avih_flags & AVI_USEINDEX)
@@ -291,19 +300,22 @@ int read_avi_header( avi_context *ac, int fd)
 				    "    AVI is interleaved");
 			if(ac->total_frames)
 				LOG(VB_GENERAL, LOG_DEBUG,
-				    "    total frames: %d", ac->total_frames);
+				    QString("    total frames: %1")
+				    .arg(ac->total_frames));
 
-			LOG(VB_GENERAL, LOG_DEBUG, "    number of streams: %d",
-				ac->nstreams);
-			LOG(VB_GENERAL, LOG_DEBUG, "    size: %dx%d",
-				ac->width, ac->height);
+			LOG(VB_GENERAL, LOG_DEBUG,
+				QString("    number of streams: %1")
+				.arg(ac->nstreams));
+			LOG(VB_GENERAL, LOG_DEBUG, QString("    size: %1x%2")
+                                .arg(ac->width).arg(ac->height));
 #endif
 			break;
 
 		case TAG_IT('s','t','r','h'):
 			size = getsize(fd);
 #ifdef DEBUG
-			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
+			LOG(VB_GENERAL, LOG_DEBUG,
+				QString("  size: %1").arg(size));
 #endif
 
 			c=0;
@@ -312,8 +324,8 @@ int read_avi_header( avi_context *ac, int fd)
 			c+=16;
 #ifdef DEBUG
 			cc = (char *) &tag;
-			LOG(VB_GENERAL, LOG_DEBUG, "    tag: %c%c%c%c",
-			    *cc, *(cc+1), *(cc+2), *(cc+3));
+			LOG(VB_GENERAL, LOG_DEBUG, QString("    tag: %1%2%3%4")
+				.arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg((cc+3)));
 #endif
 			switch ( tag ){
 			case TAG_IT('v','i','d','s'):
@@ -322,8 +334,8 @@ int read_avi_header( avi_context *ac, int fd)
 				if (ac->vhandler){
 					cc = (char *) &ac->vhandler;
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    "     video handler: %c%c%c%c",
-					    *cc, *(cc+1), *(cc+2), *(cc+3));
+					    QString("     video handler: %1%2%3%4")
+					    .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg(*(cc+3)));
 				}
 #endif
 				ac->vi.initial_frames = getle32(buf+c);
@@ -339,11 +351,12 @@ int read_avi_header( avi_context *ac, int fd)
 						ac->vi.dw_scale;
 
 				LOG(VB_GENERAL, LOG_INFO,
-				    "AVI video info:  dw_scale %d  dw_rate %d "
-				    "fps %0.3f  ini_frames %d  dw_start %d",
-					ac->vi.dw_scale, ac->vi.dw_rate,
-					ac->vi.fps/1000.0, 
-					ac->vi.initial_frames, ac->vi.dw_start);
+				    QString("AVI video info:  dw_scale %1  dw_rate %2 "
+					    "fps %3  ini_frames %4  dw_start %5")
+				    .arg(ac->vi.dw_scale).arg(ac->vi.dw_rate)
+				    .arg(ac->vi.fps/1000.0, 0,'f',3,QChar('0'))
+				    .arg(ac->vi.initial_frames)
+				    .arg(ac->vi.dw_start));
 				break;	
 			case TAG_IT('a','u','d','s'):
 				ac->ahandler = getle32(buf+4);
@@ -351,8 +364,9 @@ int read_avi_header( avi_context *ac, int fd)
 				if (ac->ahandler){
 					cc = (char *) &ac->ahandler;
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    "     audio handler: %c%c%c%c",
-					    *cc, *(cc+1), *(cc+2), *(cc+3));
+					    QString("     audio handler: %1%2%3%4")
+                                            .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg((cc+3)));
+
 				}
 #endif
 
@@ -373,14 +387,14 @@ int read_avi_header( avi_context *ac, int fd)
 						ac->ai[n].dw_scale;
 
 				LOG(VB_GENERAL, LOG_INFO,
-				    "AVI audio%d info:  dw_scale %d  dw_rate "
-				    "%d ini_frames %d  dw_start %d  fps %0.3f "
-				    " sam_size %d", n,
-					ac->ai[n].dw_scale, ac->ai[n].dw_rate,
-					ac->ai[n].initial_frames,
-					ac->ai[n].dw_start,
-					ac->ai[n].fps/1000.0,
-					ac->ai[n].dw_ssize);
+				    QString("AVI audio%1 info:  dw_scale %2  dw_rate "
+					    "%3 ini_frames %4  dw_start %5  fps %6 "
+					    " sam_size %7").arg(n)
+				    .arg(ac->ai[n].dw_scale).arg(ac->ai[n].dw_rate)
+				    .arg(ac->ai[n].initial_frames)
+				    .arg(ac->ai[n].dw_start)
+				    .arg(ac->ai[n].fps/1000.0, 0,'f',3,QChar('0'))
+				    .arg(ac->ai[n].dw_ssize));
 				
 				ac->ntracks++;
 				break;	
@@ -391,7 +405,7 @@ int read_avi_header( avi_context *ac, int fd)
 			size -=4;
 			skip =1;
 #ifdef DEBUG
-			LOG(VB_GENERAL, LOG_DEBUG, "  size: %d", size);
+			LOG(VB_GENERAL, LOG_DEBUG, QString("  size: %1").arg(size));
 #endif
 			break;
 
@@ -410,11 +424,11 @@ int read_avi_header( avi_context *ac, int fd)
 
 #define MAX_BUF_SIZE 0xffff
 int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac, 
-		       void (*func)(pes_in_t *p), int insize)
+		       void (*func)(pes_in_t *p), uint32_t insize)
 {
 	struct replex *rx= (struct replex *) p->priv;
 	avi_index *idx = ac->idx;
-	int cidx = ac->current_idx;
+	uint32_t cidx = ac->current_idx;
 	uint8_t buf[MAX_BUF_SIZE];
 	uint32_t cid;
 	int c=0;
@@ -438,8 +452,9 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	default:
 		LOG(VB_GENERAL, LOG_ERR, "strange chunk :");
 		show_buf((uint8_t *) &idx[cidx].id,4);
-		LOG(VB_GENERAL, LOG_ERR, "offset: 0x%04x  length: 0x%04x",
-			(int)idx[cidx].off, (int)idx[cidx].len);
+		LOG(VB_GENERAL, LOG_ERR, QString("offset: 0x%1  length: 0x%2")
+		    .arg(idx[cidx].off, 4,16,QChar('0'))
+                    .arg(idx[cidx].len, 4,16,QChar('0')));
 		ac->current_idx++;
 		p->found=0;
 		return 0;
@@ -469,16 +484,17 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	if (cid != idx[cidx].id){
 		char *cc;
 		cc = (char *)&idx[cidx].id;
-		LOG(VB_GENERAL, LOG_ERR, "wrong chunk id: %c%c%c%c != %c%c%c%c",
-			buf[0], buf[1], buf[2], buf[3],
-			*cc, *(cc+1), *(cc+2), *(cc+3));
+		LOG(VB_GENERAL, LOG_ERR,
+		    QString("wrong chunk id: %1%2%3%4 != %5%6%7%8")
+		    .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3])
+		    .arg(*cc).arg(*(cc+1)).arg(*(cc+2)).arg(*(cc+3)));
 		
 		print_index(ac,cidx);
 		exit(1);
 	}
 	if (p->plength != idx[cidx].len){
-		LOG(VB_GENERAL, LOG_ERR, "wrong chunk size: %d != %d",
-			(int)p->plength, idx[cidx].len);
+                LOG(VB_GENERAL, LOG_ERR, QString("wrong chunk size: %1 != %2")
+		    .arg(p->plength).arg(idx[cidx].len));
 		exit(1);
 	}
 	c+=4;
@@ -487,17 +503,18 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	
 	per = (int)(100*(pos-ac->movi_start)/ac->movi_length);
 	if (per % 10 == 0 && per>lastper)
-		LOG(VB_GENERAL, LOG_INFO, "read %3d%%", per);
+                LOG(VB_GENERAL, LOG_INFO, QString("read %1%%").arg(per,3));
 	lastper = per;
 
 	if (ring_write(p->rbuf, buf+c, p->plength)<0){
-		LOG(VB_GENERAL, LOG_ERR, "ring buffer overflow %d 0x%02x",
-		    p->rbuf->size, p->type);
+                LOG(VB_GENERAL, LOG_ERR,
+		    QString("ring buffer overflow %1 0x%2")
+		    .arg(p->rbuf->size).arg(p->type, 2,16,QChar('0')));
 		exit(1);
 	}
 	
 	func(p);
-	init_pes_in(p, 0, NULL, p->withbuf);
+	init_pes_in(p, 0, nullptr, p->withbuf);
 	
 	ac->current_idx++;
 
@@ -608,10 +625,13 @@ void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 #if 0
 			if (p->type == 1)
 			{
-				LOG(VB_GENERAL, LOG_ERR, "audio 0x%x 0x%x",
-				    p->plength, ALIGN(p->plength));
-				LOG(VB_GENERAL, LOG_ERR, "video 0x%x 0x%x",
-				    p->plength, ALIGN(p->plength));
+				LOG(VB_GENERAL, LOG_ERR, QString("audio 0x%1 0x%2")
+				    .arg(p->plength, 0,16)
+				    .arg(ALIGN(p->plength), 0,16));
+				LOG(VB_GENERAL, LOG_ERR, QString("video 0x%1 0x%2")
+				    .arg(p->plength, 0,16)
+				    .arg(ALIGN(p->plength), 0,16));
+                        }
 #endif
 			break;
 
@@ -627,7 +647,8 @@ void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				l = p->plength+8-p->found;
 			if (ring_write(p->rbuf, buf+c, l)<0){
 				LOG(VB_GENERAL, LOG_ERR,
-				    "ring buffer overflow %d", p->rbuf->size);
+				    QString("ring buffer overflow %1")
+				    .arg(p->rbuf->size));
 				exit(1);
 			}
 			p->found += l;
@@ -640,7 +661,7 @@ void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 
 	if (p->plength && p->found == p->plength+8) {
 		int a = 0;//ALIGN(p->plength);
-		init_pes_in(p, 0, NULL, p->withbuf);
+		init_pes_in(p, 0, nullptr, p->withbuf);
 		if (c+a < count)
 			get_avi(p, buf+c+a, count-c-a, func);
 	}

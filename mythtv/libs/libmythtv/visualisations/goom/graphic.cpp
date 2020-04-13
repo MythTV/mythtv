@@ -13,7 +13,7 @@ unsigned int SIZE;
 unsigned int HEIGHT;
 unsigned int WIDTH;
 
-int    *rand_tab = 0;
+int    *rand_tab = nullptr;
 //unsigned short int rand_pos = 0;
 /*
 inline unsigned int RAND(void)

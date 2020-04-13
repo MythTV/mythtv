@@ -13,10 +13,10 @@
 /// This file gets included in two different ways:
 /// 1) from mythlogging.h from nearly every file.  This will define the
 ///    VerboseMask enum
-/// 2) specifically (and a second include with _IMPLEMENT_VERBOSE defined) from
-///    mythlogging.cpp.  This is done in verboseInit (in the middle of the
-///    function) as it will expand out to a series of calls to verboseAdd()
-///    to fill the verboseMap.
+/// 2) specifically (and a second include with MYTH_IMPLEMENT_VERBOSE defined)
+///    from mythlogging.cpp.  This is done in verboseInit (in the middle of the
+///    function) as it will expand out to a series of calls to verboseAdd() to
+///    fill the verboseMap.
 ///
 /// The 4 fields are:
 ///     enum name (expected to start with VB_)
@@ -37,7 +37,7 @@
 #undef LOGLEVEL_POSTAMBLE
 #undef LOGLEVEL_MAP
 
-#ifdef _IMPLEMENT_VERBOSE
+#ifdef MYTH_IMPLEMENT_VERBOSE
 
 // This is used to actually implement the mask in mythlogging.cpp
 #define VERBOSE_PREAMBLE
@@ -50,7 +50,7 @@
 #define LOGLEVEL_MAP(name,value,shortname) \
     loglevelAdd(value,QString(#name),shortname);
 
-#else // !defined(_IMPLEMENT_VERBOSE)
+#else // !defined(MYTH_IMPLEMENT_VERBOSE)
 
 // This is used to define the enumerated type (used by all files)
 
@@ -71,9 +71,9 @@
 #endif
 
 #define LOGLEVEL_PREAMBLE \
-    typedef enum { //NOLINT(modernize-use-using) included from C code
+    enum LogLevel_t {
 #define LOGLEVEL_POSTAMBLE \
-    } LogLevel_t;
+    };
 #define LOGLEVEL_MAP(name,value,shortname) \
     name = (value),
 
@@ -198,7 +198,7 @@ LOGLEVEL_MAP(LOG_DEBUG,   7, 'D')
 LOGLEVEL_MAP(LOG_UNKNOWN, 8, '-')
 LOGLEVEL_POSTAMBLE
 
-#ifndef _IMPLEMENT_VERBOSE
+#ifndef MYTH_IMPLEMENT_VERBOSE
 #ifdef __cplusplus
 struct VerboseDef {
     uint64_t    mask     {0};

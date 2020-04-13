@@ -108,6 +108,6 @@ struct CHANLISTS {
 
 /* --------------------------------------------------------------------- */
 
-extern MTV_PUBLIC struct CHANLISTS   chanlists[];
+extern MTV_PUBLIC struct CHANLISTS   gChanLists[];
 
 #endif

@@ -24,15 +24,15 @@
  *
  */
 
-#ifndef _MPG_COMMON_H_
-#define _MPG_COMMON_H_
+#ifndef MPG_COMMON_H
+#define MPG_COMMON_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "ringbuffer.h"
 
 
 
-typedef struct index_unit_s{
+struct index_unit {
 	uint8_t  active;
 	uint32_t length;
 	uint32_t start;
@@ -49,9 +49,9 @@ typedef struct index_unit_s{
 	uint8_t  err;
 	uint32_t framesize;
 	uint64_t ptsrate;
-} index_unit;
+};
 
-typedef struct extdata_s{
+struct extdata_t {
 	index_unit iu;
 	uint64_t pts;
 	uint64_t pts_off;
@@ -60,7 +60,7 @@ typedef struct extdata_s{
 	int frmperpkt;
 	char language[4];
 	dummy_buffer dbuf;
-} extdata_t;
+};
 
 
 #define NO_ERR    0
@@ -75,4 +75,4 @@ int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off);
 int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le);
 int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le);
 
-#endif /*_MPG_COMMON_H_*/
+#endif /* MPG_COMMON_H */

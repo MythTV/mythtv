@@ -87,7 +87,7 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
             {
                 uint8_t buf[2048];
                 ssize_t read = 0;
-                uint32_t crc = static_cast<uint32_t>(crc32(0L, Z_NULL, 0));
+                auto crc = static_cast<uint32_t>(crc32(0L, Z_NULL, 0));
 
                 while((read = MythFileRead(fd, buf, sizeof(buf))) > 0)
                     crc = static_cast<uint32_t>(crc32(crc, buf, static_cast<uint>(read)));

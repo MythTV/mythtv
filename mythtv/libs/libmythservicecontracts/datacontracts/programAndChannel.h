@@ -112,6 +112,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_CommFree        ( false  ),
               m_UseEIT          ( false  ),
               m_Visible         ( true   ),
+              m_ServiceType     ( 0      ),
               m_SerializeDetails( true   )
         {
         }

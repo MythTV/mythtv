@@ -1,5 +1,5 @@
-#ifndef _RECORDING_FILE_H_
-#define _RECORDING_FILE_H_
+#ifndef RECORDING_FILE_H
+#define RECORDING_FILE_H
 
 #include <QString>
 #include <QSize>
@@ -60,4 +60,4 @@ class MTV_PUBLIC RecordingFile
     static AVContainer AVContainerFromString(const QString &formatStr);
 };
 
-#endif
+#endif // RECORDING_FILE_H

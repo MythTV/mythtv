@@ -50,7 +50,7 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
     ~DialogCompletionEvent() override;
 
     QString GetId() { return m_id; }
-    int GetResult() { return m_result; }
+    int GetResult() const { return m_result; }
     QString GetResultText() { return m_resultText; }
     QVariant GetData() { return m_resultData; }
 

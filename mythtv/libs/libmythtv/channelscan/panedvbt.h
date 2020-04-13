@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_DVBT_H_
-#define _PANE_DVBT_H_
+#ifndef PANE_DVBT_H
+#define PANE_DVBT_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -84,4 +84,4 @@ class PaneDVBT : public GroupSetting
     ScanHierarchy        *m_phierarchy      {nullptr};
 };
 
-#endif // _PANE_DVBT_H_
+#endif // PANE_DVBT_H

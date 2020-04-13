@@ -46,8 +46,10 @@
 #define O_LARGEFILE 0
 #endif
 
+extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+}
 
 #ifdef _WIN32
 # define S_IRGRP 0
@@ -123,7 +125,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
 
         /* it is assumed that the samples buffer is large enough based on the
          * relevant parameters */
-        samples_size = av_samples_get_buffer_size(NULL, avctx->channels,
+        samples_size = av_samples_get_buffer_size(nullptr, avctx->channels,
                                                   frame->nb_samples,
                                                   avctx->sample_fmt, 1);
         if ((ret = avcodec_fill_audio_frame(frame, avctx->channels,
@@ -136,7 +138,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
 
         frame->pts = AV_NOPTS_VALUE;
     } else {
-        frame = NULL;
+        frame = nullptr;
     }
 
     //  SUGGESTION
@@ -172,7 +174,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
 static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 {
 	AVCodec *codec;
-	AVCodecContext *c= NULL;
+	AVCodecContext *c= nullptr;
 	int frame_size, j, out_size;
 	short *samples;
 	
@@ -194,7 +196,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	c->sample_fmt = AV_SAMPLE_FMT_S16;
 
     /* open it */
-	if (avcodec_open2(c, codec, NULL) < 0) {
+	if (avcodec_open2(c, codec, nullptr) < 0) {
 		LOG(VB_GENERAL, LOG_ERR, "could not open codec");
 		av_free(c);
 		return 1;
@@ -202,7 +204,7 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 
 	/* the codec gives us the frame size, in samples */
 	frame_size = c->frame_size;
-	samples = malloc(frame_size * 2 * c->channels);
+	samples = static_cast<short*>(malloc(frame_size * 2 * c->channels));
 	
 	/* create samples for a single blank frame */
 	for (j=0;j<frame_size;j++) {
@@ -215,8 +217,8 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	
 	if (out_size != bufsize) {
 		LOG(VB_GENERAL, LOG_ERR,
-		    "frame size (%d) does not equal required size (%d)?",
-			out_size, bufsize);
+		    QString("frame size (%1) does not equal required size (%2)?")
+		    .arg(out_size).arg(bufsize));
 		free(samples);
 		avcodec_free_context(&c);
 		return 1;
@@ -232,17 +234,17 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 {
 	int c=0;
 	int pos=0;
-	audio_frame_t *aframe = NULL;
-	index_unit *iu = NULL;
-	ringbuffer *rbuf = NULL, *index_buf = NULL;
-	uint64_t *acount=NULL;
-	uint64_t *fpts=NULL;
-	uint64_t *lpts=NULL;
+	audio_frame_t *aframe = nullptr;
+	index_unit *iu = nullptr;
+	ringbuffer *rbuf = nullptr, *index_buf = nullptr;
+	uint64_t *acount=nullptr;
+	uint64_t *fpts=nullptr;
+	uint64_t *lpts=nullptr;
 	int bsize = 0;
 	int first = 1;
 	uint8_t buf[7];
 	int off=0;
-	int *apes_abort=NULL;
+	int *apes_abort=nullptr;
 	int re=0;
 	
 	switch ( type ){
@@ -335,8 +337,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					
 						c += pos+2;
 #ifdef IN_DEBUG
-						LOG(VB_GENERAL, LOG_DEBUG,"
-						    WRONG HEADER1 %d", diff);
+						LOG(VB_GENERAL, LOG_DEBUG,
+						    QString("WRONG HEADER1 %1").arg(diff));
 #endif
 						continue;
 					}
@@ -345,7 +347,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					c += pos+2;
 #if 0
 					LOG(VB_GENERAL, LOG_ERR,
-					    "WRONG HEADER2 %d", diff);
+					    QString("WRONG HEADER2 %1").arg(diff));
 #endif
 					continue;
 				}
@@ -365,8 +367,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 						diff = abs(diff);
 						int framesdiff = diff / frame_time;
 						LOG(VB_GENERAL, LOG_INFO,
-						    " - need to remove %d frame(s)",
-							framesdiff);
+						    QString(" - need to remove %1 frame(s)")
+						    .arg(framesdiff));
 						
 						// FIXME can only remove one frame at a time for now
 						if (framesdiff > 1)
@@ -377,8 +379,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					} else {
 						int framesdiff = diff / frame_time;
 						LOG(VB_GENERAL, LOG_INFO,
-						    " - need to add %d frame(s)",
-							framesdiff);
+						    QString(" - need to add %1 frame(s)")
+						    .arg(framesdiff));
 						
 						// limit inserts to a maximum of 5 frames
 						if (framesdiff > 5)
@@ -399,8 +401,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 							res = ring_peek(rbuf, framebuf, aframe->framesize, 0);
 							if (res != (int) aframe->framesize) {
 								LOG(VB_GENERAL, LOG_ERR,
-								    "ring buffer failed to peek frame res: %d",
-									res);
+								    QString("ring buffer failed to peek frame res: %1")
+								    .arg(res));
 								exit(1);
 							}
 						}	
@@ -429,8 +431,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 					if (iu->length < aframe->framesize ||
 					    iu->length > aframe->framesize+1){
 						LOG(VB_GENERAL, LOG_ERR,
-						    "Wrong audio frame size: %d",
-							 iu->length);
+						    QString("Wrong audio frame size: %1")
+						    .arg(iu->length));
 						iu->err= FRAME_ERR;
 					}
 					if (ring_write(index_buf, 
@@ -454,7 +456,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 
 					diff = ptsdiff(trans_pts_dts(p->pts),
 							iu->pts + *fpts);
-					if( !rx->keep_pts && abs ((int)diff) > 40*CLOCK_MS){
+					if( !rx->keep_pts && (llabs(diff) > 40*CLOCK_MS)){
 						LOG(VB_GENERAL, LOG_ERR,
 						    "audio PTS inconsistent:");
 						printpts(trans_pts_dts(p->pts)-*fpts);
@@ -490,7 +492,8 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 			c += pos;
 			if (c + (int) aframe->framesize > len){
 #if 0
-				LOG(VB_GENERAL, LOG_INFO, "SHORT %d", len -c);
+                                LOG(VB_GENERAL, LOG_INFO,
+				    QString("SHORT %1").arg(len-c));
 #endif
 				c = len;
 			} else {
@@ -536,12 +539,13 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 	rx->vpes_abort = 0;
 	off = ring_rdiff(rbuf, p->ini_pos);
 #ifdef IN_DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, " ini pos %d", (p->ini_pos)%rx->videobuf);
+	LOG(VB_GENERAL, LOG_DEBUG, QString(" ini pos %1")
+	    .arg((p->ini_pos)%rx->videobuf));
 #endif
 
 	
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "len %d  %d",len,off);
+	LOG(VB_GENERAL, LOG_INFO, QString("len %1  %2").arg(len).arg(off));
 #endif
 	while (c < len){
 		if ((pos = ring_find_any_header( rbuf, &head, c+off, len-c)) 
@@ -549,8 +553,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 			switch(head){
 			case SEQUENCE_HDR_CODE:
 #ifdef IN_DEBUG
-				LOG(VB_GENERAL, LOG_DEBUG, " seq headr %d",
-					(p->ini_pos+c+pos)%rx->videobuf);
+				LOG(VB_GENERAL, LOG_DEBUG, QString(" seq headr %1")
+				    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 
 				seq_h = 1;
@@ -564,7 +568,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 
 #ifdef IN_DEBUG
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    " seq headr result %d", re);
+					        QString(" seq headr result %1")
+						.arg(re));
 #endif
 					if (re == -2){
 						rx->vpes_abort = len -(c+pos-1);
@@ -586,8 +591,9 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				int ext_id = 0;
 
 #ifdef IN_DEBUG
-				LOG(VB_GENERAL, LOG_DEBUG, " seq ext headr %d",
-					(p->ini_pos+c+pos)+rx->videobuf);
+				LOG(VB_GENERAL, LOG_DEBUG,
+					QString(" seq ext headr %1")
+					.arg((p->ini_pos+c+pos)+rx->videobuf));
 #endif
 				ext_id = get_video_ext_info(rbuf, 
 							    &rx->seq_head, 
@@ -619,10 +625,10 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 #ifdef IN_DEBUG
 					
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    "fcount %d  gcount %d  tempref %d  %d",
-						(int)rx->vframe_count, (int)rx->vgroup_count, 
-						(int)s->current_tmpref,
-						(int)(s->current_tmpref - rx->vgroup_count 
+					    QString("fcount %1  gcount %2  tempref %3  %4")
+					    .arg(rx->vframe_count).arg(rx->vgroup_count)
+					    .arg(s->current_tmpref)
+					    .arg(s->current_tmpref - rx->vgroup_count
 						      + rx->vframe_count));
 #endif
 					newdts = next_ptsdts_video(
@@ -638,7 +644,7 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 							       + newpts);
 
 						if (!rx->keep_pts &&
-						    abs((int)(diff)) > 3*SEC_PER/2){
+						    (llabs(diff) > 3*SEC_PER/2)){
 							LOG(VB_GENERAL, LOG_INFO,
 							    "video PTS inconsistent:");
 							printpts(trans_pts_dts(p->pts));
@@ -653,12 +659,12 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 
 					if (!rx->ignore_pts &&
 					    (p->flag2 & PTS_DTS) == PTS_DTS){ 
-						uint64_t diff;
+						int64_t diff;
 						diff = ptsdiff(iu->dts, 
 							       newdts + 
 							       rx->first_vpts); 
 						if (!rx->keep_pts &&
-						    abs((int)diff) > 3*SEC_PER/2){
+						    (llabs(diff) > 3*SEC_PER/2)){
 							LOG(VB_GENERAL, LOG_INFO,
 							    "video DTS inconsistent: ");
 							printpts(trans_pts_dts(p->dts));
@@ -718,8 +724,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 
 			case SEQUENCE_END_CODE:
 #ifdef IN_DEBUG
-				LOG(VB_GENERAL, LOG_DEBUG, " seq end %d",
-					(p->ini_pos+c+pos)%rx->videobuf);
+				LOG(VB_GENERAL, LOG_DEBUG, QString(" seq end %1")
+				    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 				if (s->set)
 					seq_end = 1;
@@ -727,11 +733,10 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				break;
 
 			case GROUP_START_CODE:{
-				int hour, min, sec;
 //#define ANA
 #ifdef ANA
-				LOG(VB_GENERAL, LOG_DEBUG, "  %d",
-				    (int)rx->vgroup_count);
+				LOG(VB_GENERAL, LOG_DEBUG, QString("  %1")
+				    .arg(rx->vgroup_count));
 #endif
 
 				if (s->set){
@@ -745,16 +750,18 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 					rx->vpes_abort = len -(c+pos-1);
 					return;
 				}				
-				hour = (int)((buf[4]>>2)& 0x1F);
-				min  = (int)(((buf[4]<<4)& 0x30)| 
-					     ((buf[5]>>4)& 0x0F));
-				sec  = (int)(((buf[5]<<3)& 0x38)|
-					     ((buf[6]>>5)& 0x07));
 #ifdef IN_DEBUG
+				int hour = (int)((buf[4]>>2)& 0x1F);
+				int min  = (int)(((buf[4]<<4)& 0x30)|
+                                                 ((buf[5]>>4)& 0x0F));
+				int sec  = (int)(((buf[5]<<3)& 0x38)|
+                                                 ((buf[6]>>5)& 0x07));
 				LOG(VB_GENERAL, LOG_DEBUG,
-				    " gop %02d:%02d.%02d %d",
-					hour,min,sec, 
-					(p->ini_pos+c+pos)%rx->videobuf);
+				    QString(" gop %1:%2.%3 %4")
+				    .arg(hour,2,10,QChar('0'))
+				    .arg(min, 2,10,QChar('0'))
+				    .arg(sec, 2,10,QChar('0'))
+				    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 				rx->vgroup_count = 0;
 
@@ -799,8 +806,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 #endif
 #ifdef IN_DEBUG
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    " I-frame %d",
-						(p->ini_pos+c+pos)%rx->videobuf);
+					    QString(" I-frame %1")
+					    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 					break;
 				case B_FRAME:
@@ -809,8 +816,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 #endif
 #ifdef IN_DEBUG
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    " B-frame %d",
-						(p->ini_pos+c+pos)%rx->videobuf);
+					    QString(" B-frame %1")
+					    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 					break;
 				case P_FRAME:
@@ -819,8 +826,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 #endif
 #ifdef IN_DEBUG
 					LOG(VB_GENERAL, LOG_DEBUG,
-					    " P-frame %d",
-						(p->ini_pos+c+pos)%rx->videobuf);
+					    QString(" P-frame %1")
+					    .arg((p->ini_pos+c+pos)%rx->videobuf));
 #endif
 					break;
 				}
@@ -833,7 +840,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 #ifdef IN_DEBUG
 #if 0
 				LOG(VB_GENERAL, LOG_ERR,
-				    "other header 0x%02x (%d+%d)", head, c, pos);
+				    QString("other header 0x%1 (%2+%3)")
+				    .arg(head, 2,16,QChar('0')).arg(c).arg(pos));
 #endif
 #endif
 			  break;
@@ -872,8 +880,8 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				iu->start =  (p->ini_pos+pos+c-frame_off)
 					%rx->videobuf;
 #ifdef IN_DEBUG
-				LOG(VB_GENERAL, LOG_DEBUG, "START %d",
-					iu->start);
+				LOG(VB_GENERAL, LOG_DEBUG,
+				    QString("START %1").arg(iu->start));
 #endif
 			}
 
@@ -960,14 +968,15 @@ static void es_out(pes_in_t *p)
 	}
 
 	default:
-                LOG(VB_GENERAL, LOG_ERR, "UNKNOWN AUDIO type %d", p->type);
+                LOG(VB_GENERAL, LOG_ERR,
+			QString("UNKNOWN AUDIO type %1").arg(p->type));
 		return;
 
 
 	}
 
 #ifdef IN_DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, "%s PES", t);
+	LOG(VB_GENERAL, LOG_DEBUG, QString("%1 PES").arg(t));
 #endif
 }
 
@@ -1079,7 +1088,7 @@ static void pes_es_out(pes_in_t *p)
 	}
 	
 #ifdef IN_DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, "%s PES %d", t, len);
+	LOG(VB_GENERAL, LOG_DEBUG, QString("%1 PES %2").arg(t).arg(len));
 #endif
 }
 
@@ -1146,7 +1155,7 @@ static void avi_es_out(pes_in_t *p)
 
 	}
 #ifdef IN_DEBUG
-	LOG(VB_GENERAL, LOG_DEBUG, "%s PES", t);
+	LOG(VB_GENERAL, LOG_DEBUG, QString("%1 PES").arg(t));
 #endif
 
 }
@@ -1157,7 +1166,7 @@ static int replex_tsp(struct replex *rx, uint8_t *tsp)
 	uint16_t pid;
 	int type;
 	int off=0;
-	pes_in_t *p=NULL;
+	pes_in_t *p=nullptr;
 
 	pid = get_pid(tsp+1);
 
@@ -1186,7 +1195,7 @@ static int replex_tsp(struct replex *rx, uint8_t *tsp)
 		if (p->plength == MMAX_PLENGTH-6){
 			p->plength = p->found-6;
 			es_out(p);
-			init_pes_in(p, p->type, NULL, 0);
+			init_pes_in(p, p->type, nullptr, 0);
 		}
 	}
 
@@ -1224,12 +1233,13 @@ static ssize_t save_read(struct replex *rx, void *buf, size_t count)
 		
 		per = (uint8_t)(rx->finread*100/rx->inflength);
 		if (per % 10 == 0 && rx->lastper < per){
-			LOG(VB_GENERAL, LOG_DEBUG, "read %3d%%", (int)per);
+			LOG(VB_GENERAL, LOG_DEBUG, QString("read %1%%")
+			    .arg(per,3));
 			rx->lastper = per;
 		}
 	} else
-		LOG(VB_GENERAL, LOG_DEBUG, "read %.2f MB",
-		    rx->finread/1024.0/1024.0);
+		LOG(VB_GENERAL, LOG_DEBUG, QString("read %1 MB")
+		    .arg(rx->finread/1024.0/1024.0, 0,'f',2,QChar('0')));
 #endif
 	if (neof < 0 && re == 0) return neof;
 	else return re;
@@ -1264,8 +1274,9 @@ static int guess_fill( struct replex *rx)
 	}
 
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "free %d  %d %d %d", fill, vavail, aavail,
-		ac3avail);
+	LOG(VB_GENERAL, LOG_INFO,
+	    QString("free %1  %2 %3 %4")
+	    .arg(fill).arg(vavail).arg(aavail).arg(ac3avail));
 #endif
 
 	if (!fill){ 
@@ -1293,28 +1304,28 @@ static void find_pids_file(struct replex *rx)
 		if (rx->vpid) vfound = 1;
 		if (rx->apidn) afound = 1;
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-				strerror(errno));
+                        LOG(VB_GENERAL, LOG_ERR,
+			    QString("reading: %1").arg(strerror(errno)));
 		else 
 			count += re;
 		if ( (re = find_pids(&vpid, &apid, &ac3pid, buf, re))){
 			if (!rx->vpid && vpid){
 				rx->vpid = vpid;
-				LOG(VB_GENERAL, LOG_INFO,"vpid 0x%04x",
-					(int)rx->vpid);
+				LOG(VB_GENERAL, LOG_INFO,QString("vpid 0x%1")
+				    .arg(rx->vpid, 4,16,QChar('0')));
 				vfound++;
 			}
 			if (!rx->apidn && apid){
 				rx->apid[0] = apid;
-				LOG(VB_GENERAL, LOG_INFO, "apid 0x%04x",
-					(int)rx->apid[0]);
+				LOG(VB_GENERAL, LOG_INFO, QString("apid 0x%1")
+				    .arg(rx->apid[0], 4,16,QChar('0')));
 				rx->apidn++;
 				afound++;
 			}
 			if (!rx->ac3n && ac3pid){
 				rx->ac3_id[0] = ac3pid;
-				LOG(VB_GENERAL, LOG_INFO, "ac3pid 0x%04x",
-					(int)rx->ac3_id[0]);
+				LOG(VB_GENERAL, LOG_INFO, QString("ac3pid 0x%1")
+				    .arg(rx->ac3_id[0], 4,16,QChar('0')));
 				rx->ac3n++;
 				afound++;
 			}
@@ -1352,8 +1363,8 @@ static void find_all_pids_file(struct replex *rx)
 	LOG(VB_GENERAL, LOG_INFO, "Trying to find PIDs");
 	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-				strerror(errno));
+			LOG(VB_GENERAL, LOG_ERR, QString("reading: %1")
+			    .arg(strerror(errno)));
 		else 
 			count += re;
 		if ( (re = find_pids_pos(&vp, &ap, &cp, buf, re, 
@@ -1363,7 +1374,7 @@ static void find_all_pids_file(struct replex *rx)
 				for (j=0; j < vn; j++){
 #if 0
 					LOG(VB_GENERAL, LOG_INFO,
-					    "%d. %d", j+1, vpid[j]);
+					    QString("%1. %2").arg(j+1).arg(vpid[j]));
 #endif
 					if (vpid[j] == vp){
 						old = 1;
@@ -1374,10 +1385,11 @@ static void find_all_pids_file(struct replex *rx)
 					vpid[vn]=vp;
 					
 					LOG(VB_GENERAL, LOG_INFO,
-					    "vpid %d: 0x%04x (%d)  PES ID: 0x%02x",
-					       vn+1,
-					       (int)vpid[vn], (int)vpid[vn],
-					       buf[vpos]);
+					    QString("vpid %1: 0x%2 (%3)  PES ID: 0x%4")
+					    .arg(vn+1)
+					    .arg(vpid[vn], 4,16,QChar('0'))
+					    .arg(vpid[vn])
+					    .arg(buf[vpos], 2,16,QChar('0')));
 					if (vn+1 < MAXVPID) vn++;
 				} 				
 			}
@@ -1392,10 +1404,11 @@ static void find_all_pids_file(struct replex *rx)
 				if (!old){
 					apid[an]=ap;
 					LOG(VB_GENERAL, LOG_INFO,
-					    "apid %d: 0x%04x (%d)  PES ID: 0x%02x",
-					       an +1,
-					       (int)apid[an],(int)apid[an],
-					       buf[apos]);
+					    QString("apid %1: 0x%2 (%3)  PES ID: 0x%4")
+					    .arg(an +1)
+					    .arg(apid[an], 4,16,QChar('0'))
+					    .arg(apid[an])
+					    .arg(buf[apos], 2,16,QChar('0')));
 					if (an+1 < MAXAPID) an++;
 				}				
 			}
@@ -1410,10 +1423,10 @@ static void find_all_pids_file(struct replex *rx)
 				if (!old){
 					ac3pid[ac3n]=cp;
 					LOG(VB_GENERAL, LOG_INFO,
-					    "ac3pid %d: 0x%04x (%d)",
-					       ac3n+1,
-					       (int)ac3pid[ac3n],
-					       (int)ac3pid[ac3n]);
+					    QString("ac3pid %1: 0x%2 (%3)")
+					    .arg(ac3n+1)
+					    .arg(ac3pid[ac3n], 4,16,QChar('0'))
+					    .arg(ac3pid[ac3n]));
 					if (ac3n+1< MAXAC3PID) ac3n++;
 				}				
 			}
@@ -1471,14 +1484,14 @@ static void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 	if (afound && vfound){
 		LOG(VB_GENERAL, LOG_INFO, "found");
 		if (rx->vpid)
-			LOG(VB_GENERAL, LOG_INFO, "vpid %d (0x%04x)",
-			      rx->vpid, rx->vpid);
+			LOG(VB_GENERAL, LOG_INFO, QString("vpid %1 (0x%2)")
+			    .arg(rx->vpid).arg(rx->vpid, 4,16,QChar('0')));
 		if (rx->apidn)
-			LOG(VB_GENERAL, LOG_INFO, "apid %d (0x%04x)",
-			      rx->apid[0], rx->apid[0]);
+			LOG(VB_GENERAL, LOG_INFO, QString("apid %1 (0x%2)")
+			    .arg(rx->apid[0]).arg(rx->apid[0], 4,16,QChar('0')));
 		if (rx->ac3n)
-			LOG(VB_GENERAL, LOG_INFO, "ac3pid %d (0x%04x)",
-			      rx->ac3_id[0], rx->ac3_id[0]);
+			LOG(VB_GENERAL, LOG_INFO, QString("ac3pid %1 (0x%2)")
+			    .arg(rx->ac3_id[0]).arg(rx->ac3_id[0], 4,16,QChar('0')));
 	} else {
 		LOG(VB_GENERAL, LOG_ERR, "Couldn't find pids");
 		exit(1);
@@ -1490,11 +1503,8 @@ static void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 static void pes_id_out(pes_in_t *p)
 {
 
-	struct replex *rx;
-	int len;
-
-	len = p->plength-3-p->hlength;
-	rx = (struct replex *) p->priv;
+//	int len = p->plength-3-p->hlength;
+	struct replex *rx = (struct replex *) p->priv;
 
 	rx->scan_found=0;
 	switch(p->cid){
@@ -1530,8 +1540,9 @@ static void pes_id_out(pes_in_t *p)
 						rx->scan_found = id;
 #if 0
 						LOG(VB_GENERAL, LOG_INFO,
-						    "0x%04x  0x%04x \n",
-						    c-9-p->hlength-4, fframe);
+						    QString("0x%1  0x%2 \n")
+						    .arg(c-9-p->hlength-4, 4,16,QChar('0'))
+						    .arg(fframe,	   4,16,QChar('0')));
 						if (id>0x80)show_buf(p->buf+9+p->hlength,8);
 						if (id>0x80)show_buf(p->buf+c,8);
 #endif
@@ -1569,8 +1580,8 @@ static void find_pes_ids(struct replex *rx)
 	rx->pvideo.priv = rx ;
 	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
-			LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-				strerror(errno));
+			LOG(VB_GENERAL, LOG_ERR, QString("reading: %1")
+				.arg(strerror(errno)));
 		else 
 			count += re;
 		
@@ -1586,7 +1597,7 @@ static void find_pes_ids(struct replex *rx)
 				for (j=0; j < vn; j++){
 #if 0
 					LOG(VB_GENERAL, LOG_INFO,
-					    "%d. %d", j+1, vpid[j]);
+					    QString("%1. %2").arg(j+1).arg(vpid[j]));
 #endif
 					if (vpid[j] == rx->scan_found){
 						old = 1;
@@ -1597,9 +1608,10 @@ static void find_pes_ids(struct replex *rx)
 					vpid[vn]=rx->scan_found;
 					
 					LOG(VB_GENERAL, LOG_INFO,
-					    "MPEG VIDEO %d: 0x%02x (%d)",
-					       vn+1,
-					       (int)vpid[vn], (int)vpid[vn]);
+					    QString("MPEG VIDEO %1: 0x%2 (%3)")
+					    .arg(vn+1)
+					    .arg(vpid[vn], 2,16,QChar('0'))
+					    .arg(vpid[vn]));
 					if (vn+1 < MAXVPID) vn++;
 				}
 			} 				
@@ -1617,9 +1629,10 @@ static void find_pes_ids(struct replex *rx)
 				if (!old){
 					apid[an]=rx->scan_found;
 					LOG(VB_GENERAL, LOG_INFO,
-					    "MPEG AUDIO %d: 0x%02x (%d)",
-					       an +1,
-					       (int)apid[an],(int)apid[an]);
+					    QString("MPEG AUDIO %1: 0x%2 (%3)")
+					    .arg(an +1)
+					    .arg(apid[an], 2,16,QChar('0'))
+					    .arg(apid[an]));
 					if (an+1 < MAXAPID) an++;
 				}				
 			}
@@ -1640,10 +1653,10 @@ static void find_pes_ids(struct replex *rx)
 						    "possible AC3 AUDIO with private stream 1 pid (0xbd)");
 					}else{
 						LOG(VB_GENERAL, LOG_INFO,
-						    "AC3 AUDIO %d: 0x%02x (%d)",
-						       ac3n+1,
-						       (int)ac3pid[ac3n],
-						       (int)ac3pid[ac3n]);
+						    QString("AC3 AUDIO %1: 0x%2 (%3)")
+						    .arg(ac3n+1)
+						    .arg(ac3pid[ac3n], 2,16,QChar('0'))
+						    .arg(ac3pid[ac3n]));
 					}
 					if (ac3n+1< MAXAC3PID) ac3n++;
 				}				
@@ -1687,7 +1700,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 	if (rx->finish) return 0;
 	fill =  guess_fill(rx);
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "trying to fill buffers with %d", fill);
+	LOG(VB_GENERAL, LOG_INFO,
+	    QString("trying to fill buffers with %1").arg(fill));
 #endif
 	if (fill < 0) return -1;
 
@@ -1700,7 +1714,7 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 		} else rsize = IN_SIZE;
 		
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "filling with %d", rsize);
+		LOG(VB_GENERAL, LOG_INFO, QString("filling with %1").arg(rsize));
 #endif
 		
 		if (!rsize) return 0;
@@ -1718,8 +1732,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 			} else {
 				memcpy(buf,mbuf+i,2*TS_SIZE-i);
 				if ((count = save_read(rx,mbuf,i))<0)
-					LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-						strerror(errno));
+					LOG(VB_GENERAL, LOG_ERR, QString("reading: %1")
+					    .arg(strerror(errno)));
 				memcpy(buf+2*TS_SIZE-i,mbuf,i);
 				i = 188;
 			}
@@ -1729,8 +1743,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 #define MAX_TRIES 5
 		while (count < rsize && tries < MAX_TRIES){
 			if ((re = save_read(rx,buf+i,rsize-i)+i)<0)
-				LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-					strerror(errno));
+				LOG(VB_GENERAL, LOG_ERR, QString("reading: %1")
+				    .arg(strerror(errno)));
 			else 
 				count += re;
 			tries++;
@@ -1765,8 +1779,8 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 		
 		while (count < rsize && tries < MAX_TRIES){
 			if ((re = save_read(rx, buf, rsize))<0)
-				LOG(VB_GENERAL, LOG_ERR, "reading PS: %s",
-					strerror(errno));
+				LOG(VB_GENERAL, LOG_ERR, QString("reading PS: %1")
+				    .arg(strerror(errno)));
 			else 
 				count += re;
 	
@@ -1794,8 +1808,9 @@ static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 
 			while (count < rsize && tries < MAX_TRIES){
 				if ((re = save_read(rx, buf, rsize))<0)
-					LOG(VB_GENERAL, LOG_ERR, "reading AVI: %s",
-						strerror(errno));
+					LOG(VB_GENERAL, LOG_ERR,
+					    QString("reading AVI: %1")
+					    .arg(strerror(errno)));
 				else 
 					count += re;
 				
@@ -1824,7 +1839,7 @@ static int fill_buffers(void *r, int finish)
 	
 	rx->finish = finish;
 
-	return replex_fill_buffers(rx, NULL);
+	return replex_fill_buffers(rx, nullptr);
 }
 
 
@@ -1909,8 +1924,8 @@ static void init_replex(struct replex *rx)
 	rx->analyze=0;
 
 	if (save_read(rx, mbuf, 2*TS_SIZE)<0)
-		LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-			strerror(errno));
+		LOG(VB_GENERAL, LOG_ERR,
+		    QString("reading: %1").arg(strerror(errno)));
 	
 	check_stream_type(rx, mbuf, 2*TS_SIZE);
 	if (rx->itype == REPLEX_TS){
@@ -1941,7 +1956,7 @@ static void init_replex(struct replex *rx)
 	if (rx->itype == REPLEX_TS || rx->itype == REPLEX_AVI)
 		init_pes_in(&rx->pvideo, 0xE0, &rx->vrbuffer, 0);
 	else {
-		init_pes_in(&rx->pvideo, 0, NULL, 1);
+		init_pes_in(&rx->pvideo, 0, nullptr, 1);
 	}
 	rx->pvideo.priv = (void *) rx;
 	ring_init(&rx->index_vrbuffer, INDEX_BUF);
@@ -2006,8 +2021,8 @@ static void init_replex(struct replex *rx)
 		memset(ac, 0, sizeof(avi_context));
 		if ((read_count = save_read(rx, buf, 12)) != 12) {
 			LOG(VB_GENERAL, LOG_ERR,
-			    "Error reading in 12 bytes from replex. Read %d bytes",
-				(int)read_count);
+			    QString("Error reading in 12 bytes from replex. Read %1 bytes")
+			    .arg(read_count));
 			exit(1);
 		}
 		
@@ -2030,8 +2045,8 @@ static void init_replex(struct replex *rx)
 
 		rx->inflength = lseek(rx->fd_in, 0, SEEK_CUR)+ac->movi_length;
 
-		LOG(VB_GENERAL, LOG_INFO, "AVI initial frames %d",
-			(int)rx->vframe_count);
+		LOG(VB_GENERAL, LOG_INFO, QString("AVI initial frames %1")
+		    .arg(rx->vframe_count));
 		if (!ac->done){
 			LOG(VB_GENERAL, LOG_ERR, "Error reading AVI header");
 			exit(1);
@@ -2063,7 +2078,7 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		do {
 			while (ring_avail(&rx->index_arbuffer[i]) < 
 			       sizeof(index_unit)){
-				if (replex_fill_buffers(rx, 0)< 0) {
+				if (replex_fill_buffers(rx, nullptr)< 0) {
 					LOG(VB_GENERAL, LOG_ERR,
 					    "error in fix audio");
 					exit(1);
@@ -2078,7 +2093,7 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		} while (1);
 		mx->ext[i].pts_off = aiu.pts;
 		
-		LOG(VB_GENERAL, LOG_INFO, "Audio%d  offset: ", i);
+		LOG(VB_GENERAL, LOG_INFO, QString("Audio%1  offset: ").arg(i));
 		printpts(mx->ext[i].pts_off);
 		printpts(rx->first_apts[i]+mx->ext[i].pts_off);
 	}
@@ -2087,7 +2102,7 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		do {
 			while (ring_avail(&rx->index_ac3rbuffer[i]) < 
 			       sizeof(index_unit)){
-				if (replex_fill_buffers(rx, 0)< 0) {
+				if (replex_fill_buffers(rx, nullptr)< 0) {
 					LOG(VB_GENERAL, LOG_ERR,
 					    "error in fix audio");
 					exit(1);
@@ -2102,7 +2117,7 @@ static void fix_audio(struct replex *rx, multiplex_t *mx)
 		} while (1);
 		mx->ext[i].pts_off = aiu.pts;
 		
-		LOG(VB_GENERAL, LOG_INFO, "AC3%d  offset: ", i);
+		LOG(VB_GENERAL, LOG_INFO, QString("AC3%1  offset: ").arg(i));
 		printpts(mx->ext[i].pts_off);
 		printpts(rx->first_ac3pts[i]+mx->ext[i].pts_off);
 
@@ -2165,7 +2180,7 @@ static void do_analyze(struct replex *rx)
 	
 	
 	while(!rx->finish){
-		if (replex_fill_buffers(rx, 0)< 0) {
+		if (replex_fill_buffers(rx, nullptr)< 0) {
 			LOG(VB_GENERAL, LOG_ERR,
 			    "error in get next video unit");
 			return;
@@ -2176,8 +2191,8 @@ static void do_analyze(struct replex *rx)
 					  dummy2.length);
 				if (av>=1){
 					LOG(VB_GENERAL, LOG_INFO,
-					    "MPG2 Audio%d unit:  length %d  "
-					    "PTS ", i, dummy2.length);
+					    QString("MPG2 Audio%1 unit:  length %2  PTS ")
+					    .arg(i).arg(dummy2.length));
 					printptss(dummy2.pts);
 					
 					if (lastapts[i]){
@@ -2196,8 +2211,8 @@ static void do_analyze(struct replex *rx)
 					  dummy2.length);
 				if (av>=1){
 					LOG(VB_GENERAL, LOG_INFO,
-					    "AC3 Audio%d unit:  length %d  "
-					    "PTS ", i, dummy2.length);
+					    QString("AC3 Audio%1 unit:  length %2  PTS ")
+					    .arg(i).arg(dummy2.length));
 					printptss(dummy2.pts);
 					if (lastac3pts[i]){
 						LOG(VB_GENERAL, LOG_INFO,
@@ -2233,8 +2248,8 @@ static void do_analyze(struct replex *rx)
 					LOG(VB_GENERAL, LOG_INFO, "P-frame");
 					break;
 				}
-				LOG(VB_GENERAL, LOG_INFO, " length %d  PTS ",
-					dummy.length);
+				LOG(VB_GENERAL, LOG_INFO, QString(" length %1  PTS ")
+				    .arg(dummy.length));
 				printptss(dummy.pts);
 				if (lastvpts){
 					LOG(VB_GENERAL, LOG_INFO,"  diff:");
@@ -2263,8 +2278,8 @@ static void do_scan(struct replex *rx)
 	rx->analyze=0;
 
 	if (save_read(rx, mbuf, 2*TS_SIZE)<0)
-		LOG(VB_GENERAL, LOG_ERR, "reading: %s",
-			strerror(errno));
+		LOG(VB_GENERAL, LOG_ERR, QString("reading: %1")
+		    .arg(strerror(errno)));
 	
 	LOG(VB_GENERAL, LOG_INFO, "STARTING SCAN");
 	
@@ -2276,7 +2291,7 @@ static void do_scan(struct replex *rx)
 		break;
 		
 	case REPLEX_PS:
-		init_pes_in(&rx->pvideo, 0, NULL, 1);
+		init_pes_in(&rx->pvideo, 0, nullptr, 1);
 		find_pes_ids(rx);
 		break;
 
@@ -2294,7 +2309,7 @@ static void do_demux(struct replex *rx)
 	LOG(VB_GENERAL, LOG_INFO, "STARTING DEMUX");
 	
 	while(!rx->finish){
-		if (replex_fill_buffers(rx, 0)< 0) {
+		if (replex_fill_buffers(rx, nullptr)< 0) {
 			LOG(VB_GENERAL, LOG_ERR,
 			    "error in get next video unit");
 			return;
@@ -2336,7 +2351,7 @@ static void do_replex(struct replex *rx)
 	memset(ext_ok, 0, N_AUDIO*sizeof(int));
 
 	while (!replex_all_set(rx)){
-		if (replex_fill_buffers(rx, 0)< 0) {
+		if (replex_fill_buffers(rx, nullptr)< 0) {
 			LOG(VB_GENERAL, LOG_INFO, "error filling buffer");
 			exit(1);
 		}
@@ -2410,7 +2425,7 @@ int main(int argc, char **argv)
 	int c;
 	int analyze=0;
 	int scan =0;
-	char *filename = NULL;
+	char *filename = nullptr;
 	const char *type = "SVCD";
 	const char *inpt = "TS";
 
@@ -2421,23 +2436,23 @@ int main(int argc, char **argv)
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = {
-			{"type", required_argument, NULL, 't'},
-			{"input_stream", required_argument, NULL, 'i'},
-			{"video_pid", required_argument, NULL, 'v'},
-			{"audio_pid", required_argument, NULL, 'a'},
-			{"audio_delay", required_argument, NULL, 'e'},
-			{"video_delay", required_argument, NULL, 'd'},
-			{"ac3_id", required_argument, NULL, 'c'},
-			{"of",required_argument, NULL, 'o'},
-			{"ignore_PTS",required_argument, NULL, 'f'},
-			{"keep_PTS",required_argument, NULL, 'k'},
-			{"fix_sync",no_argument, NULL, 'n'},
-			{"demux",no_argument, NULL, 'z'},
-			{"analyze",required_argument, NULL, 'y'},
-			{"scan",required_argument, NULL, 's'},
-			{"vdr",required_argument, NULL, 'x'},
-			{"help", no_argument , NULL, 'h'},
-			{0, 0, 0, 0}
+			{"type", required_argument, nullptr, 't'},
+			{"input_stream", required_argument, nullptr, 'i'},
+			{"video_pid", required_argument, nullptr, 'v'},
+			{"audio_pid", required_argument, nullptr, 'a'},
+			{"audio_delay", required_argument, nullptr, 'e'},
+			{"video_delay", required_argument, nullptr, 'd'},
+			{"ac3_id", required_argument, nullptr, 'c'},
+			{"of",required_argument, nullptr, 'o'},
+			{"ignore_PTS",required_argument, nullptr, 'f'},
+			{"keep_PTS",required_argument, nullptr, 'k'},
+			{"fix_sync",no_argument, nullptr, 'n'},
+			{"demux",no_argument, nullptr, 'z'},
+			{"analyze",required_argument, nullptr, 'y'},
+			{"scan",required_argument, nullptr, 's'},
+			{"vdr",required_argument, nullptr, 'x'},
+			{"help", no_argument , nullptr, 'h'},
+			{nullptr, 0, nullptr, 0}
 		};
 		c = getopt_long (argc, argv, 
 					"t:o:a:v:i:hp:q:d:c:n:fkd:e:zy:sx",
@@ -2453,11 +2468,11 @@ int main(int argc, char **argv)
 			inpt = optarg;
 			break;
 		case 'd':
-			rx.video_delay = strtol(optarg,(char **)NULL, 0) 
+			rx.video_delay = strtol(optarg,(char **)nullptr, 0)
 				*CLOCK_MS;
 			break;
 		case 'e':
-			rx.audio_delay = strtol(optarg,(char **)NULL, 0) 
+			rx.audio_delay = strtol(optarg,(char **)nullptr, 0)
 				*CLOCK_MS;
 			break;
 		case 'a':
@@ -2465,18 +2480,18 @@ int main(int argc, char **argv)
 				LOG(VB_GENERAL, LOG_ERR, "Too many audio PIDs");
 				exit(1);
 			}
-                        rx.apid[rx.apidn] = strtol(optarg,(char **)NULL, 0);
+                        rx.apid[rx.apidn] = strtol(optarg,(char **)nullptr, 0);
 			rx.apidn++;
 			break;
 		case 'v':
-			rx.vpid = strtol(optarg,(char **)NULL, 0);
+			rx.vpid = strtol(optarg,(char **)nullptr, 0);
 			break;
 		case 'c':
 			if (rx.ac3n==N_AC3){
 				LOG(VB_GENERAL, LOG_ERR, "Too many audio PIDs");
 				exit(1);
 			}
-			rx.ac3_id[rx.ac3n] = strtol(optarg,(char **)NULL, 0);
+			rx.ac3_id[rx.ac3n] = strtol(optarg,(char **)nullptr, 0);
 			rx.ac3n++;
 			break;
 		case 'o':
@@ -2495,7 +2510,7 @@ int main(int argc, char **argv)
 			rx.fix_sync =1;
 			break;
 		case 'y':
-			analyze = strtol(optarg,(char **)NULL, 0);
+			analyze = strtol(optarg,(char **)nullptr, 0);
 			if (analyze>2) usage(argv[0]);
 			analyze++;
 			break;
@@ -2517,10 +2532,12 @@ int main(int argc, char **argv)
 			perror("Error opening input file ");
 			exit(1);
 		}
-		LOG(VB_GENERAL, LOG_INFO, "Reading from %s", argv[optind]);
+		LOG(VB_GENERAL, LOG_INFO,
+		    QString("Reading from %1").arg(argv[optind]));
 		rx.inflength = lseek(rx.fd_in, 0, SEEK_END);
-		LOG(VB_GENERAL, LOG_INFO, "Input file length: %.2f MB",
-			rx.inflength/1024.0/1024.0);
+		LOG(VB_GENERAL, LOG_INFO,
+		    QString("Input file length: %1 MB")
+		    .arg(rx.inflength/1024.0/1024.0, 0,'f',2,QChar('0')));
 		lseek(rx.fd_in,0,SEEK_SET);
 		rx.lastper = 0;
 		rx.finread = 0;
@@ -2540,8 +2557,8 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			LOG(VB_GENERAL, LOG_INFO, "Output File is: %s",
-				filename);
+			LOG(VB_GENERAL, LOG_INFO,
+			    QString("Output File is: %1").arg(filename));
 		} else {
 			rx.fd_out = STDOUT_FILENO;
 			LOG(VB_GENERAL, LOG_INFO, "using stdout as output");
@@ -2591,7 +2608,7 @@ int main(int argc, char **argv)
 		int i;
 		char fname[256];
 		if (!filename){
-			filename = malloc(4);
+                        filename = static_cast<char*>(malloc(4));
 			strcpy(filename,"out");
 		}
 		if (strlen(filename) > 250){
@@ -2610,8 +2627,8 @@ int main(int argc, char **argv)
 			perror("Error opening output file");
 			exit(1);
 		}
-		LOG(VB_GENERAL, LOG_INFO, "Video output File is: %s",
-			fname);
+		LOG(VB_GENERAL, LOG_INFO,
+		    QString("Video output File is: %1").arg(fname));
 		
 		for (i=0; i < rx.apidn; i++){
 			snprintf(fname,256,"%s%d.mp2",filename
@@ -2627,8 +2644,9 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			LOG(VB_GENERAL, LOG_INFO, "Audio%d output File is: %s",
-				i, fname);
+			LOG(VB_GENERAL, LOG_INFO,
+			    QString("Audio%1 output File is: %2")
+			    .arg(i).arg(fname));
 		}
 		
 		
@@ -2646,8 +2664,9 @@ int main(int argc, char **argv)
 				perror("Error opening output file");
 				exit(1);
 			}
-			LOG(VB_GENERAL, LOG_INFO, "AC3%d output File is: %s",
-				i, fname);
+			LOG(VB_GENERAL, LOG_INFO,
+			    QString("AC3%1 output File is: %2")
+			    .arg(i).arg(fname));
 		}
 		do_demux(&rx);
 	} else if (analyze){
@@ -2658,15 +2677,4 @@ int main(int argc, char **argv)
 	}
 
 	return 0;
-}
-
-void LogPrintLineC( uint64_t mask, LogLevel_t level, const char *file, int line,
-                   const char *function, const char *format, ... )
-{
-	va_list         arguments;
-
-	va_start(arguments, format);
-	vfprintf(stderr, format, arguments);
-	va_end(arguments);
-	fprintf(stderr, "\n");
 }

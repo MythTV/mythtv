@@ -27,7 +27,7 @@
 #ifndef _REPLEX_H_
 #define _REPLEX_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include "mpg_common.h"
 #include "ts.h"
 #include "element.h"

@@ -77,10 +77,6 @@ typedef int_fast32_t fi32;	typedef uint_fast32_t fu32;
 /* use this only to cast quoted strings in function calls */
 #define CUS (const unsigned char *)
 
-/* forward declarations */
-typedef struct _Png4File Png4File;
-typedef struct _BoundStr BoundStr;
-
 enum { MiscError = 1, EOFIndicator, IndexError };
 
 int sup2dast(const char *supfile, const char *ifofile, int delay_ms);
@@ -121,6 +117,8 @@ struct
 
 #define exc_catchall else
 #define exc_endall(x) EXC.m_last = exc_s##x.m_prev; } while (0)
+
+#define exc_cleanup() EXC.m_last = NULL;
 
 static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
 {
@@ -391,8 +389,7 @@ static void argpalette(const char * arg,
 }
 
 
-/* typedef struct _Png4File Png4File; */
-struct _Png4File 
+typedef struct Png4File
 {
     FILE *m_fh;
     int   m_width;
@@ -404,7 +401,7 @@ struct _Png4File
     eu32  m_adler;
     eu8   m_paletteChunk[24];
     eu8   m_buffer[65536];
-};
+} Png4File;
 
 static void png4file_init(Png4File * self, eu8 palette[4][3])
 {
@@ -619,11 +616,11 @@ static char * pts2ts(fu32 pts, char * rvbuf, bool is_png_filename)
 
 /* *********** */
 
-struct _BoundStr 
+typedef struct BoundStr
 {
     eu8 *m_p;
     int  m_l;
-};
+} BoundStr;
 
 static void boundstr_init(BoundStr * bs, eu8 * p, int l) 
 {
@@ -821,6 +818,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
         size_t len = write(1, sptsstr, strlen(sptsstr));
         if (len != strlen(sptsstr))
             printf("ERROR: write failed");
+        exc_cleanup();
         return;
     }
     exc_end(1);
@@ -982,6 +980,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         if (write(2, "\n", 1) != 1)
             printf("ERROR: write failed");
 
+        exc_cleanup();
         return 1;
     }
     exc_endall(1);

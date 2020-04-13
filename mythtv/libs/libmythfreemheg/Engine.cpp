@@ -306,9 +306,9 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         delete pProgram;
         return false;
     }
-    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != nullptr)   // Print it so we know what's going on.
+    if ((gMHLogoptions & MHLogScenes) && gMHLogStream != nullptr)   // Print it so we know what's going on.
     {
-        pProgram->PrintMe(__mhlogStream, 0);
+        pProgram->PrintMe(gMHLogStream, 0);
     }
 
     // Clear the action queue of anything pending.
@@ -501,13 +501,13 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     m_Interacting = nullptr;
 
     // Switch to the new scene.
-    CurrentApp()->m_pCurrentScene = static_cast< MHScene* >(pProgram);
+    CurrentApp()->m_pCurrentScene = dynamic_cast< MHScene* >(pProgram);
     SetInputRegister(CurrentScene()->m_nEventReg);
     m_redrawRegion = QRegion(0, 0, CurrentScene()->m_nSceneCoordX, CurrentScene()->m_nSceneCoordY); // Redraw the whole screen
 
-    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != nullptr)   // Print it so we know what's going on.
+    if ((gMHLogoptions & MHLogScenes) && gMHLogStream != nullptr)   // Print it so we know what's going on.
     {
-        pProgram->PrintMe(__mhlogStream, 0);
+        pProgram->PrintMe(gMHLogStream, 0);
     }
 
     pProgram->Preparation(this);
@@ -621,11 +621,11 @@ void MHEngine::RunActions()
         // Run it.  If it fails and throws an exception catch it and continue with the next.
         try
         {
-            if ((__mhlogoptions & MHLogActions) && __mhlogStream != nullptr)   // Debugging
+            if ((gMHLogoptions & MHLogActions) && gMHLogStream != nullptr)   // Debugging
             {
-                fprintf(__mhlogStream, "[freemheg] Action - ");
-                pAction->PrintMe(__mhlogStream, 0);
-                fflush(__mhlogStream);
+                fprintf(gMHLogStream, "[freemheg] Action - ");
+                pAction->PrintMe(gMHLogStream, 0);
+                fflush(gMHLogStream);
             }
 
             pAction->Perform(this);
@@ -1143,6 +1143,10 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         m_PersistentStore.Append(pEntry);
     }
 
+    // This should never happen
+    if (pEntry == nullptr)
+        return false;
+
     if (fIsLoad)   // Copy the data into the variables.
     {
         // Check that we have sufficient data before we continue?
@@ -1188,7 +1192,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
 bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 {
     QString csFeat = QString::fromUtf8((const char *)feature.Bytes(), feature.Size());
-    QStringList strings = csFeat.split(QRegExp("[\\(\\,\\)]"));
+    QStringList strings = csFeat.split(QRegExp(R"([\(\,\)])"));
 
     MHLOG(MHLogNotifications, "NOTE GetEngineSupport " + csFeat);
 
@@ -1473,20 +1477,20 @@ void MHEngine::GetDefaultFontAttrs(MHOctetString &str)
 const char *MHEngine::MHEGEngineProviderIdString = "MHGGNU001";
 
 // Define the logging function and settings
-int __mhlogoptions = MHLogError;
+int gMHLogoptions = MHLogError;
 
-FILE *__mhlogStream = nullptr;
+FILE *gMHLogStream = nullptr;
 
 // The MHEG engine calls this when it needs to log something.
-void __mhlog(const QString& logtext)
+void mhlog_fn(const QString& logtext)
 {
     QByteArray tmp = logtext.toLatin1();
-    fprintf(__mhlogStream, "[freemheg] %s\n", tmp.constData());
+    fprintf(gMHLogStream, "[freemheg] %s\n", tmp.constData());
 }
 
 // Called from the user of the library to set the logging.
 void MHSetLogging(FILE *logStream, unsigned int logLevel)
 {
-    __mhlogStream = logStream;
-    __mhlogoptions = logLevel;
+    gMHLogStream = logStream;
+    gMHLogoptions = logLevel;
 }

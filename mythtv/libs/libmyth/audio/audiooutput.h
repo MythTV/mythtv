@@ -156,7 +156,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool IsUpmixing(void)   { return false; }
     virtual bool ToggleUpmix(void)  { return false; }
     virtual bool CanUpmix(void)     { return false; }
-    bool PulseStatus(void) { return m_pulseWasSuspended; }
+    bool PulseStatus(void) const { return m_pulseWasSuspended; }
 
     /**
      * \param fmt The audio format in question.

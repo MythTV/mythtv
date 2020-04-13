@@ -401,7 +401,7 @@ void MythBurn::updateArchiveList(void)
         busyPopup = nullptr;
     }
 
-    qApp->processEvents();
+    QCoreApplication::processEvents();
 
     m_archiveButtonList->Reset();
 
@@ -413,7 +413,7 @@ void MythBurn::updateArchiveList(void)
     {
         foreach (auto a, m_archiveList)
         {
-            qApp->processEvents();
+            QCoreApplication::processEvents();
             // get duration of this file
             if (a->duration == 0)
             {

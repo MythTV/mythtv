@@ -34,7 +34,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 		cycle10 = 7 - s_cycle / 10;
 
 	{
-		unsigned char *tmp = (unsigned char *) &couleursl;
+		auto *tmp = (unsigned char *) &couleursl;
 
 		for (int i = 0; i < 4; i++) {
 			*tmp = (*tmp) >> cycle10;

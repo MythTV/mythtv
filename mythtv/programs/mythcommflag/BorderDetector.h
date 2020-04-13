@@ -9,8 +9,8 @@
  * different filler color.
  */
 
-#ifndef __BORDERDETECTOR_H__
-#define __BORDERDETECTOR_H__
+#ifndef BORDERDETECTOR_H
+#define BORDERDETECTOR_H
 
 using AVFrame = struct AVFrame;
 class MythPlayer;
@@ -52,6 +52,6 @@ private:
     bool                    m_timeReported    {false};
 };
 
-#endif  /* !__BORDERDETECTOR_H__ */
+#endif  /* !BORDERDETECTOR_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

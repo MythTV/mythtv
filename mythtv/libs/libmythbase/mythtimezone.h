@@ -1,5 +1,5 @@
-#ifndef _MYTH_TIME_ZONE_H_
-#define _MYTH_TIME_ZONE_H_
+#ifndef MYTH_TIME_ZONE_H
+#define MYTH_TIME_ZONE_H
 
 #include <QString>
 
@@ -13,4 +13,4 @@ MBASE_PUBLIC bool checkTimeZone(void);
 MBASE_PUBLIC bool checkTimeZone(const QStringList &master_settings);
 };
 
-#endif // _MYTH_TIME_ZONE_H_
+#endif // MYTH_TIME_ZONE_H

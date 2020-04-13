@@ -13,10 +13,8 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythlogging.h>
 
-extern "C" {
 #include "goom_tools.h"
 #include "goom_core.h"
-}
 
 Goom::Goom()
 {

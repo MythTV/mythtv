@@ -44,7 +44,7 @@ class UPNP_PUBLIC MethodInfo
     public:
         MethodInfo() = default;
 
-        QVariant Invoke( Service *pService, const QStringMap &reqParams );
+        QVariant Invoke( Service *pService, const QStringMap &reqParams ) const;
 };
 
 using MetaInfoMap = QMap< QString, MethodInfo >;

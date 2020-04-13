@@ -3,8 +3,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _RTP_DATA_PACKET_H_
-#define _RTP_DATA_PACKET_H_
+#ifndef RTP_DATA_PACKET_H
+#define RTP_DATA_PACKET_H
 
 #include <arpa/inet.h> // for ntohs()/ntohl()
 
@@ -127,4 +127,4 @@ class RTPDataPacket : public UDPPacket
     mutable uint m_off { 0 };
 };
 
-#endif // _RTP_DATA_PACKET_H_
+#endif // RTP_DATA_PACKET_H

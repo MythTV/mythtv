@@ -26,8 +26,8 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "element.h"
 #include "pes.h"
 #include "ts.h"
@@ -36,40 +36,40 @@
 
 void show_buf(uint8_t *buf, int length)
 {
-	uint8_t buffer[100];
-	uint8_t temp[8];
+	char buffer[100];
+	char temp[8];
 	buffer[0] = '\0';
 
 	for (int i=0; i<length; i+=16){
 		int j = 0;
 		for (j=0; j < 8 && j+i<length; j++)
 		{
-			sprintf(temp,"0x%02x ", (int)(buf[i+j]));
-			strcat(buffer, temp);
+			std::sprintf(temp,"0x%02x ", (int)(buf[i+j]));
+			std::strcat(buffer, temp);
 		}
 		for (int r=j; r<8; r++)
-			strcat(buffer, "     ");
+			std::strcat(buffer, "     ");
 
-		strcat(buffer, "  ");
+		std::strcat(buffer, "  ");
 
 		for (j=8; j < 16 && j+i<length; j++)
 		{
-			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
-			strcat(buffer, temp);
+			std::sprintf(temp, "0x%02x ", (int)(buf[i+j]));
+			std::strcat(buffer, temp);
 		}
 		for (int r=j; r<16; r++)
-			strcat(buffer, "     ");
+			std::strcat(buffer, "     ");
 
 		for (j=0; j < 16 && j+i<length; j++){
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				sprintf(temp, "%c", buf[i+j]);
+				std::sprintf(temp, "%c", buf[i+j]);
 				break;
 			default:
-				sprintf(temp, ".");
+				std::sprintf(temp, ".");
 			}
-			strcat(buffer, temp);
+			std::strcat(buffer, temp);
 		}
 		LOG(VB_GENERAL, LOG_INFO, buffer);
 	}

@@ -16,10 +16,11 @@
 
 // Adding member initializers caused compilation to fail with an error
 // that it cannot convert a brace-enclosed initializer list to MHData.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 struct MHData
 {
-    void   (*callback)(MythMediaDevice *mediadevice); // NOLINT(cppcoreguidelines-pro-type-member-init)
-    int      MythMediaType;                           // NOLINT(cppcoreguidelines-pro-type-member-init)
+    void   (*callback)(MythMediaDevice *mediadevice);
+    int      MythMediaType;
     QString  destination;
     QString  description;
 };
@@ -88,7 +89,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
-    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
+    void mediaStatusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia) const;
 
   protected:
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);

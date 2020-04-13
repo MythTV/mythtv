@@ -298,8 +298,8 @@ int V4LChannel::SetDefaultFreqTable(const QString &name)
 
 void V4LChannel::SetFreqTable(const int index)
 {
-    m_curList = chanlists[index].list;
-    m_totalChannels = chanlists[index].count;
+    m_curList = gChanLists[index].list;
+    m_totalChannels = gChanLists[index].count;
 }
 
 int V4LChannel::SetFreqTable(const QString &tablename)
@@ -308,7 +308,7 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
     int i = 0;
-    char *listname = (char *)chanlists[i].name;
+    char *listname = (char *)gChanLists[i].name;
 
     m_curList = nullptr;
     while (listname != nullptr)
@@ -327,13 +327,13 @@ int V4LChannel::SetFreqTable(const QString &tablename)
             return i;
         }
         i++;
-        listname = (char *)chanlists[i].name;
+        listname = (char *)gChanLists[i].name;
     }
 
     LOG(VB_CHANNEL, LOG_ERR,
         QString("Channel(%1)::SetFreqTable(): Invalid "
                 "frequency table name %2, using %3.").
-            arg(m_device).arg(name).arg((char *)chanlists[1].name));
+            arg(m_device).arg(name).arg((char *)gChanLists[1].name));
     SetFreqTable(1);
     return 1;
 }

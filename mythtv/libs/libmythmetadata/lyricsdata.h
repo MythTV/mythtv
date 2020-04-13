@@ -34,7 +34,7 @@ class META_PUBLIC LyricsLine
     }
 
   private:
-    QString formatTime(void)
+    QString formatTime(void) const
     {
         QString res;
         int minutes = m_time / (1000 * 60);
@@ -78,10 +78,10 @@ class META_PUBLIC LyricsData : public QObject
     QMap<int, LyricsLine*>* lyrics(void) { return &m_lyricsMap; }
     void setLyrics(const QStringList &lyrics);
 
-    bool syncronized(void) { return m_syncronized; }
+    bool syncronized(void) const { return m_syncronized; }
     void setSyncronized(bool syncronized ) { m_syncronized = syncronized; }
 
-    bool changed(void) { return m_changed; }
+    bool changed(void) const { return m_changed; }
     void setChanged(bool changed) { m_changed = changed; }
 
     enum Status

@@ -83,9 +83,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define PROPERTYIMP_PTR( type, name )   \
-    private: type* m_##name;            \
+    private: type* m_##name;              /* NOLINT(bugprone-macro-parentheses) */ \
     public:                             \
-    type* name()                        \
+    type* name()                          /* NOLINT(bugprone-macro-parentheses) */ \
     {                                   \
         if (m_##name == nullptr)        \
             m_##name = new type( this );\
@@ -97,7 +97,7 @@
 #define PROPERTYIMP_RO_REF( type, name ) \
     private: type m_##name;              \
     public:                              \
-    type &name()                         \
+    type &name()                           /* NOLINT(bugprone-macro-parentheses) */ \
     {                                    \
         return m_##name;                 \
     }

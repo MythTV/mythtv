@@ -296,7 +296,10 @@ bool XMLTVParser::parseFile(
                     return false;
                 }
 
-                QString programid, season, episode, totalepisodes;
+                QString programid;
+                QString season;
+                QString episode;
+                QString totalepisodes;
                 auto *pginfo = new ProgInfo();
 
                 QString text = xml.attributes().value("start").toString();
@@ -328,7 +331,7 @@ bool XMLTVParser::parseFile(
                     {
                         QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
                         if (xml.attributes().value("lang").toString() == "ja_JP")
-                        {
+                        { // NOLINT(bugprone-branch-clone)
                             pginfo->m_title = text2;
                         }
                         else if (xml.attributes().value("lang").toString() == "ja_JP@kana")
@@ -433,7 +436,7 @@ bool XMLTVParser::parseFile(
                         // in the XML.  no idea what we'd do with multiple values.
                         QString rat;
                         QString rating_system = xml.attributes().value("system").toString();
-                        if (rating_system == NULL)
+                        if (rating_system == nullptr)
                             rating_system = "";
 
                         do

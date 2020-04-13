@@ -1004,7 +1004,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         !m_currentInfo->m_nits.empty())
     {
         // Update transport with delivery system descriptors from the NIT
-        nit_vec_t::const_iterator it = m_currentInfo->m_nits.begin();
+        auto it = m_currentInfo->m_nits.begin();
         while (it != m_currentInfo->m_nits.end())
         {
             UpdateScanTransports(*it);
@@ -2165,7 +2165,8 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
     }
 
     // Start signal monitor for this channel
-    m_signalMonitor->Start();
+    if (m_signalMonitor)
+        m_signalMonitor->Start();
 
     m_timer.start();
     m_waitingForTables = (item.m_tuning.m_sistandard != "analog");
@@ -2461,8 +2462,8 @@ bool ChannelScanSM::AddToList(uint mplexid)
     if (query.value(4).toString() == "8vsb")
     {
         QString chan = QString("%1 Hz").arg(query.value(3).toInt());
-        struct CHANLIST *curList = chanlists[0].list;
-        int totalChannels = chanlists[0].count;
+        struct CHANLIST *curList = gChanLists[0].list;
+        int totalChannels = gChanLists[0].count;
         int findFrequency = (query.value(3).toInt() / 1000) - 1750;
         for (int x = 0 ; x < totalChannels ; ++x)
         {

@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _PRIVATE_DESCRIPTORS_H_
-#define _PRIVATE_DESCRIPTORS_H_
+#ifndef PREMIERE_DESCRIPTORS_H
+#define PREMIERE_DESCRIPTORS_H
 
 // C++ headers
 #include <cinttypes>
@@ -58,4 +58,4 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
     mutable vector<const uint8_t*> m_timePtrs;
 };
 
-#endif // _PRIVATE_DESCRIPTORS_H_
+#endif // PREMIERE_DESCRIPTORS_H

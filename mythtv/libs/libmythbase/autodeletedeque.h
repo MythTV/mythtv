@@ -1,5 +1,5 @@
-#ifndef _AUTO_DELETE_DEQUE_H_
-#define _AUTO_DELETE_DEQUE_H_
+#ifndef AUTO_DELETE_DEQUE_H
+#define AUTO_DELETE_DEQUE_H
 
 // C++ headers
 #include <deque>
@@ -90,4 +90,4 @@ T AutoDeleteDeque<T>::take(uint index)
     return info;
 }
 
-#endif // _AUTO_DELETE_DEQUE_H_
+#endif // AUTO_DELETE_DEQUE_H

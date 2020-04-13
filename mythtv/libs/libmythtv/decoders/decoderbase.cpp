@@ -24,9 +24,9 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       m_languagePreference(iso639_get_language_key_list())
 {
     ResetTracks();
-    m_tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));
-    m_tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1, 0));
-    m_tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3, 0));
+    m_tracks[kTrackTypeAudio].emplace_back(0, 0, 0, 0, 0);
+    m_tracks[kTrackTypeCC608].emplace_back(0, 0, 0, 1, 0);
+    m_tracks[kTrackTypeCC608].emplace_back(0, 0, 2, 3, 0);
 }
 
 DecoderBase::~DecoderBase()
@@ -392,7 +392,7 @@ bool DecoderBase::SyncPositionMap(void)
         {
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index * m_keyframeDist;
-            if (m_fps)
+            if (m_fps != 0.0)
                 length = (int)((totframes * 1.0) / m_fps);
         }
 
@@ -1100,9 +1100,9 @@ int DecoderBase::AutoSelectTrack(uint Type)
         selTrack = 0;
         for (uint i = 0; i < numStreams; i++)
         {
-            int forced = (Type == kTrackTypeSubtitle &&
-                          m_tracks[Type][i].m_forced &&
-                          m_parent->ForcedSubtitlesFavored());
+            bool forced = (Type == kTrackTypeSubtitle &&
+                           m_tracks[Type][i].m_forced &&
+                           m_parent->ForcedSubtitlesFavored());
             int position = static_cast<int>(numStreams) - static_cast<int>(i);
             int language = 0;
             for (uint j = 0; (language == 0) && (j < m_languagePreference.size()); ++j)
@@ -1110,7 +1110,8 @@ int DecoderBase::AutoSelectTrack(uint Type)
                 if (m_tracks[Type][i].m_language == m_languagePreference[j])
                     language = static_cast<int>(m_languagePreference.size()) - static_cast<int>(j);
             }
-            int score = (kForcedWeight * forced) + (kLanguageWeight * language) +
+            int score = (kForcedWeight * static_cast<int>(forced)) +
+                        (kLanguageWeight * language) +
                         (kPositionWeight * position);
             if (score > bestScore)
             {

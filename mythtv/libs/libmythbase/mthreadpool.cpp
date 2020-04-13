@@ -216,7 +216,7 @@ class MThreadPoolPrivate
     explicit MThreadPoolPrivate(QString name) :
         m_name(std::move(name)) {}
 
-    int GetRealMaxThread(void)
+    int GetRealMaxThread(void) const
     {
         return max(m_maxThreadCount,1) + m_reserveThread;
     }

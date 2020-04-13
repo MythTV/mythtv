@@ -78,6 +78,8 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
 
     if (!m_currentNode)
         DoSetCurrentNode(m_rootNode->getSelectedChild());
+    if (!m_currentNode)
+        return;
 
     QList<MythGenericTree *> route = m_currentNode->getRoute();
 

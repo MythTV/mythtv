@@ -71,7 +71,6 @@ class SERVICE_PUBLIC LogMessage : public QObject
               m_Filename    (        ),
               m_Line        ( 0      ),
               m_Function    (        ),
-              m_Time        (        ),
               m_Level       (        ),
               m_Message     (        )
         {

@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H_
-#define _MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H_
+#ifndef MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H
+#define MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H
 
 #include "mythcommandlineparser.h"
 
@@ -14,6 +14,6 @@ class MythCCExtractorCommandLineParser : public MythCommandLineParser
     QString GetHelpHeader(void) const override; // MythCommandLineParser
 };
 
-#endif // _MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H_
+#endif // MYTH_CCEXTRACTOR_COMMAND_LINE_PARSER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

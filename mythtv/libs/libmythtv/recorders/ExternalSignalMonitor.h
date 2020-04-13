@@ -40,6 +40,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
     ExternalStreamHandler *m_stream_handler         {nullptr};
     bool                   m_stream_handler_started {false};
     int                    m_lock_timeout           {0};
+    QString                m_loc;
 };
 
 #endif // EXTERNALSIGNALMONITOR_H

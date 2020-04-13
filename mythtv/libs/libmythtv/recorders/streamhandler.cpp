@@ -302,7 +302,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         // PIDs that need to be added..
         for (auto lit = pids.constBegin(); lit != pids.constEnd(); ++lit)
         {
-            if (*lit && (m_pidInfo.find(lit.key()) == m_pidInfo.end()))
+            if ((*lit != 0U) && (m_pidInfo.find(lit.key()) == m_pidInfo.end()))
             {
                 add_pids[lit.key()] = CreatePIDInfo(
                     lit.key(), StreamID::PrivSec, 0);

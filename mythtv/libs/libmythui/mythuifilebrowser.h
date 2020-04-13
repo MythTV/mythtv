@@ -38,7 +38,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
 
     QString fileName(void) const;
     QString filePath(void) const;
-    bool isRemote(void) { return m_isRemote; }
+    bool isRemote(void) const { return m_isRemote; }
     bool isDir(void) const;
     bool isFile(void) const;
     bool isParentDir(void) const;

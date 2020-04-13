@@ -26,8 +26,7 @@ class StatusBoxItem : public QTimer, public MythUIButtonListItem
 
   public:
     StatusBoxItem(MythUIButtonList *lbtype, const QString& text, QVariant data)
-      : QTimer(),
-        MythUIButtonListItem (lbtype, text, data) { }
+      : MythUIButtonListItem (lbtype, text, data) { }
 
     void Start(int Interval = 1); // Seconds
 

@@ -26,7 +26,7 @@ class VDPAUCodec
   public:
     VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size,
                uint32_t Macroblocks, uint32_t Level);
-    bool Supported(int Width, int Height, int Level);
+    bool Supported(int Width, int Height, int Level) const;
     QSize    m_maxSize        { 0, 0 };
     uint32_t m_maxMacroBlocks { 0 };
     uint32_t m_maxLevel       { 0 };
@@ -57,7 +57,7 @@ class MythVDPAUHelper : public QObject
     explicit MythVDPAUHelper(AVVDPAUDeviceContext *Context);
     ~MythVDPAUHelper(void) override;
 
-    bool             IsValid(void);
+    bool             IsValid(void) const;
     void             SetPreempted(void);
     bool             IsFeatureAvailable(uint Feature);
     VdpOutputSurface CreateOutputSurface(QSize Size);

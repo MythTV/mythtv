@@ -1,9 +1,9 @@
-#ifndef _VBILUT_H_
-#define _VBILUT_H_
+#ifndef VBILUT_H
+#define VBILUT_H
 
 #include <cstdint>
 
-extern "C" const unsigned char lang_chars[][16];
+extern const unsigned char  lang_chars[][16];
 extern const unsigned char  chartab_original[];
 extern const char           chartab_swedish[];
 extern const unsigned short hammtab[];
@@ -27,5 +27,6 @@ enum vbimode
 int hamm8(const uint8_t *p, int *err);
 int hamm84(const uint8_t *p, int *err);
 int hamm16(const uint8_t *p, int *err);
+int hamm24(const uint8_t *p, int *err);
 
-#endif // _VBILUT_H_
+#endif // VBILUT_H

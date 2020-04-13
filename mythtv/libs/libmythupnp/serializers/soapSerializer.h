@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SOAPSERIALIZER_H__
-#define __SOAPSERIALIZER_H__
+#ifndef SOAPSERIALIZER_H
+#define SOAPSERIALIZER_H
 
 #include "upnpexp.h"
 #include "xmlSerializer.h"
@@ -78,5 +78,4 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
         }
 };
 
-#endif
-
+#endif // SOAPSERIALIZER_H

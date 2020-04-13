@@ -4,8 +4,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _RTP_PACKET_BUFFER_H_
-#define _RTP_PACKET_BUFFER_H_
+#ifndef RTP_PACKET_BUFFER_H
+#define RTP_PACKET_BUFFER_H
 
 #include <QMap>
 
@@ -32,4 +32,4 @@ class RTPPacketBuffer : public PacketBuffer
     QMap<uint64_t, RTPDataPacket> m_unorderedPackets;
 };
 
-#endif // _RTP_PACKET_BUFFER_H_
+#endif // RTP_PACKET_BUFFER_H

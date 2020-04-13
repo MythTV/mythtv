@@ -8,7 +8,7 @@
 
 #define TR GallerySettings::tr
 
-StandardSetting *GallerySettings::ImageOrder()
+StandardSetting *GallerySettings::ImageOrder() const
 {
     auto *gc = new HostComboBoxSetting("GalleryImageOrder");
 
@@ -43,7 +43,7 @@ StandardSetting *GallerySettings::ImageOrder()
     return gc;
 }
 
-StandardSetting *GallerySettings::DirOrder()
+StandardSetting *GallerySettings::DirOrder() const
 {
     auto *gc = new HostComboBoxSetting("GalleryDirOrder");
 
@@ -65,7 +65,7 @@ StandardSetting *GallerySettings::DirOrder()
 static void AddFormat(HostComboBoxSetting* gc, const QDateTime& date, const QString& format)
 { gc->addSelection(gCoreContext->GetQLocale().toString(date, format), format); }
 
-StandardSetting *GallerySettings::DateFormat()
+StandardSetting *GallerySettings::DateFormat() const
 {
     auto *gc = new HostComboBoxSetting("GalleryDateFormat");
 
@@ -179,7 +179,7 @@ static StandardSetting *Import(bool enabled)
  \brief Setting for excluding image files by pattern
  \param enabled True if password has been entered
 */
-StandardSetting *GallerySettings::Exclusions(bool enabled)
+StandardSetting *GallerySettings::Exclusions(bool enabled) const
 {
     auto *gc = new GlobalTextEditSetting("GalleryIgnoreFilter");
 
@@ -233,7 +233,7 @@ static StandardSetting *Password(bool enabled)
  \brief Setting for clearing image database
  \param enabled True if password has been entered
 */
-StandardSetting *GallerySettings::ClearDb(bool enabled)
+StandardSetting *GallerySettings::ClearDb(bool enabled) const
 {
     auto *gc = new ButtonStandardSetting(TR("Reset Image Database"));
 

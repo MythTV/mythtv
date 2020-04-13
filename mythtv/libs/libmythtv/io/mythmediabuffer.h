@@ -79,7 +79,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     QString   GetDecoderRate       (void);
     QString   GetStorageRate       (void);
     QString   GetAvailableBuffer   (void);
-    uint      GetBufferSize        (void);
+    uint      GetBufferSize        (void) const;
     bool      IsNearEnd            (double Framerate, uint Frames) const;
     long long GetWritePosition     (void) const;
     long long GetRealFileSize      (void) const;
@@ -105,7 +105,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     // LiveTV used utilities
     int       GetReadBufAvail      (void) const;
     bool      SetReadInternalMode  (bool Mode);
-    bool      IsReadInternalMode   (void);
+    bool      IsReadInternalMode   (void) const;
     bool      LiveMode             (void) const;
     void      SetLiveMode          (LiveTVChain *Chain);
     void      IgnoreLiveEOF        (bool Ignore);

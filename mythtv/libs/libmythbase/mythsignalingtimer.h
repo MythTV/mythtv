@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _MYTH_SIGNALING_TIMER_H_
-#define _MYTH_SIGNALING_TIMER_H_
+#ifndef MYTH_SIGNALING_TIMER_H
+#define MYTH_SIGNALING_TIMER_H
 
 #include <cstdint>
 
@@ -46,4 +46,4 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
     volatile uint64_t m_millisec {0};
 };
 
-#endif // _MYTH_SIGNALING_TIMER_H_
+#endif // MYTH_SIGNALING_TIMER_H

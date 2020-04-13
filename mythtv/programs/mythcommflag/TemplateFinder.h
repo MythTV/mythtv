@@ -15,8 +15,8 @@
  * sequence of images will cause this algorithm to fail.
  */
 
-#ifndef __TEMPLATEFINDER_H__
-#define __TEMPLATEFINDER_H__
+#ifndef TEMPLATEFINDER_H
+#define TEMPLATEFINDER_H
 
 extern "C" {
 #include "libavcodec/avcodec.h"    /* AVFrame */
@@ -95,6 +95,6 @@ private:
     struct timeval  m_analyzeTime      {0,0};
 };
 
-#endif  /* !__TEMPLATEFINDER_H__ */
+#endif  /* !TEMPLATEFINDER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

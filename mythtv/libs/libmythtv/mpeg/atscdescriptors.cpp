@@ -193,9 +193,9 @@ QString CaptionServiceDescriptor::toString(void) const
     for (uint i = 0; i < ServicesCount(); i++)
     {
         str.append(QString("\n     lang(%1) type(%2) ")
-                   .arg(LanguageString(i)).arg(Type(i)));
+                   .arg(LanguageString(i)).arg(static_cast<int>(Type(i))));
         str.append(QString("easy_reader(%1) wide(%2) ")
-                   .arg(EasyReader(i)).arg(WideAspectRatio(i)));
+                   .arg(static_cast<int>(EasyReader(i))).arg(static_cast<int>(WideAspectRatio(i))));
         if (Type(i))
         {
             str.append(QString("service_num(%1)")
@@ -203,7 +203,7 @@ QString CaptionServiceDescriptor::toString(void) const
         }
         else
         {
-            str.append(QString("line_21_field(%1)").arg(Line21Field(i)));
+            str.append(QString("line_21_field(%1)").arg(static_cast<int>(Line21Field(i))));
         }
     }
 
@@ -299,7 +299,7 @@ QString AudioStreamDescriptor::toString() const
     QString str;
     str.append(QString("Audio Stream Descriptor "));
     str.append(QString(" full_srv(%1) sample_rate(%2) bit_rate(%3, %4)\n")
-               .arg(FullService()).arg(SampleRateCodeString())
+               .arg(static_cast<int>(FullService())).arg(SampleRateCodeString())
                .arg(BitRateCodeString()).arg(BitRateCode()));
     str.append(QString("      bsid(%1) bs_mode(%2) channels(%3) Dolby(%4)\n")
                .arg(bsid()).arg(BasicServiceMode())

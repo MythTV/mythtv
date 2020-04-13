@@ -579,7 +579,7 @@ const VAAPIProfiles &MythVAAPIContext::GetProfiles(void)
                     uint attrcount = 0;
                     if (vaQuerySurfaceAttributes(hwctx->display, config, nullptr, &attrcount) == VA_STATUS_SUCCESS)
                     {
-                        VASurfaceAttrib *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(*attrlist)));
+                        auto *attrlist = static_cast<VASurfaceAttrib*>(av_malloc(attrcount * sizeof(VASurfaceAttrib)));
                         if (vaQuerySurfaceAttributes(hwctx->display, config, attrlist, &attrcount) == VA_STATUS_SUCCESS)
                         {
                             for (uint k = 0; k < attrcount; ++k)
@@ -711,7 +711,7 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
         {
             // preserve interlaced flags
             m_lastInterlaced = Frame->interlaced_frame;
-            m_lastTopFieldFirst = Frame->top_field_first;
+            m_lastTopFieldFirst = (Frame->top_field_first != 0);
         }
 
         if (ret < 0)
@@ -771,7 +771,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->top_field_first = m_lastTopFieldFirst;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->already_deinterlaced = 1;
+        Frame->already_deinterlaced = true;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can

@@ -106,7 +106,7 @@ QString MythEGL::GetEGLVendor(void)
     if (extensions.contains("EGL_EXT_platform_base"))
     {
         QString vendor;
-        MYTH_EGLGETPLATFORMDISPLAY getdisp =
+        auto getdisp =
             reinterpret_cast<MYTH_EGLGETPLATFORMDISPLAY>(eglGetProcAddress("eglGetPlatformDisplay"));
         if (getdisp && extensions.contains("platform_x11"))
         {

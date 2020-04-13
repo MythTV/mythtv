@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __CONFIGURATION_H__
-#define __CONFIGURATION_H__
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
 
 #include <QDomDocument>
 #include <QStringList>
@@ -109,5 +109,4 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
             {SetValue(sSetting, static_cast<int>(value)); }
 };
 
-#endif
-
+#endif // CONFIGURATION_H

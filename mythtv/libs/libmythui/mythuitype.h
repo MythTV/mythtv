@@ -212,7 +212,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void HandleAlphaPulse();
     void HandleMovementPulse();
 
-    int CalcAlpha(int alphamod);
+    int CalcAlpha(int alphamod) const;
 
     static int NormX(int width);
     static int NormY(int height);

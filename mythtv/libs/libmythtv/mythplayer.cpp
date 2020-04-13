@@ -492,7 +492,7 @@ static inline QString toQString(FrameScanType scan) {
 
 FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
                                           FrameScanType scan,
-                                          float fps, int video_height)
+                                          float fps, int video_height) const
 {
     QString dbg = QString("detectInterlace(") + toQString(newScan) +
         QString(", ") + toQString(scan) + QString(", ") +
@@ -1199,7 +1199,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
         msg += tr("TXT CAP");
     if (kDisplayTeletextCaptions & mode)
     {
-        msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
                                        GetTrack(kTrackTypeTeletextCaptions));
         DisableTeletext();
     }
@@ -1210,7 +1211,8 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
         (kDisplayAVSubtitle & mode) || (kDisplayRawTextSubtitle & mode))
     {
         int type = toTrackType(mode);
-        msg += m_decoder->GetTrackDesc(type, GetTrack(type));
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
         if (m_osd)
             m_osd->EnableSubtitles(preserve);
     }
@@ -1239,7 +1241,8 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
         int type = toTrackType(mode);
-        msg += m_decoder->GetTrackDesc(type, GetTrack(type));
+        if (m_decoder != nullptr)
+            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
         if (m_osd)
             m_osd->EnableSubtitles(mode);
     }
@@ -1251,7 +1254,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
     }
     if (kDisplayNUVTeletextCaptions & mode)
         msg += tr("TXT %1").arg(m_ttPageNum, 3, 16);
-    if (kDisplayTeletextCaptions & mode)
+    if ((kDisplayTeletextCaptions & mode) && (m_decoder != nullptr))
     {
         msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
                                        GetTrack(kTrackTypeTeletextCaptions));
@@ -1279,7 +1282,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 bool MythPlayer::ToggleCaptions(void)
 {
     SetCaptionsEnabled(!((bool)m_textDisplayMode));
-    return m_textDisplayMode;
+    return m_textDisplayMode != 0U;
 }
 
 bool MythPlayer::ToggleCaptions(uint type)
@@ -1291,10 +1294,10 @@ bool MythPlayer::ToggleCaptions(uint type)
     if (m_textDisplayMode)
         DisableCaptions(m_textDisplayMode, (origMode & mode) != 0U);
     if (origMode & mode)
-        return m_textDisplayMode;
+        return m_textDisplayMode != 0U;
     if (mode)
         EnableCaptions(mode);
-    return m_textDisplayMode;
+    return m_textDisplayMode != 0U;
 }
 
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
@@ -1337,7 +1340,7 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     ResetCaptions();
 }
 
-bool MythPlayer::GetCaptionsEnabled(void)
+bool MythPlayer::GetCaptionsEnabled(void) const
 {
     return (kDisplayNUVTeletextCaptions == m_textDisplayMode) ||
            (kDisplayTeletextCaptions    == m_textDisplayMode) ||
@@ -1805,7 +1808,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     else if (buffer && is_interlaced(ps))
     {
         ps = kScan_Interlaced;
-        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
+        buffer->interlaced_reversed = (m_scan == kScan_Intr2ndField);
     }
 
     // only display the second field if needed
@@ -3645,7 +3648,7 @@ bool MythPlayer::UpdateFFRewSkip(void)
             m_fpsMultiplier = m_decoder->GetfpsMultiplier();
         m_frameInterval = (int) (1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed))
             / m_fpsMultiplier;
-        m_ffrewSkip = (m_playSpeed != 0.0F);
+        m_ffrewSkip = static_cast<int>(m_playSpeed != 0.0F);
     }
     else
     {
@@ -4870,7 +4873,7 @@ int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
     uint64_t pos = m_totalFrames;
 
     if (IsWatchingInprogress())
-        pos = (uint64_t)-1;
+        pos = UINT64_MAX;
 
     return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
 }
@@ -5108,7 +5111,7 @@ uint64_t MythPlayer::TranslatePositionFrameToMs(uint64_t position,
                                                 bool use_cutlist) const
 {
     float frameRate = GetFrameRate();
-    if (position == (uint64_t)-1 &&
+    if (position == UINT64_MAX &&
         m_playerCtx->m_recorder && m_playerCtx->m_recorder->IsValidRecorder())
     {
         float recorderFrameRate = m_playerCtx->m_recorder->GetFrameRate();

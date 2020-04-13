@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _MPEG_TABLES_H_
-#define _MPEG_TABLES_H_
+#ifndef MPEG_TABLES_H
+#define MPEG_TABLES_H
 
 #include <cassert>
 #include <utility>
@@ -775,7 +775,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
                 return i;
         return -1;
     }
-    uint FindUnusedPID(uint desired_pid = 0x20);
+    uint FindUnusedPID(uint desired_pid = 0x20) const;
 
     void RemoveAllStreams(void)
     {
@@ -800,7 +800,8 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
                               uint infoLength)
     {
         SetStreamInfoLength(i, infoLength);
-        memcpy(m_ptrs[i] + 5, streamInfo, infoLength);
+        if ((streamInfo != nullptr) && (infoLength > 0))
+            memcpy(m_ptrs[i] + 5, streamInfo, infoLength);
     }
 
     void SetProgramInfoLength(uint length)
@@ -1243,4 +1244,4 @@ class MTV_PUBLIC AdaptationFieldControl
     const unsigned char* m_data;
 };
 
-#endif
+#endif // MPEG_TABLES_H

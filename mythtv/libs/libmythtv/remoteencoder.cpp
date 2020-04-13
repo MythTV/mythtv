@@ -33,7 +33,7 @@ bool RemoteEncoder::Setup(void)
         LOG(VB_NETWORK, LOG_DEBUG, "RemoteEncoder::Setup(): Connecting...");
 
         QString ann = QString("ANN Playback %1 %2")
-            .arg(gCoreContext->GetHostName()).arg(false);
+            .arg(gCoreContext->GetHostName()).arg(static_cast<int>(false));
 
         m_controlSock = gCoreContext->ConnectCommandSocket(
             m_remotehost, m_remoteport, ann);
@@ -402,7 +402,7 @@ void RemoteEncoder::SetLiveRecording(bool recording)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "SET_LIVE_RECORDING";
-    strlist << QString::number(recording);
+    strlist << QString::number(static_cast<int>(recording));
 
     SendReceiveStringList(strlist);
 }

@@ -23,7 +23,7 @@ ExitPrompter::ExitPrompter()
 ExitPrompter::~ExitPrompter()
 {
     if (m_power)
-        m_power->AcquireRelease(this, false);
+        MythPower::AcquireRelease(this, false);
 }
 
 void ExitPrompter::DoQuit()
@@ -31,7 +31,7 @@ void ExitPrompter::DoQuit()
     qApp->exit();
 }
 
-void ExitPrompter::ConfirmHalt()
+void ExitPrompter::ConfirmHalt() const
 {
     Confirm(MythPower::FeatureShutdown);
 }
@@ -62,7 +62,7 @@ void ExitPrompter::DoHalt(bool Confirmed)
     myth_system("sudo /sbin/halt -p");
 }
 
-void ExitPrompter::ConfirmReboot()
+void ExitPrompter::ConfirmReboot() const
 {
     Confirm(MythPower::FeatureRestart);
 }
@@ -92,7 +92,7 @@ void ExitPrompter::DoReboot(bool Confirmed)
     myth_system("sudo /sbin/reboot");
 }
 
-void ExitPrompter::ConfirmSuspend(void)
+void ExitPrompter::ConfirmSuspend(void) const
 {
     Confirm(MythPower::FeatureSuspend);
 }
@@ -230,7 +230,7 @@ void ExitPrompter::HandleExit()
     ss->AddScreen(dlg);
 }
 
-void ExitPrompter::Confirm(MythPower::Feature Action)
+void ExitPrompter::Confirm(MythPower::Feature Action) const
 {
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
 

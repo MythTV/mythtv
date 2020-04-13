@@ -1,5 +1,5 @@
-#ifndef __CHANNEL_SCAN_TYPES_H_
-#define __CHANNEL_SCAN_TYPES_H_
+#ifndef CHANNEL_SCAN_TYPES_H
+#define CHANNEL_SCAN_TYPES_H
 
 enum ServiceRequirements
 {
@@ -10,4 +10,4 @@ enum ServiceRequirements
     kRequireData    = 0x4,
 };
 
-#endif // __CHANNEL_SCAN_TYPES_H_
+#endif // CHANNEL_SCAN_TYPES_H

@@ -3,8 +3,8 @@
  * License: GPL v2
  */
 
-#ifndef _EIT_CACHE_H
-#define _EIT_CACHE_H
+#ifndef EIT_CACHE_H
+#define EIT_CACHE_H
 
 #include <cstdint>
 
@@ -62,6 +62,6 @@ class EITCache
     static MTV_PUBLIC void ClearChannelLocks(void);
 };
 
-#endif // _EIT_CACHE_H
+#endif // EIT_CACHE_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

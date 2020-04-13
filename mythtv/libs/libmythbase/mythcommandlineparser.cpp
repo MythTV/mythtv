@@ -2506,7 +2506,7 @@ QString MythCommandLineParser::GetLogFilePath(void)
 
 /** \brief Helper utility for logging interface to return syslog facility
  */
-int MythCommandLineParser::GetSyslogFacility(void)
+int MythCommandLineParser::GetSyslogFacility(void) const
 {
     QString setting = toString("syslog").toLower();
     if (setting == "none")
@@ -2517,7 +2517,7 @@ int MythCommandLineParser::GetSyslogFacility(void)
 
 /** \brief Helper utility for logging interface to filtering level
  */
-LogLevel_t MythCommandLineParser::GetLogLevel(void)
+LogLevel_t MythCommandLineParser::GetLogLevel(void) const
 {
     QString setting = toString("loglevel");
     if (setting.isEmpty())
@@ -2558,7 +2558,7 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 
 /** \brief Read in logging options and initialize the logging interface
  */
-int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int progress)
+int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 {
     int err = 0;
 
@@ -2569,7 +2569,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int pr
 
     if (toBool("verbose"))
     {
-        if ((err = verboseArgParse(toString("verbose"))))
+        if ((err = verboseArgParse(toString("verbose"))) != 0)
             return err;
     }
     else if (toBool("verboseint"))
@@ -2578,7 +2578,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int pr
     verboseMask |= VB_STDIO|VB_FLUSH;
 
     int quiet = toUInt("quiet");
-    if (max(quiet, (int)progress) > 1)
+    if (max(quiet, static_cast<int>(progress)) > 1)
     {
         verboseMask = VB_NONE|VB_FLUSH;
         verboseArgParse("none");
@@ -2731,7 +2731,7 @@ bool setUser(const QString &username)
 
 /** \brief Fork application into background, and detatch from terminal
  */
-int MythCommandLineParser::Daemonize(void)
+int MythCommandLineParser::Daemonize(void) const
 {
     ofstream pidfs;
     if (!openPidfile(pidfs, toString("pidfile")))

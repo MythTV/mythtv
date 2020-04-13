@@ -1,5 +1,5 @@
-#ifndef _FILLDATA_H_
-#define _FILLDATA_H_
+#ifndef FILLDATA_H
+#define FILLDATA_H
 
 // C++ headers
 #include <vector>
@@ -80,4 +80,4 @@ class FillData
     mutable QStringList m_fatalErrors;
 };
 
-#endif // _FILLDATA_H_
+#endif // FILLDATA_H

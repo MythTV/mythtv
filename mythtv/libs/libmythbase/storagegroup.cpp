@@ -338,10 +338,12 @@ QStringList StorageGroup::GetFileInfoList(const QString &Path)
         if (entry.isDir())
             tmp = QString("dir::%1::0").arg(entry.fileName());
         else
+        {
             tmp = QString("file::%1::%2::%3%4").arg(entry.fileName())
                           .arg(entry.size())
                           .arg(relPath).arg(entry.fileName());
 
+        }
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("GetFileInfoList: (%1)").arg(tmp));
         files.append(tmp);

@@ -124,7 +124,7 @@ void RecordingSelector::Init(void)
     auto *thread = new GetRecordingListThread(this);
     while (thread->isRunning())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(2000);
     }
 
@@ -434,7 +434,7 @@ void RecordingSelector::updateRecordingList(void)
 
                 item->SetData(QVariant::fromValue(p));
             }
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
     }
 
@@ -509,7 +509,7 @@ void RecordingSelector::updateSelectedList()
                 break;
             }
 
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
     }
 }

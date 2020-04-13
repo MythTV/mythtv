@@ -1,5 +1,5 @@
-#ifndef _CONTROLREQUESTHANDLER_H_
-#define _CONTROLREQUESTHANDLER_H_
+#ifndef CONTROLREQUESTHANDLER_H
+#define CONTROLREQUESTHANDLER_H
 
 using namespace std;
 
@@ -20,4 +20,4 @@ class ControlRequestHandler : public OutboundRequestHandler
     bool AnnounceSocket(void) override; // OutboundRequestHandler
 };
 
-#endif
+#endif // CONTROLREQUESTHANDLER_H

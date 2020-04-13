@@ -1,5 +1,5 @@
-#ifndef _CHANNEL_IMPORTER_HELPERS_H_
-#define _CHANNEL_IMPORTER_HELPERS_H_
+#ifndef CHANNEL_IMPORTER_HELPERS_H
+#define CHANNEL_IMPORTER_HELPERS_H
 
 // C++ headers
 #include <cstdint>
@@ -37,4 +37,4 @@ MTV_PUBLIC vector<ScanInfo> LoadScanList(void);
 uint SaveScan(const ScanDTVTransportList &scan);
 MTV_PUBLIC ScanDTVTransportList LoadScan(uint scanid);
 
-#endif // _CHANNEL_IMPORTER_HELPERS_H_
+#endif // CHANNEL_IMPORTER_HELPERS_H

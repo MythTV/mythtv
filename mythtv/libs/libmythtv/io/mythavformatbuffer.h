@@ -24,9 +24,9 @@ class MythAVFormatBuffer
     static int          Read           (URLContext* Context, uint8_t *Buffer, int Size);
     static int          Write          (URLContext* Context, const uint8_t *Buffer, int Size);
     static int64_t      Seek           (URLContext* Context, int64_t Offset, int Whence);
-    static int          Close          (URLContext*);
+    static int          Close          (URLContext* /*Context*/);
     void                SetInInit      (bool State);
-    bool                IsInInit       (void);
+    bool                IsInInit       (void) const;
 
   private:
     MythMediaBuffer    *m_buffer       { nullptr };

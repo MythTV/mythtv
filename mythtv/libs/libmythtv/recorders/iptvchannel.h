@@ -7,8 +7,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _IPTV_CHANNEL_H_
-#define _IPTV_CHANNEL_H_
+#ifndef IPTV_CHANNEL_H
+#define IPTV_CHANNEL_H
 
 // Qt headers
 #include <QMutex>
@@ -70,6 +70,6 @@ class IPTVChannel : QObject, public DTVChannel
     QString            m_videoDev;
 };
 
-#endif // _IPTV_CHANNEL_H_
+#endif // IPTV_CHANNEL_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -4,8 +4,8 @@
  * Detect scene changes based on histogram analysis.
  */
 
-#ifndef __SCENECHANGEDETECTOR_H__
-#define __SCENECHANGEDETECTOR_H__
+#ifndef SCENECHANGEDETECTOR_H
+#define SCENECHANGEDETECTOR_H
 
 #include <QString>
 
@@ -61,7 +61,6 @@ public:
     bool                    m_sceneChangeDone    {false};
 };
 
-#endif  /* !__SCENECHANGEDETECTOR_H__ */
+#endif  /* !SCENECHANGEDETECTOR_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

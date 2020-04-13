@@ -34,7 +34,7 @@ using namespace std;
 #include "fileselector.h"
 #include "recordingselector.h"
 #include "videoselector.h"
-#include "dbcheck.h"
+#include "archivedbcheck.h"
 #include "archiveutil.h"
 #include "selectdestination.h"
 #include "exportnative.h"
@@ -91,7 +91,7 @@ static bool checkLockFile(const QString &lockFile)
         // Is the process that created the lock still alive?
         if (!checkProcess(lockFile))
         {
-            showWarningDialog(qApp->translate("(MythArchiveMain)",
+            showWarningDialog(QCoreApplication::translate("(MythArchiveMain)",
                 "Found a lock file but the owning process isn't running!\n"
                 "Removing stale lock file."));
             if (!file.remove())
@@ -212,14 +212,14 @@ static void runTestDVD(void)
 {
     if (!gCoreContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
     {
-        showWarningDialog(qApp->translate("(MythArchiveMain)",
+        showWarningDialog(QCoreApplication::translate("(MythArchiveMain)",
             "Last run did not create a playable DVD."));
         return;
     }
 
     if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
-        showWarningDialog(qApp->translate("(MythArchiveMain)", 
+        showWarningDialog(QCoreApplication::translate("(MythArchiveMain)",
                                           "Last run failed to create a DVD."));
         return;
     }

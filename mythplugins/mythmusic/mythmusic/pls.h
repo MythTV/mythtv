@@ -24,7 +24,7 @@ class PlayListFileEntry
 
     QString File(void) { return m_file; }
     QString Title(void) { return m_title; }
-    int Length(void) { return m_length; }
+    int Length(void) const { return m_length; }
 
     void setFile(const QString &f) { m_file = f; }
     void setTitle(const QString &t) { m_title = t; }

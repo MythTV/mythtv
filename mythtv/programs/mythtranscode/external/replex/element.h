@@ -24,10 +24,10 @@
  *
  */
 
-#ifndef _ELEMENT_H_
-#define _ELEMENT_H_
+#ifndef ELEMENT_H
+#define ELEMENT_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "ringbuffer.h"
 
@@ -74,8 +74,8 @@ enum { VIDEO_NONE=0, VIDEO_PAL, VIDEO_NTSC};
 #define PULLDOWN32 1
 #define PULLDOWN23 2
 
-#define CLOCK_MS        27000ULL
-#define CLOCK_PER    27000000000ULL
+#define CLOCK_MS        27000LL
+#define CLOCK_PER    27000000000LL
 #define SEC_PER      (CLOCK_PER/s->frame_rate)
 
 
@@ -83,7 +83,7 @@ enum {
 	NONE=0,AC3, MPEG_AUDIO, LPCM, MAX_TYPES
 };
 
-typedef struct sequence_s{
+struct sequence_t {
 	int set;
 	int ext_set;
 	uint16_t h_size;
@@ -103,10 +103,9 @@ typedef struct sequence_s{
 	uint8_t  pulldown;
 	uint8_t  current_frame;
 	uint8_t  current_tmpref;
-} sequence_t;
+};
 
-typedef
-struct audio_frame_s{
+struct audio_frame_t {
 	int set;
 	int layer;
 	uint32_t bit_rate;
@@ -118,7 +117,7 @@ struct audio_frame_s{
 	uint32_t frametime;
 	uint32_t off;
 	char     language[4];
-} audio_frame_t;
+};
 
 void pts2time(uint64_t pts, uint8_t *buf, int len);
 int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le);
@@ -137,4 +136,4 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af,
 		       int  off, int le, int type);
 int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le);
 
-#endif /*_ELEMENT_H_*/
+#endif /* ELEMENT_H */

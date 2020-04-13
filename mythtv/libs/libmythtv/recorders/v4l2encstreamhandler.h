@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _V4L2encStreamhandler_H_
-#define _V4L2encStreamhandler_H_
+#ifndef V4L2encStreamhandler_H
+#define V4L2encStreamhandler_H
 
 #include <cstdint>
 #include <vector>
@@ -149,4 +149,4 @@ class V4L2encStreamHandler : public StreamHandler
     bool          m_pauseEncodingAllowed   {true};
 };
 
-#endif // _V4L2encSTREAMHANDLER_H_
+#endif // V4L2encSTREAMHANDLER_H

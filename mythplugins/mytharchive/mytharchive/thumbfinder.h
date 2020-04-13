@@ -65,7 +65,7 @@ class ThumbFinder : public MythScreenType
     void updateCurrentPos(void);
     bool seekToFrame(int frame, bool checkPos = true);
     static QString createThumbDir(void);
-    QString frameToTime(int64_t frame, bool addFrame = false);
+    QString frameToTime(int64_t frame, bool addFrame = false) const;
 
     // avcodec stuff
     bool initAVCodec(const QString &inFile);

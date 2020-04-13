@@ -61,9 +61,9 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 */
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame, FrameScanType Scan)
+                                                               VideoFrame *Frame, FrameScanType Scan) const
 {
-    Frame->already_deinterlaced = 1;
+    Frame->already_deinterlaced = true;
     vector<MythVideoTexture*> result;
     for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
     {
@@ -178,7 +178,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
 */
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame)
+                                                               VideoFrame *Frame) const
 {
     // N.B. this works for YV12/NV12/P010 etc but will probably break for YUV422 etc
     vector<QSize> sizes;
@@ -268,7 +268,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
 */
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
                                                                 MythRenderOpenGL *Context,
-                                                                VideoFrame *Frame)
+                                                                VideoFrame *Frame) const
 {
     // As for CreateSeparate - may not work for some formats
     AVDRMLayerDescriptor* layer = &Desc->layers[0];

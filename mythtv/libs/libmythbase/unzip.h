@@ -25,8 +25,8 @@
 **
 **********************************************************************/
 
-#ifndef OSDAB_UNZIP__H
-#define OSDAB_UNZIP__H
+#ifndef OSDAB_UNZIP_H
+#define OSDAB_UNZIP_H
 
 #include <QtGlobal>
 #include <QMap>
@@ -148,4 +148,4 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(UnZip::ExtractionOptions)
 
-#endif // OSDAB_UNZIP__H
+#endif // OSDAB_UNZIP_H

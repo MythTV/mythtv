@@ -26,7 +26,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
 
     bool IsWide() const;
     QString GetAspect() const { return m_aspect; }
-    const QSize GetBaseRes() const { return m_baseres; }
+    QSize GetBaseRes() const { return m_baseres; }
     QString GetName() const { return m_name; }
     QString GetBaseTheme() const { return m_baseTheme; }
     QString GetDescription() const { return m_description; }

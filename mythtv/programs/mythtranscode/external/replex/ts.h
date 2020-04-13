@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _TS_H_
-#define _TS_H_
+#ifndef TS_H
+#define TS_H
 
 #include "ringbuffer.h"
 #include "mpg_common.h"
@@ -73,4 +73,4 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	 uint8_t ptsdts, int nframes, ringbuffer *ac3rbuffer);
 void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num,
 			uint8_t *buf);
-#endif /*_TS_H_*/
+#endif /* TS_H */

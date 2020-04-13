@@ -1,5 +1,5 @@
-#ifndef _MYTHSESSION_H_
-#define _MYTHSESSION_H_
+#ifndef MYTHSESSION_H
+#define MYTHSESSION_H
 
 #include "mythbaseexp.h"
 
@@ -221,4 +221,4 @@ class MBASE_PUBLIC MythSessionManager
     QMap<QString, MythUserSession> m_sessionList;
 };
 
-#endif
+#endif // MYTHSESSION_H

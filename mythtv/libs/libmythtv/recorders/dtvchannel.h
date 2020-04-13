@@ -4,8 +4,8 @@
  *  Contains base class for digital channels.
  */
 
-#ifndef _DTVCHANNEL_H_
-#define _DTVCHANNEL_H_
+#ifndef DTVCHANNEL_H
+#define DTVCHANNEL_H
 
 // C++ headers
 #include <cstdint>
@@ -181,4 +181,4 @@ class DTVChannel : public ChannelBase
     static MasterMap         s_master_map;
 };
 
-#endif // _DTVCHANNEL_H_
+#endif // DTVCHANNEL_H

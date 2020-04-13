@@ -9,11 +9,11 @@
 
 using namespace std;
 
-QMap<int, QString>    _iso639_key_to_english_name;
-static QMap<int, int> _iso639_key2_to_key3;
-static QMap<int, int> _iso639_key3_to_canonical_key3;
-static QStringList    _languages;
-static vector<int>    _language_keys;
+QMap<int, QString>    iso639_key_to_english_name;
+static QMap<int, int> s_iso639_key2_to_key3;
+static QMap<int, int> s_iso639_key3_to_canonical_key3;
+static QStringList    s_languages;
+static vector<int>    s_language_keys;
 
 /* Note: this file takes a long time to compile. **/
 
@@ -23,8 +23,8 @@ static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical);
 
 void iso639_clear_language_list(void)
 {
-    _languages.clear();
-    _language_keys.clear();
+    s_languages.clear();
+    s_language_keys.clear();
 }
 
 /** \fn QStringList iso639_get_language_list(void)
@@ -34,7 +34,7 @@ void iso639_clear_language_list(void)
  */
 QStringList iso639_get_language_list(void)
 {
-    if (_languages.empty())
+    if (s_languages.empty())
     {
         for (uint i = 0; true; i++)
         {
@@ -42,36 +42,36 @@ QStringList iso639_get_language_list(void)
             QString lang = gCoreContext->GetSetting(q, "").toLower();
             if (lang.isEmpty())
                 break;
-            _languages << lang;
+            s_languages << lang;
         }
-        if (_languages.empty())
+        if (s_languages.empty())
         {
             QString s3 = iso639_str2_to_str3(
                                         gCoreContext->GetLanguage().toLower());
             if (!s3.isEmpty())
-                _languages << s3;
+                s_languages << s3;
         }
     }
-    return _languages;
+    return s_languages;
 }
 
 vector<int> iso639_get_language_key_list(void)
 {
-    if (_language_keys.empty())
+    if (s_language_keys.empty())
     {
         const QStringList list = iso639_get_language_list();
         foreach (const auto & it, list)
-            _language_keys.push_back(iso639_str3_to_key(it));
+            s_language_keys.push_back(iso639_str3_to_key(it));
     }
-    return _language_keys;
+    return s_language_keys;
 }
 
 QString iso639_str2_to_str3(const QString &str2)
 {
     int key2 = iso639_str2_to_key2(str2.toLatin1().constData());
     int key3 = 0;
-    if (_iso639_key2_to_key3.contains(key2))
-        key3 = _iso639_key2_to_key3[key2];
+    if (s_iso639_key2_to_key3.contains(key2))
+        key3 = s_iso639_key2_to_key3[key2];
     if (key3)
         return iso639_key_to_str3(key3);
     return "und";
@@ -82,8 +82,8 @@ static QString iso639_Alpha3_toName(const unsigned char *iso639_2)
     int alpha3 = iso639_str3_to_key(iso639_2);
     alpha3 = iso639_key_to_canonical_key(alpha3);
 
-    if (_iso639_key_to_english_name.contains(alpha3))
-        return _iso639_key_to_english_name[alpha3];
+    if (iso639_key_to_english_name.contains(alpha3))
+        return iso639_key_to_english_name[alpha3];
 
     return "Unknown";
 }
@@ -92,8 +92,8 @@ static QString iso639_Alpha2_toName(const unsigned char *iso639_1)
 {
     int alpha2 = iso639_str2_to_key2(iso639_1);
 
-    if (_iso639_key2_to_key3.contains(alpha2))
-        return _iso639_key_to_english_name[_iso639_key2_to_key3[alpha2]];
+    if (s_iso639_key2_to_key3.contains(alpha2))
+        return iso639_key_to_english_name[s_iso639_key2_to_key3[alpha2]];
 
     return "Unknown";
 }
@@ -110,8 +110,8 @@ QString iso639_str_toName(const unsigned char *iso639)
 QString iso639_key_toName(int iso639_2)
 {
     QMap<int, QString>::const_iterator it;
-    it = _iso639_key_to_english_name.find(iso639_2);
-    if (it != _iso639_key_to_english_name.end())
+    it = iso639_key_to_english_name.find(iso639_2);
+    if (it != iso639_key_to_english_name.end())
         return *it;
 
     return "Unknown";
@@ -120,21 +120,21 @@ QString iso639_key_toName(int iso639_2)
 int iso639_key_to_canonical_key(int iso639_2)
 {
     QMap<int, int>::const_iterator it;
-    it = _iso639_key3_to_canonical_key3.find(iso639_2);
+    it = s_iso639_key3_to_canonical_key3.find(iso639_2);
 
-    if (it != _iso639_key3_to_canonical_key3.end())
+    if (it != s_iso639_key3_to_canonical_key3.end())
         return *it;
     return iso639_2;
 }
 
 int dummy_createCodeToEnglishNamesMap =
-    createCodeToEnglishNamesMap(_iso639_key_to_english_name);
+    createCodeToEnglishNamesMap(iso639_key_to_english_name);
 
 int dummy_createCode2ToCode3Map =
-    createCode2ToCode3Map(_iso639_key2_to_key3);
+    createCode2ToCode3Map(s_iso639_key2_to_key3);
 
 int dummy_createCodeToCanonicalCodeMap =
-    createCodeToCanonicalCodeMap(_iso639_key3_to_canonical_key3);
+    createCodeToCanonicalCodeMap(s_iso639_key3_to_canonical_key3);
 
 static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical)
 {

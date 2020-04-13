@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "v3d.h"
 #include "surf3d.h"
@@ -22,16 +22,16 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 
 void tentacle_free (void) {
 	free (vals);
-        for (int tmp=0;tmp<nbgrid;tmp++) {
-                grid3d_free(&(grille[tmp]));
-        }
+	for (auto & tmp : grille) {
+		grid3d_free(&tmp);
+	}
 }
 
 void tentacle_new (void) {
 	v3d center = {0,-17.0,0};
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
-	for (int tmp=0;tmp<nbgrid;tmp++) {
+	for (auto & tmp : grille) {
 		// Pseudo-random is good enough. Don't need a true random.
 		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		int z = 45+rand()%30;
@@ -39,7 +39,7 @@ void tentacle_new (void) {
 		int x = 85+rand()%5;
 		center.z = z;
 		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-		grille[tmp] = grid3d_new (x,definitionx,z,definitionz+rand()%10,center);
+		tmp = grid3d_new (x,definitionx,z,definitionz+rand()%10,center);
 		center.y += 8;
 	}
 }
@@ -64,7 +64,7 @@ lighten (unsigned char value, float power)
 static void
 lightencolor (int *col, float power)
 {
-	unsigned char *color = (unsigned char *) col;
+	auto *color = (unsigned char *) col;
 	*color = lighten (*color, power);
 	color++;
 	*color = lighten (*color, power);
@@ -167,7 +167,8 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 	s_lig += s_ligs;
 
 	if (s_lig > 1.01F) {
-		if ((s_lig>10.0F) | (s_lig<1.1F)) s_ligs = -s_ligs;
+		if ((s_lig>10.0F) || (s_lig<1.1F))
+                    s_ligs = -s_ligs;
 		
 		if ((s_lig<6.3F)&&(iRAND(30)==0))
 			s_dstCol=iRAND(3);
@@ -190,17 +191,17 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 		
 		pretty_move (cycle,&dist,&dist2,&rotangle);
 
-		for (int tmp=0;tmp<nbgrid;tmp++) {
+		for (auto & tmp : grille) {
 			for (int tmp2=0;tmp2<definitionx;tmp2++) {
 				float val = (float)(ShiftRight(data[0][iRAND(511)],10)) * rapport;
 				vals[tmp2] = val;
 			}
 			
-			grid3d_update (grille[tmp],rotangle, vals, dist2);
+			grid3d_update (tmp,rotangle, vals, dist2);
 		}
 		cycle+=0.01F;
-		for (int tmp=0;tmp<nbgrid;tmp++)
-			grid3d_draw (grille[tmp],color,colorlow,dist,buf,back,W,H);
+		for (auto & tmp : grille)
+			grid3d_draw (tmp,color,colorlow,dist,buf,back,W,H);
 	}
 	else {
 		s_lig = 1.05F;

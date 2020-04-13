@@ -4,8 +4,8 @@
  * Implement the Canny edge detection algorithm.
  */
 
-#ifndef __CANNYEDGEDETECTOR_H__
-#define __CANNYEDGEDETECTOR_H__
+#ifndef CANNYEDGEDETECTOR_H
+#define CANNYEDGEDETECTOR_H
 
 extern "C" {
 #include "libavcodec/avcodec.h"    /* AVFrame */
@@ -46,6 +46,6 @@ private:
     }               m_exclude {};
 };
 
-#endif  /* !__CANNYEDGEDETECTOR_H__ */
+#endif  /* !CANNYEDGEDETECTOR_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

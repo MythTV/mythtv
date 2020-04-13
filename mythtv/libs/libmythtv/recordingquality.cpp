@@ -115,12 +115,12 @@ bool RecordingQuality::IsDamaged(void) const
 QString RecordingQuality::toStringXML(void) const
 {
     QString str =
-        QString("<RecordingQuality overall_score=\"%1\" key=\"%2\"")
+        QString(R"(<RecordingQuality overall_score="%1" key="%2")")
         .arg(m_overallScore).arg(m_programKey);
 
     if (m_packetCount)
     {
-        str += QString(" continuity_error_count=\"%1\" packet_count=\"%2\"")
+        str += QString(R"( continuity_error_count="%1" packet_count="%2")")
             .arg(m_continuityErrorCount).arg(m_packetCount);
     }
 

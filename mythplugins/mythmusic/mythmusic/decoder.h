@@ -30,7 +30,6 @@ class DecoderEvent : public MythEvent
 {
   public:
     explicit DecoderEvent(Type type) : MythEvent(type) { ; }
-
     explicit DecoderEvent(QString *e) : MythEvent(Error), m_errorMsg(e) { ; }
 
     ~DecoderEvent() override
@@ -39,6 +38,8 @@ class DecoderEvent : public MythEvent
     }
 
     const QString *errorMessage() const { return m_errorMsg; }
+
+    DecoderEvent &operator=(const DecoderEvent&) = delete;
 
     MythEvent *clone(void) const override // MythEvent
         { return new DecoderEvent(*this); }
@@ -56,7 +57,6 @@ class DecoderEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
-    DecoderEvent &operator=(const DecoderEvent&) = delete;
 
   private:
     QString *m_errorMsg {nullptr};

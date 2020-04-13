@@ -234,7 +234,7 @@ class OsdNavigation : public MythScreenType
     void SetTextFromMap(const InfoMap &Map) override;
     void ShowMenu(void) override;
 
-    int getVisibleGroup() { return m_visibleGroup; }
+    int getVisibleGroup() const { return m_visibleGroup; }
 
   public slots:
     void GeneralAction(void);

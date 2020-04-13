@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPTASKSEARCH_H__
-#define __UPNPTASKSEARCH_H__
+#ifndef UPNPTASKSEARCH_H
+#define UPNPTASKSEARCH_H
 
 // POSIX headers
 #include <sys/types.h>
@@ -76,4 +76,4 @@ class UPnpSearchTask : public Task
 };
 
 
-#endif
+#endif // UPNPTASKSEARCH_H

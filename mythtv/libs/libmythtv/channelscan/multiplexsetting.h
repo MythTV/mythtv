@@ -2,8 +2,8 @@
  * vim: set expandtab tabstop=4 shiftwidth=4:
  */
 
-#ifndef _MULTIPLEX_SETTING_H_
-#define _MULTIPLEX_SETTING_H_
+#ifndef MULTIPLEX_SETTING_H
+#define MULTIPLEX_SETTING_H
 
 // MythTV headers
 #include "standardsettings.h"
@@ -23,4 +23,4 @@ class MultiplexSetting : public TransMythUIComboBoxSetting
     uint m_sourceid {0};
 };
 
-#endif // _MULTIPLEX_SETTING_H_
+#endif // MULTIPLEX_SETTING_H

@@ -38,14 +38,14 @@ class FrameRate
 public:
     explicit FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
     double toDouble(void) const { return m_num / (double)m_den; }
-    bool isNonzero(void) const { return m_num; }
+    bool isNonzero(void) const { return m_num != 0U; }
     uint getNum(void) const { return m_num; }
     uint getDen(void) const { return m_den; }
     QString toString(void) const { return QString("%1/%2").arg(m_num).arg(m_den); }
-    bool operator==(const FrameRate &other) {
+    bool operator==(const FrameRate &other) const {
         return m_num == other.m_num && m_den == other.m_den;
     }
-    bool operator!=(const FrameRate &other) { return !(*this == other); }
+    bool operator!=(const FrameRate &other) const { return !(*this == other); }
 private:
     uint m_num;
     uint m_den;

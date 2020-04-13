@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _FIREWIRESIGNALMONITOR_H_
-#define _FIREWIRESIGNALMONITOR_H_
+#ifndef FIREWIRESIGNALMONITOR_H
+#define FIREWIRESIGNALMONITOR_H
 
 // C++ headers
 #include <vector>
@@ -76,4 +76,4 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     static QMutex           s_pat_keys_lock;
 };
 
-#endif // _FIREWIRESIGNALMONITOR_H_
+#endif // FIREWIRESIGNALMONITOR_H

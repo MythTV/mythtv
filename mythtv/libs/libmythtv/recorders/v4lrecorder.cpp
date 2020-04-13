@@ -68,8 +68,9 @@ void V4LRecorder::SetOption(const QString &name, const QString &value)
         DTVRecorder::SetOption(name, value);
 }
 
-static void vbi_event(struct VBIData *data, struct vt_event *ev)
+static void vbi_event(void *data_in, struct vt_event *ev)
 {
+    auto *data = static_cast<struct VBIData *>(data_in);
     switch (ev->type)
     {
        case EV_PAGE:
@@ -115,7 +116,7 @@ int V4LRecorder::OpenVBIDevice(void)
             vbi_cb = new VBIData;
             memset(vbi_cb, 0, sizeof(VBIData));
             vbi_cb->nvr = this;
-            vbi_add_handler(pal_tt, (void*) vbi_event, vbi_cb);
+            vbi_add_handler(pal_tt, vbi_event, vbi_cb);
         }
     }
     else if (VBIMode::NTSC_CC == m_vbiMode)
@@ -230,7 +231,7 @@ void V4LRecorder::CloseVBIDevice(void)
 
     if (m_palVbiTt)
     {
-        vbi_del_handler(m_palVbiTt, (void*) vbi_event, m_palVbiCb);
+        vbi_del_handler(m_palVbiTt, vbi_event, m_palVbiCb);
         vbi_close(m_palVbiTt);
         delete m_palVbiCb;
         m_palVbiCb = nullptr;

@@ -47,7 +47,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void run(void) override; // MThread
     void setRunThread(void) { m_runThread = true; }
     QThread *getQueueThread(void) { return m_queueThread; }
-    bool isRunning(void) { return m_isRunning; }
+    bool isRunning(void) const { return m_isRunning; }
 
     // Methods to GET a URL
     void preCache(const QString &url);

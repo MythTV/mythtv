@@ -6,69 +6,20 @@ using namespace std;
 
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mythdbcheck.h>
 
-#include "dbcheck.h"
+#include "gamedbcheck.h"
 #include "gamesettings.h"
 
 const QString currentDatabaseVersion = "1019";
-
-static bool UpdateDBVersionNumber(const QString &newnumber)
-{
-
-    if (!gCoreContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,nullptr))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("DB Error (Setting new DB version number): %1\n")
-                .arg(newnumber));
-
-        return false;
-    }
-
-    return true;
-}
-
-static bool performActualUpdate(const QString updates[], const QString& version,
-                                QString &dbver)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Upgrading to MythGame schema version ") + version);
-
-    int counter = 0;
-    QString thequery = updates[counter];
-
-    while (thequery != "")
-    {
-        if (!query.exec(thequery))
-        {
-            QString msg =
-                QString("DB Error (Performing database upgrade): \n"
-                        "Query was: %1 \nError was: %2 \nnew version: %3")
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()))
-                .arg(version);
-            LOG(VB_GENERAL, LOG_ERR, msg);
-            return false;
-        }
-
-        counter++;
-        thequery = updates[counter];
-    }
-
-    if (!UpdateDBVersionNumber(version))
-        return false;
-
-    dbver = version;
-    return true;
-}
+const QString MythGameVersionName = "GameDBSchemaVer";
 
 static bool InitializeDatabase(void)
 {
     LOG(VB_GENERAL, LOG_NOTICE,
         "Inserting MythGame initial database information.");
 
-    const QString updates[] = {
+    DBUpdates updates {
 "CREATE TABLE gamemetadata ("
 "  `system` varchar(128) NOT NULL default '',"
 "  romname varchar(128) NOT NULL default '',"
@@ -122,11 +73,11 @@ static bool InitializeDatabase(void)
 "  KEY name (name),"
 "  KEY description (description),"
 "  KEY platform (platform)"
-");",
-""
+");"
 };
     QString dbver = "";
-    return performActualUpdate(updates, "1011", dbver);
+    return performActualUpdate("MythGame", MythGameVersionName,
+                               updates, "1011", dbver);
 }
 
 bool UpgradeGameDatabaseSchema(void)
@@ -146,11 +97,11 @@ bool UpgradeGameDatabaseSchema(void)
 
     if (dbver == "1000")
     {
-        const QString updates[] = {
-"ALTER TABLE gamemetadata ADD COLUMN favorite BOOL NULL;",
-""
+        DBUpdates updates {
+"ALTER TABLE gamemetadata ADD COLUMN favorite BOOL NULL;"
 };
-        if (!performActualUpdate(updates, "1001", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1001", dbver))
             return false;
     }
 
@@ -159,7 +110,7 @@ bool UpgradeGameDatabaseSchema(void)
       || (dbver == "1002"))
       || (dbver == "1001"))
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
 "CREATE TABLE gameplayers ("
 "  gameplayerid int(10) unsigned NOT NULL auto_increment,"
@@ -174,21 +125,21 @@ bool UpgradeGameDatabaseSchema(void)
 "  UNIQUE KEY playername (playername)"
 ");",
 "ALTER TABLE gamemetadata ADD COLUMN rompath varchar(255) NOT NULL default ''; ",
-"ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default ''; ",
-""
+"ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default ''; "
 };
-        if (!performActualUpdate(updates, "1005", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1005", dbver))
             return false;
     }
 
     if (dbver == "1005")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 "ALTER TABLE gameplayers ADD COLUMN spandisks tinyint(1) NOT NULL default 0; ",
-"ALTER TABLE gamemetadata ADD COLUMN diskcount tinyint(1) NOT NULL default 1; ",
-""
+"ALTER TABLE gamemetadata ADD COLUMN diskcount tinyint(1) NOT NULL default 1; "
 };
-        if (!performActualUpdate(updates, "1006", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1006", dbver))
             return false;
     }
 
@@ -202,31 +153,31 @@ bool UpgradeGameDatabaseSchema(void)
                 MythDB::DBError("update GameAllTreeLevels", query);
         }
 
-        QString updates[] = {
+        DBUpdates updates = {
 "ALTER TABLE gamemetadata ADD COLUMN country varchar(128) NOT NULL default ''; ",
 "ALTER TABLE gamemetadata ADD COLUMN crc_value varchar(64) NOT NULL default ''; ",
-"ALTER TABLE gamemetadata ADD COLUMN display tinyint(1) NOT NULL default 1; ",
-""
+"ALTER TABLE gamemetadata ADD COLUMN display tinyint(1) NOT NULL default 1; "
 };
 
-        if (!performActualUpdate(updates, "1007", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1007", dbver))
             return false;
     }
 
     if (dbver == "1007")
     {
-        const QString updates[] = {
-"ALTER TABLE gameplayers MODIFY commandline TEXT NOT NULL default ''; ",
-""
+        DBUpdates updates {
+"ALTER TABLE gameplayers MODIFY commandline TEXT NOT NULL default ''; "
 };
 
-        if (!performActualUpdate(updates, "1008", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1008", dbver))
             return false;
     }
 
     if (dbver == "1008")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 "CREATE TABLE romdb ("
 "  crc varchar(64) NOT NULL default '',"
 "  name varchar(128) NOT NULL default '',"
@@ -246,56 +197,56 @@ bool UpgradeGameDatabaseSchema(void)
 "  KEY name (name),"
 "  KEY description (description),"
 "  KEY platform (platform)"
-");",
-""
+");"
 };
 
-        if (!performActualUpdate(updates, "1009", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1009", dbver))
             return false;
     }
 
     if (dbver == "1009")
     {
-        const QString updates[] = {
-"ALTER TABLE gamemetadata MODIFY year varchar(10) not null default '';",
-""
+        DBUpdates updates {
+"ALTER TABLE gamemetadata MODIFY year varchar(10) not null default '';"
 };
 
-        if (!performActualUpdate(updates, "1010", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1010", dbver))
             return false;
     }
 
     if (dbver == "1010")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
 "ALTER TABLE gamemetadata ADD COLUMN version varchar(64) NOT NULL default '';",
-"ALTER TABLE gamemetadata ADD COLUMN publisher varchar(128) NOT NULL default '';",
-""
+"ALTER TABLE gamemetadata ADD COLUMN publisher varchar(128) NOT NULL default '';"
 };
 
-        if (!performActualUpdate(updates, "1011", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1011", dbver))
             return false;
     }
 
 
     if (dbver == "1011")
     {
-        const QString updates[] = {
-"ALTER TABLE romdb ADD COLUMN binfile varchar(64) NOT NULL default ''; ",
-""
+        DBUpdates updates {
+"ALTER TABLE romdb ADD COLUMN binfile varchar(64) NOT NULL default ''; "
 };
 
-        if (!performActualUpdate(updates, "1012", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1012", dbver))
             return false;
     }
 
 
     if (dbver == "1012")
     {
-        const QString updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-        .arg(gContext->GetDatabaseParams().m_dbName),
+        DBUpdates updates {
+qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().m_dbName)),
 "ALTER TABLE gamemetadata"
 "  MODIFY `system` varbinary(128) NOT NULL default '',"
 "  MODIFY romname varbinary(128) NOT NULL default '',"
@@ -328,20 +279,20 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
 "  MODIFY platform varbinary(64) NOT NULL default '',"
 "  MODIFY flags varbinary(64) NOT NULL default '',"
 "  MODIFY version varbinary(64) NOT NULL default '',"
-"  MODIFY binfile varbinary(64) NOT NULL default '';",
-""
+"  MODIFY binfile varbinary(64) NOT NULL default '';"
 };
 
-        if (!performActualUpdate(updates, "1013", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1013", dbver))
             return false;
     }
 
 
     if (dbver == "1013")
     {
-        const QString updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-        .arg(gContext->GetDatabaseParams().m_dbName),
+        DBUpdates updates {
+qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().m_dbName)),
 "ALTER TABLE gamemetadata"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY `system` varchar(128) CHARACTER SET utf8 NOT NULL default '',"
@@ -377,75 +328,75 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  MODIFY platform varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY flags varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY version varchar(64) CHARACTER SET utf8 NOT NULL default '',"
-"  MODIFY binfile varchar(64) CHARACTER SET utf8 NOT NULL default '';",
-""
+"  MODIFY binfile varchar(64) CHARACTER SET utf8 NOT NULL default '';"
 };
 
-        if (!performActualUpdate(updates, "1014", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1014", dbver))
             return false;
     }
 
     if (dbver == "1014")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
 "ALTER TABLE gamemetadata ADD fanart VARCHAR(255) NOT NULL AFTER rompath,"
-"ADD boxart VARCHAR( 255 ) NOT NULL AFTER fanart;",
-""
+"ADD boxart VARCHAR( 255 ) NOT NULL AFTER fanart;"
 };
 
-        if (!performActualUpdate(updates, "1015", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1015", dbver))
             return false;
     }
 
     if (dbver == "1015")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
 "ALTER TABLE gamemetadata ADD screenshot VARCHAR(255) NOT NULL AFTER rompath,"
-"ADD plot TEXT NOT NULL AFTER fanart;",
-""
+"ADD plot TEXT NOT NULL AFTER fanart;"
 };
 
-        if (!performActualUpdate(updates, "1016", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1016", dbver))
             return false;
     }
 
     if (dbver == "1016")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
-"ALTER TABLE gamemetadata ADD inetref TEXT AFTER crc_value;",
-""
+"ALTER TABLE gamemetadata ADD inetref TEXT AFTER crc_value;"
 };
 
-        if (!performActualUpdate(updates, "1017", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1017", dbver))
             return false;
     }
 
     if (dbver == "1017")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 
 "ALTER TABLE gamemetadata ADD intid int(11) NOT NULL AUTO_INCREMENT "
-"PRIMARY KEY FIRST;",
-""
+"PRIMARY KEY FIRST;"
 };
 
-        if (!performActualUpdate(updates, "1018", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1018", dbver))
             return false;
     }
 
     if (dbver == "1018")
     {
-        const QString updates[] = {
+        DBUpdates updates {
 "ALTER TABLE romdb MODIFY description varchar(192) CHARACTER SET utf8 NOT NULL default '';",
 "ALTER TABLE romdb MODIFY binfile     varchar(128) CHARACTER SET utf8 NOT NULL default '';",
-"ALTER TABLE romdb MODIFY filesize    int(12) unsigned default NULL;",
-""
+"ALTER TABLE romdb MODIFY filesize    int(12) unsigned default NULL;"
 };
 
-        if (!performActualUpdate(updates, "1019", dbver))
+        if (!performActualUpdate("MythGame", MythGameVersionName,
+                                 updates, "1019", dbver))
             return false;
     }
 

@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _ATSC_TABLES_H_
-#define _ATSC_TABLES_H_
+#ifndef ATSC_TABLES_H
+#define ATSC_TABLES_H
 
 #include <cstdint>  // uint32_t
 #include <QString>
@@ -833,4 +833,4 @@ class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
         { return "<AggregateExtendedTextTable />"; }
 };
 
-#endif // _ATSC_TABLES_H_
+#endif // ATSC_TABLES_H

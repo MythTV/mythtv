@@ -73,7 +73,7 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            VideoMultiplex *pObject = new VideoMultiplex( this );
+            auto *pObject = new VideoMultiplex( this );
             m_VideoMultiplexes.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

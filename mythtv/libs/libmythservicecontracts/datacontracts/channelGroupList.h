@@ -46,7 +46,7 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            ChannelGroup *pObject = new ChannelGroup( this );
+            auto *pObject = new ChannelGroup( this );
             m_ChannelGroups.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

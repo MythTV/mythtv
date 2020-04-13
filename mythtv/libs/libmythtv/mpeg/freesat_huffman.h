@@ -1,5 +1,5 @@
-#ifndef _FREESAT_HUFFMAN_H_
-#define _FREESAT_HUFFMAN_H_
+#ifndef FREESAT_HUFFMAN_H
+#define FREESAT_HUFFMAN_H
 
 // POSIX header
 #include <unistd.h>
@@ -9,4 +9,4 @@
 
 QString freesat_huffman_to_string(const unsigned char *compressed, uint size);
 
-#endif // _FREESAT_HUFFMAN_H_
+#endif // FREESAT_HUFFMAN_H

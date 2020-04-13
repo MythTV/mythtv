@@ -191,7 +191,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     int GetItemPos(MythUIButtonListItem* item) const;
     int GetTopItemPos(void) const { return m_topPosition; }
     int GetCount() const;
-    uint GetVisibleCount();
+    int GetVisibleCount();
     bool IsEmpty() const;
 
     virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
@@ -304,7 +304,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     int m_itemHeight                  {0};
     int m_itemHorizSpacing            {0};
     int m_itemVertSpacing             {0};
-    uint m_itemsVisible               {0};
+    int m_itemsVisible                {0};
     int m_maxVisible                  {0};
     int m_rows                        {0};
     int m_columns                     {0};

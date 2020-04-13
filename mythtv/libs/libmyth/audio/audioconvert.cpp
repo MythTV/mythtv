@@ -604,7 +604,7 @@ public:
             return;
         }
     }
-    int Process(void* out, const void* in, int bytes)
+    int Process(void* out, const void* in, int bytes) const
     {
         if (!m_swr)
             return -1;
@@ -681,9 +681,7 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
         }
         // this leave S24 -> U8/S16.
         // TODO: native handling of those ; use internal temp buffer in the mean time
-
-        // cppcheck-suppress unassignedVariable
-        alignas(16) uint8_t buffer[65536];
+        alignas(16) uint8_t buffer[65536] {0};
         int left        = bytes;
 
         while (left > 0)
@@ -731,7 +729,7 @@ void AudioConvert::MonoToStereo(void* dst, const void* src, int samples)
 }
 
 template <class AudioDataType>
-void _DeinterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames)
+void tDeinterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames)
 {
     AudioDataType* outp[8];
 
@@ -767,20 +765,20 @@ void AudioConvert::DeinterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _DeinterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
+        tDeinterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
     }
     else if (bits == 16)
     {
-        _DeinterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
+        tDeinterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
     }
     else
     {
-        _DeinterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
+        tDeinterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
     }
 }
 
 template <class AudioDataType>
-void _InterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
+void tInterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
                        const AudioDataType*  const* inp = nullptr)
 {
     const AudioDataType* my_inp[8];
@@ -829,17 +827,17 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _InterleaveSample((char*)output, (const char*)nullptr, channels, data_size/sizeof(char)/channels,
+        tInterleaveSample((char*)output, (const char*)nullptr, channels, data_size/sizeof(char)/channels,
                           (const char*  const*)input);
     }
     else if (bits == 16)
     {
-        _InterleaveSample((short*)output, (const short*)nullptr, channels, data_size/sizeof(short)/channels,
+        tInterleaveSample((short*)output, (const short*)nullptr, channels, data_size/sizeof(short)/channels,
                           (const short*  const*)input);
     }
     else
     {
-        _InterleaveSample((int*)output, (const int*)nullptr, channels, data_size/sizeof(int)/channels,
+        tInterleaveSample((int*)output, (const int*)nullptr, channels, data_size/sizeof(int)/channels,
                           (const int*  const*)input);
     }
 }
@@ -855,15 +853,15 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _InterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
+        tInterleaveSample((char*)output, (const char*)input, channels, data_size/sizeof(char)/channels);
     }
     else if (bits == 16)
     {
-        _InterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
+        tInterleaveSample((short*)output, (const short*)input, channels, data_size/sizeof(short)/channels);
     }
     else
     {
-        _InterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
+        tInterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
     }
 }
 

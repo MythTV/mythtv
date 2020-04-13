@@ -1,13 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "../config.h"
 #ifdef HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
 #endif
 
-#include <inttypes.h>
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "goom_core.h"
 #include "goom_tools.h"
@@ -18,10 +17,6 @@
 //#include "gfontlib.h"
 
 //#define VERBOSE
-
-#ifdef VERBOSE
-#include <stdio.h>
-#endif
 
 #define STOP_SPEED 128
 
@@ -35,7 +30,7 @@ static guint32 *back;
 static guint32 *p1, *p2, *tmp;
 static guint32 cycle;
 
-typedef struct {
+struct GoomState {
 	int m_drawIfs;
 	int m_drawPoints;
 	int m_drawTentacle;
@@ -45,7 +40,7 @@ typedef struct {
 
 	int m_rangeMin;
 	int m_rangeMax;
-} GoomState;
+};
 
 #define STATES_NB 8
 #define STATES_RANGEMAX 510
@@ -65,8 +60,8 @@ GoomState *curGState = states+4;
 guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
 // effet de ligne..
-static GMLine *gmline1 = NULL;
-static GMLine *gmline2 = NULL;
+static GMLine *gmline1 = nullptr;
+static GMLine *gmline2 = nullptr;
 
 void    choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far);
 
@@ -169,11 +164,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	static char s_goomLimit = 2;		// sensibilité du goom
 	static ZoomFilterData s_zfd = {
 		127, 8, 16,
-		1, 1, 0, NORMAL_MODE,
-		0, 0, 0, 0, 0
+		1, 1, false, NORMAL_MODE,
+		0, 0, false, false, 0
 	};
 
-	ZoomFilterData *pzfd = NULL;
+	ZoomFilterData *pzfd = nullptr;
 
 	/* test if the config has changed, update it if so */
 	guint32 pointWidth = (resolx * 2) / 5;
@@ -267,7 +262,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	}
 
 	// par défaut pas de changement de zoom
-	pzfd = NULL;
+	pzfd = nullptr;
 
 	/* 
 	 * Test forceMode
@@ -328,12 +323,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			s_zfd.hypercosEffect = iRAND (2);
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
-			// fall through
+			[[clang::fallthrough]];
                     case 13:
                     case 20:
                     case 21:
 			s_zfd.mode = WAVE_MODE;
-			s_zfd.reverse = 0;
+			s_zfd.reverse = false;
 			s_zfd.waveEffect = (iRAND (3) == 0);
 			if (iRAND (2))
                             s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
@@ -341,38 +336,38 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                     case 1:
                     case 11:
 			s_zfd.mode = CRYSTAL_BALL_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 2:
                     case 12:
 			s_zfd.mode = AMULETTE_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 3:
 			s_zfd.mode = WATER_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 4:
                     case 14:
 			s_zfd.mode = SCRUNCH_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 5:
                     case 15:
                     case 22:
 			s_zfd.mode = HYPERCOS1_MODE;
-			s_zfd.waveEffect = 0;
+			s_zfd.waveEffect = false;
 			s_zfd.hypercosEffect = (iRAND (3) == 0);
 			break;
                     case 6:
                     case 16:
 			s_zfd.mode = HYPERCOS2_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
 			break;
                     case 7:
                     case 17:
@@ -384,8 +379,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                     case 18:
                     case 19:
 			s_zfd.mode = SCRUNCH_MODE;
-			s_zfd.waveEffect = 1;
-			s_zfd.hypercosEffect = 1;
+			s_zfd.waveEffect = true;
+			s_zfd.hypercosEffect = true;
 			break;
                     case 29:
                     case 30:
@@ -397,8 +392,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			break;
                     default:
 			s_zfd.mode = NORMAL_MODE;
-			s_zfd.waveEffect = 0;
-			s_zfd.hypercosEffect = 0;
+			s_zfd.waveEffect = false;
+			s_zfd.hypercosEffect = false;
                     }
                 }
 	}
@@ -449,12 +444,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                                 // Pseudo-random is good enough. Don't need a true random.
                                 // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
-					s_zfd.reverse = 0;
+					s_zfd.reverse = false;
 					s_zfd.vitesse = STOP_SPEED - 2;
 					s_lockVar = 75;
 				}
 				if (iRAND (10) == 0) {
-					s_zfd.reverse = 1;
+					s_zfd.reverse = true;
 					s_lockVar = 100;
 				}
 
@@ -628,13 +623,13 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	}
 
 	if (forceMode == -1) {
-		pzfd = NULL;
+		pzfd = nullptr;
 	}
 
 	/*
 	 * Changement d'effet de zoom !
 	 */
-	if (pzfd != NULL) {
+	if (pzfd != nullptr) {
 		static int s_exvit = 128;
 
 		s_nombreCddc = 0;
@@ -857,11 +852,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 }
 
 void goom_close () {
-	if (pixel != NULL)
+	if (pixel != nullptr)
 		free (pixel);
-	if (back != NULL)
+	if (back != nullptr)
 		free (back);
-	pixel = back = NULL;
+	pixel = back = nullptr;
 	RAND_CLOSE ();
 	release_ifs ();
 	goom_lines_free (&gmline1);
@@ -919,7 +914,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 
 /*
 void goom_set_font (int ***chars, int *width, int *height) {
-    if (chars == NULL)
+    if (chars == nullptr)
         return ;
 }
 */

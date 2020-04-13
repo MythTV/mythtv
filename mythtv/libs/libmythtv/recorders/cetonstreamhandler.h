@@ -5,8 +5,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _CETONSTREAMHANDLER_H_
-#define _CETONSTREAMHANDLER_H_
+#ifndef CETONSTREAMHANDLER_H
+#define CETONSTREAMHANDLER_H
 
 // Qt headers
 #include <QString>
@@ -81,4 +81,4 @@ class CetonStreamHandler : public IPTVStreamHandler
     static QMap<QString, bool>                  s_infoQueried;
 };
 
-#endif // _CETONSTREAMHANDLER_H_
+#endif // CETONSTREAMHANDLER_H

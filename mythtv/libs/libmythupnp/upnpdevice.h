@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPDEVICE_H__
-#define __UPNPDEVICE_H__
+#ifndef UPNPDEVICE_H
+#define UPNPDEVICE_H
 
 #include <utility>
 
@@ -129,7 +129,7 @@ class UPNP_PUBLIC UPnpDevice
 
         QString GetUDN(void) const;
 
-        void toMap(InfoMap &map);
+        void toMap(InfoMap &map) const;
 
         UPnpService GetService(const QString &urn, bool *found = nullptr) const;
 
@@ -173,7 +173,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static QString  FormatValue ( const QString &sName, const QString &sValue );
         static QString  FormatValue ( const QString &sName, int nValue );
 
-        QString  GetHostName ();
+        QString  GetHostName () const;
 
     public:
 
@@ -193,7 +193,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
         static UPnpDeviceDesc *Retrieve  ( QString &sURL );
 
-        void toMap(InfoMap &map)
+        void toMap(InfoMap &map) const
         {
             map["hostname"] = m_sHostName;
             m_rootDevice.toMap(map);
@@ -331,4 +331,4 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         }
 };
 
-#endif
+#endif // UPNPDEVICE_H

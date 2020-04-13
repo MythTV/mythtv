@@ -1,43 +1,25 @@
 #ifndef MYTHLOGGING_H_
 #define MYTHLOGGING_H_
 
-#ifdef __cplusplus
 #include <QString>
 #include <QStringList>
 #include <cstdint>
 #include <cerrno>
-#else
-#include <stdint.h>
-#include <errno.h>
-#endif
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // Helper for checking verbose mask & level outside of LOG macro
 #define VERBOSE_LEVEL_NONE        (verboseMask == 0)
-#ifdef __cplusplus
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
     (componentLogLevel.contains(_MASK_) ?                               \
      (*(componentLogLevel.find(_MASK_)) >= (_LEVEL_)) :                   \
      (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_)))
-#else
-#define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
-    (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_))
-#endif
 
 #define VERBOSE please_use_LOG_instead_of_VERBOSE
 
-// There are two LOG macros now.  One for use with Qt/C++, one for use
-// without Qt.
-//
-// Neither of them will lock the calling thread other than momentarily to put
+// This doesn't lock the calling thread other than momentarily to put
 // the log message onto a queue.
-#ifdef __cplusplus
 #define LOG(_MASK_, _LEVEL_, _QSTRING_)                                 \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
@@ -47,46 +29,24 @@ extern "C" {
                          _QSTRING_);                                    \
         }                                                               \
     } while (false)
-#else
-#define LOG(_MASK_, _LEVEL_, _FORMAT_, ...)                             \
-    do {                                                                \
-        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
-        {                                                               \
-            LogPrintLineC(_MASK_, _LEVEL_,                              \
-                         __FILE__, __LINE__, __FUNCTION__,              \
-                         (const char *)_FORMAT_, ##__VA_ARGS__);        \
-        }                                                               \
-    } while (0)
-#endif
 
 /* Define the external prototype */
-#ifdef __cplusplus
 MBASE_PUBLIC void LogPrintLine( uint64_t mask, LogLevel_t level,
                                 const char *file, int line,
                                 const char *function,
                                 QString message);
-extern "C" {
-#endif
-MBASE_PUBLIC void LogPrintLineC( uint64_t mask, LogLevel_t level,
-                                 const char *file, int line,
-                                 const char *function,
-                                 const char *format, ...);
-#ifdef __cplusplus
-}
-#endif
 
 extern MBASE_PUBLIC LogLevel_t logLevel;
 extern MBASE_PUBLIC uint64_t   verboseMask;
 
-#ifdef __cplusplus
 extern MBASE_PUBLIC ComponentLogLevelMap componentLogLevel;
-}
 
 extern MBASE_PUBLIC QStringList logPropagateArgList;
 extern MBASE_PUBLIC QString     logPropagateArgs;
 extern MBASE_PUBLIC QString     verboseString;
 
-MBASE_PUBLIC void logStart(const QString& logfile, int progress = 0, int quiet = 0,
+MBASE_PUBLIC void logStart(const QString& logfile, bool progress = false,
+                           int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
                            bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);
@@ -108,7 +68,6 @@ MBASE_PUBLIC QString logStrerror(int errnum);
 /// next line in the verbose output.
 #define ENO (QString("\n\t\t\teno: ") + logStrerror(errno))
 #define ENO_STR ENO.toLocal8Bit().constData()
-#endif // __cplusplus
 
 #endif
 

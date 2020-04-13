@@ -106,7 +106,7 @@ int read_avi_header( avi_context *ac, int fd);
 void get_avi(pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p));
 int avi_read_index(avi_context *ac, int fd);
 int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac, 
-		       void (*func)(pes_in_t *p), int insize);
+		       void (*func)(pes_in_t *p), uint32_t insize);
 
 
 #endif /* _AVI_H_ */

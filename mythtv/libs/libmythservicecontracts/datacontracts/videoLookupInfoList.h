@@ -71,7 +71,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            VideoLookup *pObject = new VideoLookup( this );
+            auto *pObject = new VideoLookup( this );
             m_VideoLookups.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

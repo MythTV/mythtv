@@ -19,9 +19,9 @@ macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
 SOURCES += main.cpp transcode.cpp mpeg2fix.cpp
 SOURCES += audioreencodebuffer.cpp cutter.cpp videodecodebuffer.cpp
 SOURCES += commandlineparser.cpp
-SOURCES += external/replex/element.c external/replex/mpg_common.c
-SOURCES += external/replex/multiplex.c external/replex/pes.c
-SOURCES += external/replex/ringbuffer.c external/replex/ts.c
+SOURCES += external/replex/element.cpp external/replex/mpg_common.cpp
+SOURCES += external/replex/multiplex.cpp external/replex/pes.cpp
+SOURCES += external/replex/ringbuffer.cpp external/replex/ts.cpp
 
 HEADERS += mpeg2fix.h transcodedefs.h commandlineparser.h
 HEADERS += audioreencodebuffer.h cutter.h videodecodebuffer.h

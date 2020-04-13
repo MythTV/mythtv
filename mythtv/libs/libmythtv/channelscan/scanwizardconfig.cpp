@@ -134,7 +134,7 @@ void ScanWizard::SetPaneDefaults(const QString &cardid_inputname)
         MythDB::DBError("ScanOptionalConfig::SetPaneDefaults", query);
         return;
     }
-    else if (query.next())
+    if (query.next())
     {
         scanfrequency = query.value(0).toUInt();
         freqtable = query.value(1).toString();

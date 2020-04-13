@@ -2,6 +2,7 @@
 #define MYTHPLAYER_H
 
 #include <cstdint>
+#include <utility>
 
 #include <QCoreApplication>
 #include <QList>
@@ -136,7 +137,7 @@ class DecoderCallback
   public:
     using Callback = void (*)(void*, void*, void*);
     DecoderCallback() = default;
-    DecoderCallback(const QString &Debug, Callback Function, QAtomicInt *Ready,
+    DecoderCallback(QString Debug, Callback Function, QAtomicInt *Ready,
                     void *Opaque1, void *Opaque2, void *Opaque3)
       : m_debug(std::move(Debug)),
         m_function(Function),
@@ -155,6 +156,10 @@ class DecoderCallback
     void* m_opaque3     { nullptr };
 };
 
+// Padding between class members reduced from 113 to 73 bytes, but its
+// still higher than the default warning threshhold of 24 bytes.
+//
+// NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
 class MTV_PUBLIC MythPlayer
 {
     Q_DECLARE_TR_FUNCTIONS(MythPlayer)
@@ -213,7 +218,7 @@ class MTV_PUBLIC MythPlayer
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
     void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void)
-        { return !(FlagIsSet(kVideoIsNull)) && m_playerCtx->IsAudioNeeded(); }
+        { return ((FlagIsSet(kVideoIsNull)) == 0) && m_playerCtx->IsAudioNeeded(); }
     uint    GetVolume(void) { return m_audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
@@ -555,7 +560,7 @@ class MTV_PUBLIC MythPlayer
     bool ToggleCaptions(uint type);
     bool HasTextSubtitles(void)        { return m_subReader.HasTextSubtitles(); }
     void SetCaptionsEnabled(bool enable, bool osd_msg=true);
-    bool GetCaptionsEnabled(void);
+    bool GetCaptionsEnabled(void) const;
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
     virtual void EnableCaptions(uint mode, bool osd_msg=true);
 
@@ -591,7 +596,7 @@ class MTV_PUBLIC MythPlayer
   protected:
     // Private initialization stuff
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
-                                  float fps, int video_height);
+                                  float fps, int video_height) const;
     virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
 
     // Private Sets
@@ -658,7 +663,6 @@ class MTV_PUBLIC MythPlayer
     void  JumpToStream(const QString &stream);
 
   protected:
-    PlayerFlags      m_playerFlags;
     DecoderBase     *m_decoder            {nullptr};
     QMutex           m_decoderCallbackLock;
     QVector<DecoderCallback> m_decoderCallbacks;
@@ -667,34 +671,34 @@ class MTV_PUBLIC MythPlayer
     PlayerContext   *m_playerCtx          {nullptr};
     DecoderThread   *m_decoderThread      {nullptr};
     QThread         *m_playerThread       {nullptr};
-
 #ifdef Q_OS_ANDROID
     int            m_playerThreadId       {0};
 #endif
+    PlayerFlags      m_playerFlags;
 
     // Window stuff
     MythDisplay* m_display                {nullptr};
     QWidget *m_parentWidget               {nullptr};
-    bool     m_embedding                  {false};
     QRect    m_embedRect                  {0,0,0,0};
+    bool     m_embedding                  {false};
 
     // State
     QWaitCondition m_decoderThreadPause;
     QWaitCondition m_decoderThreadUnpause;
     mutable QMutex m_decoderPauseLock;
     mutable QMutex m_decoderSeekLock;
+    mutable QMutex m_bufferPauseLock;
+    mutable QMutex m_videoPauseLock;
+    mutable QMutex m_pauseLock;
+    int64_t        m_decoderSeek            {-1};
     bool           m_totalDecoderPause      {false};
     bool           m_decoderPaused          {false};
     bool           m_inJumpToProgramPause   {false};
     bool           m_pauseDecoder           {false};
     bool           m_unpauseDecoder         {false};
     bool volatile  m_killDecoder            {false};
-    int64_t        m_decoderSeek            {-1};
     bool           m_decodeOneFrame         {false};
     bool           m_needNewPauseFrame      {false};
-    mutable QMutex m_bufferPauseLock;
-    mutable QMutex m_videoPauseLock;
-    mutable QMutex m_pauseLock;
     bool           m_bufferPaused           {false};
     bool           m_videoPaused            {false};
     bool           m_allPaused              {false};
@@ -703,15 +707,15 @@ class MTV_PUBLIC MythPlayer
     mutable QWaitCondition m_playingWaitCond;
     mutable QMutex m_vidExitLock;
     mutable QMutex m_playingLock;
+    mutable QMutex   m_errorLock;
+    QString  m_errorMsg;   ///< Reason why NVP exited with a error
+    int m_errorType                       {kError_None};
     bool     m_doubleFramerate            {false};///< Output fps is double Video (input) rate
     bool     m_liveTV                     {false};
     bool     m_watchingRecording          {false};
     bool     m_transcoding                {false};
     bool     m_hasFullPositionMap         {false};
     mutable bool     m_limitKeyRepeat     {false};
-    mutable QMutex   m_errorLock;
-    QString  m_errorMsg;   ///< Reason why NVP exited with a error
-    int m_errorType                       {kError_None};
 
     // Chapter stuff
     int m_jumpChapter                     {0};
@@ -745,24 +749,24 @@ class MTV_PUBLIC MythPlayer
     // -- end state stuff --
 
     // Input Video Attributes
+    double   m_videoFrameRate            {29.97};///< Video (input) Frame Rate (often inaccurate)
+    /// Codec Name - used by playback profile
+    QString  m_codecName;
     QSize    m_videoDispDim              {0,0}; ///< Video (input) width & height
     QSize    m_videoDim                  {0,0}; ///< Video (input) buffer width & height
     int      m_maxReferenceFrames        {0}; ///< Number of reference frames used in the video stream
-    double   m_videoFrameRate            {29.97};///< Video (input) Frame Rate (often inaccurate)
     float    m_videoAspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
     float    m_forcedVideoAspect         {-1};
 
+    long long     m_scanTracker          { 0 };
     FrameScanType m_resetScan            { kScan_Ignore     };
     FrameScanType m_scan                 { kScan_Interlaced };
     FrameScanType m_scanOverride         { kScan_Detect     };
     bool          m_scanLocked           { false };
     bool          m_scanInitialized      { false };
-    long long     m_scanTracker          { 0 };
 
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     m_keyframeDist              {30};
-    /// Codec Name - used by playback profile
-    QString  m_codecName;
 
     // Buffering
     bool     m_buffering                  {false};
@@ -797,12 +801,12 @@ class MTV_PUBLIC MythPlayer
     CC708Reader m_cc708;
 
     // Support for MHEG/MHI
-    bool       m_itvVisible               {false};
     InteractiveTV *m_interactiveTV        {nullptr};
-    bool       m_itvEnabled               {false};
     QMutex     m_itvLock;
     QMutex     m_streamLock;
     QString    m_newStream; // Guarded by streamLock
+    bool       m_itvVisible               {false};
+    bool       m_itvEnabled               {false};
 
     // OSD stuff
     OSD    *m_osd                         {nullptr};
@@ -815,47 +819,45 @@ class MTV_PUBLIC MythPlayer
 
     // Picture-in-Picture
     PIPMap         m_pipPlayers;
+    PIPLocation    m_pipDefaultLoc;
     volatile bool  m_pipActive            {false};
     volatile bool  m_pipVisible           {true};
-    PIPLocation    m_pipDefaultLoc;
 
     // Commercial filtering
     CommBreakMap   m_commBreakMap;
     bool       m_forcePositionMapSync     {false};
     // Manual editing
     DeleteMap  m_deleteMap;
-    bool       m_pausedBeforeEdit         {false};
     QElapsedTimer m_editUpdateTimer;
     float      m_speedBeforeEdit          {1.0F};
+    bool       m_pausedBeforeEdit         {false};
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
     QMutex     m_decoderLock              {QMutex::Recursive};
     float      m_nextPlaySpeed            {1.0F};
-    bool       m_nextNormalSpeed        {true};
-
     float      m_playSpeed                {1.0F};
-    bool       m_normalSpeed              {true};
     int        m_frameInterval            {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
     int        m_frameIntervalPrev        {0}; ///< used to detect changes to frame_interval
     int        m_fpsMultiplier            {1}; ///< used to detect changes
-
     int        m_ffrewSkip                {1};
     int        m_ffrewAdjust              {0};
     bool       m_fileChanged              {false};
+    bool       m_nextNormalSpeed          {true};
+    bool       m_normalSpeed              {true};
 
     // Audio and video synchronization stuff
+    bool       m_avsyncAudioPaused        {false};
     int        m_avsyncAvg                {0};
     int64_t    m_dispTimecode             {0};
-    bool       m_avsyncAudioPaused        {false};
     int64_t    m_rtcBase                  {0}; // real time clock base for presentation time (microsecs)
     int64_t    m_maxTcVal                 {0}; // maximum to date video tc
-    int        m_maxTcFrames              {0}; // number of frames seen since max to date tc
-    int        m_numDroppedFrames         {0}; // number of consecutive dropped frames.
     int64_t    m_priorAudioTimecode       {0}; // time code from prior frame
     int64_t    m_priorVideoTimecode       {0}; // time code from prior frame
-    float      m_lastFix                  {0.0F}; //last sync adjustment to prior frame
     int64_t    m_timeOffsetBase           {0};
+    int        m_maxTcFrames              {0}; // number of frames seen since max to date tc
+    int        m_numDroppedFrames         {0}; // number of consecutive dropped frames.
+    float      m_lastFix                  {0.0F}; //last sync adjustment to prior frame
 
     // Time Code stuff
     int        m_prevTc                   {0}; ///< 32 bit timecode if last VideoFrame shown

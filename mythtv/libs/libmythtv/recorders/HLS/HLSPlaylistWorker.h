@@ -1,5 +1,5 @@
-#ifndef _HLS_Playlist_Worker_h
-#define _HLS_Playlist_Worker_h
+#ifndef HLS_PLAYLIST_WORKER_H
+#define HLS_PLAYLIST_WORKER_H
 
 #include <QWaitCondition>
 #include <QMutex>
@@ -29,4 +29,4 @@ class HLSPlaylistWorker : public MThread
     QMutex          m_lock;
 };
 
-#endif
+#endif // HLS_PLAYLIST_WORKER_H

@@ -76,7 +76,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         m_dbSettings[kPictureAttribute_Contrast]   = gCoreContext->GetNumSetting("PlaybackContrast",   50);
         m_dbSettings[kPictureAttribute_Colour]     = gCoreContext->GetNumSetting("PlaybackColour",     50);
         m_dbSettings[kPictureAttribute_Hue]        = gCoreContext->GetNumSetting("PlaybackHue",        0);
-        m_dbSettings[kPictureAttribute_Range]      = gCoreContext->GetBoolSetting("GUIRGBLevels",      true);
+        m_dbSettings[kPictureAttribute_Range]      = static_cast<int>(gCoreContext->GetBoolSetting("GUIRGBLevels", true));
         m_primariesMode = toPrimariesMode(gCoreContext->GetSetting("ColourPrimariesMode", "auto"));
     }
 
@@ -84,7 +84,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     SetContrast(m_dbSettings[kPictureAttribute_Contrast]);
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
-    SetFullRange(m_dbSettings[kPictureAttribute_Range]);
+    SetFullRange(m_dbSettings[kPictureAttribute_Range] != 0);
 
     // This isn't working as intended (most notable on OSX internal display).
     // Presumably the driver is expecting sRGB/Rec709 and handles any final
@@ -455,12 +455,12 @@ QMatrix4x4 VideoColourSpace::GetPrimaryMatrix(void)
     return m_primaryMatrix;
 }
 
-float VideoColourSpace::GetColourGamma(void)
+float VideoColourSpace::GetColourGamma(void) const
 {
     return m_colourGamma;
 }
 
-float VideoColourSpace::GetDisplayGamma(void)
+float VideoColourSpace::GetDisplayGamma(void) const
 {
     return m_displayGamma;
 }

@@ -13,7 +13,7 @@
 #include <mythmainwindow.h>
 
 // MythNews headers
-#include "dbcheck.h"
+#include "newsdbcheck.h"
 #include "mythnews.h"
 #include "mythnewsconfig.h"
 

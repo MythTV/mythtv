@@ -47,28 +47,28 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     bool      GetNameAndSerialNum  (QString& Name, QString& SerialNumber) override;
 
     int       GetTitle             (void) const;
-    bool      DVDWaitingForPlayer  (void);
+    bool      DVDWaitingForPlayer  (void) const;
     int       GetPart              (void) const;
     int       GetCurrentAngle      (void) const;
-    int       GetNumAngles         (void);
-    long long GetTotalReadPosition (void);
+    int       GetNumAngles         (void) const;
+    long long GetTotalReadPosition (void) const;
     uint      GetChapterLength     (void) const;
     void      GetChapterTimes      (QList<long long> &Times);
     uint64_t  GetChapterTimes      (int Title);
-    void      GetDescForPos        (QString &Description);
+    void      GetDescForPos        (QString &Description) const;
     void      GetPartAndTitle      (int &Part, int &Title) const;
-    uint      GetTotalTimeOfTitle  (void);
-    float     GetAspectOverride    (void);
-    uint      GetCellStart         (void);
+    uint      GetTotalTimeOfTitle  (void) const;
+    float     GetAspectOverride    (void) const;
+    uint      GetCellStart         (void) const;
     bool      PGCLengthChanged     (void);
     bool      CellChanged          (void);
     bool      IsStillFramePending  (void) const;
-    bool      AudioStreamsChanged  (void);
+    bool      AudioStreamsChanged  (void) const;
     bool      IsWaiting            (void) const;
     int       NumPartsInTitle      (void) const;
     void      GetMenuSPUPkt        (uint8_t *Buffer, int Size, int StreamID, uint32_t StartTime);
-    uint32_t  AdjustTimestamp      (uint32_t Timestamp);
-    int64_t   AdjustTimestamp      (int64_t  Timestamp);
+    uint32_t  AdjustTimestamp      (uint32_t Timestamp) const;
+    int64_t   AdjustTimestamp      (int64_t  Timestamp) const;
     MythDVDContext* GetDVDContext  (void);
     int32_t   GetLastEvent         (void) const;
     AVSubtitle* GetMenuSubtitle    (uint &Version);
@@ -76,7 +76,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     QRect     GetButtonCoords      (void);
     void      ReleaseMenuButton    (void);
     uint      GetSubtitleLanguage  (int Id);
-    int       GetSubtitleTrackNum  (uint StreamId);
+    int8_t    GetSubtitleTrackNum  (uint StreamId);
     bool      DecodeSubtitles      (AVSubtitle* Subtitle, int* GotSubtitles,
                                     const uint8_t* SpuPkt, int BufSize, uint32_t StartTime);
     uint      GetAudioLanguage     (int Index);
@@ -85,8 +85,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     bool      GetDVDStateSnapshot  (QString& State);
     bool      RestoreDVDStateSnapshot(QString& State);
     double    GetFrameRate         (void);
-    bool      StartOfTitle         (void);
-    bool      EndOfTitle           (void);
+    bool      StartOfTitle         (void) const;
+    bool      EndOfTitle           (void) const;
     void      PlayTitleAndPart     (int Title, int Part);
     void      CloseDVD             (void);
     bool      PlayTrack            (int Track);
@@ -107,7 +107,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int64_t   GetCurrentTime       (void);
     uint      TitleTimeLeft        (void);
     void      SetTrack             (uint Type, int TrackNo);
-    int       GetTrack             (uint Type);
+    int       GetTrack             (uint Type) const;
     uint16_t  GetNumAudioChannels  (int Index);
     void      SetDVDSpeed          (void);
     void      SetDVDSpeed          (int Speed);

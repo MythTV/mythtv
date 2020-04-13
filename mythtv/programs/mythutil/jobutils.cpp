@@ -49,7 +49,7 @@ static int QueueJob(const MythUtilCommandLineParser &cmdline)
     
     bool result = JobQueue::QueueJob(jobType,
         pginfo.GetChanID(), pginfo.GetRecordingStartTime(), "", "", "",
-        rebuildSeektable, JOB_QUEUED, QDateTime());
+        static_cast<int>(rebuildSeektable), JOB_QUEUED, QDateTime());
 
     if (result)
     {

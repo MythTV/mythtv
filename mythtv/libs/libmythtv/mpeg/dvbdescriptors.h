@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _DVB_DESCRIPTORS_H_
-#define _DVB_DESCRIPTORS_H_
+#ifndef DVB_DESCRIPTORS_H
+#define DVB_DESCRIPTORS_H
 
 #include <cassert>
 
@@ -631,7 +631,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     uint CountryCount(void) const { return ((DescriptorLength() - 1) / 3); }
 
     // country_avail_flag       1   2.0
-    bool IsAvailable(void) const { return (m_data[2] & 0x1); }
+    bool IsAvailable(void) const { return (m_data[2] & 0x1) != 0; }
     // reserved_future_use      7   2.1
     //
     // for (i=0; i<N; i++)
@@ -651,7 +651,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("CountryAvailabilityDescriptor: Available(%1) in (%2)")
-            .arg(IsAvailable()).arg(CountryNames());
+            .arg(static_cast<int>(IsAvailable())).arg(CountryNames());
     }
 };
 
@@ -730,6 +730,8 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     }
     unsigned long long FrequencyHz(void) const
     {
+        if (m_data == nullptr)
+            return 0;
         return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
     }
     // reserved_future_use     12   6.0
@@ -831,11 +833,10 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         static QString ps[] = { "h", "v", "l", "r" };
         return ps[Polarization()];
     }
-    bool IsCircularPolarization(void) const { return (m_data[8]>>6)&0x1; }
-    bool IsLinearPolarization(void) const { return !((m_data[8]>>6)&0x1); }
-    bool IsHorizontalLeftPolarization(void) const { return (m_data[8]>>5)&0x1; }
-    bool IsVerticalRightPolarization(void) const
-        { return !((m_data[8]>>5)&0x1); }
+    bool IsCircularPolarization(void) const       { return ((m_data[8]>>6)&0x1) != 0; }
+    bool IsLinearPolarization(void) const         { return ((m_data[8]>>6)&0x1) == 0; }
+    bool IsHorizontalLeftPolarization(void) const { return ((m_data[8]>>5)&0x1) != 0; }
+    bool IsVerticalRightPolarization(void) const  { return ((m_data[8]>>5)&0x1) == 0; }
     // roll off                 2   8.3
     enum
     {
@@ -936,9 +937,9 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     // priority                 1   6.3
     bool HighPriority(void) const { return ( m_data[6] & 0x10 ) != 0; }
     // time_slicing_indicator   1   6.4
-    bool IsTimeSlicingIndicatorUsed(void) const { return !(m_data[6] & 0x08); }
+    bool IsTimeSlicingIndicatorUsed(void) const { return (m_data[6] & 0x08) == 0; }
     // MPE-FEC_indicator        1   6.5
-    bool IsMPE_FECUsed(void) const { return !(m_data[6] & 0x04); }
+    bool IsMPE_FECUsed(void) const { return (m_data[6] & 0x04) == 0; }
     // reserved_future_use      2   6.6
     // constellation            2   7.0
     enum
@@ -1035,7 +1036,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return tm[TransmissionMode()];
     }
     // other_frequency_flag     1   8.7
-    bool OtherFrequencyInUse(void) const { return m_data[8] & 0x1; }
+    bool OtherFrequencyInUse(void) const { return (m_data[8] & 0x1) != 0; }
     // reserved_future_use     32   9.0
 
     QString toString(void) const override; // MPEGDescriptor
@@ -1209,7 +1210,7 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     //   local_time_off_polarity 1   3.7+p
     /// -1 if true, +1 if false (behind utc, ahead of utc, resp).
     bool LocalTimeOffsetPolarity(uint i) const
-        { return m_data[2 + i*13 + 3] & 0x01; }
+        { return (m_data[2 + i*13 + 3] & 0x01) != 0; }
     //   local_time_offset     16   4.0+p
     uint LocalTimeOffset(uint i) const
         { return (m_data[2 + i*13 + 4] << 8) | m_data[2 + i*13 + 5]; }
@@ -2511,4 +2512,4 @@ class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
     }
 };
 
-#endif
+#endif // DVB_DESCRIPTORS_H

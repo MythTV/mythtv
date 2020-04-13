@@ -12,13 +12,15 @@
 
 //#define _DEBUG_PIXEL;
 
+#include <cinttypes>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+
 #include "filters.h"
-#include "graphic.h"
 #include "goom_tools.h"
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-#include <inttypes.h>
+#include "graphic.h"
+#include "goom/zoom_filters.h"
 
 #ifdef MMX
 #define USE_ASM
@@ -39,11 +41,6 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 static void select_zoom_filter (void);
 
 #ifdef MMX
-
-void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_xmmx_supported (void);
-void    zoom_filter_mmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_mmx_supported (void);
 
 static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
@@ -93,15 +90,15 @@ extern const void ppc_zoom (unsigned int *frompixmap, unsigned int *topixmap, un
 #endif /* ASM */
 
 
-unsigned int *coeffs = 0, *freecoeffs = 0;
+unsigned int *coeffs = nullptr, *freecoeffs = nullptr;
 
-signed int *brutS = 0, *freebrutS = 0;	// source
-signed int *brutD = 0, *freebrutD = 0;	// dest
-signed int *brutT = 0, *freebrutT = 0;	// temp (en cours de génération)
+signed int *brutS = nullptr, *freebrutS = nullptr;	// source
+signed int *brutD = nullptr, *freebrutD = nullptr;	// dest
+signed int *brutT = nullptr, *freebrutT = nullptr;	// temp (en cours de génération)
 
 // TODO : virer
-guint32 *expix1 = 0;						// pointeur exporte vers p1
-guint32 *expix2 = 0;						// pointeur exporte vers p2
+guint32 *expix1 = nullptr;				// pointeur exporte vers p1
+guint32 *expix2 = nullptr;				// pointeur exporte vers p2
 // fin TODO
 
 guint32 zoom_width;
@@ -111,8 +108,8 @@ unsigned int     prevX = 0, prevY = 0;
 static int sintable[0x10000];
 static int vitesse = 127;
 static char theMode = AMULETTE_MODE;
-static int waveEffect = 0;
-static int hypercosEffect = 0;
+static bool waveEffect = false;
+static bool hypercosEffect = false;
 static int vPlaneEffect = 0;
 static int hPlaneEffect = 0;
 static char noisify = 2;
@@ -134,7 +131,7 @@ int     buffratio = 0;
 // faire : a / sqrtperte <=> a >> PERTEDEC
 #define PERTEDEC 4
 
-static int *firedec = 0;
+static int *firedec = nullptr;
 
 
 // retourne x>>s , en testant le signe de x
@@ -375,7 +372,7 @@ getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 /*inline*/ void
 getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
 {
-	register unsigned char *tmp8 = NULL;
+	unsigned char *tmp8 = nullptr;
 
 #ifdef _DEBUG
 	if (x >= resolx * c_resoly) {
@@ -404,7 +401,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
              unsigned int lprevX, unsigned int lprevY,
              const signed int *lbrutS, const signed int *lbrutD)
 {
-	Color   couleur;
+	Color   couleur {};
 //	unsigned int coefv, coefh;
 
 	unsigned int ax = (lprevX - 1) << PERTEDEC;
@@ -416,10 +413,10 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
 	for (int myPos = 0; myPos < bufsize; myPos += 2) {
-		Color   col1;
-		Color   col2;
-		Color   col3;
-		Color   col4;
+		Color   col1 {};
+		Color   col2 {};
+		Color   col3 {};
+		Color   col4 {};
 		int     brutSmypos = lbrutS[myPos];
 
 		int myPos2 = myPos + 1;
@@ -511,28 +508,28 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 		if (brutS)
 			free (freebrutS);
-		brutS = 0;
+		brutS = nullptr;
 		if (brutD)
 			free (freebrutD);
-		brutD = 0;
+		brutD = nullptr;
 		if (brutT)
 			free (freebrutT);
-		brutT = 0;
+		brutT = nullptr;
 
 		middleX = resx / 2;
 		middleY = resy - 1;
 		s_firstTime = 1;
 		if (firedec)
 			free (firedec);
-		firedec = 0;
+		firedec = nullptr;
 	}
 
 	if (s_interlaceStart != -2)
-		zf = NULL;
+		zf = nullptr;
 
 	/** changement de config **/
 	if (zf) {
-		static char s_reverse = 0;			// vitesse inversé..(zoom out)
+		static bool s_reverse = false;	// vitesse inversé..(zoom out)
 		s_reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (s_reverse)

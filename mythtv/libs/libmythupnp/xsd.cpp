@@ -105,7 +105,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
     if (!pRequest->m_mapParams.contains( "raw" ))
     {
         appendChild( createProcessingInstruction( "xml-stylesheet",
-                        "type=\"text/xsl\" href=\"/xslt/enum.xslt\"" ));
+                        R"(type="text/xsl" href="/xslt/enum.xslt")" ));
     }
 
     // ----------------------------------------------------------------------
@@ -258,7 +258,7 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     if (!pRequest->m_mapParams.contains( "raw" ))
     {
         appendChild( createProcessingInstruction( "xml-stylesheet",
-                        "type=\"text/xsl\" href=\"/xslt/class.xslt\"" ));
+                        R"(type="text/xsl" href="/xslt/class.xslt")" ));
     }
 
     if (bIsArray)

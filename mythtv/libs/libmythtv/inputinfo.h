@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _INPUTINFO_H_
-#define _INPUTINFO_H_
+#ifndef INPUTINFO_H
+#define INPUTINFO_H
 
 #include <utility>
 
@@ -56,4 +56,4 @@ class MTV_PUBLIC InputInfo
     bool    m_quickTune     {false};
 };
 
-#endif // _INPUTINFO_H_
+#endif // INPUTINFO_H

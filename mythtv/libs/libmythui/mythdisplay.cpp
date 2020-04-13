@@ -141,25 +141,25 @@ QStringList MythDisplay::GetDescription(void)
     }
 
     QScreen *current = display->GetCurrentScreen();
-    QList<QScreen*> screens = qGuiApp->screens();
+    QList<QScreen*> screens = QGuiApplication::screens();
     bool first = true;
-    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
+    foreach (auto screen, screens)
     {
         if (!first)
             result.append("");
         first = false;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-        QString id = QString("(%1)").arg((*it)->manufacturer());
+        QString id = QString("(%1)").arg(screen->manufacturer());
 #else
         QString id;
 #endif
-        if ((*it) == current && !spanall)
-            result.append(tr("Current screen %1 %2:").arg((*it)->name()).arg(id));
+        if (screen == current && !spanall)
+            result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
         else
-            result.append(tr("Screen %1 %2:").arg((*it)->name()).arg(id));
+            result.append(tr("Screen %1 %2:").arg(screen->name()).arg(id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
-                .arg((*it)->physicalSize().width()).arg((*it)->physicalSize().height()));
-        if ((*it) == current)
+                .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
+        if (screen == current)
         {
             QString source;
             double aspect = display->GetAspectRatio(source);
@@ -185,10 +185,14 @@ MythDisplay::MythDisplay()
     if (m_screen)
         connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
 
-    connect(qGuiApp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
-    connect(qGuiApp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
+    auto *guiapp = qobject_cast<QGuiApplication *>(QCoreApplication::instance());
+    if (guiapp == nullptr)
+        return;
+
+    connect(guiapp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
+    connect(guiapp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    connect(qGuiApp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
+    connect(guiapp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
 #endif
 }
 
@@ -253,7 +257,7 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
 
 int MythDisplay::GetScreenCount(void)
 {
-    return qGuiApp->screens().size();
+    return QGuiApplication::screens().size();
 }
 
 double MythDisplay::GetPixelAspectRatio(void)
@@ -306,12 +310,12 @@ QScreen *MythDisplay::GetDesiredScreen(void)
         // this matches the check in MythMainWindow
         bool windowed = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
                         !MythMainWindow::WindowIsAlwaysFullscreen();
-        QRect override = GetMythUI()->GetGeometryOverride();
+        QRect override = MythUIHelper::GetGeometryOverride();
         // When windowed, we use topleft as a best guess as to which screen we belong in.
         // When fullscreen, Qt appears to use the reverse - though this may be
         // the window manager rather than Qt. So could be wrong.
         QPoint point = windowed ? override.topLeft() : override.bottomRight();
-        foreach (QScreen *screen, qGuiApp->screens())
+        foreach (QScreen *screen, QGuiApplication::screens())
         {
             if (screen->geometry().contains(point))
             {
@@ -327,14 +331,14 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     if (!newscreen && MythDisplay::SpanAllScreens())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Using primary screen for multiscreen");
-        newscreen = qGuiApp->primaryScreen();
+        newscreen = QGuiApplication::primaryScreen();
     }
 
     QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
     // Lookup by name
     if (!newscreen)
     {
-        foreach (QScreen *screen, qGuiApp->screens())
+        foreach (QScreen *screen, QGuiApplication::screens())
         {
             if (!name.isEmpty() && name == screen->name())
             {
@@ -349,7 +353,7 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     {
         bool ok = false;
         int screen_num = name.toInt(&ok);
-        QList<QScreen *>screens = qGuiApp->screens();
+        QList<QScreen *>screens = QGuiApplication::screens();
         if (ok && (screen_num >= 0) && (screen_num < screens.size()))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen number %1 (%2)")
@@ -361,7 +365,7 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     // For anything else, return the primary screen.
     if (!newscreen)
     {
-        QScreen *primary = qGuiApp->primaryScreen();
+        QScreen *primary = QGuiApplication::primaryScreen();
         if (name.isEmpty() && primary)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Defaulting to primary screen (%1)")
@@ -401,13 +405,13 @@ void MythDisplay::PrimaryScreenChanged(QScreen* qScreen)
 void MythDisplay::ScreenAdded(QScreen* qScreen)
 {
     DebugScreen(qScreen, "New");
-    emit ScreenCountChanged(qGuiApp->screens().size());
+    emit ScreenCountChanged(QGuiApplication::screens().size());
 }
 
 void MythDisplay::ScreenRemoved(QScreen* qScreen)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' removed").arg(qScreen->name()));
-    emit ScreenCountChanged(qGuiApp->screens().size());
+    emit ScreenCountChanged(QGuiApplication::screens().size());
 }
 
 void MythDisplay::GeometryChanged(const QRect &Geo)
@@ -563,16 +567,16 @@ void MythDisplay::Initialise(void)
 */
 void MythDisplay::InitScreenBounds(void)
 {
-    QList<QScreen*> screens = qGuiApp->screens();
-    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
+    QList<QScreen*> screens = QGuiApplication::screens();
+    for (auto *screen : screens)
     {
-        QRect dim = (*it)->geometry();
-        QString extra = MythDisplay::GetExtraScreenInfo(*it);
+        QRect dim = screen->geometry();
+        QString extra = MythDisplay::GetExtraScreenInfo(screen);
         LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1: %2x%3 %4")
-            .arg((*it)->name()).arg(dim.width()).arg(dim.height()).arg(extra));
+            .arg(screen->name()).arg(dim.width()).arg(dim.height()).arg(extra));
     }
 
-    QScreen *primary = qGuiApp->primaryScreen();
+    QScreen *primary = QGuiApplication::primaryScreen();
     LOG(VB_GUI, LOG_INFO, LOC +QString("Primary screen: %1.").arg(primary->name()));
 
     int numScreens = MythDisplay::GetScreenCount();
@@ -726,12 +730,12 @@ bool MythDisplay::SwitchToGUI(bool Wait)
     return true;
 }
 
-double MythDisplay::GetRefreshRate(void)
+double MythDisplay::GetRefreshRate(void) const
 {
     return m_refreshRate;
 }
 
-int MythDisplay::GetRefreshInterval(int Fallback)
+int MythDisplay::GetRefreshInterval(int Fallback) const
 {
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
         return static_cast<int>(lround(1000000.0 / m_refreshRate));
@@ -802,8 +806,9 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
         Source = tr("Override");
         return override;
     }
+
     // Auto for multiscreen is a best guess
-    else if (multiscreen)
+    if (multiscreen)
     {
         double aspect = EstimateVirtualAspectRatio();
         if (valid(aspect))
@@ -906,7 +911,7 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     // If all else fails, use the total resolution and assume pixel aspect ratio
     // equals display aspect ratio
     if (!totalresolution.isEmpty())
-        result = totalresolution.width() / totalresolution.height();
+        result = static_cast<double>(totalresolution.width()) / totalresolution.height();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen layout: %1x%2").arg(rows).arg(columns));
     if (rows == columns)

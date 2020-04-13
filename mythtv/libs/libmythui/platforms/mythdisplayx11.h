@@ -18,7 +18,7 @@ class MythDisplayX11 : public MythDisplay
     MythDisplayX11();
    ~MythDisplayX11() override = default;
     static bool IsAvailable(void);
-    void UpdateCurrentMode(void) override final;
+    void UpdateCurrentMode(void) final;
 
 #ifdef USING_XRANDR
     bool VideoModesAvailable(void) override { return true; }

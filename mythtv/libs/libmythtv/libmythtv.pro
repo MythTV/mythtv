@@ -89,14 +89,12 @@ using_valgrind:DEFINES += USING_VALGRIND
     !mingw:!win32-msvc* {
         HEADERS += recorders/vbitext/cc.h
         HEADERS += recorders/vbitext/dllist.h
-        HEADERS += recorders/vbitext/hamm.h
         HEADERS += recorders/vbitext/lang.h
         HEADERS += recorders/vbitext/vbi.h
         HEADERS += recorders/vbitext/vt.h
         SOURCES += recorders/vbitext/cc.cpp
-        SOURCES += recorders/vbitext/vbi.c
-        SOURCES += recorders/vbitext/hamm.c
-        SOURCES += recorders/vbitext/lang.c
+        SOURCES += recorders/vbitext/vbi.cpp
+        SOURCES += recorders/vbitext/lang.cpp
     }
 #}
 
@@ -583,18 +581,19 @@ using_frontend {
             HEADERS += visualisations/goom/surf3d.h
             HEADERS += visualisations/goom/tentacle3d.h
             HEADERS += visualisations/goom/v3d.h
+            HEADERS += visualisations/goom/zoom_filters.h
             HEADERS += visualisations/videovisualgoom.h
 
-            SOURCES += visualisations/goom/filters.c
-            SOURCES += visualisations/goom/goom_core.c
-            SOURCES += visualisations/goom/graphic.c
-            SOURCES += visualisations/goom/tentacle3d.c
-            SOURCES += visualisations/goom/ifs.c
-            SOURCES += visualisations/goom/ifs_display.c
-            SOURCES += visualisations/goom/lines.c
-            SOURCES += visualisations/goom/surf3d.c
-            SOURCES += visualisations/goom/zoom_filter_mmx.c
-            SOURCES += visualisations/goom/zoom_filter_xmmx.c
+            SOURCES += visualisations/goom/filters.cpp
+            SOURCES += visualisations/goom/goom_core.cpp
+            SOURCES += visualisations/goom/graphic.cpp
+            SOURCES += visualisations/goom/tentacle3d.cpp
+            SOURCES += visualisations/goom/ifs.cpp
+            SOURCES += visualisations/goom/ifs_display.cpp
+            SOURCES += visualisations/goom/lines.cpp
+            SOURCES += visualisations/goom/surf3d.cpp
+            SOURCES += visualisations/goom/zoom_filter_mmx.cpp
+            SOURCES += visualisations/goom/zoom_filter_xmmx.cpp
             SOURCES += visualisations/videovisualgoom.cpp
         }
     }

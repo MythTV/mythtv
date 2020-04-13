@@ -30,11 +30,11 @@ class ProgramRecPriorityInfo : public RecordingInfo
     ProgramRecPriorityInfo() = default;
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &/*other*/) = default;
     ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
-        { clone(other); return *this; }
+        { if (this != &other) clone(other); return *this; }
     ProgramRecPriorityInfo &operator=(const RecordingInfo &other)
-        { clone(other); return *this; }
+        { if (this != &other) clone(other); return *this; }
     ProgramRecPriorityInfo &operator=(const ProgramInfo &other)
-        { clone(other); return *this; }
+        { if (this != &other) clone(other); return *this; }
     virtual void clone(const ProgramRecPriorityInfo &other,
                        bool ignore_non_serialized_data = false);
     void clone(const RecordingInfo &other,

@@ -11,8 +11,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __HTTPSERVER_H__
-#define __HTTPSERVER_H__
+#ifndef HTTPSERVER_H
+#define HTTPSERVER_H
 
 // POSIX headers
 #include <sys/types.h>
@@ -204,4 +204,4 @@ class HttpWorker : public QRunnable
 };
 
 
-#endif
+#endif // HTTPSERVER_H

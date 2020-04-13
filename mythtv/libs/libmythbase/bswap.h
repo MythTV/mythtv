@@ -29,6 +29,7 @@
 // TODO: Any reason we choose not to use bswap_64 for this?
 static __inline__ double bswap_dbl(double x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
     union {
         uint32_t l[2];
         double   d;

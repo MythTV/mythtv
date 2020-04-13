@@ -204,7 +204,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         return true;
     }
 
-    return m_mixer && m_outputSurface;
+    return (m_mixer != 0U) && (m_outputSurface != 0U);
 }
 
 /*! \brief Map VDPAU video surfaces to an OpenGL texture.
@@ -348,8 +348,8 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
     // Render surface
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
-                          Frame->interlaced_reversed ? !Frame->top_field_first :
-                          Frame->top_field_first, m_referenceFrames);
+                          static_cast<int>(Frame->interlaced_reversed ? !Frame->top_field_first :
+                          Frame->top_field_first), m_referenceFrames);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 
@@ -372,7 +372,7 @@ void MythVDPAUInterop::DisplayPreempted(void)
     m_preempted = true;
 }
 
-bool MythVDPAUInterop::IsPreempted(void)
+bool MythVDPAUInterop::IsPreempted(void) const
 {
     return m_preempted;
 }

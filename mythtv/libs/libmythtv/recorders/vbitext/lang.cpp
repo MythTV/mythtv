@@ -1,4 +1,4 @@
-#include <string.h>
+#include <cstring>
 #include "vt.h"
 #include "lang.h"
 
@@ -142,7 +142,7 @@ add_enhance(struct enhance *eh, int dcode, unsigned int *data)
 void
 do_enhancements(struct enhance *eh, struct vt_page *vtp)
 {
-    int row = 0;
+    int8_t row = 0;
 
     if (eh->next_des < 1)
        return;
@@ -151,9 +151,9 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
     {
        if (*p % 2048 != 2047)
        {
-           int adr = *p % 64;
-           int mode = *p / 64 % 32;
-           int data = *p / 2048 % 128;
+           int8_t adr = *p % 64;
+           int8_t mode = *p / 64 % 32;
+           int8_t data = *p / 2048 % 128;
 
            //printf("%2x,%d,%d ", mode, adr, data);
            if (adr < 40)
@@ -174,9 +174,8 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
                            struct mark *mark = marks + (mode - 16);
-                           char *x = NULL;
-
-                           if ((x = strchr(mark->m_g0, data)))
+                           const char *x = std::strchr(mark->m_g0, data);
+                           if (x != nullptr)
                            {
                                if (latin1)
                                    data = mark->m_latin1[x - mark->m_g0];

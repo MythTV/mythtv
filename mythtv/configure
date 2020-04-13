@@ -4574,8 +4574,6 @@ if test "$?" != 0; then
     die "C compiler test failed."
 fi
 
-add_cppflags -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
-#add_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -std=$CPP_STANDARD -faligned-new
 
 # some compilers silently accept -std=c11, so we also need to check that the
@@ -4600,16 +4598,10 @@ fi
 
 
 check_cppflags -D_FILE_OFFSET_BITS=64
-check_cppflags -D_LARGEFILE_SOURCE
 check_cxx -D_FILE_OFFSET_BITS=64 <<EOF && add_cxxppflags -D_FILE_OFFSET_BITS=64
 #include <stdlib.h>
 EOF
-check_cxx -D_LARGEFILE_SOURCE <<EOF && add_cxxppflags -D_LARGEFILE_SOURCE
-#include <stdlib.h>
-EOF
 
-add_host_cppflags -D_ISOC99_SOURCE
-check_host_cflags -std=c99
 check_host_cflags -Wall
 check_host_cflags $host_cflags_speed
 
@@ -4701,7 +4693,7 @@ case $target_os in
         enabled_all suncc x86 &&
             echo "hwcap_1 = OVERRIDE;" > mapfile &&
             add_ldflags -Wl,-M,mapfile
-        add_cxxppflags -D__EXTENSIONS__ -D_XOPEN_SOURCE=600
+        add_cxxppflags -D__EXTENSIONS__
         nm_default='nm -P -g'
         version_script='-M'
         VERSION_SCRIPT_POSTPROCESS_CMD='perl $(SRC_PATH)/compat/solaris/make_sunver.pl - $(OBJS)'
@@ -4711,8 +4703,6 @@ case $target_os in
         oss_indev_extralibs="-lossaudio"
         oss_outdev_extralibs="-lossaudio"
         enabled gcc || check_ldflags -Wl,-zmuldefs
-        add_cppflags -D_XOPEN_SOURCE=600
-        add_cxxppflags -D_XOPEN_SOURCE=600
         ;;
     openbsd|bitrig)
         disable symver
@@ -4894,7 +4884,6 @@ case $target_os in
         enabled x86_64 && objformat="win64" || objformat="win32"
         enable dos_paths
         enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
-        add_cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
         ;;
     *-dos|freedos|opendos)
         disable ffserver
@@ -4926,7 +4915,6 @@ case $target_os in
         strip="lxlite -CS"
         striptype=""
         objformat="aout"
-        add_cppflags -D_GNU_SOURCE
         add_ldflags -Zomf -Zbin-files -Zargs-wild -Zhigh-mem -Zmap
         SHFLAGS='$(SUBDIR)$(NAME).def -Zdll -Zomf'
         LIBSUF="_s.a"
@@ -5081,7 +5069,7 @@ EOF
         eval ${pfx}libc_type=bionic
     elif check_${pfx}cpp_condition sys/brand.h "defined LABELED_BRAND_NAME"; then
         eval ${pfx}libc_type=solaris
-        add_${pfx}cppflags -D__EXTENSIONS__ -D_XOPEN_SOURCE=600
+        add_${pfx}cppflags -D__EXTENSIONS__
     fi
     check_${pfx}cc <<EOF
 #include <time.h>
@@ -6274,9 +6262,6 @@ check_cxxflags -Wpointer-arith
 if disabled deprecation_warnings; then
     check_cxxflags -Wno-deprecated-declarations
 fi
-#needed for INT64_C in libs/libavformat under g++
-check_cxxflags -D__STDC_CONSTANT_MACROS
-check_cxxflags -D__STDC_LIMIT_MACROS
 
 # add some linker flags
 check_ldflags -Wl,--warn-common

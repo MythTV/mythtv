@@ -205,7 +205,7 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
         memset(At(i), 0, sizeof(VideoFrame));
         At(i)->codec            = FMT_NONE;
         At(i)->interlaced_frame = -1;
-        At(i)->top_field_first  = 1;
+        At(i)->top_field_first  = true;
         m_vbufferMap[At(i)]     = i;
     }
 
@@ -391,7 +391,7 @@ void VideoBuffers::ReleaseFrame(VideoFrame *Frame)
     m_vpos = m_vbufferMap[Frame];
     m_limbo.remove(Frame);
     //non directrendering frames are ffmpeg handled
-    if (Frame->directrendering != 0)
+    if (Frame->directrendering)
         m_decode.enqueue(Frame);
     m_used.enqueue(Frame);
 }
@@ -531,10 +531,10 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
     frame_queue_t discards(m_used);
     discards.insert(discards.end(), m_limbo.begin(), m_limbo.end());
     discards.insert(discards.end(), m_finished.begin(), m_finished.end());
-    for (auto it = discards.begin(); it != discards.end(); ++it)
+    for (auto & discard : discards)
     {
-        ReleaseDecoderResources(*it, refs);
-        SafeEnqueue(kVideoBuffer_avail, *it);
+        ReleaseDecoderResources(discard, refs);
+        SafeEnqueue(kVideoBuffer_avail, discard);
     }
 
     if (m_available.count() + m_pause.count() + m_displayed.count() != Size())
@@ -555,10 +555,10 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
         }
     }
 
-    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
-        Remove(kVideoBuffer_all, *it);
-    for (auto it = m_decode.begin(); it != m_decode.end(); ++it)
-        m_available.enqueue(*it);
+    for (auto & it : m_decode)
+        Remove(kVideoBuffer_all, it);
+    for (auto & it : m_decode)
+        m_available.enqueue(it);
     m_decode.clear();
 
     DeleteBuffers();
@@ -705,7 +705,7 @@ void VideoBuffers::Enqueue(BufferType Type, VideoFrame *Frame)
     queue->remove(Frame);
     queue->enqueue(Frame);
     if (Type == kVideoBuffer_pause)
-        Frame->pause_frame = 1;
+        Frame->pause_frame = true;
     m_globalLock.unlock();
 }
 

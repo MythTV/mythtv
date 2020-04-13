@@ -64,9 +64,6 @@ class MPUBLIC MythContext
 /// This global variable contains the MythContext instance for the application
 extern MPUBLIC MythContext *gContext;
 
-/// Service type for the backend's UPnP server
-extern const QString kBackendURI;
-
 #endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

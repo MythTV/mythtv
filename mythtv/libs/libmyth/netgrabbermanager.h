@@ -152,9 +152,9 @@ class MPUBLIC Search : public QObject
     QByteArray GetData() { return m_data; };
     void SetData(QByteArray data);
 
-    uint numResults() { return m_numResults; };
-    uint numReturned() { return m_numReturned; };
-    uint numIndex() { return m_numIndex; };
+    uint numResults() const { return m_numResults; };
+    uint numReturned() const { return m_numReturned; };
+    uint numIndex() const { return m_numIndex; };
     QString nextPageToken() { return m_nextPageToken; }
     QString prevPageToken() { return m_prevPageToken; }
 

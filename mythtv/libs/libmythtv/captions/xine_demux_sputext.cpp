@@ -80,9 +80,15 @@ static inline void trail_space(char *s) {
   while (isspace(*s)) {
     char *copy = s;
     do {
+      // The clang-tidy warning is wrong.  All callers have a null
+      // terminated string.  If the null is the first character in the
+      // string, this loop is never called.  If not, there's
+      // guaranteed to at least be a second character, even if that
+      // second character is the null.
+      // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
       copy[0] = copy[1];
       copy++;
-    } while(*copy);
+    } while(*copy != 0);
   }
   int i = strlen(s) - 1;
   while (i > 0 && isspace(s[i]))
@@ -403,7 +409,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
         }
       }
     }
-  } while(i<SUB_MAX_TEXT && !end_sub);
+  } while(i<SUB_MAX_TEXT && (end_sub == 0));
   if(i>=SUB_MAX_TEXT)
     printf("Too many lines in a subtitle\n");
   current->lines=i;
@@ -481,15 +487,15 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
      * TODO: it seems that format of time is not easily determined, it may be 1:12, 1:12.0 or 0:1:12.0
      * to describe the same moment in time. Maybe there are even more formats in use.
      */
-    if (sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8)
+    if (sscanf (line, R"(<Time Begin="%d:%d:%d.%d" End="%d:%d:%d.%d")",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8)
 
       plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
     if (
-        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen) < 4) &&
-        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen) < 5) &&
+        (sscanf (line, R"(<%*[tT]ime %*[bB]egin="%d:%d" %*[Ee]nd="%d:%d"%*[^<]<clear/>%n)",&a2,&a3,&b2,&b3,&plen) < 4) &&
+        (sscanf (line, R"(<%*[tT]ime %*[bB]egin="%d:%d" %*[Ee]nd="%d:%d.%d"%*[^<]<clear/>%n)",&a2,&a3,&b2,&b3,&b4,&plen) < 5) &&
         /*      (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen) < 5) && */
-        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen) < 6) &&
-        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen) < 8)
+        (sscanf (line, R"(<%*[tT]ime %*[bB]egin="%d:%d.%d" %*[Ee]nd="%d:%d.%d"%*[^<]<clear/>%n)",&a2,&a3,&a4,&b2,&b3,&b4,&plen) < 6) &&
+        (sscanf (line, R"(<%*[tT]ime %*[bB]egin="%d:%d:%d.%d" %*[Ee]nd="%d:%d:%d.%d"%*[^<]<clear/>%n)",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen) < 8)
         )
       continue;
     current->start = a1*360000+a2*6000+a3*100+a4/10;
@@ -1156,6 +1162,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   int n_max=32;
   auto *first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));
   if(!first) return nullptr;
+  memset(first, 0, n_max*sizeof(subtitle_t));
   int timeout = MAX_TIMEOUT;
 
   if (demuxstr->uses_time) timeout *= 100;
@@ -1163,12 +1170,17 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
   while(true) {
     if(demuxstr->num>=n_max){
+      int old_size = n_max*sizeof(subtitle_t);
       n_max+=16;
       auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
       if (new_first == nullptr) {
+          // clang-tidy-11 says this is fine.  ct-9 produces a weird
+          // warning here.  NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
           free(first);
           return nullptr;
       }
+      // Clear only the new space at the end of the array.
+      memset((char*)new_first + old_size, 0, 16*sizeof(subtitle_t));
       first = new_first;
     }
 

@@ -19,8 +19,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _SCTE_TABLES_H_
-#define _SCTE_TABLES_H_
+#ifndef SCTE_TABLES_H
+#define SCTE_TABLES_H
 
 #include <cassert>
 
@@ -688,4 +688,4 @@ class MTV_PUBLIC AggregateDataEventTable : public PSIPTable
 };
 
 
-#endif // _SCTE_TABLES_H_
+#endif // SCTE_TABLES_H

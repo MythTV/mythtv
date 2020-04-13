@@ -78,8 +78,8 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
 
-    bool IsLoading(void) { return m_IsLoading; }
-    bool IsLoaded(void) { return m_IsLoaded; }
+    bool IsLoading(void) const { return m_IsLoading; }
+    bool IsLoaded(void) const { return m_IsLoaded; }
 
     MythPainter *GetPainter(void) override; // MythUIType
 

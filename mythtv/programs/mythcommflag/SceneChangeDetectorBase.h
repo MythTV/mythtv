@@ -1,5 +1,5 @@
-#ifndef _SCENECHANGEDETECTORBASE_H_
-#define _SCENECHANGEDETECTORBASE_H_
+#ifndef SCENECHANGEDETECTORBASE_H
+#define SCENECHANGEDETECTORBASE_H
 
 #include <QObject>
 #include "mythframe.h"
@@ -25,7 +25,6 @@ class SceneChangeDetectorBase : public QObject
     unsigned int m_width, m_height;
 };
 
-#endif
+#endif // SCENECHANGEDETECTORBASE_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

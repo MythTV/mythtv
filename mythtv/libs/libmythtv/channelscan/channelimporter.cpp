@@ -84,7 +84,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // List of transports
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
     {
-        if (transports.size() > 0)
+        if (!transports.empty())
         {
             cout << endl;
             cout << "Transport list before processing (" << transports.size() << "):" << endl;
@@ -116,7 +116,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         RemoveDuplicates(transports, duplicates);
         if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
         {
-            if (duplicates.size() > 0)
+            if (!duplicates.empty())
             {
                 cout << endl;
                 cout << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
@@ -234,7 +234,7 @@ uint ChannelImporter::DeleteChannels(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
-            bool was_in_db = chan.m_dbMplexId && chan.m_channelId;
+            bool was_in_db = (chan.m_dbMplexId != 0U) && (chan.m_channelId != 0U);
             if (!was_in_db)
                 continue;
 
@@ -731,7 +731,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
     UpdateAction action,
     ChannelType type,
     ScanDTVTransportList &updated_list,
-    ScanDTVTransportList &skipped_list)
+    ScanDTVTransportList &skipped_list) const
 {
     ScanDTVTransportList next_list;
 
@@ -1278,11 +1278,11 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
         {
             int enc = (chan.m_isEncrypted) ?
                 ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
-            info.m_atscChannels[enc] += (chan.m_siStandard == "atsc");
-            info.m_dvbChannels [enc] += (chan.m_siStandard == "dvb");
-            info.m_mpegChannels[enc] += (chan.m_siStandard == "mpeg");
-            info.m_scteChannels[enc] += (chan.m_siStandard == "opencable");
-            info.m_ntscChannels[enc] += (chan.m_siStandard == "ntsc");
+            if (chan.m_siStandard == "atsc")      info.m_atscChannels[enc] += 1;
+            if (chan.m_siStandard == "dvb")       info.m_dvbChannels[enc]  += 1;
+            if (chan.m_siStandard == "mpeg")      info.m_mpegChannels[enc] += 1;
+            if (chan.m_siStandard == "opencable") info.m_scteChannels[enc] += 1;
+            if (chan.m_siStandard == "ntsc")      info.m_ntscChannels[enc] += 1;
             if (chan.m_siStandard != "ntsc")
             {
                 ++info.m_progNumCnt[chan.m_serviceId];
@@ -1638,7 +1638,7 @@ void ChannelImporter::CountChannels(
     new_chan = old_chan = 0;
     for (const auto & transport : transports)
     {
-        for (auto chan : transport.m_channels)
+        for (const auto& chan : transport.m_channels)
         {
             if (IsType(info, chan, type))
             {

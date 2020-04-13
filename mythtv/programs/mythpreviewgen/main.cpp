@@ -76,7 +76,7 @@ int preview_helper(uint chanid, QDateTime starttime,
     if (setpriority(PRIO_PROCESS, 0, 9))
         LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
 
-    if (!QFileInfo(infile).isReadable() && (!chanid || !starttime.isValid()))
+    if (!QFileInfo(infile).isReadable() && ((chanid == 0U) || !starttime.isValid()))
         ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
     ProgramInfo *pginfo = nullptr;

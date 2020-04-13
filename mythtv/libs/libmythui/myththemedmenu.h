@@ -62,7 +62,7 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
                     bool allowreorder = false, MythThemedMenuState *state = nullptr);
    ~MythThemedMenu() override;
 
-    bool foundTheme(void);
+    bool foundTheme(void) const;
 
     void getCallback(void (**lcallback)(void *, QString &), void **data);
     void setCallback(void (*lcallback)(void *, QString &), void *data);

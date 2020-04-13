@@ -455,7 +455,7 @@ void MythUIType::Pulse(void)
         (*it)->Pulse();
 }
 
-int MythUIType::CalcAlpha(int alphamod)
+int MythUIType::CalcAlpha(int alphamod) const
 {
     return (int)(m_Effects.m_alpha * (alphamod / 255.0));
 }
@@ -1072,7 +1072,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 
 void MythUIType::UpdateDependState(bool isDefault)
 {
-    auto *dependee = static_cast<MythUIType*>(sender());
+    auto *dependee = dynamic_cast<MythUIType*>(sender());
 
     UpdateDependState(dependee, isDefault);
 }

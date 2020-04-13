@@ -111,7 +111,7 @@ int Orientation::GetCurrent(bool compensate)
  * \param transform Rotation/flip to apply
  * \return int New orientation code that will apply the transform to the image
  */
-int Orientation::Apply(int transform)
+int Orientation::Apply(int transform) const
 {
     if (transform == kResetToExif)
         return m_file;
@@ -225,7 +225,7 @@ int Orientation::FromRotation(const QString &degrees)
  * different, the Db orientation
  * \return Text description of orientation
  */
-QString Orientation::Description()
+QString Orientation::Description() const
 {
     return (m_file == m_current)
             ? AsText(m_file)

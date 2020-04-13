@@ -228,10 +228,10 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
     }
 
     bool tune_mismatch =
-        (counts["ANALOG_TUNING"]  && counts["DIGITAL_TUNING"]) ||
-        (counts["VIRTUAL_TUNING"] && counts["DIGITAL_TUNING"]);
-    bool enc_mismatch  = counts["ENCODER"] && counts["NOT_ENCODER"];
-    bool scan_mismatch = counts["SCAN"]    && counts["NO_SCAN"];
+        ((counts["ANALOG_TUNING"] != 0U)  && (counts["DIGITAL_TUNING"] != 0U)) ||
+        ((counts["VIRTUAL_TUNING"] != 0U) && (counts["DIGITAL_TUNING"] != 0U));
+    bool enc_mismatch  = (counts["ENCODER"] != 0U) && (counts["NOT_ENCODER"] != 0U);
+    bool scan_mismatch = (counts["SCAN"] != 0U)    && (counts["NO_SCAN"] != 0U);
 
     if (tune_mismatch)
     {

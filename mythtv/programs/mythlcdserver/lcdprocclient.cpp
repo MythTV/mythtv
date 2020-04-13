@@ -517,7 +517,7 @@ void LCDProcClient::init()
     }
 }
 
-QString LCDProcClient::expandString(const QString &aString)
+QString LCDProcClient::expandString(const QString &aString) const
 {
     if ( m_pVersion != LCD_VERSION_5)
         return aString;
@@ -2048,7 +2048,7 @@ void LCDProcClient::outputScrollerText(const QString& theScreen, const QString& 
     sendToServer(aString);
 }
 
-QStringList LCDProcClient::formatScrollerText(const QString &text)
+QStringList LCDProcClient::formatScrollerText(const QString &text) const
 {
     QString separators = " |-_/:('<~";
     QStringList lines;

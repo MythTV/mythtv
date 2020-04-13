@@ -1,10 +1,6 @@
 #ifndef VBI_H
 #define VBI_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "vt.h"
 #include "dllist.h"
 #include "lang.h"
@@ -42,10 +38,12 @@ struct vbi
     int soc, eoc;              // start/end of clock run-in
 };
 
+using vbic_handler = void (*)(void *data, struct vt_event *ev);
+
 struct vbi_client
 {
     struct dl_node node[1];
-    void (*handler)(void *data, struct vt_event *ev);
+    vbic_handler handler;
     void *data;
 };
 
@@ -53,16 +51,12 @@ struct vbi *vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune,
                                                                int big_buf);
 void vbi_close(struct vbi *vbi);
 void vbi_reset(struct vbi *vbi);
-int vbi_add_handler(struct vbi *vbi, void *handler, void *data);
-void vbi_del_handler(struct vbi *vbi, void *handler, void *data);
+int vbi_add_handler(struct vbi *vbi, vbic_handler handler, void *data);
+void vbi_del_handler(struct vbi *vbi, vbic_handler handler, void *data);
 struct vt_page *vbi_query_page(struct vbi *vbi, int pgno, int subno);
 void vbi_pll_reset(struct vbi *vbi, int fine_tune);
 
 void vbi_handler(struct vbi *vbi, int fd);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

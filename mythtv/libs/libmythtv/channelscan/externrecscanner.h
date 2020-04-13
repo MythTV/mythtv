@@ -3,8 +3,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _EXTERNREC_CHANNEL_FETCHER_H_
-#define _EXTERNREC_CHANNEL_FETCHER_H_
+#ifndef EXTERNREC_CHANNEL_FETCHER_H
+#define EXTERNREC_CHANNEL_FETCHER_H
 
 // Qt headers
 #include <QString>
@@ -52,6 +52,6 @@ class ExternRecChannelScanner : public QRunnable
     QMutex       m_lock;
 };
 
-#endif // _EXTERNREC_CHANNEL_FETCHER_H_
+#endif // EXTERNREC_CHANNEL_FETCHER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

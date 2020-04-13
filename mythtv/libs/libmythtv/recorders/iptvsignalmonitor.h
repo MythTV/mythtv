@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _IPTVSIGNALMONITOR_H_
-#define _IPTVSIGNALMONITOR_H_
+#ifndef IPTVSIGNALMONITOR_H
+#define IPTVSIGNALMONITOR_H
 
 #include "dtvsignalmonitor.h"
 
@@ -36,4 +36,4 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     bool m_locked               {false};
 };
 
-#endif // _IPTVSIGNALMONITOR_H_
+#endif // IPTVSIGNALMONITOR_H

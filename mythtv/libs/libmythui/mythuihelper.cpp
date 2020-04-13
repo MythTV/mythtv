@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <unistd.h>
+#include <iostream>
 
 #include <QImage>
 #include <QPixmap>
@@ -92,26 +93,40 @@ class MythUIHelperPrivate
 {
 public:
     explicit MythUIHelperPrivate(MythUIHelper *p)
-    : m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_imageThreadPool(new MThreadPool("MythUIHelper")),
-      m_parent(p) {}
+        : m_parent(p), m_cacheLock(new QMutex(QMutex::Recursive)),
+          m_imageThreadPool(new MThreadPool("MythUIHelper")) {}
     ~MythUIHelperPrivate();
 
     void Init();
     void StoreGUIsettings(void);
 
-    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
+    MythUIHelper *m_parent                   {nullptr};
+
     QString   m_menuthemepathname;
     QString   m_themepathname;
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
+    // The part of the screen(s) allocated for the GUI. Unless
+    // overridden by the user, defaults to the full drawable area.
+    QRect m_screenRect                       { 0, 0, 0, 0};
+
+    // Command-line GUI size, which overrides both the above sets of sizes
+    static int x_override;
+    static int y_override;
+    static int w_override;
+    static int h_override;
+
     float m_wmult                            {1.0F};
     float m_hmult                            {1.0F};
+
+    int m_fontStretch                        {100};
 
     // Dimensions of the theme
     QSize m_baseSize                         { 800, 600 };
     bool m_isWide                            {false};
+
+    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
 
     QMap<QString, MythImage *> m_imageCache;
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
@@ -131,34 +146,20 @@ public:
     QAtomicInteger<qint64> m_maxCacheSize    {30 * 1024 * 1024};
 #endif
 
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to the full drawable area.
-    QRect m_screenRect                       { 0, 0, 0, 0};
-
-    // Command-line GUI size, which overrides both the above sets of sizes
-    static int x_override;
-    static int y_override;
-    static int w_override;
-    static int h_override;
-
     QString m_themecachedir;
     QString m_userThemeDir;
 
-    ScreenSaverControl *m_screensaver        {nullptr};
-    bool                m_screensaverEnabled {false};
-
     MythDisplay *m_display                   {nullptr};
-    bool         m_screenSetup               {false};
 
     MThreadPool *m_imageThreadPool           {nullptr};
 
     MythUIMenuCallbacks m_callbacks          {nullptr,nullptr,nullptr,nullptr,nullptr};
 
-    MythUIHelper *m_parent                   {nullptr};
-
-    int m_fontStretch                        {100};
-
     QStringList m_searchPaths;
+
+    ScreenSaverControl *m_screensaver        {nullptr};
+    bool                m_screensaverEnabled {false};
+    bool                m_screenSetup        {false};
 };
 
 int MythUIHelperPrivate::x_override = -1;
@@ -332,7 +333,7 @@ void MythUIHelper::LoadQtConfig(void)
     if (d->m_display->UsingVideoModes())
         d->m_display->SwitchToGUI(true);
 
-    qApp->setStyle("Windows");
+    QApplication::setStyle("Windows");
 
     QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = FindThemeDir(themename);
@@ -856,7 +857,7 @@ void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor
 void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 {
     QRegExp     sre("^(\\d+)x(\\d+)$");
-    QRegExp     lre("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
+    QRegExp     lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
     QStringList geo;
     bool        longForm = false;
 
@@ -955,8 +956,8 @@ bool MythUIHelper::IsGeometryOverridden(void)
 QRect MythUIHelper::GetGeometryOverride(void)
 {
     // NB Call IsGeometryOverridden first to ensure this is valid
-    return QRect(MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
-                 MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override);
+    return {MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
+            MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override};
 }
 
 /**
@@ -1383,7 +1384,7 @@ QFont MythUIHelper::GetSmallFont(void)
 
 void MythUIHelper::DisableScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),
@@ -1393,7 +1394,7 @@ void MythUIHelper::DisableScreensaver(void)
 
 void MythUIHelper::RestoreScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),
@@ -1403,7 +1404,7 @@ void MythUIHelper::RestoreScreensaver(void)
 
 void MythUIHelper::ResetScreensaver(void)
 {
-    if (qobject_cast<QApplication*>(qApp))
+    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
     {
         QCoreApplication::postEvent(
             GetMythMainWindow(),

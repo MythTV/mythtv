@@ -633,27 +633,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     }
 }
 
-/// \brief  Format and send a log message into the queue.  This is called from
-///         the LOG() macro.  The intention is minimal blocking of the caller.
-/// \param  mask    Verbosity mask of the message (VB_*)
-/// \param  level   Log level of this message (LOG_* - matching syslog levels)
-/// \param  file    Filename of source code logging the message
-/// \param  line    Line number within the source of log message source
-/// \param  function    Function name of the log message source
-/// \param  format  printf format string (when not from QString), log message
-///                 (when from QString)
-/// \param  ...     printf arguments (when not from QString)
-void LogPrintLineC( uint64_t mask, LogLevel_t level, const char *file, int line,
-                    const char *function, const char *format, ...)
-{
-    va_list arguments;
-
-    va_start(arguments, format);
-    LogPrintLine(mask, level, file, line, function,
-                 QString::asprintf(format, arguments));
-    va_end(arguments);
-}
-
 
 /// \brief Generate the logPropagateArgs global with the latest logging
 ///        level, mask, etc to propagate to all of the mythtv programs
@@ -715,7 +694,7 @@ void logPropagateCalc(void)
 /// \return true if --quiet is being propagated
 bool logPropagateQuiet(void)
 {
-    return logPropagateOpts.m_quiet;
+    return logPropagateOpts.m_quiet != 0;
 }
 
 /// \brief  Entry point to start logging for the application.  This will
@@ -730,7 +709,7 @@ bool logPropagateQuiet(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-void logStart(const QString& logfile, int progress, int quiet, int facility,
+void logStart(const QString& logfile, bool progress, int quiet, int facility,
               LogLevel_t level, bool dblog, bool propagate)
 {
     if (logThread && logThread->isRunning())
@@ -932,14 +911,14 @@ void verboseInit(void)
 
     // This looks funky, so I'll put some explanation here.  The verbosedefs.h
     // file gets included as part of the mythlogging.h include, and at that
-    // time, the normal (without _IMPLEMENT_VERBOSE defined) code case will
-    // define the VerboseMask enum.  At this point, we force it to allow us
-    // to include the file again, but with _IMPLEMENT_VERBOSE set so that the
+    // time, the normal (without MYTH_IMPLEMENT_VERBOSE defined) code case will
+    // define the VerboseMask enum.  At this point, we force it to allow us to
+    // include the file again, but with MYTH_IMPLEMENT_VERBOSE set so that the
     // single definition of the VB_* values can be shared to define also the
     // contents of verboseMap, via repeated calls to verboseAdd()
 
 #undef VERBOSEDEFS_H_
-#define _IMPLEMENT_VERBOSE
+#define MYTH_IMPLEMENT_VERBOSE
 #include "verbosedefs.h"
 
     verboseInitialized = true;

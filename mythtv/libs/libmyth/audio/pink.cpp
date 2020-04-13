@@ -24,15 +24,15 @@
   Copyleft 1999 Phil Burk - No rights reserved.
 */
 
-#include <stdio.h>
-#include <math.h>
+#include <cmath>
+#include <cstdio>
 #include "pink.h"
 
 /************************************************************/
 /* Calculate pseudo-random 32 bit number based on linear congruential method. */
-static unsigned long generate_random_number( void )
+static uint32_t generate_random_number( void )
 {
-    static unsigned long s_randSeed = 22222;  /* Change this for different random sequences. */
+    static uint32_t s_randSeed = 22222;  /* Change this for different random sequences. */
     s_randSeed = (s_randSeed * 196314165) + 907633515;
     return s_randSeed;
 }
@@ -41,9 +41,11 @@ static unsigned long generate_random_number( void )
 void initialize_pink_noise( pink_noise_t *pink, int num_rows )
 {
     pink->pink_index = 0;
-    pink->pink_index_mask = (1<<num_rows) - 1;
+    if (num_rows > PINK_MAX_RANDOM_ROWS)
+        num_rows = PINK_MAX_RANDOM_ROWS;
+    pink->pink_index_mask = (1ULL << num_rows) - 1;
 /* Calculate maximum possible signed random value. Extra 1 for white noise always added. */
-    long pmax = (num_rows + 1) * (1<<(PINK_RANDOM_BITS-1));
+    int32_t pmax = (num_rows + 1) * (1<<(PINK_RANDOM_BITS-1));
     pink->pink_scalar = 1.0F / pmax;
 /* Initialize rows. */
     for( int i=0; i<num_rows; i++ ) pink->pink_rows[i] = 0;
@@ -74,14 +76,14 @@ float generate_pink_noise_sample( pink_noise_t *pink )
 	 * values together. Only one changes each time.
 	 */
 	pink->pink_running_sum -= pink->pink_rows[num_zeros];
-	long new_random = ((long)generate_random_number()) >> PINK_RANDOM_SHIFT;
+	int32_t new_random = ((int32_t)generate_random_number()) >> PINK_RANDOM_SHIFT;
 	pink->pink_running_sum += new_random;
 	pink->pink_rows[num_zeros] = new_random;
     }
 	
 /* Add extra white noise value. */
-    long new_random = ((long)generate_random_number()) >> PINK_RANDOM_SHIFT;
-    long sum = pink->pink_running_sum + new_random;
+    int32_t new_random = ((int32_t)generate_random_number()) >> PINK_RANDOM_SHIFT;
+    int32_t sum = pink->pink_running_sum + new_random;
 
 /* Scale to range of -1.0 to 0.9999. */
     float output = pink->pink_scalar * sum;

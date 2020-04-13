@@ -61,7 +61,7 @@ QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
     if (m_inputId && !input.isEmpty())
         quickTuning = CardUtil::GetQuickTuning(m_inputId, input);
 
-    bool useQuickTuning = (quickTuning && is_live_tv) || (quickTuning > 1);
+    bool useQuickTuning = ((quickTuning != 0U) && is_live_tv) || (quickTuning > 1);
 
     QMutexLocker locker(&m_dtvinfo_lock);
     if (!useQuickTuning && ((m_sistandard == "atsc") || (m_sistandard == "dvb")))

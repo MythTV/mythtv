@@ -941,7 +941,7 @@ void MusicPlayer::customEvent(QEvent *event)
     QObject::customEvent(event);
 }
 
-void MusicPlayer::getBufferStatus(int *bufferAvailable, int *bufferSize)
+void MusicPlayer::getBufferStatus(int *bufferAvailable, int *bufferSize) const
 {
     *bufferAvailable = m_bufferAvailable;
     *bufferSize = m_bufferSize;
@@ -1113,7 +1113,7 @@ void MusicPlayer::seek(int pos)
     }
 }
 
-void MusicPlayer::showMiniPlayer(void)
+void MusicPlayer::showMiniPlayer(void) const
 {
     if (m_canShowPlayer)
     {
@@ -1409,7 +1409,7 @@ MuteState MusicPlayer::getMuteState(void) const
     return kMuteOff;
 }
 
-void MusicPlayer::toMap(InfoMap &map)
+void MusicPlayer::toMap(InfoMap &map) const
 {
     map["volumemute"] = isMuted() ? tr("%1% (Muted)", "Zero Audio Volume").arg(getVolume()) :
                                     QString("%1%").arg(getVolume());

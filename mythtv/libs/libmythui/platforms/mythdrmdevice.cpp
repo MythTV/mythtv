@@ -185,36 +185,34 @@ bool MythDRMDevice::Initialise(void)
                 m_connector = connector;
                 break;
             }
+
+            // Does the connected display have the serial number we are looking for?
+            drmModePropertyBlobPtr edidblob = GetBlobProperty(connector, "EDID");
+            if (edidblob)
+            {
+                MythEDID edid(reinterpret_cast<const char *>(edidblob->data),
+                              static_cast<int>(edidblob->length));
+                drmModeFreePropertyBlob(edidblob);
+                if (edid.Valid() && edid.SerialNumbers().contains(serial))
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched connector with serial '%1'")
+                        .arg(serial));
+                    m_connector = connector;
+                    m_physicalSize = QSize(static_cast<int>(connector->mmWidth),
+                                           static_cast<int>(connector->mmHeight));
+                    m_serialNumber = serial;
+                    m_edid = edid;
+                    break;
+                }
+                if (!edid.Valid())
+                    LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
+
+                if (m_connector && !m_serialNumber.isEmpty())
+                    break;
+            }
             else
             {
-                // Does the connected display have the serial number we are looking for?
-                drmModePropertyBlobPtr edidblob = GetBlobProperty(connector, "EDID");
-                if (edidblob)
-                {
-                    MythEDID edid(reinterpret_cast<const char *>(edidblob->data),
-                                  static_cast<int>(edidblob->length));
-                    drmModeFreePropertyBlob(edidblob);
-                    if (edid.Valid() && edid.SerialNumbers().contains(serial))
-                    {
-                        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched connector with serial '%1'")
-                            .arg(serial));
-                        m_connector = connector;
-                        m_physicalSize = QSize(static_cast<int>(connector->mmWidth),
-                                               static_cast<int>(connector->mmHeight));
-                        m_serialNumber = serial;
-                        m_edid = edid;
-                        break;
-                    }
-                    if (!edid.Valid())
-                        LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
-
-                    if (m_connector && !m_serialNumber.isEmpty())
-                        break;
-                }
-                else
-                {
-                    LOG(VB_GENERAL, m_verbose, LOC + "Connected device has no EDID");
-                }
+                LOG(VB_GENERAL, m_verbose, LOC + "Connected device has no EDID");
             }
         }
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Ignoring disconnected connector %1")
@@ -363,7 +361,7 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
-drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property)
+drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const
 {
     drmModePropertyBlobPtr result = nullptr;
     if (!Connector || Property.isEmpty())

@@ -246,7 +246,7 @@ static inline void fast_short_set(short *p,
 }
 
 static inline void fast_real_set_from_short(fftw_real *d,
-                        short *s,
+                        const short *s,
                         long c)
 {
     while (c >= 4L) {

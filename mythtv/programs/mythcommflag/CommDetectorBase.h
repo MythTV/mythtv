@@ -1,5 +1,5 @@
-#ifndef _CommDetectorBase_H_
-#define _CommDetectorBase_H_
+#ifndef COMMDETECTOR_BASE_H
+#define COMMDETECTOR_BASE_H
 
 #include <iostream>
 using namespace std;
@@ -55,7 +55,6 @@ protected:
     bool m_bStop   { false };
 };
 
-#endif
-
+#endif // COMMDETECTOR_BASE_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

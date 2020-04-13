@@ -453,12 +453,8 @@ bool ChannelInsertInfo::IsSameChannel(
 {
     if (m_atscMajorChannel)
     {
-        if ((m_atscMajorChannel == other.m_atscMajorChannel &&
-             m_atscMinorChannel == other.m_atscMinorChannel))
-        {
-            return true;
-        }
-        return false;
+        return ((m_atscMajorChannel == other.m_atscMajorChannel) &&
+                (m_atscMinorChannel == other.m_atscMinorChannel));
     }
 
     if ((m_origNetId == other.m_origNetId) &&

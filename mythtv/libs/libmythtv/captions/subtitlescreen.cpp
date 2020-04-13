@@ -217,9 +217,9 @@ static QString fontToString(MythFontProperties *f)
         .arg(f->GetFace()->family())
         .arg(f->GetFace()->pixelSize())
         .arg(srtColorString(f->color()))
-        .arg(f->GetFace()->italic())
+        .arg(static_cast<int>(f->GetFace()->italic()))
         .arg(f->GetFace()->weight())
-        .arg(f->GetFace()->underline());
+        .arg(static_cast<int>(f->GetFace()->underline()));
     QPoint offset;
     QColor color;
     int alpha = 0;
@@ -227,14 +227,14 @@ static QString fontToString(MythFontProperties *f)
     f->GetShadow(offset, color, alpha);
     result += QString(" shadow=%1 shadowoffset=%2 "
                       "shadowcolor=%3 shadowalpha=%4")
-        .arg(f->hasShadow())
+        .arg(static_cast<int>(f->hasShadow()))
         .arg(QString("(%1,%2)").arg(offset.x()).arg(offset.y()))
         .arg(srtColorString(color))
         .arg(alpha);
     f->GetOutline(color, size, alpha);
     result += QString(" outline=%1 outlinecolor=%2 "
                       "outlinesize=%3 outlinealpha=%4")
-        .arg(f->hasOutline())
+        .arg(static_cast<int>(f->hasOutline()))
         .arg(srtColorString(color))
         .arg(size)
         .arg(alpha);
@@ -690,9 +690,9 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(m_format.m_offset)
         .arg(m_format.m_penSize);
     str += QString("it=%1 ul=%2 bf=%3 ")
-        .arg(m_format.m_italics)
-        .arg(m_format.m_underline)
-        .arg(m_format.m_boldface);
+        .arg(static_cast<int>(m_format.m_italics))
+        .arg(static_cast<int>(m_format.m_underline))
+        .arg(static_cast<int>(m_format.m_boldface));
     str += QString("font=%1 ").arg(m_format.m_fontTag);
     str += QString(" text='%1'").arg(m_text);
     return str;
@@ -1213,6 +1213,7 @@ void FormattedTextSubtitle608::Layout(void)
 
     // Shift Y coordinates back up into the safe area.
     int shift = min(firstY, max(0, prevY - safeHeight));
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_lines.size(); i++)
         m_lines[i].m_yIndent -= shift;
 

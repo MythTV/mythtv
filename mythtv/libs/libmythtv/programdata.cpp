@@ -40,7 +40,7 @@ static QVariant denullify(const QDateTime &dt)
 static void add_genres(MSqlQuery &query, const QStringList &genres,
                 uint chanid, const QDateTime &starttime)
 {
-    QString relevance = QStringLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    QString relevance = QString("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     for (auto it = genres.constBegin(); (it != genres.constEnd()) &&
              ((it - genres.constBegin()) < relevance.size()); ++it)
     {

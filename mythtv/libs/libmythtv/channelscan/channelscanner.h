@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _CHANNEL_SCANNER_H_
-#define _CHANNEL_SCANNER_H_
+#ifndef CHANNEL_SCANNER_H
+#define CHANNEL_SCANNER_H
 
 // Qt headers
 #include <QCoreApplication>
@@ -160,4 +160,4 @@ class MTV_PUBLIC ChannelScanner
     ServiceRequirements      m_serviceRequirements {kRequireAV};
 };
 
-#endif // _CHANNEL_SCANNER_H_
+#endif // CHANNEL_SCANNER_H

@@ -146,7 +146,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
     }
 
     // OpenGL ES 2.0 has very limited texture format support
-    bool legacy = Context->GetExtraFeatures() & kGLLegacyTextures;
+    bool legacy = (Context->GetExtraFeatures() & kGLLegacyTextures) != 0;
     // GLES3 supports GL_RED etc and 16bit formats but there are no unsigned,
     // normalised 16bit integer formats. So we must use unsigned integer formats
     // for 10bit video textures which force:-

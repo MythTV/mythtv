@@ -330,6 +330,7 @@ public:
                m_data.size() - aeslen);
 
         // remove the PKCS#7 padding from the buffer
+        // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         int pad = decrypted_data[m_data.size()-1];
         if (pad <= 0 || pad > AES_BLOCK_SIZE)
         {
@@ -780,7 +781,7 @@ public:
      * Will download all required segment AES-128 keys
      * Will try to re-use already downloaded keys if possible
      */
-    int ManageSegmentKeys()
+    int ManageSegmentKeys() const
     {
         HLSSegment   *seg       = nullptr;
         HLSSegment   *prev_seg  = nullptr;

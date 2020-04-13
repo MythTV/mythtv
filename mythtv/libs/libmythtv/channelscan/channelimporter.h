@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef _CHANNEL_IMPORTER_H_
-#define _CHANNEL_IMPORTER_H_
+#ifndef CHANNEL_IMPORTER_H
+#define CHANNEL_IMPORTER_H
 
 // C++ headers
 #include <cstring>
@@ -168,7 +168,7 @@ class MTV_PUBLIC ChannelImporter
         UpdateAction action,
         ChannelType type,
         ScanDTVTransportList &updated,
-        ScanDTVTransportList &skipped);
+        ScanDTVTransportList &skipped) const;
 
     /// For multiple channels
     DeleteAction QueryUserDelete(const QString &msg);
@@ -272,4 +272,4 @@ class MTV_PUBLIC ChannelImporter
     QEventLoop          m_eventLoop;
 };
 
-#endif // _CHANNEL_IMPORTER_H_
+#endif // CHANNEL_IMPORTER_H

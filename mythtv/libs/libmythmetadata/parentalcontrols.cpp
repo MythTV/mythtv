@@ -179,7 +179,7 @@ namespace
             for (ParentalLevel i = level;
                     i <= ParentalLevel::plHigh && i.good(); ++i)
             {
-                pws::const_iterator p = m_passwords.find(i.GetLevel());
+                auto p = m_passwords.find(i.GetLevel());
                 if (p != m_passwords.end() && !p->second.isEmpty())
                     ret.push_back(p->second);
             }
@@ -193,7 +193,7 @@ namespace
             for (ParentalLevel i = level;
                     i >= ParentalLevel::plLow && i.good(); --i)
             {
-                pws::const_iterator p = m_passwords.find(i.GetLevel());
+                auto p = m_passwords.find(i.GetLevel());
                 if (p != m_passwords.end() && !p->second.isEmpty())
                 {
                     ret = p->second;

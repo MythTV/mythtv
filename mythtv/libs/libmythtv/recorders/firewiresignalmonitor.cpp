@@ -140,6 +140,9 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     auto *lchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!lchan)
     {
+        // clang-tidy assumes that if the result of dynamic_cast is
+        // nullptr that the thing being casted must also be a nullptr.
+        // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
         while (m_dtvMonitorRunning)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));

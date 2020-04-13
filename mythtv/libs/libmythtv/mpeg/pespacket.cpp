@@ -146,7 +146,7 @@ uint PESPacket::CalcCRC(void) const
 {
     if (Length() < 1)
         return kTheMagicNoCRCCRC;
-    return av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE), (uint32_t) -1,
+    return av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE), UINT32_MAX,
                              m_pesData, Length() - 1));
 }
 

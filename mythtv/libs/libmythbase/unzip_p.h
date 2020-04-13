@@ -36,8 +36,8 @@
 // We mean it.
 //
 
-#ifndef OSDAB_UNZIP_P__H
-#define OSDAB_UNZIP_P__H
+#ifndef OSDAB_UNZIP_P_H
+#define OSDAB_UNZIP_P_H
 
 #include "unzip.h"
 #include "zipentry_p.h"
@@ -97,7 +97,7 @@ public:
 
 	bool createDirectory(const QString& path);
 
-	inline void decryptBytes(quint32* keys, char* buffer, qint64 read);
+	inline void decryptBytes(quint32* keys, char* buffer, qint64 read) const;
 
 	static inline quint32 getULong(const unsigned char* data, quint32 offset) ;
 	static inline quint64 getULLong(const unsigned char* data, quint32 offset) ;
@@ -109,4 +109,4 @@ public:
 	static inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) ;
 };
 
-#endif // OSDAB_UNZIP_P__H
+#endif // OSDAB_UNZIP_P_H

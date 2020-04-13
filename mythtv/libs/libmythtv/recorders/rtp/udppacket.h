@@ -3,8 +3,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _UDP_PACKET_H_
-#define _UDP_PACKET_H_
+#ifndef UDP_PACKET_H
+#define UDP_PACKET_H
 
 #include <cinttypes>
 
@@ -42,4 +42,4 @@ class UDPPacket
     QByteArray m_data;
 };
 
-#endif // _UDP_PACKET_H_
+#endif // UDP_PACKET_H

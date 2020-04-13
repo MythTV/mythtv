@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
                                                                        
-#ifndef _MBROADCAST_SOCKET_DEVICE_H_
-#define _MBROADCAST_SOCKET_DEVICE_H_
+#ifndef MBROADCAST_SOCKET_DEVICE_H
+#define MBROADCAST_SOCKET_DEVICE_H
 
 #include <QString>
 
@@ -68,4 +68,4 @@ class MBroadcastSocketDevice : public MSocketDevice
     quint16         m_port;
 };
 
-#endif // _MBROADCAST_SOCKET_DEVICE_H_
+#endif // MBROADCAST_SOCKET_DEVICE_H

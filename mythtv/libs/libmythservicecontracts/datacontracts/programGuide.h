@@ -102,7 +102,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            ChannelInfo *pObject = new ChannelInfo( this );
+            auto *pObject = new ChannelInfo( this );
             Channels().append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

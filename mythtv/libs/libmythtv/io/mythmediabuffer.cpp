@@ -562,7 +562,7 @@ bool MythMediaBuffer::SetReadInternalMode(bool Mode)
     return old;
 }
 
-bool MythMediaBuffer::IsReadInternalMode(void)
+bool MythMediaBuffer::IsReadInternalMode(void) const
 {
     return m_readInternalMode;
 }
@@ -1515,8 +1515,8 @@ QString MythMediaBuffer::BitrateToString(uint64_t Rate, bool Hz)
         return QObject::tr(">1Gbps");
 
     QString msg;
-    double bitrate = static_cast<double>(NAN);
-    double rate = static_cast<double>(Rate);
+    auto bitrate = static_cast<double>(NAN);
+    auto rate = static_cast<double>(Rate);
     int range = 0;
 
     if (Rate >= 1000000)
@@ -1559,7 +1559,7 @@ QString MythMediaBuffer::GetAvailableBuffer(void)
     return QString("%1%").arg(lroundf((static_cast<float>(avail) / static_cast<float>(m_bufferSize) * 100.0F)));
 }
 
-uint MythMediaBuffer::GetBufferSize(void)
+uint MythMediaBuffer::GetBufferSize(void) const
 {
     return m_bufferSize;
 }

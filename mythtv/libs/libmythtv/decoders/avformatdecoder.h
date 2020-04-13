@@ -171,7 +171,7 @@ class AvFormatDecoder : public DecoderBase
 
     QString GetXDS(const QString &Key) const override; // DecoderBase
     QByteArray GetSubHeader(uint TrackNo) override;
-    void GetAttachmentData(uint TrackNo, QByteArray &Dilename, QByteArray &Data) override; // DecoderBase
+    void GetAttachmentData(uint TrackNo, QByteArray &Filename, QByteArray &Data) override; // DecoderBase
 
     // MHEG stuff
     bool SetAudioByComponentTag(int Tag) override; // DecoderBase
@@ -179,7 +179,7 @@ class AvFormatDecoder : public DecoderBase
 
     // Stream language info
     virtual int GetTeletextLanguage(uint Index);
-    virtual int GetSubtitleLanguage(uint, uint StreamIndex);
+    virtual int GetSubtitleLanguage(uint /*unused*/, uint StreamIndex);
     virtual int GetCaptionLanguage(TrackType TrackType, int ServiceNum);
     virtual int GetAudioLanguage(uint AudioIndex, uint StreamIndex);
     virtual AudioTrackType GetAudioTrackType(uint StreamIndex);

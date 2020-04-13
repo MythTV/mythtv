@@ -228,7 +228,7 @@ QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
     strlist << host;
     strlist << groupname;
     strlist << directory;
-    strlist << QString::number(fileNamesOnly);
+    strlist << QString::number(static_cast<int>(fileNamesOnly));
 
     SendReceiveStringList(strlist);
 
@@ -491,7 +491,7 @@ void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "RECORD_PENDING";
     strlist << QString::number(secsleft);
-    strlist << QString::number(hasLater);
+    strlist << QString::number(static_cast<int>(hasLater));
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
@@ -526,7 +526,7 @@ void PlaybackSock::CancelNextRecording(int capturecardnum, bool cancel)
                         .arg(capturecardnum));
 
     strlist << "CANCEL_NEXT_RECORDING";
-    strlist << QString::number(cancel);
+    strlist << QString::number(static_cast<int>(cancel));
 
     SendReceiveStringList(strlist);
 }

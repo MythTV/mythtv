@@ -436,6 +436,7 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_drmFrames.begin() ; it != m_drmFrames.end(); ++it)
     {
         for (int i = 0; i < (*it)->nb_objects; i++)
@@ -486,7 +487,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             {
                 s_supported = true;
                 for (auto & texture : textures)
-                    s_supported &= texture->m_data && texture->m_textureId;
+                    s_supported &= texture->m_data && (texture->m_textureId != 0U);
                 ClearDMATextures(m_context, textures);
             }
             for (uint32_t i = 0; i < vadesc.num_objects; ++i)

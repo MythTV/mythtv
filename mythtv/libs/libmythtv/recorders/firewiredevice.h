@@ -4,8 +4,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _FIREWIRE_DEVICE_H_
-#define _FIREWIRE_DEVICE_H_
+#ifndef FIREWIRE_DEVICE_H
+#define FIREWIRE_DEVICE_H
 
 // C++ headers
 #include <vector>
@@ -246,4 +246,4 @@ class FirewireDevice
     static QMutex                 s_static_lock;
 };
 
-#endif // _FIREWIRE_DEVICE_H_
+#endif // FIREWIRE_DEVICE_H

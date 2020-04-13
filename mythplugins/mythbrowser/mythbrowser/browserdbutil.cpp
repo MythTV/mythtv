@@ -4,6 +4,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mythdbcheck.h>
 #include <mythsorthelper.h>
 
 // mythbrowser
@@ -11,57 +12,7 @@
 #include "bookmarkmanager.h"
 
 const QString currentDatabaseVersion = "1003";
-
-static bool UpdateDBVersionNumber(const QString &newnumber)
-{
-
-    if (!gCoreContext->SaveSettingOnHost("BrowserDBSchemaVer", newnumber, nullptr))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("DB Error (Setting new DB version number): %1\n")
-                .arg(newnumber));
-
-        return false;
-    }
-
-    return true;
-}
-
-static bool performActualUpdate(const QString updates[], const QString& version,
-                                QString &dbver)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    LOG(VB_GENERAL, LOG_NOTICE,
-        "Upgrading to MythBrowser schema version " + version);
-
-    int counter = 0;
-    QString thequery = updates[counter];
-
-    while (thequery != "")
-    {
-        if (!query.exec(thequery))
-        {
-            QString msg =
-                QString("DB Error (Performing database upgrade): \n"
-                        "Query was: %1 \nError was: %2 \nnew version: %3")
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()))
-                .arg(version);
-            LOG(VB_GENERAL, LOG_ERR, msg);
-            return false;
-        }
-
-        counter++;
-        thequery = updates[counter];
-    }
-
-    if (!UpdateDBVersionNumber(version))
-        return false;
-
-    dbver = version;
-    return true;
-}
+const QString MythBrowserVersionName = "BrowserDBSchemaVer";
 
 bool UpgradeBrowserDatabaseSchema(void)
 {
@@ -75,51 +26,51 @@ bool UpgradeBrowserDatabaseSchema(void)
         LOG(VB_GENERAL, LOG_NOTICE,
             "Inserting MythBrowser initial database information.");
 
-        const QString updates[] =
+        DBUpdates updates
         {
             "DROP TABLE IF EXISTS websites;",
             "CREATE TABLE websites ("
             "id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, "
             "category VARCHAR(100) NOT NULL, "
             "name VARCHAR(100) NOT NULL, "
-            "url VARCHAR(255) NOT NULL);",
-            ""
+            "url VARCHAR(255) NOT NULL);"
         };
-        if (!performActualUpdate(updates, "1000", dbver))
+        if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
+                                 updates, "1000", dbver))
             return false;
     }
 
     if (dbver == "1000") 
     { 
-        const QString updates[] =
+        DBUpdates updates
         {
-            "UPDATE settings SET data = 'Internal' WHERE data LIKE '%mythbrowser' AND value = 'WebBrowserCommand';", 
-            "" 
+            "UPDATE settings SET data = 'Internal' WHERE data LIKE '%mythbrowser' AND value = 'WebBrowserCommand';"
         };
-        if (!performActualUpdate(updates, "1001", dbver))
+        if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
+                                 updates, "1001", dbver))
             return false;
     }
 
     if (dbver == "1001")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETETAB' AND context = 'Browser';",
-            ""
+            " WHERE action = 'DELETETAB' AND context = 'Browser';"
         };
-        if (!performActualUpdate(updates, "1002", dbver))
+        if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
+                                 updates, "1002", dbver))
             return false;
     }
 
     if (dbver == "1002")
     {
-        const QString updates[] =
+        DBUpdates updates
         {
-            "ALTER TABLE `websites` ADD `homepage` BOOL NOT NULL;",
-            ""
+            "ALTER TABLE `websites` ADD `homepage` BOOL NOT NULL;"
         };
-        if (!performActualUpdate(updates, "1003", dbver))
+        if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
+                                 updates, "1003", dbver))
             return false;
     }
 

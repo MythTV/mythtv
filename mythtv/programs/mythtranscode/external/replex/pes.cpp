@@ -26,9 +26,9 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -48,12 +48,12 @@ void printpts(int64_t pts)
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	LOG(VB_GENERAL, LOG_INFO, "%s%2d:%02d:%02d.%04d",
-		(negative ? "-" : ""),
-		(unsigned int)(pts/90000.0)/3600,
-		((unsigned int)(pts/90000.0)%3600)/60,
-		((unsigned int)(pts/90000.0)%3600)%60,
-		(((unsigned int)(pts/9.0)%36000000)%600000)%10000);
+	LOG(VB_GENERAL, LOG_INFO, QString("%1%2:%3:%4.%5")
+	    .arg(negative ? "-" : "")
+	    .arg((unsigned int)(pts/90000.0)/3600, 2,10,QChar('0'))
+	    .arg(((unsigned int)(pts/90000.0)%3600)/60, 2,10,QChar('0'))
+	    .arg(((unsigned int)(pts/90000.0)%3600)%60, 2,10,QChar('0'))
+	    .arg((((unsigned int)(pts/9.0)%36000000)%600000)%10000, 4,10,QChar('0')));
 }
 
 void printptss(int64_t pts)
@@ -65,13 +65,12 @@ void printptss(int64_t pts)
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	LOG(VB_GENERAL, LOG_INFO, "%s%2d:%02d:%02d.%03d",
-		(negative ? "-" : ""),
-		(unsigned int)(pts/90000.0)/3600,
-		((unsigned int)(pts/90000.0)%3600)/60,
-		((unsigned int)(pts/90000.0)%3600)%60,
-		(((unsigned int)(pts/90.0)%3600000)%60000)%1000
-		);
+	LOG(VB_GENERAL, LOG_INFO, QString("%1%2:%3:%4.%5")
+	    .arg(negative ? "-" : "")
+	    .arg((unsigned int)(pts/90000.0)/3600, 2,10,QChar('0'))
+	    .arg(((unsigned int)(pts/90000.0)%3600)/60, 2,10,QChar('0'))
+	    .arg(((unsigned int)(pts/90000.0)%3600)%60, 2,10,QChar('0'))
+	    .arg((((unsigned int)(pts/90.0)%3600000)%60000)%1000, 3,10,QChar('0')));
 }
 
 /* use if you know that ptss are close and may overflow */
@@ -128,7 +127,8 @@ int ptscmp(uint64_t pts1, uint64_t pts2)
 			ret = -2;
 	}
 #if 0
-	LOG(VB_GENERAL, LOG_INFO, "PTSCMP: %lli %lli %d\n", pts1, pts2, ret);
+	LOG(VB_GENERAL, LOG_INFO,
+	    QString("PTSCMP: %1 %2 %3\n").arg(pts1).arg(pts2).arg(ret));
 	printpts(pts1);
 	printpts(pts2);
 #endif
@@ -150,11 +150,11 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 	p->withbuf = wi;
 	
 	if (p->withbuf && !p->buf){
-		p->buf = malloc(MAX_PLENGTH*sizeof(uint8_t));
+		p->buf = static_cast<uchar*>(malloc(MAX_PLENGTH*sizeof(uint8_t)));
 		memset(p->buf,0,MAX_PLENGTH*sizeof(uint8_t));
 	} else if (rb) p->rbuf = rb;
 	if (p->rbuf) p->ini_pos = ring_wpos(p->rbuf); 
-        p->done = 0;
+        p->done = false;
 	memset(p->pts, 0 , 5);
 	memset(p->dts, 0 , 5);
 }
@@ -162,13 +162,13 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 
 void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 {
-	unsigned short *pl = NULL;
-	int done = 1;
+	unsigned short *pl = nullptr;
+	bool done = true;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
 	do {
 		int c=0;
-		done = 1;
+		done = true;
 		while (c < count && (!p->mpeg ||
 				     (p->mpeg == 2 && p->found < 9))
 	               &&  (p->found < 5 || !p->done)){
@@ -197,7 +197,8 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				case PADDING_STREAM :
 				case DSM_CC_STREAM  :
 				case ISO13522_STREAM:
-					p->done = 1;
+					p->done = true;
+					[[clang::fallthrough]];
 				case PRIVATE_STREAM1:
 				case VIDEO_STREAM_S ... VIDEO_STREAM_E:
 				case AUDIO_STREAM_S ... AUDIO_STREAM_E:
@@ -352,8 +353,8 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 						} else {
 							if (ring_write(p->rbuf, buf+c, l)<0){
 								LOG(VB_GENERAL, LOG_ERR,
-									"ring buffer overflow %d",
-									p->rbuf->size);
+									QString("ring buffer overflow %1")
+									.arg(p->rbuf->size));
 								exit(1);
 							}
 						}
@@ -379,9 +380,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			}
 
 			if (p->plength && p->found == p->plength+6) {
-				init_pes_in(p, p->type, NULL, p->withbuf);
+				init_pes_in(p, p->type, nullptr, p->withbuf);
 				if (c < count) {
-					done = 0;
+					done = false;
 					count -= c;
 					buf += c;
 				}
@@ -391,6 +392,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 }
 
 
+#if 0
 static uint32_t scr_base_ps(const uint8_t *scr)
 {
 	uint32_t base = 0;
@@ -423,13 +425,13 @@ static uint16_t scr_ext_ps(const uint8_t *scr)
 
 	return ext;
 }
-
+#endif
 
 
 static void init_ps(ps_packet *p)
 {
         p->stuff_length=0xF8;
-        p->data = NULL;
+        p->data = nullptr;
         p->sheader_length = 0;
         p->audio_bound = 0;
         p->video_bound = 0;
@@ -445,7 +447,7 @@ static void kill_ps(ps_packet *p)
 
 static void setlength_ps(ps_packet *p)
 {
-	short *ll = (short *) p->sheader_llength;
+	auto *ll = (short *) p->sheader_llength;
 	p->sheader_length = ntohs(*ll) - 6;
 }
 
@@ -510,13 +512,13 @@ static int write_ps_header(uint8_t *buf,
 		    uint8_t    video_bound,
 		    uint8_t    navpack)
 {
-	ps_packet p;
+	ps_packet p {};
 
 	init_ps(&p);
 	
 	uint32_t lscr = htonl((uint32_t) ((SCR/300ULL) & 0x00000000FFFFFFFF));
-	uint8_t *scr = (uint8_t *) &lscr;
-	uint16_t scr_ext = (uint16_t) ((SCR%300ULL) & 0x00000000000001FF);
+	auto *scr = (uint8_t *) &lscr;
+	auto scr_ext = (uint16_t) ((SCR%300ULL) & 0x00000000000001FF);
 	
 // SCR = 0
 	p.scr[0] = 0x44;
@@ -605,12 +607,12 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	uint8_t headr[3] = {0x00, 0x00, 0x01};
 	
 	uint32_t lpts = htonl((PTS/300ULL) & 0x00000000FFFFFFFFULL);
-	uint8_t *pts = (uint8_t *) &lpts;
+	auto *pts = (uint8_t *) &lpts;
 	get_pespts(pts,ppts);
 	if ((PTS/300ULL) & 0x0000000100000000ULL) ppts[0] |= 0x80;
 
 	uint32_t ldts = htonl((DTS/300ULL) & 0x00000000FFFFFFFFULL);
-	uint8_t *dts = (uint8_t *) &ldts;
+	auto *dts = (uint8_t *) &ldts;
 	get_pespts(dts,pdts);
 	if ((DTS/300ULL) & 0x0000000100000000ULL) pdts[0] |= 0x80;
 
@@ -715,8 +717,8 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 	pos += write_pes_header( 0xE0, length-pos, vpts, vdts, buf+pos, 
 				 stuff, ptsdts);
 	if (length-pos > *vlength){
-		LOG(VB_GENERAL, LOG_ERR, "WHAT THE HELL  %d > %d", length-pos,
-			*vlength);
+            LOG(VB_GENERAL, LOG_ERR,
+		QString("WHAT THE HELL  %1 > %2").arg(length-pos).arg(*vlength));
 	}
 
 	int add = ring_read( vrbuffer, buf+pos, length-pos);
@@ -770,7 +772,7 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 		pos = pack_size;
 	}		
 	if (pos != pack_size) {
-		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
+		LOG(VB_GENERAL, LOG_ERR, QString("apos: %1").arg(pos));
 		exit(1);
 	}
 
@@ -823,7 +825,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 		pos = pack_size;
 	}		
 	if (pos != pack_size) {
-		LOG(VB_GENERAL, LOG_ERR, "apos: %d", pos);
+		LOG(VB_GENERAL, LOG_ERR, QString("apos: %1").arg(pos));
 		exit(1);
 	}
 

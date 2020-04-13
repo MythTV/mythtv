@@ -4,8 +4,8 @@
  * Detect frame-to-frame changes in histograms.
  */
 
-#ifndef __HISTOGRAMANALYZER_H__
-#define __HISTOGRAMANALYZER_H__
+#ifndef HISTOGRAMANALYZER_H
+#define HISTOGRAMANALYZER_H
 
 #include "FrameAnalyzer.h"
 
@@ -74,6 +74,6 @@ private:
     struct timeval        m_analyzeTime   {0,0};
 };
 
-#endif  /* !__HISTOGRAMANALYZER_H__ */
+#endif  /* !HISTOGRAMANALYZER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

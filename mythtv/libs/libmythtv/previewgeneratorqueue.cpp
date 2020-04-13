@@ -434,7 +434,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     QString ret;
 
     bool is_special = !outputfile.isEmpty() || time >= 0 ||
-        size.width() || size.height();
+        (size.width() != 0) || (size.height() != 0);
 
     bool needs_gen = true;
     if (!is_special)

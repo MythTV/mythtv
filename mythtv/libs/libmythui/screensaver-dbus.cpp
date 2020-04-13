@@ -118,8 +118,7 @@ class ScreenSaverDBusPrivate
 };
 
 ScreenSaverDBus::ScreenSaverDBus() :
-    m_bus(QDBusConnection::sessionBus()),
-    m_dbusPrivateInterfaces(QList<ScreenSaverDBusPrivate *>())
+    m_bus(QDBusConnection::sessionBus())
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice
     for (uint i=0; i < NUM_DBUS_METHODS; i++) {

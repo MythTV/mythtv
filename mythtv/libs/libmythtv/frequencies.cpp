@@ -2227,7 +2227,7 @@ static CHANLIST israel_hot_matav[] = {
 
 /* --------------------------------------------------------------------- */
 
-struct CHANLISTS chanlists[] = {
+struct CHANLISTS gChanLists[] = {
     { "us-bcast",         ntsc_bcast,        CHAN_COUNT(ntsc_bcast)        },
     { "us-cable",         ntsc_cable,        CHAN_COUNT(ntsc_cable)        },
     { "us-cable-hrc",     ntsc_hrc,          CHAN_COUNT(ntsc_hrc)          },

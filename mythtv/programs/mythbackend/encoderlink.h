@@ -54,7 +54,7 @@ class EncoderLink
     /// \brief Returns true if the encoder is awake.
     bool IsAwake(void) const { return (m_sleepStatus == sStatus_Awake); }
     /// \brief Returns true if the encoder is asleep.
-    bool IsAsleep(void) const { return (m_sleepStatus & sStatus_Asleep); }
+    bool IsAsleep(void) const { return (m_sleepStatus & sStatus_Asleep) != 0; }
     /// \brief Returns true if the encoder is waking up.
     bool IsWaking(void) const { return (m_sleepStatus == sStatus_Waking); }
     /// \brief Returns true if the encoder is falling asleep.

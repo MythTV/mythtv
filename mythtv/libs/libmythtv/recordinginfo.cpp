@@ -367,7 +367,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
                           bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+        ((m_chanId != 0U) && m_recStartTs.isValid() && m_startTs.isValid() &&
          m_chanId     == other.GetChanID() &&
          m_recStartTs == other.GetRecordingStartTime() &&
          m_startTs    == other.GetScheduledStartTime());
@@ -402,7 +402,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
                           bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+        ((m_chanId != 0U) && m_recStartTs.isValid() && m_startTs.isValid() &&
          m_chanId     == other.GetChanID() &&
          m_recStartTs == other.GetRecordingStartTime() &&
          m_startTs    == other.GetScheduledStartTime());

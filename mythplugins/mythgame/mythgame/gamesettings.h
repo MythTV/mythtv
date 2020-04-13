@@ -44,7 +44,7 @@ public:
 
 private:
     void Load() override; // StandardSetting
-    void NewPlayerDialog();
+    void NewPlayerDialog() const;
     void CreateNewPlayer(const QString& name);
 };
 

@@ -135,17 +135,17 @@ class RomInfo
     QString Inetref() const { return m_inetref; }
     void setInetref(const QString &linetref) { m_inetref = linetref; }
 
-    int Favorite() const { return m_favorite; }
+    bool Favorite() const { return m_favorite; }
     void setFavorite(bool updateDatabase = false);
 
-    QString getExtension();
-    QString toString();
+    QString getExtension() const;
+    QString toString() const;
 
     void setField(const QString& field, const QString& data);
     void fillData();
 
-    void SaveToDatabase();
-    void DeleteFromDatabase();
+    void SaveToDatabase() const;
+    void DeleteFromDatabase() const;
 
   protected:
     int     m_id;

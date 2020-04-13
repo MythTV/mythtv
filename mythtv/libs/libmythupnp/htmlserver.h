@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __HTMLSERVER_H__
-#define __HTMLSERVER_H__
+#ifndef HTMLSERVER_H
+#define HTMLSERVER_H
 
 #include "httpserver.h"
 #include "serverSideScripting.h"
@@ -51,4 +51,4 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 
 };
 
-#endif
+#endif // HTMLSERVER_H

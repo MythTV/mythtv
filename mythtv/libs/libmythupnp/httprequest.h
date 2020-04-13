@@ -174,8 +174,8 @@ class UPNP_PUBLIC HTTPRequest
         bool            ProcessSOAPPayload  ( const QString &sSOAPAction );
         void            ExtractMethodFromURL( ); // Service method, not HTTP method
 
-        QString         GetResponseStatus   ( void );
-        QString         GetResponseType     ( void );
+        QString         GetResponseStatus   ( void ) const;
+        QString         GetResponseType     ( void ) const;
         QString         GetResponseHeaders  ( void );
 
         bool            ParseRange          ( QString sRange,
@@ -197,7 +197,7 @@ class UPNP_PUBLIC HTTPRequest
         bool            Authenticated       ();
 
         QString         GetAuthenticationHeader (bool isStale = false);
-        QString         CalculateDigestNonce ( const QString &timeStamp);
+        QString         CalculateDigestNonce ( const QString &timeStamp) const;
 
         bool            BasicAuthentication ();
         bool            DigestAuthentication ();
@@ -232,7 +232,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
 
-        bool            GetKeepAlive () { return m_bKeepAlive; }
+        bool            GetKeepAlive () const { return m_bKeepAlive; }
 
         Serializer *    GetSerializer   ();
 

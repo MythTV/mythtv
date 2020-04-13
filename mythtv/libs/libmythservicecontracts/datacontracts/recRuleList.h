@@ -67,7 +67,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            RecRule *pObject = new RecRule( this );
+            auto *pObject = new RecRule( this );
             m_RecRules.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

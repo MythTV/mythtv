@@ -261,12 +261,12 @@ const V4L2Profiles& MythV4L2M2MContext::GetProfiles(void)
 
         // check capture and output support
         // these mimic the device checks in v4l2_m2m.c
-        bool mplanar = (caps & (V4L2_CAP_VIDEO_CAPTURE_MPLANE | V4L2_CAP_VIDEO_OUTPUT_MPLANE) &&
-                       caps & V4L2_CAP_STREAMING);
-        bool mplanarm2m = caps & V4L2_CAP_VIDEO_M2M_MPLANE;
-        bool splanar = (caps & (V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_VIDEO_OUTPUT) &&
-                        caps & V4L2_CAP_STREAMING);
-        bool splanarm2m = caps & V4L2_CAP_VIDEO_M2M;
+        bool mplanar = ((caps & (V4L2_CAP_VIDEO_CAPTURE_MPLANE | V4L2_CAP_VIDEO_OUTPUT_MPLANE)) != 0U) &&
+                       ((caps & V4L2_CAP_STREAMING) != 0U);
+        bool mplanarm2m = (caps & V4L2_CAP_VIDEO_M2M_MPLANE) != 0U;
+        bool splanar = ((caps & (V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_VIDEO_OUTPUT)) != 0U) &&
+                       ((caps & V4L2_CAP_STREAMING) != 0U);
+        bool splanarm2m = (caps & V4L2_CAP_VIDEO_M2M) != 0U;
 
         if (!(mplanar || mplanarm2m || splanar || splanarm2m))
             continue;

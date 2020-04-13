@@ -26,35 +26,40 @@
 # files that are "installed" from mythtv for mythplugins.  These will
 # be caught when processing files in the mythtv directory.
 #
-# Sadly this doesn't work because llvm regex doesn't support lookahead. ,
-# HeaderFilterRegex: '^((?!/(external|include)/).)*$'
-
-# This doesn't seem to work either. ,
-#HeaderFilterRegex: '[A-Za-z0-9]+.h|.*/libmyth.*|.*/mythplugins/.*'
-
-# Include warnings from header files. ,
-#HeaderFilterRegex: '.*'
-
+# Possible matches in order:
+#
+# file.h or ./file.h or dir/file.h or ./dir/file.h
+# ../dir/file.h
+# ../../libmyth<blah>/dir/format.h
+#,
+HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./external/libmythsoundtouch/[[:alnum:]]+\.h)$'
 
 Checks: '-*,
 
     bugprone-*,
-        # Bunch of warnings.... ,
-        # Comment out this and the cppcoreguidelines version. ,
+
+       -bugprone-misplaced-widening-cast,
+
+        # Renamed/replaced by cppcoreguidelines-narrowing-conversions. ,
        -bugprone-narrowing-conversions,
 
-    # Explicitly list the tests that arent aliases. ,
+        # Doesn''t distinguish between identifiers in the code and
+        # those supplied on the command line with "-X_FOO=BAR". The
+        # only remaining positives are those passed on the command
+        # line. New in clang11. ,
+       -bugprone-reserved-identifier,
+
     cert-*,
+
+	# Aliases for bugprone-reserved-identifier,
+       -cert-dcl37-c,
+       -cert-dcl51-cpp,
 
         # Dont declare c-style varardic functions. ,
        -cert-dcl50-cpp,
 
         # Using function invokes a command interpreter. Should fix. ,
        -cert-env33-c,
-
-        # Should throw anonymous temporary values.
-       -cert-err09-cpp,
-       -cert-err61-cpp,
 
         # string-to-number conversion functions that do not verify the
         # validity of the conversion. Needs work. ,
@@ -74,10 +79,13 @@ Checks: '-*,
         # wrong, but a valid pointer if the inheritance is right. ,
         #
         # One valid error in m_groupName in globalsettings.cpp??? ,
-       -clang-analyzer-core.CallAndMessage,
+        clang-analyzer-core.CallAndMessage,
 
-        # mytharchivehelper/external/pxsup2dast.c has try/catch code. ,
-       -clang-analyzer-core.StackAddrEscapeBase,
+        # 2 instances in FFmpeg, 2 in dvbdescriptors.h, 1 progdetails.cpp. ,
+       -clang-analyzer-core.NullDereference,
+
+        # One instance in cc708window.h. ,
+       -clang-analyzer-cplusplus.NewDelete,
 
         # Doesnt recognize cases where the constructor adds the new
         # object to a list (either static or in the parent.)
@@ -86,7 +94,7 @@ Checks: '-*,
         # need to be chased down. ,
        -clang-analyzer-cplusplus.NewDeleteLeaks,
 
-        # Most testing on x86-64. ,
+        # All testing on x86-64. ,
        -clang-analyzer-osx.*,
 
         # Cant fix due to missing LIB_EXT1 extensions. ,
@@ -94,10 +102,18 @@ Checks: '-*,
        -clang-analyzer-security.insecureAPI.strcpy,
 
     # Explicitly list the tests that arent aliases. ,
-    #cppcoreguidelines-*,
+   -cppcoreguidelines-*,
+
+        # Needs work. ,
        -cppcoreguidelines-avoid-goto,
+
         cppcoreguidelines-init-variables,
+
+        # One instance. ,
        -cppcoreguidelines-interfaces-global-init,
+
+        # Tons of warnings.  Most complaining that #define should
+        # become a constexpr. ,
        -cppcoreguidelines-macro-usage,
 
         # Bunch of warnings.... ,
@@ -120,22 +136,26 @@ Checks: '-*,
        -cppcoreguidelines-pro-type-const-cast,
         # Bunch of warnings.... ,
        -cppcoreguidelines-pro-type-cstyle-cast,
+
+        # Good. ,
         cppcoreguidelines-pro-type-member-init,
+
+        # Haven''t checked recently. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
 
-        # The qapplication.h header file includes a static_cast.
-       -cppcoreguidelines-pro-type-static-cast-downcast,
+        # Good. ,
+        cppcoreguidelines-pro-type-static-cast-downcast,
 
         # Recommends using boost:: to access unions. ,
        -cppcoreguidelines-pro-type-union-access,
 
-        # Warns on every LogPrintLine. ,
+        # Warns on every (*)printf, sscanf,open, ioctl, etc. ,
        -cppcoreguidelines-pro-type-vararg,
 
        -cppcoreguidelines-slicing,
        -cppcoreguidelines-special-member-functions,
 
-    google-explicit-constructor,
+   -google-explicit-constructor,
    -google-runtime-int,
 
     misc-*,
@@ -143,72 +163,81 @@ Checks: '-*,
         # Cases exist. Need to add getters/setters to classes. ,
        -misc-non-private-member-variables-in-classes,
 
-        # Cases exist. Need evaluation. ,
-       -misc-throw-by-value-catch-by-reference,
-
     modernize-*,
 
         # Lots of changes to be done. ,
        -modernize-avoid-c-arrays,
 
-        # Run again.  Seems like should do more.  Supposedly presence
-        # of *any* of \\, \<squote>, \<dquote>, \?, octal, hex. ,
-       -modernize-raw-string-literal,
-
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
+
+        # A couple of instances in libsoundtouch. Convert that to c++
+        # then fix. ,
+       -modernize-use-override,
+       -modernize-use-using,
 
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
-        ## C++14 modernize-make-unique,
-        ## C++14 modernize-use-transparent-functors,
-        ## C++17 modernize-concat-nested-namespaces,
-        ## C++17 modernize-unary-static-assert,
-        ## C++17 modernize-use-nodiscard,
+        # Disable new tests for now. ,
+       -modernize-make-unique,
+       -modernize-use-transparent-functors,
+       -modernize-concat-nested-namespaces,
+       -modernize-unary-static-assert,
+       -modernize-use-nodiscard,
 
     performance-*,
+
+        # There are 250 or so of these in the datacontracts directory.
+        # They are all genreated by the Qt PROPERTYIMP macro, so
+        # cannot be fixed by us. ,
+       -performance-unnecessary-value-param,
 
     readability-*,
 
         # Not investigated yet. ,
        -readability-function-size,
 
-        # Wants to convert all "if (x)" pointer validity checks to be
-        # "if (x != nullptr)".  These should be ignored as the
-        # AllowPointerConditions key is set to "1", but tidy complains
-        # anyway. ,
+        # A couple of instances in libsoundtouch. Convert that to c++
+        # then fix. ,
+       -readability-identifier-naming,
+
+        # Wants to rewrite lots of implicit nullptr tests. ,
        -readability-implicit-bool-conversion,
 
         # Lots of noise. Needs work. ,
        -readability-magic-numbers,
 
+        # Doesn''t understand Qt signals/slots. ,
+       -readability-redundant-access-specifiers,
+
 '
 
 CheckOptions:
-  - { key: bugprone-suspicious-string-compare.WarnOnLogicalNotComparison, value: '1' }
+  - { key: bugprone-suspicious-string-compare.WarnOnLogicalNotComparison, value: 1 }
 
-  - { key: cppcoreguidelines-pro-type-member-init.IgnoreArrays, value: '1' }
+  - { key: cppcoreguidelines-pro-type-member-init.IgnoreArrays, value: 1 }
+  - { key: cppcoreguidelines-narrowing-conversions.PedanticMode, value: 0 } # test 1 at some point
 
-  - { key: modernize-make-shared.IgnoreMacros,             value: '0' }
-  - { key: modernize-make-unique.IgnoreMacros,             value: '0' }
-  - { key: modernize-use-bool-literals.IgnoreMacros,       value: '1' }
-  - { key: modernize-use-default-member-init.IgnoreMacros, value: '1' }
-  - { key: modernize-use-equals-default.IgnoreMacros,      value: '0' }
+  - { key: modernize-make-shared.IgnoreMacros,             value: 0 }
+  - { key: modernize-make-unique.IgnoreMacros,             value: 0 }
+  - { key: modernize-use-bool-literals.IgnoreMacros,       value: 1 }
+  - { key: modernize-use-default-member-init.IgnoreMacros, value: 1 }
+  - { key: modernize-use-equals-default.IgnoreMacros,      value: 0 }
   - { key: modernize-use-nullptr.NullMacros,               value: 'Z_NULL' }
-  - { key: modernize-use-using.IgnoreMacros,               value: '1' }
+  - { key: modernize-use-using.IgnoreMacros,               value: 1 }
 
   - { key: performance-inefficient-vector-operation.VectorLikeClasses,
     value: '::std::vector,QList,QByteArrayList,QItemSelection,QQueue,QStringList' }
 
-  - { key: readability-braces-around-statements.ShortStatementLines,       value: '3' }
-  - { key: readability-implicit-bool-conversion.AllowPointerConditions,    value: '1' }
-  - { key: readability-implicit-bool-conversion.AllowIntegerConditions,    value: '1' }
-  - { key: readability-inconsistent-declaration-parameter-name.strict,     value: '1' }
-  - { key: readability-redundant-declaration.IgnoreMacros,                 value: '0' }
-  - { key: readability-simplify-boolean-expr.chainedconditionalreturn,     value: '1' }
-  - { key: readability-simplify-boolean-expr.chainedconditionalassignment, value: '1' }
-  - { key: readability-uppercase-literal-suffix.IgnoreMacros,              value: '0' }
+  - { key: readability-braces-around-statements.ShortStatementLines,       value: 3 }
+  - { key: readability-implicit-bool-conversion.AllowPointerConditions,    value: 1 }
+  - { key: readability-implicit-bool-conversion.AllowIntegerConditions,    value: 1 }
+  - { key: readability-inconsistent-declaration-parameter-name.strict,     value: 1 }
+  - { key: readability-redundant-declaration.IgnoreMacros,                 value: 0 }
+  - { key: readability-simplify-boolean-expr.chainedconditionalreturn,     value: 1 }
+  - { key: readability-simplify-boolean-expr.chainedconditionalassignment, value: 1 }
+  - { key: readability-uppercase-literal-suffix.IgnoreMacros,              value: 0 }
   - { key: readability-simplify-subscript-expr.Types,
     value: '::std::basic_string;::std::basic_string_view;::std::vector;::std::array;QByteArray;QString' }
 

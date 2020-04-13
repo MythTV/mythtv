@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2005, Daniel Kristjansson
 
-#ifndef _CC708_WINDOW_
-#define _CC708_WINDOW_
+#ifndef CC708_WINDOW_H
+#define CC708_WINDOW_H
 
 #include <utility>
 #include <vector>
@@ -153,8 +153,8 @@ class CC708Pen
         m_attr.m_textTag   = text_tag;
         m_attr.m_fontTag   = font_tag;
         m_attr.m_edgeType  = edge_type;
-        m_attr.m_underline = underline;
-        m_attr.m_italics   = italics;
+        m_attr.m_underline = (underline != 0);
+        m_attr.m_italics   = (italics != 0);
         m_attr.m_boldface  = false;
     }
   public:
@@ -312,4 +312,4 @@ class CC708Service
     CC708Window m_windows[k708MaxWindows];
 };
 
-#endif // _CC708_WINDOW_
+#endif // CC708_WINDOW_H

@@ -22,7 +22,6 @@
 
 extern "C" {
 #include <cinttypes>
-#include "ivtv_myth.h"
 #include "vbitext/vt.h"
 }
 
@@ -105,7 +104,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             return; // error in vbimode
     }
 
-    int b1=0, b2=0, b3=0, b4=0;
+    int b1=0;
+    int b2=0;
+    int b3=0;
+    int b4=0;
     switch (packet)
     {
         case 0:  // Page Header

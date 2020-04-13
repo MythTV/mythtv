@@ -719,7 +719,7 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 		    mpeg2dec->fbuf[!low_delay + !mpeg2dec->convert];
 	}
 	if (mpeg2dec->convert) {
-	    mpeg2_convert_init_t convert_init;
+	    mpeg2_convert_init_t convert_init = {0};
 	    if (!mpeg2dec->convert_start) {
 		mpeg2dec->decoder.convert_id =
 		    mpeg2_malloc (mpeg2dec->convert_id_size,

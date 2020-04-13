@@ -1,20 +1,21 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 #include "surf3d.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 void grid3d_free(grid3d **grid)
 {
     free ((*grid)->surf.vertex);
     free ((*grid)->surf.svertex);
     free (*grid);
-    *grid = NULL;
+    *grid = nullptr;
 }
 
 grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	int x = defx;
 	int y = defz;
-	grid3d *g = (grid3d*)malloc (sizeof(grid3d));
+	auto *g = (grid3d*)malloc (sizeof(grid3d));
 	surf3d *s = &(g->surf);
 	s->nbvertex = x*y;
 	s->vertex = (v3d*)malloc (x*y*sizeof(v3d));
@@ -44,7 +45,7 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 #include "drawmethods.h"
 
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
-	v2d v2;
+	v2d v2 {};
 	
 	for (int i=0;i<s->nbvertex;i++) {
 		V3D_TO_V2D(s->svertex[i],v2,W,H,dist);
@@ -61,8 +62,8 @@ void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int
 
 void grid3d_draw (grid3d *g, int color, int colorlow,
 									int dist, int *buf, int *back, int W,int H) {
-	v2d v2;
-	v2d v2x;
+	v2d v2  {};
+	v2d v2x {};
 	
 	for (int x=0;x<g->defx;x++) {
 		V3D_TO_V2D(g->surf.svertex[x],v2x,W,H,dist);

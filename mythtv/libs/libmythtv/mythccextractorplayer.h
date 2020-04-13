@@ -125,7 +125,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     TeletextReader *GetTeletextReader(uint id=0) override; // MythPlayer
 
   private:
-    void IngestSubtitle(QList<OneSubtitle> &list, const QStringList &content);
+    void IngestSubtitle(QList<OneSubtitle> &list, const QStringList &content) const;
     static void IngestSubtitle(QList<OneSubtitle> &list, const OneSubtitle &content);
 
     enum { kProcessNormal = 0, kProcessFinalize = 1 };

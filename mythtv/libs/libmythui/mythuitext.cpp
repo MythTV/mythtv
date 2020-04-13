@@ -101,7 +101,7 @@ void MythUIText::ResetMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
+    QRegExp regexp(R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+))?%)");
     regexp.setMinimal(true);
 
     bool replaced = map.contains(objectName());
@@ -110,7 +110,7 @@ void MythUIText::ResetMap(const InfoMap &map)
     {
         int pos = 0;
 
-        QString translatedTemplate = qApp->translate("ThemeUI",
+        QString translatedTemplate = QCoreApplication::translate("ThemeUI",
                                                      newText.toUtf8());
 
         while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
@@ -162,14 +162,14 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
+    QRegExp regexp(R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+))?%)");
     regexp.setMinimal(true);
 
     if (!newText.isEmpty() && newText.contains(regexp))
     {
         int pos = 0;
 
-        QString translatedTemplate = qApp->translate("ThemeUI",
+        QString translatedTemplate = QCoreApplication::translate("ThemeUI",
                                                      newText.toUtf8());
 
         QString tempString = translatedTemplate;
@@ -279,7 +279,7 @@ void MythUIText::SetJustification(int just)
     }
 }
 
-int MythUIText::GetJustification(void)
+int MythUIText::GetJustification(void) const
 {
     return m_Justification;
 }
@@ -828,13 +828,13 @@ void MythUIText::FillCutMessage(void)
 
         if (isNumber && m_TemplateText.contains("%n"))
         {
-            m_CutMessage = qApp->translate("ThemeUI",
+            m_CutMessage = QCoreApplication::translate("ThemeUI",
                                            m_TemplateText.toUtf8(), nullptr,
                                            qAbs(value));
         }
         else if (m_TemplateText.contains("%1"))
         {
-            QString tmp = qApp->translate("ThemeUI", m_TemplateText.toUtf8());
+            QString tmp = QCoreApplication::translate("ThemeUI", m_TemplateText.toUtf8());
             m_CutMessage = tmp.arg(m_Message);
         }
     }
@@ -1442,7 +1442,7 @@ bool MythUIText::ParseElement(
     {
         if (element.attribute("lang", "").isEmpty())
         {
-            m_Message = qApp->translate("ThemeUI",
+            m_Message = QCoreApplication::translate("ThemeUI",
                                         parseText(element).toUtf8());
         }
         else if ((element.attribute("lang", "").toLower() ==

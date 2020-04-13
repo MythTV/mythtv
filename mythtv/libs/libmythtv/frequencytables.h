@@ -219,14 +219,20 @@ class transport_scan_items_it_t
         return *this;
     }
 
-    transport_scan_items_it_t operator++(int)
+    // cert-dcl21-cpp says this function should be const.
+    // readability-const-return-type says it shouldn't.
+    // NOLINTNEXTLINE(readability-const-return-type)
+    const transport_scan_items_it_t operator++(int)
     {
         transport_scan_items_it_t tmp = *this;
         operator++();
         return tmp;
     }
 
-    transport_scan_items_it_t operator--(int)
+    // cert-dcl21-cpp says this function should be const.
+    // readability-const-return-type says it shouldn't.
+    // NOLINTNEXTLINE(readability-const-return-type)
+    const transport_scan_items_it_t operator--(int)
     {
         transport_scan_items_it_t tmp = *this;
         operator--();
@@ -267,10 +273,7 @@ class transport_scan_items_it_t
 inline bool operator==(const transport_scan_items_it_t& A,
                        const transport_scan_items_it_t& B)
 {
-    list<TransportScanItem>::const_iterator A_it = A.m_it;
-    list<TransportScanItem>::const_iterator B_it = B.m_it;
-
-    return (A_it == B_it) && (A.m_offset == B.m_offset);
+    return (A.m_it == B.m_it) && (A.m_offset == B.m_offset);
 }
 
 inline bool operator!=(const transport_scan_items_it_t &A,
@@ -282,10 +285,7 @@ inline bool operator!=(const transport_scan_items_it_t &A,
 inline bool operator==(const transport_scan_items_it_t& A,
                        const list<TransportScanItem>::iterator& B)
 {
-    list<TransportScanItem>::const_iterator A_it = A.m_it;
-    list<TransportScanItem>::const_iterator B_it = B;
-
-    return (A_it == B_it) && (0 == A.offset());
+    return (A.m_it == B) && (0 == A.offset());
 }
 
 using transport_scan_items_t = list<TransportScanItem>;

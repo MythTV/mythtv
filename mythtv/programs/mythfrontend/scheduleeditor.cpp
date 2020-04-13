@@ -108,7 +108,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             StoreOptMixin(*this, recRule),
             PostProcMixin(*this, recRule),
             m_recordingRule(recRule),
-            m_player(player),  m_view(kMainView)
+            m_player(player)
 {
 }
 

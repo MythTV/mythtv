@@ -1,5 +1,5 @@
-#ifndef __BACKENDSELECT_H__
-#define __BACKENDSELECT_H__
+#ifndef BACKENDSELECT_H
+#define BACKENDSELECT_H
 
 #include <QMutex>
 
@@ -94,4 +94,4 @@ class BackendSelection : public MythScreenType
 
 Q_DECLARE_METATYPE(DeviceLocation*)
 
-#endif
+#endif // BACKENDSELECT_H

@@ -26,6 +26,8 @@
  *  Support for importing Xml formatted property lists will be added.
  */
 
+#include <cmath>
+
 // TODO
 // parse uid (and use QPair to differentiate?)
 
@@ -131,7 +133,7 @@ bool PList::ToXML(QIODevice *device)
     xml.setAutoFormatting(true);
     xml.setAutoFormattingIndent(4);
     xml.writeStartDocument();
-    xml.writeDTD("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+    xml.writeDTD(R"(<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">)");
     xml.writeStartElement("plist");
     xml.writeAttribute("version", "1.0");
     bool success = ToXML(m_result, xml);
@@ -218,7 +220,7 @@ void PList::ParseBinaryPList(const QByteArray &data)
     m_result = QVariant();
 
     // check minimum size
-    quint32 size = static_cast<quint32>(data.size());
+    auto size = static_cast<quint32>(data.size());
     if (size < MIN_SIZE)
         return;
 
@@ -431,7 +433,7 @@ QVariant PList::ParseBinaryReal(quint8 *data)
     if (count == sizeof(float))
     {
         convert_float(data, static_cast<quint8>(count));
-        float temp;
+        float temp = NAN;
         std::copy(data, data + sizeof(float), reinterpret_cast<quint8*>(&temp));
         result = static_cast<double>(temp);
     }
@@ -456,9 +458,9 @@ QVariant PList::ParseBinaryDate(quint8 *data)
         return result;
 
     convert_float(data, 8);
-    double temp;
+    double temp = NAN;
     std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&temp));
-    quint64 msec = static_cast<quint64>(temp * 1000.0);
+    auto msec = static_cast<quint64>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);

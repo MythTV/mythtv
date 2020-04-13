@@ -56,6 +56,7 @@ void MHParseText::GetNextChar()
     }
     else
     {
+        // NOLINTNEXTLINE(bugprone-signed-char-misuse)
         m_ch = m_data[m_p++];
     }
 }
@@ -363,7 +364,7 @@ static int FindTag(const char *p)
 // Ditto for the enumerated types
 #define MAX_ENUM        30
 
-void MHParseText::Error(const char *str)
+void MHParseText::Error(const char *str) const
 {
     MHERROR(QString("%1- at line %2\n").arg(str).arg(m_lineCount));
 }
