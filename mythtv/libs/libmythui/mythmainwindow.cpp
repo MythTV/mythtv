@@ -1004,12 +1004,6 @@ void MythMainWindow::Init(bool mayReInit)
     // screen position ends up stuck. Adding a border temporarily prevents this
     setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 
-    if (!inwindow)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Using Frameless Window");
-        flags |= Qt::FramelessWindowHint;
-    }
-
     // Workaround Qt/Windows playback bug?
 #ifdef _WIN32
     flags |= Qt::MSWindowsOwnDC;
