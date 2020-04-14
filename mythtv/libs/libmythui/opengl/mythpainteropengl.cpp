@@ -6,7 +6,6 @@
 #include <QPainter>
 
 // MythTV
-#include "mythmainwindow_internal.h"
 #include "mythrenderopengl.h"
 #include "mythpainteropengl.h"
 

@@ -23,9 +23,10 @@ LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS  = mythmainwindow.h mythpainter.h mythimage.h mythrect.h
+HEADERS  = mythmainwindowprivate.h mythmainwindow.h mythpainter.h mythimage.h mythrect.h
+HEADERS += mythpainterwindow.h mythpainterwindowqt.h
 HEADERS += myththemebase.h  mythpainter_qimage.h
-HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
+HEADERS += mythpainter_qt.h mythuihelper.h
 HEADERS += mythscreenstack.h mythgesture.h mythuitype.h mythscreentype.h
 HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
 HEADERS += mythuibutton.h myththemedmenu.h mythdialogbox.h
@@ -44,7 +45,8 @@ HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h
 HEADERS += mythedid.h
 
-SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
+SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
+SOURCES += mythpainterwindow.cpp mythpainterwindowqt.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
 SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp
@@ -191,12 +193,17 @@ mingw | win32-msvc*{
 
 using_opengl {
     DEFINES += USING_OPENGL
-    SOURCES += opengl/mythpainteropengl.cpp  opengl/mythrenderopengl.cpp
-    HEADERS += opengl/mythpainteropengl.h    opengl/mythrenderopengl.h
-    HEADERS += opengl/mythrenderopengldefs.h opengl/mythrenderopenglshaders.h
+    HEADERS += opengl/mythpainterwindowopengl.h
+    HEADERS += opengl/mythpainteropengl.h
+    HEADERS += opengl/mythrenderopengl.h
+    HEADERS += opengl/mythrenderopengldefs.h
+    HEADERS += opengl/mythrenderopenglshaders.h
     HEADERS += opengl/mythopenglperf.h
-    SOURCES += opengl/mythopenglperf.cpp
     HEADERS += opengl/mythegl.h
+    SOURCES += opengl/mythpainterwindowopengl.cpp
+    SOURCES += opengl/mythpainteropengl.cpp
+    SOURCES += opengl/mythrenderopengl.cpp
+    SOURCES += opengl/mythopenglperf.cpp
     SOURCES += opengl/mythegl.cpp
 
     using_egl {

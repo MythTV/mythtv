@@ -23,7 +23,7 @@ using MediaPlayCallback = int (*)(const QString &, const QString &, const QStrin
 
 class MythMainWindowPrivate;
 
-class MythPainterWindowGL;
+class MythPainterWindowOpenGL;
 class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
 class MythPainterWindowD3D9;
@@ -32,7 +32,7 @@ class MythRender;
 class MUI_PUBLIC MythMainWindow : public QWidget
 {
     Q_OBJECT
-    friend class MythPainterWindowGL;
+    friend class MythPainterWindowOpenGL;
     friend class MythPainterWindowQt;
     friend class MythPainterWindowVDPAU;
     friend class MythPainterWindowD3D9;

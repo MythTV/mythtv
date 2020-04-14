@@ -1,5 +1,5 @@
 #include "mythmainwindow.h"
-#include "mythmainwindow_internal.h"
+#include "mythmainwindowprivate.h"
 
 // C headers
 #include <cmath>
@@ -65,8 +65,10 @@ using namespace std;
 
 #include "mythscreentype.h"
 #include "mythpainter.h"
+#include "mythpainterwindowqt.h"
 #ifdef USING_OPENGL
 #include "mythpainteropengl.h"
+#include "mythpainterwindowopengl.h"
 #endif
 #include "mythpainter_qt.h"
 #include "mythgesture.h"
@@ -85,182 +87,7 @@ using namespace std;
 #define STANDBY_TIMEOUT 90 // Minutes
 #define LONGPRESS_INTERVAL 1000
 
-#define LOC      QString("MythMainWindow: ")
-
-class KeyContext
-{
-  public:
-    void AddMapping(int key, const QString& action)
-    {
-        m_actionMap[key].append(action);
-    }
-
-    bool GetMapping(int key, QStringList &actions)
-    {
-        if (m_actionMap.count(key) > 0)
-        {
-            actions += m_actionMap[key];
-            return true;
-        }
-        return false;
-    }
-
-    QMap<int, QStringList> m_actionMap;
-};
-
-// Adding member initializers caused compilation to fail with an error
-// that it cannot convert a brace-enclosed initializer list to JumpData.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-struct JumpData
-{
-    void (*m_callback)(void);
-    QString m_destination;
-    QString m_description;
-    bool    m_exittomain;
-    QString m_localAction;
-};
-
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-struct MPData {
-    QString           m_description;
-    MediaPlayCallback m_playFn;
-};
-
-class MythMainWindowPrivate
-{
-  public:
-    MythMainWindowPrivate() = default;
-
-    static int TranslateKeyNum(QKeyEvent *e);
-
-    float                m_wmult                {1.0F};
-    float                m_hmult                {1.0F};
-    QRect                m_screenRect;
-    QRect                m_uiScreenRect;
-    bool                 m_doesFillScreen       {false};
-
-    bool                 m_ignoreLircKeys       {false};
-    bool                 m_ignoreJoystickKeys   {false};
-
-    LIRC                *m_lircThread           {nullptr};
-
-#ifdef USE_JOYSTICK_MENU
-    JoystickMenuThread  *m_joystickThread       {nullptr};
-#endif
-
-#ifdef USING_APPLEREMOTE
-    AppleRemoteListener *m_appleRemoteListener  {nullptr};
-    AppleRemote         *m_appleRemote          {nullptr};
-#endif
-
-#ifdef USING_LIBCEC
-    MythCECAdapter       m_cecAdapter           { };
-#endif
-
-    bool                 m_exitingtomain        {false};
-    bool                 m_popwindows           {false};
-
-    /// To allow or prevent database access
-    bool                 m_useDB                {true};
-
-    QHash<QString, KeyContext *> m_keyContexts;
-    QMap<int, JumpData*> m_jumpMap;
-    QMap<QString, JumpData> m_destinationMap;
-    QMap<QString, MPData> m_mediaPluginMap;
-    QHash<QString, QHash<QString, QString> > m_actionText;
-
-    void (*m_exitMenuCallback)(void) {nullptr};
-
-    void (*m_exitMenuMediaDeviceCallback)(MythMediaDevice* mediadevice) {nullptr};
-    MythMediaDevice * m_mediaDeviceForCallback {nullptr};
-
-    int      m_escapekey                 {0};
-
-    QObject *m_sysEventHandler           {nullptr};
-
-    int      m_drawInterval              {1000 / MythMainWindow::drawRefresh};
-    MythSignalingTimer *m_drawTimer      {nullptr};
-    QVector<MythScreenStack *> m_stackList;
-    MythScreenStack *m_mainStack         {nullptr};
-
-    MythDisplay     *m_display           { MythDisplay::AcquireRelease() };
-    MythPainter     *m_painter           {nullptr};
-
-    QRegion          m_repaintRegion;
-
-    MythGesture      m_gesture;
-    QTimer          *m_gestureTimer      {nullptr};
-    QTimer          *m_hideMouseTimer    {nullptr};
-
-    /* compatibility only, FIXME remove */
-    std::vector<QWidget *> m_widgetList;
-    QMap<QWidget *, bool> m_enabledWidgets;
-
-    MythPainterWindow *m_paintwin        {nullptr};
-
-    QWidget         *m_oldpaintwin       {nullptr};
-    MythPainter     *m_oldpainter        {nullptr};
-
-    QMutex           m_drawDisableLock;
-    uint             m_drawDisabledDepth {0};
-    bool             m_drawEnabled       {true};
-
-    MythThemeBase   *m_themeBase         {nullptr};
-    MythUDPListener *m_udpListener       {nullptr};
-
-    MythNotificationCenter *m_nc         {nullptr};
-    QTimer          *m_idleTimer         {nullptr};
-    int              m_idleTime          {0};
-    bool             m_standby           {false};
-    bool             m_enteringStandby   {false};
-    bool             m_disableIdle       {false};
-
-    bool             m_allowInput        {true};
-
-    bool             m_pendingUpdate     {false};
-
-        // window aspect
-    bool             m_firstinit         {true};
-    bool             m_bSavedPOS         {false};
-    // Support for long press
-    int              m_longPressKeyCode  {0};
-    ulong            m_longPressTime     {0};
-};
-
-// Make keynum in QKeyEvent be equivalent to what's in QKeySequence
-int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
-{
-    int keynum = e->key();
-
-    if ((keynum != Qt::Key_Shift  ) && (keynum !=Qt::Key_Control   ) &&
-        (keynum != Qt::Key_Meta   ) && (keynum !=Qt::Key_Alt       ) &&
-        (keynum != Qt::Key_Super_L) && (keynum !=Qt::Key_Super_R   ) &&
-        (keynum != Qt::Key_Hyper_L) && (keynum !=Qt::Key_Hyper_R   ) &&
-        (keynum != Qt::Key_AltGr  ) && (keynum !=Qt::Key_CapsLock  ) &&
-        (keynum != Qt::Key_NumLock) && (keynum !=Qt::Key_ScrollLock ))
-    {
-        Qt::KeyboardModifiers modifiers;
-        // if modifiers have been pressed, rebuild keynum
-        if ((modifiers = e->modifiers()) != Qt::NoModifier)
-        {
-            int modnum = Qt::NoModifier;
-            if (((modifiers & Qt::ShiftModifier) != 0U) &&
-                (keynum > 0x7f) &&
-                (keynum != Qt::Key_Backtab))
-                modnum |= Qt::SHIFT;
-            if ((modifiers & Qt::ControlModifier) != 0U)
-                modnum |= Qt::CTRL;
-            if ((modifiers & Qt::MetaModifier) != 0U)
-                modnum |= Qt::META;
-            if ((modifiers & Qt::AltModifier) != 0U)
-                modnum |= Qt::ALT;
-            modnum &= ~Qt::UNICODE_ACCEL;
-            return (keynum | modnum);
-        }
-    }
-
-    return keynum;
-}
+#define LOC QString("MythMainWindow: ")
 
 static MythMainWindow *mainWin = nullptr;
 static QMutex mainLock;
@@ -325,62 +152,6 @@ MythNotificationCenter *GetNotificationCenter(void)
     return mainWin->GetCurrentNotificationCenter();
 }
 
-MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
-  : QWidget(MainWin)
-{
-}
-
-#ifdef USING_OPENGL
-MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *MainWin,
-                                         MythMainWindowPrivate *MainWinPriv)
-  : MythPainterWindow(MainWin),
-    m_parent(MainWin),
-    d(MainWinPriv)
-{
-    setAttribute(Qt::WA_NoSystemBackground);
-    setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_DontCreateNativeAncestors);
-    winId();
-#ifdef Q_OS_MACOS
-     // must be visible before OpenGL initialisation on OSX
-    setVisible(true);
-#endif
-    MythRenderOpenGL *render = MythRenderOpenGL::Create(this);
-    if (render)
-    {
-        m_render = render;
-        if (render->Init() && render->IsRecommendedRenderer())
-            m_valid = true;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create MythRenderOpenGL");
-    }
-}
-
-QPaintEngine *MythPainterWindowGL::paintEngine() const
-{
-    return testAttribute(Qt::WA_PaintOnScreen) ? nullptr : m_parent->paintEngine();
-}
-
-MythPainterWindowGL::~MythPainterWindowGL()
-{
-    if (m_render)
-        m_render->DecrRef();
-}
-
-bool MythPainterWindowGL::IsValid(void) const
-{
-    return m_valid;
-}
-
-void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
-{
-    d->m_repaintRegion = d->m_repaintRegion.united(pe->region());
-    m_parent->drawScreen();
-}
-#endif
-
 #ifdef _WIN32
 MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
                                              MythMainWindowPrivate *priv)
@@ -396,21 +167,6 @@ void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
     m_parent->drawScreen();
 }
 #endif
-
-MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *MainWin,
-                                         MythMainWindowPrivate *MainWinPriv)
-  : MythPainterWindow(MainWin),
-    m_parent(MainWin),
-    d(MainWinPriv)
-{
-    setAttribute(Qt::WA_NoSystemBackground);
-}
-
-void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
-{
-    d->m_repaintRegion = d->m_repaintRegion.united(pe->region());
-    m_parent->drawScreen();
-}
 
 MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
@@ -1084,7 +840,7 @@ void MythMainWindow::Init(bool mayReInit)
     // always use OpenGL by default. Only fallback to Qt painter as a last resort.
     if (!d->m_painter && !d->m_paintwin)
     {
-        auto* glwindow = new MythPainterWindowGL(this, d);
+        auto* glwindow = new MythPainterWindowOpenGL(this, d);
         if (glwindow && glwindow->IsValid())
         {
             d->m_paintwin = glwindow;
