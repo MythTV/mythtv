@@ -70,7 +70,6 @@ struct MPData {
 class MythMainWindowPrivate
 {
     friend class MythMainWindow;
-    friend class MythPainterWindowOpenGL;
     friend class MythPainterWindowQt;
 
   protected:

@@ -5,11 +5,9 @@
 
 #define LOC QString("GLPaintWin: ")
 
-MythPainterWindowOpenGL::MythPainterWindowOpenGL(MythMainWindow *MainWin,
-                                                 MythMainWindowPrivate *MainWinPriv)
+MythPainterWindowOpenGL::MythPainterWindowOpenGL(MythMainWindow *MainWin)
   : MythPainterWindow(MainWin),
-    m_parent(MainWin),
-    d(MainWinPriv)
+    m_parent(MainWin)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_NativeWindow);
@@ -48,8 +46,7 @@ bool MythPainterWindowOpenGL::IsValid(void) const
     return m_valid;
 }
 
-void MythPainterWindowOpenGL::paintEvent(QPaintEvent *pe)
+void MythPainterWindowOpenGL::paintEvent(QPaintEvent* /*PaintEvent*/)
 {
-    d->m_repaintRegion = d->m_repaintRegion.united(pe->region());
     m_parent->drawScreen();
 }

@@ -6,22 +6,20 @@
 #include "mythrenderopengl.h"
 
 class MythMainWindow;
-class MythMainWindowPrivate;
 
 class MythPainterWindowOpenGL : public MythPainterWindow
 {
     Q_OBJECT
 
   public:
-    MythPainterWindowOpenGL(MythMainWindow *MainWin, MythMainWindowPrivate *MainWinPriv);
+    MythPainterWindowOpenGL(MythMainWindow *MainWin);
    ~MythPainterWindowOpenGL() override;
 
     bool          IsValid    (void) const;
     QPaintEngine* paintEngine(void) const override;
-    void          paintEvent (QPaintEvent *e) override;
+    void          paintEvent (QPaintEvent *PaintEvent) override;
 
     MythMainWindow *m_parent { nullptr };
-    MythMainWindowPrivate *d { nullptr };
     bool m_valid             { false   };
 };
 
