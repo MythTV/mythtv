@@ -183,7 +183,7 @@ int64_t MythBDPlayer::GetChapter(int Chapter)
 {
     if (GetNumChapters() < 1)
         return -1;
-    uint32_t chapter = static_cast<uint32_t>(Chapter - 1);
+    auto chapter = static_cast<uint32_t>(Chapter - 1);
     return static_cast<int64_t>(m_playerCtx->m_buffer->BD()->GetChapterStartFrame(chapter));
 }
 

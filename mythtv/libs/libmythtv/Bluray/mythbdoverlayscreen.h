@@ -11,7 +11,7 @@ class MythBDOverlayScreen : public MythScreenType
 {
   public:
     MythBDOverlayScreen(MythPlayer *Player, const QString &Name);
-   ~MythBDOverlayScreen() override;
+   ~MythBDOverlayScreen() override = default;
 
     void DisplayBDOverlay(MythBDOverlay *Overlay);
 

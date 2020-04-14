@@ -104,8 +104,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     void      GoToPreviousProgram  (void);
     bool      GoBack               (void);
     void      AudioStreamsChanged  (bool Change);
-    int64_t   GetCurrentTime       (void);
-    uint      TitleTimeLeft        (void);
+    int64_t   GetCurrentTime       (void) const;
+    uint      TitleTimeLeft        (void) const;
     void      SetTrack             (uint Type, int TrackNo);
     int       GetTrack             (uint Type) const;
     uint16_t  GetNumAudioChannels  (int Index);

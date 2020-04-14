@@ -616,7 +616,7 @@ uint64_t MythBDBuffer::GetTotalTimeOfTitle(void) const
     return m_currentTitleLength / 90000;
 }
 
-uint64_t MythBDBuffer::GetCurrentTime(void)
+uint64_t MythBDBuffer::GetCurrentTime(void) const
 {
     return m_currentTime / 90000;
 }

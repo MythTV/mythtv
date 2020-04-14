@@ -51,7 +51,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     int       GetTitleDuration   (int Title);
     uint64_t  GetTitleSize       (void) const;
     uint64_t  GetTotalTimeOfTitle(void) const;
-    uint64_t  GetCurrentTime     (void);
+    uint64_t  GetCurrentTime     (void) const;
     uint64_t  GetTotalReadPosition(void);
     uint32_t  GetNumChapters     (void);
     uint32_t  GetCurrentChapter  (void);

@@ -1967,12 +1967,12 @@ void MythDVDBuffer::SetDVDSpeed(int Speed)
 }
 
 /// \brief returns seconds left in the title
-uint MythDVDBuffer::TitleTimeLeft(void)
+uint MythDVDBuffer::TitleTimeLeft(void) const
 {
     return static_cast<uint>(GetTotalTimeOfTitle() - GetCurrentTime());
 }
 
-int64_t MythDVDBuffer::GetCurrentTime(void)
+int64_t MythDVDBuffer::GetCurrentTime(void) const
 {
     return (m_currentTime / 90000);
 }
