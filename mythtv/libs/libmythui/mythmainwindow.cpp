@@ -1627,8 +1627,7 @@ void MythMainWindow::RegisterMediaPlugin(const QString &name,
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Registering %1 as a media playback plugin.").arg(name));
-        MPData mpd = {desc, fn};
-        d->m_mediaPluginMap[name] = mpd;
+        d->m_mediaPluginMap[name] = { desc, fn };
     }
     else
     {
@@ -1653,10 +1652,10 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (d->m_mediaPluginMap.count(lhandler))
     {
-        d->m_mediaPluginMap[lhandler].m_playFn(mrl, plot, title, subtitle,
-                                           director, season, episode,
-                                           inetref, lenMins, year, id,
-                                           useBookmarks);
+        d->m_mediaPluginMap[lhandler].second(mrl, plot, title, subtitle,
+                                             director, season, episode,
+                                             inetref, lenMins, year, id,
+                                             useBookmarks);
         return true;
     }
 

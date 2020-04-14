@@ -61,11 +61,7 @@ struct JumpData
     QString m_localAction;
 };
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-struct MPData {
-    QString           m_description;
-    MediaPlayCallback m_playFn;
-};
+using MythMediaCallback = QPair<QString, MediaPlayCallback>;
 
 class MythMainWindowPrivate
 {
@@ -104,7 +100,7 @@ class MythMainWindowPrivate
     QHash<QString, KeyContext *> m_keyContexts;
     QMap<int, JumpData*> m_jumpMap;
     QMap<QString, JumpData> m_destinationMap;
-    QMap<QString, MPData> m_mediaPluginMap;
+    QMap<QString, MythMediaCallback> m_mediaPluginMap;
     QHash<QString, QHash<QString, QString> > m_actionText;
 
     void (*m_exitMenuCallback)(void) { nullptr };
