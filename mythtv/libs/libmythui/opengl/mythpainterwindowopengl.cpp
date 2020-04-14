@@ -1,6 +1,5 @@
 // MythTV
 #include "mythmainwindow.h"
-#include "mythmainwindowprivate.h"
 #include "opengl/mythpainterwindowopengl.h"
 
 #define LOC QString("GLPaintWin: ")

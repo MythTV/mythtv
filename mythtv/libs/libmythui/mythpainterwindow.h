@@ -8,10 +8,15 @@
 #include "mythrender_base.h"
 
 class MythMainWindow;
+class MythPainter;
 
 class MythPainterWindow : public QWidget
 {
   public:
+    static QString CreatePainters(MythMainWindow* MainWindow,
+                                  MythPainterWindow*& PaintWin,
+                                  MythPainter*& Painter);
+
     MythPainterWindow(MythMainWindow *MainWin);
     MythRender* GetRenderDevice(void);
     bool        RenderIsShared (void);

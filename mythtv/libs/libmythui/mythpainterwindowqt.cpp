@@ -1,18 +1,15 @@
 // MythTV
-#include "mythmainwindowprivate.h"
+#include "mythmainwindow.h"
 #include "mythpainterwindowqt.h"
 
-MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *MainWin,
-                                         MythMainWindowPrivate *MainWinPriv)
+MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *MainWin)
   : MythPainterWindow(MainWin),
-    m_parent(MainWin),
-    d(MainWinPriv)
+    m_parent(MainWin)
 {
     setAttribute(Qt::WA_NoSystemBackground);
 }
 
 void MythPainterWindowQt::paintEvent(QPaintEvent *Event)
 {
-    d->m_repaintRegion = d->m_repaintRegion.united(Event->region());
-    m_parent->drawScreen();
+    m_parent->drawScreen(Event);
 }

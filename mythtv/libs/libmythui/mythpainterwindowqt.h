@@ -4,18 +4,16 @@
 // MythTV
 #include "mythpainterwindow.h"
 
-class MythMainWindowPrivate;
-
 class MythPainterWindowQt : public MythPainterWindow
 {
     Q_OBJECT
 
   public:
-    MythPainterWindowQt(MythMainWindow *MainWin, MythMainWindowPrivate *MainWinPriv);
+    MythPainterWindowQt(MythMainWindow *MainWin);
 
     void paintEvent(QPaintEvent *Event) override;
 
+  private:
     MythMainWindow *m_parent;
-    MythMainWindowPrivate *d;
 };
 #endif // MYTHPAINTERWINDOWQT_H

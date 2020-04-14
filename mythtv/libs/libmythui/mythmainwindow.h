@@ -22,11 +22,6 @@ class MythMediaDevice;
 using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
 class MythMainWindowPrivate;
-
-class MythPainterWindowOpenGL;
-class MythPainterWindowQt;
-class MythPainterWindowVDPAU;
-class MythPainterWindowD3D9;
 class MythRender;
 
 class MUI_PUBLIC MythMainWindow : public QWidget
@@ -34,8 +29,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     Q_OBJECT
     friend class MythPainterWindowOpenGL;
     friend class MythPainterWindowQt;
-    friend class MythPainterWindowVDPAU;
-    friend class MythPainterWindowD3D9;
 
   public:
     enum {drawRefresh = 70};
@@ -159,7 +152,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void customEvent(QEvent *ce) override; // QWidget
     void closeEvent(QCloseEvent *e) override; // QWidget
 
-    void drawScreen();
+    void drawScreen(QPaintEvent* Event = nullptr);
 
     bool event(QEvent* e) override; // QWidget
 

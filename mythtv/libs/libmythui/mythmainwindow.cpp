@@ -65,12 +65,7 @@ using namespace std;
 
 #include "mythscreentype.h"
 #include "mythpainter.h"
-#include "mythpainterwindowqt.h"
-#ifdef USING_OPENGL
-#include "mythpainteropengl.h"
-#include "mythpainterwindowopengl.h"
-#endif
-#include "mythpainter_qt.h"
+#include "mythpainterwindow.h"
 #include "mythgesture.h"
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
@@ -472,13 +467,18 @@ void MythMainWindow::animate(void)
     d->m_drawTimer->blockSignals(false);
 }
 
-void MythMainWindow::drawScreen(void)
+void MythMainWindow::drawScreen(QPaintEvent* Event)
 {
     if (!d->m_drawEnabled)
         return;
 
+    if (Event)
+        d->m_repaintRegion = d->m_repaintRegion.united(Event->region());
+
     if (!d->m_painter->SupportsClipping())
+    {
         d->m_repaintRegion = d->m_repaintRegion.united(d->m_uiScreenRect);
+    }
     else
     {
         // Ensure that the region is not larger than the screen which
@@ -836,33 +836,9 @@ void MythMainWindow::Init(bool mayReInit)
         d->m_painter = nullptr;
     }
 
-#ifdef USING_OPENGL
-    // always use OpenGL by default. Only fallback to Qt painter as a last resort.
+    QString warningmsg;
     if (!d->m_painter && !d->m_paintwin)
-    {
-        auto* glwindow = new MythPainterWindowOpenGL(this);
-        if (glwindow && glwindow->IsValid())
-        {
-            d->m_paintwin = glwindow;
-            auto *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
-            d->m_painter = new MythOpenGLPainter(render, this);
-        }
-        else
-        {
-            delete glwindow;
-        }
-    }
-#endif
-
-    // NOLINTNEXTLINE(readability-misleading-indentation)
-    bool openglwarn = false;
-    if (!d->m_painter && !d->m_paintwin)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter. Video playback will not work!");
-        d->m_painter = new MythQtPainter();
-        d->m_paintwin = new MythPainterWindowQt(this, d);
-        openglwarn = QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND;
-    }
+        warningmsg = MythPainterWindow::CreatePainters(this, d->m_paintwin, d->m_painter);
 
     if (!d->m_paintwin)
     {
@@ -910,9 +886,9 @@ void MythMainWindow::Init(bool mayReInit)
     d->m_cecAdapter.Open();
 #endif
 
-    if (openglwarn)
+    if (!warningmsg.isEmpty())
     {
-        MythNotification notification(tr("Warning: OpenGL is not available."), "");
+        MythNotification notification(warningmsg, "");
         d->m_nc->Queue(notification);
     }
 }
