@@ -68,17 +68,20 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     ScanDTVTransportList transports = _transports;
 
-    // Print some scan parameters
+    // Scan parameters
     {
-        cout << endl << "Scan parameters:" << endl;
         bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
-        cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
-        cout << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << endl;
-        cout << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
-        cout << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
-        cout << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
-        cout << "Remove duplicate channels   : " << (m_removeDuplicates  ? "yes" : "no") << endl;
+        QString msg;
+        QTextStream ssMsg(&msg);
+        ssMsg << endl << "Scan parameters:" << endl;
+        ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
+        ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << endl;
+        ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
+        ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
+        ssMsg << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
+        ssMsg << "Remove duplicates           : " << (m_removeDuplicates  ? "yes" : "no") << endl;
+        LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
     // List of transports
@@ -500,14 +503,14 @@ void ChannelImporter::InsertChannels(
 
 // ChannelImporter::InsertChannels
 //
-// transports       List of channels to update
+// transports       List of channels to insert
 // info             Channel statistics
 // action           Insert all, Insert manually, Ignore all
 // type             Channel type such as dvb or atsc
 // inserted_list    List of inserted channels
 // skipped_list     List of skipped channels
 //
-// return:          List of transports/channels that have not been inserted
+// return:          List of channels that have not been inserted
 //
 ScanDTVTransportList ChannelImporter::InsertChannels(
     const ScanDTVTransportList &transports,
@@ -716,14 +719,14 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
 // ChannelImporter::UpdateChannels
 //
-// transports   list of transports/channels to update
-// info         Channel statistics
-// action       Update All, Ignore All
-// type         Channel type such as dvb or atsc
-// inserted     List of inserted channels
-// skipped      List of skipped channels
+// transports       List of channels to update
+// info             Channel statistics
+// action           Update All, Ignore All
+// type             Channel type such as dvb or atsc
+// updated_list     List of updated channels
+// skipped_list     List of skipped channels
 //
-// return:      List of transports/channels that have not been updated
+// return:          List of channels that have not been updated
 //
 ScanDTVTransportList ChannelImporter::UpdateChannels(
     const ScanDTVTransportList &transports,
@@ -805,10 +808,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 tsid = (tsid) ? tsid : chan.m_sdtTsId;
                 tsid = (tsid) ? tsid : chan.m_patTsId;
                 tsid = (tsid) ? tsid : chan.m_vctChanTsId;
-                int id = ChannelUtil::GetBetterMplexID(chan.m_dbMplexId,
-                            tsid, chan.m_origNetId);
-                if (id >= 0)
-                    chan.m_dbMplexId = id;
+
+                chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
+                    chan.m_sourceId, transport, tsid, chan.m_origNetId);
 
                 updated = ChannelUtil::UpdateChannel(
                     chan.m_dbMplexId,
@@ -978,8 +980,9 @@ void ChannelImporter::RemoveDuplicates(ScanDTVTransportList &transports, ScanDTV
                 bool found_diff = true;
                 if (ta.m_channels.size() == tb.m_channels.size())
                 {
-                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Comparing transports " +
-                        FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()) +
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Comparing transport A " +
+                        FormatTransport(ta) + QString(" size(%1)").arg(ta.m_channels.size()));
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Comparing transport B " +
                         FormatTransport(tb) + QString(" size(%1)").arg(tb.m_channels.size()));
 
                     for (size_t k = 0; found_same && k < tb.m_channels.size(); ++k)
@@ -1002,11 +1005,10 @@ void ChannelImporter::RemoveDuplicates(ScanDTVTransportList &transports, ScanDTV
                     ignore[lowss] = true;
                     duplicates.push_back(transports[lowss]);
 
-                    LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                        "Duplicate transports found:" +
-                        "\n\t" + "Transport A " + FormatTransport(transports[i]) +
-                        "\n\t" + "Transport B " + FormatTransport(transports[j]) +
-                        "\n\t" + "Discarding  " + FormatTransport(transports[lowss]));
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Duplicate transports found:");
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport A " + FormatTransport(transports[i]));
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Transport B " + FormatTransport(transports[j]));
+                    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Discarding  " + FormatTransport(transports[lowss]));
                 }
             }
         }
