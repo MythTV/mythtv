@@ -67,43 +67,37 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     }
 
     ScanDTVTransportList transports = _transports;
+    QString msg;
+    QTextStream ssMsg(&msg);
 
     // Scan parameters
     {
         bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
-        QString msg;
-        QTextStream ssMsg(&msg);
-        ssMsg << endl << "Scan parameters:" << endl;
+        ssMsg << endl << endl;
+        ssMsg << "Scan parameters:" << endl;
         ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
         ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << endl;
         ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
         ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
         ssMsg << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
         ssMsg << "Remove duplicates           : " << (m_removeDuplicates  ? "yes" : "no") << endl;
-        LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 
-    // List of transports
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    // Transports and channels before processing
+    if (!transports.empty())
     {
-        if (!transports.empty())
-        {
-            cout << endl;
-            cout << "Transport list before processing (" << transports.size() << "):" << endl;
-            cout << FormatTransports(transports).toLatin1().constData() << endl;
-        }
-    }
+        ssMsg << endl;
+        ssMsg << "Transport list before processing (" << transports.size() << "):" << endl;
+        ssMsg << FormatTransports(transports).toLatin1().constData();
 
-    // Print out each channel
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
-    {
-        cout << endl << "Channel list before processing (";
-        cout << SimpleCountChannels(transports) << "):" << endl;
-        ChannelImporterBasicStats infoA = CollectStats(transports);
-        cout << FormatChannels(transports, &infoA).toLatin1().constData() << endl;
-        cout << endl;
+        ChannelImporterBasicStats info = CollectStats(transports);
+        ssMsg << endl;
+        ssMsg << "Channel list before processing (";
+        ssMsg << SimpleCountChannels(transports) << "):" << endl;
+        ssMsg << FormatChannels(transports, &info).toLatin1().constData();
     }
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
     uint saved_scan = 0;
     if (m_doSave)
@@ -117,19 +111,15 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     {
         ScanDTVTransportList duplicates;
         RemoveDuplicates(transports, duplicates);
-        if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+        if (!duplicates.empty())
         {
-            if (!duplicates.empty())
-            {
-                cout << endl;
-                cout << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
-                cout << FormatTransports(duplicates).toLatin1().constData() << endl;
-                cout << endl;
-                cout << "With channels (";
-                cout << SimpleCountChannels(duplicates) << "):" << endl;
-                cout << FormatChannels(duplicates).toLatin1().constData() << endl;
-                cout << endl;
-            }
+            msg = "";
+            ssMsg << endl;
+            ssMsg << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
+            ssMsg << FormatTransports(duplicates).toLatin1().constData() << endl;
+            ssMsg << "With channels (" << SimpleCountChannels(duplicates) << "):" << endl;
+            ssMsg << FormatChannels(duplicates).toLatin1().constData() << endl;
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
 
@@ -140,28 +130,26 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Channels not found in scan but only in DB are returned in db_trans
     sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    msg = "";
+    ssMsg << endl;
+    if (!db_trans.empty())
     {
-        if (!db_trans.empty())
-        {
-            cout << endl;
-            cout << "Transports with channels in DB but not in scan (";
-            cout << db_trans.size() << "):" << endl;
-            cout << FormatTransports(db_trans).toLatin1().constData() << endl;
-        }
+        ssMsg << endl;
+        ssMsg << "Transports with channels in DB but not in scan (";
+        ssMsg << db_trans.size() << "):" << endl;
+        ssMsg << FormatTransports(db_trans).toLatin1().constData();
     }
 
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
 
     // All channels in the scan after comparing with the database
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
     {
-        cout << endl << "Channel list after compare with database (";
-        cout << SimpleCountChannels(transports) << "):" << endl;
-        ChannelImporterBasicStats infoA = CollectStats(transports);
-        cout << FormatChannels(transports, &infoA).toLatin1().constData() << endl;
-        cout << endl;
+        ChannelImporterBasicStats info = CollectStats(transports);
+        ssMsg << endl;
+        ssMsg << "Channel list after compare with database (";
+        ssMsg << SimpleCountChannels(transports) << "):" << endl;
+        ssMsg << FormatChannels(transports, &info).toLatin1().constData();
     }
 
     // Add channels from the DB to the channels from the scan
@@ -183,14 +171,16 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     ChannelImporterUniquenessStats stats =
         CollectUniquenessStats(transports, info);
 
-    // Print out each channel
-    cout << endl;
-    cout << "Channel list (" << SimpleCountChannels(transports) << "):" << endl;
-    cout << FormatChannels(transports).toLatin1().constData() << endl;
+    // Final channel list
+    ssMsg << endl;
+    ssMsg << "Channel list (" << SimpleCountChannels(transports) << "):" << endl;
+    ssMsg << FormatChannels(transports).toLatin1().constData();
 
     // Create summary
-    QString msg = GetSummary(transports.size(), info, stats);
-    cout << msg.toLatin1().constData() << endl << endl;
+    ssMsg << endl;
+    ssMsg << GetSummary(transports.size(), info, stats) << endl;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
     if (m_doInsert)
         InsertChannels(transports, info);
@@ -455,37 +445,36 @@ void ChannelImporter::InsertChannels(
         }
     }
 
-    // Updated transports
-    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
-    {
-        if (!updated.empty())
-        {
-            cout << endl;
-            cout << "Transport list (updated) (" << updated.size() << "):" << endl;
-            cout << FormatTransports(updated).toLatin1().constData() << endl;
-        }
-    }
+    QString msg;
+    QTextStream ssMsg(&msg);
 
-    // List what has been done with each channel
     if (!updated.empty())
     {
-        cout << endl << "Updated old channels (" << SimpleCountChannels(updated) << "):" << endl;
-        cout << FormatChannels(updated).toLatin1().constData() << endl;
+        ssMsg << endl << endl;
+        ssMsg << "Updated old transports (" << updated.size() << "):" << endl;
+        ssMsg << FormatTransports(updated).toLatin1().constData();
+
+        ssMsg << endl;
+        ssMsg << "Updated old channels (" << SimpleCountChannels(updated) << "):" << endl;
+        ssMsg << FormatChannels(updated).toLatin1().constData();
     }
     if (!skipped_updates.empty())
     {
-        cout << endl << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << endl;
-        cout << FormatChannels(skipped_updates).toLatin1().constData() << endl;
+        ssMsg << endl;
+        ssMsg << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << endl;
+        ssMsg << FormatChannels(skipped_updates).toLatin1().constData();
     }
     if (!inserted.empty())
     {
-        cout << endl << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << endl;
-        cout << FormatChannels(inserted).toLatin1().constData() << endl;
+        ssMsg << endl;
+        ssMsg << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << endl;
+        ssMsg << FormatChannels(inserted).toLatin1().constData();
     }
     if (!skipped_inserts.empty())
     {
-        cout << endl << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << endl;
-        cout << FormatChannels(skipped_inserts).toLatin1().constData() << endl;
+        ssMsg << endl;
+        ssMsg << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << endl;
+        ssMsg << FormatChannels(skipped_inserts).toLatin1().constData();
     }
 
     // Remaining channels and sum uniques again
@@ -493,12 +482,12 @@ void ChannelImporter::InsertChannels(
     {
         ChannelImporterBasicStats      ninfo  = CollectStats(list);
         ChannelImporterUniquenessStats nstats = CollectUniquenessStats(list, ninfo);
-        cout << "Remaining channels (" << SimpleCountChannels(list) << "):" << endl;
-        cout << FormatChannels(list).toLatin1().constData() << endl;
-        cout << endl;
-        cout << GetSummary(list.size(), ninfo, nstats).toLatin1().constData();
-        cout << endl;
+        ssMsg << endl;
+        ssMsg << "Remaining channels (" << SimpleCountChannels(list) << "):" << endl;
+        ssMsg << FormatChannels(list).toLatin1().constData() << endl;
+        ssMsg << GetSummary(list.size(), ninfo, nstats).toLatin1().constData();
     }
+    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 }
 
 // ChannelImporter::InsertChannels
