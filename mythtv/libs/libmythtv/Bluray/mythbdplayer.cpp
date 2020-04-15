@@ -239,14 +239,9 @@ QString MythBDPlayer::GetTitleName(int Title) const
 {
     if (Title >= 0 && Title < GetNumTitles())
     {
-        int secs = GetTitleDuration(Title);
         // BD doesn't provide title names, so show title number and duration
-        int hours = secs / 60 / 60;
-        int minutes = (secs / 60) - (hours * 60);
-        secs = secs % 60;
-        QString name = QString("%1 (%2:%3:%4)").arg(Title+1)
-                .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
-                .arg(secs, 2, 10, QChar(48));
+        QString timestr = MythFormatTime(GetTitleDuration(Title), "HH:mm:ss");
+        QString name = QString("%1 (%2)").arg(Title+1).arg(timestr);
         return name;
     }
     return QString();

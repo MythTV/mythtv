@@ -8,6 +8,7 @@
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"            // for MythCoreContext, etc
+#include "mythmiscutil.h"
 #include "mythtypes.h"                  // for InfoMap
 #include "mythuiactions.h"              // for ACTION_DOWN, ACTION_UP
 #include "playercontext.h"              // for PlayerContext
@@ -163,18 +164,10 @@ QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
     const
 {
     uint64_t ms = TranslatePositionFrameToMs(frame, frame_rate, use_cutlist);
-    int secs = (int)(ms / 1000);
-    int remainder = (int)(ms % 1000);
-    int totalSecs = (int)
-        (TranslatePositionFrameToMs(frame, frame_rate, use_cutlist) / 1000);
-    QString timestr;
-    if (totalSecs >= 3600)
-        timestr = QString::number(secs / 3600) + ":";
-    timestr += QString("%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
-        QString(":%1").arg(secs % 60, 2, 10, QChar(48));
+    QString fmt = (ms >= ONEHOURINMS) ? "H:mm:ss" : "mm:ss";
     if (full_resolution)
-        timestr += QString(".%1").arg(remainder, 3, 10, QChar(48));
-    return timestr;
+        fmt += ".zzz";
+    return MythFormatTimeMs(ms, fmt);
 }
 
  /**

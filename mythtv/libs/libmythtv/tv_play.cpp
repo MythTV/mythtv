@@ -46,6 +46,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
+#include "mythmiscutil.h"
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
 #include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
@@ -8338,17 +8339,6 @@ void TV::ShowLCDChannelInfo(const PlayerContext *ctx)
     }
 }
 
-static void format_time(int seconds, QString &tMin, QString &tHrsMin)
-{
-    int minutes     = seconds / 60;
-    int hours       = minutes / 60;
-    int min         = minutes % 60;
-
-    tMin = TV::tr("%n minute(s)", "", minutes);
-    tHrsMin = QString("%1:%2").arg(hours).arg(min, 2, 10, QChar('0'));
-}
-
-
 void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 {
     LCD *lcd = LCD::Get();
@@ -8379,16 +8369,14 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
     }
     else
     {
-        QString timeMins;
-        QString timeHrsMin;
         int playingTitle = 0;
         int playingPart = 0;
 
         dvd->GetPartAndTitle(playingPart, playingTitle);
         int totalParts = dvd->NumPartsInTitle();
-        format_time(dvd->GetTotalTimeOfTitle(), timeMins, timeHrsMin);
 
-        mainStatus = tr("Title: %1 (%2)").arg(playingTitle).arg(timeHrsMin);
+        mainStatus = tr("Title: %1 (%2)").arg(playingTitle)
+            .arg(MythFormatTime(dvd->GetTotalTimeOfTitle(), "HH:mm"));
         subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
     }
     if ((dvdName != m_lcdCallsign) || (mainStatus != m_lcdTitle) ||
@@ -11433,15 +11421,10 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             int size = QString::number(m_tvmNumChapters).size();
             for (int i = 0; i < m_tvmNumChapters; i++)
             {
-                int hours   =  m_tvmChapterTimes[i] / 60 / 60;
-                int minutes = (m_tvmChapterTimes[i] / 60) - (hours * 60);
-                int secs    =  m_tvmChapterTimes[i] % 60;
                 QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
                 QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-                QString desc = chapter1 + QString(" (%1:%2:%3)")
-                    .arg(hours,   2, 10, QChar(48))
-                    .arg(minutes, 2, 10, QChar(48))
-                    .arg(secs,    2, 10, QChar(48));
+                QString timestr = MythFormatTime(m_tvmChapterTimes[i], "HH:mm:ss");
+                QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
                 active = (m_tvmCurrentChapter == (i + 1));
                 BUTTON(action, desc);

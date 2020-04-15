@@ -1212,4 +1212,14 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     return currA->isNull() ? -1 : + 1;
 }
 
+QString MythFormatTimeMs(int msecs, QString fmt)
+{
+    return QTime::fromMSecsSinceStartOfDay(msecs).toString(fmt);
+}
+
+QString MythFormatTime(int secs, QString fmt)
+{
+    return QTime::fromMSecsSinceStartOfDay(secs*1000).toString(fmt);
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

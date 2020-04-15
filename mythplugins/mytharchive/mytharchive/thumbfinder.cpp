@@ -402,19 +402,12 @@ void ThumbFinder::updateThumb(void)
 
 QString ThumbFinder::frameToTime(int64_t frame, bool addFrame) const
 {
-    QString str;
-
     int sec = (int) (frame / m_fps);
     frame = frame - (int) (sec * m_fps);
-    int min = sec / 60;
-    sec %= 60;
-    int hour = min / 60;
-    min %= 60;
 
+    QString str = MythFormatTime(sec, "HH:mm:ss");
     if (addFrame)
-        str = str.sprintf("%01d:%02d:%02d.%02d", hour, min, sec, (int) frame);
-    else
-        str = str.sprintf("%02d:%02d:%02d", hour, min, sec);
+        str += QString(".%1").arg(frame,10,2,QChar('0'));
     return str;
 }
 

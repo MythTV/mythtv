@@ -5018,6 +5018,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         stillFrame = (secsplayed < 0);
         playbackLen = max(playbackLen, 0);
         secsplayed = min(playbackLen, max(secsplayed, 0));
+        int secsbehind = max((playbackLen - secsplayed), 0);
 
         if (playbackLen > 0)
             pos = (int)(1000.0F * (secsplayed / (float)playbackLen));
@@ -5026,70 +5027,32 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         info.values.insert(relPrefix + "totalseconds", playbackLen);
         info.values[relPrefix + "position"] = pos;
 
-        int phours = secsplayed / 3600;
-        int pmins = (secsplayed - phours * 3600) / 60;
-        int psecs = (secsplayed - phours * 3600 - pmins * 60);
-
-        int shours = playbackLen / 3600;
-        int smins = (playbackLen - shours * 3600) / 60;
-        int ssecs = (playbackLen - shours * 3600 - smins * 60);
-
-        int secsbehind = max((playbackLen - secsplayed), 0);
-        int sbhours = secsbehind / 3600;
-        int sbmins = (secsbehind - sbhours * 3600) / 60;
-        int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
-
         QString text1;
         QString text2;
         QString text3;
         if (paddedFields)
         {
-            text1 = QString("%1:%2:%3")
-                    .arg(phours, 2, 10, QLatin1Char('0'))
-                    .arg(pmins,  2, 10, QLatin1Char('0'))
-                    .arg(psecs,  2, 10, QLatin1Char('0'));
-            text2 = QString("%1:%2:%3")
-                    .arg(shours, 2, 10, QLatin1Char('0'))
-                    .arg(smins,  2, 10, QLatin1Char('0'))
-                    .arg(ssecs,  2, 10, QLatin1Char('0'));
-            text3 = QString("%1:%2:%3")
-                    .arg(sbhours, 2, 10, QLatin1Char('0'))
-                    .arg(sbmins,  2, 10, QLatin1Char('0'))
-                    .arg(sbsecs,  2, 10, QLatin1Char('0'));
+            text1 = MythFormatTime(secsplayed, "HH:mm:ss");
+            text2 = MythFormatTime(playbackLen, "HH:mm:ss");
+            text3 = MythFormatTime(secsbehind, "HH:mm:ss");
         }
         else
         {
-            if (shours > 0)
-            {
-                text1 = QString("%1:%2:%3")
-                        .arg(phours)
-                        .arg(pmins,  2, 10, QLatin1Char('0'))
-                        .arg(psecs,  2, 10, QLatin1Char('0'));
-                text2 = QString("%1:%2:%3")
-                        .arg(shours)
-                        .arg(smins,  2, 10, QLatin1Char('0'))
-                        .arg(ssecs,  2, 10, QLatin1Char('0'));
-            }
-            else
-            {
-                text1 = QString("%1:%2").arg(pmins).arg(psecs,  2, 10, QLatin1Char('0'));
-                text2 = QString("%1:%2").arg(smins).arg(ssecs,  2, 10, QLatin1Char('0'));
-            }
+            QString fmt = (playbackLen >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss";
+            text1 = MythFormatTime(secsplayed, fmt);
+            text2 = MythFormatTime(playbackLen, fmt);
 
-            if (sbhours > 0)
+            if (secsbehind >= ONEHOURINSEC)
             {
-                text3 = QString("%1:%2:%3")
-                        .arg(sbhours)
-                        .arg(sbmins,  2, 10, QLatin1Char('0'))
-                        .arg(sbsecs,  2, 10, QLatin1Char('0'));
+                text3 = MythFormatTime(secsbehind, "H:mm:ss");
             }
-            else if (sbmins > 0)
+            else if (secsbehind >= ONEMININSEC)
             {
-                text3 = QString("%1:%2").arg(sbmins).arg(sbsecs,  2, 10, QLatin1Char('0'));
+                text3 = MythFormatTime(secsbehind, "mm:ss");
             }
             else
             {
-                text3 = tr("%n second(s)", "", sbsecs);
+                text3 = tr("%n second(s)", "", secsbehind);
             }
         }
 

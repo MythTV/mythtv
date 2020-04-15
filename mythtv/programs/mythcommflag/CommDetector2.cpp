@@ -17,6 +17,7 @@ using namespace std;
 #include "compat.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"
@@ -254,34 +255,17 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 QString frameToTimestamp(long long frameno, float fps)
 {
     int ms = (int)roundf(frameno / fps * 1000);
-
-    int ss = ms / 1000;
-    ms %= 1000;
-    if (ms >= 500)
-        ss++;
-
-    int mm = ss / 60;
-    ss %= 60;
-
-    int hh = mm / 60;
-    mm %= 60;
-
-    return QString("%1:%2:%3")
-        .arg(hh).arg(mm, 2, 10, QChar('0')) .arg(ss, 2, 10, QChar('0'));
+    if (ms % 1000 >= 500)
+        ms += 500; // Round up to next second
+    return MythFormatTimeMs(ms, "hh:mm:ss");
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
     int ms = (int)roundf(frameno / fps * 1000);
-
-    int ss = ms / 1000;
-    ms %= 1000;
-
-    int mm = ss / 60;
-    ss %= 60;
-
-    return QString("%1:%2:%3")
-        .arg(mm).arg(ss, 2, 10, QChar(QChar('0'))).arg(ms, 2, 10, QChar(QChar('0')));
+    QString timestr = MythFormatTimeMs(ms, "mm:ss.zzz");
+    timestr.chop(1); // Chop 1 to return hundredths
+    return timestr;
 }
 
 QString strftimeval(const struct timeval *tv)

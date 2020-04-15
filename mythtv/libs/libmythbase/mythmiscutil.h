@@ -86,6 +86,38 @@ MBASE_PUBLIC void setHttpProxy(void);
 MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
                                 Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
+#define ONESECINMS   (      1000)
+#define ONEMININMS   (   60*1000)
+#define ONEHOURINMS  (60*60*1000)
+#define ONEMININSEC  (   60)
+#define ONEHOURINSEC (60*60)
+
+/**
+ * \brief Format a milliseconds time value
+ *
+ * Convert a millisecond time value into a textual representation of the value.
+ *
+ * \param msecs The time value in milliseconds.
+ *
+ * \param fmt A formatting string specifying how to output the time.
+ *     See QTime::toString for the a definition fo valid formatting
+ *     characters.
+ */
+MBASE_PUBLIC QString MythFormatTimeMs(int msecs, QString fmt);
+
+/**
+ * \brief Format a seconds time value
+ *
+ * Convert a second time value into a textual representation of the value.
+ *
+ * \param secs The time value in seconds.
+ *
+ * \param mft A formatting string specifying how to output the time.
+ *     See QTime::toString for the a definition fo valid formatting
+ *     characters.
+ */
+MBASE_PUBLIC QString MythFormatTime(int secs, QString fmt);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

@@ -2154,37 +2154,12 @@ void MusicCommon::updatePlaylistStats(void)
 
 QString MusicCommon::getTimeString(int exTime, int maxTime)
 {
-    QString time_string;
-
-    int eh = exTime / 3600;
-    int em = (exTime / 60) % 60;
-    int es = exTime % 60;
-
-    int maxh = maxTime / 3600;
-    int maxm = (maxTime / 60) % 60;
-    int maxs = maxTime % 60;
-
     if (maxTime <= 0)
-    {
-        if (eh > 0)
-            time_string.sprintf("%d:%02d:%02d", eh, em, es);
-        else
-            time_string.sprintf("%02d:%02d", em, es);
-    }
-    else
-    {
-        if (maxh > 0)
-        {
-            time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
-                    es, maxh, maxm, maxs);
-        }
-        else
-        {
-            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, maxs);
-        }
-    }
+        return MythFormatTime(exTime,
+                              (exTime >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss");
 
-    return time_string;
+    QString fmt = (maxTime >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss";
+    return MythFormatTime(exTime, fmt) + " / " + MythFormatTime(maxTime, fmt);
 }
 
 void MusicCommon::searchButtonList(void)

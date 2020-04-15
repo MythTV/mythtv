@@ -33,6 +33,7 @@
 #include "programtypes.h"               // for frm_dir_map_t, etc
 #include "tv.h"                         // for CommSkipMode
 #include "videoouttypes.h"              // for FrameScanType, PIPLocation, etc
+#include "mythmiscutil.h"
 
 #include "mythtvexp.h"
 

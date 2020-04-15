@@ -25,20 +25,6 @@ void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
  */
 QString SRTWriter::FormatTime(uint64_t time_in_msec)
 {
-    uint64_t msec = time_in_msec % 1000;
-    time_in_msec /= 1000;
-
-    uint64_t ss = time_in_msec % 60;
-    time_in_msec /= 60;
-
-    uint64_t mm = time_in_msec % 60;
-    time_in_msec /= 60;
-
-    uint64_t hh = time_in_msec;
-
-    return QString("%1:%2:%3,%4")
-        .arg(hh,2,10,QChar('0'))
-        .arg(mm,2,10,QChar('0'))
-        .arg(ss,2,10,QChar('0'))
-        .arg(msec,3,10,QChar('0'));
+    QTime time = QTime::fromMSecsSinceStartOfDay(time_in_msec);
+    return time.toString("HH:mm:ss,zzz");
 }

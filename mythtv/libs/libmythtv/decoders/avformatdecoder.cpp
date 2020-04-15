@@ -1257,18 +1257,13 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         int64_t start = m_ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num /
                                  (long double)den;
-        int hours = (int)total_secs / 60 / 60;
-        int minutes = ((int)total_secs / 60) - (hours * 60);
-        double secs = (double)total_secs -
-                      (double)(hours * 60 * 60 + minutes * 60);
+        auto msec = static_cast<uint64_t>(total_secs * 1000.0);
         auto framenum = (long long)(total_secs * m_fps);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Chapter %1 found @ [%2:%3:%4]->%5")
+            QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(hours,   2,10,QChar('0'))
-                .arg(minutes, 2,10,QChar('0'))
-                .arg(secs,    6,'f',3,QChar('0'))
-                .arg(framenum));
+                .arg(MythFormatTimeMs(msec, "HH:mm:ss.zzz")
+                .arg(framenum)));
     }
 
     if (getenv("FORCE_DTS_TIMESTAMPS"))

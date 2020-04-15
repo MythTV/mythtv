@@ -30,6 +30,7 @@ using namespace std;
 #include <lcddevice.h>
 #include <mythmediamonitor.h>
 #include <mythdirs.h>
+#include <mythmiscutil.h>
 
 // MythUI
 #include <mythdialogbox.h>
@@ -1221,14 +1222,9 @@ void Ripper::updateTrackList(void)
             item->SetText(metadata->Title(), "title");
             item->SetText(metadata->Artist(), "artist");
 
-            int length = track->length / 1000;
-            if (length > 0)
+            if (track->length >= ONESECINMS)
             {
-                int min = length / 60;
-                int sec = length % 60;
-                QString s;
-                s.sprintf("%02d:%02d", min, sec);
-                item->SetText(s, "length");
+                item->SetText(MythFormatTimeMs(track->length, "mm:ss"), "length");
             }
             else
                 item->SetText("", "length");

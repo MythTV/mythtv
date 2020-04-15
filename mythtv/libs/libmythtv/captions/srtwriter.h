@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QPoint>
 #include <QHash>
+#include <QTime>
 
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomElement>

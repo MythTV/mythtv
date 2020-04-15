@@ -22,6 +22,7 @@
 #include "storagegroup.h"
 #include "mythsystem.h"
 #include "mythcoreutil.h"
+#include "mythmiscutil.h"
 
 // mythbase
 #include "mythsorthelper.h"
@@ -1092,23 +1093,8 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "genre"] = m_genre;
     metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 
-    int len = m_length / 1000;
-    int eh = len / 3600;
-    int em = (len / 60) % 60;
-    int es = len % 60;
-    if (eh > 0)
-    {
-        metadataMap[prefix + "length"] = QString("%1:%2:%3")
-            .arg(eh,1,10)
-            .arg(em,2,10,QChar('0'))
-            .arg(es,2,10,QChar('0'));
-    }
-    else
-    {
-        metadataMap[prefix + "length"] = QString("%1:%2")
-            .arg(em,2,10,QChar('0'))
-            .arg(es,2,10,QChar('0'));
-    }
+    QString fmt = (m_length >= ONEHOURINMS) ? "H:mm:ss" : "mm:ss";
+    metadataMap[prefix + "length"] = MythFormatTimeMs(m_length, fmt);
 
     if (m_lastPlay.isValid())
     {

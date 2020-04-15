@@ -11,6 +11,7 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
+#include "mythmiscutil.h"
 #include "mythdirs.h"
 #include "libbluray/bluray.h"
 #include "io/mythiowrapper.h"
@@ -560,6 +561,14 @@ uint32_t MythBDBuffer::GetCurrentChapter(void)
     return 0;
 }
 
+uint64_t MythBDBuffer::GetChapterStartTimeMs(uint32_t Chapter)
+{
+    if (Chapter >= GetNumChapters())
+        return 0;
+    QMutexLocker locker(&m_infoLock);
+    return m_currentTitleInfo->chapters[Chapter].start / 90;
+}
+
 uint64_t MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
 {
     if (Chapter >= GetNumChapters())
@@ -706,14 +715,9 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     m_timeDiff = 0;
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
-    uint64_t total_secs = m_currentTitleLength / 90000;
-    int hours = static_cast<int>(total_secs / 60 / 60);
-    int minutes = static_cast<int>((total_secs / 60) - (static_cast<uint64_t>(hours * 60)));
-    double secs = static_cast<double>(total_secs) - static_cast<double>(hours * 60 * 60 + minutes * 60);
-    QString duration = QString("%1:%2:%3")
-            .arg(hours,   2, 10, QChar('0'))
-            .arg(minutes, 2, 10, QChar('0'))
-            .arg(secs,    2, 'f', 1, QChar('0'));
+    uint64_t total_msecs = m_currentTitleLength / 90;
+    QString duration = MythFormatTimeMs(total_msecs, "HH:mm:ss.zzz");
+    duration.chop(2); // Chop 2 to show tenths
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
             .arg(m_currentTitle).arg(m_currentTitleInfo->playlist).arg(duration).arg(chapter_count));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Clips: %1 Angles: %2 Title Size: %3 Frame Rate %4")
@@ -723,13 +727,9 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     for (uint i = 0; i < chapter_count; i++)
     {
         uint64_t framenum   = GetChapterStartFrame(i);
-        total_secs = GetChapterStartTime(i);
-        hours   = static_cast<int>(total_secs / 60 / 60);
-        minutes = static_cast<int>((total_secs / 60) - (static_cast<uint64_t>(hours * 60)));
-        secs    = static_cast<double>(total_secs) - static_cast<double>(hours * 60 * 60 + minutes * 60);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
-            .arg(i + 1,   2, 10, QChar('0')).arg(hours, 2, 10, QChar('0'))
-            .arg(minutes, 2, 10, QChar('0')).arg(secs,  6, 'f', 3, QChar('0'))
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2]->%3")
+            .arg(i + 1,   2, 10, QChar('0'))
+            .arg(MythFormatTimeMs(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
             .arg(framenum));
     }
 
