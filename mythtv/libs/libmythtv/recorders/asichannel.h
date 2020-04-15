@@ -1,7 +1,7 @@
 /// -*- Mode: c++ -*-
 
-#ifndef _ASI_CHANNEL_H_
-#define _ASI_CHANNEL_H_
+#ifndef ASI_CHANNEL_H
+#define ASI_CHANNEL_H
 
 #include <vector>
 using namespace std;
@@ -45,4 +45,4 @@ class ASIChannel : public DTVChannel
     bool                     m_isOpen {false};
 };
 
-#endif // _ASI_CHANNEL_H_
+#endif // ASI_CHANNEL_H

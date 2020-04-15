@@ -17,7 +17,7 @@ MythInteractiveBuffer::MythInteractiveBuffer(const QString &Url, MythMediaBuffer
     m_parent(Parent)
 {
     m_startReadAhead = true;
-    OpenFile(Url);
+    MythInteractiveBuffer::OpenFile(Url);
 }
 
 MythInteractiveBuffer::~MythInteractiveBuffer()

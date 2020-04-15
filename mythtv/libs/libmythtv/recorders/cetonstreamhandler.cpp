@@ -516,7 +516,7 @@ QStringList CetonStreamHandler::GetProgramList()
     }
 
     QRegExp regex(
-        "^\\{ \"?length\"?: \\d+(, \"?results\"?: \\[ (.*) \\])? \\}$");
+        R"(^\{ "?length"?: \d+(, "?results"?: \[ (.*) \])? \}$)");
 
     if (regex.indexIn(response) == -1)
     {

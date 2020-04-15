@@ -290,7 +290,7 @@ void ZMEvents::playerExited(void)
 {
     // refresh the grid and restore the saved position
 
-    if (m_savedPosition > (int)m_eventList->size() - 1)
+    if (m_savedPosition > m_eventList->size() - 1)
         m_savedPosition = m_eventList->size() - 1;
 
     updateUIList();

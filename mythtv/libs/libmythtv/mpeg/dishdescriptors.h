@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _DISH_DESCRIPTORS_H_
-#define _DISH_DESCRIPTORS_H_
+#ifndef DISH_DESCRIPTORS_H
+#define DISH_DESCRIPTORS_H
 
 #include <QString>
 #include <QMutex>
@@ -92,7 +92,7 @@ class DishEventDescriptionDescriptor : public MPEGDescriptor
     // event_name            dlen-2 3.0/4.0
     const unsigned char *DescriptionRaw(void) const;
     uint DescriptionRawLength(void) const;
-    bool HasDescription(void) const { return DescriptionRawLength(); }
+    bool HasDescription(void) const { return DescriptionRawLength() != 0U; }
     QString Description(uint compression_type) const;
 };
 
@@ -171,4 +171,4 @@ class DishContentDescriptor : public ContentDescriptor
     static volatile bool      s_dishCategoryDescExists;
 };
 
-#endif // _DISH_DESCRIPTORS_H_
+#endif // DISH_DESCRIPTORS_H

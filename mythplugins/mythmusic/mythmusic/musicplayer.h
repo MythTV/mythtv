@@ -89,7 +89,7 @@ class MusicPlayer : public QObject, public MythObservable
     void  setSpeed(float speed);
     void  incSpeed();
     void  decSpeed();
-    float getSpeed() { return m_playSpeed; }
+    float getSpeed() const { return m_playSpeed; }
 
     void play(void);
     void stop(bool stopAll = false);
@@ -99,18 +99,18 @@ class MusicPlayer : public QObject, public MythObservable
 
     void nextAuto(void);
 
-    bool isPlaying(void) { return m_isPlaying; }
+    bool isPlaying(void) const { return m_isPlaying; }
     bool isPaused(void) { return getOutput() ? getOutput()->IsPaused() : false; }
     bool isStopped(void) { return !(isPlaying() || isPaused()); }
     bool hasClient(void) { return hasListeners(); }
 
     /// This will allow/disallow the mini player showing on track changes
     void autoShowPlayer(bool autoShow) { m_autoShowPlayer = autoShow; }
-    bool getAutoShowPlayer(void) { return m_autoShowPlayer; }
+    bool getAutoShowPlayer(void) const { return m_autoShowPlayer; }
 
     /// This will allow/disallow the mini player showing even using its jumppoint
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
-    bool getCanShowPlayer(void) { return m_canShowPlayer; }
+    bool getCanShowPlayer(void) const { return m_canShowPlayer; }
 
     Decoder        *getDecoder(void) { return m_decoderHandler ? m_decoderHandler->getDecoder() : nullptr; }
     DecoderHandler *getDecoderHandler(void) { return m_decoderHandler; }
@@ -129,11 +129,11 @@ class MusicPlayer : public QObject, public MythObservable
 
     QList<MusicMetadata*> &getPlayedTracksList(void) { return m_playedList; }
 
-    int          getCurrentTrackPos(void) { return m_currentTrack; }
+    int          getCurrentTrackPos(void) const { return m_currentTrack; }
     bool         setCurrentTrackPos(int pos);
     void         changeCurrentTrack(int trackNo);
 
-    int          getCurrentTrackTime(void) { return m_currentTime; }
+    int          getCurrentTrackTime(void) const { return m_currentTime; }
 
     void         activePlaylistChanged(int trackID, bool deleted);
     void         playlistChanged(int playlistID);
@@ -151,9 +151,9 @@ class MusicPlayer : public QObject, public MythObservable
     void         sendTrackUnavailableEvent(int trackID);
     void         sendCDChangedEvent(void);
 
-    void         toMap(InfoMap &infoMap);
+    void         toMap(InfoMap &infoMap) const;
 
-    void         showMiniPlayer(void);
+    void         showMiniPlayer(void) const;
     enum RepeatMode
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
@@ -187,7 +187,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     ResumeMode  getResumeMode(void);
 
-    void getBufferStatus(int *bufferAvailable, int *bufferSize);
+    void getBufferStatus(int *bufferAvailable, int *bufferSize) const;
 
   public slots:
     void StartPlayback(void);

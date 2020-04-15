@@ -170,7 +170,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
         return true;
     }
 
-    bool res = m_dict[newname]->run();
+    bool res = m_dict[newname]->run() != 0;
 
     return res;
 }
@@ -188,7 +188,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
         return true;
     }
 
-    bool res = m_dict[newname]->config();
+    bool res = m_dict[newname]->config() != 0;
 
     return res;
 }

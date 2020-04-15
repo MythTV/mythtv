@@ -85,7 +85,7 @@ inline Service::Service(QObject *parent) : QObject(parent)
             {                        \
                 code                 \
             }                        \
-            catch( QString msg )     \
+            catch( QString &msg )    \
             {                        \
                 m_pEngine->currentContext()->throwError( QScriptContext::UnknownError, msg ); \
                 return default;      \
@@ -108,10 +108,10 @@ inline Service::Service(QObject *parent) : QObject(parent)
 //////////////////////////////////////////////////////////////////////////////
 
 #define Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV(T, _Arg1) \
-template<> inline QScriptValue qscriptQMetaObjectConstructor<T>(QScriptContext *ctx, QScriptEngine *eng, T *) \
+template<> inline QScriptValue qscriptQMetaObjectConstructor<T>(QScriptContext *ctx, QScriptEngine *eng, T *) /* NOLINT(bugprone-macro-parentheses) */ \
 { \
     _Arg1 arg1 = qscriptvalue_cast<_Arg1> (ctx->argument(0)); \
-    T* t = new T(eng, arg1); \
+    T* t = new T(eng, arg1); /* NOLINT(bugprone-macro-parentheses) */ \
     if (ctx->isCalledAsConstructor()) \
         return eng->newQObject(ctx->thisObject(), t, QScriptEngine::AutoOwnership); \
     QScriptValue o = eng->newQObject(t, QScriptEngine::AutoOwnership); \

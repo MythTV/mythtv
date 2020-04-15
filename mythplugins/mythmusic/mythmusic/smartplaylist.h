@@ -47,18 +47,18 @@ class SmartPLCriteriaRow
 
   public:
 
-    SmartPLCriteriaRow(QString _Field, QString _Operator,
-                       QString _Value1, QString _Value2)
-        : m_field(std::move(_Field)), m_operator(std::move(_Operator)),
-          m_value1(std::move(_Value1)), m_value2(std::move(_Value2)) {}
+    SmartPLCriteriaRow(QString field, QString op,
+                       QString value1, QString value2)
+        : m_field(std::move(field)), m_operator(std::move(op)),
+          m_value1(std::move(value1)), m_value2(std::move(value2)) {}
     SmartPLCriteriaRow(void) = default;
     ~SmartPLCriteriaRow(void) = default;
 
-    QString getSQL(void);
+    QString getSQL(void) const;
 
-    bool saveToDatabase(int smartPlaylistID);
+    bool saveToDatabase(int smartPlaylistID) const;
 
-    QString toString(void);
+    QString toString(void) const;
 
   public:
     QString m_field;

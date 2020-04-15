@@ -873,7 +873,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-void MusicCommon::changeVolume(bool up)
+void MusicCommon::changeVolume(bool up) const
 {
     if (m_controlVolume && gPlayer->getOutput())
     {
@@ -897,7 +897,7 @@ void MusicCommon::changeSpeed(bool up)
     }
 }
 
-void MusicCommon::toggleMute()
+void MusicCommon::toggleMute() const
 {
     if (m_controlVolume)
     {

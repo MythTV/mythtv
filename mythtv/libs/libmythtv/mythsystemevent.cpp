@@ -187,7 +187,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 
     // 1st, try loading RecordingInfo / ProgramInfo
     RecordingInfo recinfo(chanid, recstartts);
-    bool loaded = recinfo.GetChanID();
+    bool loaded = recinfo.GetChanID() != 0U;
     if (loaded)
         recinfo.SubstituteMatches(command);
     else

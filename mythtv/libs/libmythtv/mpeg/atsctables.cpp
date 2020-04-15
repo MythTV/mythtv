@@ -311,7 +311,7 @@ QString VirtualChannelTable::XMLChannelValues(
     str += QString("short_channel_name=\"%1\" ").arg(ShortChannelName(chan));
     str += "\n" + indent_0;
 
-    str += QString("modulation=\"0x%1\" modulation_desc=\"%2\" ")
+    str += QString(R"(modulation="0x%1" modulation_desc="%2" )")
         .arg(ModulationMode(chan),2,16,QChar('0'))
         .arg(ModulationModeString(chan));
     str += QString("channel_tsid=\"0x%1\"")
@@ -330,7 +330,7 @@ QString VirtualChannelTable::XMLChannelValues(
         .arg(xml_bool_to_string(IsHiddenInGuide(chan)));
     str += "\n" + indent_0;
 
-    str += QString("service_type=\"0x%1\" service_type_desc=\"%2\"")
+    str += QString(R"(service_type="0x%1" service_type_desc="%2")")
         .arg(ServiceType(chan),2,16,QChar('0'))
         .arg(ServiceTypeString(chan));
     str += "\n" + indent_0;
@@ -344,7 +344,7 @@ QString VirtualChannelTable::XMLChannelValues(
 QString TerrestrialVirtualChannelTable::XMLChannelValues(
     uint indent_level, uint chan) const
 {
-    return QString("major_channel=\"%1\" minor_channel=\"%2\" ")
+    return QString(R"(major_channel="%1" minor_channel="%2" )")
         .arg(MajorChannel(chan)).arg(MinorChannel(chan)) +
         VirtualChannelTable::XMLChannelValues(indent_level, chan);
 }
@@ -361,9 +361,9 @@ QString TerrestrialVirtualChannelTable::ChannelString(uint chan) const
 
     str.append(QString("    pnum(%1) ").arg(ProgramNumber(chan)));
     str.append(QString("ETM_loc(%1) ").arg(ETMlocation(chan)));
-    str.append(QString("access_ctrl(%1) ").arg(IsAccessControlled(chan)));
-    str.append(QString("hidden(%1) ").arg(IsHidden(chan)));
-    str.append(QString("hide_guide(%1) ").arg(IsHiddenInGuide(chan)));
+    str.append(QString("access_ctrl(%1) ").arg(static_cast<int>(IsAccessControlled(chan))));
+    str.append(QString("hidden(%1) ").arg(static_cast<int>(IsHidden(chan))));
+    str.append(QString("hide_guide(%1) ").arg(static_cast<int>(IsHiddenInGuide(chan))));
     str.append(QString("service_type(%1)\n").arg(ServiceTypeString(chan)));
 
     str.append(QString("    source_id(%1)\n").arg(SourceID(chan)));
@@ -387,14 +387,14 @@ QString CableVirtualChannelTable::XMLChannelValues(
     uint indent_level, uint chan) const
 {
     QString channel_info = SCTEIsChannelNumberTwoPart(chan) ?
-        QString("major_channel=\"%1\" minor_channel=\"%2\" ")
+        QString(R"(major_channel="%1" minor_channel="%2" )")
         .arg(MajorChannel(chan)).arg(MinorChannel(chan)) :
         QString("channel_number=\"%1\" ")
         .arg(SCTEOnePartChannel(chan));
 
     return channel_info +
         VirtualChannelTable::XMLChannelValues(indent_level, chan) +
-        QString(" path_select=\"%1\" out_of_band=\"%2\"")
+        QString(R"( path_select="%1" out_of_band="%2")")
         .arg(xml_bool_to_string(IsPathSelect(chan)))
         .arg(xml_bool_to_string(IsOutOfBand(chan)));
 }
@@ -421,14 +421,14 @@ QString CableVirtualChannelTable::ChannelString(uint chan) const
 
     str.append(QString("    pnum(%1) ").arg(ProgramNumber(chan)));
     str.append(QString("ETM_loc(%1) ").arg(ETMlocation(chan)));
-    str.append(QString("access_ctrl(%1) ").arg(IsAccessControlled(chan)));
-    str.append(QString("hidden(%1) ").arg(IsHidden(chan)));
-    str.append(QString("hide_guide(%1) ").arg(IsHiddenInGuide(chan)));
+    str.append(QString("access_ctrl(%1) ").arg(static_cast<int>(IsAccessControlled(chan))));
+    str.append(QString("hidden(%1) ").arg(static_cast<int>(IsHidden(chan))));
+    str.append(QString("hide_guide(%1) ").arg(static_cast<int>(IsHiddenInGuide(chan))));
     str.append(QString("service_type(%1)\n").arg(ServiceTypeString(chan)));
 
     str.append(QString("    source_id(%1) ").arg(SourceID(chan)));
-    str.append(QString("path_select(%1) ").arg(IsPathSelect(chan)));
-    str.append(QString("out_of_band(%1)\n").arg(IsOutOfBand(chan)));
+    str.append(QString("path_select(%1) ").arg(static_cast<int>(IsPathSelect(chan))));
+    str.append(QString("out_of_band(%1)\n").arg(static_cast<int>(IsOutOfBand(chan))));
 
     if (0 != DescriptorsLength(chan))
     {
@@ -477,7 +477,7 @@ QString ExtendedTextTable::toString(void) const
         QString("Extended Text Table -- sourceID(%1) eventID(%2) "
                 "ettID(%3) isChannelETM(%4) isEventETM(%5)\n%6")
         .arg(SourceID()).arg(EventID()).arg(ExtendedTextTableID())
-        .arg(IsChannelETM()).arg(IsEventETM())
+        .arg(static_cast<int>(IsChannelETM())).arg(static_cast<int>(IsEventETM()))
         .arg(ExtendedTextMessage().toString());
     return str;
 }
@@ -527,7 +527,7 @@ QString SystemTimeTable::toString(void) const
         QString("System Time Section GPSTime(%1) GPS2UTC_Offset(%2) ")
         .arg(SystemTimeGPS().toString(Qt::ISODate)).arg(GPSOffset());
     str.append(QString("DS(%3) Day(%4) Hour(%5)\n")
-               .arg(InDaylightSavingsTime())
+               .arg(static_cast<int>(InDaylightSavingsTime()))
                .arg(DayDaylightSavingsStarts())
                .arg(HourDaylightSavingsStarts()));
     return str;

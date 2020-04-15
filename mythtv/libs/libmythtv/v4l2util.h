@@ -1,5 +1,5 @@
-#ifndef _V4L2_util_h_
-#define _V4L2_util_h_
+#ifndef V4L2_UTIL_H
+#define V4L2_UTIL_H
 
 #ifdef USING_V4L2
 #include "videodev2.h" // our copy
@@ -107,4 +107,4 @@ class MTV_PUBLIC V4L2util
     bool     m_haveQueryExtCtrl     {false};
 };
 
-#endif
+#endif // V4L2_UTIL_H

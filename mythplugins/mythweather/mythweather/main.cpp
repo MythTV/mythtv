@@ -15,7 +15,7 @@
 #include "weather.h"
 #include "weatherSetup.h"
 #include "sourceManager.h"
-#include "dbcheck.h"
+#include "weatherdbcheck.h"
 
 SourceManager *srcMan = nullptr;
 

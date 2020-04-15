@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef _XSD_H_
-#define _XSD_H_
+#ifndef XSD_H
+#define XSD_H
 
 #include <QMetaObject>
 #include <QString>
@@ -71,4 +71,4 @@ class UPNP_PUBLIC Xsd : public QDomDocument
 
 struct TypeInfo { QString sAttrName; QString sContentType; };
 
-#endif
+#endif // XSD_H

@@ -129,10 +129,7 @@ struct MPData {
 class MythMainWindowPrivate
 {
   public:
-    MythMainWindowPrivate() :
-        m_gesture(MythGesture())
-    {
-    }
+    MythMainWindowPrivate() = default;
 
     static int TranslateKeyNum(QKeyEvent *e);
 
@@ -372,7 +369,7 @@ MythPainterWindowGL::~MythPainterWindowGL()
         m_render->DecrRef();
 }
 
-bool MythPainterWindowGL::IsValid(void)
+bool MythPainterWindowGL::IsValid(void) const
 {
     return m_valid;
 }
@@ -530,7 +527,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
 MythMainWindow::~MythMainWindow()
 {
-    gCoreContext->removeListener(this);
+    if (gCoreContext != nullptr)
+        gCoreContext->removeListener(this);
 
     d->m_drawTimer->stop();
 
@@ -895,7 +893,7 @@ void MythMainWindow::doRemoteScreenShot(const QString& filename, int x, int y)
     args << filename;
 
     MythEvent me(MythEvent::MythEventMessage, ACTION_SCREENSHOT, args);
-    qApp->sendEvent(this, &me);
+    QCoreApplication::sendEvent(this, &me);
 }
 
 void MythMainWindow::RemoteScreenShot(QString filename, int x, int y)
@@ -1086,14 +1084,14 @@ void MythMainWindow::Init(bool mayReInit)
     // always use OpenGL by default. Only fallback to Qt painter as a last resort.
     if (!d->m_painter && !d->m_paintwin)
     {
-        MythPainterWindowGL* glwindow = new MythPainterWindowGL(this, d);
+        auto* glwindow = new MythPainterWindowGL(this, d);
         if (glwindow && glwindow->IsValid())
         {
             d->m_paintwin = glwindow;
-            MythRenderOpenGL *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
+            auto *render = dynamic_cast<MythRenderOpenGL*>(glwindow->GetRenderDevice());
             d->m_painter = new MythOpenGLPainter(render, this);
         }
-        else if (glwindow)
+        else
         {
             delete glwindow;
         }
@@ -1116,7 +1114,7 @@ void MythMainWindow::Init(bool mayReInit)
         return;
     }
 
-    if (d->m_painter->GetName() != "Qt")
+    if (d->m_painter && d->m_painter->GetName() != "Qt")
     {
         setAttribute(Qt::WA_NoSystemBackground);
         setAutoFillBackground(false);
@@ -1128,13 +1126,14 @@ void MythMainWindow::Init(bool mayReInit)
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
     // 2nd window (e.g. TVPlayback) is created before this is redrawn.
 #ifdef ANDROID
-    LOG(VB_GENERAL, LOG_INFO, QString("Platform name is %1").arg(qApp->platformName()));
+    LOG(VB_GENERAL, LOG_INFO, QString("Platform name is %1")
+        .arg(QGuiApplication::platformName()));
 #   define EARLY_SHOW_PLATFORM_NAME_CHECK "android"
 #else
 #   define EARLY_SHOW_PLATFORM_NAME_CHECK "egl"
 #endif
-    if (qApp->platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
-        qApp->processEvents();
+    if (QGuiApplication::platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
+        QCoreApplication::processEvents();
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         d->m_paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
@@ -1385,7 +1384,7 @@ bool MythMainWindow::WindowIsAlwaysFullscreen(void)
     return true;
 #else
     // this may need to cover other platform plugins
-    return qApp->platformName().toLower().contains("eglfs");
+    return QGuiApplication::platformName().toLower().contains("eglfs");
 #endif
 }
 
@@ -2417,7 +2416,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
-            Qt::KeyboardModifiers mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
+            auto mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
             int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
             QString text;
 
@@ -2649,7 +2648,7 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 
     if (!key_target)
     {
-        QWidget *focus_widget = qApp->focusWidget();
+        QWidget *focus_widget = QApplication::focusWidget();
         if (focus_widget && focus_widget->isEnabled())
         {
             key_target = focus_widget;

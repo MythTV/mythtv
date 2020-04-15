@@ -246,7 +246,7 @@ class ZMServer
     bool processRequest(char* buf, int nbytes);
 
   private:
-    string getZMSetting(const string &setting);
+    string getZMSetting(const string &setting) const;
     bool send(const string &s) const;
     bool send(const string &s, const unsigned char *buffer, int dataLen) const;
     void sendError(const string &error);

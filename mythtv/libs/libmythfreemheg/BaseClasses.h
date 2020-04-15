@@ -114,7 +114,8 @@ class MHOctetString
     virtual ~MHOctetString();
 
     void Copy(const MHOctetString &str);
-    MHOctetString& operator=(const MHOctetString& o) {Copy(o); return *this; }
+    MHOctetString& operator=(const MHOctetString& o)
+        { if (this==&o) return *this; Copy(o); return *this; }
     int Size() const { return m_nLength; }
     // Comparison - returns <0, =0, >0 depending on the ordering.
     int Compare(const MHOctetString &str) const;

@@ -33,7 +33,7 @@ using namespace std;
 #include "mediamonitor-unix.h"
 #endif
 
-static const QString _Location = QObject::tr("Media Monitor");
+static const QString sLocation = QObject::tr("Media Monitor");
 
 MediaMonitor *MediaMonitor::s_monitor = nullptr;
 
@@ -265,7 +265,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     if (!selected)
     {
-        ShowNotification(tr("No devices to eject"), _Location);
+        ShowNotification(tr("No devices to eject"), sLocation);
         return;
     }
 
@@ -296,7 +296,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
                 QObject::tr("Unable to open or close the empty drive %1");
             QString extra =
                 QObject::tr("You may have to use the eject button under its tray");
-            ShowNotificationError(msg.arg(dev), _Location, extra);
+            ShowNotificationError(msg.arg(dev), sLocation, extra);
         }
         return;
     }
@@ -311,7 +311,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
         if (device->isMounted())
         {
             ShowNotificationError(tr("Failed to unmount %1").arg(dev),
-                                  _Location);
+                                  sLocation);
             return;
         }
 #endif
@@ -327,11 +327,11 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
     {
         // Physical ejection isn't possible (there is no tray or slot),
         // but logically the device is now ejected (ignored by the OS).
-        ShowNotification(tr("You may safely remove %1").arg(dev), _Location);
+        ShowNotification(tr("You may safely remove %1").arg(dev), sLocation);
     }
     else if (err == MEDIAERR_FAILED)
     {
-        ShowNotificationError(tr("Failed to eject %1").arg(dev), _Location);
+        ShowNotificationError(tr("Failed to eject %1").arg(dev), sLocation);
     }
 }
 
@@ -724,7 +724,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
  *        media event to the mainwindow
  */
 void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
-                                      MythMediaDevice* pMedia)
+                                      MythMediaDevice* pMedia) const
 {
     // If we're not active then ignore signal.
     if (!m_Active)

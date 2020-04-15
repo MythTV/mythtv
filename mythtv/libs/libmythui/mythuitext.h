@@ -81,7 +81,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void CycleColor(const QColor& startColor, const QColor& endColor, int numSteps);
     void StopCycling();
 
-    int GetJustification(void);
+    int GetJustification(void) const;
     void SetCutDown(Qt::TextElideMode mode);
     Qt::TextElideMode GetCutDown(void) const { return m_Cutdown; }
     void SetMultiLine(bool multiline);

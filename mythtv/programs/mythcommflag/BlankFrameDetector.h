@@ -4,8 +4,8 @@
  * Detect blank frames based on histogram analysis.
  */
 
-#ifndef __BLANKFRAMEDETECTOR_H__
-#define __BLANKFRAMEDETECTOR_H__
+#ifndef BLANKFRAMEDETECTOR_H
+#define BLANKFRAMEDETECTOR_H
 
 #include "FrameAnalyzer.h"
 
@@ -47,6 +47,6 @@ private:
     int                     m_debugLevel {0};
 };
 
-#endif  /* !__BLANKFRAMEDETECTOR_H__ */
+#endif  /* !BLANKFRAMEDETECTOR_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -222,7 +222,7 @@ void Synaesthesia::coreInit(void)
 #define lastOutput ((unsigned char*)m_lastOutputBmp.data)
 #define lastLastOutput ((unsigned char*)m_lastLastOutputBmp.data)
 
-void Synaesthesia::addPixel(int x, int y, int br1, int br2)
+void Synaesthesia::addPixel(int x, int y, int br1, int br2) const
 {
     if (x < 0 || x > m_outWidth || y < 0 || y >= m_outHeight)
         return;
@@ -250,7 +250,7 @@ void Synaesthesia::addPixelFast(unsigned char *p, int br1, int br2)
         p[1] = 255;
 }
 
-unsigned char Synaesthesia::getPixel(int x, int y, int where)
+unsigned char Synaesthesia::getPixel(int x, int y, int where) const
 {
     if (x < 0 || y < 0 || x >= m_outWidth || y >= m_outHeight)
         return 0;
@@ -258,7 +258,7 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where)
     return lastOutput[where];
 }
 
-void Synaesthesia::fadeFade(void)
+void Synaesthesia::fadeFade(void) const
 {
     auto *ptr = (uint32_t *)output;
     int i = m_outWidth * m_outHeight * 2 / sizeof(uint32_t);

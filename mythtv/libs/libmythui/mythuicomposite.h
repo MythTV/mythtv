@@ -1,5 +1,5 @@
-#ifndef __MythTV__mythuicomposite__
-#define __MythTV__mythuicomposite__
+#ifndef MYTHTV_MYTHUICOMPOSITE_H
+#define MYTHTV_MYTHUICOMPOSITE_H
 
 #include "mythuitype.h"
 #include "mythtypes.h"
@@ -14,4 +14,4 @@ public:
     virtual void ResetMap(const InfoMap &infoMap);
 };
 
-#endif /* defined(__MythTV__mythuicomposite__) */
+#endif /* defined(MYTHTV_MYTHUICOMPOSITE_H) */

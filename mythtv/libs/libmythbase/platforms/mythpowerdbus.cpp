@@ -7,16 +7,16 @@
 
 #define LOC QString("PowerDBus: ")
 
-#define FREE_SERVICE     (QStringLiteral("org.freedesktop."))
-#define FREE_PATH        (QStringLiteral("/org/freedesktop/"))
-#define UPOWER           (QStringLiteral("UPower"))
-#define LOGIN1           (QStringLiteral("login1"))
+#define FREE_SERVICE     (QString("org.freedesktop."))
+#define FREE_PATH        (QString("/org/freedesktop/"))
+#define UPOWER           (QString("UPower"))
+#define LOGIN1           (QString("login1"))
 #define UPOWER_SERVICE   (FREE_SERVICE + UPOWER)
 #define UPOWER_PATH      (FREE_PATH + UPOWER)
 #define UPOWER_INTERFACE (UPOWER_SERVICE)
 #define LOGIN1_SERVICE   (FREE_SERVICE + LOGIN1)
 #define LOGIN1_PATH      (FREE_PATH + LOGIN1)
-#define LOGIN1_INTERFACE (LOGIN1_SERVICE + QStringLiteral(".Manager"))
+#define LOGIN1_INTERFACE (LOGIN1_SERVICE + QString(".Manager"))
 
 /*! \brief Static check for DBus interfaces that support some form of power management.
  *
@@ -161,7 +161,9 @@ void MythPowerDBus::Init(void)
 
 bool MythPowerDBus::DoFeature(bool Delayed)
 {
-    if (!(m_logindInterface && (m_features & m_scheduledFeature) && m_scheduledFeature))
+    if (!(m_logindInterface &&
+          ((m_features & m_scheduledFeature) != 0U) &&
+          (m_scheduledFeature != 0U)))
         return false;
 
     if (!Delayed)

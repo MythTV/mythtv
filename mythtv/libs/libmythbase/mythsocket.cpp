@@ -841,7 +841,7 @@ void MythSocket::ReadStringListReal(
     }
 
     QString sizes = sizestr;
-    qint64 btr = sizes.trimmed().toInt();
+    int btr = sizes.trimmed().toInt();
 
     if (btr < 1)
     {

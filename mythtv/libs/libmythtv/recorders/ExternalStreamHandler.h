@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _External_Streamhandler_H_
-#define _External_Streamhandler_H_
+#ifndef EXTERNAL_STREAMHANDLER_H
+#define EXTERNAL_STREAMHANDLER_H
 
 #include <cstdint>
 #include <vector>
@@ -140,4 +140,4 @@ class ExternalStreamHandler : public StreamHandler
     QMutex        m_processLock;
 };
 
-#endif // _ExternalSTREAMHANDLER_H_
+#endif // EXTERNAL_STREAMHANDLER_H

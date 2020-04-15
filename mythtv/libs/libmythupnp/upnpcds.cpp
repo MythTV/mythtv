@@ -297,7 +297,7 @@ static UPnpCDSClientException clientExceptions[] = {
     // Sony Blu-ray players
     { CDS_ClientSonyDB,
       "X-AV-Client-Info",
-      "cn=\"Sony Corporation\"; mn=\"Blu-ray Disc Player\"" },
+      R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")" },
 };
 static uint clientExceptionCount = sizeof(clientExceptions) /
                                    sizeof(clientExceptions[0]);
@@ -771,7 +771,7 @@ void UPnpCDS::HandleGetServiceResetToken(HTTPRequest* pRequest)
         QString("UPnpCDS::ProcessRequest : %1 : %2")
             .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
 
-    QString sToken = GetValue<QString>("ServiceResetToken");
+    auto sToken = GetValue<QString>("ServiceResetToken");
 
     list.push_back(NameValue("ResetToken", sToken));
 

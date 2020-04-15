@@ -113,7 +113,7 @@ class VisFactory
     VisFactory*        m_pNextVisFactory {nullptr};
 };
 
-#define RUBBERBAND 0
+#define RUBBERBAND false
 #define TWOCOLOUR 0
 
 class StereoScope : public VisualBase
@@ -131,7 +131,7 @@ class StereoScope : public VisualBase
   protected:
     QColor         m_startColor  {Qt::green};
     QColor         m_targetColor {Qt::red};
-    vector<double> m_magnitudes;
+    vector<double> m_magnitudes  {};
     QSize          m_size;
     bool const     m_rubberband  {RUBBERBAND};
     double const   m_falloff     {1.0};
@@ -284,7 +284,7 @@ struct piano_key_data {
     QColor          m_blackStartColor  {10,10,10};
     QColor          m_blackTargetColor {Qt::red};
 
-    vector<QRect>   m_rects;
+    vector<QRect>   m_rects            {};
     QSize           m_size;
 
     unsigned long   m_offset_processed {0};
@@ -292,7 +292,7 @@ struct piano_key_data {
     piano_key_data *m_piano_data       {nullptr};
     piano_audio    *m_audio_data       {nullptr};
 
-    vector<double>  m_magnitude;
+    vector<double>  m_magnitude        {};
 };
 
 class AlbumArt : public VisualBase

@@ -69,7 +69,7 @@ class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
     void parseKey(const QDomElement &element);
     void updateKeys(bool connectSignals = false);
     static QString decodeChar(QString c);
-    QString getKeyText(const KeyDefinition& key);
+    QString getKeyText(const KeyDefinition& key) const;
     static void loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action);
 
     MythUITextEdit *m_parentEdit   {nullptr};

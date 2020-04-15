@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef _TRANSPORT_EDITOR_H_
-#define _TRANSPORT_EDITOR_H_
+#ifndef TRANSPORT_EDITOR_H
+#define TRANSPORT_EDITOR_H
 
 #include <QObject>
 
@@ -92,4 +92,4 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     bool m_isLoading {false};
 };
 
-#endif // _TRANSPORT_EDITOR_H_
+#endif // TRANSPORT_EDITOR_H

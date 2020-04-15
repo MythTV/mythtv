@@ -1,6 +1,6 @@
 /** -*- Mode: c++ -*- */
-#ifndef _MYTHSOCKET_CB_H_
-#define _MYTHSOCKET_CB_H_
+#ifndef MYTHSOCKET_CB_H
+#define MYTHSOCKET_CB_H
 
 #include "mythbaseexp.h"
 
@@ -19,4 +19,4 @@ class MBASE_PUBLIC MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
-#endif // _MYTHSOCKET_CB_H_
+#endif // MYTHSOCKET_CB_H

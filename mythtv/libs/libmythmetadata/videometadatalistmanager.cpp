@@ -350,12 +350,11 @@ smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
                                         const QString &prefix,
                                         const QVariant &data)
 {
-    for (meta_dir_list::const_iterator p = m_subdirs.begin();
-    p != m_subdirs.end(); ++p)
+    for (auto & entry : m_subdirs)
     {
-        if (subdir == (*p)->getPath())
+        if (subdir == entry->getPath())
         {
-            return *p;
+            return entry;
         }
     }
 

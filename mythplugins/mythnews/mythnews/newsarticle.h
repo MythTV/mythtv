@@ -1,5 +1,5 @@
-#ifndef _NEWSARTICLE_H_
-#define _NEWSARTICLE_H_
+#ifndef NEWSARTICLE_H
+#define NEWSARTICLE_H
 
 // C++ headers
 #include <vector>
@@ -37,4 +37,4 @@ class NewsArticle
     QString   m_enclosureType;
 };
 
-#endif // _NEWSARTICLE_H_
+#endif // NEWSARTICLE_H

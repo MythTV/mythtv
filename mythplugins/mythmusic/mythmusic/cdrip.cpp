@@ -194,7 +194,7 @@ void CDRipperThread::cancel(void)
     m_quit = true;
 }
 
-bool CDRipperThread::isCancelled(void)
+bool CDRipperThread::isCancelled(void) const
 {
     return m_quit;
 }
@@ -885,16 +885,16 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
             " ON music_songs.directory_id=music_directories.directory_id "
             "WHERE artist_name REGEXP \'");
     QString token = artist;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"),
+    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
                   QString("."));
 
     queryString += token + "\' AND " + "album_name REGEXP \'";
     token = album;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"),
+    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
                   QString("."));
     queryString += token + "\' AND " + "name    REGEXP \'";
     token = title;
-    token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"),
+    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
                   QString("."));
     queryString += token + "\' ORDER BY artist_name, album_name,"
                            " name, song_id, filename LIMIT 1";
@@ -939,7 +939,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
     return false;
 }
 
-bool Ripper::somethingWasRipped()
+bool Ripper::somethingWasRipped() const
 {
     return m_somethingwasripped;
 }
@@ -1541,7 +1541,7 @@ void RipStatus::customEvent(QEvent *event)
         auto *dce = dynamic_cast<DialogCompletionEvent *>(event);
         if (dce == nullptr)
             return;
-        if (dce->GetId() == "stop_ripping" && dce->GetResult())
+        if ((dce->GetId() == "stop_ripping") && (dce->GetResult() != 0))
         {
             m_ripperThread->cancel();
             m_ripperThread->wait();

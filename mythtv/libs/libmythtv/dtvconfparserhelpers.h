@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef _DTVCONFPARSERHELPERS_H_
-#define _DTVCONFPARSERHELPERS_H_
+#ifndef DTVCONFPARSERHELPERS_H
+#define DTVCONFPARSERHELPERS_H
 
 #include <QString>
 #ifdef USING_DVB
@@ -711,4 +711,4 @@ class DTVRollOff : public DTVParamHelper
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
 };
 
-#endif // _DTVCONFPARSERHELPERS_H_
+#endif // DTVCONFPARSERHELPERS_H

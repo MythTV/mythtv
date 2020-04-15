@@ -1,5 +1,5 @@
-#ifndef _STORAGEGROUPEDITOR_H
-#define _STORAGEGROUPEDITOR_H
+#ifndef STORAGEGROUPEDITOR_H
+#define STORAGEGROUPEDITOR_H
 
 #include "storagegroup.h"
 #include "standardsettings.h"
@@ -73,6 +73,6 @@ class StorageGroupDirSetting : public MythUIFileBrowserSetting
     QString m_group;
 };
 
-#endif
+#endif // STORAGEGROUPEDITOR_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

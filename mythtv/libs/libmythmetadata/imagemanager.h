@@ -402,8 +402,8 @@ class META_PUBLIC ImageDbReader : protected ImageHandler<ImageDbLocal>
 public:
     ~ImageDbReader() override { delete m_remote; }
 
-    int  GetType()        { return m_showType; }
-    bool GetVisibility()  { return m_showHidden; }
+    int  GetType() const        { return m_showType; }
+    bool GetVisibility() const  { return m_showHidden; }
 
     void SetType(int showType)
     { m_showType = showType; SetRefinementClause(); }

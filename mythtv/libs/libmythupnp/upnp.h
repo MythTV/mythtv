@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNP_H__
-#define __UPNP_H__
+#ifndef UPNP_H
+#define UPNP_H
 
 // Qt
 #include <QObject>
@@ -113,8 +113,8 @@ class UPNP_PUBLIC UPnp : public QObject
         static QList<QHostAddress>  g_IPAddrList;
 
     public:
-                 UPnp();
-        virtual ~UPnp();
+        UPnp();
+       ~UPnp() override;
 
         static void           SetConfiguration( Configuration *pConfig );
         static Configuration* GetConfiguration();
@@ -144,11 +144,11 @@ class UPNP_PUBLIC UPnp : public QObject
                                                        const QString &hostName );
 
     public slots:
-        void DisableNotifications(uint);
-        void EnableNotificatins(qint64);
+        static void DisableNotifications(uint /*unused*/);
+        void EnableNotificatins(qint64 /*unused*/) const;
 
     private:
         MythPower* m_power;
 };
 
-#endif
+#endif // UPNP_H

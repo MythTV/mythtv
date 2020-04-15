@@ -1,5 +1,5 @@
-#ifndef _VIDEO_META_DATA_UTIL_H_
-#define _VIDEO_META_DATA_UTIL_H_
+#ifndef VIDEO_META_DATA_UTIL_H
+#define VIDEO_META_DATA_UTIL_H
 
 // Qt headers
 #include <QString>
@@ -13,4 +13,4 @@ class MTV_PUBLIC VideoMetaDataUtil
     static QString GetArtPath(const QString &pathname, const QString &type);
 };
 
-#endif // _VIDEO_META_DATA_UTIL_H_
+#endif // VIDEO_META_DATA_UTIL_H

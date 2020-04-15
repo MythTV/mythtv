@@ -380,7 +380,7 @@ QString ELD::sad_desc(int index)
         .arg(buf2);
 }
 
-QString ELD::channel_allocation_desc()
+QString ELD::channel_allocation_desc() const
 {
     QString result = QString();
 
@@ -394,7 +394,7 @@ QString ELD::channel_allocation_desc()
     return result;
 }
 
-QString ELD::eld_version_name()
+QString ELD::eld_version_name() const
 {
     switch (m_e.eld_ver)
     {
@@ -404,7 +404,7 @@ QString ELD::eld_version_name()
     }
 }
 
-QString ELD::edid_version_name()
+QString ELD::edid_version_name() const
 {
     switch (m_e.cea_edid_ver)
     {
@@ -416,7 +416,7 @@ QString ELD::edid_version_name()
     }
 }
 
-QString ELD::info_desc()
+QString ELD::info_desc() const
 {
     QString result = QString("manufacture_id\t\t0x%1\n")
         .arg(m_e.manufacture_id, 0, 16);
@@ -429,7 +429,7 @@ QString ELD::info_desc()
     return result;
 }
 
-bool ELD::isValid()
+bool ELD::isValid() const
 {
     return m_e.eld_valid;
 }
@@ -464,7 +464,7 @@ QString ELD::product_name()
     return QString(m_e.monitor_name);
 }
 
-QString ELD::connection_name()
+QString ELD::connection_name() const
 {
     return eld_connection_type_names[m_e.conn_type];
 }
@@ -496,7 +496,7 @@ int ELD::maxChannels()
     return channels;
 }
 
-QString ELD::codecs_desc()
+QString ELD::codecs_desc() const
 {
     QString result = QString();
     bool found_one = false;

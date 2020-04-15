@@ -1,5 +1,5 @@
-#ifndef _CHANNELDATA_H_
-#define _CHANNELDATA_H_
+#ifndef CHANNELDATA_H
+#define CHANNELDATA_H
 
 // Qt headers
 #include <QString>
@@ -14,10 +14,10 @@ class ChannelData
   public:
     ChannelData() = default;
 
-    bool insert_chan(uint sourceid);
-    void handleChannels(int id, ChannelInfoList *chanlist);
+    bool insert_chan(uint sourceid) const;
+    void handleChannels(int id, ChannelInfoList *chanlist) const;
     unsigned int promptForChannelUpdates(ChannelInfoList::iterator chaninfo,
-                                         unsigned int chanid);
+                                         unsigned int chanid) const;
 
     static ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
                             ChannelList existingChannels);
@@ -33,4 +33,4 @@ class ChannelData
     QString m_cardType;
 };
 
-#endif // _CHANNELDATA_H_
+#endif // CHANNELDATA_H

@@ -18,8 +18,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _SPLICE_DESCRIPTOR_H_
-#define _SPLICE_DESCRIPTOR_H_
+#ifndef SPLICE_DESCRIPTOR_H
+#define SPLICE_DESCRIPTOR_H
 
 #include "splicedescriptors.h"
 #include "mythmiscutil.h" // for xml_indent
@@ -215,4 +215,4 @@ QString SegmentationDescriptor::toString() const
     return QString("Segmentation: id(%1)").arg(SegmentationEventIdString());
 }
 
-#endif // _SPLICE_DESCRIPTOR_H_
+#endif // SPLICE_DESCRIPTOR_H

@@ -56,7 +56,7 @@ namespace
 
         ReferenceCounter::PrintDebug();
 
-        delete qApp;
+        delete QCoreApplication::instance();
 
         SignalHandler::Done();
     }
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 */
 
     startAppearWiz(GuiOffsetX, GuiOffsetY, GuiWidth, GuiHeight);
-    int exitCode = qApp->exec();
+    int exitCode = QCoreApplication::exec();
 
 /*
     if (sysEventHandler)

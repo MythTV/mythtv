@@ -400,7 +400,7 @@ void ThumbFinder::updateThumb(void)
     m_imageGrid->SetRedraw();
 }
 
-QString ThumbFinder::frameToTime(int64_t frame, bool addFrame)
+QString ThumbFinder::frameToTime(int64_t frame, bool addFrame) const
 {
     QString str;
 
@@ -478,7 +478,7 @@ bool ThumbFinder::getThumbImages()
 
     new MythUIButtonListItem(m_imageGrid, thumb->caption, thumb->filename);
 
-    qApp->processEvents();
+    QCoreApplication::processEvents();
 
     for (int x = 1; x <= m_thumbCount; x++)
     {
@@ -513,11 +513,11 @@ bool ThumbFinder::getThumbImages()
             m_frameFile = thumb->filename;
 
         seekToFrame(thumb->frame);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         getFrameImage();
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         new MythUIButtonListItem(m_imageGrid, thumb->caption, thumb->filename);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     }
 
     m_frameFile = origFrameFile;

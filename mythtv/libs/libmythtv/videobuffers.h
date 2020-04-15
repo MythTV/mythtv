@@ -1,5 +1,5 @@
-#ifndef __VIDEOBUFFERS_H__
-#define __VIDEOBUFFERS_H__
+#ifndef VIDEOBUFFERS_H
+#define VIDEOBUFFERS_H
 
 // Qt
 #include <QSize>
@@ -130,4 +130,4 @@ class MTV_PUBLIC VideoBuffers
     mutable QMutex       m_globalLock                { QMutex::Recursive };
 };
 
-#endif // __VIDEOBUFFERS_H__
+#endif // VIDEOBUFFERS_H

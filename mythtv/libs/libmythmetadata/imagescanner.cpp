@@ -111,7 +111,7 @@ template <class DBFS>
 QStringList ImageScanThread<DBFS>::GetProgress()
 {
     QMutexLocker locker(&m_mutexProgress);
-    return QStringList() << QString::number(gCoreContext->IsBackend())
+    return QStringList() << QString::number(static_cast<int>(gCoreContext->IsBackend()))
                          << QString::number(m_progressCount)
                          << QString::number(m_progressTotalCount);
 }
@@ -610,7 +610,7 @@ void ImageScanThread<DBFS>::Broadcast(int progress)
 {
     // Only 2 scanners are ever visible (FE & BE) so use bool as scanner id
     QStringList status;
-    status << QString::number(gCoreContext->IsBackend())
+    status << QString::number(static_cast<int>(gCoreContext->IsBackend()))
            << QString::number(progress)
            << QString::number(m_progressTotalCount);
 

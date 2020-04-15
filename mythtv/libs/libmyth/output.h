@@ -5,8 +5,8 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef   __output_h
-#define   __output_h
+#ifndef   OUTPUT_H
+#define   OUTPUT_H
 
 class OutputListeners;
 class OutputEvent;
@@ -46,6 +46,8 @@ class MPUBLIC OutputEvent : public MythEvent
         delete m_errorMsg;
     }
 
+    OutputEvent &operator=(const OutputEvent&) = delete;
+
     const QString *errorMessage() const { return m_errorMsg; }
 
     const long &elapsedSeconds() const { return m_elaspedSeconds; }
@@ -77,7 +79,6 @@ class MPUBLIC OutputEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
-    OutputEvent &operator=(const OutputEvent&) = delete;
 
   private:
     QString       *m_errorMsg        {nullptr};
@@ -123,4 +124,4 @@ private:
 };
 
 
-#endif // __output_h
+#endif // OUTPUT_H

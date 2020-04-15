@@ -4,8 +4,8 @@
  *  Digital multiplexes info class
  */
 
-#ifndef _DTVMULTIPLEX_H_
-#define _DTVMULTIPLEX_H_
+#ifndef DTVMULTIPLEX_H
+#define DTVMULTIPLEX_H
 
 // C++ headers
 #include <cstdint>
@@ -142,4 +142,4 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
 };
 using ScanDTVTransportList = vector<ScanDTVTransport>;
 
-#endif // _DTVMULTIPLEX_H_
+#endif // DTVMULTIPLEX_H

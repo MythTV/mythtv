@@ -4,8 +4,8 @@
  * Object to convert a MythPlayer frame into a greyscale image.
  */
 
-#ifndef __PGMCONVERTER_H__
-#define __PGMCONVERTER_H__
+#ifndef PGMCONVERTER_H
+#define PGMCONVERTER_H
 
 extern "C" {
 #include "libavcodec/avcodec.h"    /* AVFrame */
@@ -50,6 +50,6 @@ private:
 #endif /* PGM_CONVERT_GREYSCALE */
 };
 
-#endif  /* !__PGMCONVERTER_H__ */
+#endif  /* !PGMCONVERTER_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _MISC_SETTINGS_H_
-#define _MISC_SETTINGS_H_
+#ifndef CHANNEL_SCAN_MISC_SETTINGS_H
+#define CHANNEL_SCAN_MISC_SETTINGS_H
 
 #include "standardsettings.h"
 #include "channelscantypes.h"
@@ -470,4 +470,4 @@ class PaneError : public GroupSetting
     }
 };
 
-#endif // _MISC_SETTINGS_H_
+#endif // CHANNEL_SCAN_MISC_SETTINGS_H

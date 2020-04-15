@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_ALL_H_
-#define _PANE_ALL_H_
+#ifndef PANE_ALL_H
+#define PANE_ALL_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -48,13 +48,13 @@ class PaneAll : public GroupSetting
     }
 
     bool ignoreSignalTimeout(void) const
-        { return m_ignore_signal_timeout->getValue().toInt(); }
+        { return m_ignore_signal_timeout->getValue().toInt() != 0; }
     bool GetFollowNIT(void) const
-        { return m_follow_nit->getValue().toInt(); }
+        { return m_follow_nit->getValue().toInt() != 0; }
 
   protected:
     IgnoreSignalTimeout *m_ignore_signal_timeout {nullptr};
     FollowNITSetting    *m_follow_nit {nullptr};
 };
 
-#endif // _PANE_ALL_H_
+#endif // PANE_ALL_H

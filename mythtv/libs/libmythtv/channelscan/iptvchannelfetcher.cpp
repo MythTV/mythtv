@@ -463,7 +463,7 @@ static bool parse_extinf(const QString &line,
                          int           &nextChanNum)
 {
     // Parse extension portion, Freebox or SAT>IP format
-    QRegExp chanNumName1("^-?\\d+,(\\d+)(?:\\.\\s|\\s-\\s)(.*)$");
+    QRegExp chanNumName1(R"(^-?\d+,(\d+)(?:\.\s|\s-\s)(.*)$)");
     int pos = chanNumName1.indexIn(line);
     if (pos != -1)
     {
@@ -483,7 +483,7 @@ static bool parse_extinf(const QString &line,
     }
 
     // Parse extension portion, Moviestar TV number then name
-    QRegExp chanNumName3("^-?\\d+,\\[(\\d+)\\]\\s+(.*)$");
+    QRegExp chanNumName3(R"(^-?\d+,\[(\d+)\]\s+(.*)$)");
     pos = chanNumName3.indexIn(line);
     if (pos != -1)
     {
@@ -493,7 +493,7 @@ static bool parse_extinf(const QString &line,
     }
 
     // Parse extension portion, Moviestar TV name then number
-    QRegExp chanNumName4("^-?\\d+,(.*)\\s+\\[(\\d+)\\]$");
+    QRegExp chanNumName4(R"(^-?\d+,(.*)\s+\[(\d+)\]$)");
     pos = chanNumName4.indexIn(line);
     if (pos != -1)
     {
@@ -503,7 +503,7 @@ static bool parse_extinf(const QString &line,
     }
 
     // Parse extension portion, russion iptv plugin style
-    QRegExp chanNumName5("^(-?\\d+)\\s+[^,]*,\\s*(.*)$");
+    QRegExp chanNumName5(R"(^(-?\d+)\s+[^,]*,\s*(.*)$)");
     pos = chanNumName5.indexIn(line);
     if (pos != -1)
     {

@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPTASKNOTIFY_H__
-#define __UPNPTASKNOTIFY_H__
+#ifndef UPNPTASKNOTIFY_H
+#define UPNPTASKNOTIFY_H
 
 // POSIX headers
 #include <sys/types.h>
@@ -116,4 +116,4 @@ class UPnpNotifyTask : public Task
 };
 
 
-#endif
+#endif // UPNPTASKNOTIFY_H

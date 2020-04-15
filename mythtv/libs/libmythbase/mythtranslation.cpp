@@ -62,7 +62,7 @@ void MythTranslation::load(const QString &module_name)
         LOG(VB_GENERAL, LOG_INFO,
             QString("Loading %1 translation for module %2")
                 .arg(lang).arg(module_name));
-        qApp->installTranslator(trans);
+        QCoreApplication::installTranslator(trans);
         d.m_translators[module_name] = trans;
     }
     else
@@ -79,7 +79,7 @@ void MythTranslation::unload(const QString &module_name)
     if (it != d.m_translators.end())
     {
         // found translator, remove it from qApp and our map
-        qApp->removeTranslator(*it);
+        QCoreApplication::removeTranslator(*it);
         delete *it;
         d.m_translators.erase(it);
     }

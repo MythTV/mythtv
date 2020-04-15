@@ -165,48 +165,48 @@ QString CustomEdit::evaluate(QString clause)
         QString mid = clause.mid(s0 + 1, e0 - s0 - 1);
         QString repl = "";
 
-        if (!mid.compare("TITLE")) {
+        if (mid.compare("TITLE") == 0) {
             repl = m_pginfo->GetTitle();
             repl.replace("\'","\'\'");
-        } else if (!mid.compare("SUBTITLE")) {
+        } else if (mid.compare("SUBTITLE") == 0) {
             repl = m_pginfo->GetSubtitle();
             repl.replace("\'","\'\'");
-        } else if (!mid.compare("DESCR")) {
+        } else if (mid.compare("DESCR") == 0) {
             repl = m_pginfo->GetDescription();
             repl.replace("\'","\'\'");
-        } else if (!mid.compare("SERIESID")) {
+        } else if (mid.compare("SERIESID") == 0) {
             repl = QString("%1").arg(m_pginfo->GetSeriesID());
-        } else if (!mid.compare("PROGID")) {
+        } else if (mid.compare("PROGID") == 0) {
             repl = m_pginfo->GetProgramID();
-        } else if (!mid.compare("SEASON")) {
+        } else if (mid.compare("SEASON") == 0) {
             repl = QString::number(m_pginfo->GetSeason());
-        } else if (!mid.compare("EPISODE")) {
+        } else if (mid.compare("EPISODE") == 0) {
             repl = QString::number(m_pginfo->GetEpisode());
-        } else if (!mid.compare("CATEGORY")) {
+        } else if (mid.compare("CATEGORY") == 0) {
             repl = m_pginfo->GetCategory();
-        } else if (!mid.compare("CHANID")) {
+        } else if (mid.compare("CHANID") == 0) {
             repl = QString("%1").arg(m_pginfo->GetChanID());
-        } else if (!mid.compare("CHANNUM")) {
+        } else if (mid.compare("CHANNUM") == 0) {
             repl = m_pginfo->GetChanNum();
-        } else if (!mid.compare("SCHEDID")) {
+        } else if (mid.compare("SCHEDID") == 0) {
             repl = m_pginfo->GetChannelSchedulingID();
-        } else if (!mid.compare("CHANNAME")) {
+        } else if (mid.compare("CHANNAME") == 0) {
             repl = m_pginfo->GetChannelName();
-        } else if (!mid.compare("DAYNAME")) {
+        } else if (mid.compare("DAYNAME") == 0) {
             repl = m_pginfo->GetScheduledStartTime().toString("dddd");
-        } else if (!mid.compare("STARTDATE")) {
+        } else if (mid.compare("STARTDATE") == 0) {
             repl = m_pginfo->GetScheduledStartTime().toString("yyyy-mm-dd hh:mm:ss");
-        } else if (!mid.compare("ENDDATE")) {
+        } else if (mid.compare("ENDDATE") == 0) {
             repl = m_pginfo->GetScheduledEndTime().toString("yyyy-mm-dd hh:mm:ss");
-        } else if (!mid.compare("STARTTIME")) {
+        } else if (mid.compare("STARTTIME") == 0) {
             repl = m_pginfo->GetScheduledStartTime().toString("hh:mm");
-        } else if (!mid.compare("ENDTIME")) {
+        } else if (mid.compare("ENDTIME") == 0) {
             repl = m_pginfo->GetScheduledEndTime().toString("hh:mm");
-        } else if (!mid.compare("STARTSEC")) {
+        } else if (mid.compare("STARTSEC") == 0) {
             QDateTime date = m_pginfo->GetScheduledStartTime();
             QDateTime midnight = QDateTime(date.date());
             repl = QString("%1").arg(midnight.secsTo(date));
-        } else if (!mid.compare("ENDSEC")) {
+        } else if (mid.compare("ENDSEC") == 0) {
             QDateTime date = m_pginfo->GetScheduledEndTime();
             QDateTime midnight = QDateTime(date.date());
             repl = QString("%1").arg(midnight.secsTo(date));
@@ -578,7 +578,7 @@ void CustomEdit::ruleChanged(MythUIButtonListItem *item)
 
     m_currentRuleItem = item;
 
-    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
+    auto rule = item->GetData().value<CustomRuleInfo>();
 
     m_titleEdit->SetText(rule.title);
     m_descriptionEdit->SetText(rule.description);
@@ -603,7 +603,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
+    auto rule = item->GetData().value<CustomRuleInfo>();
 
     QString msg = (m_evaluate) ? evaluate(rule.description) : rule.description;
     msg.replace('\n', ' ');
@@ -623,7 +623,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
+    auto rule = item->GetData().value<CustomRuleInfo>();
 
     QString clause;
     QString desc = m_descriptionEdit->GetText();
@@ -678,7 +678,7 @@ void CustomEdit::recordClicked(void)
     auto *record = new RecordingRule();
 
     MythUIButtonListItem* item = m_ruleList->GetItemCurrent();
-    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
+    auto rule = item->GetData().value<CustomRuleInfo>();
 
     int cur_recid = rule.recordid.toInt();
     if (cur_recid > 0)

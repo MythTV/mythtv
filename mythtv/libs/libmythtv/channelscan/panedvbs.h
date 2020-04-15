@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_DVBS_H_
-#define _PANE_DVBS_H_
+#ifndef PANE_DVBS_H
+#define PANE_DVBS_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -68,4 +68,4 @@ class PaneDVBS : public GroupSetting
     ScanPolarity       *m_ppolarity   {nullptr};
 };
 
-#endif // _PANE_DVBS_H_
+#endif // PANE_DVBS_H

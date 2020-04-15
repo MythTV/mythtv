@@ -171,7 +171,8 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (control)
     {
-        strlist.append(QString("ANN Playback %1 %2").arg(hostname).arg(false));
+        strlist.append(QString("ANN Playback %1 %2")
+                       .arg(hostname).arg(static_cast<int>(false)));
         if (!lsock->SendReceiveStringList(strlist))
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
@@ -184,8 +185,8 @@ MythSocket *RemoteFile::openSocket(bool control)
     else
     {
         strlist.push_back(QString("ANN FileTransfer %1 %2 %3 %4")
-                          .arg(hostname).arg(m_writeMode)
-                          .arg(m_useReadAhead).arg(m_timeoutMs));
+                          .arg(hostname).arg(static_cast<int>(m_writeMode))
+                          .arg(static_cast<int>(m_useReadAhead)).arg(m_timeoutMs));
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
@@ -1206,7 +1207,7 @@ void RemoteFile::SetTimeout(bool fast)
     // handled.  The CheckConnection function can call Resume which
     // calls Close, which deletes m_controlSock.  However, the
     // subsequent call to OpenInternal is guaranteed to recreate the
-    // socket or return false for a non-local connection, an this must
+    // socket or return false for a non-local connection, and this must
     // be a non-local connection if this line of code is executed.
     if (!CheckConnection())
     {
@@ -1214,6 +1215,8 @@ void RemoteFile::SetTimeout(bool fast)
             "RemoteFile::SetTimeout(): Couldn't connect");
         return;
     }
+    if (m_controlSock == nullptr)
+        return;
 
     QStringList strlist( m_query.arg(m_recorderNum) );
     strlist << "SET_TIMEOUT";

@@ -1,5 +1,5 @@
-#ifndef _MYTHSOCKETMANAGER_H_
-#define _MYTHSOCKETMANAGER_H_
+#ifndef MYTHSOCKETMANAGER_H
+#define MYTHSOCKETMANAGER_H
 
 // Qt
 #include <QMap>
@@ -75,4 +75,4 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     QMutex m_socketListLock;
     QSet<MythSocket*> m_socketList;
 };
-#endif
+#endif // MYTHSOCKETMANAGER_H

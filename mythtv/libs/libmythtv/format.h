@@ -144,7 +144,7 @@ struct vidbuffertype
     int freeToBuffer;
     unsigned char *buffer;
     int bufferlen;
-    int forcekey;
+    bool forcekey;
 };
 
 struct audbuffertype

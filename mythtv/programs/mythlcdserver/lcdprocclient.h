@@ -58,8 +58,8 @@ class LCDProcClient : public QObject
     void updateLEDs(int mask);
     void stopAll(void);
 
-    int  getLCDWidth(void) { return m_lcdWidth; }
-    int  getLCDHeight(void) { return m_lcdHeight; }
+    int  getLCDWidth(void) const { return m_lcdWidth; }
+    int  getLCDHeight(void) const { return m_lcdHeight; }
 
   private slots: 
     void veryBadThings(QAbstractSocket::SocketError error); // Communication Errors
@@ -97,7 +97,7 @@ class LCDProcClient : public QObject
     void outputScrollerText(const QString& theScreen, const QString& theText,
                          const QString& widget = "scroller", int top = 1, int bottom = 1);
 
-    QStringList formatScrollerText(const QString &text);
+    QStringList formatScrollerText(const QString &text) const;
     void outputText(QList<LCDTextItem> *textItems);
 
     void sendToServer(const QString &someText);
@@ -106,7 +106,7 @@ class LCDProcClient : public QObject
     void setPriority(const QString &screen, PRIORITY priority);
 
     void setHeartbeat (const QString &screen, bool onoff);
-    QString expandString(const QString &aString);
+    QString expandString(const QString &aString) const;
 
     void init();
     void loadSettings();   //reload the settings from the db

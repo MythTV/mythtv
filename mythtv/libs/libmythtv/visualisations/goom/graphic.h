@@ -1,13 +1,12 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
 
-typedef unsigned int Uint;
+using Uint = unsigned int;
 
-typedef struct
+struct Color
 {
 	unsigned short r, v, b;
-}
-Color;
+};
 
 extern const Color BLACK;
 extern const Color WHITE;

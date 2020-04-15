@@ -1,5 +1,5 @@
-#ifndef _BACKEND_CONTEXT_H_
-#define _BACKEND_CONTEXT_H_
+#ifndef BACKEND_CONTEXT_H
+#define BACKEND_CONTEXT_H
 
 #include <QString>
 #include <QMap>
@@ -56,4 +56,4 @@ class BackendContext
     QMap<QString, Frontend*> m_knownFrontends;
 };
 
-#endif // _BACKEND_CONTEXT_H_
+#endif // BACKEND_CONTEXT_H

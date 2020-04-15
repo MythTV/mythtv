@@ -1,5 +1,5 @@
-#ifndef _DRAWMETHODS_H
-#define _DRAWMETHODS_H
+#ifndef DRAWMETHODS_H
+#define DRAWMETHODS_H
 
 #include "goomconfig.h"
 
@@ -50,7 +50,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
     int     dy = 0;
     int     yy = 0;
     int     xx = 0;
-    int    *p = NULL;
+    int    *p = nullptr;
 
 
 	if ((y1 < 0) || (y2 < 0) || (x1 < 0) || (x2 < 0) || (y1 >= screeny) || (y2 >= screeny) || (x1 >= screenx) || (x2 >= screenx)) 
@@ -166,4 +166,4 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 }
 #endif
 
-#endif
+#endif // DRAWMETHODS_H

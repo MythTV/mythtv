@@ -18,11 +18,11 @@
 
 // Matches Season 2, S 2 and "Series 2," etc but not "hits 2"
 // cap1 = season
-const QString seasonStr = "\\b(?:Season|Series|S)\\s*(\\d+)\\s*,?";
+const QString seasonStr = R"(\b(?:Season|Series|S)\s*(\d+)\s*,?)";
 
 // Matches Episode 3, Ep 3/4, Ep 3 of 4 etc but not "step 1"
 // cap1 = ep, cap2 = total
-const QString longEp = "\\b(?:Ep|Episode)\\s*(\\d+)\\s*(?:(?:/|of)\\s*(\\d*))?";
+const QString longEp = R"(\b(?:Ep|Episode)\s*(\d+)\s*(?:(?:/|of)\s*(\d*))?)";
 
 // Matches S2 Ep 3/4, "Season 2, Ep 3 of 4", Episode 3 etc
 // cap1 = season, cap2 = ep, cap3 = total
@@ -30,11 +30,11 @@ const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(seasonStr, longEp);
 
 // Matches long seas/ep with surrounding parenthesis & trailing period
 // cap1 = season, cap2 = ep, cap3 = total
-const QString longContext = QString("\\(*%1\\s*\\)?\\s*\\.?").arg(longSeasEp);
+const QString longContext = QString(R"(\(*%1\s*\)?\s*\.?)").arg(longSeasEp);
 
 // Matches 3/4, 3 of 4
 // cap1 = ep, cap2 = total
-const QString shortEp = "(\\d+)\\s*(?:/|of)\\s*(\\d+)";
+const QString shortEp = R"((\d+)\s*(?:/|of)\s*(\d+))";
 
 // Matches short ep/total, ignoring Parts and idioms such as 9/11, 24/7 etc.
 // ie. x/y in parenthesis or has no leading or trailing text in the sentence.
@@ -42,58 +42,58 @@ const QString shortEp = "(\\d+)\\s*(?:/|of)\\s*(\\d+)";
 // cap1 = shortEp with surrounding parenthesis & trailing period (to remove)
 // cap2 = ep, cap3 = total,
 const QString shortContext =
-        QString("(?:^|\\.)(\\s*\\(*\\s*%1[\\s)]*(?:[).:]|$))").arg(shortEp);
+        QString(R"((?:^|\.)(\s*\(*\s*%1[\s)]*(?:[).:]|$)))").arg(shortEp);
 
 
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
       m_bellActors("\\set\\s|,"),
-      m_bellPPVTitleAllDayHD("\\s*\\(All Day\\, HD\\)\\s*$"),
-      m_bellPPVTitleAllDay("\\s*\\(All Day.*\\)\\s*$"),
+      m_bellPPVTitleAllDayHD(R"(\s*\(All Day\, HD\)\s*$)"),
+      m_bellPPVTitleAllDay(R"(\s*\(All Day.*\)\s*$)"),
       m_bellPPVTitleHD("^HD\\s?-\\s?"),
-      m_bellPPVSubtitleAllDay("^All Day \\(.*\\sEastern\\)\\s*$"),
-      m_bellPPVDescriptionAllDay("^\\(.*\\sEastern\\)"),
-      m_bellPPVDescriptionAllDay2("^\\([0-9].*am-[0-9].*am\\sET\\)"),
+      m_bellPPVSubtitleAllDay(R"(^All Day \(.*\sEastern\)\s*$)"),
+      m_bellPPVDescriptionAllDay(R"(^\(.*\sEastern\))"),
+      m_bellPPVDescriptionAllDay2(R"(^\([0-9].*am-[0-9].*am\sET\))"),
       m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
       m_dishPPVTitleHD("\\sHD\\s*$"),
       m_dishPPVTitleColon("\\:\\s*$"),
-      m_dishPPVSpacePerenEnd("\\s\\)\\s*$"),
-      m_dishDescriptionNew("\\s*New\\.\\s*"),
-      m_dishDescriptionFinale("\\s*(Series|Season)\\sFinale\\.\\s*"),
-      m_dishDescriptionFinale2("\\s*Finale\\.\\s*"),
-      m_dishDescriptionPremiere("\\s*(Series|Season)\\s(Premier|Premiere)\\.\\s*"),
-      m_dishDescriptionPremiere2("\\s*(Premier|Premiere)\\.\\s*"),
-      m_dishPPVCode("\\s*\\(([A-Z]|[0-9]){5}\\)\\s*$"),
+      m_dishPPVSpacePerenEnd(R"(\s\)\s*$)"),
+      m_dishDescriptionNew(R"(\s*New\.\s*)"),
+      m_dishDescriptionFinale(R"(\s*(Series|Season)\sFinale\.\s*)"),
+      m_dishDescriptionFinale2(R"(\s*Finale\.\s*)"),
+      m_dishDescriptionPremiere(R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)"),
+      m_dishDescriptionPremiere2(R"(\s*(Premier|Premiere)\.\s*)"),
+      m_dishPPVCode(R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
-      m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
+      m_ukNew(R"((New\.|\s*(Brand New|New)\s*(Series|Episode)\s*[:\.\-]))",Qt::CaseInsensitive),
       m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukAlsoInHD("\\s*Also in HD\\.",Qt::CaseInsensitive),
-      m_ukCEPQ("[:\\!\\.\\?]\\s"),
+      m_ukCEPQ(R"([:\!\.\?]\s)"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
       m_ukDotEnd("\\.$"),
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
-      m_ukPart("[-(\\:,.]\\s*(?:Part|Pt)\\s*(\\d+)\\s*(?:(?:of|/)\\s*(\\d+))?\\s*[-):,.]", Qt::CaseInsensitive),
+      m_ukPart(R"([-(\:,.]\s*(?:Part|Pt)\s*(\d+)\s*(?:(?:of|/)\s*(\d+))?\s*[-):,.])", Qt::CaseInsensitive),
       // Prefer long format resorting to short format
       // cap0 = long match to remove, cap1 = long season, cap2 = long ep, cap3 = long total,
       // cap4 = short match to remove, cap5 = short ep, cap6 = short total
       m_ukSeries("(?:" + longContext + "|" + shortContext + ")", Qt::CaseInsensitive),
       m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
-      m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
+      m_ukYear(R"([\[\(]([\d]{4})[\)\]])"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
-      m_ukStarring("(?:Western\\s)?[Ss]tarring ([\\w\\s\\-']+)[Aa]nd\\s([\\w\\s\\-']+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
-      m_ukBBC7rpt("\\[Rptd?[^]]+\\d{1,2}\\.\\d{1,2}[ap]m\\]\\."),
-      m_ukDescriptionRemove("^(?:CBBC\\s*\\.|CBeebies\\s*\\.|Class TV\\s*:|BBC Switch\\.)"),
+      m_ukStarring(R"((?:Western\s)?[Ss]tarring ([\w\s\-']+)[Aa]nd\s([\w\s\-']+)[\.|,](?:\s)*(\d{4})?(?:\.\s)?)"),
+      m_ukBBC7rpt(R"(\[Rptd?[^]]+\d{1,2}\.\d{1,2}[ap]m\]\.)"),
+      m_ukDescriptionRemove(R"(^(?:CBBC\s*\.|CBeebies\s*\.|Class TV\s*:|BBC Switch\.))"),
       m_ukTitleRemove("^(?:[tT]4:|Schools\\s*:)"),
       m_ukDoubleDotEnd("\\.\\.+$"),
       m_ukDoubleDotStart("^\\.\\.+"),
-      m_ukTime("\\d{1,2}[\\.:]\\d{1,2}\\s*(am|pm|)"),
+      m_ukTime(R"(\d{1,2}[\.:]\d{1,2}\s*(am|pm|))"),
       m_ukBBC34("BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\\.",Qt::CaseInsensitive),
       m_ukYearColon("^[\\d]{4}:"),
       m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
       m_ukCompleteDots("^\\.\\.+$"),
-      m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
+      m_ukQuotedSubtitle(R"((?:^')([\w\s\-,]+)(?:\.' ))"),
       m_ukAllNew("All New To 4Music!\\s?"),
       m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|UK|You the Jury)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
@@ -108,73 +108,73 @@ EITFixUp::EITFixUp()
       m_comHemPersSeparator("(, |\\soch\\s)"),
       m_comHemPersons("\\s?([Rr]egi|[Ss]k\xE5""despelare|[Pp]rogramledare|"
                       "[Ii] rollerna):\\s([^\\.]+)\\."),
-      m_comHemSubEnd("\\s?\\.\\s?$"),
+      m_comHemSubEnd(R"(\s?\.\s?$)"),
       m_comHemSeries1("\\s?(?:[dD]el|[eE]pisode)\\s([0-9]+)"
                       "(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."),
-      m_comHemSeries2("\\s?-?\\s?([Dd]el\\s+([0-9]+))"),
-      m_comHemTSub("\\s+-\\s+([^\\-]+)"),
-      m_mcaIncompleteTitle("(.*).\\.\\.\\.$"),
+      m_comHemSeries2(R"(\s?-?\s?([Dd]el\s+([0-9]+)))"),
+      m_comHemTSub(R"(\s+-\s+([^\-]+))"),
+      m_mcaIncompleteTitle(R"((.*).\.\.\.$)"),
       m_mcaCompleteTitlea("^'?("),
-      m_mcaCompleteTitleb("[^\\.\\?]+[^\\'])'?[\\.\\?]\\s+(.+)"),
-      m_mcaSubtitle("^'([^\\.]+)'\\.\\s+(.+)"),
-      m_mcaSeries("^S?(\\d+)\\/E?(\\d+)\\s-\\s(.*)$"),
-      m_mcaCredits("(.*)\\s\\((\\d{4})\\)\\s*([^\\.]+)\\.?\\s*$"),
-      m_mcaAvail("\\s(Only available on [^\\.]*bouquet|Not available in RSA [^\\.]*)\\.?"),
-      m_mcaActors("(.*\\.)\\s+([^\\.]+\\s[A-Z][^\\.]+)\\.\\s*"),
+      m_mcaCompleteTitleb(R"([^\.\?]+[^\'])'?[\.\?]\s+(.+))"),
+      m_mcaSubtitle(R"(^'([^\.]+)'\.\s+(.+))"),
+      m_mcaSeries(R"(^S?(\d+)\/E?(\d+)\s-\s(.*)$)"),
+      m_mcaCredits(R"((.*)\s\((\d{4})\)\s*([^\.]+)\.?\s*$)"),
+      m_mcaAvail(R"(\s(Only available on [^\.]*bouquet|Not available in RSA [^\.]*)\.?)"),
+      m_mcaActors(R"((.*\.)\s+([^\.]+\s[A-Z][^\.]+)\.\s*)"),
       m_mcaActorsSeparator("(,\\s+)"),
-      m_mcaYear("(.*)\\s\\((\\d{4})\\)\\s*$"),
+      m_mcaYear(R"((.*)\s\((\d{4})\)\s*$)"),
       m_mcaCC(",?\\s(HI|English) Subtitles\\.?"),
       m_mcaDD(",?\\sDD\\.?"),
-      m_rtlRepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
-      m_rtlSubtitle("^([^\\.]{3,})\\.\\s+(.+)"),
+      m_rtlRepeat(R"((\(|\s)?Wiederholung.+vo[m|n].+((?:\d{2}\.\d{2}\.\d{4})|(?:\d{2}[:\.]\d{2}\sUhr))\)?)"),
+      m_rtlSubtitle(R"(^([^\.]{3,})\.\s+(.+))"),
       /* should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20 */
-      m_rtlSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\s|\\.\\s*|$)"),
-      m_rtlSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
-      m_rtlSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
-      m_rtlSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
+      m_rtlSubtitle1(R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))"),
+      m_rtlSubtitle2(R"(^Folge\s(\d{1,4})\s+(.{,5}[^\.]{,120})[\?!\.]\s*)"),
+      m_rtlSubtitle3(R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{,5}[^\.]{,120})[\?!\.]\s*)"),
+      m_rtlSubtitle4(R"(^Thema.{0,5}:\s([^\.]+)\.\s*)"),
       m_rtlSubtitle5("^'(.+)'\\.\\s*"),
       m_pro7Subtitle(",{0,1}([^,]*),([^,]+)\\s{0,1}(\\d{4})$"),
       m_pro7Crew("\n\n(Regie:.*)$"),
       m_pro7CrewOne("^(.*):\\s+(.*)$"),
       m_pro7Cast("\n\nDarsteller:\n(.*)$"),
-      m_pro7CastOne("^([^\\(]*)\\((.*)\\)$"),
-      m_atvSubtitle(",{0,1}\\sFolge\\s(\\d{1,3})$"),
+      m_pro7CastOne(R"(^([^\(]*)\((.*)\)$)"),
+      m_atvSubtitle(R"(,{0,1}\sFolge\s(\d{1,3})$)"),
       m_disneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
-      m_rtlEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
-      m_rtlEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
-      m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
+      m_rtlEpisodeNo1(R"(^(Folge\s\d{1,4})\.*\s*)"),
+      m_rtlEpisodeNo2(R"(^(\d{1,2}\/[IVX]+)\.*\s*)"),
+      m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
       m_fiRerun2("\\([Uu]\\)"),
       m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
       m_fiFilm("^(Film|Elokuva): "),
-      m_dePremiereLength("\\s?[0-9]+\\sMin\\."),
-      m_dePremiereAirdate("\\s?([^\\s^\\.]+)\\s((?:1|2)[0-9]{3})\\."),
-      m_dePremiereCredits("\\sVon\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s([^\\.]*)\\."),
-      m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
-      m_deSkyDescriptionSeasonEpisode("^(\\d{1,2}).\\sStaffel,\\sFolge\\s(\\d{1,2}):\\s"),
+      m_dePremiereLength(R"(\s?[0-9]+\sMin\.)"),
+      m_dePremiereAirdate(R"(\s?([^\s^\.]+)\s((?:1|2)[0-9]{3})\.)"),
+      m_dePremiereCredits(R"(\sVon\s([^,]+)(?:,|\su\.\sa\.)\smit\s([^\.]*)\.)"),
+      m_dePremiereOTitle(R"(\s*\(([^\)]*)\)$)"),
+      m_deSkyDescriptionSeasonEpisode(R"(^(\d{1,2}).\sStaffel,\sFolge\s(\d{1,2}):\s)"),
       m_nlTxt("txt"),
       m_nlWide("breedbeeld"),
       m_nlRepeat("herh."),
       m_nlHD("\\sHD$"),
-      m_nlSub("\\sAfl\\.:\\s([^\\.]+)\\."),
+      m_nlSub(R"(\sAfl\.:\s([^\.]+)\.)"),
       m_nlSub2("\\s\"([^\"]+)\""),
-      m_nlActors("\\sMet:\\s.+e\\.a\\."),
-      m_nlPres("\\sPresentatie:\\s([^\\.]+)\\."),
+      m_nlActors(R"(\sMet:\s.+e\.a\.)"),
+      m_nlPres(R"(\sPresentatie:\s([^\.]+)\.)"),
       m_nlPersSeparator("(, |\\sen\\s)"),
-      m_nlRub("\\s?\\({1}\\W+\\){1}\\s?"),
+      m_nlRub(R"(\s?\({1}\W+\){1}\s?)"),
       m_nlYear1("(?=\\suit\\s)([1-2]{2}[0-9]{2})"),
-      m_nlYear2("([\\s]{1}[\\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\\)]{1})"),
-      m_nlDirector("(?=\\svan\\s)(([A-Z]{1}[a-z]+\\s)|([A-Z]{1}\\.\\s))"),
+      m_nlYear2(R"(([\s]{1}[\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\)]{1}))"),
+      m_nlDirector(R"((?=\svan\s)(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
-      m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
+      m_nlOmroep (R"(\s\(([A-Z]+/?)+\)$)"),
       m_noRerun("\\(R\\)"),
-      m_noHD("[\\(\\[]HD[\\)\\]]"),
+      m_noHD(R"([\(\[]HD[\)\]])"),
       m_noColonSubtitle("^([^:]+): (.+)"),
       m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
                         "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
                         "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
                         "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
       m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
-      m_stereo("\\b\\(?[sS]tereo\\)?\\b"),
+      m_stereo(R"(\b\(?[sS]tereo\)?\b)"),
       m_dkEpisode("\\(([0-9]+)\\)"),
       m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
       m_dkSubtitle1("^([^:]+): (.+)"),
@@ -184,7 +184,7 @@ EITFixUp::EITFixUp()
       m_dkFeatures("Features:(.+)"),
       m_dkWidescreen(" 16:9"),
       m_dkDolby(" 5:1"),
-      m_dkSurround(" \\(\\(S\\)\\)"),
+      m_dkSurround(R"( \(\(S\)\))"),
       m_dkStereo(" S"),
       m_dkReplay(" \\(G\\)"),
       m_dkTxt(" TTV"),
@@ -193,10 +193,10 @@ EITFixUp::EITFixUp()
       m_dkPersonsSeparator("(, )|(og )"),
       m_dkDirector("(?:Instr.: |Instrukt.r: )(.+)$"),
       m_dkYear(" fra ([0-9]{4})[ \\.]"),
-      m_auFreeviewSY("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\)$"),
+      m_auFreeviewSY(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)"),
       m_auFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
-      m_auFreeviewYC("(.*) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
-      m_auFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
+      m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
+      m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_html("</?EM>", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
@@ -212,10 +212,10 @@ EITFixUp::EITFixUp()
       m_grlongEp("\\b(?:Επ.|επεισ[οό]διο:?)\\s*(\\d+)(?:\\W?)",Qt::CaseInsensitive),
       m_grSeasonAsRomanNumerals(",\\s*([MDCLXVIΙΧ]+)$",Qt::CaseInsensitive),
       m_grSeason("(?:\\W-?)*(?:\\(-\\s*)?\\b(([Α-Ω]{1,2})(?:'|΄)?|(\\d{1,2})(?:ος|ου|oς|os)?)(?:\\s*κ[υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
-      m_grRealTitleinDescription("(?:^\\()([A-Za-z\\s\\d-]+)(?:\\))(?:\\s*)"),
+      m_grRealTitleinDescription(R"((?:^\()([A-Za-z\s\d-]+)(?:\))(?:\s*))"),
       // cap1 = real title
       // cap0 = real title in parentheses.
-      m_grRealTitleinTitle("(?:\\()([A-Za-z\\s\\d-]+)(?:\\))(?:\\s*$)*"),
+      m_grRealTitleinTitle(R"((?:\()([A-Za-z\s\d-]+)(?:\))(?:\s*$)*)"),
       // cap1 = real title
       // cap0 = real title in parentheses.
       m_grCommentsinTitle("(?:\\()([Α-Ωα-ω\\s\\d-]+)(?:\\))(?:\\s*$)*"),
@@ -246,7 +246,7 @@ EITFixUp::EITFixUp()
       m_grCategSciFi("(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
       m_grCategHealth("(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",Qt::CaseInsensitive),
       m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive),
-      m_unitymediaImdbrating("\\s*IMDb Rating: (\\d\\.\\d)\\s?/10$")
+      m_unitymediaImdbrating(R"(\s*IMDb Rating: (\d\.\d)\s?/10$)")
 {
 }
 

@@ -40,8 +40,7 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
         Q_INVOKABLE TimeZoneInfo(QObject *parent = nullptr)
             : QObject             ( parent ),
               m_TimeZoneID        (        ),
-              m_UTCOffset         ( 0      ),
-              m_CurrentDateTime   (        )
+              m_UTCOffset         ( 0      )
         {
         }
 

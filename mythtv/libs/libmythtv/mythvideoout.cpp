@@ -278,7 +278,6 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
-  : m_display(nullptr)
 {
     m_dbAspectOverride  = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
     m_dbAdjustFill      = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));

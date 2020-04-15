@@ -35,7 +35,7 @@ class ZMPlayer : public MythScreenType
 
   public:
     ZMPlayer(MythScreenStack *parent, const char *name,
-             std::vector<Event *> *eventList, int *currentEvent);
+             std::vector<Event *> *eventList, size_t *currentEvent);
     ~ZMPlayer() override;
 
     bool Create(void) override; // MythScreenType
@@ -69,7 +69,7 @@ class ZMPlayer : public MythScreenType
     MythUIButton     *m_nextButton       {nullptr};
     MythUIButton     *m_prevButton       {nullptr};
 
-    int              *m_currentEvent     {nullptr};
+    size_t           *m_currentEvent     {nullptr};
     std::vector<Event *>  *m_eventList   {nullptr};
 
     std::vector<Frame *>  *m_frameList   {nullptr};

@@ -752,7 +752,7 @@ bool MSqlQuery::seekDebug(const char *type, bool result,
         QString str;
         QSqlRecord rec = record();
 
-        for (long int i = 0; i < rec.count(); i++)
+        for (int i = 0; i < rec.count(); i++)
         {
             if (!str.isEmpty())
                 str.append(", ");

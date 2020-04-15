@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _CHANNEL_SCANNER_CLI_H_
-#define _CHANNEL_SCANNER_CLI_H_
+#ifndef CHANNEL_SCANNER_CLI_H
+#define CHANNEL_SCANNER_CLI_H
 
 // Qt headers
 #include <QString>
@@ -64,4 +64,4 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
     QString m_statusLastLog;
 };
 
-#endif // _CHANNEL_SCANNER_CLI_H_
+#endif // CHANNEL_SCANNER_CLI_H

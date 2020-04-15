@@ -20,8 +20,7 @@
 #include "ExternalRecorder.h"
 #include "ExternalStreamHandler.h"
 
-#define LOC QString("ExternSigMon[%1](%2): ") \
-    .arg(m_inputid).arg(static_cast<ExternalChannel *>(m_channel)->GetDescription())
+#define LOC QString("ExternSigMon[%1](%2): ").arg(m_inputid).arg(m_loc)
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -145,7 +144,7 @@ void ExternalSignalMonitor::UpdateValues(void)
     {
         QMutexLocker locker(&m_statusLock);
         m_signalStrength.SetValue(strength);
-        m_signalLock.SetValue(is_locked);
+        m_signalLock.SetValue(static_cast<int>(is_locked));
     }
 
     EmitStatus();

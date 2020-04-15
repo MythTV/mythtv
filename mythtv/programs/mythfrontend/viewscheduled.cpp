@@ -59,7 +59,7 @@ ViewScheduled::~ViewScheduled()
     if (m_player)
     {
         QString message = QString("VIEWSCHEDULED_EXITING");
-        qApp->postEvent(m_player, new MythEvent(message));
+        QCoreApplication::postEvent(m_player, new MythEvent(message));
     }
 }
 
@@ -366,7 +366,7 @@ void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
     if (!item || m_recList.empty())
         return;
 
-    QDate group = item->GetData().value<QDate>();
+    auto group = item->GetData().value<QDate>();
 
     m_currentGroup = group;
 

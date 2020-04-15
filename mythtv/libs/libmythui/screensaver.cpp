@@ -23,8 +23,7 @@
 QEvent::Type ScreenSaverEvent::kEventType =
     static_cast<QEvent::Type>(QEvent::registerEventType());
 
-ScreenSaverControl::ScreenSaverControl() :
-    m_screenSavers(QList<ScreenSaver *>())
+ScreenSaverControl::ScreenSaverControl()
 {
 #if defined(USING_DBUS)
     m_screenSavers.push_back(new ScreenSaverDBus());

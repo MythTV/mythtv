@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _TV_BROWSE_HELPER_H_
-#define _TV_BROWSE_HELPER_H_
+#ifndef TV_BROWSE_HELPER_H
+#define TV_BROWSE_HELPER_H
 
 #include <utility>
 
@@ -133,4 +133,4 @@ class TVBrowseHelper : public MThread
     QList<BrowseInfo>        m_list;
 };
 
-#endif // _TV_BROWSE_HELPER_H_
+#endif // TV_BROWSE_HELPER_H

@@ -1,5 +1,5 @@
-#ifndef __WEATHER_SOURCE_H__
-#define __WEATHER_SOURCE_H__
+#ifndef WEATHER_SOURCE_H
+#define WEATHER_SOURCE_H
 
 #include <QStringList>
 #include <QObject>
@@ -47,12 +47,12 @@ class WeatherSource : public QObject
     explicit WeatherSource(ScriptInfo *info);
     ~WeatherSource() override;
 
-    bool isReady() { return m_ready; }
+    bool isReady() const { return m_ready; }
     QString getVersion() { return m_info->version; }
     QString getName() { return m_info->name; }
     QString getAuthor() { return m_info->author; }
     QString getEmail() { return m_info->email; }
-    units_t getUnits() { return m_units; }
+    units_t getUnits() const { return m_units; }
     void setUnits(units_t units) { m_units = units; }
     QStringList getLocationList(const QString &str);
     void setLocale(const QString &locale) { m_locale = locale; }
@@ -69,7 +69,7 @@ class WeatherSource : public QObject
     void startUpdateTimer() { m_updateTimer->start(m_info->updateTimeout); }
     void stopUpdateTimer() { m_updateTimer->stop(); }
 
-    bool inUse() { return m_inuse; }
+    bool inUse() const { return m_inuse; }
     void setInUse(bool inuse) { m_inuse = inuse; }
 
     int getId() { return m_info->id; }
@@ -101,4 +101,4 @@ class WeatherSource : public QObject
     DataMap m_data;
 };
 
-#endif
+#endif /* WEATHER_SOURCE_H */

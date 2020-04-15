@@ -1,5 +1,5 @@
-#ifndef _MYTH_SCHEDULER_H_
-#define _MYTH_SCHEDULER_H_
+#ifndef MYTH_SCHEDULER_H
+#define MYTH_SCHEDULER_H
 
 #include <deque>
 
@@ -33,4 +33,4 @@ class MythScheduler
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const = 0;
 };
 
-#endif
+#endif // MYTH_SCHEDULER_H

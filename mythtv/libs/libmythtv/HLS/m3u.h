@@ -1,5 +1,5 @@
-#ifndef _mythtv_m3u_h_
-#define _mythtv_m3u_h_
+#ifndef MYTHTV_M3U_H
+#define MYTHTV_M3U_H
 
 #include <cinttypes>
 
@@ -34,4 +34,4 @@ namespace M3U
     bool ParseEndList(const QString& loc, bool& is_vod);
 }
 
-#endif
+#endif // MYTHTV_M3U_H

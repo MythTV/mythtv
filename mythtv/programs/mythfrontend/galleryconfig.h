@@ -10,11 +10,11 @@ class GallerySettings : public GroupSetting
 {
     Q_OBJECT
 
-    StandardSetting *DirOrder();
-    StandardSetting *ImageOrder();
-    StandardSetting *DateFormat();
-    StandardSetting *Exclusions (bool enabled);
-    StandardSetting *ClearDb    (bool enabled);
+    StandardSetting *DirOrder() const;
+    StandardSetting *ImageOrder() const;
+    StandardSetting *DateFormat() const;
+    StandardSetting *Exclusions (bool enabled) const;
+    StandardSetting *ClearDb    (bool enabled) const;
     void             ShowConfirmDialog();
 
 signals:

@@ -10,16 +10,16 @@ class ExitPrompter : public QObject
    ~ExitPrompter() override;
 
   public slots:
-    void DoQuit(void);
+    static void DoQuit(void);
     void DoHalt(bool Confirmed = true);
     void DoReboot(bool Confirmed = true);
-    void DoStandby(void);
+    static void DoStandby(void);
     void DoSuspend(bool Confirmed = true);
     void HandleExit(void);
-    void ConfirmHalt(void);
-    void ConfirmReboot(void);
-    void ConfirmSuspend(void);
-    void Confirm(MythPower::Feature Action);
+    void ConfirmHalt(void) const;
+    void ConfirmReboot(void) const;
+    void ConfirmSuspend(void) const;
+    void Confirm(MythPower::Feature Action) const;
 
   private:
     MythPower* m_power { nullptr };

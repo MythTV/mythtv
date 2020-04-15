@@ -32,7 +32,7 @@ QString NetworkInformationTable::toString(void) const
     QString str = QString("NIT: NetID(%1) transports(%2)\n")
         .arg(NetworkID()).arg(TransportStreamCount());
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
-        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
+        .arg(Section()).arg(LastSection()).arg(static_cast<int>(IsCurrent())));
 
     if (0 != NetworkDescriptorsLength())
     {
@@ -131,7 +131,7 @@ QString ServiceDescriptionTable::toString(void) const
         .arg(TSID(), 0, 16).arg(OriginalNetworkID(), 0, 16)
         .arg(ServiceCount());
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
-        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
+        .arg(Section()).arg(LastSection()).arg(static_cast<int>(IsCurrent())));
 
     for (uint i = 0; i < ServiceCount(); i++)
     {
@@ -204,7 +204,7 @@ QString BouquetAssociationTable::toString(void) const
         .arg(BouquetID(), 0, 16).arg(TransportStreamCount());
 
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
-        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
+        .arg(Section()).arg(LastSection()).arg(static_cast<int>(IsCurrent())));
 
     if (0 != BouquetDescriptorsLength())
     {

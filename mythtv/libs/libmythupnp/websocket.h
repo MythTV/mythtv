@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __WEBSOCKET_H__
-#define __WEBSOCKET_H__
+#ifndef WEBSOCKET_H
+#define WEBSOCKET_H
 
 #include "serverpool.h"
 #include "upnpexp.h"
@@ -294,4 +294,4 @@ class WebSocketWorker : public QObject
     QList<WebSocketExtension *> m_extensions;
 };
 
-#endif
+#endif // WEBSOCKET_H

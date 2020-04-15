@@ -28,9 +28,9 @@ private:
     void generate_phongdat(void);
 
     void translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
-                   int *angle);
+                   int *angle) const;
 
-    inline void draw_vert_line(unsigned char *buffer, int x, int y1, int y2);
+    inline void draw_vert_line(unsigned char *buffer, int x, int y1, int y2) const;
     void render_light(int lx, int ly);
 
     static void rgb_to_hsv(unsigned int color, double *h, double *s, double *v);
@@ -53,7 +53,7 @@ private:
 
     int            m_bpl            {0};
 
-    vector<vector<unsigned char> > m_phongDat;
+    vector<vector<unsigned char> > m_phongDat {};
     unsigned char *m_rgbBuf         {nullptr};
     double         m_intense1[256]  {};
     double         m_intense2[256]  {};

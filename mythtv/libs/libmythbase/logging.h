@@ -139,7 +139,7 @@ class LoggingItem: public QObject, public ReferenceCounter
   protected:
     int                 m_pid        {-1};
     qlonglong           m_tid        {-1};
-    qulonglong          m_threadId   {(qulonglong)-1};
+    qulonglong          m_threadId   {UINT64_MAX};
     uint                m_usec       {0};
     int                 m_line       {0};
     LoggingType         m_type       {kMessage};
@@ -194,7 +194,7 @@ class LoggerThread : public QObject, public MThread
                                     ///  Protected by logQueueMutex
     QString m_filename;    ///< Filename of debug logfile
     bool    m_progress;    ///< show only LOG_ERR and more important (console only)
-    int     m_quiet;       ///< silence the console (console only)
+    bool    m_quiet;       ///< silence the console (console only)
     QString m_appname {QCoreApplication::applicationName()};
                            ///< Cached application name
     QString m_tablename;   ///< Cached table name for db logging

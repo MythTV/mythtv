@@ -4,11 +4,11 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef __constants_h
-#define __constants_h
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 const unsigned int historySize      = 100;
 const unsigned int groupOpenTimeout = 750;
 const unsigned int numbBands        = 10;
 
-#endif // __constants_h
+#endif // CONSTANTS_H

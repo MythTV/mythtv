@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __UPNPUTIL_H__
-#define __UPNPUTIL_H__
+#ifndef UPNPUTIL_H
+#define UPNPUTIL_H
 
 #include <utility>
 
@@ -83,7 +83,7 @@ class NameValue
     inline ~NameValue();
 
     inline void AddAttribute(const QString &name, const QString &value, bool required);
-    inline QString toXML();
+    inline QString toXML() const;
 };
 class NameValues : public QList<NameValue> {};
 
@@ -135,7 +135,7 @@ inline void NameValue::AddAttribute(const QString &name, const QString &value,
 }
 
 
-inline QString NameValue::toXML()
+inline QString NameValue::toXML() const
 {
     QString sAttributes;
     QString attributeTemplate = " %1=\"%2\"";
@@ -165,4 +165,4 @@ void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 UPNP_PUBLIC QStringList GetSourceProtocolInfos ();
 UPNP_PUBLIC QStringList GetSinkProtocolInfos ();
 
-#endif
+#endif // UPNPUTIL_H

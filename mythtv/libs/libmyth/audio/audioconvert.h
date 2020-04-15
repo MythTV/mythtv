@@ -21,8 +21,8 @@
  */
 
 
-#ifndef __MythXCode__audioconvert__
-#define __MythXCode__audioconvert__
+#ifndef MythXCode_audioconvert
+#define MythXCode_audioconvert
 
 #include "mythexp.h"
 #include "audiooutputsettings.h"
@@ -82,4 +82,4 @@ private:
     AudioFormat m_in, m_out;
 };
 
-#endif /* defined(__MythXCode__audioconvert__) */
+#endif /* defined(MythXCode_audioconvert) */

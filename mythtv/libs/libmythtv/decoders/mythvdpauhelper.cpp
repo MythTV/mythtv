@@ -35,7 +35,7 @@ VDPAUCodec::VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size, uint3
         m_maxLevel = 1000;
 }
 
-bool VDPAUCodec::Supported(int Width, int Height, int Level)
+bool VDPAUCodec::Supported(int Width, int Height, int Level) const
 {
     uint32_t macros = static_cast<uint32_t>(((Width + 15) & ~15) * ((Height + 15) & ~15)) / 256;
     return (Width <= m_maxSize.width()) && (Height <= m_maxSize.height()) &&
@@ -280,7 +280,7 @@ bool MythVDPAUHelper::InitProcs(void)
     return ok;
 }
 
-bool MythVDPAUHelper::IsValid(void)
+bool MythVDPAUHelper::IsValid(void) const
 {
     return m_valid;
 }
@@ -530,10 +530,10 @@ bool MythVDPAUHelper::IsFeatureAvailable(uint Feature)
         return false;
 
     INIT_ST
-    VdpBool supported = false;
+    auto supported = static_cast<VdpBool>(false);
     status = m_vdpVideoMixerQueryFeatureSupport(m_device, Feature, &supported);
     CHECK_ST
-    return ok && supported;
+    return ok && static_cast<bool>(supported);
 }
 
 QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma)

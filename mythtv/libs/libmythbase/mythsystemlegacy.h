@@ -19,8 +19,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _MYTHSYSTEMLEGACY_H_
-#define _MYTHSYSTEMLEGACY_H_
+#ifndef MYTHSYSTEMLEGACY_H
+#define MYTHSYSTEMLEGACY_H
 
 #include "mythbaseexp.h"
 
@@ -120,7 +120,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     // FIXME: Rename "GetExitStatus" and document that this does not
     //        block until an exit status exists.
     // FIXME: Document what this actually returns.
-    uint GetStatus(void)             { return m_status; }
+    uint GetStatus(void) const       { return m_status; }
     // FIXME Make private.
     void SetStatus(uint status)      { m_status = status; }
 
@@ -148,8 +148,8 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     //        after construcion.
     void SetArgs(const QStringList &args)  { m_args = args; }
 
-    int GetNice(void)                { return m_nice; }
-    int GetIOPrio(void)              { return m_ioprio; }
+    int GetNice(void) const          { return m_nice; }
+    int GetIOPrio(void) const        { return m_ioprio; }
 
     // FIXME: We should not return a pointer to a QBuffer
     QBuffer *GetBuffer(int index)    { return &m_stdbuff[index]; }
@@ -205,7 +205,7 @@ extern "C"
 #endif // __cplusplus
 MBASE_PUBLIC uint myth_system_c(char *command, uint flags, uint timeout);
 
-#endif // _MYTHSYSTEMLEGACY_H_
+#endif // MYTHSYSTEMLEGACY_H
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */

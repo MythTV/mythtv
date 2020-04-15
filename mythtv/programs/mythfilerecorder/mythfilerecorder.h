@@ -1,5 +1,5 @@
-#ifndef _FILE_RECORDER_H_
-#define _FILE_RECORDER_H_
+#ifndef MYTH_FILE_RECORDER_H
+#define MYTH_FILE_RECORDER_H
 
 #include <QObject>
 #include <QFile>
@@ -76,4 +76,4 @@ class Commands : public QObject
     QAtomicInt m_eof     {       0 };
 };
 
-#endif
+#endif // MYTH_FILE_RECORDER_H

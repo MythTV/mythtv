@@ -118,9 +118,9 @@ class MPUBLIC MusicCommon : public MythScreenType
     void updateRepeatMode(void);
     void updateShuffleMode(bool updateUIList = false);
 
-    void changeVolume(bool up);
+    void changeVolume(bool up) const;
     static void changeSpeed(bool up);
-    void toggleMute(void);
+    void toggleMute(void) const;
     static void toggleUpmix(void);
     static void showVolume(void);
     void updateVolume(void);

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef __CI_H
-#define __CI_H
+#ifndef DVBCI_H
+#define DVBCI_H
 
 #if HAVE_STDINT_H
 #include <cstdint>
@@ -88,8 +88,8 @@ public:
   const char *SubTitleText(void) { return m_subTitleText; }
   const char *BottomText(void) { return m_bottomText; }
   const char *Entry(int n) { return n < m_numEntries ? m_entries[n] : nullptr; }
-  int NumEntries(void) { return m_numEntries; }
-  bool Selectable(void) { return m_selectable; }
+  int NumEntries(void) const { return m_numEntries; }
+  bool Selectable(void) const { return m_selectable; }
   bool Select(int Index);
   bool Cancel(void);
   };
@@ -105,8 +105,8 @@ private:
 public:
   ~cCiEnquiry();
   const char *Text(void) { return m_text; }
-  bool Blind(void) { return m_blind; }
-  int ExpectedLength(void) { return m_expectedLength; }
+  bool Blind(void) const { return m_blind; }
+  int ExpectedLength(void) const { return m_expectedLength; }
   bool Reply(const char *s);
   bool Cancel(void);
   };
@@ -209,7 +209,7 @@ class cHlCiHandler : public cCiHandler {
     int            m_numCaSystemIds {0};
     unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
     cHlCiHandler(int Fd, int NumSlots);
-    int CommHL(unsigned tag, unsigned function, struct ca_msg *msg);
+    int CommHL(unsigned tag, unsigned function, struct ca_msg *msg) const;
     int GetData(unsigned tag, struct ca_msg *msg);
     int SendData(unsigned tag, struct ca_msg *msg);
   public:
@@ -225,7 +225,7 @@ class cHlCiHandler : public cCiHandler {
     bool SetCaPmt(cCiCaPmt &CaPmt);
     const unsigned short *GetCaSystemIds(int Slot) override; // cCiHandler
     bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
-    bool Reset(int Slot);
+    bool Reset(int Slot) const;
     bool connected() const;
 };
 
@@ -234,4 +234,4 @@ int accept_tcp(int ip_sock,struct sockaddr_in *ip_name);
 int udp_listen(struct sockaddr_un *name,char const * filename);
 int accept_udp(int ip_sock,struct sockaddr_un *ip_name);
 
-#endif //__CI_H
+#endif // DVBCI_H

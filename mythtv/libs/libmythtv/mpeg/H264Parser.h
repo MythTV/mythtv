@@ -267,7 +267,7 @@ class H264Parser {
     uint       m_seqParameterSetId           {0};
 
     uint8_t    m_deltaPicOrderAlwaysZeroFlag {0};
-    uint8_t    m_separateColourPlaneFlag     {0};
+    bool       m_separateColourPlaneFlag     {false};
     int8_t     m_frameMbsOnlyFlag            {-1};
     int8_t     m_picOrderPresentFlag         {-1};
     int8_t     m_redundantPicCntPresentFlag  {0};

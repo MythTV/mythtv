@@ -184,7 +184,7 @@ void MythOpenGLVideo::CleanupDeinterlacers(void)
         if ((m_inputType == FMT_YV12) && (m_profile == "opengl"))
             m_outputType = FMT_YUY2;
         SetupFrameFormat(m_inputType, m_outputType, m_videoDim, m_textureTarget);
-        emit OutputChanged(m_videoDim, m_videoDim, -1.0f);
+        emit OutputChanged(m_videoDim, m_videoDim, -1.0F);
     }
     m_fallbackDeinterlacer = DEINT_NONE;
     m_deinterlacer = DEINT_NONE;
@@ -1068,10 +1068,10 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 QString MythOpenGLVideo::VideoResizeToString(VideoResizing Resize)
 {
     QStringList reasons;
-    if (Resize & Deinterlacer) reasons << "Deinterlacer";
-    if (Resize & Sampling)     reasons << "Sampling";
-    if (Resize & Performance)  reasons << "Performance";
-    if (Resize & Framebuffer)  reasons << "Framebuffer";
+    if ((Resize & Deinterlacer) != 0U) reasons << "Deinterlacer";
+    if ((Resize & Sampling)     != 0U) reasons << "Sampling";
+    if ((Resize & Performance)  != 0U) reasons << "Performance";
+    if ((Resize & Framebuffer)  != 0U) reasons << "Framebuffer";
     return reasons.join(",");
 }
 

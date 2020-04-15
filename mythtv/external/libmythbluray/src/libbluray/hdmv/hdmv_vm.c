@@ -101,14 +101,14 @@ static int _save_state(HDMV_VM *p, uint32_t *s)
         s[0] = (uint32_t)(p->playing_object - p->movie_objects->objects);
         s[1] = p->playing_pc;
     } else {
-        s[0] = (uint32_t)-1;
+        s[0] = UINT32_MAX;
     }
 
     if (p->suspended_object) {
         s[2] = (uint32_t)(p->suspended_object - p->movie_objects->objects);
         s[3] = p->suspended_pc;
     } else {
-        s[2] = (uint32_t)-1;
+        s[2] = UINT32_MAX;
     }
 
     /* nv timer ? */
@@ -118,7 +118,7 @@ static int _save_state(HDMV_VM *p, uint32_t *s)
 
 static int _restore_state(HDMV_VM *p, const uint32_t *s)
 {
-    if (s[0] == (uint32_t)-1) {
+    if (s[0] == UINT32_MAX) {
         p->playing_object = NULL;
     } else if (s[0] >= p->movie_objects->num_objects) {
         BD_DEBUG(DBG_HDMV | DBG_CRIT, "_restore_state() failed: invalid playing object index\n");
@@ -128,7 +128,7 @@ static int _restore_state(HDMV_VM *p, const uint32_t *s)
     }
     p->playing_pc = s[1];
 
-    if (s[2] == (uint32_t)-1) {
+    if (s[2] == UINT32_MAX) {
         p->suspended_object = NULL;
     } else if (s[2] >= p->movie_objects->num_objects) {
         BD_DEBUG(DBG_HDMV | DBG_CRIT, "_restore_state() failed: invalid suspended object index\n");

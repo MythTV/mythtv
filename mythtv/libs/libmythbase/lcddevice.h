@@ -73,7 +73,7 @@ class MBASE_PUBLIC LCDTextItem
     QString getText() const { return m_itemText; }
     QString getScreen() const { return m_itemScreen; }
     QString getWidget() const { return m_itemWidget; }
-    int getScroll() const { return m_itemScrollable; }
+    bool getScroll() const { return m_itemScrollable; }
 
     void setRow(unsigned int value) { m_itemRow = value; }
     void setAlignment(TEXT_ALIGNMENT value) { m_itemAlignment = value; }
@@ -288,8 +288,8 @@ class MBASE_PUBLIC LCD : public QObject
 
     void stopAll(void);
 
-    uint getLCDHeight(void) { return m_lcdHeight; }
-    uint getLCDWidth(void) { return m_lcdWidth; }
+    uint getLCDHeight(void) const { return m_lcdHeight; }
+    uint getLCDWidth(void) const { return m_lcdWidth; }
 
     void resetServer(void); // tell the mythlcdserver to reload its settings
 

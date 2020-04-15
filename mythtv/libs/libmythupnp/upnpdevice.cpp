@@ -657,7 +657,7 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString UPnpDeviceDesc::GetHostName()
+QString UPnpDeviceDesc::GetHostName() const
 {
     if (m_sHostName.length() == 0)
     {
@@ -765,7 +765,7 @@ QString UPnpDevice::GetUDN(void) const
     return m_sUDN;
 }
 
-void UPnpDevice::toMap(InfoMap &map)
+void UPnpDevice::toMap(InfoMap &map) const
 {
     map["name"] = m_sFriendlyName;
     map["modelname"] = m_sModelName;

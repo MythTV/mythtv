@@ -125,7 +125,7 @@ void HDHRSignalMonitor::UpdateValues(void)
     {
         QMutexLocker locker(&m_statusLock);
         m_signalStrength.SetValue(sig);
-        m_signalLock.SetValue(status.lock_supported);
+        m_signalLock.SetValue(static_cast<int>(status.lock_supported));
         isLocked = m_signalLock.IsGood();
     }
 

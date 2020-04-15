@@ -44,7 +44,7 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            LiveStreamInfo *pObject = new LiveStreamInfo( this );
+            auto *pObject = new LiveStreamInfo( this );
             m_LiveStreamInfos.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

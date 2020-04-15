@@ -478,7 +478,7 @@ class MHTextItem
     int           m_nTabCount; // Number of tabs immediately before this (usually zero)
 
     // Generate new items inheriting properties from the previous
-    MHTextItem *NewItem();
+    MHTextItem *NewItem() const;
 };
 
 MHTextItem::MHTextItem()
@@ -489,7 +489,7 @@ MHTextItem::MHTextItem()
     m_nTabCount = 0;
 }
 
-MHTextItem *MHTextItem::NewItem()
+MHTextItem *MHTextItem::NewItem() const
 {
     auto *pItem = new MHTextItem;
     pItem->m_colour = m_colour;

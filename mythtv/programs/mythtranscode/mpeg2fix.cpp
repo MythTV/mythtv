@@ -162,7 +162,8 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
     while (m_offset[idx].count() > 1 && !done)
     {
         it = ++m_offset[idx].begin();
-        if ((((*it).type == 0) && (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
+        if (((static_cast<int>((*it).type) == 0) &&
+             (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
             (((*it).type) /* Pos type */ &&
              ((pkt->pos >= (*it).pos_pts) || (pkt->duration > (*it).framenum))))
         {
@@ -232,7 +233,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
 
 MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        frm_dir_map_t *deleteMap,
-                       const char *fmt, int norp, int fixPTS, int maxf,
+                       const char *fmt, bool norp, bool fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
 {
@@ -356,6 +357,9 @@ static void SETBITS(unsigned char *ptr, long value, int num)
         s_sbPtr = ptr;
         s_sbPos = 0;
     }
+
+    if (s_sbPtr == nullptr)
+        return;
 
     int offset = s_sbPos >> 3;
     int offset_r = s_sbPos & 0x07;
@@ -530,7 +534,7 @@ void *MPEG2fixup::ReplexStart(void *data)
 void MPEG2replex::Start()
 {
     int start = 1;
-    multiplex_t mx;
+    multiplex_t mx {};
 
     //array defines number of allowed audio streams
     // note that although only 1 stream is currently supported, multiplex.c
@@ -545,7 +549,6 @@ void MPEG2replex::Start()
     int video_delay = 0;
     int audio_delay = 0;
 
-    memset(&mx, 0, sizeof(mx));
     memset(ext_ok, 0, sizeof(ext_ok));
 
     mx.priv = (void *)this;
@@ -661,7 +664,7 @@ void MPEG2fixup::FrameInfo(MPEG2frame *f)
 
 int MPEG2fixup::AddFrame(MPEG2frame *f)
 {
-    index_unit iu;
+    index_unit iu {};
     ringbuffer *rb = nullptr;
     ringbuffer *rbi = nullptr;
     int id = f->m_pkt.stream_index;
@@ -674,8 +677,8 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         rb = &m_rx.m_vrBuf;
         rbi = &m_rx.m_indexVrbuf;
         iu.frame = GetFrameTypeN(f);
-        iu.seq_header = f->m_isSequence;
-        iu.gop = f->m_isGop;
+        iu.seq_header = static_cast<uint8_t>(f->m_isSequence);
+        iu.gop = static_cast<uint8_t>(f->m_isGop);
 
         iu.gop_off = f->m_gopPos - f->m_pkt.data;
         iu.frame_off = f->m_framePos - f->m_pkt.data;
@@ -811,7 +814,7 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
         }
     }
 
-    m_mkvFile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
+    m_mkvFile = m_inputFC->iformat && strcmp(m_inputFC->iformat->name, "mkv") == 0;
 
     if (offset)
         av_seek_frame(m_inputFC, m_vidId, offset, AVSEEK_FLAG_BYTE);
@@ -1350,7 +1353,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             m_vFrame.append(m_unreadFrames.dequeue());
             if (m_realFileEnd && !m_unreadFrames.count())
                 m_fileEnd = true;
-            return m_fileEnd;
+            return static_cast<int>(m_fileEnd);
         }
 
         while (!done)
@@ -1766,7 +1769,7 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
     foreach (auto & of, *orderedFrames)
     {
         int i = GetFrameNum(of);
-        if ((spare = DecodeToFrame(i, headPos == 0)) == nullptr)
+        if ((spare = DecodeToFrame(i, static_cast<int>(headPos == 0))) == nullptr)
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 QString("ConvertToI skipping undecoded frame #%1").arg(i));
@@ -1950,7 +1953,7 @@ FrameList MPEG2fixup::ReorderDTStoPTS(FrameList *dtsOrder, int pos)
 }
 
 void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
-                                 int64_t &PTSdiscrep, int numframes, bool fix)
+                                 int64_t &PTSdiscrep, int numframes, bool fix) const
 {
     int64_t tmpPTS = diff2x33(curFrame->m_pkt.pts,
                               origvPTS / 300);
@@ -2082,7 +2085,7 @@ int MPEG2fixup::Start()
         origaPTS[it.key()] = af->first()->m_pkt.pts * 300;
         //expectedPTS[it.key()] = udiff2x33(af->first()->m_pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
-        cutState[it.key()] = m_discard;
+        cutState[it.key()] = static_cast<int>(m_discard);
     }
 
     ShowRangeMap(&m_delMap, "Cutlist:");
@@ -2405,6 +2408,9 @@ int MPEG2fixup::Start()
                             markedFrame = nullptr;
                         }
 
+                        // Make clang-tidy null dereference checker happy.
+                        if (curFrame == nullptr)
+                            continue;
                         curFrame->m_pkt.dts = (expectedDTS / 300);
 #if 0
                         if (GetFrameTypeT(curFrame) == 'B')

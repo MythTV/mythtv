@@ -955,7 +955,7 @@ void GameHandler::customEvent(QEvent *event)
         if (resultid == "removalPopup")
         {
             int buttonNum = dce->GetResult();
-            GameScan scan = dce->GetData().value<GameScan>();
+            auto scan = dce->GetData().value<GameScan>();
             switch (buttonNum)
             {
                 case 1:

@@ -1,5 +1,5 @@
-#ifndef _MYTH_THREAD_H_
-#define _MYTH_THREAD_H_
+#ifndef MYTH_THREAD_H
+#define MYTH_THREAD_H
 
 #include <QThread>
 
@@ -137,4 +137,4 @@ class MBASE_PUBLIC MThread
     bool m_epilogExecuted     {true};
 };
 
-#endif // _MYTH_THREAD_H_
+#endif // MYTH_THREAD_H

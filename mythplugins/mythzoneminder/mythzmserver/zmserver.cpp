@@ -188,7 +188,7 @@ void connectToDatabase(void)
     if (!mysql_init(&g_dbConn))
     {
         cout << "Error: Can't initialise structure: " <<  mysql_error(&g_dbConn) << endl;
-        exit(mysql_errno(&g_dbConn));
+        exit(static_cast<int>(mysql_errno(&g_dbConn)));
     }
 
     reconnect_t reconnect = 1;
@@ -198,13 +198,13 @@ void connectToDatabase(void)
          g_password.c_str(), nullptr, 0, nullptr, 0))
     {
         cout << "Error: Can't connect to server: " <<  mysql_error(&g_dbConn) << endl;
-        exit(mysql_errno( &g_dbConn));
+        exit(static_cast<int>(mysql_errno( &g_dbConn)));
     }
 
     if (mysql_select_db(&g_dbConn, g_database.c_str()))
     {
         cout << "Error: Can't select database: " << mysql_error(&g_dbConn) << endl;
-        exit(mysql_errno(&g_dbConn));
+        exit(static_cast<int>(mysql_errno(&g_dbConn)));
     }
 }
 
@@ -237,7 +237,7 @@ void kickDatabase(bool debug)
 
 void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
 {
-    int shared_data_size = 0;
+    size_t shared_data_size = 0;
     int frame_size = m_width * m_height * m_bytesPerPixel;
 
     if (!m_enabled)
@@ -765,7 +765,7 @@ void ZMServer::handleGetServerStatus(void)
     long long used = 0;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "%d%%", (int) ((100.0F / ((float) total / used))));
+    sprintf(buf, "%d%%", static_cast<int>((used * 100) / total));
     ADD_STR(outStr, buf)
 
     send(outStr);
@@ -1875,7 +1875,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     return monitor->m_width * monitor->m_height * 3;
 }
 
-string ZMServer::getZMSetting(const string &setting)
+string ZMServer::getZMSetting(const string &setting) const
 {
     string result;
     string sql("SELECT Name, Value FROM Config ");

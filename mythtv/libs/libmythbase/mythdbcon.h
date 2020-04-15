@@ -132,7 +132,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     ~MSqlQuery();
 
     /// \brief Only updated once during object creation
-    bool isConnected(void) { return m_isConnected; }
+    bool isConnected(void) const { return m_isConnected; }
 
     /// \brief Wrap QSqlQuery::exec() so we can display SQL
     bool exec(void);

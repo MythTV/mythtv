@@ -6,8 +6,8 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
-#ifndef _AUDIO_OUTPUT_SETTINGS_H_
-#define _AUDIO_OUTPUT_SETTINGS_H_
+#ifndef AUDIO_OUTPUT_SETTINGS_H
+#define AUDIO_OUTPUT_SETTINGS_H
 
 #include <vector>
 
@@ -77,7 +77,7 @@ class MPUBLIC AudioOutputSettings
         int  BestSupportedChannels();
 
         void setPassthrough(int val)    { m_passthrough = val; };
-        int  canPassthrough()           { return m_passthrough; };
+        int  canPassthrough() const     { return m_passthrough; };
             /**
              * return DigitalFeature mask.
              * possible values are:
@@ -88,32 +88,32 @@ class MPUBLIC AudioOutputSettings
              * - FEATURE_TRUEHD
              * - FEATURE_DTSHD
              */
-        bool canFeature(DigitalFeature arg)
+        bool canFeature(DigitalFeature arg) const
         { return (m_features & arg) != 0U; };
-        bool canFeature(unsigned int arg)
+        bool canFeature(unsigned int arg) const
         { return (m_features & arg) != 0U; };
 
             /**
              * return true if device can or may support AC3
              * (deprecated, see canFeature())
              */
-        bool canAC3()                   { return canFeature(FEATURE_AC3); };
+        bool canAC3() const             { return canFeature(FEATURE_AC3); };
             /**
              * return true if device can or may support DTS
              * (deprecated, see canFeature())
              */
-        bool canDTS()                   { return canFeature(FEATURE_DTS); };
+        bool canDTS() const             { return canFeature(FEATURE_DTS); };
             /**
              * return true if device supports multichannels PCM
              * (deprecated, see canFeature())
              */
-        bool canLPCM()                  { return canFeature(FEATURE_LPCM); };
+        bool canLPCM() const            { return canFeature(FEATURE_LPCM); };
             /**
              * return true if class instance is marked invalid.
              * if true, you can not assume any of the other method returned
              * values are valid
              */
-        bool IsInvalid()                { return m_invalid; };
+        bool IsInvalid() const          { return m_invalid; };
 
             /**
              * set the provided digital feature
@@ -144,14 +144,14 @@ class MPUBLIC AudioOutputSettings
              * return the highest iec958 rate supported.
              * return 0 if no HD rate are supported
              */
-        int  GetMaxHDRate();
+        int  GetMaxHDRate() const;
 
             /**
              * Display in human readable form the digital features
              * supported by the output device
              */
         static QString FeaturesToString(DigitalFeature arg);
-        QString FeaturesToString(void)
+        QString FeaturesToString(void) const
         { return FeaturesToString((DigitalFeature)m_features); };
 
             /**
@@ -166,7 +166,7 @@ class MPUBLIC AudioOutputSettings
             /**
              * get the ELD flag
              */
-        bool hasELD();
+        bool hasELD() const;
         bool hasValidELD();
             /**
              * set ELD data
@@ -213,4 +213,4 @@ class MPUBLIC AudioOutputSettings
         std::vector<AudioFormat>::iterator m_sfIt;
 };
 
-#endif // _AUDIO_OUTPUT_SETTINGS_H_
+#endif // AUDIO_OUTPUT_SETTINGS_H

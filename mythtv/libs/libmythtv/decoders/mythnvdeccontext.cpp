@@ -105,7 +105,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
     }
 
-    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     // and finally try and retrieve the actual FFmpeg decoder
     QString name = QString((*Codec)->name) + "_cuvid";
     if (name == "mpeg2video_cuvid")
@@ -344,11 +344,11 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame 
     if (Frame && m_deinterlacer)
     {
         Frame->interlaced_frame = 0;
-        Frame->interlaced_reversed = 0;
-        Frame->top_field_first = 0;
+        Frame->interlaced_reversed = false;
+        Frame->top_field_first = false;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->already_deinterlaced = 1;
+        Frame->already_deinterlaced = true;
     }
 }
 
@@ -374,10 +374,10 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
     {
         if (*PixFmt == AV_PIX_FMT_CUDA)
         {
-            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+            auto * decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
             if (decoder)
             {
-                MythNVDECContext* me = dynamic_cast<MythNVDECContext*>(decoder->GetMythCodecContext());
+                auto * me = dynamic_cast<MythNVDECContext*>(decoder->GetMythCodecContext());
                 if (me)
                     me->InitFramesContext(Context);
             }
@@ -428,7 +428,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     Frame->width = AvFrame->width;
     Frame->height = AvFrame->height;
     Frame->pix_fmt = Context->pix_fmt;
-    Frame->directrendering = 1;
+    Frame->directrendering = true;
 
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
@@ -442,7 +442,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     }
 
     // NVDEC 'fixes' 10/12/16bit colour values
-    Frame->colorshifted = 1;
+    Frame->colorshifted = true;
 
     // Frame->data[0] holds CUdeviceptr for the frame data - offsets calculated above
     Frame->buf = AvFrame->data[0];
@@ -502,7 +502,7 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
 }
 
 bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoChromaFormat Format,
-                                               uint Depth, int Width, int Height)
+                                               uint Depth, int Width, int Height) const
 {
     uint mblocks = static_cast<uint>((Width * Height) / 256);
 
@@ -568,9 +568,11 @@ void MythNVDECContext::GetDecoderList(QStringList &Decoders)
         return;
     Decoders.append("NVDEC:");
     for (auto profile : profiles)
+    {
         if (!(profile.m_depth % 2)) // Ignore 9/11bit etc
             Decoders.append(MythCodecContext::GetProfileDescription(profile.m_profile, profile.m_maximum,
                                                                     profile.m_type, profile.m_depth + 8));
+    }
 }
 
 const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfiles(void)
@@ -651,7 +653,7 @@ void MythNVDECContext::InitFramesContext(AVCodecContext *Context)
 
     if (m_framesContext)
     {
-        AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
+        auto *frames = reinterpret_cast<AVHWFramesContext*>(m_framesContext->data);
         if ((frames->sw_format == Context->sw_pix_fmt) && (frames->width == Context->coded_width) &&
             (frames->height == Context->coded_height))
         {
@@ -668,7 +670,7 @@ void MythNVDECContext::InitFramesContext(AVCodecContext *Context)
     av_buffer_unref(&m_framesContext);
 
     AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
-    AVHWFramesContext *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
+    auto *frames = reinterpret_cast<AVHWFramesContext*>(framesref->data);
     frames->free = MythCodecContext::FramesContextFinished;
     frames->user_opaque = nullptr;
     frames->sw_format = Context->sw_pix_fmt;

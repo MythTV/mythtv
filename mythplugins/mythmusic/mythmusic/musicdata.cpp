@@ -54,7 +54,7 @@ void MusicData::scanMusic (void)
 }
 
 /// reload music after a scan, rip or import
-void MusicData::reloadMusic(void)
+void MusicData::reloadMusic(void) const
 {
     if (!m_all_music || !m_all_playlists)
         return;
@@ -82,7 +82,7 @@ void MusicData::reloadMusic(void)
     m_all_music->startLoading();
     while (!m_all_music->doneLoading())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(50000);
     }
 
@@ -95,14 +95,14 @@ void MusicData::reloadMusic(void)
         gPlayer->restorePosition();
 }
 
-void MusicData::loadMusic(void)
+void MusicData::loadMusic(void) const
 {
     // only do this once
     if (m_initialized)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = qApp->translate("(MythMusicMain)",
+    QString message = QCoreApplication::translate("(MythMusicMain)",
                                       "Loading Music. Please wait ...");
 
     auto *busy = new MythUIBusyDialog(message, popupStack, "musicscanbusydialog");
@@ -128,7 +128,7 @@ void MusicData::loadMusic(void)
     while (!gMusicData->m_all_playlists->doneLoading()
            || !gMusicData->m_all_music->doneLoading())
     {
-        qApp->processEvents();
+        QCoreApplication::processEvents();
         usleep(50000);
     }
 

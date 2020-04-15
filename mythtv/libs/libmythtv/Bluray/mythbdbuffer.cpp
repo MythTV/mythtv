@@ -77,7 +77,7 @@ MythBDBuffer::MythBDBuffer(const QString &Filename)
 {
     m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
-    OpenFile(Filename);
+    MythBDBuffer::OpenFile(Filename);
 }
 
 MythBDBuffer::~MythBDBuffer()
@@ -245,7 +245,7 @@ void MythBDBuffer::ProgressUpdate(void)
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-bool MythBDBuffer::BDWaitingForPlayer(void)
+bool MythBDBuffer::BDWaitingForPlayer(void) const
 {
     return m_playerWait;
 }
@@ -616,7 +616,7 @@ uint64_t MythBDBuffer::GetTotalTimeOfTitle(void) const
     return m_currentTitleLength / 90000;
 }
 
-uint64_t MythBDBuffer::GetCurrentTime(void)
+uint64_t MythBDBuffer::GetCurrentTime(void) const
 {
     return m_currentTime / 90000;
 }
@@ -790,7 +790,7 @@ bool MythBDBuffer::SwitchAngle(uint Angle)
     return true;
 }
 
-uint64_t MythBDBuffer::GetNumAngles(void)
+uint64_t MythBDBuffer::GetNumAngles(void) const
 {
     return m_currentTitleAngleCount;
 }
@@ -802,7 +802,7 @@ uint64_t MythBDBuffer::GetTotalReadPosition(void)
     return 0;
 }
 
-int64_t MythBDBuffer::AdjustTimestamp(int64_t Timestamp)
+int64_t MythBDBuffer::AdjustTimestamp(int64_t Timestamp) const
 {
     int64_t newTimestamp = Timestamp;
     if ((newTimestamp != AV_NOPTS_VALUE) && (newTimestamp >= m_timeDiff))
@@ -1038,8 +1038,8 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
             {
                 if (m_currentPlayitem != static_cast<int>(Event.param))
                 {
-                    int64_t out = static_cast<int64_t>(m_currentTitleInfo->clips[m_currentPlayitem].out_time);
-                    int64_t in  = static_cast<int64_t>(m_currentTitleInfo->clips[Event.param].in_time);
+                    auto out = static_cast<int64_t>(m_currentTitleInfo->clips[m_currentPlayitem].out_time);
+                    auto in  = static_cast<int64_t>(m_currentTitleInfo->clips[Event.param].in_time);
                     int64_t diff = in - out;
                     if (diff != 0 && m_processState == PROCESS_NORMAL)
                     {

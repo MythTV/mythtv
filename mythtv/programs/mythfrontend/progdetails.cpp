@@ -750,7 +750,7 @@ void ProgDetails::loadPage(void)
         recordingRule = QString("%1, ").arg(m_progInfo.GetRecordingRuleID());
         if (m_progInfo.GetRecordingRuleType() != kNotRecording)
             recordingRule += toString(m_progInfo.GetRecordingRuleType());
-        if (!(record->m_title.isEmpty()))
+        if (record && !record->m_title.isEmpty())
             recordingRule += QString(" \"%2\"").arg(record->m_title);
 
         query.prepare("SELECT last_record, next_record, avg_delay "

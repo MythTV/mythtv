@@ -22,7 +22,7 @@ class MythQtImage : public MythImage
     QPixmap *GetPixmap(void) { return m_pixmap; }
     void SetPixmap(QPixmap *p) { m_pixmap = p; }
 
-    bool NeedsRegen(void) { return m_bRegenPixmap; }
+    bool NeedsRegen(void) const { return m_bRegenPixmap; }
     void RegeneratePixmap(void);
 
   protected:
@@ -136,10 +136,10 @@ MythImage *MythQtPainter::GetFormatImagePriv()
 
 void MythQtPainter::DeleteFormatImagePriv(MythImage *im)
 {
-    auto *qim = static_cast<MythQtImage *>(im);
+    auto *qim = dynamic_cast<MythQtImage *>(im);
 
     QMutexLocker locker(&m_imageDeleteLock);
-    if (qim->GetPixmap())
+    if (qim && qim->GetPixmap())
     {
         m_imageDeleteList.push_back(qim->GetPixmap());
         qim->SetPixmap(nullptr);

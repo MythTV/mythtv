@@ -86,7 +86,7 @@ class SingleValueImp
 
     bool get(int id, QString &value)
     {
-        entry_map::const_iterator p = m_entries.find(id);
+        auto p = m_entries.find(id);
         if (p != m_entries.end())
         {
             value = p->second;
@@ -118,7 +118,7 @@ class SingleValueImp
 
     bool exists(const QString &name, int *id = nullptr)
     {
-        entry_map::const_iterator p = find(name);
+        auto p = find(name);
         if (p != m_entries.end())
         {
             if (id)
@@ -135,11 +135,10 @@ class SingleValueImp
             m_dirty = false;
             m_retEntries.clear();
 
-            for (entry_map::const_iterator p = m_entries.begin();
-                    p != m_entries.end(); ++p)
+            for (auto & item : m_entries)
             {
-                m_retEntries.push_back(entry_list::value_type(p->first,
-                                        p->second));
+                m_retEntries.push_back(
+                    entry_list::value_type(item.first, item.second));
             }
             std::sort(m_retEntries.begin(), m_retEntries.end(),
                       call_sort<SingleValueImp, entry>(*this));

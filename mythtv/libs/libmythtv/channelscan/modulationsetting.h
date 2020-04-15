@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _MODULATION_SETTING_H_
-#define _MODULATION_SETTING_H_
+#ifndef MODULATION_SETTING_H
+#define MODULATION_SETTING_H
 
 // Qt headers
 #include <QCoreApplication>
@@ -84,7 +84,7 @@ class ScanModulationSetting: public TransMythUIComboBoxSetting
 class ScanModulation: public ScanModulationSetting
 {
   public:
-    ScanModulation() : ScanModulationSetting()
+    ScanModulation()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
@@ -97,7 +97,7 @@ class ScanModulation: public ScanModulationSetting
 class ScanConstellation: public ScanModulationSetting
 {
   public:
-    ScanConstellation() : ScanModulationSetting()
+    ScanConstellation()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Constellation"));
@@ -129,4 +129,4 @@ class ScanDVBSModulation: public TransMythUIComboBoxSetting
     }
 };
 
-#endif // _MODULATION_SETTING_H_
+#endif // MODULATION_SETTING_H

@@ -1,5 +1,5 @@
-#ifndef _MYTHFONTMANAGER_H
-#define _MYTHFONTMANAGER_H
+#ifndef MYTHFONTMANAGER_H
+#define MYTHFONTMANAGER_H
 
 #include <utility>
 
@@ -60,6 +60,6 @@ class MythFontReference
     const int m_fontID;
 };
 
-#endif
+#endif // MYTHFONTMANAGER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

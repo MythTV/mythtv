@@ -269,9 +269,9 @@ void LyricsData::loadLyrics(const QString &xmlData)
         {
             QStringList times;
             int lastind = 0;
-            while (lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\]"),
+            while (lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\])"),
                                  lastind) == lastind ||
-                   lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\.\\d\\d\\]"),
+                   lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\.\d\d\])"),
                                  lastind) == lastind)
             {
                 if (lyric[lastind+6] == '.')
@@ -332,8 +332,8 @@ void LyricsData::setLyrics(const QStringList &lyrics)
             if (!lyric.isEmpty())
             {
                 // does the line start with a time code like [12:34] or [12:34.56]
-                if (lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\]"), 0) == 0 ||
-                    lyric.indexOf(QRegExp("\\[\\d\\d:\\d\\d\\.\\d\\d\\]"), 0) == 0)
+                if (lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\])"), 0) == 0 ||
+                    lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\.\d\d\])"), 0) == 0)
                 {
                     int minutes = lyric.mid(1, 2).toInt();
                     int seconds = lyric.mid(4, 2).toInt();

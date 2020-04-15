@@ -54,7 +54,7 @@ QString crcinfo(const QString& romname, const QString& GameType, QString *key, R
     char block[32768] = "";
     uLong crc = crc32(0, Z_NULL, 0);
     QString crcRes;
-    unz_file_info file_info;
+    unz_file_info file_info {};
 
     int blocksize = 8192;
 #if 0

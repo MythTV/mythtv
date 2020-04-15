@@ -573,8 +573,8 @@ class ScriptableDvr : public QObject
                                      bool      MakeOverride )
         {
             SCRIPT_CATCH_EXCEPTION( nullptr,
-                return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
-                                                ChanId, StartTime, MakeOverride);
+                return m_obj.GetRecordSchedule( RecordId,  std::move(Template), RecordedId,
+                                                ChanId, std::move(StartTime), MakeOverride);
             )
         }
 
@@ -613,42 +613,42 @@ class ScriptableDvr : public QObject
         QString RecTypeToString( QString RecType )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.RecTypeToString( RecType );
+                return m_obj.RecTypeToString( std::move(RecType) );
             )
         }
 
         QString RecTypeToDescription( QString RecType )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.RecTypeToDescription( RecType );
+                return m_obj.RecTypeToDescription( std::move(RecType) );
             )
         }
 
         QString DupMethodToString( QString DupMethod )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.DupMethodToString( DupMethod );
+                return m_obj.DupMethodToString( std::move(DupMethod) );
             )
         }
 
         QString DupMethodToDescription( QString DupMethod )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.DupMethodToDescription( DupMethod );
+                return m_obj.DupMethodToDescription( std::move(DupMethod) );
             )
         }
 
         QString DupInToString( QString DupIn )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.DupInToString( DupIn );
+                return m_obj.DupInToString( std::move(DupIn) );
             )
         }
 
         QString DupInToDescription( QString DupIn )
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
-                return m_obj.DupInToDescription( DupIn );
+                return m_obj.DupInToDescription( std::move(DupIn) );
             )
         }
 
@@ -666,9 +666,9 @@ class ScriptableDvr : public QObject
                                              JobName,
                                              JobId,
                                              RecordedId,
-                                             JobStartTime,
-                                             RemoteHost,
-                                             JobArgs );
+                                             std::move(JobStartTime),
+                                             std::move(RemoteHost),
+                                             std::move(JobArgs) );
             )
         }
 

@@ -28,13 +28,12 @@ using namespace std;
 #include <QFileInfo>
 #include <QPainter>
 
-#include "teletextextractorreader.h"
-#include "mythccextractorplayer.h"
+#include "captions/teletextextractorreader.h"
 #include "avformatdecoder.h"
-#include "subtitlescreen.h"
-#include "srtwriter.h"
+#include "captions/subtitlescreen.h"
+#include "captions/srtwriter.h"
 #include "iso639.h"
-
+#include "mythccextractorplayer.h"
 
 const int OneSubtitle::kDefaultLength = 750; /* ms */
 
@@ -88,7 +87,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
         double fps = frame->frame_rate;
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
-        double duration = 1 / fps + frame->repeat_pict * 0.5 / fps;
+        double duration = 1 / fps + static_cast<double>(frame->repeat_pict) * 0.5 / fps;
         m_curTime += duration * 1000;
         m_videoOutput->DoneDisplayingFrame(frame);
     }
@@ -220,7 +219,7 @@ bool MythCCExtractorPlayer::run(void)
  */
 
 void MythCCExtractorPlayer::IngestSubtitle(
-    QList<OneSubtitle> &list, const QStringList &content)
+    QList<OneSubtitle> &list, const QStringList &content) const
 {
     bool update_last =
         !list.isEmpty() &&

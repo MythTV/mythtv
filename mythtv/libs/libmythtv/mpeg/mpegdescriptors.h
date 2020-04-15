@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#ifndef _MPEG_DESCRIPTORS_H_
-#define _MPEG_DESCRIPTORS_H_
+#ifndef MPEG_DESCRIPTORS_H
+#define MPEG_DESCRIPTORS_H
 
 // C++ headers
 #include <vector>
@@ -436,7 +436,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
     bool HRDManagementValid(void)      const { return ( m_data[2]&0x80 ) != 0; }
     // reserved                 6   2.1
     // picture_and_timing_info_present 1 2.7
-    bool HasPictureAndTimingInfo(void) const { return m_data[2]&0x01;}
+    bool HasPictureAndTimingInfo(void) const { return (m_data[2]&0x01) != 0;}
     // if (picture_and_timing_info_present) {
     //   90kHz_flag             1   3.0
     //   reserved               7   3.1
@@ -492,4 +492,4 @@ class HEVCVideoDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
-#endif // _MPEG_DESCRIPTORS_H_
+#endif // MPEG_DESCRIPTORS_H

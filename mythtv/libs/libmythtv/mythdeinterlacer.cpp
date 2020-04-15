@@ -259,7 +259,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
                   pitch_for_plane(m_inputType, m_frame->width, plane), height_for_plane(m_inputType, m_frame->height, plane));
 
     Frame->timecode = m_frame->pts;
-    Frame->already_deinterlaced = 1;
+    Frame->already_deinterlaced = true;
 
     // Free frame data
     av_frame_unref(m_frame);
@@ -466,7 +466,7 @@ void MythDeinterlacer::OneField(VideoFrame *Frame, FrameScanType Scan)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Error scaling frame: height %1 expected %2")
             .arg(result).arg(Frame->height));
     }
-    Frame->already_deinterlaced = 1;
+    Frame->already_deinterlaced = true;
 }
 
 inline static uint32_t avg(uint32_t A, uint32_t B)
@@ -698,5 +698,5 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
                       second);
         }
     }
-    Frame->already_deinterlaced = 1;
+    Frame->already_deinterlaced = true;
 }

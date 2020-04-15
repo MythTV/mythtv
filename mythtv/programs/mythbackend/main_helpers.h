@@ -1,5 +1,5 @@
-#ifndef _MAIN_HELPERS_H_
-#define _MAIN_HELPERS_H_
+#ifndef MAIN_HELPERS_H
+#define MAIN_HELPERS_H
 
 // C++ headers
 #include <iostream>
@@ -17,4 +17,4 @@ int  connect_to_master(void);
 void print_warnings(const MythBackendCommandLineParser &cmdline);
 int  run_backend(MythBackendCommandLineParser &cmdline);
 
-#endif // _MAIN_HELPERS_H_
+#endif // MAIN_HELPERS_H

@@ -94,10 +94,9 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
             m_channels, m_channels[0].m_chanId,
             mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
-        ChannelInfoList::const_iterator cit =
-            find(m_channels.begin(), m_channels.end(), chanid);
+        auto cit = find(m_channels.begin(), m_channels.end(), chanid);
 
-        if (chanid && cit != m_channels.end())
+        if ((chanid != 0U) && (cit != m_channels.end()))
         {
             if (!setchan)
             {
@@ -357,7 +356,7 @@ void ChannelBase::HandleScript(const QString &freqid)
 }
 
 bool ChannelBase::ChangeInternalChannel(const QString &freqid,
-                                        uint inputid)
+                                        uint inputid) const
 {
 #ifdef USING_FIREWIRE
     FirewireDevice *device = nullptr;

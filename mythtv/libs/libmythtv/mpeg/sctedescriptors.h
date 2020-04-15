@@ -19,8 +19,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#ifndef _SCTE_TABLES_H_
-#define _SCTE_TABLES_H_
+#ifndef SCTE_TABLES_H
+#define SCTE_TABLES_H
 
 // Qt headers
 #include <QString>
@@ -73,7 +73,7 @@ class FrameRateDescriptor : public MPEGDescriptor
     {
         return QString("FrameRateDescriptor: "
                        "MultipleFrameRates(%1) MaximumFrameRate(%2)")
-            .arg(MultipleFrameRates())
+            .arg(static_cast<int>(MultipleFrameRates()))
             .arg(FrameRate());
     }
 };
@@ -97,8 +97,8 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     {
         return QString("ExtendedVideoDescriptor: "
                        "CatalogModeFlag(%1) VideoIncludesSetup(%2)")
-            .arg(CatalogModeFlag())
-            .arg(VideoIncludesSetup());
+            .arg(static_cast<int>(CatalogModeFlag()))
+            .arg(static_cast<int>(VideoIncludesSetup()));
     }
 };
 
@@ -220,7 +220,7 @@ class ModulationParamsDescriptor : public MPEGDescriptor
     // inner_coding_mode        4   2.4
     uint InnerCodingMode(void) const { return m_data[2] & 0x0f; }
     // split_bitstream_mode     1   3.0
-    bool SplitBitstreamMode(void) const { return m_data[3] >> 7; }
+    bool SplitBitstreamMode(void) const { return (m_data[3] >> 7) != 0; }
     //reserved                  2   3.1
     //modulation_format         5   3.3
     uint ModulationFormat(void) const { return m_data[3] & 0x1F; }
@@ -273,4 +273,4 @@ class RevisionDetectionDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
-#endif // _SCTE_TABLES_H_
+#endif // SCTE_TABLES_H

@@ -6,6 +6,7 @@
 #include <QDataStream>
 #include <QTextStream>
 #include <QDateTime>
+#include <QTimeZone>
 #include <QFileInfo>
 #include <QDir>
 
@@ -155,7 +156,7 @@ static bool read_time_zone_id(const QString& filename, QString& zone_id)
             QString line;
             QTextStream in(&file);
             // Handle whitespace and quotes
-            QRegExp re("^(?:ZONE\\s*=)?\\s*(['\"]?)([\\w\\s/-\\+]+)\\1\\s*(?:#.*)?$");
+            QRegExp re(R"(^(?:ZONE\s*=)?\s*(['"]?)([\w\s/-\+]+)\1\s*(?:#.*)?$)");
             re.setPatternSyntax(QRegExp::RegExp2);
             while (!in.atEnd())
             {
@@ -181,82 +182,15 @@ static QString getSystemTimeZoneID(void)
 {
     QString zone_id("UNDEF");
 #ifdef _WIN32
-    // typedef struct _TIME_ZONE_INFORMATION { ...
+    // struct _TIME_ZONE_INFORMATION { ...
     // GetTimeZoneInformation();
     // ...
     // Sadly, Windows zone names are different to the (probably Unix)
     // backend's names - "AUS Eastern Standard Time" vs "Australia/Sydney".
     // Translation is not worthwhile. Leave it as UNDEF to check the offset.
 #else
-    // Try to determine the time zone information by inspecting the system
-    // configuration
-    QString time_zone_file_path("/etc/timezone");
-    QString clock_file_path("/etc/sysconfig/clock");
-    QString zoneinfo_file_path("/etc/localtime");
-    QString zoneinfo_dir_path("/usr/share/zoneinfo");
-
-    // First, check time_zone_file_path (used by Debian-based systems)
-    if (read_time_zone_id(time_zone_file_path, zone_id))
-        return zone_id;
-
-    // Next, look for the ZONE entry in clock_file_path (used by Red Hat-based
-    // systems)
-    if (read_time_zone_id(clock_file_path, zone_id))
-        return zone_id;
-
-    // Next check zoneinfo_file_path
-    QFile zoneinfo_file(zoneinfo_file_path);
-    QFileInfo info(zoneinfo_file);
-
-    if (info.exists() && info.isFile())
-    {
-        QString tz;
-        if (info.isSymLink())
-        {
-            // The symlink refers to a file whose name contains the zone ID
-            tz = info.symLinkTarget();
-        }
-        else
-        {
-            // The zoneinfo_file is a copy of the file in the
-            // zoneinfo_dir_path, so search for the same file in
-            // zoneinfo_dir_path
-            tz = findZoneinfoFile(zoneinfo_file_path, zoneinfo_dir_path);
-        }
-        if (tz != "UNDEF")
-        {
-            int pos = 0;
-            // Get the zone ID from the filename
-            // Look for the basename of zoneinfo_dir_path in case it's a
-            // relative link
-            QString zoneinfo_dirname = zoneinfo_dir_path.section('/', -1);
-            if ((pos = tz.indexOf(zoneinfo_dirname)) != -1)
-            {
-                zone_id = tz.right(tz.size() - (pos + 1) -
-                                   zoneinfo_dirname.size());
-            }
-        }
-        else
-        {
-            // If we still haven't found a time zone, try localtime_r() to at
-            // least get the zone name/abbreviation (as opposed to the
-            // identifier for the set of rules governing the zone)
-            char name[64];
-            auto *result = (struct tm *)malloc(sizeof(struct tm));
-            if (result != nullptr)
-            {
-                time_t t = time(nullptr);
-                localtime_r(&t, result);
-                if (result != nullptr)
-                {
-                    if (strftime(name, sizeof(name), "%Z", result) > 0)
-                        zone_id = name;
-                    free(result);
-                }
-            }
-        }
-    }
-
+    QDateTime dt = QDateTime::currentDateTime();
+    zone_id = dt.timeZone().id();
 #endif
     return zone_id;
 }

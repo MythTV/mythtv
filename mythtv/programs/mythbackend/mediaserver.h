@@ -8,8 +8,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MEDIASERVER_H__
-#define __MEDIASERVER_H__
+#ifndef MEDIASERVER_H
+#define MEDIASERVER_H
 
 #include <QString>
 
@@ -56,4 +56,4 @@ class MediaServer : public UPnp
 
 };
 
-#endif
+#endif // MEDIASERVER_H

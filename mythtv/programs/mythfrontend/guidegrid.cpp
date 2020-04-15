@@ -448,7 +448,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
             if (player && allowFinder)
             {
                 message = QString("EPG_EXITING");
-                qApp->postEvent(player, new MythEvent(message));
+                QCoreApplication::postEvent(player, new MythEvent(message));
             }
         }
 
@@ -644,7 +644,7 @@ GuideGrid::~GuideGrid()
     if (m_player && m_allowFinder)
     {
         QString message = QString("EPG_EXITING");
-        qApp->postEvent(m_player, new MythEvent(message));
+        QCoreApplication::postEvent(m_player, new MythEvent(message));
     }
 
     // maybe the user selected a different channel group,
@@ -1721,7 +1721,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
 
     int arrow = GridTimeNormal;
     int cnt = 0;
-    int spread = 1;
+    int8_t spread = 1;
     QDateTime lastprog;
     QRect tempRect;
     bool isCurrent = false;
@@ -2354,7 +2354,7 @@ void GuideGrid::cursorLeft()
         return;
     }
 
-    int startCol = test->m_startCol;
+    int8_t startCol = test->m_startCol;
     m_currentCol = startCol - 1;
 
     if (m_currentCol < 0)
@@ -2378,8 +2378,8 @@ void GuideGrid::cursorRight()
         return;
     }
 
-    int spread = test->m_spread;
-    int startCol = test->m_startCol;
+    int8_t spread = test->m_spread;
+    int8_t startCol = test->m_startCol;
 
     m_currentCol = startCol + spread;
 
@@ -2652,7 +2652,7 @@ void GuideGrid::HideTVWindow(void)
 void GuideGrid::EmbedTVWindow(void)
 {
     auto *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
-    qApp->postEvent(this, me);
+    QCoreApplication::postEvent(this, me);
 
     m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
     if (!m_usingNullVideo)
@@ -2664,7 +2664,7 @@ void GuideGrid::EmbedTVWindow(void)
     else
     {
         me = new MythEvent("START_VIDEO_REFRESH_TIMER");
-        qApp->postEvent(this, me);
+        QCoreApplication::postEvent(this, me);
     }
 }
 

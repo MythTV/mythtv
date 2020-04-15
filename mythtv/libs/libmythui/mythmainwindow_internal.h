@@ -30,7 +30,7 @@ class MythPainterWindowGL : public MythPainterWindow
   public:
     MythPainterWindowGL(MythMainWindow *MainWin, MythMainWindowPrivate *MainWinPriv);
     ~MythPainterWindowGL() override;
-    bool IsValid(void);
+    bool IsValid(void) const;
     QPaintEngine *paintEngine() const override;
 
     // QWidget

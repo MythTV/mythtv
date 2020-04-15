@@ -1,5 +1,5 @@
-#ifndef _LINUX_AVC_INFO_H_
-#define _LINUX_AVC_INFO_H_
+#ifndef LINUX_AVC_INFO_H
+#define LINUX_AVC_INFO_H
 
 #ifdef USING_LINUX_FIREWIRE
 
@@ -48,4 +48,4 @@ using avcinfo_list_t = QMap<uint64_t,LinuxAVCInfo*>;
 
 #endif // USING_LINUX_FIREWIRE
 
-#endif // _LINUX_AVC_INFO_H_
+#endif // LINUX_AVC_INFO_H

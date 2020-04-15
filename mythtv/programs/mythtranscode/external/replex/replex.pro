@@ -8,8 +8,8 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-SOURCES += avi.c element.c mpg_common.c multiplex.c ringbuffer.c
-SOURCES += ts.c replex.c pes.c
+SOURCES += avi.cpp element.cpp mpg_common.cpp multiplex.cpp ringbuffer.cpp
+SOURCES += ts.cpp replex.cpp pes.cpp
 
 HEADERS += avi.h element.h mpg_common.h multiplex.h ringbuffer.h
 HEADERS += ts.h replex.h pes.h

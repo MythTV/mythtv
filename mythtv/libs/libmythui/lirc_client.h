@@ -20,10 +20,6 @@
 #include <stddef.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define LIRC_RET_SUCCESS  (0)
 #define LIRC_RET_ERROR   (-1)
 
@@ -117,9 +113,5 @@ int lirc_code2charprog(struct lirc_state *state,
 size_t lirc_getsocketname(const char *filename, char *buf, size_t size);
 const char *lirc_getmode(const struct lirc_state *state, struct lirc_config *config);
 const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *config, const char *mode);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -36,7 +36,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
                                   uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
 
     void      ProgressUpdate     (void);
-    bool      BDWaitingForPlayer (void);
+    bool      BDWaitingForPlayer (void) const;
     void      SkipBDWaitingForPlayer(void);
 
     bool      GetBDStateSnapshot (QString& State);
@@ -51,11 +51,11 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     int       GetTitleDuration   (int Title);
     uint64_t  GetTitleSize       (void) const;
     uint64_t  GetTotalTimeOfTitle(void) const;
-    uint64_t  GetCurrentTime     (void);
+    uint64_t  GetCurrentTime     (void) const;
     uint64_t  GetTotalReadPosition(void);
     uint32_t  GetNumChapters     (void);
     uint32_t  GetCurrentChapter  (void);
-    uint64_t  GetNumAngles       (void);
+    uint64_t  GetNumAngles       (void) const;
     uint64_t  GetChapterStartTime  (uint32_t Chapter);
     uint64_t  GetChapterStartFrame (uint32_t Chapter);
     bool      IsHDMVNavigation   (void) const;
@@ -63,7 +63,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool      IsValidStream      (uint StreamId);
     void      UnblockReading     (void);
     bool      IsReadingBlocked   (void);
-    int64_t   AdjustTimestamp    (int64_t Timestamp);
+    int64_t   AdjustTimestamp    (int64_t Timestamp) const;
     void      GetDescForPos      (QString &Desc);
     double    GetFrameRate       (void);
     int       GetAudioLanguage   (uint StreamID);

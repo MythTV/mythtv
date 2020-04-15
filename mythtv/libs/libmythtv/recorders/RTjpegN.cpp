@@ -688,8 +688,8 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 
   }
 #else
-  volatile mmx_t tmp6;
-  volatile mmx_t tmp7;
+  volatile mmx_t tmp6 {};
+  volatile mmx_t tmp7 {};
   auto *dataptr = (mmx_t *)m_block;
   auto *idata2 = (mmx_t *)idata;
 
@@ -3043,7 +3043,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 {
  auto *mold=(mmx_t *)_old;
  auto *mblock=(mmx_t *)rblock;
- volatile mmx_t result;
+ volatile mmx_t result {};
  static mmx_t s_neg= { 0xffffffffffffffffULL };
 
  movq_m2r(*mask, mm7);

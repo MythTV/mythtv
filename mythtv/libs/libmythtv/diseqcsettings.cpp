@@ -1292,7 +1292,7 @@ class USALSRotorSetting : public GroupSetting
         addChild(m_numeric);
         addChild(m_hemisphere);
 
-        addChild(new RotorConfig(static_cast<DiSEqCDevRotor&>(m_node), this));
+        addChild(new RotorConfig(dynamic_cast<DiSEqCDevRotor&>(m_node), this));
     }
 
     void Load(void) override // StandardSetting

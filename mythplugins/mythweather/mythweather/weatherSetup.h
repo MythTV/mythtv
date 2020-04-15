@@ -1,5 +1,5 @@
-#ifndef _WEATHER_SETUP_H_
-#define _WEATHER_SETUP_H_
+#ifndef WEATHER_SETUP_H
+#define WEATHER_SETUP_H
 
 // QT headers
 #include <QList>
@@ -166,4 +166,4 @@ class LocationDialog : public MythScreenType
     MythUIText *m_sourceText;
 };
 
-#endif
+#endif /* WEATHER_SETUP_H */

@@ -47,7 +47,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     virtual bool RequestFeature    (Feature Request, bool Delay = true);
     Features     GetFeatures       (void);
     bool         IsFeatureSupported(Feature Supported);
-    int          GetPowerLevel     (void);
+    int          GetPowerLevel     (void) const;
     QStringList  GetFeatureList    (void);
 
   public slots:

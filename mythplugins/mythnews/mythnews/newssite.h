@@ -1,5 +1,5 @@
-#ifndef _NEWSSITE_H_
-#define _NEWSSITE_H_
+#ifndef NEWSSITE_H
+#define NEWSSITE_H
 
 // C++ headers
 #include <vector>
@@ -134,4 +134,4 @@ class NewsSite : public QObject
 };
 Q_DECLARE_METATYPE(NewsSite*)
 
-#endif // _NEWSSITE_H_
+#endif // NEWSSITE_H

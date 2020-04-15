@@ -5,8 +5,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _HLSSTREAMHANDLER_H_
-#define _HLSSTREAMHANDLER_H_
+#ifndef HLSSTREAMHANDLER_H
+#define HLSSTREAMHANDLER_H
 
 #include <vector>
 using namespace std;
@@ -48,4 +48,4 @@ class HLSStreamHandler : public IPTVStreamHandler
     static QMap<QString, uint>               s_hlshandlers_refcnt;
 };
 
-#endif // _HLSSTREAMHANDLER_H_
+#endif // HLSSTREAMHANDLER_H

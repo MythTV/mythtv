@@ -503,7 +503,7 @@ bool ClassicCommDetector::go()
         {
             float elapsed = flagTime.elapsed() / 1000.0;
 
-            if (elapsed)
+            if (elapsed != 0.0F)
                 flagFPS = currentFrameNumber / elapsed;
             else
                 flagFPS = 0.0;
@@ -2271,7 +2271,7 @@ bool ClassicCommDetector::FrameIsInBreakMap(
     return false;
 }
 
-void ClassicCommDetector::DumpMap(frm_dir_map_t &map)
+void ClassicCommDetector::DumpMap(frm_dir_map_t &map) const
 {
     frm_dir_map_t::iterator it;
     QString msg;

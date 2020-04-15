@@ -55,7 +55,7 @@ class SERVICE_PUBLIC GenreList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            Genre *pObject = new Genre( this );
+            auto *pObject = new Genre( this );
             m_Genres.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

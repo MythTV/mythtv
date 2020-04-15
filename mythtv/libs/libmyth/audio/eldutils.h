@@ -20,8 +20,8 @@
  *  Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef __ELDUTILS_H
-#define __ELDUTILS_H
+#ifndef ELDUTILS_H
+#define ELDUTILS_H
 
 #include <cstdint>
 #include <QString>
@@ -40,21 +40,21 @@ class MPUBLIC ELD
 {
   public:
     ELD(const char *buf, int size);
-    ELD(const ELD&);
+    ELD(const ELD& /*rhs*/);
     ELD();
     ~ELD()= default;
     ELD& operator=(const ELD& /*rhs*/);
     void show();
-    QString eld_version_name();
-    QString edid_version_name();
-    QString info_desc();
-    QString channel_allocation_desc();
+    QString eld_version_name() const;
+    QString edid_version_name() const;
+    QString info_desc() const;
+    QString channel_allocation_desc() const;
     QString product_name();
-    QString connection_name();
-    bool isValid();
+    QString connection_name() const;
+    bool isValid() const;
     int maxLPCMChannels();
     int maxChannels();
-    QString codecs_desc();
+    QString codecs_desc() const;
     
     enum cea_audio_coding_types {
         TYPE_REF_STREAM_HEADER =  0,
@@ -126,4 +126,4 @@ class MPUBLIC ELD
     eld_data m_e;
 };
 
-#endif /* __ELDUTILSL_H */
+#endif /* ELDUTILSL_H */

@@ -131,7 +131,7 @@ static HostTextEditSetting *VAAPIDevice()
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFMPEGTS");
+    auto *gc = new HostCheckBoxSetting("FFMPEGTS");
 
     gc->setLabel(PlaybackSettings::tr("Use FFmpeg's original MPEG-TS demuxer"));
 
@@ -3112,8 +3112,8 @@ static void ISO639_fill_selections(MythUIComboBoxSetting *widget, uint i)
         lang = iso639_str2_to_str3(gCoreContext->GetLanguage().toLower());
     }
 
-    QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
-    QMap<int,QString>::iterator ite = _iso639_key_to_english_name.end();
+    QMap<int,QString>::iterator it  = iso639_key_to_english_name.begin();
+    QMap<int,QString>::iterator ite = iso639_key_to_english_name.end();
 
     for (; it != ite; ++it)
     {
@@ -3940,7 +3940,7 @@ class ShutDownRebootSetting : public GroupSetting
     ShutDownRebootSetting();
 
   private slots:
-    void childChanged(StandardSetting*) override;
+    void childChanged(StandardSetting* /*unused*/) override;
 
   private:
     StandardSetting *m_overrideExitMenu { nullptr };
@@ -3966,7 +3966,7 @@ ShutDownRebootSetting::ShutDownRebootSetting()
             SLOT(childChanged(StandardSetting *)));
 }
 
-void ShutDownRebootSetting::childChanged(StandardSetting*)
+void ShutDownRebootSetting::childChanged(StandardSetting* /*unused*/)
 {
     if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand)
         return;
@@ -4553,14 +4553,14 @@ void GuiDimension::childChanged(StandardSetting * /*setting*/)
 
 void AppearanceSettings::applyChange()
 {
-    qApp->processEvents();
+    QCoreApplication::processEvents();
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
 void AppearanceSettings::PopulateScreens(int Screens)
 {
     m_screen->clearSelections();
-    foreach (QScreen *qscreen, qGuiApp->screens())
+    foreach (QScreen *qscreen, QGuiApplication::screens())
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
         m_screen->addSelection(qscreen->name() + extra, qscreen->name());
@@ -4640,7 +4640,7 @@ class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
   public:
     ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &name);
-    uint getChannelId(){return m_channelId;};
+    uint getChannelId() const{return m_channelId;};
   private:
     uint m_channelId;
 
@@ -4656,8 +4656,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
 
 ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
-    : m_groupId(groupId),
-    m_groupName(nullptr)
+    : m_groupId(groupId)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
     setValue(groupName);
@@ -4674,10 +4673,11 @@ void ChannelGroupSetting::Save()
         if (m_groupId == -1)//create a new group
         {
             MSqlQuery query(MSqlQuery::InitCon());
+            QString newname = m_groupName ? m_groupName->getValue() : "undefined";
             QString qstr =
                 "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
             query.prepare(qstr);
-            query.bindValue(":NEWNAME", m_groupName->getValue());
+            query.bindValue(":NEWNAME", newname);
 
             if (!query.exec())
                 MythDB::DBError("ChannelGroupSetting::Close", query);
@@ -4687,7 +4687,7 @@ void ChannelGroupSetting::Save()
                 QString qstr2 = "SELECT grpid FROM channelgroupnames "
                                 "WHERE name = :NEWNAME;";
                 query.prepare(qstr2);
-                query.bindValue(":NEWNAME", m_groupName->getValue());
+                query.bindValue(":NEWNAME", newname);
                 if (!query.exec())
                     MythDB::DBError("ChannelGroupSetting::Close", query);
                 else

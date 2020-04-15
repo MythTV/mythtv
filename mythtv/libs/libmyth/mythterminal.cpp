@@ -169,7 +169,7 @@ bool MythTerminal::Create(void)
             [this]()
             {
                 QMutexLocker locker(&m_lock);
-                if (m_running)
+                if (m_running) // NOLINT(clang-analyzer-core.NullDereference)
                 {
                     QString text = m_textEdit->GetText() + "\r\n";
                     AddText(text);

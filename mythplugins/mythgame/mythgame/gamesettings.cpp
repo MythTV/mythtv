@@ -398,7 +398,7 @@ void GamePlayersList::Load()
     GroupSetting::Load();
 }
 
-void GamePlayersList::NewPlayerDialog()
+void GamePlayersList::NewPlayerDialog() const
 {
     MythScreenStack *stack = GetMythMainWindow()->GetStack("popup stack");
     auto *nameDialog = new MythTextInputDialog(stack, tr("Player Name"));

@@ -61,7 +61,7 @@ using namespace std;
 
 MythContext *gContext = nullptr;
 
-static const QString _Location = "MythContext";
+static const QString sLocation = "MythContext";
 
 class MythContextPrivate : public QObject
 {
@@ -86,17 +86,17 @@ class MythContextPrivate : public QObject
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
-    void    ResetDatabase(void);
+    void    ResetDatabase(void) const;
 
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int timeLimit);
+    bool    checkPort(QString &host, int port, int timeLimit) const;
     static void processEvents(void);
     bool    saveSettingsCache(void);
-    void    loadSettingsCacheOverride(void);
+    void    loadSettingsCacheOverride(void) const;
     static void clearSettingsCacheOverride(void);
 
 
@@ -216,7 +216,7 @@ static void configplugin_cb(const QString &cmd)
 
     if (GetNotificationCenter() && pmanager->config_plugin(cmd.trimmed()))
     {
-        ShowNotificationError(cmd, _Location,
+        ShowNotificationError(cmd, sLocation,
                               QObject::tr("Failed to configure plugin"));
     }
 }
@@ -230,7 +230,7 @@ static void plugin_cb(const QString &cmd)
     if (GetNotificationCenter() && pmanager->run_plugin(cmd.trimmed()))
     {
         ShowNotificationError(QObject::tr("Plugin failure"),
-                              _Location,
+                              sLocation,
                               QObject::tr("%1 failed to run for some reason").arg(cmd));
     }
 }
@@ -324,7 +324,7 @@ void MythContextPrivate::EndTempWindow(void)
  * \param timeLimit Limit in seconds for testing.
  */
 
-bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit)
+bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
@@ -1130,7 +1130,7 @@ void MythContextPrivate::EnableDBerrors(void)
  * Any cached settings also need to be cleared,
  * so that they can be re-read from the new database
  */
-void MythContextPrivate::ResetDatabase(void)
+void MythContextPrivate::ResetDatabase(void) const
 {
     gCoreContext->GetDBManager()->CloseDatabases();
     gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);
@@ -1408,7 +1408,7 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
             "mythtv-setup correct?");
 
     QString message = QObject::tr("Could not connect to master backend");
-    MythErrorNotification n(message, _Location, description);
+    MythErrorNotification n(message, sLocation, description);
     n.SetId(m_registration);
     n.SetParent(this);
     GetNotificationCenter()->Queue(n);
@@ -1422,7 +1422,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     if (!m_lastCheck.isValid())
         return;
 
-    MythCheckNotification n(QObject::tr("Backend is online"), _Location);
+    MythCheckNotification n(QObject::tr("Backend is online"), sLocation);
     n.SetId(m_registration);
     n.SetParent(this);
     n.SetDuration(5);
@@ -1500,7 +1500,7 @@ bool MythContextPrivate::saveSettingsCache(void)
     return config.Save();
 }
 
-void MythContextPrivate::loadSettingsCacheOverride(void)
+void MythContextPrivate::loadSettingsCacheOverride(void) const
 {
     if (!m_gui)
         return;

@@ -173,7 +173,7 @@ public:
     void UpdateFrom(const MythNotificationScreen &s);
 
     void SetSingleShotTimer(int s, bool update = false);
-    void SetErrorState(void);
+    void SetErrorState(void) const;
 
     // UI methods
     void AdjustYPosition(void);
@@ -252,11 +252,11 @@ public:
 
     void CheckDeletes()
     {
-        for (auto it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
+        foreach (auto & screen, m_ToDelete)
         {
-            (*it)->SetAlpha(0);
-            (*it)->SetVisible(false);
-            (*it)->Close();
+            screen->SetAlpha(0);
+            screen->SetVisible(false);
+            screen->Close();
         }
         MythScreenStack::CheckDeletes();
     }

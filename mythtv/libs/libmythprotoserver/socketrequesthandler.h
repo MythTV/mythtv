@@ -1,5 +1,5 @@
-#ifndef _SOCKETREQUESTHANDLER_H_
-#define _SOCKETREQUESTHANDLER_H_
+#ifndef SOCKETREQUESTHANDLER_H
+#define SOCKETREQUESTHANDLER_H
 
 #include <QString>
 
@@ -33,4 +33,4 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
     MythSocketManager *m_parent { nullptr };
 };
 
-#endif
+#endif // SOCKETREQUESTHANDLER_H

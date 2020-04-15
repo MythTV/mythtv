@@ -74,13 +74,6 @@ const char* format_description(VideoFrameType Type)
     return "?";
 }
 
-#ifndef __MAX
-#   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
-#endif
-#ifndef __MIN
-#   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
-#endif
-
 #if ARCH_X86
 
 static bool features_detected = false;
@@ -548,7 +541,7 @@ static void SSE_copyplane(uint8_t *dst, int dst_pitch,
 
     for (int y = 0; y < height; y += hstep)
     {
-        const int hblock =  __MIN(hstep, height - y);
+        const int hblock =  std::min(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
         CopyFromUswc(cache, w16,
@@ -577,7 +570,7 @@ static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
 
     for (int y = 0; y < height; y += hstep)
     {
-        const int hblock =  __MIN(hstep, height - y);
+        const int hblock =  std::min(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
         CopyFromUswc(cache, w16, src, src_pitch,
@@ -785,7 +778,7 @@ void MythUSWCCopy::resetUSWCDetection(void)
 void MythUSWCCopy::allocateCache(int width)
 {
     av_freep(&m_cache);
-    m_size  = __MAX((width + 63) & ~63, 4096);
+    m_size  = std::max((width + 63) & ~63, 4096);
     m_cache = (uint8_t*)av_malloc(m_size);
 }
 

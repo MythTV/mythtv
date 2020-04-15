@@ -93,8 +93,8 @@ class MUI_PUBLIC MythPainter
         m_showNames = showNames;
     }
 
-    bool ShowBorders(void) { return m_showBorders; }
-    bool ShowTypeNames(void) { return m_showNames; }
+    bool ShowBorders(void) const { return m_showBorders; }
+    bool ShowTypeNames(void) const { return m_showNames; }
 
     void SetMaximumCacheSizes(int hardware, int software);
 

@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _SOURCEUTIL_H_
-#define _SOURCEUTIL_H_
+#ifndef SOURCEUTIL_H
+#define SOURCEUTIL_H
 
 // C++ headers
 #include <vector>
@@ -50,4 +50,4 @@ class MTV_PUBLIC SourceUtil
     static bool    DeleteAllSources(void);
 };
 
-#endif //_SOURCEUTIL_H_
+#endif //SOURCEUTIL_H

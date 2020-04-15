@@ -21,11 +21,11 @@ class MythDisplayRPI : public MythDisplay
     MythDisplayRPI();
    ~MythDisplayRPI() override;
 
-    void  UpdateCurrentMode (void) override final;
+    void  UpdateCurrentMode (void) override;
     bool  VideoModesAvailable(void) override { return true; }
-    bool  UsingVideoModes   (void) override final;
-    bool  SwitchToVideoMode (QSize Size, double Framerate) override final;
-    const vector<MythDisplayMode>& GetVideoModes(void) override final;
+    bool  UsingVideoModes   (void) override;
+    bool  SwitchToVideoMode (QSize Size, double Framerate) override;
+    const vector<MythDisplayMode>& GetVideoModes(void) override;
     void  Callback(uint32_t Reason, uint32_t, uint32_t);
 
   private:

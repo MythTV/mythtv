@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _MYTHSETTINGS_H_
-#define _MYTHSETTINGS_H_
+#ifndef MYTHSETTINGS_H
+#define MYTHSETTINGS_H
 
 #include <utility>
 
@@ -139,4 +139,4 @@ QString               StringMapToJSON(const QMap<QString,QString> &map);
 QString               StringListToJSON(const QString &key, const QStringList &sList);
 QMap<QString,QString> GetSettingsMap(MythSettingList &settings, const QString &hostname);
 
-#endif
+#endif // MYTHSETTINGS_H

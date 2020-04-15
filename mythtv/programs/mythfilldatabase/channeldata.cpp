@@ -55,7 +55,7 @@ static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
     }
 }
 
-bool ChannelData::insert_chan(uint sourceid)
+bool ChannelData::insert_chan(uint sourceid) const
 {
     bool insert_channels = m_channelUpdates;
     if (!insert_channels)
@@ -81,7 +81,7 @@ bool ChannelData::insert_chan(uint sourceid)
 
 
 unsigned int ChannelData::promptForChannelUpdates(
-    ChannelInfoList::iterator chaninfo, unsigned int chanid)
+    ChannelInfoList::iterator chaninfo, unsigned int chanid) const
 {
     (*chaninfo).m_name = getResponse(QObject::tr("Choose a channel name (any string, "
                                      "long version) "),(*chaninfo).m_name);
@@ -185,7 +185,7 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
     return existChan;
 }
 
-void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
+void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
 {
     if (m_guideDataOnly)
     {

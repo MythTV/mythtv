@@ -92,7 +92,7 @@ public:
 
 
     //! Delete thumbnails associated with device
-    void RemoveThumbs(void)
+    void RemoveThumbs(void) const
     {
         // Remove thumbnails
         QString dir = QString("%1/" TEMP_SUBDIR "/%2").arg(GetConfDir(), m_thumbs);
@@ -1984,7 +1984,7 @@ void ImageManagerFe::CreateThumbnails(const ImageIdList &ids, bool forFolder)
             .arg(lists.second).arg(forFolder));
 
         QStringList message;
-        message << QString::number(forFolder) << lists.second;
+        message << QString::number(static_cast<int>(forFolder)) << lists.second;
         gCoreContext->SendEvent(MythEvent("CREATE_THUMBNAILS", message));
     }
 
@@ -1995,7 +1995,7 @@ void ImageManagerFe::CreateThumbnails(const ImageIdList &ids, bool forFolder)
             .arg(lists.first).arg(forFolder));
 
         QStringList message;
-        message << QString::number(forFolder) << lists.first;
+        message << QString::number(static_cast<int>(forFolder)) << lists.first;
         HandleCreateThumbnails(message);
     }
 }
@@ -2062,7 +2062,7 @@ QString ImageManagerFe::HideFiles(bool hidden, const ImageIdList &ids)
     if (!lists.second.isEmpty())
     {
         QStringList message;
-        message << "IMAGE_HIDE" << QString::number(hidden) << lists.second;
+        message << "IMAGE_HIDE" << QString::number(static_cast<int>(hidden)) << lists.second;
 
         if (!gCoreContext->SendReceiveStringList(message, true))
             result = message[1];
@@ -2183,7 +2183,7 @@ QString ImageManagerFe::MakeDir(int parent, const QStringList &names, bool resca
     if (!ImageItem::IsLocalId(parent))
     {
         QStringList message("IMAGE_CREATE_DIRS");
-        message << destId << QString::number(rescan) << names;
+        message << destId << QString::number(static_cast<int>(rescan)) << names;
         bool ok = gCoreContext->SendReceiveStringList(message, true);
         return ok ? "" : message[1];
     }
@@ -2236,7 +2236,7 @@ QString ImageManagerFe::CreateImages(int destId, const ImageListK &images)
         aDef << QString::number(im->m_id)
              << QString::number(im->m_type)
              << im->m_filePath
-             << QString::number(im->m_isHidden)
+             << QString::number(static_cast<int>(im->m_isHidden))
              << QString::number(im->m_orientation)
              << QString::number(im->m_userThumbnail);
 

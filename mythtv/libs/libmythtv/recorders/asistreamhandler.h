@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _ASISTREAMHANDLER_H_
-#define _ASISTREAMHANDLER_H_
+#ifndef ASISTREAMHANDLER_H
+#define ASISTREAMHANDLER_H
 
 #include <vector>
 using namespace std;
@@ -86,4 +86,4 @@ class ASIStreamHandler : public StreamHandler
     static QMap<QString, uint>              s_handlersRefCnt;
 };
 
-#endif // _ASISTREAMHANDLER_H_
+#endif // ASISTREAMHANDLER_H

@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _CARDUTIL_H_
-#define _CARDUTIL_H_
+#ifndef CARDUTIL_H
+#define CARDUTIL_H
 
 // C++ headers
 #include <cstdint>
@@ -445,4 +445,4 @@ class MTV_PUBLIC CardUtil
     static QMap <QString,QStringList> s_videoDeviceCache;
 };
 
-#endif //_CARDUTIL_H_
+#endif //CARDUTIL_H

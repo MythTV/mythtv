@@ -288,7 +288,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             m_out = tmp;
             m_outSize = required_len;
         }
-        int data_size = 0;
+        size_t data_size = 0;
         m_spdifEnc->GetData((uint8_t *)m_out + m_outlen, data_size);
         m_outlen += data_size;
         m_inlen  -= m_samplesPerFrame * sizeof(inbuf_t);

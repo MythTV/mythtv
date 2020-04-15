@@ -1,14 +1,10 @@
 #ifndef LANG_H
 #define LANG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "vt.h"
+#include "vbilut.h"
 
 extern int latin1;
-extern const unsigned char lang_chars[][16]; /* from vbilut.cpp */
 
 struct enhance
 {
@@ -22,10 +18,6 @@ void conv2latin(unsigned char *p, int n, int lang);
 void init_enhance(struct enhance *eh);
 void add_enhance(struct enhance *eh, int dcode, unsigned int *data);
 void do_enhancements(struct enhance *eh, struct vt_page *vtp);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // LANG_H
 

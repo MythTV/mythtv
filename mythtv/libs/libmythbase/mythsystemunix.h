@@ -1,7 +1,7 @@
 /// -*- Mode: c++ -*-
 
-#ifndef _MYTHSYSTEM_UNIX_H_
-#define _MYTHSYSTEM_UNIX_H_
+#ifndef MYTHSYSTEM_UNIX_H
+#define MYTHSYSTEM_UNIX_H
 
 #include <csignal>
 #include <sys/select.h>
@@ -32,7 +32,7 @@ class MythSystemLegacyIOHandler: public MThread
     public:
         explicit MythSystemLegacyIOHandler(bool read)
             : MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-              m_pMap(PMap_t()), m_read(read) {};
+              m_read(read) {};
         ~MythSystemLegacyIOHandler() override { wait(); }
         void   run(void) override; // MThread
 
@@ -116,7 +116,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
         int         m_stdpipe[3] {-1,-1, -1};
 };
 
-#endif // _MYTHSYSTEM_UNIX_H_
+#endif // MYTHSYSTEM_UNIX_H
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

@@ -925,7 +925,7 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     query.bindValue(":CHANID", chanid);
 
     bool ok = true;
-    pid_cache_t::const_iterator ito = old_cache.begin();
+    auto ito = old_cache.begin();
     for (auto itn : pid_cache)
     {
         // if old pid smaller than current new pid, skip this old pid
@@ -2378,9 +2378,9 @@ uint ChannelUtil::GetNextChannel(
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
-                (mplexid_restriction &&
+                ((mplexid_restriction != 0U) &&
                  (mplexid_restriction != it->m_mplexId)) ||
-                (chanid_restriction &&
+                ((chanid_restriction != 0U) &&
                  (chanid_restriction != it->m_chanId))));
     }
     else if ((CHANNEL_DIRECTION_UP == direction) ||
@@ -2397,9 +2397,9 @@ uint ChannelUtil::GetNextChannel(
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
-                (mplexid_restriction &&
+                ((mplexid_restriction != 0U) &&
                  (mplexid_restriction != it->m_mplexId)) ||
-                (chanid_restriction &&
+                ((chanid_restriction != 0U) &&
                  (chanid_restriction != it->m_chanId))));
     }
 

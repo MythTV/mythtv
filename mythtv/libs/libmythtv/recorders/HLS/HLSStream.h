@@ -33,7 +33,7 @@ class HLSRecStream
     void SetVersion(int x)          { m_version = x; }
     int TargetDuration(void) const  { return m_targetDuration; }
     void SetTargetDuration(int x)   { m_targetDuration = x; }
-    uint64_t AverageBandwidth(void) { return static_cast<uint64_t>(m_bandwidth); }
+    uint64_t AverageBandwidth(void) const { return static_cast<uint64_t>(m_bandwidth); }
     uint64_t Bitrate(void) const    { return m_bitrate; }
     void SetBitrate(uint64_t bitrate) { m_bitrate = bitrate; }
     uint64_t CurrentByteRate(void) const { return m_curByteRate; }
@@ -103,4 +103,4 @@ class HLSRecStream
 #endif // USING_LIBCRYPTO
 };
 
-#endif
+#endif // HLS_STREAM_H

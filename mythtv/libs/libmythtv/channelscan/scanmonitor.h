@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _SCAN_MONITOR_H_
-#define _SCAN_MONITOR_H_
+#ifndef SCAN_MONITOR_H
+#define SCAN_MONITOR_H
 
 // Qt headers
 #include <QObject>
@@ -97,7 +97,7 @@ class ScannerEvent : public QEvent
     int     intValue()       const { return m_intValue; }
     void    intValue(int intvalue) { m_intValue = intvalue; }
 
-    int     boolValue()       const { return m_intValue != 0; }
+    bool    boolValue()       const { return m_intValue != 0; }
 
     Configurable *ConfigurableValue() const { return m_cfgPtr; }
     void    ConfigurableValue(Configurable *cfg_ptr)
@@ -130,4 +130,4 @@ void post_event(QObject *dest, QEvent::Type type, const QString &val);
 void post_event(QObject *dest, QEvent::Type type, int val,
                 Configurable *spp);
 
-#endif // _SCAN_MONITOR_H_
+#endif // SCAN_MONITOR_H

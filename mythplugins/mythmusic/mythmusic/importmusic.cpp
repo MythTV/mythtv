@@ -421,7 +421,7 @@ void ImportMusicDialog::addAllNewPressed()
     while (m_currentTrack < (int) m_tracks->size())
     {
         fillWidgets();
-        qApp->processEvents();
+        QCoreApplication::processEvents();
 
         if (m_tracks->at(m_currentTrack)->isNewTune)
         {
@@ -429,7 +429,7 @@ void ImportMusicDialog::addAllNewPressed()
             newCount++;
         }
 
-        qApp->processEvents();
+        QCoreApplication::processEvents();
 
         m_currentTrack++;
     }
@@ -484,7 +484,7 @@ bool ImportMusicDialog::copyFile(const QString &src, const QString &dst)
     while (!copy->isFinished())
     {
         usleep(500);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     }
 
     res = copy->GetResult();
@@ -523,7 +523,7 @@ void ImportMusicDialog::startScan()
     while (!scanner->isFinished())
     {
         usleep(500);
-        qApp->processEvents();
+        QCoreApplication::processEvents();
     }
 
     delete scanner;

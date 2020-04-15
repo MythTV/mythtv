@@ -42,7 +42,7 @@ class MHParseText: public MHParseBase
     void GetNextChar();
     void NextSym();
     MHParseNode *DoParse();
-    void Error(const char *str);
+    void Error(const char *str) const;
 
     int            m_lineCount     {1};
 

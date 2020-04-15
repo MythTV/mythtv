@@ -935,7 +935,7 @@ void LocationDialog::doSearch()
     QString searchingresults = tr("Searching... Results: %1");
 
     m_resultsText->SetText(searchingresults.arg(0));
-    qApp->processEvents();
+    QCoreApplication::processEvents();
 
     QList<ScriptInfo *> sources;
     // if a screen makes it this far, theres at least one source for it
@@ -949,7 +949,7 @@ void LocationDialog::doSearch()
             result_cache[si] = results;
             numresults += results.size();
             m_resultsText->SetText(searchingresults.arg(numresults));
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
     }
 
@@ -977,7 +977,7 @@ void LocationDialog::doSearch()
             ri->idstr = tmp[0];
             ri->src = si;
             item->SetData(QVariant::fromValue(ri));
-            qApp->processEvents();
+            QCoreApplication::processEvents();
         }
     }
 

@@ -22,11 +22,7 @@ static inline struct dl_head *
 dl_init(struct dl_head *h)
 {
     h->first = (struct dl_node *)&h->null;
-#ifdef __cplusplus
     h->null = nullptr;
-#else
-    h->null = NULL;
-#endif
     h->last = (struct dl_node *)&h->first;
     return h;
 }
@@ -49,7 +45,7 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
     return n;
 }
 
-#define dl_empty(h)             ((h)->first->next == 0)
+#define dl_empty(h)             ((h)->first->next == nullptr)
 #define dl_insert_before(p, n)  dl_insert_after((p)->prev, (n))
 #define dl_insert_first(h, n)   ({ struct dl_node *_n = (n); \
                                        dl_insert_before((h)->first, _n); })

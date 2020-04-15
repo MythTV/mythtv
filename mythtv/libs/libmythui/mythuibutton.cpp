@@ -258,7 +258,7 @@ bool MythUIButton::ParseElement(
 {
     if (element.tagName() == "value")
     {
-        m_ValueText = qApp->translate("ThemeUI",
+        m_ValueText = QCoreApplication::translate("ThemeUI",
                                       parseText(element).toUtf8());
     }
     else

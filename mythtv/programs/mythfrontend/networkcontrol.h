@@ -55,6 +55,8 @@ class NetworkCommand : public QObject
 
     NetworkCommand &operator=(NetworkCommand const &nc)
     {
+        if (this == &nc)
+            return *this;
         m_command = nc.m_command;
         m_client = nc.m_client;
         m_args = m_command.simplified().split(" ");

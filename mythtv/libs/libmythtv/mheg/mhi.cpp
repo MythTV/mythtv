@@ -737,7 +737,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
     osdWindow->SetVisible(true);
 }
 
-void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
+void MHIContext::GetInitialStreams(int &audioTag, int &videoTag) const
 {
     audioTag = m_audioTag;
     videoTag = m_videoTag;

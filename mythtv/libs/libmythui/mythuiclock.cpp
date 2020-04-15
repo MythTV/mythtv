@@ -88,7 +88,7 @@ bool MythUIClock::ParseElement(
         element.tagName() == "template")
     {
         QString format = parseText(element);
-        format = qApp->translate("ThemeUI", format.toUtf8());
+        format = QCoreApplication::translate("ThemeUI", format.toUtf8());
         format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);

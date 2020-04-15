@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
-#ifndef __MythTV__mythnotification__
-#define __MythTV__mythnotification__
+#ifndef MYTHTV_MYTHNOTIFICATION_H
+#define MYTHTV_MYTHNOTIFICATION_H
 
 #include <utility>
 
@@ -399,4 +399,4 @@ class MUI_PUBLIC MythBusyNotification : public MythNotification
     : MythNotification(Busy, title, author, details) { }
 };
 
-#endif /* defined(__MythTV__mythnotification__) */
+#endif /* defined(MYTHTV_MYTHNOTIFICATION_H) */

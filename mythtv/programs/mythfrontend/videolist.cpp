@@ -39,7 +39,7 @@ class TreeNodeDataPrivate
     }
 
     TreeNodeDataPrivate(QString path, QString host, QString prefix) :
-        m_metadata(nullptr), m_host(std::move(host)), m_path(std::move(path)), m_prefix(std::move(prefix))
+        m_host(std::move(host)), m_path(std::move(path)), m_prefix(std::move(prefix))
     {
     }
 
@@ -85,7 +85,7 @@ TreeNodeData::TreeNodeData(QString path, QString host, QString prefix)
     m_d = new TreeNodeDataPrivate(std::move(path), std::move(host), std::move(prefix));
 }
 
-TreeNodeData::TreeNodeData(const TreeNodeData &other) : m_d(nullptr)
+TreeNodeData::TreeNodeData(const TreeNodeData &other)
 {
     *this = other;
 }
@@ -430,7 +430,7 @@ class VideoListImp
     void buildDbList(void);
     void buildTVList(void);
     void buildFileList(smart_dir_node &directory, metadata_list &metalist,
-                       const QString &prefix);
+                       const QString &prefix) const;
 
     void update_meta_view(bool flat_list);
 
@@ -547,7 +547,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         return;
     }
 
-    for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
+    for (auto dir = src->dirs_begin();
          dir != src->dirs_end(); ++dir)
     {
         if ((*dir)->has_entries())
@@ -566,7 +566,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         }
     }
 
-    for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
+    for (auto entry = src->entries_begin();
          entry != src->entries_end(); ++entry)
     {
         if (((*entry)->getData()->GetSeason() > 0) ||
@@ -1203,7 +1203,7 @@ class dirhandler : public DirectoryHandler
 };
 
 void VideoListImp::buildFileList(
-    smart_dir_node &directory, metadata_list &metalist, const QString &prefix)
+    smart_dir_node &directory, metadata_list &metalist, const QString &prefix) const
 {
     FileAssociations::ext_ignore_list ext_list;
     FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);

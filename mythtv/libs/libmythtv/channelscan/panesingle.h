@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_SINGLE_H_
-#define _PANE_SINGLE_H_
+#ifndef PANE_SINGLE_H
+#define PANE_SINGLE_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -53,9 +53,9 @@ class PaneSingle : public GroupSetting
     int  GetMultiplex(void) const
         { return m_transport_setting->getValue().toInt(); }
     bool ignoreSignalTimeout(void) const
-        { return m_ignore_signal_timeout->getValue().toInt(); }
+        { return m_ignore_signal_timeout->getValue().toInt() != 0; }
     bool GetFollowNIT(void) const
-        { return m_follow_nit->getValue().toInt(); }
+        { return m_follow_nit->getValue().toInt() != 0; }
 
     void SetSourceID(uint sourceid)
         { m_transport_setting->SetSourceID(sourceid); }
@@ -66,4 +66,4 @@ class PaneSingle : public GroupSetting
     FollowNITSetting    *m_follow_nit            {nullptr};
 };
 
-#endif // _PANE_SINGLE_H_
+#endif // PANE_SINGLE_H

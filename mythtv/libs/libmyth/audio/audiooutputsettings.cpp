@@ -22,7 +22,7 @@ extern "C" {
 #define LOC QString("AOS: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_invalid(invalid), m_eld(ELD())
+    m_invalid(invalid)
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));
@@ -428,7 +428,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
     return aosettings;
 }
 
-int AudioOutputSettings::GetMaxHDRate()
+int AudioOutputSettings::GetMaxHDRate() const
 {
     if (!canFeature(FEATURE_DTSHD))
         return 0;
@@ -556,7 +556,7 @@ bool AudioOutputSettings::hasValidELD()
     return m_hasEld && m_eld.isValid();
 };
 
-bool AudioOutputSettings::hasELD()
+bool AudioOutputSettings::hasELD() const
 {
     return m_hasEld;
 };

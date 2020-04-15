@@ -142,7 +142,7 @@ struct blockInput_t
     RemoteFile*         m_file;
 };
 
-static int _def_close(udfread_block_input *p_gen)
+static int def_close(udfread_block_input *p_gen)
 {
     auto *p = (blockInput_t *)p_gen;
     int result = -1;
@@ -157,14 +157,14 @@ static int _def_close(udfread_block_input *p_gen)
     return result;
 }
 
-static uint32_t _def_size(udfread_block_input *p_gen)
+static uint32_t def_size(udfread_block_input *p_gen)
 {
     auto *p = (blockInput_t *)p_gen;
 
     return (uint32_t)(p->m_file->GetRealFileSize() / UDF_BLOCK_SIZE);
 }
 
-static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
+static int def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
 {
     (void)flags;
     int result = -1;
@@ -189,9 +189,9 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
         blockInput_t blockInput {};
 
         blockInput.m_file = new RemoteFile(path); // Normally deleted via a call to udfread_close
-        blockInput.m_input.close = _def_close;
-        blockInput.m_input.read = _def_read;
-        blockInput.m_input.size = _def_size;
+        blockInput.m_input.close = def_close;
+        blockInput.m_input.read = def_read;
+        blockInput.m_input.size = def_size;
 
         if (blockInput.m_file->isOpen())
         {

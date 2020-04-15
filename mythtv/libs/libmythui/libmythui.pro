@@ -162,7 +162,7 @@ using_joystick_menu {
 using_lirc {
     DEFINES += USE_LIRC
     HEADERS += lirc.h   lircevent.h   lirc_client.h
-    SOURCES += lirc.cpp lircevent.cpp lirc_client.c
+    SOURCES += lirc.cpp lircevent.cpp lirc_client.cpp
 }
 
 using_libcec {

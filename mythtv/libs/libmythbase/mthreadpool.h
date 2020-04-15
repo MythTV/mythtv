@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _MYTH_THREAD_POOL_H_
-#define _MYTH_THREAD_POOL_H_
+#ifndef MYTH_THREAD_POOL_H
+#define MYTH_THREAD_POOL_H
 
 #include <QString>
 
@@ -56,6 +56,6 @@ class MBASE_PUBLIC MThreadPool
     MThreadPoolPrivate *m_priv {nullptr};
 };
 
-#endif // _MYTH_THREAD_POOL_H_
+#endif // MYTH_THREAD_POOL_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

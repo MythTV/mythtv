@@ -15,10 +15,6 @@ MythBDOverlayScreen::MythBDOverlayScreen(MythPlayer *Player, const QString &Name
 {
 }
 
-MythBDOverlayScreen::~MythBDOverlayScreen()
-{
-}
-
 void MythBDOverlayScreen::DisplayBDOverlay(MythBDOverlay *Overlay)
 {
     if (!Overlay || !m_player)

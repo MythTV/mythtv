@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef _PANE_DVB_UTILS_IMPORT_H_
-#define _PANE_DVB_UTILS_IMPORT_H_
+#ifndef PANE_DVB_UTILS_IMPORT_H
+#define PANE_DVB_UTILS_IMPORT_H
 
 // Qt headers
 #include <QString>
@@ -53,11 +53,11 @@ class PaneDVBUtilsImport : public GroupSetting
 
     QString GetFilename(void)   const { return m_filename->getValue();    }
     bool DoIgnoreSignalTimeout(void) const
-        { return m_ignoreSignalTimeout->getValue().toInt(); }
+        { return m_ignoreSignalTimeout->getValue().toInt() != 0; }
 
   private:
     TransTextEditSetting    *m_filename              {nullptr};
     IgnoreSignalTimeout     *m_ignoreSignalTimeout   {nullptr};
 };
 
-#endif // _PANE_DVB_UTILS_IMPORT_H_
+#endif // PANE_DVB_UTILS_IMPORT_H

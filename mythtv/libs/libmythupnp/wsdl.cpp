@@ -26,7 +26,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     if (!pRequest->m_mapParams.contains( "raw" ))
     {
         appendChild( createProcessingInstruction( "xml-stylesheet",
-                    "type=\"text/xsl\" href=\"/xslt/service.xslt\"" ));
+                    R"(type="text/xsl" href="/xslt/service.xslt")" ));
     }
 
     QDomElement  oNode;

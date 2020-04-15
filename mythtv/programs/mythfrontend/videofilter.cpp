@@ -56,8 +56,7 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     }
 }
 
-VideoFilterSettings::VideoFilterSettings(const VideoFilterSettings &rhs) :
-    m_changedState(0)
+VideoFilterSettings::VideoFilterSettings(const VideoFilterSettings &rhs)
 {
     *this = rhs;
 }
@@ -298,12 +297,12 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 
     if (matches && m_browse != kBrowseFilterAll)
     {
-        matches = (mdata.GetBrowse() == m_browse);
+        matches = (static_cast<int>(mdata.GetBrowse()) == m_browse);
     }
 
     if (matches && m_watched != kWatchedFilterAll)
     {
-        matches = (mdata.GetWatched() == m_watched);
+        matches = (static_cast<int>(mdata.GetWatched()) == m_watched);
     }
 
     if (matches && m_inetRef != kInetRefFilterAll)

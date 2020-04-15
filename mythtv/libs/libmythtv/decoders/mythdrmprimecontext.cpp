@@ -49,7 +49,7 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
     if (name.startsWith("mpeg2video"))
         name = "mpeg2_" + CodecName;
     AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     if (!codec || !decoder)
     {
         // this shouldn't happen!
@@ -174,7 +174,7 @@ bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Fram
     Frame->height = AvFrame->height;
     Frame->pix_fmt = Context->pix_fmt;
     Frame->sw_pix_fmt = Context->sw_pix_fmt;
-    Frame->directrendering = 1;
+    Frame->directrendering = true;
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
 

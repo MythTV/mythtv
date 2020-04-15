@@ -22,10 +22,10 @@ INSTALLS += installfiles
 # Input
 HEADERS += mythnews.h     mythnewsconfig.h   mythnewseditor.h
 HEADERS += newssite.h     newsarticle.h
-HEADERS += newsdbutil.h   dbcheck.h
+HEADERS += newsdbutil.h   newsdbcheck.h
 SOURCES += mythnews.cpp   mythnewsconfig.cpp mythnewseditor.cpp
 SOURCES += newssite.cpp   newsarticle.cpp
-SOURCES += newsdbutil.cpp dbcheck.cpp
+SOURCES += newsdbutil.cpp newsdbcheck.cpp
 SOURCES += main.cpp
 
 DEFINES += MPLUGIN_API

@@ -31,7 +31,7 @@ MythOpenGLPerf::MythOpenGLPerf(QString Name,
         .arg(sampleCount()).arg(m_totalSamples));
 }
 
-int MythOpenGLPerf::GetTimersRunning(void)
+int MythOpenGLPerf::GetTimersRunning(void) const
 {
     return m_timersRunning;
 }

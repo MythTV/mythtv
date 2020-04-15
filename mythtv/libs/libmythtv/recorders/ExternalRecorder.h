@@ -5,8 +5,8 @@
  *  Copyright notice is in ExternalRecorder.cpp of the MythTV project.
  */
 
-#ifndef _EXTERNAL_RECORDER_H_
-#define _EXTERNAL_RECORDER_H_
+#ifndef EXTERNAL_RECORDER_H
+#define EXTERNAL_RECORDER_H
 
 // MythTV includes
 #include "dtvrecorder.h"
@@ -49,4 +49,4 @@ class ExternalRecorder : public DTVRecorder
     ExternalStreamHandler *m_streamHandler  {nullptr};
 };
 
-#endif // _External_RECORDER_H_
+#endif // EXTERNAL_RECORDER_H

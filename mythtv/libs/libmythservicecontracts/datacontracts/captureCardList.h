@@ -54,7 +54,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            CaptureCard *pObject = new CaptureCard( this );
+            auto *pObject = new CaptureCard( this );
             m_CaptureCards.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

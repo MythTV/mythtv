@@ -40,7 +40,7 @@ MythDVDBuffer::MythDVDBuffer(const QString &Filename)
 {
     m_seekSpeedMap = { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
                        { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
-    OpenFile(Filename);
+    MythDVDBuffer::OpenFile(Filename);
 }
 
 MythDVDBuffer::~MythDVDBuffer()
@@ -231,7 +231,7 @@ bool MythDVDBuffer::IsSeekingAllowed(void)
             (m_processState != PROCESS_WAIT));
 }
 
-void MythDVDBuffer::GetDescForPos(QString &Description)
+void MythDVDBuffer::GetDescForPos(QString &Description) const
 {
     if (m_inMenu)
     {
@@ -424,7 +424,7 @@ int MythDVDBuffer::GetTitle(void) const
     return m_title;
 }
 
-bool MythDVDBuffer::DVDWaitingForPlayer(void)
+bool MythDVDBuffer::DVDWaitingForPlayer(void) const
 {
     return m_playerWait;
 }
@@ -439,12 +439,12 @@ int MythDVDBuffer::GetCurrentAngle(void) const
     return m_currentAngle;
 }
 
-int MythDVDBuffer::GetNumAngles(void)
+int MythDVDBuffer::GetNumAngles(void) const
 {
     return m_currentTitleAngleCount;
 }
 
-long long MythDVDBuffer::GetTotalReadPosition(void)
+long long MythDVDBuffer::GetTotalReadPosition(void) const
 {
     return m_titleLength;
 }
@@ -460,7 +460,7 @@ void MythDVDBuffer::GetPartAndTitle(int &Part, int &Title) const
     Title = m_title;
 }
 
-uint32_t MythDVDBuffer::AdjustTimestamp(uint32_t Timestamp)
+uint32_t MythDVDBuffer::AdjustTimestamp(uint32_t Timestamp) const
 {
     uint32_t newTimestamp = Timestamp;
     if (newTimestamp >= m_timeDiff)
@@ -468,7 +468,7 @@ uint32_t MythDVDBuffer::AdjustTimestamp(uint32_t Timestamp)
     return newTimestamp;
 }
 
-int64_t MythDVDBuffer::AdjustTimestamp(int64_t Timestamp)
+int64_t MythDVDBuffer::AdjustTimestamp(int64_t Timestamp) const
 {
     int64_t newTimestamp = Timestamp;
     if ((newTimestamp != AV_NOPTS_VALUE) && (newTimestamp >= m_timeDiff))
@@ -1132,19 +1132,19 @@ void MythDVDBuffer::PrevTrack(void)
 /** \brief get the total time of the title in seconds
  * 90000 ticks = 1 sec
  */
-uint MythDVDBuffer::GetTotalTimeOfTitle(void)
+uint MythDVDBuffer::GetTotalTimeOfTitle(void) const
 {
     return static_cast<uint>(lround(m_pgcLength / 90000.0F));
 }
 
-float MythDVDBuffer::GetAspectOverride(void)
+float MythDVDBuffer::GetAspectOverride(void) const
 {
     return m_forcedAspect;
 }
 
 /** \brief get the start of the cell in seconds
  */
-uint MythDVDBuffer::GetCellStart(void)
+uint MythDVDBuffer::GetCellStart(void) const
 {
     return static_cast<uint>(m_cellStart / 900000.F);
 }
@@ -1163,7 +1163,7 @@ bool MythDVDBuffer::IsStillFramePending(void) const
     return dvdnav_get_next_still_flag(m_dvdnav) > 0;
 }
 
-bool MythDVDBuffer::AudioStreamsChanged(void)
+bool MythDVDBuffer::AudioStreamsChanged(void) const
 {
     return m_audioStreamsChanged;
 }
@@ -1791,9 +1791,9 @@ uint MythDVDBuffer::GetSubtitleLanguage(int Id)
 /** \brief get the logical subtitle track/stream number from the dvd
  * \param stream_id the stream id, range 0-31
  */
-int MythDVDBuffer::GetSubtitleTrackNum(uint StreamId)
+int8_t MythDVDBuffer::GetSubtitleTrackNum(uint StreamId)
 {
-    int logstream = -1;
+    int8_t logstream = -1;
 
     // VM always sets stream_id to zero if we're not in the VTS
     // domain and always returns 0 (instead of -1) if nothing has
@@ -1865,7 +1865,7 @@ void MythDVDBuffer::SetTrack(uint Type, int TrackNo)
  * or determined from the dvd IFO.
  * \param type: use either kTrackTypeSubtitle or kTrackTypeAudio
  */
-int MythDVDBuffer::GetTrack(uint Type)
+int MythDVDBuffer::GetTrack(uint Type) const
 {
     if (Type == kTrackTypeSubtitle)
         return m_curSubtitleTrack;
@@ -1937,12 +1937,12 @@ double MythDVDBuffer::GetFrameRate(void)
     return dvdfps;
 }
 
-bool MythDVDBuffer::StartOfTitle(void)
+bool MythDVDBuffer::StartOfTitle(void) const
 {
     return m_part == 0;
 }
 
-bool MythDVDBuffer::EndOfTitle(void)
+bool MythDVDBuffer::EndOfTitle(void) const
 {
     return ((m_titleParts == 0) || (m_part == (m_titleParts - 1)) || (m_titleParts == 1));
 }
@@ -1967,12 +1967,12 @@ void MythDVDBuffer::SetDVDSpeed(int Speed)
 }
 
 /// \brief returns seconds left in the title
-uint MythDVDBuffer::TitleTimeLeft(void)
+uint MythDVDBuffer::TitleTimeLeft(void) const
 {
     return static_cast<uint>(GetTotalTimeOfTitle() - GetCurrentTime());
 }
 
-int64_t MythDVDBuffer::GetCurrentTime(void)
+int64_t MythDVDBuffer::GetCurrentTime(void) const
 {
     return (m_currentTime / 90000);
 }

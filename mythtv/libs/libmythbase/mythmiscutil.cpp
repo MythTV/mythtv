@@ -733,17 +733,17 @@ void myth_yield(void)
 #include <asm/unistd.h>
 
 #if defined(__i386__)
-# define __NR_ioprio_set  289
-# define __NR_ioprio_get  290
+# define NR_ioprio_set  289
+# define NR_ioprio_get  290
 #elif defined(__ppc__)
-# define __NR_ioprio_set  273
-# define __NR_ioprio_get  274
+# define NR_ioprio_set  273
+# define NR_ioprio_get  274
 #elif defined(__x86_64__)
-# define __NR_ioprio_set  251
-# define __NR_ioprio_get  252
+# define NR_ioprio_set  251
+# define NR_ioprio_get  252
 #elif defined(__ia64__)
-# define __NR_ioprio_set  1274
-# define __NR_ioprio_get  1275
+# define NR_ioprio_set  1274
+# define NR_ioprio_get  1275
 #endif
 
 #define IOPRIO_BITS             (16)
@@ -764,17 +764,17 @@ bool myth_ioprio(int val)
     int new_ioprio = IOPRIO_PRIO_VALUE(new_ioclass, new_iodata);
 
     int pid = getpid();
-    int old_ioprio = syscall(__NR_ioprio_get, IOPRIO_WHO_PROCESS, pid);
+    int old_ioprio = syscall(NR_ioprio_get, IOPRIO_WHO_PROCESS, pid);
     if (old_ioprio == new_ioprio)
         return true;
 
-    int ret = syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+    int ret = syscall(NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
 
     if (-1 == ret && EPERM == errno && IOPRIO_CLASS_BE != new_ioclass)
     {
         new_iodata = (new_ioclass == IOPRIO_CLASS_RT) ? 0 : 7;
         new_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, new_iodata);
-        ret = syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
+        ret = syscall(NR_ioprio_set, IOPRIO_WHO_PROCESS, pid, new_ioprio);
     }
 
     return 0 == ret;

@@ -433,7 +433,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 DishEventMPAADescriptor mpaa(mpaa_data);
                 stars = mpaa.stars();
 
-                if (stars) // Only movies for now
+                if (stars != 0.0F) // Only movies for now
                 {
                     rating = mpaa.rating();
                     rating_system = "MPAA";
@@ -441,7 +441,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 }
             }
 
-            if (!stars) // Not MPAA rated, check VCHIP
+            if (stars == 0.0F) // Not MPAA rated, check VCHIP
             {
                 const unsigned char *vchip_data = MPEGDescriptor::Find(
                     list, PrivateDescriptorID::dish_event_vchip);

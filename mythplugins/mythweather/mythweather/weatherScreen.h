@@ -1,5 +1,5 @@
-#ifndef _WEATHERSCREEN_H_
-#define _WEATHERSCREEN_H_
+#ifndef WEATHERSCREEN_H
+#define WEATHERSCREEN_H
 
 // QT headers
 #include <QStringList>
@@ -42,11 +42,11 @@ class WeatherScreen : public MythScreenType
     bool containsKey(const QString &key) { return m_dataValueMap.contains(key); }
     virtual bool canShowScreen();
     void setUnits(units_t units) { m_units = units; }
-    units_t getUnits() { return m_units; }
+    units_t getUnits() const { return m_units; }
     virtual bool usingKeys() { return false; }
-    bool inUse() { return m_inuse; }
+    bool inUse() const { return m_inuse; }
     void setInUse(bool inuse) { m_inuse = inuse; }
-    int getId() { return m_id; }
+    int getId() const { return m_id; }
 
   signals:
     void screenReady(WeatherScreen *);
@@ -74,4 +74,4 @@ class WeatherScreen : public MythScreenType
     int  m_id;
 };
 
-#endif
+#endif // WEATHERSCREEN_H

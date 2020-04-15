@@ -486,7 +486,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             if (!dce->GetData().canConvert<RecordingInfo>())
                 return;
 
-            RecordingInfo recInfo = dce->GetData().value<RecordingInfo>();
+            auto recInfo = dce->GetData().value<RecordingInfo>();
 
             if (resulttext == tr("Record this showing"))
             {

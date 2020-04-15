@@ -1,5 +1,5 @@
-#ifndef _IDLESCREEN_H_
-#define _IDLESCREEN_H_
+#ifndef IDLESCREEN_H
+#define IDLESCREEN_H
 
 #include <mythscreentype.h>
 // libmyth
@@ -52,4 +52,4 @@ class IdleScreen : public MythScreenType
     bool            m_hasConflicts            {false};
 };
 
-#endif
+#endif // IDLESCREEN_H

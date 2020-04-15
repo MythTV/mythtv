@@ -23,8 +23,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef _SERVICEUTIL_H_
-#define _SERVICEUTIL_H_
+#ifndef SERVICEUTIL_H
+#define SERVICEUTIL_H
 
 #include "datacontracts/programAndChannel.h"
 #include "datacontracts/recRule.h"
@@ -102,4 +102,4 @@ void FillCommBreak( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
 
 
-#endif
+#endif // SERVICEUTIL_H

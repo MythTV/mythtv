@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef _PANE_DVBT2_H_
-#define _PANE_DVBT2_H_
+#ifndef PANE_DVBT2_H
+#define PANE_DVBT2_H
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -89,4 +89,4 @@ class PaneDVBT2 : public GroupSetting
     ScanDVBTModSys       *m_pmod_sys        {nullptr};
 };
 
-#endif // _PANE_DVBT2_H_
+#endif // PANE_DVBT2_H

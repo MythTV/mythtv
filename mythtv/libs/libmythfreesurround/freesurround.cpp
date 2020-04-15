@@ -121,7 +121,7 @@ void FreeSurround::SetParams()
 {
     if (m_decoder)
     {
-        m_decoder->steering_mode(m_params.steering);
+        m_decoder->steering_mode(m_params.steering != 0);
         m_decoder->phase_mode(m_params.phasemode);
         m_decoder->surround_coefficients(m_params.coeff_a, m_params.coeff_b);
         m_decoder->separation(m_params.front_sep/100.0,m_params.rear_sep/100.0);
@@ -440,17 +440,17 @@ void FreeSurround::close()
     m_decoder = nullptr;
 }
 
-uint FreeSurround::numUnprocessedFrames()
+uint FreeSurround::numUnprocessedFrames() const
 {
     return m_inCount;
 }
 
-uint FreeSurround::numFrames()
+uint FreeSurround::numFrames() const
 {
     return m_outCount;
 }
 
-uint FreeSurround::frameLatency()
+uint FreeSurround::frameLatency() const
 {
     if (m_processed)
         return m_inCount + m_outCount + (block_size/2);

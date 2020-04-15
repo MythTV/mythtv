@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
-#ifndef _STREAMLISTENERS_H_
-#define _STREAMLISTENERS_H_
+#ifndef STREAMLISTENERS_H
+#define STREAMLISTENERS_H
 
 #include "tspacket.h"
 #include "mythdate.h"
@@ -199,4 +199,4 @@ class DVBEITStreamListener
 };
 
 
-#endif // _STREAMLISTENERS_H_
+#endif // STREAMLISTENERS_H

@@ -54,7 +54,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            Encoder *pObject = new Encoder( this );
+            auto *pObject = new Encoder( this );
             m_Encoders.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

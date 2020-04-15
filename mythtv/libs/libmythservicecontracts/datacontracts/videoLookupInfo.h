@@ -164,7 +164,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 
         ArtworkItem *AddNewArtwork()
         {
-            ArtworkItem *pObject = new ArtworkItem( this );
+            auto *pObject = new ArtworkItem( this );
             Artwork().append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

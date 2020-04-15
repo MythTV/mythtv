@@ -4,8 +4,8 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _PACKET_BUFFER_H_
-#define _PACKET_BUFFER_H_
+#ifndef PACKET_BUFFER_H
+#define PACKET_BUFFER_H
 
 #include <QList>
 #include <QMap>
@@ -53,4 +53,4 @@ class PacketBuffer
     QList<UDPPacket> m_available_packets;
 };
 
-#endif // _PACKET_BUFFER_H_
+#endif // PACKET_BUFFER_H

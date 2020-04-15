@@ -1,5 +1,5 @@
-#ifndef _VBOX_UTILS_H_
-#define _VBOX_UTILS_H_
+#ifndef VBOX_UTILS_H
+#define VBOX_UTILS_H
 
 // Qt headers
 #include <QString>
@@ -50,4 +50,4 @@ class VBox
     static QString getStrValue(QDomElement &element, const QString &name, int index = 0);
     static int getIntValue(QDomElement &element, const QString &name, int index = 0);
 };
-#endif // _VBOX_UTILS_H_
+#endif // VBOX_UTILS_H

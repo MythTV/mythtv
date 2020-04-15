@@ -4,8 +4,8 @@
  * Routines for querying and manipulating PGM (greyscale) images.
  */
 
-#ifndef __PGM_H__
-#define __PGM_H__
+#ifndef PGM_H
+#define PGM_H
 
 struct VideoFrame_;
 struct AVFrame;
@@ -22,6 +22,6 @@ int pgm_convolve_radial(struct AVFrame *dst, struct AVFrame *s1,
         struct AVFrame *s2, const struct AVFrame *src, int srcheight,
         const double *mask, int mask_radius);
 
-#endif  /* !__PGM_H__ */
+#endif  /* !PGM_H */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

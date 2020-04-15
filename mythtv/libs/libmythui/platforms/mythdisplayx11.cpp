@@ -10,7 +10,6 @@
 #define LOC QString("DisplayX11: ")
 
 MythDisplayX11::MythDisplayX11()
-  : MythDisplay()
 {
     Initialise();
 }
@@ -149,7 +148,7 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
             int width = static_cast<int>(mode.width);
             int height = static_cast<int>(mode.height);
             double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
-            bool interlaced = mode.modeFlags & RR_Interlace;
+            bool interlaced = (mode.modeFlags & RR_Interlace) != 0U;
             if (interlaced)
                 rate *= 2.0;
 
@@ -294,7 +293,8 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
 
     while (rroutput)
     {
-        Atom edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID, false);
+        Atom edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID,
+                                        static_cast<Bool>(false));
         if (!edidproperty)
             break;
 
@@ -322,7 +322,8 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
         unsigned long nitems = 0;
         unsigned char* data = nullptr;
         if (XRRGetOutputProperty(mDisplay->GetDisplay(), rroutput, edidproperty,
-                                 0, 128, false, false, AnyPropertyType, &actualtype,
+                                 0, 128, static_cast<Bool>(false), static_cast<Bool>(false),
+                                 AnyPropertyType, &actualtype,
                                  &actualformat, &nitems, &bytesafter, &data) == Success)
         {
             if (actualtype == XA_INTEGER && actualformat == 8)

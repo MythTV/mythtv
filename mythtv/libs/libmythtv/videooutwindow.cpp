@@ -48,7 +48,6 @@ const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow()
-  : m_display(nullptr)
 {
     m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
 

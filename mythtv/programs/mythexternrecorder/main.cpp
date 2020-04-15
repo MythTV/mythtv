@@ -86,6 +86,8 @@ int main(int argc, char *argv[])
                           .arg(filename);
         process = new MythExternRecApp(command, "", logfile, logging);
     }
+    if (process == nullptr)
+        return GENERIC_EXIT_NOT_OK;
 
     QObject::connect(process, &MythExternRecApp::Opened,
                      control, &MythExternControl::Opened);

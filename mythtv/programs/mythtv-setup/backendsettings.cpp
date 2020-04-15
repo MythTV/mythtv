@@ -242,8 +242,8 @@ static GlobalComboBoxSetting *FreqTable()
     auto *gc = new GlobalComboBoxSetting("FreqTable");
     gc->setLabel(QObject::tr("Channel frequency table"));
 
-    for (uint i = 0; chanlists[i].name; i++)
-        gc->addSelection(chanlists[i].name);
+    for (uint i = 0; gChanLists[i].name; i++)
+        gc->addSelection(gChanLists[i].name);
 
     gc->setHelpText(QObject::tr("Select the appropriate frequency table for "
                     "your system. If you have an antenna, use a \"-bcast\" "

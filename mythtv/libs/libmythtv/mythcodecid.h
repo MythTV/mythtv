@@ -1,5 +1,5 @@
-#ifndef _MYTH_CODEC_ID_H_
-#define _MYTH_CODEC_ID_H_
+#ifndef MYTH_CODEC_ID_H
+#define MYTH_CODEC_ID_H
 
 #include <QString>
 extern "C"
@@ -382,4 +382,4 @@ uint mpeg_version(int codec_id);
 #define CODEC_IS_MEDIACODEC(codec) (0)
 #endif
 
-#endif // _MYTH_CODEC_ID_H_
+#endif // MYTH_CODEC_ID_H

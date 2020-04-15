@@ -59,7 +59,7 @@ class PrevRecordedList : public ScheduleCommon
     void UpdateTitleList(void);
     void UpdateShowList(void);
     void UpdateList(MythUIButtonList *bnList,
-          ProgramList *progData, bool isShows);
+          ProgramList *progData, bool isShows) const;
     void LoadShowsByTitle(void);
     void LoadShowsByDate(void);
 

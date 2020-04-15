@@ -494,7 +494,7 @@ void MythNotificationScreen::Init(void)
     m_refresh = false;
 }
 
-void MythNotificationScreen::SetErrorState(void)
+void MythNotificationScreen::SetErrorState(void) const
 {
     if (!m_errorState)
         return;
@@ -789,7 +789,9 @@ NCPrivate::~NCPrivate()
  */
 void NCPrivate::ScreenDeleted(void)
 {
-    auto *screen = static_cast<MythNotificationScreen*>(sender());
+    auto *screen = dynamic_cast<MythNotificationScreen*>(sender());
+    if (screen == nullptr)
+        return;
 
     bool duefordeletion = m_deletedScreens.contains(screen);
 
@@ -867,7 +869,6 @@ bool NCPrivate::Queue(const MythNotification &notification)
     int id = notification.GetId();
     void *parent = notification.GetParent();
 
-    auto *tmp = static_cast<MythNotification*>(notification.clone());
     if (id > 0)
     {
         // quick sanity check to ensure the right caller is attempting
@@ -886,16 +887,16 @@ bool NCPrivate::Queue(const MythNotification &notification)
             if (m_suspended.contains(id))
             {
                 if (notification.type() == MythNotification::Update)
-                {
-                    delete tmp;
                     return false;
-                }
                 // got something else than an update, remove it from the
                 // suspended list
                 m_suspended.removeAll(id);
             }
         }
     }
+    auto *tmp = dynamic_cast<MythNotification*>(notification.clone());
+    if (tmp == nullptr)
+        return false;
     m_notifications.append(tmp);
 
     // Tell the GUI thread we have new notifications to process

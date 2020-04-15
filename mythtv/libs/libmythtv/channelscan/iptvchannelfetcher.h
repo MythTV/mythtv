@@ -3,8 +3,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#ifndef _IPTVCHANNELFETCHER_H_
-#define _IPTVCHANNELFETCHER_H_
+#ifndef IPTVCHANNELFETCHER_H
+#define IPTVCHANNELFETCHER_H
 
 #include <utility>
 
@@ -101,6 +101,6 @@ class IPTVChannelFetcher : public QRunnable
     QMutex           m_lock;
 };
 
-#endif // _IPTVCHANNELFETCHER_H_
+#endif // IPTVCHANNELFETCHER_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

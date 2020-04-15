@@ -74,7 +74,7 @@ class CDRipperThread: public MThread
         void run(void) override; // MThread
         int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
 
-        bool isCancelled(void);
+        bool isCancelled(void) const;
 
         RipStatus         *m_parent           {nullptr};
         bool               m_quit             {false};
@@ -103,7 +103,7 @@ class Ripper : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
-    bool somethingWasRipped();
+    bool somethingWasRipped() const;
     void scanCD(void);
     void ejectCD(void);
 

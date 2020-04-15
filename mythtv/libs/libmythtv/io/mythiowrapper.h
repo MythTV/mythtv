@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef void (*callback_t)(void*); //NOLINT(modernize-use-using)included from C code
+typedef void (*callback_t)(void*); //NOLINT(modernize-use-using) included from C code
 
 void               MythFileOpenRegisterCallback(const char *Pathname, void* Object, callback_t Func);
 int                MythFileCheck  (int Id);

@@ -489,6 +489,9 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     QString incoming("R");
     if (fillBrush.style() == Qt::LinearGradientPattern && fillBrush.gradient())
     {
+        // The Q*Gradient classes are not polymorohic, and therefore
+        // dynamic_cast can't be used here.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
         const auto *gradient = static_cast<const QLinearGradient*>(fillBrush.gradient());
         if (gradient)
         {

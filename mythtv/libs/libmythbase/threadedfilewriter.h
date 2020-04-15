@@ -60,7 +60,7 @@ class MBASE_PUBLIC ThreadedFileWriter
 
     void SetWriteBufferMinWriteSize(uint newMinSize = kMinWriteSize);
 
-    void Sync(void);
+    void Sync(void) const;
     void Flush(void);
     bool SetBlocking(bool block = true);
     bool WritesFailing(void) const { return m_ignoreWrites; }

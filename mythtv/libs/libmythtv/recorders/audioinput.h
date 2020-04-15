@@ -18,8 +18,8 @@
  */
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
-#ifndef _AUDIOINPUT_H_
-#define _AUDIOINPUT_H_
+#ifndef AUDIOINPUT_H
+#define AUDIOINPUT_H
 
 #include <QString>
 #include <unistd.h>
@@ -52,4 +52,4 @@ class AudioInput
     int        m_audio_sample_bits {0};
     int        m_audio_sample_rate {0};
 };
-#endif /* _AUDIOINPUT_H_ */
+#endif /* AUDIOINPUT_H */

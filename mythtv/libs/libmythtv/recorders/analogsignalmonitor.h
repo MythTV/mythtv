@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
-#ifndef _ANALOG_SIGNAL_MONITOR_H_
-#define _ANALOG_SIGNAL_MONITOR_H_
+#ifndef ANALOG_SIGNAL_MONITOR_H
+#define ANALOG_SIGNAL_MONITOR_H
 
 // MythTV headers
 #include "signalmonitor.h"
@@ -33,4 +33,4 @@ class AnalogSignalMonitor : public SignalMonitor
     int       m_logIdx      {40};
 };
 
-#endif // _ANALOG_SIGNAL_MONITOR_H_
+#endif // ANALOG_SIGNAL_MONITOR_H

@@ -749,7 +749,7 @@ bool TVRec::StateIsPlaying(TVState state)
  *         returns a kState_None, otherwise returns kState_Error.
  *  \param state TVState to check.
  */
-TVState TVRec::RemoveRecording(TVState state)
+TVState TVRec::RemoveRecording(TVState state) const
 {
     if (StateIsRecording(state))
         return kState_None;
@@ -765,7 +765,7 @@ TVState TVRec::RemoveRecording(TVState state)
  *         keep recording if we are watching an in progress recording.
  *  \param state TVState to check.
  */
-TVState TVRec::RemovePlaying(TVState state)
+TVState TVRec::RemovePlaying(TVState state) const
 {
     if (StateIsPlaying(state))
     {
@@ -2174,7 +2174,7 @@ DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
  *      RemoteEncoder::ShouldSwitchToAnotherInput(QString),
  *      CheckChannel(QString)
  */
-bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
+bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid) const
 {
     QString msg("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2313,7 +2313,7 @@ static QString add_spacer(const QString &channel, const QString &spacer)
 bool TVRec::CheckChannelPrefix(const QString &prefix,
                                uint          &complete_valid_channel_on_rec,
                                bool          &is_extra_char_useful,
-                               QString       &needed_spacer)
+                               QString       &needed_spacer) const
 {
 #if DEBUG_CHANNEL_PREFIX
     LOG(VB_GENERAL, LOG_DEBUG, QString("CheckChannelPrefix(%1)").arg(prefix));
@@ -4120,7 +4120,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
 }
 
 QString TVRec::LoadProfile(void *tvchain, RecordingInfo *rec,
-                           RecordingProfile &profile)
+                           RecordingProfile &profile) const
 {
     // Determine the correct recording profile.
     // In LiveTV mode use "Live TV" profile, otherwise use the

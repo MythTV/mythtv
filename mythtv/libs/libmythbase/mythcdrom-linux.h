@@ -1,7 +1,7 @@
-#ifndef _MYTHCDROM_LINUX_H_
-#define _MYTHCDROM_LINUX_H_
+#ifndef MYTHCDROM_LINUX_H
+#define MYTHCDROM_LINUX_H
 
 class MythCDROM *GetMythCDROMLinux(class QObject* par, const char* devicePath,
                                    bool SuperMount, bool AllowEject);
 
-#endif // _MYTHCDROM_LINUX_H_
+#endif // MYTHCDROM_LINUX_H

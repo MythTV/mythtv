@@ -79,7 +79,7 @@ class MTV_PUBLIC VideoDisplayProfile
     void    SetVideoRenderer(const QString &VideoRenderer);
     bool    CheckVideoRendererGroup(const QString &Renderer);
     QString GetDecoder(void) const;
-    bool    IsDecoderCompatible(const QString &Decoder);
+    bool    IsDecoderCompatible(const QString &Decoder) const;
     uint    GetMaxCPUs(void) const ;
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;
@@ -120,7 +120,7 @@ class MTV_PUBLIC VideoDisplayProfile
   private:
     vector<ProfileItem>::const_iterator
             FindMatch(const QSize &Size, float Framerate, const QString &CodecName,
-                      const QStringList DisallowedDecoders = QStringList());
+                      QStringList DisallowedDecoders = QStringList());
     void    LoadBestPreferences(const QSize &Size, float Framerate, const QString &CodecName,
                                 const QStringList &DisallowedDecoders = QStringList());
     QString GetPreference(const QString &Key) const;
