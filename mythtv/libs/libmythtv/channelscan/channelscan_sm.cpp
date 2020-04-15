@@ -332,6 +332,12 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
         return false;
     }
+    else
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            QString("Found %1 transports for ").arg(multiplexes.size()) +
+            QString("sourceid %1").arg(sourceid));
+    }
 
     for (uint multiplex : multiplexes)
         AddToList(multiplex);
@@ -530,8 +536,8 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             if (!authority.IsValid() || !services.IsValid())
                 continue;
 
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Found default authority '%1' in BAT for services in %2 %3")
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("Found default authority '%1' in BAT for services in nid %2 tid %3")
                     .arg(authority.DefaultAuthority())
                     .arg(netid).arg(tsid));
 
@@ -540,7 +546,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
                 // If the default authority is given in the SDT this
                 // overrides any definition in the BAT (or in the NIT)
                 LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-                    QString("Found default authority '%1' in BAT for service %2 %3 %4")
+                    QString("Found default authority '%1' in BAT for service nid %2 tid %3 sid %4")
                         .arg(authority.DefaultAuthority())
                         .arg(netid).arg(tsid).arg(services.ServiceID(j)));
                uint64_t index = ((uint64_t)netid << 32) | (tsid << 16) |
@@ -580,8 +586,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
             DefaultAuthorityDescriptor authority(def_auth);
             if (!authority.IsValid())
                 continue;
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Found default authority '%1' in SDTo for service %2 %3 %4")
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("Found default authority '%1' in SDTo for service nid %2 tid %3 sid %4")
                     .arg(authority.DefaultAuthority())
                     .arg(netid).arg(tsid).arg(serviceId));
             m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
@@ -750,8 +756,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 }
                 case DescriptorID::t2_terrestrial_delivery_system:
                 {
-                    // Additional info in the T2 descriptor not yet used
-                    continue;
+                    tt = DTVTunerType::kTunerTypeDVBT2;
+                    continue;                           // T2 descriptor not yet used
                 }
                 case DescriptorID::satellite_delivery_system:
                 {
@@ -762,8 +768,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 }
                 case DescriptorID::s2_satellite_delivery_system:
                 {
-                    // Additional info in the S2 descriptor not yet used
-                    continue;
+                    tt = DTVTunerType::kTunerTypeDVBS2;
+                    continue;                           // S2 descriptor not yet used
                 }
                 case DescriptorID::cable_delivery_system:
                 {
@@ -773,9 +779,6 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     break;
                 }
                 default:
-                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-                        QString("Descriptor %1 (0x%2) '%3' ignored")
-                            .arg(tag).arg(tag,0,16).arg(tagString));
                     continue;
             }
 
@@ -935,23 +938,24 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         {
             uint tsid = dtv_sm->GetTransportID();
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("\n\t\t\tsd->HasCachedAnyNIT():         %1").arg(sd->HasCachedAnyNIT()) +
-                QString("\n\t\t\tsd->HasCachedAnySDTs():        %1").arg(sd->HasCachedAnySDTs()) +
-                QString("\n\t\t\tsd->HasCachedAnyBATs():        %1").arg(sd->HasCachedAnyBATs()) +
-                QString("\n\t\t\tsd->HasCachedAllPMTs():        %1").arg(sd->HasCachedAllPMTs()) +
-                QString("\n\t\t\tsd->HasCachedAllNIT():         %1").arg(sd->HasCachedAllNIT()) +
-                QString("\n\t\t\tsd->HasCachedAllSDT(%1):    %2").arg(tsid,5).arg(sd->HasCachedAllSDT(tsid)) +
-                QString("\n\t\t\tsd->HasCachedAllBATs():        %1").arg(sd->HasCachedAllBATs()) +
-                QString("\n\t\t\tsd->HasCachedMGT():            %1").arg(sd->HasCachedMGT()) +
-                QString("\n\t\t\tsd->HasCachedAnyVCTs():        %1").arg(sd->HasCachedAnyVCTs()) +
-                QString("\n\t\t\tsd->HasCachedAllCVCTs():       %1").arg(sd->HasCachedAllCVCTs()) +
-                QString("\n\t\t\tsd->HasCachedAllTVCTs():       %1").arg(sd->HasCachedAllTVCTs()) +
-                QString("\n\t\t\tcurrentInfo->m_pmts.empty():   %1").arg(m_currentInfo->m_pmts.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_nits.empty():   %1").arg(m_currentInfo->m_nits.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_sdts.empty():   %1").arg(m_currentInfo->m_sdts.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_bats.empty():   %1").arg(m_currentInfo->m_bats.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_cvtcs.empty():  %1").arg(m_currentInfo->m_cvcts.empty()) +
-                QString("\n\t\t\tcurrentInfo->m_tvtcs.empty():  %1").arg(m_currentInfo->m_tvcts.empty()));
+                QString("\nTable status after transport tune complete:") +
+                QString("\nsd->HasCachedAnyNIT():         %1").arg(sd->HasCachedAnyNIT()) +
+                QString("\nsd->HasCachedAnySDTs():        %1").arg(sd->HasCachedAnySDTs()) +
+                QString("\nsd->HasCachedAnyBATs():        %1").arg(sd->HasCachedAnyBATs()) +
+                QString("\nsd->HasCachedAllPMTs():        %1").arg(sd->HasCachedAllPMTs()) +
+                QString("\nsd->HasCachedAllNIT():         %1").arg(sd->HasCachedAllNIT()) +
+                QString("\nsd->HasCachedAllSDT(%1):    %2").arg(tsid,5).arg(sd->HasCachedAllSDT(tsid)) +
+                QString("\nsd->HasCachedAllBATs():        %1").arg(sd->HasCachedAllBATs()) +
+                QString("\nsd->HasCachedMGT():            %1").arg(sd->HasCachedMGT()) +
+                QString("\nsd->HasCachedAnyVCTs():        %1").arg(sd->HasCachedAnyVCTs()) +
+                QString("\nsd->HasCachedAllCVCTs():       %1").arg(sd->HasCachedAllCVCTs()) +
+                QString("\nsd->HasCachedAllTVCTs():       %1").arg(sd->HasCachedAllTVCTs()) +
+                QString("\ncurrentInfo->m_pmts.empty():   %1").arg(m_currentInfo->m_pmts.empty()) +
+                QString("\ncurrentInfo->m_nits.empty():   %1").arg(m_currentInfo->m_nits.empty()) +
+                QString("\ncurrentInfo->m_sdts.empty():   %1").arg(m_currentInfo->m_sdts.empty()) +
+                QString("\ncurrentInfo->m_bats.empty():   %1").arg(m_currentInfo->m_bats.empty()) +
+                QString("\ncurrentInfo->m_cvtcs.empty():  %1").arg(m_currentInfo->m_cvcts.empty()) +
+                QString("\ncurrentInfo->m_tvtcs.empty():  %1").arg(m_currentInfo->m_tvcts.empty()));
         }
     }
     if (!wait_until_complete)
@@ -1239,8 +1243,8 @@ static void update_info(ChannelInsertInfo &info,
         DefaultAuthorityDescriptor authority(def_auth);
         if (authority.IsValid())
         {
-            LOG(VB_CHANSCAN, LOG_INFO,
-                QString("ChannelScanSM: Found default authority '%1' in SDT for service %2 %3 %4")
+            LOG(VB_CHANSCAN, LOG_DEBUG,
+                QString("ChannelScanSM: Found default authority '%1' in SDT for service onid %2 tid %3 sid %4")
                     .arg(authority.DefaultAuthority())
                     .arg(info.m_origNetId).arg(info.m_sdtTsId).arg(info.m_serviceId));
             info.m_defaultAuthority = authority.DefaultAuthority();
@@ -1320,7 +1324,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             for (uint i = 0; i < pat->ProgramCount(); ++i)
             {
                 if ((pat->ProgramNumber(i) == 0) &&
-                    (pat->ProgramPID(i) == 0x1ffc))
+                    (pat->ProgramPID(i) == SCTE_PSIP_PID))
                 {
                     could_be_opencable = true;
                 }
@@ -2207,7 +2211,7 @@ bool ChannelScanSM::ScanTransports(
     const QString &table_end)
 {
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-        QString("%1: ").arg(__FUNCTION__) +
+        QString("%1:%2 ").arg(__FUNCTION__).arg(__LINE__) +
         QString("SourceID:%1 ").arg(SourceID) +
         QString("std:%1 ").arg(std) +
         QString("modulation:%1 ").arg(modulation) +
