@@ -104,7 +104,6 @@ class MythMainWindowPrivate
     MythMediaDevice * m_mediaDeviceForCallback { nullptr };
 
     int      m_escapekey                 { 0       };
-    QObject *m_sysEventHandler           { nullptr };
     int      m_drawInterval              { 1000 / MythMainWindow::drawRefresh };
     MythSignalingTimer *m_drawTimer      { nullptr };
     QVector<MythScreenStack *> m_stackList;
@@ -127,7 +126,6 @@ class MythMainWindowPrivate
     bool             m_pendingUpdate     { false   };
     // window aspect
     bool             m_firstinit         { true    };
-    bool             m_bSavedPOS         { false   };
     // Support for long press
     int              m_longPressKeyCode  { 0       };
     ulong            m_longPressTime     { 0       };

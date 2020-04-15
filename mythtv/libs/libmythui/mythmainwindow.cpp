@@ -172,7 +172,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_mediaDeviceForCallback = nullptr;
     d->m_escapekey = Qt::Key_Escape;
     d->m_mainStack = nullptr;
-    d->m_sysEventHandler = nullptr;
 
     installEventFilter(this);
 
