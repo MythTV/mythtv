@@ -212,7 +212,9 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     s_stringLock.lock();
     if (s_fullLine.isEmpty() && ptr) {
         AVClass* avc = *(AVClass**)ptr;
-        s_fullLine.sprintf("[%s @ %p] ", avc->item_name(ptr), avc);
+        s_fullLine = QString("[%1 @ %2] ")
+            .arg(avc->item_name(ptr))
+            .arg(reinterpret_cast<size_t>(avc),QT_POINTER_SIZE,8,QChar('0'));
     }
 
     char str[kMsgLen+1];

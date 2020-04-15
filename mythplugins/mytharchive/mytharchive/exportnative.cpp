@@ -137,12 +137,10 @@ void ExportNative::updateSizeBar()
     m_usedSpace = size / 1024 / 1024;
     uint freeSpace = m_archiveDestination.freeSpace / 1024;
 
-    QString tmpSize;
-
     m_sizeBar->SetTotal(freeSpace);
     m_sizeBar->SetUsed(m_usedSpace);
 
-    tmpSize.sprintf("%0d Mb", freeSpace);
+    QString tmpSize = QString("%1 Mb").arg(freeSpace);
 
     if (m_maxsizeText)
         m_maxsizeText->SetText(tmpSize);
@@ -150,7 +148,7 @@ void ExportNative::updateSizeBar()
     if (m_minsizeText)
         m_minsizeText->SetText("0 Mb");
 
-    tmpSize.sprintf("%0d Mb", m_usedSpace);
+    tmpSize = QString("%1 Mb").arg(m_usedSpace);
 
     if (m_usedSpace > freeSpace)
     {

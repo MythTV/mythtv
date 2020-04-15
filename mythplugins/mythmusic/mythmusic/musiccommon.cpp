@@ -1299,9 +1299,10 @@ void MusicCommon::customEvent(QEvent *event)
                                 static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
 #else
-            info_string.sprintf(qUtf8Printable("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")),
-                                oe->bitrate(), static_cast<double>(oe->frequency()) / 1000.0,
-                                oe->channels() > 1 ? "2" : "1");
+            info_string = QString("%1 "+tr("kbps")+ "   %2 "+ tr("kHz")+ "   %3 "+ tr("ch"))
+                .arg(oe->bitrate())
+                .arg(static_cast<double>(oe->frequency()) / 1000.0,0,'f',1,QChar('0'))
+                .arg(oe->channels() > 1 ? "2" : "1");
 #endif
         }
         else
@@ -1311,9 +1312,9 @@ void MusicCommon::customEvent(QEvent *event)
                                 static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
 #else
-            info_string.sprintf(qUtf8Printable("%.1f "+ tr("kHz")+ "   %s "+ tr("ch")),
-                                static_cast<double>(oe->frequency()) / 1000.0,
-                                oe->channels() > 1 ? "2" : "1");
+            info_string = QString("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"))
+                .arg(static_cast<double>(oe->frequency()) / 1000.0,0,'f',1,QChar('0'))
+                .arg(oe->channels() > 1 ? "2" : "1");
 #endif
         }
 
