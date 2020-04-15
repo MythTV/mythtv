@@ -147,22 +147,6 @@ MythNotificationCenter *GetNotificationCenter(void)
     return mainWin->GetCurrentNotificationCenter();
 }
 
-#ifdef _WIN32
-MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
-                                             MythMainWindowPrivate *priv)
-                   : QWidget(win),
-                     m_parent(win), d(priv)
-{
-    setAutoBufferSwap(false);
-}
-
-void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
-{
-    d->m_repaintRegion = d->m_repaintRegion.united(pe->region());
-    m_parent->drawScreen();
-}
-#endif
-
 MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
 {
@@ -241,9 +225,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_drawTimer->start(d->m_drawInterval);
 
     d->m_allowInput = true;
-
-    d->m_repaintRegion = QRegion(QRect(0,0,0,0));
-
     d->m_drawEnabled = true;
 
     connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
@@ -434,7 +415,7 @@ void MythMainWindow::animate(void)
 
     bool redraw = false;
 
-    if (!d->m_repaintRegion.isEmpty())
+    if (!m_repaintRegion.isEmpty())
         redraw = true;
 
     foreach (auto & widget, d->m_stackList)
@@ -450,14 +431,14 @@ void MythMainWindow::animate(void)
             {
                 QRegion topDirty = screen->GetDirtyArea();
                 screen->ResetNeedsRedraw();
-                d->m_repaintRegion = d->m_repaintRegion.united(topDirty);
+                m_repaintRegion = m_repaintRegion.united(topDirty);
                 redraw = true;
             }
         }
     }
 
     if (redraw && !m_painterWin->RenderIsShared())
-        m_painterWin->update(d->m_repaintRegion);
+        m_painterWin->update(m_repaintRegion);
 
     foreach (auto & widget, d->m_stackList)
         widget->ScheduleInitIfNeeded();
@@ -471,17 +452,17 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
         return;
 
     if (Event)
-        d->m_repaintRegion = d->m_repaintRegion.united(Event->region());
+        m_repaintRegion = m_repaintRegion.united(Event->region());
 
     if (!m_painter->SupportsClipping())
     {
-        d->m_repaintRegion = d->m_repaintRegion.united(d->m_uiScreenRect);
+        m_repaintRegion = m_repaintRegion.united(d->m_uiScreenRect);
     }
     else
     {
         // Ensure that the region is not larger than the screen which
         // can happen with bad themes
-        d->m_repaintRegion = d->m_repaintRegion.intersected(d->m_uiScreenRect);
+        m_repaintRegion = m_repaintRegion.intersected(d->m_uiScreenRect);
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
@@ -500,7 +481,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
                     for (int i = 0; i < wrects.size(); i++)
                     {
                         bool foundThisRect = false;
-                        QVector<QRect> drects = d->m_repaintRegion.rects();
+                        QVector<QRect> drects = m_repaintRegion.rects();
                         for (int j = 0; j < drects.size(); j++)
                         {
                             // Can't use QRegion::contains because it only
@@ -520,7 +501,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
                     for (const QRect& wrect: screen->GetDirtyArea())
                     {
                         bool foundThisRect = false;
-                        for (const QRect& drect: d->m_repaintRegion)
+                        for (const QRect& drect: m_repaintRegion)
                         {
                             // Can't use QRegion::contains because it only
                             // checks for overlap.  QRect::contains checks
@@ -542,53 +523,49 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
     }
 
     if (!m_painterWin->RenderIsShared())
-        draw();
+        Draw();
 
-    d->m_repaintRegion = QRegion(QRect(0, 0, 0, 0));
+    m_repaintRegion = QRegion();
 }
 
-void MythMainWindow::draw(MythPainter *painter /* = 0 */)
+void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
 {
-    if (!painter)
-        painter = m_painter;
-
-    if (!painter)
+    if (!Painter)
+        Painter = m_painter;
+    if (!Painter)
         return;
 
-    painter->Begin(m_painterWin);
+    Painter->Begin(m_painterWin);
 
-    if (!painter->SupportsClipping())
-        d->m_repaintRegion = QRegion(d->m_uiScreenRect);
+    if (!Painter->SupportsClipping())
+        m_repaintRegion = QRegion(d->m_uiScreenRect);
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-    QVector<QRect> rects = d->m_repaintRegion.rects();
+    QVector<QRect> rects = m_repaintRegion.rects();
     for (int i = 0; i < rects.size(); i++)
     {
-        const QRect& r = rects[i];
+        const QRect& rect = rects[i];
 #else
-    for (const QRect& r : d->m_repaintRegion)
+    for (const QRect& rect : m_repaintRegion)
     {
 #endif
-        if (r.width() == 0 || r.height() == 0)
+        if (rect.width() == 0 || rect.height() == 0)
             continue;
 
-        if (r != d->m_uiScreenRect)
-            painter->SetClipRect(r);
+        if (rect != d->m_uiScreenRect)
+            Painter->SetClipRect(rect);
 
         foreach (auto & widget, d->m_stackList)
         {
             QVector<MythScreenType *> redrawList;
             widget->GetDrawOrder(redrawList);
-
             foreach (auto & screen, redrawList)
-            {
-                screen->Draw(painter, 0, 0, 255, r);
-            }
+                screen->Draw(Painter, 0, 0, 255, rect);
         }
     }
 
-    painter->End();
-    d->m_repaintRegion = QRegion();
+    Painter->End();
+    m_repaintRegion = QRegion();
 }
 
 // virtual

@@ -121,7 +121,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
-    void draw(MythPainter *painter = nullptr);
+    void Draw(MythPainter *Painter = nullptr);
 
     void ResetIdleTimer(void);
     void PauseIdleTimer(bool pause);
@@ -175,6 +175,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
   private:
     MythDisplay*       m_display       { nullptr };
+    QRegion            m_repaintRegion;
     MythPainter*       m_painter       { nullptr };
     MythPainter*       m_oldPainter    { nullptr };
     MythPainterWindow* m_painterWin    { nullptr };

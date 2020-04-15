@@ -2,7 +2,6 @@
 #define MYTHMAINWINDOWPRIVATE_H
 
 // Qt
-#include <QRect>
 #include <QKeyEvent>
 
 // MythTV
@@ -110,7 +109,6 @@ class MythMainWindowPrivate
     MythSignalingTimer *m_drawTimer      { nullptr };
     QVector<MythScreenStack *> m_stackList;
     MythScreenStack *m_mainStack         { nullptr };
-    QRegion          m_repaintRegion;
     MythGesture      m_gesture;
     QTimer          *m_gestureTimer      { nullptr };
     QTimer          *m_hideMouseTimer    { nullptr };

@@ -586,12 +586,12 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
             if (twopass)
                 m_render->SetViewPort(first, true);
             win->GetPaintWindow()->clearMask();
-            win->draw(m_openGLPainter);
+            win->Draw(m_openGLPainter);
             if (twopass)
             {
                 m_render->SetViewPort(second, true);
                 win->GetPaintWindow()->clearMask();
-                win->draw(m_openGLPainter);
+                win->Draw(m_openGLPainter);
                 m_render->SetViewPort(main, true);
             }
         }
