@@ -296,8 +296,8 @@ void MHGroup::Activation(MHEngine *engine)
     }
 
     m_fRunning = true;
-    // Record the time here.  This is the basis for absolute times.
-    m_StartTime.start();
+    // Start the timer here.  This is the basis for expiration..
+    m_RunTime.start();
     // Don't generate IsRunning here - that's done by the sub-classes.
 }
 
@@ -363,10 +363,7 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
     }
 
     // If the time has passed we don't set up a timer.
-    QTime currentTime;
-    currentTime.start(); // Set current time
-
-    if (nMilliSecs < 0 || (fAbsolute && m_StartTime.addMSecs(nMilliSecs) < currentTime))
+    if (nMilliSecs < 0 || (fAbsolute && m_RunTime.hasExpired(nMilliSecs)))
     {
         return;
     }
@@ -377,11 +374,12 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
 
     if (fAbsolute)
     {
-        pTimer->m_Time = m_StartTime.addMSecs(nMilliSecs);
+        QTime startTime = QTime::currentTime().addMSecs(-m_RunTime.elapsed());
+        pTimer->m_Time = startTime.addMSecs(nMilliSecs);
     }
     else
     {
-        pTimer->m_Time = currentTime.addMSecs(nMilliSecs);
+        pTimer->m_Time = QTime::currentTime().addMSecs(nMilliSecs);
     }
 }
 

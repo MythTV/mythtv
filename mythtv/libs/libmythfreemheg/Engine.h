@@ -33,9 +33,10 @@
 #include <QString>
 #include <QRect>
 #include <QRegion>
+#include <QElapsedTimer>
 #include <QList>
-#include <QStack>
 #include <QQueue>
+#include <QStack>
 #include <QTime>
 
 class MHDLADisplay;
@@ -63,7 +64,7 @@ class MHExternContent {
   public:
     QString m_FileName;
     MHIngredient *m_pRequester {nullptr}; 
-    QTime m_time;
+    QElapsedTimer m_time;
 };
 
 class MHInteractible;

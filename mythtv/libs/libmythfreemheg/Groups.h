@@ -24,6 +24,7 @@
 #define GROUPCLASS_H
 #include <QString>
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QList>
 
 #include "Root.h"
@@ -72,9 +73,9 @@ class MHGroup : public MHRoot
     friend class MHEngine;
 
     // Timers are an attribute of the scene class in the standard but have been moved
-    // to the group in UK MHEG.  We record the time that the group starts running so
-    // we know how to calculate absolute times.
-    QTime m_StartTime;
+    // to the group in UK MHEG.  We start this timer when that the group starts
+    // running so we know how to calculate expiration times.
+    QElapsedTimer m_RunTime;
     QList<MHTimer*> m_Timers;
     int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
                         // next event or zero if there aren't any.
