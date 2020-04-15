@@ -25,6 +25,7 @@ using MediaPlayCallback = int (*)(const QString &, const QString &, const QStrin
 
 class MythDisplay;
 class MythMainWindowPrivate;
+class MythPainterWindow;
 class MythRender;
 
 class MUI_PUBLIC MythMainWindow : public QWidget
@@ -173,7 +174,11 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void DelayedAction(void);
 
   private:
-    MythDisplay *m_display { nullptr };
+    MythDisplay*       m_display       { nullptr };
+    MythPainter*       m_painter       { nullptr };
+    MythPainter*       m_oldPainter    { nullptr };
+    MythPainterWindow* m_painterWin    { nullptr };
+    MythPainterWindow* m_oldPainterWin { nullptr };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

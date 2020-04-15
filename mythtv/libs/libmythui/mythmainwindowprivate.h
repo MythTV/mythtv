@@ -17,8 +17,6 @@
 #include "AppleRemoteListener.h"
 #endif
 
-class MythPainter;
-class MythPainterWindow;
 class MythScreenStack;
 class MythSignalingTimer;
 class MythThemeBase;
@@ -112,14 +110,10 @@ class MythMainWindowPrivate
     MythSignalingTimer *m_drawTimer      { nullptr };
     QVector<MythScreenStack *> m_stackList;
     MythScreenStack *m_mainStack         { nullptr };
-    MythPainter     *m_painter           { nullptr };
     QRegion          m_repaintRegion;
     MythGesture      m_gesture;
     QTimer          *m_gestureTimer      { nullptr };
     QTimer          *m_hideMouseTimer    { nullptr };
-    MythPainterWindow *m_paintwin        { nullptr };
-    QWidget         *m_oldpaintwin       { nullptr };
-    MythPainter     *m_oldpainter        { nullptr };
     QMutex           m_drawDisableLock;
     uint             m_drawDisabledDepth { 0       };
     bool             m_drawEnabled       { true    };

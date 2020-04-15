@@ -176,10 +176,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     // This prevents database errors from RegisterKey() when there is no DB:
     d->m_useDB = useDB;
-    d->m_painter = nullptr;
-    d->m_paintwin = nullptr;
-    d->m_oldpainter = nullptr;
-    d->m_oldpaintwin = nullptr;
 
     //Init();
 
@@ -338,8 +334,8 @@ MythMainWindow::~MythMainWindow()
 
     delete d->m_nc;
 
-    delete d->m_painter;
-    delete d->m_paintwin;
+    delete m_painter;
+    delete m_painterWin;
 
     MythDisplay::AcquireRelease(false);
 
@@ -348,7 +344,7 @@ MythMainWindow::~MythMainWindow()
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)
 {
-    return d->m_painter;
+    return m_painter;
 }
 
 MythNotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
@@ -358,31 +354,31 @@ MythNotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
 
 QWidget *MythMainWindow::GetPaintWindow(void)
 {
-    return d->m_paintwin;
+    return m_painterWin;
 }
 
 void MythMainWindow::ShowPainterWindow(void)
 {
-    if (d->m_paintwin)
+    if (m_painterWin)
     {
-        d->m_paintwin->show();
-        d->m_paintwin->raise();
+        m_painterWin->show();
+        m_painterWin->raise();
     }
 }
 
 void MythMainWindow::HidePainterWindow(void)
 {
-    if (d->m_paintwin)
+    if (m_painterWin)
     {
-        d->m_paintwin->clearMask();
-        if (!d->m_paintwin->RenderIsShared())
-            d->m_paintwin->hide();
+        m_painterWin->clearMask();
+        if (!m_painterWin->RenderIsShared())
+            m_painterWin->hide();
     }
 }
 
 MythRender *MythMainWindow::GetRenderDevice()
 {
-    return d->m_paintwin->GetRenderDevice();
+    return m_painterWin->GetRenderDevice();
 }
 
 void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
@@ -431,7 +427,7 @@ MythScreenStack* MythMainWindow::GetStackAt(int pos)
 
 void MythMainWindow::animate(void)
 {
-    if (!d->m_drawEnabled || !d->m_paintwin)
+    if (!d->m_drawEnabled || !m_painterWin)
         return;
 
     d->m_drawTimer->blockSignals(true);
@@ -460,8 +456,8 @@ void MythMainWindow::animate(void)
         }
     }
 
-    if (redraw && !d->m_paintwin->RenderIsShared())
-        d->m_paintwin->update(d->m_repaintRegion);
+    if (redraw && !m_painterWin->RenderIsShared())
+        m_painterWin->update(d->m_repaintRegion);
 
     foreach (auto & widget, d->m_stackList)
         widget->ScheduleInitIfNeeded();
@@ -477,7 +473,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
     if (Event)
         d->m_repaintRegion = d->m_repaintRegion.united(Event->region());
 
-    if (!d->m_painter->SupportsClipping())
+    if (!m_painter->SupportsClipping())
     {
         d->m_repaintRegion = d->m_repaintRegion.united(d->m_uiScreenRect);
     }
@@ -545,7 +541,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
         }
     }
 
-    if (!d->m_paintwin->RenderIsShared())
+    if (!m_painterWin->RenderIsShared())
         draw();
 
     d->m_repaintRegion = QRegion(QRect(0, 0, 0, 0));
@@ -554,12 +550,12 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
 void MythMainWindow::draw(MythPainter *painter /* = 0 */)
 {
     if (!painter)
-        painter = d->m_painter;
+        painter = m_painter;
 
     if (!painter)
         return;
 
-    painter->Begin(d->m_paintwin);
+    painter->Begin(m_painterWin);
 
     if (!painter->SupportsClipping())
         d->m_repaintRegion = QRegion(d->m_uiScreenRect);
@@ -825,30 +821,30 @@ void MythMainWindow::Init(bool mayReInit)
 
     move(d->m_screenRect.topLeft());
 
-    if (d->m_paintwin)
+    if (m_painterWin)
     {
-        d->m_oldpaintwin = d->m_paintwin;
-        d->m_paintwin = nullptr;
+        m_oldPainterWin = m_painterWin;
+        m_painterWin = nullptr;
         d->m_drawTimer->stop();
     }
 
-    if (d->m_painter)
+    if (m_painter)
     {
-        d->m_oldpainter = d->m_painter;
-        d->m_painter = nullptr;
+        m_oldPainter = m_painter;
+        m_painter = nullptr;
     }
 
     QString warningmsg;
-    if (!d->m_painter && !d->m_paintwin)
-        warningmsg = MythPainterWindow::CreatePainters(this, d->m_paintwin, d->m_painter);
+    if (!m_painter && !m_painterWin)
+        warningmsg = MythPainterWindow::CreatePainters(this, m_painterWin, m_painter);
 
-    if (!d->m_paintwin)
+    if (!m_painterWin)
     {
         LOG(VB_GENERAL, LOG_ERR, "MythMainWindow failed to create a painter window.");
         return;
     }
 
-    if (d->m_painter && d->m_painter->GetName() != "Qt")
+    if (m_painter && m_painter->GetName() != "Qt")
     {
         setAttribute(Qt::WA_NoSystemBackground);
         setAutoFillBackground(false);
@@ -870,7 +866,7 @@ void MythMainWindow::Init(bool mayReInit)
         QCoreApplication::processEvents();
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
-        d->m_paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
+        m_painterWin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
     GetMythUI()->UpdateImageCache();
     if (d->m_themeBase)
@@ -1076,10 +1072,10 @@ void MythMainWindow::ReloadKeys()
 
 void MythMainWindow::ReinitDone(void)
 {
-    delete d->m_oldpainter;
-    d->m_oldpainter = nullptr;
-    delete d->m_oldpaintwin;
-    d->m_oldpaintwin = nullptr;
+    delete m_oldPainter;
+    m_oldPainter = nullptr;
+    delete m_oldPainterWin;
+    m_oldPainterWin = nullptr;
 
 
     ShowPainterWindow();
@@ -1104,10 +1100,10 @@ void MythMainWindow::MoveResize(QRect &Geometry)
     setFixedSize(Geometry.size());
     setGeometry(Geometry);
 
-    if (d->m_paintwin)
+    if (m_painterWin)
     {
-        d->m_paintwin->setFixedSize(Geometry.size());
-        d->m_paintwin->setGeometry(0, 0, Geometry.width(), Geometry.height());
+        m_painterWin->setFixedSize(Geometry.size());
+        m_painterWin->setGeometry(0, 0, Geometry.width(), Geometry.height());
     }
 }
 
