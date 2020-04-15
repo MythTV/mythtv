@@ -96,14 +96,12 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id, polarity);
 
-    LOG(VB_CHANSCAN, LOG_INFO, QString(
-                "insert_dtv_multiplex(db_source_id:%1, sistandard:'%2', "
-                "frequency:%3, modulation:%4, transport_id:%5, "
-                "network_id:%6, polarity:%7 ...) mplexid:%8")
-            .arg(db_source_id).arg(sistandard)
-            .arg(frequency).arg(modulation)
-            .arg(transport_id).arg(network_id)
-            .arg(QChar(polarity)).arg(mplex));
+    LOG(VB_CHANSCAN, LOG_INFO, "insert_dtv_multiplex(" +
+        QString("dbid:%1 std:'%2' ").arg(db_source_id).arg(sistandard) +
+        QString("freq:%1 mod:%2 ").arg(frequency).arg(modulation) +
+        QString("tid:%1 nid:%2 ").arg(transport_id).arg(network_id) +
+        QString("pol:%1 mod_sys:%2 ...)").arg(QChar(polarity)).arg(mod_sys) +
+        QString("mplexid:%1").arg(mplex));
 
     bool isDVB = (sistandard.toLower() == "dvb");
 
@@ -207,14 +205,14 @@ static uint insert_dtv_multiplex(
         if (isDVB)
         {
             query.bindValue(":TRANSPORTID",   transport_id);
-            query.bindValue(":NETWORKID",    network_id);
+            query.bindValue(":NETWORKID",     network_id);
             query.bindValue(":WHEREPOLARITY", QString(polarity));
         }
         else
         {
             query.bindValue(":FREQUENCY2",    QString::number(frequency));
             if (transport_id)
-                query.bindValue(":TRANSPORTID", transport_id);
+                query.bindValue(":TRANSPORTID",   transport_id);
         }
     }
     else
@@ -222,7 +220,7 @@ static uint insert_dtv_multiplex(
         if (transport_id || isDVB)
             query.bindValue(":TRANSPORTID",   transport_id);
         if (isDVB)
-            query.bindValue(":NETWORKID",    network_id);
+            query.bindValue(":NETWORKID",     network_id);
     }
 
     if (!modulation.isNull())
@@ -271,7 +269,7 @@ static uint insert_dtv_multiplex(
         transport_id,  network_id, polarity);
 
     LOG(VB_CHANSCAN, LOG_INFO, QString("insert_dtv_multiplex -- ") +
-            QString("inserted %1").arg(mplex));
+            QString("inserted mplexid %1").arg(mplex));
 
     return mplex;
 }
