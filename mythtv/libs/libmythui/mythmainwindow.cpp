@@ -166,6 +166,8 @@ void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
 MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
 {
+    m_display = MythDisplay::AcquireRelease();
+
     d = new MythMainWindowPrivate;
 
     setObjectName("mainwindow");
@@ -735,7 +737,7 @@ bool MythMainWindow::event(QEvent *e)
 
 void MythMainWindow::Init(bool mayReInit)
 {
-    d->m_display->SetWidget(nullptr);
+    m_display->SetWidget(nullptr);
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
     if (!(mayReInit || d->m_firstinit))
@@ -799,7 +801,7 @@ void MythMainWindow::Init(bool mayReInit)
     setWindowFlags(flags);
 
     // SetWidget may move the widget into a new screen.
-    d->m_display->SetWidget(this);
+    m_display->SetWidget(this);
     // Ensure MythUIHelper has latest screen bounds if we have moved
     GetMythUI()->UpdateScreenSettings();
     // And use them
@@ -814,7 +816,7 @@ void MythMainWindow::Init(bool mayReInit)
     Show();
     // The window is sometimes not created until Show has been called - so try
     // MythDisplay::setWidget again to ensure we listen for QScreen changes
-    d->m_display->SetWidget(this);
+    m_display->SetWidget(this);
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         setMouseTracking(true); // Required for mouse cursor auto-hide

@@ -1,8 +1,10 @@
 #ifndef MYTHMAINWINDOW_H_
 #define MYTHMAINWINDOW_H_
 
+// Qt
 #include <QWidget>
 
+// MythTV
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
@@ -21,6 +23,7 @@ class MythMediaDevice;
 
 using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
+class MythDisplay;
 class MythMainWindowPrivate;
 class MythRender;
 
@@ -168,6 +171,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
   private slots:
     void DelayedAction(void);
+
+  private:
+    MythDisplay *m_display { nullptr };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

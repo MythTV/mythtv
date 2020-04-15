@@ -7,7 +7,6 @@
 
 // MythTV
 #include "mythconfig.h"
-#include "mythdisplay.h"
 #include "mythmainwindow.h"
 #include "mythgesture.h"
 
@@ -113,7 +112,6 @@ class MythMainWindowPrivate
     MythSignalingTimer *m_drawTimer      { nullptr };
     QVector<MythScreenStack *> m_stackList;
     MythScreenStack *m_mainStack         { nullptr };
-    MythDisplay     *m_display           { MythDisplay::AcquireRelease() };
     MythPainter     *m_painter           { nullptr };
     QRegion          m_repaintRegion;
     MythGesture      m_gesture;
