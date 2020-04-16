@@ -17,7 +17,6 @@ class MythScreenStack;
 class MythSignalingTimer;
 class MythThemeBase;
 class MythUDPListener;
-class JoystickMenuThread;
 class LIRC;
 class MythMediaDevice;
 
@@ -71,11 +70,7 @@ class MythMainWindowPrivate
     QRect                m_uiScreenRect;
     bool                 m_doesFillScreen       { false   };
     bool                 m_ignoreLircKeys       { false   };
-    bool                 m_ignoreJoystickKeys   { false   };
     LIRC                *m_lircThread           { nullptr };
-#ifdef USE_JOYSTICK_MENU
-    JoystickMenuThread  *m_joystickThread       { nullptr };
-#endif
 #ifdef USING_APPLEREMOTE
     AppleRemoteListener *m_appleRemoteListener  { nullptr };
     AppleRemote         *m_appleRemote          { nullptr };

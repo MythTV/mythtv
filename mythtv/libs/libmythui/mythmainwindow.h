@@ -64,6 +64,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void RegisterKey(const QString &context, const QString &action,
                      const QString &description, const QString &key);
     static QString GetKey(const QString &context, const QString &action);
+    QObject *getTarget(QKeyEvent &key);
     QString GetActionText(const QString &context, const QString &action) const;
 
     void ClearJump(const QString &destination);
@@ -163,8 +164,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     bool event(QEvent* e) override; // QWidget
 
     void ExitToMainMenu();
-
-    QObject *getTarget(QKeyEvent &key);
 
     void LockInputDevices(bool locked);
 

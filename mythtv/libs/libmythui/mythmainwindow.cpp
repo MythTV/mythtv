@@ -54,15 +54,6 @@ using namespace std;
 #include "AppleRemoteListener.h"
 #endif
 
-#ifdef USE_JOYSTICK_MENU
-#include "jsmenu.h"
-#include "jsmenuevent.h"
-#endif
-
-#ifdef USING_LIBCEC
-#include "devices/mythcecadapter.h"
-#endif
-
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #include "mythpainterwindow.h"
@@ -165,7 +156,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     //Init();
 
     d->m_ignoreLircKeys = false;
-    d->m_ignoreJoystickKeys = false;
     d->m_exitingtomain = false;
     d->m_popwindows = true;
     d->m_exitMenuCallback = nullptr;
@@ -178,17 +168,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     d->m_lircThread = nullptr;
     StartLIRC();
-
-#ifdef USE_JOYSTICK_MENU
-    d->m_ignoreJoystickKeys = false;
-
-    QString joy_config_file = GetConfDir() + "/joystickmenurc";
-
-    d->m_joystickThread = nullptr;
-    d->m_joystickThread = new JoystickMenuThread(this);
-    if (d->m_joystickThread->Init(joy_config_file))
-        d->m_joystickThread->start();
-#endif
 
 #ifdef USING_APPLEREMOTE
     d->m_appleRemoteListener = new AppleRemoteListener(this);
@@ -287,20 +266,6 @@ MythMainWindow::~MythMainWindow()
     {
         d->m_lircThread->deleteLater();
         d->m_lircThread = nullptr;
-    }
-#endif
-
-#ifdef USE_JOYSTICK_MENU
-    if (d->m_joystickThread)
-    {
-        if (d->m_joystickThread->isRunning())
-        {
-            d->m_joystickThread->Stop();
-            d->m_joystickThread->wait();
-        }
-
-        delete d->m_joystickThread;
-        d->m_joystickThread = nullptr;
     }
 #endif
 
@@ -2096,43 +2061,6 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
     }
 #endif
-#ifdef USE_JOYSTICK_MENU
-    else if (ce->type() == JoystickKeycodeEvent::kEventType &&
-             !d->m_ignoreJoystickKeys)
-    {
-        auto *jke = dynamic_cast<JoystickKeycodeEvent *>(ce);
-        if (jke == nullptr)
-            return;
-
-        int keycode = jke->getKeycode();
-        if (keycode)
-        {
-            MythUIHelper::ResetScreensaver();
-            if (GetMythUI()->GetScreenIsAsleep())
-                return;
-
-            auto mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
-            int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
-            QString text;
-
-            QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
-                          QEvent::KeyRelease, k, mod, text);
-
-            QObject *key_target = getTarget(key);
-            if (!key_target)
-                QCoreApplication::sendEvent(this, &key);
-            else
-                QCoreApplication::sendEvent(key_target, &key);
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING,
-                    QString("attempt to convert '%1' to a key sequence failed. "
-                            "Fix your key mappings.")
-                    .arg(jke->getJoystickMenuText()));
-        }
-    }
-#endif
     else if (ce->type() == MythMediaEvent::kEventType)
     {
         auto *me = dynamic_cast<MythMediaEvent*>(ce);
@@ -2489,10 +2417,6 @@ void MythMainWindow::LockInputDevices( bool locked )
 {
 #ifdef USE_LIRC
     d->m_ignoreLircKeys = locked;
-#endif
-
-#ifdef USE_JOYSTICK_MENU
-    d->m_ignoreJoystickKeys = locked;
 #endif
 
     m_deviceHandler.IgnoreKeys(locked);

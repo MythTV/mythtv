@@ -9,12 +9,15 @@
 #include "devices/mythcecadapter.h"
 #endif
 
+class MythMainWindow;
+class JoystickMenuThread;
+
 class MythInputDeviceHandler : public QObject
 {
     Q_OBJECT
 
   public:
-    explicit MythInputDeviceHandler(QWidget* Parent);
+    explicit MythInputDeviceHandler(MythMainWindow* Parent);
    ~MythInputDeviceHandler() override;
 
     void Start           (void);
@@ -30,10 +33,13 @@ class MythInputDeviceHandler : public QObject
   private:
     Q_DISABLE_COPY(MythInputDeviceHandler)
 
-    QWidget*       m_parent     { nullptr };
-    bool           m_ignoreKeys { false   };
+    MythMainWindow* m_parent     { nullptr };
+    bool            m_ignoreKeys { false   };
 #ifdef USING_LIBCEC
-    MythCECAdapter m_cecAdapter { };
+    MythCECAdapter  m_cecAdapter { };
+#endif
+#ifdef USE_JOYSTICK_MENU
+    JoystickMenuThread  *m_joystickThread { nullptr };
 #endif
 };
 
