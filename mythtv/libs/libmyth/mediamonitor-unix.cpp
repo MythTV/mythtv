@@ -71,7 +71,7 @@ extern "C" {
 #ifndef MNTTYPE_SUPERMOUNT
 #define MNTTYPE_SUPERMOUNT "supermount"
 #endif
-#define SUPER_OPT_DEV "dev="
+static const std::string kSuperOptDev { "dev=" };
 
 #if CONFIG_QTDBUS
 // DBus UDisk service - http://hal.freedesktop.org/docs/udisks/
@@ -173,14 +173,14 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
 
 #if CONFIG_QTDBUS
 // Get a device property by name
-static QVariant DeviceProperty(const QDBusObjectPath& o, const char kszProperty[])
+static QVariant DeviceProperty(const QDBusObjectPath& o, const std::string& kszProperty)
 {
     QVariant v;
 
     QDBusInterface iface(UDISKS_SVC, o.path(), UDISKS_IFACE".Device",
         QDBusConnection::systemBus() );
     if (iface.isValid())
-        v = iface.property(kszProperty);
+        v = iface.property(kszProperty.c_str());
 
     return v;
 }
@@ -684,27 +684,21 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     }
     else
     {
-        char *dev = nullptr;
-        int len = 0;
-        dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
-        if (dev == nullptr)
+        QString dev(mep->fs_mntops);
+        int pos = dev.indexOf(QString::fromStdString(kSuperOptDev));
+        if (pos == -1)
             return false;
-
-        dev += sizeof(SUPER_OPT_DEV)-1;
-        while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
-            len++;
-
-        if (dev[len] != 0)
-        {
-            char devstr[256];
-            strncpy(devstr, dev, len);
-            devstr[len] = 0;
-            if (is_cdrom)
-                pDevice = MythCDROM::get(this, devstr,
-                                         is_supermount, m_allowEject);
-        }
-        else
+        dev = dev.mid(pos+kSuperOptDev.size());
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList parts = dev.split(QRegularExpression("[, ]"),
+                                      QString::SkipEmptyParts);
+#else
+        QStringList parts = dev.split(QRegularExpression("[, ]"),
+                                      Qt::SkipEmptyParts);
+#endif
+        if (parts[0].isEmpty())
             return false;
+        pDevice = MythCDROM::get(this, qPrintable(dev), is_supermount, m_allowEject);
     }
 
     if (pDevice)

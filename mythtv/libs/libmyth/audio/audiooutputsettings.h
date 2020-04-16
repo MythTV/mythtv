@@ -43,11 +43,8 @@ enum DigitalFeature {
     FEATURE_AAC    = 1 << 6,
 };
 
-static const int srs[] = { 5512, 8000,  11025, 16000, 22050, 32000,  44100,
-                           48000, 88200, 96000, 176400, 192000 };
-
-static const AudioFormat fmts[] = { FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB,
-                                    FORMAT_S24, FORMAT_S32, FORMAT_FLT };
+using rate_array = std::array<const int,12>;
+using format_array = std::array<const AudioFormat,6>;
 
 class MPUBLIC AudioOutputSettings
 {
@@ -208,10 +205,14 @@ class MPUBLIC AudioOutputSettings
         bool         m_hasEld      {false};
         ELD          m_eld;
 
-        std::vector<int> m_sr, m_rates, m_channels;
-        std::vector<AudioFormat> m_sf, m_formats;
-        std::vector<int>::iterator m_srIt;
-        std::vector<AudioFormat>::iterator m_sfIt;
+        std::vector<int>          m_rates;
+        std::vector<int>          m_channels;
+        std::vector<AudioFormat>  m_formats;
+        rate_array::iterator      m_srIt { };
+        format_array::iterator    m_sfIt { };
+
+        static const rate_array   kStdRates;
+        static const format_array kStdFormats;
 };
 
 #endif // AUDIO_OUTPUT_SETTINGS_H

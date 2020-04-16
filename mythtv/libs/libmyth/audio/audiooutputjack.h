@@ -13,6 +13,9 @@
 #define JACK_CHANNELS_MIN 2
 #define JACK_CHANNELS_MAX 8
 
+using jack_port_array = std::array<jack_port_t*,JACK_CHANNELS_MAX>;
+using jack_vol_array  = std::array<int,JACK_CHANNELS_MAX>;
+
 class AudioOutputJACK : public AudioOutputBase
 {
     Q_DECLARE_TR_FUNCTIONS(AudioOutputJACK);
@@ -56,10 +59,10 @@ class AudioOutputJACK : public AudioOutputBase
     inline void JackClientClose(jack_client_t **client);
 
     void DeinterleaveAudio(const float *aubuf, float **bufs,
-                           int nframes, const int* channel_volumes);
+                           int nframes, const jack_vol_array& channel_volumes);
 
-    jack_port_t   *m_ports[JACK_CHANNELS_MAX]       {};
-    int            m_chanVolumes[JACK_CHANNELS_MAX] {};
+    jack_port_array m_ports       {};
+    jack_vol_array m_chanVolumes  {};
     jack_client_t *m_client       {nullptr};
     jack_client_t *m_staleClient  {nullptr};
     int            m_jackLatency  {0};

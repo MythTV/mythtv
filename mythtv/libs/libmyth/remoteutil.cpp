@@ -36,7 +36,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
     return info;
 }
 
-bool RemoteGetLoad(double load[3])
+bool RemoteGetLoad(system_load_array& load)
 {
     QStringList strlist(QString("QUERY_LOAD"));
 

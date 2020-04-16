@@ -65,7 +65,8 @@ class AudioReencodeBuffer : public AudioOutput
 
     //  These are pure virtual in AudioOutput, but we don't need them here
     void      bufferOutputData(bool /*y*/) override       { } // AudioOutput
-    int       readOutputData(unsigned char */*read_buffer*/, int /*max_length*/) override { return 0; } // AudioOutput
+    int       readOutputData(unsigned char */*read_buffer*/,
+                             size_t /*max_length*/) override { return 0; } // AudioOutput
 
     int                  m_channels        {-1};
     int                  m_bytes_per_frame {-1};

@@ -5,6 +5,7 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
+#include <array>
 #include <algorithm>
 #include <vector>
 
@@ -21,22 +22,27 @@ extern "C" {
 
 #define LOC QString("AOS: ")
 
+const rate_array AudioOutputSettings::kStdRates
+{
+    5512, 8000,  11025, 16000, 22050, 32000,  44100,
+    48000, 88200, 96000, 176400, 192000
+};
+
+const format_array AudioOutputSettings::kStdFormats
+{
+    FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB, FORMAT_S24, FORMAT_S32, FORMAT_FLT
+};
+
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
     m_invalid(invalid)
 {
-    m_sr.assign(srs,  srs  +
-                sizeof(srs)  / sizeof(int));
-    m_sf.assign(fmts, fmts +
-                sizeof(fmts) / sizeof(AudioFormat));
-    m_srIt = m_sr.begin();
-    m_sfIt = m_sf.begin();
+    m_srIt = kStdRates.begin();
+    m_sfIt = kStdFormats.begin();
 }
 
 AudioOutputSettings::~AudioOutputSettings()
 {
-    m_sr.clear();
     m_rates.clear();
-    m_sf.clear();
     m_formats.clear();
     m_channels.clear();
 }
@@ -46,9 +52,7 @@ AudioOutputSettings& AudioOutputSettings::operator=(
 {
     if (this == &rhs)
         return *this;
-    m_sr            = rhs.m_sr;
     m_rates         = rhs.m_rates;
-    m_sf            = rhs.m_sf;
     m_formats       = rhs.m_formats;
     m_channels      = rhs.m_channels;
     m_passthrough   = rhs.m_passthrough;
@@ -56,16 +60,16 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_invalid       = rhs.m_invalid;
     m_hasEld        = rhs.m_hasEld;
     m_eld           = rhs.m_eld;
-    m_srIt          = m_sr.begin() + (rhs.m_srIt - rhs.m_sr.begin());
-    m_sfIt          = m_sf.begin() + (rhs.m_sfIt - rhs.m_sf.begin());
+    m_srIt          = kStdRates.begin() + (rhs.m_srIt - kStdRates.begin());
+    m_sfIt          = kStdFormats.begin() + (rhs.m_sfIt - kStdFormats.begin());
     return *this;
 }
 
 int AudioOutputSettings::GetNextRate()
 {
-    if (m_srIt == m_sr.end())
+    if (m_srIt == kStdRates.end())
     {
-        m_srIt = m_sr.begin();
+        m_srIt = kStdRates.begin();
         return 0;
     }
 
@@ -84,13 +88,8 @@ bool AudioOutputSettings::IsSupportedRate(int rate)
     if (m_rates.empty() && rate == 48000)
         return true;
 
-    vector<int>::iterator it;
-
-    for (it = m_rates.begin(); it != m_rates.end(); ++it)
-        if (*it == rate)
-            return true;
-
-    return false;
+    auto result = std::find(m_rates.cbegin(), m_rates.cend(), rate);
+    return result != m_rates.end();
 }
 
 int AudioOutputSettings::BestSupportedRate()
@@ -105,23 +104,22 @@ int AudioOutputSettings::NearestSupportedRate(int rate)
     if (m_rates.empty())
         return 48000;
 
-    vector<int>::iterator it;
-
     // Assume rates vector is sorted
-    for (it = m_rates.begin(); it != m_rates.end(); ++it)
+    for (const auto entry : m_rates)
     {
-        if (*it >= rate)
-            return *it;
+        if (entry >= rate)
+            return entry;
     }
+
     // Not found, so return highest available rate
     return m_rates.back();
 }
 
 AudioFormat AudioOutputSettings::GetNextFormat()
 {
-    if (m_sfIt == m_sf.end())
+    if (m_sfIt == kStdFormats.end())
     {
-        m_sfIt = m_sf.begin();
+        m_sfIt = kStdFormats.begin();
         return FORMAT_NONE;
     }
 
@@ -140,13 +138,8 @@ bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
     if (m_formats.empty() && format == FORMAT_S16)
         return true;
 
-    vector<AudioFormat>::iterator it;
-
-    for (it = m_formats.begin(); it != m_formats.end(); ++it)
-        if (*it == format)
-            return true;
-
-    return false;
+    auto result = std::find(m_formats.cbegin(), m_formats.cend(), format);
+    return result != m_formats.end();
 }
 
 AudioFormat AudioOutputSettings::BestSupportedFormat()
@@ -255,10 +248,8 @@ bool AudioOutputSettings::IsSupportedChannels(int channels)
     if (m_channels.empty() && channels == 2)
         return true;
 
-    vector<int>::iterator it;
-
-    for (it = m_channels.begin(); it != m_channels.end(); ++it)
-        if (*it == channels)
+    for (const auto entry : m_channels)
+        if (entry == channels)
             return true;
 
     return false;
@@ -442,38 +433,30 @@ int AudioOutputSettings::GetMaxHDRate() const
     return 768000;      // TrueHD or DTS-HD MA: 192k, 16 bits, 8 ch
 }
 
-#define ARG(x) ((tmp.isEmpty() ? "" : ",") + QString(x))
+struct featureStruct
+{
+    const DigitalFeature flag;
+    const std::string name;
+};
+static const std::array<featureStruct,7> feature {{
+    { FEATURE_AC3,    "AC3"},
+    { FEATURE_DTS,    "DTS"},
+    { FEATURE_LPCM,   "LPCM"},
+    { FEATURE_EAC3,   "EAC3"},
+    { FEATURE_TRUEHD, "TRUEHD"},
+    { FEATURE_DTSHD,  "DTSHD"},
+    { FEATURE_AAC,    "AAC"},
+}};
 
 QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
 {
-    QString tmp;
-    DigitalFeature feature[] = {
-        FEATURE_AC3,
-        FEATURE_DTS,
-        FEATURE_LPCM,
-        FEATURE_EAC3,
-        FEATURE_TRUEHD,
-        FEATURE_DTSHD,
-        FEATURE_AAC,
-        (DigitalFeature)-1
-    };
-    const char *feature_str[] = {
-        "AC3",
-        "DTS",
-        "LPCM",
-        "EAC3",
-        "TRUEHD",
-        "DTSHD",
-        "AAC",
-        nullptr
-    };
-
-    for (unsigned int i = 0; feature[i] != (DigitalFeature)-1; i++)
+    QStringList tmp;
+    for (const auto & [flag, name] : feature)
     {
-        if (arg & feature[i])
-            tmp += ARG(feature_str[i]);
+        if (arg & flag)
+            tmp += QString::fromStdString(name);
     }
-    return tmp;
+    return tmp.join(",");
 }
 
 QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,

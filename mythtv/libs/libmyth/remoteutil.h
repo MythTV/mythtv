@@ -14,8 +14,10 @@ using std::vector;
 class ProgramInfo;
 class MythEvent;
 
+using system_load_array = std::array<double,3>;
+
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
-MPUBLIC bool RemoteGetLoad(double load[3]);
+MPUBLIC bool RemoteGetLoad(system_load_array &load);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);

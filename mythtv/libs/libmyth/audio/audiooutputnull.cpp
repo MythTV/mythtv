@@ -82,32 +82,32 @@ void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
 {
     if (m_bufferOutputDataForUse)
     {
-        if (size + m_currentBufferSize > NULLAUDIO_OUTPUT_BUFFER_SIZE)
+        if (size + m_pcmOutputBuffer.size() > NULLAUDIO_OUTPUT_BUFFER_SIZE)
         {
             LOG(VB_GENERAL, LOG_ERR, "null audio output should not have just "
                                      "had data written to it");
             return;
         }
         m_pcmOutputBufferMutex.lock();
-        memcpy(m_pcmOutputBuffer + m_currentBufferSize, aubuf, size);
-        m_currentBufferSize += size;
+        m_pcmOutputBuffer.insert(m_pcmOutputBuffer.end(), aubuf, aubuf+size);
         m_pcmOutputBufferMutex.unlock();
     }
 }
 
-int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
+int AudioOutputNULL::readOutputData(unsigned char *read_buffer, size_t max_length)
 {
-    int amount_to_read = max_length;
-    if (amount_to_read > m_currentBufferSize)
+    size_t amount_to_read = max_length;
+    if (amount_to_read > m_pcmOutputBuffer.size())
     {
-        amount_to_read = m_currentBufferSize;
+        amount_to_read = m_pcmOutputBuffer.size();
     }
 
     m_pcmOutputBufferMutex.lock();
-    memcpy(read_buffer, m_pcmOutputBuffer, amount_to_read);
-    memmove(m_pcmOutputBuffer, m_pcmOutputBuffer + amount_to_read,
-            m_currentBufferSize - amount_to_read);
-    m_currentBufferSize -= amount_to_read;
+    std::copy(m_pcmOutputBuffer.cbegin(),
+              m_pcmOutputBuffer.cbegin() + amount_to_read,
+              read_buffer);
+    m_pcmOutputBuffer.erase(m_pcmOutputBuffer.cbegin(),
+              m_pcmOutputBuffer.cbegin() + amount_to_read);
     m_pcmOutputBufferMutex.unlock();
 
     return amount_to_read;
@@ -118,7 +118,7 @@ void AudioOutputNULL::Reset()
     if (m_bufferOutputDataForUse)
     {
         m_pcmOutputBufferMutex.lock();
-        m_currentBufferSize = 0;
+        m_pcmOutputBuffer.clear();
         m_pcmOutputBufferMutex.unlock();
     }
     AudioOutputBase::Reset();
@@ -127,9 +127,7 @@ void AudioOutputNULL::Reset()
 int AudioOutputNULL::GetBufferedOnSoundcard(void) const
 {
     if (m_bufferOutputDataForUse)
-    {
-        return m_currentBufferSize;
-    }
+        return m_pcmOutputBuffer.size();
 
     return 0;
 }

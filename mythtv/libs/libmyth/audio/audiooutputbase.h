@@ -115,7 +115,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     //  Only really used by the AudioOutputNULL object
     void bufferOutputData(bool y) override // AudioOutput
         { m_bufferOutputDataForUse = y; }
-    int readOutputData(unsigned char *read_buffer, int max_length) override; // AudioOutput
+    int readOutputData(unsigned char *read_buffer, size_t max_length) override; // AudioOutput
 
     static const uint kAudioSRCInputSize = 16384;
 
@@ -290,7 +290,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     /**
      * main audio buffer
      */
-    uchar             m_audioBuffer[kAudioRingBufferSize] {0};
+    std::array<uchar,kAudioRingBufferSize> m_audioBuffer  {0};
     uint              m_memoryCorruptionTest3             {0xdeadbeef};;
     bool              m_configureSucceeded                {false};
     int64_t           m_lengthLastData                    {0};

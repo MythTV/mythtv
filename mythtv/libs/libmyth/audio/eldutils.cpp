@@ -274,20 +274,15 @@ int ELD::update_eld(const char *buf, int size)
     m_e.manufacture_id  = LE_SHORT(buf + 16);
     m_e.product_id      = LE_SHORT(buf + 18);
 
-    if (mnl > ELD_MAX_MNL)
-    {
-        VBAUDIO(QString("MNL is reserved value %1").arg(mnl));
-        goto out_fail;
-    }
-    else if (ELD_FIXED_BYTES + mnl > size)
+    if (ELD_FIXED_BYTES + mnl > size)
     {
         VBAUDIO(QString("out of range MNL %1").arg(mnl));
         goto out_fail;
     }
     else
     {
-        strncpy(m_e.monitor_name, (char *)buf + ELD_FIXED_BYTES, mnl + 1);
-        m_e.monitor_name[mnl] = '\0';
+        std::string tmp(buf + ELD_FIXED_BYTES, mnl);
+        m_e.monitor_name = QString::fromStdString(tmp);
     }
 
     for (int i = 0; i < m_e.sad_count; i++)
@@ -457,9 +452,9 @@ void ELD::show()
     }
 }
 
-QString ELD::product_name()
+QString ELD::product_name() const
 {
-    return QString(m_e.monitor_name);
+    return m_e.monitor_name;
 }
 
 QString ELD::connection_name() const

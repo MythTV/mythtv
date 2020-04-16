@@ -152,9 +152,9 @@ bool AudioOutputPulseAudio::OpenDevice()
         VBERROR(fn_log_tag + "invalid sample spec");
         return false;
     }
-    char spec[PA_SAMPLE_SPEC_SNPRINT_MAX];
-    pa_sample_spec_snprint(spec, sizeof(spec), &m_sampleSpec);
-    VBAUDIO(fn_log_tag + QString("using sample spec %1").arg(spec));
+    std::string spec(PA_SAMPLE_SPEC_SNPRINT_MAX,'\0');
+    pa_sample_spec_snprint(spec.data(), spec.size(), &m_sampleSpec);
+    VBAUDIO(fn_log_tag + "using sample spec " + spec.data());
 
     if(!pa_channel_map_init_auto(&m_channelMap, m_channels, PA_CHANNEL_MAP_WAVEEX))
     {

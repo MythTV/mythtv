@@ -1406,12 +1406,12 @@ void StatusBox::doMachineStatus()
         }
 
         // weighted average loads
-        double floads[3];
+        system_load_array floads;
         if (RemoteGetLoad(floads))
         {
             auto UpdateRemoteLoad = [](StatusBoxItem* Item)
             {
-                double loads[3] = { 0.0 };
+                system_load_array loads = { 0.0, 0.0, 0.0 };
                 RemoteGetLoad(loads);
                 Item->SetText(QString("   %1: %2 %3 %4").arg(tr("Load")).arg(loads[0], 1, 'f', 2)
                         .arg(loads[1], 1, 'f', 2).arg(loads[2], 1, 'f', 2));

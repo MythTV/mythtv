@@ -33,7 +33,7 @@ class AudioOutputNULL : public AudioOutputBase
     void SetVolumeChannel(int /* channel */, int /* volume */) override // VolumeBase
         {}
 
-    int readOutputData(unsigned char *read_buffer, int max_length) override; // AudioOutputBase
+    int readOutputData(unsigned char *read_buffer, size_t max_length) override; // AudioOutputBase
 
   protected:
     // AudioOutputBase
@@ -45,8 +45,7 @@ class AudioOutputNULL : public AudioOutputBase
 
   private:
     QMutex        m_pcmOutputBufferMutex {QMutex::NonRecursive};
-    unsigned char m_pcmOutputBuffer[NULLAUDIO_OUTPUT_BUFFER_SIZE] {0};
-    int           m_currentBufferSize     {0};
+    std::vector<unsigned char> m_pcmOutputBuffer {0};
 };
 
 #endif

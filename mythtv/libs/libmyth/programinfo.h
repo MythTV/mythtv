@@ -67,6 +67,9 @@ class PMapDBReplacement;
 class MPUBLIC ProgramInfo
 {
     friend int pginfo_init_statics(void);
+  private:
+    // Must match the number of items in CategoryType below
+    static const std::array<const QString,5> kCatName;
   public:
     static constexpr int kNumCatTypes = 5;
     enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,

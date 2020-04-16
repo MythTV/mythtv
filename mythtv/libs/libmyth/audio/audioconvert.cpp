@@ -610,12 +610,12 @@ public:
         if (!m_swr)
             return -1;
 
-        uint8_t* outp[] = {(uint8_t*)out};
-        const uint8_t* inp[]  = {(const uint8_t*)in};
+        std::array<uint8_t*,1> outp {(uint8_t*)out};
+        std::array<const uint8_t*,1> inp {(const uint8_t*)in};
         int samples = bytes / av_get_bytes_per_sample(m_in);
         int ret = swr_convert(m_swr,
-                              outp, samples,
-                              inp, samples);
+                              outp.data(), samples,
+                              inp.data(), samples);
         if (ret < 0)
             return ret;
         return ret * av_get_bytes_per_sample(m_out);
@@ -682,7 +682,8 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
         }
         // this leave S24 -> U8/S16.
         // TODO: native handling of those ; use internal temp buffer in the mean time
-        alignas(16) uint8_t buffer[65536] {0};
+
+        alignas(16) std::array<uint8_t,65536> buffer {0};
         int left        = bytes;
 
         while (left > 0)
@@ -691,15 +692,15 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
 
             if (left >= 65536)
             {
-                s       = toFloat(m_in, buffer, in, 65536);
+                s       = toFloat(m_in, buffer.data(), in, buffer.size());
                 in      = (void*)((long)in + s);
-                out     = (void*)((long)out + fromFloat(m_out, out, buffer, s));
-                left   -= 65536;
+                out     = (void*)((long)out + fromFloat(m_out, out, buffer.data(), s));
+                left   -= buffer.size();
                 continue;
             }
-            s       = toFloat(m_in, buffer, in, left);
+            s       = toFloat(m_in, buffer.data(), in, left);
             in      = (void*)((long)in + s);
-            out     = (void*)((long)out + fromFloat(m_out, out, buffer, s));
+            out     = (void*)((long)out + fromFloat(m_out, out, buffer.data(), s));
             left    = 0;
         }
         return bytes * AudioOutputSettings::SampleSize(m_out) / AudioOutputSettings::SampleSize(m_in);

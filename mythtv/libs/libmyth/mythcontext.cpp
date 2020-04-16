@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
+#include <QHostInfo>
 #include <QMutex>
 #include <QDateTime>
 #include <QTcpSocket>
@@ -11,6 +12,7 @@
 #include <QtAndroidExtras>
 #endif
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <queue>
@@ -579,12 +581,11 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     if (hostname.isEmpty() ||
         hostname == "my-unique-identifier-goes-here")
     {
-        char localhostname[1024];
-        if (gethostname(localhostname, 1024))
+        QString localhostname = QHostInfo::localHostName();
+        if (localhostname.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ALERT,
                     "MCP: Error, could not determine host name." + ENO);
-            localhostname[0] = '\0';
         }
 #ifdef Q_OS_ANDROID
 #define ANDROID_EXCEPTION_CHECK \
@@ -592,8 +593,8 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     env->ExceptionClear(); \
     exception=true; \
   }
-        if (strcmp(localhostname, "localhost") == 0
-            || localhostname[0] == '\0')
+
+        if ((localhostname == "localhost") || localhostname.isEmpty())
         {
             hostname = "android";
             bool exception=false;

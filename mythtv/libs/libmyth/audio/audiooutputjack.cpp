@@ -42,10 +42,8 @@ using namespace std;
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
-    for (auto & port : m_ports)
-        port = nullptr;
-    for (int & volume : m_chanVolumes)
-        volume = 100;
+    m_ports.fill( nullptr);
+    m_chanVolumes.fill(100);
 
     // Set everything up
     InitSettings(settings);
@@ -256,7 +254,7 @@ int AudioOutputJACK::GetBufferedOnSoundcard(void) const
   Output: bufs: non interleaved float values.
 */
 void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nframes,
-                                        const int* channel_volumes)
+                                        const jack_vol_array& channel_volumes)
 {
     // Convert to floats and de-interleave
     // TODO: Implicit assumption dealing with float input only.
@@ -265,7 +263,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
     // Create a local float version of the channel_volumes array
     // TODO: This can probably be removed
     //       if we have float software volume control in AOB?
-    float volumes[JACK_CHANNELS_MAX];
+    std::array<float,JACK_CHANNELS_MAX> volumes {};
     for (int channel = 0; channel < m_channels; channel++)
     {
         if (m_internalVol)
@@ -359,7 +357,7 @@ int AudioOutputJACK::JackCallbackHelper(jack_nframes_t nframes, void *arg)
 */
 int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
 {
-    float *bufs[JACK_CHANNELS_MAX];
+    std::array<float*,JACK_CHANNELS_MAX> bufs {};
     int bytes_needed = nframes * m_outputBytesPerFrame;
     int bytes_read = 0;
 
@@ -422,7 +420,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         }
     }
     // Now deinterleave audio (and convert to float)
-    DeinterleaveAudio((float*)m_auBuf, bufs, nframes, m_chanVolumes);
+    DeinterleaveAudio((float*)m_auBuf, bufs.data(), nframes, m_chanVolumes);
 
     if (!m_pauseAudio)
     {
@@ -508,8 +506,7 @@ void AudioOutputJACK::VolumeInit(void)
         volume = gCoreContext->GetNumSetting(controlLabel, 80);
     }
 
-    for (int & cvolume : m_chanVolumes)
-        cvolume = volume;
+    m_chanVolumes.fill(volume);
 }
 
 int AudioOutputJACK::GetVolumeChannel(int channel) const
