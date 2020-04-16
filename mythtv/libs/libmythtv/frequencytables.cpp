@@ -168,39 +168,36 @@ QString TransportScanItem::toString() const
         return m_iptvChannel + ": " + m_iptvTuning.GetDeviceKey();
     }
 
-    QString str = QString("Transport Scan Item '%1' #%2\n")
-        .arg(m_friendlyName).arg(m_friendlyNum);
-    str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
-        .arg(m_mplexid).arg(m_tuning.m_sistandard).arg(m_sourceID);
-    str += QString("\tuseTimer(%1) scanning(%2)\n")
-        .arg(static_cast<int>(m_useTimer)).arg(static_cast<int>(m_scanning));
-    str += QString("\ttimeoutTune(%3 msec)\n").arg(m_timeoutTune);
+    QString str = QString("Transport Scan Item '%1' #%2").arg(m_friendlyName).arg(m_friendlyNum);
+    str += "\n\t";
+    str += QString("mplexid(%1) "           ).arg(m_mplexid);
+    str += QString("standard(%1) "          ).arg(m_tuning.m_sistandard);
+    str += QString("sourceid(%1) "          ).arg(m_sourceID);
+    str += QString("useTimer(%1) "          ).arg(static_cast<int>(m_useTimer));
+    str += QString("scanning(%1) "          ).arg(static_cast<int>(m_scanning));
+    str += QString("timeoutTune(%3 msec)  " ).arg(m_timeoutTune);
+    str += "\n\t";
+    str += QString("frequency(%1) "         ).arg(m_tuning.m_frequency);
+    str += QString("offset[0..2]: %1 %2 %3 ").arg(m_freqOffsets[0]).arg(m_freqOffsets[1]).arg(m_freqOffsets[2]);
+
     if (m_tuning.m_sistandard == "atsc" || m_tuning.m_sistandard == "analog")
     {
-        str += QString("\tfrequency(%1) modulation(%2)\n")
-            .arg(m_tuning.m_frequency)
-            .arg(m_tuning.m_modulation.toString());
+        str += QString("modulation(%1) "    ).arg(m_tuning.m_modulation.toString());
     }
     else
     {
-        str += QString("\tfrequency(%1) constellation(%2)\n")
-            .arg(m_tuning.m_frequency)
-            .arg(m_tuning.m_modulation.toString());
-        str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
-            .arg(m_tuning.m_inversion)
-            .arg(m_tuning.m_bandwidth)
-            .arg(m_tuning.m_hpCodeRate)
-            .arg(m_tuning.m_lpCodeRate);
-        str += QString("\t  trans_mode(%1) guard_int(%2) hierarchy(%3)\n")
-            .arg(m_tuning.m_transMode)
-            .arg(m_tuning.m_guardInterval)
-            .arg(m_tuning.m_hierarchy);
-        str += QString("\t  symbol_rate(%1) fec(%2)\n")
-            .arg(m_tuning.m_symbolRate)
-            .arg(m_tuning.m_fec);
+        str += QString("constellation(%1) " ).arg(m_tuning.m_modulation.toString());
+        str += QString("inv(%1) "           ).arg(m_tuning.m_inversion);
+        str += QString("bandwidth(%1) "     ).arg(m_tuning.m_bandwidth);
+        str += QString("hp(%1) "            ).arg(m_tuning.m_hpCodeRate);
+        str += QString("lp(%1) "            ).arg(m_tuning.m_lpCodeRate);
+        str += "\n\t";
+        str += QString("trans_mode(%1) "    ).arg(m_tuning.m_transMode);
+        str += QString("guard_int(%1) "     ).arg(m_tuning.m_guardInterval);
+        str += QString("hierarchy(%1) "     ).arg(m_tuning.m_hierarchy);
+        str += QString("symbol_rate(%1) "   ).arg(m_tuning.m_symbolRate);
+        str += QString("fec(%1) "           ).arg(m_tuning.m_fec);
     }
-    str += QString("\toffset[0..2]: %1 %2 %3")
-        .arg(m_freqOffsets[0]).arg(m_freqOffsets[1]).arg(m_freqOffsets[2]);
     return str;
 }
 
