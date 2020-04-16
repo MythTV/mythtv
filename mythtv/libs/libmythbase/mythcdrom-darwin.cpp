@@ -14,14 +14,14 @@
 class MythCDROMDarwin: public MythCDROM
 {
 public:
-    MythCDROMDarwin(QObject* par, const char* DevicePath,
+    MythCDROMDarwin(QObject* par, const QString DevicePath,
                     bool SuperMount, bool AllowEject):
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {};
 
     void setDeviceSpeed(const char *device, int speed) override; // MythMediaDevice
 };
 
-MythCDROM *GetMythCDROMDarwin(QObject* par, const char* devicePath,
+MythCDROM *GetMythCDROMDarwin(QObject* par, const QString devicePath,
                               bool SuperMount, bool AllowEject)
 {
     return new MythCDROMDarwin(par, devicePath, SuperMount, AllowEject);

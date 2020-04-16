@@ -6,7 +6,7 @@
 class MBASE_PUBLIC MythHDD : public MythMediaDevice
 {
   public:
-    MythHDD(QObject* par, const char* DevicePath,
+    MythHDD(QObject* par, const QString& DevicePath,
             bool SuperMount, bool AllowEject);
 
     MythMediaStatus checkMedia(void) override; // MythMediaDevice

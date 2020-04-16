@@ -10,6 +10,7 @@
 #include <QWaitCondition>
 #include <QString>
 
+#include "mythbaseutil.h"
 #include "mythtimer.h"
 #include "tspacket.h"
 #include "mthread.h"
@@ -84,8 +85,8 @@ class DeviceReadBuffer : protected MThread
 
     QString                 m_videoDevice;
     int                     m_streamFd              {-1};
-    mutable int             m_wakePipe[2]           {-1,-1};
-    mutable long            m_wakePipeFlags[2]      {0,0};
+    mutable pipe_fd_array   m_wakePipe              {-1,-1};
+    mutable pipe_flag_array m_wakePipeFlags         {0,0};
 
     DeviceReaderCB         *m_readerCB              {nullptr};
 

@@ -7,7 +7,7 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
 {
     Q_OBJECT
   protected:
-    MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
+    MythCDROM(QObject* par, const QString& DevicePath, bool SuperMount,
               bool AllowEject);
   public:
     ~MythCDROM() override = default;
@@ -20,7 +20,7 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
     }
     void setDeviceSpeed(const char *devicePath, int speed) override; // MythMediaDevice
 
-    static MythCDROM* get(QObject* par, const char* devicePath,
+    static MythCDROM* get(QObject* par, const QString& devicePath,
                                   bool SuperMount, bool AllowEject);
 
     enum ImageType

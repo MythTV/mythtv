@@ -39,6 +39,8 @@
 #ifndef OSDAB_ZIPENTRY_P_H
 #define OSDAB_ZIPENTRY_P_H
 
+#include <array>
+
 #include <QtGlobal>
 #include <QString>
 
@@ -49,10 +51,10 @@ public:
 	{
 		lhOffset = 0;
 		dataOffset = 0;
-		gpFlag[0] = gpFlag[1] = 0;
+		gpFlag.fill(0);
 		compMethod = 0;
-		modTime[0] = modTime[1] = 0;
-		modDate[0] = modDate[1] = 0;
+		modTime.fill(0);
+		modDate.fill(0);
 		crc = 0;
 		szComp = szUncomp = 0;
 		lhEntryChecked = false;
@@ -60,10 +62,10 @@ public:
 
 	quint32 lhOffset;			// Offset of the local header record for this entry
 	quint32 dataOffset;			// Offset of the file data for this entry
-	unsigned char gpFlag[2]  {};		// General purpose flag
+	std::array<uint8_t,2> gpFlag {};	// General purpose flag
 	quint16 compMethod;			// Compression method
-	unsigned char modTime[2] {};		// Last modified time
-	unsigned char modDate[2] {};		// Last modified date
+	std::array<uint8_t,2> modTime {};	// Last modified time
+	std::array<uint8_t,2> modDate {};	// Last modified date
 	quint32 crc;				// CRC32
 	quint32 szComp;				// Compressed file size
 	quint32 szUncomp;			// Uncompressed file size

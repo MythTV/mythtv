@@ -3,7 +3,6 @@ using namespace std;
 
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
-#include "mythbaseutil.h"
 #include "mythlogging.h"
 #include "tspacket.h"
 #include "mthread.h"

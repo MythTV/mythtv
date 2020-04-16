@@ -7,6 +7,7 @@
 #include <QList>
 #include <QMap>
 
+#include <array>
 #include <cstdint>
 #include <csignal>
 #include <unistd.h>
@@ -47,7 +48,7 @@ class MBASE_PUBLIC SignalHandler: public QObject
     ~SignalHandler() override;
     void SetHandlerPrivate(int signum, SigHandlerFunc handler);
 
-    static int s_sigFd[2];
+    static std::array<int,2> s_sigFd;
     static volatile bool s_exit_program;
     QSocketNotifier *m_notifier {nullptr};
     char            *m_sigStack {nullptr};

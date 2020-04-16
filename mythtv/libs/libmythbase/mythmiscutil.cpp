@@ -2,6 +2,7 @@
 #include "mythmiscutil.h"
 
 // C++ headers
+#include <array>
 #include <cerrno>
 #include <cstdlib>
 #include <ctime>
@@ -75,16 +76,14 @@ bool getUptime(time_t &uptime)
 
 #elif defined(__FreeBSD__) || CONFIG_DARWIN
 
-    int            mib[2];
+    std::array<int,2> mib { CTL_KERN, KERN_BOOTTIME };
     struct timeval bootTime;
     size_t         len;
 
     // Uptime is calculated. Get this machine's boot time
     // and subtract it from the current machine time
     len    = sizeof(bootTime);
-    mib[0] = CTL_KERN;
-    mib[1] = KERN_BOOTTIME;
-    if (sysctl(mib, 2, &bootTime, &len, nullptr, 0) == -1)
+    if (sysctl(mib.data(), 2, &bootTime, &len, nullptr, 0) == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
@@ -633,10 +632,9 @@ QString FileHash(const QString& filename)
 
 bool WakeOnLAN(const QString& MAC)
 {
-    char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";
-    int  msglen = 6;
+    std::vector<char> msg(6, static_cast<char>(0xFF));
+    std::array<char,6> macaddr {};
     QStringList tokens = MAC.split(':');
-    int macaddr[6];
 
     if (tokens.size() != 6)
     {
@@ -658,16 +656,17 @@ bool WakeOnLAN(const QString& MAC)
         }
     }
 
+    msg.reserve(1024);
     for (int x = 0; x < 16; x++)
-        for (int y : macaddr)
-            msg[msglen++] = y;
+        msg.insert(msg.end(), macaddr.cbegin(), macaddr.cend());
 
     LOG(VB_NETWORK, LOG_INFO,
             QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));
 
     QUdpSocket udp_socket;
+    qlonglong msglen = msg.size();
     return udp_socket.writeDatagram(
-        msg, msglen, QHostAddress::Broadcast, 32767) == msglen;
+        msg.data(), msglen, QHostAddress::Broadcast, 32767) == msglen;
 }
 
 // Wake up either by command or by MAC address

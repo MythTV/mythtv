@@ -3,6 +3,7 @@
 #ifndef MYTHSYSTEM_UNIX_H
 #define MYTHSYSTEM_UNIX_H
 
+#include <array>
 #include <csignal>
 #include <sys/select.h>
 
@@ -54,7 +55,7 @@ class MythSystemLegacyIOHandler: public MThread
         fd_set m_fds   {};
         int    m_maxfd {-1};
         bool   m_read  {true};
-        char   m_readbuf[65536] {0};
+        std::array<char,65536> m_readbuf {};
 };
 
 // spawn separate thread for signals to prevent manager
@@ -113,7 +114,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
         pid_t       m_pid     {0};
         time_t      m_timeout {0};
 
-        int         m_stdpipe[3] {-1,-1, -1};
+        std::array<int,3> m_stdpipe {-1, -1, -1};
 };
 
 #endif // MYTHSYSTEM_UNIX_H

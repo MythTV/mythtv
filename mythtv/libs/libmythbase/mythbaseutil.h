@@ -2,6 +2,7 @@
 #define MYTH_BASE_UTIL_H
 
 // POSIX
+#include <array>
 #include <cerrno>       // for checking errno
 #include <fcntl.h>      // for fnctl
 #include <sys/types.h>  // for fnctl
@@ -12,16 +13,19 @@
 // MythTV
 #include "mythlogging.h"
 
+using pipe_fd_array = std::array<int,2>;
+using pipe_flag_array = std::array<long,2>;
+
 #ifdef _WIN32
-static inline void setup_pipe(int[2], long[2]) {}
+static inline void setup_pipe(pipe_fd_array&, pipe_flag_array&) {}
 #else
-static inline void setup_pipe(int mypipe[2], long myflags[2])
+static inline void setup_pipe(pipe_fd_array& mypipe, pipe_flag_array& myflags)
 {
-    int pipe_ret = pipe(mypipe);
+    int pipe_ret = pipe(mypipe.data());
     if (pipe_ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to open pipes" + ENO);
-        mypipe[0] = mypipe[1] = -1;
+        mypipe.fill(-1);
     }
     else
     {

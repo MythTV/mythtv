@@ -148,7 +148,7 @@ void MythSystemLegacyIOHandler::run(void)
 void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
 {
     errno = 0;
-    int len = read(fd, &m_readbuf, 65536);
+    int len = read(fd, m_readbuf.data(), m_readbuf.size());
     if( len <= 0 )
     {
         if( errno != EAGAIN )
@@ -159,7 +159,7 @@ void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
     }
     else
     {
-        buff->buffer().append(m_readbuf, len);
+        buff->buffer().append(m_readbuf.data(), len);
 
         // Get the corresponding MythSystemLegacy instance, and the stdout/stderr
         // type
@@ -770,20 +770,18 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
     // For use in the child
-    char locerr[MAX_BUFLEN];
-    strncpy(locerr, LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
-    locerr[MAX_BUFLEN-1] = '\0';
+    std::string locerr = qPrintable(LOC_ERR);
 
     LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
 
-    int p_stdin[]  = {-1,-1};
-    int p_stdout[] = {-1,-1};
-    int p_stderr[] = {-1,-1};
+    std::array<int,2> p_stdin  {-1,-1};
+    std::array<int,2> p_stdout {-1,-1};
+    std::array<int,2> p_stderr {-1,-1};
 
     /* set up pipes */
     if( GetSetting("UseStdin") )
     {
-        if( pipe(p_stdin) == -1 )
+        if( pipe(p_stdin.data()) == -1 )
         {
             LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdin pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
@@ -811,7 +809,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     }
     if( GetSetting("UseStdout") )
     {
-        if( pipe(p_stdout) == -1 )
+        if( pipe(p_stdout.data()) == -1 )
         {
             LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stdout pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );
@@ -839,7 +837,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     }
     if( GetSetting("UseStderr") )
     {
-        if( pipe(p_stderr) == -1 )
+        if( pipe(p_stderr.data()) == -1 )
         {
             LOG(VB_SYSTEM, LOG_ERR, LOC_ERR + "stderr pipe() failed");
             SetStatus( GENERIC_EXIT_NOT_OK );

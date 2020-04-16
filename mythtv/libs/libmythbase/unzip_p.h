@@ -44,6 +44,8 @@
 
 #include <QtGlobal>
 
+using keyset = std::array<quint32,3>;
+
 // zLib authors suggest using larger buffers (128K or 256K) for (de)compression (especially for inflate())
 // we use a 256K buffer here - if you want to use this code on a pre-iceage mainframe please change it ;)
 #define UNZIP_READ_BUFFER (256*1024)
@@ -92,21 +94,21 @@ public:
 	UnZip::ErrorCode extractFile(const QString& path, ZipEntryP& entry, const QDir& dir, UnZip::ExtractionOptions options);
 	UnZip::ErrorCode extractFile(const QString& path, ZipEntryP& entry, QIODevice* device, UnZip::ExtractionOptions options);
 
-	UnZip::ErrorCode testPassword(quint32* keys, const QString& file, const ZipEntryP& header);
-	bool testKeys(const ZipEntryP& header, quint32* keys);
+	UnZip::ErrorCode testPassword(keyset keys, const QString& file, const ZipEntryP& header);
+	bool testKeys(const ZipEntryP& header, keyset keys);
 
 	bool createDirectory(const QString& path);
 
-	inline void decryptBytes(quint32* keys, char* buffer, qint64 read) const;
+	inline void decryptBytes(keyset keys, char* buffer, qint64 read) const;
 
 	static inline quint32 getULong(const unsigned char* data, quint32 offset) ;
 	static inline quint64 getULLong(const unsigned char* data, quint32 offset) ;
 	static inline quint16 getUShort(const unsigned char* data, quint32 offset) ;
 	static inline int decryptByte(quint32 key2) ;
-	inline void updateKeys(quint32* keys, int c) const;
-	inline void initKeys(const QString& pwd, quint32* keys) const;
+	inline void updateKeys(keyset keys, int c) const;
+	inline void initKeys(const QString& pwd, keyset keys) const;
 
-	static inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) ;
+	static inline QDateTime convertDateTime(const std::array<uint8_t,2> &date, const std::array<uint8_t,2> &time) ;
 };
 
 #endif // OSDAB_UNZIP_P_H

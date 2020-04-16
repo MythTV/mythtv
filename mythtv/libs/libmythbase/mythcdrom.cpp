@@ -32,7 +32,7 @@
 #define PATHTO_AUDIO_DETECT "/.TOC.plist"
 
 
-MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
+MythCDROM* MythCDROM::get(QObject* par, const QString& devicePath,
                           bool SuperMount, bool AllowEject)
 {
 #if defined(linux) && !defined(Q_OS_ANDROID)
@@ -46,7 +46,7 @@ MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
 #endif
 }
 
-MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
+MythCDROM::MythCDROM(QObject* par, const QString& DevicePath, bool SuperMount,
                      bool AllowEject)
          : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {

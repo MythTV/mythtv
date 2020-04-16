@@ -52,7 +52,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     friend class MonitorThreadDarwin;  // and trigger posting of MythMediaEvents
 
  public:
-    MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount,
+    MythMediaDevice(QObject* par, QString DevicePath, bool SuperMount,
                     bool AllowEject);
 
     const QString& getMountPath() const { return m_mountPath; }

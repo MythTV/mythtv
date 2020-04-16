@@ -35,6 +35,10 @@ using CDROMgenericCmd = struct cdrom_generic_command;
 
 // Some structures stolen from the __KERNEL__ section of linux/cdrom.h.
 
+// Prevent clang-tidy modernize-avoid-c-arrays warnings in these
+// kernel structures
+extern "C" {
+
 // This contains the result of a GPCMD_GET_EVENT_STATUS_NOTIFICATION.
 // It is the joining of a struct event_header and a struct media_event_desc
 struct CDROMeventStatus
@@ -108,6 +112,9 @@ struct CDROMdiscInfo {
     uint8_t  m_nOpc;
 };
 
+// end of kernel structures.
+};
+
 enum CDROMdiscStatus
 {
     MEDIA_IS_EMPTY      = 0x0,
@@ -126,7 +133,7 @@ enum CDROMdiscStatus
 class MythCDROMLinux: public MythCDROM
 {
 public:
-    MythCDROMLinux(QObject* par, const char* DevicePath, bool SuperMount,
+    MythCDROMLinux(QObject* par, const QString& DevicePath, bool SuperMount,
                    bool AllowEject):
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
@@ -151,7 +158,7 @@ private:
     int SCSIstatus(void);
 };
 
-MythCDROM *GetMythCDROMLinux(QObject* par, const char* devicePath,
+MythCDROM *GetMythCDROMLinux(QObject* par, const QString& devicePath,
                              bool SuperMount, bool AllowEject)
 {
     return new MythCDROMLinux(par, devicePath, SuperMount, AllowEject);
@@ -187,17 +194,14 @@ int MythCDROMLinux::driveStatus()
 
 bool MythCDROMLinux::hasWritableMedia()
 {
-    unsigned char    buffer[32];
-    CDROMgenericCmd  cgc;
-
-    memset(buffer, 0, sizeof(buffer));
-    memset(&cgc,   0, sizeof(cgc));
+    std::array<uint8_t,32> buffer {};
+    CDROMgenericCmd  cgc {};
 
     cgc.cmd[0] = GPCMD_READ_DISC_INFO;
-    cgc.cmd[8] = sizeof(buffer);
+    cgc.cmd[8] = buffer.size();
     cgc.quiet  = 1;
-    cgc.buffer = buffer;
-    cgc.buflen = sizeof(buffer);
+    cgc.buffer = buffer.data();
+    cgc.buflen = buffer.size();
     cgc.data_direction = CGC_DATA_READ;
 
     if (ioctl(m_deviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
@@ -207,7 +211,7 @@ bool MythCDROMLinux::hasWritableMedia()
         return false;
     }
 
-    auto *di = (CDROMdiscInfo *) buffer;
+    auto *di = (CDROMdiscInfo *) buffer.data();
     switch (di->m_discStatus)
     {
         case MEDIA_IS_EMPTY:
@@ -237,22 +241,19 @@ bool MythCDROMLinux::hasWritableMedia()
 
 int MythCDROMLinux::SCSIstatus()
 {
-    unsigned char    buffer[8];
-    CDROMgenericCmd  cgc;
-
-    memset(buffer, 0, sizeof(buffer));
-    memset(&cgc,   0, sizeof(cgc));
+    std::array<uint8_t,8> buffer {};
+    CDROMgenericCmd  cgc {};
 
     cgc.cmd[0] = GPCMD_GET_EVENT_STATUS_NOTIFICATION;
     cgc.cmd[1] = 1;       // Tell us immediately
     cgc.cmd[4] = 1 << 4;  // notification class of media
-    cgc.cmd[8] = sizeof(buffer);
+    cgc.cmd[8] = buffer.size();
     cgc.quiet  = 1;
-    cgc.buffer = buffer;
-    cgc.buflen = sizeof(buffer);
+    cgc.buffer = buffer.data();
+    cgc.buflen = buffer.size();
     cgc.data_direction = CGC_DATA_READ;
 
-    auto *es = (CDROMeventStatus *) buffer;
+    auto *es = (CDROMeventStatus *) buffer.data();
 
     if ((ioctl(m_deviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
         || es->m_nea                         // drive does not support request
@@ -337,10 +338,10 @@ MythMediaError MythCDROMLinux::ejectSCSI()
 {
     int k = 0;
     sg_io_hdr_t io_hdr;
-    unsigned char allowRmBlk[6] = {ALLOW_MEDIUM_REMOVAL, 0, 0, 0, 0, 0};
-    unsigned char startStop1Blk[6] = {START_STOP, 0, 0, 0, 1, 0}; // start
-    unsigned char startStop2Blk[6] = {START_STOP, 0, 0, 0, 2, 0}; // load eject
-    unsigned char sense_buffer[16];
+    std::array<uint8_t,6> allowRmBlk    {ALLOW_MEDIUM_REMOVAL, 0, 0, 0, 0, 0};
+    std::array<uint8_t,6> startStop1Blk {START_STOP, 0, 0, 0, 1, 0}; // start
+    std::array<uint8_t,6> startStop2Blk {START_STOP, 0, 0, 0, 2, 0}; // load eject
+    std::array<uint8_t,16> sense_buffer {};
     const unsigned DID_OK = 0;
     const unsigned DRIVER_OK = 0;
 
@@ -358,12 +359,12 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
     io_hdr.interface_id = 'S';
     io_hdr.cmd_len = 6;
-    io_hdr.mx_sb_len = sizeof(sense_buffer);
+    io_hdr.mx_sb_len = sense_buffer.size();
     io_hdr.dxfer_direction = SG_DXFER_NONE;
-    io_hdr.sbp = sense_buffer;
+    io_hdr.sbp = sense_buffer.data();
     io_hdr.timeout = 10000; // millisecs
 
-    io_hdr.cmdp = allowRmBlk;
+    io_hdr.cmdp = allowRmBlk.data();
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO allowRmBlk ioctl failed" + ENO);
@@ -375,7 +376,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
 	    return MEDIAERR_FAILED;
     }
 
-    io_hdr.cmdp = startStop1Blk;
+    io_hdr.cmdp = startStop1Blk.data();
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(start) ioctl failed" + ENO);
@@ -387,7 +388,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
 	    return MEDIAERR_FAILED;
     }
 
-    io_hdr.cmdp = startStop2Blk;
+    io_hdr.cmdp = startStop2Blk.data();
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(eject) ioctl failed" + ENO);
@@ -756,9 +757,9 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
  */
 void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 {
-    unsigned char buffer[28] {};
-    unsigned char cmd[16] {};
-    unsigned char sense[16] {};
+    std::array<uint8_t,28> buffer {};
+    std::array<uint8_t,16> cmd {};
+    std::array<uint8_t,16> sense {};
     struct sg_io_hdr sghdr {};
     struct stat st {};
     int rate = 0;
@@ -821,15 +822,15 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
     sghdr.interface_id = 'S';
     sghdr.timeout = 5000;
     sghdr.dxfer_direction = SG_DXFER_TO_DEV;
-    sghdr.mx_sb_len = sizeof(sense);
-    sghdr.dxfer_len = sizeof(buffer);
-    sghdr.cmd_len = sizeof(cmd);
-    sghdr.sbp = sense;
-    sghdr.dxferp = buffer;
-    sghdr.cmdp = cmd;
+    sghdr.mx_sb_len = sense.size();
+    sghdr.dxfer_len = buffer.size();
+    sghdr.cmd_len = cmd.size();
+    sghdr.sbp = sense.data();
+    sghdr.dxferp = buffer.data();
+    sghdr.cmdp = cmd.data();
 
     cmd[0] = GPCMD_SET_STREAMING;
-    cmd[10] = sizeof(buffer);
+    cmd[10] = buffer.size();
 
     buffer[8]  = 0xff;
     buffer[9]  = 0xff;

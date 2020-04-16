@@ -1,6 +1,7 @@
 // C header
 #include <fcntl.h>
 #include <unistd.h>
+#include <utility>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
@@ -72,9 +73,9 @@ MythMediaEvent::~MythMediaEvent()
 
 ext_to_media_t MythMediaDevice::s_ext_to_media;
 
-MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
+MythMediaDevice::MythMediaDevice(QObject* par, QString DevicePath,
                                  bool SuperMount,  bool AllowEject)
-    : QObject(par), m_devicePath(DevicePath),
+    : QObject(par), m_devicePath(std::move(DevicePath)),
       m_allowEject(AllowEject), m_superMount(SuperMount)
 {
     m_realDevice = getSymlinkTarget(m_devicePath);

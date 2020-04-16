@@ -698,7 +698,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 #endif
         if (parts[0].isEmpty())
             return false;
-        pDevice = MythCDROM::get(this, qPrintable(dev), is_supermount, m_allowEject);
+        pDevice = MythCDROM::get(this, dev, is_supermount, m_allowEject);
     }
 
     if (pDevice)

@@ -27,7 +27,7 @@ MythHDD *MythHDD::Get(QObject* par, const char* devicePath, bool SuperMount,
  *  \param AllowEject True if the user is allowed to eject the media.
  *  \return new MythHDD instance.
  */
-MythHDD::MythHDD(QObject *par, const char *DevicePath,
+MythHDD::MythHDD(QObject *par, const QString& DevicePath,
                  bool SuperMount, bool AllowEject)
     : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {

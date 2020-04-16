@@ -1876,13 +1876,9 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                 QFile f(filename);
                 if (f.open(QIODevice::ReadOnly))
                 {
-                    char buf[1024];
-                    int64_t len = f.readLine(buf, sizeof(buf) - 1);
-                    while (len != -1)
-                    {
-                        if (len >= 1 && buf[len-1]=='\n')
-                            buf[len-1] = 0;
-                        QString line(buf);
+                    QTextStream in(&f);
+                    while (!in.atEnd()) {
+                        QString line = in.readLine().trimmed();
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                         QStringList tokens = line.split("=",
                                 QString::SkipEmptyParts);
@@ -1899,7 +1895,6 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                             if (!tokens[0].isEmpty())
                                 smap[tokens[0]] = tokens[1];
                         }
-                        len = f.readLine(buf, sizeof(buf) - 1);
                     }
                 }
                 else
