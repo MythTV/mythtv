@@ -22,7 +22,7 @@
 **--------------------------------------------------------------------------*/
 
 // Own header
-#include "jsmenu.h"
+#include "devices/jsmenu.h"
 
 // QT headers
 #include <QCoreApplication>

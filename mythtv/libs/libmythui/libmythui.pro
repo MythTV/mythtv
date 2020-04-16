@@ -159,8 +159,8 @@ android {
 
 using_joystick_menu {
     DEFINES += USE_JOYSTICK_MENU
-    HEADERS += jsmenu.h jsmenuevent.h
-    SOURCES += jsmenu.cpp jsmenuevent.cpp
+    HEADERS += devices/jsmenu.h devices/jsmenuevent.h
+    SOURCES += devices/jsmenu.cpp devices/jsmenuevent.cpp
 }
 
 using_lirc {
