@@ -9,9 +9,6 @@
 #include "mythmainwindow.h"
 #include "mythgesture.h"
 
-#ifdef USING_LIBCEC
-#include "devices/mythcecadapter.h"
-#endif
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
 #endif
@@ -82,10 +79,6 @@ class MythMainWindowPrivate
 #ifdef USING_APPLEREMOTE
     AppleRemoteListener *m_appleRemoteListener  { nullptr };
     AppleRemote         *m_appleRemote          { nullptr };
-#endif
-
-#ifdef USING_LIBCEC
-    MythCECAdapter       m_cecAdapter           { };
 #endif
 
     bool                 m_exitingtomain        { false   };

@@ -151,6 +151,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
 {
     m_display = MythDisplay::AcquireRelease();
+    connect(this, &MythMainWindow::signalWindowReady, &m_deviceHandler, &MythInputDeviceHandler::MainWindowReady);
 
     d = new MythMainWindowPrivate;
 
@@ -308,9 +309,7 @@ MythMainWindow::~MythMainWindow()
     delete d->m_appleRemoteListener;
 #endif
 
-#ifdef USING_LIBCEC
-    d->m_cecAdapter.Close();
-#endif
+    m_deviceHandler.Stop();
 
     delete d->m_nc;
 
@@ -853,12 +852,7 @@ void MythMainWindow::Init(bool mayReInit)
     if (!d->m_nc)
         d->m_nc = new MythNotificationCenter();
 
-#ifdef USING_LIBCEC
-    // Open any adapter after the window has been created to ensure we capture
-    // the EDID if available. This will close any existing adapter in the event
-    // that the window has been re-init'ed.
-    d->m_cecAdapter.Open();
-#endif
+    emit signalWindowReady();
 
     if (!warningmsg.isEmpty())
     {
@@ -1636,13 +1630,9 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     return false;
 }
 
-void MythMainWindow::HandleTVPower(bool poweron)
+void MythMainWindow::HandleTVAction(const QString &Action)
 {
-#ifdef USING_LIBCEC
-    d->m_cecAdapter.Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
-#else
-    (void) poweron;
-#endif
+    m_deviceHandler.Action(Action);
 }
 
 void MythMainWindow::AllowInput(bool allow)
@@ -2497,11 +2487,6 @@ void MythMainWindow::StartLIRC(void)
 
 void MythMainWindow::LockInputDevices( bool locked )
 {
-    if( locked )
-        LOG(VB_GENERAL, LOG_INFO, "Locking input devices");
-    else
-        LOG(VB_GENERAL, LOG_INFO, "Unlocking input devices");
-
 #ifdef USE_LIRC
     d->m_ignoreLircKeys = locked;
 #endif
@@ -2509,6 +2494,8 @@ void MythMainWindow::LockInputDevices( bool locked )
 #ifdef USE_JOYSTICK_MENU
     d->m_ignoreJoystickKeys = locked;
 #endif
+
+    m_deviceHandler.IgnoreKeys(locked);
 }
 
 void MythMainWindow::ShowMouseCursor(bool show)

@@ -5,6 +5,7 @@
 #include <QWidget>
 
 // MythTV
+#include "devices/mythinputdevicehandler.h"
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
@@ -81,7 +82,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                      int season=0, int episode=0, const QString& inetref="",
                      int lenMins=120, const QString& year="1895",
                      const QString &id="", bool useBookmarks = false);
-    void HandleTVPower(bool poweron);
+    void HandleTVAction(const QString &Action);
 
     void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
@@ -145,6 +146,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
   signals:
     void signalRemoteScreenShot(QString filename, int x, int y);
     void signalSetDrawEnabled(bool enable);
+    void signalWindowReady(void);
 
   protected:
     explicit MythMainWindow(bool useDB = true);
@@ -180,6 +182,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythPainter*       m_oldPainter    { nullptr };
     MythPainterWindow* m_painterWin    { nullptr };
     MythPainterWindow* m_oldPainterWin { nullptr };
+    MythInputDeviceHandler m_deviceHandler { this };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();
