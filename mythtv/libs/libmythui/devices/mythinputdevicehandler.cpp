@@ -59,6 +59,9 @@ void MythInputDeviceHandler::IgnoreKeys(bool Ignore)
     else
         LOG(VB_GENERAL, LOG_INFO, LOC + "Unlocking input devices");
     m_ignoreKeys = Ignore;
+#ifdef USING_LIBCEC
+    m_cecAdapter.IgnoreKeys(Ignore);
+#endif
 }
 
 void MythInputDeviceHandler::MainWindowReady(void)

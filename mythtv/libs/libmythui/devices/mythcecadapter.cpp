@@ -29,15 +29,21 @@ int MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message M
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::KeyPressCallback(void* /*unused*/, const cec_keypress Keypress)
+int MythCECAdapter::KeyPressCallback(void* Adapter, const cec_keypress Keypress)
 {
-    return MythCECAdapter::HandleKeyPress(Keypress);
+    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    if (adapter)
+        return adapter->HandleKeyPress(Keypress);
+    return 1;
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::CommandCallback(void* /*unused*/, const cec_command Command)
+int MythCECAdapter::CommandCallback(void* Adapter, const cec_command Command)
 {
-    return MythCECAdapter::HandleCommand(Command);
+    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    if (adapter)
+        return adapter->HandleCommand(Command);
+    return 1;
 }
 
 // cppcheck-suppress passedByValue
@@ -51,14 +57,18 @@ void MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message*
     MythCECAdapter::LogMessage(*Message);
 }
 
-void MythCECAdapter::KeyPressCallback(void* /*unused*/, const cec_keypress* Keypress)
+void MythCECAdapter::KeyPressCallback(void* Adapter, const cec_keypress* Keypress)
 {
-    MythCECAdapter::HandleKeyPress(*Keypress);
+    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    if (adapter)
+        adapter->HandleKeyPress(*Keypress);
 }
 
-void MythCECAdapter::CommandCallback(void* /*unused*/, const cec_command* Command)
+void MythCECAdapter::CommandCallback(void* Adapter, const cec_command* Command)
 {
-    MythCECAdapter::HandleCommand(*Command);
+    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    if (adapter)
+        adapter->HandleCommand(*Command);
 }
 
 void MythCECAdapter::AlertCallback(void* /*unused*/, const libcec_alert Alert, const libcec_parameter Data)
@@ -305,7 +315,7 @@ int MythCECAdapter::HandleCommand(const cec_command &Command)
 int MythCECAdapter::HandleKeyPress(const cec_keypress &Key)
 {
     // Ignore key down events and wait for the key 'up'
-    if (Key.duration < 1)
+    if (Key.duration < 1 || m_ignoreKeys)
         return 1;
 
     QString code;
@@ -740,5 +750,10 @@ void MythCECAdapter::Action(const QString &Action)
         HandleActions(PowerOnTV);
     else if (ACTION_TVPOWEROFF == Action)
         HandleActions(PowerOffTV);
+}
+
+void MythCECAdapter::IgnoreKeys(bool Ignore)
+{
+    m_ignoreKeys = Ignore;
 }
 
