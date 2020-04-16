@@ -41,19 +41,12 @@ using namespace std;
 // libmythui headers
 #include "myththemebase.h"
 #include "screensaver.h"
-#include "lirc.h"
-#include "lircevent.h"
 #include "mythudplistener.h"
 #include "mythrender_base.h"
 #include "mythuistatetracker.h"
 #include "mythuiactions.h"
 #include "mythrect.h"
 #include "mythdisplay.h"
-
-#ifdef USING_APPLEREMOTE
-#include "AppleRemoteListener.h"
-#endif
-
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #include "mythpainterwindow.h"
@@ -155,7 +148,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     //Init();
 
-    d->m_ignoreLircKeys = false;
     d->m_exitingtomain = false;
     d->m_popwindows = true;
     d->m_exitMenuCallback = nullptr;
@@ -165,29 +157,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_mainStack = nullptr;
 
     installEventFilter(this);
-
-    d->m_lircThread = nullptr;
-    StartLIRC();
-
-#ifdef USING_APPLEREMOTE
-    d->m_appleRemoteListener = new AppleRemoteListener(this);
-    d->m_appleRemote         = AppleRemote::Get();
-
-    d->m_appleRemote->setListener(d->m_appleRemoteListener);
-    d->m_appleRemote->startListening();
-    if (d->m_appleRemote->isListeningToRemote())
-    {
-        d->m_appleRemote->start();
-    }
-    else
-    {
-        // start listening failed, no remote receiver present
-        delete d->m_appleRemote;
-        delete d->m_appleRemoteListener;
-        d->m_appleRemote = nullptr;
-        d->m_appleRemoteListener = nullptr;
-    }
-#endif
 
     d->m_udpListener = new MythUDPListener();
 
@@ -260,19 +229,6 @@ MythMainWindow::~MythMainWindow()
         d->m_keyContexts.erase(d->m_keyContexts.begin());
         delete context;
     }
-
-#ifdef USE_LIRC
-    if (d->m_lircThread)
-    {
-        d->m_lircThread->deleteLater();
-        d->m_lircThread = nullptr;
-    }
-#endif
-
-#ifdef USING_APPLEREMOTE
-    delete d->m_appleRemote;
-    delete d->m_appleRemoteListener;
-#endif
 
     m_deviceHandler.Stop();
 
@@ -657,16 +613,8 @@ bool MythMainWindow::event(QEvent *e)
         return true;
     }
 
-#ifdef USING_APPLEREMOTE
-    if (d->m_appleRemote)
-    {
-        if (e->type() == QEvent::WindowActivate)
-            d->m_appleRemote->startListening();
-
-        if (e->type() == QEvent::WindowDeactivate)
-            d->m_appleRemote->stopListening();
-    }
-#endif
+    if ((e->type() == QEvent::WindowActivate) || (e->type() == QEvent::WindowDeactivate))
+        m_deviceHandler.Event(e);
 
     return QWidget::event(e);
 }
@@ -2029,38 +1977,6 @@ void MythMainWindow::customEvent(QEvent *ce)
         else
             QCoreApplication::sendEvent(key_target, &key);
     }
-#if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
-    else if (ce->type() == LircKeycodeEvent::kEventType &&
-             !d->m_ignoreLircKeys)
-    {
-        auto *lke = dynamic_cast<LircKeycodeEvent *>(ce);
-        if (lke == nullptr)
-            return;
-
-        if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
-        {
-            LOG(VB_GENERAL, LOG_WARNING,
-                    QString("Attempt to convert LIRC key sequence '%1' "
-                            "to a Qt key sequence failed.")
-                    .arg(lke->lirctext()));
-        }
-        else
-        {
-            MythUIHelper::ResetScreensaver();
-            if (GetMythUI()->GetScreenIsAsleep())
-                return;
-
-            QKeyEvent key(lke->keytype(),   lke->key(),
-                          lke->modifiers(), lke->text());
-
-            QObject *key_target = getTarget(key);
-            if (!key_target)
-                QCoreApplication::sendEvent(this, &key);
-            else
-                QCoreApplication::sendEvent(key_target, &key);
-        }
-    }
-#endif
     else if (ce->type() == MythMediaEvent::kEventType)
     {
         auto *me = dynamic_cast<MythMediaEvent*>(ce);
@@ -2139,12 +2055,12 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::kLockInputDevicesEventType)
     {
-        LockInputDevices(true);
+        m_deviceHandler.IgnoreKeys(true);
         PauseIdleTimer(true);
     }
     else if (ce->type() == MythEvent::kUnlockInputDevicesEventType)
     {
-        LockInputDevices(false);
+        m_deviceHandler.IgnoreKeys(false);
         PauseIdleTimer(false);
     }
     else if (ce->type() == MythEvent::kDisableUDPListenerEventType)
@@ -2378,48 +2294,9 @@ int MythMainWindow::GetDrawInterval() const
     return d->m_drawInterval;
 }
 
-void MythMainWindow::StartLIRC(void)
+void MythMainWindow::RestartInputHandlers(void)
 {
-#ifdef USE_LIRC
-    if (d->m_lircThread)
-    {
-        d->m_lircThread->deleteLater();
-        d->m_lircThread = nullptr;
-    }
-
-    QString config_file = GetConfDir() + "/lircrc";
-    if (!QFile::exists(config_file))
-        config_file = QDir::homePath() + "/.lircrc";
-
-    /* lircd socket moved from /dev/ to /var/run/lirc/ in lirc 0.8.6 */
-    QString lirc_socket = "/dev/lircd";
-    if (!QFile::exists(lirc_socket))
-        lirc_socket = "/var/run/lirc/lircd";
-
-    d->m_lircThread = new LIRC(
-        this,
-        GetMythDB()->GetSetting("LircSocket", lirc_socket),
-        "mythtv", config_file);
-
-    if (d->m_lircThread->Init())
-    {
-        d->m_lircThread->start();
-    }
-    else
-    {
-        d->m_lircThread->deleteLater();
-        d->m_lircThread = nullptr;
-    }
-#endif
-}
-
-void MythMainWindow::LockInputDevices( bool locked )
-{
-#ifdef USE_LIRC
-    d->m_ignoreLircKeys = locked;
-#endif
-
-    m_deviceHandler.IgnoreKeys(locked);
+    m_deviceHandler.Reset();
 }
 
 void MythMainWindow::ShowMouseCursor(bool show)

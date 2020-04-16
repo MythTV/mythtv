@@ -67,7 +67,7 @@ void MonitorThread::run(void)
             if (HasMythMainWindow())
             {
                 LOG(VB_GENERAL, LOG_INFO, "Restarting LIRC handler");
-                GetMythMainWindow()->StartLIRC();
+                GetMythMainWindow()->RestartInputHandlers();
             }
         }
         m_lastCheckTime = now;

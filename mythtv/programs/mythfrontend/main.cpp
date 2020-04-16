@@ -2218,7 +2218,7 @@ void handleSIGUSR1(void)
 void handleSIGUSR2(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "Restarting LIRC handler");
-    GetMythMainWindow()->StartLIRC();
+    GetMythMainWindow()->RestartInputHandlers();
 }
 
 #include "main.moc"

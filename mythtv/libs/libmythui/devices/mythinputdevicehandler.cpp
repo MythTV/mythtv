@@ -1,17 +1,26 @@
 // Qt
 #include <QCoreApplication>
 #include <QKeyEvent>
+#include <QDir>
 
 // MythTV
+#include "mythconfig.h"
 #include "mythlogging.h"
+#include "mythdb.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
+#include "lirc.h"
+#include "lircevent.h"
 #include "mythinputdevicehandler.h"
 
 #ifdef USE_JOYSTICK_MENU
-#include "jsmenu.h"
-#include "jsmenuevent.h"
+#include "devices/jsmenu.h"
+#include "devices/jsmenuevent.h"
+#endif
+
+#ifdef USING_APPLEREMOTE
+#include "AppleRemoteListener.h"
 #endif
 
 #define LOC QString("InputHandler: ")
@@ -38,6 +47,31 @@ void MythInputDeviceHandler::Start(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Starting");
 
+#ifdef USE_LIRC
+    if (!m_lircThread)
+    {
+        QString config = GetConfDir() + "/lircrc";
+        if (!QFile::exists(config))
+            config = QDir::homePath() + "/.lircrc";
+
+        // lircd socket moved from /dev/ to /var/run/lirc/ in lirc 0.8.6
+        QString socket = "/dev/lircd";
+        if (!QFile::exists(socket))
+            socket = "/var/run/lirc/lircd";
+
+        m_lircThread = new LIRC(this, GetMythDB()->GetSetting("LircSocket", socket), "mythtv", config);
+        if (m_lircThread->Init())
+        {
+            m_lircThread->start();
+        }
+        else
+        {
+            m_lircThread->deleteLater();
+            m_lircThread = nullptr;
+        }
+    }
+#endif
+
 #ifdef USE_JOYSTICK_MENU
     if (!m_joystickThread)
     {
@@ -45,6 +79,29 @@ void MythInputDeviceHandler::Start(void)
         m_joystickThread = new JoystickMenuThread(this);
         if (m_joystickThread->Init(config))
             m_joystickThread->start();
+    }
+#endif
+
+#ifdef USING_APPLEREMOTE
+    if (!m_appleRemoteListener)
+    {
+        m_appleRemoteListener = new AppleRemoteListener(this);
+        m_appleRemote         = AppleRemote::Get();
+
+        m_appleRemote->setListener(m_appleRemoteListener);
+        m_appleRemote->startListening();
+        if (m_appleRemote->isListeningToRemote())
+        {
+            m_appleRemote->start();
+        }
+        else
+        {
+            // start listening failed, no remote receiver present
+            delete m_appleRemote;
+            delete m_appleRemoteListener;
+            m_appleRemote = nullptr;
+            m_appleRemoteListener = nullptr;
+        }
     }
 #endif
 }
@@ -58,17 +115,34 @@ void MythInputDeviceHandler::Stop(bool Finishing /* = true */)
         m_cecAdapter.Close();
 #endif
 
+#ifdef USING_APPLEREMOTE
+    if (Finishing)
+    {
+        delete m_appleRemote;
+        delete m_appleRemoteListener;
+        m_appleRemote = nullptr;
+        m_appleRemoteListener = nullptr;
+    }
+#endif
+
 #ifdef USE_JOYSTICK_MENU
-    if (m_joystickThread)
+    if (m_joystickThread && Finishing)
     {
         if (m_joystickThread->isRunning())
         {
             m_joystickThread->Stop();
             m_joystickThread->wait();
         }
-
         delete m_joystickThread;
         m_joystickThread = nullptr;
+    }
+#endif
+
+#ifdef USE_LIRC
+    if (m_lircThread)
+    {
+        m_lircThread->deleteLater();
+        m_lircThread = nullptr;
     }
 #endif
 }
@@ -77,6 +151,22 @@ void MythInputDeviceHandler::Reset(void)
 {
     Stop(false);
     Start();
+}
+
+void MythInputDeviceHandler::Event(QEvent *Event)
+{
+    if (!Event)
+        return;
+
+#ifdef USING_APPLEREMOTE
+    if (m_appleRemote)
+    {
+        if (Event->type() == QEvent::WindowActivate)
+            m_appleRemote->startListening();
+        if (Event->type() == QEvent::WindowDeactivate)
+            m_appleRemote->stopListening();
+    }
+#endif
 }
 
 void MythInputDeviceHandler::Action(const QString &Action)
@@ -115,6 +205,10 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
     if (m_ignoreKeys)
         return;
 
+    QKeyEvent key(QEvent::KeyPress, 0, Qt::NoModifier);
+    QObject* target = nullptr;
+    QString error;
+
 #ifdef USE_JOYSTICK_MENU
     if (Event->type() == JoystickKeycodeEvent::kEventType)
     {
@@ -125,30 +219,47 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         int keycode = jke->getKeycode();
         if (keycode)
         {
-            MythUIHelper::ResetScreensaver();
-            if (GetMythUI()->GetScreenIsAsleep())
-                return;
-
-            auto mod = Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK));
-            int k = (keycode & static_cast<int>(~Qt::MODIFIER_MASK)); // trim off the mod
-            QString text;
-            QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
-                                             QEvent::KeyRelease, k, mod, text);
-
-            QObject *target = m_parent->getTarget(key);
-            if (!target)
-                QCoreApplication::sendEvent(m_parent, &key);
-            else
-                QCoreApplication::sendEvent(target, &key);
+            key = QKeyEvent(jke->isKeyDown() ? QEvent::KeyPress : QEvent::KeyRelease,
+                            (keycode & static_cast<int>(~Qt::MODIFIER_MASK)),
+                            Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK)));
+            target = m_parent->getTarget(key);
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Attempt to convert '%1' to a key sequence failed. Fix your key mappings.")
-                    .arg(jke->getJoystickMenuText()));
+            error = jke->getJoystickMenuText();
         }
-
-        return;
     }
 #endif
+
+#if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
+    if (Event->type() == LircKeycodeEvent::kEventType)
+    {
+        auto *lke = dynamic_cast<LircKeycodeEvent *>(Event);
+        if (!lke)
+            return;
+
+        if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
+        {
+            error = lke->lirctext();
+        }
+        else
+        {
+            key = QKeyEvent(lke->keytype(), lke->key(), lke->modifiers(), lke->text());
+            target = m_parent->getTarget(key);
+        }
+    }
+#endif
+
+    if (!error.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Attempt to convert key sequence '%1' to a Qt key sequence failed.").arg(error));
+    }
+    else if (target)
+    {
+        MythUIHelper::ResetScreensaver();
+        if (GetMythUI()->GetScreenIsAsleep())
+            return;
+        QCoreApplication::sendEvent(target, &key);
+    }
 }

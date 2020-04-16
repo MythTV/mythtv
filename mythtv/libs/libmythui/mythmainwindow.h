@@ -119,7 +119,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     int NormX(int x);
     int NormY(int y);
     void SetScalingFactors(float wmult, float hmult);
-    void StartLIRC(void);
+    void RestartInputHandlers(void);
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
@@ -158,15 +158,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     bool eventFilter(QObject *o, QEvent *e) override; // QWidget
     void customEvent(QEvent *ce) override; // QWidget
     void closeEvent(QCloseEvent *e) override; // QWidget
-
     void drawScreen(QPaintEvent* Event = nullptr);
-
     bool event(QEvent* e) override; // QWidget
-
     void ExitToMainMenu();
-
-    void LockInputDevices(bool locked);
-
     void ShowMouseCursor(bool show);
 
     MythMainWindowPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)

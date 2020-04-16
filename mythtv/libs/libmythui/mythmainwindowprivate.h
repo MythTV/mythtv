@@ -1,23 +1,15 @@
 #ifndef MYTHMAINWINDOWPRIVATE_H
 #define MYTHMAINWINDOWPRIVATE_H
 
-// Qt
-#include <QKeyEvent>
-
 // MythTV
 #include "mythconfig.h"
 #include "mythmainwindow.h"
 #include "mythgesture.h"
 
-#ifdef USING_APPLEREMOTE
-#include "AppleRemoteListener.h"
-#endif
-
 class MythScreenStack;
 class MythSignalingTimer;
 class MythThemeBase;
 class MythUDPListener;
-class LIRC;
 class MythMediaDevice;
 
 class KeyContext
@@ -69,13 +61,6 @@ class MythMainWindowPrivate
     QRect                m_screenRect;
     QRect                m_uiScreenRect;
     bool                 m_doesFillScreen       { false   };
-    bool                 m_ignoreLircKeys       { false   };
-    LIRC                *m_lircThread           { nullptr };
-#ifdef USING_APPLEREMOTE
-    AppleRemoteListener *m_appleRemoteListener  { nullptr };
-    AppleRemote         *m_appleRemote          { nullptr };
-#endif
-
     bool                 m_exitingtomain        { false   };
     bool                 m_popwindows           { false   };
     /// To allow or prevent database access
