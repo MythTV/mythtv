@@ -569,11 +569,9 @@ int BufferedSocketDevice::Getch()
 
 int BufferedSocketDevice::Putch( int ch )
 {
-    char buf[2];
+    std::array <char,2> buf  { static_cast<char>(ch), 0 };
 
-    buf[0] = ch;
-
-    return WriteBlock(buf, 1) == 1 ? ch : -1;
+    return WriteBlock(buf.data(), 1) == 1 ? ch : -1;
 }
 
 /////////////////////////////////////////////////////////////////////////////

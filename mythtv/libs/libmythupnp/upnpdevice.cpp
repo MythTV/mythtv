@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QHostAddress>
+#include <QHostInfo>
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
@@ -663,14 +664,13 @@ QString UPnpDeviceDesc::GetHostName() const
     {
         // Get HostName
 
-        char localHostName[1024];
-
-        if (gethostname(localHostName, 1024))
+        QString localHostName = QHostInfo::localHostName();
+        if (localHostName.isEmpty())
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpDeviceDesc: Error, could not determine host name." + ENO);
 
         return UPnp::GetConfiguration()->GetValue("Settings/HostName",
-                                                  QString(localHostName));
+                                                  localHostName);
     }
 
     return m_sHostName;

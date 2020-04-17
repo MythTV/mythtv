@@ -14,6 +14,7 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QHostInfo>
 #include <QTextCodec>
 #include <QStringList>
 #include <QCryptographicHash>
@@ -666,21 +667,19 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     if ( !pDevice->seek( llStart ))
         return -1;
 
-    char   aBuffer[ SENDFILE_BUFFER_SIZE ];
+    std::array<char,SENDFILE_BUFFER_SIZE> aBuffer {};
 
     qint64 llBytesRemaining = llBytes;
     qint64 llBytesToRead    = 0;
     qint64 llBytesRead      = 0;
 
-    memset (aBuffer, 0, sizeof(aBuffer));
-
     while ((sent < llBytes) && !pDevice->atEnd())
     {
         llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
 
-        if (( llBytesRead = pDevice->read( aBuffer, llBytesToRead )) != -1 )
+        if (( llBytesRead = pDevice->read( aBuffer.data(), llBytesToRead )) != -1 )
         {
-            if ( WriteBlock( aBuffer, llBytesRead ) == -1)
+            if ( WriteBlock( aBuffer.data(), llBytesRead ) == -1)
                 return -1;
 
             // -=>TODO: We don't handle the situation where we read more than was sent.
@@ -1032,7 +1031,7 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
     {
         ext = type.pszExtension;
 
-        if ( sFileExtension.toUpper() == ext.toUpper() )
+        if ( sFileExtension.compare(ext, Qt::CaseInsensitive) == 0 )
             return( type.pszType );
     }
 
@@ -2289,7 +2288,6 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
     // ----------------------------------------------------------------------
 
     QStringList allowedOrigins;
-    char localhostname[1024]; // about HOST_NAME_MAX * 4
 
     int serverStatusPort = gCoreContext->GetMasterServerStatusPort();
     int backendSSLPort = gCoreContext->GetNumSetting( "BackendSSLPort",
@@ -2305,7 +2303,8 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
     allowedOrigins << QString("http://%1").arg(masterAddrPort);
     allowedOrigins << QString("https://%2").arg(masterTLSAddrPort);
 
-    if (!gethostname(localhostname, 1024))
+    QString localhostname = QHostInfo::localHostName();
+    if (!localhostname.isEmpty())
     {
         allowedOrigins << QString("http://%1:%2")
             .arg(localhostname).arg(serverStatusPort);

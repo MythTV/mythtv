@@ -54,11 +54,8 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     // switched to static array for performance.
     // ----------------------------------------------------------------------
 
-    void *param[ MAX_PARAMS ];
-    int   types[ MAX_PARAMS ];
-
-    memset( param, 0, MAX_PARAMS * sizeof(void *));
-    memset( types, 0, MAX_PARAMS * sizeof(int));
+    std::array<void*,MAX_PARAMS> param {};
+    std::array<int,MAX_PARAMS> types {};
 
     try
     {
@@ -119,7 +116,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
 
         pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
                                m_nMethodIndex, 
-                               param );
+                               param.data() );
 
         // --------------------------------------------------------------
         // Delete param array, skip return parameter since not dynamically
