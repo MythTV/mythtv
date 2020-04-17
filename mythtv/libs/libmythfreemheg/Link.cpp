@@ -128,7 +128,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-static const char *rchEventType[] =
+static const std::array<const QString,33> rchEventType
 {
     "IsAvailable",
     "ContentAvailable",
@@ -166,11 +166,11 @@ static const char *rchEventType[] =
 };
 
 // Look up the event type. Returns zero if it doesn't match.
-int MHLink::GetEventType(const char *str)
+int MHLink::GetEventType(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchEventType) / sizeof(rchEventType[0])); i++)
+    for (size_t i = 0; i < rchEventType.size(); i++)
     {
-        if (strcasecmp(str, rchEventType[i]) == 0)
+        if (str.compare(rchEventType[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);    // Numbered from 1
         }
@@ -181,7 +181,7 @@ int MHLink::GetEventType(const char *str)
 
 QString MHLink::EventTypeToString(enum EventType ev)
 {
-    if (ev > 0 && ev <= (int)(sizeof(rchEventType) / sizeof(rchEventType[0])))
+    if (ev > 0 && ev <= rchEventType.size())
     {
         return rchEventType[ev-1];
     }
@@ -197,9 +197,9 @@ void MHLink::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, ":EventSource ");
     m_eventSource.PrintMe(fd, nTabs + 1);
     fprintf(fd, "\n");
-    MHASSERT(m_nEventType > 0 && m_nEventType <= (int)(sizeof(rchEventType) / sizeof(rchEventType[0])));
+    MHASSERT(m_nEventType > 0 && m_nEventType <= rchEventType.size());
     PrintTabs(fd, nTabs + 1);
-    fprintf(fd, ":EventType %s\n", rchEventType[m_nEventType-1]);
+    fprintf(fd, ":EventType %s\n", qPrintable(rchEventType[m_nEventType-1]));
 
     // The event data is optional and its format depends on the event type.
     switch (m_eventData.m_Type)

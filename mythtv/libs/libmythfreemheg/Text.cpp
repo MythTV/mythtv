@@ -138,7 +138,7 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
     m_fNeedsRedraw = true;
 }
 
-static const char * const rchJustification[] =
+static const std::array<const QString,4> rchJustification
 {
     "start", // 1
     "end",
@@ -147,11 +147,11 @@ static const char * const rchJustification[] =
 };
 
 // Look up the Justification. Returns zero if it doesn't match.  Used in the text parser only.
-int MHText::GetJustification(const char *str)
+int MHText::GetJustification(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchJustification) / sizeof(rchJustification[0])); i++)
+    for (size_t i = 0; i < rchJustification.size(); i++)
     {
-        if (strcasecmp(str, rchJustification[i]) == 0)
+        if (str.compare(rchJustification[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);    // Numbered from 1
         }
@@ -160,17 +160,17 @@ int MHText::GetJustification(const char *str)
     return 0;
 }
 
-static const char * const rchlineOrientation[] =
+static const std::array<const QString,2> rchlineOrientation
 {
     "vertical", // 1
     "horizontal"
 };
 
-int MHText::GetLineOrientation(const char *str)
+int MHText::GetLineOrientation(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchlineOrientation) / sizeof(rchlineOrientation[0])); i++)
+    for (size_t i = 0; i < rchlineOrientation.size(); i++)
     {
-        if (strcasecmp(str, rchlineOrientation[i]) == 0)
+        if (str.compare(rchlineOrientation[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);
         }
@@ -179,7 +179,7 @@ int MHText::GetLineOrientation(const char *str)
     return 0;
 }
 
-static const char * const rchStartCorner[] =
+static const std::array<const QString,4> rchStartCorner
 {
     "upper-left", // 1
     "upper-right",
@@ -187,11 +187,11 @@ static const char * const rchStartCorner[] =
     "lower-right" // 4
 };
 
-int MHText::GetStartCorner(const char *str)
+int MHText::GetStartCorner(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchStartCorner) / sizeof(rchStartCorner[0])); i++)
+    for (size_t i = 0; i < rchStartCorner.size(); i++)
     {
-        if (strcasecmp(str, rchStartCorner[i]) == 0)
+        if (str.compare(rchStartCorner[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);
         }
@@ -247,25 +247,25 @@ void MHText::PrintMe(FILE *fd, int nTabs) const
     if (m_horizJ != Start)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":HJustification %s\n", rchJustification[m_horizJ-1]);
+        fprintf(fd, ":HJustification %s\n", qPrintable(rchJustification[m_horizJ-1]));
     }
 
     if (m_vertJ != Start)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":VJustification %s\n", rchJustification[m_vertJ-1]);
+        fprintf(fd, ":VJustification %s\n", qPrintable(rchJustification[m_vertJ-1]));
     }
 
     if (m_lineOrientation != Horizontal)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":LineOrientation %s\n", rchlineOrientation[m_lineOrientation-1]);
+        fprintf(fd, ":LineOrientation %s\n", qPrintable(rchlineOrientation[m_lineOrientation-1]));
     }
 
     if (m_startCorner != UpperLeft)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":StartCorner %s\n", rchStartCorner[m_startCorner-1]);
+        fprintf(fd, ":StartCorner %s\n", qPrintable(rchStartCorner[m_startCorner-1]));
     }
 
     if (m_fTextWrap)

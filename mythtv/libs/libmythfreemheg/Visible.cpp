@@ -680,7 +680,7 @@ void MHSlider::Initialise(MHParseNode *p, MHEngine *engine)
     }
 }
 
-static const char *rchOrientation[] =
+static const std::array<const QString,4> rchOrientation
 {
     "left", // 1
     "right",
@@ -689,11 +689,11 @@ static const char *rchOrientation[] =
 };
 
 // Look up the Orientation. Returns zero if it doesn't match.  Used in the text parser only.
-int MHSlider::GetOrientation(const char *str)
+int MHSlider::GetOrientation(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchOrientation) / sizeof(rchOrientation[0])); i++)
+    for (size_t i = 0; i < rchOrientation.size(); i++)
     {
-        if (strcasecmp(str, rchOrientation[i]) == 0)
+        if (str.compare(rchOrientation[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);    // Numbered from 1
         }
@@ -702,18 +702,18 @@ int MHSlider::GetOrientation(const char *str)
     return 0;
 }
 
-static const char *rchStyle[] =
+static const std::array<const QString,3> rchStyle
 {
     "normal", // 1
     "thermometer",
     "proportional" // 3
 };
 
-int MHSlider::GetStyle(const char *str)
+int MHSlider::GetStyle(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchStyle) / sizeof(rchStyle[0])); i++)
+    for (size_t i = 0; i < rchStyle.size(); i++)
     {
-        if (strcasecmp(str, rchStyle[i]) == 0)
+        if (str.compare(rchStyle[i], Qt::CaseInsensitive) == 0)
         {
             return (i + 1);    // Numbered from 1
         }
@@ -730,7 +730,7 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
     MHInteractible::PrintMe(fd, nTabs + 1);
 
     PrintTabs(fd, nTabs);
-    fprintf(fd, ":Orientation %s\n", rchOrientation[m_orientation-1]);
+    fprintf(fd, ":Orientation %s\n", qPrintable(rchOrientation[m_orientation-1]));
 
     if (m_initialValue >= m_origMinValue)
     {
@@ -765,7 +765,7 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
     if (m_style != SliderNormal)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":SliderStyle %s\n", rchStyle[m_style-1]);
+        fprintf(fd, ":SliderStyle %s\n", qPrintable(rchStyle[m_style-1]));
     }
 
     if (m_sliderRefColour.IsSet())

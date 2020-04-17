@@ -60,9 +60,9 @@ class MHText : public MHVisible
     void SetFontAttributes(const MHOctetString &fontAttrs, MHEngine *engine) override; // MHRoot
 
     // Enumerated type lookup functions for the text parser.
-    static int GetJustification(const char *str);
-    static int GetLineOrientation(const char *str);
-    static int GetStartCorner(const char *str);
+    static int GetJustification(const QString& str);
+    static int GetLineOrientation(const QString& str);
+    static int GetStartCorner(const QString& str);
 
     // Display function.
     void Display(MHEngine *engine) override; // MHVisible

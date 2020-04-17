@@ -340,10 +340,7 @@ void MHOctetStrVar::SetVariableValue(const MHUnion &value)
 {
     if (value.m_Type == MHUnion::U_Int)
     {
-        // Implicit conversion of int to string.
-        char buff[30]; // 30 chars is more than enough.
-        snprintf(buff, sizeof(buff), "%0d", value.m_nIntVal);
-        m_value.Copy(buff);
+        m_value.Copy(std::to_string(value.m_nIntVal).data());
     }
     else
     {

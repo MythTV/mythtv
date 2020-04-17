@@ -520,13 +520,7 @@ void MHGenericOctetString::GetValue(MHOctetString &str, MHEngine *engine) const
         if (result.m_Type == MHUnion::U_Int)
         {
             // Implicit conversion of int to string.
-            char buff[30]; // 30 chars is more than enough.
-#ifdef _WIN32
-            _snprintf(buff, sizeof(buff), "%0d", result.m_nIntVal);
-#else
-            snprintf(buff, sizeof(buff), "%0d", result.m_nIntVal);
-#endif
-            str.Copy(buff);
+            str.Copy(std::to_string(result.m_nIntVal).data());
         }
         else
         {

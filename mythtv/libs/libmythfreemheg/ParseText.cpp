@@ -64,7 +64,7 @@ void MHParseText::GetNextChar()
 // Maximum length of a tag (i.e. a symbol beginning with a colon). Actually  the longest is around 22 chars.
 #define MAX_TAG_LENGTH  30
 
-const char *rchTagNames[] =
+const std::array<const QString,253> rchTagNames
 {
     ":Application",
     ":Scene",
@@ -324,12 +324,13 @@ const char *rchTagNames[] =
 };
 
 // Some example programs use these colour names
-static struct
+struct colourTable
 {
     const char *m_name;
     unsigned char m_r, m_g, m_b, m_t;
-} colourTable[] =
-{
+};
+static std::array<const struct colourTable,13> colourTable
+{{
     { "black",          0,  0,  0,  0   },
     { "transparent",    0,  0,  0,  255 },
     { "gray"/*sic*/,    128, 128, 128, 0 },
@@ -343,15 +344,15 @@ static struct
     { "yellow",         255, 255, 0,  0 },
     { "cyan",           0,  255, 255, 0 },
     { "magenta",        255, 0,  255, 0 }
-};
+}};
 
 
 // Search for a tag and return it if it exists.  Returns -1 if it isn't found.
-static int FindTag(const char *p)
+static int FindTag(const QString& str)
 {
-    for (int i = 0; i < (int)(sizeof(rchTagNames) / sizeof(rchTagNames[0])); i++)
+    for (size_t i = 0; i < rchTagNames.size(); i++)
     {
-        if (stricmp(p, rchTagNames[i]) == 0)
+        if (str.compare(rchTagNames[i], Qt::CaseInsensitive) == 0)
         {
             return i;
         }
@@ -410,22 +411,20 @@ void MHParseText::NextSym()
             case ':': // Start of a tag
             {
                 m_nType = PTTag;
-                char buff[MAX_TAG_LENGTH+1];
-                char *p = buff;
+                QString buff {};
+                buff.reserve(MAX_TAG_LENGTH);
 
                 do
                 {
-                    *p++ = m_ch;
+                    buff += m_ch;
                     GetNextChar();
 
-                    if (p == buff + MAX_TAG_LENGTH)
+                    if (buff.size() == MAX_TAG_LENGTH)
                     {
                         break;
                     }
                 }
                 while ((m_ch >= 'a' && m_ch <= 'z') || (m_ch >= 'A' && m_ch <= 'Z'));
-
-                *p = 0;
 
                 // Look it up and return it if it's found.
                 m_nTag = FindTag(buff);
@@ -699,37 +698,35 @@ void MHParseText::NextSym()
             {
                 // Start of an enumerated type.
                 m_nType = PTEnum;
-                char buff[MAX_ENUM+1];
-                char *p = buff;
+                QString buff;
+                buff.reserve(MAX_ENUM);
 
                 do
                 {
-                    *p++ = m_ch;
+                    buff += m_ch;
                     GetNextChar();
 
-                    if (p == buff + MAX_ENUM)
+                    if (buff.size() == MAX_ENUM)
                     {
                         break;
                     }
                 }
                 while ((m_ch >= 'a' && m_ch <= 'z') || (m_ch >= 'A' && m_ch <= 'Z') || m_ch == '-');
 
-                *p = '\0';
-
-                if (stricmp(buff, "NULL") == 0)
+                if (buff.compare("NULL", Qt::CaseInsensitive) == 0)
                 {
                     m_nType = PTNull;
                     return;
                 }
 
-                if (stricmp(buff, "true") == 0)
+                if (buff.compare("true", Qt::CaseInsensitive) == 0)
                 {
                     m_nType = PTBool;
                     m_fBool = true;
                     return;
                 }
 
-                if (stricmp(buff, "false") == 0)
+                if (buff.compare("false", Qt::CaseInsensitive) == 0)
                 {
                     m_nType = PTBool;
                     m_fBool = false;
@@ -781,9 +778,9 @@ void MHParseText::NextSym()
                 }
 
                 // Check the colour table.  If it's there generate a string containing the colour info.
-                for (auto & colour : colourTable)
+                for (const auto & colour : colourTable)
                 {
-                    if (stricmp(buff, colour.m_name) == 0)
+                    if (buff.compare(colour.m_name, Qt::CaseInsensitive) == 0)
                     {
                         m_nType = PTString;
                         auto *str = (unsigned char *)realloc(m_string, 4 + 1);

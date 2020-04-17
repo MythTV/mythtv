@@ -51,7 +51,7 @@ class MHParseText: public MHParseBase
                          PTEOF, PTBool };
     ParseTextType  m_nType         {PTNull};
 
-    int            m_ch            {0};
+    char           m_ch            {0};
     int            m_nTag          {0};
     int            m_nInt          {0};
     bool           m_fBool         {false};

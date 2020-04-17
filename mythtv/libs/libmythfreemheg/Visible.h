@@ -211,8 +211,8 @@ class MHSlider : public MHVisible, public MHInteractible
     void SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine) override; // MHRoot
 
     // Enumerated type lookup functions for the text parser.
-    static int GetOrientation(const char *str);
-    static int GetStyle(const char *str);
+    static int GetOrientation(const QString& str);
+    static int GetStyle(const QString& str);
   protected:
     void Increment(MHEngine *engine);
     void Decrement(MHEngine *engine);
