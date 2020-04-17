@@ -53,6 +53,7 @@ using namespace std;
 #include "mythgesture.h"
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
+#include "devices/mythinputdevicehandler.h"
 
 #ifdef _WIN32
 #include "mythpainter_d3d9.h"
@@ -135,7 +136,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
 {
     m_display = MythDisplay::AcquireRelease();
-    connect(this, &MythMainWindow::signalWindowReady, &m_deviceHandler, &MythInputDeviceHandler::MainWindowReady);
+    m_deviceHandler = new MythInputDeviceHandler(this);
+    connect(this, &MythMainWindow::signalWindowReady, m_deviceHandler, &MythInputDeviceHandler::MainWindowReady);
 
     d = new MythMainWindowPrivate;
 
@@ -230,10 +232,8 @@ MythMainWindow::~MythMainWindow()
         delete context;
     }
 
-    m_deviceHandler.Stop();
-
+    delete m_deviceHandler;
     delete d->m_nc;
-
     delete m_painter;
     delete m_painterWin;
 
@@ -614,7 +614,7 @@ bool MythMainWindow::event(QEvent *e)
     }
 
     if ((e->type() == QEvent::WindowActivate) || (e->type() == QEvent::WindowDeactivate))
-        m_deviceHandler.Event(e);
+        m_deviceHandler->Event(e);
 
     return QWidget::event(e);
 }
@@ -1545,7 +1545,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
 
 void MythMainWindow::HandleTVAction(const QString &Action)
 {
-    m_deviceHandler.Action(Action);
+    m_deviceHandler->Action(Action);
 }
 
 void MythMainWindow::AllowInput(bool allow)
@@ -2055,12 +2055,12 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::kLockInputDevicesEventType)
     {
-        m_deviceHandler.IgnoreKeys(true);
+        m_deviceHandler->IgnoreKeys(true);
         PauseIdleTimer(true);
     }
     else if (ce->type() == MythEvent::kUnlockInputDevicesEventType)
     {
-        m_deviceHandler.IgnoreKeys(false);
+        m_deviceHandler->IgnoreKeys(false);
         PauseIdleTimer(false);
     }
     else if (ce->type() == MythEvent::kDisableUDPListenerEventType)
@@ -2296,7 +2296,7 @@ int MythMainWindow::GetDrawInterval() const
 
 void MythMainWindow::RestartInputHandlers(void)
 {
-    m_deviceHandler.Reset();
+    m_deviceHandler->Reset();
 }
 
 void MythMainWindow::ShowMouseCursor(bool show)

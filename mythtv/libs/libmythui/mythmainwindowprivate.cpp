@@ -1,3 +1,6 @@
+// Qt
+#include <QKeyEvent>
+
 // MythTV
 #include "mythmainwindowprivate.h"
 

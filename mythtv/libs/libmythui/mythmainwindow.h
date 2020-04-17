@@ -5,7 +5,6 @@
 #include <QWidget>
 
 // MythTV
-#include "devices/mythinputdevicehandler.h"
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
@@ -25,6 +24,7 @@ class MythMediaDevice;
 using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
 class MythDisplay;
+class MythInputDeviceHandler;
 class MythMainWindowPrivate;
 class MythPainterWindow;
 class MythRender;
@@ -175,7 +175,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythPainter*       m_oldPainter    { nullptr };
     MythPainterWindow* m_painterWin    { nullptr };
     MythPainterWindow* m_oldPainterWin { nullptr };
-    MythInputDeviceHandler m_deviceHandler { this };
+    MythInputDeviceHandler* m_deviceHandler { nullptr };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

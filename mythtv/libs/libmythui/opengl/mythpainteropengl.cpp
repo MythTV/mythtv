@@ -50,6 +50,8 @@ void MythOpenGLPainter::FreeResources(void)
         }
         m_mappedBufferPoolReady = false;
     }
+
+    MythPainter::FreeResources();
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
