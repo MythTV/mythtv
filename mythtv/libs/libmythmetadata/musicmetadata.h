@@ -75,7 +75,7 @@ enum RepoType
 #define STREAMUPDATEURL "https://services.mythtv.org/music/data/?data=streams"
 #define STREAMURLCOUNT 5
 
-using UrlList = QString[STREAMURLCOUNT];
+using UrlList = std::array<QString,STREAMURLCOUNT>;
 
 class META_PUBLIC MusicMetadata
 {

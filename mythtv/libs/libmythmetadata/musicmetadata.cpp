@@ -72,9 +72,7 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
             m_country(std::move(lcountry)),
             m_language(std::move(llanguage))
 {
-    for (int x = 0; x < STREAMURLCOUNT; x++)
-        m_urls[x] = lurls[x];
-
+    m_urls = lurls;
     setRepo(RT_Radio);
     ensureSortFields();
 }
@@ -142,8 +140,7 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_channel = rhs.m_channel;
     m_description = rhs.m_description;
 
-    for (int x = 0; x < 5; x++)
-        m_urls[x] = rhs.m_urls[x];
+    m_urls = rhs.m_urls;
     m_logoUrl = rhs.m_logoUrl;
     m_metaFormat = rhs.m_metaFormat;
     m_country = rhs.m_country;
