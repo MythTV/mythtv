@@ -1,10 +1,10 @@
 
-#include "AppleRemoteListener.h"
+#include "devices/AppleRemoteListener.h"
 
 #include <QCoreApplication>
 #include <QKeySequence>
 #include <QString>
-#include "lircevent.h"
+#include "devices/lircevent.h"
 
 void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
                                             bool pressedDown)

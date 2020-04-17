@@ -10,8 +10,6 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
-#include "lirc.h"
-#include "lircevent.h"
 #include "mythinputdevicehandler.h"
 
 #ifdef USE_JOYSTICK_MENU
@@ -20,7 +18,12 @@
 #endif
 
 #ifdef USING_APPLEREMOTE
-#include "AppleRemoteListener.h"
+#include "devices/AppleRemoteListener.h"
+#endif
+
+#ifdef USE_LIRC
+#include "devices/lirc.h"
+#include "devices/lircevent.h"
 #endif
 
 #define LOC QString("InputHandler: ")

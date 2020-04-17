@@ -1,7 +1,7 @@
 #ifndef APPLEREMOTELISTENER
 #define APPLEREMOTELISTENER
 
-#include "AppleRemote.h"
+#include "devices/AppleRemote.h"
 
 class AppleRemoteListener: public AppleRemote::Listener
 {

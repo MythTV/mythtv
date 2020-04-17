@@ -145,10 +145,10 @@ macx {
     LIBS              += -framework Cocoa -framework IOKit
 
     using_appleremote {
-        HEADERS += AppleRemote.h   AppleRemoteListener.h
-        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp
-        !using_lirc: HEADERS += lircevent.h
-        !using_lirc: SOURCES += lircevent.cpp
+        HEADERS += devices/AppleRemote.h   devices/AppleRemoteListener.h
+        SOURCES += devices/AppleRemote.cpp devices/AppleRemoteListener.cpp
+        !using_lirc: HEADERS += devices/lircevent.h
+        !using_lirc: SOURCES += devices/lircevent.cpp
     }
 }
 
@@ -165,8 +165,8 @@ using_joystick_menu {
 
 using_lirc {
     DEFINES += USE_LIRC
-    HEADERS += lirc.h   lircevent.h   lirc_client.h
-    SOURCES += lirc.cpp lircevent.cpp lirc_client.cpp
+    HEADERS += devices/lirc.h   devices/lircevent.h   devices/lirc_client.h
+    SOURCES += devices/lirc.cpp devices/lircevent.cpp devices/lirc_client.cpp
 }
 
 using_libcec {
