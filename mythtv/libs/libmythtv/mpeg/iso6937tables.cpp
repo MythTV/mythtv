@@ -3,7 +3,7 @@
 // conversion tables from iso/iec 6937 to unicode for single byte characters
 // double byte chracters are marked as 0xFFFF for further processing
 
-const uint16_t iso6937table_base[256] =
+const iso6937table iso6937table_base
 {
     0x00, 0x01, 0x02, 0x03,   0x04, 0x05, 0x06, 0x07,       // iso 0x00-0x07
     0x08, 0x09, 0x0A, 0x0B,   0x0C, 0x0D, 0x0E, 0x0F,       // iso 0x08-0x0F
@@ -61,7 +61,7 @@ const uint16_t iso6937table_base[256] =
 // note: all characters marked as 0xFFFF are not in iso/iec 6937 encoding
 // they will be processed in the next step as character without any accent
 
-const uint16_t iso6937table_C1[256] =
+const iso6937table iso6937table_C1
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -129,7 +129,7 @@ const uint16_t iso6937table_C1[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C2[256] =
+const iso6937table iso6937table_C2
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -199,7 +199,7 @@ const uint16_t iso6937table_C2[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C3[256] =
+const iso6937table iso6937table_C3
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -267,7 +267,7 @@ const uint16_t iso6937table_C3[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C4[256] =
+const iso6937table iso6937table_C4
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -335,7 +335,7 @@ const uint16_t iso6937table_C4[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C5[256] =
+const iso6937table iso6937table_C5
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -403,7 +403,7 @@ const uint16_t iso6937table_C5[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C6[256] =
+const iso6937table iso6937table_C6
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -471,7 +471,7 @@ const uint16_t iso6937table_C6[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C7[256] =
+const iso6937table iso6937table_C7
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -539,7 +539,7 @@ const uint16_t iso6937table_C7[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_C8[256] =
+const iso6937table iso6937table_C8
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -607,7 +607,7 @@ const uint16_t iso6937table_C8[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_CA[256] =
+const iso6937table iso6937table_CA
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -675,7 +675,7 @@ const uint16_t iso6937table_CA[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_CB[256] =
+const iso6937table iso6937table_CB
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x0-0x7
@@ -743,7 +743,7 @@ const uint16_t iso6937table_CB[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_CD[256] =
+const iso6937table iso6937table_CD
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x00-0x07
@@ -811,7 +811,7 @@ const uint16_t iso6937table_CD[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_CE[256] =
+const iso6937table iso6937table_CE
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x0-0x7
@@ -879,7 +879,7 @@ const uint16_t iso6937table_CE[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_CF[256] =
+const iso6937table iso6937table_CF
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x0-0x7
@@ -954,7 +954,7 @@ const uint16_t iso6937table_CF[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-const uint16_t iso6937table_dummy[256] =
+const iso6937table iso6937table_dummy
 {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0x0-0x7
@@ -1022,8 +1022,8 @@ const uint16_t iso6937table_dummy[256] =
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,                         // iso 0xF8-0xFF
 };
 
-static const uint16_t* d = iso6937table_dummy;
-const uint16_t *iso6937table_secondary[256] =
+static const iso6937table* d = &iso6937table_dummy;
+const std::array<const iso6937table *,256> iso6937table_secondary
 {
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0x00-0x0F
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0x10-0x1F
@@ -1037,15 +1037,15 @@ const uint16_t *iso6937table_secondary[256] =
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0x90-0x9F
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0xA0-0xAF
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0xB0-0xDF
-    d,                  iso6937table_C1,
-    iso6937table_C2,    iso6937table_C3,
-    iso6937table_C4,    iso6937table_C5,
-    iso6937table_C6,    iso6937table_C7,
+    d,                  &iso6937table_C1,
+    &iso6937table_C2,   &iso6937table_C3,
+    &iso6937table_C4,   &iso6937table_C5,
+    &iso6937table_C6,   &iso6937table_C7,
 
-    iso6937table_C8,    d,
-    iso6937table_CA,    iso6937table_CB,
-    d,                  iso6937table_CD,
-    iso6937table_CE,    iso6937table_CF,                   // 0xC0-0xCF
+    &iso6937table_C8,   d,
+    &iso6937table_CA,   &iso6937table_CB,
+    d,                  &iso6937table_CD,
+    &iso6937table_CE,   &iso6937table_CF,                  // 0xC0-0xCF
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0xD0-0xDF
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0xE0-0xEF
     d, d, d, d, d, d, d, d,   d, d, d, d, d, d, d, d,      // 0xF0-0xFF

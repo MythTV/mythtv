@@ -1,5 +1,9 @@
+#include <array>
+
 using uint16_t = unsigned short;
+using iso6937table = std::array<const uint16_t,256>;
 
 // conversion tables from iso/iec 6937 to unicode
-extern const uint16_t iso6937table_base[256];
-extern const uint16_t *iso6937table_secondary[256];
+
+extern const iso6937table iso6937table_base;
+extern const std::array<const iso6937table *,256> iso6937table_secondary;

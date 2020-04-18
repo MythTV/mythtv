@@ -25,7 +25,8 @@ static QString decode_iso6937(const unsigned char *buf, uint length)
         if (ch == 0xFFFF)
         {
             // Process second byte of two byte character
-            ch = iso6937table_secondary[buf[i-1]][buf[i]];
+            const iso6937table * foo = iso6937table_secondary[buf[i-1]];
+            ch = (*foo)[buf[i]];
             if (ch == 0xFFFF)
             {
                 // If no valid code found in secondary table,
