@@ -213,20 +213,19 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
             list, DescriptorID::short_event, languagePreferences);
 
     // from EN 300 468, Appendix A.2 - Selection of character table
-    unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
-    unsigned char enc_2[3]  = { 0x10, 0x00, 0x02 };
-    unsigned char enc_7[3]  = { 0x10, 0x00, 0x07 }; // Latin/Greek Alphabet
-    unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
-    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
-    int enc_len = 0;
-    const unsigned char *enc = nullptr;
+    const enc_override enc_1  { 0x10, 0x00, 0x01 };
+    const enc_override enc_2  { 0x10, 0x00, 0x02 };
+    const enc_override enc_7  { 0x10, 0x00, 0x07 }; // Latin/Greek Alphabet
+    const enc_override enc_9  { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
+    const enc_override enc_15 { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
+    const enc_override enc_none {};
+    enc_override enc = enc_none;
 
     // Is this BellExpressVU EIT (Canada) ?
     // Use an encoding override of ISO 8859-1 (Latin1)
     if (fix & EITFixUp::kEFixForceISO8859_1)
     {
         enc = enc_1;
-        enc_len = sizeof(enc_1);
     }
 
     // Is this broken DVB provider in Central Europe?
@@ -234,7 +233,6 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
     if (fix & EITFixUp::kEFixForceISO8859_2)
     {
         enc = enc_2;
-        enc_len = sizeof(enc_2);
     }
 
     // Is this broken DVB provider in Western Europe?
@@ -242,7 +240,6 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
     if (fix & EITFixUp::kEFixForceISO8859_9)
     {
         enc = enc_9;
-        enc_len = sizeof(enc_9);
     }
 
     // Is this broken DVB provider in Western Europe?
@@ -250,7 +247,6 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
     if (fix & EITFixUp::kEFixForceISO8859_15)
     {
         enc = enc_15;
-        enc_len = sizeof(enc_15);
     }
 
     // Is this broken DVB provider in Greece?
@@ -258,7 +254,6 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
     if (fix & EITFixUp::kEFixForceISO8859_7)
     {
         enc = enc_7;
-        enc_len = sizeof(enc_7);
     }
 
     if (bestShortEvent)
@@ -266,16 +261,8 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
         ShortEventDescriptor sed(bestShortEvent);
         if (sed.IsValid())
         {
-            if (enc)
-            {
-                title    = sed.EventName(enc, enc_len);
-                subtitle = sed.Text(enc, enc_len);
-            }
-            else
-            {
-                title    = sed.EventName();
-                subtitle = sed.Text();
-            }
+            title    = sed.EventName(enc);
+            subtitle = sed.Text(enc);
         }
     }
 
@@ -295,10 +282,7 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
         ExtendedEventDescriptor eed(best_event);
         if (eed.IsValid())
         {
-            if (enc)
-                description += eed.Text(enc, enc_len);
-            else
-                description += eed.Text();
+            description += eed.Text(enc);
         }
         // add items from the descriptor to the items
         items.unite (eed.Items());

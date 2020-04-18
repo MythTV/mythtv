@@ -54,8 +54,7 @@ static QString decode_text(const unsigned char *buf, uint length);
 
 // Decode a text string according to ETSI EN 300 468 Annex A
 QString dvb_decode_text(const unsigned char *src, uint raw_length,
-                        const unsigned char *encoding_override,
-                        uint encoding_override_length)
+                        const enc_override &encoding_override)
 {
     if (!raw_length)
         return "";
@@ -86,12 +85,12 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
-    auto *dst = new unsigned char[raw_length + encoding_override_length];
+    auto *dst = new unsigned char[raw_length + encoding_override.size()];
 
     uint length = 0;
-    if (encoding_override && src[0] >= 0x20) {
-        memcpy(dst, encoding_override, encoding_override_length);
-        length = encoding_override_length;
+    if (!encoding_override.empty() && (src[0] >= 0x20)) {
+        std::copy(encoding_override.cbegin(), encoding_override.cend(), dst);
+        length = encoding_override.size();
     }
 
     // Strip formatting characters

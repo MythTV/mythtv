@@ -296,7 +296,7 @@ void TestMPEGTables::TestUCS2 (void)
 
     QCOMPARE (sizeof (QChar), (size_t) 2);
     QCOMPARE (sizeof (ucs2_data) - 1, (size_t) ucs2_data[0]);
-    QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], nullptr, 0);
+    QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], {});
     QCOMPARE (ucs2.length(), (int) (ucs2_data[0] - 1) / 2);
     QCOMPARE (ucs2, QString::fromWCharArray (wchar_data));
 }

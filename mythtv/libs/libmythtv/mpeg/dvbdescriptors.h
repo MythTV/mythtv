@@ -37,13 +37,13 @@
 
 static QString coderate_inner(uint coderate);
 
+using enc_override = std::vector<uint8_t>;
 MTV_PUBLIC QString dvb_decode_text(const unsigned char *src, uint length,
-                               const unsigned char *encoding_override,
-                               uint encoding_override_length);
+                               const enc_override &encoding_override);
 
 inline QString dvb_decode_text(const unsigned char *src, uint length)
 {
-    return dvb_decode_text(src, length, nullptr, 0);
+    return dvb_decode_text(src, length, {} );
 }
 
 QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
@@ -1558,11 +1558,10 @@ class MTV_PUBLIC ExtendedEventDescriptor : public MPEGDescriptor
         { return dvb_decode_text(&m_data[8 + LengthOfItems()], TextLength()); }
 
     // HACK beg -- Pro7Sat is missing encoding
-    QString Text(const unsigned char *encoding_override,
-                 uint encoding_length) const
+    QString Text(const enc_override &encoding_override) const
     {
         return dvb_decode_text(&m_data[8 + LengthOfItems()], TextLength(),
-                               encoding_override, encoding_length);
+                               encoding_override);
     }
     // HACK end -- Pro7Sat is missing encoding
 };
@@ -2159,18 +2158,16 @@ class ShortEventDescriptor : public MPEGDescriptor
         { return dvb_decode_text(&m_data[7 + m_data[5]], TextLength()); }
 
     // HACK beg -- Pro7Sat is missing encoding
-    QString EventName(const unsigned char *encoding_override,
-                      uint encoding_length) const
+    QString EventName(const enc_override& encoding_override) const
     {
         return dvb_decode_text(&m_data[6], m_data[5],
-                               encoding_override, encoding_length);
+                               encoding_override);
     }
 
-    QString Text(const unsigned char *encoding_override,
-                 uint encoding_length) const
+    QString Text(const enc_override& encoding_override) const
     {
         return dvb_decode_text(&m_data[7 + m_data[5]], TextLength(),
-                               encoding_override, encoding_length);
+                               encoding_override);
     }
     // HACK end -- Pro7Sat is missing encoding
 
