@@ -1701,8 +1701,9 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // a result of rounding when drawing ellipses.
 struct lineSeg { int m_yBottom, m_yTop, m_xBottom; float m_slope; };
 
-void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray)
+void MHIDLA::DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec& yArray)
 {
+    int nPoints = xArray.size();
     if (nPoints < 2)
         return;
 

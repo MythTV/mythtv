@@ -344,7 +344,7 @@ class MHIDLA : public MHDLADisplay
     void DrawOval(int x, int y, int width, int height) override; // MHDLADisplay
     void DrawArcSector(int x, int y, int width, int height,
                        int start, int arc, bool isSector) override; // MHDLADisplay
-    void DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray) override; // MHDLADisplay
+    void DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec& yArray) override; // MHDLADisplay
 
   protected:
     void DrawRect(int x, int y, int width, int height, MHRgba colour);

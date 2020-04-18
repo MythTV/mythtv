@@ -31,6 +31,9 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
+
+using MHPointVec = std::vector<int>; // Duplicated in BaseClasses.h
 
 class MHDLADisplay;
 class MHTextDisplay;
@@ -183,7 +186,7 @@ class MHDLADisplay
     virtual void DrawBorderedRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawOval(int x, int y, int width, int height) = 0;
     virtual void DrawArcSector(int x, int y, int width, int height, int start, int arc, bool isSector) = 0;
-    virtual void DrawPoly(bool isFilled, int nPoints, const int xArray[], const int yArray[]) = 0;
+    virtual void DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec& yArray) = 0;
 };
 
 class MHTextDisplay {

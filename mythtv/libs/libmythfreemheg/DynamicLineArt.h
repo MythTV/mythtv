@@ -66,7 +66,7 @@ class MHDynamicLineArt : public MHLineArt
     void DrawLine(int x1, int y1, int x2, int y2, MHEngine *engine) override; // MHRoot
     void DrawOval(int x1, int y1, int width, int height, MHEngine *engine) override; // MHRoot
     void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *engine) override; // MHRoot
-    void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *engine) override; // MHRoot
+    void DrawPoly(bool fIsPolygon, const MHPointVec& xArray, const MHPointVec& yArray, MHEngine *engine) override; // MHRoot
 
   protected:
     MHDLADisplay *m_picture {nullptr}; // The sequence of drawing actions.

@@ -202,7 +202,7 @@ class MHRoot
         { InvalidAction("DrawOval"); }
     virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine */*engine*/)
         { InvalidAction("DrawRectangle"); }
-    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int * /*xArray*/, const int * /*yArray*/, MHEngine */*engine*/)
+    virtual void DrawPoly(bool /*fIsPolygon*/, const MHPointVec& /*xArray*/, const MHPointVec& /*yArray*/, MHEngine */*engine*/)
          { InvalidAction("DrawPoly(gon/line)"); }
 
     // Actions on Video streams.

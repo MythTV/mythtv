@@ -168,9 +168,9 @@ void MHDynamicLineArt::DrawArcSector(bool fIsSector, int x, int y, int width, in
     engine->Redraw(GetVisibleArea());
 }
 
-void MHDynamicLineArt::DrawPoly(bool fIsPolygon, int nPoints, const int xArray[], const int yArray[], MHEngine *engine)
+void MHDynamicLineArt::DrawPoly(bool fIsPolygon, const MHPointVec& xArray, const MHPointVec& yArray, MHEngine *engine)
 {
-    m_picture->DrawPoly(fIsPolygon, nPoints, xArray, yArray);
+    m_picture->DrawPoly(fIsPolygon, xArray, yArray);
     engine->Redraw(GetVisibleArea());
 }
 
@@ -193,8 +193,8 @@ void MHDrawPoly::Initialise(MHParseNode *p, MHEngine *engine)
 void MHDrawPoly::Perform(MHEngine *engine)
 {
     int nPoints = m_points.Size();
-    int *xArray = new int[nPoints];
-    int *yArray = new int[nPoints];
+    MHPointVec xArray; xArray.reserve(nPoints);
+    MHPointVec yArray; yArray.reserve(nPoints);
 
     for (int i = 0; i < nPoints; i++)
     {
@@ -203,9 +203,7 @@ void MHDrawPoly::Perform(MHEngine *engine)
         yArray[i] = pPoint->m_y.GetValue(engine);
     }
 
-    Target(engine)->DrawPoly(m_fIsPolygon, nPoints, xArray, yArray, engine);
-    delete[](xArray);
-    delete[](yArray);
+    Target(engine)->DrawPoly(m_fIsPolygon, xArray, yArray, engine);
 }
 
 void MHDrawPoly::PrintArgs(FILE *fd, int /*nTabs*/) const

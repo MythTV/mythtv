@@ -29,6 +29,9 @@
 
 #include <array>
 #include <QString>
+#include <vector>
+
+using MHPointVec = std::vector<int>; // Duplicated in freemheg.h
 
 #include "Logging.h" // For MHASSERT
 
