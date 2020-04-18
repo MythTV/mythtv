@@ -1801,6 +1801,8 @@ class ParentalRatingDescriptor : public MPEGDescriptor
   public:
     explicit ParentalRatingDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::parental_rating) { }
+    explicit ParentalRatingDescriptor(const std::vector<uint8_t> &data) :
+        MPEGDescriptor(data, DescriptorID::parental_rating) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x55
     // descriptor_length        8   1.0
@@ -1869,6 +1871,8 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
   public:
     explicit PrivateDataSpecifierDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::private_data_specifier) { }
+    explicit PrivateDataSpecifierDescriptor(const std::vector<uint8_t> &data) :
+        MPEGDescriptor(data, DescriptorID::private_data_specifier) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x5f
     // descriptor_length        8   1.0
@@ -2909,6 +2913,8 @@ class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
     public:
      explicit PrivateUPCCablecomEpisodeTitleDescriptor(const unsigned char *data, int len = 300) :
          MPEGDescriptor(data, len, PrivateDescriptorID::upc_event_episode_title) { }
+    explicit PrivateUPCCablecomEpisodeTitleDescriptor(const std::vector<uint8_t> &data) :
+        MPEGDescriptor(data, PrivateDescriptorID::upc_event_episode_title) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0xa7
     // descriptor_length        8   1.0

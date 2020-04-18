@@ -3,7 +3,7 @@
 #include <cstdint> // for intptr_t
 #include "tspacket.h"
 
-const unsigned char TSHeader::kPayloadOnlyHeader[4] =
+const TSHeaderArray TSHeader::kPayloadOnlyHeader
 {
     SYNC_BYTE,
     0x40, // payload start
@@ -11,7 +11,7 @@ const unsigned char TSHeader::kPayloadOnlyHeader[4] =
     0x10,  // adaptation field control == payload only
 };
 
-const unsigned char NULL_PACKET_BYTES[188] =
+const std::array<unsigned char,188> NULL_PACKET_BYTES
 {
     SYNC_BYTE, 0x1F, 0xFF, 0x00,
     0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 36
@@ -23,7 +23,7 @@ const unsigned char NULL_PACKET_BYTES[188] =
 };
 
 const TSPacket *TSPacket::kNullPacket =
-    reinterpret_cast<const TSPacket*>(NULL_PACKET_BYTES);
+    reinterpret_cast<const TSPacket*>(NULL_PACKET_BYTES.data());
 
 QString TSPacket::toString() const
 {

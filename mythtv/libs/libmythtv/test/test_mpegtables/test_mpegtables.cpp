@@ -27,7 +27,7 @@
 
 void TestMPEGTables::pat_test(void)
 {
-    const unsigned char si_data[] = {
+    const std::vector<uint8_t> si_data {
         0x00, 0xb0, 0x31, 0x04, 0x37, 0xdf, 0x00, 0x00,  0x2b, 0x66, 0xf7, 0xd4, 0x6d, 0x66, 0xe0, 0x64,  /* ..1.7...+f..mf.d */
         0x6d, 0x67, 0xe0, 0xc8, 0x6d, 0x68, 0xe1, 0x2c,  0x6d, 0x6b, 0xe2, 0x58, 0x6d, 0x6c, 0xe2, 0xbc,  /* mg..mh.,mk.Xml.. */
         0x6d, 0x6d, 0xe3, 0x20, 0x6d, 0x6e, 0xe2, 0x8a,  0x6d, 0x70, 0xe4, 0x4c, 0x6d, 0x71, 0xe1, 0x9b,  /* mm. mn..mp.Lmq.. */
@@ -113,11 +113,10 @@ void TestMPEGTables::pat_test(void)
     QVERIFY (pat3->VerifyCRC());
 
     // Create a PAT object
-    unsigned char si_data4[188];
-    memset (&si_data4, 0, sizeof(si_data4));
+    std::vector<uint8_t> si_data4(188,'\0');
     si_data4[1] = 1 << 7 & 0 << 6 & 3 << 4 & 0 << 2 & 0;
     si_data4[2] = 0x00;
-    auto* pat4 = new ProgramAssociationTable(PSIPTable((unsigned char*)&si_data4));
+    auto* pat4 = new ProgramAssociationTable(PSIPTable(si_data4));
     QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
     QVERIFY (pat4->VerifyCRC());
     delete pat4;
@@ -135,7 +134,7 @@ void TestMPEGTables::dvbdate(void)
 
 void TestMPEGTables::tdt_test(void)
 {
-    const unsigned char si_data[] = {
+    const std::vector<uint8_t> si_data {
         0x70, 0x70, 0x05, 0xdc, 0xa9, 0x12, 0x33, 0x37                                                    /* pp....37 */
     };
 
@@ -169,7 +168,7 @@ void TestMPEGTables::tdt_test(void)
 
 void TestMPEGTables::ContentIdentifierDescriptor_test(void)
 {
-    const unsigned char eit_data[] = {
+    const std::vector<uint8_t> eit_data {
         0x4f, 0xf2, 0x17, 0x42, 0xd8, 0xdb, 0x00, 0x01,  0x00, 0xab, 0x27, 0x0f, 0x01, 0x4f, 0x30, 0x17,  /* O..B......'..O0. */
         0xdc, 0xc9, 0x07, 0x15, 0x00, 0x00, 0x25, 0x00,  0x81, 0xfc, 0x4d, 0xb2, 0x65, 0x6e, 0x67, 0x0d,  /* ......%...M.eng. */
         0x05, 0x4d, 0x6f, 0x6e, 0x65, 0x79, 0x62, 0x72,  0x6f, 0x74, 0x68, 0x65, 0x72, 0xa0, 0x05, 0x44,  /* .Moneybrother..D */
@@ -243,7 +242,7 @@ void TestMPEGTables::clone_test(void)
 void TestMPEGTables::PrivateDataSpecifierDescriptor_test (void)
 {
     /* from https://code.mythtv.org/trac/ticket/12091 */
-    const unsigned char si_data[] = { 
+    const std::vector<uint8_t> si_data {
         0x5f, 0x04, 0x00, 0x00, 0x06, 0x00
     };
     PrivateDataSpecifierDescriptor desc(si_data);
@@ -252,7 +251,7 @@ void TestMPEGTables::PrivateDataSpecifierDescriptor_test (void)
 
 void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
 {
-    const unsigned char si_data[] = {
+    const std::vector<uint8_t> si_data {
         0xa7, 0x13, 0x67, 0x65, 0x72, 0x05, 0x4b, 0x72,  0x61, 0x6e, 0x6b, 0x20, 0x76, 0x6f, 0x72, 0x20,  /* ..ger.Krank vor  */
         0x4c, 0x69, 0x65, 0x62, 0x65                                                                      /* Liebe            */
     };
@@ -287,24 +286,24 @@ void TestMPEGTables::ItemList_test (void)
 
 void TestMPEGTables::TestUCS2 (void)
 {
-    unsigned char ucs2_data[] = {
+    std::array<uint8_t,24> ucs2_data {
         0x17, 0x11, 0x80, 0x06, 0x5e, 0xb7, 0x67, 0x03,  0x54, 0x48, 0x73, 0x7b, 0x00, 0x3a, 0x95, 0x8b,
         0xc3, 0x80, 0x01, 0x53, 0xcb, 0x8a, 0x18, 0xbf
     };
 
-    wchar_t wchar_data[] = L"\u8006\u5eb7\u6703\u5448\u737b\u003a\u958b\uc380\u0153\ucb8a\u18bf";
+    std::array<wchar_t,12> wchar_data { L"\u8006\u5eb7\u6703\u5448\u737b\u003a\u958b\uc380\u0153\ucb8a\u18bf"};
 
     QCOMPARE (sizeof (QChar), (size_t) 2);
     QCOMPARE (sizeof (ucs2_data) - 1, (size_t) ucs2_data[0]);
     QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], {});
     QCOMPARE (ucs2.length(), (int) (ucs2_data[0] - 1) / 2);
-    QCOMPARE (ucs2, QString::fromWCharArray (wchar_data));
+    QCOMPARE (ucs2, QString::fromWCharArray (wchar_data.data()));
 }
 
 void TestMPEGTables::ParentalRatingDescriptor_test (void)
 {
     /* from https://forum.mythtv.org/viewtopic.php?p=4376 / #12553 */
-    const unsigned char si_data[] = { 
+    const std::vector<uint8_t> si_data {
         0x55, 0x04, 0x47, 0x42, 0x52, 0x0B
     };
     ParentalRatingDescriptor desc(si_data);
@@ -333,26 +332,26 @@ void TestMPEGTables::OTAChannelName_test (void)
     /* manually crafted according to A65/2013
      * http://atsc.org/wp-content/uploads/2015/03/Program-System-Information-Protocol-for-Terrestrial-Broadcast-and-Cable.pdf
      */
-    unsigned char tvct_data[] = {
+    const std::vector<uint8_t> tvct_data {
         0xc8, 0xf0, 0x2d, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x01, 0x00,  'A', 0x00,  'B', 0x00,  'C',
         0x00,  'D', 0x00,  'E', 0x00,  'F', 0x00, '\0',  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x60, 0xc4, 0x82, 0xb9
     };
 
-    PSIPTable psip = PSIPTable(tvct_data);
+    PSIPTable psip = PSIPTable(tvct_data.data());
     TerrestrialVirtualChannelTable table(psip);
 
     QVERIFY (table.HasCRC());
     QCOMPARE (table.CalcCRC(), table.CRC());
     QVERIFY (table.VerifyCRC());
 
-    QCOMPARE (table.SectionLength(), (unsigned int)sizeof (tvct_data));
+    QCOMPARE (table.SectionLength(), static_cast<uint>(tvct_data.size()));
 
     QCOMPARE (table.ChannelCount(), 1U);
     QCOMPARE (table.ShortChannelName(0), QString("ABCDEF"));
     QCOMPARE (table.ShortChannelName(1), QString());
 
-    PSIPTable psip2 = PSIPTable(tvct_data_0000);
+    PSIPTable psip2 = PSIPTable(tvct_data_0000.data());
     TerrestrialVirtualChannelTable tvct(psip2);
     QVERIFY (tvct.VerifyCRC());
     QVERIFY (tvct.VerifyPSIP(false));

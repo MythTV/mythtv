@@ -7,7 +7,7 @@
 #include "mythlogging.h"
 #include "mpegtables.h"
 
-const unsigned char DEFAULT_PAT_HEADER[8] =
+const std::array<const uint8_t,8> DEFAULT_PAT_HEADER
 {
     0x00, // TableID::PAT
     0xb0, // Syntax indicator
@@ -20,7 +20,7 @@ const unsigned char DEFAULT_PAT_HEADER[8] =
     0x00, // Last Section
 };
 
-const unsigned char DEFAULT_PMT_HEADER[12] =
+const std::array<const uint8_t,12> DEFAULT_PMT_HEADER
 {
     0x02, // TableID::PMT
     0xb0, // Syntax indicator
@@ -331,14 +331,14 @@ ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)
 {
     (void) smallPacket; // currently always a small packet..
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-    memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
-           DEFAULT_PAT_HEADER, sizeof(DEFAULT_PAT_HEADER));
+    auto *dst = tspacket->data() + sizeof(TSHeader) + 1; /* start of field pointer */
+    std::copy(DEFAULT_PAT_HEADER.cbegin(), DEFAULT_PAT_HEADER.cend(), dst);
     PSIPTable psip = PSIPTable::View(*tspacket);
     psip.SetLength(TSPacket::kPayloadSize
                    - 1 /* for start of field pointer */
                    - 3 /* for data before data last byte of pes length */);
     auto *pat = new ProgramAssociationTable(psip);
-    pat->SetTotalLength(sizeof(DEFAULT_PAT_HEADER));
+    pat->SetTotalLength(DEFAULT_PAT_HEADER.size());
     delete tspacket;
     return pat;
 }
@@ -382,8 +382,8 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
 {
     ProgramMapTable *pmt = nullptr;
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-    memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
-           DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
+    auto *dst = tspacket->data() + sizeof(TSHeader) + 1; /* start of field pointer */
+    std::copy(DEFAULT_PMT_HEADER.cbegin(), DEFAULT_PMT_HEADER.cend(), dst);
 
     if (smallPacket)
     {
@@ -398,7 +398,7 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
         pmt = new ProgramMapTable(psip);
     }
 
-    pmt->SetTotalLength(sizeof(DEFAULT_PMT_HEADER));
+    pmt->SetTotalLength(DEFAULT_PMT_HEADER.size());
     delete tspacket;
     return pmt;
 }

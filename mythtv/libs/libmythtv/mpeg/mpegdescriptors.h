@@ -4,6 +4,7 @@
 #define MPEG_DESCRIPTORS_H
 
 // C++ headers
+#include <array>
 #include <vector>
 using namespace std;
 
@@ -302,10 +303,23 @@ class MTV_PUBLIC MPEGDescriptor
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             m_data = nullptr;
     }
+    explicit MPEGDescriptor(const std::vector<uint8_t> &data) : m_data(data.data())
+    {
+        if ((data.size() < 2) ||
+            ((static_cast<size_t>(DescriptorLength()) + 2) > data.size()))
+            m_data = nullptr;
+    }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag) : m_data(data)
     {
         if ((len < 2) || ((int(DescriptorLength()) + 2) > len)
+            || (DescriptorTag() != tag))
+            m_data = nullptr;
+    }
+    MPEGDescriptor(const std::vector<uint8_t> &data, uint tag) : m_data(data.data())
+    {
+        if ((data.size() < 2) ||
+            ((static_cast<size_t>(DescriptorLength()) + 2) > data.size())
             || (DescriptorTag() != tag))
             m_data = nullptr;
     }
