@@ -160,7 +160,7 @@ class SegmentationDescriptor : public SpliceDescriptor
     explicit SegmentationDescriptor(const unsigned char *data, int len = 300) :
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
-        _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;
+        _ptrs.fill(nullptr);
         if (m_data && !SegmentationDescriptor::Parse())
             m_data = nullptr;
     }
@@ -280,5 +280,5 @@ class SegmentationDescriptor : public SpliceDescriptor
     // _ptrs[0] = program_segmentation_flag ? 12 : 13 + component_count * 6
     // _ptrs[1] = _ptrs[0] + HasSegmentationDuration() ? 5 : 0
     // _ptrs[2] = _ptrs[1] + 2 + SegmentationUPIDLength()
-    unsigned char const * _ptrs[3] {};
+    std::array<unsigned char const *,3> _ptrs {};
 };

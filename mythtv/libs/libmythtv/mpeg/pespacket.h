@@ -238,7 +238,7 @@ class SequenceHeader
     SequenceHeader() {;} // only used via reinterpret cast
     ~SequenceHeader() {;}
 
-    unsigned char m_data[11] {};
+    std::array<unsigned char,11> m_data {};
     static const AspectArray kMpeg1Aspect;
     static const AspectArray kMpeg2Aspect;
     static const AspectArray kMpeg2Fps;

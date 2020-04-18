@@ -23,6 +23,7 @@
 #ifndef AVCPARSER_H
 #define AVCPARSER_H
 
+#include <array>
 #include <H2645Parser.h>
 
 class AVCParser : public H2645Parser
@@ -137,12 +138,12 @@ class AVCParser : public H2645Parser
 
 
     int        m_deltaPicOrderCntBottom      {0};
-    int        m_deltaPicOrderCnt[2]         {0};
+    std::array<int,2> m_deltaPicOrderCnt     {0};
     int        m_frameNum                    {-1};
     int        m_picOrderCntLsb              {0};
     int        m_picParameterSetId           {-1};
     int        m_prevDeltaPicOrderCntBottom  {0};
-    int        m_prevDeltaPicOrderCnt[2]     {0};
+    std::array<int,2> m_prevDeltaPicOrderCnt {0};
     int        m_prevFrameNum                {-1};
     int        m_prevPicOrderCntLsb          {0};
     int        m_prevPicParameterSetId       {-1};

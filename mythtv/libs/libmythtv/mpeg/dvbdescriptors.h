@@ -2834,7 +2834,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     {
         size_t count  = 0;
 
-        memset ((void *) m_crid, 0, sizeof(m_crid));
+        m_crid.fill(nullptr);
 
         if (IsValid())
         {
@@ -2879,7 +2879,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
 
   private:
     size_t m_cridCount;
-    const uint8_t *m_crid[8] {};
+    std::array<const uint8_t*,8> m_crid {};
 };
 
 // ETSI TS 102 323 (TV Anytime)
