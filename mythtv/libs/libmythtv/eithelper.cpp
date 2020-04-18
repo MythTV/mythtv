@@ -300,7 +300,7 @@ static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
             else
                 description += eed.Text();
         }
-        // add items from the decscriptor to the items
+        // add items from the descriptor to the items
         items.unite (eed.Items());
     }
 }
