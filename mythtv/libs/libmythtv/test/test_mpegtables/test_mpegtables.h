@@ -74,4 +74,8 @@ class TestMPEGTables: public QObject
     /** test US channel names for trailing \0 characters, #12612
       */
     static void OTAChannelName_test (void);
+
+    /** test atsc huffman1 decoding */
+    static void atsc_huffman_test_data (void);
+    static void atsc_huffman_test (void);
 };

@@ -21,6 +21,7 @@
 #include "test_mpegtables.h"
 
 #include "atsctables.h"
+#include "atsc_huffman.h"
 #include "mpegtables.h"
 #include "dvbtables.h"
 
@@ -382,6 +383,64 @@ void TestMPEGTables::OTAChannelName_test (void)
     QCOMPARE (tvct.GetExtendedChannelName(5), QString());
     QCOMPARE (tvct.GetExtendedChannelName(6), QString());
     QCOMPARE (tvct.GetExtendedChannelName(999), QString());
+}
+
+void TestMPEGTables::atsc_huffman_test_data (void)
+{
+    QTest::addColumn<QString>("encoding");
+    QTest::addColumn<QByteArray>("compressed");
+    QTest::addColumn<QString>("e_uncompressed");
+
+    // This is the only example I could find online.
+    const std::array<uint8_t,5> example1
+        {0b01000011, 0b00101000, 0b11011100, 0b10000100, 0b11010100};
+    QTest::newRow("Title")
+        << "C5"
+        << QByteArray((char *)example1.data(), example1.size())
+        << "The next";
+
+    // M = 1010, y = 011, t = 1101001, h = 111, 27 = 1110001,
+    // T = 01010100, V = 111100, ' ' = 01010, i = 010010, s = 0011,
+    // ' ' = 10, c = 01000000, o = 1001, o = 0011, l = 0100,
+    // 27 = 0111001, '!' = 00100001, END = 1
+    const std::array<uint8_t,12> example2
+        { 0b10100111, 0b10100111, 0b11110001, 0b01010100,
+          0b11110001, 0b01001001, 0b00111010, 0b10000001,
+          0b00100110, 0b10001110, 0b01001000, 0b01100000};
+    QTest::newRow("myth title")
+        << "C5"
+        << QByteArray((char *)example2.data(), example2.size())
+        << "MythTV is cool!";
+
+    // M = 1111, 27 = 11010, y = 0111 1001, 27 = 01010, t = 0111 0100,
+    // h = 00, 27 = 1011100, T = 0101 0100, V = 1000, ' ' = 10,
+    // i = 10101, s = 101, ' ' = 0, c = 10011, o = 101, o = 10100,
+    // l = 0101, '.' = 00100, END = 1
+    const std::array<uint8_t,11> example3
+        { 0b11111101, 0b00111100, 0b10101001, 0b11010000,
+          0b10111000, 0b10101001, 0b00010101, 0b01101010,
+          0b01110110, 0b10001010, 0b01001000};
+    QTest::newRow("myth descr")
+        << "C7"
+        << QByteArray((char *)example3.data(), example3.size())
+        << "MythTV is cool.";
+}
+
+void TestMPEGTables::atsc_huffman_test (void)
+{
+    QFETCH(QString,    encoding);
+    QFETCH(QByteArray, compressed);
+    QFETCH(QString,    e_uncompressed);
+
+    QString uncompressed {};
+    if (encoding == "C5") {
+        uncompressed = atsc_huffman1_to_string((uchar *)compressed.data(),
+                                               compressed.size(), 1);
+    } else if (encoding == "C7") {
+        uncompressed = atsc_huffman1_to_string((uchar *)compressed.data(),
+                                               compressed.size(), 2);
+    }
+    QCOMPARE(uncompressed.trimmed(), e_uncompressed);
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)

@@ -7,12 +7,18 @@
  *------------------------------------------------------------------------*/
 
 struct huffman_table {
-    unsigned int  m_encodedSequence;
-    unsigned char m_character;
-    unsigned char m_numberOfBits;
+    uint16_t m_encodedSequence;
+    uint8_t  m_character;
+    uint8_t  m_numberOfBits;
 };
 
-unsigned char ATSC_C5[] =
+using atsc_table_vec = std::vector<uint8_t>;
+using huff2_table_vec = std::vector<huffman_table>;
+using huff2_lookup_vec = std::vector<uint8_t>;
+
+// Table C5: English-language Program Title Decode Table
+// Optimized for each word starting with initial capital letter.
+const atsc_table_vec ATSC_C5
 {
     0x01, 0x00, 0x01, 0x3A, 0x01, 0x3C, 0x01, 0x3E,
     0x01, 0x40, 0x01, 0x42, 0x01, 0x44, 0x01, 0x46,
@@ -259,7 +265,8 @@ unsigned char ATSC_C5[] =
     0x9B, 0x9B, 0x9B, 0x9B
 };
 
-unsigned char ATSC_C7[] =
+// Table C5: English-language Program Description Decode Table
+const atsc_table_vec ATSC_C7
 {
     0x01, 0x00, 0x01, 0x2C, 0x01, 0x2E, 0x01, 0x30,
     0x01, 0x32, 0x01, 0x34, 0x01, 0x36, 0x01, 0x38,
@@ -486,14 +493,13 @@ unsigned char ATSC_C7[] =
     0x9B, 0x9B, 0x9B, 0x9B, 0x9B, 0x9B
 };
 
-static const unsigned char *atsc_tables[] =
+const std::array<const atsc_table_vec,2> atsc_tables
 {
-    nullptr,
     ATSC_C5,
     ATSC_C7,
 };
 
-struct huffman_table Table128[] =
+const huff2_table_vec Table128
 {
     { 0x0000, 0x20, 0x03, },  // ' ' duplicate entry makes 1st lookup non zero
     { 0x0000, 0x20, 0x03, },  // ' '
@@ -624,10 +630,9 @@ struct huffman_table Table128[] =
     { 0x07FD, 0x02, 0x0B, },  // ''
     { 0x07FE, 0x01, 0x0B, },  // ''
     { 0x07FF, 0x00, 0x0B, },  // ''
-
 } ;
 
-struct huffman_table Table255[] =
+const huff2_table_vec Table255
 {
     { 0x0000, 0x20, 0x02, },  // ' ' duplicate entry makes 1st lookup non zero
     { 0x0000, 0x20, 0x02, },  // ' '
@@ -887,7 +892,7 @@ struct huffman_table Table255[] =
     { 0x1FFF, 0x00, 0x0D, },  // ''
 };
 
-unsigned char Huff2Lookup128[] =
+const huff2_lookup_vec Huff2Lookup128
 {
     0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1147,7 +1152,7 @@ unsigned char Huff2Lookup128[] =
     0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80,
 };
 
-unsigned char Huff2Lookup256[] =
+const huff2_lookup_vec Huff2Lookup256
 {
     0x01, 0x00, 0x00, 0x00, 0x02, 0x03, 0x04, 0x05,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2175,8 +2180,22 @@ unsigned char Huff2Lookup256[] =
     0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
 };
 
+struct huff2_parts {
+    const huff2_table_vec  table;
+    const huff2_lookup_vec lookup;
+    uint                   min_size;
+    uint                   max_size;
+};
+
+const std::array<const huff2_parts,2> huff2_tables
+{{
+        {Table128, Huff2Lookup128, 3, 12},
+        {Table255, Huff2Lookup256, 2, 14}
+}};
+
+
 /* returns the root for character input from table Table[] */
-static inline int huffman1_get_root(uint input, const unsigned char *table)
+static inline int huffman1_get_root(uint input, const atsc_table_vec &table)
 {
     if (input > 127)
         return -1;
@@ -2194,7 +2213,11 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
 {
     QString retval = "";
 
-    const unsigned char *table = atsc_tables[table_index];
+    if (table_index < 1 || table_index > 2)
+        return QString("");
+    table_index -= 1;
+
+    const atsc_table_vec &table = atsc_tables[table_index];
     int totalbits = size * 8;
     int bit = 0;
     int root = huffman1_get_root(0, table);
@@ -2268,29 +2291,16 @@ QString atsc_huffman2_to_string(const unsigned char *compressed,
 {
     QString decompressed = "";
 
+    if (table < 1 || table > 2)
+        return "";
+    table -= 1;
+
     unsigned char        bitpos = 0;
     const unsigned char *bufptr = nullptr;
     huffman2_set_pos(bitpos, &bufptr, compressed, 0);
 
     // Determine which huffman table to use
-    struct huffman_table *ptrTable = nullptr;
-    const unsigned char  *lookup = nullptr;
-    uint                  min_size = 0;
-    uint                  max_size = 0;
-    if (table == 1)
-    {
-        ptrTable = Table128;
-        lookup   = Huff2Lookup128;
-        min_size = 3;
-        max_size = 12;
-    }
-    else
-    {
-        ptrTable = Table255;
-        lookup   = Huff2Lookup256;
-        min_size = 2;
-        max_size = 14;
-    }
+    const auto & [ptrTable, lookup, min_size, max_size] = huff2_tables[table];
 
     // walk thru all the bits in the byte array, finding each sequence in the
     // list and decoding it to a character.
