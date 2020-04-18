@@ -140,7 +140,7 @@ QString DishEventTagsDescriptor::seriesid(void) const
 
 QDate DishEventTagsDescriptor::originalairdate(void) const
 {
-    unsigned char mjd[5];
+    std::array<uint8_t,5> mjd {};
 
     if (DescriptorLength() != 8)
         return {};

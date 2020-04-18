@@ -125,7 +125,7 @@ void TestMPEGTables::pat_test(void)
 
 void TestMPEGTables::dvbdate(void)
 {
-    unsigned char dvbdate_data[] = {
+    const std::array<uint8_t,5> dvbdate_data {
         0xdc, 0xa9, 0x12, 0x33, 0x37 /* day 0xdca9, 12:33:37 UTC */
     };
 

@@ -14,6 +14,15 @@ MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
 MTV_PUBLIC time_t dvbdate2unix(const unsigned char *buf);
 uint32_t dvbdate2key(const unsigned char *buf);
 
+static inline QDateTime dvbdate2qt(const std::array<uint8_t,5> buf)
+{
+    return dvbdate2qt(buf.data());
+}
+static inline time_t dvbdate2unix(const std::array<uint8_t,5> buf)
+{
+    return dvbdate2unix(buf.data());
+}
+
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.
  *  \todo This is just a stub.
