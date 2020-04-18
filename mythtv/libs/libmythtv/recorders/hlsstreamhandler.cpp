@@ -181,7 +181,7 @@ void HLSStreamHandler::run(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("Packet not starting with SYNC Byte (got 0x%1)")
-                .arg((char)m_readbuffer[0], 2, QLatin1Char('0')));
+                .arg((char)m_readbuffer[0], 2, 16, QLatin1Char('0')));
             continue;
         }
 
