@@ -94,6 +94,12 @@ static uint64_t mdate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
+static bool downloadURL(const QString &url, QByteArray *buffer, QString &finalURL)
+{
+    MythDownloadManager *mdm = GetMythDownloadManager();
+    return mdm->download(url, buffer, false, &finalURL);
+}
+
 static bool downloadURL(const QString &url, QByteArray *buffer)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
@@ -2506,13 +2512,20 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     m_safeFilename = lfilename;
     m_filename = lfilename;
+    QString finalURL;
 
     QByteArray buffer;
-    if (!downloadURL(m_filename, &buffer))
+    if (!downloadURL(m_filename, &buffer, finalURL))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             QString("Couldn't open URL %1").arg(m_filename));
         return false;   // can't download file
+    }
+    if (m_filename != finalURL)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Redirected %1 -> %2 ").arg(m_filename).arg(finalURL));
+        m_filename = finalURL;
     }
     if (!IsHTTPLiveStreaming(&buffer))
     {
