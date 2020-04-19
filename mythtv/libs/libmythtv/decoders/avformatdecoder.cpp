@@ -281,19 +281,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             .arg((quintptr)avc, QT_POINTER_SIZE * 2, 16, QChar('0'));
     }
 
-    char str[kMsgLen+1];
-    int bytes = vsnprintf(str, kMsgLen+1, fmt, vl);
-
-    // check for truncated messages and fix them
-    if (bytes > kMsgLen)
-    {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("Libav log output truncated %1 of %2 bytes written")
-                .arg(kMsgLen).arg(bytes));
-        str[kMsgLen-1] = '\n';
-    }
-
-    s_fullLine += QString(str);
+    s_fullLine += QString::vasprintf(fmt, vl);
     if (s_fullLine.endsWith("\n"))
     {
         LOG(verbose_mask, verbose_level, s_fullLine.trimmed());
