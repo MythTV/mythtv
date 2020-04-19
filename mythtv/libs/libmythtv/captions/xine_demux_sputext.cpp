@@ -32,6 +32,7 @@
 #include "config.h"
 #endif
 
+#include <array>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -121,7 +122,7 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
 
 static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *current) {
 
-  static char s_line[LINE_LEN + 1];
+  static std::array<char,LINE_LEN + 1> s_line;
   static char *s_s = nullptr;
   char text[LINE_LEN + 1];
 
@@ -132,7 +133,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
 
   /* read the first line */
   if (!s_s)
-    if (!(s_s = read_line_from_input(demuxstr, s_line, LINE_LEN))) return nullptr;
+    if (!(s_s = read_line_from_input(demuxstr, s_line.data(), LINE_LEN))) return nullptr;
 
   do {
     switch (state) {
@@ -183,7 +184,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
     }
 
     /* read next line */
-    if (state != 99 && !(s_s = read_line_from_input (demuxstr, s_line, LINE_LEN)))
+    if (state != 99 && !(s_s = read_line_from_input (demuxstr, s_line.data(), LINE_LEN)))
       return nullptr;
 
   } while (state != 99);

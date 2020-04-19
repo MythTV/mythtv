@@ -11,7 +11,7 @@
 #include "mythtvexp.h"
 #include "captions/teletextreader.h"
 
-QString decode_teletext(int codePage, const uint8_t data[40]);
+QString decode_teletext(int codePage, const tt_line_array& data);
 
 class MTV_PUBLIC TeletextExtractorReader : public TeletextReader 
 {
@@ -28,7 +28,7 @@ class MTV_PUBLIC TeletextExtractorReader : public TeletextReader
 
   protected:
     void PageUpdated(int page, int subpage) override; // TeletextReader
-    void HeaderUpdated(int page, int subpage, uint8_t *page_ptr, int lang) override; // TeletextReader
+    void HeaderUpdated(int page, int subpage, tt_line_array& page_ptr, int lang) override; // TeletextReader
 
   private:
     QSet<QPair<int, int> > m_updatedPages;

@@ -3,6 +3,7 @@
 // Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
 
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 // Qt headers
@@ -18,7 +19,7 @@ using namespace std;
 
 #define DEBUG_XDS 0
 
-static void init_xds_program_type(QString xds_program_type[96]);
+static void init_xds_program_type(CC608ProgramType& xds_program_type);
 
 CC608Decoder::CC608Decoder(CC608Input *ccr)
     : m_reader(ccr),
@@ -52,7 +53,7 @@ void CC608Decoder::FormatCC(int tc, int code1, int code2)
     FormatCCField(tc, 1, code2);
 }
 
-void CC608Decoder::GetServices(uint seconds, bool seen[4]) const
+void CC608Decoder::GetServices(uint seconds, CC608Seen seen) const
 {
     time_t now = time(nullptr);
     time_t then = now - seconds;
@@ -880,7 +881,7 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
     if ((int8_t) c < 0)
     {
         m_vpsLabel[m_vpsL] = 0;
-        memcpy(m_vpsPrLabel, m_vpsLabel, sizeof(m_vpsPrLabel));
+        m_vpsPrLabel = m_vpsLabel;
         m_vpsL = 0;
     }
     c &= 0x7F;
@@ -889,7 +890,7 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
 
     LOG(VB_VBI, LOG_INFO, QString("VPS: 3-10: %1 %2 %3 %4 %5 %6 %7 %8 (\"%9\")")
             .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]).arg(buf[4])
-            .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(m_vpsPrLabel));
+            .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(m_vpsPrLabel.data()));
 
     int pcs = buf[2] >> 6;
     int cni = + ((buf[10] & 3) << 10)
@@ -1442,7 +1443,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
     return handled;
 }
 
-static void init_xds_program_type(QString xds_program_type[96])
+static void init_xds_program_type(CC608ProgramType& xds_program_type)
 {
     xds_program_type[0]  = QCoreApplication::translate("(Categories)",
                                                        "Education");

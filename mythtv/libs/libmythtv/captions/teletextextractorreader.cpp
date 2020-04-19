@@ -9,7 +9,7 @@ void TeletextExtractorReader::PageUpdated(int page, int subpage)
 }
 
 void TeletextExtractorReader::HeaderUpdated(
-    int page, int subpage, uint8_t *page_ptr, int lang)
+    int page, int subpage, tt_line_array& page_ptr, int lang)
 {
     m_updatedPages.insert(qMakePair(page, subpage));
     TeletextReader::HeaderUpdated(page, subpage, page_ptr, lang);
@@ -53,8 +53,9 @@ void TeletextExtractorReader::HeaderUpdated(
  * 0x08 0x09 0x0a 0x0b 0x0c 0x0d (apparently a control character) 0x0e 0x0f
  */
 
-static const uint16_t ppi_national_subsets[][20] =
-{
+using ppi_natl_array = std::array<const uint16_t,20>;
+static const std::array<const ppi_natl_array,13> ppi_national_subsets
+{{
     { 0x00a3, 0x0024, 0x0040, 0x00ab, 0x00bd, 0x00bb, 0x005e, 0x0023,
       0x002d, 0x00bc, 0x00a6, 0x00be, 0x00f7 }, /* english, 000 */
 
@@ -97,33 +98,30 @@ static const uint16_t ppi_national_subsets[][20] =
 
     { 0x0054, 0x011f, 0x0130, 0x015e, 0x00d6, 0x00c7, 0x00dc, 0x011e,
       0x0131, 0x015f, 0x00f6, 0x00e7, 0x00fc }, /* turkish, 1100 */
-};
+}};
 
 // utc-2 --> utf-8
 // this is not a general function, but it's enough for what we do here
 // the result buffer need to be at least 4 bytes long
-static void to_utf8(char *res, uint16_t ch)
+static void to_utf8(std::string &res, uint16_t ch)
 {
     if(ch >= 0x80)
     {
         if(ch >= 0x800)
         {
-            res[0] = (ch >> 12) | 0xE0;
-            res[1] = ((ch >> 6) & 0x3F) | 0x80;
-            res[2] = (ch & 0x3F) | 0x80;
-            res[3] = 0;
+            res = { static_cast<char>( (ch >> 12)        | 0xE0),
+                    static_cast<char>(((ch >> 6) & 0x3F) | 0x80),
+                    static_cast<char>( (ch & 0x3F)       | 0x80) };
         }
         else
         {
-            res[0] = (ch >> 6) | 0xC0;
-            res[1] = (ch & 0x3F) | 0x80;
-            res[2] = 0;
+            res = { static_cast<char>((ch >> 6)   | 0xC0),
+                    static_cast<char>((ch & 0x3F) | 0x80) } ;
         }
     }
     else
     {
-        res[0] = ch;
-        res[1] = 0;
+        res = { static_cast<char>(ch) };
     }
 }
 
@@ -131,12 +129,12 @@ static void to_utf8(char *res, uint16_t ch)
  * Get decoded ttx as a string.
  */
 
-QString decode_teletext(int codePage, const uint8_t data[40])
+QString decode_teletext(int codePage, const tt_line_array& data)
 {
     QString res;
-    char utf8[7];
+    std::string utf8 {};
 
-    const uint16_t *pi_active_national_set = ppi_national_subsets[codePage];
+    const ppi_natl_array pi_active_national_set = ppi_national_subsets[codePage];
 
     for (int i = 0; i < 40; ++i)
     {
@@ -213,7 +211,7 @@ QString decode_teletext(int codePage, const uint8_t data[40])
 
         /* convert to utf-8 */
         to_utf8(utf8, out);
-        res += QString::fromUtf8(utf8, strlen(utf8));
+        res += QString::fromUtf8(utf8.c_str());
     }
 
     return res;

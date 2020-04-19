@@ -23,9 +23,9 @@ CC708Reader::CC708Reader(MythPlayer *owner)
 
         m_tempStrAlloc[i]  = 512;
         m_tempStrSize[i]   = 0;
-        m_tempStr[i]       = (short*) malloc(m_tempStrAlloc[i] * sizeof(short));
+        m_tempStr[i]       = (int16_t*) malloc(m_tempStrAlloc[i] * sizeof(int16_t));
     }
-    memset(&CC708DelayedDeletes, 0, sizeof(CC708DelayedDeletes));
+    m_cc708DelayedDeletes.fill(0);
 }
 
 CC708Reader::~CC708Reader()
@@ -48,7 +48,7 @@ void CC708Reader::SetCurrentWindow(uint service_num, int window_id)
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("SetCurrentWindow(%1, %2)")
             .arg(service_num).arg(window_id));
-    CC708services[service_num].m_currentWindow = window_id;
+    m_cc708services[service_num].m_currentWindow = window_id;
 }
 
 void CC708Reader::DefineWindow(
@@ -68,7 +68,7 @@ void CC708Reader::DefineWindow(
 
     CHECKENABLED;
 
-    CC708DelayedDeletes[service_num & 63] &= ~(1 << window_id);
+    m_cc708DelayedDeletes[service_num & 63] &= ~(1 << window_id);
 
     LOG(VB_VBI, LOG_DEBUG, LOC +
         QString("DefineWindow(%1, %2,\n\t\t\t\t\t")
@@ -91,7 +91,7 @@ void CC708Reader::DefineWindow(
                       row_lock,         column_lock,
                       pen_style,        window_style);
 
-    CC708services[service_num].m_currentWindow = window_id;
+    m_cc708services[service_num].m_currentWindow = window_id;
 }
 
 void CC708Reader::DeleteWindows(uint service_num, int window_map)
@@ -103,7 +103,7 @@ void CC708Reader::DeleteWindows(uint service_num, int window_map)
     for (uint i = 0; i < 8; i++)
         if ((1 << i) & window_map)
             GetCCWin(service_num, i).Clear();
-    CC708DelayedDeletes[service_num&63] |= window_map;
+    m_cc708DelayedDeletes[service_num&63] |= window_map;
 }
 
 void CC708Reader::DisplayWindows(uint service_num, int window_map)
@@ -114,7 +114,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
 
     for (uint i = 0; i < 8; i++)
     {
-        if ((1 << i) & CC708DelayedDeletes[service_num & 63])
+        if ((1 << i) & m_cc708DelayedDeletes[service_num & 63])
         {
             CC708Window &win = GetCCWin(service_num, i);
             QMutexLocker locker(&win.m_lock);
@@ -126,7 +126,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
                 win.m_text = nullptr;
             }
         }
-        CC708DelayedDeletes[service_num & 63] = 0;
+        m_cc708DelayedDeletes[service_num & 63] = 0;
     }
 
     for (uint i = 0; i < 8; i++)
@@ -219,7 +219,7 @@ void CC708Reader::SetPenAttributes(
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("SetPenAttributes(%1, %2,")
-            .arg(service_num).arg(CC708services[service_num].m_currentWindow) +
+            .arg(service_num).arg(m_cc708services[service_num].m_currentWindow) +
             QString("\n\t\t\t\t\t      pen_size %1, offset %2, text_tag %3, "
                     "font_tag %4,"
                     "\n\t\t\t\t\t      edge_type %5, underline %6, italics %7")
@@ -281,7 +281,7 @@ void CC708Reader::Reset(uint service_num)
 }
 
 void CC708Reader::TextWrite(uint service_num,
-                                  short* unicode_string, short len)
+                            int16_t* unicode_string, int16_t len)
 {
     CHECKENABLED;
     QString debug = QString();
@@ -291,5 +291,5 @@ void CC708Reader::TextWrite(uint service_num,
         debug += QChar(unicode_string[i]);
     }
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("AddText to %1->%2 |%3|")
-        .arg(service_num).arg(CC708services[service_num].m_currentWindow).arg(debug));
+        .arg(service_num).arg(m_cc708services[service_num].m_currentWindow).arg(debug));
 }

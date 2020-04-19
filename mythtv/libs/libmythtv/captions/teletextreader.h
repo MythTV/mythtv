@@ -3,8 +3,10 @@
 #ifndef TELETEXTREADER_H
 #define TELETEXTREADER_H
 
+#include <array>
 #include <cstdint>
 #include <map>
+#include <vector>
 
 #include <QString>
 #include <QMutex>
@@ -33,6 +35,8 @@ enum TTColor
 #define TP_NEWSFLASH        0x40
 #define TP_SUBTITLE         0x80
 
+using tt_line_array = std::array<uint8_t,40>;
+
 class TeletextSubPage
 {
   public:
@@ -40,9 +44,9 @@ class TeletextSubPage
     int subpagenum;           ///< the wanted subpage
     int lang;                 ///< language code
     int flags;                ///< misc flags
-    uint8_t data[25][40];     ///< page data
+    std::array<tt_line_array,25> data;   ///< page data
     int flof;                 ///< page has FastText links
-    int floflink[6];          ///< FastText links (FLOF)
+    std::array<int,6> floflink; ///< FastText links (FLOF)
     bool subtitle;            ///< page is subtitle page
     bool active;              ///< data has arrived since page last cleared
 };
@@ -93,7 +97,7 @@ class TeletextReader
     int  GetPageInput(uint num) const   { return m_pageinput[num];     }
     TeletextSubPage* FindSubPage(void)
         { return FindSubPage(m_curpage, m_cursubpage); }
-    uint8_t* GetHeader(void)            { return m_header;             }
+    tt_line_array GetHeader(void)       { return m_header;             }
 
     // Decoder methods
     void AddPageHeader(int page, int subpage, const uint8_t *buf,
@@ -104,7 +108,7 @@ class TeletextReader
   protected:
     virtual void PageUpdated(int page, int subpage);
     virtual void HeaderUpdated(
-        int page, int subpage, uint8_t *page_ptr, int lang);
+        int page, int subpage, tt_line_array& page_ptr, int lang);
 
     const TeletextSubPage *FindSubPage(int page, int subpage, int dir=0) const
         { return FindSubPageInternal(page, subpage, dir); }
@@ -128,14 +132,14 @@ class TeletextReader
     int              m_cursubpage         {-1};
     bool             m_curpageShowHeader  {true};
     bool             m_curpageIsSubtitle  {false};
-    int              m_pageinput[3]       {0};
+    std::array<int,3> m_pageinput         {0};
     bool             m_transparent        {false};
     bool             m_revealHidden       {false};
-    uint8_t          m_header[40]         {0};
+    tt_line_array    m_header             {0};
     bool             m_headerChanged      {false};
     bool             m_pageChanged        {false};
-    TeletextMagazine m_magazines[8]       { };
-    unsigned char    m_bitswap[256]       {};
+    std::array<TeletextMagazine,8> m_magazines {};
+    std::array<uint8_t,256>        m_bitswap   {};
     int              m_fetchpage          {0};
     int              m_fetchsubpage       {0};
 };

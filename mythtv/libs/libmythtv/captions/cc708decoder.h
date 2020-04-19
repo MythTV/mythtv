@@ -10,11 +10,14 @@
 #include "format.h"
 #include "compat.h"
 
+using cc708_seen_flags = std::array<bool,64>;
+using cc708_seen_times = std::array<time_t,64>;
+
 #ifndef __CC_CALLBACKS_H__
 /** EIA-708-A closed caption packet */
 struct CaptionPacket
 {
-    unsigned char data[128+16];
+    std::array<unsigned char,128+16> data;
     int size;
 };
 #endif
@@ -24,23 +27,19 @@ class CC708Reader;
 class CC708Decoder
 {
   public:
-    explicit CC708Decoder(CC708Reader *ccr) : m_reader(ccr)
-    {
-        memset(&m_partialPacket, 0, sizeof(CaptionPacket));
-        memset(m_lastSeen,       0, sizeof(m_lastSeen));
-    }
+    explicit CC708Decoder(CC708Reader *ccr) : m_reader(ccr) {}
    ~CC708Decoder() = default;
 
     void decode_cc_data(uint cc_type, uint data1, uint data2);
     void decode_cc_null(void);
 
     /// \return Services seen in last few seconds as specified.
-    void services(uint seconds, bool seen[64]) const;
+    void services(uint seconds, cc708_seen_flags & seen) const;
 
   private:
     CaptionPacket  m_partialPacket {};
     CC708Reader   *m_reader        {nullptr};
-    time_t         m_lastSeen[64]  {};
+    cc708_seen_times m_lastSeen    {};
 };
 
 #endif // CC708DECODER_H_

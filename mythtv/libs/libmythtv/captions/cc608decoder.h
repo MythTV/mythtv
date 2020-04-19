@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <ctime>
 
+#include <array>
 #include <vector>
 using namespace std;
 
@@ -14,6 +15,11 @@ using namespace std;
 #include <QChar>
 
 #include "format.h"
+
+using CC608Seen        = std::array<bool,4>;
+using CC608ProgramType = std::array<QString,96>;
+using CC608PerField    = std::array<int,2>;
+using CC608PerMode     = std::array<int,8>;
 
 class CC608Input
 {
@@ -62,7 +68,7 @@ class CC608Decoder
     QString GetXDS(const QString &key) const;
 
     /// \return Services seen in last few seconds as specified.
-    void GetServices(uint seconds, bool seen[4]) const;
+    void GetServices(uint seconds, CC608Seen seen) const;
 
     static QString ToASCII(const QString &cc608, bool suppress_unknown);
 
@@ -86,43 +92,43 @@ class CC608Decoder
 
     bool            m_ignoreTimeCode        {false};
 
-    time_t          m_lastSeen[4]           {0};
+    std::array<time_t,4> m_lastSeen         {0};
 
     // per-field
-    int             m_badVbi[2]             { 0,  0};
-    int             m_lastTc[2]             { 0,  0};
-    int             m_lastCode[2]           {-1, -1};
-    int             m_lastCodeTc[2]         { 0,  0};
-    int             m_ccMode[2]             {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
-    int             m_xds[2]                { 0,  0};
-    int             m_txtMode[4]            { 0,  0,  0,  0};
+    CC608PerField   m_badVbi                { 0,  0};
+    CC608PerField   m_lastTc                { 0,  0};
+    CC608PerField   m_lastCode              {-1, -1};
+    CC608PerField   m_lastCodeTc            { 0,  0};
+    CC608PerField   m_ccMode                {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
+    CC608PerField   m_xds                   { 0,  0};
+    std::array<int,4> m_txtMode             { 0,  0,  0,  0};
 
     // per-mode state
-    int             m_lastRow[8]            {0};
-    int             m_newRow[8]             {0};
-    int             m_newCol[8]             {0};
-    int             m_newAttr[8]            {0}; // color+italic+underline
-    int             m_timeCode[8]           {0};
-    int             m_row[8]                {0};
-    int             m_col[8]                {0};
-    int             m_rowCount[8]           {0};
-    int             m_style[8]              {0};
-    int             m_lineCont[8]           {0};
-    int             m_resumeText[8]         {0};
-    int             m_lastClr[8]            {0};
-    QString         m_ccBuf[8];
+    CC608PerMode    m_lastRow               {0};
+    CC608PerMode    m_newRow                {0};
+    CC608PerMode    m_newCol                {0};
+    CC608PerMode    m_newAttr               {0}; // color+italic+underline
+    CC608PerMode    m_timeCode              {0};
+    CC608PerMode    m_row                   {0};
+    CC608PerMode    m_col                   {0};
+    CC608PerMode    m_rowCount              {0};
+    CC608PerMode    m_style                 {0};
+    CC608PerMode    m_lineCont              {0};
+    CC608PerMode    m_resumeText            {0};
+    CC608PerMode    m_lastClr               {0};
+    std::array<QString,8> m_ccBuf;
 
     // translation table
-    QChar           m_stdChar[128];
+    std::array<QChar,128> m_stdChar;
 
     // temporary buffer
     unsigned char  *m_rbuf                  {nullptr};
-    int             m_lastFormatTc[2]       {0, 0};
-    int             m_lastFormatData[2]     {0, 0};
+    std::array<int,2>  m_lastFormatTc       {0, 0};
+    std::array<int,2>  m_lastFormatData     {0, 0};
 
     // VPS data
-    char            m_vpsPrLabel[20]        {0};
-    char            m_vpsLabel[20]          {0};
+    std::array<char,20> m_vpsPrLabel        {0};
+    std::array<char,20> m_vpsLabel          {0};
     int             m_vpsL                  {0};
 
     // WSS data
@@ -130,21 +136,21 @@ class CC608Decoder
     bool            m_wssValid              {false};
 
     int             m_xdsCurService         {-1};
-    vector<unsigned char> m_xdsBuf[7];
+    std::array<vector<unsigned char>,7> m_xdsBuf;
     uint            m_xdsCrcPassed          {0};
     uint            m_xdsCrcFailed          {0};
 
     mutable QMutex  m_xdsLock               {QMutex::Recursive};
-    uint            m_xdsRatingSystems[2]   {0};
-    uint            m_xdsRating[2][4]       {{0}};
-    QString         m_xdsProgramName[2];
-    vector<uint>    m_xdsProgramType[2];
+    std::array<uint,2> m_xdsRatingSystems   {0};
+    std::array<std::array<uint,4>,2> m_xdsRating       {{}};
+    std::array<QString,2>            m_xdsProgramName;
+    std::array<vector<uint>,2>       m_xdsProgramType;
 
     QString         m_xdsNetCall;
     QString         m_xdsNetName;
     uint            m_xdsTsid               {0};
 
-    QString         m_xdsProgramTypeString[96];
+    CC608ProgramType  m_xdsProgramTypeString;
 };
 
 #endif

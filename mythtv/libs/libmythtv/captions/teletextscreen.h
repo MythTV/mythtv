@@ -35,8 +35,8 @@ class TeletextScreen: public MythScreenType
     void DrawRect(int row, QRect rect);
     void DrawCharacter(int x, int y, QChar ch, bool doubleheight = false);
     void DrawMosaic(int x, int y, int code, bool doubleheight);
-    void DrawLine(const uint8_t *page, uint row, int lang);
-    void DrawHeader(const uint8_t *page, int lang);
+    void DrawLine(const tt_line_array& page, uint row, int lang);
+    void DrawHeader(const tt_line_array &page, int lang);
     void DrawStatus(void);
     void DrawPage(void);
 

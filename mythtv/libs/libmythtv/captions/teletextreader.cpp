@@ -12,9 +12,9 @@
 
 TeletextReader::TeletextReader()
 {
+    m_bitswap.fill(0);
     for (int i = 0; i < 256; i++)
     {
-        m_bitswap[i] = 0;
         for (int bit = 0; bit < 8; bit++)
             if (i & (1 << bit))
                 m_bitswap[i] |= (1 << (7-bit));
@@ -280,7 +280,7 @@ void TeletextReader::Reset(void)
         mag.current_subpage = 0;
         mag.loadingpage.active = false;
     }
-    memset(m_header, ' ', 40);
+    m_header.fill(' ');
 
     m_curpage    = 0x100;
     m_cursubpage = -1;
@@ -358,21 +358,19 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
     m_magazines[magazine - 1].current_page = page;
     m_magazines[magazine - 1].current_subpage = subpage;
 
-    memset(ttpage->data, ' ', sizeof(ttpage->data));
+    for (auto & line : ttpage->data)
+        line.fill(' ');
 
     ttpage->active = true;
     ttpage->subpagenum = subpage;
-
-    for (int & flof : ttpage->floflink)
-        flof = 0;
-
+    ttpage->floflink.fill(0);
     ttpage->lang = lang;
     ttpage->flags = flags;
     ttpage->flof = 0;
 
     ttpage->subtitle = (vbimode == VBI_DVB_SUBTITLE);
 
-    memset(ttpage->data[0], ' ', 8 * sizeof(uint8_t));
+    std::fill_n(ttpage->data[0].data(), 8, ' ');
 
     if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
     {
@@ -381,12 +379,12 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
     }
     else
     {
-        memcpy(ttpage->data[0]+0, buf, 40);
+        std::copy(buf, buf + 40, ttpage->data[0].data());
     }
 
     if ( !(ttpage->flags & TP_INTERRUPTED_SEQ))
     {
-        memcpy(m_header, ttpage->data[0], 40);
+        std::copy(ttpage->data[0].cbegin(), ttpage->data[0].cend(), m_header.data());
         HeaderUpdated(page, subpage, ttpage->data[0],ttpage->lang);
     }
 }
@@ -493,7 +491,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                 }
                 else
                 {
-                    memcpy(ttpage->data[row], buf, 40);
+                    std::copy(buf, buf + 40, ttpage->data[row].data());
                 }
             }
 
@@ -511,14 +509,12 @@ void TeletextReader::PageUpdated(int page, int subpage)
 }
 
 void TeletextReader::HeaderUpdated(
-    int page, int subpage, uint8_t *page_ptr, int lang)
+    int page, int subpage, tt_line_array& page_ptr, int lang)
 {
     (void)page;
     (void)subpage;
+    (void)page_ptr;
     (void)lang;
-
-    if (page_ptr == nullptr)
-        return;
 
     if (!m_curpageShowHeader)
         return;

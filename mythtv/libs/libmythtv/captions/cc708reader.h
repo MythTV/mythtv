@@ -20,16 +20,16 @@ class CC708Reader
     virtual ~CC708Reader();
 
     void SetCurrentService(int service) { m_currentService = service; }
-    CC708Service* GetCurrentService(void) { return &CC708services[m_currentService]; }
+    CC708Service* GetCurrentService(void) { return &m_cc708services[m_currentService]; }
     void SetEnabled(bool enable) { m_enabled = enable; }
     void ClearBuffers(void);
 
     CC708Service* GetService(uint service_num)
-        { return &(CC708services[service_num]); }
+        { return &(m_cc708services[service_num]); }
     CC708Window &GetCCWin(uint service_num, uint window_id)
-        { return CC708services[service_num].m_windows[window_id]; }
+        { return m_cc708services[service_num].m_windows[window_id]; }
     CC708Window &GetCCWin(uint svc_num)
-        { return GetCCWin(svc_num, CC708services[svc_num].m_currentWindow); }
+        { return GetCCWin(svc_num, m_cc708services[svc_num].m_currentWindow); }
 
     // Window settings
     virtual void SetCurrentWindow(uint service_num, int window_id);
@@ -72,21 +72,21 @@ class CC708Reader
 
     // Text
     virtual void TextWrite(uint service_num,
-                           short* unicode_string, short len);
+                           int16_t* unicode_string, int16_t len);
 
     // Data
-    unsigned char *m_buf[k708MaxServices]          {};
-    uint           m_bufAlloc[k708MaxServices]     {};
-    uint           m_bufSize[k708MaxServices]      {};
-    bool           m_delayed[k708MaxServices]      {};
+    std::array<unsigned char *,k708MaxServices> m_buf          {};
+    std::array<uint,k708MaxServices>            m_bufAlloc     {};
+    std::array<uint,k708MaxServices>            m_bufSize      {};
+    std::array<bool,k708MaxServices>            m_delayed      {};
 
-    short         *m_tempStr[k708MaxServices]      {};
-    int            m_tempStrAlloc[k708MaxServices] {};
-    int            m_tempStrSize[k708MaxServices]  {};
+    std::array<int16_t *,k708MaxServices>       m_tempStr      {};
+    std::array<int,k708MaxServices>             m_tempStrAlloc {};
+    std::array<int,k708MaxServices>             m_tempStrSize  {};
 
-    int            m_currentService {1};
-    CC708Service   CC708services[k708MaxServices];
-    int            CC708DelayedDeletes[k708MaxServices] {};
+    int                                         m_currentService {1};
+    std::array<CC708Service,k708MaxServices>    m_cc708services;
+    std::array<int,k708MaxServices>             m_cc708DelayedDeletes {};
 
     MythPlayer    *m_parent  {nullptr};
     bool           m_enabled {false};

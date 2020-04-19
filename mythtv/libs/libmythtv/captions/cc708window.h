@@ -310,7 +310,7 @@ class CC708Service
 
   public:
     uint        m_currentWindow {0};
-    CC708Window m_windows[k708MaxWindows];
+    std::array<CC708Window,k708MaxWindows> m_windows;
 };
 
 #endif // CC708_WINDOW_H

@@ -2927,7 +2927,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     bool check_608, bool check_708)
 {
     bool need_change_608 = false;
-    bool seen_608[4];
+    CC608Seen seen_608;
     if (check_608)
     {
         m_ccd608->GetServices(15/*seconds*/, seen_608);
@@ -2939,7 +2939,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     }
 
     bool need_change_708 = false;
-    bool seen_708[64];
+    cc708_seen_flags seen_708;
     if (check_708 || need_change_608)
     {
         m_ccd708->services(15/*seconds*/, seen_708);

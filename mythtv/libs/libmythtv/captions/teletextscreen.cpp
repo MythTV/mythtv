@@ -195,7 +195,7 @@ void TeletextScreen::Pulse(void)
     if (!ttpage)
     {
         // no page selected so show the header and a list of available pages
-        DrawHeader(nullptr, 0);
+        DrawHeader({}, 0);
         m_teletextReader->SetPageChanged(false);
         OptimiseDisplayedArea();
         return;
@@ -253,12 +253,12 @@ void TeletextScreen::Reset(void)
         m_teletextReader->Reset();
 }
 
-void TeletextScreen::DrawHeader(const uint8_t *page, int lang)
+void TeletextScreen::DrawHeader(const tt_line_array& page, int lang)
 {
     if (!m_displaying)
         return;
 
-    if (page != nullptr)
+    if (!page.empty())
         DrawLine(page, 1, lang);
 
     DrawStatus();
@@ -317,7 +317,7 @@ void TeletextScreen::SetBackgroundColor(int ttcolor)
                        0x00 : gTTBackgroundAlpha);
 }
 
-void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
+void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
 {
     unsigned char last_ch = ' ';
 
