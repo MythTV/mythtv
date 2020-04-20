@@ -23,6 +23,9 @@
 
 #ifdef USE_LIRC
 #include "devices/lirc.h"
+#endif
+
+#if defined (USE_LIRC) || defined (USING_APPLEREMOTE)
 #include "devices/lircevent.h"
 #endif
 
