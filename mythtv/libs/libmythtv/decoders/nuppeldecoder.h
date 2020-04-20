@@ -126,7 +126,7 @@ class NuppelDecoder : public DecoderBase
     unsigned char        *m_strm                  {nullptr};
     unsigned char        *m_buf                   {nullptr};
     unsigned char        *m_buf2                  {nullptr};
-    unsigned char        *m_planes[3]             {};
+    std::array<uint8_t*,3> m_planes               {};
 
     list<RawDataList*>    m_storedData;
 

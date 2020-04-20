@@ -862,10 +862,10 @@ void MythVideoOutput::SetPIPState(PIPState Setting)
     m_window.SetPIPState(Setting);
 }
 
-VideoFrameType* MythVideoOutput::DirectRenderFormats(void)
+VideoFrameVec MythVideoOutput::DirectRenderFormats(void)
 {
-    static VideoFrameType s_defaultFormats[] = { FMT_YV12, FMT_NONE };
-    return &s_defaultFormats[0];
+    static const VideoFrameVec s_defaultFormats { FMT_YV12, FMT_NONE };
+    return s_defaultFormats;
 }
 
 /**

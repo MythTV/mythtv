@@ -427,7 +427,7 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
 
     VdpVideoMixer result = 0;
 
-    VdpVideoMixerParameter parameters[] = {
+    static const std::array<const VdpVideoMixerParameter,4> parameters {
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
         VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE,
@@ -438,12 +438,12 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
     uint width  = static_cast<uint>(Size.width());
     uint height = static_cast<uint>(Size.height());
     uint layers = 0;
-    void const * parametervalues[] = { &width, &height, &ChromaType, &layers};
+    std::array<void const *,4> parametervalues { &width, &height, &ChromaType, &layers};
 
     uint32_t featurecount = 0;
-    VdpVideoMixerFeature features[2];
+    std::array<VdpVideoMixerFeature,2> features {};
     VdpBool enable = VDP_TRUE;
-    const VdpBool enables[2] = { enable, enable };
+    const std::array<VdpBool,2> enables = { enable, enable };
 
     if (DEINT_MEDIUM == Deinterlacer || DEINT_HIGH == Deinterlacer)
     {
@@ -458,8 +458,8 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
     }
 
     INIT_ST
-    status = m_vdpVideoMixerCreate(m_device, featurecount, featurecount ? features : nullptr,
-                                   4, parameters, parametervalues, &result);
+    status = m_vdpVideoMixerCreate(m_device, featurecount, featurecount ? features.data() : nullptr,
+                                   4, parameters.data(), parametervalues.data(), &result);
     CHECK_ST
 
     if (!ok || !result)
@@ -468,7 +468,7 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
         return result;
     }
 
-    status = m_vdpVideoMixerSetFeatureEnables(result, featurecount, features, enables);
+    status = m_vdpVideoMixerSetFeatureEnables(result, featurecount, features.data(), enables.data());
     CHECK_ST
     return result;
 }
@@ -502,8 +502,8 @@ void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
     }
     else
     {
-        VdpVideoSurface past[2]   = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
-        VdpVideoSurface future[1] = { VDP_INVALID_HANDLE };
+        std::array<VdpVideoSurface,2> past   = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
+        std::array<VdpVideoSurface,1> future = { VDP_INVALID_HANDLE };
 
         auto next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
         auto current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
@@ -523,7 +523,8 @@ void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
 
         INIT_ST
         status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, field,
-                                       2, past, current, 1, future, nullptr, Dest, nullptr, nullptr, 0, nullptr);
+                                       2, past.data(), current, 1, future.data(),
+                                       nullptr, Dest, nullptr, nullptr, 0, nullptr);
         CHECK_ST
     }
 }

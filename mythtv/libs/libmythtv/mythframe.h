@@ -178,6 +178,8 @@ struct VideoFrame
     bool          deinterlace_inuse2x;
 };
 
+using VideoFrameVec = std::vector<VideoFrameType>;
+
 #ifdef __cplusplus
 }
 #endif

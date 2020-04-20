@@ -45,7 +45,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&m_fileHeader, 0, sizeof(rtfileheader));
     memset(&m_frameHeader, 0, sizeof(rtframeheader));
     memset(&m_extraData, 0, sizeof(extendeddata));
-    m_planes[0] = m_planes[1] = m_planes[2] = nullptr;
+    m_planes.fill(nullptr);
     m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
 
     // set parent class variables
@@ -850,9 +850,9 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     if (frameheader->comptype == '2' || frameheader->comptype == '1')
     {
         if (compoff)
-            m_rtjd->Decompress((int8_t*)lstrm, m_planes);
+            m_rtjd->Decompress((int8_t*)lstrm, m_planes.data());
         else
-            m_rtjd->Decompress((int8_t*)m_buf2, m_planes);
+            m_rtjd->Decompress((int8_t*)m_buf2, m_planes.data());
 
         CopyToVideo(m_buf, m_videoWidth, m_videoHeight, frame);
     }

@@ -49,7 +49,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     bool StereoscopicModesAllowed(void) const override { return true; }
     void DoneDisplayingFrame(VideoFrame *Frame) override;
     void DiscardFrames(bool KeyFrame, bool Flushed) override;
-    VideoFrameType* DirectRenderFormats(void) override;
+    VideoFrameVec DirectRenderFormats(void) override;
     void WindowResized(const QSize &Size) override;
     void SetVideoFrameRate(float NewRate) override;
 

@@ -91,8 +91,8 @@ __inline AVRational GetAVTimeBaseQ()
 static const int max_video_queue_size = 220;
 
 static int cc608_parity(uint8_t byte);
-static int cc608_good_parity(const int *parity_table, uint16_t data);
-static void cc608_build_parity_table(int *parity_table);
+static int cc608_good_parity(const CC608Parity &parity_table, uint16_t data);
+static void cc608_build_parity_table(CC608Parity &parity_table);
 
 static bool silence_ffmpeg_logging = false;
 
@@ -1621,7 +1621,7 @@ static int cc608_parity(uint8_t byte)
 // CC Parity checking
 // taken from xine-lib libspucc
 
-static void cc608_build_parity_table(int *parity_table)
+static void cc608_build_parity_table(CC608Parity &parity_table)
 {
     for (uint8_t byte = 0; byte <= 127; byte++)
     {
@@ -1635,7 +1635,7 @@ static void cc608_build_parity_table(int *parity_table)
 // CC Parity checking
 // taken from xine-lib libspucc
 
-static int cc608_good_parity(const int *parity_table, uint16_t data)
+static int cc608_good_parity(const CC608Parity &parity_table, uint16_t data)
 {
     bool ret = (parity_table[data & 0xff] != 0)
         && (parity_table[(data & 0xff00) >> 8] != 0);
@@ -1651,7 +1651,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
     QMutexLocker locker(&m_trackLock);
 
-    memset(m_ccX08InPmt, 0, sizeof(m_ccX08InPmt));
+    m_ccX08InPmt.fill(false);
     m_pmtTracks.clear();
     m_pmtTrackTypes.clear();
 
@@ -1726,11 +1726,11 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 
     m_tracks[kTrackTypeCC608].clear();
     m_tracks[kTrackTypeCC708].clear();
-    memset(m_ccX08InTracks, 0, sizeof(m_ccX08InTracks));
+    m_ccX08InTracks.fill(false);
 
     uint pidx = 0;
     uint sidx = 0;
-    map<int,uint> lang_cc_cnt[2];
+    std::array<map<int,uint>,2> lang_cc_cnt;
     while (true)
     {
         bool pofr = pidx >= (uint)m_pmtTracks.size();
@@ -2733,19 +2733,9 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
-    VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
-    bool found = false;
-    while (*supported != FMT_NONE)
-    {
-        if (*supported == type)
-        {
-            found = true;
-            break;
-        }
-        supported++;
-    }
-
-    if (!found)
+    VideoFrameVec supported = decoder->GetPlayer()->DirectRenderFormats();
+    auto foundIt = std::find(supported.cbegin(), supported.cend(), type);
+    if (foundIt == supported.end())
     {
         decoder->m_directRendering = false;
         return avcodec_default_get_buffer2(c, pic, flags);

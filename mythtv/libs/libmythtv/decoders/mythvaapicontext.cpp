@@ -357,11 +357,11 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
                 .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
         }
 
-        VASurfaceAttrib prefs[3] = {
+        std::array<VASurfaceAttrib,3> prefs {{
             { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { format } } },
             { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
-            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
-        vaapi_frames_ctx->attributes = prefs;
+            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } }};
+        vaapi_frames_ctx->attributes = prefs.data();
         vaapi_frames_ctx->nb_attributes = 3;
     }
 
@@ -863,8 +863,7 @@ void MythVAAPIContext::DestroyDeinterlacer(void)
     m_filterSink = nullptr;
     m_filterSource = nullptr;
     m_filterPTSUsed = 0;
-    m_filterPriorPTS[0] = 0;
-    m_filterPriorPTS[1] = 0;
+    m_filterPriorPTS.fill(0);
     m_filterWidth = 0;
     m_filterHeight = 0;
     if (m_framesCtx)

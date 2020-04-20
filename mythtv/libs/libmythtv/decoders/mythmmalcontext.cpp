@@ -179,20 +179,10 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFr
     // Ensure we can render this format
     AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
-    VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
-    bool found = false;
-    while (*supported != FMT_NONE)
-    {
-        if (*supported == type)
-        {
-            found = true;
-            break;
-        }
-        supported++;
-    }
-
+    VideoFrameVec supported = decoder->GetPlayer()->DirectRenderFormats();
+    auto foundIt = std::find(supported.cbegin(), supported.cend(), type);
     // No fallback currently (unlikely)
-    if (!found)
+    if (foundIt == supported.end())
         return false;
 
     // Re-allocate if necessary

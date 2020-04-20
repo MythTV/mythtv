@@ -62,7 +62,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     AVFilterGraph   *m_filterGraph       { nullptr };
     bool             m_filterError       { false   };
     AVBufferRef     *m_framesCtx         { nullptr };
-    int64_t          m_filterPriorPTS[2] { 0 };
+    std::array<int64_t,2> m_filterPriorPTS { 0 };
     int64_t          m_filterPTSUsed     { 0 };
     int              m_filterWidth       { 0 };
     int              m_filterHeight      { 0 };

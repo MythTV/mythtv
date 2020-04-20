@@ -100,7 +100,7 @@ class MythVideoOutput
     int          FreeVideoFrames(void);
     bool         EnoughFreeFrames(void);
     bool         EnoughDecodedFrames(void);
-    virtual VideoFrameType* DirectRenderFormats(void);
+    virtual VideoFrameVec DirectRenderFormats(void);
     virtual VideoFrame *GetNextFreeFrame(void);
     virtual void ReleaseFrame(VideoFrame *Frame);
     virtual void DeLimboFrame(VideoFrame *Frame);

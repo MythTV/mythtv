@@ -348,10 +348,10 @@ class DecoderBase
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     QMutex               m_trackLock                     { QMutex::Recursive };
     bool                 m_decodeAllSubtitles            { false };
-    int                  m_currentTrack[kTrackTypeCount] { -1    };
-    vector<StreamInfo>   m_tracks[kTrackTypeCount];
-    StreamInfo           m_wantedTrack[kTrackTypeCount];
-    StreamInfo           m_selectedTrack[kTrackTypeCount];
+    std::array<int,        kTrackTypeCount> m_currentTrack {};
+    std::array<sinfo_vec_t,kTrackTypeCount> m_tracks;
+    std::array<StreamInfo, kTrackTypeCount> m_wantedTrack;
+    std::array<StreamInfo, kTrackTypeCount> m_selectedTrack;
 
     /// language preferences for auto-selection of streams
     vector<int>          m_languagePreference;

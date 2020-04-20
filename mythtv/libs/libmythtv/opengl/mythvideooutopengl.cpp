@@ -722,10 +722,10 @@ void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
     MythVideoOutput::DiscardFrames(KeyFrame, Flushed);
 }
 
-VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
+VideoFrameVec MythVideoOutputOpenGL::DirectRenderFormats(void)
 {
     // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
-    static VideoFrameType s_AllFormats[] =
+    static const VideoFrameVec s_AllFormats
         { FMT_YV12,     FMT_NV12,      FMT_YUV422P,   FMT_YUV444P,
           FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
           FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
@@ -734,10 +734,10 @@ VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
           FMT_NONE };
 
     // OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
-    static VideoFrameType s_LegacyFormats[] =
+    static const VideoFrameVec s_LegacyFormats
         { FMT_YV12, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
 
-    static VideoFrameType* s_formats[2] = { s_AllFormats, s_LegacyFormats };
+    static const std::array<VideoFrameVec,2> s_formats { s_AllFormats, s_LegacyFormats };
     return s_formats[m_textureFormats];
 }
 
