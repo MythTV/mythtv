@@ -1312,7 +1312,7 @@ void MusicCommon::customEvent(QEvent *event)
                                 static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
 #else
-            info_string = QString("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"))
+            info_string = QString("%1 "+ tr("kHz")+ "   %2 "+ tr("ch"))
                 .arg(static_cast<double>(oe->frequency()) / 1000.0,0,'f',1,QChar('0'))
                 .arg(oe->channels() > 1 ? "2" : "1");
 #endif
