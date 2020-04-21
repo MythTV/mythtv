@@ -90,7 +90,7 @@ QString resDurationFormat(uint32_t msec)
     // M = Minutes (2 digits, 0 prefix)
     // S = Seconds (2 digits, 0 prefix)
     // FS = Fractional Seconds (milliseconds)
-    return QString("%01u:%02u:%02u.%01u")
+    return QString("%1:%2:%3.%4")
         .arg((msec / (1000 * 60 * 60)) % 24, 1,10,QChar('0')) // Hours
         .arg((msec / (1000 * 60)) % 60,      2,10,QChar('0')) // Minutes
         .arg((msec / 1000) % 60,             2,10,QChar('0')) // Seconds
