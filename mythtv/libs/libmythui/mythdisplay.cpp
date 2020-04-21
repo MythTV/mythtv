@@ -1103,8 +1103,6 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
     //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     // Ignore desktop scaling
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-#endif
 }

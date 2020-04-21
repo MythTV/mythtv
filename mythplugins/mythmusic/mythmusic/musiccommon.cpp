@@ -1294,28 +1294,16 @@ void MusicCommon::customEvent(QEvent *event)
         //  Hack around for cd bitrates
         if (oe->bitrate() < 2000)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,4,0)
-            info_string.sprintf(QString("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                static_cast<double>(oe->frequency()) / 1000.0,
-                                oe->channels() > 1 ? "2" : "1");
-#else
             info_string = QString("%1 "+tr("kbps")+ "   %2 "+ tr("kHz")+ "   %3 "+ tr("ch"))
                 .arg(oe->bitrate())
                 .arg(static_cast<double>(oe->frequency()) / 1000.0,0,'f',1,QChar('0'))
                 .arg(oe->channels() > 1 ? "2" : "1");
-#endif
         }
         else
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,4,0)
-            info_string.sprintf(QString("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                static_cast<double>(oe->frequency()) / 1000.0,
-                                oe->channels() > 1 ? "2" : "1");
-#else
             info_string = QString("%1 "+ tr("kHz")+ "   %2 "+ tr("ch"))
                 .arg(static_cast<double>(oe->frequency()) / 1000.0,0,'f',1,QChar('0'))
                 .arg(oe->channels() > 1 ? "2" : "1");
-#endif
         }
 
         if (curMeta)

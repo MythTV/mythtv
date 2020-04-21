@@ -407,23 +407,6 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         MythPoint  outline(outlineSize, outlineSize);
 
-#if QT_VERSION < QT_VERSION_CHECK(5,6,0) // else done in MythUIText::FormatTemplate
-        QTextLayout::FormatRange range;
-
-        outlineColor.setAlpha(outlineAlpha);
-
-        outline.NormPoint(); // scale it to screen resolution
-
-        QPen pen;
-        pen.setBrush(outlineColor);
-        pen.setWidth(outline.x());
-
-        range.start = 0;
-        range.length = m_CutMessage.size();
-        range.format.setTextOutline(pen);
-        formats.push_back(range);
-#endif
-
         drawrect.setX(drawrect.x() - outline.x());
         drawrect.setWidth(drawrect.width() + outline.x());
         drawrect.setY(drawrect.y() - outline.y());
@@ -462,16 +445,13 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
     layout->clearFormats();
-#endif
 
     FormatVector formats;
     QTextLayout::FormatRange range;
     QString fontname;
     bool    res = false;  // Return true if paragraph changed.
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0) // else done in DrawSelf
     if (GetFontProperties()->hasOutline())
     {
         int outlineSize = 0;
@@ -495,7 +475,6 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
         range.format.setTextOutline(pen);
         formats.push_back(range);
     }
-#endif
 
     range.start = 0;
     range.length = 0;

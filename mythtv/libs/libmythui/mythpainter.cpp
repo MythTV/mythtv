@@ -447,12 +447,8 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         painter.setPen(QPen(font.GetBrush(), 0));
         foreach (auto layout, layouts)
         {
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
             layout->draw(&painter, canvas.topLeft(),
                            layout->formats(), clip);
-#else
-            layout->draw(&painter, canvas.topLeft(), formats, clip);
-#endif
         }
         painter.end();
 
