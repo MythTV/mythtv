@@ -12,6 +12,7 @@
 
 //#define _DEBUG_PIXEL;
 
+#include <array>
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>
@@ -83,7 +84,10 @@ guint32 mmx_zoom_size;
 #ifdef POWERPC
 #include "altivec.h"
 extern unsigned int useAltivec;
-extern const void ppc_zoom (unsigned int *frompixmap, unsigned int *topixmap, unsigned int sizex, unsigned int sizey, unsigned int *brutS, unsigned int *brutD, unsigned int buffratio, int precalCoef[16][16]);
+extern const void ppc_zoom (unsigned int *frompixmap, unsigned int *topixmap,
+                            unsigned int sizex, unsigned int sizey,
+                            unsigned int *brutS, unsigned int *brutD,
+                            unsigned int buffratio, GoomCoefficients &precalCoef]);
 
 #endif /* PowerPC */
 
@@ -105,7 +109,7 @@ guint32 zoom_width;
 
 unsigned int     prevX = 0, prevY = 0;
 
-static int sintable[0x10000];
+static std::array<int,0x10000> sintable;
 static int vitesse = 127;
 static char theMode = AMULETTE_MODE;
 static bool waveEffect = false;
@@ -138,7 +142,7 @@ static int *firedec = nullptr;
 #define ShiftRight(_x,_s) (((_x)<0) ? -(-(_x)>>(_s)) : ((_x)>>(_s)))
 
 /** modif d'optim by Jeko : precalcul des 4 coefs résultant des 2 pos */
-int     precalCoef[16][16];
+GoomCoefficients precalCoef = {};
 
 /* Prototypes to keep gcc from spewing warnings */
 void generatePrecalCoef (void);
@@ -588,8 +592,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			for (uint16_t us = 0; us < 0xffff; us++) {
                                 sintable[us] =
                                     roundf(1024 * sinf ((float) us * 360
-                                                       / ((float)sizeof (sintable)
-                                                          / sizeof (sintable[0]) - 1)
+                                                       / ((float)sintable.size() - 1)
                                                        * 3.141592F / 180));
 			}
 

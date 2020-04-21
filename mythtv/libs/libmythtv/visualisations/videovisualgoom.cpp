@@ -59,18 +59,12 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         if (node->m_length < 512)
             numSamps = node->m_length;
 
-        signed short int data[2][512];
+        GoomDualData data {};
         int i= 0;
         for (; i < numSamps; i++)
         {
             data[0][i] = node->m_left[i];
             data[1][i] = node->m_right ? node->m_right[i] : data[0][i];
-        }
-
-        for (; i < 512; i++)
-        {
-            data[0][i] = 0;
-            data[1][i] = 0;
         }
 
         m_buffer = goom_update(data, 0);

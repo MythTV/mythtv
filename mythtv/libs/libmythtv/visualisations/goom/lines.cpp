@@ -8,6 +8,7 @@
 
 #include "lines.h"
 #include "drawmethods.h"
+#include "goom_core.h"
 #include "goom_tools.h"
 
 extern unsigned int resolx, c_resoly;
@@ -199,7 +200,7 @@ goom_lines_free (GMLine ** l)
 }
 
 void
-goom_lines_draw (GMLine * line, const gint16 data[512], unsigned int *p)
+goom_lines_draw (GMLine * line, const GoomSingleData data, unsigned int *p)
 {
 	if (line != nullptr) {
 		guint32 color = line->color;

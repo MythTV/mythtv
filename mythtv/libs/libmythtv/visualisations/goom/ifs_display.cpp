@@ -1,3 +1,5 @@
+#include <array>
+
 #include "ifs.h"
 #include "goomconfig.h"
 
@@ -12,8 +14,8 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 						int increment)
 {
 	static int s_couleur = 0xc0c0c0c0;
-	static int s_v[4] = { 2, 4, 3, 2 };
-	static int s_col[4] = { 2, 4, 3, 2 };
+	static std::array<int,4> s_v { 2, 4, 3, 2 };
+	static std::array<int,4> s_col { 2, 4, 3, 2 };
 
 #define MOD_MER 0
 #define MOD_FEU 1

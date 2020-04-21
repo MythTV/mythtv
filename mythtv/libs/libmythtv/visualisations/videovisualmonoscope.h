@@ -19,12 +19,12 @@ class VideoVisualMonoScope : public VideoVisual
     MythRenderOpenGL* Initialise(const QRect &Area);
 
     bool                  m_fade       { false };
-    GLfloat               m_vertices[(NUM_SAMPLES * 2) + 16] { 0.0 };
+    std::array<GLfloat,NUM_SAMPLES * 2>     m_vertices   { 0.0 };
     QOpenGLShaderProgram *m_shader     { nullptr };
     QOpenGLBuffer        *m_vbo        { nullptr };
     bool                  m_currentFBO { false };
-    QOpenGLFramebufferObject *m_fbo[2] { nullptr };
-    MythGLTexture        *m_texture[2] { nullptr };
+    std::array<QOpenGLFramebufferObject*,2> m_fbo        { };
+    std::array<MythGLTexture*,2>            m_texture    { };
     int64_t               m_lastTime   { 0 };
     qreal                 m_hue        { 0.0 };
 };

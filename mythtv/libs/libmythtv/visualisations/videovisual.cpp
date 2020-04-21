@@ -104,7 +104,7 @@ VisualNode* VideoVisual::GetNode(void)
 
 // TODO Add MMX path
 static inline void stereo16_from_stereofloat32(
-    short l[], short r[], const float s[], unsigned long cnt)
+    short *l, short *r, const float *s, unsigned long cnt)
 {
     const float f((1 << 15) - 1);
     while (cnt--)
@@ -116,7 +116,7 @@ static inline void stereo16_from_stereofloat32(
 
 // TODO Add MMX path
 static inline void mono16_from_monofloat32(
-    short l[], const float s[], unsigned long cnt)
+    short *l, const float *s, unsigned long cnt)
 {
     const float f((1 << 15) - 1);
     while (cnt--)

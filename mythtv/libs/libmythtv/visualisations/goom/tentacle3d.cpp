@@ -2,6 +2,7 @@
 
 #include "v3d.h"
 #include "surf3d.h"
+#include "goom_core.h"
 #include "goom_tools.h"
 #include "goomconfig.h"
 
@@ -12,13 +13,13 @@
 #define definitionz 45
 
 static float cycle = 0.0F;
-static grid3d *grille[nbgrid];
+static std::array<grid3d *,nbgrid> grille;
 static float *vals;
 
 /* Prototypes to keep gcc from spewing warnings */
 void tentacle_free (void);
 void tentacle_new (void);
-void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit);
+void tentacle_update(int *buf, int *back, int W, int H, GoomDualData data, float rapport, int drawit);
 
 void tentacle_free (void) {
 	free (vals);
@@ -146,8 +147,8 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 		*rotangle = s_rot = (tmp + 15.0F*s_rot) / 16.0F;
 }
 
-void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit) {
-	static int s_colors[] = {
+void tentacle_update(int *buf, int *back, int W, int H, GoomDualData data, float rapport, int drawit) {
+        static std::array<int,3> s_colors {
 		(0x18<<(ROUGE*8))|(0x4c<<(VERT*8))|(0x2f<<(BLEU*8)),
 		(0x48<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x6f<<(BLEU*8)),
 		(0x58<<(ROUGE*8))|(0x3c<<(VERT*8))|(0x0f<<(BLEU*8))};

@@ -44,7 +44,7 @@ struct GoomState {
 
 #define STATES_NB 8
 #define STATES_RANGEMAX 510
-GoomState states[STATES_NB] = {
+const std::array<const GoomState,STATES_NB> kStates {{
 	{1,0,0,1,4, 000, 100},
 	{1,0,0,1,1, 101, 140}, // turned on drawScope
 	{1,0,0,1,2, 141, 200},
@@ -53,9 +53,9 @@ GoomState states[STATES_NB] = {
 	{0,1,1,1,4, 331, 400},
 	{0,0,1,1,5, 401, 450}, // turned on drawScope
         {0,0,1,1,1, 451, 510}
-};
+}};
 
-GoomState *curGState = states+4;
+const GoomState *curGState = &kStates[4];
 
 guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
@@ -135,7 +135,7 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-guint32 * goom_update (gint16 data[2][512], int forceMode) {
+guint32 * goom_update (GoomDualData data, int forceMode) {
 	static int s_lockVar = 0;		// pour empecher de nouveaux changements
 	static int s_goomVar = 0;		// boucle des gooms
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
@@ -414,10 +414,12 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			}
 			else if (s_blocker) s_blocker--;
 
-			for (int j=0;j<STATES_NB;j++) {
-				if ((s_rndn >= states[j].m_rangeMin)
-				    && (s_rndn <= states[j].m_rangeMax))
-					curGState = states+j;
+			for (auto state : kStates) {
+				if ((s_rndn >= state.m_rangeMin)
+				    && (s_rndn <= state.m_rangeMax)) {
+					curGState = &state;
+                                        break;
+                                }
                         }
 
 			if ((curGState->m_drawIfs) && (s_ifsIncr<=0)) {

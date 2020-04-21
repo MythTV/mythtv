@@ -58,10 +58,8 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     delete m_fbo[1];
     render->DeleteTexture(m_texture[0]);
     render->DeleteTexture(m_texture[1]);
-    m_fbo[0] = nullptr;
-    m_fbo[1] = nullptr;
-    m_texture[0] = nullptr;
-    m_texture[1] = nullptr;
+    m_fbo.fill(nullptr);
+    m_texture.fill(nullptr);
     m_currentFBO = false;
 
     if (m_fade)
@@ -180,7 +178,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
         m_hue -= 1.0;
     render->glEnableVertexAttribArray(0);
     m_vbo->bind();
-    m_vbo->write(0, m_vertices, NUM_SAMPLES * 2 * sizeof(GLfloat));
+    m_vbo->write(0, m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
     render->glVertexAttrib4f(1, static_cast<GLfloat>(color.redF()),
                                 static_cast<GLfloat>(color.greenF()),
                                 static_cast<GLfloat>(color.blueF()), 1.0F);
