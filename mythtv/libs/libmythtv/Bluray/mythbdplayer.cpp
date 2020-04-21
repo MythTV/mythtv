@@ -420,8 +420,8 @@ uint64_t MythBDPlayer::GetBookmark(void)
     return frames;;
 }
 
-void MythBDPlayer::CreateDecoder(char *TestBuffer, int TestReadSize)
+void MythBDPlayer::CreateDecoder(TestBufferVec & TestBuffer)
 {
-    if (MythBDDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename(), TestReadSize))
+    if (MythBDDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename()))
         SetDecoder(new MythBDDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }

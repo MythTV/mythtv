@@ -1,6 +1,7 @@
 #ifndef DECODERBASE_H_
 #define DECODERBASE_H_
 
+#include <array>
 #include <cstdint>
 #include <vector>
 using namespace std;
@@ -20,6 +21,7 @@ class AudioPlayer;
 class MythCodecContext;
 
 const int kDecoderProbeBufferSize = 256 * 1024;
+using TestBufferVec = std::vector<char>;
 
 /// Track types
 enum TrackType
@@ -126,8 +128,7 @@ class DecoderBase
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
 
     virtual int OpenFile(MythMediaBuffer *Buffer, bool novideo,
-                         char testbuf[kDecoderProbeBufferSize],
-                         int testbufsize = kDecoderProbeBufferSize) = 0;
+                         TestBufferVec & testbuf) = 0;
 
     virtual void SetEofState(EofState eof)  { m_atEof = eof;  }
     virtual void SetEof(bool eof)  {

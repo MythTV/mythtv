@@ -767,15 +767,15 @@ void MythPlayer::OpenDummy(void)
     SetDecoder(dec);
 }
 
-void MythPlayer::CreateDecoder(char *TestBuffer, int TestSize)
+void MythPlayer::CreateDecoder(TestBufferVec & TestBuffer)
 {
-    if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename(), TestSize))
+    if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename()))
     {
         SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
         return;
     }
 
-    if (NuppelDecoder::CanHandle(TestBuffer, TestSize))
+    if (NuppelDecoder::CanHandle(TestBuffer))
         SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
 }
 
@@ -813,7 +813,9 @@ int MythPlayer::OpenFile(int Retries)
     m_playerCtx->m_buffer->Start();
 
     /// OSX has a small stack, so we put this buffer on the heap instead.
-    char *testbuf = new char[kDecoderProbeBufferSize];
+    TestBufferVec testbuf {};
+    testbuf.reserve(kDecoderProbeBufferSize);
+
     UnpauseBuffer();
 
     // delete any pre-existing recorder
@@ -826,9 +828,10 @@ int MythPlayer::OpenFile(int Retries)
     int timeout = max((Retries + 1) * 500, 30000);
     while (testreadsize <= kDecoderProbeBufferSize)
     {
+        testbuf.resize(testreadsize);
         MythTimer peekTimer;
         peekTimer.start();
-        while (m_playerCtx->m_buffer->Peek(testbuf, testreadsize) != testreadsize)
+        while (m_playerCtx->m_buffer->Peek(testbuf) != testreadsize)
         {
             // NB need to allow for streams encountering network congestion
             if (peekTimer.elapsed() > 30000 || bigTimer.elapsed() > timeout
@@ -838,7 +841,6 @@ int MythPlayer::OpenFile(int Retries)
                     QString("OpenFile(): Could not read first %1 bytes of '%2'")
                         .arg(testreadsize)
                         .arg(m_playerCtx->m_buffer->GetFilename()));
-                delete[] testbuf;
                 SetErrored(tr("Could not read first %1 bytes").arg(testreadsize));
                 return -1;
             }
@@ -847,7 +849,7 @@ int MythPlayer::OpenFile(int Retries)
         }
 
         m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-        CreateDecoder(testbuf, testreadsize);
+        CreateDecoder(testbuf);
         m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
         if (m_decoder || (bigTimer.elapsed() > timeout))
             break;
@@ -862,7 +864,6 @@ int MythPlayer::OpenFile(int Retries)
                 .arg(m_playerCtx->m_buffer->GetFilename()));
         SetErrored(tr("Could not find an A/V decoder"));
 
-        delete[] testbuf;
         return -1;
     }
 
@@ -872,7 +873,6 @@ int MythPlayer::OpenFile(int Retries)
         SetDecoder(nullptr);
         SetErrored(tr("Could not initialize A/V decoder"));
 
-        delete[] testbuf;
         return -1;
     }
 
@@ -883,8 +883,7 @@ int MythPlayer::OpenFile(int Retries)
     m_decoder->SetTranscoding(m_transcoding);
 
     // Open the decoder
-    int result = m_decoder->OpenFile(m_playerCtx->m_buffer, false, testbuf, testreadsize);
-    delete[] testbuf;
+    int result = m_decoder->OpenFile(m_playerCtx->m_buffer, false, testbuf);
 
     if (result < 0)
     {

@@ -89,11 +89,10 @@ NuppelDecoder::~NuppelDecoder()
     CloseAVCodecAudio();
 }
 
-bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
-                              int /*testbufsize*/)
+bool NuppelDecoder::CanHandle(TestBufferVec & testbuf)
 {
-    return strncmp(testbuf, "NuppelVideo", 11) == 0 ||
-           strncmp(testbuf, "MythTVVideo", 11) == 0;
+    return strncmp(testbuf.data(), "NuppelVideo", 11) == 0 ||
+           strncmp(testbuf.data(), "MythTVVideo", 11) == 0;
 }
 
 MythCodecID NuppelDecoder::GetVideoCodecID(void) const
@@ -153,8 +152,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 }
 
 int NuppelDecoder::OpenFile(MythMediaBuffer *rbuffer, bool novideo,
-                            char testbuf[kDecoderProbeBufferSize],
-                            int /*testbufsize*/)
+                            TestBufferVec & testbuf)
 {
     (void)testbuf;
 

@@ -40,12 +40,10 @@ class NuppelDecoder : public DecoderBase
     NuppelDecoder(const NuppelDecoder &) = delete;            // not copyable
     NuppelDecoder &operator=(const NuppelDecoder &) = delete; // not copyable
 
-    static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
-                          int testbufsize = kDecoderProbeBufferSize);
+    static bool CanHandle(TestBufferVec & testbuf);
 
     int OpenFile(MythMediaBuffer *rbuffer, bool novideo, 
-                 char testbuf[kDecoderProbeBufferSize], 
-                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
+                 TestBufferVec & testbuf) override; // DecoderBase
 
     bool GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override; // DecoderBase
 

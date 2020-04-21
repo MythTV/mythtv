@@ -50,7 +50,7 @@ class MythBDPlayer : public MythPlayer
     void     DisplayPauseFrame (void) override;
     void     PreProcessNormalFrame(void) override;
     bool     JumpToFrame       (uint64_t Frame) override;
-    void     CreateDecoder     (char *TestBuffer, int TestReadSize) override;
+    void     CreateDecoder     (TestBufferVec & TestBuffer) override;
     void     SeekForScreenGrab (uint64_t &/*Number*/, uint64_t /*FrameNumber*/,
                                 bool /*Absolute*/) override {}
 

@@ -615,7 +615,7 @@ class MTV_PUBLIC MythPlayer
     void UnpauseBuffer(void);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *TestBuffer, int TestSize);
+    virtual void CreateDecoder(TestBufferVec & TestBuffer);
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return m_decoder; }

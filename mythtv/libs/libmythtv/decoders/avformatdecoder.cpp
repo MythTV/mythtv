@@ -853,25 +853,24 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset,
     }
 }
 
-bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
-                                const QString &filename, int testbufsize)
+bool AvFormatDecoder::CanHandle(TestBufferVec & testbuf, const QString &filename)
 {
     AVProbeData probe;
     memset(&probe, 0, sizeof(AVProbeData));
 
     QByteArray fname = filename.toLatin1();
     probe.filename = fname.constData();
-    probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = testbufsize;
+    probe.buf = (unsigned char *)testbuf.data();
+    probe.buf_size = testbuf.size();
 
     int score = AVPROBE_SCORE_MAX/4;
 
-    if (testbufsize + AVPROBE_PADDING_SIZE > kDecoderProbeBufferSize)
+    if (testbuf.size() + AVPROBE_PADDING_SIZE > kDecoderProbeBufferSize)
     {
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
         score = 0;
     }
-    else if (testbufsize*2 >= kDecoderProbeBufferSize)
+    else if (testbuf.size()*2 >= kDecoderProbeBufferSize)
     {
         score--;
     }
@@ -944,8 +943,7 @@ int AvFormatDecoder::FindStreamInfo(void)
  *                     or kDecoderProbeBufferSize will be used.
  */
 int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
-                              char testbuf[kDecoderProbeBufferSize],
-                              int testbufsize)
+                              TestBufferVec & testbuf)
 {
     CloseContext();
 
@@ -967,9 +965,9 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
     AVProbeData probe;
     memset(&probe, 0, sizeof(AVProbeData));
     probe.filename = filename;
-    probe.buf = reinterpret_cast<unsigned char *>(testbuf);
-    if (testbufsize + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
-        probe.buf_size = testbufsize;
+    probe.buf = reinterpret_cast<unsigned char *>(testbuf.data());
+    if (testbuf.size() + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
+        probe.buf_size = testbuf.size();
     else
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
     memset(probe.buf + probe.buf_size, 0, AVPROBE_PADDING_SIZE);

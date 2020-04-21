@@ -110,14 +110,12 @@ class AvFormatDecoder : public DecoderBase
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
-    static bool CanHandle(char testbuf[kDecoderProbeBufferSize],
-                          const QString &filename,
-                          int testbufsize = kDecoderProbeBufferSize);
+    static bool CanHandle(TestBufferVec & testbuf,
+                          const QString &filename);
 
     /// Open our file and set up or audio and video parameters.
     int OpenFile(MythMediaBuffer *Buffer, bool novideo,
-                 char testbuf[kDecoderProbeBufferSize],
-                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
+                 TestBufferVec & testbuf) override; // DecoderBase
 
     bool GetFrame(DecodeType Type, bool &Retry) override; // DecoderBase
 

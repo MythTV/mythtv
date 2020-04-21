@@ -61,7 +61,7 @@ class MythDVDPlayer : public MythPlayer
     void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
     int      SetTrack(uint Type, int TrackNo) override;
-    void     CreateDecoder(char *Testbuf, int TestReadSize) override;
+    void     CreateDecoder(TestBufferVec & Testbuf) override;
     bool     DoJumpChapter(int Chapter) override;
 
   private:

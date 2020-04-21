@@ -92,6 +92,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     MythBDBuffer        *BD        (void);
     int       Read                 (void *Buffer, int Count);
     int       Peek                 (void *Buffer, int Count);
+    int       Peek                 (std::vector<char>& Buffer);
     void      Reset                (bool Full = false, bool ToAdjust = false, bool ResetInternal = false);
     void      Pause                (void);
     void      Unpause              (void);

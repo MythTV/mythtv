@@ -14,7 +14,7 @@ class DummyDecoder : public DecoderBase
     ~DummyDecoder() override = default;
 
     // DecoderBase
-    int         OpenFile(MythMediaBuffer* /*Buffer*/, bool /*novideo*/, char */*testbuf*/, int /*testbufsize*/) override
+    int         OpenFile(MythMediaBuffer* /*Buffer*/, bool /*novideo*/, TestBufferVec & /*testbuf*/) override
                     { return 0; }
     bool        GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override
                     { usleep(10000); return false; }

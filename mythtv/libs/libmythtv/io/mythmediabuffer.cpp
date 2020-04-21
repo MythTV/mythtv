@@ -1178,6 +1178,11 @@ int MythMediaBuffer::Peek(void *Buffer, int Count)
     return result;
 }
 
+int MythMediaBuffer::Peek(std::vector<char>& Buffer)
+{
+    return Peek(Buffer.data(), Buffer.size());
+};
+
 bool MythMediaBuffer::WaitForReadsAllowed(void)
 {
     // Wait up to 30000 ms for reads allowed (or readsdesired if post seek/open)
