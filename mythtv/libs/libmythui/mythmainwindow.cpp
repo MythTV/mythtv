@@ -690,10 +690,12 @@ void MythMainWindow::animate(void)
     if (!d->m_repaintRegion.isEmpty())
         redraw = true;
 
-    foreach (auto & widget, d->m_stackList)
+    // The call to GetDrawOrder can apparently alter m_stackList.
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
-        widget->GetDrawOrder(drawList);
+        (*it)->GetDrawOrder(drawList);
 
         foreach (auto & screen, drawList)
         {
@@ -733,10 +735,12 @@ void MythMainWindow::drawScreen(void)
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
-        foreach (auto & widget, d->m_stackList)
+        // The call to GetDrawOrder can apparently alter m_stackList.
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
-            widget->GetDrawOrder(redrawList);
+            (*it)->GetDrawOrder(redrawList);
 
             foreach (auto & screen, redrawList)
             {
@@ -823,11 +827,12 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
         if (r != d->m_uiScreenRect)
             painter->SetClipRect(r);
 
-        foreach (auto & widget, d->m_stackList)
+        // The call to GetDrawOrder can apparently alter m_stackList.
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
-            widget->GetDrawOrder(redrawList);
-
+            (*it)->GetDrawOrder(redrawList);
             foreach (auto & screen, redrawList)
             {
                 screen->Draw(painter, 0, 0, 255, r);
