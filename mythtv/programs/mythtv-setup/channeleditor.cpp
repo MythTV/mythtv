@@ -308,7 +308,8 @@ void ChannelEditor::fillList(void)
             else
                 state = "warning";
 
-            if (channum.isEmpty() && m_currentHideMode)
+            // Also hide channels that are not visible
+            if ((!visible || channum.isEmpty()) && m_currentHideMode)
                 continue;
 
             if (name.isEmpty())
