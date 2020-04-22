@@ -64,12 +64,12 @@ class HLSRecStream
     bool DownloadKey(MythSingleDownload& downloader,
 		     const QString& keypath, AES_KEY* aeskey);
     bool DecodeData(MythSingleDownload& downloader,
-		    const uint8_t *IV, const QString& keypath,
+		    const QByteArray& IV, const QString& keypath,
 		    QByteArray& data, int64_t sequence);
     bool SetAESIV(QString line);
     bool IVLoaded(void) const { return m_ivLoaded; }
 
-    uint8_t *AESIV(void) { return m_aesIV; }
+    QByteArray AESIV(void) { return m_aesIV; }
     void SetKeyPath(const QString& x) { m_keypath = x; }
 #endif // USING_LIBCRYPTO
 
@@ -98,7 +98,7 @@ class HLSRecStream
   private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivLoaded       {false};
-    uint8_t     m_aesIV[AES_BLOCK_SIZE] {0};// IV used when decypher the block
+    QByteArray  m_aesIV          {AES_BLOCK_SIZE,0};// IV used when decypher the block
     AESKeyMap   m_aesKeys;       // AES-128 keys by path
 #endif // USING_LIBCRYPTO
 };

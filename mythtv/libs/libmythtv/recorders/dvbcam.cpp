@@ -37,6 +37,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -324,7 +325,7 @@ void DVBCam::SetTimeOffset(double offset_in_seconds)
         m_ciHandler->SetTimeOffset(offset_in_seconds);
 }
 
-static const char *cplm_info[] =
+static std::array<const std::string,6> cplm_info
 {
     "CPLM_MORE",
     "CPLM_FIRST",
@@ -334,7 +335,7 @@ static const char *cplm_info[] =
     "CPLM_UPDATE"
 };
 
-cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const unsigned short* /*casids*/, uint /*cplm*/);
+cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const dvbca_vector &/*casids*/, uint /*cplm*/);
 
 /*
  * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)
@@ -345,17 +346,9 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 
     for (uint s = 0; s < (uint)m_ciHandler->NumSlots(); s++)
     {
-        const unsigned short *casids = m_ciHandler->GetCaSystemIds(s);
+        dvbca_vector casids = m_ciHandler->GetCaSystemIds(s);
 
-        if (!casids)
-        {
-            LOG(success ? VB_DVBCAM : VB_GENERAL, LOG_ERR,
-                LOC + "GetCaSystemIds returned NULL! " +
-                QString("(Slot #%1)").arg(s));
-            continue;
-        }
-
-        if (!casids[0])
+        if (casids.empty())
         {
             LOG(success ? VB_DVBCAM : VB_GENERAL, LOG_ERR,
                 LOC + "CAM supports no CA systems! " +
@@ -371,7 +364,7 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 
         LOG(VB_DVBCAM, LOG_INFO, LOC +
             QString("Sending CA_PMT with %1 to CI slot #%2")
-                .arg(cplm_info[cplm]).arg(s));
+                .arg(QString::fromStdString(cplm_info[cplm])).arg(s));
 
         if (!m_ciHandler->SetCaPmt(capmt, s))
         {
@@ -386,16 +379,16 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 }
 
 static void process_desc(cCiCaPmt &capmt,
-                  const unsigned short *casids,
+                  const dvbca_vector &casids,
                   const desc_list_t &desc)
 {
     desc_list_t::const_iterator it;
     for (it = desc.begin(); it != desc.end(); ++it)
     {
         ConditionalAccessDescriptor cad(*it);
-        for (uint q = 0; casids[q]; q++)
+        for (auto id : casids)
         {
-            if (!cad.IsValid() || cad.SystemID() != casids[q])
+            if (!cad.IsValid() || cad.SystemID() != id)
                 continue;
 
             LOG(VB_DVBCAM, LOG_INFO, QString("DVBCam: Adding CA descriptor: "
@@ -410,7 +403,7 @@ static void process_desc(cCiCaPmt &capmt,
 }
 
 cCiCaPmt CreateCAPMT(const ProgramMapTable &pmt,
-                     const unsigned short *casids,
+                     const dvbca_vector &casids,
                      uint cplm)
 {
     cCiCaPmt capmt(pmt.ProgramNumber(), cplm);

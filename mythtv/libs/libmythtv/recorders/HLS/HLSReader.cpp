@@ -945,7 +945,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     /* If the segment is encrypted, decode it */
     if (segment.HasKeyPath())
     {
-        if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : nullptr,
+        if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : QByteArray(),
                              segment.KeyPath(),
                              buffer, segment.Sequence()))
             return 0;

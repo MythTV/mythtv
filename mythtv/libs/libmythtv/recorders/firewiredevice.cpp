@@ -162,10 +162,11 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return false;
     }
 
-    int digit[3];
-    digit[0] = (channel % 1000) / 100;
-    digit[1] = (channel % 100)  / 10;
-    digit[2] = (channel % 10);
+    std::array<uint,3> digit {
+        (channel % 1000) / 100,
+        (channel % 100)  / 10,
+        (channel % 10)
+    };
 
     if (m_subunitid >= kAVCSubunitIdExtended)
     {
@@ -233,7 +234,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     if (is_mot && !alt_method)
     {
-        for (int d : digit)
+        for (uint d : digit)
         {
             cmd.clear();
             cmd.push_back(kAVCControlCommand);

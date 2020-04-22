@@ -190,7 +190,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     RTjpeg             *m_rtjc                   {nullptr};
 
 #define OUT_LEN (1024*1024 + 1024*1024 / 64 + 16 + 3)    
-    lzo_byte            m_out[OUT_LEN] {};
+    array<lzo_byte,OUT_LEN> m_out                {};
 #define HEAP_ALLOC(var,size) \
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS) {};

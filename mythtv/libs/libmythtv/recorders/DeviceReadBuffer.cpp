@@ -179,12 +179,11 @@ void DeviceReadBuffer::SetPaused(bool val)
 // The WakePoll code is copied from MythSocketThread::WakeReadyReadThread()
 void DeviceReadBuffer::WakePoll(void) const
 {
-    char buf[1];
-    buf[0] = '0';
+    std::string buf(1,'\0');
     ssize_t wret = 0;
     while (isRunning() && (wret <= 0) && (m_wakePipe[1] >= 0))
     {
-        wret = ::write(m_wakePipe[1], &buf, 1);
+        wret = ::write(m_wakePipe[1], buf.data(), buf.size());
         if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "WakePoll failed.");
@@ -423,8 +422,7 @@ bool DeviceReadBuffer::Poll(void) const
     timer.start();
 
     int poll_cnt = 1;
-    struct pollfd polls[2];
-    memset(polls, 0, sizeof(polls));
+    std::array<struct pollfd,2> polls {};
 
     polls[0].fd      = m_streamFd;
     polls[0].events  = POLLIN | POLLPRI;
@@ -451,7 +449,7 @@ bool DeviceReadBuffer::Poll(void) const
             // subtract a bit to allow processing time.
             timeout = max((int)m_maxPollWait - timer.elapsed() - 15, 10);
 
-        int ret = poll(polls, poll_cnt, timeout);
+        int ret = poll(polls.data(), poll_cnt, timeout);
 
         if (polls[0].revents & POLLHUP)
         {
@@ -506,9 +504,9 @@ bool DeviceReadBuffer::Poll(void) const
         // Clear out any pending pipe reads
         if ((poll_cnt > 1) && (polls[1].revents & POLLIN))
         {
-            char dummy[128];
+            std::array<char,128> dummy {};
             int cnt = (m_wakePipeFlags[0] & O_NONBLOCK) ? 128 : 1;
-            ::read(m_wakePipe[0], dummy, cnt);
+            ::read(m_wakePipe[0], dummy.data(), cnt);
         }
 
         if (m_pollTimeoutIsError && (timer.elapsed() >= (int)m_maxPollWait))

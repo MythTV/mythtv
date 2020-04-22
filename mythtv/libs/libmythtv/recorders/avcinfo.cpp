@@ -8,7 +8,7 @@
 
 AVCInfo::AVCInfo()
 {
-    memset(m_unit_table, 0xff, sizeof(m_unit_table));
+    m_unit_table.fill(0xff);
 }
 
 AVCInfo::AVCInfo(const AVCInfo &o) :
@@ -18,7 +18,7 @@ AVCInfo::AVCInfo(const AVCInfo &o) :
     m_firmware_revision(o.m_firmware_revision),
     m_product_name(o.m_product_name)
 {
-    memcpy(m_unit_table, o.m_unit_table, sizeof(m_unit_table));
+    m_unit_table = o.m_unit_table;
 }
 
 AVCInfo &AVCInfo::operator=(const AVCInfo &o)
@@ -34,14 +34,14 @@ AVCInfo &AVCInfo::operator=(const AVCInfo &o)
     m_modelid  = o.m_modelid;
     m_firmware_revision = o.m_firmware_revision;
     m_product_name = o.m_product_name;
-    memcpy(m_unit_table, o.m_unit_table, sizeof(m_unit_table));
+    m_unit_table = o.m_unit_table;
 
     return *this;
 }
 
 bool AVCInfo::GetSubunitInfo(void)
 {
-    memset(m_unit_table, 0xff, 32 * sizeof(uint8_t));
+    m_unit_table.fill(0xff);
 
     for (uint i = 0; i < 8; i++)
     {

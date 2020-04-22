@@ -28,8 +28,8 @@ bool LinuxAVCInfo::Update(uint64_t _guid, raw1394handle_t handle,
     m_firmware_revision = dir.unit_sw_version;
     m_product_name      = QString("%1").arg(dir.label);
 
-    if (avc1394_subunit_info(handle, m_node, (uint32_t*)m_unit_table) < 0)
-        memset(m_unit_table, 0xff, sizeof(m_unit_table));
+    if (avc1394_subunit_info(handle, m_node, (uint32_t*)m_unit_table.data()) < 0)
+        m_unit_table.fill(0xff);
 
     return true;
 }
@@ -82,14 +82,14 @@ bool LinuxAVCInfo::SendAVCCommand(
     if (cmd.size() > 4096)
         return false;
 
-    uint32_t cmdbuf[1024];
+    std::array<uint32_t,1024> cmdbuf {};
     for (size_t i = 0; i < cmd.size(); i+=4)
         cmdbuf[i>>2] = cmd[i]<<24 | cmd[i+1]<<16 | cmd[i+2]<<8 | cmd[i+3];
 
     uint result_length = 0;
 
     uint32_t *ret = avc1394_transaction_block2(
-        m_fwHandle, m_node, cmdbuf, cmd.size() >> 2,
+        m_fwHandle, m_node, cmdbuf.data(), cmd.size() >> 2,
         &result_length, retry_cnt);
 
     if (!ret)

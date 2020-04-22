@@ -1365,8 +1365,8 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     numbuffers = vrbuf.count;
 
-    unsigned char *buffers[MAX_VIDEO_BUFFERS];
-    int bufferlen[MAX_VIDEO_BUFFERS];
+    std::array<uint8_t*,MAX_VIDEO_BUFFERS> buffers   {};
+    std::array<int,MAX_VIDEO_BUFFERS>      bufferlen {};
 
     for (uint i = 0; i < numbuffers; i++)
     {
@@ -1875,11 +1875,11 @@ void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 void NuppelVideoRecorder::WriteFileHeader(void)
 {
     struct rtfileheader fileheader {};
-    static constexpr char kFinfo[12] = "MythTVVideo";
-    static constexpr char kVers[5]   = "0.07";
+    static const std::string kFinfo { "MythTVVideo" };
+    static const std::string kVers  { "0.07" };
 
-    memcpy(fileheader.finfo, kFinfo, sizeof(fileheader.finfo));
-    memcpy(fileheader.version, kVers, sizeof(fileheader.version));
+    std::copy(kFinfo.cbegin(), kFinfo.cend(), fileheader.finfo);
+    std::copy(kVers.cbegin(), kVers.cend(), fileheader.version);
     fileheader.width  = m_wOut;
     fileheader.height = (int)(m_hOut * m_heightMultiplier);
     fileheader.desiredwidth  = 0;
@@ -1926,16 +1926,15 @@ void NuppelVideoRecorder::WriteHeader(void)
     }
     else
     {
-        static unsigned long int s_tbls[128];
+        static std::array<uint32_t,128> s_tbls {};
 
         frameheader.comptype = 'R'; // compressor data for RTjpeg
-        frameheader.packetlength = sizeof(s_tbls);
+        frameheader.packetlength = s_tbls.size() * sizeof(uint32_t);
 
         // compression configuration header
         WriteFrameheader(&frameheader);
 
-        memset(s_tbls, 0, sizeof(s_tbls));
-        m_ringBuffer->Write(s_tbls, sizeof(s_tbls));
+        m_ringBuffer->Write(s_tbls.data(), s_tbls.size() * sizeof(uint32_t));
     }
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -2315,8 +2314,8 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     unsigned char *outpos = m_textBuffer[act]->buffer;
     *outpos = 0;
     struct teletextsubtitle st {};
-    unsigned char linebuf[VT_WIDTH + 1];
-    unsigned char *linebufpos = linebuf;
+    std::vector<uint8_t> linebuf {};
+    linebuf.reserve(VT_WIDTH + 1);
 
     for (int y = 0; y < VT_HEIGHT; y++)
     {
@@ -2419,11 +2418,9 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                     st.dbl = dbl;
                     st.fg  = fg;
                     st.bg  = bg;
-                    linebufpos = linebuf;
-                    *linebufpos = 0;
+                    linebuf.clear();
                 }
-                *linebufpos++ = c;
-                *linebufpos = 0;
+                linebuf.push_back(c);
                 visible = 1;
             }
 
@@ -2432,23 +2429,16 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
         }
         if (visible)
         {
-            st.len = linebufpos - linebuf + 1;;
-            int max = 200;
+            st.len = linebuf.size() + 1;
+            int maxlen = 200;
             int bufsize = ((outpos - m_textBuffer[act]->buffer + 1) + st.len);
-            if (bufsize > max)
+            if (bufsize > maxlen)
                 break;
             memcpy(outpos, &st, sizeof(st));
             outpos += sizeof(st);
-            if (st.len < 42)
-            {
-                memcpy(outpos, linebuf, st.len);
-                outpos += st.len;
-            }
-            else
-            {
-                memcpy(outpos, linebuf, 41);
-                outpos += 41;
-            }
+            int count = max(st.len, static_cast<uint8_t>(41));
+            std::copy(linebuf.cbegin(), linebuf.cbegin() + count, outpos);
+            outpos += count;
             *outpos = 0;
         }
     }
@@ -2673,7 +2663,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     int raw = 0;
     int compressthis = m_compression;
     // cppcheck-suppress variableScope
-    uint8_t *planes[3] = {
+    std::array<uint8_t*,3> planes {
         frame->buf + frame->offsets[0],
         frame->buf + frame->offsets[1],
         frame->buf + frame->offsets[2] };
@@ -2784,7 +2774,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             if (wantkeyframe)
                 m_rtjc->SetNextKey();
-            tmp = m_rtjc->Compress(m_strm, planes);
+            tmp = m_rtjc->Compress(m_strm, planes.data());
         }
         else
             tmp = frame->size;
@@ -2796,11 +2786,11 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             if (raw)
             {
                 r = lzo1x_1_compress(frame->buf, frame->size,
-                                     m_out, &out_len, wrkmem);
+                                     m_out.data(), &out_len, wrkmem);
             }
             else
             {
-                r = lzo1x_1_compress((unsigned char *)m_strm, tmp, m_out,
+                r = lzo1x_1_compress((unsigned char *)m_strm, tmp, m_out.data(),
                                      &out_len, wrkmem);
             }
             if (r != LZO_E_OK)
@@ -2866,7 +2856,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             frameheader.comptype  = '3'; // raw YUV420 with lzo
         frameheader.packetlength = out_len;
         WriteFrameheader(&frameheader);
-        m_ringBuffer->Write(m_out, out_len);
+        m_ringBuffer->Write(m_out.data(), out_len);
     }
 
     if (m_framesWritten == 0)
@@ -2940,7 +2930,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
     if (m_compressAudio)
     {
-        char mp3gapless[7200];
+        std::array<uint8_t,7200> mp3gapless {};
         int compressedsize = 0;
         int gaplesssize = 0;
         int lameret = 0;
@@ -2974,8 +2964,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         }
         compressedsize = lameret;
 
-        lameret = lame_encode_flush_nogap(m_gf, (unsigned char *)mp3gapless,
-                                          7200);
+        lameret = lame_encode_flush_nogap(m_gf, mp3gapless.data(), mp3gapless.size());
         if (lameret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2993,7 +2982,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         {
             WriteFrameheader(&frameheader);
             m_ringBuffer->Write(m_mp3Buf, compressedsize);
-            m_ringBuffer->Write(mp3gapless, gaplesssize);
+            m_ringBuffer->Write(mp3gapless.data(), gaplesssize);
         }
         m_audioBytes += m_audioBufferSize;
     }

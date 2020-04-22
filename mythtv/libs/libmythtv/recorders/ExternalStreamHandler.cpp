@@ -73,12 +73,11 @@ ExternIO::~ExternIO(void)
 bool ExternIO::Ready(int fd, int timeout, const QString & what)
 {
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    struct pollfd m_poll[2];
-    memset(m_poll, 0, sizeof(m_poll));
+    std::array<struct pollfd,2> m_poll {};
 
     m_poll[0].fd = fd;
     m_poll[0].events = POLLIN | POLLPRI;
-    int ret = poll(m_poll, 1, timeout);
+    int ret = poll(m_poll.data(), 1, timeout);
 
     if (m_poll[0].revents & POLLHUP)
     {
@@ -177,9 +176,9 @@ QString ExternIO::GetStatus(int timeout)
     int waitfor = m_status.atEnd() ? timeout : 0;
     if (Ready(m_appErr, waitfor, "status"))
     {
-        char buffer[2048];
-        int len = read(m_appErr, buffer, 2048);
-        m_status << QString::fromLatin1(buffer, len);
+        std::array<char,2048> buffer {};
+        int len = read(m_appErr, buffer.data(), buffer.size());
+        m_status << QString::fromLatin1(buffer.data(), len);
     }
 
     if (m_status.atEnd())
@@ -320,23 +319,23 @@ void ExternIO::Fork(void)
 
     LOG(VB_RECORD, LOG_INFO, QString("ExternIO::Fork '%1'").arg(full_command));
 
-    int in[2]  = {-1, -1};
-    int out[2] = {-1, -1};
-    int err[2] = {-1, -1};
+    std::array<int,2> in  = {-1, -1};
+    std::array<int,2> out = {-1, -1};
+    std::array<int,2> err = {-1, -1};
 
-    if (pipe(in) < 0)
+    if (pipe(in.data()) < 0)
     {
         m_error = "pipe(in) failed: " + ENO;
         return;
     }
-    if (pipe(out) < 0)
+    if (pipe(out.data()) < 0)
     {
         m_error = "pipe(out) failed: " + ENO;
         close(in[0]);
         close(in[1]);
         return;
     }
-    if (pipe(err) < 0)
+    if (pipe(err.data()) < 0)
     {
         m_error = "pipe(err) failed: " + ENO;
         close(in[0]);

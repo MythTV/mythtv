@@ -20,6 +20,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <array>
 #include <cstdlib>
 #include <cstdarg>
 #include <unistd.h>
@@ -68,14 +69,15 @@ static bool decodebit(const unsigned char *data, int threshold, int scale1)
 
 static int decode(unsigned char *vbiline, int scale0, int scale1)
 {
-    int max[7];
-    int min[7];
-    int val[7];
+    std::array<int,7> max {};
+    std::array<int,7> min {};
+    std::array<int,7> val {};
     int sample = 0;
     int packedbits = 0;
 
-    for (int clk = 0; clk < 7; clk++)
-        max[clk] = min[clk] = val[clk] = -1;
+    max.fill(-1);
+    min.fill(-1);
+    val.fill(-1);
     int clk = 0;
     int tmp = 0;
     int i = 30;
@@ -124,7 +126,6 @@ static int webtv_check(char *buf, int len)
     unsigned long sum;
     unsigned long nwords;
     unsigned short csum = 0;
-    char temp[9];
     int nbytes = 0;
 
     while (buf[0] != '<' && len > 6)    //search for the start
@@ -166,9 +167,11 @@ static int webtv_check(char *buf, int len)
         sum = csum + (sum & 0xffff);
         csum = (unsigned short) (sum >> 16);
     }
-    sprintf(temp, "%04X\n", (int) ~sum & 0xffff);
+
+    std::array<char,9> temp {};
+    sprintf(temp.data(), "%04X\n", (int) ~sum & 0xffff);
     buf++;
-    if (!strncmp(buf, temp, 4))
+    if (!strncmp(buf, temp.data(), 4))
     {
         buf[5] = 0;
         printf("\33[35mWEBTV: %s\33[0m\n", buf - nbytes - 1);
@@ -187,14 +190,14 @@ struct cc *cc_open(const char *vbi_name)
     if (!(cc = new struct cc))
     {
         printf("out of memory\n");
-        return 0;
+        return nullptr;
     }
 
     if ((cc->fd = open(vbi_name, O_RDONLY)) == -1)
     {
         printf("cannot open vbi device\n");
         free(cc);
-        return 0;
+        return nullptr;
     }
 
     cc->code1 = -1;

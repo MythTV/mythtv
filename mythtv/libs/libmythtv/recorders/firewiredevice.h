@@ -223,8 +223,6 @@ class FirewireDevice
     virtual bool SendAVCCommand(const vector<uint8_t> &cmd,
                                 vector<uint8_t> &result,
                                 int retry_cnt) = 0;
-    bool GetSubunitInfo(uint8_t table[32]);
-
     void SetLastChannel(uint channel);
     void ProcessPATPacket(const TSPacket &tspacket);
     virtual void BroadcastToListeners(

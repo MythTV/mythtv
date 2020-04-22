@@ -32,6 +32,7 @@
 #endif 
 
 #include <cstdio>
+#include <vector>
 
 #include <pthread.h>
 #include <sys/types.h>
@@ -41,7 +42,7 @@
 #include <sys/stat.h>
 #include <sys/uio.h>
 
-#define MAXCASYSTEMIDS 64
+using dvbca_vector = std::vector<uint16_t>;
 
 class cMutex {
   friend class cCondVar;
@@ -151,7 +152,7 @@ public:
   virtual bool EnterMenu(int Slot) = 0;
   virtual cCiMenu *GetMenu(void) = 0;
   virtual cCiEnquiry *GetEnquiry(void) = 0;
-  virtual const unsigned short *GetCaSystemIds(int Slot) = 0;
+  virtual dvbca_vector GetCaSystemIds(int Slot) = 0;
   virtual bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) = 0;
   virtual void SetTimeOffset(double /*offset_in_seconds*/) { }
   };
@@ -192,7 +193,7 @@ public:
   cCiMenu *GetMenu(void) override; // cCiHandler
   cCiEnquiry *GetEnquiry(void) override; // cCiHandler
   bool SetCaPmt(cCiCaPmt &CaPmt);
-  const unsigned short *GetCaSystemIds(int Slot) override; // cCiHandler
+  dvbca_vector GetCaSystemIds(int Slot) override; // cCiHandler
   bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
   void SetTimeOffset(double offset_in_seconds) override; // cCiHandler
   bool Reset(int Slot);
@@ -207,7 +208,7 @@ class cHlCiHandler : public cCiHandler {
     int            m_numSlots;
     int            m_state          {0};
     int            m_numCaSystemIds {0};
-    unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
+    dvbca_vector   m_caSystemIds    {};
     cHlCiHandler(int Fd, int NumSlots);
     int CommHL(unsigned tag, unsigned function, struct ca_msg *msg) const;
     int GetData(unsigned tag, struct ca_msg *msg);
@@ -223,7 +224,7 @@ class cHlCiHandler : public cCiHandler {
     cCiMenu *GetMenu(void) override; // cCiHandler
     cCiEnquiry *GetEnquiry(void) override; // cCiHandler
     bool SetCaPmt(cCiCaPmt &CaPmt);
-    const unsigned short *GetCaSystemIds(int Slot) override; // cCiHandler
+    dvbca_vector GetCaSystemIds(int Slot) override; // cCiHandler
     bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
     bool Reset(int Slot) const;
     bool connected() const;

@@ -1,10 +1,11 @@
+#include <array>
 #include <cstring>
 #include "vt.h"
 #include "lang.h"
 
 int latin1 = -1;
 
-static unsigned char lang_char[256];
+static std::array<uint8_t,256> lang_char;
 
 /* Yankable latin charset :-)
      !"#$%&'()*+,-./0123456789:;<=>?
@@ -17,8 +18,9 @@ static unsigned char lang_char[256];
 
 
 
-static struct mark { const char *m_g0, *m_latin1, *m_latin2; } marks[16] =
-{
+struct mark { const std::string m_g0, m_latin1, m_latin2; };
+static const std::array<const mark,16> marks =
+{{
     /* none */         { "#",
                          "\xA4", /* ¤ */
                          "$"                                   },
@@ -67,9 +69,9 @@ static struct mark { const char *m_g0, *m_latin1, *m_latin2; } marks[16] =
     /* caron - v */    { "cdelnrstzCDELNRSTZ",
                          "cdelnrstzCDELNRSTZ",
                          "\xE8\xEF\xEC\xB5\xF2\xF8\xB9\xBB\xBE\xC8\xCF̥\xD2ة\xAB\xAE" /* èïìµòø¹»¾ÈÏÌ¥ÒØ©«® */ },
-};
+}};
 
-static unsigned char g2map_latin1[] =
+static const std::string g2map_latin1 =
    /*0123456789abcdef*/
     "\x20\xA1\xA2\xA3\x24\xA5\x23\xA7\xA4\x27\x22\xAB\x20\x20\x20\x20"  /*  ¡¢£$¥#§¤'\"«     */
     "\xB0\xB1\xB2\xB3\xD7\xB5\xB6\xB7\xF7\x27\x22\xBB\xBC\xBD\xBE\xBF"  /* °±²³×µ¶·÷'\"»¼½¾¿ */
@@ -78,7 +80,7 @@ static unsigned char g2map_latin1[] =
     "\x20\xC6\xD0\xAA\x48\x20\x49\x4C\x4C\xD8\x20\xBA\xDE\x54\x4E\x6E"  /*  ÆÐªH ILLØ ºÞTNn */
     "\x4B\xE6\x64\xF0\x68\x69\x69\x6C\x6C\xF8\x20\xDF\xFE\x74\x6E\x7f"; /* Kædðhiillø ßþtn\x7f" */
 
-static unsigned char g2map_latin2[] =
+static const std::string g2map_latin2 =
    /*0123456789abcdef*/
     "\x20\x69\x63\x4C\x24\x59\x23\xA7\xA4\x27\x22\x3C\x20\x20\x20\x20"  /*  icL$Y#§¤'\"<     */
     "\xB0\x20\x20\x20\xD7\x75\x20\x20\xF7\x27\x22\x3E\x20\x20\x20\x20"  /* °   ×u  ÷'\">     */
@@ -94,7 +96,7 @@ lang_init(void)
 {
     int i = 0;
 
-    memset(lang_char, 0, sizeof(lang_char));
+    lang_char.fill(0);
     for (i = 1; i <= 13; i++)
         lang_char[(unsigned char)(lang_chars[0][i])] = i;
 }
@@ -128,11 +130,11 @@ init_enhance(struct enhance *eh)
 }
 
 void
-add_enhance(struct enhance *eh, int dcode, unsigned int *data)
+add_enhance(struct enhance *eh, int dcode, std::array<unsigned int,13>& data)
 {
     if (dcode == eh->next_des)
     {
-       memcpy(eh->trip + dcode * 13, data, 13 * sizeof(*data));
+       memcpy(eh->trip + dcode * 13, data.cbegin(), data.size() * sizeof(unsigned int));
        eh->next_des++;
     }
     else
@@ -173,14 +175,14 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                    case 16 ... 31: // char from G0 set with diacritical mark
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
-                           struct mark *mark = marks + (mode - 16);
-                           const char *x = std::strchr(mark->m_g0, data);
-                           if (x != nullptr)
+                           const struct mark *mark = &marks[mode - 16];
+                           size_t index = mark->m_g0.find(data);
+                           if (index != std::string::npos)
                            {
                                if (latin1)
-                                   data = mark->m_latin1[x - mark->m_g0];
+                                   data = mark->m_latin1[index];
                                else
-                                   data = mark->m_latin2[x - mark->m_g0];
+                                   data = mark->m_latin2[index];
                            }
                            vtp->data[row][adr] = data;
                        }

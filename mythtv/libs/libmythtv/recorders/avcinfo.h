@@ -2,6 +2,7 @@
 #define AVC_INFO_H
 
 // C++ headers
+#include <array>
 #include <cstdint>
 #include <vector>
 using namespace std;
@@ -50,7 +51,7 @@ class AVCInfo
     uint     m_modelid           {0};
     uint     m_firmware_revision {0};
     QString  m_product_name;
-    uint8_t  m_unit_table[32]    {};
+    std::array<uint8_t,32>  m_unit_table {};
 };
 
 #endif // AVC_INFO_H

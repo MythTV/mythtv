@@ -141,6 +141,28 @@ static uint8_t *SetLength(uint8_t *Data, int Length)
   return p;
 }
 
+//! @copydoc SetLength(uint8_t *Data, int Length)
+static void SetLength(std::vector<uint8_t> &Data, int Length)
+{
+  if (Length < 128)
+  {
+      Data.push_back(Length);
+      return;
+  }
+
+  // This will be replaced with the number of bytes in the length
+  size_t len_offset = Data.size();
+  Data.push_back(0);
+
+  int n = sizeof(Length);
+  for (int i = n - 1; i >= 0; i--) {
+      int b = (Length >> (8 * i)) & 0xFF;
+      if ((len_offset != Data.size()) || b)
+          Data.push_back(b);
+  }
+  Data[len_offset] = (Data.size() - len_offset) | SIZE_INDICATOR;
+}
+
 static char *CopyString(int Length, const uint8_t *Data)
 ///< Copies the string at Data.
 ///< \param Length The number of bytes to copy from Data.
@@ -240,7 +262,7 @@ bool cMutexLock::Lock(cMutex *Mutex)
 class cTPDU {
 private:
   int     m_size {0};
-  uint8_t m_data[MAX_TPDU_SIZE] {0};
+  std::array<uint8_t,MAX_TPDU_SIZE>  m_data {0};
   const uint8_t *GetData(const uint8_t *Data, int &Length) const;
 public:
   cTPDU(void) = default;
@@ -248,7 +270,7 @@ public:
   uint8_t Slot(void) { return m_data[0]; }
   uint8_t Tcid(void) { return m_data[1]; }
   uint8_t Tag(void)  { return m_data[2]; }
-  const uint8_t *Data(int &Length) { return GetData(m_data + 3, Length); }
+  const uint8_t *Data(int &Length) { return GetData(m_data.data() + 3, Length); }
   uint8_t Status(void);
   int Write(int fd);
   int Read(int fd);
@@ -285,12 +307,12 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
     case T_DATA_LAST:
     case T_DATA_MORE:
          if (Length <= MAX_TPDU_DATA) {
-            uint8_t *p = m_data + 3;
+            uint8_t *p = m_data.data() + 3;
             p = SetLength(p, Length + 1);
             *p++ = Tcid;
             if (Length)
                memcpy(p, Data, Length);
-            m_size = Length + (p - m_data);
+            m_size = Length + (p - m_data.data());
             }
          else
             esyslog("ERROR: illegal data length for TPDU tag 0x%02X: %d", Tag, Length);
@@ -304,14 +326,14 @@ int cTPDU::Write(int fd)
 {
   Dump(true);
   if (m_size)
-     return write(fd, m_data, m_size) == m_size ? OK : ERROR;
+     return write(fd, m_data.data(), m_size) == m_size ? OK : ERROR;
   esyslog("ERROR: attemp to write TPDU with zero size");
   return ERROR;
 }
 
 int cTPDU::Read(int fd)
 {
-  m_size = safe_read(fd, m_data, sizeof(m_data));
+  m_size = safe_read(fd, m_data.data(), m_data.size());
   if (m_size < 0) {
      esyslog("ERROR: %m");
      m_size = 0;
@@ -391,6 +413,8 @@ public:
   ~cCiTransportConnection();
   int Slot(void) const { return m_slot; }
   int SendData(int Length, const uint8_t *Data);
+  int SendData(std::vector<uint8_t> &Data)
+        { return SendData(Data.size(), Data.data()); }
   int RecvData(void);
   const uint8_t *Data(int &Length);
   //XXX Close()
@@ -429,13 +453,13 @@ int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Dat
 
 int cCiTransportConnection::RecvTPDU(void)
 {
-  struct pollfd pfd[1];
+  std::array<struct pollfd,1> pfd {};
   pfd[0].fd = m_fd;
   pfd[0].events = POLLIN;
   m_lastResponse = ERROR;
 
   for (;;) {
-      int ret = poll(pfd, 1, CAM_READ_TIMEOUT);
+      int ret = poll(pfd.data(), 1, CAM_READ_TIMEOUT);
       if (ret == -1 && (errno == EAGAIN || errno == EINTR))
           continue;
       break;
@@ -574,7 +598,7 @@ class cCiTransportLayer {
 private:
   int                    m_fd;
   int                    m_numSlots;
-  cCiTransportConnection m_tc[MAX_CI_CONNECT];
+  std::array<cCiTransportConnection,MAX_CI_CONNECT> m_tc;
 public:
   cCiTransportLayer(int Fd, int NumSlots);
   cCiTransportConnection *NewConnection(int Slot);
@@ -752,6 +776,8 @@ protected:
   static int GetTag(int &Length, const uint8_t **Data);
   static const uint8_t *GetData(const uint8_t *Data, int &Length);
   int SendData(int Tag, int Length = 0, const uint8_t *Data = nullptr);
+    int SendData(int Tag, std::vector<uint8_t> &Data)
+        { return SendData(Tag, Data.size(), Data.data()); };
 public:
   cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc);
   virtual ~cCiSession() = default;
@@ -796,36 +822,39 @@ const uint8_t *cCiSession::GetData(const uint8_t *Data, int &Length)
 
 int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
 {
-  uint8_t buffer[2048];
-  uint8_t *p = buffer;
-  *p++ = ST_SESSION_NUMBER;
-  *p++ = 0x02;
-  *p++ = (m_sessionId >> 8) & 0xFF;
-  *p++ =  m_sessionId       & 0xFF;
-  *p++ = (Tag >> 16) & 0xFF;
-  *p++ = (Tag >>  8) & 0xFF;
-  *p++ =  Tag        & 0xFF;
-  if (Length >= 0)
+  if (Length < 0)
   {
-    p = SetLength(p, Length);
-    if (p - buffer + Length < int(sizeof(buffer)))
-    {
-        if (Length != 0)
-        {
-            if (!Data)
-            {
-                esyslog("ERROR: CAM: Data pointer null");
-                return ERROR;
-            }
-            memcpy(p, Data, Length);
-            p += Length;
-        }
-        return m_tc->SendData(p - buffer, buffer);
-    }
-    esyslog("ERROR: CAM: data length (%d) exceeds buffer size", Length);
+    esyslog("ERROR: CAM: data length (%d) is negative", Length);
+    return ERROR;
   }
-  esyslog("ERROR: CAM: data length (%d) is negative", Length);
-  return ERROR;
+
+  if (!Data)
+  {
+    esyslog("ERROR: CAM: Data pointer null");
+    return ERROR;
+  }
+
+  std::vector<uint8_t> buffer {
+    ST_SESSION_NUMBER, 0x02,
+    static_cast<uint8_t>((m_sessionId >> 8) & 0xFF),
+    static_cast<uint8_t>((m_sessionId     ) & 0xFF),
+    static_cast<uint8_t>((Tag >> 16) & 0xFF),
+    static_cast<uint8_t>((Tag >>  8) & 0xFF),
+    static_cast<uint8_t>((Tag      ) & 0xFF)} ;
+  buffer.reserve(2048);
+
+  SetLength(buffer, Length);
+  if (buffer.size() + Length >= buffer.capacity())
+  {
+    esyslog("ERROR: CAM: data length (%d) exceeds buffer size", Length);
+    return ERROR;
+  }
+
+  if (Length != 0)
+  {
+    buffer.insert(buffer.end(), Data, Data + Length);
+  }
+  return m_tc->SendData(buffer);
 }
 
 bool cCiSession::Process(int Length, const uint8_t *Data)
@@ -859,7 +888,7 @@ bool cCiResourceManager::Process(int Length, const uint8_t *Data)
      switch (Tag) {
        case AOT_PROFILE_ENQ: {
             dbgprotocol("%d: <== Profile Enquiry\n", SessionId());
-            uint32_t resources[] =
+            const std::array<const uint32_t,5> resources
             {
                 htonl(RI_RESOURCE_MANAGER),
                 htonl(RI_APPLICATION_INFORMATION),
@@ -868,7 +897,8 @@ bool cCiResourceManager::Process(int Length, const uint8_t *Data)
                 htonl(RI_MMI)
             };
             dbgprotocol("%d: ==> Profile\n", SessionId());
-            SendData(AOT_PROFILE, sizeof(resources), (uint8_t*)resources);
+            SendData(AOT_PROFILE, resources.size() * sizeof(uint32_t),
+                     reinterpret_cast<const uint8_t*>(resources.data()));
             m_state = 3;
             }
             break;
@@ -988,13 +1018,12 @@ bool cCiApplicationInformation::EnterMenu(void)
 class cCiConditionalAccessSupport : public cCiSession {
 private:
   int m_state {0};
-  int m_numCaSystemIds {0};
-  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
+  dvbca_vector m_caSystemIds {};
   bool m_needCaPmt {false};
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
-  const unsigned short *GetCaSystemIds(void) { return m_caSystemIds; }
+  dvbca_vector GetCaSystemIds(void) { return m_caSystemIds; }
   bool SendPMT(cCiCaPmt &CaPmt);
   bool NeedCaPmt(void) const { return m_needCaPmt; }
   };
@@ -1020,22 +1049,16 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
                   dbgprotocol(" %04X", id);
                   d += 2;
                   l -= 2;
-                  if (m_numCaSystemIds < MAXCASYSTEMIDS) {
-                     int i = 0;
-                     // Make sure the id is not already present
-                     for (; i < m_numCaSystemIds; i++)
-                        if (m_caSystemIds[i] == id)
-                           break;
 
-                     if (i < m_numCaSystemIds)
-                         continue;
+                  // Make sure the id is not already present
+                  if (std::find(m_caSystemIds.cbegin(), m_caSystemIds.cend(), id)
+                      != m_caSystemIds.end())
+                      continue;
 
-                     m_caSystemIds[m_numCaSystemIds++] = id;
-                     m_caSystemIds[m_numCaSystemIds] = 0;
-                     }
-                  else
-                     esyslog("ERROR: too many CA system IDs!");
-                    }
+                  // Insert before the last element.
+                  m_caSystemIds.emplace_back(id);
+            }
+
             dbgprotocol("\n");
             }
             m_state = 2;
@@ -1111,21 +1134,22 @@ bool cCiDateTime::SendDateTime(void)
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
 #define DEC2BCD(d) (uint8_t((((d) / 10) << 4) + ((d) % 10)))
-#define BYTE0(a) ((a) & 0xFF)
-#define BYTE1(a) (((a) >> 8) & 0xFF)
-     uint8_t T[7];
+#define BYTE0(a) static_cast<uint8_t>((a) & 0xFF)
+#define BYTE1(a) static_cast<uint8_t>(((a) >> 8) & 0xFF)
      uint16_t mjd = htons(MJD);
      int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
-     T[0] = BYTE0(mjd);
-     T[1] = BYTE1(mjd);
-     T[2] = DEC2BCD(tm_gmt.tm_hour);
-     T[3] = DEC2BCD(tm_gmt.tm_min);
-     T[4] = DEC2BCD(tm_gmt.tm_sec);
-     T[5] = BYTE0(local_offset);
-     T[6] = BYTE1(local_offset);
+     std::vector<uint8_t> T {
+         BYTE0(mjd),
+         BYTE1(mjd),
+         DEC2BCD(tm_gmt.tm_hour),
+         DEC2BCD(tm_gmt.tm_min),
+         DEC2BCD(tm_gmt.tm_sec),
+         BYTE0(local_offset),
+         BYTE1(local_offset)
+     };
 
      dbgprotocol("%d: ==> Date Time\n", SessionId());
-     SendData(AOT_DATE_TIME, 7, T);
+     SendData(AOT_DATE_TIME, T);
      //XXX return value of all SendData() calls???
      return true;
      }
@@ -1368,10 +1392,14 @@ bool cCiMMI::SendMenuAnswer(uint8_t Selection)
   return true;
 }
 
+// Define protocol structure
+extern "C" {
+    struct tAnswer { uint8_t m_id; char m_text[256]; };
+}
+
 bool cCiMMI::SendAnswer(const char *Text)
 {
   dbgprotocol("%d: ==> Answ\n", SessionId());
-  struct tAnswer { uint8_t m_id; char m_text[256]; };//XXX
   tAnswer answer {};
   answer.m_id = Text ? AI_ANSWER : AI_CANCEL;
   if (Text) {
@@ -1587,20 +1615,19 @@ int cLlCiHandler::ResourceIdToInt(const uint8_t *Data)
 
 bool cLlCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
 {
-  uint8_t buffer[16];
-  uint8_t *p = buffer;
-  *p++ = Tag;
-  *p++ = 0x00; // will contain length
+  std::vector<uint8_t> buffer {Tag, 0x00} ; // 0x00 will be replaced with length
   if (Status >= 0)
-     *p++ = Status;
+     buffer.push_back(Status);
   if (ResourceId) {
-     *(int *)p = htonl(ResourceId);
-     p += 4;
+     buffer.push_back((ResourceId >> 24) & 0xFF);
+     buffer.push_back((ResourceId >> 16) & 0xFF);
+     buffer.push_back((ResourceId >>  8) & 0xFF);
+     buffer.push_back( ResourceId        & 0xFF);
      }
-  *(short *)p = htons(SessionId);
-  p += 2;
-  buffer[1] = p - buffer - 2; // length
-  return m_tc && m_tc->SendData(p - buffer, buffer) == OK;
+  buffer.push_back((SessionId >> 8) & 0xFF);
+  buffer.push_back( SessionId       & 0xFF);
+  buffer[1] = buffer.size() - 2; // length
+  return m_tc && m_tc->SendData(buffer) == OK;
 }
 
 cCiSession *cLlCiHandler::GetSessionBySessionId(int SessionId)
@@ -1816,11 +1843,12 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
   return nullptr;
 }
 
-const unsigned short *cLlCiHandler::GetCaSystemIds(int Slot)
+dvbca_vector cLlCiHandler::GetCaSystemIds(int Slot)
  {
+  static dvbca_vector empty {};
   cMutexLock MutexLock(&m_mutex);
   auto *cas = dynamic_cast<cCiConditionalAccessSupport *>(GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot));
-  return cas ? cas->GetCaSystemIds() : nullptr;
+  return cas ? cas->GetCaSystemIds() : empty;
 }
 
 bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
@@ -1923,12 +1951,9 @@ bool cHlCiHandler::Process(void)
                     dbgprotocol(" %04X", id);
                     d += 2;
                     l -= 2;
-                    if (m_numCaSystemIds < MAXCASYSTEMIDS) {
-                        m_caSystemIds[m_numCaSystemIds++] = id;
-                        m_caSystemIds[m_numCaSystemIds] = 0;
-                    }
-                    else
-                        esyslog("ERROR: too many CA system IDs!");
+
+                    // Insert before the last element.
+                    m_caSystemIds.emplace_back(id);
                 }
                 dbgprotocol("\n");
             }
@@ -1957,7 +1982,7 @@ cCiEnquiry *cHlCiHandler::GetEnquiry(void)
     return nullptr;
 }
 
-const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
+dvbca_vector cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 {
     return m_caSystemIds;
 }
