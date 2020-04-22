@@ -22,10 +22,10 @@
 #define IncrementButtonVersion if (++m_buttonVersion > 1024) m_buttonVersion = 1;
 #define DVD_DRIVE_SPEED 1
 
-static const char *DVDMenuTable[] =
+static const std::array<const std::string,8> DVDMenuTable
 {
-    nullptr,
-    nullptr,
+    "",
+    "",
     QT_TRANSLATE_NOOP("(DVD menu)", "Title Menu"),
     QT_TRANSLATE_NOOP("(DVD menu)", "Root Menu"),
     QT_TRANSLATE_NOOP("(DVD menu)", "Subpicture Menu"),
@@ -35,11 +35,13 @@ static const char *DVDMenuTable[] =
     QT_TRANSLATE_NOOP("(DVD menu)", "Part Menu")
 };
 
+const QMap<int, int> MythDVDBuffer::kSeekSpeedMap =
+{ {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
+  { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
+
 MythDVDBuffer::MythDVDBuffer(const QString &Filename)
   : MythOpticalBuffer(kMythBufferDVD)
 {
-    m_seekSpeedMap = { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
-                       { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
     MythDVDBuffer::OpenFile(Filename);
 }
 
@@ -172,8 +174,8 @@ long long MythDVDBuffer::Seek(long long Time)
 
     if (ffrewSkip != 1 && ffrewSkip != 0 && Time != 0)
     {
-        auto it = m_seekSpeedMap.lowerBound(static_cast<int>(labs(Time)));
-        if (it == m_seekSpeedMap.end())
+        auto it = kSeekSpeedMap.lowerBound(static_cast<int>(labs(Time)));
+        if (it == kSeekSpeedMap.end())
             seekSpeed = *(it - 1);
         else
             seekSpeed = *it;
@@ -235,8 +237,8 @@ void MythDVDBuffer::GetDescForPos(QString &Description) const
 {
     if (m_inMenu)
     {
-        if ((m_part <= DVD_MENU_MAX) && DVDMenuTable[m_part])
-            Description = QCoreApplication::translate("(DVD menu)", DVDMenuTable[m_part]);
+        if ((m_part <= DVD_MENU_MAX) && !DVDMenuTable[m_part].empty())
+            Description = QCoreApplication::translate("(DVD menu)", DVDMenuTable[m_part].c_str());
     }
     else
     {
@@ -533,7 +535,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
     while ((m_processState != PROCESS_WAIT) && needed)
     {
-        blockBuf = m_dvdBlockWriteBuf;
+        blockBuf = m_dvdBlockWriteBuf.data();
 
         if (m_processState == PROCESS_REPROCESS)
         {
@@ -567,7 +569,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     }
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
 
                     // debug
@@ -660,7 +662,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     IncrementButtonVersion
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -672,9 +674,11 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_SPU_CLUT_CHANGE");
 
                     // store the new clut
-                    memcpy(m_clut, blockBuf, 16 * sizeof(uint32_t));
+                    // m_clut = std::to_array(blockBuf); // C++20
+                    std::copy(blockBuf, blockBuf + 16 * sizeof(uint32_t),
+                              m_clut.data());
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -701,7 +705,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                             .arg(spu->physical_pan_scan).arg(m_curSubtitleTrack));
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -729,7 +733,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     }
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -881,7 +885,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         }
                     }
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -939,7 +943,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     m_lastcellid = m_cellid = 0;
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -966,7 +970,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                             .arg(highlight->pts).arg(highlight->buttonN));
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -1018,7 +1022,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         }
 
                         // release buffer
-                        if (blockBuf != m_dvdBlockWriteBuf)
+                        if (blockBuf != m_dvdBlockWriteBuf.data())
                             dvdnav_free_cache_block(m_dvdnav, blockBuf);
                     }
                 }
@@ -1053,7 +1057,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         }
 
                         // release buffer
-                        if (blockBuf != m_dvdBlockWriteBuf)
+                        if (blockBuf != m_dvdBlockWriteBuf.data())
                             dvdnav_free_cache_block(m_dvdnav, blockBuf);
                     }
                 }
@@ -1067,7 +1071,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     m_gotStop = true;
 
                     // release buffer
-                    if (blockBuf != m_dvdBlockWriteBuf)
+                    if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
                 }
                 break;
@@ -1448,8 +1452,8 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
 {
     #define GETBE16(p) (((p)[0] << 8) | (p)[1])
 
-    uint8_t alpha[4]   = {0, 0, 0, 0};
-    uint8_t palette[4] = {0, 0, 0, 0};
+    AlphaArray   alpha   {0, 0, 0, 0};
+    PaletteArray palette {0, 0, 0, 0};
 
     if (!SpuPkt)
         return false;
@@ -1811,10 +1815,8 @@ uint MythDVDBuffer::ConvertLangCode(uint16_t Code)
     if (Code == 0)
         return 0;
 
-    QChar str2[2];
-    str2[0] = QChar(Code >> 8);
-    str2[1] = QChar(Code & 0xff);
-    QString str3 = iso639_str2_to_str3(QString(str2, 2));
+    std::array<QChar,2> str2 { Code >> 8, Code & 0xff };
+    QString str3 = iso639_str2_to_str3(QString(str2.data(), str2.size()));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("code: %1; iso639: %2").arg(Code).arg(str3));
 
@@ -1978,7 +1980,7 @@ int64_t MythDVDBuffer::GetCurrentTime(void) const
 }
 
 /// \brief converts palette values from YUV to RGB
-void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const uint8_t *Palette, const uint8_t *Alpha)
+void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const PaletteArray& Palette, const AlphaArray& Alpha)
 {
     memset(RGBAPalette, 0, 16);
     for (int i = 0 ; i < 4 ; i++)
@@ -2053,7 +2055,7 @@ uint MythDVDBuffer::GetNibble(const uint8_t *Buffer, int NibbleOffset)
  * \brief Obtained from ffmpeg dvdsubdec.c
  * Used to find smallest bounded rectangle
  */
-int MythDVDBuffer::IsTransparent(const uint8_t *Buffer, int Pitch, int Num, const uint8_t *Colors)
+int MythDVDBuffer::IsTransparent(const uint8_t *Buffer, int Pitch, int Num, const ColorArray& Colors)
 {
     for (int i = 0; i < Num; i++)
     {
@@ -2070,7 +2072,7 @@ int MythDVDBuffer::IsTransparent(const uint8_t *Buffer, int Pitch, int Num, cons
  */
 int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 {
-    uint8_t colors[256] = { 0 };
+    ColorArray colors {};
 
     if (Subtitle->num_rects == 0 || Subtitle->rects == nullptr ||
         Subtitle->rects[0]->w <= 0 || Subtitle->rects[0]->h <= 0)

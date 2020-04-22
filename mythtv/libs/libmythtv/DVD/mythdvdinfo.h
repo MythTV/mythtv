@@ -1,6 +1,9 @@
 #ifndef MYTHDVDINFO_H
 #define MYTHDVDINFO_H
 
+// C++
+#include <array>
+
 // Qt
 #include <QCoreApplication>
 
@@ -9,6 +12,9 @@
 
 // libdvd
 #include "dvdnav/dvdnav.h"
+
+#define DVD_BLOCK_SIZE 2048LL
+using DvdBuffer = std::array<uint8_t,DVD_BLOCK_SIZE>;
 
 class MTV_PUBLIC MythDVDInfo
 {

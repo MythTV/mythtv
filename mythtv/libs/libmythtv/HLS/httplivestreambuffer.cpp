@@ -51,6 +51,7 @@ using std::min;
 // encryption related stuff
 #include <openssl/aes.h>
 #define AES_BLOCK_SIZE 16       // HLS only support AES-128
+using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
 #endif
 
 #define LOC QString("HLSBuffer: ")
@@ -304,13 +305,13 @@ public:
         return RET_OK;
     }
 
-    int DecodeData(const uint8_t *IV)
+    int DecodeData(const aesiv_array &IV, bool iv_valid)
     {
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;
-        unsigned char iv[AES_BLOCK_SIZE];
+        aesiv_array iv {};
         char *decrypted_data = new char[m_data.size()];
-        if (IV == nullptr)
+        if (!iv_valid)
         {
             /*
              * If the EXT-X-KEY tag does not have the IV attribute, implementations
@@ -319,7 +320,6 @@ public:
              * representation of the sequence number SHALL be placed in a 16-octet
              * buffer and padded (on the left) with zeros.
              */
-            memset(iv, 0, AES_BLOCK_SIZE);
             iv[15] = m_id         & 0xff;
             iv[14] = (m_id >> 8)  & 0xff;
             iv[13] = (m_id >> 16) & 0xff;
@@ -327,11 +327,11 @@ public:
         }
         else
         {
-            memcpy(iv, IV, sizeof(iv));
+            std::copy(IV.cbegin(), IV.cend(), iv.begin());
         }
         AES_cbc_encrypt((unsigned char*)m_data.constData(),
                         (unsigned char*)decrypted_data, aeslen,
-                        &m_aeskey, iv, AES_DECRYPT);
+                        &m_aeskey, iv.data(), AES_DECRYPT);
         memcpy(decrypted_data + aeslen, m_data.constData() + aeslen,
                m_data.size() - aeslen);
 
@@ -407,7 +407,7 @@ public:
         m_bitrate       = bitrate;
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
-        memset(m_aesIv, 0, sizeof(m_aesIv));
+        m_aesIv.fill(0);
 #endif
     }
 
@@ -448,7 +448,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
-        memcpy(m_aesIv, rhs.m_aesIv, sizeof(m_aesIv));
+        m_aesIv         = rhs.m_aesIv;
 #endif
         return *this;
     }
@@ -682,7 +682,7 @@ public:
                     return RET_OK;
                 }
             }
-            if (segment->DecodeData(m_ivloaded ? m_aesIv : nullptr) != RET_OK)
+            if (segment->DecodeData(m_aesIv, m_ivloaded) != RET_OK)
             {
                 segment->Unlock();
                 return RET_ERROR;
@@ -835,11 +835,11 @@ public:
         int padding = max(0, AES_BLOCK_SIZE - (line.size() - 2));
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-        memcpy(m_aesIv, ba.constData(), ba.size());
+        std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());
         m_ivloaded = true;
         return true;
     }
-    uint8_t *AESIV(void)
+    aesiv_array AESIV(void)
     {
         return m_aesIv;
     }
@@ -851,7 +851,7 @@ public:
 private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivloaded       {false};
-    uint8_t     m_aesIv[AES_BLOCK_SIZE]{0};// IV used when decypher the block
+    aesiv_array m_aesIv          {0};   // IV used when decypher the block
 #endif
 
 private:
@@ -1726,11 +1726,11 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
                          AVIO_FLAG_READ, nullptr, nullptr);
     if (ret >= 0)
     {
-        unsigned char buffer[1024];
-        ret = ffurl_read(context, buffer, sizeof(buffer));
+        std::array<uint8_t,1024> buffer {};
+        ret = ffurl_read(context, buffer.data(), buffer.size());
         if (ret > 0)
         {
-            QByteArray ba((const char*)buffer, ret);
+            QByteArray ba((const char*)buffer.data(), ret);
             isHLS = IsHTTPLiveStreaming(&ba);
         }
         ffurl_close(context);

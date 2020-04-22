@@ -85,12 +85,12 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
 
             if (fd > 0)
             {
-                uint8_t buf[2048];
+                DvdBuffer buf {};
                 ssize_t read = 0;
                 auto crc = static_cast<uint32_t>(crc32(0L, Z_NULL, 0));
 
-                while((read = MythFileRead(fd, buf, sizeof(buf))) > 0)
-                    crc = static_cast<uint32_t>(crc32(crc, buf, static_cast<uint>(read)));
+                while((read = MythFileRead(fd, buf.data(), buf.size())) > 0)
+                    crc = static_cast<uint32_t>(crc32(crc, buf.data(), static_cast<uint>(read)));
 
                 MythfileClose(fd);
                 Serialnum = QString("%1__gen").arg(crc, 0, 16, QChar('0'));

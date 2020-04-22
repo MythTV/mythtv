@@ -1,6 +1,9 @@
 #ifndef MYTH_DVD_BUFFER_H_
 #define MYTH_DVD_BUFFER_H_
 
+// C++
+#include <array>
+
 // Qt
 #include <QMap>
 #include <QString>
@@ -20,10 +23,14 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
 class MythDVDPlayer;
+
+using CLUTArray    = std::array<uint32_t,16>;
+using AlphaArray   = std::array<uint8_t,4>;
+using PaletteArray = std::array<uint8_t,4>;
+using ColorArray   = std::array<uint8_t,256>;
 
 class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
 {
@@ -135,13 +142,14 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     static uint GetNibble       (const uint8_t *Buffer, int NibbleOffset);
     static int DecodeRLE        (uint8_t *Bitmap, int Linesize, int Width, int Height,
                                  const uint8_t *Buffer, int NibbleOffset, int BufferSize);
-    void       GuessPalette     (uint32_t *RGBAPalette, const uint8_t *Palette, const uint8_t *Alpha);
+    void       GuessPalette     (uint32_t *RGBAPalette, const PaletteArray& Palette,
+                                 const AlphaArray& Alpha);
     static int IsTransparent    (const uint8_t *Buffer, int Pitch, int Num,
-                                 const uint8_t *Colors);
+                                 const ColorArray& Colors);
     static int FindSmallestBoundingRectangle(AVSubtitle *Subtitle);
 
     dvdnav_t      *m_dvdnav                 { nullptr };
-    unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE] { 0 };
+    DvdBuffer      m_dvdBlockWriteBuf       { 0 };
     unsigned char *m_dvdBlockReadBuf        { nullptr };
     int            m_dvdBlockRPos           { 0       };
     int            m_dvdBlockWPos           { 0       };
@@ -184,7 +192,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     bool           m_seeking                { false   };
     int64_t        m_seektime               { 0       };
     int64_t        m_currentTime            { 0       };
-    QMap<int, int> m_seekSpeedMap;
+    static const QMap<int, int> kSeekSpeedMap;
     QMap<int, QList<uint64_t> > m_chapterMap;
     MythDVDPlayer  *m_parent                { nullptr };
     float           m_forcedAspect          { -1.0F   };
@@ -195,9 +203,9 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int32_t         m_dvdEventSize          { 0       };
     uint            m_buttonVersion         { 1       };
     int             m_buttonStreamID        { 0       };
-    uint32_t        m_clut[16]              { 0       };
-    uint8_t         m_buttonColor[4]        { 0       };
-    uint8_t         m_buttonAlpha[4]        { 0       };
+    CLUTArray       m_clut                  { 0       };
+    AlphaArray      m_buttonColor           { 0       };
+    PaletteArray    m_buttonAlpha           { 0       };
     QRect           m_hlButton              { 0, 0, 0, 0 };
     uint8_t        *m_menuSpuPkt            { nullptr };
     int             m_menuBuflength         { 0       };

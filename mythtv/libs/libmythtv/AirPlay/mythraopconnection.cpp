@@ -440,16 +440,14 @@ void MythRAOPConnection::SendResendRequest(uint64_t timestamp,
         QString("Missed %1 packet(s): expected %2 got %3 ts:%4")
         .arg(missed).arg(expected).arg(got).arg(timestamp));
 
-    unsigned char req[8];
-    req[0] = 0x80;
-    req[1] = RANGE_RESEND | 0x80;
-    *(uint16_t *)(req + 2) = qToBigEndian(m_seqNum++);
-    *(uint16_t *)(req + 4) = qToBigEndian(expected);   // missed seqnum
-    *(uint16_t *)(req + 6) = qToBigEndian(missed);     // count
+    std::array<uint8_t,8> req { 0x80, RANGE_RESEND | 0x80};
+    *(uint16_t *)(&req[2]) = qToBigEndian(m_seqNum++);
+    *(uint16_t *)(&req[4]) = qToBigEndian(expected);   // missed seqnum
+    *(uint16_t *)(&req[6]) = qToBigEndian(missed);     // count
 
-    if (m_clientControlSocket->writeDatagram((char *)req, sizeof(req),
+    if (m_clientControlSocket->writeDatagram((char *)req.data(), req.size(),
                                              m_peerAddress, m_clientControlPort)
-        == sizeof(req))
+        == (qint64)req.size())
     {
         for (uint16_t count = 0; count < missed; count++)
         {
@@ -497,21 +495,17 @@ void MythRAOPConnection::SendTimeRequest(void)
     timeval t {};
     gettimeofday(&t, nullptr);
 
-    unsigned char req[32];
-    req[0] = 0x80;
-    req[1] = TIMING_REQUEST | 0x80;
-    // this is always 0x00 0x07 according to http://blog.technologeek.org/airtunes-v2
-    // no other value works
-    req[2] = 0x00;
-    req[3] = 0x07;
-    *(uint32_t *)(req + 4)  = (uint32_t)0;
-    *(uint64_t *)(req + 8)  = (uint64_t)0;
-    *(uint64_t *)(req + 16) = (uint64_t)0;
-    *(uint32_t *)(req + 24) = qToBigEndian((uint32_t)t.tv_sec);
-    *(uint32_t *)(req + 28) = qToBigEndian((uint32_t)t.tv_usec);
+    std::array<uint8_t,32> req {
+        0x80, TIMING_REQUEST | 0x80,
+        // this is always 0x00 0x07 according to http://blog.technologeek.org/airtunes-v2
+        // no other value works
+        0x00, 0x07
+    };
+    *(uint32_t *)(&req[24]) = qToBigEndian((uint32_t)t.tv_sec);
+    *(uint32_t *)(&req[28]) = qToBigEndian((uint32_t)t.tv_usec);
 
-    if (m_clientTimingSocket->writeDatagram((char *)req, sizeof(req), m_peerAddress,
-                                            m_clientTimingPort) != sizeof(req))
+    if (m_clientTimingSocket->writeDatagram((char *)req.data(), req.size(), m_peerAddress,
+                                            m_clientTimingPort) != (qint64)req.size())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to send resend time request.");
         return;
@@ -613,19 +607,20 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
         return -1;
 
     int aeslen = len & ~0xf;
-    unsigned char iv[16];
-    unsigned char decrypted_data[MAX_PACKET_SIZE];
-    memcpy(iv, m_aesIV.constData(), sizeof(iv));
+    std::array<uint8_t,16> iv {};
+    std::array<uint8_t,MAX_PACKET_SIZE> decrypted_data {};
+    std::copy(m_aesIV.cbegin(), m_aesIV.cbegin() + iv.size(), iv.data());
     AES_cbc_encrypt((const unsigned char *)data_in,
-                    decrypted_data, aeslen,
-                    &m_aesKey, iv, AES_DECRYPT);
-    memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
+                    decrypted_data.data(), aeslen,
+                    &m_aesKey, iv.data(), AES_DECRYPT);
+    std::copy(data_in + aeslen, data_in + len - aeslen,
+              decrypted_data.data() + aeslen);
 
     AVPacket tmp_pkt;
     AVCodecContext *ctx = m_codecContext;
 
     av_init_packet(&tmp_pkt);
-    tmp_pkt.data = decrypted_data;
+    tmp_pkt.data = decrypted_data.data();
     tmp_pkt.size = len;
 
     uint32_t frames_added = 0;
@@ -971,15 +966,16 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         }
 
         int i = 0;
-        unsigned char from[38];
-        memcpy(from, challenge.constData(), challenge_size);
+        std::array<uint8_t,38> from {};
+        std::copy(challenge.cbegin(), challenge.cbegin() + challenge_size,
+                  from.data());
         i += challenge_size;
         if (m_socket->localAddress().protocol() ==
             QAbstractSocket::IPv4Protocol)
         {
             uint32_t ip = m_socket->localAddress().toIPv4Address();
             ip = qToBigEndian(ip);
-            memcpy(from + i, &ip, 4);
+            memcpy(&from[i], &ip, 4);
             i += 4;
         }
         else if (m_socket->localAddress().protocol() ==
@@ -990,31 +986,31 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                       "\x00\x00\x00\x00" "\x00\x00\x00\x00" "\x00\x00\xff\xff",
                       12) == 0)
             {
-                memcpy(from + i, &ip[12], 4);
+                memcpy(&from[i], &ip[12], 4);
                 i += 4;
             }
             else
             {
-                memcpy(from + i, &ip, 16);
+                memcpy(&from[i], &ip, 16);
                 i += 16;
             }
         }
-        memcpy(from + i, m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
+        memcpy(&from[i], m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
         i += AIRPLAY_HARDWARE_ID_SIZE;
 
         int pad = 32 - i;
         if (pad > 0)
         {
-            memset(from + i, 0, pad);
+            memset(&from[i], 0, pad);
             i += pad;
         }
 
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Full base64 response: '%1' size %2")
-            .arg(QByteArray((const char *)from, i).toBase64().constData())
+            .arg(QByteArray((char *)from.data(), i).toBase64().constData())
             .arg(i));
 
-        RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
+        RSA_private_encrypt(i, from.data(), to, LoadKey(), RSA_PKCS1_PADDING);
 
         QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
         delete[] to;
