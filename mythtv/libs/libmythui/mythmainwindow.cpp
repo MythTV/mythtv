@@ -339,7 +339,7 @@ void MythMainWindow::animate(void)
 
     // The call to GetDrawOrder can apparently alter m_stackList.
     // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    for (auto * it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
@@ -389,7 +389,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
         // the dirty region list in ::animate()
         // The call to GetDrawOrder can apparently alter m_stackList.
         // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        for (auto * it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -480,7 +480,7 @@ void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
 
         // The call to GetDrawOrder can apparently alter m_stackList.
         // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        for (auto * it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -1172,7 +1172,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
         return false;
     }
 
-    int keynum = d->TranslateKeyNum(e);
+    int keynum = MythMainWindowPrivate::TranslateKeyNum(e);
 
     QStringList localActions;
     if (allowJumps && (d->m_jumpMap.count(keynum) > 0) &&

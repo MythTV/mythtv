@@ -26,10 +26,7 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWindow,
         Painter = new MythOpenGLPainter(render, MainWindow);
         return QString();
     }
-    else
-    {
-        delete glwindow;
-    }
+    delete glwindow;
 #endif
 
     // Fallback to Qt painter as the last resort.

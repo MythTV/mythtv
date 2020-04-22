@@ -26,7 +26,7 @@ class MythInputDeviceHandler : public QObject
     void Start           (void);
     void Stop            (bool Finishing = true);
     void Reset           (void);
-    void Event           (QEvent *Event);
+    void Event           (QEvent *Event) const;
     void Action          (const QString &Action);
     void IgnoreKeys      (bool Ignore);
 

@@ -312,7 +312,7 @@ int MythCECAdapter::HandleCommand(const cec_command &Command)
     return 1;
 }
 
-int MythCECAdapter::HandleKeyPress(const cec_keypress &Key)
+int MythCECAdapter::HandleKeyPress(const cec_keypress &Key) const
 {
     // Ignore key down events and wait for the key 'up'
     if (Key.duration < 1 || m_ignoreKeys)

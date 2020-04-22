@@ -332,12 +332,10 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
         return false;
     }
-    else
-    {
-        LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("Found %1 transports for ").arg(multiplexes.size()) +
-            QString("sourceid %1").arg(sourceid));
-    }
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Found %1 transports for ").arg(multiplexes.size()) +
+        QString("sourceid %1").arg(sourceid));
 
     for (uint multiplex : multiplexes)
         AddToList(multiplex);

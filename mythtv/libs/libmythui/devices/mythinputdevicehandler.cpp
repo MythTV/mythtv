@@ -159,7 +159,7 @@ void MythInputDeviceHandler::Reset(void)
     Start();
 }
 
-void MythInputDeviceHandler::Event(QEvent *Event)
+void MythInputDeviceHandler::Event(QEvent *Event) const
 {
     if (!Event)
         return;
