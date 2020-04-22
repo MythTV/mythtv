@@ -1039,21 +1039,6 @@ void EITFixUp::FixUK(DBEventEIT &event) const
                  event.m_description.remove(m_ukSpaceStart);
                  SetUKSubtitle(event);
             }
-
-            // At this point there is already a split in title/subtitle/description.
-            // If the title is now split in title and description then the
-            // existing description is discarded.
-#if 0
-            if ((position1 = strFull.indexOf(m_ukYear)) != -1)
-            {
-                // Looks like they are using the airdate as a delimiter
-                if ((uint)position1 < kSubtitleMaxLen)
-                {
-                    event.m_description = event.m_title.mid(position1);
-                    event.m_title = event.m_title.left(position1);
-                }
-            }
-#endif
         }
         else if ((position1 = tmp24ep.indexIn(event.m_description)) != -1)
         {
