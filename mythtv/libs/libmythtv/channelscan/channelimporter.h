@@ -30,24 +30,19 @@ enum OkCancelType {
     kOCTOkAll     = +2,
 };
 
+using ChanStats = std::array<uint,3>;
+
 class ChannelImporterBasicStats
 {
   public:
-    ChannelImporterBasicStats()
-    {
-        memset(m_atscChannels, 0, sizeof(m_atscChannels));
-        memset(m_dvbChannels,  0, sizeof(m_dvbChannels));
-        memset(m_scteChannels, 0, sizeof(m_scteChannels));
-        memset(m_mpegChannels, 0, sizeof(m_mpegChannels));
-        memset(m_ntscChannels, 0, sizeof(m_ntscChannels));
-    }
+    ChannelImporterBasicStats() = default;
 
     // totals
-    uint m_atscChannels[3] {};
-    uint m_dvbChannels [3] {};
-    uint m_scteChannels[3] {};
-    uint m_mpegChannels[3] {};
-    uint m_ntscChannels[3] {};
+    ChanStats m_atscChannels {};
+    ChanStats m_dvbChannels  {};
+    ChanStats m_scteChannels {};
+    ChanStats m_mpegChannels {};
+    ChanStats m_ntscChannels {};
 
     // per channel counts
     QMap<uint,uint>    m_progNumCnt;
