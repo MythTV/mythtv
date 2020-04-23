@@ -881,7 +881,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
             init(&frame, FMT_YV12, newFrame, video_width, video_height,
-                 static_cast<int>(newSize), nullptr, nullptr, -1, -1, 0 /* aligned */);
+                 static_cast<int>(newSize), {}, {}, -1, -1, 0 /* aligned */);
         }
         else
         {

@@ -100,6 +100,7 @@ MythVideoTexture* MythOpenGLTonemap::Map(vector<MythVideoTexture *> &Inputs, QSi
             return nullptr;
         }
         m_render->glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_storageBuffer);
+        // Data structure passed to kernel. NOLINTNEXTLINE(modernize-avoid-c-arrays)
         struct dummy { float a[2] {0.0F}; uint32_t b {0}; uint32_t c {0}; uint32_t d {0}; } buffer;
         m_render->glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(dummy), &buffer, GL_STREAM_COPY);
         m_render->glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);

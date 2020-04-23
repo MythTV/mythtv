@@ -92,7 +92,8 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
                 // goom doesn't render properly due to changes in video alpha blending
                 // so turn blend off
                 glrender->SetBlend(false);
-                glrender->DrawBitmap(&m_glSurface, 1, nullptr, m_area, area, nullptr, 0);
+                std::vector<MythGLTexture*> surfaces {m_glSurface};
+                glrender->DrawBitmap(surfaces, nullptr, m_area, area, nullptr, 0);
                 glrender->SetBlend(true);
             }
             glrender->doneCurrent();

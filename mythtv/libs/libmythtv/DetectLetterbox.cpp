@@ -35,8 +35,8 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
         return;
 
     unsigned char *buf = Frame->buf;
-    int *pitches = Frame->pitches;
-    int *offsets = Frame->offsets;
+    const FramePitches pitches = Frame->pitches;
+    const FrameOffsets offsets = Frame->offsets;
     const int height = Frame->height;
 
     // If the black bars is larger than this limit we switch to Half or Full Mode

@@ -1,23 +1,17 @@
 #ifndef MYTHFRAME_H
 #define MYTHFRAME_H
 
-#ifdef __cplusplus
+#include <array>
 #include <cstdint>
 #include <cstring>
-#else
-#include <stdint.h>
-#include <string.h>
-#endif
+#include <vector>
+
 #include "mythtvexp.h" // for MTV_PUBLIC
 #include "mythaverror.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define MYTH_WIDTH_ALIGNMENT 64
 #define MYTH_HEIGHT_ALIGNMENT 16
@@ -134,6 +128,9 @@ inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return stati
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
 inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
 
+using FramePitches = std::array<int,3>;
+using FrameOffsets = std::array<int,3>;
+
 struct VideoFrame
 {
     VideoFrameType codec;
@@ -149,7 +146,7 @@ struct VideoFrame
     long long frameCounter; ///< raw frame counter/ticker for discontinuity checks
     long long timecode;
     int64_t   disp_timecode;
-    unsigned char *priv[4]; ///< random empty storage
+    std::array<uint8_t*,4> priv; ///< random empty storage
     int interlaced_frame; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
     bool top_field_first; ///< true if top field is first.
     bool interlaced_reversed; /// true for user override of scan
@@ -158,8 +155,8 @@ struct VideoFrame
     bool forcekey; ///< hardware encoded .nuv
     bool dummy;
     bool pause_frame;
-    int pitches[3]; ///< Y, U, & V pitches
-    int offsets[3]; ///< Y, U, & V offsets
+    FramePitches pitches; ///< Y, U, & V pitches
+    FrameOffsets offsets; ///< Y, U, & V offsets
     int pix_fmt;
     int sw_pix_fmt;
     bool directrendering; ///< true if managed by FFmpeg
@@ -180,13 +177,7 @@ struct VideoFrame
 
 using VideoFrameVec = std::vector<VideoFrameType>;
 
-#ifdef __cplusplus
-}
-#endif
-
 int MTV_PUBLIC ColorDepth(int Format);
-
-#ifdef __cplusplus
 
 MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
@@ -220,21 +211,21 @@ private:
 void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
                           bool useSSE = true);
 
-static inline void init(VideoFrame *vf, VideoFrameType _codec,
-                        unsigned char *_buf, int _width, int _height, int _size,
-                        const int *p = nullptr,
-                        const int *o = nullptr,
-                        float _aspect = -1.0F, double _rate = -1.0F,
-                        int _aligned = MYTH_WIDTH_ALIGNMENT);
-static inline void clear(VideoFrame *vf);
 static inline int  bitsperpixel(VideoFrameType type);
 static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
 static inline int  height_for_plane(VideoFrameType Type, int Height, uint Plane);
 
+using mavtriplet = std::array<int,3>;
+using mavtripletptr = mavtriplet::const_pointer;
+
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height,
-                        int _size, const int *p, const int *o,
-                        float _aspect, double _rate, int _aligned)
+                        int _size,
+                        const FramePitches p,
+                        const FrameOffsets o,
+                        bool arrays_valid = true,
+                        float _aspect = -1.0F, double _rate = -1.0F,
+                        int _aligned = MYTH_WIDTH_ALIGNMENT)
 {
     vf->bpp    = bitsperpixel(_codec);
     vf->codec  = _codec;
@@ -271,7 +262,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->deinterlace_allowed = DEINT_NONE;
     vf->deinterlace_inuse = DEINT_NONE;
     vf->deinterlace_inuse2x = false;
-    memset(vf->priv, 0, 4 * sizeof(unsigned char *));
+    vf->priv.fill(nullptr);
 
     int width_aligned = 0;
     int height_aligned = (_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
@@ -280,9 +271,9 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     else
         width_aligned = (_width + _aligned - 1) & ~(_aligned - 1);
 
-    if (p)
+    if (arrays_valid)
     {
-        memcpy(vf->pitches, p, 3 * sizeof(int));
+        vf->pitches = p;
     }
     else
     {
@@ -290,9 +281,9 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->pitches[i] = pitch_for_plane(_codec, width_aligned, i);
     }
 
-    if (o)
+    if (arrays_valid)
     {
-        memcpy(vf->offsets, o, 3 * sizeof(int));
+        vf->offsets = o;
     }
     else
     {
@@ -342,6 +333,15 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = vf->offsets[2] = 0;
         }
     }
+}
+
+static inline void init(VideoFrame *vf, VideoFrameType _codec,
+                        unsigned char *_buf, int _width, int _height, int _size,
+                        float _aspect = -1.0F, double _rate = -1.0F,
+                        int _aligned = MYTH_WIDTH_ALIGNMENT)
+{
+    init(vf, _codec, _buf, _width, _height, _size, {}, {}, false,
+         _aspect, _rate, _aligned);
 }
 
 static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
@@ -708,11 +708,11 @@ static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,
         VideoFrame framein {};
         int chroma_pitch  = pitch >> 1;
         int chroma_height = dst->height >> 1;
-        int offsets[3] =
+        FrameOffsets offsets
             { 0,
               pitch * dst->height,
               pitch * dst->height + chroma_pitch * chroma_height };
-        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+        FramePitches pitches { pitch, chroma_pitch, chroma_pitch };
 
         init(&framein, type, buffer, dst->width, dst->height, dst->size,
              pitches, offsets);
@@ -721,8 +721,8 @@ static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,
     else if (type == FMT_NV12)
     {
         VideoFrame framein {};
-        int offsets[3] = { 0, pitch * dst->height, 0 };
-        int pitches[3] = { pitch, pitch, 0 };
+        FrameOffsets offsets { 0, pitch * dst->height, 0 };
+        FramePitches pitches { pitch, pitch, 0 };
 
         init(&framein, type, buffer, dst->width, dst->height, dst->size,
              pitches, offsets);
@@ -741,11 +741,11 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
         VideoFrame frameout {};
         int chroma_pitch  = pitch >> 1;
         int chroma_height = src->height >> 1;
-        int offsets[3] =
+        FrameOffsets offsets
             { 0,
               pitch * src->height,
               pitch * src->height + chroma_pitch * chroma_height };
-        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+        FramePitches pitches { pitch, chroma_pitch, chroma_pitch };
 
         init(&frameout, type, dstbuffer, src->width, src->height, src->size,
              pitches, offsets);
@@ -754,14 +754,13 @@ static inline void copybuffer(uint8_t *dstbuffer, const VideoFrame *src,
     else if (type == FMT_NV12)
     {
         VideoFrame frameout {};
-        int offsets[3] = { 0, pitch * src->height, 0 };
-        int pitches[3] = { pitch, pitch, 0 };
+        FrameOffsets offsets { 0, pitch * src->height, 0 };
+        FramePitches pitches { pitch, pitch, 0 };
 
         init(&frameout, type, dstbuffer, src->width, src->height, src->size,
              pitches, offsets);
         copy(&frameout, src);
     }
 }
-#endif /* __cplusplus */
 
 #endif /* MYTHFRAME_H */

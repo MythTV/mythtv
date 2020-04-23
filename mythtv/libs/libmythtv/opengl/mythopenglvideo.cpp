@@ -563,8 +563,8 @@ void MythOpenGLVideo::ResetFrameFormat(void)
     for (auto & shader : m_shaders)
         if (shader)
             m_render->DeleteShaderProgram(shader);
-    memset(m_shaders, 0, sizeof(m_shaders));
-    memset(m_shaderCost, 1, sizeof(m_shaderCost));
+    m_shaders.fill(nullptr);
+    m_shaderCost.fill(1);
     MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
     MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
     MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
@@ -659,21 +659,19 @@ void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
     if (m_deinterlacer == DEINT_BASIC)
     {
         // first field. Fake the pitches
-        int pitches[3];
-        memcpy(pitches, Frame->pitches, sizeof(int) * 3);
+        FramePitches pitches = Frame->pitches;
         Frame->pitches[0] = Frame->pitches[0] << 1;
         Frame->pitches[1] = Frame->pitches[1] << 1;
         Frame->pitches[2] = Frame->pitches[2] << 1;
         MythVideoTexture::UpdateTextures(m_render, Frame, m_inputTextures);
         // second field. Fake the offsets as well.
-        int offsets[3];
-        memcpy(offsets, Frame->offsets, sizeof(int) * 3);
+        FrameOffsets offsets = Frame->offsets;
         Frame->offsets[0] = Frame->offsets[0] + pitches[0];
         Frame->offsets[1] = Frame->offsets[1] + pitches[1];
         Frame->offsets[2] = Frame->offsets[2] + pitches[2];
         MythVideoTexture::UpdateTextures(m_render, Frame, m_nextTextures);
-        memcpy(Frame->pitches, pitches, sizeof(int) * 3);
-        memcpy(Frame->offsets, offsets, sizeof(int) * 3);
+        Frame->pitches = pitches;
+        Frame->offsets = offsets;
     }
     else
     {
@@ -941,12 +939,11 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
             m_render->SetViewPort(vrect);
 
             // bind correct textures
-            MythGLTexture* textures[MAX_VIDEO_TEXTURES];
-            uint numtextures = 0;
-            BindTextures(deinterlacing, inputtextures, &textures[0], numtextures);
+            vector<MythGLTexture*> textures {};
+            BindTextures(deinterlacing, inputtextures, textures);
 
             // render
-            m_render->DrawBitmap(textures, numtextures, m_frameBuffer,
+            m_render->DrawBitmap(textures, m_frameBuffer,
                                  trect2, vrect, m_shaders[program], 0);
             nexttexture = m_frameBufferTexture;
         }
@@ -982,9 +979,8 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     }
 
     // bind correct textures
-    MythGLTexture* textures[MAX_VIDEO_TEXTURES];
-    uint numtextures = 0;
-    BindTextures(deinterlacing, inputtextures, &textures[0], numtextures);
+    vector<MythGLTexture*> textures;
+    BindTextures(deinterlacing, inputtextures, textures);
 
     // rotation
     if (Frame)
@@ -1000,7 +996,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     }
 
     // draw
-    m_render->DrawBitmap(textures, numtextures, nullptr, trect,
+    m_render->DrawBitmap(textures, nullptr, trect,
                          m_displayVideoRect, m_shaders[program], m_lastRotation);
 
     // disable scissoring
@@ -1023,7 +1019,7 @@ void MythOpenGLVideo::ResetTextures(void)
 }
 
 void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
-                                   MythGLTexture **Textures, uint &TextureCount)
+                                   vector<MythGLTexture *>&Textures)
 {
     bool usecurrent = true;
     if (Deinterlacing)
@@ -1042,17 +1038,17 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>
             vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
             for (uint i = 0; i < count; ++i)
-                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(prev[i]);
+                Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
             for (uint i = 0; i < count; ++i)
-                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(current[i]);
+                Textures.push_back(reinterpret_cast<MythGLTexture*>(current[i]));
             for (uint i = 0; i < count; ++i)
-                Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(m_nextTextures[i]);
+                Textures.push_back(reinterpret_cast<MythGLTexture*>(m_nextTextures[i]));
         }
     }
 
     if (usecurrent)
         for (auto & texture : Current)
-            Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(texture);
+            Textures.push_back(reinterpret_cast<MythGLTexture*>(texture));
 }
 
 QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)

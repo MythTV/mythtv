@@ -1,6 +1,9 @@
 #ifndef MYTHRENDER_OPENGL_H_
 #define MYTHRENDER_OPENGL_H_
 
+// C++
+#include <vector>
+
 // Qt
 #include <QObject>
 #include <QtGlobal>
@@ -69,7 +72,7 @@ class MUI_PUBLIC MythGLTexture
     bool            m_crop                    { false };
     QRect           m_source                  { QRect() };
     QRect           m_destination             { QRect() };
-    GLfloat         m_vertexData[16]          { 0.0F };
+    std::array<GLfloat,16> m_vertexData       { 0.0F };
     GLenum          m_target                  { QOpenGLTexture::Target2D };
     int             m_rotation                { 0 };
 
@@ -152,7 +155,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
                      QOpenGLShaderProgram *Program, int Alpha = 255, qreal Scale = 1.0);
-    void  DrawBitmap(MythGLTexture **Textures, uint TextureCount,
+    void  DrawBitmap(std::vector<MythGLTexture *> &Textures,
                      QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
                      QOpenGLShaderProgram *Program, int Rotation);
@@ -203,7 +206,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     GLuint                       m_fence { 0 };
 
     // Shaders
-    QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount] { nullptr };
+    std::array<QOpenGLShaderProgram*,kShaderCount> m_defaultPrograms { nullptr };
     QOpenGLShaderProgram*        m_activeProgram { nullptr };
 
     // Vertices

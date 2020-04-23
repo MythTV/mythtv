@@ -81,7 +81,7 @@ class MythOpenGLVideo : public QObject
                              QSize Size, GLenum TextureTarget);
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
     void    BindTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
-                         MythGLTexture** Textures, uint &TextureCount);
+                         vector<MythGLTexture *>&Textures);
     bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan,
                             MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
     QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
@@ -103,8 +103,8 @@ class MythOpenGLVideo : public QObject
     MythDeintType  m_fallbackDeinterlacer { MythDeintType::DEINT_NONE };  ///< Only used if there are insufficient texture units (for kernel)
     VideoColourSpace *m_videoColourSpace;
     bool           m_viewportControl;     ///< Video has control over view port
-    QOpenGLShaderProgram* m_shaders[ShaderCount] { nullptr };
-    int            m_shaderCost[ShaderCount]     { 1 };
+    std::array<QOpenGLShaderProgram*,ShaderCount> m_shaders { nullptr };
+    std::array<int,ShaderCount> m_shaderCost     { 1 };
     vector<MythVideoTexture*> m_inputTextures; ///< Current textures with raw video data
     vector<MythVideoTexture*> m_prevTextures;  ///< Previous textures with raw video data
     vector<MythVideoTexture*> m_nextTextures;  ///< Next textures with raw video data

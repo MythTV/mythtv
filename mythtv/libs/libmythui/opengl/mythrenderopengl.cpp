@@ -824,12 +824,16 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
         {
             void* target = buffer->map(QOpenGLBuffer::WriteOnly);
             if (target)
-                memcpy(target, Texture->m_vertexData, kVertexSize);
+            {
+                std::copy(Texture->m_vertexData.cbegin(),
+                          Texture->m_vertexData.cend(),
+                          static_cast<GLfloat*>(target));
+            }
             buffer->unmap();
         }
         else
         {
-            buffer->write(0, Texture->m_vertexData, kVertexSize);
+            buffer->write(0, Texture->m_vertexData.data(), kVertexSize);
         }
     }
 
@@ -845,13 +849,13 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     doneCurrent();
 }
 
-void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
+void MythRenderOpenGL::DrawBitmap(std::vector<MythGLTexture *> &Textures,
                                   QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
                                   QOpenGLShaderProgram *Program,
                                   int Rotation)
 {
-    if (!Textures || !TextureCount)
+    if (Textures.empty())
         return;
 
     makeCurrent();
@@ -867,7 +871,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     SetShaderProjection(Program);
 
     GLenum textarget = first->m_target;
-    for (uint i = 0; i < TextureCount; i++)
+    for (uint i = 0; i < Textures.size(); i++)
     {
         QString uniform = QString("s_texture%1").arg(i);
         Program->setUniformValue(qPrintable(uniform), i);
@@ -886,12 +890,16 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
         {
             void* target = buffer->map(QOpenGLBuffer::WriteOnly);
             if (target)
-                memcpy(target, first->m_vertexData, kVertexSize);
+            {
+                std::copy(first->m_vertexData.cbegin(),
+                          first->m_vertexData.cend(),
+                          static_cast<GLfloat*>(target));
+            }
             buffer->unmap();
         }
         else
         {
-            buffer->write(0, first->m_vertexData, kVertexSize);
+            buffer->write(0, first->m_vertexData.data(), kVertexSize);
         }
     }
 
@@ -1266,7 +1274,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     Texture->m_destination = Destination;
     Texture->m_rotation    = Rotation;
 
-    GLfloat *data = Texture->m_vertexData;
+    GLfloat *data = Texture->m_vertexData.data();
     QSize    size = Texture->m_size;
 
     int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();

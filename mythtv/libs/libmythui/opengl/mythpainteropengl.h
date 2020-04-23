@@ -74,7 +74,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     QMutex                     m_textureDeleteLock;
 
     QVector<MythGLTexture*>    m_mappedTextures;
-    QOpenGLBuffer*             m_mappedBufferPool[MAX_BUFFER_POOL] { nullptr };
+    std::array<QOpenGLBuffer*,MAX_BUFFER_POOL> m_mappedBufferPool { nullptr };
     int                        m_mappedBufferPoolIdx { 0 };
     bool                       m_mappedBufferPoolReady { false };
 };

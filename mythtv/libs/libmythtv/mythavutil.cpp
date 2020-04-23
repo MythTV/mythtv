@@ -268,18 +268,18 @@ void MythAVCopy::FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
     {
         int chroma_pitch  = pitch >> 1;
         int chroma_height = height >> 1;
-        int offsets[3] =
+        FrameOffsets offsets
             { 0,
               pitch * height,
               pitch * height + chroma_pitch * chroma_height };
-        int pitches[3] = { pitch, chroma_pitch, chroma_pitch };
+        FramePitches pitches { pitch, chroma_pitch, chroma_pitch };
 
         init(frame, FMT_YV12, pic->data[0], width, height, size, pitches, offsets);
     }
     else if (pix_fmt == AV_PIX_FMT_NV12)
     {
-        int offsets[3] = { 0, pitch * height, 0 };
-        int pitches[3] = { pitch, pitch, 0 };
+        FrameOffsets offsets { 0, pitch * height, 0 };
+        FramePitches pitches { pitch, pitch, 0 };
 
         init(frame, FMT_NV12, pic->data[0], width, height, size, pitches, offsets);
     }
