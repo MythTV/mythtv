@@ -226,9 +226,9 @@ class MTV_PUBLIC IPTVTuningData
   protected:
     bool IsHLSPlaylist(void) const
     {
-        if (qobject_cast<QApplication*>(QCoreApplication::instance()) == nullptr)
+        if (QCoreApplication::instance() == nullptr)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - No QApplication!!"));
+            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - No QCoreApplication!!"));
             return false;
         }
 
