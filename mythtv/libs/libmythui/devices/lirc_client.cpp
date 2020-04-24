@@ -17,6 +17,7 @@
 # include "config.h"
 #endif
 
+#include <array>
 #include <cerrno>
 #include <climits>
 #include <cstdarg>
@@ -1633,19 +1634,19 @@ int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,co
 		char* command = static_cast<char*>(malloc((10+strlen(code)+1+1) * sizeof(char)));
 		if (command == nullptr)
 			return LIRC_RET_ERROR;
-		static char s_buf[LIRC_PACKET_SIZE];
-		size_t buf_len = LIRC_PACKET_SIZE;
+		static std::array<char,LIRC_PACKET_SIZE> s_buf;
+		size_t buf_len = s_buf.size();
 		int success = LIRC_RET_ERROR;
 		
 		sprintf(command, "CODE %s\n", code);
 		
 		int ret = lirc_send_command(state, config->sockfd, command,
-					s_buf, &buf_len, &success);
+					s_buf.data(), &buf_len, &success);
 		if(success == LIRC_RET_SUCCESS)
 		{
 			if(ret > 0)
 			{
-				*string = s_buf;
+				*string = s_buf.data();
 			}
 			else
 			{
@@ -1846,17 +1847,17 @@ const char *lirc_getmode(const struct lirc_state *state, struct lirc_config *con
 {
 	if(config->sockfd!=-1)
 	{
-		static char s_buf[LIRC_PACKET_SIZE];
-		size_t buf_len = LIRC_PACKET_SIZE;
+		static std::array<char,LIRC_PACKET_SIZE> s_buf;
+		size_t buf_len = s_buf.size();
 		int success = LIRC_RET_ERROR;
 		
 		int ret = lirc_send_command(state, config->sockfd, "GETMODE\n",
-                                            s_buf, &buf_len, &success);
+                                            s_buf.data(), &buf_len, &success);
 		if(success == LIRC_RET_SUCCESS)
 		{
 			if(ret > 0)
 			{
-				return s_buf;
+				return s_buf.data();
 			}
                         return nullptr;
 		}
@@ -1869,11 +1870,11 @@ const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *con
 {
 	if(config->sockfd!=-1)
 	{
-		static char s_buf[LIRC_PACKET_SIZE];
-		size_t buf_len = LIRC_PACKET_SIZE;
+		static std::array<char,LIRC_PACKET_SIZE> s_buf {};
+		std::array<char,LIRC_PACKET_SIZE> cmd {};
+		size_t buf_len = s_buf.size();
 		int success = LIRC_RET_ERROR;
-		char cmd[LIRC_PACKET_SIZE];
-		if(snprintf(cmd, LIRC_PACKET_SIZE, "SETMODE%s%s\n",
+		if(snprintf(cmd.data(), LIRC_PACKET_SIZE, "SETMODE%s%s\n",
 			    mode ? " ":"",
 			    mode ? mode:"")
 		   >= LIRC_PACKET_SIZE)
@@ -1881,13 +1882,13 @@ const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *con
 			return nullptr;
 		}
 		
-		int ret = lirc_send_command(state, config->sockfd, cmd,
-					s_buf, &buf_len, &success);
+		int ret = lirc_send_command(state, config->sockfd, cmd.data(),
+					s_buf.data(), &buf_len, &success);
 		if(success == LIRC_RET_SUCCESS)
 		{
 			if(ret > 0)
 			{
-				return s_buf;
+				return s_buf.data();
 			}
                         return nullptr;
 		}
@@ -1901,7 +1902,7 @@ const char *lirc_setmode(const struct lirc_state *state, struct lirc_config *con
 
 static const char *lirc_read_string(const struct lirc_state *state, int fd)
 {
-	static char s_buffer[LIRC_PACKET_SIZE+1]="";
+	static std::array<char,LIRC_PACKET_SIZE+1> s_buffer;
 	char *end = nullptr;
 	static size_t s_head=0;
 	static size_t s_tail=0;
@@ -1912,16 +1913,16 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 	
 	if(s_head>0)
 	{
-		memmove(s_buffer,s_buffer+s_head,s_tail-s_head+1);
+		memmove(s_buffer.data(),s_buffer.data()+s_head,s_tail-s_head+1);
 		s_tail-=s_head;
 		s_head=0;
-		end=strchr(s_buffer,'\n');
+		end=strchr(s_buffer.data(),'\n');
 	}
 	else
 	{
 		end=nullptr;
 	}
-	if(strlen(s_buffer)!=s_tail)
+	if(strlen(s_buffer.data())!=s_tail)
 	{
 		lirc_printf(state, "%s: protocol error\n", state->lirc_prog);
 		goto lirc_read_string_error;
@@ -1956,7 +1957,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 			goto lirc_read_string_error;
 		}
 		
-		n=read(fd, s_buffer+s_tail, LIRC_PACKET_SIZE-s_tail);
+		n=read(fd, s_buffer.data()+s_tail, LIRC_PACKET_SIZE-s_tail);
 		if(n<=0)
 		{
 			lirc_printf(state, "%s: read() failed\n", state->lirc_prog);
@@ -1965,12 +1966,12 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 		}
 		s_buffer[s_tail+n]=0;
 		s_tail+=n;
-		end=strchr(s_buffer,'\n');
+		end=strchr(s_buffer.data(),'\n');
 	}
 	
 	end[0]=0;
-	s_head=strlen(s_buffer)+1;
-	return(s_buffer);
+	s_head=strlen(s_buffer.data())+1;
+	return(s_buffer.data());
 
  lirc_read_string_error:
 	s_head=s_tail=0;

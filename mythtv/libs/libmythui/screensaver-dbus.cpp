@@ -46,7 +46,7 @@ class ScreenSaverDBusPrivate
     friend class    ScreenSaverDBus;
 
   public:
-    ScreenSaverDBusPrivate(const QString &dbusService, const QString &dbusPath,
+    ScreenSaverDBusPrivate(const QString &dbusService, const QString& dbusPath,
                            const QString &dbusInterface, QDBusConnection *bus) :
         m_bus(bus),
         m_interface(new QDBusInterface(dbusService, dbusPath , dbusInterface, *m_bus)),

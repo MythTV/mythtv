@@ -191,13 +191,13 @@ bool MythXDisplay::CheckErrors(Display *Disp)
 
     for (const auto & event : events)
     {
-        char buf[200];
-        XGetErrorText(d, event.error_code, buf, sizeof(buf));
+        std::string buf(200,'\0');
+        XGetErrorText(d, event.error_code, buf.data(), buf.size());
         LOG(VB_GENERAL, LOG_ERR,
             QString("XError type: %1\nSerial no: %2\nErr code: %3 (%4)\n"
                    "Req code: %5\nmMinor code: %6\nResource id: %7\n")
                    .arg(event.type).arg(event.serial)
-                   .arg(event.error_code).arg(buf)
+                   .arg(event.error_code).arg(buf.data())
                    .arg(event.request_code).arg(event.minor_code)
                    .arg(event.resourceid));
     }
