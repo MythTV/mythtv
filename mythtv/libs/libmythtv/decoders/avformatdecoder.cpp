@@ -236,7 +236,6 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
         return;
 
     static QString s_fullLine("");
-    static constexpr int kMsgLen = 255;
     static QMutex s_stringLock;
     uint64_t   verbose_mask  = VB_LIBAV;
     LogLevel_t verbose_level = LOG_EMERG;
