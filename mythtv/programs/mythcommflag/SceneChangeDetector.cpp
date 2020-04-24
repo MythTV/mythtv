@@ -34,7 +34,7 @@ void
 scenechange_data_init(SceneChangeDetector::SceneChangeData *scdata,
         const HistogramAnalyzer::Histogram *hh)
 {
-    unsigned int    ncolors = sizeof(*hh)/sizeof((*hh)[0]);
+    unsigned int    ncolors = hh->size();
 
     for (unsigned int ii = 0; ii < ncolors; ii++)
     {

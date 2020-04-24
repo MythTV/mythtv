@@ -1201,7 +1201,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     int aspect = COMM_ASPECT_NORMAL;
     QString msgformat("%1 %2:%3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15");
     QString msg;
-    uint64_t formatCounts[COMM_FORMAT_MAX];
+    std::array<uint64_t,COMM_FORMAT_MAX> formatCounts {};
     frm_dir_map_t tmpCommMap;
     frm_dir_map_t::iterator it;
 
@@ -1244,7 +1244,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     }
     else
     {
-        memset(&formatCounts, 0, sizeof(formatCounts));
+        formatCounts.fill(0);
 
         for(int64_t i = m_preRoll;
             i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++ )
@@ -2412,7 +2412,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
     if ((m_framesProcessed > (m_fps * 60)) &&
         (m_blankFrameCount < (m_framesProcessed * 0.0004)))
     {
-        int avgHistogram[256];
+        std::array<int,256> avgHistogram {};
         int minAvg = -1;
         int newThreshold = -1;
 
@@ -2425,7 +2425,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
         m_blankFrameMap.clear();
         m_blankFrameCount = 0;
 
-        memset(avgHistogram, 0, sizeof(avgHistogram));
+        avgHistogram.fill(0);
 
         for (uint64_t i = 1; i <= m_framesProcessed; i++)
             avgHistogram[clamp(m_frameInfo[i].avgBrightness, 0, 255)] += 1;

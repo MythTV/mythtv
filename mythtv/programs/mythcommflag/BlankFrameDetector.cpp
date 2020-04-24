@@ -210,16 +210,17 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
      *
      * Common commercial-break lengths.
      */
-    static constexpr struct {
+    struct breakType {
         int     m_len;    /* seconds */
         int     m_delta;  /* seconds */
-    } kBreakType[] = {
+    };
+    static constexpr std::array<const breakType,4> kBreakType {{
         /* Sort by "len". */
         { 15,   2 },
         { 20,   2 },
         { 30,   5 },
         { 60,   5 },
-    };
+    }};
 
     /*
      * TUNABLE:

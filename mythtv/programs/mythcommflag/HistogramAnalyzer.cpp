@@ -30,7 +30,7 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
 {
-    quint32         counter[UCHAR_MAX + 1];
+    std::array<quint32,UCHAR_MAX + 1> counter {};
 
     QByteArray fname = filename.toLocal8Bit();
     FILE *fp = fopen(fname.constData(), "r");
@@ -90,7 +90,7 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
         fcol[frameno] = colval;
         fwidth[frameno] = widthval;
         fheight[frameno] = heightval;
-        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (size_t ii = 0; ii < counter.size(); ii++)
             histogram[frameno][ii] = counter[ii];
         monochromatic[frameno] = !widthval || !heightval ? 1 : 0;
         /*
@@ -343,7 +343,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
         ((rr3 - rr2) / kRInc) * (cc3 / kCInc);            /* bottom */
 
     pp = &m_buf[borderpixels];
-    memset(m_histVal, 0, sizeof(m_histVal));
+    m_histVal.fill(0);
     m_histVal[kDefaultColor] += borderpixels;
     for (int rr = rr1; rr < rr2; rr += kRInc)
     {

@@ -201,10 +201,10 @@ int pgm_overlay(AVFrame *dst, const AVFrame *s1, int s1height,
 
     // av_image_copy is badly designed to require writeable
     // pointers to the read-only data, so copy the pointers here
-    const uint8_t *src_data[4]
-      =  {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
+    std::array<const uint8_t*,4> src_data
+        {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
 
-    av_image_copy(dst->data, dst->linesize, src_data, s1->linesize,
+    av_image_copy(dst->data, dst->linesize, src_data.data(), s1->linesize,
         AV_PIX_FMT_GRAY8, s1width, s1height);
 
     /* Overwrite overlay area of "dst" with "s2". */
@@ -247,12 +247,12 @@ int pgm_convolve_radial(AVFrame *dst, AVFrame *s1, AVFrame *s2,
 
     // av_image_copy is badly designed to require writeable
     // pointers to the read-only data, so copy the pointers here
-    const uint8_t *src_data[4]
-    =  {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
+    std::array<const uint8_t*,4> src_data
+        {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
 
-    av_image_copy(s2->data, s2->linesize, src_data, s1->linesize,
+    av_image_copy(s2->data, s2->linesize, src_data.data(), s1->linesize,
         AV_PIX_FMT_GRAY8, newwidth, newheight);
-    av_image_copy(dst->data, dst->linesize, src_data, s1->linesize,
+    av_image_copy(dst->data, dst->linesize, src_data.data(), s1->linesize,
         AV_PIX_FMT_GRAY8, newwidth, newheight);
 
     /* "s1" convolve with column vector => "s2" */

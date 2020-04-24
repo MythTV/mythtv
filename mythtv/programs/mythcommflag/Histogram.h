@@ -21,7 +21,7 @@ public:
     // do not override default copy constructor, as the default copy
     // constructor will do just fine.
 private:
-    int m_data[256] {0};
+    std::array<int,256> m_data {0};
 
     // prevent division by 0 in case a virgin histogram gets used.
     unsigned int m_numberOfSamples {1};

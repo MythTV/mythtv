@@ -10,7 +10,7 @@ void Histogram::generateFromImage(VideoFrame* frame, unsigned int frameWidth,
          unsigned int minScanY, unsigned int maxScanY, unsigned int XSpacing,
          unsigned int YSpacing)
 {
-    memset(m_data,0,sizeof(m_data));
+    m_data.fill(0);
     m_numberOfSamples = 0;
 
     if (maxScanX > frameWidth-1)
