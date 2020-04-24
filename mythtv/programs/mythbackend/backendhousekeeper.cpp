@@ -188,19 +188,16 @@ void CleanupTask::CleanupRecordedTables(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
-    int tableIndex = 0;
     // tables[tableIndex][0] is the table name
     // tables[tableIndex][1] is the name of the column on which the join is
     // performed
-    QString tables[][2] = {
+    std::array<std::array<QString,2>,5> tables {{
         { "recordedprogram", "progstart" },
         { "recordedrating", "progstart" },
         { "recordedcredits", "progstart" },
         { "recordedmarkup", "starttime" },
         { "recordedseek", "starttime" },
-        { "", "" } }; // This blank entry must exist, do not remove.
-    QString table = tables[tableIndex][0];
-    QString column = tables[tableIndex][1];
+    }};
 
     // Because recordedseek can have millions of rows, we don't want to JOIN it
     // with recorded.  Instead, pull out DISTINCT chanid and starttime into a
@@ -219,7 +216,7 @@ void CleanupTask::CleanupRecordedTables(void)
         return;
     }
 
-    while (!table.isEmpty())
+    for (auto [table,column] : tables)
     {
         query.prepare(QString("TRUNCATE TABLE temprecordedcleanup;"));
         if (!query.exec() || !query.isActive())
@@ -270,10 +267,6 @@ void CleanupTask::CleanupRecordedTables(void)
                 return;
             }
         }
-
-        tableIndex++;
-        table = tables[tableIndex][0];
-        column = tables[tableIndex][1];
     }
 
     if (!query.exec("DROP TABLE temprecordedcleanup;"))

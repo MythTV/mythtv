@@ -2521,7 +2521,7 @@ bool Scheduler::HandleRunSchedulerStartup(
 // If a recording is about to start on a backend in a few minutes, wake it...
 void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 {
-    static constexpr int kSysEventSecs[5] = { 120, 90, 60, 30, 0 };
+    static constexpr std::array<const int,4> kSysEventSecs = { 120, 90, 60, 30 };
 
     QDateTime curtime = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
@@ -2535,9 +2535,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     QString sysEventKey = ri.MakeUniqueKey();
 
-    int i = 0;
     bool pendingEventSent = false;
-    while (kSysEventSecs[i] != 0)
+    for (size_t i = 0; i < kSysEventSecs.size(); i++)
     {
         if ((secsleft <= kSysEventSecs[i]) &&
             (!m_sysEvents[i].contains(sysEventKey)))
@@ -2551,12 +2550,11 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
             m_sysEvents[i].insert(sysEventKey);
             pendingEventSent = true;
         }
-        i++;
     }
 
     // cleanup old sysEvents once in a while
     QSet<QString> keys;
-    for (i = 0; kSysEventSecs[i] != 0; i++)
+    for (size_t i = 0; i < kSysEventSecs.size(); i++)
     {
         if (m_sysEvents[i].size() < 20)
             continue;

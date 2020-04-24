@@ -272,7 +272,7 @@ class Scheduler : public MThread, public MythScheduler
 
     int m_error                        {0};
 
-    QSet<QString> m_sysEvents[4];
+    std::array<QSet<QString>,4> m_sysEvents;
 
     // Try to avoid LiveTV sessions until this time
     QDateTime m_livetvTime;
