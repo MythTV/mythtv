@@ -86,11 +86,13 @@ MBASE_PUBLIC void setHttpProxy(void);
 MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
                                 Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
-#define ONESECINMS   (      1000)
-#define ONEMININMS   (   60*1000)
-#define ONEHOURINMS  (60*60*1000)
-#define ONEMININSEC  (   60)
-#define ONEHOURINSEC (60*60)
+#define ONESECINMS   (         1000)
+#define ONEMININMS   (      60*1000)
+#define ONEHOURINMS  (   60*60*1000)
+#define ONEDAYINMS   (24*60*60*1000)
+#define ONEMININSEC  (      60)
+#define ONEHOURINSEC (   60*60)
+#define ONEDAYINSEC  (24*60*60)
 
 /**
  * \brief Format a milliseconds time value

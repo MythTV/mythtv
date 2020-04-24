@@ -22,6 +22,7 @@ using namespace std;
 #include "cardutil.h"
 #include "recordinginfo.h"
 
+#include "mythmiscutil.h"
 #include "mythuihelper.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"
@@ -1175,26 +1176,19 @@ static QString uptimeStr(time_t uptime)
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
-    int days = uptime/(60*60*24);
-    uptime -= days*60*60*24;
-    int hours = uptime/(60*60);
-    uptime -= hours*60*60;
-    int min  = uptime/60;
-    int secs = uptime%60;
+    int days = uptime/ONEDAYINSEC;
+    int secs = uptime - days*ONEDAYINSEC;
 
+    QString astext;
     if (days > 0)
     {
-        char    buff[6];
-        QString dayLabel = StatusBox::tr("%n day(s)", "", days);
-
-        sprintf(buff, "%d:%02d", hours, min);
-
-        return str + QString("%1, %2").arg(dayLabel).arg(buff);
+        astext = QString("%1, %2")
+            .arg(StatusBox::tr("%n day(s)", "", days))
+            .arg(MythFormatTimeMs(secs, "H:mm"));
+    } else {
+        astext = MythFormatTimeMs(secs, "H:mm:ss");
     }
-
-    char  buff[9];
-    sprintf(buff, "%d:%02d:%02d", hours, min, secs);
-    return str + QString( buff );
+    return str + astext;
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)
