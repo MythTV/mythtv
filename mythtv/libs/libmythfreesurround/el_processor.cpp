@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "el_processor.h"
+#include <array>
 #include <cmath>
 #include <complex>
 #include <cstdlib>
@@ -38,6 +39,8 @@ using FFTComplexArray = FFTSample[2];
 #endif
 
 using cfloat = std::complex<float>;
+using InputBufs  = std::array<float*,2>;
+using OutputBufs = std::array<float*,6>;
 
 static const float PI = 3.141592654;
 static const float epsilon = 0.000001;
@@ -95,8 +98,8 @@ public:
         for (unsigned k=0;k<m_n;k++)
             m_wnd[k] = sqrt(0.5*(1-std::cos(2*PI*k/m_n))/m_n);
         m_currentBuf = 0;
-        memset(m_inbufs, 0, sizeof(m_inbufs));
-        memset(m_outbufs, 0, sizeof(m_outbufs));
+        m_inbufs.fill(nullptr);
+        m_outbufs.fill(nullptr);
         // set the default coefficients
         surround_coefficients(0.8165,0.5774);
         phase_mode(0);
@@ -134,7 +137,7 @@ public:
     {
         m_inbufs[0] = &m_inbuf[0][m_currentBuf*m_halfN];
         m_inbufs[1] = &m_inbuf[1][m_currentBuf*m_halfN];
-        return m_inbufs;
+        return m_inbufs.data();
     }
 
     float ** getOutputBuffers()
@@ -145,7 +148,7 @@ public:
         m_outbufs[3] = &m_outbuf[3][m_currentBuf*m_halfN];
         m_outbufs[4] = &m_outbuf[4][m_currentBuf*m_halfN];
         m_outbufs[5] = &m_outbuf[5][m_currentBuf*m_halfN];
-        return m_outbufs;
+        return m_outbufs.data();
     }
 
     // decode a chunk of stereo sound, has to contain exactly blocksize samples
@@ -155,10 +158,10 @@ public:
     void decode(float center_width, float dimension, float adaption_rate) {
         // process first part
         int index = m_currentBuf*m_halfN;
-        float *in_second[2] = {&m_inbuf[0][index],&m_inbuf[1][index]};
+        InputBufs in_second {&m_inbuf[0][index],&m_inbuf[1][index]};
         m_currentBuf ^= 1;
         index = m_currentBuf*m_halfN;
-        float *in_first[2] = {&m_inbuf[0][index],&m_inbuf[1][index]};
+        InputBufs in_first {&m_inbuf[0][index],&m_inbuf[1][index]};
         add_output(in_first,in_second,center_width,dimension,adaption_rate,true);
         // shift last half of input buffer to the beginning
     }
@@ -204,7 +207,7 @@ public:
 
     // set the phase shifting mode
     void phase_mode(unsigned mode) {
-        const float modes[4][2] = {{0,0},{0,PI},{PI,0},{-PI/2,PI/2}};
+        const std::array<std::array<float,2>,4> modes {{ {0,0}, {0,PI}, {PI,0}, {-PI/2,PI/2} }};
         m_phaseOffsetL = modes[mode][0];
         m_phaseOffsetR = modes[mode][1];
     }
@@ -220,8 +223,8 @@ public:
 
 private:
     // polar <-> cartesian coodinates conversion
-    static inline float amplitude(const float cf[2]) { return std::sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
-    static inline float phase(const float cf[2]) { return std::atan2(cf[1],cf[0]); }
+    static inline float amplitude(const float *cf) { return std::sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
+    static inline float phase(const float *cf) { return std::atan2(cf[1],cf[0]); }
     static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
     static inline float sqr(float x) { return x*x; }
     // the dreaded min/max
@@ -230,14 +233,14 @@ private:
     static inline float clamp(float x) { return max(-1,min(1,x)); }
 
     // handle the output buffering for overlapped calls of block_decode
-    void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
+    void add_output(InputBufs input1, InputBufs input2, float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
         // add the windowed data to the last 1/2 of the output buffer
-        float *out[6] = {&m_outbuf[0][0],&m_outbuf[1][0],&m_outbuf[2][0],&m_outbuf[3][0],&m_outbuf[4][0],&m_outbuf[5][0]};
+        OutputBufs out {&m_outbuf[0][0],&m_outbuf[1][0],&m_outbuf[2][0],&m_outbuf[3][0],&m_outbuf[4][0],&m_outbuf[5][0]};
         block_decode(input1,input2,out,center_width,dimension,adaption_rate);
     }
 
     // CORE FUNCTION: decode a block of data
-    void block_decode(float *input1[2], float *input2[2], float *output[6], float center_width, float dimension, float adaption_rate) {
+    void block_decode(InputBufs input1, InputBufs input2, OutputBufs output, float center_width, float dimension, float adaption_rate) {
         // 1. scale the input by the window function; this serves a dual purpose:
         // - first it improves the FFT resolution b/c boundary discontinuities (and their frequencies) get removed
         // - second it allows for smooth blending of varying filters between the blocks
@@ -307,7 +310,7 @@ private:
                 float right = (1+m_xFs[f])/2;
                 float front = (1+m_yFs[f])/2;
                 float back = (1-m_yFs[f])/2;
-                float volume[5] = {
+                std::array<float,5> volume {
                     front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),  // left
                     front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),          // center
                     front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)), // right
@@ -354,7 +357,7 @@ private:
                 float right = (1+m_xFs[f])/2;
                 float front = (1+m_yFs[f])/2;
                 float back = (1-m_yFs[f])/2;
-                float volume[5] = {
+                std::array<float,5> volume {
                     front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),      // left
                     front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),              // center
                     front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)),     // right
@@ -543,9 +546,9 @@ private:
     std::vector<cfloat> m_trueavg;       // for lfe generation
     std::vector<float> m_xFs,m_yFs;      // the feature space positions for each frequency bin
     std::vector<float> m_wnd;            // the window function, precalculated
-    std::vector<float> m_filter[6];      // a frequency filter for each output channel
-    std::vector<float> m_inbuf[2];       // the sliding input buffers
-    std::vector<float> m_outbuf[6];      // the sliding output buffers
+    std::array<std::vector<float>,6> m_filter;      // a frequency filter for each output channel
+    std::array<std::vector<float>,2> m_inbuf;       // the sliding input buffers
+    std::array<std::vector<float>,6> m_outbuf;      // the sliding output buffers
     // coefficients
     float m_surroundHigh    {0.0F};      // high surround mixing coefficient (e.g. 0.8165/0.5774)
     float m_surroundLow     {0.0F};      // low surround mixing coefficient (e.g. 0.8165/0.5774)
@@ -558,8 +561,8 @@ private:
     bool  m_linearSteering  {false};     // whether the steering should be linear or not
     cfloat m_a,m_b,m_c,m_d,m_e,m_f,m_g,m_h; // coefficients for the linear steering
     int m_currentBuf;                    // specifies which buffer is 2nd half of input sliding buffer
-    float * m_inbufs[2]  {};             // for passing back to driver
-    float * m_outbufs[6] {};             // for passing back to driver
+    InputBufs  m_inbufs     {};          // for passing back to driver
+    OutputBufs m_outbufs    {};          // for passing back to driver
 
     friend class fsurround_decoder;
 };
