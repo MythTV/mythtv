@@ -692,7 +692,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
 
 DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 {
-    if (m_scanDTVTunerType != (int)DTVTunerType::kTunerTypeUnknown)
+    if (m_scanDTVTunerType != DTVTunerType::kTunerTypeUnknown)
         type = m_scanDTVTunerType;
 
     const DTVChannel *chan = GetDTVChannel();
@@ -731,7 +731,6 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 
         for (size_t j = 0; j < list.size(); ++j)
         {
-            int mplexid = -1;
             uint64_t frequency = 0;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
@@ -741,7 +740,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
 
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("NIT ts-loop j:%1 tag:%2 (0x%3) '%4' length:%5")
-                .arg(j).arg(tag).arg(tag,0,16).arg(tagString).arg(length));
+                .arg(j).arg(tag,3).arg(tag,0,16).arg(tagString).arg(length));
 
             switch (tag)
             {
@@ -777,26 +776,25 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     break;
                 }
                 default:
-                    continue;
+                    continue;                           // Next descriptor
             }
 
-            mplexid = ChannelUtil::GetMplexID(m_sourceID, frequency, tsid, netid);
-            mplexid = max(0, mplexid);
-
+            // Have now a delivery system descriptor
             tt = GuessDTVTunerType(tt);
-
             DTVMultiplex tuning;
-            if (mplexid)
+            if (tuning.FillFromDeliverySystemDesc(tt, desc))
             {
-                if (!tuning.FillFromDB(tt, mplexid))
-                    continue;
+                LOG(VB_CHANSCAN, LOG_DEBUG, QString("NIT %1 add ts %2  %3")
+                    .arg(nit->NetworkID()).arg(tsid).arg(tuning.toString()));
+                m_extendTransports[id] = tuning;
             }
-            else if (!tuning.FillFromDeliverySystemDesc(tt, desc))
+            else
             {
-                continue;
+                LOG(VB_CHANSCAN, LOG_DEBUG, QString("Cannot add ts from NIT %1 frequency %2 with tunertype %2")
+                    .arg(nit->NetworkID()).arg(frequency).arg(tt.toString()));
             }
 
-            m_extendTransports[id] = tuning;
+            // Next TS in loop
             break;
         }
     }
