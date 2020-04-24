@@ -87,7 +87,7 @@ static bool has_sse4     = false;
 #define cpuid    __cpuid
 
 #else
-/* NOLINTNEXTLINE(readability-non-const-parameter) */
+/* NOLINTNEXTLINE(modernize-avoid-c-arrays,readability-non-const-parameter) */
 inline void cpuid(int CPUInfo[4],int InfoType)
 {
     __asm__ __volatile__ (
@@ -111,14 +111,14 @@ inline void cpuid(int CPUInfo[4],int InfoType)
 
 static void cpu_detect_features()
 {
-    int info[4];
-    cpuid(info, 0);
+    std::array<int,4> info {};
+    cpuid(info.data(), 0);
     int nIds = info[0];
 
     //  Detect Features
     if (nIds >= 0x00000001)
     {
-        cpuid(info,0x00000001);
+        cpuid(info.data(),0x00000001);
         has_sse2  = (info[3] & (1 << 26)) != 0;
         has_sse3  = (info[2] & (1 <<  0)) != 0;
         has_ssse3 = (info[2] & (1 <<  9)) != 0;
@@ -160,9 +160,9 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
                                    const uint8_t* src, int src_pitch,
                                    int width, int height)
 {
-    const uint8_t shuffle[] = { 0, 2, 4, 6, 8, 10, 12, 14,
+    const std::array<const uint8_t,16> shuffle { 0, 2, 4, 6, 8, 10, 12, 14,
                                 1, 3, 5, 7, 9, 11, 13, 15 };
-    const uint8_t mask[] = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
+    const std::array<const uint8_t,16> mask { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
                              0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
     const bool sse3 = sse3_check();
     const bool ssse3 = ssse3_check();
@@ -209,7 +209,9 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
                         "pshufb  %%xmm7, %%xmm2\n"
                         "pshufb  %%xmm7, %%xmm3\n"
                         STORE2X32
-                        : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]), [src]"r"(&src[2*x]), [shuffle]"r"(shuffle) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm7");
+                        : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]),
+                            [src]"r"(&src[2*x]), [shuffle]"r"(shuffle.data())
+                        : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm7");
                 }
             }
             else
@@ -235,7 +237,9 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
                         "packuswb %%xmm6, %%xmm2\n"
                         "packuswb %%xmm7, %%xmm3\n"
                         STORE2X32
-                        : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
+                        : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]),
+                            [src]"r"(&src[2*x]), [mask]"r"(mask.data())
+                        : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
                 }
             }
         }
@@ -253,7 +257,9 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
                         "pshufb  %%xmm7, %%xmm2\n"
                         "pshufb  %%xmm7, %%xmm3\n"
                         STORE2X32
-                        : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]), [src]"r"(&src[2*x]), [shuffle]"r"(shuffle) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm7");
+                        : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]),
+                            [src]"r"(&src[2*x]), [shuffle]"r"(shuffle.data())
+                        : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm7");
                 }
             }
             else
@@ -279,7 +285,9 @@ static inline void SSE_splitplanes(uint8_t* dstu, int dstu_pitch,
                         "packuswb %%xmm6, %%xmm2\n"
                         "packuswb %%xmm7, %%xmm3\n"
                         STORE2X32
-                        : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask) : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
+                        : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]),
+                            [src]"r"(&src[2*x]), [mask]"r"(mask.data())
+                        : "memory", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
                 }
             }
         }

@@ -509,14 +509,14 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         uint32_t  device_type = HDHOMERUN_DEVICE_TYPE_TUNER;
         uint32_t  device_id   = HDHOMERUN_DEVICE_ID_WILDCARD;
         const int max_count   = 50;
-        hdhomerun_discover_device_t result_list[max_count];
+        std::array<hdhomerun_discover_device_t,max_count> result_list {};
 
 #ifdef HDHOMERUN_V2
         int result = hdhomerun_discover_find_devices_custom_v2(
-            target_ip, device_type, device_id, result_list, max_count);
+            target_ip, device_type, device_id, result_list.data(), result_list.size());
 #else
         int result = hdhomerun_discover_find_devices_custom(
-            target_ip, device_type, device_id, result_list, max_count);
+            target_ip, device_type, device_id, result_list.data(), result_list.size());
 #endif
 
         if (result == -1)

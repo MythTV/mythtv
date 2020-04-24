@@ -113,13 +113,13 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         }
         QString sep = "_";
         uint max = counts["_"];
-        static const char *s_spacers[6] = { "", "-", "#", ".", "0", nullptr };
-        for (uint i=0; (s_spacers[i] != nullptr); ++i)
+        static const std::array<const QString,5> s_spacers { "", "-", "#", ".", "0" };
+        for (const auto & spacer : s_spacers)
         {
-            if (counts[s_spacers[i]] > max)
+            if (counts[spacer] > max)
             {
-                max = counts[s_spacers[i]];
-                sep = s_spacers[i];
+                max = counts[spacer];
+                sep = spacer;
             }
         }
         return sep;

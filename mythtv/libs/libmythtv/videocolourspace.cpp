@@ -16,13 +16,13 @@ extern "C" {
 #include <cmath>
 
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT709 =
-    {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
+    {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_525 =
-    {{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}, {0.3127F, 0.3290F}};
+    {{{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_625 =
-    {{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
+    {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
-    {{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}, {0.3127F, 0.3290F}};
+    {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
 
 #define LOC QString("ColourSpace: ")
 
@@ -582,7 +582,7 @@ bool VideoColourSpace::Similar(const ColourPrimaries &First, const ColourPrimari
            cmp(First.whitepoint[1],   Second.whitepoint[1]);
 }
 
-inline float CalcBy(const float p[3][2], const float w[2])
+inline float CalcBy(const PrimarySpace p, const WhiteSpace w)
 {
     float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
     (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
@@ -591,7 +591,7 @@ inline float CalcBy(const float p[3][2], const float w[2])
     return val;
 }
 
-inline float CalcGy(const float p[3][2], const float w[2], const float By)
+inline float CalcGy(const PrimarySpace p, const WhiteSpace w, const float By)
 {
     float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
     val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
@@ -616,17 +616,19 @@ QMatrix4x4 VideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
     float Gy = CalcGy(Primaries.primaries, Primaries.whitepoint, By);
     float Ry = CalcRy(By, Gy);
 
-    float temp[4][4];
-    temp[0][0] = Ry * Primaries.primaries[0][0] / Primaries.primaries[0][1];
-    temp[0][1] = Gy * Primaries.primaries[1][0] / Primaries.primaries[1][1];
-    temp[0][2] = By * Primaries.primaries[2][0] / Primaries.primaries[2][1];
-    temp[1][0] = Ry;
-    temp[1][1] = Gy;
-    temp[1][2] = By;
-    temp[2][0] = Ry / Primaries.primaries[0][1] * (1- Primaries.primaries[0][0] - Primaries.primaries[0][1]);
-    temp[2][1] = Gy / Primaries.primaries[1][1] * (1- Primaries.primaries[1][0] - Primaries.primaries[1][1]);
-    temp[2][2] = By / Primaries.primaries[2][1] * (1- Primaries.primaries[2][0] - Primaries.primaries[2][1]);
-    temp[0][3] = temp[1][3] = temp[2][3] = temp[3][0] = temp[3][1] = temp[3][2] = 0.0F;
-    temp[3][3] = 1.0F;
-    return QMatrix4x4(temp[0]);
+    return {
+        // Row 0
+        Ry * Primaries.primaries[0][0] / Primaries.primaries[0][1],
+        Gy * Primaries.primaries[1][0] / Primaries.primaries[1][1],
+        By * Primaries.primaries[2][0] / Primaries.primaries[2][1],
+        0.0F,
+        // Row 1
+        Ry, Gy, By, 0.0F,
+        // Row 2
+        Ry / Primaries.primaries[0][1] * (1- Primaries.primaries[0][0] - Primaries.primaries[0][1]),
+        Gy / Primaries.primaries[1][1] * (1- Primaries.primaries[1][0] - Primaries.primaries[1][1]),
+        By / Primaries.primaries[2][1] * (1- Primaries.primaries[2][0] - Primaries.primaries[2][1]),
+        0.0F,
+        // Row 3
+        0.0F, 0.0F, 0.0F, 1.0F };
 }

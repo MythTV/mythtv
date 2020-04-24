@@ -65,6 +65,7 @@ enum TCTypes
     TC_CC
 };
 #define TCTYPESMAX 4
+using tctype_arr = std::array<int64_t,TCTYPESMAX>;
 
 // Caption Display modes
 enum
@@ -863,8 +864,8 @@ class MTV_PUBLIC MythPlayer
     // Time Code stuff
     int        m_prevTc                   {0}; ///< 32 bit timecode if last VideoFrame shown
     int        m_prevRp                   {0}; ///< repeat_pict of last frame
-    int64_t    m_tcWrap[TCTYPESMAX]       {};
-    int64_t    m_tcLastVal[TCTYPESMAX]    {};
+    tctype_arr m_tcWrap                   {};
+    tctype_arr m_tcLastVal                {};
     int64_t    m_savedAudioTimecodeOffset {0};
 
     // LiveTV

@@ -3490,10 +3490,10 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
         return m_pipDefaultLoc;
 
     // order of preference, could be stored in db if we want it configurable
-    PIPLocation ols[] =
+    const std::array<const PIPLocation,4> ols
         { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
 
-    for (auto & ol : ols)
+    for (const auto & ol : ols)
     {
         PIPMap::const_iterator it = m_pipPlayers.begin();
         for (; it != m_pipPlayers.end() && (*it != ol); ++it);
@@ -4005,8 +4005,8 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
 
     int64_t savedTC = m_tcWrap[TC_AUDIO];
 
-    for (int j = 0; j < TCTYPESMAX; j++)
-        m_tcWrap[j] = m_tcLastVal[j] = 0;
+    m_tcWrap.fill(0);
+    m_tcLastVal.fill(0);
 
     m_tcWrap[TC_AUDIO] = savedTC;
 

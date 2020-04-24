@@ -3,6 +3,7 @@
 #include "jitterometer.h"
 
 // Std
+#include <array>
 #include <cmath>
 #include <cstdlib>
 #include <utility>
@@ -164,9 +165,7 @@ QString Jitterometer::GetCPUStat(void)
         line = m_cpuStat->readLine(256);
         while (!line.isEmpty() && cores < MAX_CORES)
         {
-            static constexpr int kSize = sizeof(unsigned long long) * 9;
-            unsigned long long stats[9];
-            memset(stats, 0, kSize);
+            std::array<unsigned long long,9> stats {};
             int num = 0;
             if (sscanf(line.constData(),
                        "cpu%30d %30llu %30llu %30llu %30llu %30llu "
@@ -183,7 +182,7 @@ QString Jitterometer::GetCPUStat(void)
                 float total = load + stats[3] - m_lastStats[ptr + 3];
                 if (total > 0)
                     result += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
-                memcpy(&m_lastStats[ptr], stats, kSize);
+                std::copy(stats.cbegin(), stats.cend(), &m_lastStats[ptr]);
             }
             line = m_cpuStat->readLine(256);
             cores++;
@@ -203,8 +202,7 @@ QString Jitterometer::GetCPUStat(void)
         int ptr = 0;
         for (natural_t i = 0; i < processorcount && i < MAX_CORES; i++)
         {
-            unsigned long long stats[9];
-            memset(stats, 0, sizeof(unsigned long long) * 2);
+            std::array<unsigned long long,2> stats {};
             stats[0] = load[i].cpu_ticks[CPU_STATE_IDLE];
             stats[1] = load[i].cpu_ticks[CPU_STATE_IDLE] + load[i].cpu_ticks[CPU_STATE_USER] +
                        load[i].cpu_ticks[CPU_STATE_SYSTEM] + load[i].cpu_ticks[CPU_STATE_NICE];
@@ -212,7 +210,7 @@ QString Jitterometer::GetCPUStat(void)
             double totaldelta = stats[1] - m_lastStats[ptr + 1];
             if (totaldelta > 0)
                 result += QString("%1% ").arg(((totaldelta - idledelta) / totaldelta) * 100.0, 0, 'f', 0);
-            memcpy(&m_lastStats[ptr], stats, sizeof(unsigned long long) * 2);
+            std::copy(stats.cbegin(), stats.cend(), &m_lastStats[ptr]);
             ptr += 2;
         }
     }

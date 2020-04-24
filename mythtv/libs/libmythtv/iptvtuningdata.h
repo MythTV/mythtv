@@ -47,13 +47,13 @@ class MTV_PUBLIC IPTVTuningData
 
     IPTVTuningData()
     {
-        memset(&m_bitrate, 0, sizeof(m_bitrate));
+        m_bitrate.fill(0);
     }
 
     IPTVTuningData(const QString &data_url, IPTVProtocol protocol) :
         m_dataUrl(data_url),  m_protocol(protocol)
     {
-        memset(&m_bitrate, 0, sizeof(m_bitrate));
+        m_bitrate.fill(0);
     }
 
     IPTVTuningData(const QString &data_url, uint data_bitrate,
@@ -268,7 +268,7 @@ class MTV_PUBLIC IPTVTuningData
     FECType      m_fecType    {kNone};
     QUrl         m_fecUrl0;
     QUrl         m_fecUrl1;
-    uint         m_bitrate[3] {};
+    std::array<uint,3> m_bitrate {};
     IPTVProtocol m_protocol   {inValid};
 };
 

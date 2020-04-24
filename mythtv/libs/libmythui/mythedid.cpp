@@ -218,9 +218,9 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     // to sRGB specs. If sRGB is set, the client should use the spec values - not
     // the computed values
     m_sRGB = ((Data[FEATURES_OFFSET] & 0x04) != 0);
-    static const unsigned char s_sRGB[10] =
+    static constexpr std::array<const uint8_t,10> s_sRGB =
         { 0xEE, 0x91, 0xA3, 0x54, 0x4C, 0x99, 0x26, 0x0F, 0x50, 0x54 };
-    bool srgb = memcmp(Data + 0x19, s_sRGB, sizeof(s_sRGB)) == 0;
+    bool srgb = std::equal(s_sRGB.cbegin(), s_sRGB.cend(), Data + 0x19);
 
     if (!m_sRGB && srgb)
         m_sRGB = true;
@@ -246,7 +246,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
 
     // As per VideoColourspace.
     static const Primaries s_sRGBPrim =
-        {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
+        {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
 
     auto like = [](const Primaries &First, const Primaries &Second, float Fuzz)
     {

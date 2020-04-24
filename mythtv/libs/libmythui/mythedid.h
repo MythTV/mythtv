@@ -11,6 +11,9 @@
 // MythTV
 #include "mythuiexp.h"
 
+using PrimarySpace = std::array<std::array<float,2>,3>;
+using WhiteSpace = std::array<float,2>;
+
 class MUI_PUBLIC MythEDID
 {
   public:
@@ -18,8 +21,8 @@ class MUI_PUBLIC MythEDID
     // TODO move ColourPrimaries into MythDisplay
     struct Primaries
     {
-        float primaries[3][2];
-        float whitepoint[2];
+        PrimarySpace primaries;
+        WhiteSpace   whitepoint;
     };
 
     MythEDID(void) = default;
@@ -57,13 +60,13 @@ class MUI_PUBLIC MythEDID
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
     bool        m_likeSRGB        { false }; // Temporary until Colourspace handling in libmythui
-    Primaries   m_primaries       { {{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}, {0.0F, 0.0F} };
+    Primaries   m_primaries       { {{{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}}, {0.0F, 0.0F} };
     bool        m_isHDMI          { false };
     uint16_t    m_physicalAddress { 0 };
     bool        m_latencies       { false };
     bool        m_interLatencies  { false };
-    int         m_audioLatency[2] { 0 };
-    int         m_videoLatency[2] { 0 };
+    std::array<int,2> m_audioLatency { 0 };
+    std::array<int,2> m_videoLatency { 0 };
 };
 
 #endif // MYTHEDID_H

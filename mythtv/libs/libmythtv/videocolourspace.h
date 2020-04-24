@@ -14,6 +14,9 @@
 // FFmpeg
 #include "libavutil/pixfmt.h" // For AVCOL_xxx defines
 
+using PrimarySpace = std::array<std::array<float,2>,3>;
+using WhiteSpace = std::array<float,2>;
+
 class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {
     Q_OBJECT
@@ -36,8 +39,8 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
 
     struct ColourPrimaries
     {
-        float primaries[3][2];
-        float whitepoint[2];
+        PrimarySpace primaries;
+        WhiteSpace   whitepoint;
     };
 
     static const ColourPrimaries kBT709;

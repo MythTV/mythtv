@@ -14,6 +14,7 @@
  *****************************************************************************/
 
 #include "mythconfig.h"
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,17 +23,15 @@ extern "C" {
 #endif
 
 /* Probably not thread safe */
-static inline char * fourcc_str(int i)
+static inline const char * fourcc_str(int i)
 {
-    static char str[5];
+    static std::string str(5,'\0');
 
-    str[0] = ((char) (i & 0xFF)),
-    str[1] = ((char) ((i >> 8) & 0xFF)),
-    str[2] = ((char) ((i >> 16) & 0xFF)),
-    str[3] = ((char) ((i >> 24) & 0xFF)),
-    str[4] = '\0';
-
-    return str;
+    str[0] = ((char) (i & 0xFF));
+    str[1] = ((char) ((i >> 8) & 0xFF));
+    str[2] = ((char) ((i >> 16) & 0xFF));
+    str[3] = ((char) ((i >> 24) & 0xFF));
+    return str.c_str();
 }
 
 

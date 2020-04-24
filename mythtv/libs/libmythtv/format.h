@@ -9,6 +9,10 @@
 #define MYTH_PACKED
 #endif
 
+// Prevent clang-tidy modernize-avoid-c-arrays warnings in these
+// kernel structures
+extern "C" {
+
 struct rtfileheader
 {
   char finfo[12];     // "NuppelVideo" + \0
@@ -203,5 +207,8 @@ struct ccsubtitle
 #define CC_CC4        0x50
 #define CC_TXT3       0x60
 #define CC_TXT4       0x70
+
+// end of kernel structures.
+};
 
 #endif

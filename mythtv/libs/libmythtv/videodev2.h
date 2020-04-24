@@ -75,6 +75,14 @@ using __s8  = int8_t;
 #include <linux/v4l2-common.h>
 #include <linux/v4l2-controls.h>
 
+//
+// All of the structures in this file are for communicating with the
+// kernel.  Wrap the entire thing in an 'extern C' declaration so
+// that the clang-tidy modernize-avoid-c-arrays checker won't complain
+// about the arrays.
+//
+extern "C" {
+
 /*
  * Common stuff for both V4L1 and V4L2
  * Moved from videodev.h
@@ -1983,7 +1991,7 @@ struct v4l2_sliced_vbi_format {
            service_lines[1][...] specifies lines 0-23 (1-23 used) of the second field
                                  (equals frame lines 313-336 for 625 line video
                                   standards, 263-286 for 525 line standards) */
-        __u16   service_lines[2][24];
+        __u16   service_lines[2][24];   /* NOLINT(modernize-avoid-c-arrays) */
         __u32   io_size;
         __u32   reserved[2];            /* must be zero */
 };
@@ -2007,7 +2015,7 @@ struct v4l2_sliced_vbi_cap {
            service_lines[1][...] specifies lines 0-23 (1-23 used) of the second field
                                  (equals frame lines 313-336 for 625 line video
                                   standards, 263-286 for 525 line standards) */
-        __u16   service_lines[2][24];
+        __u16   service_lines[2][24];   /* NOLINT(modernize-avoid-c-arrays) */
         __u32	type;		/* enum v4l2_buf_type */
         __u32   reserved[3];    /* must be 0 */
 };
@@ -2428,5 +2436,7 @@ struct v4l2_create_buffers {
    drivers/media/v4l2-core/v4l2-compat-ioctl32.c as well! */
 
 #define BASE_VIDIOC_PRIVATE	192		/* 192-255 are private */
+
+} // extern "C"
 
 #endif /* __LINUX_VIDEODEV2_H */

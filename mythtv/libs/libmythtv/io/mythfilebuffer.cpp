@@ -198,7 +198,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
 
     if (islocal)
     {
-        char buf[kReadTestSize];
+        std::array<char,kReadTestSize> buf {};
         int lasterror = 0;
 
         MythTimer openTimer;
@@ -225,7 +225,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
             }
             else
             {
-                ssize_t ret = read(m_fd2, buf, kReadTestSize);
+                ssize_t ret = read(m_fd2, buf.data(), buf.size());
                 if (ret != kReadTestSize)
                 {
                     lasterror = 2;
