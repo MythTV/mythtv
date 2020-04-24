@@ -1384,7 +1384,7 @@ void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
 
 static HostComboBoxSetting *PlayBoxOrdering()
 {
-    QString str[4] =
+    std::array<QString,4> str
     {
         PlaybackSettings::tr("Sort all sub-titles/multi-titles Ascending"),
         PlaybackSettings::tr("Sort all sub-titles/multi-titles Descending"),
@@ -1405,7 +1405,7 @@ static HostComboBoxSetting *PlayBoxOrdering()
 
     gc->setLabel(PlaybackSettings::tr("Episode sort orderings"));
 
-    for (int i = 0; i < 4; ++i)
+    for (size_t i = 0; i < str.size(); ++i)
         gc->addSelection(str[i], QString::number(i));
 
     gc->setValue(3);

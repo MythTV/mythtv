@@ -34,7 +34,7 @@ class MythUIGuideGrid;
 
 using db_chan_list_t = vector<ChannelInfo>  ;
 using db_chan_list_list_t = vector<db_chan_list_t>;
-using ProgInfoGuideArray = ProgramInfo *[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
+using ProgInfoGuideArray = array<array<ProgramInfo *,MAX_DISPLAY_TIMES>,MAX_DISPLAY_CHANS>;
 
 class JumpToChannel;
 class JumpToChannelListener

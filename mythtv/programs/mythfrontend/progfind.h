@@ -93,7 +93,8 @@ class JaProgFinder : public ProgFinder
 {
   public:
     explicit JaProgFinder(MythScreenStack *parentStack, bool gg = false,
-                 TV *player = nullptr, bool embedVideo = false);
+                 TV *player = nullptr, bool embedVideo = false)
+        : ProgFinder(parentStack, gg, player, embedVideo) {}
 
   protected:
     void initAlphabetList() override; // ProgFinder
@@ -103,15 +104,15 @@ class JaProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar kSearchChars[];
-    int m_numberOfSearchChars;
+    static const std::vector<QChar> kSearchChars;
 };
 
 class HeProgFinder : public ProgFinder
 {
   public:
     explicit HeProgFinder(MythScreenStack *parentStack, bool gg = false,
-                 TV *player = nullptr, bool embedVideo = false);
+                 TV *player = nullptr, bool embedVideo = false)
+        : ProgFinder(parentStack, gg, player, embedVideo) {}
 
   protected:
     void initAlphabetList() override; // ProgFinder
@@ -121,15 +122,15 @@ class HeProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar kSearchChars[];
-    int m_numberOfSearchChars;
+    static const std::vector<QChar> kSearchChars;
 };
 ///////////////////////////////
 class RuProgFinder : public ProgFinder
 {
   public:
     explicit RuProgFinder(MythScreenStack *parentStack, bool gg = false, 
-                       TV *player = nullptr, bool embedVideo = false);
+                       TV *player = nullptr, bool embedVideo = false)
+        : ProgFinder(parentStack, gg, player, embedVideo) {}
                        
   protected:
     void initAlphabetList() override; // ProgFinder
@@ -139,8 +140,7 @@ class RuProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
                                              
   private:
-    static const QChar kSearchChars[];
-    int m_numberOfSearchChars;
+    static const std::vector<QChar> kSearchChars;
 };
 ///////////////////////////////////
 

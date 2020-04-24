@@ -650,7 +650,7 @@ void AudioTestThread::run()
 {
     RunProlog();
     m_interrupted = false;
-    int smptelayout[7][8] = {
+    std::array<std::array<int,8>,7> smptelayout {{
         { 0, 1, 1 },                    //stereo
         { },                            //not used
         { },                            //not used
@@ -658,7 +658,7 @@ void AudioTestThread::run()
         { 0, 2, 1, 5, 4, 3 },           //5.1
         { 0, 2, 1, 6, 4, 5, 3 },        //6.1
         { 0, 2, 1, 7, 5, 4, 6, 3 },     //7.1
-    };
+    }};
 
     if (m_audioOutput)
     {
@@ -1094,7 +1094,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
     return gc;
 }
 
-const char* AudioConfigSettings::kMixerControlControls[] =
+const std::array<const char *,2> AudioConfigSettings::kMixerControlControls
     {QT_TR_NOOP("PCM"),
      QT_TR_NOOP("Master")};
 
@@ -1104,7 +1104,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
     gc->setLabel(tr("Mixer controls"));
 
-    for (auto & control : kMixerControlControls)
+    for (const auto & control : kMixerControlControls)
         gc->addSelection(tr(control), control);
 
     gc->setHelpText(tr("Changing the volume adjusts the selected mixer."));

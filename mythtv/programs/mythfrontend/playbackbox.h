@@ -351,8 +351,8 @@ class PlaybackBox : public ScheduleCommon
 
     QString      m_artHostOverride;
     constexpr static int kNumArtImages = 3;
-    MythUIImage *m_artImage[kNumArtImages]    {};
-    QTimer      *m_artTimer[kNumArtImages]    {};
+    std::array<MythUIImage*,kNumArtImages> m_artImage {};
+    std::array<QTimer*,kNumArtImages>      m_artTimer {};
 
     InfoMap m_currentMap;
 

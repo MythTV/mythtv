@@ -1,5 +1,8 @@
 #include "playbackbox.h"
 
+// C++
+#include <array>
+
 // QT
 #include <QCoreApplication>
 #include <QDateTime>
@@ -198,7 +201,7 @@ static bool comp_season_rev_less_than(
     return comp_season_rev(a, b) < 0;
 }
 
-static const uint s_artDelay[] =
+static const std::array<const uint,3> s_artDelay
     { kArtworkFanTimeout, kArtworkBannerTimeout, kArtworkCoverTimeout,};
 
 static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
@@ -758,13 +761,16 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo,
     }
 }
 
-static const char *disp_flags[] = { "playlist", "watched", "preserve",
-                                    "cutlist", "autoexpire", "editing",
-                                    "bookmark", "inuse", "transcoded" };
+static const std::array<const std::string,9> disp_flags
+{
+    "playlist", "watched", "preserve",
+    "cutlist", "autoexpire", "editing",
+    "bookmark", "inuse", "transcoded"
+};
 
 void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
 {
-    bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
+    std::array<bool,disp_flags.size()> disp_flag_stat {};
 
     disp_flag_stat[0] = m_playList.contains(pginfo->GetRecordingID());
     disp_flag_stat[1] = pginfo->IsWatched();
@@ -776,8 +782,9 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
     disp_flag_stat[7] = pginfo->IsInUsePlaying();
     disp_flag_stat[8] = ((pginfo->GetProgramFlags() & FL_TRANSCODED) != 0U);
 
-    for (size_t i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
-        item->DisplayState(disp_flag_stat[i] ? "yes" : "no", disp_flags[i]);
+    for (size_t i = 0; i < disp_flags.size(); ++i)
+        item->DisplayState(disp_flag_stat[i] ? "yes" : "no",
+                           QString::fromStdString(disp_flags[i]));
 }
 
 void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
@@ -3114,6 +3121,28 @@ MythMenu* PlaybackBox::createRecordingMenu(void)
     return menu;
 }
 
+static constexpr int kMaxJobs {7};
+static const std::array<const int,kMaxJobs> kJobs
+{
+    JOB_TRANSCODE,
+    JOB_COMMFLAG,
+    JOB_METADATA,
+    JOB_USERJOB1,
+    JOB_USERJOB2,
+    JOB_USERJOB3,
+    JOB_USERJOB4,
+};
+static const std::array<const char *,kMaxJobs*2> kMySlots
+{   // stop                         start
+    SLOT(doBeginTranscoding()),     SLOT(createTranscodingProfilesMenu()),
+    SLOT(doBeginFlagging()),        SLOT(doBeginFlagging()),
+    SLOT(doBeginLookup()),          SLOT(doBeginLookup()),
+    SLOT(doBeginUserJob1()),        SLOT(doBeginUserJob1()),
+    SLOT(doBeginUserJob2()),        SLOT(doBeginUserJob2()),
+    SLOT(doBeginUserJob3()),        SLOT(doBeginUserJob3()),
+    SLOT(doBeginUserJob4()),        SLOT(doBeginUserJob4()),
+};
+
 MythMenu* PlaybackBox::createJobMenu()
 {
     ProgramInfo *pginfo = GetCurrentProgram();
@@ -3126,7 +3155,7 @@ MythMenu* PlaybackBox::createJobMenu()
 
     QString command;
 
-    bool add[7] =
+    const std::array<const bool,kMaxJobs> add
     {
         true,
         true,
@@ -3136,17 +3165,7 @@ MythMenu* PlaybackBox::createJobMenu()
         !gCoreContext->GetSetting("UserJob3", "").isEmpty(),
         !gCoreContext->GetSetting("UserJob4", "").isEmpty(),
     };
-    int jobs[7] =
-    {
-        JOB_TRANSCODE,
-        JOB_COMMFLAG,
-        JOB_METADATA,
-        JOB_USERJOB1,
-        JOB_USERJOB2,
-        JOB_USERJOB3,
-        JOB_USERJOB4,
-    };
-    QString desc[14] =
+    const std::array<const QString,kMaxJobs*2> desc
     {
         // stop                         start
         tr("Stop Transcoding"),         tr("Begin Transcoding"),
@@ -3157,18 +3176,8 @@ MythMenu* PlaybackBox::createJobMenu()
         "3",                            "3",
         "4",                            "4",
     };
-    const char *myslots[14] =
-    {   // stop                         start
-        SLOT(doBeginTranscoding()),     SLOT(createTranscodingProfilesMenu()),
-        SLOT(doBeginFlagging()),        SLOT(doBeginFlagging()),
-        SLOT(doBeginLookup()),          SLOT(doBeginLookup()),
-        SLOT(doBeginUserJob1()),        SLOT(doBeginUserJob1()),
-        SLOT(doBeginUserJob2()),        SLOT(doBeginUserJob2()),
-        SLOT(doBeginUserJob3()),        SLOT(doBeginUserJob3()),
-        SLOT(doBeginUserJob4()),        SLOT(doBeginUserJob4()),
-    };
 
-    for (size_t i = 0; i < sizeof(add) / sizeof(bool); i++)
+    for (size_t i = 0; i < kMaxJobs; i++)
     {
         if (!add[i])
             continue;
@@ -3185,10 +3194,10 @@ MythMenu* PlaybackBox::createJobMenu()
         }
 
         bool running = JobQueue::IsJobQueuedOrRunning(
-            jobs[i], pginfo->GetChanID(), pginfo->GetRecordingStartTime());
+            kJobs[i], pginfo->GetChanID(), pginfo->GetRecordingStartTime());
 
-        const char *slot = myslots[i * 2 + (running ? 0 : 1)];
-        MythMenu *submenu = (slot == myslots[1] ? createTranscodingProfilesMenu() : nullptr);
+        const char *slot = kMySlots[i * 2 + (running ? 0 : 1)];
+        MythMenu *submenu = (slot == kMySlots[1] ? createTranscodingProfilesMenu() : nullptr);
 
         menu->AddItem((running) ? stop_desc : start_desc, slot, submenu);
     }
@@ -3675,9 +3684,9 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(uint recordingID,
                                                const QString& recgroup)
 {
     // LiveTV ProgramInfo's are not in the aggregated list
-    ProgramList::iterator _it[2] = {
+    std::array<ProgramList::iterator,2> _it {
         m_progLists[tr("Live TV").toLower()].begin(), m_progLists[""].begin() };
-    ProgramList::iterator _end[2] = {
+    std::array<ProgramList::iterator,2> _end {
         m_progLists[tr("Live TV").toLower()].end(),   m_progLists[""].end()   };
 
     if (recgroup != "LiveTV")

@@ -111,7 +111,7 @@ class AudioConfigSettings : public GroupSetting
 
     int                  m_maxSpeakers               {0};
     QString              m_lastAudioDevice;
-    static const char   *kMixerControlControls[];
+    static const std::array<const char *,2> kMixerControlControls;
 };
 
 class AudioDeviceComboBox : public HostComboBoxSetting
