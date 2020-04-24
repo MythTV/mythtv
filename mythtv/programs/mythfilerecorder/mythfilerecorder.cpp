@@ -313,8 +313,7 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
     QString cmd;
 
     int poll_cnt = 1;
-    struct pollfd polls[2];
-    memset(polls, 0, sizeof(polls));
+    std::array<struct pollfd,2> polls {};
 
     polls[0].fd      = 0;
     polls[0].events  = POLLIN | POLLPRI;
@@ -342,7 +341,7 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
 
     while (m_run)
     {
-        int ret = poll(polls, poll_cnt, m_timeout);
+        int ret = poll(polls.data(), poll_cnt, m_timeout);
 
         if (polls[0].revents & POLLHUP)
         {

@@ -440,8 +440,7 @@ void Commands::Run(void)
 
     QString cmd;
 
-    struct pollfd polls[2];
-    memset(polls, 0, sizeof(polls));
+    std::array<struct pollfd,2> polls {};
 
     polls[0].fd      = 0;
     polls[0].events  = POLLIN | POLLPRI;
@@ -457,7 +456,7 @@ void Commands::Run(void)
     {
         int timeout = 250;
         int poll_cnt = 1;
-        int ret = poll(polls, poll_cnt, timeout);
+        int ret = poll(polls.data(), poll_cnt, timeout);
 
         if (polls[0].revents & POLLHUP)
         {
