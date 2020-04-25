@@ -62,7 +62,7 @@ class PaneDVBT : public GroupSetting
     QString guard_interval(void) const { return m_pguard_interval->getValue();}
     QString hierarchy(void)      const { return m_phierarchy->getValue();     }
 
-    void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);          }
+    void setFrequency(uint frequency)                    { m_pfrequency->setValue(frequency);          }
     void setBandwidth(const QString& bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
     void setInversion(const QString& inversion)          { m_pinversion->setValue(inversion);          }
     void setConstellation(const QString& constellation)  { m_pconstellation->setValue(constellation);  }

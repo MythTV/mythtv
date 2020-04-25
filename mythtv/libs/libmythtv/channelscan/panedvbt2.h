@@ -42,11 +42,11 @@ class PaneDVBT2 : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      m_pfrequency       = new ScanFrequency(),
-                                      m_pbandwidth       = new ScanBandwidth(),
-                                      m_pinversion       = new ScanInversion(),
-                                      m_pconstellation   = new ScanConstellation(),
-                                      m_pmod_sys         = new ScanDVBTModSys(),
+                                      m_pfrequency      = new ScanFrequency(),
+                                      m_pbandwidth      = new ScanBandwidth(),
+                                      m_pinversion      = new ScanInversion(),
+                                      m_pconstellation  = new ScanConstellation(),
+                                      m_pmodsys         = new ScanDVBTModSys(),
                                       m_pcoderate_lp    = new ScanCodeRateLP(),
                                       m_pcoderate_hp    = new ScanCodeRateHP(),
                                       m_ptrans_mode     = new ScanTransmissionMode(),
@@ -63,9 +63,9 @@ class PaneDVBT2 : public GroupSetting
     QString trans_mode(void)     const { return m_ptrans_mode->getValue();    }
     QString guard_interval(void) const { return m_pguard_interval->getValue();}
     QString hierarchy(void)      const { return m_phierarchy->getValue();     }
-    QString mod_sys(void)        const { return m_pmod_sys->getValue();       }
+    QString modsys(void)         const { return m_pmodsys->getValue();        }
 
-    void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);          }
+    void setFrequency(uint frequency)                    { m_pfrequency->setValue(frequency);          }
     void setBandwidth(const QString& bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
     void setInversion(const QString& inversion)          { m_pinversion->setValue(inversion);          }
     void setConstellation(const QString& constellation)  { m_pconstellation->setValue(constellation);  }
@@ -74,7 +74,7 @@ class PaneDVBT2 : public GroupSetting
     void setTransmode(const QString& trans_mode)         { m_ptrans_mode->setValue(trans_mode);        }
     void setGuardInterval(const QString& guard_interval) { m_pguard_interval->setValue(guard_interval);}
     void setHierarchy(const QString& hierarchy)          { m_phierarchy->setValue(hierarchy);          }
-    void setModsys(const QString& mod_sys)               { m_pmod_sys->setValue(mod_sys);              }
+    void setModsys(const QString& mod_sys)               { m_pmodsys->setValue(mod_sys);               }
 
   protected:
     ScanFrequency        *m_pfrequency      {nullptr};
@@ -86,7 +86,7 @@ class PaneDVBT2 : public GroupSetting
     ScanTransmissionMode *m_ptrans_mode     {nullptr};
     ScanGuardInterval    *m_pguard_interval {nullptr};
     ScanHierarchy        *m_phierarchy      {nullptr};
-    ScanDVBTModSys       *m_pmod_sys        {nullptr};
+    ScanDVBTModSys       *m_pmodsys         {nullptr};
 };
 
 #endif // PANE_DVBT2_H

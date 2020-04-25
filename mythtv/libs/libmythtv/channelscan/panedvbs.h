@@ -43,29 +43,29 @@ class PaneDVBS : public GroupSetting
                                      {this,
                                       m_pfrequency  = new ScanFrequencykHz(),
                                       m_ppolarity   = new ScanPolarity(),
-                                      m_psymbolrate = new ScanSymbolRateDVBS(),
-                                      m_pfec       = new ScanFec(),
-                                      m_pinversion = new ScanInversion()});
+                                      m_psymbolrate = new ScanDVBSSymbolRate(),
+                                      m_pfec        = new ScanFec(),
+                                      m_pinversion  = new ScanInversion()});
     }
 
     QString frequency(void)  const { return m_pfrequency->getValue();  }
-    QString symbolrate(void) const { return m_psymbolrate->getValue(); }
-    QString inversion(void)  const { return m_pinversion->getValue();  }
-    QString fec(void)        const { return m_pfec->getValue();        }
     QString polarity(void)   const { return m_ppolarity->getValue();   }
+    QString symbolrate(void) const { return m_psymbolrate->getValue(); }
+    QString fec(void)        const { return m_pfec->getValue();        }
+    QString inversion(void)  const { return m_pinversion->getValue();  }
 
-    void setFrequency(uint frequency)      { m_pfrequency->setValue(frequency);  }
-    void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
-    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
-    void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
+    void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);  }
     void setPolarity(const QString& polarity)     { m_ppolarity->setValue(polarity);    }
+    void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
+    void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
+    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
 
   protected:
     ScanFrequencykHz   *m_pfrequency  {nullptr};
-    ScanSymbolRateDVBS *m_psymbolrate {nullptr};
-    ScanInversion      *m_pinversion  {nullptr};
-    ScanFec            *m_pfec        {nullptr};
     ScanPolarity       *m_ppolarity   {nullptr};
+    ScanDVBSSymbolRate *m_psymbolrate {nullptr};
+    ScanFec            *m_pfec        {nullptr};
+    ScanInversion      *m_pinversion  {nullptr};
 };
 
 #endif // PANE_DVBS_H

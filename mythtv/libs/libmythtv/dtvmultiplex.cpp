@@ -511,7 +511,8 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
 
                 return ParseDVB_S_and_C(
                     QString::number(cd.FrequencykHz()),  "a",
-                    QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
+                    QString::number(cd.SymbolRateHz()),
+                    cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString());
             }
@@ -520,10 +521,12 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             {
                 return ParseDVB_S2(
                     QString::number(cd.FrequencykHz()),  "a",
-                    QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
+                    QString::number(cd.SymbolRateHz()),
+                    cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString(),
-                    cd.ModulationSystemString(),         cd.RollOffString());
+                    cd.ModulationSystemString(),
+                    cd.RollOffString());
             }
 
             break;
@@ -543,7 +546,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
         }
         default:
             LOG(VB_CHANSCAN, LOG_ERR, LOC +
-                "unknown delivery system descriptor");
+                QString("Unknown delivery system descriptor 0x%1").arg(tag,0,16));
             return false;
     }
 

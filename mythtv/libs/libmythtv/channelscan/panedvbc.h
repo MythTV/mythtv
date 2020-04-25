@@ -42,29 +42,33 @@ class PaneDVBC : public GroupSetting
         setting->addTargetedChildren(target,
                                      {this,
                                       m_pfrequency   = new ScanFrequency(),
-                                      m_psymbolrate  = new ScanSymbolRateDVBC(),
+                                      m_psymbolrate  = new ScanDVBCSymbolRate(),
+                                      m_pmodulation  = new ScanModulation(),
+                                      m_pmodsys      = new ScanDVBCModSys(),
                                       m_pinversion   = new ScanInversion(),
-                                      m_pmodulation = new ScanModulation(),
-                                      m_pfec        = new ScanFec()});
+                                      m_pfec         = new ScanFec()});
     }
 
     QString frequency(void)  const { return m_pfrequency->getValue();  }
     QString symbolrate(void) const { return m_psymbolrate->getValue(); }
+    QString modulation(void) const { return m_pmodulation->getValue(); }
+    QString modsys(void)     const { return m_pmodsys->getValue();     }
     QString inversion(void)  const { return m_pinversion->getValue();  }
     QString fec(void)        const { return m_pfec->getValue();        }
-    QString modulation(void) const { return m_pmodulation->getValue(); }
 
-    void setFrequency(uint frequency)      { m_pfrequency->setValue(frequency);  }
+    void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);  }
     void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
-    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
     void setModulation(const QString& modulation) { m_pmodulation->setValue(modulation);}
+    void setModsys(const QString& modsys)         { m_pmodsys->setValue(modsys);        }
+    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
     void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
 
   protected:
     ScanFrequency      *m_pfrequency  {nullptr};
-    ScanSymbolRateDVBC *m_psymbolrate {nullptr};
-    ScanInversion      *m_pinversion  {nullptr};
+    ScanDVBCSymbolRate *m_psymbolrate {nullptr};
     ScanModulation     *m_pmodulation {nullptr};
+    ScanDVBCModSys     *m_pmodsys     {nullptr};
+    ScanInversion      *m_pinversion  {nullptr};
     ScanFec            *m_pfec        {nullptr};
 };
 

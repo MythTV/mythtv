@@ -762,6 +762,8 @@ DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
             tunertype = DTVTunerType::kTunerTypeDVBS2;
             break;
         case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A:
+        case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B:
+        case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_C:
             tunertype = DTVTunerType::kTunerTypeDVBC;
             break;
         case DTVModulationSystem::kModulationSystem_DVBT:
