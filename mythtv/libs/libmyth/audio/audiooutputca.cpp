@@ -12,6 +12,8 @@
  * Jeremiah Morris, Andrew Kimpton, Nigel Pearson, Jean-Yves Avenard
  *****************************************************************************/
 
+#include <vector>
+
 #include <CoreServices/CoreServices.h>
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
@@ -26,6 +28,9 @@
 
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
+
+using AudioStreamIDVec = std::vector<AudioStreamID>;
+using AudioStreamRangedVec = std::vector<AudioStreamRangedDescription>;
 
 #define OSS_STATUS(x) UInt32ToFourCC((UInt32*)&(x))
 char* UInt32ToFourCC(UInt32* pVal)
@@ -112,8 +117,8 @@ public:
     bool *ChannelsList(AudioDeviceID d, bool passthru);
 
     // Helpers for iterating. Returns a malloc'd array
-    AudioStreamID               *StreamsList(AudioDeviceID d);
-    AudioStreamBasicDescription *FormatsList(AudioStreamID s);
+    AudioStreamIDVec             StreamsList(AudioDeviceID d);
+    AudioStreamRangedVec         FormatsList(AudioStreamID s);
 
     int  AudioStreamChangeFormat(AudioStreamID               s,
                                  AudioStreamBasicDescription format);
@@ -148,6 +153,7 @@ public:
     bool           mInitialized   {false};
     bool           mStarted       {false};
     bool           mWasDigital    {false};
+    AudioDeviceIOProcID mIoProcID {};
 };
 
 // These callbacks communicate with Core Audio.
@@ -531,12 +537,28 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
 {
     UInt32 size = 0;
     AudioDeviceID deviceID = 0;
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyDevices,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
+    OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
+						  0, nullptr, &size);
+    if (err)
+    {
+        Warn(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+                     "Error [%1]")
+             .arg(err));
+	return deviceID;
+    }
+
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
     AudioDeviceID* pDevices = new AudioDeviceID[deviceCount];
 
-    OSStatus err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &size, pDevices);
+    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
+				     0, nullptr, &size, pDevices);
     if (err)
     {
         Warn(QString("GetDeviceWithName: Unable to retrieve the list of available devices. "
@@ -568,13 +590,18 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
 AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
 {
     UInt32        paramSize;
-    OSStatus      err;
     AudioDeviceID deviceId = 0;
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyDefaultOutputDevice,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
     // Find the ID of the default Device
     paramSize = sizeof(deviceId);
-    err = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-                                   &paramSize, &deviceId);
+    OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
+					      0, nullptr, &paramSize, &deviceId);
     if (err == noErr)
         Debug(QString("GetDefaultOutputDevice: default device ID = %1").arg(deviceId));
     else
@@ -592,13 +619,27 @@ int CoreAudioData::GetTotalOutputChannels()
         return 0;
     UInt32 channels = 0;
     UInt32 size = 0;
-    AudioDeviceGetPropertyInfo(mDeviceID, 0, false,
-                               kAudioDevicePropertyStreamConfiguration,
-                               &size, nullptr);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertyStreamConfiguration,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
+    OSStatus err = AudioObjectGetPropertyDataSize(mDeviceID, &pa,
+						  0, nullptr, &size);
+    if (err)
+    {
+        Warn(QString("GetTotalOutputChannels: Unable to get "
+                     "size of device output channels - id: %1 Error = [%2]")
+             .arg(mDeviceID)
+             .arg(err));
+	return 0;
+    }
+
     AudioBufferList *pList = (AudioBufferList *)malloc(size);
-    OSStatus err = AudioDeviceGetProperty(mDeviceID, 0, false,
-                                          kAudioDevicePropertyStreamConfiguration,
-                                          &size, pList);
+    err = AudioObjectGetPropertyData(mDeviceID, &pa,
+				     0, nullptr, &size, pList);
     if (!err)
     {
         for (UInt32 buffer = 0; buffer < pList->mNumberBuffers; buffer++)
@@ -621,15 +662,17 @@ QString *CoreAudioData::GetName()
 {
     if (!mDeviceID)
         return nullptr;
-    UInt32 propertySize;
-    AudioObjectPropertyAddress propertyAddress;
+
+    AudioObjectPropertyAddress pa
+    {
+	kAudioObjectPropertyName,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
     CFStringRef name;
-    propertySize = sizeof(CFStringRef);
-    propertyAddress.mSelector = kAudioObjectPropertyName;
-    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
-    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
-    OSStatus err = AudioObjectGetPropertyData(mDeviceID, &propertyAddress,
+    UInt32 propertySize = sizeof(CFStringRef);
+    OSStatus err = AudioObjectGetPropertyData(mDeviceID, &pa,
                                               0, nullptr, &propertySize, &name);
     if (err)
     {
@@ -648,8 +691,14 @@ bool CoreAudioData::GetAutoHogMode()
 {
     UInt32 val = 0;
     UInt32 size = sizeof(val);
-    OSStatus err = AudioHardwareGetProperty(kAudioHardwarePropertyHogModeIsAllowed,
-                                            &size, &val);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyHogModeIsAllowed,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
+    OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr, &size, &val);
     if (err)
     {
         Warn(QString("GetAutoHogMode: Unable to get auto 'hog' mode. Error = [%1]")
@@ -662,8 +711,15 @@ bool CoreAudioData::GetAutoHogMode()
 void CoreAudioData::SetAutoHogMode(bool enable)
 {
     UInt32 val = enable ? 1 : 0;
-    OSStatus err = AudioHardwareSetProperty(kAudioHardwarePropertyHogModeIsAllowed,
-                                            sizeof(val), &val);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyHogModeIsAllowed,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
+    OSStatus err = AudioObjectSetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr,
+					      sizeof(val), &val);
     if (err)
     {
         Warn(QString("SetAutoHogMode: Unable to set auto 'hog' mode. Error = [%1]")
@@ -673,12 +729,16 @@ void CoreAudioData::SetAutoHogMode(bool enable)
 
 pid_t CoreAudioData::GetHogStatus()
 {
-    OSStatus err;
     pid_t PID;
     UInt32 PIDsize = sizeof(PID);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertyHogMode,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
-    err = AudioDeviceGetProperty(mDeviceID, 0, FALSE,
-                                 kAudioDevicePropertyHogMode,
+    OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr,
                                  &PIDsize, &PID);
     if (err != noErr)
     {
@@ -693,6 +753,13 @@ pid_t CoreAudioData::GetHogStatus()
 
 bool CoreAudioData::SetHogStatus(bool hog)
 {
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertyHogMode,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
     // According to Jeff Moore (Core Audio, Apple), Setting kAudioDevicePropertyHogMode
     // is a toggle and the only way to tell if you do get hog mode is to compare
     // the returned pid against getpid, if the match, you have hog mode, if not you don't.
@@ -705,9 +772,8 @@ bool CoreAudioData::SetHogStatus(bool hog)
         {
             Debug(QString("SetHogStatus: Setting 'hog' status on device %1")
                   .arg(mDeviceID));
-            OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
-                                                  kAudioDevicePropertyHogMode,
-                                                  sizeof(mHog), &mHog);
+	    OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
+						      sizeof(mHog), &mHog);
             if (err || mHog != getpid())
             {
                 Warn(QString("SetHogStatus: Unable to set 'hog' status. Error = [%1]")
@@ -725,9 +791,8 @@ bool CoreAudioData::SetHogStatus(bool hog)
             Debug(QString("SetHogStatus: Releasing 'hog' status on device %1")
                   .arg(mDeviceID));
             pid_t hogPid = -1;
-            OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
-                                                  kAudioDevicePropertyHogMode,
-                                                  sizeof(hogPid), &hogPid);
+	    OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
+						      sizeof(hogPid), &hogPid);
             if (err || hogPid == getpid())
             {
                 Warn(QString("SetHogStatus: Unable to release 'hog' status. Error = [%1]")
@@ -751,9 +816,15 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     Debug(QString("SetMixingSupport: %1abling mixing for device %2")
           .arg(mix ? "En" : "Dis")
           .arg(mDeviceID));
-    OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
-                                          kAudioDevicePropertySupportsMixing,
-                                          sizeof(mixEnable), &mixEnable);
+
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertySupportsMixing,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+    OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
+					      sizeof(mixEnable), &mixEnable);
     if (err)
     {
         Warn(QString("SetMixingSupport: Unable to set MixingSupport to %1. Error = [%2]")
@@ -772,9 +843,14 @@ bool CoreAudioData::GetMixingSupport()
         return false;
     UInt32 val = 0;
     UInt32 size = sizeof(val);
-    OSStatus err = AudioDeviceGetProperty(mDeviceID, 0, false,
-                                          kAudioDevicePropertySupportsMixing,
-                                          &size, &val);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertySupportsMixing,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+    OSStatus err = AudioObjectGetPropertyData(mDeviceID, &pa, 0, nullptr,
+					      &size, &val);
     if (err)
         return false;
     return (val > 0);
@@ -783,92 +859,91 @@ bool CoreAudioData::GetMixingSupport()
 /**
  * Get a list of all the streams on this device
  */
-AudioStreamID *CoreAudioData::StreamsList(AudioDeviceID d)
+AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
 {
     OSStatus       err;
     UInt32         listSize;
-    AudioStreamID  *list;
+    AudioStreamIDVec vec {};
 
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertyStreams,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
-    err = AudioDeviceGetPropertyInfo(d, 0, FALSE,
-                                     kAudioDevicePropertyStreams,
-                                     &listSize, nullptr);
+    err = AudioObjectGetPropertyDataSize(d, &pa,
+					 0, nullptr, &listSize);
     if (err != noErr)
     {
         Error(QString("StreamsList: could not get list size: [%1]")
               .arg(OSS_STATUS(err)));
-        return nullptr;
+        return {};
     }
 
-    // Space for a terminating ID:
-    listSize += sizeof(AudioStreamID);
-    list      = (AudioStreamID *)malloc(listSize);
-
-    if (list == nullptr)
+    try
+    {
+	vec.reserve(listSize / sizeof(AudioStreamID));
+    }
+    catch (...)
     {
         Error("StreamsList(): out of memory?");
-        return nullptr;
+        return {};
     }
 
-    err = AudioDeviceGetProperty(d, 0, FALSE,
-                                 kAudioDevicePropertyStreams,
-                                 &listSize, list);
+    err = AudioObjectGetPropertyData(d, &pa,
+				     0, nullptr, &listSize, vec.data());
     if (err != noErr)
     {
         Error(QString("StreamsList: could not get list: [%1]")
               .arg(OSS_STATUS(err)));
-        return nullptr;
+        return {};
     }
-    // Add a terminating ID:
-    list[listSize/sizeof(AudioStreamID)] = kAudioHardwareBadStreamError;
 
-    return list;
+    return vec;
 }
 
-AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
+AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
 {
     OSStatus                     err;
-    AudioStreamBasicDescription  *list;
+    AudioStreamRangedVec         vec;
     UInt32                       listSize;
-    AudioDevicePropertyID        p;
 
-
-    // This is deprecated for kAudioStreamPropertyAvailablePhysicalFormats,
-    // but compiling on 10.3 requires the older constant
-    p = kAudioStreamPropertyPhysicalFormats;
+    AudioObjectPropertyAddress pa
+    {
+	kAudioStreamPropertyPhysicalFormats,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
     // Retrieve all the stream formats supported by this output stream
-    err = AudioStreamGetPropertyInfo(s, 0, p, &listSize, nullptr);
+    err = AudioObjectGetPropertyDataSize(s, &pa, 0, nullptr, &listSize);
     if (err != noErr)
     {
         Warn(QString("FormatsList(): couldn't get list size: [%1]")
              .arg(OSS_STATUS(err)));
-        return nullptr;
+        return {};
     }
 
-    // Space for a terminating ID:
-    listSize += sizeof(AudioStreamBasicDescription);
-    list      = (AudioStreamBasicDescription *)malloc(listSize);
-
-    if (list == nullptr)
+    try
+    {
+	vec.reserve(listSize / sizeof(AudioStreamRangedDescription));
+    }
+    catch (...)
     {
         Error("FormatsList(): out of memory?");
-        return nullptr;
+        return {};
     }
 
-    err = AudioStreamGetProperty(s, 0, p, &listSize, list);
+    err = AudioObjectGetPropertyData(s, &pa, 0, nullptr, &listSize, vec.data());
     if (err != noErr)
     {
         Warn(QString("FormatsList: couldn't get list: [%1]")
              .arg(OSS_STATUS(err)));
-        free(list);
-        return nullptr;
+        return {};
     }
 
-    // Add a terminating ID:
-    list[listSize/sizeof(AudioStreamBasicDescription)].mFormatID = 0;
-
-    return list;
+    return vec;
 }
 
 static UInt32   sNumberCommonSampleRates = 15;
@@ -897,10 +972,15 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
     UInt32                      listSize;
     UInt32                      nbitems = 0;
 
+    AudioObjectPropertyAddress pa
+    {
+	kAudioDevicePropertyAvailableNominalSampleRates,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
     // retrieve size of rate list
-    err = AudioDeviceGetPropertyInfo(d, 0, 0,
-                                     kAudioDevicePropertyAvailableNominalSampleRates,
-                                     &listSize, nullptr);
+    err = AudioObjectGetPropertyDataSize(d, &pa, 0, nullptr, &listSize);
     if (err != noErr)
     {
         Warn(QString("RatesList(): couldn't get data rate list size: [%1]")
@@ -915,9 +995,7 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
         return nullptr;
     }
 
-    err = AudioDeviceGetProperty(
-        d, 0, 0, kAudioDevicePropertyAvailableNominalSampleRates,
-        &listSize, list);
+    err = AudioObjectGetPropertyData(d, &pa, 0, nullptr, &listSize, list);
     if (err != noErr)
     {
         Warn(QString("RatesList(): couldn't get list: [%1]")
@@ -970,8 +1048,8 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
 
 bool *CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru)
 {
-    AudioStreamID               *streams;
-    AudioStreamBasicDescription *formats;
+    AudioStreamIDVec            streams;
+    AudioStreamRangedVec        formats;
     bool                        founddigital = false;
     bool                        *list;
 
@@ -981,7 +1059,7 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru)
     memset(list, 0, (CHANNELS_MAX+1) * sizeof(bool));
 
     streams = StreamsList(mDeviceID);
-    if (!streams)
+    if (streams.empty())
     {
         free(list);
         return nullptr;
@@ -989,37 +1067,35 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru)
 
     if (passthru)
     {
-        for (int i = 0; streams[i] != kAudioHardwareBadStreamError; i++)
+        for (auto stream : streams)
         {
-            formats = FormatsList(streams[i]);
-            if (!formats)
+            formats = FormatsList(stream);
+            if (formats.empty())
                 continue;
 
             // Find a stream with a cac3 stream
-            for (int j = 0; formats[j].mFormatID != 0; j++)
+            for (auto format : formats)
             {
-                if (formats[j].mFormatID == 'IAC3' ||
-                    formats[j].mFormatID == kAudioFormat60958AC3)
+                if (format.mFormat.mFormatID == 'IAC3' ||
+                    format.mFormat.mFormatID == kAudioFormat60958AC3)
                 {
-                    list[formats[j].mChannelsPerFrame] = true;
+                    list[format.mFormat.mChannelsPerFrame] = true;
                     founddigital = true;
                 }
             }
-            free(formats);
         }
     }
 
     if (!founddigital)
     {
-        for (int i = 0; streams[i] != kAudioHardwareBadStreamError; i++)
+        for (auto stream : streams)
         {
-            formats = FormatsList(streams[i]);
-            if (!formats)
+            formats = FormatsList(stream);
+            if (formats.empty())
                 continue;
-            for (int j = 0; formats[j].mFormatID != 0; j++)
-                if (formats[j].mChannelsPerFrame <= CHANNELS_MAX)
-                    list[formats[j].mChannelsPerFrame] = true;
-            free(formats);
+            for (auto format : formats)
+                if (format.mFormat.mChannelsPerFrame <= CHANNELS_MAX)
+                    list[format.mFormat.mChannelsPerFrame] = true;
         }
     }
     return list;
@@ -1027,11 +1103,17 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru)
 
 int CoreAudioData::OpenAnalog()
 {
-    ComponentDescription         desc;
+    AudioComponentDescription    desc;
     AudioStreamBasicDescription  DeviceFormat;
     AudioChannelLayout          *layout;
     AudioChannelLayout           new_layout;
     AudioDeviceID                defaultDevice = GetDefaultOutputDevice();
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyDevices,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
 
     Debug("OpenAnalog: Entering");
 
@@ -1049,14 +1131,14 @@ int CoreAudioData::OpenAnalog()
     desc.componentFlagsMask = 0;
     mDigitalInUse = false;
 
-    Component comp = FindNextComponent(nullptr, &desc);
+    AudioComponent comp = AudioComponentFindNext(nullptr, &desc);
     if (comp == nullptr)
     {
         Error("OpenAnalog: AudioComponentFindNext failed");
         return false;
     }
 
-    OSErr err = OpenAComponent(comp, &mOutputUnit);
+    OSErr err = AudioComponentInstanceNew(comp, &mOutputUnit);
     if (err)
     {
         Error(QString("OpenAnalog: AudioComponentInstanceNew returned %1")
@@ -1134,23 +1216,16 @@ int CoreAudioData::OpenAnalog()
               .arg(StreamDescriptionToString(DeviceFormat)));
     }
     /* Get the channel layout of the device side of the unit */
-    err = AudioUnitGetPropertyInfo(mOutputUnit,
-                                   kAudioDevicePropertyPreferredChannelLayout,
-                                   kAudioUnitScope_Output,
-                                   0,
-                                   &param_size,
-                                   nullptr);
+    pa.mSelector = kAudioDevicePropertyPreferredChannelLayout;
+    err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
+					 0, nullptr, &param_size);
 
     if(!err)
     {
         layout = (AudioChannelLayout *) malloc(param_size);
 
-        err = AudioUnitGetProperty(mOutputUnit,
-                                   kAudioDevicePropertyPreferredChannelLayout,
-                                   kAudioUnitScope_Output,
-                                   0,
-                                   layout,
-                                   &param_size);
+	err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
+					 0, nullptr, &param_size, layout);
 
         /* We need to "fill out" the ChannelLayout, because there are multiple ways that it can be set */
         if(layout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
@@ -1365,7 +1440,7 @@ void CoreAudioData::CloseAnalog()
             Debug(QString("CloseAnalog: AudioUnitUninitialize %1")
                   .arg(err));
         }
-        err = CloseComponent(mOutputUnit);
+        err = AudioComponentInstanceDispose(mOutputUnit);
         Debug(QString("CloseAnalog: CloseComponent %1")
               .arg(err));
         mOutputUnit = nullptr;
@@ -1379,46 +1454,43 @@ void CoreAudioData::CloseAnalog()
 bool CoreAudioData::OpenSPDIF()
 {
     OSStatus       err;
-    AudioStreamID  *streams;
+    AudioStreamIDVec streams;
     AudioStreamBasicDescription outputFormat {};
 
     Debug("OpenSPDIF: Entering");
 
     streams = StreamsList(mDeviceID);
-    if (!streams)
+    if (streams.empty())
     {
         Warn("OpenSPDIF: Couldn't retrieve list of streams");
         return false;
     }
 
-    for (int i = 0; streams[i] != kAudioHardwareBadStreamError; ++i)
+    for (size_t i = 0; i < streams.size(); ++i)
     {
-        AudioStreamBasicDescription *formats = FormatsList(streams[i]);
-        if (!formats)
+        AudioStreamRangedVec formats = FormatsList(streams[i]);
+        if (formats.empty())
             continue;
 
         // Find a stream with a cac3 stream
-        for (int j = 0; formats[j].mFormatID != 0; j++)
+        for (auto format : formats)
         {
             Debug(QString("OpenSPDIF: Considering Physical Format: %1")
-                  .arg(StreamDescriptionToString(formats[j])));
-            if ((formats[j].mFormatID == 'IAC3' ||
-                 formats[j].mFormatID == kAudioFormat60958AC3) &&
-                formats[j].mSampleRate == mCA->m_sampleRate)
+                  .arg(StreamDescriptionToString(format.mFormat)));
+            if ((format.mFormat.mFormatID == 'IAC3' ||
+                 format.mFormat.mFormatID == kAudioFormat60958AC3) &&
+                format.mFormat.mSampleRate == mCA->m_sampleRate)
             {
                 Debug("OpenSPDIF: Found digital format");
                 mStreamIndex  = i;
                 mStreamID     = streams[i];
-                outputFormat  = formats[j];
+                outputFormat  = format.mFormat;
                 break;
             }
         }
-        free(formats);
-
         if (outputFormat.mFormatID)
             break;
     }
-    free(streams);
 
     if (!outputFormat.mFormatID)
     {
@@ -1428,12 +1500,18 @@ bool CoreAudioData::OpenSPDIF()
 
     if (mRevertFormat == false)
     {
+	AudioObjectPropertyAddress pa
+	{
+	    kAudioStreamPropertyPhysicalFormat,
+	    kAudioObjectPropertyScopeGlobal,
+	    kAudioObjectPropertyElementMaster
+	};
+
         // Retrieve the original format of this stream first
         // if not done so already
         UInt32 paramSize = sizeof(mFormatOrig);
-        err = AudioStreamGetProperty(mStreamID, 0,
-                                     kAudioStreamPropertyPhysicalFormat,
-                                     &paramSize, &mFormatOrig);
+        err = AudioObjectGetPropertyData(mStreamID, &pa, 0, nullptr,
+					 &paramSize, &mFormatOrig);
         if (err != noErr)
         {
             Warn(QString("OpenSPDIF - could not retrieve the original streamformat: [%1]")
@@ -1465,19 +1543,19 @@ bool CoreAudioData::OpenSPDIF()
     mBytesPerPacket = mFormatNew.mBytesPerPacket;
 
     // Add IOProc callback
-    err = AudioDeviceAddIOProc(mDeviceID,
-                               (AudioDeviceIOProc)RenderCallbackSPDIF,
-                               (void *)this);
+    err = AudioDeviceCreateIOProcID(mDeviceID,
+				    (AudioDeviceIOProc)RenderCallbackSPDIF,
+				    (void *)this, &mIoProcID);
     if (err != noErr)
     {
-        Error(QString("OpenSPDIF: AudioDeviceAddIOProc failed: [%1]")
+        Error(QString("OpenSPDIF: AudioDeviceCreateIOProcID failed: [%1]")
               .arg(OSS_STATUS(err)));
         return false;
     }
     mIoProc = true;
 
     // Start device
-    err = AudioDeviceStart(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF);
+    err = AudioDeviceStart(mDeviceID, mIoProcID);
     if (err != noErr)
     {
         Error(QString("OpenSPDIF: AudioDeviceStart failed: [%1]")
@@ -1499,7 +1577,7 @@ void CoreAudioData::CloseSPDIF()
     // Stop device
     if (mStarted)
     {
-        err = AudioDeviceStop(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF);
+        err = AudioDeviceStop(mDeviceID, mIoProcID);
         if (err != noErr)
             Error(QString("CloseSPDIF: AudioDeviceStop failed: [%1]")
                   .arg(OSS_STATUS(err)));
@@ -1509,10 +1587,9 @@ void CoreAudioData::CloseSPDIF()
     // Remove IOProc callback
     if (mIoProc)
     {
-        err = AudioDeviceRemoveIOProc(mDeviceID,
-                                      (AudioDeviceIOProc)RenderCallbackSPDIF);
+        err = AudioDeviceDestroyIOProcID(mDeviceID, mIoProcID);
         if (err != noErr)
-            Error(QString("CloseSPDIF: AudioDeviceRemoveIOProc failed: [%1]")
+            Error(QString("CloseSPDIF: AudioDeviceDestroyIOProcID failed: [%1]")
                   .arg(OSS_STATUS(err)));
         mIoProc = false;
     }
@@ -1540,9 +1617,14 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
           .arg(s)
           .arg(StreamDescriptionToString(format)));
 
-    OSStatus err = AudioStreamSetProperty(s, nullptr, 0,
-                                          kAudioStreamPropertyPhysicalFormat,
-                                          sizeof(format), &format);
+    AudioObjectPropertyAddress pa
+    {
+	kAudioStreamPropertyPhysicalFormat,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+    OSStatus err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
+					      sizeof(format), &format);
     if (err != noErr)
     {
         Error(QString("AudioStreamChangeFormat couldn't set stream format: [%1]")
@@ -1554,37 +1636,31 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
 
 bool CoreAudioData::FindAC3Stream()
 {
-    bool           foundAC3Stream = false;
-    AudioStreamID  *streams;
+    AudioStreamIDVec streams;
 
 
     // Get a list of all the streams on this device
     streams = StreamsList(mDeviceID);
-    if (!streams)
+    if (streams.empty())
         return false;
 
-    for (int i = 0; !foundAC3Stream &&
-         streams[i] != kAudioHardwareBadStreamError; ++i)
+    for (auto stream : streams)
     {
-        AudioStreamBasicDescription *formats = FormatsList(streams[i]);
-        if (!formats)
+        AudioStreamRangedVec formats = FormatsList(stream);
+        if (formats.empty())
             continue;
 
         // Find a stream with a cac3 stream
-        for (int j = 0; formats[j].mFormatID != 0; j++)
-            if (formats[j].mFormatID == 'IAC3' ||
-                formats[j].mFormatID == kAudioFormat60958AC3)
+        for (auto format : formats)
+            if (format.mFormat.mFormatID == 'IAC3' ||
+                format.mFormat.mFormatID == kAudioFormat60958AC3)
             {
                 Debug("FindAC3Stream: found digital format");
-                foundAC3Stream = true;
-                break;
+                return true;
             }
-
-        free(formats);
     }
-    free(streams);
 
-    return foundAC3Stream;
+    return false;
 }
 
 /**
@@ -1593,34 +1669,46 @@ bool CoreAudioData::FindAC3Stream()
  */
 void CoreAudioData::ResetAudioDevices()
 {
-    AudioDeviceID  *devices;
-    int            numDevices;
     UInt32         size;
-
-
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
-    devices    = (AudioDeviceID*)malloc(size);
-    if (!devices)
+    AudioObjectPropertyAddress pa
     {
-        Error("ResetAudioDevices: out of memory?");
-        return;
+	kAudioHardwarePropertyDevices,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
+    OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
+						  0, nullptr, &size);
+    if (err)
+    {
+        Warn(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+                     "Error [%1]")
+             .arg(err));
+	return;
     }
-    numDevices = size / sizeof(AudioDeviceID);
-    AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &size, devices);
 
-    for (int i = 0; i < numDevices; i++)
+    std::vector<AudioDeviceID> devices = {};
+    devices.resize(size / sizeof(AudioDeviceID));
+    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
+				     0, nullptr, &size, devices.data());
+    if (err)
     {
-        AudioStreamID  *streams;
+        Warn(QString("GetPropertyData: Unable to retrieve the list of available devices. "
+                     "Error [%1]")
+             .arg(err));
+	return;
+    }
 
-        streams = StreamsList(devices[i]);
-        if (!streams)
+    for (const auto & dev : devices)
+    {
+        AudioStreamIDVec streams;
+
+        streams = StreamsList(dev);
+        if (streams.empty())
             continue;
-        for (int j = 0; streams[j] != kAudioHardwareBadStreamError; j++)
-            ResetStream(streams[j]);
-
-        free(streams);
+        for (auto stream : streams)
+            ResetStream(stream);
     }
-    free(devices);
 }
 
 void CoreAudioData::ResetStream(AudioStreamID s)
@@ -1628,29 +1716,35 @@ void CoreAudioData::ResetStream(AudioStreamID s)
     AudioStreamBasicDescription  currentFormat;
     OSStatus                     err;
     UInt32                       paramSize;
+    AudioObjectPropertyAddress pa
+    {
+	kAudioStreamPropertyPhysicalFormat,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
 
     // Find the streams current physical format
     paramSize = sizeof(currentFormat);
-    AudioStreamGetProperty(s, 0, kAudioStreamPropertyPhysicalFormat,
-                           &paramSize, &currentFormat);
+    AudioObjectGetPropertyData(s, &pa, 0, nullptr,
+			       &paramSize, &currentFormat);
 
     // If it's currently AC-3/SPDIF then reset it to some mixable format
     if (currentFormat.mFormatID == 'IAC3' ||
         currentFormat.mFormatID == kAudioFormat60958AC3)
     {
-        AudioStreamBasicDescription *formats    = FormatsList(s);
+        AudioStreamRangedVec        formats    = FormatsList(s);
         bool                        streamReset = false;
 
 
-        if (!formats)
+        if (formats.empty())
             return;
 
-        for (int i = 0; !streamReset && formats[i].mFormatID != 0; i++)
-            if (formats[i].mFormatID == kAudioFormatLinearPCM)
+        for (auto format : formats)
+            if (format.mFormat.mFormatID == kAudioFormatLinearPCM)
             {
-                err = AudioStreamSetProperty(s, nullptr, 0,
-                                             kAudioStreamPropertyPhysicalFormat,
-                                             sizeof(formats[i]), &(formats[i]));
+	      err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
+					       sizeof(format), &(format.mFormat));
                 if (err != noErr)
                 {
                     Warn(QString("ResetStream: could not set physical format: [%1]")
@@ -1663,8 +1757,6 @@ void CoreAudioData::ResetStream(AudioStreamID s)
                     sleep(1);   // For the change to take effect
                 }
             }
-
-        free(formats);
     }
 }
 
@@ -1674,11 +1766,28 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
 
     // Obtain a list of all available audio devices
     UInt32 size = 0;
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
+
+    AudioObjectPropertyAddress pa
+    {
+	kAudioHardwarePropertyDevices,
+	kAudioObjectPropertyScopeGlobal,
+	kAudioObjectPropertyElementMaster
+    };
+
+    OSStatus err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
+						  0, nullptr, &size);
+    if (err)
+    {
+        VBAUDIO(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+                     "Error [%1]")
+             .arg(err));
+	return devs;
+    }
+
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
     AudioDeviceID* pDevices = new AudioDeviceID[deviceCount];
-    OSStatus err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices,
-                                            &size, pDevices);
+    err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
+				     0, nullptr, &size, pDevices);
     if (err)
         VBAUDIO(QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
                         "available devices. Error [%1]")
