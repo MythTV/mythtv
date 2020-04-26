@@ -22,7 +22,8 @@ using namespace std;
 #endif
 
 static void dfd_device_change_msg(
-    void*, io_service_t, natural_t messageType, void*);
+    void* /*dfd*/, io_service_t /*unused*/, natural_t messageType,
+    void* /*unused*/);
 
 void DarwinAVCInfo::Update(uint64_t _guid, DarwinFirewireDevice *dev,
                            IONotificationPortRef notify_port,
@@ -65,23 +66,23 @@ void DarwinAVCInfo::Update(uint64_t _guid, DarwinFirewireDevice *dev,
     if (kIOReturnSuccess != ret)
         return; // this is bad
 
-    CFNumberRef specDesc = (CFNumberRef)
+    auto specDesc = (CFNumberRef)
         CFDictionaryGetValue(props, CFSTR("Unit_Spec_ID"));
     CFNumberGetValue(specDesc, kCFNumberSInt32Type, &m_specid);
 
-    CFNumberRef typeDesc = (CFNumberRef)
+    auto typeDesc = (CFNumberRef)
         CFDictionaryGetValue(props, CFSTR("Unit_Type"));
     CFNumberGetValue(typeDesc, kCFNumberSInt32Type, &m_modelid);
 
-    CFNumberRef vendorDesc = (CFNumberRef)
+    auto vendorDesc = (CFNumberRef)
         CFDictionaryGetValue(props, CFSTR("Vendor_ID"));
     CFNumberGetValue(vendorDesc, kCFNumberSInt32Type, &m_vendorid);
 
-    CFNumberRef versionDesc = (CFNumberRef)
+    auto versionDesc = (CFNumberRef)
         CFDictionaryGetValue(props, CFSTR("Unit_SW_Version"));
     CFNumberGetValue(versionDesc, kCFNumberSInt32Type, &m_firmware_revision);
 
-    CFStringRef tmp0 = (CFStringRef)
+    auto tmp0 = (CFStringRef)
         CFDictionaryGetValue(props, CFSTR("FireWire Product Name"));
     if (tmp0)
     {
@@ -338,9 +339,8 @@ bool DarwinAVCInfo::GetDeviceNodes(int &local_node, int &remote_node)
 }
 
 static void dfd_device_change_msg(
-    void *dfd, io_service_t, natural_t messageType, void*)
+    void *dfd, io_service_t /*unused*/, natural_t messageType, void* /*unused*/)
 {
-    DarwinFirewireDevice *dev =
-        reinterpret_cast<DarwinFirewireDevice*>(dfd);
+    auto *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
     dev->HandleDeviceChange(messageType);
 }

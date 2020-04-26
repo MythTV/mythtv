@@ -17,7 +17,6 @@ static OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend);
  * created and used in the main thread only - otherwise callbacks will not work.
 */
 MythPowerOSX::MythPowerOSX()
-  : MythPower()
 {
     MythPowerOSX::Init();
 }
@@ -118,10 +117,10 @@ void MythPowerOSX::Refresh(void)
         if (static_cast<CFBooleanRef>(CFDictionaryGetValue(description, CFSTR(kIOPSIsPresentKey))) == kCFBooleanFalse)
             continue;
 
-        CFStringRef type = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSTransportTypeKey)));
+        auto type = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSTransportTypeKey)));
         if (type && CFStringCompare(type, CFSTR(kIOPSInternalType), 0) == kCFCompareEqualTo)
         {
-            CFStringRef state = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSPowerSourceStateKey)));
+            auto state = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSPowerSourceStateKey)));
             if (state && CFStringCompare(state, CFSTR(kIOPSACPowerValue), 0) == kCFCompareEqualTo)
             {
                 newlevel = ACPower;
@@ -130,7 +129,7 @@ void MythPowerOSX::Refresh(void)
             {
                 int32_t current;
                 int32_t max;
-                CFNumberRef capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey)));
+                auto capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey)));
                 CFNumberGetValue(capacity, kCFNumberSInt32Type, &current);
                 capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSMaxCapacityKey)));
                 CFNumberGetValue(capacity, kCFNumberSInt32Type, &max);
@@ -156,7 +155,7 @@ void MythPowerOSX::Refresh(void)
 void MythPowerOSX::PowerSourceCallBack(void *Reference)
 {
     CocoaAutoReleasePool pool;
-    MythPowerOSX* power = static_cast<MythPowerOSX*>(Reference);
+    auto* power = static_cast<MythPowerOSX*>(Reference);
     if (power)
         power->Refresh();
 }
@@ -167,11 +166,11 @@ void MythPowerOSX::PowerSourceCallBack(void *Reference)
  * from main menu bar) will cause signals to be sent to MythFrontend - which
  * usually trigger the exit prompt.
 */
-void MythPowerOSX::PowerCallBack(void *Reference, io_service_t,
+void MythPowerOSX::PowerCallBack(void *Reference, io_service_t /*unused*/,
                                  natural_t Type, void *Data)
 {
     CocoaAutoReleasePool pool;
-    MythPowerOSX* power  = static_cast<MythPowerOSX*>(Reference);
+    auto* power  = static_cast<MythPowerOSX*>(Reference);
     if (!power)
         return;
 

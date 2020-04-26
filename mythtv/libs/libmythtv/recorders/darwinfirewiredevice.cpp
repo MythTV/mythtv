@@ -64,9 +64,9 @@ namespace AVS
 
 static IOReturn dfd_tspacket_handler_thunk(
     UInt32 tsPacketCount, UInt32 **ppBuf, void *callback_data);
-static void dfd_update_device_list(void *dfd, io_iterator_t iterator);
-static void dfd_streaming_log_message(char *pString);
-void *dfd_controller_thunk(void *param);
+static void dfd_update_device_list(void *dfd, io_iterator_t deviter);
+static void dfd_streaming_log_message(char *msg);
+void *dfd_controller_thunk(void *callback_data);
 void dfd_stream_msg(UInt32 msg, UInt32 param1,
                    UInt32 param2, void *callback_data);
 int dfd_no_data_notification(void *callback_data);
@@ -96,12 +96,12 @@ private:
         }
     }
 
-    pthread_t              m_controller_thread         {0};
+    pthread_t              m_controller_thread         {nullptr};
     CFRunLoopRef           m_controller_thread_cf_ref  {nullptr};
     bool                   m_controller_thread_running {false};
 
-    IONotificationPortRef  m_notify_port               {0};
-    CFRunLoopSourceRef     m_notify_source             {0};
+    IONotificationPortRef  m_notify_port               {nullptr};
+    CFRunLoopSourceRef     m_notify_source             {nullptr};
     io_iterator_t          m_deviter                   {0};
 
     int                    m_actual_fwchan             {-1};
@@ -575,7 +575,8 @@ void DarwinFirewireDevice::ProcessStreamingMessage(
 
     if (AVS::kMpeg2ReceiverAllocateIsochPort == msg)
     {
-        int speed = param1, fw_channel = param2;
+        int speed = param1;
+        int fw_channel = param2;
 
         bool ok = UpdatePlugRegister(
             plug_number, fw_channel, speed, true, false);
@@ -661,7 +662,7 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 
     if (it == m_priv->m_devices.end())
     {
-        DarwinAVCInfo *ptr = new DarwinAVCInfo();
+        auto *ptr = new DarwinAVCInfo();
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Adding   0x%1").arg(guid, 0, 16));
@@ -920,9 +921,7 @@ void dfd_stream_msg(UInt32 msg, UInt32 param1,
 int dfd_tspacket_handler(uint tsPacketCount, uint32_t **ppBuf,
                          void *callback_data)
 {
-    DarwinFirewireDevice *fw =
-        reinterpret_cast<DarwinFirewireDevice*>(callback_data);
-
+    auto *fw = reinterpret_cast<DarwinFirewireDevice*>(callback_data);
     if (!fw)
         return kIOReturnBadArgument;
 
@@ -941,7 +940,7 @@ static IOReturn dfd_tspacket_handler_thunk(
 
 static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 {
-    DarwinFirewireDevice *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
+    auto *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
 
     io_object_t it = 0;
     while ((it = IOIteratorNext(deviter)))
@@ -954,7 +953,7 @@ static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 
         if (kIOReturnSuccess == ret)
         {
-            CFNumberRef GUIDDesc = (CFNumberRef)
+            auto GUIDDesc = (CFNumberRef)
                 CFDictionaryGetValue(props, CFSTR("GUID"));
             CFNumberGetValue(GUIDDesc, kCFNumberSInt64Type, &guid);
             CFRelease(props);

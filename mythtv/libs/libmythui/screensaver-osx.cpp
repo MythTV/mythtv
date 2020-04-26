@@ -36,9 +36,11 @@ void ScreenSaverOSX::Disable(void)
                                           ScreenSaverOSXPrivate::timerCallback,
                                           &context);
         if (d->m_timer)
+	{
             CFRunLoopAddTimer(CFRunLoopGetCurrent(),
                               d->m_timer,
                               kCFRunLoopCommonModes);
+	}
     }
 }
 

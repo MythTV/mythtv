@@ -30,13 +30,13 @@ public:
     void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
     // TODO: convert these to macros!
-    void Debug(const QString& msg)
+    static void Debug(const QString& msg)
     {   LOG(VB_AUDIO, LOG_INFO,     "AudioOutputCA::" + msg);   }
 
-    void Error(const QString& msg)
+    static void Error(const QString& msg)
     {   LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: " + msg);   }
 
-    void Warn(const QString& msg)
+    static void Warn(const QString& msg)
     {   LOG(VB_GENERAL, LOG_WARNING, "AudioOutputCA Warning: " + msg);   }
 
 protected:
@@ -55,8 +55,7 @@ private:
     CoreAudioData * d {nullptr};
     friend class    CoreAudioData;
 
-    int             m_bufferedBytes;
-    long            m_caAudiotimeUpdated;
+    int             m_bufferedBytes      {-1};
 };
 
 #endif

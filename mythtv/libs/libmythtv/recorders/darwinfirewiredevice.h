@@ -9,10 +9,10 @@ class DarwinAVCInfo;
 
 class DarwinFirewireDevice : public FirewireDevice
 {
-    friend void *dfd_controller_thunk(void *param);
+    friend void *dfd_controller_thunk(void *callback_data);
     friend void dfd_update_device_list_item(DarwinFirewireDevice *dev,
                                        uint64_t guid, void *item);
-    friend int dfd_no_data_notification(void *cb_data);
+    friend int dfd_no_data_notification(void *callback_data);
     friend void dfd_stream_msg(
         UInt32 msg, UInt32 param1,
         UInt32 param2, void *callback_data);
@@ -30,8 +30,8 @@ class DarwinFirewireDevice : public FirewireDevice
 
     void HandleDeviceChange(uint messageType);
 
-    void AddListener(TSDataListener*) override; // FirewireDevice
-    void RemoveListener(TSDataListener*) override; // FirewireDevice
+    void AddListener(TSDataListener* /*listener*/) override; // FirewireDevice
+    void RemoveListener(TSDataListener* /*listener*/) override; // FirewireDevice
 
     // Gets
     bool IsPortOpen(void) const override; // FirewireDevice

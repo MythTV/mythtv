@@ -402,11 +402,9 @@ bool AppleRemote::_openDevice()
     if (result != S_OK || !queue)
         LOG(VB_GENERAL, LOG_ERR, LOC + "_openDevice() - error creating queue");
 
-    for (std::vector<int>::iterator iter = cookies.begin();
-         iter != cookies.end();
-         ++iter)
+    for (int & iter : cookies)
     {
-        IOHIDElementCookie cookie = (IOHIDElementCookie)(*iter);
+        auto cookie = (IOHIDElementCookie)iter;
         (*queue)->addElement(queue, cookie, 0);
     }
 
@@ -436,7 +434,7 @@ bool AppleRemote::_openDevice()
 void AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
                                         void* refcon, void* sender)
 {
-    AppleRemote* remote = static_cast<AppleRemote*>(target);
+    auto* remote = static_cast<AppleRemote*>(target);
 
     if (remote->mUsingNewAtv)
         remote->_queueCallbackATV23(result);
@@ -497,7 +495,7 @@ void AppleRemote::_queueCallbackATV23(IOReturn result)
 
         if ( ((int)event.elementCookie == 280) && (event.longValueSize == 20))
         {
-            ATV_IR_EVENT* atv_ir_event = (ATV_IR_EVENT*)event.longValue;
+            auto* atv_ir_event = (ATV_IR_EVENT*)event.longValue;
             key_code = atv_ir_event->keycode;
         }
 

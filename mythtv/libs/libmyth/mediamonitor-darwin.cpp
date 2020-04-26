@@ -55,12 +55,16 @@ MythMediaType FindMediaType(io_service_t service)
                                                &iter);
 
     if (KERN_SUCCESS != kernResult)
+    {
         LOG(VB_GENERAL, LOG_CRIT, msg +
             QString("IORegistryEntryCreateIterator returned %1")
                 .arg(kernResult));
+    }
     else if (!iter)
+    {
         LOG(VB_GENERAL, LOG_CRIT, msg +
             "IORegistryEntryCreateIterator returned NULL iterator");
+    }
     else
     {
         // A reference on the initial service object is released in
@@ -79,8 +83,10 @@ MythMediaType FindMediaType(io_service_t service)
                               kCFAllocatorDefault, 0);
 
                 if (!wholeMedia)
+		{
                     LOG(VB_GENERAL, LOG_ALERT, msg +
                         "Could not retrieve Whole property");
+                }
                 else
                 {
                     isWholeMedia = CFBooleanGetValue((CFBooleanRef)wholeMedia);
@@ -207,7 +213,7 @@ static char * getVolName(CFDictionaryRef diskDetails)
 /*
  * Given a DA description, return a compound description to help identify it.
  */
-static const QString getModel(CFDictionaryRef diskDetails)
+static QString getModel(CFDictionaryRef diskDetails)
 {
     QString     desc;
     const void  *strRef;
@@ -579,7 +585,7 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
  * Given a device, return a compound description to help identify it.
  * We try to find out if it is internal, its manufacturer, and model.
  */
-static const QString getModel(io_object_t drive)
+static QString getModel(io_object_t drive)
 {
     QString                 desc;
     CFMutableDictionaryRef  props = nullptr;
