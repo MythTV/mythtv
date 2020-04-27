@@ -3,11 +3,13 @@
 
 #include "screensaver.h"
 
+#include <IOKit/pwr_mgt/IOPMLib.h>
+
 class ScreenSaverOSX : public ScreenSaver
 {
 public:
-    ScreenSaverOSX();
-    ~ScreenSaverOSX() override;
+    ScreenSaverOSX() = default;
+    ~ScreenSaverOSX() override = default;
 
     void Disable(void) override; // ScreenSaver
     void Restore(void) override; // ScreenSaver
@@ -21,6 +23,8 @@ protected:
 private:
     ScreenSaverOSX(const ScreenSaverOSX &) = delete;            // not copyable
     ScreenSaverOSX &operator=(const ScreenSaverOSX &) = delete; // not copyable
+
+    IOPMAssertionID iopm_id {kIOPMNullAssertionID};
 };
 
 #endif // MYTH_SCREENSAVER_OSX_H
