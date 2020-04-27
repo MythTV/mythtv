@@ -51,7 +51,7 @@ static QString crcStr(uLong crc)
 QString crcinfo(const QString& romname, const QString& GameType, QString *key, RomDBMap *romDB)
 {
     // Get CRC of file
-    char block[32768] = "";
+    std::array<char,32768> block {};
     uLong crc = crc32(0, Z_NULL, 0);
     QString crcRes;
     unz_file_info file_info {};
@@ -70,24 +70,24 @@ QString crcinfo(const QString& romname, const QString& GameType, QString *key, R
         {
             if (unzOpenCurrentFile(zf) == UNZ_OK)
             {
-                char filename_inzip[256];
-                unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),nullptr,0,nullptr,0);
+                std::string filename_inzip(256,'\0');
+                unzGetCurrentFileInfo(zf,&file_info,filename_inzip.data(),filename_inzip.size(),nullptr,0,nullptr,0);
 
                 int offset = calcOffset(GameType, file_info.uncompressed_size);
 
                 if (offset > 0)
-                    unzReadCurrentFile(zf, block, offset);
+                    unzReadCurrentFile(zf, block.data(), offset);
 
                 // Get CRC of rom data
                 int count = 0;
-                while ((count = unzReadCurrentFile(zf, block, blocksize)) > 0)
+                while ((count = unzReadCurrentFile(zf, block.data(), blocksize)) > 0)
                 {
-                    crc = crc32(crc, (Bytef *)block, (uInt)count);
+                    crc = crc32(crc, (Bytef *)block.data(), (uInt)count);
                 }
                 crcRes = crcStr(crc);
                 *key = QString("%1:%2")
                              .arg(crcRes)
-                             .arg(filename_inzip);
+                             .arg(filename_inzip.data());
 
                 if (romDB->contains(*key))
                 {
@@ -109,13 +109,13 @@ QString crcinfo(const QString& romname, const QString& GameType, QString *key, R
             int offset = calcOffset(GameType, f.size());
 
             if (offset > 0)
-                f.read(block, offset);
+                f.read(block.data(), offset);
 
             // Get CRC of rom data
             qint64 count = 0;
-            while ((count = f.read(block, blocksize)) > 0)
+            while ((count = f.read(block.data(), blocksize)) > 0)
             {
-                crc = crc32(crc, (Bytef *)block, (uInt)count);
+                crc = crc32(crc, (Bytef *)block.data(), (uInt)count);
             }
 
             crcRes = crcStr(crc);

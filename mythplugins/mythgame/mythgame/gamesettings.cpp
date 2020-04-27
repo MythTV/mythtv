@@ -11,10 +11,8 @@ struct GameTypes {
     QString   m_extensions;
 };
 
-#define MAX_GAME_TYPES 12
-
-const GameTypes GameTypeList[MAX_GAME_TYPES] =
-{
+const std::array<GameTypes,12> GameTypeList
+{{
     { QT_TRANSLATE_NOOP("(GameTypes)", "OTHER"),   "OTHER",  "" },
     { QT_TRANSLATE_NOOP("(GameTypes)", "AMIGA"),   "AMIGA",  "adf,ipf" },
     { QT_TRANSLATE_NOOP("(GameTypes)", "ATARI"),   "ATARI",  "bin,a26" },
@@ -27,7 +25,7 @@ const GameTypes GameTypeList[MAX_GAME_TYPES] =
     { QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),"PCE",    "pce" },
     { QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), "SEGA", "sms" },
     { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
-};
+}};
 
 QString GetGameTypeName(const QString &GameType)
 {

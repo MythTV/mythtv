@@ -871,7 +871,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
                         QString basename = romdata->Romname().left(romdata->Romname().length() - (romdata->getExtension().length() + 2));
                         QString extension = romdata->getExtension();
                         QString rom;
-                        QString diskid[] = { "%d0", "%d1", "%d2", "%d3", "%d4", "%d5", "%d6" };
+                        std::array<QString,7> diskid { "%d0", "%d1", "%d2", "%d3", "%d4", "%d5", "%d6" };
 
                         for (int disk = 1; disk <= romdata->DiskCount(); disk++)
                         {
