@@ -6,6 +6,7 @@
 // MythTV headers
 #include "sourceutil.h"
 #include "cardutil.h"
+#include "scaninfo.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
@@ -532,6 +533,9 @@ bool SourceUtil::DeleteSource(uint sourceid)
         MythDB::DBError("Deleting inputs", query);
         return false;
     }
+
+    // Delete all the saved channel scans for this source
+    ScanInfo::DeleteScansFromSource(sourceid);
 
     // Delete the source itself
     query.prepare("DELETE FROM videosource "

@@ -24,6 +24,7 @@ class ScanInfo
 
     static bool MarkProcessed(uint scanid);
     static bool DeleteScan(uint scanid);
+    static void DeleteScansFromSource(uint sourceid);
 
   public:
     uint      m_scanid    {0};
@@ -34,6 +35,7 @@ class ScanInfo
 };
 
 MTV_PUBLIC vector<ScanInfo> LoadScanList(void);
+MTV_PUBLIC vector<ScanInfo> LoadScanList(uint sourceid);
 uint SaveScan(const ScanDTVTransportList &scan);
 MTV_PUBLIC ScanDTVTransportList LoadScan(uint scanid);
 

@@ -57,16 +57,12 @@ class PaneExistingScanImport : public GroupSetting
         if (!m_sourceid)
             return;
 
-        vector<ScanInfo> scans = LoadScanList();
-        for (auto & scan : scans)
+        vector<ScanInfo> scans = LoadScanList(m_sourceid);
+        for (vector<ScanInfo>::reverse_iterator it = scans.rbegin(); it != scans.rend(); ++it)
         {
-            if (scan.m_sourceid != m_sourceid)
-                continue;
-
-            QString scanDate = MythDate::toString(
-                scan.m_scandate, MythDate::kDateTimeFull);
-            QString proc     = (scan.m_processed) ?
-                tr("processed") : tr("unprocessed");
+            ScanInfo &scan   = *it;
+            QString scanDate = MythDate::toString(scan.m_scandate, MythDate::kDateTimeFull);
+            QString proc     = (scan.m_processed) ? tr("processed") : tr("unprocessed");
 
             m_scanSelect->addSelection(
                 QString("%1 %2").arg(scanDate).arg(proc),
