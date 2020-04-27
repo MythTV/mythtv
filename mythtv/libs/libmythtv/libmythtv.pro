@@ -66,7 +66,7 @@ macx {
     LIBS += -framework OpenGL
     LIBS += -framework IOKit
     LIBS += -framework CoreVideo
-    LIBS += -framework VideoToolBox
+    LIBS += -framework VideoToolbox
     LIBS += -framework IOSurface
     DEFINES += USING_VTB
     HEADERS += decoders/mythvtbcontext.h
