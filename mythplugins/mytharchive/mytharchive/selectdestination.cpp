@@ -64,11 +64,11 @@ bool SelectDestination::Create(void)
     connect(m_destinationSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(setDestination(MythUIButtonListItem*)));
 
-    for (int x = 0; x < ArchiveDestinationsCount; x++)
+    for (const auto & dest : ArchiveDestinations)
     {
         auto *item = new
-            MythUIButtonListItem(m_destinationSelector, tr(ArchiveDestinations[x].name));
-        item->SetData(QVariant::fromValue(ArchiveDestinations[x].type));
+            MythUIButtonListItem(m_destinationSelector, tr(dest.name));
+        item->SetData(QVariant::fromValue(dest.type));
     }
     connect(m_findButton, SIGNAL(Clicked()), this, SLOT(handleFind()));
 
@@ -208,9 +208,9 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
     if (!item)
         return;
 
-    int itemNo = item->GetData().value<ARCHIVEDESTINATION>();
+    size_t itemNo = item->GetData().value<ARCHIVEDESTINATION>();
 
-    if (itemNo < 0 || itemNo > ArchiveDestinationsCount - 1)
+    if (itemNo > ArchiveDestinations.size() - 1)
         itemNo = 0;
 
     m_destinationText->SetText(tr(ArchiveDestinations[itemNo].description));

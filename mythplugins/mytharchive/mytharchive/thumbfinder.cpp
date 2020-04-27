@@ -68,8 +68,8 @@ extern "C" {
 // the amount to seek before the required frame
 #define PRE_SEEK_AMOUNT 50
 
-struct SeekAmount SeekAmounts[] =
-{
+static const std::array<const SeekAmount,9> kSeekAmounts
+{{
     {"frame",       -1},
     {"1 second",     1},
     {"5 seconds",    5},
@@ -79,9 +79,7 @@ struct SeekAmount SeekAmounts[] =
     {"5 minutes",  300},
     {"10 minutes", 600},
     {"Cut Point",   -2},
-};
-
-int SeekAmountsCount = sizeof(SeekAmounts) / sizeof(SeekAmounts[0]);
+}};
 
 ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                          const QString &menuTheme)
@@ -145,7 +143,7 @@ bool ThumbFinder::Create(void)
 
     connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
 
-    m_seekAmountText->SetText(SeekAmounts[m_currentSeek].name);
+    m_seekAmountText->SetText(kSeekAmounts[m_currentSeek].name);
 
     BuildFocusList();
 
@@ -319,17 +317,17 @@ void ThumbFinder::changeSeekAmount(bool up)
     if (up)
     {
         m_currentSeek++;
-        if (m_currentSeek >= SeekAmountsCount)
+        if (m_currentSeek >= kSeekAmounts.size())
             m_currentSeek = 0;
     }
     else
     {
+        if (m_currentSeek == 0)
+            m_currentSeek = kSeekAmounts.size();
         m_currentSeek--;
-        if (m_currentSeek < 0)
-            m_currentSeek = SeekAmountsCount - 1;
     }
 
-    m_seekAmountText->SetText(SeekAmounts[m_currentSeek].name);
+    m_seekAmountText->SetText(kSeekAmounts[m_currentSeek].name);
 }
 
 void ThumbFinder::gridItemChanged(MythUIButtonListItem *item)
@@ -684,7 +682,7 @@ bool ThumbFinder::seekForward()
 {
     int64_t currentFrame = (m_currentPTS - m_startPTS) / m_frameTime;
 
-    int inc = SeekAmounts[m_currentSeek].amount;
+    int inc = kSeekAmounts[m_currentSeek].amount;
 
     if (inc == -1)
         inc = 1;
@@ -721,7 +719,7 @@ bool ThumbFinder::seekBackward()
 {
     int64_t currentFrame = (m_currentPTS - m_startPTS) / m_frameTime;
 
-    int inc = SeekAmounts[m_currentSeek].amount;
+    int inc = kSeekAmounts[m_currentSeek].amount;
     if (inc == -1)
         inc = -1;
     else if (inc == -2)

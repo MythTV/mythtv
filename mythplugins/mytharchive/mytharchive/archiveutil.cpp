@@ -25,7 +25,7 @@ using namespace std;
 #include "archiveutil.h"
 
 
-struct ArchiveDestination ArchiveDestinations[] =
+std::vector<ArchiveDestination> ArchiveDestinations
 {
     {AD_DVD_SL,
      QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD"),
@@ -44,8 +44,6 @@ struct ArchiveDestination ArchiveDestinations[] =
      QT_TRANSLATE_NOOP("SelectDestination", "Any file accessable from your filesystem."),
      -1},
 };
-
-int ArchiveDestinationsCount = sizeof(ArchiveDestinations) / sizeof(ArchiveDestinations[0]);
 
 QString formatSize(int64_t sizeKB, int prec)
 {

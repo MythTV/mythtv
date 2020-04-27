@@ -25,9 +25,6 @@ struct SeekAmount
     int amount;
 };
 
-extern struct SeekAmount SeekAmounts[];
-extern int SeekAmountsCount;
-
 class MythUIButton;
 class MythUItext;
 class MythUIImage;
@@ -92,7 +89,7 @@ class ThumbFinder : public MythScreenType
     int              m_frameWidth        { 0};
     int              m_frameHeight       { 0};
     int              m_videostream       { 0};
-    int              m_currentSeek       { 0};
+    size_t           m_currentSeek       { 0};
     int64_t          m_startTime         {-1}; // in time_base units
     int64_t          m_startPTS          {-1}; // in time_base units
     int64_t          m_currentPTS        {-1}; // in time_base units

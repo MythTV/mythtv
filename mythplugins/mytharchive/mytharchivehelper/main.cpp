@@ -1944,22 +1944,21 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
     for (uint i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
-        char buf[256];
+        std::string buf (256,'\0');
         AVCodecContext *avctx = codecmap.getCodecContext(st);
         AVCodecParameters *par = st->codecpar;
 
-        buf[0]=0;
         if (avctx)
-            avcodec_string(buf, sizeof(buf), avctx, static_cast<int>(false));
+            avcodec_string(buf.data(), buf.size(), avctx, static_cast<int>(false));
 
         switch (st->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
             {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
 #else
-                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
                 QString codec = param[0].remove("Video:", Qt::CaseInsensitive);
                 QDomElement stream = doc.createElement("video");
@@ -2088,9 +2087,9 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
             case AVMEDIA_TYPE_AUDIO:
             {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
 #else
-                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
                 QString codec = param[0].remove("Audio:", Qt::CaseInsensitive);
 
@@ -2137,9 +2136,9 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
             case AVMEDIA_TYPE_SUBTITLE:
             {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', QString::SkipEmptyParts);
 #else
-                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+                QStringList param = QString::fromStdString(buf).split(',', Qt::SkipEmptyParts);
 #endif
                 QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive);
 
@@ -2166,7 +2165,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
             {
                 QDomElement stream = doc.createElement("data");
                 stream.setAttribute("streamindex", i);
-                stream.setAttribute("codec", buf);
+                stream.setAttribute("codec", QString::fromStdString(buf));
                 streams.appendChild(stream);
 
                 break;
