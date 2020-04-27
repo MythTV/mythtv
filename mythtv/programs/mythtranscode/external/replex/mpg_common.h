@@ -72,6 +72,7 @@ int find_mpg_header(uint8_t head, const uint8_t *buf, int length);
 int find_any_header(uint8_t *head, const uint8_t *buf, int length);
 uint64_t trans_pts_dts(const uint8_t *pts);
 int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off);
+int mring_peek( ringbuffer *rbuf, peek_poke_vec &buf, unsigned int l, uint32_t off);
 int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le);
 int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le);
 

@@ -537,7 +537,7 @@ void MPEG2replex::Start()
     //array defines number of allowed audio streams
     // note that although only 1 stream is currently supported, multiplex.c
     // expects the size to by N_AUDIO
-    int ext_ok[N_AUDIO];
+    aok_arr ext_ok {};
     int video_ok = 0;
 
     //seq_head should be set only for the 1st sequence header.  If a new
@@ -546,8 +546,6 @@ void MPEG2replex::Start()
 
     int video_delay = 0;
     int audio_delay = 0;
-
-    memset(ext_ok, 0, sizeof(ext_ok));
 
     mx.priv = (void *)this;
 
@@ -976,8 +974,8 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
             // (for B-frames only).
             // 0xb2 is 'user data' and is actually illegal between pic
             // headers, but it is just discarded by libmpeg2
-            uint8_t tmp[8] = {0x00, 0x00, 0x01, 0xb2, 0xff, 0xff, 0xff, 0xff};
-            mpeg2_buffer(dec, tmp, tmp + 8);
+            std::array<uint8_t,8> tmp {0x00, 0x00, 0x01, 0xb2, 0xff, 0xff, 0xff, 0xff};
+            mpeg2_buffer(dec, tmp.data(), tmp.data() + 8);
             mpeg2_parse(dec);
         }   
     }
@@ -1131,7 +1129,7 @@ void MPEG2fixup::WriteData(const QString& filename, uint8_t *data, int size)
 
 bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
 {
-    uint16_t intra_matrix[64] ATTR_ALIGN(16);
+    std::array<uint16_t,64> intra_matrix {} ATTR_ALIGN(16);
     int64_t savedPts = pkt->pts; // save the original pts
 
     const mpeg2_info_t *info = mpeg2_info(m_imgDecoder);
@@ -1234,7 +1232,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     //  c->flags=CODEC_FLAG_LOW_DELAY;
 
     if (intra_matrix[0] == 0x08)
-        c->intra_matrix = intra_matrix;
+        c->intra_matrix = intra_matrix.data();
 
     c->qmin = c->qmax = 2;
 
@@ -1891,7 +1889,7 @@ void MPEG2fixup::AddRangeList(const QStringList& rangelist, int type)
         if (tmp.size() < 2)
             continue;
 
-        bool ok[2] = { false, false };
+        std::array<bool,2> ok { false, false };
 
         long long start = tmp[0].toLongLong(&ok[0]);
         long long end   = tmp[1].toLongLong(&ok[1]);
@@ -2015,7 +2013,7 @@ int MPEG2fixup::Start()
     // accounting of rounding errors (still won't be right, but better)
     int64_t lastPTS = 0;
     int64_t deltaPTS = 0;
-    int64_t origaPTS[N_AUDIO];
+    std::array<int64_t,N_AUDIO> origaPTS {};
     int64_t cutStartPTS = 0;
     int64_t cutEndPTS = 0;
     uint64_t frame_count = 0;

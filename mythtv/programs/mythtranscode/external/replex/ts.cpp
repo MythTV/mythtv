@@ -26,6 +26,7 @@
  *
  */
 
+#include <array>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -130,7 +131,7 @@ int find_pids(uint16_t *vpid, uint16_t *apid, uint16_t *ac3pid,uint8_t *buf, int
 
 //taken and adapted from libdtv, (c) Rolf Hakenes
 // CRC32 lookup table for polynomial 0x04c11db7
-static unsigned int crc_table[256] = {
+static const std::array <const uint32_t,256> crc_table {
    0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
    0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
    0x350c9b64, 0x31cd86d3, 0x3c8ea00a, 0x384fbdbd, 0x4c11db70, 0x48d0c6c7,
@@ -287,8 +288,8 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		   uint8_t ptsdts, ringbuffer *arbuffer)
 {
-	static int s_count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-				  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static std::array<int,32> s_count {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -330,8 +331,8 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	 uint8_t ptsdts, int nframes, ringbuffer *ac3rbuffer)
 {
-	static int s_count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-				  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static std::array<int,32> s_count {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -384,16 +385,18 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	int pmtpos = 13;
 	//PMT Program number = 1
 	//PMT PID = 0x20
-	uint8_t pat[17] = {0x00, 0x00, 0xb0, 0x0d, 0xfe, 0xef, 0xc1, 0x00, 0x00,
-	                   0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00};
-	uint8_t pmt[184] ={0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
-	                   0x00, 0x00, 0xf0, 0x00};
+	std::array<uint8_t,17> pat
+	    {0x00, 0x00, 0xb0, 0x0d, 0xfe, 0xef, 0xc1, 0x00, 0x00,
+	     0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00};
+	std::array<uint8_t,184> pmt
+	    {0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
+	     0x00, 0x00, 0xf0, 0x00};
 
 	//PAT
 	pat[10] = prog_num;
 	int pos = write_ts_header(0x00, 1, s_count, -1, buf, 0);
-	*(uint32_t *)(pat+13)= htonl(crc32_04c11db7(pat+1, 12, 0xffffffff));
-	memcpy(buf+pos, pat, 17);
+	*(uint32_t *)(pat.data()+13)= htonl(crc32_04c11db7(pat.data()+1, 12, 0xffffffff));
+	memcpy(buf+pos, pat.data(), 17);
 	pos += 17;
 	memset(buf+pos, 0xff, TS_SIZE - pos);
 	pos = TS_SIZE;
@@ -439,7 +442,7 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	*(uint32_t *)&pmt[pmtpos] = htonl(crc32_04c11db7(&pmt[1], pmtpos -1,
 	                                  0xffffffff));
 	pmtpos+=4;
-	memcpy(buf+pos, pmt, pmtpos);
+	memcpy(buf+pos, pmt.data(), pmtpos);
 	pos += pmtpos;
 	memset(buf+pos, 0xff, 2*TS_SIZE - pos);
 //	pos = 2*TS_SIZE;

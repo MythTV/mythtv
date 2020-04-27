@@ -259,7 +259,7 @@ class MPEG2fixup
     int             m_frameNum              {0};
     int             m_statusUpdateTime      {5};
     uint64_t        m_lastWrittenPos        {0};
-    uint16_t        m_invZigzagDirect16[64] {};
+    std::array<uint16_t,64> m_invZigzagDirect16 {};
     bool            m_zigzagInit            {false};
 };
 

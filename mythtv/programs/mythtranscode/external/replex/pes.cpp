@@ -26,6 +26,7 @@
  *
  */
 
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -165,7 +166,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 	unsigned short *pl = nullptr;
 	bool done = true;
 
-	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
+	std::array<uint8_t,3> headr { 0x00, 0x00, 0x01} ;
 	do {
 		int c=0;
 		done = true;
@@ -287,11 +288,11 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 			case PRIVATE_STREAM1:
 
 				if (p->withbuf){
-					memcpy(p->buf, headr, 3);
+					memcpy(p->buf, headr.data(), 3);
 					p->buf[3] = p->cid;
 					memcpy(p->buf+4,p->plen,2);
 				} else {
-					memcpy(p->hbuf, headr, 3);
+					memcpy(p->hbuf, headr.data(), 3);
 					p->hbuf[3] = p->cid;
 					memcpy(p->hbuf+4,p->plen,2);
 				}
@@ -461,12 +462,12 @@ static void setl_ps(ps_packet *p)
 static int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 {
         (void)length;
-        uint8_t headr1[4] = {0x00, 0x00, 0x01, PACK_START };
-        uint8_t headr2[4] = {0x00, 0x00, 0x01, SYS_START };
+        std::array<uint8_t,4> headr1 {0x00, 0x00, 0x01, PACK_START };
+        std::array<uint8_t,4> headr2 {0x00, 0x00, 0x01, SYS_START };
         uint8_t buffy = 0xFF;
 
 
-        memcpy(buf,headr1,4);
+        memcpy(buf,headr1.data(),4);
 	long count = 4;
 	memcpy(buf+count,p->scr,6);
 	count += 6;
@@ -480,7 +481,7 @@ static int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 	}
 
         if (p->sheader_length){
-                memcpy(buf+count,headr2,4);
+                memcpy(buf+count,headr2.data(),4);
                 count += 4;
                 memcpy(buf+count,p->sheader_llength,2);
                 count += 2;
@@ -582,8 +583,9 @@ static int write_ps_header(uint8_t *buf,
         return PS_HEADER_L1;
 }
 
+using pts_arr = std::array<uint8_t,5>;
 
-static void get_pespts(const uint8_t *spts,uint8_t *pts)
+static void get_pespts(const uint8_t *spts, pts_arr &pts)
 {
 	//Make sure to set the 1st 4 bits properly
         pts[0] = 0x01 |
@@ -600,11 +602,11 @@ static void get_pespts(const uint8_t *spts,uint8_t *pts)
 int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS, 
 		     uint8_t *obuf, int stuffing, uint8_t ptsdts)
 {
-	uint8_t le[2];
-	uint8_t dummy[3];
-	uint8_t ppts[5];
-	uint8_t pdts[5];
-	uint8_t headr[3] = {0x00, 0x00, 0x01};
+	std::array<uint8_t,2> le    {};
+	std::array<uint8_t,3> dummy {};
+	pts_arr               ppts  {};
+	pts_arr               pdts  {};
+	std::array<uint8_t,3> headr {0x00, 0x00, 0x01};
 	
 	uint32_t lpts = htonl((PTS/300ULL) & 0x00000000FFFFFFFFULL);
 	auto *pts = (uint8_t *) &lpts;
@@ -617,7 +619,7 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	if ((DTS/300ULL) & 0x0000000100000000ULL) pdts[0] |= 0x80;
 
 	int c = 0;
-	memcpy(obuf+c,headr,3);
+	memcpy(obuf+c,headr.data(),3);
 	c += 3;
 	memcpy(obuf+c,&id,1);
 	c++;
@@ -628,7 +630,7 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 
 	le[0] |= ((uint8_t)(length >> 8) & 0xFF); 
 	le[1] |= ((uint8_t)(length) & 0xFF); 
-	memcpy(obuf+c,le,2);
+	memcpy(obuf+c,le.data(),2);
 	c += 2;
 
 	if (id == PADDING_STREAM){
@@ -653,16 +655,16 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	}
 		
 
-	memcpy(obuf+c,dummy,3);
+	memcpy(obuf+c,dummy.data(),3);
 	c += 3;
 
 	if (ptsdts == PTS_ONLY){
-		memcpy(obuf+c,ppts,5);
+		memcpy(obuf+c,ppts.data(),5);
 		c += 5;
 	} else if ( ptsdts == PTS_DTS ){
-		memcpy(obuf+c,ppts,5);
+		memcpy(obuf+c,ppts.data(),5);
 		c += 5;
-		memcpy(obuf+c,pdts,5);
+		memcpy(obuf+c,pdts.data(),5);
 		c += 5;
 	}
 
@@ -836,17 +838,17 @@ int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr,
 		   uint8_t *buf)
 {
 	int pos = 0;
-        uint8_t headr[5] = {0x00, 0x00, 0x01, PRIVATE_STREAM2, 0x03 };
+        std::array<uint8_t,5> headr {0x00, 0x00, 0x01, PRIVATE_STREAM2, 0x03 };
         (void)pack_size;
 
 	pos = write_ps_header( buf, SCR, muxr, extcnt, 0, 0, 1, 1, 1, 1);
-	memcpy(buf+pos, headr, 5);
+	memcpy(buf+pos, headr.data(), 5);
 	buf[pos+5] = 0xD4;
 	pos += 6;
 	memset(buf+pos, 0, 0x03d4);
 	pos += 0x03d4;
 
-	memcpy(buf+pos, headr, 5);
+	memcpy(buf+pos, headr.data(), 5);
 	buf[pos+5] = 0xFA;
 	pos += 6;
 	memset(buf+pos, 0, 0x03fA);

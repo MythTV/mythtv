@@ -242,7 +242,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 	uint64_t *lpts=nullptr;
 	int bsize = 0;
 	int first = 1;
-	uint8_t buf[7];
+	audio_sync_buf buf;
 	int off=0;
 	int *apes_abort=nullptr;
 	int re=0;
@@ -508,7 +508,7 @@ static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int
 
 static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 {
-	uint8_t buf[8];
+	std::vector<uint8_t> buf(8);
 	int c=0;
 	int pos=0;
 	uint8_t head;
@@ -745,8 +745,7 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				gop = 1;
 				gop_off = c+pos - seq_p;
 				
-				if (ring_peek(rbuf, (uint8_t *) buf, 7, 
-					      off+c+pos) < 0){
+				if (ring_peek(rbuf, buf, 7, off+c+pos) < 0) {
 					rx->vpes_abort = len -(c+pos-1);
 					return;
 				}				
@@ -774,7 +773,7 @@ static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 					return;
 				}
 				
-				if (ring_peek(rbuf, (uint8_t *) buf, 6,
+				if (ring_peek(rbuf, buf, 6,
                                               off+c+pos) < 0) return;
 
 
@@ -2341,14 +2340,13 @@ static void do_demux(struct replex *rx)
 static void do_replex(struct replex *rx)
 {
 	int video_ok = 0;
-	int ext_ok[N_AUDIO];
+	aok_arr ext_ok {};
 	int start=1;
 	multiplex_t mx;
 
 
 	LOG(VB_GENERAL, LOG_INFO, "STARTING REPLEX");
 	memset(&mx, 0, sizeof(mx));
-	memset(ext_ok, 0, N_AUDIO*sizeof(int));
 
 	while (!replex_all_set(rx)){
 		if (replex_fill_buffers(rx, nullptr)< 0) {

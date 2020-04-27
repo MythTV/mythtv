@@ -148,6 +148,16 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 	return count;
 }
 
+int ring_peek(ringbuffer *rbuf, peek_poke_vec data, unsigned int count, uint32_t off)
+{
+    return ring_peek(rbuf, data.data(), count, off);
+}
+
+int ring_peek(ringbuffer *rbuf, peek_poke_vec data, uint32_t off)
+{
+    return ring_peek(rbuf, data.data(), data.size(), off);
+}
+
 int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 {
 	if (off+count > rbuf->size || off+count >ring_avail(rbuf))
@@ -175,6 +185,16 @@ int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 	}
 
 	return count;
+}
+
+int ring_poke(ringbuffer *rbuf, peek_poke_vec data, unsigned int count, uint32_t off)
+{
+    return ring_poke(rbuf, data.data(), count, off);
+}
+
+int ring_poke(ringbuffer *rbuf, peek_poke_vec data, uint32_t off)
+{
+    return ring_poke(rbuf, data.data(), data.size(), off);
 }
 
 int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
@@ -318,40 +338,31 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 
 static void show(uint8_t *buf, int length)
 {
-	char temp[8];
-	char buffer[100];
-	buffer[0] = '\0';
+	QString buffer;
 
 	for (int i=0; i<length; i+=16){
 		int j = 0;
 		for (j=0; j < 8 && j+i<length; j++)
-		{
-			std::sprintf(temp, "0x%02x ", (int)(buf[i+j]));
-			std::strcat(buffer, temp);
-		}
+			buffer += QString("0x%1 ").arg(buf[i+j],16,2,QChar('0'));
 		for (int r=j; r<8; r++)
-			std::strcat(buffer, "     ");
+			buffer += "	";
 
-		std::strcat(buffer,"  ");
+		buffer += "  ";
 
 		for (j=8; j < 16 && j+i<length; j++)
-		{
-			std::sprintf(temp, "0x%02x ", (int)(buf[i+j]));
-			std::strcat(buffer, temp);
-		}
+			buffer += QString("0x%1 ").arg(buf[i+j],16,2,QChar('0'));
 		for (int r=j; r<16; r++)
-			std::strcat(buffer, "     ");
+			buffer += "	";
 
 		for (j=0; j < 16 && j+i<length; j++){
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				std::sprintf(temp, "%c", buf[i+j]);
+				buffer += QString(buf[i+j]);
 				break;
 			default:
-				std::sprintf(temp, ".");
+				buffer += ".";
 			}
-			std::strcat(buffer, temp);
 		}
 		LOG(VB_GENERAL, LOG_INFO, buffer);
 	}

@@ -20,14 +20,14 @@ static int buffers_filled(multiplex_t *mx)
 	return 0;
 }
 
-static int use_video(uint64_t vpts, extdata_t *ext, const int *aok, int n)
+static int use_video(uint64_t vpts, ext_arr &ext, const aok_arr &aok, int n)
 {
 	for (int i=0; i < n; i++)
 		if(aok[i] && ptscmp(vpts,ext[i].pts) > 0)
 			return 0;
 	return 1;
 }
-static int which_ext(extdata_t *ext, const int *aok, int n)
+static int which_ext(ext_arr &ext, const aok_arr &aok, int n)
 {
 	int started = 0;
 	int pos = -1;
@@ -183,7 +183,7 @@ static uint8_t get_ptsdts(multiplex_t *mx, index_unit *viu)
 
 static void writeout_video(multiplex_t *mx)
 {  
-	uint8_t outbuf[3000];
+	std::array<uint8_t,3000> outbuf {};
 	int written=0;
 	uint8_t ptsdts=0;
         int frame_len=0;
@@ -201,13 +201,13 @@ static void writeout_video(multiplex_t *mx)
 	if (viu->frame_start && viu->seq_header && viu->gop && 
 	    viu->frame == I_FRAME){
 		if (!mx->startup && mx->is_ts){
-			write_ts_patpmt(mx->ext, mx->extcnt, 1, outbuf);
-			write(mx->fd_out, outbuf, mx->pack_size*2);
+			write_ts_patpmt(mx->ext.data(), mx->extcnt, 1, outbuf.data());
+			write(mx->fd_out, outbuf.data(), mx->pack_size*2);
 			ptsinc(&mx->SCR, mx->SCRinc*2);
 		} else if (!mx->startup && mx->navpack){
 			write_nav_pack(mx->pack_size, mx->extcnt, 
-				       mx->SCR, mx->muxr, outbuf);
-			write(mx->fd_out, outbuf, mx->pack_size);
+				       mx->SCR, mx->muxr, outbuf.data());
+			write(mx->fd_out, outbuf.data(), mx->pack_size);
 			ptsinc(&mx->SCR, mx->SCRinc);
 		} else mx->startup = 0;
 #ifdef OUT_DEBUG
@@ -247,11 +247,11 @@ static void writeout_video(multiplex_t *mx)
 	if (viu->frame_start){
 		viu->frame_start=0;
 	if (viu->gop){
-                uint8_t gop[8];
+		std::vector<uint8_t> gop(8);
                 frame_len=length-frame_len;
-                ring_peek(mx->vrbuffer, gop, 8, frame_len);
-		pts2time( viu->pts + mx->video_delay, gop, 8);
-                ring_poke(mx->vrbuffer, gop, 8, frame_len);
+		ring_peek(mx->vrbuffer, gop, frame_len);
+		pts2time( viu->pts + mx->video_delay, gop.data(), 8);
+		ring_poke(mx->vrbuffer, gop.data(), 8, frame_len);
                 viu->gop=0;
 	}
 		if (mx->VBR) {
@@ -276,13 +276,13 @@ static void writeout_video(multiplex_t *mx)
 	if (mx->is_ts) {
 		written = write_video_ts(  viu->pts+mx->video_delay, 
 					   viu->dts+mx->video_delay, 
-					   mx->SCR, outbuf, &nlength,
+					   mx->SCR, outbuf.data(), &nlength,
 					   ptsdts, mx->vrbuffer);
 	} else {
 		written = write_video_pes( mx->pack_size, mx->extcnt, 
 					   viu->pts+mx->video_delay, 
 					   viu->dts+mx->video_delay, 
-					   mx->SCR, mx->muxr, outbuf, &nlength,
+					   mx->SCR, mx->muxr, outbuf.data(), &nlength,
 					   ptsdts, mx->vrbuffer);
 	}
 
@@ -298,7 +298,7 @@ static void writeout_video(multiplex_t *mx)
 	//estimate next pts based on bitrate of this stream and data written
 	viu->dts = uptsdiff(viu->dts + ((nlength*viu->ptsrate)>>8), 0);
 
-	write(mx->fd_out, outbuf, written);
+	write(mx->fd_out, outbuf.data(), written);
 
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG, "VPTS");
@@ -316,7 +316,7 @@ static void writeout_video(multiplex_t *mx)
 
 static void writeout_ext(multiplex_t *mx, int n)
 {  
-	uint8_t outbuf[3000];
+	std::array<uint8_t,3000> outbuf {};
 	int written=0;
 	uint64_t dpts=0;
 	int newpts=0;
@@ -412,24 +412,24 @@ static void writeout_ext(multiplex_t *mx, int n)
 	case MPEG_AUDIO:
 		if(mx->is_ts) {
 			written = write_audio_ts( mx->ext[n].strmnum, pts,
-					outbuf, &nlength, newpts ? 0 : PTS_ONLY,
+					outbuf.data(), &nlength, newpts ? 0 : PTS_ONLY,
 					&mx->extrbuffer[n]);
 		} else {
 			written = write_audio_pes( mx->pack_size, mx->extcnt,
 					mx->ext[n].strmnum, pts, mx->SCR,
-					mx->muxr, outbuf, &nlength, PTS_ONLY,
+					mx->muxr, outbuf.data(), &nlength, PTS_ONLY,
 					&mx->extrbuffer[n]);
 		}
 		break;
 	case AC3:
 		if(mx->is_ts) {
 			written = write_ac3_ts(mx->ext[n].strmnum, pts,
-					outbuf, &nlength, newpts ? 0 : PTS_ONLY,
+					outbuf.data(), &nlength, newpts ? 0 : PTS_ONLY,
 					mx->ext[n].frmperpkt, &mx->extrbuffer[n]);
 		} else {
 			written = write_ac3_pes( mx->pack_size, mx->extcnt,
 					mx->ext[n].strmnum, pts, mx->SCR,
-					mx->muxr, outbuf, &nlength, PTS_ONLY,
+					mx->muxr, outbuf.data(), &nlength, PTS_ONLY,
 					nframes, ac3_off,
 					&mx->extrbuffer[n]);
 		}
@@ -442,7 +442,7 @@ static void writeout_ext(multiplex_t *mx, int n)
 		return;
 
 	length -= nlength;
-	write(mx->fd_out, outbuf, written);
+	write(mx->fd_out, outbuf.data(), written);
 
 	dummy_add(dbuf, dpts, aiu->length-length);
 	aiu->length = length;
@@ -472,21 +472,21 @@ static void writeout_ext(multiplex_t *mx, int n)
 
 static void writeout_padding (multiplex_t *mx)
 {
-	uint8_t outbuf[3000];
+	std::array<uint8_t,3000> outbuf {};
 #if 0
 	LOG(VB_GENERAL, LOG_INFO, "writing PADDING pack");
 #endif
 
 	write_padding_pes( mx->pack_size, mx->extcnt, mx->SCR, 
-			   mx->muxr, outbuf);
-	write(mx->fd_out, outbuf, mx->pack_size);
+			   mx->muxr, outbuf.data());
+	write(mx->fd_out, outbuf.data(), mx->pack_size);
 }
 
-void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
+void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 {
 	int set_ok = 0;
 
-	memset(ext_ok, 0, N_AUDIO*sizeof(int));
+	ext_ok.fill(false);
 	*video_ok = 0;
 	
 	if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
@@ -555,7 +555,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 		    mx->ext[i].iu.length > 0 &&
 		    ptscmp(mx->ext[i].pts, 500*CLOCK_MS + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_extrbuffer[i])){
-			ext_ok[i] = 1;
+			ext_ok[i] = true;
                         set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
 		}
 	}
@@ -578,7 +578,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
         (void)set_ok;
 #endif
 }
-void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
+void write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok)
 {
 	if (video_ok && use_video(mx->viu.dts + mx->video_delay,
 	    mx->ext, ext_ok, mx->extcnt)) {
@@ -601,11 +601,10 @@ void finish_mpg(multiplex_t *mx)
 {
 	int start=0;
 	int video_ok = 0;
-	int ext_ok[N_AUDIO];
+	aok_arr ext_ok {};
         int n = 0;
-        uint8_t mpeg_end[4] = { 0x00, 0x00, 0x01, 0xB9 };
+        std::array<uint8_t,4> mpeg_end { 0x00, 0x00, 0x01, 0xB9 };
                                                                                 
-        memset(ext_ok, 0, N_AUDIO*sizeof(int));
         mx->finish = 1;
                                                                                 
         int old = 0;
@@ -641,7 +640,7 @@ void finish_mpg(multiplex_t *mx)
 	}
 	
 	if (mx->otype == REPLEX_MPEG2)
-		write(mx->fd_out, mpeg_end,4);
+		write(mx->fd_out, mpeg_end.data(), 4);
 
 	dummy_destroy(&mx->vdbuf);
 	for (int i=0; i<mx->extcnt;i++)
@@ -807,7 +806,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 		//Use best guess for TS streams
 		mx->data_size = get_ts_video_overhead(mx->pack_size, seq_head);
 		mx->extsize = get_ts_ext_overhead(mx->pack_size, extframe,
-				mx->ext, mx->extcnt);
+				mx->ext.data(), mx->extcnt);
 		
 	} else {
 		//Use worst case for PS streams
@@ -855,16 +854,16 @@ void setup_multiplex(multiplex_t *mx)
 
 	// write first VOBU header
 	if (mx->is_ts) {
-		uint8_t outbuf[2048];
-		write_ts_patpmt(mx->ext, mx->extcnt, 1, outbuf);
-		write(mx->fd_out, outbuf, mx->pack_size*2);
+		std::array<uint8_t,2048> outbuf {};
+		write_ts_patpmt(mx->ext.data(), mx->extcnt, 1, outbuf.data());
+		write(mx->fd_out, outbuf.data(), mx->pack_size*2);
 		ptsinc(&mx->SCR, mx->SCRinc*2);
 		mx->startup = 1;
 	} else if (mx->navpack){
-		uint8_t outbuf[2048];
+		std::array<uint8_t,2048> outbuf {};
 		write_nav_pack(mx->pack_size, mx->extcnt, 
-			       mx->SCR, mx->muxr, outbuf);
-		write(mx->fd_out, outbuf, mx->pack_size);
+			       mx->SCR, mx->muxr, outbuf.data());
+		write(mx->fd_out, outbuf.data(), mx->pack_size);
 		ptsinc(&mx->SCR, mx->SCRinc);
 		mx->startup = 1;
 	} else mx->startup = 0;

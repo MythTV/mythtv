@@ -35,21 +35,21 @@
 
 #include "mythlogging.h"
 
-unsigned int slots [4] = {12, 144, 0, 0};
-unsigned int bitrates[3][16] =
-{{0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
+std::array<unsigned int,4> slots {12, 144, 0, 0};
+std::array<std::array<unsigned int,16>,3> bitrates {{
+ {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
  {0,32,48,56,64,80,96,112,128,160,192,224,256,320,384,0},
- {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0}};
+ {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0}
+}};
 
-uint32_t freq[4] = {441, 480, 320, 0};
-static uint64_t samples[4] = { 384, 1152, 1152, 1536};
-//const char *frames[3] = {"I-Frame","P-Frame","B-Frame"};
+static const std::array<const uint32_t,4> freq    {441, 480, 320, 0};
+static const std::array<const uint64_t,4> samples {384, 1152, 1152, 1536};
 
-unsigned int ac3_bitrates[32] =
+static const std::array<const uint16_t,32> ac3_bitrates
     {32,40,48,56,64,80,96,112,128,160,192,224,256,320,384,448,512,576,640,
      0,0,0,0,0,0,0,0,0,0,0,0,0};
-static uint8_t ac3half[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
-uint32_t ac3_freq[4] = {480, 441, 320, 0};
+static const std::array<const uint8_t,12> ac3half  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
+static const std::array<const uint32_t,4> ac3_freq {480, 441, 320, 0};
 
 #define DEBUG true
 
@@ -194,7 +194,8 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 
 int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 {
-        uint8_t buf[150];
+        std::vector<uint8_t> buf;
+        buf.resize(150);
         int form = -1;
         int c = 0;
 
@@ -204,8 +205,8 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
         int re = ring_find_mpg_header(rbuf, SEQUENCE_HDR_CODE, off, le);
         if (re < 0)
 		return re;
-	uint8_t *headr = buf+4;
-	if (ring_peek(rbuf, buf, 150, off) < 0) return -2;
+	uint8_t *headr = buf.data()+4;
+	if (ring_peek(rbuf, buf, off) < 0) return -2;
 	
 	s->h_size	= ((headr[1] &0xF0) >> 4) | (headr[0] << 4);
 	s->v_size	= ((headr[1] &0x0F) << 8) | (headr[2]);
@@ -323,12 +324,12 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	return c;
 }
 
-int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
+int find_audio_sync(ringbuffer *rbuf, audio_sync_buf &buf, int off, int type, int le)
 {
 	int found = 0;
 	int l=0;
 
-	memset(buf,0,7);
+	buf.fill(0);
 	uint8_t b1 = 0x00;
 	uint8_t b2 = 0x00;
 	uint8_t m2 = 0xFF;
@@ -362,7 +363,7 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 			
 		case 1:
 			if ( (b&m2) == b2){
-				if (mring_peek(rbuf, buf, l, c-1) < -1) 
+				if (mring_peek(rbuf, buf.data(), l, c-1) < -1)
 					return -2;
 				return c-1-off;	
 			} else if ( b != b1) found = 0;
@@ -418,7 +419,7 @@ int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le, 
 		       int type)
 {
-	uint8_t headr[7];
+	audio_sync_buf headr {};
 	uint8_t frame = 0;
 	int fr = 0;
 	int half = 0;
@@ -483,7 +484,7 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 {
 	int c = 0;
 	int fr =0;
-	uint8_t headr[7];
+	audio_sync_buf headr {};
 
 	af->set=0;
 
@@ -532,7 +533,7 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 {
-	uint8_t headr[7];
+	audio_sync_buf headr {};
 
 	af->set=0;
 
@@ -589,7 +590,8 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 {
-        uint8_t buf[12];
+        std::vector<uint8_t> buf;
+        buf.resize(12);
 
         int re =ring_find_mpg_header(rbuf, EXTENSION_START_CODE, off, le);
         if (re < 0) {
@@ -598,7 +600,7 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	}
 
 	if (ring_peek(rbuf, buf, 5, off) < 0) return -2;
-	uint8_t *headr=buf+4;
+	uint8_t *headr=buf.data()+4;
 	
 	uint8_t ext_id = (headr[0]&0xF0) >> 4;
 
@@ -606,7 +608,7 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	case SEQUENCE_EXTENSION:{
 		if (s->ext_set || !s->set) break;
 		if (ring_peek(rbuf, buf, 10, off) < 0) return -2;
-		headr=buf+4;
+		headr=buf.data()+4;
 
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_DEBUG, "Sequence Extension:");
@@ -671,7 +673,7 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 
 		if (!s->set || s->pulldown_set) break;
 		if (ring_peek(rbuf, buf, 10, off) < 0) return -2;
-		headr=buf+4;
+		headr=buf.data()+4;
 		
 		if ( (headr[2]&0x03) != 0x03 ) break; // not frame picture
 		if ( (headr[3]&0x02) ) pulldown = 1; // repeat flag set => pulldown

@@ -27,6 +27,7 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
+#include <array>
 #include <cstdint>
 
 #include "ringbuffer.h"
@@ -119,8 +120,10 @@ struct audio_frame_t {
 	char     language[4];
 };
 
+using audio_sync_buf = std::array<uint8_t,7>;
+
 void pts2time(uint64_t pts, uint8_t *buf, int len);
-int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le);
+int find_audio_sync(ringbuffer *rbuf, audio_sync_buf &buf, int off, int type, int le);
 int find_audio_s(const uint8_t *rbuf, int off, int type, int le);
 int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le);
 int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le); 
