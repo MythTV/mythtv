@@ -93,7 +93,7 @@ struct Cddb
     static bool Write(const Album& album, bool bLocalOnly = true);
 
     // Support
-    static discid_t Discid(unsigned& secs, const Msf v[], unsigned tracks);
+    static discid_t Discid(unsigned& secs, const Toc &toc, unsigned tracks);
     static void Alias(const Album& album, discid_t discID);
 };
 

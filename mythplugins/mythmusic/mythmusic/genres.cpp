@@ -1,4 +1,6 @@
-const char *genre_table[] =
+#include "genres.h"
+
+const genre_table_array genre_table
 {
        "Blues",
        "Classic Rock",
@@ -149,6 +151,4 @@ const char *genre_table[] =
        "JPop",
        "Synthpop"
 };
-
-int genre_table_size = sizeof(genre_table) / sizeof(genre_table[0]);
 

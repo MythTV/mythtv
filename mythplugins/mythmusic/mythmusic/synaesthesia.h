@@ -1,6 +1,7 @@
 #ifndef SYNAETHESIA
 #define SYNAETHESIA
 
+#include <array>
 #include <visual.h>
 #include "polygon.h"
 #include "mainvisual.h"
@@ -11,6 +12,9 @@ class QImage;
 #define LogSize 10
 #define Brightness 150
 #define NumSamples (1<<LogSize)
+
+using samp_dbl_array = std::array<double,NumSamples>;
+using samp_int_array = std::array<int,NumSamples>;
 
 #define Flame 0
 #define Wave 1
@@ -48,10 +52,10 @@ private:
 
     QSize m_size                 {0,0};
 
-    double m_cosTable[NumSamples]    {};
-    double m_negSinTable[NumSamples] {};
-    int    m_bitReverse[NumSamples]  {};
-    int    m_scaleDown[256]          {};
+    samp_dbl_array      m_cosTable    {};
+    samp_dbl_array      m_negSinTable {};
+    samp_int_array      m_bitReverse  {};
+    std::array<int,256> m_scaleDown   {};
     int    m_maxStarRadius       {1};
     int    m_fadeMode            {Stars};
     bool   m_pointsAreDiamonds   {true};
@@ -66,7 +70,7 @@ private:
     Bitmap<unsigned short> m_lastLastOutputBmp;
     QImage *m_outputImage        {nullptr};
 
-    unsigned char m_palette[768] {};
+    std::array<uint8_t,768>  m_palette {};
     double m_fgRedSlider         {0.0};
     double m_fgGreenSlider       {0.5};
     double m_bgRedSlider         {0.75};

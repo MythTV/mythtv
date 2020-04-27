@@ -89,8 +89,9 @@ class FlacEncoder : public Encoder
   private:
     FLAC_ENCODER *m_encoder    {nullptr};
     unsigned int  m_sampleIndex {0};
-    FLAC__int32   m_inputIn[NUM_CHANNELS][MAX_SAMPLES] {};
-    FLAC__int32  *m_input[NUM_CHANNELS] {};
+
+    std::array<std::array<FLAC__int32,MAX_SAMPLES>,NUM_CHANNELS> m_inputIn {};
+    std::array<FLAC__int32 *,NUM_CHANNELS>m_input {};
 };
 
 #endif

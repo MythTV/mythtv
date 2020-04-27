@@ -1289,8 +1289,8 @@ void Ripper::searchGenre()
     QStringList searchList = MusicMetadata::fillFieldList("genre");
     // load genre list
     m_searchList.clear();
-    for (int x = 0; x < genre_table_size; x++)
-        m_searchList.push_back(QString(genre_table[x]));
+    for (const auto & genre : genre_table)
+        m_searchList.push_back(QString::fromStdString(genre));
     m_searchList.sort();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");

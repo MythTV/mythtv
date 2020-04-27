@@ -34,7 +34,7 @@ extern "C" {
 const unsigned kSamplesPerSec = 44100;
 
 // Handle cdio log output
-static void logger(cdio_log_level_t level, const char message[])
+static void logger(cdio_log_level_t level, const char *message)
 {
     switch (level)
     {

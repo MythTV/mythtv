@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <string>
 
 #include <QFile>
 #include <QFileInfo>
@@ -25,8 +26,7 @@ const int CDROM_LEADOUT_TRACK = 0xaa;
 const int CD_FRAMES_PER_SEC = 75;
 const int SECS_PER_MIN = 60;
 
-//static const char URL[] = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
-static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
+static const std::string URL = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
 static const QString& helloID();
 
 /*
@@ -104,7 +104,7 @@ bool Cddb::Query(Matches& res, const Toc& toc)
     const unsigned totalTracks = toc.size() - 1;
 
     unsigned secs = 0;
-    const discid_t discID = Discid(secs, toc.data(), totalTracks);
+    const discid_t discID = Discid(secs, toc, totalTracks);
 
     // Is it cached?
     if (Dbase::Search(res, discID))
@@ -112,7 +112,8 @@ bool Cddb::Query(Matches& res, const Toc& toc)
 
     // Construct query
     // cddb query discid ntrks off1 off2 ... nsecs
-    QString URL2 = URL + QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
+    QString URL2 = QString::fromStdString(URL) +
+        QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
 
     for (unsigned t = 0; t < totalTracks; ++t)
         URL2 += QString("%1+").arg(msf2lsn(toc[t]));
@@ -200,7 +201,8 @@ bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
         return true;
 
     // Lookup the details...
-    QString URL2 = URL + QString("cddb+read+") + genre.toLower() +
+    QString URL2 = QString::fromStdString(URL) +
+        QString("cddb+read+") + genre.toLower() +
         QString("+%1").arg(discID,0,16) + "&hello=" + helloID() + "&proto=5";
     LOG(VB_MEDIA, LOG_INFO, "CDDB read: " + URL2);
 
@@ -262,14 +264,14 @@ static inline int cddb_sum(int i)
  * discID calculation. See appendix A of freedb_howto1.07.zip
  */
 // static
-Cddb::discid_t Cddb::Discid(unsigned& secs, const Msf v[], unsigned tracks)
+Cddb::discid_t Cddb::Discid(unsigned& secs, const Toc &toc, unsigned tracks)
 {
     int checkSum = 0;
     for (unsigned t = 0; t < tracks; ++t)
-        checkSum += cddb_sum(v[t].min * SECS_PER_MIN + v[t].sec);
+        checkSum += cddb_sum(toc[t].min * SECS_PER_MIN + toc[t].sec);
 
-    secs = v[tracks].min * SECS_PER_MIN + v[tracks].sec -
-        (v[0].min * SECS_PER_MIN + v[0].sec);
+    secs = toc[tracks].min * SECS_PER_MIN + toc[tracks].sec -
+        (toc[0].min * SECS_PER_MIN + toc[0].sec);
 
     const discid_t discID = ((discid_t)(checkSum % 255) << 24) |
         ((discid_t)secs << 8) | tracks;
