@@ -67,16 +67,14 @@ static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     (void) ptr;
 
     static QString s_fullLine("");
-    char str[256];
 
     if (level > AV_LOG_INFO)
         return;
-    vsprintf(str, fmt, vl);
 
-    s_fullLine += QString(str);
+    s_fullLine += QString::asprintf(fmt, vl);
     if (s_fullLine.endsWith("\n"))
     {
-        s_fullLine.truncate(s_fullLine.length() - 1);
+        s_fullLine.chop(1);
         LOG(VB_GENERAL, LOG_INFO, s_fullLine);
         s_fullLine = QString("");
     }
