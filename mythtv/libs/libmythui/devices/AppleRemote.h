@@ -72,7 +72,6 @@ private:
     int                    remoteId            {0};
     Listener*              _listener           {nullptr};
 
-    bool                   mUsingNewAtv        {false};
     AppleRemote::Event     mLastEvent          {AppleRemote::Undefined};
     int                    mEventCount         {0};
     bool                   mKeyIsDown          {false};
@@ -87,14 +86,8 @@ private:
                                       void* refcon, void* sender);
     void        _queueCallbackFunction(IOReturn result,
                                        void* refcon, void* sender);
-    void        _queueCallbackATV23(IOReturn result);
     void        _handleEventWithCookieString(std::string cookieString,
                                              SInt32 sumOfValues);
-    void        _handleEventATV23(std::string cookieString, SInt32 sumOfValues);
-    
-private slots:
-    // Key up event handling on the ATV v2.3 and above
-    void         TimeoutHandler();
 };
 
 #endif // APPLEREMOTE
