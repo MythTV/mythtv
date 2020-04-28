@@ -26,6 +26,10 @@
 
 using namespace std;
 
+// the maximum image size we are ever likely to get from ZM
+#define MAX_IMAGE_SIZE  (2048*1536*3)
+using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
+
 extern bool checkVersion(int major, int minor, int revision);
 extern void loadZMConfig(const string &configfile);
 extern void connectToDatabase(void);
@@ -67,6 +71,10 @@ enum State
     ALERT,
     TAPE
 };
+
+// Prevent clang-tidy modernize-avoid-c-arrays warnings in these
+// library structures
+extern "C" {
 
 // shared data for ZM version 1.24.x and 1.25.x
 struct SharedData
@@ -244,6 +252,9 @@ struct VideoStoreData
     timeval recording;
 };
 
+// end of library structures.
+};
+
 class MONITOR
 {
   public:
@@ -300,7 +311,7 @@ class ZMServer
     bool send(const string &s, const unsigned char *buffer, int dataLen) const;
     void sendError(const string &error);
     void getMonitorList(void);
-    static int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
+    static int  getFrame(FrameData &buffer, MONITOR *monitor);
     static long long getDiskSpace(const string &filename, long long &total, long long &used);
     static void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
@@ -338,7 +349,6 @@ class ZMServer
     string               m_analysisFileFormat;
     key_t                m_shmKey;
     string               m_mmapPath;
-    char                 m_buf[10]            {0};
 };
 
 

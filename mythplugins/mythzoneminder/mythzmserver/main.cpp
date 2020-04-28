@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     int fdmax = -1;                 // maximum file descriptor number
     int listener = -1;              // listening socket descriptor
     int newfd = -1;                 // newly accept()ed socket descriptor
-    char buf[4096];                 // buffer for client data
+    std::array<char,4096> buf {};   // buffer for client data
     int yes=1;                      // for setsockopt() SO_REUSEADDR, below
     bool quit = false;              // quit flag
 
@@ -361,7 +361,7 @@ int main(int argc, char **argv)
                 else
                 {
                     // handle data from a client
-                    int nbytes = recv(i, buf, sizeof(buf), 0);
+                    int nbytes = recv(i, buf.data(), buf.size(), 0);
                     if (nbytes <= 0)
                     {
                         // got error or connection closed by client
@@ -388,7 +388,7 @@ int main(int argc, char **argv)
                     else
                     {
                         ZMServer *server = serverList[i];
-                        quit = server->processRequest(buf, nbytes);
+                        quit = server->processRequest(buf.data(), nbytes);
                     }
                 }
             }

@@ -12,6 +12,8 @@ using namespace std;
 
 // zm
 #include "zmdefines.h"
+#define MAX_IMAGE_SIZE  (2048*1536*3)
+using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
 
 class MPUBLIC ZMClient : public QObject
 {
@@ -46,7 +48,7 @@ class MPUBLIC ZMClient : public QObject
                       const QString &date, bool includeContinuous, vector<Event*> *eventList);
     void getEventFrame(Event *event, int frameNo, MythImage **image);
     void getAnalyseFrame(Event *event, int frameNo, QImage &image);
-    int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);
+    int  getLiveFrame(int monitorID, QString &status, FrameData& buffer);
     void getFrameList(int eventID, vector<Frame*> *frameList);
     void deleteEvent(int eventID);
     void deleteEventList(vector<Event*> *eventList);

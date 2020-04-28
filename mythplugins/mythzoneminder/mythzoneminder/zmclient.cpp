@@ -736,7 +736,7 @@ void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
     delete [] data;
 }
 
-int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize)
+int ZMClient::getLiveFrame(int monitorID, QString &status, FrameData& buffer)
 {
     QMutexLocker locker(&m_commandLock);
 
@@ -771,9 +771,9 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     status = strList[2];
 
     // get frame length from data
-    int imageSize = strList[3].toInt();
+    size_t imageSize = strList[3].toInt();
 
-    if (bufferSize < imageSize)
+    if (buffer.size() < imageSize)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient::getLiveFrame(): Live frame buffer is too small!");
@@ -784,7 +784,7 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     if (imageSize == 0)
         return 0;
 
-    if (!readData(buffer, imageSize))
+    if (!readData(buffer.data(), imageSize))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient::getLiveFrame(): Failed to get image data");

@@ -14,6 +14,8 @@
  * ============================================================ */
 
 
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
@@ -49,12 +51,8 @@
 // the version of the protocol we understand
 #define ZM_PROTOCOL_VERSION "11"
 
-// the maximum image size we are ever likely to get from ZM
-#define MAX_IMAGE_SIZE  (2048*1536*3)
-
 #define ADD_STR(list,s)  list += (s); (list) += "[]:[]";
-// TODO rewrite after we require C++11, see http://en.cppreference.com/w/cpp/string/basic_string/to_string
-#define ADD_INT(list,n)  sprintf(m_buf, "%d", (n)); (list) += m_buf; (list) += "[]:[]";
+#define ADD_INT(list,n)  (list) += std::to_string(n); (list) += "[]:[]";
 
 // error messages
 #define ERROR_TOKEN_COUNT      "Invalid token count"
@@ -106,75 +104,67 @@ bool checkVersion(int major, int minor, int revision)
 void loadZMConfig(const string &configfile)
 {
     cout << "loading zm config from " << configfile << endl;
-    char line[512];
-    char val[250];
 
-    FILE *cfg = fopen(configfile.c_str(), "r");
-    if ( cfg == nullptr )
+    std::ifstream ifs(configfile);
+    if ( ifs.fail() )
     {
         fprintf(stderr, "Can't open %s\n", configfile.c_str());
     }
 
-    while ( fgets( line, sizeof(line), cfg ) != nullptr )
+    string line {};
+    while ( std::getline(ifs, line) )
     {
-        char *line_ptr = line;
-        // Trim off any cr/lf line endings
-        size_t chomp_len = strcspn( line_ptr, "\r\n" );
-        line_ptr[chomp_len] = '\0';
-
-        // Remove leading white space
-        size_t white_len = strspn( line_ptr, " \t" );
-        line_ptr += white_len;
+        // Trim off begining and ending whitespace including cr/lf line endings
+        constexpr const char *whitespace = " \t\r\n";
+        auto begin = line.find_first_not_of(whitespace);
+        if (begin == string::npos)
+            continue; // Only whitespace
+        auto end = line.find_last_not_of(whitespace);
+        if (end != string::npos)
+            end = end + 1;
+        line = line.substr(begin, end);
 
         // Check for comment or empty line
-        if ( *line_ptr == '\0' || *line_ptr == '#' )
+        if ( line.empty() || line[0] == '#' )
             continue;
 
-        // Remove trailing white space
-        char *temp_ptr = line_ptr+strlen(line_ptr)-1;
-        while ( *temp_ptr == ' ' || *temp_ptr == '\t' )
-        {
-            *temp_ptr-- = '\0';
-            temp_ptr--;
-        }
-
         // Now look for the '=' in the middle of the line
-        temp_ptr = strchr( line_ptr, '=' );
-        if ( !temp_ptr )
+        auto index = line.find('=');
+        if (index == string::npos)
         {
-            fprintf(stderr,"Invalid data in %s: '%s'\n", configfile.c_str(), line );
+            fprintf(stderr,"Invalid data in %s: '%s'\n", configfile.c_str(), line.c_str() );
             continue;
         }
 
         // Assign the name and value parts
-        char *name_ptr = line_ptr;
-        char *val_ptr = temp_ptr+1;
+        string name = line.substr(0,index);
+        string val = line.substr(index+1);
 
         // Trim trailing space from the name part
-        do
-        {
-            *temp_ptr = '\0';
-            temp_ptr--;
-        }
-        while ( *temp_ptr == ' ' || *temp_ptr == '\t' );
+        end = name.find_last_not_of(whitespace);
+        if (end != string::npos)
+            end = end + 1;
+        name = name.substr(0, end);
 
         // Remove leading white space from the value part
-        white_len = strspn( val_ptr, " \t" );
-        val_ptr += white_len;
+        begin = val.find_first_not_of(whitespace);
+        if (begin != string::npos)
+            val = val.substr(begin);
 
-        strncpy( val, val_ptr, strlen(val_ptr)+1 );
-        if ( strcasecmp( name_ptr, "ZM_DB_HOST" ) == 0 )       g_server = val;
-        else if ( strcasecmp( name_ptr, "ZM_DB_NAME" ) == 0 )  g_database = val;
-        else if ( strcasecmp( name_ptr, "ZM_DB_USER" ) == 0 )  g_user = val;
-        else if ( strcasecmp( name_ptr, "ZM_DB_PASS" ) == 0 )  g_password = val;
-        else if ( strcasecmp( name_ptr, "ZM_PATH_WEB" ) == 0 ) g_webPath = val;
-        else if ( strcasecmp( name_ptr, "ZM_PATH_BIN" ) == 0 ) g_binPath = val;
-        else if ( strcasecmp( name_ptr, "ZM_WEB_USER" ) == 0 ) g_webUser = val;
-        else if ( strcasecmp( name_ptr, "ZM_VERSION" ) == 0 ) g_zmversion = val;
-        else if ( strcasecmp( name_ptr, "ZM_PATH_MAP" ) == 0 ) g_mmapPath = val;
-        else if ( strcasecmp( name_ptr, "ZM_DIR_EVENTS" ) == 0 ) g_eventsPath = val;
+        // convert name to uppercase
+        std::transform(name.cbegin(), name.cend(), name.begin(), ::toupper);
+
+        if      ( name == "ZM_DB_HOST"    ) g_server = val;
+        else if ( name == "ZM_DB_NAME"    ) g_database = val;
+        else if ( name == "ZM_DB_USER"    ) g_user = val;
+        else if ( name == "ZM_DB_PASS"    ) g_password = val;
+        else if ( name == "ZM_PATH_WEB"   ) g_webPath = val;
+        else if ( name == "ZM_PATH_BIN"   ) g_binPath = val;
+        else if ( name == "ZM_WEB_USER"   ) g_webUser = val;
+        else if ( name == "ZM_VERSION"    ) g_zmversion = val;
+        else if ( name == "ZM_PATH_MAP"   ) g_mmapPath = val;
+        else if ( name == "ZM_DIR_EVENTS" ) g_eventsPath = val;
     }
-    fclose(cfg);
 }
 
 #if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80000
@@ -526,7 +516,6 @@ ZMServer::ZMServer(int sock, bool debug)
     m_debug = debug;
 
     // get the shared memory key
-    char buf[100];
     m_shmKey = 0x7a6d2000;
     string setting = getZMSetting("ZM_SHM_KEY");
 
@@ -539,8 +528,9 @@ ZMServer::ZMServer(int sock, bool debug)
 
     if (m_debug)
     {
-        snprintf(buf, sizeof(buf), "0x%x", (unsigned int)m_shmKey);
-        cout << "Shared memory key is: " << buf << endl;
+        cout << "Shared memory key is: 0x"
+             << std::hex << (unsigned int)m_shmKey
+             << std::dec << endl;
     }
 
     // get the MMAP path
@@ -557,14 +547,13 @@ ZMServer::ZMServer(int sock, bool debug)
     // get the event filename format
     setting = getZMSetting("ZM_EVENT_IMAGE_DIGITS");
     int eventDigits = atoi(setting.c_str());
-    snprintf(buf, sizeof(buf), "%%0%dd-capture.jpg", eventDigits);
-    m_eventFileFormat = buf;
+    string eventDigitsFmt = "%0" + std::to_string(eventDigits) + "d";
+    m_eventFileFormat = eventDigitsFmt + "-capture.jpg";
     if (m_debug)
         cout << "Event file format is: " << m_eventFileFormat << endl;
 
     // get the analysis filename format
-    snprintf(buf, sizeof(buf), "%%0%dd-analyse.jpg", eventDigits);
-    m_analysisFileFormat = buf;
+    m_analysisFileFormat = eventDigitsFmt + "-analyse.jpg";
     if (m_debug)
         cout << "Analysis file format is: " << m_analysisFileFormat << endl;
 
@@ -701,10 +690,9 @@ bool ZMServer::processRequest(char* buf, int nbytes)
 bool ZMServer::send(const string &s) const
 {
     // send length
-    size_t len = s.size();
-    char buf[9];
-    sprintf(buf, "%8u", (unsigned int) len);
-    int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
+    string str = "0000000" + std::to_string(s.size());
+    str.erase(0, str.size()-8);
+    int status = ::send(m_sock, str.data(), 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;
 
@@ -716,10 +704,9 @@ bool ZMServer::send(const string &s) const
 bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) const
 {
     // send length
-    size_t len = s.size();
-    char buf[9];
-    sprintf(buf, "%8u", (unsigned int) len);
-    int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
+    string str = "0000000" + std::to_string(s.size());
+    str.erase(0, str.size()-8);
+    int status = ::send(m_sock, str.data(), 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;
 
@@ -796,18 +783,18 @@ void ZMServer::handleGetServerStatus(void)
     }
     else
     {
-        char buf[30];
-        sprintf(buf, "%0.2lf", loads[0]);
+        // to_string gives six decimal places.  Drop last four.
+        string buf = std::to_string(loads[0]);
+        buf.resize(buf.size() - 4);
         ADD_STR(outStr, buf)
     }
 
     // get free space on the disk where the events are stored
-    char buf[15];
     long long total = 0;
     long long used = 0;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "%d%%", static_cast<int>((used * 100) / total));
+    string buf = std::to_string(static_cast<int>((used * 100) / total)) + "%";
     ADD_STR(outStr, buf)
 
     send(outStr);
@@ -1085,11 +1072,11 @@ string ZMServer::runCommand(const string& command)
 {
     string outStr;
     FILE *fd = popen(command.c_str(), "r");
-    char buffer[100];
+    std::array<char,100> buffer {};
 
-    while (fgets(buffer, sizeof(buffer), fd) != nullptr)
+    while (fgets(buffer.data(), buffer.size(), fd) != nullptr)
     {
-        outStr += buffer;
+        outStr += buffer.data();
     }
     pclose(fd);
     return outStr;
@@ -1148,7 +1135,7 @@ void ZMServer::getMonitorStatus(const string &id, const string &type,
 
 void ZMServer::handleGetEventFrame(vector<string> tokens)
 {
-    static unsigned char s_buffer[MAX_IMAGE_SIZE];
+    static FrameData s_buffer {};
 
     if (tokens.size() != 5)
     {
@@ -1171,7 +1158,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
 
     // try to find the frame file
     string filepath;
-    char str[100];
+    string str (100,'\0');
 
     if (checkVersion(1, 32, 0))
     {
@@ -1179,11 +1166,11 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
         int month = 0;
         int day = 0;
 
-        sscanf(eventTime.c_str(), "%2d/%2d/%2d", &year, &month, &day);
-        sprintf(str, "20%02d-%02d-%02d", year, month, day);
+        sscanf(eventTime.data(), "%2d/%2d/%2d", &year, &month, &day);
+        sprintf(str.data(), "20%02d-%02d-%02d", year, month, day);
 
         filepath = g_eventsPath + "/" + monitorID + "/" + str + "/" + eventID + "/";
-        sprintf(str, m_eventFileFormat.c_str(), frameNo);
+        sprintf(str.data(), m_eventFileFormat.c_str(), frameNo);
         filepath += str;
     }
     else
@@ -1191,13 +1178,13 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
         if (m_useDeepStorage)
         {
             filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
-            sprintf(str, m_eventFileFormat.c_str(), frameNo);
+            sprintf(str.data(), m_eventFileFormat.c_str(), frameNo);
             filepath += str;
         }
         else
         {
             filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-            sprintf(str, m_eventFileFormat.c_str(), frameNo);
+            sprintf(str.data(), m_eventFileFormat.c_str(), frameNo);
             filepath += str;
         }
     }
@@ -1206,7 +1193,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     FILE *fd = fopen(filepath.c_str(), "r" );
     if (fd != nullptr)
     {
-        fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
+        fileSize = fread(s_buffer.data(), 1, s_buffer.size(), fd);
         fclose(fd);
     }
     else
@@ -1223,13 +1210,13 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     ADD_INT(outStr, fileSize)
 
     // send the data
-    send(outStr, s_buffer, fileSize);
+    send(outStr, s_buffer.data(), fileSize);
 }
 
 void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 {
-    static unsigned char s_buffer[MAX_IMAGE_SIZE];
-    char str[100];
+    static FrameData s_buffer {};
+    std::array<char,100> str {};
 
     if (tokens.size() != 5)
     {
@@ -1328,8 +1315,8 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
         int day = 0;
 
         sscanf(eventTime.c_str(), "%2d/%2d/%2d", &year, &month, &day);
-        sprintf(str, "20%02d-%02d-%02d", year, month, day);
-        filepath = g_eventsPath + "/" + monitorID + "/" + str + "/" + eventID + "/";
+        sprintf(str.data(), "20%02d-%02d-%02d", year, month, day);
+        filepath = g_eventsPath + "/" + monitorID + "/" + str.data() + "/" + eventID + "/";
     }
     else
     {
@@ -1347,12 +1334,12 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     // try to find an analysis frame for the frameID
     if (m_useAnalysisImages)
     {
-        sprintf(str, m_analysisFileFormat.c_str(), frameID);
-        frameFile = filepath + str;
+        sprintf(str.data(), m_analysisFileFormat.c_str(), frameID);
+        frameFile = filepath + str.data();
 
         if ((fd = fopen(frameFile.c_str(), "r" )))
         {
-            fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
+            fileSize = fread(s_buffer.data(), 1, s_buffer.size(), fd);
             fclose(fd);
 
             if (m_debug)
@@ -1362,18 +1349,18 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
             ADD_INT(outStr, fileSize)
 
             // send the data
-            send(outStr, s_buffer, fileSize);
+            send(outStr, s_buffer.data(), fileSize);
             return;
         }
     }
 
     // try to find a normal frame for the frameID these should always be available
-    sprintf(str, m_eventFileFormat.c_str(), frameID);
-    frameFile = filepath + str;
+    sprintf(str.data(), m_eventFileFormat.c_str(), frameID);
+    frameFile = filepath + str.data();
 
     if ((fd = fopen(frameFile.c_str(), "r" )))
     {
-        fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
+        fileSize = fread(s_buffer.data(), 1, s_buffer.size(), fd);
         fclose(fd);
     }
     else
@@ -1390,12 +1377,12 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     ADD_INT(outStr, fileSize)
 
     // send the data
-    send(outStr, s_buffer, fileSize);
+    send(outStr, s_buffer.data(), fileSize);
 }
 
 void ZMServer::handleGetLiveFrame(vector<string> tokens)
 {
-    static unsigned char s_buffer[MAX_IMAGE_SIZE];
+    static FrameData s_buffer {};
 
     // we need to periodically kick the DB connection here to make sure it
     // stays alive because the user may have left the frontend on the live
@@ -1437,7 +1424,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     }
 
     // read a frame from the shared memory
-    int dataSize = getFrame(s_buffer, sizeof(s_buffer), monitor);
+    int dataSize = getFrame(s_buffer, monitor);
 
     if (m_debug)
         cout << "Frame size: " <<  dataSize << endl;
@@ -1458,7 +1445,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     ADD_INT(outStr, dataSize)
 
     // send the data
-    send(outStr, s_buffer, dataSize);
+    send(outStr, s_buffer.data(), dataSize);
 }
 
 void ZMServer::handleGetFrameList(vector<string> tokens)
@@ -1521,11 +1508,8 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
             for (int x = 0; x < frameCount; x++)
             {
-                char str[10];
-                sprintf(str, "%f", delta);
-
                 ADD_STR(outStr, "Normal") // Type
-                ADD_STR(outStr, str)      // Delta
+                ADD_STR(outStr, std::to_string(delta)) // Delta
             }
         }
     }
@@ -1785,10 +1769,8 @@ void ZMServer::getMonitorList(void)
     mysql_free_result(res);
 }
 
-int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
+int ZMServer::getFrame(FrameData &buffer, MONITOR *monitor)
 {
-    (void) bufferSize;
-
     // is there a new frame available?
     if (monitor->getLastWriteIndex() == monitor->m_lastRead )
         return 0;
