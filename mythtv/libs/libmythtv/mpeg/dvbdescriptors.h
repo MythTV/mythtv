@@ -791,7 +791,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
-// DVB Bluebook A038 (Sept 2011) p 53
+// DVB Bluebook A038 (Feb 2019) p 58
 class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -900,7 +900,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
-// DVB Bluebook A038 (Sept 2011) p 55
+// DVB Bluebook A038 (Feb 2019) p 60
 class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -1032,7 +1032,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint TransmissionMode(void) const { return (m_data[8]>>1) & 0x3; }
     QString TransmissionModeString(void) const
     {
-        static QString tm[] = { "2", "8", "4", "auto" };
+        static QString tm[] = { "2k", "8k", "4k", "auto" };
         return tm[TransmissionMode()];
     }
     // other_frequency_flag     1   8.7
@@ -1042,17 +1042,66 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
-// DVB Bluebook A038 (Feb 2019) p 104
-class T2TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
+// DVB Bluebook A038 (Feb 2019) p 110
+class ImageIconDescriptor : public MPEGDescriptor
 {
   public:
-    explicit T2TerrestrialDeliverySystemDescriptor(
+    explicit ImageIconDescriptor(
         const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::t2_terrestrial_delivery_system) { }
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::image_icon)
+            {
+                m_data = nullptr;
+            }
+        }
     //       Name             bits  loc  expected value
-    // descriptor_tag           8   0.0       0x7f
+    // descriptor_tag           8   0.0       0x7f      extension
     // descriptor_length        8   1.0
-    // descriptor_tag_extension 8   2.0       0x4
+    // descriptor_tag_extension 8   2.0       0x00      image_icon
+
+    // descriptor_number        4   3.0
+    uint DescriptorNumber(void) const
+    {
+        return m_data[3] >> 4;
+    }
+
+    // last_descriptor_number   4   3.4
+    uint LastDescriptorNumber(void) const
+    {
+        return m_data[3] & 0xF;
+    }
+
+    // icon_id                  3   4.5
+    uint IconID(void) const
+    {
+        return m_data[4] & 0x7;
+    }
+
+    //
+    // TBD
+    //
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+// DVB Bluebook A038 (Feb 2019) p 104
+class T2DeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit T2DeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::t2_delivery_system)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x7f      extension
+    // descriptor_length        8   1.0
+    // descriptor_tag_extension 8   2.0       0x04      t2_delivery_system
 
     // plp_id                   8   3.0
     uint PlpID(void) const
@@ -1065,6 +1114,168 @@ class T2TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     {
         return ((m_data[4]<<8) | (m_data[5]));
     }
+
+    // SISO/MISO                2   6.0
+    uint SisoMiso(void) const { return (m_data[6] >> 6) & 0x3; }
+    QString SisoMisoString(void) const
+    {
+        static QString sm[] = { "SISO", "MISO", "reserved", "reserved" };
+        return sm[SisoMiso()];
+    }
+
+    // bandwidth                4   6.2
+    enum
+    {
+        kBandwidth8Mhz = 0x0,
+        kBandwidth7Mhz = 0x1,
+        kBandwidth6Mhz = 0x2,
+        kBandwidth5Mhz = 0x3,
+        kBandwidth10Mhz = 0x4,
+        kBandwidth1712kHz = 0x5,
+    };
+    uint Bandwidth(void) const { return (m_data[6] >> 2) & 0xF; }
+    uint BandwidthHz(void) const
+    {
+        static uint bw[] = { 8000000, 7000000, 6000000, 5000000, 10000000, 1712000 };
+        return (Bandwidth() <= kBandwidth1712kHz ? bw[Bandwidth()] : 0);
+    }
+    QString BandwidthString(void) const
+    {
+        static QString bs[] = { "8", "7", "6", "5", "10", "1.712" };
+        return (Bandwidth() <= kBandwidth1712kHz) ? bs[Bandwidth()] : "0";
+    }
+
+    // guard_interval           3   7.0
+    enum
+    {
+        kGuardInterval_1_32    = 0x0,
+        kGuardInterval_1_16    = 0x1,
+        kGuardInterval_1_8     = 0x2,
+        kGuardInterval_1_4     = 0x3,
+        kGuardInterval_1_128   = 0x4,
+        kGuardInterval_19_128  = 0x5,
+        kGuardInterval_19_256  = 0x6,
+    };
+    uint GuardInterval(void) const { return (m_data[7]>>5) & 0x7; }
+    QString GuardIntervalString(void) const
+    {
+        static QString gi[] = { "1/32", "1/16", "1/8", "1/4", "1/128", "19/128", "19/256", "reserved" };
+        return gi[GuardInterval()];
+    }
+
+    // transmission_mode        3   7.3
+    enum
+    {
+        kTransmissionMode2k  = 0x00,
+        kTransmissionMode8k  = 0x01,
+        kTransmissionMode4k  = 0x02,
+        kTransmissionMode1k  = 0x03,
+        kTransmissionMode16k = 0x04,
+        kTransmissionMode32k = 0x05,
+    };
+    uint TransmissionMode(void) const { return (m_data[7]>>2) & 0x7; }
+    QString TransmissionModeString(void) const
+    {
+        static QString tm[] = { "2k", "8k", "4k", "1k", "16k", "32k", "reserved", "reserved" };
+        return tm[TransmissionMode()];
+    }
+    uint OtherFrequencyFlag(void) const { return (m_data[7]>>1) & 0x1; }
+    uint TFSFlag(void) const { return m_data[7] & 0x1; }
+
+    //
+    // TBD
+    //
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+// DVB Bluebook A038 (Feb 2019) p 100
+class SHDeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit SHDeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::sh_delivery_system)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x7f      extension
+    // descriptor_length        8   1.0
+    // descriptor_tag_extension 8   2.0       0x05      sh_delivery_system
+
+    //
+    // TBD
+    //
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+// DVB Bluebook A038 (Feb 2019) p 98
+class C2DeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit C2DeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::c2_delivery_system)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name                     bits  loc     expected value
+    // descriptor_tag                   8   0.0     0x7f    extension
+    // descriptor_length                8   1.0     9
+    // descriptor_tag_extension         8   2.0     0x0D    c2_delivery_system
+
+    // plp_id                           8   3.0
+    uint PlpID(void) const
+    {
+        return m_data[3];
+    }
+
+    // data_slice_id                    8   4.0
+    uint DataSliceID(void) const
+    {
+        return m_data[4];
+    }
+
+    // C2_System_tuning_frequency       32  5.0
+    uint Frequency(void) const
+    {
+        return ((m_data[5]<<24) | (m_data[6]<<16) |
+                (m_data[7]<<8)  | (m_data[8]));
+    }
+
+    //
+    // TBD
+    //
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+// DVB Bluebook A038 (Feb 2019) p 108
+class S2XSatelliteDeliverySystemDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit S2XSatelliteDeliverySystemDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::s2x_satellite_delivery_system)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name                     bits  loc     expected value
+    // descriptor_tag                   8   0.0     0x7f    extension
+    // descriptor_length                8   1.0
+    // descriptor_tag_extension         8   2.0     0x17    s2x_delivery_system
+
 
     //
     // TBD

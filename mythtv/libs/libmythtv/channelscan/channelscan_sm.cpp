@@ -751,10 +751,18 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     tt = DTVTunerType::kTunerTypeDVBT;
                     break;
                 }
-                case DescriptorID::t2_terrestrial_delivery_system:
+                case DescriptorID::extension:
                 {
-                    tt = DTVTunerType::kTunerTypeDVBT2;
-                    continue;                           // T2 descriptor not yet used
+                    switch (desc.DescriptorTagExtension())
+                    {
+                        case DescriptorID::t2_delivery_system:
+                        {
+                            tt = DTVTunerType::kTunerTypeDVBT2;
+                            continue;                           // T2 descriptor not yet used
+                        }
+                        default:
+                            continue;                           // Next descriptor
+                    }
                 }
                 case DescriptorID::satellite_delivery_system:
                 {

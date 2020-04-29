@@ -68,7 +68,7 @@ class DescriptorID
         flex_mux_timing             = 0x2C,
         hevc_video                  = 0x38,
 
-        // DVB
+        // DVB Bluebook A038 (Feb 2019) p 36-38, Table 12
         network_name                = 0x40, /* implemented */
         service_list                = 0x41, /* implemented */
         dvb_stuffing                = 0x42, /* implemented */
@@ -135,7 +135,24 @@ class DescriptorID
         aac                            = 0x7C,
         xait_location                  = 0x7D,
         fta_content_management         = 0x7E,
-        t2_terrestrial_delivery_system = 0x7F,
+        extension                      = 0x7F,
+
+        // DVB Bluebook A038 (Feb 2019) p 94, Table 109
+        //
+        // Extension descriptors
+        image_icon                     = 0x00,
+        t2_delivery_system             = 0x04,
+        sh_delivery_system             = 0x05,
+        network_change_notify          = 0x07,
+        message                        = 0x08,
+        target_region                  = 0x09,
+        target_region_name             = 0x0A,
+        xait_pid                       = 0x0C,
+        c2_delivery_system             = 0x0D,
+        uri_linkage                    = 0x13,
+        ci_ancillary_data              = 0x14,
+        c2_bundle_delivery_system      = 0x16,
+        s2x_satellite_delivery_system  = 0x17,
 
         // ATSC
         atsc_stuffing               = 0x80,
@@ -297,8 +314,9 @@ class MTV_PUBLIC MPEGDescriptor
     uint size(void) const { return DescriptorLength() + 2; }
 
     uint DescriptorTag(void) const { return m_data[0]; }
-    QString DescriptorTagString(void) const;
     uint DescriptorLength(void) const { return m_data[1]; }
+    uint DescriptorTagExtension(void) const { return m_data[2]; }
+    QString DescriptorTagString(void) const;
 
     virtual QString toString(void) const;
     virtual QString toStringPD(uint priv_dsid) const;

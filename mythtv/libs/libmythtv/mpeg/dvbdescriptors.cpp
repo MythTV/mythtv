@@ -584,7 +584,7 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     QString str = QString("TerrestrialDeliverySystemDescriptor: ");
 
     str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
-    str.append(QString("      BW=%1k, C=%2, HP=%3, LP=%4, GI=%5, TransMode=%6k")
+    str.append(QString("      BW=%1MHz C=%2 HP=%3 LP=%4 GI=%5 TransMode=%6")
         .arg(BandwidthString())
         .arg(ConstellationString())
         .arg(CodeRateHPString())
@@ -595,12 +595,62 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
-QString T2TerrestrialDeliverySystemDescriptor::toString() const
+QString ImageIconDescriptor::toString() const
 {
-    QString str = QString("T2TerrestrialDeliverySystemDescriptor: ");
-    str.append(QString("plp_id(%1) T2_system_id(%2)")
-        .arg(PlpID())
-        .arg(T2SystemID()));
+    QString str = QString("ImageIconDescriptor: ");
+    str.append(QString("%1/%2 id:%3")
+        .arg(DescriptorNumber())
+        .arg(LastDescriptorNumber()));
+    //
+    // TBD
+    //
+    return str;
+}
+
+QString T2DeliverySystemDescriptor::toString() const
+{
+    QString str = QString("T2DeliverySystemDescriptor: ");
+    str += QString("plp_id(%1) ").arg(PlpID());
+    str += QString("T2_system_id(%1) ").arg(T2SystemID());
+    if (DescriptorLength() > 4)
+    {
+        str += QString("\n      %1 ").arg(SisoMisoString());
+        str += QString("BW=%1MHz ").arg(BandwidthString());
+        str += QString("GI=%1 ").arg(GuardIntervalString());
+        str += QString("TransMode=%1 ").arg(TransmissionModeString());
+        str += QString("OF=%1 ").arg(OtherFrequencyFlag());
+        str += QString("TFS=%1 ").arg(TFSFlag());
+    }
+    if (DescriptorLength() > 6)
+    {
+        //
+        // TBD
+        //
+    }
+    return str;
+}
+
+QString SHDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("SHDeliverySystemDescriptor: ");
+    //
+    // TBD
+    //
+    return str;
+}
+
+QString C2DeliverySystemDescriptor::toString() const
+{
+    QString str = QString("C2DeliverySystemDescriptor: ");
+    //
+    // TBD
+    //
+    return str;
+}
+
+QString S2XSatelliteDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("S2XSatelliteDeliverySystemDescriptor: ");
     //
     // TBD
     //
