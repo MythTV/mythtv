@@ -1444,27 +1444,10 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     continue;
                 }
 
-                // Descriptors in the transport stream loop of this transport in the NIT
+                // Get channel numbers from UK Frequency List Descriptors
                 const desc_list_t &list =
                     MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                           nit->TransportDescriptorsLength(i));
-
-                // Presence of T2 delivery system descriptor indicates DVB-T2 delivery system
-                // DVB BlueBook A038 (Feb 2019) page 104, paragraph 6.4.6.3
-                {
-                    const unsigned char *desc =
-                        MPEGDescriptor::Find(
-                            list, DescriptorID::t2_terrestrial_delivery_system);
-
-                    if (desc)
-                    {
-                        T2TerrestrialDeliverySystemDescriptor t2tdsd(desc);
-                        if (t2tdsd.IsValid())
-                        {
-                            (*trans_info).m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
-                        }
-                    }
-                }
 
                 // Logical channel numbers
                 {
