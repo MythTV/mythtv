@@ -31,16 +31,17 @@ uint SaveScan(const ScanDTVTransportList &scan)
     uint sourceid = scan[0].m_channels[0].m_sourceId;
     uint cardid   = scan[0].m_cardid;
 
-    // Delete scans more than two weeks old
+    // Delete saved scans when there are too many or when they are too old
     const vector<ScanInfo> list = LoadScanList(sourceid);
-    for (const auto & si : list)
+    for (uint i = 0; i < list.size(); i++)
     {
-        if (si.m_scandate < MythDate::current().addDays(-14))
+        if (((i + 10) < (list.size())) ||
+            (list[i].m_scandate < MythDate::current().addMonths(-6)))
         {
-            LOG(VB_CHANSCAN, LOG_DEBUG, "ScanInfo::SaveScan " +
-                QString("si.m_scanid:%1 si.m_scandate:%2 --  delete now")
-                .arg(si.m_scanid).arg(si.m_scandate.toString()));
-            ScanInfo::DeleteScan(si.m_scanid);
+            LOG(VB_CHANSCAN, LOG_INFO, "SaveScan() " +
+                QString("Delete saved scan id:%1 date:%2")
+                .arg(list[i].m_scanid).arg(list[i].m_scandate.toString()));
+            ScanInfo::DeleteScan(list[i].m_scanid);
         }
     }
 
