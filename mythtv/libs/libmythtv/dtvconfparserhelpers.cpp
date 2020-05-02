@@ -38,6 +38,10 @@ QString DTVParamHelper::toString(const char *strings[], int index,
     return strings[index];
 }
 
+//
+// === Tuner Type ===
+//
+
 const int DTVTunerType::kTunerTypeDVBS1   = 0x0000;
 const int DTVTunerType::kTunerTypeDVBS2   = 0x0020;
 const int DTVTunerType::kTunerTypeDVBC    = 0x0001;
@@ -88,6 +92,10 @@ const DTVParamHelperStruct DTVTunerType::kParseTable[] =
     { nullptr,   kTunerTypeUnknown },
 };
 
+//
+// === Inversion ===
+//
+
 const DTVParamHelperStruct DTVInversion::kConfTable[] =
 {
    { "INVERSION_AUTO", kInversionAuto },
@@ -98,17 +106,17 @@ const DTVParamHelperStruct DTVInversion::kConfTable[] =
 
 const DTVParamHelperStruct DTVInversion::kVdrTable[] =
 {
-   { "999", kInversionAuto },
-   { "0",   kInversionOff  },
-   { "1",   kInversionOn   },
+   { "999",   kInversionAuto },
+   { "0",     kInversionOff  },
+   { "1",     kInversionOn   },
    { nullptr, kInversionAuto },
 };
 
 const DTVParamHelperStruct DTVInversion::kParseTable[] =
 {
-   { "a",  kInversionAuto },
-   { "0",  kInversionOff  },
-   { "1",  kInversionOn   },
+   { "a",     kInversionAuto },
+   { "0",     kInversionOff  },
+   { "1",     kInversionOn   },
    { nullptr, kInversionAuto },
 };
 
@@ -119,44 +127,67 @@ const char *DTVInversion::s_dbStr[DTVInversion::kDBStrCnt] =
     "a"  ///< kInversionAuto
 };
 
+//
+// === Bandwidth ===
+//
+// Database update needed for the 10MHz and 1.712MHz because
+// dtvmultiplex:bandwidth is now only one character.
+//
+
 const DTVParamHelperStruct DTVBandwidth::kConfTable[] =
 {
-   { "BANDWIDTH_AUTO",  kBandwidthAuto },
-   { "BANDWIDTH_8_MHZ", kBandwidth8MHz },
-   { "BANDWIDTH_7_MHZ", kBandwidth7MHz },
-   { "BANDWIDTH_6_MHZ", kBandwidth6MHz },
-   { nullptr,           kBandwidthAuto },
+   { "BANDWIDTH_AUTO",      kBandwidthAuto    },
+   { "BANDWIDTH_8_MHZ",     kBandwidth8MHz    },
+   { "BANDWIDTH_7_MHZ",     kBandwidth7MHz    },
+   { "BANDWIDTH_6_MHZ",     kBandwidth6MHz    },
+   { "BANDWIDTH_5_MHZ",     kBandwidth5MHz    },
+   { "BANDWIDTH_10_MHZ",    kBandwidth10MHz   },
+   { "BANDWIDTH_1_712_MHZ", kBandwidth1712kHz },
+   { nullptr,               kBandwidthAuto    },
 };
 
 const DTVParamHelperStruct DTVBandwidth::kVdrTable[] =
 {
-   { "999", kBandwidthAuto },
-   { "8",   kBandwidth8MHz },
-   { "7",   kBandwidth7MHz },
-   { "6",   kBandwidth6MHz },
-   { nullptr, kBandwidthAuto },
+   { "999",   kBandwidthAuto    },
+   { "8",     kBandwidth8MHz    },
+   { "7",     kBandwidth7MHz    },
+   { "6",     kBandwidth6MHz    },
+   { "5",     kBandwidth5MHz    },
+   { "10",    kBandwidth10MHz   },
+   { "1712",  kBandwidth1712kHz },
+   { nullptr, kBandwidthAuto    },
 };
 
 const DTVParamHelperStruct DTVBandwidth::kParseTable[] =
 {
-   { "a",    kBandwidthAuto },
-   { "8",    kBandwidth8MHz },
-   { "7",    kBandwidth7MHz },
-   { "6",    kBandwidth6MHz },
-   { nullptr,kBandwidthAuto },
+   { "a",     kBandwidthAuto    },
+   { "8",     kBandwidth8MHz    },
+   { "7",     kBandwidth7MHz    },
+   { "6",     kBandwidth6MHz    },
+   { "5",     kBandwidth5MHz    },
+   { "10",    kBandwidth10MHz   },
+   { "1712",  kBandwidth1712kHz },
+   { nullptr, kBandwidthAuto    },
 };
 
 const char *DTVBandwidth::s_dbStr[DTVBandwidth::kDBStrCnt] =
 {
-    "8",   ///< kBandwidth8MHz
-    "7",   ///< kBandwidth7MHz
-    "6",   ///< kBandwidth6MHz
-    "a"    ///< kBandwidthAUTO
+    "8",     ///< kBandwidth8MHz
+    "7",     ///< kBandwidth7MHz
+    "6",     ///< kBandwidth6MHz
+    "a",     ///< kBandwidthAUTO
+    "5",     ///< kBandwidth5MHz
+    "10",    ///< kBandwidth10MHz
+    "1712",  ///< kBandwidth1712kHz
 };
+
+//
+// === Forward Error Correction / Code Rate ===
+//
 
 const DTVParamHelperStruct DTVCodeRate::kConfTable[] =
 {
-    { "FEC_AUTO", kFECAuto },
+    { "FEC_AUTO", kFECAuto  },
     { "FEC_1_2",  kFEC_1_2  },
     { "FEC_2_3",  kFEC_2_3  },
     { "FEC_3_4",  kFEC_3_4  },
@@ -165,61 +196,65 @@ const DTVParamHelperStruct DTVCodeRate::kConfTable[] =
     { "FEC_6_7",  kFEC_6_7  },
     { "FEC_7_8",  kFEC_7_8  },
     { "FEC_8_9",  kFEC_8_9  },
-    { "FEC_NONE", kFECNone },
+    { "FEC_NONE", kFECNone  },
     { "FEC_3_5",  kFEC_3_5  },
     { "FEC_9_10", kFEC_9_10 },
-    { nullptr,    kFECAuto },
+    { nullptr,    kFECAuto  },
 };
 
 const DTVParamHelperStruct DTVCodeRate::kVdrTable[] =
 {
-    { "999", kFECAuto },
-    { "12",  kFEC_1_2 },
-    { "23",  kFEC_2_3 },
-    { "34",  kFEC_3_4 },
-    { "45",  kFEC_4_5 },
-    { "56",  kFEC_5_6 },
-    { "67",  kFEC_6_7 },
-    { "78",  kFEC_7_8 },
-    { "89",  kFEC_8_9 },
-    { "0",   kFECNone },
-    { "35",  kFEC_3_5 },
-    { "910", kFEC_9_10 },
-    { nullptr, kFECAuto }
+    { "999",   kFECAuto  },
+    { "12",    kFEC_1_2  },
+    { "23",    kFEC_2_3  },
+    { "34",    kFEC_3_4  },
+    { "45",    kFEC_4_5  },
+    { "56",    kFEC_5_6  },
+    { "67",    kFEC_6_7  },
+    { "78",    kFEC_7_8  },
+    { "89",    kFEC_8_9  },
+    { "0",     kFECNone  },
+    { "35",    kFEC_3_5  },
+    { "910",   kFEC_9_10 },
+    { nullptr, kFECAuto  }
 };
 
 const DTVParamHelperStruct DTVCodeRate::kParseTable[] =
 {
-    { "auto", kFECAuto },
-    { "1/2",  kFEC_1_2 },
-    { "2/3",  kFEC_2_3 },
-    { "3/4",  kFEC_3_4 },
-    { "4/5",  kFEC_4_5 },
-    { "5/6",  kFEC_5_6 },
-    { "6/7",  kFEC_6_7 },
-    { "7/8",  kFEC_7_8 },
-    { "8/9",  kFEC_8_9 },
-    { "none", kFECNone },
-    { "3/5",  kFEC_3_5 },
-    { "9/10", kFEC_9_10},
-    { nullptr, kFECAuto }
+    { "auto",  kFECAuto  },
+    { "1/2",   kFEC_1_2  },
+    { "2/3",   kFEC_2_3  },
+    { "3/4",   kFEC_3_4  },
+    { "4/5",   kFEC_4_5  },
+    { "5/6",   kFEC_5_6  },
+    { "6/7",   kFEC_6_7  },
+    { "7/8",   kFEC_7_8  },
+    { "8/9",   kFEC_8_9  },
+    { "none",  kFECNone  },
+    { "3/5",   kFEC_3_5  },
+    { "9/10",  kFEC_9_10 },
+    { nullptr, kFECAuto  }
 };
 
 const char *DTVCodeRate::s_dbStr[DTVCodeRate::kDBStrCnt] =
 {
-     "none", ///< kFECNone
-     "1/2",  ///< kFEC_1_2
-     "2/3",  ///< kFEC_2_3
-     "3/4",  ///< kFEC_3_4
-     "4/5",  ///< kFEC_4_5
-     "5/6",  ///< kFEC_5_6
-     "6/7",  ///< kFEC_6_7
-     "7/8",  ///< kFEC_7_8
-     "8/9",  ///< kFEC_8_9
-     "auto", ///< kFECAuto
-     "3/5",  ///< kFEC_3_5
+     "none",  ///< kFECNone
+     "1/2",   ///< kFEC_1_2
+     "2/3",   ///< kFEC_2_3
+     "3/4",   ///< kFEC_3_4
+     "4/5",   ///< kFEC_4_5
+     "5/6",   ///< kFEC_5_6
+     "6/7",   ///< kFEC_6_7
+     "7/8",   ///< kFEC_7_8
+     "8/9",   ///< kFEC_8_9
+     "auto",  ///< kFECAuto
+     "3/5",   ///< kFEC_3_5
      "9/10",  ///< kFEC_9_10
 };
+
+//
+// === Modulation ===
+//
 
 const DTVParamHelperStruct DTVModulation::kConfTable[] =
 {
@@ -246,18 +281,18 @@ const DTVParamHelperStruct DTVModulation::kConfTable[] =
 
 const DTVParamHelperStruct DTVModulation::kVdrTable[] =
 {
-   { "998", kModulationQAMAuto },
-   { "16",  kModulationQAM16   },
-   { "32",  kModulationQAM32   },
-   { "64",  kModulationQAM64   },
-   { "128", kModulationQAM128  },
-   { "256", kModulationQAM256  },
-   { "2",   kModulationQPSK    },
-   { "5",   kModulation8PSK    },
-   { "6",   kModulation16APSK  },
-   { "7",   kModulation32APSK  },
-   { "10",  kModulation8VSB    },
-   { "11",  kModulation16VSB   },
+   { "999",   kModulationQAMAuto },
+   { "16",    kModulationQAM16   },
+   { "32",    kModulationQAM32   },
+   { "64",    kModulationQAM64   },
+   { "128",   kModulationQAM128  },
+   { "256",   kModulationQAM256  },
+   { "2",     kModulationQPSK    },
+   { "5",     kModulation8PSK    },
+   { "6",     kModulation16APSK  },
+   { "7",     kModulation32APSK  },
+   { "10",    kModulation8VSB    },
+   { "11",    kModulation16VSB   },
    { nullptr, kModulationQAMAuto },
 };
 
@@ -319,75 +354,117 @@ const char *DTVModulation::s_dbStr[DTVModulation::kDBStrCnt] =
     "dqpsk"    ///< kModulationDQPSK
 };
 
+//
+// === Transmission Mode ===
+//
+// Database update needed for the 16k and 32k modes because
+// dtvmultiplex:transmission_mode is now only one character.
+//
 const DTVParamHelperStruct DTVTransmitMode::kConfTable[] =
 {
-   { "TRANSMISSION_MODE_AUTO", kTransmissionModeAuto },
+   { "TRANSMISSION_MODE_1K",   kTransmissionMode1K   },
    { "TRANSMISSION_MODE_2K",   kTransmissionMode2K   },
+   { "TRANSMISSION_MODE_4K",   kTransmissionMode4K   },
    { "TRANSMISSION_MODE_8K",   kTransmissionMode8K   },
+   { "TRANSMISSION_MODE_16K",  kTransmissionMode16K  },
+   { "TRANSMISSION_MODE_32K",  kTransmissionMode32K  },
+   { "TRANSMISSION_MODE_AUTO", kTransmissionModeAuto },
    { nullptr,                  kTransmissionModeAuto },
 };
 
 const DTVParamHelperStruct DTVTransmitMode::kVdrTable[] =
 {
-   { "999", kTransmissionModeAuto },
-   { "2",   kTransmissionMode2K   },
-   { "8",   kTransmissionMode8K   },
+   { "999",   kTransmissionModeAuto },
+   { "1",     kTransmissionMode1K   },
+   { "2",     kTransmissionMode2K   },
+   { "4",     kTransmissionMode4K   },
+   { "8",     kTransmissionMode8K   },
+   { "16",    kTransmissionMode16K  },
+   { "32",    kTransmissionMode32K  },
    { nullptr, kTransmissionModeAuto },
 };
 
 const DTVParamHelperStruct DTVTransmitMode::kParseTable[] =
 {
-   { "a",    kTransmissionModeAuto },
-   { "2",    kTransmissionMode2K   },
-   { "8",    kTransmissionMode8K   },
-   { nullptr,  kTransmissionModeAuto },
+   { "a",     kTransmissionModeAuto },
+   { "1",     kTransmissionMode1K   },
+   { "2",     kTransmissionMode2K   },
+   { "4",     kTransmissionMode4K   },
+   { "8",     kTransmissionMode8K   },
+   { "16",    kTransmissionMode16K  },
+   { "32",    kTransmissionMode32K  },
+   { nullptr, kTransmissionModeAuto },
 };
 
 const char *DTVTransmitMode::s_dbStr[DTVTransmitMode::kDBStrCnt] =
 {
     "2",   ///< kTransmissionMode2K
     "8",   ///< kTransmissionMode8K
-    "a"    ///< kTransmissionModeAuto
+    "a",   ///< kTransmissionModeAuto
+    "4",   ///< kTransmissionMode4K
+    "1",   ///< kTransmissionMode1K
+    "16",  ///< kTransmissionMode16K
+    "32"   ///< kTransmissionMode32K
 };
+
+//
+// === Guard Interval ===
+//
 
 const DTVParamHelperStruct DTVGuardInterval::kConfTable[] =
 {
-   { "GUARD_INTERVAL_AUTO", kGuardIntervalAuto  },
-   { "GUARD_INTERVAL_1_32", kGuardInterval_1_32 },
-   { "GUARD_INTERVAL_1_16", kGuardInterval_1_16 },
-   { "GUARD_INTERVAL_1_8",  kGuardInterval_1_8  },
-   { "GUARD_INTERVAL_1_4",  kGuardInterval_1_4  },
-   { nullptr,               kGuardIntervalAuto  },
+   { "GUARD_INTERVAL_1_32",    kGuardInterval_1_32   },
+   { "GUARD_INTERVAL_1_16",    kGuardInterval_1_16   },
+   { "GUARD_INTERVAL_1_8",     kGuardInterval_1_8    },
+   { "GUARD_INTERVAL_1_4",     kGuardInterval_1_4    },
+   { "GUARD_INTERVAL_AUTO",    kGuardIntervalAuto    },
+   { "GUARD_INTERVAL_1_128",   kGuardInterval_1_128  },
+   { "GUARD_INTERVAL_19_128",  kGuardInterval_19_128 },
+   { "GUARD_INTERVAL_19_256",  kGuardInterval_19_256 },
+   { nullptr,                  kGuardIntervalAuto    },
 };
 
 const DTVParamHelperStruct DTVGuardInterval::kVdrTable[] =
 {
-   { "999", kGuardIntervalAuto  },
-   { "32",  kGuardInterval_1_32 },
-   { "16",  kGuardInterval_1_16 },
-   { "8",   kGuardInterval_1_8  },
-   { "4",   kGuardInterval_1_4  },
-   { nullptr, kGuardIntervalAuto  },
+   { "999",    kGuardIntervalAuto    },
+   { "32",     kGuardInterval_1_32   },
+   { "16",     kGuardInterval_1_16   },
+   { "8",      kGuardInterval_1_8    },
+   { "4",      kGuardInterval_1_4    },
+   { "128",    kGuardInterval_1_128  },
+   { "19128",  kGuardInterval_19_128 },
+   { "19256",  kGuardInterval_19_256 },
+   { nullptr,  kGuardIntervalAuto    },
 };
 
 const DTVParamHelperStruct DTVGuardInterval::kParseTable[] =
 {
-   { "auto", kGuardIntervalAuto  },
-   { "1/32", kGuardInterval_1_32 },
-   { "1/16", kGuardInterval_1_16 },
-   { "1/8",  kGuardInterval_1_8  },
-   { "1/4",  kGuardInterval_1_4  },
-   { nullptr, kGuardIntervalAuto  },
+   { "auto",   kGuardIntervalAuto    },
+   { "1/32",   kGuardInterval_1_32   },
+   { "1/16",   kGuardInterval_1_16   },
+   { "1/8",    kGuardInterval_1_8    },
+   { "1/4",    kGuardInterval_1_4    },
+   { "1/128",  kGuardInterval_1_128  },
+   { "19/128", kGuardInterval_19_128 },
+   { "19/256", kGuardInterval_19_256 },
+   { nullptr,  kGuardIntervalAuto    },
 };
 
 const char *DTVGuardInterval::s_dbStr[DTVGuardInterval::kDBStrCnt] =
 {
-    "1/32", ///< kGuardInterval_1_32
-    "1/16", ///< kGuardInterval_1_16
-    "1/8",  ///< kGuardInterval_1_8
-    "1/4",  ///< kGuardInterval_1_4
-    "auto"  ///< kGuardIntervalAuto
+    "1/32",   ///< kGuardInterval_1_32
+    "1/16",   ///< kGuardInterval_1_16
+    "1/8",    ///< kGuardInterval_1_8
+    "1/4",    ///< kGuardInterval_1_4
+    "auto",   ///< kGuardIntervalAuto
+    "1/128",  ///< kGuardInterval_1_128
+    "19/128", ///< kGuardInterval_19_128
+    "19/256", ///< kGuardInterval_19_256
 };
+
+//
+// === Hierarchy ===
+//
 
 const DTVParamHelperStruct DTVHierarchy::kConfTable[] =
 {
@@ -401,21 +478,21 @@ const DTVParamHelperStruct DTVHierarchy::kConfTable[] =
 
 const DTVParamHelperStruct DTVHierarchy::kVdrTable[] =
 {
-   { "0",   kHierarchyNone },
-   { "1",   kHierarchy1    },
-   { "2",   kHierarchy2    },
-   { "4",   kHierarchy4    },
-   { "999", kHierarchyAuto },
+   { "999",   kHierarchyAuto },
+   { "0",     kHierarchyNone },
+   { "1",     kHierarchy1    },
+   { "2",     kHierarchy2    },
+   { "4",     kHierarchy4    },
    { nullptr, kHierarchyAuto },
 };
 
 const DTVParamHelperStruct DTVHierarchy::kParseTable[] =
 {
-   { "n",  kHierarchyNone },
-   { "1",  kHierarchy1    },
-   { "2",  kHierarchy2    },
-   { "4",  kHierarchy4    },
-   { "a",  kHierarchyAuto },
+   { "n",     kHierarchyNone },
+   { "1",     kHierarchy1    },
+   { "2",     kHierarchy2    },
+   { "4",     kHierarchy4    },
+   { "a",     kHierarchyAuto },
    { nullptr, kHierarchyAuto },
 };
 
@@ -428,12 +505,16 @@ const char *DTVHierarchy::s_dbStr[DTVHierarchy::kDBStrCnt] =
     "a"  ///< kHierarchyAuto
 };
 
+//
+// === Polarity ===
+//
+
 const DTVParamHelperStruct DTVPolarity::kParseTable[] =
 {
-    { "v",  kPolarityVertical   },
-    { "h",  kPolarityHorizontal },
-    { "r",  kPolarityRight      },
-    { "l",  kPolarityLeft       },
+    { "v",     kPolarityVertical   },
+    { "h",     kPolarityHorizontal },
+    { "r",     kPolarityRight      },
+    { "l",     kPolarityLeft       },
     { nullptr, kPolarityVertical   },
 };
 
@@ -444,6 +525,10 @@ const char *DTVPolarity::s_dbStr[DTVPolarity::kDBStrCnt] =
    "r", ///< kPolarityRight
    "l"  ///< kPolarityLeft
 };
+
+//
+// === Modulation System ===
+//
 
 const DTVParamHelperStruct DTVModulationSystem::kConfTable[] =
 {
@@ -461,7 +546,7 @@ const DTVParamHelperStruct DTVModulationSystem::kConfTable[] =
     { "SYS_ISDBC",         kModulationSystem_ISDBC         },
     { "SYS_ATSC",          kModulationSystem_ATSC          },
     { "SYS_ATSCMH",        kModulationSystem_ATSCMH        },
-    { "SYS_DMBTH",         kModulationSystem_DMBTH         },
+    { "SYS_DTMB",          kModulationSystem_DTMB          },
     { "SYS_CMMB",          kModulationSystem_CMMB          },
     { "SYS_DAB",           kModulationSystem_DAB           },
     { "SYS_TURBO",         kModulationSystem_TURBO         },
@@ -471,8 +556,8 @@ const DTVParamHelperStruct DTVModulationSystem::kConfTable[] =
 
 const DTVParamHelperStruct DTVModulationSystem::kVdrTable[] =
 {
-    { "0",  kModulationSystem_DVBS      },
-    { "1",  kModulationSystem_DVBS2     },
+    { "0",     kModulationSystem_DVBS      },
+    { "1",     kModulationSystem_DVBS2     },
     { nullptr, kModulationSystem_UNDEFINED },
 };
 
@@ -491,7 +576,7 @@ const DTVParamHelperStruct DTVModulationSystem::kParseTable[] =
     { "ISDBC",        kModulationSystem_ISDBC         },
     { "ATSC",         kModulationSystem_ATSC          },
     { "ATSCMH",       kModulationSystem_ATSCMH        },
-    { "DMBTH",        kModulationSystem_DMBTH         },
+    { "DTMB",         kModulationSystem_DTMB          },
     { "CMMB",         kModulationSystem_CMMB          },
     { "DAB",          kModulationSystem_DAB           },
     { "DVB-T2",       kModulationSystem_DVBT2         },
@@ -515,7 +600,7 @@ const char *DTVModulationSystem::s_dbStr[DTVModulationSystem::kDBStrCnt] =
     "ISDBC",         ///< kModulationSystem_ISDBC
     "ATSC",          ///< kModulationSystem_ATSC
     "ATSCMH",        ///< kModulationSystem_ATSCMH
-    "DMBTH",         ///< kModulationSystem_DMBTH
+    "DTMB",          ///< kModulationSystem_DTMB
     "CMMB",          ///< kModulationSystem_CMMB
     "DAB",           ///< kModulationSystem_DAB
     "DVB-T2",        ///< kModulationSystem_DVBT2
@@ -523,29 +608,34 @@ const char *DTVModulationSystem::s_dbStr[DTVModulationSystem::kDBStrCnt] =
     "DVB-C/C",       ///< kModulationSystem_DVBC_ANNEX_C
 };
 
+//
+// === Rolloff ===
+//
+
 const DTVParamHelperStruct DTVRollOff::kConfTable[] =
 {
    { "ROLLOFF_35",   kRollOff_35   },
    { "ROLLOFF_20",   kRollOff_20   },
    { "ROLLOFF_25",   kRollOff_25   },
    { "ROLLOFF_AUTO", kRollOff_Auto },
-   { nullptr,        kRollOff_35 },
+   { nullptr,        kRollOff_35   },
 };
 
 const DTVParamHelperStruct DTVRollOff::kVdrTable[] =
 {
-   { "35",   kRollOff_35   },
-   { "20",   kRollOff_20   },
-   { "25",   kRollOff_25   },
-   { "0",    kRollOff_Auto },
+   { "35",    kRollOff_35   },
+   { "20",    kRollOff_20   },
+   { "25",    kRollOff_25   },
+   { "0",     kRollOff_Auto },
    { nullptr, kRollOff_35   },
 };
+
 const DTVParamHelperStruct DTVRollOff::kParseTable[] =
 {
-   { "0.35", kRollOff_35   },
-   { "0.20", kRollOff_20   },
-   { "0.25", kRollOff_25   },
-   { "auto", kRollOff_Auto },
+   { "0.35",  kRollOff_35   },
+   { "0.20",  kRollOff_20   },
+   { "0.25",  kRollOff_25   },
+   { "auto",  kRollOff_Auto },
    { nullptr, kRollOff_35   },
 };
 
@@ -554,5 +644,5 @@ const char *DTVRollOff::s_dbStr[DTVRollOff::kDBStrCnt] =
    "0.35",   ///< kRollOff_35
    "0.20",   ///< kRollOff_20
    "0.25",   ///< kRollOff_25
-   "auto", ///< kRollOff_Auto
+   "auto",   ///< kRollOff_Auto
 };
