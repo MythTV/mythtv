@@ -2617,6 +2617,8 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
         quiet = max(quiet, 1);
 
     logStart(logfile, progress, quiet, facility, level, dblog, propagate);
+    qInstallMessageHandler([](QtMsgType, const QMessageLogContext&, const QString &Msg)
+        { LOG(VB_GENERAL, LOG_INFO, "Qt: " + Msg); });
 
     return GENERIC_EXIT_OK;
 }
