@@ -86,6 +86,19 @@ const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
     return nullptr;
 }
 
+const unsigned char *MPEGDescriptor::FindExtension(const desc_list_t &parsed,
+                                                    uint desc_tag)
+{
+    for (const auto *item : parsed)
+    {
+        if (item[0] == DescriptorID::extension &&
+            item[1] > 1 &&
+            item[2] == desc_tag)
+            return item;
+    }
+    return nullptr;
+}
+
 desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;

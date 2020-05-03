@@ -329,6 +329,7 @@ class MTV_PUBLIC MPEGDescriptor
                                         int excluded_descid);
 
     static const unsigned char *Find(const desc_list_t &parsed, uint desc_tag);
+    static const unsigned char *FindExtension(const desc_list_t &parsed, uint desc_tag);
     static desc_list_t FindAll(const desc_list_t &parsed, uint desc_tag);
 
     static const unsigned char *FindBestMatch(
