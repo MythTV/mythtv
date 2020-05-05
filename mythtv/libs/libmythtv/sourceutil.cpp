@@ -65,6 +65,29 @@ QString SourceUtil::GetSourceName(uint sourceid)
     return query.value(0).toString();
 }
 
+uint SourceUtil::GetSourceID(const QString &name)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT sourceid "
+        "FROM videosource "
+        "WHERE name = :NAME");
+    query.bindValue(":NAME", name);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("SourceUtil::GetSourceID()", query);
+        return 0;
+    }
+    if (!query.next())
+    {
+        return 0;
+    }
+
+    return query.value(0).toUInt();
+}
+
 QString SourceUtil::GetChannelSeparator(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

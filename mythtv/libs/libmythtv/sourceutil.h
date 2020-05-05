@@ -17,6 +17,7 @@ class MTV_PUBLIC SourceUtil
   public:
     static bool    HasDigitalChannel(uint sourceid);
     static QString GetSourceName(uint sourceid);
+    static uint    GetSourceID(const QString &name);
     static QString GetChannelSeparator(uint sourceid);
     static QString GetChannelFormat(uint sourceid);
     static uint    GetChannelCount(uint sourceid);

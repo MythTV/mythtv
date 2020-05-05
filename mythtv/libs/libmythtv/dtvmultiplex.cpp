@@ -509,7 +509,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     return false;
                 }
 
-                return ParseDVB_S_and_C(
+                return ParseDVB_S(
                     QString::number(cd.FrequencykHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
