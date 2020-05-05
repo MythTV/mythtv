@@ -35,6 +35,7 @@ using namespace std;
 
 #include "transporteditor.h"
 #include "videosource.h"
+#include "sourceutil.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 
@@ -109,6 +110,14 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
             cardtype = CardUtil::ProbeSubTypeName(cardid);
         nType = CardUtil::toInputType(cardtype);
 
+        if (nType == CardUtil::HDHOMERUN)
+        {
+            if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
+                nType = CardUtil::DVBC;
+            else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+                nType = CardUtil::DVBT2;
+        }
+
         if ((CardUtil::ERROR_OPEN    == nType) ||
             (CardUtil::ERROR_UNKNOWN == nType) ||
             (CardUtil::ERROR_PROBE   == nType))
@@ -176,22 +185,22 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     return retval;
 }
 
-void TransportListEditor::SetSourceID(uint _sourceid)
+void TransportListEditor::SetSourceID(uint sourceid)
 {
     for (auto *setting : m_list)
         removeChild(setting);
     m_list.clear();
 
-    if (!_sourceid)
+    if (!sourceid)
     {
         m_sourceid = 0;
     }
     else
     {
-        m_cardtype = get_cardtype(_sourceid);
+        m_cardtype = get_cardtype(sourceid);
         m_sourceid = ((CardUtil::ERROR_OPEN    == m_cardtype) ||
                       (CardUtil::ERROR_UNKNOWN == m_cardtype) ||
-                      (CardUtil::ERROR_PROBE   == m_cardtype)) ? 0 : _sourceid;
+                      (CardUtil::ERROR_PROBE   == m_cardtype)) ? 0 : sourceid;
     }
 }
 
@@ -214,11 +223,14 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     SetSourceID(sourceid);
 }
 
-void TransportListEditor::SetSourceID(const QString& sourceid)
+void TransportListEditor::SetSourceID(const QString& name)
 {
     if (m_isLoading)
         return;
-    SetSourceID(sourceid.toUInt());
+
+    uint sourceid = SourceUtil::GetSourceID(name);
+
+    SetSourceID(sourceid);
     Load();
 }
 

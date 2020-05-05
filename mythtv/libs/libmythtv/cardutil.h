@@ -79,10 +79,16 @@ class MTV_PUBLIC CardUtil
             return ERROR_PROBE;
         if ("QPSK" == name)
             return QPSK;
+        if ("DVBS" == name)
+            return DVBS;
         if ("QAM" == name)
             return QAM;
+        if ("DVBC" == name)
+            return DVBC;
         if ("OFDM" == name)
             return OFDM;
+        if ("DVBT" == name)
+            return DVBT;
         if ("ATSC" == name)
             return ATSC;
         if ("V4L" == name)

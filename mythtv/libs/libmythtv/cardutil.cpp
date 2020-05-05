@@ -265,7 +265,7 @@ bool CardUtil::IsTunerShared(uint inputidA, uint inputidB)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::is_tuner_shared", query);
+        MythDB::DBError("CardUtil::is_tuner_shared()", query);
         return false;
     }
 
@@ -320,7 +320,7 @@ bool CardUtil::IsInputTypePresent(const QString &rawtype, QString hostname)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::IsInputTypePresent", query);
+        MythDB::DBError("CardUtil::IsInputTypePresent()", query);
         return false;
     }
 
@@ -1231,7 +1231,7 @@ QString get_on_input(const QString &to_get, uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
-        MythDB::DBError("CardUtil::get_on_source", query);
+        MythDB::DBError("CardUtil::get_on_input", query);
     else if (query.next())
         return query.value(0).toString();
 
@@ -1599,7 +1599,7 @@ vector<uint> CardUtil::GetInputIDs(uint sourceid)
 
     if (!query.exec())
     {
-        MythDB::DBError("CardUtil::GetInputIDs()", query);
+        MythDB::DBError("CardUtil::GetInputIDs(sourceid)", query);
         return list;
     }
 
@@ -1620,7 +1620,7 @@ bool CardUtil::SetStartChannel(uint inputid, const QString &channum)
 
     if (!query.exec())
     {
-        MythDB::DBError("set_startchan", query);
+        MythDB::DBError("CardUtil::SetStartChannel", query);
         return false;
     }
 
@@ -1838,7 +1838,7 @@ int CardUtil::CreateCardInput(const uint inputid,
 
     if (!query.exec())
     {
-        MythDB::DBError("CreateCardInput", query);
+        MythDB::DBError("CardUtil::CreateCardInput()", query);
         return -1;
     }
 
@@ -1855,7 +1855,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
     query.bindValue(":GROUPNAME", name);
     if (!query.exec())
     {
-        MythDB::DBError("CreateNewInputGroup 0", query);
+        MythDB::DBError("CardUtil::CreateNewInputGroup 0", query);
         return 0;
     }
 
@@ -1865,7 +1865,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
     query.prepare("SELECT MAX(inputgroupid) FROM inputgroup");
     if (!query.exec())
     {
-        MythDB::DBError("CreateNewInputGroup 1", query);
+        MythDB::DBError("CardUtil::CreateNewInputGroup 1", query);
         return 0;
     }
 
@@ -1880,7 +1880,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
     query.bindValue(":GROUPNAME", name);
     if (!query.exec())
     {
-        MythDB::DBError("CreateNewInputGroup 2", query);
+        MythDB::DBError("CardUtil::CreateNewInputGroup 2", query);
         return 0;
     }
 

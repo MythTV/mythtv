@@ -117,7 +117,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
             ssMsg << endl;
             ssMsg << "Discarded duplicate transports (" << duplicates.size() << "):" << endl;
             ssMsg << FormatTransports(duplicates).toLatin1().constData() << endl;
-            ssMsg << "With channels (" << SimpleCountChannels(duplicates) << "):" << endl;
+            ssMsg << "Discarded duplicate channels (" << SimpleCountChannels(duplicates) << "):" << endl;
             ssMsg << FormatChannels(duplicates).toLatin1().constData() << endl;
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
