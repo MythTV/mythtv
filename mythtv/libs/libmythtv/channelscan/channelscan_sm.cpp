@@ -533,12 +533,12 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             ServiceListDescriptor services(serv_list);
             if (!authority.IsValid() || !services.IsValid())
                 continue;
-
+#if 0
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("Found default authority '%1' in BAT for services in nid %2 tid %3")
                     .arg(authority.DefaultAuthority())
                     .arg(netid).arg(tsid));
-
+#endif
             for (uint j = 0; j < services.ServiceCount(); ++j)
             {
                 // If the default authority is given in the SDT this
@@ -584,10 +584,12 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
             DefaultAuthorityDescriptor authority(def_auth);
             if (!authority.IsValid())
                 continue;
+#if 0
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("Found default authority '%1' in SDTo for service nid %2 tid %3 sid %4")
                     .arg(authority.DefaultAuthority())
                     .arg(netid).arg(tsid).arg(serviceId));
+#endif
             m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
                 authority.DefaultAuthority();
         }
@@ -714,8 +716,12 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
     return type;
 }
 
-void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
+void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInformationTable *nit)
 {
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("%1 NIT nid:%2 fr:%3 section:%4/%5 ts count:%6 ")
+        .arg(__func__).arg(nit->NetworkID()).arg(nit_frequency).arg(nit->Section()).arg(nit->LastSection())
+        .arg(nit->TransportStreamCount()));
+
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
     {
         uint32_t tsid  = nit->TSID(i);
@@ -734,14 +740,9 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             uint64_t frequency = 0;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
-            uint length = desc.DescriptorLength();
             QString tagString = desc.DescriptorTagString();
 
             DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
-
-            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("NIT ts-loop j:%1 tag:%2 (0x%3) '%4' length:%5")
-                .arg(j).arg(tag,3).arg(tag,0,16).arg(tagString).arg(length));
-
             switch (tag)
             {
                 case DescriptorID::terrestrial_delivery_system:
@@ -792,14 +793,14 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             DTVMultiplex tuning;
             if (tuning.FillFromDeliverySystemDesc(tt, desc))
             {
-                LOG(VB_CHANSCAN, LOG_DEBUG, QString("NIT %1 add ts %2  %3")
-                    .arg(nit->NetworkID()).arg(tsid).arg(tuning.toString()));
+                LOG(VB_CHANSCAN, LOG_DEBUG, QString("NIT onid:%1 add ts(%2):%3  %4")
+                    .arg(netid).arg(i).arg(tsid).arg(tuning.toString()));
                 m_extendTransports[id] = tuning;
             }
             else
             {
-                LOG(VB_CHANSCAN, LOG_DEBUG, QString("Cannot add ts from NIT %1 frequency %2 with tunertype %2")
-                    .arg(nit->NetworkID()).arg(frequency).arg(tt.toString()));
+                LOG(VB_CHANSCAN, LOG_DEBUG, QString("NIT onid:%1 cannot add ts(%2):%3 fr:%4")
+                    .arg(netid).arg(i).arg(tsid).arg(frequency));
             }
 
             // Next TS in loop
@@ -1015,7 +1016,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         auto it = m_currentInfo->m_nits.begin();
         while (it != m_currentInfo->m_nits.end())
         {
-            UpdateScanTransports(*it);
+            UpdateScanTransports((*m_current).m_tuning.m_frequency, *it);
             ++it;
         }
     }
@@ -1251,10 +1252,12 @@ static void update_info(ChannelInsertInfo &info,
         DefaultAuthorityDescriptor authority(def_auth);
         if (authority.IsValid())
         {
+#if 0
             LOG(VB_CHANSCAN, LOG_DEBUG,
                 QString("ChannelScanSM: Found default authority '%1' in SDT for service onid %2 tid %3 sid %4")
                     .arg(authority.DefaultAuthority())
                     .arg(info.m_origNetId).arg(info.m_sdtTsId).arg(info.m_serviceId));
+#endif
             info.m_defaultAuthority = authority.DefaultAuthority();
             return;
         }
