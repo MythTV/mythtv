@@ -584,7 +584,7 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     QString str = QString("TerrestrialDeliverySystemDescriptor: ");
 
     str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
-    str.append(QString("      BW=%1MHz C=%2 HP=%3 LP=%4 GI=%5 TransMode=%6")
+    str.append(QString("      BW=%1MHz C=%2 HP=%3 LP=%4 GI=%5 TransMode=%6k")
         .arg(BandwidthString())
         .arg(ConstellationString())
         .arg(CodeRateHPString())
