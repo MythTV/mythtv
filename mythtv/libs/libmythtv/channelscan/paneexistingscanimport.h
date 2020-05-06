@@ -58,7 +58,7 @@ class PaneExistingScanImport : public GroupSetting
             return;
 
         vector<ScanInfo> scans = LoadScanList(m_sourceid);
-        for (vector<ScanInfo>::reverse_iterator it = scans.rbegin(); it != scans.rend(); ++it)
+        for (auto it = scans.rbegin(); it != scans.rend(); ++it)
         {
             ScanInfo &scan   = *it;
             QString scanDate = MythDate::toString(scan.m_scandate, MythDate::kDateTimeFull);

@@ -76,7 +76,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     void SetSourceID(uint _sourceid);
 
   public slots:
-    void SetSourceID(const QString &_sourceid);
+    void SetSourceID(const QString &name);
     void Menu(TransportSetting *transport);
     void NewTransport(void);
 

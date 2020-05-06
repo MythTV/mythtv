@@ -160,6 +160,7 @@ void MythInputDeviceHandler::Reset(void)
     Start();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void MythInputDeviceHandler::Event(QEvent *Event) const
 {
     if (!Event)

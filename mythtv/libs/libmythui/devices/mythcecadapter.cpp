@@ -59,14 +59,14 @@ void MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message*
 
 void MythCECAdapter::KeyPressCallback(void* Adapter, const cec_keypress* Keypress)
 {
-    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    auto * adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
     if (adapter)
         adapter->HandleKeyPress(*Keypress);
 }
 
 void MythCECAdapter::CommandCallback(void* Adapter, const cec_command* Command)
 {
-    MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
+    auto * adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
     if (adapter)
         adapter->HandleCommand(*Command);
 }
