@@ -612,6 +612,7 @@ QString T2DeliverySystemDescriptor::toString() const
     QString str = QString("T2DeliverySystemDescriptor: ");
     str += QString("plp_id(%1) ").arg(PlpID());
     str += QString("T2_system_id(%1) ").arg(T2SystemID());
+    str += QString("descriptor_length(%1) ").arg(DescriptorLength());
     if (DescriptorLength() > 4)
     {
         str += QString("\n      %1 ").arg(SisoMisoString());
@@ -663,7 +664,7 @@ QString DVBLogicalChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1 < ChannelCount()) ? (i+3)%10 ? ", " : ",\n      " : "";
+        ret += (i+1 < ChannelCount()) ? (i+4)%10 ? ", " : ",\n      " : "";
     }
     return ret;
 }

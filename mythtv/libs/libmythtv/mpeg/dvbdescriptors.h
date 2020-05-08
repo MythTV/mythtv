@@ -1785,7 +1785,7 @@ class ServiceDescriptorMapping
     uint m_serviceType;
 };
 
-// DVB Bluebook A038 (Sept 2011) p 80
+// DVB Bluebook A038 (Feb 2019) p 82
 class ServiceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1838,7 +1838,7 @@ class ServiceDescriptor : public MPEGDescriptor
     }
 };
 
-// DVB Bluebook A038 (Sept 2011) p 82
+// DVB Bluebook A038 (Feb 2019) p 84
 class ServiceAvailabilityDescriptor : public MPEGDescriptor
 {
   public:
@@ -1853,7 +1853,7 @@ class ServiceAvailabilityDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++) { cell_id 16 }
 };
 
-// DVB Bluebook A038 (Sept 2011) p 82
+// DVB Bluebook A038 (Feb 2019) p 84
 class ServiceListDescriptor : public MPEGDescriptor
 {
   public:
@@ -1882,8 +1882,10 @@ class ServiceListDescriptor : public MPEGDescriptor
         for (uint i=0; i<ServiceCount(); i++)
         {
             if (i!=0) str.append("\n");
-            str.append(QString("      Service (%1) Type%2").arg(ServiceID(i))
-                .arg(ServiceDescriptorMapping(ServiceType(i)).toString()));
+            str.append(QString("      Service (%1) Type%2 (0x%3)")
+                .arg(ServiceID(i))
+                .arg(ServiceDescriptorMapping(ServiceType(i)).toString())
+                .arg(ServiceType(i),2,16,QChar('0')));
         }
         return str;
     }

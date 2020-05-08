@@ -1380,17 +1380,17 @@ QString ChannelImporter::FormatChannel(
 
     if (info)
     {
-        ssMsg <<"\t"
-              << chan.m_channelId;
-    }
+        ssMsg << ' ';
+        msg = msg.leftJustified(72);
 
-    if (info)
-    {
+        ssMsg << chan.m_channelId;
+
         ssMsg << ":"
               << (QString("cnt(pnum:%1,channum:%2)")
                   .arg(info->m_progNumCnt[chan.m_serviceId])
                   .arg(info->m_chanNumCnt[map_str(chan.m_chanNum)])
                   ).toLatin1().constData();
+
         if (chan.m_siStandard == "atsc")
         {
             ssMsg <<

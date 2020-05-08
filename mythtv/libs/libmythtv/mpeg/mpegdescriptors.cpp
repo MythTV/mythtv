@@ -603,13 +603,7 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     // POSSIBLY UNSAFE ! -- end
     else
     {
-        str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")
-            .arg(DescriptorTagString())
-            .arg(DescriptorTag(),2,16,QChar('0'))
-            .arg(DescriptorLength());
-        //for (uint i=0; i<DescriptorLength(); i++)
-        //    str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
-        str.append(hexdump());
+        str = descrDump(DescriptorTagString());
     }
     return str;
 }
