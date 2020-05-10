@@ -41,7 +41,11 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def _ping121(self): self._get_db().ping()
     def _ping122(self): self._get_db().ping(True)
 
-    def _sanitize(self, query): return query.replace('?', '%s')
+    def _sanitize(self, query):
+        if isinstance(query, bytearray):
+            # MySQLdb calls execute() as bytearrays, already sanitized
+            return query
+        return query.replace('?', '%s')
 
     def log_query(self, query, args):
         if isinstance(query, bytearray):
