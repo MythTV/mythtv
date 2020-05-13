@@ -3,6 +3,8 @@
 
 #include <cstdint> /* uint32_t */
 
+#define bswap_dbl(x) bswap_64(x)
+
 #if HAVE_BYTESWAP_H
 #  include <byteswap.h> /* bswap_16|32|64 */
 #elif HAVE_SYS_ENDIAN_H
@@ -23,22 +25,6 @@
 #  define bswap_64(x) OSSwapInt64(x)
 #elif HAVE_BIGENDIAN
 #  error Byte swapping functions not defined for this platform
-#endif
-
-#ifdef bswap_32
-// TODO: Any reason we choose not to use bswap_64 for this?
-static __inline__ double bswap_dbl(double x)
-{
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-    union {
-        uint32_t l[2];
-        double   d;
-    } w, r;
-    w.d = x;
-    r.l[0] = bswap_32(w.l[1]);
-    r.l[1] = bswap_32(w.l[0]);
-    return r.d;
-}
 #endif
 
 #endif /* ndef MYTHTV_BSWAP_H */
