@@ -513,6 +513,13 @@ bool Buffer::Fill(const QByteArray & buffer)
     static int s_droppedBytes = 0;
 
     m_parent->m_flow_mutex.lock();
+
+    if (!m_dataSeen)
+    {
+        m_dataSeen = true;
+        emit m_parent->DataStarted();
+    }
+
     if (m_data.size() < MAX_QUEUE)
     {
         block_t blk(reinterpret_cast<const uint8_t *>(buffer.constData()),

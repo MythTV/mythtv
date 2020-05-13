@@ -87,6 +87,7 @@ bool MythExternRecApp::config(void)
     m_recDesc     = settings.value("RECORDER/desc").toString();
     m_cleanup     = settings.value("RECORDER/cleanup").toString();
     m_tuneCommand = settings.value("TUNER/command", "").toString();
+    m_onDataStart = settings.value("TUNER/ondatastart", "").toString();
     m_channelsIni = settings.value("TUNER/channels", "").toString();
     m_lockTimeout = settings.value("TUNER/timeout", "").toInt();
     m_scanCommand = settings.value("SCANNER/command", "").toString();
@@ -295,6 +296,37 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + ": Cleanup finished.");
+}
+
+Q_SLOT void MythExternRecApp::DataStarted(void)
+{
+    if (m_onDataStart.isEmpty())
+        return;
+
+    QString cmd = m_onDataStart;
+
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString(" Data started, finishing tune: '%1'").arg(cmd));
+
+    QProcess finish;
+    finish.start(cmd);
+    if (!finish.waitForStarted())
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to finish tune process: "
+            + ENO);
+        return;
+    }
+    finish.waitForFinished(5000);
+    if (finish.state() == QProcess::NotRunning)
+    {
+        if (finish.exitStatus() != QProcess::NormalExit)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + ": Finish tune failed: " + ENO);
+            return;
+        }
+    }
+
+    LOG(VB_RECORD, LOG_INFO, LOC + ": tunning finished.");
 }
 
 Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)

@@ -66,6 +66,7 @@ class Buffer : QObject
     std::thread      m_thread;
 
     stack_t  m_data;
+    bool     m_dataSeen {false};
 
     std::chrono::time_point<std::chrono::system_clock> m_heartbeat;
 };
@@ -152,6 +153,7 @@ class MythExternControl : public QObject
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
     void Cleanup(void);
+    void DataStarted(void);
 
   public slots:
     void SetDescription(const QString & desc) { m_desc = desc; }

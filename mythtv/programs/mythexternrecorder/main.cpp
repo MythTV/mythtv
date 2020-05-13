@@ -114,6 +114,8 @@ int main(int argc, char *argv[])
                      process, &MythExternRecApp::HasTuner);
     QObject::connect(control, &MythExternControl::Cleanup,
                      process, &MythExternRecApp::Cleanup);
+    QObject::connect(control, &MythExternControl::DataStarted,
+                     process, &MythExternRecApp::DataStarted);
     QObject::connect(control, &MythExternControl::LoadChannels,
                      process, &MythExternRecApp::LoadChannels);
     QObject::connect(control, &MythExternControl::FirstChannel,

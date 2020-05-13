@@ -70,6 +70,7 @@ class MythExternRecApp : public QObject
     void LockTimeout(const QString & serial);
     void HasTuner(const QString & serial);
     void Cleanup(void);
+    void DataStarted(void);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
@@ -108,6 +109,7 @@ class MythExternRecApp : public QObject
 
     QProcess                m_tuneProc;
     QString                 m_tuneCommand;
+    QString                 m_onDataStart;
     QString                 m_channelsIni;
     uint                    m_lockTimeout  { 0 };
 
