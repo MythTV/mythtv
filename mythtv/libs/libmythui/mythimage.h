@@ -54,9 +54,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     bool IsReflected() const { return m_isReflected; }
     bool IsOriented() const { return m_isOriented; }
 
-    void SetToYUV(void) { m_isYUV = true; }
-    void ConvertToYUV(void);
-
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
 
@@ -122,7 +119,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 
     bool           m_isOriented    {false};
     bool           m_isReflected   {false};
-    bool           m_isYUV         {false};
 
     unsigned int   m_imageId       {0};
 
