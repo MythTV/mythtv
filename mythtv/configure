@@ -134,6 +134,8 @@ Advanced options (experts only):
   --disable-asi            disable support for DVEO ASI recorder
   --disable-x11            disable X11 support
   --enable-opengles        link to OpenGL ES (auto)
+  --enable-vulkan          enable Vulkan rendering
+  --enable-libglslang      enable runtime GLSL compilation for Vulkan (development only)
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
@@ -142,8 +144,6 @@ Advanced options (experts only):
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-mediacodec     disable hardware accelerated decoding on android
   --disable-mmal           disable hardware accelerated decoding on Raspberry Pi
-  --disable-opengl-video   disable OpenGL based video display
-  --disable-opengl-themepainter disable OpenGL based theme painting
   --disable-libass         disable libass SSA/ASS subtitle support
   --disable-systemd_notify disable systemd notify support
   --disable-systemd_journal disable systemd journal support
@@ -1684,6 +1684,7 @@ HEADERS_LIST="
     udplite_h
     unistd_h
     valgrind_valgrind_h
+    vulkan_vulkan_core_h
     windows_h
     winsock2_h
 "
@@ -2050,6 +2051,8 @@ USING_LIST='
     vdpau
     mediacodec
     mmal
+    vulkan
+    libglslang
 '
 
 CMDLINE_SELECT="
@@ -2616,6 +2619,7 @@ egl_deps="EGL_egl_h"
 v4l2_deps="linux_videodev2_h"
 v4l2prime_deps="v4l2 drm"
 v4l1_deps="backend v4l2 linux_videodev_h"
+vulkan_deps="vulkan_vulkan_core_h"
 xrandr_deps="x11"
 asi_deps="backend"
 
@@ -3007,6 +3011,10 @@ for opt do
         --enable-mac-bundle) enable mac_bundle
         ;;
         --enable-opengles) enable opengles && disable opengl
+        ;;
+        --enable-vulkan) enable vulkan
+        ;;
+        --enable-libglslang) enable libglslang
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
@@ -5761,6 +5769,7 @@ check_header sys/un.h
 check_header termios.h
 check_header unistd.h
 check_header valgrind/valgrind.h
+check_header vulkan/vulkan_core.h
 check_func_headers VideoToolbox/VTCompressionSession.h VTCompressionSessionPrepareToEncodeFrames -framework VideoToolbox
 check_header windows.h
 check_header asm/types.h
@@ -6528,8 +6537,17 @@ disabled opengl || enabled opengles && {
                   }
 
 enabled opengles && enable opengl
-if disabled opengl; then
-    die "Neither OpenGL or OpenGLES found!"
+
+# Vulkan requires Qt >5.10 and the Vulkan headers - Qt dynamically loads the libs
+# (but we may need to link to Vulkan if we use any external/helper libraries (e.g. VMA)
+if enabled vulkan; then
+    if [ $qt_version -lt $(version2num "5.10.0") ]; then
+        disable vulkan && echo Vulkan is not supported with this version of Qt
+    fi
+fi
+
+if ! (enabled opengl || enabled vulkan); then
+    die "Need either OpenGL, OpenGLES or Vulkan. None found!"
 fi
 
 enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
@@ -6537,6 +6555,8 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                     check_pkg_config EGL egl EGL/egl.h eglGetProcAddress && enable egl
                   }
                 }
+
+enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
 
 enable enforce_wshadow
 case $target_os in
@@ -7445,6 +7465,7 @@ fi
     echo "Windows (Direct3D)        yes"
     echo "DXVA2 support             ${dxva2-no}"
   fi
+  echo "Vulkan                    ${vulkan-no} (libglslang ${libglslang-no})"
   echo "MHEG support              ${mheg}"
   echo "libass subtitle support   ${libass-no}"
   echo

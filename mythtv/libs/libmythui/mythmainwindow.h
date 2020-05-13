@@ -33,6 +33,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 {
     Q_OBJECT
     friend class MythPainterWindowOpenGL;
+    friend class MythPainterWindowVulkan;
     friend class MythPainterWindowQt;
 
   public:

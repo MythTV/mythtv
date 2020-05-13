@@ -12,7 +12,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-DEPENDPATH  += ./opengl ./platforms ./devices
+DEPENDPATH  += ./opengl ./platforms ./devices ./vulkan
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
@@ -191,6 +191,30 @@ mingw | win32-msvc*{
     LIBS    += -lGdi32 -lUser32
 
     using_dxva2: DEFINES += USING_DXVA2
+}
+
+using_vulkan {
+    DEFINES += USING_VULKAN
+    HEADERS += vulkan/mythpainterwindowvulkan.h
+    HEADERS += vulkan/mythpaintervulkan.h
+    HEADERS += vulkan/mythrendervulkan.h
+    HEADERS += vulkan/mythwindowvulkan.h
+    HEADERS += vulkan/mythtexturevulkan.h
+    HEADERS += vulkan/mythshadervulkan.h
+    HEADERS += vulkan/mythshadersvulkan.h
+    HEADERS += vulkan/mythvertexbuffervulkan.h
+    HEADERS += vulkan/mythindexbuffervulkan.h
+    HEADERS += vulkan/mythuniformbuffervulkan.h
+    SOURCES += vulkan/mythpainterwindowvulkan.cpp
+    SOURCES += vulkan/mythpaintervulkan.cpp
+    SOURCES += vulkan/mythrendervulkan.cpp
+    SOURCES += vulkan/mythwindowvulkan.cpp
+    SOURCES += vulkan/mythtexturevulkan.cpp
+    SOURCES += vulkan/mythshadervulkan.cpp
+    SOURCES += vulkan/mythvertexbuffervulkan.cpp
+    SOURCES += vulkan/mythindexbuffervulkan.cpp
+    SOURCES += vulkan/mythuniformbuffervulkan.cpp
+    using_libglslang: DEFINES += USING_GLSLANG
 }
 
 using_opengl {
