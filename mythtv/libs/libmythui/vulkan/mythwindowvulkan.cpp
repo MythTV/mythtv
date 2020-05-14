@@ -11,6 +11,7 @@ MythWindowVulkan::MythWindowVulkan(MythRenderVulkan *Render)
     // Most drivers/devices only seem to support these formats. Prefer UNORM.
     QVector<VkFormat> formats = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_B8G8R8A8_SRGB };
     setPreferredColorFormats(formats);
+    setFlags(QVulkanWindow::PersistentResources);
 }
 
 MythWindowVulkan::~MythWindowVulkan()
