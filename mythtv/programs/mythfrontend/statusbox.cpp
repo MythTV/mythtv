@@ -1184,9 +1184,9 @@ static QString uptimeStr(time_t uptime)
     {
         astext = QString("%1, %2")
             .arg(StatusBox::tr("%n day(s)", "", days))
-            .arg(MythFormatTimeMs(secs, "H:mm"));
+            .arg(MythFormatTime(secs, "H:mm"));
     } else {
-        astext = MythFormatTimeMs(secs, "H:mm:ss");
+        astext = MythFormatTime(secs, "H:mm:ss");
     }
     return str + astext;
 }
