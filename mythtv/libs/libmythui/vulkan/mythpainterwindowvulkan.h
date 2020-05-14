@@ -15,7 +15,6 @@ class MythPainterWindowVulkan : public MythPainterWindow
 
     bool              IsValid         (void) const;
     MythWindowVulkan* GetVulkanWindow (void);
-    QPaintEngine*     paintEngine     (void) const override;
     void              paintEvent      (QPaintEvent* PaintEvent) override;
     void              resizeEvent     (QResizeEvent* ResizeEvent) override;
 

@@ -78,11 +78,6 @@ MythWindowVulkan* MythPainterWindowVulkan::GetVulkanWindow(void)
     return m_window;
 }
 
-QPaintEngine* MythPainterWindowVulkan::paintEngine(void) const
-{
-    return testAttribute(Qt::WA_PaintOnScreen) ? nullptr : m_parent->paintEngine();
-}
-
 void MythPainterWindowVulkan::paintEvent(QPaintEvent* /*PaintEvent*/)
 {
     m_parent->drawScreen();
