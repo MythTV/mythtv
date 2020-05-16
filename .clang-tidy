@@ -32,7 +32,9 @@
 # ../dir/file.h
 # ../../libmyth<blah>/dir/format.h
 #,
-HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./external/libmythsoundtouch/[[:alnum:]]+\.h)$'
+#HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./external/libmythsoundtouch/[[:alnum:]]+\.h)$'
+#,
+HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h)$'
 
 Checks: '-*,
 
@@ -70,49 +72,38 @@ Checks: '-*,
         # all appear to be within Qt code that cant be fixed by us. ,
        -cert-err58-cpp,
 
-        # Alias for bugprone-signed-char-misuse,
+        # Similar to bugprone-signed-char-misuse but not quite the same. ,
        -cert-str34-c,
 
     clang-analyzer-*,
-        # Not tested. ,
-       -clang-analyzer-apiModeling.*,
-
-        # Treats dynamic_cast like static_cast.  Doesnt understand
-        # that dynamic_cast may return nullptr if the inheritance is
-        # wrong, but a valid pointer if the inheritance is right. ,
-        #
-        # One valid error in m_groupName in globalsettings.cpp??? ,
-        clang-analyzer-core.CallAndMessage,
-
-        # 2 instances in FFmpeg, 2 in dvbdescriptors.h, 1 progdetails.cpp. ,
+        # One instance in mpegdescriptors.h ,
        -clang-analyzer-core.NullDereference,
 
         # One instance in cc708window.h. ,
        -clang-analyzer-cplusplus.NewDelete,
 
-        # Doesnt recognize cases where the constructor adds the new
-        # object to a list (either static or in the parent.)
-        #
-        # There are some warnings in the commercial detectors that
-        # need to be chased down. ,
-       -clang-analyzer-cplusplus.NewDeleteLeaks,
-
-        # All testing on x86-64. ,
-       -clang-analyzer-osx.*,
-
-        # Cant fix due to missing LIB_EXT1 extensions. ,
+        # The "safe" versions functions were optional in the standard
+        # and were never implemented by GCC or Clang.  There has been
+        # a move to have these functions removed from the standard as
+        # "the design suffers from far too many problems to
+        # correct". There are warnings in 5 or 6 files. ,
        -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
        -clang-analyzer-security.insecureAPI.strcpy,
 
     # Explicitly list the tests that arent aliases. ,
    -cppcoreguidelines-*,
 
-        # Needs work. ,
-       -cppcoreguidelines-avoid-goto,
-
         # Good. ,
         cppcoreguidelines-init-variables,
         cppcoreguidelines-interfaces-global-init,
+        cppcoreguidelines-pro-type-member-init,
+        cppcoreguidelines-pro-type-static-cast-downcast,
+
+        # Needs work. ,
+       -cppcoreguidelines-avoid-goto,
+
+        # About 20,000 of warnings. ,
+       -cppcoreguidelines-avoid-non-const-global-variables,
 
         # Tons of warnings.  Most complaining that #define should
         # become a constexpr. ,
@@ -139,14 +130,8 @@ Checks: '-*,
         # Bunch of warnings.... ,
        -cppcoreguidelines-pro-type-cstyle-cast,
 
-        # Good. ,
-        cppcoreguidelines-pro-type-member-init,
-
         # Haven''t checked recently. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
-
-        # Good. ,
-        cppcoreguidelines-pro-type-static-cast-downcast,
 
         # Recommends using boost:: to access unions. ,
        -cppcoreguidelines-pro-type-union-access,
@@ -179,27 +164,13 @@ Checks: '-*,
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
-        # A couple of instances in libsoundtouch. Convert that to c++
-        # then fix. ,
-       -modernize-use-override,
-       -modernize-use-using,
-
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
         # Disable newer C++14/17 tests for now. ,
-       -modernize-make-unique,
-       -modernize-use-transparent-functors,
-       -modernize-concat-nested-namespaces,
-       -modernize-unary-static-assert,
        -modernize-use-nodiscard,
 
     performance-*,
-
-        # There are 250 or so of these in the datacontracts directory.
-        # They are all genreated by the Qt PROPERTYIMP macro, so
-        # cannot be fixed by us. ,
-       -performance-unnecessary-value-param,
 
     readability-*,
 
@@ -253,12 +224,12 @@ CheckOptions:
   - { key: readability-identifier-naming.PrivateMemberCase,     value: 'camelBack' }
   - { key: readability-identifier-naming.PrivateMemberPrefix,   value: 'm_'}
   - { key: readability-identifier-naming.ProtectedMethodCase,   value: 'aNy_CasE' }
-  - { key: readability-identifier-naming.ProtectedMemberCase,   value: 'camelBack_CasE' }
+  - { key: readability-identifier-naming.ProtectedMemberCase,   value: 'camelBack' }
   - { key: readability-identifier-naming.ProtectedMemberPrefix, value: 'm_'}
   - { key: readability-identifier-naming.PuplicMethodCase,      value: 'aNy_CasE' }
   - { key: readability-identifier-naming.PuplicMemberCase,      value: 'camelBack' }
   - { key: readability-identifier-naming.PuplicMemberPrefix,    value: 'm_'}
-  - { key: readability-identifier-naming.ClassConstantCase,     value: 'Any_Case' }
+  - { key: readability-identifier-naming.ClassConstantCase,     value: 'aNy_CasE' }
   - { key: readability-identifier-naming.ClassConstantPrefix,   value: 'k' }
 
   - { key: google-runtime-int.TypeSuffix,   value: '_t' }
