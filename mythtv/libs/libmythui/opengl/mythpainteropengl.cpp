@@ -12,7 +12,7 @@
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
-  : m_parent(Parent),
+  : m_widget(Parent),
     m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
@@ -89,10 +89,10 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
     MythPainter::Begin(Parent);
 
-    if (!m_parent)
+    if (!m_widget)
     {
-        m_parent = dynamic_cast<QWidget *>(Parent);
-        if (!m_parent)
+        m_widget = dynamic_cast<QWidget *>(Parent);
+        if (!m_widget)
             return;
     }
 
@@ -111,12 +111,12 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     }
 
     // check if we need to adjust cache sizes
-    if (m_lastSize != m_parent->size())
+    if (m_lastSize != m_widget->size())
     {
         // This will scale the cache depending on the resolution in use
         static const int s_onehd = 1920 * 1080;
         static const int s_basesize = 64;
-        m_lastSize = m_parent->size();
+        m_lastSize = m_widget->size();
         float hdscreens = (static_cast<float>(m_lastSize.width() + 1) * m_lastSize.height()) / s_onehd;
         int cpu = qMax(static_cast<int>(hdscreens * s_basesize), s_basesize);
         int gpu = cpu * 3 / 2;
@@ -132,7 +132,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     if (m_target || m_swapControl)
     {
         m_render->BindFramebuffer(m_target);
-        m_render->SetViewPort(QRect(0, 0, m_parent->width(), m_parent->height()));
+        m_render->SetViewPort(QRect(0, 0, m_widget->width(), m_widget->height()));
         m_render->SetBackground(0, 0, 0, 0);
         m_render->ClearFramebuffer();
     }
