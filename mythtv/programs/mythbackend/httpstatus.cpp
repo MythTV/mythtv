@@ -197,7 +197,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     TVRec::s_inputsLock.lockForRead();
 
-    foreach (auto elink, *m_pEncoders)
+    for (auto * elink : qAsConst(*m_pEncoders))
     {
         if (elink != nullptr)
         {

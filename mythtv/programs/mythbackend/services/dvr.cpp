@@ -680,7 +680,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    foreach (auto elink, tvList)
+    for (auto * elink : qAsConst(tvList))
     {
         if (elink != nullptr)
         {

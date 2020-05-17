@@ -1863,7 +1863,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         bool wasAsleep = true;
         TVRec::s_inputsLock.lockForRead();
-        foreach (auto elink, *m_encoderList)
+        for (auto * elink : qAsConst(*m_encoderList))
         {
             if (elink->GetHostName() == commands[2])
             {
@@ -2930,6 +2930,8 @@ void MainServer::DoHandleStopRecording(
                 if (m_sched)
                     m_sched->UpdateRecStatus(&recinfo);
             }
+
+            break;
         }
     }
     TVRec::s_inputsLock.unlock();
@@ -4238,7 +4240,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
     QString enchost;
 
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto elink, *m_encoderList)
+    for (auto * elink : qAsConst(*m_encoderList))
     {
         // we're looking for a specific card but this isn't the one we want
         if ((cardid != -1) && (cardid != elink->GetInputID()))
@@ -4363,7 +4365,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     // Lopp over each encoder and divide the inputs into busy and free
     // lists.
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto elink, *m_encoderList)
+    for (auto * elink : qAsConst(*m_encoderList))
     {
         InputInfo info;
         info.m_inputId = elink->GetInputID();
@@ -4895,7 +4897,7 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
     }
 
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto & encoder, *m_encoderList)
+    for (auto * encoder : qAsConst(*m_encoderList))
     {
         if (encoder)
         {
@@ -5091,7 +5093,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
     size_t totalKBperMin = 0;
 
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto enc, *m_encoderList)
+    for (auto * enc : qAsConst(*m_encoderList))
     {
         if (!enc->IsConnected() || !enc->IsBusy())
             continue;
@@ -7328,7 +7330,7 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
     QStringList retlist;
 
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto elink, *m_encoderList)
+    for (auto * elink : qAsConst(*m_encoderList))
     {
         if (elink->IsBusyRecording()) {
             RecordingsInProgress++;
@@ -7793,7 +7795,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
                 bool isFallingAsleep = true;
                 TVRec::s_inputsLock.lockForRead();
-                foreach (auto elink, *m_encoderList)
+                for (auto * elink : qAsConst(*m_encoderList))
                 {
                     if (elink->GetSocket() == pbs)
                     {
@@ -7834,7 +7836,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                 if (chain->HostSocketCount() == 0)
                 {
                     TVRec::s_inputsLock.lockForRead();
-                    foreach (auto enc, *m_encoderList)
+                    for (auto * enc : qAsConst(*m_encoderList))
                     {
                         if (enc->IsLocal())
                         {
@@ -8181,7 +8183,7 @@ void MainServer::reconnectTimeout(void)
     QStringList strlist( str );
 
     TVRec::s_inputsLock.lockForRead();
-    foreach (auto elink, *m_encoderList)
+    for (auto * elink : qAsConst(*m_encoderList))
     {
         elink->CancelNextRecording(true);
         ProgramInfo *pinfo = elink->GetRecording();
@@ -8354,7 +8356,7 @@ void MainServer::UpdateSystemdStatus (void)
     {
         int active = 0;
         TVRec::s_inputsLock.lockForRead();
-        foreach (auto elink, *m_encoderList)
+        for (auto * elink : qAsConst(*m_encoderList))
         {
             if (not elink->IsLocal())
                 continue;
