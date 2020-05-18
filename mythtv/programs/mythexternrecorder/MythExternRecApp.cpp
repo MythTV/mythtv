@@ -87,6 +87,7 @@ bool MythExternRecApp::config(void)
     m_recDesc     = settings.value("RECORDER/desc").toString();
     m_cleanup     = settings.value("RECORDER/cleanup").toString();
     m_tuneCommand = settings.value("TUNER/command", "").toString();
+    m_newEpisodeCommand = settings.value("TUNER/newepisodecommand", "").toString();
     m_onDataStart = settings.value("TUNER/ondatastart", "").toString();
     m_channelsIni = settings.value("TUNER/channels", "").toString();
     m_lockTimeout = settings.value("TUNER/timeout", "").toInt();
@@ -450,6 +451,36 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
     GetChannel(serial, "NextChannel");
 }
 
+void MythExternRecApp::NewEpisodeStarting(const QString & channum)
+{
+    QString cmd = m_newEpisodeCommand;
+    cmd.replace("%CHANNUM%", channum);
+
+    LOG(VB_RECORD, LOG_WARNING, LOC +
+        QString(" New episode starting on current channel: '%1'").arg(cmd));
+
+    QProcess proc;
+    proc.start(cmd);
+    if (!proc.waitForStarted())
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            " NewEpisodeStarting: Failed to start process: " + ENO);
+        return;
+    }
+    proc.waitForFinished(5000);
+    if (proc.state() == QProcess::NotRunning)
+    {
+        if (proc.exitStatus() != QProcess::NormalExit)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                " NewEpisodeStarting: process failed: " + ENO);
+            return;
+        }
+    }
+
+    LOG(VB_RECORD, LOG_INFO, LOC + "NewEpisodeStarting: finished.");
+}
+
 Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
                                           const QString & channum)
 {
@@ -462,6 +493,9 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     if (m_tunedChannel == channum)
     {
+        if (!m_newEpisodeCommand.isEmpty())
+            NewEpisodeStarting(channum);
+
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("TuneChanne: Already on %1").arg(channum));
         emit SendMessage("TuneChannel", serial,

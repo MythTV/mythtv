@@ -75,6 +75,7 @@ class MythExternRecApp : public QObject
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
 
+    void NewEpisodeStarting(const QString & channum);
     void TuneChannel(const QString & serial, const QString & channum);
     void TuneStatus(const QString & serial);
     void HasPictureAttributes(const QString & serial);
@@ -110,6 +111,7 @@ class MythExternRecApp : public QObject
     QProcess                m_tuneProc;
     QString                 m_tuneCommand;
     QString                 m_onDataStart;
+    QString                 m_newEpisodeCommand;
     QString                 m_channelsIni;
     uint                    m_lockTimeout  { 0 };
 
