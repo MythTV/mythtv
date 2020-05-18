@@ -245,7 +245,7 @@ void NetSearch::FillGrabberButtonList()
 {
     m_siteList->Reset();
 
-    foreach (auto & g, m_grabberList)
+    for (const auto & g : qAsConst(m_grabberList))
     {
         auto *item = new MythUIButtonListItem(m_siteList, g->GetTitle());
         item->SetText(g->GetTitle(), "title");
@@ -421,7 +421,7 @@ void NetSearch::SearchTimeout(Search * /*item*/)
 
 void NetSearch::PopulateResultList(const ResultItem::resultList& list)
 {
-    foreach (auto & result, list)
+    for (const auto & result : qAsConst(list))
     {
         QString title = result->GetTitle();
         auto *item = new MythUIButtonListItem(m_searchResultList, title,

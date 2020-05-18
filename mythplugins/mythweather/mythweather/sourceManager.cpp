@@ -196,7 +196,7 @@ void SourceManager::setupSources()
 ScriptInfo *SourceManager::getSourceByName(const QString &name)
 {
     ScriptInfo *src = nullptr;
-    foreach (auto script, m_scripts)
+    for (auto *script : qAsConst(m_scripts))
     {
         src = script;
         if (src->name == name)
@@ -230,7 +230,7 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
                                             units_t units)
 {
     // matching source exists?
-    foreach (auto src, m_sources)
+    for (auto *src : qAsConst(m_sources))
     {
         if (src->getId() == id && src->getLocale() == loc &&
             src->getUnits() == units)
@@ -240,7 +240,7 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
     }
 
     // no matching source, make one
-    foreach (auto si, m_scripts)
+    for (auto *si : qAsConst(m_scripts))
     {
         if (si->id == id)
         {
@@ -260,19 +260,19 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
 
 void SourceManager::startTimers()
 {
-    foreach (auto src, m_sources)
+    for (auto *src : qAsConst(m_sources))
         src->startUpdateTimer();
 }
 
 void SourceManager::stopTimers()
 {
-    foreach (auto src, m_sources)
+    for (auto *src : qAsConst(m_sources))
         src->stopUpdateTimer();
 }
 
 void SourceManager::doUpdate(bool forceUpdate)
 {
-    foreach (auto src, m_sources)
+    for (auto *src : qAsConst(m_sources))
     {
         if (src->inUse())
             src->startUpdate(forceUpdate);
@@ -282,7 +282,7 @@ void SourceManager::doUpdate(bool forceUpdate)
 bool SourceManager::findPossibleSources(QStringList types,
                                         QList<ScriptInfo *> &sources)
 {
-    foreach (auto si, m_scripts)
+    for (auto *si : qAsConst(m_scripts))
     {
         QStringList stypes = si->types;
         bool handled = true;

@@ -243,11 +243,11 @@ void VideoSelector::OKPressed()
     // loop though selected videos and add them to the list
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
-    foreach (auto a, *m_archiveList)
+    for (auto *a : qAsConst(*m_archiveList))
     {
         bool found = false;
 
-        foreach (auto v, m_selectedList)
+        for (const auto *v : qAsConst(m_selectedList))
         {
             if (a->type != "Video" || a->filename == v->filename)
             {
@@ -260,14 +260,14 @@ void VideoSelector::OKPressed()
             tempAList.append(a);
     }
 
-    foreach (auto x, tempAList)
+    for (auto *x : qAsConst(tempAList))
         m_archiveList->removeAll(x);
 
     // remove any items that are already in the list
     QList<VideoInfo *> tempSList;
-    foreach (auto v, m_selectedList)
+    for (auto *v : qAsConst(m_selectedList))
     {
-        foreach (auto a, *m_archiveList)
+        for (const auto *a : qAsConst(*m_archiveList))
         {
             if (a->filename == v->filename)
             {
@@ -277,11 +277,11 @@ void VideoSelector::OKPressed()
         }
     }
 
-    foreach (auto x, tempSList)
+    for (auto *x : qAsConst(tempSList))
         m_selectedList.removeAll(x);
 
     // add all that are left
-    foreach (auto v, m_selectedList)
+    for (const auto *v : qAsConst(m_selectedList))
     {
         auto *a = new ArchiveItem;
         a->type = "Video";
@@ -521,9 +521,9 @@ void VideoSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    foreach (auto a, *m_archiveList)
+    for (const auto *a : qAsConst(*m_archiveList))
     {
-        foreach (auto v, *m_videoList)
+        for (auto *v : qAsConst(*m_videoList))
         {
             if (v->filename == a->filename)
             {

@@ -64,7 +64,7 @@ void GameScannerThread::verifyFiles()
                           GameScanner::tr("Verifying game files..."));
 
     // For every file we know about, check to see if it still exists.
-    foreach (auto info, m_dbgames)
+    for (const auto *info : qAsConst(m_dbgames))
     {
         QString romfile = info->Romname();
         QString system = info->System();
@@ -104,7 +104,7 @@ void GameScannerThread::updateDB()
         SendProgressEvent(counter, (uint)(m_files.size() + m_remove.size()),
                           GameScanner::tr("Updating game database..."));
 
-    foreach (auto & file, m_files)
+    for (const auto & file : qAsConst(m_files))
     {
         if (!file.indb)
         {
@@ -119,7 +119,7 @@ void GameScannerThread::updateDB()
             SendProgressEvent(++counter);
     }
 
-    foreach (const uint & p, m_remove)
+    for (const uint & p : qAsConst(m_remove))
     {
         removeOrphan(p);
         m_dbDataChanged = true;
@@ -143,7 +143,7 @@ bool GameScannerThread::buildFileList()
         QDir dir((*iter)->SystemRomPath());
         QStringList extensions = (*iter)->ValidExtensions();
         QStringList filters;
-        foreach (auto & ext, extensions)
+        for (const auto & ext : qAsConst(extensions))
         {
             filters.append(QString("*.%1").arg(ext));
         }
@@ -152,7 +152,7 @@ bool GameScannerThread::buildFileList()
         dir.setFilter(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
 
         QStringList files = dir.entryList();
-        foreach (auto & file, files)
+        for (const auto & file : qAsConst(files))
         {
             RomFileInfo info;
             info.system = (*iter)->SystemName();

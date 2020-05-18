@@ -191,7 +191,7 @@ void NetEditorBase::CreateBusyDialog(const QString& title)
 
 void NetEditorBase::FillGrabberButtonList()
 {
-    foreach (auto & g, m_grabberList)
+    for (const auto & g : qAsConst(m_grabberList))
     {
         auto *item = new MythUIButtonListItem(m_grabbers, g->GetTitle());
         item->SetText(g->GetTitle(), "title");

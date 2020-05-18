@@ -652,7 +652,7 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
     bool badTrack = false;
 
     QStringList list = songList.split(",", QString::SkipEmptyParts);
-    foreach (auto & song, list)
+    for (const auto & song : qAsConst(list))
     {
         MusicMetadata::IdType id = song.toUInt();
         int repo = ID_TO_REPO(id);
@@ -827,7 +827,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
             bool bFound = false;
             QString tempList;
-            foreach (auto & song, list)
+            for (const auto & song : qAsConst(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;
@@ -1076,7 +1076,7 @@ QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QStr
     QStringList newList = new_songlist.split(",", QString::SkipEmptyParts);
     QString songlist;
 
-    foreach (auto & song, newList)
+    for (const auto & song : qAsConst(newList))
     {
         if (curList.indexOf(song) == -1)
             songlist += "," + song;

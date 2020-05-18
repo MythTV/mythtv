@@ -300,7 +300,7 @@ static void UpdateGameCounts(const QStringList& updatelist)
     QString firstname;
     QString basename;
 
-    foreach (auto GameType, updatelist)
+    for (const auto & GameType : qAsConst(updatelist))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
@@ -776,7 +776,7 @@ void GameHandler::processAllGames(void)
     checkHandlers();
     QStringList updatelist;
 
-    foreach (auto handler, *handlers)
+    for (auto *handler : qAsConst(*handlers))
     {
         if (handler)
         {
@@ -797,7 +797,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
     if (!rominfo)
         return nullptr;
 
-    foreach (auto handler, *handlers)
+    for (auto *handler : qAsConst(*handlers))
     {
         if (handler)
         {
@@ -814,7 +814,7 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
     if (systemname.isEmpty() || systemname.isNull())
         return nullptr;
 
-    foreach (auto handler, *handlers)
+    for (auto *handler : qAsConst(*handlers))
     {
         if (handler)
         {
@@ -914,7 +914,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
     QStringList cmdlist = exec.split(";");
     if (cmdlist.count() > 0)
     {
-        foreach (auto & cmd, cmdlist)
+        for (const auto & cmd : qAsConst(cmdlist))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Executing : %1").arg(cmd));

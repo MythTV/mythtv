@@ -192,7 +192,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 void MythBurn::updateSizeBar(void)
 {
     int64_t size = 0;
-    foreach (auto a, m_archiveList)
+    for (const auto *a : qAsConst(m_archiveList))
         size += a->newsize;
 
     uint usedSpace = size / 1024 / 1024;
@@ -411,7 +411,7 @@ void MythBurn::updateArchiveList(void)
     }
     else
     {
-        foreach (auto a, m_archiveList)
+        for (auto *a : qAsConst(m_archiveList))
         {
             QCoreApplication::processEvents();
             // get duration of this file
@@ -548,7 +548,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
         QString defaultProfile =
                 gCoreContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
 
-        foreach (auto x, m_profileList)
+        for (auto *x : qAsConst(m_profileList))
             if (x->name == defaultProfile)
                 profile = x;
     }
@@ -694,7 +694,7 @@ void MythBurn::loadConfiguration(void)
 
 EncoderProfile *MythBurn::getProfileFromName(const QString &profileName)
 {
-    foreach (auto x, m_profileList)
+    for (auto *x : qAsConst(m_profileList))
         if (x->name == profileName)
             return x;
 

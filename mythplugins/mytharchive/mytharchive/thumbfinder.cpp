@@ -92,7 +92,7 @@ ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
 {
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();
-    foreach (auto item, m_archiveItem->thumbList)
+    for (const auto *item : qAsConst(m_archiveItem->thumbList))
     {
         auto *thumb = new ThumbImage;
         *thumb = *item;
@@ -288,7 +288,7 @@ void ThumbFinder::savePressed()
          delete m_archiveItem->thumbList.takeFirst();
     m_archiveItem->thumbList.clear();
 
-    foreach (auto item, m_thumbList)
+    for (const auto *item : qAsConst(m_thumbList))
     {
         auto *thumb = new ThumbImage;
         *thumb = *item;

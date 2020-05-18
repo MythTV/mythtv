@@ -273,7 +273,7 @@ void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
                 QStringList players = all_systems.split(',');
-                foreach (auto & player, players)
+                for (const auto & player : qAsConst(players))
                     chooseSystemPopup->AddButton(player);
                 popupStack->AddScreen(chooseSystemPopup);
             }

@@ -276,7 +276,7 @@ void ScreenSetup::loadData()
         // available to satisfy the requirements.
         if (m_sourceManager->findPossibleSources(type_strs, scriptList))
         {
-            foreach (auto script, scriptList)
+            for (const auto *script : qAsConst(scriptList))
                 si->m_sources.append(script->name);
             auto *item = new MythUIButtonListItem(m_inactiveList, si->m_title);
             item->SetData(QVariant::fromValue(new ScreenListInfo(*si)));
@@ -329,7 +329,7 @@ void ScreenSetup::loadData()
             auto *item = new MythUIButtonListItem(m_activeList, si->m_title);
 
             // Only insert types meant for this screen
-            foreach (auto & type, types)
+            for (const auto & type : qAsConst(types))
             {
                 if (type == dataitem)
                     si->m_types.insert(dataitem, ti);
@@ -341,7 +341,7 @@ void ScreenSetup::loadData()
         else
         {
             ScreenListInfo *si = active_screens[draworder];
-            foreach (auto & type, types)
+            for (const auto & type : qAsConst(types))
             {
                 if (type == dataitem)
                 {
@@ -361,7 +361,7 @@ void ScreenSetup::saveData()
     {
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         auto *si = item->GetData().value<ScreenListInfo *>();
-        foreach (auto & type, si->m_types)
+        for (const auto & type : qAsConst(si->m_types))
         {
             if (type.m_src)
                 continue;
@@ -420,7 +420,7 @@ void ScreenSetup::saveData()
                     "weatherscreens_screen_id, weathersourcesettings_sourceid) "
                     "VALUES (:LOC, :ITEM, :SCREENID, :SRCID);";
             db2.prepare(query2);
-            foreach (auto & type, si->m_types)
+            for (const auto & type : qAsConst(si->m_types))
             {
                 db2.bindValue(":LOC",      type.m_location);
                 db2.bindValue(":ITEM",     type.m_name);
@@ -646,7 +646,7 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             auto *si = dce->GetData().value<ScreenListInfo *>();
 
-            foreach (auto & type, si->m_types)
+            for (const auto & type : qAsConst(si->m_types))
             {
                 if (type.m_location.isEmpty())
                     return;
@@ -862,7 +862,7 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
       m_locationEdit(nullptr),m_searchButton(nullptr),
       m_resultsText(nullptr), m_sourceText(nullptr)
 {
-    foreach (auto & type, si->m_types)
+    for (const auto & type : qAsConst(si->m_types))
         m_types << type.m_name;
 }
 
@@ -941,7 +941,7 @@ void LocationDialog::doSearch()
     // if a screen makes it this far, theres at least one source for it
     m_sourceManager->findPossibleSources(m_types, sources);
     QString search = m_locationEdit->GetText();
-    foreach (auto si, sources)
+    for (auto *si : qAsConst(sources))
     {
         if (!result_cache.contains(si))
         {

@@ -532,7 +532,7 @@ void NetTree::FillTree()
         rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
                             .arg(GetShareDir()));
 
-        foreach (auto & feed, m_rssList)
+        for (const auto & feed : qAsConst(m_rssList))
         {
             ResultItem::resultList items = getRSSArticles(feed->GetTitle(),
                                                           VIDEO_PODCAST);
@@ -545,7 +545,7 @@ void NetTree::FillTree()
             if (m_type != DLG_TREE)
                 ret->addNode(tr("Back"), kUpFolder, true, false);
 
-            foreach (auto & item, items)
+            for (const auto & item : qAsConst(items))
                 AddFileNode(ret, item);
             SetSubfolderData(ret);
         }
@@ -555,7 +555,7 @@ void NetTree::FillTree()
     }
 
     // Now let's add all the grabber trees
-    foreach (auto & g, m_grabberList)
+    for (const auto & g : qAsConst(m_grabberList))
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
@@ -572,7 +572,7 @@ void NetTree::FillTree()
         if (m_type != DLG_TREE)
             ret->addNode(tr("Back"), kUpFolder, true, false);
 
-        foreach (auto & path, paths)
+        for (const auto & path : qAsConst(paths))
         {
             QStringList curPaths = path.first.split("/");
             QString dirthumb = path.second;
@@ -619,7 +619,7 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
     else
     {
         // File Handling
-        foreach (auto & video, videos)
+        for (const auto & video : qAsConst(videos))
             AddFileNode(folder, video);
     }
     SetSubfolderData(folder);

@@ -127,7 +127,7 @@ void PlaylistContainer::describeYourself(void) const
 {
     //    Debugging
     m_activePlaylist->describeYourself();
-    foreach (auto & playlist, *m_allPlaylists)
+    for (const auto & playlist : qAsConst(*m_allPlaylists))
         playlist->describeYourself();
 }
 
@@ -141,7 +141,7 @@ Playlist *PlaylistContainer::getPlaylist(int id)
         return m_activePlaylist;
     }
 
-    foreach (auto & playlist, *m_allPlaylists)
+    for (const auto & playlist : qAsConst(*m_allPlaylists))
     {
         if (playlist->getID() == id)
             return playlist;
@@ -157,7 +157,7 @@ Playlist *PlaylistContainer::getPlaylist(const QString &name)
     //  return a pointer to a playlist
     //  by name;
 
-    foreach (auto & playlist, *m_allPlaylists)
+    for (const auto & playlist : qAsConst(*m_allPlaylists))
     {
         if (playlist->getName() == name)
             return playlist;
@@ -259,7 +259,7 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
             return m_activePlaylist->getName();
         }
 
-        foreach (auto & playlist, *m_allPlaylists)
+        for (const auto & playlist : qAsConst(*m_allPlaylists))
         {
             if (playlist->getID() == index)
                 return playlist->getName();
@@ -278,7 +278,7 @@ bool PlaylistContainer::nameIsUnique(const QString& a_name, int which_id)
     if (a_name == DEFAULT_PLAYLIST_NAME)
         return false;
 
-    foreach (auto & playlist, *m_allPlaylists)
+    for (const auto & playlist : qAsConst(*m_allPlaylists))
     {
         if (playlist->getName() == a_name && playlist->getID() != which_id)
             return false;
@@ -291,7 +291,7 @@ QStringList PlaylistContainer::getPlaylistNames(void)
 {
     QStringList res;
 
-    foreach (auto & playlist, *m_allPlaylists)
+    for (const auto & playlist : qAsConst(*m_allPlaylists))
     {
         res.append(playlist->getName());
     }

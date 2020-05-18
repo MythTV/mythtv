@@ -79,7 +79,7 @@ QStringList Decoder::all()
 
     QStringList l;
 
-    foreach (auto & factory, *factories)
+    for (const auto & factory : qAsConst(*factories))
         l += factory->description();
 
     return l;
@@ -89,7 +89,7 @@ bool Decoder::supports(const QString &source)
 {
     checkFactories();
 
-    foreach (auto & factory, *factories)
+    for (const auto & factory : qAsConst(*factories))
     {
         if (factory->supports(source))
             return true;
@@ -107,7 +107,7 @@ Decoder *Decoder::create(const QString &source, AudioOutput *output, bool deleta
 {
     checkFactories();
 
-    foreach (auto & factory, *factories)
+    for (const auto & factory : qAsConst(*factories))
     {
         if (factory->supports(source))
             return factory->create(source, output, deletable);

@@ -385,7 +385,7 @@ void ZMEvents::setGridLayout(int layout)
     QString layoutName = QString("layout%1").arg(layout);
     QList<MythUIType *> *children = GetAllChildren();
 
-    foreach (auto type, *children)
+    for (auto *type : qAsConst(*children))
     {
         name = type->objectName();
         if (name.startsWith("layout"))
