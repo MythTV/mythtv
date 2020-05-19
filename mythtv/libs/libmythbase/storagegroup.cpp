@@ -226,7 +226,7 @@ QStringList StorageGroup::GetDirFileList(const QString &dir,
         QStringList list =
             d.entryList(QDir::Dirs|QDir::NoDotAndDotDot|QDir::Readable);
 
-        foreach (auto & p, list)
+        for (const auto& p : qAsConst(list))
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("GetDirFileList: Dir: %1/%2").arg(base).arg(p));
@@ -241,7 +241,7 @@ QStringList StorageGroup::GetDirFileList(const QString &dir,
     if (!onlyDirs)
     {
         QStringList list = d.entryList(QDir::Files|QDir::Readable);
-        foreach (auto & p, list)
+        for (const auto& p : qAsConst(list))
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("GetDirFileList: File: %1%2").arg(base).arg(p));
@@ -259,7 +259,7 @@ QStringList StorageGroup::GetDirList(const QString &Path, bool recursive)
     QStringList files;
     QString tmpDir;
     QDir d;
-    foreach (auto & dir, m_dirlist)
+    for (const auto& dir : qAsConst(m_dirlist))
     {
         tmpDir = dir + Path;
         d.setPath(tmpDir);
@@ -275,7 +275,7 @@ QStringList StorageGroup::GetFileList(const QString &Path, bool recursive)
     QString tmpDir;
     QDir d;
 
-    foreach (auto & dir, m_dirlist)
+    for (const auto& dir : qAsConst(m_dirlist))
     {
         tmpDir = dir + Path;
 
@@ -295,13 +295,13 @@ QStringList StorageGroup::GetFileInfoList(const QString &Path)
 
     if (Path.isEmpty() || Path == "/")
     {
-        foreach (auto & dir, m_dirlist)
+        for (const auto& dir : qAsConst(m_dirlist))
             files << QString("sgdir::%1").arg(dir);
 
         return files;
     }
 
-    foreach (auto & dir, m_dirlist)
+    for (const auto& dir : qAsConst(m_dirlist))
     {
         if (Path.startsWith(dir))
         {
@@ -328,7 +328,7 @@ QStringList StorageGroup::GetFileInfoList(const QString &Path)
     if (list.isEmpty())
         return files;
 
-    foreach (auto & entry, list)
+    for (const auto& entry : qAsConst(list))
     {
         if (entry.fileName() == "Thumbs.db")
             continue;
@@ -361,7 +361,7 @@ bool StorageGroup::FileExists(const QString &filename)
     if (filename.isEmpty())
         return false;
 
-    foreach (auto & dir, m_dirlist)
+    for (const auto & dir : qAsConst(m_dirlist))
     {
         if (filename.startsWith(dir))
         {
@@ -483,7 +483,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
             QString videostartupdir = query.value(0).toString();
             QStringList videodirs = videostartupdir.split(':',
                                             QString::SkipEmptyParts);
-            foreach (auto & directory, videodirs)
+            for (const auto& directory : qAsConst(videodirs))
             {
                 if (filename.startsWith(directory))
                 {
@@ -501,7 +501,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         }
     }
 
-    foreach (auto group, m_builtinGroups)
+    for (const auto& group : qAsConst(m_builtinGroups))
     {
         QDir qdir(group);
         if (!qdir.exists())
@@ -799,7 +799,7 @@ QStringList StorageGroup::getRecordingsGroups(void)
     QString sql = "SELECT DISTINCT groupname "
                   "FROM storagegroup "
                   "WHERE groupname NOT IN (";
-    foreach (const auto & group, StorageGroup::kSpecialGroups)
+    for (const auto& group : qAsConst(StorageGroup::kSpecialGroups))
         sql.append(QString(" '%1',").arg(group));
     sql = sql.left(sql.length() - 1);
     sql.append(" );");

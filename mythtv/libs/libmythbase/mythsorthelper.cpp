@@ -164,7 +164,7 @@ QString MythSortHelper::doTitle(const QString& title) const
         if (m_exclList.contains(ltitle))
             return ltitle;
     } else {
-        foreach (const QString &str, m_exclList)
+        for (const auto& str : qAsConst(m_exclList))
             if (ltitle.startsWith(str))
                 return ltitle;
     }

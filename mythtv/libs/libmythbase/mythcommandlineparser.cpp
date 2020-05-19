@@ -555,7 +555,7 @@ CommandLineArg* CommandLineArg::SetParentOf(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetParentOf(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_children << new CommandLineArg(opt);
     return this;
 }
@@ -572,7 +572,7 @@ CommandLineArg* CommandLineArg::SetParent(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetParent(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_parents << new CommandLineArg(opt);
     return this;
 }
@@ -589,7 +589,7 @@ CommandLineArg* CommandLineArg::SetChildOf(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetChildOf(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_parents << new CommandLineArg(opt);
     return this;
 }
@@ -606,7 +606,7 @@ CommandLineArg* CommandLineArg::SetChild(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetChild(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_children << new CommandLineArg(opt);
     return this;
 }
@@ -624,7 +624,7 @@ CommandLineArg* CommandLineArg::SetRequiredChild(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequiredChild(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
     {
         m_children << new CommandLineArg(opt);
         m_requires << new CommandLineArg(opt);
@@ -645,7 +645,7 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequiredChildOf(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
     {
         m_parents << new CommandLineArg(opt);
         m_requiredby << new CommandLineArg(opt);
@@ -665,7 +665,7 @@ CommandLineArg* CommandLineArg::SetRequires(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequires(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_requires << new CommandLineArg(opt);
     return this;
 }
@@ -682,7 +682,7 @@ CommandLineArg* CommandLineArg::SetBlocks(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetBlocks(const QStringList& opts)
 {
-    foreach (const auto opt, opts)
+    for (const auto& opt : qAsConst(opts))
         m_blocks << new CommandLineArg(opt);
     return this;
 }
@@ -1614,7 +1614,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << endl << "Extra argument list:" << endl;
             QStringList slist = toStringList("_args");
-            foreach (auto lopt, slist)
+            for (const auto& lopt : qAsConst(slist))
                 cerr << "  " << (lopt).toLocal8Bit().constData() << endl;
         }
 

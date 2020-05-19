@@ -127,7 +127,7 @@ void MythPowerDBus::Init(void)
         QDBusReply<QList<QDBusObjectPath> > devices = m_upowerInterface->call(QLatin1String("EnumerateDevices"));
         if (devices.isValid())
         {
-            foreach (QDBusObjectPath device, devices.value())
+            for (const auto& device : devices.value())
                 DeviceAdded(device);
         }
 
@@ -437,7 +437,7 @@ void MythPowerDBus::UpdateBattery(void)
         int   count = 0;
 
         // take an average (who has more than 1 battery?)
-        foreach (int level, m_batteries)
+        for (int level : qAsConst(m_batteries))
         {
             if (level >= 0 && level <= 100)
             {

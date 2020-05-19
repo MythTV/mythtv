@@ -190,7 +190,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
-        foreach (auto fname, m_possibleAuxFiles)
+        for (const auto& fname : qAsConst(m_possibleAuxFiles))
             strlist << fname;
 
         if (!lsock->SendReceiveStringList(strlist))

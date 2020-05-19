@@ -870,7 +870,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         LoggingItem *item = LoggingItem::create(json);
         if (!item)
             return;
-        foreach (auto & it, *logItem->m_itemList)
+        for (auto *it : qAsConst(*logItem->m_itemList))
             it->logmsg(item);
         item->DecrRef();
     }

@@ -111,7 +111,7 @@ void MythTranslation::reload()
              ++it)
             keys.append(it.key());
 
-        foreach (auto & key, keys)
+        for (const auto& key : qAsConst(keys))
             load(key);
     }
 }

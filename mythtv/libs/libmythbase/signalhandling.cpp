@@ -96,7 +96,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
     connect(m_notifier, SIGNAL(activated(int)), this, SLOT(handleSignal()));
 
-    foreach (int signum, signallist)
+    for (int signum : qAsConst(signallist))
     {
         if (!s_defaultHandlerList.contains(signum))
         {

@@ -832,7 +832,7 @@ LogLevel_t logLevelGet(const QString& level)
         locker.relock();
     }
 
-    foreach (auto item, loglevelMap)
+    for (auto *item : qAsConst(loglevelMap))
     {
         if ( item->name == level.toLower() )
             return (LogLevel_t)item->value;
@@ -992,7 +992,7 @@ int verboseArgParse(const QString& arg)
     QStringList verboseOpts = arg.split(QRegExp("[^\\w:]+",
                                                 Qt::CaseInsensitive,
                                                 QRegExp::RegExp2));
-    foreach (auto & opt, verboseOpts)
+    for (const auto& opt : qAsConst(verboseOpts))
     {
         option = opt.toLower();
         bool reverseOption = false;

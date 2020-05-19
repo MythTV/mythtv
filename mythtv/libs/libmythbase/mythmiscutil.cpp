@@ -833,8 +833,6 @@ bool MythRemoveDirectory(QDir &aDir)
 void setHttpProxy(void)
 {
     QString       LOC = "setHttpProxy() - ";
-    QNetworkProxy p;
-
 
     // Set http proxy for the application if specified in environment variable
     QString var(getenv("http_proxy"));
@@ -882,7 +880,8 @@ void setHttpProxy(void)
                 .arg(url.userName()).arg(url.password())
                 .arg(host).arg(port));
 #endif
-        p = QNetworkProxy(QNetworkProxy::HttpCachingProxy,
+        QNetworkProxy p =
+            QNetworkProxy(QNetworkProxy::HttpCachingProxy,
                           host, port, url.userName(), url.password());
         QNetworkProxy::setApplicationProxy(p);
         return;
@@ -897,7 +896,7 @@ void setHttpProxy(void)
 
     proxies = QNetworkProxyFactory::systemProxyForQuery(query);
 
-    Q_FOREACH (p, proxies)
+    for (const auto& p : qAsConst(proxies))
     {
         QString host = p.hostName();
         int     port = p.port();

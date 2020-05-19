@@ -110,7 +110,7 @@ MythPluginManager::MythPluginManager()
             LOG(VB_GENERAL, LOG_WARNING,
                     "No libraries in plugins directory " + filterDir.path());
 
-        foreach (auto library, libraries)
+        for (auto library : qAsConst(libraries))
         {
             // pull out the base library name
             library = library.right(library.length() - prefixLength);
@@ -221,7 +221,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 
 void MythPluginManager::DestroyAllPlugins(void)
 {
-    foreach (auto & it, m_dict)
+    for (auto *it : qAsConst(m_dict))
     {
         it->destroy();
         delete it;
@@ -234,7 +234,7 @@ void MythPluginManager::DestroyAllPlugins(void)
 QStringList MythPluginManager::EnumeratePlugins(void)
 {
     QStringList ret;
-    foreach (auto it, m_dict)
+    for (auto *it : qAsConst(m_dict))
         ret << it->getName();
     return ret;
 }

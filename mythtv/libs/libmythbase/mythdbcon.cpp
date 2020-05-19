@@ -472,7 +472,7 @@ void MDBManager::CloseDatabases()
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 
-    foreach (auto & conn, list)
+    for (auto *conn : qAsConst(list))
     {
         LOG(VB_DATABASE, LOG_INFO,
             "Closing DB connection named '" + conn->m_name + "'");
