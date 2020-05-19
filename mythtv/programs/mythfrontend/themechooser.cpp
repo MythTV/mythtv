@@ -143,7 +143,7 @@ void ThemeChooser::Load(void)
 
     m_infoList = themes.entryInfoList();
 
-    foreach (auto & theme, m_infoList)
+    for (const auto & theme : qAsConst(m_infoList))
     {
         if (loadThemeInfo(theme))
         {
@@ -154,7 +154,7 @@ void ThemeChooser::Load(void)
 
     themes.setPath(GetThemesParentDir());
     QFileInfoList sharedThemes = themes.entryInfoList();
-    foreach (auto & sharedTheme, sharedThemes)
+    for (const auto & sharedTheme : qAsConst(sharedThemes))
     {
         if ((!themesSeen.contains(sharedTheme.fileName())) &&
             (loadThemeInfo(sharedTheme)))
@@ -329,7 +329,7 @@ void ThemeChooser::LoadVersion(const QString &version,
         themes.setPath(themesPath);
 
         QFileInfoList downloadableThemes = themes.entryInfoList();
-        foreach (auto & dtheme, downloadableThemes)
+        for (const auto & dtheme : qAsConst(downloadableThemes))
         {
             QString dirName = dtheme.fileName();
             QString themeName = dirName;
@@ -418,7 +418,7 @@ void ThemeChooser::Init(void)
     MythUIButtonListItem *item = nullptr;
 
     m_themes->Reset();
-    foreach (auto & theme, m_infoList)
+    for (const auto & theme : qAsConst(m_infoList))
     {
         if (!m_themeFileNameInfos.contains(theme.filePath()))
             continue;

@@ -308,7 +308,7 @@ class PTSListener :
     {
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        foreach (uint stream, m_ptsStreams)
+        for (uint stream : qAsConst(m_ptsStreams))
         {
             if(m_ptsCount[stream] > pts_count){
                 pts = m_ptsFirst[stream];
@@ -321,7 +321,7 @@ class PTSListener :
     {
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        foreach (uint stream, m_ptsStreams)
+        for (uint stream : qAsConst(m_ptsStreams))
         {
             if(m_ptsCount[stream] > pts_count){
                 pts = m_ptsLast[stream];

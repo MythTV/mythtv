@@ -525,7 +525,7 @@ QString LCDProcClient::expandString(const QString &aString) const
     QString bString;
 
     // if version 5 then white space seperate the list of characters
-    foreach (auto x, aString)
+    for (auto x : qAsConst(aString))
     {
         bString += x + QString(" ");
     }
@@ -956,7 +956,7 @@ void LCDProcClient::formatScrollingWidgets()
     int max_len = 0;
 
     // Get the length of the longest item to scroll
-    foreach (auto item, *m_lcdTextItems)
+    for (const auto & item : qAsConst(*m_lcdTextItems))
     {
         if (item.getText().length() > max_len)
             max_len = item.getText().length();
@@ -1010,7 +1010,7 @@ void LCDProcClient::scrollWidgets()
         return; // Weird...
 
     unsigned int len = 0;
-    foreach (auto item, *m_lcdTextItems)
+    for (const auto & item : qAsConst(*m_lcdTextItems))
     {
         if (item.getScroll())
         {
@@ -2056,7 +2056,7 @@ QStringList LCDProcClient::formatScrollerText(const QString &text) const
     int lastSplit = 0;
     QString line = "";
 
-    foreach (auto x, text)
+    for (auto x : qAsConst(text))
     {
         if (separators.contains(x))
             lastSplit = line.length();

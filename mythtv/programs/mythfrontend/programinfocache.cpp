@@ -245,7 +245,7 @@ namespace {
 
 void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
 {
-    foreach (auto & pi, m_cache)
+    for (const auto & pi : qAsConst(m_cache))
         list.push_back(pi);
 
     if (newest_first)
@@ -268,7 +268,7 @@ ProgramInfo *ProgramInfoCache::GetRecordingInfo(uint recordingID) const
 /// Clears the cache, m_lock must be held when this is called.
 void ProgramInfoCache::Clear(void)
 {
-    foreach (auto & pi, m_cache)
+    for (const auto & pi : qAsConst(m_cache))
         delete pi;
     m_cache.clear();
 }

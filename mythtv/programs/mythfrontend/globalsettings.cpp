@@ -790,7 +790,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleDriver->setEnabled(false);
 
     QList<QPair<QString,QString> > options = VideoDisplayProfile::GetDeinterlacers();
-    foreach (const auto & option, options)
+    for (const auto & option : qAsConst(options))
     {
         m_singleDeint->addSelection(option.second, option.first);
         m_doubleDeint->addSelection(option.second, option.first);
@@ -1099,7 +1099,7 @@ bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)
     if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
         return true;
 
-    foreach (const QString &action, actions)
+    for (const QString & action : qAsConst(actions))
     {
         if (action == "DELETE")
         {
@@ -1216,7 +1216,7 @@ void PlaybackProfileConfig::Save(void)
         return;
     }
 
-    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
     {
         profile->Save();
     }
@@ -1241,7 +1241,7 @@ void PlaybackProfileConfig::Save(void)
 void PlaybackProfileConfig::DeleteProfileItem(
     PlaybackProfileItemConfig *profileToDelete)
 {
-    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
     {
         profile->Save();
     }
@@ -1255,7 +1255,7 @@ void PlaybackProfileConfig::DeleteProfileItem(
 
 void PlaybackProfileConfig::AddNewEntry(void)
 {
-    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
     {
         profile->Save();
     }
@@ -1272,7 +1272,7 @@ void PlaybackProfileConfig::ReloadSettings(void)
     getParent()->removeTargetedChild(m_profileName, m_markForDeletion);
     getParent()->removeTargetedChild(m_profileName, m_addNewEntry);
 
-    foreach (StandardSetting *setting, m_profiles)
+    for (StandardSetting *setting : qAsConst(m_profiles))
     {
         getParent()->removeTargetedChild(m_profileName, setting);
     }
@@ -1280,7 +1280,7 @@ void PlaybackProfileConfig::ReloadSettings(void)
 
     InitUI(getParent());
 
-    foreach (StandardSetting *setting, m_profiles)
+    for (StandardSetting *setting : qAsConst(m_profiles))
     {
         setting->Load();
     }
@@ -1291,7 +1291,7 @@ void PlaybackProfileConfig::ReloadSettings(void)
 
 void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
-    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
     {
         profile->Save();
     }
@@ -1520,7 +1520,7 @@ static HostComboBoxSetting *SubtitleCodec()
 
     QList<QByteArray> list = QTextCodec::availableCodecs();
 
-    foreach (const auto & codec, list)
+    for (const auto & codec : qAsConst(list))
     {
         QString val = QString(codec);
         gc->addSelection(val, val, val.toLower() == "utf-8");
@@ -1649,7 +1649,7 @@ static HostComboBoxSetting *Visualiser()
                                        "is no video. Defaults to none."));
     combo->addSelection("None", "");
     QStringList visuals = VideoVisual::GetVisualiserList(RenderType::kRenderOpenGL);
-    foreach (const auto & visual, visuals)
+    for (const auto & visual : qAsConst(visuals))
         combo->addSelection(visual, visual);
     return combo;
 }
@@ -3089,7 +3089,7 @@ static GlobalComboBoxSetting *MythLanguage()
 
     gc->clearSelections();
 
-    foreach (auto label, langs)
+    for (const auto & label : qAsConst(langs))
     {
         QString value = langMap.key(label);
         gc->addSelection(label, value, (value.toLower() == langCode));

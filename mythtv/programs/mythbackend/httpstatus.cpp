@@ -301,7 +301,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         fes = nullptr;
 
         frontends.setAttribute( "count", map.size() );
-        foreach (auto & entry, map)
+        for (const auto & entry : qAsConst(map))
         {
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
@@ -346,7 +346,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         sbes->DecrRef();
         sbes = nullptr;
 
-        foreach (auto & entry, map)
+        for (const auto & entry : qAsConst(map))
         {
             QUrl url(entry->m_sLocation);
             if (url.host() != ipaddress)
@@ -585,7 +585,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
-        foreach (auto & line, output)
+        for (const auto & line : qAsConst(output))
         {
             QDomElement info = pDoc->createElement("Information");
 

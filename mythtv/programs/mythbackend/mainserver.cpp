@@ -415,7 +415,7 @@ void MainServer::Stop()
         ft->DecrRef();
     m_fileTransferList.clear();
 
-    foreach (auto cs, m_controlSocketList)
+    for (auto *cs : qAsConst(m_controlSocketList))
         cs->DecrRef();
     m_controlSocketList.clear();
 
@@ -2469,7 +2469,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     QDir dir (fInfo.path());
     QFileInfoList miscFiles = dir.entryInfoList(nameFilters);
 
-    foreach (const auto & file, miscFiles)
+    for (const auto & file : qAsConst(miscFiles))
     {
         QString sFileName = file.absoluteFilePath();
         delete_file_immediately( sFileName, followLinks, true);
@@ -5306,7 +5306,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     // Passed the cleaned list back
     totalKB = 0;
     usedKB  = 0;
-    foreach (auto & fsInfo, fsInfos)
+    for (const auto & fsInfo : qAsConst(fsInfos))
     {
         strlist << fsInfo.getHostname();
         strlist << fsInfo.getPath();

@@ -698,7 +698,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
             else
                 pEncoder->setHostName( elink->GetHostName() );
 
-            foreach (auto inputInfo, inputInfoList)
+            for (const auto & inputInfo : qAsConst(inputInfoList))
             {
                 if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
                 {
@@ -744,7 +744,7 @@ DTC::InputList* Dvr::GetInputList()
     auto *pList = new DTC::InputList();
 
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    foreach (auto inputInfo, inputInfoList)
+    for (const auto & inputInfo : qAsConst(inputInfoList))
     {
         DTC::Input *input = pList->AddNewInput();
         FillInputInfo(input, inputInfo);

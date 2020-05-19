@@ -87,7 +87,7 @@ long long
 frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap)
 {
     long long sum = 0;
-    foreach (long long ii, *frameMap)
+    for (long long ii : qAsConst(*frameMap))
         sum += ii;
     return sum;
 }

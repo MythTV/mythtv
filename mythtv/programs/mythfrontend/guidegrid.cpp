@@ -2045,7 +2045,7 @@ void GuideGrid::updateProgramsUI(unsigned int firstRow, unsigned int numRows,
         }
     }
     m_guideGrid->SetProgPast(progPast);
-    foreach (const auto & r, elements)
+    for (const auto & r : qAsConst(elements))
     {
         m_guideGrid->SetProgramInfo(r.m_row, r.m_col, r.m_area, r.m_title,
                                     r.m_category, r.m_arrow, r.m_recType,

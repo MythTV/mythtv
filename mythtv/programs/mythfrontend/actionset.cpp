@@ -209,7 +209,7 @@ bool ActionSet::AddAction(const ActionID &id,
     (*cit).insert(id.GetAction(), a);
 
     const QStringList keylist = a->GetKeys();
-    foreach (const auto & key, keylist)
+    for (const auto & key : qAsConst(keylist))
         m_keyToActionMap[key].push_back(id);
 
     return true;
@@ -256,7 +256,7 @@ QStringList ActionSet::GetContextKeys(const QString &context_name) const
     if (cit == m_contexts.end())
         return keys;
 
-    foreach (auto ctx, (*cit))
+    for (const auto *ctx : qAsConst(*cit))
         keys += ctx->GetKeys();
     keys.sort();
     return keys;

@@ -251,7 +251,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
     root.appendChild(item);
     QDomElement markup = xml.createElement("markup");
     item.appendChild(markup);
-    foreach (auto & entry, mapMark)
+    for (const auto & entry : qAsConst(mapMark))
     {
         QDomElement child = xml.createElement("mark");
         child.setAttribute("type", entry.type);
@@ -260,7 +260,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
             child.setAttribute("data", (qulonglong)entry.data);
         markup.appendChild(child);
     }
-    foreach (auto & entry, mapSeek)
+    for (const auto & entry : qAsConst(mapSeek))
     {
         QDomElement child = xml.createElement("seek");
         child.setAttribute("type", entry.type);

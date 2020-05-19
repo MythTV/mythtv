@@ -626,7 +626,7 @@ class ItemDetailPopup : public MythScreenType
     bool OnKeyAction(const QStringList &actions)
     {
         bool handled = false;
-        foreach (const auto & action, actions)
+        for (const auto & action : qAsConst(actions))
         {
             handled = true;
             if (action == "SELECT" || action == "PLAYBACK")
@@ -2226,7 +2226,7 @@ void VideoDialog::searchComplete(const QString& string)
     else
         children = m_d->m_currentNode->getAllChildren();
 
-    foreach (auto child, *children)
+    for (auto * child : qAsConst(*children))
     {
         QString title = child->GetText();
         int id = child->getPosition();
@@ -2262,7 +2262,7 @@ void VideoDialog::searchStart(void)
     else
         children = m_d->m_currentNode->getAllChildren();
 
-    foreach (auto child, *children)
+    for (auto * child : qAsConst(*children))
     {
         childList << child->GetText();
     }
@@ -3429,7 +3429,7 @@ MythUIButtonListItem *VideoDialog::GetItemByMetadata(VideoMetadata *metadata)
 
     QList<MythGenericTree*> *children = m_d->m_currentNode->getAllChildren();
 
-    foreach (auto child, *children)
+    for (auto * child : qAsConst(*children))
     {
         int nodeInt = child->getInt();
         if (nodeInt != kSubFolder && nodeInt != kUpFolder)

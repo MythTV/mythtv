@@ -268,7 +268,7 @@ DTC::FrontendActionList* Frontend::GetActionList(const QString &lContext)
 
         // TODO can we keep the context data with QMap<QString, QStringList>?
         QStringList actions = contexts.value();
-        foreach (QString action, actions)
+        for (const QString & action : qAsConst(actions))
         {
             QStringList split = action.split(",");
             if (split.size() == 2)
@@ -312,13 +312,13 @@ void Frontend::InitialiseActions(void)
     {
         QStringList contexts = bindings->GetContexts();
         contexts.sort();
-        foreach (QString context, contexts)
+        for (const QString & context : qAsConst(contexts))
         {
             gActionDescriptions[context] = QStringList();
             QStringList ctx_actions = bindings->GetActions(context);
             ctx_actions.sort();
             gActionList += ctx_actions;
-            foreach (QString actions, ctx_actions)
+            for (const QString & actions : qAsConst(ctx_actions))
             {
                 QString desc = actions + "," +
                                bindings->GetActionDescription(context, actions);
@@ -330,7 +330,7 @@ void Frontend::InitialiseActions(void)
     gActionList.removeDuplicates();
     gActionList.sort();
 
-    foreach (QString actions, gActionList)
+    for (const QString & actions : qAsConst(gActionList))
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Action: %1").arg(actions));
 }
 

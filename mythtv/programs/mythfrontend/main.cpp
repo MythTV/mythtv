@@ -860,9 +860,9 @@ static void handleGalleryMedia(MythMediaDevice *dev)
     GetMythMainWindow()->GetMainStack()->GetScreenList(screens);
 
 
-    foreach (auto screen, screens)
+    for (const auto *screen : qAsConst(screens))
     {
-        if (dynamic_cast<GalleryThumbView*>(screen))
+        if (dynamic_cast<const GalleryThumbView*>(screen))
         {
             // Running gallery will receive this event later
             LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - already running");

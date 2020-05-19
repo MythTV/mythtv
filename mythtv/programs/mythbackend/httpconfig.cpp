@@ -204,7 +204,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 QTextStream os(&request->m_response);
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
 
-                foreach (auto entry, entries)
+                for (const auto & entry : qAsConst(entries))
                 {
                     QStringList parts = entry.split("::");
                     QFileInfo fi(parts[1]);
@@ -243,7 +243,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
 
                 QFileInfoList infoList = dir.entryInfoList();
-                foreach (auto & fi, infoList)
+                for (const auto & fi : qAsConst(infoList))
                 {
                     if (!fi.isDir())
                         continue;
@@ -260,7 +260,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
                 if (!dirsOnly)
                 {
-                    foreach (auto & fi, infoList)
+                    for (const auto & fi : qAsConst(infoList))
                     {
                         if (fi.isDir())
                             continue;
@@ -417,6 +417,6 @@ void HttpConfig::PrintSettings(QBuffer &buffer, const MythSettingList &settings)
 {
     QTextStream os(&buffer);
 
-    foreach (auto setting, settings)
+    for (const auto *setting : qAsConst(settings))
         os << setting->ToHTML(1);
 }

@@ -209,7 +209,7 @@ void ParallelAnimation::Pulse(int interval)
     if (m_running)
     {
         // Pulse all children
-        foreach(AbstractAnimation *animation, m_group)
+        for (AbstractAnimation *animation : qAsConst(m_group))
             animation->Pulse(interval);
     }
 }
@@ -229,7 +229,7 @@ void ParallelAnimation::Start(bool forwards, float speed)
 
     // Start group, then all children
     GroupAnimation::Start(forwards, speed);
-    foreach(AbstractAnimation *animation, m_group)
+    for (AbstractAnimation *animation : qAsConst(m_group))
         animation->Start(m_forwards, m_speed);
 }
 
@@ -242,7 +242,7 @@ void ParallelAnimation::SetSpeed(float speed)
 {
     // Set group speed, then all children
     GroupAnimation::SetSpeed(speed);
-    foreach(AbstractAnimation *animation, m_group)
+    for (AbstractAnimation *animation : qAsConst(m_group))
         animation->SetSpeed(m_speed);
 }
 
@@ -579,7 +579,7 @@ SlideBuffer::~SlideBuffer()
 void SlideBuffer::Teardown()
 {
     QMutexLocker lock(&m_mutexQ);
-    foreach (Slide *s, m_queue)
+    for (Slide *s : qAsConst(m_queue))
         s->Clear();
     LOG(VB_GUI, LOG_DEBUG, "Aborted Slidebuffer");
 }

@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
     {
-        foreach (auto item, sl)
+        for (const auto & item : qAsConst(sl))
         {
             QString warn = QString("Invalid entry in --refresh list: %1")
                                 .arg(item);

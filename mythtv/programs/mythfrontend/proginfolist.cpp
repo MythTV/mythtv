@@ -95,7 +95,7 @@ void ProgInfoList::Display(const DataList& data)
     Clear();
 
     // Create buttons for each data pair
-    foreach (const auto & pi, data)
+    for (const auto & pi : qAsConst(data))
     {
         if (m_infoVisible != kNone && std::get<2>(pi) <= m_infoVisible)
             CreateButton(std::get<0>(pi), std::get<1>(pi));

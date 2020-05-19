@@ -100,7 +100,7 @@ DTC::ImageMetadataInfoList* Image::GetImageInfoList(int id)
     // Each string contains a Name<seperator>Label<seperator>Value.
     QString seperator = tags.takeFirst();
     int index = 0;
-    foreach (const QString &token, tags)
+    for (const QString & token : qAsConst(tags))
     {
         QStringList parts = token.split(seperator);
         if (parts.size() != 3)

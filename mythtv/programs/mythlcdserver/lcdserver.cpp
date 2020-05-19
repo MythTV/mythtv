@@ -158,7 +158,7 @@ QStringList LCDServer::parseCommand(QString &command)
     QChar c;
     bool bInString = false;
 
-    foreach (auto && x, command)
+    for (auto && x : qAsConst(command))
     {
         c = x;
         if (!bInString && c == '"')
