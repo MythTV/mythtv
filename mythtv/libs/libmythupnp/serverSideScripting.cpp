@@ -87,7 +87,7 @@ ServerSideScripting::~ServerSideScripting()
 {
     Lock();
 
-    foreach (auto & script, m_mapScripts)
+    for (const auto *script : qAsConst(m_mapScripts))
         delete script;
 
     m_mapScripts.clear();

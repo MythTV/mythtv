@@ -44,7 +44,7 @@ void SSDPCacheEntries::Clear(void)
 {
     QMutexLocker locker(&m_mutex);
 
-    foreach (auto & entry, m_mapEntries)
+    for (auto *const entry : qAsConst(m_mapEntries))
     {
         if (entry)
             entry->DecrRef();
@@ -177,7 +177,7 @@ QTextStream &SSDPCacheEntries::OutputXML(
 {
     QMutexLocker locker(&m_mutex);
 
-    foreach (auto entry, m_mapEntries)
+    for (auto *entry : qAsConst(m_mapEntries))
     {
         if (entry == nullptr)
             continue;
@@ -200,7 +200,7 @@ void SSDPCacheEntries::Dump(uint &nEntryCount) const
 {
     QMutexLocker locker(&m_mutex);
 
-    foreach (auto entry, m_mapEntries)
+    for (auto *entry : qAsConst(m_mapEntries))
     {
         if (entry == nullptr)
             continue;
@@ -278,7 +278,7 @@ void SSDPCache::Clear(void)
 {
     QMutexLocker locker(&m_mutex);
 
-    foreach (auto & it, m_cache)
+    for (auto *const it : qAsConst(m_cache))
     {
         if (it)
             it->DecrRef();
@@ -485,7 +485,7 @@ int SSDPCache::RemoveStale()
     // (This avoids issues when removing from a QMap while iterating it)
     // ----------------------------------------------------------------------
 
-    foreach (auto & key, lstKeys)
+    for (const auto & key : qAsConst(lstKeys))
     {
         SSDPCacheEntriesMap::iterator it = m_cache.find( key );
         if (it == m_cache.end())

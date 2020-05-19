@@ -117,7 +117,7 @@ void LanguageSelection::Load(void)
     QStringList langs = langMap.values();
     langs.sort();
     bool foundLanguage = false;
-    foreach (auto nativeLang, langs)
+    for (const auto& nativeLang : qAsConst(langs))
     {
         QString code = langMap.key(nativeLang); // Slow, but map is small
         QString language = GetISO639EnglishLanguageName(code);
@@ -153,7 +153,7 @@ void LanguageSelection::Load(void)
     ISO3166ToNameMap localesMap = GetISO3166EnglishCountryMap();
     QStringList locales = localesMap.values();
     locales.sort();
-    foreach (auto country, locales)
+    for (const auto& country : qAsConst(locales))
     {
         QString code = localesMap.key(country); // Slow, but map is small
         QString nativeCountry = GetISO3166CountryName(code);

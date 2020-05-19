@@ -59,7 +59,7 @@ namespace
 
         QDir dir_tester;
 
-        foreach (auto & entry, list)
+        for (const auto& entry : qAsConst(list))
         {
             if (entry.fileName() == "Thumbs.db")
                 continue;
@@ -148,7 +148,7 @@ namespace
         if (list.isEmpty() || (list.at(0) == "EMPTY LIST"))
             return true;
 
-        foreach (auto & entry, list)
+        for (const auto& entry : qAsConst(list))
         {
             QStringList fInfo = entry.split("::");
             const QString& type = fInfo.at(0);

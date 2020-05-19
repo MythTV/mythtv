@@ -94,7 +94,7 @@ qint64 MMulticastSocketDevice::writeBlock(
     if (host.toString() == "239.255.255.250")
     {
         int retx = 0;
-        foreach (const auto & address, m_localAddresses)
+        for (const auto & address : qAsConst(m_localAddresses))
         {
             if (address.protocol() != QAbstractSocket::IPv4Protocol)
                 continue; // skip IPv6 addresses

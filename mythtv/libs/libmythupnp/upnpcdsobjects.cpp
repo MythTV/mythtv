@@ -360,7 +360,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
     // Output all Properties
     // ----------------------------------------------------------------------
 
-    foreach (auto pProp, m_properties)
+    for (auto *pProp : qAsConst(m_properties))
     {
         if (pProp->m_bRequired || (!pProp->GetValue().isEmpty()))
         {
@@ -406,7 +406,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
         bool filterAttributes = true;
         if (!bFilter || filter.contains("res#"))
             filterAttributes = false;
-        foreach (auto resource, m_resources)
+        for (auto *resource : qAsConst(m_resources))
         {
             os << "<res protocolInfo=\"" << resource->m_sProtocolInfo << "\" ";
 

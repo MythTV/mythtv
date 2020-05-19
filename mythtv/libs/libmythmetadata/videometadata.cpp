@@ -418,7 +418,7 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
         return d.rmdir(dirName);
     }
 
-    foreach (auto & entry, contents)
+    for (const auto& entry : qAsConst(contents))
     {
         if (entry.isDir())
         {

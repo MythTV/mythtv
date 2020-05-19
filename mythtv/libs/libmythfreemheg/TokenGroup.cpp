@@ -405,7 +405,7 @@ void MHListGroup::Preparation(MHEngine *engine)
             MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
 
-            foreach (auto & item, m_ItemList)
+            for (auto *item : qAsConst(m_ItemList))
             {
                 p = item;
 
@@ -429,7 +429,7 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    foreach (auto item, m_ItemList)
+    for (auto *item : qAsConst(m_ItemList))
         item->m_pVisible->ResetPosition();
 
     MHTokenGroup::Destruction(engine);
@@ -446,7 +446,7 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    foreach (auto item, m_ItemList)
+    for (auto *item : qAsConst(m_ItemList))
         item->m_pVisible->Deactivation(engine);
 
     MHTokenGroup::Deactivation(engine);
@@ -545,7 +545,7 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    foreach (auto & item, m_ItemList)
+    for (auto *item : qAsConst(m_ItemList))
     {
         if (item->m_pVisible == pItem)
         {

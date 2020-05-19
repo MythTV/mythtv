@@ -544,7 +544,7 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
 {
     QMutexLocker locker(&m_DevicesLock);
 
-    foreach (auto & dev, m_Devices)
+    for (auto *dev : qAsConst(m_Devices))
     {
         if (dev->isSameDevice(path) &&
             ((dev->getStatus() == MEDIASTAT_USEABLE) ||
@@ -617,7 +617,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
 
     QList<MythMediaDevice*> medias;
 
-    foreach (auto & dev, m_Devices)
+    for (auto *dev : qAsConst(m_Devices))
     {
         if ((dev->getMediaType() & mediatypes) &&
             ((dev->getStatus() == MEDIASTAT_USEABLE) ||
@@ -952,7 +952,7 @@ QString MediaMonitor::listDevices(void)
 {
     QStringList list;
 
-    foreach (auto & dev, m_Devices)
+    for (const auto *dev : qAsConst(m_Devices))
     {
         QString devStr;
         QString model = dev->getDeviceModel();

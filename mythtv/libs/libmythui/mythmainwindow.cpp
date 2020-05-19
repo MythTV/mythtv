@@ -309,7 +309,7 @@ MythScreenStack *MythMainWindow::GetMainStack(void)
 
 MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
 {
-    for (const auto *widget : qAsConst(d->m_stackList))
+    for (auto *widget : qAsConst(d->m_stackList))
     {
         if (widget->objectName() == stackname)
             return widget;
@@ -344,7 +344,7 @@ void MythMainWindow::animate(void)
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
 
-        for (const auto *screen : qAsConst(drawList))
+        for (auto *screen : qAsConst(drawList))
         {
             screen->Pulse();
 
@@ -361,7 +361,7 @@ void MythMainWindow::animate(void)
     if (redraw && !m_painterWin->RenderIsShared())
         m_painterWin->update(m_repaintRegion);
 
-    for (const auto *widget : qAsConst(d->m_stackList))
+    for (auto *widget : qAsConst(d->m_stackList))
         widget->ScheduleInitIfNeeded();
 
     d->m_drawTimer->blockSignals(false);
@@ -484,7 +484,7 @@ void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
-            for (const auto *screen : qAsConst(redrawList))
+            for (auto *screen : qAsConst(redrawList))
                 screen->Draw(Painter, 0, 0, 255, rect);
         }
     }
@@ -1058,7 +1058,7 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
 {
-    for (const auto *widget : qAsConst(d->m_stackList))
+    for (auto *widget : qAsConst(d->m_stackList))
     {
         if (enable)
             widget->EnableEffects();
@@ -2002,7 +2002,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         // actions which would not be appropriate when the screen doesn't have
         // focus. It is the programmers responsibility to ignore events when
         // necessary.
-        for (const auto *widget : qAsConst(d->m_stackList))
+        for (auto *widget : qAsConst(d->m_stackList))
         {
             QVector<MythScreenType *> screenList;
             widget->GetScreenList(screenList);

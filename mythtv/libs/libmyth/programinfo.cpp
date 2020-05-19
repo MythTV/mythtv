@@ -4467,7 +4467,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            foreach (const auto & entry, mapMark)
+            for (const auto& entry : qAsConst(mapMark))
             {
                 if (entry.type == MARK_DURATION_MS)
                     continue;
@@ -4557,7 +4557,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 MythDB::DBError("SaveMarkup seektable data", query);
                 return;
             }
-            foreach (const auto & entry, mapMark)
+            for (const auto& entry : qAsConst(mapMark))
             {
                 if (entry.isDataNull)
                 {

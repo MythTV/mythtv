@@ -371,7 +371,7 @@ private:
             parent = parent.parentNode().toElement();
         }
 
-        Q_FOREACH(QDomElement p, parents)
+        for (const auto& p : qAsConst(parents))
             result += CollectArbitraryLocatedData(p);
 
         return result;
@@ -440,7 +440,7 @@ private:
         QList<MRSSThumbnail> result;
         QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "thumbnail");
-        foreach (const auto & dom, thumbs)
+        for (const auto& dom : qAsConst(thumbs))
         {
             QDomElement thumbNode = dom.toElement();
             int widthOpt = GetInt(thumbNode, "width");
@@ -465,7 +465,7 @@ private:
         QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::kMediaRSS,
            "credit");
 
-        foreach (const auto & dom, credits)
+        for (const auto& dom : qAsConst(credits))
         {
             QDomElement creditNode = dom.toElement();
             if (!creditNode.hasAttribute("role"))
@@ -548,7 +548,7 @@ private:
         QList<QDomNode> links = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "peerLink");
 
-        foreach (const auto & dom, links)
+        for (const auto& dom : qAsConst(links))
         {
             QDomElement linkNode = dom.toElement();
             MRSSPeerLink pl =

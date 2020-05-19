@@ -705,7 +705,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
 // Check all the links in the application and scene and fire any that match this event.
 void MHEngine::CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un)
 {
-    foreach (auto link, m_LinkTable)
+    for (auto *link : qAsConst(m_LinkTable))
         link->MatchEvent(sourceRef, ev, un, this);
 }
 

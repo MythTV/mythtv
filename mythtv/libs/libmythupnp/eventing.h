@@ -181,7 +181,7 @@ class UPNP_PUBLIC StateVariables
         StateVariables() = default;
         virtual ~StateVariables()
         {
-            foreach (auto & it, m_map)
+            for (const auto *it : qAsConst(m_map))
                 delete it;
             m_map.clear();
         }

@@ -193,19 +193,20 @@ QStringList DeviceManager::CloseDevices(int devId, const QString &action)
     if (action == "DEVICE CLOSE ALL")
     {
         // Close all devices but retain their thumbnails
-        foreach (Device *dev, m_devices)
+        for (auto *dev : qAsConst(m_devices))
             if (dev)
                 dev->Close();
     }
     else if (action == "DEVICE CLEAR ALL")
     {
         // Remove all thumbnails but retain devices
-        foreach (Device *dev, m_devices)
+        for (const auto *dev : qAsConst(m_devices)) {
             if (dev)
             {
                 clear << dev->m_mount;
                 dev->RemoveThumbs();
             }
+        }
     }
     else
     {
@@ -245,7 +246,7 @@ int DeviceManager::LocateMount(const QString &mount) const
 StringMap DeviceManager::GetDeviceDirs() const
 {
     StringMap paths;
-    foreach (int id, m_devices.keys())
+    for (int id : m_devices.keys())
     {
         Device *dev = m_devices.value(id);
         if (dev)
@@ -259,7 +260,7 @@ StringMap DeviceManager::GetDeviceDirs() const
 QList<int> DeviceManager::GetAbsentees()
 {
     QList<int> absent;
-    foreach (int id, m_devices.keys())
+    for (int id : m_devices.keys())
     {
         Device *dev = m_devices.value(id);
         if (dev && !dev->isPresent())
@@ -278,7 +279,7 @@ ImageAdapterBase::ImageAdapterBase() :
 {
     // Generate glob list from supported extensions
     QStringList glob;
-    foreach (const QString &ext, m_imageFileExt + m_videoFileExt)
+    for (const auto& ext : (m_imageFileExt + m_videoFileExt))
         glob << "*." + ext;
 
     // Apply filters to only detect image files
@@ -299,7 +300,7 @@ QStringList ImageAdapterBase::SupportedImages()
 {
     // Determine supported picture formats from Qt
     QStringList formats;
-    foreach (const QByteArray &ext, QImageReader::supportedImageFormats())
+    for (const auto& ext : QImageReader::supportedImageFormats())
         formats << QString(ext);
     return formats;
 }
@@ -475,7 +476,7 @@ StringMap ImageAdapterSg::GetScanDirs() const
 {
     StringMap map;
     int i = 0;
-    foreach (const QString &path, m_sg.GetDirList())
+    for (const auto& path : m_sg.GetDirList())
         map.insert(i++, path);
     return map;
 }
@@ -650,7 +651,7 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
                     "FROM %1 WHERE filename LIKE :PREFIX "
                     "ORDER BY depth;").arg(m_table);
 
-    foreach (const ImagePtr &im1, dirs)
+    for (const auto& im1 : qAsConst(dirs))
     {
         query.prepare(sql);
         query.bindValue(":PREFIX", im1->m_filePath + "/%");
@@ -689,7 +690,7 @@ bool ImageDb<FS>::GetImageTree(int id, ImageList &files, const QString &refine) 
     if (GetChildren(QString::number(id), files, dirs, refine) < 0)
         return false;
 
-    foreach (const ImagePtr &im, dirs)
+    for (const auto& im : qAsConst(dirs))
         if (!GetImageTree(im->m_id, files, refine))
             return false;
     return true;
@@ -875,7 +876,7 @@ QStringList ImageDb<FS>::RemoveFromDB(const ImageList &imList) const
     QStringList ids;
     if (!imList.isEmpty())
     {
-        foreach (const ImagePtr &im, imList)
+        for (const auto& im : qAsConst(imList))
             ids << QString::number(FS::DbId(im->m_id));
 
         QString idents = ids.join(",");
@@ -1342,7 +1343,7 @@ QStringList ImageHandler<DBFS>::HandleDbCreate(QStringList defs) const
     // Create skeleton Db images using copied settings.
     // Scanner will update other attributes
     ImageItem im;
-    foreach (const QString &def, defs)
+    for (const auto& def : qAsConst(defs))
     {
         QStringList aDef = def.split(separator);
 
@@ -1407,7 +1408,7 @@ QStringList ImageHandler<DBFS>::HandleDbMove(const QString &ids,
         destPath.append("/");
 
     // Update path of images only. Scanner will repair parentId
-    foreach (const ImagePtr &im, images)
+    for (const auto& im : qAsConst(images))
     {
         QString old = im->m_filePath;
 
@@ -1486,7 +1487,7 @@ QStringList ImageHandler<DBFS>::HandleTransform(int transform,
         RESULT_ERR("Image not found", QString("Images %1 not in Db").arg(ids))
 
     // Update db
-    foreach (ImagePtr im, files)
+    for (const auto& im : qAsConst(files))
     {
         int old           = im->m_orientation;
         im->m_orientation = Orientation(im->m_orientation).Transform(transform);
@@ -1540,7 +1541,7 @@ QStringList ImageHandler<DBFS>::HandleDirs(const QString &destId,
 
     QDir destDir(destPath);
     bool succeeded = false;
-    foreach (const QString &relPath, relPaths)
+    for (const auto& relPath : qAsConst(relPaths))
     {
         // Validate dir name
         if (relPath.isEmpty() || relPath.contains("..") || relPath.startsWith(QChar('/')))
@@ -1680,7 +1681,7 @@ QStringList ImageHandler<DBFS>::HandleCreateThumbnails
     ImageList dirs;
     DBFS::GetImages(message.at(1), files, dirs);
 
-    foreach (const ImagePtrK &im, files)
+    for (const auto& im : qAsConst(files))
         // notify clients when done; highest priority
         m_thumbGen->CreateThumbnail(im, priority, true);
 
@@ -2227,7 +2228,7 @@ QString ImageManagerFe::CreateImages(int destId, const ImageListK &images)
     const QString seperator("...");
     QStringList imageDefs(seperator);
     ImageIdList ids;
-    foreach (const ImagePtrK &im, images)
+    for (const auto& im : qAsConst(images))
     {
         ids << im->m_id;
 
@@ -2266,7 +2267,7 @@ QString ImageManagerFe::MoveDbImages(const ImagePtrK& destDir, ImageListK &image
                                      const QString &srcPath)
 {
     QStringList idents;
-    foreach (const ImagePtrK &im, images)
+    for (const auto& im : qAsConst(images))
         idents << QString::number(im->m_id);
 
     // Images are either all local or all remote
@@ -2435,7 +2436,7 @@ bool ImageManagerFe::DetectLocalDevices()
     QList<MythMediaDevice*> devices
             = monitor->GetMedias(MEDIATYPE_DATA | MEDIATYPE_MGALLERY);
 
-    foreach (MythMediaDevice* dev, devices)
+    for (auto *dev : qAsConst(devices))
     {
         if (monitor->ValidateAndLock(dev) && dev->isUsable())
             OpenDevice(dev->getDeviceModel(), dev->getMountPath(), dev);
@@ -2446,7 +2447,7 @@ bool ImageManagerFe::DetectLocalDevices()
     if (DeviceCount() > 0)
     {
         // Close devices that are no longer present
-        foreach (int devId, GetAbsentees())
+        for (int devId : GetAbsentees())
             CloseDevices(devId);
 
         // Start local scan

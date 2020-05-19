@@ -261,8 +261,7 @@ void ImageScanThread<DBFS>::SyncSubTree(const QFileInfo &dirInfo, int parentId,
     int id = SyncDirectory(dirInfo, devId, base, parentId);
 
     // Sync its contents
-    QFileInfoList list = dir.entryInfoList();
-    foreach(const QFileInfo &fileInfo, list)
+    for (const auto& fileInfo : dir.entryInfoList())
     {
         if (!IsScanning())
         {
@@ -538,9 +537,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
 template <class DBFS>
 void ImageScanThread<DBFS>::CountTree(QDir &dir)
 {
-    QFileInfoList files = dir.entryInfoList();
-
-    foreach(const QFileInfo &fileInfo, files)
+    for (const auto& fileInfo : dir.entryInfoList())
     {
         // Ignore excluded dirs/files
         if (MATCHES(m_exclusions, fileInfo.fileName()))
@@ -588,7 +585,7 @@ void ImageScanThread<DBFS>::CountFiles(const QStringList &paths)
 
     // Use global image filters
     QDir dir = m_dir;
-    foreach(const QString &sgDir, paths)
+    for (const auto& sgDir : qAsConst(paths))
     {
         // Ignore missing dirs
         if (dir.cd(sgDir))

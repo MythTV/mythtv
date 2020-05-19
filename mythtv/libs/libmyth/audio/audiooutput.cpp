@@ -400,7 +400,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
 static void fillSelectionsFromDir(const QDir &dir,
                                   AudioOutput::ADCVect *list)
 {
-    foreach (auto & fi, dir.entryInfoList())
+    for (const auto& fi : dir.entryInfoList())
     {
         QString name = fi.absoluteFilePath();
         QString desc = AudioOutput::tr("OSS device");

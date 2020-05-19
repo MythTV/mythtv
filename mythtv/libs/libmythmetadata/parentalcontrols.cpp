@@ -328,7 +328,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     {
         m_passwordOK = false;
 
-        foreach (auto & valid_pwd, m_validPasswords)
+        for (const auto& valid_pwd : qAsConst(m_validPasswords))
         {
             if (password != valid_pwd)
                 continue;

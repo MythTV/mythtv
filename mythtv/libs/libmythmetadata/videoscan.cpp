@@ -41,7 +41,7 @@ namespace
                    const QStringList &image_extensions) :
             m_videoFiles(video_files)
         {
-            foreach (const auto & ext, image_extensions)
+            for (const auto& ext : qAsConst(image_extensions))
                 m_imageExt.insert(ext.toLower());
         }
 
@@ -98,7 +98,7 @@ VideoScannerThread::~VideoScannerThread()
 void VideoScannerThread::SetHosts(const QStringList &hosts)
 {
     m_liveSGHosts.clear();
-    foreach (const auto & host, hosts)
+    for (const auto& host : qAsConst(hosts))
         m_liveSGHosts << host.toLower();
 }
 

@@ -95,7 +95,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
-    foreach (auto & addr, m_addressList)
+    for (const auto & addr : qAsConst(m_addressList))
     {
         QString ipaddress;
 
@@ -208,7 +208,7 @@ void UPnpSearchTask::ProcessDevice(
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    foreach (auto device, pDevice->m_listDevices)
+    for (auto *device : qAsConst(pDevice->m_listDevices))
         ProcessDevice( pSocket, device);
 }
 

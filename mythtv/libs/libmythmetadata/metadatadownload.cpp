@@ -339,7 +339,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                     .arg(originaltitle).arg(bestTitle));
 
     // Grab the one item that matches the besttitle (IMPERFECT)
-    foreach (auto & item, list)
+    for (auto item : qAsConst(list))
     {
         if (item->GetTitle() == bestTitle)
         {

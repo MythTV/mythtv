@@ -131,7 +131,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     continue;
 
                 // loop through discovered scripts
-                foreach (auto & name, scripts)
+                for (const auto& name : qAsConst(scripts))
                 {
                     QString cmd = QDir(path).filePath(name);
                     MetaGrabberScript script(cmd);
@@ -150,7 +150,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         tmpGrabberList = grabberList;
     }
 
-    foreach (auto & item, tmpGrabberList)
+    for (const auto& item : qAsConst(tmpGrabberList))
     {
         if ((type == kGrabberAll) || (item.GetType() == type))
             retGrabberList.append(item);
@@ -212,7 +212,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
     {
         // just pull it from the cache
         GrabberList list = GetList();
-        foreach (auto & item, list)
+        for (const auto& item : qAsConst(list))
             if (item.GetPath().endsWith(cmd))
                 return item;
     }
@@ -236,7 +236,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
     GrabberList list = GetList();
 
     // search for direct match on tag
-    foreach (auto & item, list)
+    for (const auto& item : qAsConst(list))
     {
         if (item.GetCommand() == tag)
         {
@@ -247,7 +247,7 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
     // no direct match. do we require a direct match? search for one that works
     if (!absolute)
     {
-        foreach (auto & item, list)
+        for (const auto& item : qAsConst(list))
         {
             if (item.Accepts(tag))
             {

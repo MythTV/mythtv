@@ -237,7 +237,7 @@ bool MediaMonitorUnix::CheckMountable(void)
 
         // Parse the returned device array
         const QDBusObjectPathList& list(reply.value());
-        foreach (const auto & entry, list)
+        for (const auto& entry : qAsConst(list))
         {
             if (!DeviceProperty(entry, "DeviceIsSystemInternal").toBool() &&
                 !DeviceProperty(entry, "DeviceIsPartitionTable").toBool() )
@@ -274,8 +274,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     QDir sysfs("/sys/block");
     sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
-    QStringList devices = sysfs.entryList();
-    foreach (auto & device, devices)
+    for (const auto& device : sysfs.entryList())
     {
         // ignore floppies, too slow
         if (device.startsWith("fd"))
@@ -438,7 +437,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
         if (reply.isValid())
         {
             const QDBusObjectPathList& list(reply.value());
-            foreach (const auto & entry, list)
+            for (const auto& entry : qAsConst(list))
             {
                 if (DeviceProperty(entry, "DeviceIsRemovable").toBool())
                 {
@@ -584,7 +583,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    foreach (auto & device, m_Devices)
+    for (const auto *device : qAsConst(m_Devices))
     {
         if (stat(device->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
@@ -786,7 +785,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
-        foreach (auto & part, parts)
+        for (const auto& part : qAsConst(parts))
         {
             // skip some sysfs dirs that are _not_ sub-partitions
             if (part == "device" || part == "holders" || part == "queue"
@@ -856,7 +855,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         size = read(m_fifo, buffer, 255);
     }
     const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
-    foreach (const auto & notif, list)
+    for (const auto& notif : qAsConst(list))
     {
         if (notif.startsWith("add"))
         {

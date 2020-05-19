@@ -785,13 +785,13 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     else
         stream << "<" << m_sMethod << "Response>\r\n";
 
-    foreach (const auto & arg, args)
+    for (const auto & arg : qAsConst(args))
     {
         stream << "<" << arg.m_sName;
 
         if (arg.m_pAttributes)
         {
-            foreach (const auto & attr, *arg.m_pAttributes)
+            for (const auto & attr : qAsConst(*arg.m_pAttributes))
             {
                 stream << " " << attr.m_sName << "='"
                        << Encode( attr.m_sValue ) << "'";
@@ -1126,7 +1126,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     {
         QStringList params = sParams.split('&', QString::SkipEmptyParts);
 
-        foreach (auto & param, params)
+        for (const auto & param : qAsConst(params))
         {
             QString sName  = param.section( '=', 0, 0 );
             QString sValue = param.section( '=', 1 );
