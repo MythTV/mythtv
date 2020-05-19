@@ -39,7 +39,7 @@ public:
         unsigned char   color;
         unsigned char   frequency;
     };
-    using SceneChangeData = scenechange_data[UCHAR_MAX + 1];
+    using SceneChangeData = std::array<scenechange_data,UCHAR_MAX + 1>;
 
   protected:
     ~SceneChangeDetector(void) override = default;

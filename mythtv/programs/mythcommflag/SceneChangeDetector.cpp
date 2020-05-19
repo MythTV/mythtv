@@ -41,7 +41,7 @@ scenechange_data_init(SceneChangeDetector::SceneChangeData *scdata,
         (*scdata)[ii].color = ii;
         (*scdata)[ii].frequency = (*hh)[ii];
     }
-    qsort(*scdata, sizeof(*scdata)/sizeof((*scdata)[0]), sizeof((*scdata)[0]),
+    qsort(scdata->data(), scdata->size(), sizeof(SceneChangeDetector::scenechange_data),
             scenechange_data_sort_desc_frequency);
 }
 
