@@ -76,7 +76,7 @@ MythUIText::~MythUIText()
     delete m_Font;
     m_Font = nullptr;
 
-    foreach (auto & layout, m_Layouts)
+    for (auto *layout : qAsConst(m_Layouts))
         delete layout;
 }
 
@@ -669,7 +669,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
     bool    overflow = false;
     int     idx = 0;
 
-    foreach (auto & layout, m_Layouts)
+    for (auto *layout : qAsConst(m_Layouts))
         layout->clearLayout();
 
     for (Ipara = paragraphs.begin(), idx = 0;

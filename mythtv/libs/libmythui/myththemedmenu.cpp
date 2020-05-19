@@ -706,7 +706,7 @@ void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
     if (!skipPass)
         password = button.password;
 
-    foreach (auto & act, button.action)
+    for (const auto & act : qAsConst(button.action))
     {
         if (handleAction(act, password))
             break;
@@ -856,7 +856,7 @@ bool MythThemedMenu::findDepends(const QString &fileList)
     QStringList files = fileList.split(" ");
     MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
-    foreach (auto & file, files)
+    for (const auto & file : qAsConst(files))
     {
         QString filename = findMenuFile(file);
         if (!filename.isEmpty() && filename.endsWith(".xml"))

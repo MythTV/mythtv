@@ -32,15 +32,15 @@ void MythFontManager::LoadFonts(const QString &directory,
     LoadFonts(directory, registeredFor, &maxDirs);
 
     QFontDatabase database;
-    foreach (const QString & family, database.families())
+    for (const QString & family : database.families())
     {
         QString result = QString("Font Family '%1': ").arg(family);
-        foreach (const QString &style, database.styles(family))
+        for (const QString & style : database.styles(family))
         {
             result += QString("%1(").arg(style);
 
             QString sizes;
-            foreach (int points, database.smoothSizes(family, style))
+            for (int points : database.smoothSizes(family, style))
                 sizes += QString::number(points) + ' ';
 
             result += QString("%1) ").arg(sizes.trimmed());

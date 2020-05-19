@@ -100,7 +100,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                         && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
 
-    foreach (auto obj, children)
+    for (auto *obj : qAsConst(children))
     {
         if (onlyWidgets)
         {
@@ -267,11 +267,11 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
 void MythUIType::ActivateAnimations(MythUIAnimation::Trigger trigger)
 {
-    foreach (MythUIAnimation* animation, m_animations)
+    for (MythUIAnimation* animation : qAsConst(m_animations))
         if (animation->GetTrigger() == trigger)
             animation->Activate();
 
-    foreach (MythUIType* uiType, m_ChildrenList)
+    for (MythUIType* uiType : qAsConst(m_ChildrenList))
         uiType->ActivateAnimations(trigger);
 }
 
@@ -1441,7 +1441,7 @@ void MythUIType::ConnectDependants(bool recurse)
         if (dependant)
         {
             dependant->m_dependOperator = operators;
-            foreach (QString dependeeName, dependees)
+            for (QString dependeeName : qAsConst(dependees))
             {
                 bool reverse = false;
                 if (dependeeName.startsWith('!'))

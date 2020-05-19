@@ -1544,7 +1544,7 @@ void MythUIButtonList::SetValueByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    foreach (auto item, m_itemList)
+    for (auto *item : qAsConst(m_itemList))
     {
         if (item->GetData() == data)
         {
@@ -1686,7 +1686,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemByData(const QVariant& data)
     if (!m_initialized)
         Init();
 
-    foreach (auto item, m_itemList)
+    for (auto *item : qAsConst(m_itemList))
     {
         if (item->GetData() == data)
             return item;

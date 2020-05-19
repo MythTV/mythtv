@@ -1535,7 +1535,7 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         QList<QOpenGLShader*> shaders = program->shaders();
-        foreach (QOpenGLShader* shader, shaders)
+        for (QOpenGLShader* shader : qAsConst(shaders))
             LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
     }
     program->bindAttributeLocation("a_position",  VERTEX_INDEX);
@@ -1559,7 +1559,7 @@ QOpenGLShaderProgram* MythRenderOpenGL::CreateComputeShader(const QString &Sourc
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         QList<QOpenGLShader*> shaders = program->shaders();
-        foreach (QOpenGLShader* shader, shaders)
+        for (QOpenGLShader* shader : qAsConst(shaders))
             LOG(VB_GENERAL, LOG_DEBUG, "\n" + shader->sourceCode());
     }
 

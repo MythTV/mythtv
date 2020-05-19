@@ -296,7 +296,7 @@ MythGenericTree* MythGenericTree::getVisibleChildAt(uint reference) const
     QList<MythGenericTree*> *list = m_subnodes;
 
     uint n = 0;
-    foreach (auto child, *list)
+    for (auto *child : qAsConst(*list))
     {
         if (child->IsVisible())
         {

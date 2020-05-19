@@ -701,7 +701,7 @@ void MythUIHelper::ClearOldImageCache(void)
         dirtimes.erase(dirtimes.begin());
     }
 
-    foreach (const auto & dirtime, dirtimes)
+    for (const auto & dirtime : qAsConst(dirtimes))
     {
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("Keeping cache dir: %1").arg(dirtime));
@@ -787,7 +787,7 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
     // use fi.filePath() method here and then add the directory if
     // needed.  Using dir.entryList() and adding the dirname each time
     // is also slower just using dir.entryInfoList().
-    foreach (const QFileInfo &fi, dir.entryInfoList())
+    for (const QFileInfo & fi : dir.entryInfoList())
     {
         struct stat buf {};
         QString fullname = fi.filePath();
@@ -1164,7 +1164,7 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
 
     fileList.append(themeDirs.entryInfoList());
 
-    foreach (auto & theme, fileList)
+    for (const auto & theme : qAsConst(fileList))
     {
         if (theme.baseName() == "default" ||
             theme.baseName() == "default-wide" ||
@@ -1195,7 +1195,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     bool foundit = false;
     const QStringList searchpath = GetThemeSearchPath();
 
-    foreach (const auto & ii, searchpath)
+    for (const auto & ii : qAsConst(searchpath))
     {
         if (fi.isRelative())
         {

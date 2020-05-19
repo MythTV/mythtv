@@ -131,7 +131,7 @@ void MythEDID::Parse(void)
 
     // checksum
     qint8 sum = 0;
-    foreach (char i, m_data)
+    for (char i : qAsConst(m_data))
         sum += i;
     if (sum != 0)
     {
@@ -277,7 +277,7 @@ bool MythEDID::ParseBaseBlock(const quint8 *Data)
     }
 
     // Set status
-    foreach (const auto & sn, m_serialNumbers)
+    for (const auto & sn : qAsConst(m_serialNumbers))
         if (!sn.isEmpty())
             m_valid = true;
     if (!m_valid)

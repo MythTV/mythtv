@@ -252,7 +252,7 @@ public:
 
     void CheckDeletes()
     {
-        foreach (auto & screen, m_ToDelete)
+        for (auto * screen : qAsConst(m_ToDelete))
         {
             screen->SetAlpha(0);
             screen->SetVisible(false);

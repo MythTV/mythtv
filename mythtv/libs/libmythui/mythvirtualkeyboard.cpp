@@ -284,7 +284,7 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
 {
     QList<MythUIType *> *children = GetAllChildren();
-    foreach (auto child, *children)
+    for (auto *child : qAsConst(*children))
     {
         auto *button = dynamic_cast<MythUIButton *>(child);
         if (button)

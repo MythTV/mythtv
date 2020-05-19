@@ -309,7 +309,7 @@ MythScreenStack *MythMainWindow::GetMainStack(void)
 
 MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
 {
-    foreach (auto & widget, d->m_stackList)
+    for (const auto *widget : qAsConst(d->m_stackList))
     {
         if (widget->objectName() == stackname)
             return widget;
@@ -344,7 +344,7 @@ void MythMainWindow::animate(void)
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
 
-        foreach (auto & screen, drawList)
+        for (const auto *screen : qAsConst(drawList))
         {
             screen->Pulse();
 
@@ -361,7 +361,7 @@ void MythMainWindow::animate(void)
     if (redraw && !m_painterWin->RenderIsShared())
         m_painterWin->update(m_repaintRegion);
 
-    foreach (auto & widget, d->m_stackList)
+    for (const auto *widget : qAsConst(d->m_stackList))
         widget->ScheduleInitIfNeeded();
 
     d->m_drawTimer->blockSignals(false);
@@ -394,7 +394,7 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
 
-            foreach (auto & screen, redrawList)
+            for (const auto *screen : qAsConst(redrawList))
             {
                 if (screen->NeedsRedraw())
                 {
@@ -484,7 +484,7 @@ void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
-            foreach (auto & screen, redrawList)
+            for (const auto *screen : qAsConst(redrawList))
                 screen->Draw(Painter, 0, 0, 255, rect);
         }
     }
@@ -1058,7 +1058,7 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
 {
-    foreach (auto & widget, d->m_stackList)
+    for (const auto *widget : qAsConst(d->m_stackList))
     {
         if (enable)
             widget->EnableEffects();
@@ -2002,11 +2002,11 @@ void MythMainWindow::customEvent(QEvent *ce)
         // actions which would not be appropriate when the screen doesn't have
         // focus. It is the programmers responsibility to ignore events when
         // necessary.
-        foreach (auto & widget, d->m_stackList)
+        for (const auto *widget : qAsConst(d->m_stackList))
         {
             QVector<MythScreenType *> screenList;
             widget->GetScreenList(screenList);
-            foreach (auto screen, screenList)
+            for (auto *screen : qAsConst(screenList))
             {
                 if (screen)
                     screen->mediaEvent(me);

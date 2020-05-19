@@ -371,7 +371,7 @@ void MythUIStateType::AdjustDependence(void)
         return;
     }
     QList<MythUIType *> *children = m_CurrentState->GetAllChildren();
-    foreach (auto & child, *children)
+    for (auto *child : qAsConst(*children))
     {
         if (child->IsVisible())
         {

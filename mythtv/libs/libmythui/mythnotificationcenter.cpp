@@ -92,7 +92,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     if (!m_Children.isEmpty())
     {
-        foreach (auto & draw, m_DrawOrder)
+        for (auto *draw : qAsConst(m_DrawOrder))
         {
             if (draw != screen && !draw->IsDeleting())
             {
@@ -773,7 +773,7 @@ NCPrivate::~NCPrivate()
     DeleteAllScreens();
 
     // Delete all outstanding queued notifications
-    foreach(MythNotification *n, m_notifications)
+    for (MythNotification *n : qAsConst(m_notifications))
     {
         delete n;
     }
@@ -912,7 +912,7 @@ void NCPrivate::ProcessQueue(void)
 
     DeleteAllScreens();
 
-    foreach (MythNotification *n, m_notifications)
+    for (MythNotification *n : qAsConst(m_notifications))
     {
         int id = n->GetId();
         bool created = false;
@@ -1057,7 +1057,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
 
 void NCPrivate::DeleteAllRegistrations(void)
 {
-    foreach (auto & registration, m_registrations)
+    for (auto *registration : qAsConst(m_registrations))
     {
         if (registration)
         {
@@ -1234,7 +1234,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
     m_screenStack->GetScreenList(screens);
 
     int position = 0;
-    foreach (auto item, screens)
+    for (auto *item : qAsConst(screens))
     {
         auto *screen = dynamic_cast<MythNotificationScreen*>(item);
         if (screen)

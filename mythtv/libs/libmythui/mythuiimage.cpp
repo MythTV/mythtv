@@ -730,7 +730,7 @@ void MythUIImage::SetDelays(const QVector<int>& delays)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker imageLocker(&m_ImagesLock);
 
-    foreach (const int & delay, delays)
+    for (int delay : qAsConst(delays))
         m_Delays[m_Delays.size()] = delay;
 
     if (m_Delay == -1)
@@ -815,7 +815,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_imageProperties.m_isThemeImage = false;
 
-    foreach (auto im, *images)
+    for (auto *im : qAsConst(*images))
     {
         if (!im)
         {
@@ -877,7 +877,7 @@ void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
     QVector<int> delays;
     QVector<MythImage *> images;
 
-    foreach (auto & frame, frames)
+    for (const auto & frame : qAsConst(frames))
     {
         images.append(frame.first);
         delays.append(frame.second);
@@ -1340,7 +1340,7 @@ bool MythUIImage::ParseElement(
         {
             QVector<int> delays;
             QStringList tokens = value.split(",");
-            foreach (auto & token, tokens)
+            for (const auto & token : qAsConst(tokens))
             {
                 if (token.isEmpty())
                 {
@@ -1566,7 +1566,7 @@ void MythUIImage::customEvent(QEvent *event)
 
             if (animationFrames)
             {
-                foreach (auto & frame, *animationFrames)
+                for (const auto & frame : qAsConst(*animationFrames))
                 {
                     MythImage *im = frame.first;
                     if (im)
@@ -1644,7 +1644,7 @@ void MythUIImage::FindRandomImage(void)
     QStringList imageTypes;
 
     QList< QByteArray > exts = QImageReader::supportedImageFormats();
-    foreach (auto & ext, exts)
+    for (const auto & ext : qAsConst(exts))
     {
         imageTypes.append(QString("*.").append(ext));
     }
