@@ -108,7 +108,7 @@ static const std::array<const uint8_t,64> RTjpeg_chrom_quant_tbl {
 /* Block to Stream (encoding)                         */
 /*                                                    */
 
-int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
+int RTjpeg::b2s(const RTjpegData16 &data, int8_t *strm, uint8_t /*bt8*/)
 {
  int co=1;
 
@@ -276,9 +276,9 @@ fprintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
+int RTjpeg::s2b(RTjpegData16 &data, const int8_t *strm, uint8_t /*bt8*/, RTjpegData32 &qtbla)
 {
- auto *qtbl = (uint32_t *)qtbla;
+ auto *qtbl = (uint32_t *)qtbla.data();
  int ci = 0;
  unsigned char bitoff = 0;
 
@@ -515,20 +515,20 @@ void RTjpeg::QuantInit(void)
  using P16_32 = union { int16_t *m_int16; int32_t *m_int32; };
  P16_32 qtbl;
 
- qtbl.m_int32 = m_lqt;
+ qtbl.m_int32 = m_lqt.data();
  for (int i = 0; i < 64; i++)
      qtbl.m_int16[i] = static_cast<int16_t>(m_lqt[i]);
 
  // cppcheck-suppress unreadVariable
- qtbl.m_int32 = m_cqt;
+ qtbl.m_int32 = m_cqt.data();
  for (int i = 0; i < 64; i++)
     qtbl.m_int16[i] = static_cast<int16_t>(m_cqt[i]);
 }
 
-void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
+void RTjpeg::Quant(RTjpegData16 &_block, RTjpegData32 &qtbl)
 {
- auto *ql=(mmx_t *)qtbl;
- auto *bl=(mmx_t *)_block;
+ auto *ql=(mmx_t *)qtbl.data();
+ auto *bl=(mmx_t *)_block.data();
 
  movq_m2r(RTjpeg_ones, mm6);
  movq_m2r(RTjpeg_half, mm7);
@@ -562,7 +562,7 @@ void RTjpeg::QuantInit()
 {
 }
 
-void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
+void RTjpeg::Quant(RTjpegData16 &_block, RTjpegData32 &qtbl)
 {
  int i;
 
@@ -598,7 +598,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 {
 #ifndef MMX
   uint8_t *idataptr = idata;
-  int32_t *wsptr = m_ws;
+  int32_t *wsptr = m_ws.data();
 
   for (int ctr = 7; ctr >= 0; ctr--) {
     int32_t tmp0 = idataptr[0] + idataptr[7];
@@ -643,8 +643,8 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
     wsptr += 8;
   }
 
-  wsptr = m_ws;
-  int16_t *odataptr = m_block;
+  wsptr = m_ws.data();
+  int16_t *odataptr = m_block.data();
   for (int ctr = 7; ctr >= 0; ctr--) {
     int32_t tmp0 = wsptr[0] + wsptr[56];
     int32_t tmp7 = wsptr[0] - wsptr[56];
@@ -691,7 +691,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 #else
   volatile mmx_t tmp6 {};
   volatile mmx_t tmp7 {};
-  auto *dataptr = (mmx_t *)m_block;
+  auto *dataptr = (mmx_t *)m_block.data();
   auto *idata2 = (mmx_t *)idata;
 
 
@@ -1515,7 +1515,7 @@ void RTjpeg::IdctInit(void)
     }
 }
 
-void RTjpeg::Idct(uint8_t *odata, int16_t *data, int rskip)
+void RTjpeg::Idct(uint8_t *odata, RTjpegData16 &data, int rskip)
 {
 #ifdef MMX
 
@@ -1525,9 +1525,9 @@ static mmx_t s_fix184;         s_fix184.q = 0x7641764176417641LL;
 static mmx_t s_fixN184;       s_fixN184.q = 0x896f896f896f896fLL;
 static mmx_t s_fix108n184; s_fix108n184.q = 0xcf04cf04cf04cf04LL;
 
-  auto *wsptr = (mmx_t *)m_ws;
+  auto *wsptr = (mmx_t *)m_ws.data();
   auto *dataptr = (mmx_t *)odata;
-  auto *idata = (mmx_t *)data;
+  auto *idata = (mmx_t *)data.data();
 
   rskip = rskip>>3;
 /*
@@ -2517,8 +2517,8 @@ static mmx_t s_fix108n184; s_fix108n184.q = 0xcf04cf04cf04cf04LL;
   int ctr;
   int32_t dcval;
 
-  inptr = data;
-  wsptr = m_ws;
+  inptr = data.data();
+  wsptr = m_ws.data();
   for (ctr = 8; ctr > 0; ctr--) {
 
     if ((inptr[8] | inptr[16] | inptr[24] |
@@ -2588,7 +2588,7 @@ static mmx_t s_fix108n184; s_fix108n184.q = 0xcf04cf04cf04cf04LL;
     wsptr++;
   }
 
-  wsptr = m_ws;
+  wsptr = m_ws.data();
   for (ctr = 0; ctr < 8; ctr++) {
     outptr = &(odata[ctr*rskip]);
 
@@ -3040,10 +3040,10 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 
 #ifdef MMX
 
-int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
+int RTjpeg::bcomp(RTjpegData16 &rblock, int16_t *_old, mmx_t *mask)
 {
  auto *mold=(mmx_t *)_old;
- auto *mblock=(mmx_t *)rblock;
+ auto *mblock=(mmx_t *)rblock.data();
  volatile mmx_t result {};
  static mmx_t s_neg= { 0xffffffffffffffffULL };
 
@@ -3076,19 +3076,19 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 
  if (result.q)
  {
-  for(int i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
+  std::copy(rblock.cbegin(), rblock.cend(), _old);
   return 0;
  }
  return 1;
 }
 
 #else
-int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, uint16_t *mask)
+int RTjpeg::bcomp(RTjpegData16 &rblock, int16_t *_old, uint16_t *mask)
 {
  for(int i=0; i<64; i++)
   if (abs(_old[i]-rblock[i])>*mask)
   {
-   for(i=0; i<16; i++)((uint64_t *)_old)[i]=((uint64_t *)rblock)[i];
+   std::copy(rblock.cbegin(), rblock.cend(), _old);
    return 0;
   }
  return 1;

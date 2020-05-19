@@ -35,6 +35,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 #define RTJPEG_FILE_VERSION 0
 #define RTJPEG_HEADER_SIZE 12
 
+using RTjpegData16 = std::array<int16_t,64>;
+using RTjpegData32 = std::array<int32_t,64>;
+
 #if HAVE_BIGENDIAN
 #define RTJPEG_SWAP_WORD(a) ( ((a) << 24) | \
 			(((a) << 8) & 0x00ff0000) | \
@@ -78,17 +81,17 @@ class RTjpeg
     void SetNextKey(void);
 
 private:
-    static int b2s(const int16_t *data, int8_t *strm, uint8_t bt8);
-    static int s2b(int16_t *data, const int8_t *strm, uint8_t bt8, int32_t *qtbla);
+    static int b2s(const RTjpegData16 &data, int8_t *strm, uint8_t bt8);
+    static int s2b(RTjpegData16 &data, const int8_t *strm, uint8_t bt8, RTjpegData32 &qtbla);
 
     void QuantInit(void);
-    static void Quant(int16_t *block, int32_t *qtbl);
+    static void Quant(RTjpegData16 &block, RTjpegData32 &qtbl);
    
     void DctInit(void);
     void DctY(uint8_t *idata, int rskip);
 
     void IdctInit(void);
-    void Idct(uint8_t *odata, int16_t *data, int rskip);
+    void Idct(uint8_t *odata, RTjpegData16 &data, int rskip);
 
     void CalcTbls(void);
 
@@ -105,17 +108,17 @@ private:
     void decompress8(int8_t *sp, uint8_t **planes);
 
 #ifdef MMX
-    static int bcomp(int16_t *rblock, int16_t *old, mmx_t *mask);
+    static int bcomp(RTjpegData16 &rblock, int16_t *old, mmx_t *mask);
 #else
-    static int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
+    static int bcomp(RTjpegData16 &rblock, int16_t *old, uint16_t *mask);
 #endif
     
-    alignas(32) int16_t   m_block[64] {0};
-    alignas(32) int32_t   m_ws[64*4]  {0};
-    alignas(32) int32_t   m_lqt[64]   {0};
-    alignas(32) int32_t   m_cqt[64]   {0};
-    alignas(32) int32_t   m_liqt[64]  {0};
-    alignas(32) int32_t   m_ciqt[64]  {0};
+    alignas(32) RTjpegData16   m_block {0};
+    alignas(32) std::array<int32_t,64*4> m_ws    {0};
+    alignas(32) RTjpegData32   m_lqt   {0};
+    alignas(32) RTjpegData32   m_cqt   {0};
+    alignas(32) RTjpegData32   m_liqt  {0};
+    alignas(32) RTjpegData32   m_ciqt  {0};
     int32_t   m_lB8                {0};
     int32_t   m_cB8                {0};
     int32_t   m_yWidth             {0};
