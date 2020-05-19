@@ -2786,12 +2786,12 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             if (raw)
             {
                 r = lzo1x_1_compress(frame->buf, frame->size,
-                                     m_out.data(), &out_len, wrkmem);
+                                     m_out.data(), &out_len, wrkmem.data());
             }
             else
             {
                 r = lzo1x_1_compress((unsigned char *)m_strm, tmp, m_out.data(),
-                                     &out_len, wrkmem);
+                                     &out_len, wrkmem.data());
             }
             if (r != LZO_E_OK)
             {
