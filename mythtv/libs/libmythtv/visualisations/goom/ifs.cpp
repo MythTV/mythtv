@@ -35,6 +35,7 @@
 
 //#ifdef STANDALONE
 
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -123,12 +124,13 @@ struct Similitude_Struct
 	F_PT    m_fR, m_fR2;
 };
 
+using SimiData = std::array<SIMI,5 * MAX_SIMI>;
 
 struct Fractal_Struct
 {
 
 	int     m_nbSimi;
-	SIMI    m_components[5 * MAX_SIMI];
+	SimiData m_components;
 	int     m_depth, m_col;
 	int     m_count, m_speed;
 	int     m_width, m_height, m_lx, m_ly;
@@ -167,9 +169,10 @@ Half_Gauss_Rand (DBL c, DBL A, DBL S)
 }
 
 static void
-Random_Simis (FRACTAL * F, SIMI * Cur, int i)
+Random_Simis (FRACTAL * F, SimiData &simi_set, int offset, int count)
 {
-	while (i--) {
+	SIMI * Cur = &simi_set[offset];
+	while (count--) {
 		Cur->m_dCx = Gauss_Rand (0.0, .8, 4.0);
 		Cur->m_dCy = Gauss_Rand (0.0, .8, 4.0);
 		Cur->m_dR = Gauss_Rand (F->m_rMean, F->m_drMean, 3.0);
@@ -280,7 +283,7 @@ init_ifs (int width, int height)
 	// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 	Fractal->m_col = rand () % (width * height);	/* modif by JeKo */
 
-	Random_Simis (Fractal, Fractal->m_components, 5 * MAX_SIMI);
+	Random_Simis (Fractal, Fractal->m_components, 0, 5 * MAX_SIMI);
 
 	/* 
 	 * #ifndef NO_DBUF
@@ -355,7 +358,7 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 	F_PT    x = NAN;
 	F_PT    y = NAN;
 
-	SIMI *Cur = Cur_F->m_components;
+	SIMI *Cur = &Cur_F->m_components[0];
 	for (int i = Cur_F->m_nbSimi; i != 0; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
@@ -382,7 +385,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	SIMI   *Cur = nullptr;
 	SIMI   *Simi = nullptr;
 
-	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
+	for (Cur = &F->m_components[0], i = F->m_nbSimi; i; --i, Cur++) {
 		Cur->m_fCx = DBL_To_F_PT (Cur->m_dCx);
 		Cur->m_fCy = DBL_To_F_PT (Cur->m_dCy);
 
@@ -399,10 +402,10 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	Cur_Pt = 0;
 	Cur_F = F;
 	Buf = F->m_buffer2;
-	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
+	for (Cur = &F->m_components[0], i = F->m_nbSimi; i; --i, Cur++) {
 		F_PT xo = Cur->m_fCx;
 		F_PT yo = Cur->m_fCy;
-		for (Simi = F->m_components, j = F->m_nbSimi; j; --j, Simi++) {
+		for (Simi = &F->m_components[0], j = F->m_nbSimi; j; --j, Simi++) {
 			F_PT x = NAN;
 			F_PT y = NAN;
 			if (Simi == Cur)
@@ -467,11 +470,11 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	DBL u2 = 3.0 * v * uu;
 	DBL u3 = u * uu;
 
-	SIMI *S = F->m_components;
-	SIMI *S1 = S + F->m_nbSimi;
-	SIMI *S2 = S1 + F->m_nbSimi;
-	SIMI *S3 = S2 + F->m_nbSimi;
-	SIMI *S4 = S3 + F->m_nbSimi;
+	SIMI *S  = &F->m_components[0];
+	SIMI *S1 = &F->m_components[1 * F->m_nbSimi];
+	SIMI *S2 = &F->m_components[2 * F->m_nbSimi];
+	SIMI *S3 = &F->m_components[3 * F->m_nbSimi];
+	SIMI *S4 = &F->m_components[4 * F->m_nbSimi];
 
 	for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
 		S->m_dCx = u0 * S1->m_dCx + u1 * S2->m_dCx + u2 * S3->m_dCx + u3 * S4->m_dCx;
@@ -487,11 +490,11 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	Draw_Fractal ( /* mi */ );
 
 	if (F->m_count >= 1000 / F->m_speed) {
-		S = F->m_components;
-		S1 = S + F->m_nbSimi;
-		S2 = S1 + F->m_nbSimi;
-		S3 = S2 + F->m_nbSimi;
-		S4 = S3 + F->m_nbSimi;
+		S  = &F->m_components[0];
+		S1 = &F->m_components[1 * F->m_nbSimi];
+		S2 = &F->m_components[2 * F->m_nbSimi];
+		S3 = &F->m_components[3 * F->m_nbSimi];
+		S4 = &F->m_components[4 * F->m_nbSimi];
 
 		for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
 			S2->m_dCx = 2.0 * S4->m_dCx - S3->m_dCx;
@@ -503,9 +506,9 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 
 			*S1 = *S4;
 		}
-		Random_Simis (F, F->m_components + 3 * F->m_nbSimi, F->m_nbSimi);
+		Random_Simis (F, F->m_components, 3 * F->m_nbSimi, F->m_nbSimi);
 
-		Random_Simis (F, F->m_components + 4 * F->m_nbSimi, F->m_nbSimi);
+		Random_Simis (F, F->m_components, 4 * F->m_nbSimi, F->m_nbSimi);
 
 		F->m_count = 0;
 	}
