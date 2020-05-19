@@ -282,7 +282,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     // All actual buffers
     SRC_DATA          m_srcData                           {};
     uint              m_memoryCorruptionTest0             {0xdeadbeef};
-    alignas(16) float m_srcInBuf[kAudioSRCInputSize]      {};
+    alignas(16) std::array<float,kAudioSRCInputSize> m_srcInBuf {};
     uint              m_memoryCorruptionTest1             {0xdeadbeef};;
     float            *m_srcOut                            {nullptr};
     int               m_kAudioSRCOutputSize               {0};

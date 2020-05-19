@@ -64,7 +64,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     m_source(settings.m_source),
     m_setInitialVol(settings.m_setInitialVol)
 {
-    m_srcIn = m_srcInBuf;
+    m_srcIn = m_srcInBuf.data();
 
     if (m_mainDevice.startsWith("AudioTrack:"))
         m_usesSpdif = false;
@@ -1401,7 +1401,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         }
 
         // Final float conversion space requirement
-        len = sizeof(*m_srcInBuf) / sampleSize * len;
+        len = sizeof(m_srcInBuf[0]) / sampleSize * len;
 
         // Account for changes in number of channels
         if (m_needsDownmix)
