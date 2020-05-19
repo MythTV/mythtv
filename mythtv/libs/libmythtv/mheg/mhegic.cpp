@@ -33,9 +33,9 @@ MHInteractionChannel::MHInteractionChannel(QObject* parent) : QObject(parent)
 MHInteractionChannel::~MHInteractionChannel()
 {
     QMutexLocker locker(&m_mutex);
-    foreach (auto & req, m_pending)
+    for (const auto & req : qAsConst(m_pending))
         req->deleteLater();
-    foreach (auto & req, m_finished)
+    for (const auto & req : qAsConst(m_finished))
         req->deleteLater();
 }
 

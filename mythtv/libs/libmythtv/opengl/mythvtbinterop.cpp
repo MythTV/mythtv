@@ -315,9 +315,9 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::GetReferenceFrames(void)
     }
 
     result = m_openglTextures[last];
-    foreach (MythVideoTexture* tex, m_openglTextures[current])
+    for (MythVideoTexture* tex : qAsConst(m_openglTextures[current]))
         result.push_back(tex);
-    foreach (MythVideoTexture* tex, m_openglTextures[next])
+    for (MythVideoTexture* tex : qAsConst(m_openglTextures[next]))
         result.push_back(tex);
     return result;
 }

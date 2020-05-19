@@ -757,7 +757,7 @@ QStringList LiveTVChain::entriesToStringList() const
     QMutexLocker lock(&m_lock);
     QStringList ret;
     ret << QString::number(m_maxPos);
-    foreach (const auto & entry, m_chain)
+    for (const auto & entry : qAsConst(m_chain))
     {
         ret << QString::number(entry.chanid);
         ret << entry.starttime.toString(Qt::ISODate);

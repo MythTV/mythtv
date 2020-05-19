@@ -194,7 +194,7 @@ bool CetonRTSP::ProcessRequest(
     {
         // Handle broken implementation, such as VLC
         // doesn't respect the case of "CSeq", so find it regardless of the spelling
-        foreach (QString key, m_responseHeaders.keys())
+        for (const QString& key : m_responseHeaders.keys())
         {
             if (key.compare("CSeq", Qt::CaseInsensitive) == 0)
             {
@@ -333,7 +333,7 @@ bool CetonRTSP::Describe(void)
     bool found = false;
     QUrl base = m_controlUrl = GetBaseUrl();
 
-    foreach (QString line, lines)
+    for (const QString& line : qAsConst(lines))
     {
         if (line.startsWith("m="))
         {

@@ -192,7 +192,7 @@ void IPTVStreamHandler::run(void)
             }
             else
             {
-                foreach (auto & addr, list)
+                for (const auto & addr : qAsConst(list))
                 {
                     dest_addr = addr;
                     if (addr.protocol() == QAbstractSocket::IPv6Protocol)

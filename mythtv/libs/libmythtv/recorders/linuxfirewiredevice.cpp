@@ -52,7 +52,7 @@ class LFDPriv
 
     ~LFDPriv()
     {
-        foreach (auto & device, m_devices)
+        for (const auto & device : qAsConst(m_devices))
             delete device;
         m_devices.clear();
 
@@ -821,7 +821,7 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
 
     vector<AVCInfo> list;
 
-    foreach (auto & device, m_priv->m_devices)
+    for (const auto & device : qAsConst(m_priv->m_devices))
     {
         if (device->IsSubunitType(kAVCSubunitTypeTuner) &&
             device->IsSubunitType(kAVCSubunitTypePanel))

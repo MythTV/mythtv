@@ -816,7 +816,7 @@ uint DBEvent::UpdateDB(
             credit.InsertDB(query, chanid, m_starttime);
     }
 
-    foreach (const auto & rating, m_ratings)
+    for (const auto & rating : qAsConst(m_ratings))
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
@@ -1118,7 +1118,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         return 0;
     }
 
-    foreach (const auto & rating, m_ratings)
+    for (const auto & rating : qAsConst(m_ratings))
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
@@ -1531,7 +1531,7 @@ void ProgramData::HandlePrograms(MSqlQuery             &query,
                                  uint &unchanged,
                                  uint &updated)
 {
-    foreach (auto pinfo, sortlist)
+    for (auto *pinfo : qAsConst(sortlist))
     {
         if (IsUnchanged(query, chanid, *pinfo))
         {

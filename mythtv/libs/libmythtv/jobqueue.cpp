@@ -205,7 +205,7 @@ void JobQueue::ProcessQueue(void)
         if (!jobs.empty())
         {
             inTimeWindow = InJobRunWindow();
-            foreach (auto & job, jobs)
+            for (const auto & job : qAsConst(jobs))
             {
                 int status = job.status;
                 hostname = job.hostname;
@@ -1060,7 +1060,7 @@ bool JobQueue::ChangeJobArgs(int jobID, const QString& args)
 int JobQueue::GetRunningJobID(uint chanid, const QDateTime &recstartts)
 {
     m_runningJobsLock->lock();
-    foreach (auto jInfo, m_runningJobs)
+    for (const auto& jInfo : qAsConst(m_runningJobs))
     {
         if ((jInfo.pginfo->GetChanID()             == chanid) &&
             (jInfo.pginfo->GetRecordingStartTime() == recstartts))

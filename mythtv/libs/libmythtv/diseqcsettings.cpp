@@ -315,7 +315,7 @@ bool DiseqcConfigBase::keyPressEvent(QKeyEvent *e)
         return true;
 
     bool handled = false;
-    foreach(const QString &action, actions)
+    for (const QString & action : qAsConst(actions))
     {
         if (action == "DELETE")
         {

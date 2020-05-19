@@ -75,7 +75,7 @@ MythRAOPConnection::~MythRAOPConnection()
 {
     CleanUp();
 
-    foreach (QTcpSocket *client, m_eventClients)
+    for (QTcpSocket *client : qAsConst(m_eventClients))
     {
         client->close();
         client->deleteLater();
@@ -715,7 +715,7 @@ void MythRAOPConnection::ProcessAudio()
             }
             m_lastSequence++;
 
-            foreach (auto & data, *frames.data)
+            for (const auto & data : qAsConst(*frames.data))
             {
                 int offset = 0;
                 int framecnt = 0;
@@ -767,7 +767,7 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
             AudioPacket frames = packet_it.value();
             if (frames.data)
             {
-                foreach (auto & data, *frames.data)
+                for (const auto & data : qAsConst(*frames.data))
                     av_free(data.data);
                 delete frames.data;
             }
@@ -903,7 +903,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         gotRTP = true;
         QString data = tags["RTP-Info"];
         QStringList items = data.split(";");
-        foreach (QString item, items)
+        for (const QString& item : qAsConst(items))
         {
             if (item.startsWith("seq"))
             {
@@ -1040,7 +1040,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
     else if (option == "ANNOUNCE")
     {
         QStringList lines = splitLines(content);
-        foreach (QString line, lines)
+        for (const QString& line : qAsConst(lines))
         {
             if (line.startsWith("a=rsaaeskey:"))
             {
@@ -1085,10 +1085,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 m_audioFormat.clear();
                 QString format = line.mid(7).trimmed();
                 QList<QString> formats = format.split(' ');
-                foreach (QString fmt, formats)
+                for (const QString& fmt : qAsConst(formats))
                     m_audioFormat.append(fmt.toInt());
 
-                foreach (int fmt, m_audioFormat)
+                for (int fmt : qAsConst(m_audioFormat))
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("Audio parameter: %1").arg(fmt));
                 m_framesPerPacket = m_audioFormat[1];
@@ -1115,7 +1115,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             QStringList items = data.split(";");
             bool events = false;
 
-            foreach (QString item, items)
+            for (const QString& item : qAsConst(items))
             {
                 if (item.startsWith("control_port"))
                     control_port = item.mid(item.indexOf("=") + 1).trimmed().toUInt();
@@ -1196,7 +1196,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             if (m_eventServer)
             {
                 // Should never get here, but just in case
-                foreach (auto client, m_eventClients)
+                for (auto *client : qAsConst(m_eventClients))
                 {
                     client->disconnect();
                     client->abort();
@@ -1246,7 +1246,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             // Recreate transport line with new ports value
             QString newdata;
             bool first = true;
-            foreach (QString item, items)
+            for (const QString& item : qAsConst(items))
             {
                 if (!first)
                 {
@@ -1394,7 +1394,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             {
                 QStringList lines = splitLines(content);
                 *m_textStream << "Content-Type: text/parameters\r\n";
-                foreach (QString line, lines)
+                for (const QString& line : qAsConst(lines))
                 {
                     if (line == "volume")
                     {

@@ -14,7 +14,7 @@ void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
 
     if (!sub.m_text.isEmpty())
     {
-        foreach (const auto & text, sub.m_text)
+        for (const auto & text : qAsConst(sub.m_text))
             m_outStream << text << endl;
         m_outStream << endl;
     }

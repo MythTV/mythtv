@@ -187,7 +187,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
             MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
     auto haveprofile = [=](MythCodecContext::CodecProfile Profile, QSize Size)
     {
-        foreach (auto vaprofile, profiles)
+        for (auto vaprofile : qAsConst(profiles))
         {
             if (vaprofile.first == Profile &&
                 vaprofile.second.first.width() <= Size.width() &&
@@ -480,7 +480,7 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VAAPI decoders:");
             const VAAPIProfiles& profiles = MythVAAPIContext::GetProfiles();
-            foreach (auto profile, profiles)
+            for (auto profile : qAsConst(profiles))
             {
                 if (profile.first != MythCodecContext::MJPEG)
                 {
@@ -629,7 +629,7 @@ void MythVAAPIContext::GetDecoderList(QStringList &Decoders)
     if (profiles.isEmpty())
         return;
     Decoders.append("VAAPI:");
-    foreach (auto profile, profiles)
+    for (auto profile : qAsConst(profiles))
         if (profile.first != MythCodecContext::MJPEG)
             Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
 }

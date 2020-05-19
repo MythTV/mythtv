@@ -146,7 +146,7 @@ OSD::~OSD()
 
 void OSD::TearDown(void)
 {
-    foreach(MythScreenType* screen, m_children)
+    for (MythScreenType* screen : qAsConst(m_children))
         delete screen;
     m_children.clear();
     m_dialog = nullptr;
@@ -251,7 +251,7 @@ bool OSD::IsVisible(void)
     if (GetNotificationCenter()->DisplayedNotifications() > 0)
         return true;
 
-    foreach(MythScreenType* child, m_children)
+    for (MythScreenType* child : qAsConst(m_children))
     {
         if (child->IsVisible() &&
             child->objectName() != OSD_WIN_SUBTITLE &&

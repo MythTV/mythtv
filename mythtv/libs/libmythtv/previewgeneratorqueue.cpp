@@ -304,7 +304,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             list.push_back(filename);
             list.push_back(msg);
             list.push_back(datetime);
-            foreach (const auto & tok, (*it).m_tokens)
+            for (const auto & tok : qAsConst((*it).m_tokens))
             {
                 kit = m_tokenToKeyMap.find(tok);
                 if (kit != m_tokenToKeyMap.end())
@@ -314,7 +314,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
 
             if (list.size() > 4)
             {
-                foreach (auto listener, m_listeners)
+                for (auto *listener : qAsConst(m_listeners))
                 {
                     auto *le = new MythEvent(me->Message(), list);
                     QCoreApplication::postEvent(listener, le);
@@ -367,7 +367,7 @@ void PreviewGeneratorQueue::SendEvent(
     list.push_back(token);
 
     QMutexLocker locker(&m_lock);
-    foreach (auto listener, m_listeners)
+    for (auto *listener : qAsConst(m_listeners))
     {
         auto *e = new MythEvent(eventname, list);
         QCoreApplication::postEvent(listener, e);

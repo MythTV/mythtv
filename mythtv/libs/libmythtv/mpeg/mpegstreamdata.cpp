@@ -150,15 +150,15 @@ void MPEGStreamData::Reset(int desiredProgram)
     {
         QMutexLocker locker(&m_cacheLock);
 
-        foreach (auto & cached, m_cachedPats)
+        for (const auto & cached : qAsConst(m_cachedPats))
             DeleteCachedTable(cached);
         m_cachedPats.clear();
 
-        foreach (auto & cached, m_cachedPmts)
+        for (const auto & cached : qAsConst(m_cachedPmts))
             DeleteCachedTable(cached);
         m_cachedPmts.clear();
 
-        foreach (auto & cached, m_cachedCats)
+        for (const auto & cached : qAsConst(m_cachedCats))
             DeleteCachedTable(cached);
         m_cachedCats.clear();
     }
@@ -1288,7 +1288,7 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
     if (m_cachedPats.empty())
         return false;
 
-    foreach (auto pat, m_cachedPats)
+    for (auto *pat : qAsConst(m_cachedPats))
     {
         if (!HasCachedAllPAT(pat->TransportStreamID()))
             return false;
@@ -1343,7 +1343,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     QMutexLocker locker(&m_cacheLock);
     pat_vec_t pats;
 
-    foreach (auto pat, m_cachedPats)
+    for (auto *pat : qAsConst(m_cachedPats))
     {
         IncrementRefCnt(pat);
         pats.push_back(pat);
@@ -1385,7 +1385,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     QMutexLocker locker(&m_cacheLock);
     cat_vec_t cats;
 
-    foreach (auto cat, m_cachedCats)
+    for (auto *cat : qAsConst(m_cachedCats))
     {
         IncrementRefCnt(cat);
         cats.push_back(cat);

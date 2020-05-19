@@ -231,7 +231,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
     MCProfiles& profiles = MythMediaCodecContext::GetProfiles();
     MythCodecContext::CodecProfile mythprofile =
             MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
-    foreach (auto profile, profiles)
+    for (auto profile : qAsConst(profiles))
     {
         if (profile.first == mythprofile &&
             profile.second.width() >= (*Context)->width &&
@@ -466,7 +466,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                     int value       = static_cast<int>(env->GetIntField(profile, id));
                     QList<int>& mcprofiles = mimetype.second.second;
                     bool found = false;
-                    foreach (auto mcprofile, mcprofiles)
+                    for (auto mcprofile : qAsConst(mcprofiles))
                     {
                         if (value == mcprofile)
                         {
@@ -494,7 +494,7 @@ void MythMediaCodecContext::GetDecoderList(QStringList &Decoders)
         return;
 
     Decoders.append("MediaCodec:");
-    foreach (auto profile, profiles)
+    for (auto profile : qAsConst(profiles))
         Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second));
 }
 
@@ -516,7 +516,7 @@ bool MythMediaCodecContext::HaveMediaCodec(void)
         {
             s_available = true;
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available MediaCodec decoders:");
-            foreach (auto profile, profiles)
+            for (auto profile : qAsConst(profiles))
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     MythCodecContext::GetProfileDescription(profile.first, profile.second));

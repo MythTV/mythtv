@@ -146,7 +146,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
 ObjCarousel::~ObjCarousel()
 {
-    foreach (auto & cache, m_Cache)
+    for (const auto & cache : qAsConst(m_Cache))
         delete cache;
     m_Cache.clear();
 }
@@ -230,7 +230,7 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
     LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
-    foreach (auto cachep, m_Cache)
+    for (auto *cachep : qAsConst(m_Cache))
     {
         if (cachep->CarouselId() == m_id &&
             (cachep->ModuleId() == ddb->m_moduleId))

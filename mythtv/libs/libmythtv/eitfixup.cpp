@@ -523,7 +523,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
             QString tmp = event.m_description.left(position-3);
             QStringList actors =
                 tmp.split(m_bellActors, QString::SkipEmptyParts);
-            foreach (const auto & actor, actors)
+            for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
         // Remove the year and actors from the description
@@ -1261,7 +1261,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
         {
             const QStringList actors =
                 list[5].split(m_comHemPersSeparator, QString::SkipEmptyParts);
-            foreach (const auto & actor, actors)
+            for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
 
@@ -1304,7 +1304,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
 
         const QStringList actors =
             list[2].split(m_comHemPersSeparator, QString::SkipEmptyParts);
-        foreach (const auto & actor, actors)
+        for (const auto & actor : qAsConst(actors))
             event.AddPerson(role, actor);
 
         // Remove it
@@ -1648,7 +1648,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         {
             const QStringList actors = tmpExp1.cap(2).split(
                 m_mcaActorsSeparator, QString::SkipEmptyParts);
-            foreach (const auto & actor, actors)
+            for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor.trimmed());
             event.m_description = tmpExp1.cap(1).trimmed();
         }
@@ -1955,7 +1955,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
         event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
         const QStringList actors = tmpcredits.cap(2).split(
             ", ", QString::SkipEmptyParts);
-        foreach (const auto & actor, actors)
+        for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
         event.m_description = event.m_description.replace(tmpcredits, "");
     }
@@ -2158,7 +2158,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
         const QStringList actors =
             tmpActorsString.split(", ", QString::SkipEmptyParts);
-        foreach (const auto & actor, actors)
+        for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
         fullinfo = fullinfo.replace(tmpActors.cap(0), "");
     }
@@ -2172,7 +2172,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
         const QStringList presenters =
             tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
-        foreach (const auto & presenter, presenters)
+        for (const auto & presenter : qAsConst(presenters))
             event.AddPerson(DBPerson::kPresenter, presenter);
         fullinfo = fullinfo.replace(tmpPres.cap(0), "");
     }
@@ -2478,7 +2478,7 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         QString tmpDirectorsString = tmpRegEx.cap(1);
         const QStringList directors =
             tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
-        foreach (const auto & director, directors)
+        for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
@@ -2497,7 +2497,7 @@ void EITFixUp::FixDK(DBEventEIT &event) const
             tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
         const QStringList actors =
             tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
-        foreach (const auto & actor, actors)
+        for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
@@ -2623,7 +2623,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpActorsString = tmpRegEx.cap(1);
         const QStringList actors =
             tmpActorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        foreach (const auto & actor, actors)
+        for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
@@ -2640,7 +2640,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpDirectorsString = tmpRegEx.cap(1);
         const QStringList directors =
             tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        foreach (const auto & director, directors)
+        for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
@@ -2660,7 +2660,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpPresentersString = tmpRegEx.cap(1);
         const QStringList presenters =
             tmpPresentersString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        foreach (const auto & presenter, presenters)
+        for (const auto & presenter : qAsConst(presenters))
         {
             tmpPresentersString = presenter.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));

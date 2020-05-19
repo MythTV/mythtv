@@ -800,7 +800,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
         if (!driver.isEmpty())
             driverExp = new QRegExp(driver);
 
-        foreach (auto & fi, dir.entryInfoList())
+        for (const auto & fi : dir.entryInfoList())
         {
             struct stat st {};
             QString filepath = fi.absoluteFilePath();
@@ -906,7 +906,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
                                const QString &driver)
     {
         QStringList devices;
-        foreach (auto & fi, dir.entryInfoList())
+        for (const auto & fi : dir.entryInfoList())
         {
             QString    device = fi.absoluteFilePath();
             QByteArray adevice = device.toLatin1();
@@ -3839,7 +3839,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     {
         m_cardType->clearSelections();
         QStringList delsyslist = CardUtil::ProbeDeliverySystems(videodevice);
-        foreach (auto & item, delsyslist)
+        for (const auto & item : qAsConst(delsyslist))
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
                 .arg(item));

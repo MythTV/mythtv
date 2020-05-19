@@ -38,7 +38,7 @@ static uint32_t crc32(const unsigned char *data, int len);
  */
 ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
 {
-    foreach (auto car, m_carousels)
+    for (auto *car : qAsConst(m_carousels))
     {
         if (car && car->m_id == carouselId)
             return car;
@@ -454,7 +454,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
             .arg(carouselId).arg(dataBroadcastId,0,16));
 
     bool found = false;
-    foreach (auto car, m_carousels)
+    for (auto *car : qAsConst(m_carousels))
     {
         // Is the component tag one of the ones we know?
         vector<unsigned short>::iterator it2;
@@ -536,7 +536,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 void Dsmcc::Reset()
 {
     LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Resetting carousel");
-    foreach (auto & carousel, m_carousels)
+    for (const auto & carousel : qAsConst(m_carousels))
         delete carousel;
     m_carousels.clear();
     m_startTag = 0;

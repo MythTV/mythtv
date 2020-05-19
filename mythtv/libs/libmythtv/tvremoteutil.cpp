@@ -269,7 +269,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
     vector<InputInfo> inputs =
         RemoteRequestFreeInputInfo(excluded_input);
 
-    foreach (const auto & recorder, qualifiedRecorders)
+    for (const auto & recorder : qAsConst(qualifiedRecorders))
     {
         uint inputid = recorder.toUInt();
         for (auto & input : inputs)

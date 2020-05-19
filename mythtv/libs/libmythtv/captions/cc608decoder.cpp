@@ -626,7 +626,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
 {
     QString ret = "";
 
-    foreach (auto cp, cc608str)
+    for (auto cp : qAsConst(cc608str))
     {
         int cpu = cp.unicode();
         if (cpu == 0)
@@ -988,7 +988,7 @@ static bool is_better(const QString &newStr, const QString &oldStr)
             return true;
 
         // check if the string contains any bogus characters
-        foreach (auto ch, newStr)
+        for (auto ch : qAsConst(newStr))
             if (ch.toLatin1() < 0x20)
                 return false;
 

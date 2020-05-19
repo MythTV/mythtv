@@ -352,7 +352,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     if ((Default == Type) || (!format_is_yuv(m_outputType)))
     {
         QString glsldefines;
-        foreach (QString define, defines)
+        for (const QString& define : qAsConst(defines))
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
         fragment = glsldefines + YUVFragmentExtensions + RGBFragmentShader;
 
@@ -472,7 +472,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         defines << m_videoColourSpace->GetColourMappingDefines();
 
         // Add defines
-        foreach (QString define, defines)
+        for (const QString& define : qAsConst(defines))
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
 
         // Add the required samplers

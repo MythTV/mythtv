@@ -31,7 +31,7 @@ namespace M3U
             return QString();
 
         QStringList list = line.mid(p + 1).split(',');
-        foreach (auto & it, list)
+        for (const auto & it : qAsConst(list))
         {
             QString arg = it.trimmed();
             if (arg.startsWith(attr))

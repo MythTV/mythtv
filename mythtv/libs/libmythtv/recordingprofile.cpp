@@ -444,11 +444,11 @@ class AudioCompressionSettings : public GroupSetting
                  * to the same setting configuration, so we need to do
                  * this in two passes. */
 
-                foreach (auto & option, options)
+                for (const auto & option : qAsConst(options))
                 {
                     if (option.m_category == DriverOption::AUDIO_ENCODING)
                     {
-                        foreach (const auto & Imenu, option.m_menu)
+                        for (const auto & Imenu : qAsConst(option.m_menu))
                         {
                             if (!Imenu.isEmpty())
                                 m_v4l2codecs << "V4L2:" + Imenu;
@@ -458,7 +458,7 @@ class AudioCompressionSettings : public GroupSetting
 
                 for (auto Icodec = m_v4l2codecs.begin(); Icodec < m_v4l2codecs.end(); ++Icodec)
                 {
-                    foreach (auto & option, options)
+                    for (const auto & option : qAsConst(options))
                     {
                         if (option.m_category == DriverOption::AUDIO_BITRATE_MODE)
                         {
@@ -483,7 +483,7 @@ class AudioCompressionSettings : public GroupSetting
                             bool layer2 = false;
                             bool layer3 = false;
 
-                            foreach (const auto & Imenu, option.m_menu)
+                            for (const auto & Imenu : qAsConst(option.m_menu))
                             {
                                 if (Imenu.indexOf("Layer III") >= 0)
                                     layer3 = true;
@@ -529,7 +529,7 @@ class AudioCompressionSettings : public GroupSetting
             }
             else if (groupType.startsWith("V4L2:"))
             {
-                foreach (auto & codec, m_v4l2codecs)
+                for (const auto & codec : qAsConst(m_v4l2codecs))
                     m_codecName->addSelection(codec);
             }
             else
@@ -983,11 +983,11 @@ class VideoCompressionSettings : public GroupSetting
                  * to the same setting configuration, so we need to do
                  * this in two passes. */
 
-                foreach (auto & option, options)
+                for (const auto & option : qAsConst(options))
                 {
                     if (option.m_category == DriverOption::VIDEO_ENCODING)
                     {
-                        foreach (const auto & Imenu, option.m_menu)
+                        for (const auto & Imenu : qAsConst(option.m_menu))
                         {
                             if (!Imenu.isEmpty())
                                 m_v4l2codecs << "V4L2:" + Imenu;
@@ -1134,7 +1134,7 @@ class VideoCompressionSettings : public GroupSetting
                m_codecName->addSelection("MPEG-4 AVC Hardware Encoder");
             else if (groupType.startsWith("V4L2:"))
             {
-                foreach (auto & codec, m_v4l2codecs)
+                for (const auto & codec : qAsConst(m_v4l2codecs))
                     m_codecName->addSelection(codec);
             }
             else if (groupType == "MPEG")
@@ -1582,7 +1582,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
             QStringList devices = CardUtil::GetVideoDevices("V4L2ENC");
             if (!devices.isEmpty())
             {
-                foreach (auto & device, devices)
+                for (const auto & device : qAsConst(devices))
                 {
                     delete m_v4l2util;
                     m_v4l2util = new V4L2util(device);

@@ -1284,7 +1284,7 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 
     QMap<uint,ChannelInsertInfo> list = GetChannelList(m_current, m_currentInfo);
     {
-        foreach (auto & info, list)
+        for (const auto & info : qAsConst(list))
         {
             max_chan_cnt +=
                 (info.m_inPat || info.m_inPmt ||
@@ -1327,7 +1327,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PATs
-    foreach (auto pat_list, scan_info->m_pats)
+    for (const auto& pat_list : qAsConst(scan_info->m_pats))
     {
         for (const auto *pat : pat_list)
         {
@@ -1416,7 +1416,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // SDTs
     QString siStandard = (scan_info->m_mgt == nullptr) ? "dvb" : "atsc";
-    foreach (auto sdt_list, scan_info->m_sdts)
+    for (const auto& sdt_list : qAsConst(scan_info->m_sdts))
     {
         for (const auto *sdt_it : sdt_list)
         {
@@ -1773,7 +1773,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     tuner_type = GuessDTVTunerType(tuner_type);
 
-    foreach (const auto & it, m_channelList)
+    for (const auto & it : qAsConst(m_channelList))
     {
         QMap<uint,ChannelInsertInfo> pnum_to_dbchan =
             GetChannelList(it.first, it.second);

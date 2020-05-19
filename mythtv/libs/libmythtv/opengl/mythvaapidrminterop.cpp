@@ -154,9 +154,9 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::GetReferenceFrames(void)
     }
 
     result = m_openglTextures[last];
-    foreach (MythVideoTexture* tex, m_openglTextures[current])
+    for (MythVideoTexture* tex : qAsConst(m_openglTextures[current]))
         result.push_back(tex);
-    foreach (MythVideoTexture* tex, m_openglTextures[next])
+    for (MythVideoTexture* tex : qAsConst(m_openglTextures[next]))
         result.push_back(tex);
     return result;
 }
@@ -436,7 +436,7 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
-    foreach (auto * frame, m_drmFrames)
+    for (auto * frame : qAsConst(m_drmFrames))
     {
         for (int i = 0; i < frame->nb_objects; i++)
             close(frame->objects[i].fd);

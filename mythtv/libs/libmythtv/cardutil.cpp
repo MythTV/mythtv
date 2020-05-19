@@ -467,21 +467,21 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     if (rawtype.toUpper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
-        foreach (const auto & it, dir.entryInfoList())
+        for (const auto & it : dir.entryInfoList())
         {
             QDir subdir(it.filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
             const QFileInfoList subil = subdir.entryInfoList();
             if (subil.isEmpty())
                 continue;
 
-            foreach (const auto & subit, subil)
+            for (const auto & subit : qAsConst(subil))
                 devs.push_back(subit.filePath());
         }
     }
     else if (rawtype.toUpper() == "ASI")
     {
         QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
-        foreach (const auto & it, dir.entryInfoList())
+        for (const auto & it : dir.entryInfoList())
         {
             if (GetASIDeviceNumber(it.filePath()) >= 0)
             {
@@ -602,7 +602,7 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
     delsyslist = ProbeDeliverySystems(fd_frontend);
 
     QString msg = "Delivery systems:";
-    foreach (auto & item, delsyslist)
+    for (const auto & item : qAsConst(delsyslist))
     {
         msg += " ";
         msg += item;
@@ -1000,7 +1000,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
     // Get all supported delivery systems from the card
     QString msg = "Supported delivery systems:";
     QStringList delsyslist = ProbeDeliverySystems(fd);
-    foreach (auto & it, delsyslist)
+    for (const auto & it : qAsConst(delsyslist))
     {
         msg += " ";
         msg += it;

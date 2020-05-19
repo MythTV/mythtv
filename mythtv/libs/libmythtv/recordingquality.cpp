@@ -129,7 +129,7 @@ QString RecordingQuality::toStringXML(void) const
 
     str += ">\n";
 
-    foreach (const auto & gap, m_recordingGaps)
+    for (const auto & gap : qAsConst(m_recordingGaps))
     {
         str += xml_indent(1) +
             QString("<Gap start=\"%1\" end=\"%2\" duration=\"%3\" />\n")

@@ -183,15 +183,15 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     {
         m_cacheLock.lock();
 
-        foreach (auto & nit, m_cachedNit)
+        for (const auto & nit : qAsConst(m_cachedNit))
             DeleteCachedTable(nit);
         m_cachedNit.clear();
 
-        foreach (auto & cached, m_cachedSdts)
+        for (const auto & cached : qAsConst(m_cachedSdts))
             DeleteCachedTable(cached);
         m_cachedSdts.clear();
 
-        foreach (auto & cached, m_cachedBats)
+        for (const auto & cached : qAsConst(m_cachedBats))
             DeleteCachedTable(cached);
         m_cachedBats.clear();
 
@@ -752,7 +752,7 @@ bool DVBStreamData::HasCachedSDT(bool current) const
     if (m_cachedNit.empty())
         return false;
 
-    foreach (auto nit, m_cachedNit)
+    for (auto *nit : qAsConst(m_cachedNit))
     {
         for (uint i = 0; i < nit->TransportStreamCount(); i++)
         {
@@ -777,7 +777,7 @@ bool DVBStreamData::HasCachedAllSDTs(bool current) const
     if (m_cachedNit.empty())
         return false;
 
-    foreach (auto nit, m_cachedNit)
+    for (auto *nit : qAsConst(m_cachedNit))
     {
         if ((int)nit->TransportStreamCount() > m_cachedSdts.size())
             return false;
@@ -853,7 +853,7 @@ bat_vec_t DVBStreamData::GetCachedBATs(bool current) const
 
     bat_vec_t bats;
 
-    foreach (auto bat, m_cachedBats)
+    for (auto *bat : qAsConst(m_cachedBats))
     {
         IncrementRefCnt(bat);
         bats.push_back(bat);
@@ -920,7 +920,7 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 
     sdt_vec_t sdts;
 
-    foreach (auto sdt, m_cachedSdts)
+    for (auto *sdt : qAsConst(m_cachedSdts))
     {
         IncrementRefCnt(sdt);
         sdts.push_back(sdt);

@@ -275,7 +275,7 @@ bool MythMMALContext::HaveMMAL(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available MMAL decoders:");
     s_available = true;
     QSize size{0, 0};
-    foreach (auto profile, profiles)
+    for (auto profile : qAsConst(profiles))
         LOG(VB_GENERAL, LOG_INFO, LOC + MythCodecContext::GetProfileDescription(profile, size));
     return s_available;
 }
