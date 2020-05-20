@@ -512,6 +512,16 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
         SET_STRING(ImageIconDescriptor);
     }
     else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::target_region)
+    {
+        SET_STRING(TargetRegionDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::target_region_name)
+    {
+        SET_STRING(TargetRegionNameDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::t2_delivery_system)
     {
         SET_STRING(T2DeliverySystemDescriptor);
@@ -653,16 +663,23 @@ QString MPEGDescriptor::hexdump(void) const
             hex.append(" ");
         if (((i+1) % 16) == 0)
         {
-            str.append(QString("      %1 %2 |%3|\n")
+            str.append(QString("      %1 %2 |%3|")
                 .arg(i - (i % 16),3,16,QChar('0'))
                 .arg(hex).arg(prt));
             hex.clear();
             prt.clear();
+            if (i < (DescriptorLength() - 1))
+            {
+                str.append("\n");
+            }
         }
     }
-    str.append(QString("      %1 %2 |%3|")
-                .arg(i - (i % 16),3,16,QChar('0'))
-                .arg(hex,-50,' ').arg(prt));
+    if (!hex.isEmpty())
+    {
+        str.append(QString("      %1 %2 |%3|")
+                    .arg(i - (i % 16),3,16,QChar('0'))
+                    .arg(hex,-50,' ').arg(prt));
+    }
     return str;
 }
 

@@ -1214,6 +1214,72 @@ class SHDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
+// DVB Bluebook A038 (Feb 2019) p 117
+class TargetRegionDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit TargetRegionDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::target_region)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name                     bits  loc     expected value
+    // descriptor_tag                   8   0.0     0x7f    extension
+    // descriptor_length                8   1.0     4       or more
+    // descriptor_tag_extension         8   2.0     0x09    target_region
+
+    // country_code                    24   3.0     e.g. "GBR"
+    uint CountryCode(void) const
+    {
+        return ((m_data[3] << 16) | (m_data[4] << 8) | m_data[5]);
+    }
+    QString CountryCodeString(void) const
+    {
+        return QString(m_data[3]) + QChar(m_data[4]) + QChar(m_data[5]);
+    }
+    //
+    // TBD
+    //
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+// DVB Bluebook A038 (Feb 2019) p 118
+class TargetRegionNameDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit TargetRegionNameDescriptor(
+        const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::extension)
+        {
+            if (DescriptorTagExtension() != DescriptorID::target_region_name)
+            {
+                m_data = nullptr;
+            }
+        }
+    //       Name                     bits  loc     expected value
+    // descriptor_tag                   8   0.0     0x7f    extension
+    // descriptor_length                8   1.0     7       or more
+    // descriptor_tag_extension         8   2.0     0x0A    target_region_name
+
+    // country_code                    24   3.0     e.g. "GBR"
+    uint CountryCode(void) const
+    {
+        return ((m_data[3] << 16) | (m_data[4] << 8) | m_data[5]);
+    }
+    QString CountryCodeString(void) const
+    {
+        return QString(m_data[3]) + QChar(m_data[4]) + QChar(m_data[5]);
+    }
+    //
+    // TBD
+    //
+    QString toString(void) const override; // MPEGDescriptor
+};
+
 // DVB Bluebook A038 (Feb 2019) p 98
 class C2DeliverySystemDescriptor : public MPEGDescriptor
 {

@@ -504,7 +504,10 @@ QString FrequencyListDescriptor::toString() const
     QString str = "FrequencyListDescriptor: frequencies: ";
 
     for (uint i = 0; i < FrequencyCount(); i++)
-        str.append(QString(" %1").arg(FrequencyHz(i)));
+    {
+        str += QString("%1").arg(FrequencyHz(i));
+        str += (i+1 < FrequencyCount()) ? (i+4)%10 ? ", " : ",\n      " : "";
+    }
 
     return str;
 }
@@ -604,6 +607,38 @@ QString ImageIconDescriptor::toString() const
     //
     // TBD
     //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+QString TargetRegionDescriptor::toString() const
+{
+    QString str = QString("TargetRegionDescriptor");
+    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString(" length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("country_code(%1) ").arg(CountryCodeString());
+    //
+    // TBD
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+QString TargetRegionNameDescriptor::toString() const
+{
+    QString str = QString("TargetRegionNameDescriptor");
+    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString(" length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("country_code(%1) ").arg(CountryCodeString());
+    //
+    // TBD
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
     return str;
 }
 
@@ -628,33 +663,47 @@ QString T2DeliverySystemDescriptor::toString() const
         // TBD
         //
     }
+    str.append(" Dumping\n");
+    str.append(hexdump());
     return str;
 }
 
 QString SHDeliverySystemDescriptor::toString() const
 {
-    QString str = QString("SHDeliverySystemDescriptor: ");
+    QString str = QString("SHDeliverySystemDescriptor");
+    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString(" length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
+    str.append(" Dumping\n");
+    str.append(hexdump());
     return str;
 }
 
 QString C2DeliverySystemDescriptor::toString() const
 {
-    QString str = QString("C2DeliverySystemDescriptor: ");
+    QString str = QString("C2DeliverySystemDescriptor");
+    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString(" length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
+    str.append(" Dumping\n");
+    str.append(hexdump());
     return str;
 }
 
 QString S2XSatelliteDeliverySystemDescriptor::toString() const
 {
-    QString str = QString("S2XSatelliteDeliverySystemDescriptor: ");
+    QString str = QString("S2XSatelliteDeliverySystemDescriptor");
+    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString(" length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
+    str.append(" Dumping\n");
+    str.append(hexdump());
     return str;
 }
 
