@@ -141,6 +141,10 @@ class Send(object):
                          its response in XML rather than JSON. Defaults to
                          False.
 
+        opts['rawxml']:  If True, causes the backend to send it's response in
+                         XML as bytes. This can be easily parsed by Python's
+                         'lxml.etree.fromstring()'. Defaults to False.
+
         opts['wrmi']:    If True and there is postdata, the URL is then sent to
                          the server.
 
@@ -296,6 +300,9 @@ class Send(object):
         if self.opts['usexml']:
             return response.text
 
+        if self.opts['rawxml']:
+            return response.content
+
         try:
             return response.json()
         except ValueError as err:
@@ -320,7 +327,7 @@ class Send(object):
         if not isinstance(self.opts, dict):
             self.opts = {}
 
-        for option in ('noetag', 'nogzip', 'usexml', 'wrmi', 'wsdl'):
+        for option in ('noetag', 'nogzip', 'usexml', 'rawxml', 'wrmi', 'wsdl'):
             try:
                 self.opts[option]
             except (KeyError, TypeError):
@@ -368,8 +375,8 @@ class Send(object):
             raise RuntimeError('usage: postdata must be passed as a dict')
 
         self.logger.debug('The following postdata was included:')
-        for key in self.postdata:
-            self.logger.debug('%15s: %s', key, self.postdata[key])
+        for k, v in self.postdata.items():
+            self.logger.debug('%15s: %s', k, v)
 
         if not self.opts['wrmi']:
             raise RuntimeWarning('wrmi=False')
@@ -396,7 +403,7 @@ class Send(object):
         else:
             self.session.headers.update({'Accept-Encoding': 'gzip,deflate'})
 
-        if self.opts['usexml']:
+        if self.opts['usexml'] or self.opts['rawxml']:
             self.session.headers.update({'Accept': ''})
         else:
             self.session.headers.update({'Accept': 'application/json'})
