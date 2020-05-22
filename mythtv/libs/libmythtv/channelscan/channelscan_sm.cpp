@@ -735,10 +735,10 @@ void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInform
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                   nit->TransportDescriptorsLength(i));
 
-        for (size_t j = 0; j < list.size(); ++j)
+        for (const auto * const item : list)
         {
             uint64_t frequency = 0;
-            const MPEGDescriptor desc(list[j]);
+            const MPEGDescriptor desc(item);
             uint tag = desc.DescriptorTag();
             QString tagString = desc.DescriptorTagString();
 
