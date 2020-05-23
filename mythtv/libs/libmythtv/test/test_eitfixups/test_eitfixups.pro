@@ -14,6 +14,7 @@ LIBS += ../../$(OBJECTS_DIR)/atsc_huffman.o
 LIBS += ../../$(OBJECTS_DIR)/dvbdescriptors.o
 LIBS += ../../$(OBJECTS_DIR)/iso6937tables.o
 LIBS += ../../$(OBJECTS_DIR)/freesat_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/freesat_tables.o
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION

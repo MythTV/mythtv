@@ -1,4 +1,7 @@
-struct fsattab fsat_table_1[] = {
+#include "freesat_huffman.h"
+#include "mythtvexp.h"
+
+MTV_PUBLIC const std::vector<fsattab> fsat_table_1 {
     /*   51                             */
     { 0x00000000,  2,  84}, /*    0 'T' */
     { 0x40000000,  3,  66}, /*    1 'B' */
@@ -2156,7 +2159,7 @@ struct fsattab fsat_table_1[] = {
     { 0x80000000,  1,   1}  /* 2026 '0x01' */
 };
 
-unsigned fsat_index_1[] = {
+MTV_PUBLIC const std::vector<uint16_t> fsat_index_1 {
            0, /*   0 */
           51, /*   1 */
           53, /*   2 */
@@ -2288,7 +2291,7 @@ unsigned fsat_index_1[] = {
         2027  /* 128 */
 };
 
-struct fsattab fsat_table_2[] = {
+MTV_PUBLIC const std::vector<fsattab> fsat_table_2 {
     /*   51                             */
     { 0x40000000,  3,  65}, /*    0 'A' */
     { 0x80000000,  3,  67}, /*    1 'C' */
@@ -5579,7 +5582,7 @@ struct fsattab fsat_table_2[] = {
     { 0x80000000,  1,   1}  /* 3159 '0x01' */
 };
 
-unsigned fsat_index_2[] = {
+MTV_PUBLIC const std::vector<uint16_t> fsat_index_2 {
            0, /*   0 */
           51, /*   1 */
           53, /*   2 */
