@@ -9,8 +9,15 @@ using namespace std;
 // Qt headers
 #include <QString>
 
-QString guid_to_string(uint64_t guid);
-uint64_t string_to_guid(const QString &guid);
+static inline QString guid_to_string(uint64_t guid)
+{
+    return QString("%1").arg(guid, 16, 16, QLatin1Char('0')).toUpper();
+}
+
+static inline uint64_t string_to_guid(const QString &guid)
+{
+    return guid.toULongLong(nullptr, 16);
+}
 
 class AVCInfo
 {

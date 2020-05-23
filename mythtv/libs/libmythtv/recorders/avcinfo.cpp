@@ -6,17 +6,6 @@
 #include "firewiredevice.h"
 #endif
 
-QString guid_to_string(uint64_t guid)
-{
-    return QString("%1").arg(guid, 16, 16, QLatin1Char('0')).toUpper();
-}
-
-uint64_t string_to_guid(const QString &guid)
-{
-    return guid.toULongLong(nullptr, 16);
-}
-
-#ifndef GUID_ONLY
 AVCInfo::AVCInfo()
 {
     memset(m_unit_table, 0xff, sizeof(m_unit_table));
@@ -131,4 +120,3 @@ QString AVCInfo::GetSubunitInfoString(void) const
 
     return str;
 }
-#endif

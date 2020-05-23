@@ -22,9 +22,7 @@
 #include <iostream>
 #include <random>
 #include "test_avcinfo.h"
-
-#define GUID_ONLY
-#include "recorders/avcinfo.cpp"
+#include "recorders/avcinfo.h"
 
 using namespace std;
 
