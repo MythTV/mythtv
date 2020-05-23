@@ -202,18 +202,18 @@ using_vulkan {
     HEADERS += vulkan/mythtexturevulkan.h
     HEADERS += vulkan/mythshadervulkan.h
     HEADERS += vulkan/mythshadersvulkan.h
-    HEADERS += vulkan/mythvertexbuffervulkan.h
-    HEADERS += vulkan/mythindexbuffervulkan.h
     HEADERS += vulkan/mythuniformbuffervulkan.h
+    HEADERS += vulkan/mythcombobuffervulkan.h
+    HEADERS += vulkan/mythdebugvulkan.h
     SOURCES += vulkan/mythpainterwindowvulkan.cpp
     SOURCES += vulkan/mythpaintervulkan.cpp
     SOURCES += vulkan/mythrendervulkan.cpp
     SOURCES += vulkan/mythwindowvulkan.cpp
     SOURCES += vulkan/mythtexturevulkan.cpp
     SOURCES += vulkan/mythshadervulkan.cpp
-    SOURCES += vulkan/mythvertexbuffervulkan.cpp
-    SOURCES += vulkan/mythindexbuffervulkan.cpp
     SOURCES += vulkan/mythuniformbuffervulkan.cpp
+    SOURCES += vulkan/mythcombobuffervulkan.cpp
+    SOURCES += vulkan/mythdebugvulkan.cpp
     using_libglslang: DEFINES += USING_GLSLANG
 }
 

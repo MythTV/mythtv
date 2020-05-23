@@ -10,7 +10,7 @@
 #include "vulkan/mythrendervulkan.h"
 #include "vulkan/mythwindowvulkan.h"
 
-class MythIndexBufferVulkan;
+class MythDebugVulkan;
 class MythUniformBufferVulkan;
 
 #define MAX_TEXTURE_COUNT (1000)
@@ -55,10 +55,10 @@ class MythPainterVulkan : public QObject, public MythPainter
     VkDevice          m_device           { nullptr };
     QVulkanDeviceFunctions* m_devFuncs   { nullptr };
 
-    MythIndexBufferVulkan* m_indexBuffer { nullptr };
     VkDescriptorPool  m_projectionDescriptorPool { nullptr };
     VkDescriptorSet   m_projectionDescriptor { nullptr };
     MythUniformBufferVulkan* m_projectionUniform { nullptr };
+    VkSampler         m_textureSampler   { nullptr };
     MythShaderVulkan* m_textureShader    { nullptr };
     VkPipelineLayout  m_textureLayout    { nullptr };
     VkPipeline        m_texturePipeline  { nullptr };
@@ -70,7 +70,6 @@ class MythPainterVulkan : public QObject, public MythPainter
     QSize             m_lastSize         { 0, 0    };
 
     std::vector<MythTextureVulkan*> m_queuedTextures;
-    VkCommandBuffer   m_singleUseCmdBuffer { nullptr };
 
     QMap<MythImage*, MythTextureVulkan*> m_imageToTextureMap;
     std::list<MythImage*>                m_imageExpire;
@@ -78,6 +77,9 @@ class MythPainterVulkan : public QObject, public MythPainter
 
     QMatrix4x4         m_projection;
     QStack<QMatrix4x4> m_transforms;
+
+    MythDebugVulkan*   m_debugMarker     { nullptr };
+    bool               m_debugAvailable  { true    };
 };
 
 #endif

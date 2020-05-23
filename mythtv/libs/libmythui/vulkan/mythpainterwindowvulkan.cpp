@@ -17,7 +17,8 @@ MythPainterWindowVulkan::MythPainterWindowVulkan(MythMainWindow *MainWindow)
     // Create the Vulkan instance. This must outlive the Vulkan window
     m_vulkan = new QVulkanInstance();
     m_vulkan->setApiVersion(QVersionNumber(1, 1));
-    m_vulkan->setExtensions(QByteArrayList() << VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    m_vulkan->setExtensions(QByteArrayList() << VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME <<
+                                                VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
     // As for OpenGL - VB_GPU enables debug output - but this also requires the
     // validation layers to be installed
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))

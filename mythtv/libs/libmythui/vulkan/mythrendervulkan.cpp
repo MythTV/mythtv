@@ -11,8 +11,6 @@
 
 #define LOC QString("VulkanRender: ")
 
-const std::vector<uint16_t> MythRenderVulkan::s_VertexIndices = { 0, 1, 2, 2, 3, 0 };
-
 MythVulkanObject::MythVulkanObject(MythRenderVulkan *Render, VkDevice Device, QVulkanDeviceFunctions* Functions)
   : m_render(Render),
     m_device(Device),
@@ -315,11 +313,11 @@ void MythRenderVulkan::TransitionImageLayout(VkImage &Image,
     FinishSingleUseCommandBuffer(commandbuffer);
 }
 
-void MythRenderVulkan::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
+void MythRenderVulkan::CopyBufferToImage(VkBuffer Buffer, VkImage Image, uint32_t Width, uint32_t Height)
 {
     VkCommandBuffer commandbuffer = CreateSingleUseCommandBuffer();
     VkBufferImageCopy region { };
-    region.bufferOffset     = 0;
+    region.bufferOffset      = 0;
     region.bufferRowLength   = 0;
     region.bufferImageHeight = 0;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -327,8 +325,8 @@ void MythRenderVulkan::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
     region.imageOffset = { 0, 0, 0 };
-    region.imageExtent = { width, height, 1 };
-    m_devFuncs->vkCmdCopyBufferToImage(commandbuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+    region.imageExtent = { Width, Height, 1 };
+    m_devFuncs->vkCmdCopyBufferToImage(commandbuffer, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
     FinishSingleUseCommandBuffer(commandbuffer);
 }
 
@@ -391,6 +389,30 @@ bool MythRenderVulkan::CreateBuffer(VkDeviceSize          Size,
     m_devFuncs->vkDestroyBuffer(m_device, Buffer, nullptr);
     return false;
 }
+
+VkSampler MythRenderVulkan::CreateSampler(VkFilter Min, VkFilter Mag)
+{
+    VkSampler result = nullptr;
+    VkSamplerCreateInfo samplerinfo { };
+    memset(&samplerinfo, 0, sizeof(samplerinfo));
+    samplerinfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerinfo.minFilter        = Min;
+    samplerinfo.magFilter        = Mag;
+    samplerinfo.addressModeU     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerinfo.addressModeV     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerinfo.addressModeW     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerinfo.anisotropyEnable = VK_FALSE;
+    samplerinfo.maxAnisotropy    = 1;
+    samplerinfo.borderColor      = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+    samplerinfo.unnormalizedCoordinates = VK_FALSE;
+    samplerinfo.compareEnable    = VK_FALSE;
+    samplerinfo.compareOp        = VK_COMPARE_OP_ALWAYS;
+    samplerinfo.mipmapMode       = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    if (m_devFuncs->vkCreateSampler(m_device, &samplerinfo, nullptr, &result) != VK_SUCCESS)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create image sampler");
+    return result;
+}
+
 
 bool MythRenderVulkan::CreateImage(QSize             Size,
                                    VkFormat          Format,
@@ -500,10 +522,10 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     // shaders
     const auto & shaderstages = Shader->Stages();
 
-    // primitives - triangle list as for OpenGL
+    // primitives - triangle strip as for OpenGL
     VkPipelineInputAssemblyStateCreateInfo inputassembly { };
     inputassembly.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputassembly.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputassembly.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
     inputassembly.primitiveRestartEnable = VK_FALSE;
 
     // viewport - N.B. static
@@ -527,13 +549,20 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     viewportstate.pScissors     = &scissor;
 
     // Vertex input - from the shader
-    const auto & vertexattribs = Shader->GetVertexAttributes();
+    //const auto & vertexattribs = Shader->GetVertexAttributes();
+    //VkPipelineVertexInputStateCreateInfo vertexinput { };
+    //vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    //vertexinput.vertexBindingDescriptionCount   = 1;
+    //vertexinput.pVertexBindingDescriptions      = &Shader->GetVertexBindingDesc();
+    //vertexinput.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexattribs.size());
+    //vertexinput.pVertexAttributeDescriptions    = vertexattribs.data();
+
     VkPipelineVertexInputStateCreateInfo vertexinput { };
     vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexinput.vertexBindingDescriptionCount   = 1;
-    vertexinput.pVertexBindingDescriptions      = &Shader->GetVertexBindingDesc();
-    vertexinput.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexattribs.size());
-    vertexinput.pVertexAttributeDescriptions    = vertexattribs.data();
+    vertexinput.vertexBindingDescriptionCount   = 0;
+    vertexinput.pVertexBindingDescriptions      = nullptr;
+    vertexinput.vertexAttributeDescriptionCount = 0;
+    vertexinput.pVertexAttributeDescriptions    = nullptr;
 
     // multisampling - no thanks
     VkPipelineMultisampleStateCreateInfo multisampling { };

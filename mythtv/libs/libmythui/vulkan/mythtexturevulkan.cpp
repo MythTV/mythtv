@@ -3,16 +3,17 @@
 
 // MythTV
 #include "mythlogging.h"
-#include "vulkan/mythvertexbuffervulkan.h"
-#include "vulkan/mythuniformbuffervulkan.h"
 #include "vulkan/mythtexturevulkan.h"
 
 #define LOC QString("VulkanTex: ")
 
 MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice Device,
-                                             QVulkanDeviceFunctions* Functions, QImage *Image)
+                                             QVulkanDeviceFunctions* Functions, QImage *Image, VkSampler Sampler)
 {
-    MythTextureVulkan* result = new MythTextureVulkan(Render, Device, Functions, Image);
+    MythTextureVulkan* result = nullptr;
+    if (Image)
+        result = new MythTextureVulkan(Render, Device, Functions, Image, Sampler);
+
     if (result && !result->m_valid)
     {
         delete result;
@@ -22,15 +23,14 @@ MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice 
 }
 
 MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
-                                     QVulkanDeviceFunctions* Functions, QImage *Image)
-  : MythVulkanObject(Render, Device, Functions)
+                                     QVulkanDeviceFunctions* Functions,
+                                     QImage *Image, VkSampler Sampler)
+  : MythVulkanObject(Render, Device, Functions),
+    MythComboBufferVulkan(Image->width(), Image->height()),
+    m_width(static_cast<uint32_t>(Image->width())),
+    m_height(static_cast<uint32_t>(Image->height()))
 {
-    if (!(Render && Device && Functions && Image))
-        return;
-
-    // create vertex buffer object
-    m_vertexBuffer = MythVertexBufferVulkan::Create(Render, Device, Functions, 4 * 8 * sizeof(float));
-    if (!m_vertexBuffer)
+    if (!(Render && Device && Functions))
         return;
 
     // retrieve and check Image data
@@ -74,24 +74,16 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
                                   static_cast<uint32_t>(Image->height()));
         Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        // Create sampler
-        VkSamplerCreateInfo samplerinfo { };
-        memset(&samplerinfo, 0, sizeof(samplerinfo));
-        samplerinfo.sType           = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerinfo.magFilter        = VK_FILTER_LINEAR;
-        samplerinfo.minFilter        = VK_FILTER_LINEAR;
-        samplerinfo.addressModeU     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        samplerinfo.addressModeV     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        samplerinfo.addressModeW     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        samplerinfo.anisotropyEnable = VK_FALSE;
-        samplerinfo.maxAnisotropy    = 1;
-        samplerinfo.borderColor      = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
-        samplerinfo.unnormalizedCoordinates = VK_FALSE;
-        samplerinfo.compareEnable    = VK_FALSE;
-        samplerinfo.compareOp        = VK_COMPARE_OP_ALWAYS;
-        samplerinfo.mipmapMode       = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-        if (Functions->vkCreateSampler(Device, &samplerinfo, nullptr, &m_sampler) != VK_SUCCESS)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create image sampler");
+        // Create sampler if needed
+        if (!Sampler)
+        {
+            m_sampler = m_render->CreateSampler(VK_FILTER_LINEAR, VK_FILTER_LINEAR);
+            m_createdSampler = true;
+        }
+        else
+        {
+            m_sampler = Sampler;
+        }
 
         // Create image view
         VkImageViewCreateInfo viewinfo { };
@@ -107,10 +99,7 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
         if (Functions->vkCreateImageView(Device, &viewinfo, nullptr, &m_view) != VK_SUCCESS)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create image view");
 
-        m_width    = static_cast<uint32_t>(Image->width());
-        m_height   = static_cast<uint32_t>(Image->height());
         m_dataSize = datasize;
-
         m_valid = m_sampler && m_view;
     }
     else
@@ -120,8 +109,6 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
 
     Functions->vkDestroyBuffer(Device, stagingbuf, nullptr);
     Functions->vkFreeMemory(Device, stagingmem, nullptr);
-
-    m_crop = true;
 }
 
 MythTextureVulkan::~MythTextureVulkan()
@@ -129,30 +116,19 @@ MythTextureVulkan::~MythTextureVulkan()
     if (m_descriptor)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Texture has not returned descriptor");
 
-    delete m_vertexBuffer;
-    delete m_uniform;
     if (m_device && m_devFuncs)
     {
-        m_devFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
+        if (m_createdSampler)
+            m_devFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
         m_devFuncs->vkDestroyImageView(m_device, m_view, nullptr);
         m_devFuncs->vkDestroyImage(m_device, m_image, nullptr);
         m_devFuncs->vkFreeMemory(m_device, m_deviceMemory, nullptr);
     }
 }
 
-VkBuffer MythTextureVulkan::GetVertexBuffer(void) const
-{
-    return m_vertexBuffer->GetBuffer();
-}
-
 VkDescriptorImageInfo MythTextureVulkan::GetDescriptorImage(void) const
 {
     return { m_sampler, m_view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
-}
-
-void MythTextureVulkan::AddUniform(MythUniformBufferVulkan *Uniform)
-{
-    m_uniform = Uniform;
 }
 
 void MythTextureVulkan::AddDescriptor(VkDescriptorSet Descriptor)
@@ -165,46 +141,4 @@ VkDescriptorSet MythTextureVulkan::TakeDescriptor(void)
     VkDescriptorSet result = m_descriptor;
     m_descriptor = nullptr;
     return result;
-}
-
-/*! \brief Update the textures vertex buffer object if necessary
- *
- * \todo Need to use a 'cached' vertex buffer when rendering the same image multiple times
- * \todo Handle flip and rotation
- * \todo No need for full colour support - only need alpha
-*/
-void MythTextureVulkan::UpdateVertices(const QRect &Source, const QRect &Destination,
-                                       int Alpha, int Rotation, VkCommandBuffer CommandBuffer)
-{
-    if (!m_vertexBuffer->NeedsUpdate(Source, Destination, Alpha, Rotation))
-        return;
-
-    float* data = static_cast<float*>(m_vertexBuffer->GetMappedMemory());
-
-    int width  = m_crop ? std::min(Source.width(),  static_cast<int>(m_width))  : Source.width();
-    int height = m_crop ? std::min(Source.height(), static_cast<int>(m_height)) : Source.height();
-
-    // X, Y  tX, Ty  R,G,B,A
-    // BottomLeft, TopLeft, TopRight, BottomRight
-
-    // Position
-    data[ 0] = data[ 8] = Destination.left();
-    data[ 9] = data[17] = Destination.top();
-    data[16] = data[24] = Destination.left() + width;
-    data[ 1] = data[25] = Destination.top()  + height;
-
-    // Texcoord
-    data[ 2] = data[10] = Source.left() / static_cast<float>(m_width);
-    data[11] = data[19] = Source.top() / static_cast<float>(m_height);
-    data[18] = data[26] = (Source.left() + width) / static_cast<float>(m_width);
-    data[ 3] = data[27] = (Source.top() + height) / static_cast<float>(m_height);
-
-    // Color
-    data[ 7] = data[15] = data[23] = data[31] = Alpha / 255.0F;
-    data[ 4] = data[ 5] = data[ 6] =
-    data[12] = data[13] = data[14] =
-    data[20] = data[21] = data[22] =
-    data[28] = data[29] = data[30] = 1.0f;
-
-    m_vertexBuffer->Update(Source, Destination, Alpha, Rotation, CommandBuffer);
 }

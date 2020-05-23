@@ -12,7 +12,8 @@ using MythSetLayout   = std::pair<int, VkDescriptorSetLayoutBinding>;
 using MythStageLayout = std::vector<MythSetLayout>;
 using MythBindingDesc = std::tuple<MythStageLayout,
                                    VkVertexInputBindingDescription,
-                                   MythVertexAttrs>;
+                                   MythVertexAttrs,
+                                   VkPushConstantRange>;
 using MythBindingMap  = std::map<int, MythBindingDesc>;
 
 class MythShaderVulkan : protected MythVulkanObject

@@ -29,8 +29,6 @@ class MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public My
     Q_OBJECT
 
   public:
-    static const std::vector<uint16_t> s_VertexIndices;
-
     MythRenderVulkan();
    ~MythRenderVulkan() override;
 
@@ -55,7 +53,7 @@ class MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public My
                                 VkImageUsageFlags Usage, VkMemoryPropertyFlags Properties,
                                 VkImage& Image, VkDeviceMemory& ImageMemory);
     void            TransitionImageLayout(VkImage &Image, VkImageLayout OldLayout, VkImageLayout NewLayout);
-    void            CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+    void            CopyBufferToImage(VkBuffer Buffer, VkImage Image, uint32_t Width, uint32_t Height);
     bool            CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage,
                                  VkMemoryPropertyFlags Properties, VkBuffer& Buffer,
                                  VkDeviceMemory& Memory);
@@ -64,6 +62,7 @@ class MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public My
     VkPipeline      CreatePipeline(MythShaderVulkan* Shader, VkPipelineLayout Layout, const QRect &Viewport);
     VkCommandBuffer CreateSingleUseCommandBuffer(void);
     void            FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer);
+    VkSampler       CreateSampler(VkFilter Min, VkFilter Mag);
 
   signals:
     void DoFreeResources    (void);

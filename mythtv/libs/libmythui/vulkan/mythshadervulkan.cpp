@@ -286,6 +286,9 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
 
     // build the descriptor set layouts from the shader descriptions
     bool foundvertices = false;
+    bool pushconstants = false;
+    VkPushConstantRange ranges = { };
+
     std::map<int, std::vector<VkDescriptorSetLayoutBinding>> layoutbindings;
     std::map<int, std::vector<VkDescriptorPoolSize>> poolsizes;
     for (auto & stage : Stages)
@@ -315,6 +318,16 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
         {
             m_vertexBindingDesc = std::get<1>(desc);
             m_vertexAttributes  = std::get<2>(desc);
+        }
+
+        if (!pushconstants)
+        {
+            VkPushConstantRange range = std::get<3>(desc);
+            if (range.stageFlags)
+            {
+                pushconstants = true;
+                ranges = range;
+            }
         }
     }
 
@@ -346,6 +359,13 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
     pipelinelayout.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelinelayout.setLayoutCount = static_cast<uint32_t>(m_descriptorSetLayouts.size());
     pipelinelayout.pSetLayouts    = m_descriptorSetLayouts.data();
+
+    if (pushconstants)
+    {
+        pipelinelayout.pushConstantRangeCount = 1;
+        pipelinelayout.pPushConstantRanges    = &ranges;
+    }
+
     if (m_devFuncs->vkCreatePipelineLayout(m_device, &pipelinelayout, nullptr, &m_pipelineLayout) != VK_SUCCESS)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create pipeline layout");
 
