@@ -379,7 +379,6 @@ class DTVModulation : public DTVParamHelper
                   (kModulationQAM128  == (Types)QAM_128 ) &&
                   (kModulationQAM256  == (Types)QAM_256 ) &&
                   (kModulationQAMAuto == (Types)QAM_AUTO) &&
-                  (kModulationQAM16   == (Types)QAM_16  ) &&
                   (kModulation8VSB    == (Types)VSB_8   ) &&
                   (kModulation16VSB   == (Types)VSB_16  ) &&
                   (kModulation8PSK    == (Types)PSK_8   ) &&
