@@ -13,6 +13,7 @@
 
 // Qt includes
 #include <QTextStream>
+#include <QElapsedTimer>
 
 using namespace std;
 
@@ -126,6 +127,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Remove the channels that do not pass various criteria.
     FilterServices(transports);
 
+    // Remove the channels that have been relocated.
+    if (m_removeDuplicates)
+    {
+        FilterRelocatedServices(transports);
+    }
+
     // Pull in DB info in transports
     // Channels not found in scan but only in DB are returned in db_trans
     sourceid = transports[0].m_channels[0].m_sourceId;
@@ -178,7 +185,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Create summary
     ssMsg << endl;
-    ssMsg << GetSummary(transports.size(), info, stats) << endl;
+    ssMsg << GetSummary(info, stats) << endl;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
@@ -485,7 +492,7 @@ void ChannelImporter::InsertChannels(
         ssMsg << endl;
         ssMsg << "Remaining channels (" << SimpleCountChannels(list) << "):" << endl;
         ssMsg << FormatChannels(list).toLatin1().constData() << endl;
-        ssMsg << GetSummary(list.size(), ninfo, nstats).toLatin1().constData();
+        ssMsg << GetSummary(ninfo, nstats).toLatin1().constData();
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 }
@@ -1018,72 +1025,111 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
     for (auto & transport : transports)
     {
         ChannelInsertInfoList filtered;
-        for (size_t k = 0; k < transport.m_channels.size(); ++k)
+        for (auto & channel : transport.m_channels)
         {
-            if (m_ftaOnly && transport.m_channels[k].m_isEncrypted &&
-                transport.m_channels[k].m_decryptionStatus != kEncDecrypted)
+            if (m_ftaOnly && channel.m_isEncrypted &&
+                channel.m_decryptionStatus != kEncDecrypted)
                 continue;
 
-            if (require_a && transport.m_channels[k].m_isDataService)
+            if (require_a && channel.m_isDataService)
                 continue;
 
-            if (require_av && transport.m_channels[k].m_isAudioService)
+            if (require_av && channel.m_isAudioService)
                 continue;
 
             // Filter channels out that do not have a logical channel number
-            if (m_lcnOnly && transport.m_channels[k].m_chanNum.isEmpty())
+            if (m_lcnOnly && channel.m_chanNum.isEmpty())
             {
-                QString msg = FormatChannel(transport, transport.m_channels[k]);
+                QString msg = FormatChannel(transport, channel);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No LCN: %1").arg(msg));
                 continue;
             }
 
             // Filter channels out that are not present in PAT and PMT.
             if (m_completeOnly &&
-                !(transport.m_channels[k].m_inPat &&
-                  transport.m_channels[k].m_inPmt ))
+                !(channel.m_inPat &&
+                  channel.m_inPmt ))
             {
-                QString msg = FormatChannel(transport, transport.m_channels[k]);
+                QString msg = FormatChannel(transport, channel);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT: %1").arg(msg));
                 continue;
             }
 
             // Filter channels out that are not present in SDT and that are not ATSC
             if (m_completeOnly &&
-                transport.m_channels[k].m_atscMajorChannel == 0 &&
-                transport.m_channels[k].m_atscMinorChannel == 0 &&
-                !(transport.m_channels[k].m_inPat &&
-                  transport.m_channels[k].m_inPmt &&
-                  transport.m_channels[k].m_inSdt &&
-                 (transport.m_channels[k].m_patTsId ==
-                  transport.m_channels[k].m_sdtTsId)))
+                channel.m_atscMajorChannel == 0 &&
+                channel.m_atscMinorChannel == 0 &&
+                !(channel.m_inPat &&
+                  channel.m_inPmt &&
+                  channel.m_inSdt &&
+                 (channel.m_patTsId ==
+                  channel.m_sdtTsId)))
             {
-                QString msg = FormatChannel(transport, transport.m_channels[k]);
+                QString msg = FormatChannel(transport, channel);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT/SDT: %1").arg(msg));
                 continue;
             }
 
             // Filter channels out that do not have a name
-            if (m_completeOnly && transport.m_channels[k].m_serviceName.isEmpty())
+            if (m_completeOnly && channel.m_serviceName.isEmpty())
             {
-                QString msg = FormatChannel(transport, transport.m_channels[k]);
+                QString msg = FormatChannel(transport, channel);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No name: %1").arg(msg));
                 continue;
             }
 
             // Filter channels out only in channels.conf, i.e. not found
-            if (transport.m_channels[k].m_inChannelsConf &&
-                !(transport.m_channels[k].m_inPat ||
-                  transport.m_channels[k].m_inPmt ||
-                  transport.m_channels[k].m_inVct ||
-                  transport.m_channels[k].m_inNit ||
-                  transport.m_channels[k].m_inSdt))
+            if (channel.m_inChannelsConf &&
+                !(channel.m_inPat ||
+                  channel.m_inPmt ||
+                  channel.m_inVct ||
+                  channel.m_inNit ||
+                  channel.m_inSdt))
                 continue;
 
-            filtered.push_back(transport.m_channels[k]);
+            filtered.push_back(channel);
         }
         transport.m_channels = filtered;
     }
+}
+
+void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports) const
+{
+    QMap<uint64_t, bool> rs;
+    QElapsedTimer timer;
+    timer.start();
+
+    // Search all channels to find relocated services
+    for (auto & transport : transports)
+    {
+        for (auto & channel : transport.m_channels)
+        {
+            if (channel.m_oldOrigNetId > 0)
+            {
+                uint64_t key = ((uint64_t)channel.m_oldOrigNetId << 32) | (channel.m_oldTsId << 16) | channel.m_oldServiceId;
+                rs[key] = true;
+            }
+        }
+    }
+
+    // Remove all relocated services
+    for (auto & transport : transports)
+    {
+        ChannelInsertInfoList filtered;
+        for (auto & channel : transport.m_channels)
+        {
+            uint64_t key = ((uint64_t)channel.m_origNetId    << 32) | (channel.m_sdtTsId << 16) | channel.m_serviceId;
+            if (rs.value(key, false))
+            {
+                QString msg = FormatChannel(transport, channel);
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Relocated: %1").arg(msg));
+                continue;
+            }
+            filtered.push_back(channel);
+        }
+        transport.m_channels = filtered;
+    }
+    LOG(VB_CHANSCAN, LOG_DEBUG, QString("%1 processing %2 milliseconds").arg(__func__).arg(timer.elapsed()));
 }
 
 /** \fn ChannelImporter::GetDBTransports(uint,ScanDTVTransportList&) const
@@ -1341,7 +1387,6 @@ QString ChannelImporter::FormatChannel(
     QString msg;
     QTextStream ssMsg(&msg);
 
-    ssMsg << transport.m_modulation.toString().toLatin1().constData() << ":";
     ssMsg << transport.m_frequency << ":";
 
     QString si_standard = (chan.m_siStandard=="opencable") ?
@@ -1494,9 +1539,10 @@ QString ChannelImporter::FormatChannels(
 
     for (auto & transport : transports)
     {
-        for (size_t j = 0; j < transport.m_channels.size(); ++j)
-            msg += FormatChannel(transport, transport.m_channels[j],
-                                 info) + "\n";
+        for (auto & channel : transport.m_channels)
+        {
+            msg += FormatChannel(transport, channel, info) + "\n";
+        }
     }
 
     return msg;
@@ -1537,31 +1583,33 @@ QString ChannelImporter::FormatTransports(
 }
 
 QString ChannelImporter::GetSummary(
-    uint                                  transport_count,
     const ChannelImporterBasicStats      &info,
     const ChannelImporterUniquenessStats &stats)
 {
-    //: %n is the number of transports
-    QString msg = tr("Found %n transport(s):\n", "", transport_count);
-    msg += tr("Channels: FTA Enc Dec\n") +
+    QString msg = tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
-        .arg(info.m_atscChannels[0],3).arg(info.m_atscChannels[1],3)
-        .arg(info.m_atscChannels[2],3) +
+            .arg(info.m_atscChannels[0],3)
+            .arg(info.m_atscChannels[1],3)
+            .arg(info.m_atscChannels[2],3) +
         QString("DVB       %1 %2 %3\n")
-        .arg(info.m_dvbChannels [0],3).arg(info.m_dvbChannels [1],3)
-        .arg(info.m_dvbChannels [2],3) +
+            .arg(info.m_dvbChannels [0],3)
+            .arg(info.m_dvbChannels [1],3)
+            .arg(info.m_dvbChannels [2],3) +
         QString("SCTE      %1 %2 %3\n")
-        .arg(info.m_scteChannels[0],3).arg(info.m_scteChannels[1],3)
-        .arg(info.m_scteChannels[2],3) +
+            .arg(info.m_scteChannels[0],3)
+            .arg(info.m_scteChannels[1],3)
+            .arg(info.m_scteChannels[2],3) +
         QString("MPEG      %1 %2 %3\n")
-        .arg(info.m_mpegChannels[0],3).arg(info.m_mpegChannels[1],3)
-        .arg(info.m_mpegChannels[2],3) +
-        QString("NTSC      %1\n").arg(info.m_ntscChannels[0],3) +
+            .arg(info.m_mpegChannels[0],3)
+            .arg(info.m_mpegChannels[1],3)
+            .arg(info.m_mpegChannels[2],3) +
+        QString("NTSC      %1\n")
+            .arg(info.m_ntscChannels[0],3) +
         tr("Unique: prog %1 atsc %2 atsc minor %3 channum %4\n")
-        .arg(stats.m_uniqueProgNum).arg(stats.m_uniqueAtscNum)
-        .arg(stats.m_uniqueAtscMin).arg(stats.m_uniqueChanNum) +
+            .arg(stats.m_uniqueProgNum).arg(stats.m_uniqueAtscNum)
+            .arg(stats.m_uniqueAtscMin).arg(stats.m_uniqueChanNum) +
         tr("Max atsc major count: %1")
-        .arg(stats.m_maxAtscMajCnt);
+            .arg(stats.m_maxAtscMajCnt);
 
     return msg;
 }

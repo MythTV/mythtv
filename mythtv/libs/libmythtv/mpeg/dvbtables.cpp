@@ -176,6 +176,21 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
     return nullptr;
 }
 
+ServiceRelocatedDescriptor *ServiceDescriptionTable::GetServiceRelocatedDescriptor(uint i) const
+{
+    desc_list_t parsed =
+        MPEGDescriptor::Parse(ServiceDescriptors(i),
+                              ServiceDescriptorsLength(i));
+
+    const unsigned char *desc =
+        MPEGDescriptor::FindExtension(parsed, DescriptorID::service_relocated);
+
+    if (desc)
+        return new ServiceRelocatedDescriptor(desc);
+
+    return nullptr;
+}
+
 bool ServiceDescriptionTable::Mutate(void)
 {
     if (VerifyCRC())

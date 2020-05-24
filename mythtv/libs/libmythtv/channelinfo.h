@@ -252,6 +252,11 @@ class MTV_PUBLIC ChannelInsertInfo
     bool    m_isOpencable        {false};
     bool    m_couldBeOpencable   {false};
     int     m_decryptionStatus   {0};
+
+    // Service relocated descriptor
+    uint    m_oldOrigNetId       {0};
+    uint    m_oldTsId            {0};
+    uint    m_oldServiceId       {0};
 };
 using ChannelInsertInfoList = vector<ChannelInsertInfo>;
 

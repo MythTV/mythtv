@@ -158,6 +158,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
         { return m_ptrs[i]+5; }
     // }
     ServiceDescriptor *GetServiceDescriptor(uint i) const;
+    ServiceRelocatedDescriptor *GetServiceRelocatedDescriptor(uint i) const;
 
     /// mutates a SDTo into a SDTa (vice versa) and recalculates the CRC
     bool Mutate(void);

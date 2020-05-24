@@ -145,6 +145,8 @@ class MTV_PUBLIC ChannelImporter
     static void MergeSameFrequency(ScanDTVTransportList &transports);
     static void RemoveDuplicates(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates);
     void FilterServices(ScanDTVTransportList &transports) const;
+    void FilterRelocatedServices(ScanDTVTransportList &transports) const;
+
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList &transports) const;
 
@@ -229,7 +231,6 @@ class MTV_PUBLIC ChannelImporter
         const ScanDTVTransportList      &transports_in);
 
     static QString GetSummary(
-        uint                                  transport_count,
         const ChannelImporterBasicStats      &info,
         const ChannelImporterUniquenessStats &stats);
 

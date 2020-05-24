@@ -1054,7 +1054,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
 
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Adding %1 offset %2 ss %3 to m_channelList.")
+                QString("Adding %1 offset:%2 ss:%3")
                     .arg(item.m_tuning.toString()).arg(m_current.offset())
                     .arg(item.m_signalStrength));
 
@@ -1268,6 +1268,29 @@ static void update_info(ChannelInsertInfo &info,
         info.m_sdtTsId << 16 | info.m_serviceId;
     if (defAuthorities.contains(index))
         info.m_defaultAuthority = defAuthorities[index];
+
+    // Is this service relocated from somewhere else?
+    ServiceRelocatedDescriptor *srdesc = sdt->GetServiceRelocatedDescriptor(i);
+    if (srdesc)
+    {
+        info.m_oldOrigNetId = srdesc->OldOriginalNetworkID();
+        info.m_oldTsId      = srdesc->OldTransportID();
+        info.m_oldServiceId = srdesc->OldServiceID();
+
+        LOG(VB_CHANSCAN, LOG_DEBUG, "ChannelScanSM: " +
+            QString("Service '%1' onid:%2 tid:%3 sid:%4 ")
+                .arg(info.m_serviceName)
+                .arg(info.m_origNetId)
+                .arg(info.m_sdtTsId)
+                .arg(info.m_serviceId) +
+            QString(" relocated from onid:%1 tid:%2 sid:%3")
+                .arg(info.m_oldOrigNetId)
+                .arg(info.m_oldTsId)
+                .arg(info.m_oldServiceId));
+
+        delete srdesc;
+    }
+
 }
 
 uint ChannelScanSM::GetCurrentTransportInfo(
@@ -2466,7 +2489,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT sourceid, sistandard, transportid, frequency, modulation "
+        "SELECT sourceid, sistandard, transportid, frequency, modulation, mod_sys "
         "FROM dtv_multiplex "
         "WHERE mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
@@ -2486,14 +2509,18 @@ bool ChannelScanSM::AddToList(uint mplexid)
     uint    sourceid   = query.value(0).toUInt();
     QString sistandard = query.value(1).toString();
     uint    tsid       = query.value(2).toUInt();
-    DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
-
+    uint    frequency  = query.value(3).toUInt();
+    QString modulation = query.value(4).toString();
+    QString mod_sys    = query.value(5).toString();
+    DTVModulationSystem delsys;
+    delsys.Parse(mod_sys);
+    DTVTunerType tt = CardUtil::ConvertToTunerType(delsys);
     QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
         QString("Multiplex #%1").arg(mplexid);
 
-    if (query.value(4).toString() == "8vsb")
+    if (modulation == "8vsb")
     {
-        QString chan = QString("%1 Hz").arg(query.value(3).toInt());
+        QString chan = QString("%1 Hz").arg(frequency);
         struct CHANLIST *curList = gChanLists[0].list;
         int totalChannels = gChanLists[0].count;
         int findFrequency = (query.value(3).toInt() / 1000) - 1750;

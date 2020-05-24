@@ -100,7 +100,7 @@ static uint insert_dtv_multiplex(
         QString("dbid:%1 std:'%2' ").arg(db_source_id).arg(sistandard) +
         QString("freq:%1 mod:%2 ").arg(frequency).arg(modulation) +
         QString("tid:%1 nid:%2 ").arg(transport_id).arg(network_id) +
-        QString("pol:%1 mod_sys:%2 ...)").arg(QChar(polarity)).arg(mod_sys) +
+        QString("pol:%1 msys:%2 ...)").arg(QChar(polarity)).arg(mod_sys) +
         QString("mplexid:%1").arg(mplex));
 
     bool isDVB = (sistandard.toLower() == "dvb");
