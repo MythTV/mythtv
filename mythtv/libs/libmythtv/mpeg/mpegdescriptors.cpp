@@ -512,6 +512,31 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
         SET_STRING(ImageIconDescriptor);
     }
     else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::t2_delivery_system)
+    {
+        SET_STRING(T2DeliverySystemDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::sh_delivery_system)
+    {
+        SET_STRING(SHDeliverySystemDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::supplementary_audio)
+    {
+        SET_STRING(SupplementaryAudioDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::network_change_notify)
+    {
+        SET_STRING(NetworkChangeNotifyDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
+             DescriptorTagExtension() == DescriptorID::message)
+    {
+        SET_STRING(MessageDescriptor);
+    }
+    else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::target_region)
     {
         SET_STRING(TargetRegionDescriptor);
@@ -522,19 +547,14 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
         SET_STRING(TargetRegionNameDescriptor);
     }
     else if (DescriptorTag() == DescriptorID::extension &&
-             DescriptorTagExtension() == DescriptorID::t2_delivery_system)
+             DescriptorTagExtension() == DescriptorID::service_relocated)
     {
-        SET_STRING(T2DeliverySystemDescriptor);
+        SET_STRING(ServiceRelocatedDescriptor);
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::c2_delivery_system)
     {
         SET_STRING(C2DeliverySystemDescriptor);
-    }
-    else if (DescriptorTag() == DescriptorID::extension &&
-             DescriptorTagExtension() == DescriptorID::sh_delivery_system)
-    {
-        SET_STRING(SHDeliverySystemDescriptor);
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::s2x_satellite_delivery_system)

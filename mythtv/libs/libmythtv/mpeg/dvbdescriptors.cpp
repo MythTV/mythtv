@@ -598,12 +598,14 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
+// 0x7F 0x00
 QString ImageIconDescriptor::toString() const
 {
-    QString str = QString("ImageIconDescriptor: ");
-    str.append(QString("%1/%2 id:%3")
-        .arg(DescriptorNumber())
-        .arg(LastDescriptorNumber()));
+    QString str = QString("ImageIconDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1) ").arg(DescriptorLength());
+    str += QString("number %1/%2").arg(DescriptorNumber()).arg(LastDescriptorNumber());
     //
     // TBD
     //
@@ -612,42 +614,30 @@ QString ImageIconDescriptor::toString() const
     return str;
 }
 
-QString TargetRegionDescriptor::toString() const
+// 0x7F 0x04
+void T2DeliverySystemDescriptor::Parse(void) const
 {
-    QString str = QString("TargetRegionDescriptor");
-    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
-    str += QString(" length(%1)").arg(DescriptorLength());
-    str += QString("\n      ");
-    str += QString("country_code(%1) ").arg(CountryCodeString());
-    //
-    // TBD
-    //
-    str.append(" Dumping\n");
-    str.append(hexdump());
-    return str;
-}
+    m_cellPtrs.clear();
+    m_subCellPtrs.clear();
 
-QString TargetRegionNameDescriptor::toString() const
-{
-    QString str = QString("TargetRegionNameDescriptor");
-    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
-    str += QString(" length(%1)").arg(DescriptorLength());
-    str += QString("\n      ");
-    str += QString("country_code(%1) ").arg(CountryCodeString());
-    //
-    // TBD
-    //
-    str.append(" Dumping\n");
-    str.append(hexdump());
-    return str;
+    const unsigned char *cp = m_data + 8;
+    for (uint i=0; (cp - m_data + 4) < DescriptorLength(); i++)
+    {
+        m_cellPtrs.push_back(cp);
+        cp += TFSFlag() ? (2 + 1 + FrequencyLoopLength(i)) : (2 + 4);
+        m_subCellPtrs.push_back(cp);
+        cp += 1 + SubcellInfoLoopLength(i);
+    }
 }
 
 QString T2DeliverySystemDescriptor::toString() const
 {
-    QString str = QString("T2DeliverySystemDescriptor: ");
+    QString str = QString("T2DeliverySystemDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1) ").arg(DescriptorLength());
     str += QString("plp_id(%1) ").arg(PlpID());
-    str += QString("T2_system_id(%1) ").arg(T2SystemID());
-    str += QString("descriptor_length(%1) ").arg(DescriptorLength());
+    str += QString("T2_system_id(%1)").arg(T2SystemID());
     if (DescriptorLength() > 4)
     {
         str += QString("\n      %1 ").arg(SisoMisoString());
@@ -659,20 +649,42 @@ QString T2DeliverySystemDescriptor::toString() const
     }
     if (DescriptorLength() > 6)
     {
-        //
-        // TBD
-        //
+        for (uint i=0; i < NumCells(); i++)
+        {
+            str += QString("\n      ");
+            str += QString("cell_id:%1 ").arg(CellID(i));
+            str += QString("centre_frequency:");
+            if (TFSFlag())
+            {
+                for (uint j=0; j<FrequencyLoopLength(i)/4; j++)
+                {
+                    str += QString(" %1").arg(CentreFrequency(i,j));
+                }
+            }
+            else
+            {
+                str += QString(" %1").arg(CentreFrequency(i));
+            }
+            for (uint j=0; j<SubcellInfoLoopLength(i)/5; j++)
+            {
+                str += QString("\n        ");
+                str += QString("cell_id_extension:%1 ").arg(CellIDExtension(i,j));
+                str += QString("transposer_frequency:%1").arg(TransposerFrequency(i,j));
+            }
+        }
     }
     str.append(" Dumping\n");
     str.append(hexdump());
     return str;
 }
 
+// 0x7F 0x05
 QString SHDeliverySystemDescriptor::toString() const
 {
-    QString str = QString("SHDeliverySystemDescriptor");
-    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
-    str += QString(" length(%1)").arg(DescriptorLength());
+    QString str = QString("SHDeliverySystemDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
@@ -681,11 +693,117 @@ QString SHDeliverySystemDescriptor::toString() const
     return str;
 }
 
+// 0x7F 0x06
+QString SupplementaryAudioDescriptor::toString() const
+{
+    QString str = QString("SupplementaryAudioDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("mix_type(%1) ").arg(MixType());
+    str += QString("editorial_classification(%1)").arg(EditorialClassification());
+    str += QString("\n      ");
+    str += QString("language_code_present(%1)").arg(LanguageCodePresent());
+    if (LanguageCodePresent() && DescriptorLength() >= 4)
+    {
+        str += QString(" language_code(%1)").arg(LanguageString());
+    }
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x07
+QString NetworkChangeNotifyDescriptor::toString() const
+{
+    QString str = QString("NetworkChangeNotiyDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x08
+QString MessageDescriptor::toString() const
+{
+    QString str = QString("MessageDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("message_id(%1) ").arg(MessageID());
+    str += QString("language_code(%1)").arg(LanguageString());
+    str += QString("\n      ");
+    str += QString("text_char(\"%1\")").arg(Message());
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x09
+QString TargetRegionDescriptor::toString() const
+{
+    QString str = QString("TargetRegionDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("country_code(%1) ").arg(CountryCodeString());
+    //
+    // TBD
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x0A
+QString TargetRegionNameDescriptor::toString() const
+{
+    QString str = QString("TargetRegionNameDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("country_code(%1) ").arg(CountryCodeString());
+    str += QString("language_code(%1)").arg(LanguageString());
+    //
+    // TBD
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x0B
+QString ServiceRelocatedDescriptor::toString() const
+{
+    QString str = QString("ServiceRelocatedDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
+    str += QString("\n      ");
+    str += QString("old_original_network_id(%1) ").arg(OldOriginalNetworkID());
+    str += QString("old_transport_id(%1) ").arg(OldTransportID());
+    str += QString("old_service_id(%1) ").arg(OldServiceID());
+    //
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
+}
+
+// 0x7F 0x0D
 QString C2DeliverySystemDescriptor::toString() const
 {
-    QString str = QString("C2DeliverySystemDescriptor");
-    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
-    str += QString(" length(%1)").arg(DescriptorLength());
+    QString str = QString("C2DeliverySystemDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
@@ -694,11 +812,13 @@ QString C2DeliverySystemDescriptor::toString() const
     return str;
 }
 
+// 0x7F 0x17
 QString S2XSatelliteDeliverySystemDescriptor::toString() const
 {
-    QString str = QString("S2XSatelliteDeliverySystemDescriptor");
-    str += QString(" (0x%1)").arg(DescriptorTag(),2,16,QChar('0'));
-    str += QString(" length(%1)").arg(DescriptorLength());
+    QString str = QString("S2XSatelliteDeliverySystemDescriptor ");
+    str += QString("(0x%1 ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("0x%1) ").arg(DescriptorTagExtension(),2,16,QChar('0'));
+    str += QString("length(%1)").arg(DescriptorLength());
     //
     // TBD
     //
