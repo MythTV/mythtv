@@ -63,14 +63,13 @@ class MythPainterVulkan : public QObject, public MythPainter
     VkPipelineLayout  m_textureLayout    { nullptr };
     VkPipeline        m_texturePipeline  { nullptr };
     VkDescriptorPool  m_textureDescriptorPool { nullptr };
-    int               m_allocatedTextureDescriptors { 0 };
+    bool              m_textureDescriptorsCreated { false };
     std::vector<VkDescriptorSet> m_availableTextureDescriptors;
 
     bool              m_frameStarted     { false   };
     QSize             m_lastSize         { 0, 0    };
 
-    std::vector<MythTextureVulkan*> m_queuedTextures;
-
+    std::vector<MythTextureVulkan*>      m_queuedTextures;
     QMap<MythImage*, MythTextureVulkan*> m_imageToTextureMap;
     std::list<MythImage*>                m_imageExpire;
     QVector<MythTextureVulkan*>          m_texturesToDelete;

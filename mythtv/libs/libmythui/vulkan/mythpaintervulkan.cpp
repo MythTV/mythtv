@@ -63,11 +63,13 @@ void MythPainterVulkan::DoFreeResources(void)
     m_textureLayout            = nullptr; // N.B. owned by shader
     m_texturePipeline          = nullptr;
     m_textureDescriptorPool    = nullptr;
+    m_textureDescriptorsCreated = false;
+    m_availableTextureDescriptors.clear(); // destroyed with pool
+
     m_device                   = nullptr;
     m_devFuncs                 = nullptr;
     m_frameStarted             = false;
     m_lastSize                 = { 0, 0 };
-    m_availableTextureDescriptors.clear();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "Finished releasing resources");
 }
@@ -227,6 +229,28 @@ bool MythPainterVulkan::Ready(void)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create descriptor pool");
             return false;
         }
+    }
+
+    if (!m_textureDescriptorsCreated)
+    {
+        // transform and sampler are set 1 (projection is set 0)
+        VkDescriptorSetLayout layout = m_textureShader->GetDescSetLayout(1);
+        m_availableTextureDescriptors.clear();
+        for (int i = 0; i < MAX_TEXTURE_COUNT; ++i)
+        {
+            VkDescriptorSet descset = nullptr;
+            VkDescriptorSetAllocateInfo alloc { };
+            alloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            alloc.descriptorPool = m_textureDescriptorPool;
+            alloc.descriptorSetCount = 1;
+            alloc.pSetLayouts = &layout;
+            VkResult res = m_devFuncs->vkAllocateDescriptorSets(m_device, &alloc, &descset);
+            if (res != VK_SUCCESS)
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate descriptor set");
+            m_availableTextureDescriptors.push_back(descset);
+        }
+
+        m_textureDescriptorsCreated = true;
     }
 
     if (!m_textureSampler)
@@ -424,43 +448,23 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
         // text images, we can easily hit the max texture count before the cache
         // size. So ensure we always have a descriptor available.
 
-        if ((m_allocatedTextureDescriptors >= MAX_TEXTURE_COUNT) && m_availableTextureDescriptors.empty())
+        if (m_availableTextureDescriptors.empty())
         {
             MythImage *expired = m_imageExpire.front();
             m_imageExpire.pop_front();
             DeleteFormatImagePriv(expired);
             DeleteTextures();
-        }
 
-        VkDescriptorSet descset = nullptr;
-
-        // For some reason, the descriptor pool will not reallocate sets that
-        // have been freed. So we retrieve used sets and recycle them.
-        if (!m_availableTextureDescriptors.empty())
-        {
-            descset = m_availableTextureDescriptors.back();
-            m_availableTextureDescriptors.pop_back();
-        }
-        else
-        {
-            // transform and sampler are set 1 (projection is set 0)
-            VkDescriptorSetLayout layout = m_textureShader->GetDescSetLayout(1);
-            VkDescriptorSetAllocateInfo alloc { };
-            alloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-            alloc.descriptorPool = m_textureDescriptorPool;
-            alloc.descriptorSetCount = 1;
-            alloc.pSetLayouts = &layout;
-
-            VkResult res = m_devFuncs->vkAllocateDescriptorSets(m_device, &alloc, &descset);
-            if (res != VK_SUCCESS)
+            if (m_availableTextureDescriptors.empty())
             {
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to allocate descriptor set (%1)").arg(res));
+                LOG(VB_GENERAL, LOG_WARNING, LOC + "No texture descriptor available??");
                 delete texture;
                 return nullptr;
             }
-
-            m_allocatedTextureDescriptors++;
         }
+
+        VkDescriptorSet descset = m_availableTextureDescriptors.back();
+        m_availableTextureDescriptors.pop_back();
 
         auto imagedesc = texture->GetDescriptorImage();
         VkWriteDescriptorSet write { };
@@ -471,7 +475,6 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
         write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         write.descriptorCount = 1;
         write.pImageInfo = &imagedesc;
-
         m_devFuncs->vkUpdateDescriptorSets(m_device, 1, &write, 0, nullptr);
         texture->AddDescriptor(descset);
     }
@@ -508,7 +511,7 @@ void MythPainterVulkan::DeleteTextures(void)
         m_hardwareCacheSize -= texture->m_dataSize;
         VkDescriptorSet descriptor = texture->TakeDescriptor();
         if (descriptor)
-            m_availableTextureDescriptors.push_back(descriptor);
+            m_availableTextureDescriptors.emplace_back(descriptor);
         delete texture;
         m_texturesToDelete.pop_front();
     }
