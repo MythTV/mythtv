@@ -660,9 +660,8 @@ int main(int argc, char *argv[])
             "| the master backend is restarted.                            |\n"
             "===============================================================");
 
-    if (mark_repeats)
-        ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                            "MythFillDatabase");
+    ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                        "MythFillDatabase");
 
     gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
