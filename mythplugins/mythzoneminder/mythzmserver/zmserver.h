@@ -211,12 +211,12 @@ class MONITOR
     int getState(void);
     int getFrameSize(void);
 
-    string         m_name               {""};
-    string         m_type               {""};
-    string         m_function           {""};
+    string         m_name               {};
+    string         m_type               {};
+    string         m_function           {};
     int            m_enabled            {0};
-    string         m_device             {""};
-    string         m_host               {""};
+    string         m_device             {};
+    string         m_host               {};
     int            m_imageBufferCount   {0};
     int            m_width              {0};
     int            m_height             {0};
@@ -224,7 +224,7 @@ class MONITOR
     int            m_monId              {0};
     unsigned char *m_sharedImages       {nullptr};
     int            m_lastRead           {0};
-    string         m_status             {""};
+    string         m_status             {};
     int            m_palette            {0};
     int            m_controllable       {0};
     int            m_trackMotion        {0};
@@ -234,7 +234,7 @@ class MONITOR
     SharedData    *m_sharedData         {nullptr};
     SharedData26  *m_sharedData26       {nullptr};
     SharedData32  *m_sharedData32       {nullptr};
-    string         m_id                 {""};
+    string         m_id                 {};
 };
 
 class ZMServer
