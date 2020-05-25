@@ -1379,7 +1379,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PMTs
-    foreach (auto pmt, scan_info->m_pmts)
+    for (const auto *pmt : scan_info->m_pmts)
     {
         uint pnum = pmt->ProgramNumber();
         PCM_INFO_INIT("mpeg");

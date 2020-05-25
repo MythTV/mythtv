@@ -1413,7 +1413,7 @@ pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
     QMutexLocker locker(&m_cacheLock);
     vector<const ProgramMapTable*> pmts;
 
-    foreach (auto pmt, m_cachedPmts)
+    for (auto *pmt : m_cachedPmts)
     {
         IncrementRefCnt(pmt);
         pmts.push_back(pmt);
@@ -1427,7 +1427,7 @@ pmt_map_t MPEGStreamData::GetCachedPMTMap(void) const
     QMutexLocker locker(&m_cacheLock);
     pmt_map_t pmts;
 
-    foreach (auto pmt, m_cachedPmts)
+    for (auto *pmt : m_cachedPmts)
     {
         IncrementRefCnt(pmt);
         pmts[pmt->ProgramNumber()].push_back(pmt);
