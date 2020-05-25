@@ -51,6 +51,8 @@ void MythPainterVulkan::DoFreeResources(void)
         m_devFuncs->vkDestroyDescriptorPool(m_device, m_textureDescriptorPool, nullptr);
         m_devFuncs->vkDestroyDescriptorPool(m_device, m_projectionDescriptorPool, nullptr);
         m_devFuncs->vkDestroySampler(m_device, m_textureSampler, nullptr);
+        if (m_textureUploadCmd)
+            m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &m_textureUploadCmd);
     }
 
     m_projectionDescriptorPool = nullptr;
@@ -59,6 +61,7 @@ void MythPainterVulkan::DoFreeResources(void)
     m_textureShader            = nullptr;
     m_debugMarker              = nullptr;
     m_debugAvailable           = true;
+    m_textureUploadCmd         = nullptr;
     m_textureSampler           = nullptr;
     m_textureLayout            = nullptr; // N.B. owned by shader
     m_texturePipeline          = nullptr;
@@ -304,6 +307,25 @@ void MythPainterVulkan::End(void)
     if (!(m_render && m_frameStarted))
         return;
 
+    // Complete any texture updates first
+    if (m_textureUploadCmd)
+    {
+        m_devFuncs->vkEndCommandBuffer(m_textureUploadCmd);
+        VkSubmitInfo submitinfo { };
+        submitinfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitinfo.commandBufferCount = 1;
+        submitinfo.pCommandBuffers = &m_textureUploadCmd;
+        m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, VK_NULL_HANDLE);
+        m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
+        m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &m_textureUploadCmd);
+        m_textureUploadCmd = nullptr;
+
+        // release staging buffers which are no longer needed
+        for (auto * texture : m_stagedTextures)
+            texture->StagingFinished();
+        m_stagedTextures.clear();
+    }
+
     // Tell the renderer that we are requesting a frame start
     m_render->SetFrameExpected();
 
@@ -410,7 +432,10 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
     MythTextureVulkan *texture = nullptr;
     for (;;)
     {
-        texture = MythTextureVulkan::Create(m_render, m_device, m_devFuncs, Image, m_textureSampler);
+        if (!m_textureUploadCmd)
+            m_textureUploadCmd = m_render->CreateSingleUseCommandBuffer();
+        texture = MythTextureVulkan::Create(m_render, m_device, m_devFuncs, Image,
+                                            m_textureSampler, m_textureUploadCmd);
         if (texture)
             break;
 
@@ -477,6 +502,7 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
         write.pImageInfo = &imagedesc;
         m_devFuncs->vkUpdateDescriptorSets(m_device, 1, &write, 0, nullptr);
         texture->AddDescriptor(descset);
+        m_stagedTextures.emplace_back(texture);
     }
 
     CheckFormatImage(Image);

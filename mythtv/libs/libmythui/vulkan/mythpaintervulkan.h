@@ -65,10 +65,12 @@ class MythPainterVulkan : public QObject, public MythPainter
     VkDescriptorPool  m_textureDescriptorPool { nullptr };
     bool              m_textureDescriptorsCreated { false };
     std::vector<VkDescriptorSet> m_availableTextureDescriptors;
+    VkCommandBuffer   m_textureUploadCmd { nullptr };
 
     bool              m_frameStarted     { false   };
     QSize             m_lastSize         { 0, 0    };
 
+    std::vector<MythTextureVulkan*>      m_stagedTextures;
     std::vector<MythTextureVulkan*>      m_queuedTextures;
     QMap<MythImage*, MythTextureVulkan*> m_imageToTextureMap;
     std::list<MythImage*>                m_imageExpire;
