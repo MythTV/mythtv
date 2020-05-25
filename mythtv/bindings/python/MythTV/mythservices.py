@@ -28,8 +28,9 @@ XML data to/from the host.
 
 # Version History:
 #   1.0.0     2020-05-20 Initial
+#   1.1.0     2020-05-25 Added evaluation of simple responses
 
-__VERSION__ = "1.0.0"
+__VERSION__ = "1.1.0"
 
 
 import sys
@@ -229,7 +230,13 @@ class MythServiceCache( metaclass=ParameterizedSingleton ):
                             type_ns, type_value = t.get('type').split(':')
                             if (t.get('maxOccurs', '') == 'unbounded'):
                                 # add arrays immediately
-                                d_list.append({item.get('name') : [type_value]})
+                                if type_ns == 'xs':
+                                    # basic type, add conversion rule
+                                    t_value = _get_type(t.get('type'),
+                                              t.get('nillable', None))
+                                else:
+                                    t_value = type_value
+                                d_list.append({item.get('name') : [t_value]})
                                 continue
                             elif (type_ns == 'xs'):
                                 element_dict[t.get('name')] = \
@@ -342,8 +349,8 @@ class MythServiceData( DictData ):
         required by the DictData class for building an object for the
         MythTV Python Bindings:
         - self.data: holds the actual values of each field (as strings)
-        - self._field_type: holds the keys for each field
-        - self._field_order: holds the index to the transition function
+        - self._field_order: holds the keys for each field
+        - self._field_type: holds the index to the transition function
         Shorcuts are used for the various usages of the 'ArrayOf' lists,
         the 'MapOf' dictionaries and the ".Type" enums.
         Note: 'MapfOf' is a list of tuples (key, value), which is
@@ -493,14 +500,15 @@ class MythTVService( MythServiceData ):
     User Interface to the MythTV's Services:
 
     This class can be used in two ways:
-    
+
     Either to be called directly with all parameters to perform an operation:
     Each operation consists of a call to - and a reception of - the selected
     MythTVService. A direct call uses at least the following parameters:
       - service: the service category one is asking for (e.g.: 'Dvr'
-        optype = 'POST' # or 'GET'get
+        optype = 'POST' # or 'GET'
       - opdata: a dictionary describing the data needed to perform the
                 operation.
+    The result of this direct call is stored in 'self.operation_result'.
 
     Or 'MythTVService' is used sequentially by calling:
       - getoperation
@@ -510,7 +518,7 @@ class MythTVService( MythServiceData ):
     An instance of the 'MythTVService' class can be reused to perform multiple
     operations of the same service type.
 
-    Example:
+    Example of an operation:
       ms = MythTVService('Channel', host)
       op = ms.getoperation('GetChannelInfoList')
       op['opdata']['SourceID'] = 1
@@ -520,6 +528,10 @@ class MythTVService( MythServiceData ):
       if ms.perform_operation(op_encoded):
             # 'ms' is now an object of type 'GetChannelInfoList'
             print(ms.channelinfos[0].chanid)
+      print(ms.operation_version)
+
+    Note: The 'operation_version' attribue is only available for complex
+          operations.
 
     Notes about naming convention:
     The MythTV Python Bindings use lower-case names for their attributes.
@@ -555,7 +567,7 @@ class MythTVService( MythServiceData ):
         self.host = host
         self.port = port
         self.operation = None
-        self.opresult = None
+        self.operation_result = None
         MythServiceData.__init__(self, service, host, port=port)
         # initialize connection via MythServiceAPI
         self.request = ServiceAPI(host, port)
@@ -570,7 +582,7 @@ class MythTVService( MythServiceData ):
                 else:
                     op["opdata"] = {}
                 opdict = self.encode_operation(op)
-                self.opresult = self.perform_operation(opdict)
+                self.perform_operation(opdict)
             except:
                 raise MythError("Unable to perform operation '%s': '%s': '%s'!"
                                 %(opname, optype, opdata))
@@ -601,14 +613,60 @@ class MythTVService( MythServiceData ):
         self.operation = op
         return(self.getdefault(self.operations_dict[op]))
 
+    def _eval_response(self, eroot):
+        """
+        Evaluate xml data and transform them to the correct data types:
+        Fill the DictData object with xml data:
+        - self.data: holds the actual values of each field (as strings)
+        - self._field_order: holds the keys for each field
+        - self._field_type: holds the index to the transition function
+        """
+        response = self.schema_dict["%sResponse"%self.operation]
+        result_type = response["%sResult"%self.operation]
+        result_name = self.operation.replace("Get", "").lower()
+        res = False
+        if isinstance(result_type, int):
+            # basic type, transform it:
+            self.data.append(eroot.text)
+            self._field_order.append(result_name)
+            self._field_type.append(result_type)
+            res = True
+        else:
+            try:
+                # check if it is an array
+                if result_type.lower().startswith("arrayof"):
+                    data = []
+                    result_type_index = self.schema_dict[result_type][0]
+                    for el in eroot:
+                        data.append(self._trans[result_type_index](el.text))
+                    self.data.append(data)
+                    self._field_order.append(result_name)
+                    self._field_type.append(9)             # hardcoded for a list
+                    res = True
+            except AttributeError:
+                raise MythError("Unknown type of result: {0}".format(result_type))
+        if res:
+            self._process(self.data)
+        return(res)
+
     def perform_operation(self, opdict):
         """
         Actually performs the operation given by a dictionary.
         like http://<hostip>:6544/Dvr/GetRecordedList?Descending=True&Count=3
+        The xml data retrieved from the host are of different types:
+        - a simple response containing only values or list of values,
+          like the response to 'GetHostName' or 'GetHosts'.
+          Simple responses get evaluated and are returned directly.
+        - a complex response containing a xml namespace and a version,
+          like the response to 'ChannelInfo' or 'ChannelInfoList'.
+          Complex responses will be objectified within this class.
+          The version of these responses is stored in 'self.operation_version'.
+        The result of this method is stored in 'self.operation_result'.
         """
         self.operation = opdict['opname']
         messagetype = opdict['optype']
         with self.request as api_request:
+            result = None
             if messagetype == 'GET':
                 self.log(MythLog.HTTP, MythLog.INFO, "Perform Operation"
                         "'%s': 'GET': %s" %(self.operation, opdict['opdata']))
@@ -625,13 +683,17 @@ class MythTVService( MythServiceData ):
                     if str(warning).startswith("Image file"):
                        r = str(warning).replace('Image file = ','')
                        result = r.strip('"')
+                       self.operation_result = result
                        return(result)
                     else:
                        raise MythError("Unknown result from 'send' operation")
                 eroot = etree.fromstring(result)
                 #print(etree.tostring(eroot, pretty_print=True, encoding='unicode'))
-                self.perform(eroot)
-                return(True)
+                if eroot.tag in self.schema_dict.keys():
+                    self.perform(eroot)
+                    result = True
+                else:
+                    result = self._eval_response(eroot)
             elif messagetype == 'POST':
                 endpoint = '%s/%s'%(self.service, self.operation)
                 opts = {'rawxml': True, 'wrmi': True}
@@ -649,11 +711,13 @@ class MythTVService( MythServiceData ):
                     # the "Response" message is  used in all wsdls the same way
                     out_msg = opdict['opname']+"Response"
                     k, v = self.schema_dict[out_msg].items()[0]
-                    return(self._trans[v](el.text))
+                    result = self._trans[v](el.text)
                 except:
                     raise MythError("Unknown post data :{0}".format(post))
             else:
                 raise MythError("Unknown operation for {0}".format(messagetype))
+            self.operation_result = result
+            return(result)
 
     def strip_operation_defaults(self, operation, op):
         """
