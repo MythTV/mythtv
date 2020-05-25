@@ -1427,7 +1427,7 @@ class ServiceRelocatedDescriptor : public MPEGDescriptor
     // old_service_id                  16   7.0
     uint OldOriginalNetworkID(void) const { return (m_data[3] << 8) | m_data[4]; }
     uint OldTransportID(void) const { return (m_data[5] << 8) | m_data[6]; }
-    uint OldServiceID(void) const { return (m_data[5] << 8) | m_data[6]; }
+    uint OldServiceID(void) const { return (m_data[7] << 8) | m_data[8]; }
 
     QString toString(void) const override; // MPEGDescriptor
 };

@@ -403,11 +403,15 @@ QString MPEGDescriptor::DescriptorTagString(void) const
 QString MPEGDescriptor::descrDump(const QString &name) const
 {
     QString str;
-    str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")
+    str = QString("%1 Descriptor (0x%2) length(%3).")
             .arg(name)
             .arg(DescriptorTag(),2,16,QChar('0'))
             .arg(DescriptorLength());
-    str.append(hexdump());
+    if (DescriptorLength() > 0)
+    {
+        str.append(" Dumping\n");
+        str.append(hexdump());
+    }
     return str;
 }
 

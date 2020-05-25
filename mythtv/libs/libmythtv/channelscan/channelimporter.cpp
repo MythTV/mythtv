@@ -1118,7 +1118,7 @@ void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports) 
         ChannelInsertInfoList filtered;
         for (auto & channel : transport.m_channels)
         {
-            uint64_t key = ((uint64_t)channel.m_origNetId    << 32) | (channel.m_sdtTsId << 16) | channel.m_serviceId;
+            uint64_t key = ((uint64_t)channel.m_origNetId << 32) | (channel.m_sdtTsId << 16) | channel.m_serviceId;
             if (rs.value(key, false))
             {
                 QString msg = FormatChannel(transport, channel);

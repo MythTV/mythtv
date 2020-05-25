@@ -762,16 +762,16 @@ uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
 QString PSIPTable::toString(void) const
 {
     QString str;
-    str.append(QString(" PSIP tableID(0x%1) length(%2) extension(0x%3)\n")
+    str.append(QString("  PSIP tableID(0x%1) length(%2) extension(0x%3)\n")
                .arg(TableID(), 0, 16).arg(Length())
                .arg(TableIDExtension(), 0, 16));
-    str.append(QString("      version(%1) current(%2) "
+    str.append(QString("       version(%1) current(%2) "
                        "section(%3) last_section(%4)\n")
                .arg(Version()).arg(static_cast<int>(IsCurrent()))
                .arg(Section()).arg(LastSection()));
     if ((TableID() >= TableID::MGT) && (TableID() <= TableID::SRM))
     {
-        str.append(QString("      atsc_protocol_version(%1)\n")
+        str.append(QString("       atsc_protocol_version(%1)\n")
                    .arg(ATSCProtocolVersion()));
     }
     return str;
@@ -816,7 +816,7 @@ QString ProgramAssociationTable::toString(void) const
     QString str;
     str.append(QString("Program Association Section\n"));
     str.append(PSIPTable::toString());
-    str.append(QString("      tsid(%1) ").arg(TransportStreamID()));
+    str.append(QString("       tsid(%1) ").arg(TransportStreamID()));
     str.append(QString("programCount(%1)\n").arg(ProgramCount()));
 
     uint cnt0 = 0;
@@ -881,7 +881,7 @@ QString ProgramMapTable::toString(void) const
     QString str =
         QString("Program Map Section"
                 "\n%1"
-                "      pnum(%2) pid(0x%3) pcrpid(0x%4)\n")
+                "       pnum(%2) pid(0x%3) pcrpid(0x%4)\n")
         .arg(PSIPTable::toString())
         .arg(ProgramNumber())
         .arg(tsheader()->PID(),0,16)
