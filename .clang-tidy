@@ -70,6 +70,9 @@ Checks: '-*,
         # all appear to be within Qt code that cant be fixed by us. ,
        -cert-err58-cpp,
 
+        # Alias for bugprone-signed-char-misuse,
+       -cert-str34-c,
+
     clang-analyzer-*,
         # Not tested. ,
        -clang-analyzer-apiModeling.*,
@@ -163,6 +166,12 @@ Checks: '-*,
         # Cases exist. Need to add getters/setters to classes. ,
        -misc-non-private-member-variables-in-classes,
 
+        # The Q_DECLARE_METATYPE_IMPL macro triggers a warning from
+        # this checker. There are also a handful of places where
+        # MythTV uses recursion on purpose. These should be checked to
+        # ensure there are no problems. ,
+       -misc-no-recursion,
+
     modernize-*,
 
         # Lots of changes to be done. ,
@@ -179,7 +188,7 @@ Checks: '-*,
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
-        # Disable new tests for now. ,
+        # Disable newer C++14/17 tests for now. ,
        -modernize-make-unique,
        -modernize-use-transparent-functors,
        -modernize-concat-nested-namespaces,
