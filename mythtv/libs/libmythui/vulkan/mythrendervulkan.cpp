@@ -270,9 +270,11 @@ void MythRenderVulkan::EndFrame(void)
 
 void MythRenderVulkan::TransitionImageLayout(VkImage &Image,
                                              VkImageLayout OldLayout,
-                                             VkImageLayout NewLayout)
+                                             VkImageLayout NewLayout,
+                                             VkCommandBuffer CommandBuffer)
 {
-    VkCommandBuffer commandbuffer = CreateSingleUseCommandBuffer();
+
+    VkCommandBuffer commandbuffer = CommandBuffer ? CommandBuffer : CreateSingleUseCommandBuffer();
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -310,12 +312,15 @@ void MythRenderVulkan::TransitionImageLayout(VkImage &Image,
 
     m_devFuncs->vkCmdPipelineBarrier(commandbuffer, sourceStage, destinationStage,
                                      0, 0, nullptr, 0, nullptr, 1, &barrier);
-    FinishSingleUseCommandBuffer(commandbuffer);
+    if (!CommandBuffer)
+        FinishSingleUseCommandBuffer(commandbuffer);
 }
 
-void MythRenderVulkan::CopyBufferToImage(VkBuffer Buffer, VkImage Image, uint32_t Width, uint32_t Height)
+void MythRenderVulkan::CopyBufferToImage(VkBuffer Buffer, VkImage Image,
+                                         uint32_t Width, uint32_t Height,
+                                         VkCommandBuffer CommandBuffer)
 {
-    VkCommandBuffer commandbuffer = CreateSingleUseCommandBuffer();
+    VkCommandBuffer commandbuffer = CommandBuffer ? CommandBuffer : CreateSingleUseCommandBuffer();
     VkBufferImageCopy region { };
     region.bufferOffset      = 0;
     region.bufferRowLength   = 0;
@@ -327,7 +332,8 @@ void MythRenderVulkan::CopyBufferToImage(VkBuffer Buffer, VkImage Image, uint32_
     region.imageOffset = { 0, 0, 0 };
     region.imageExtent = { Width, Height, 1 };
     m_devFuncs->vkCmdCopyBufferToImage(commandbuffer, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-    FinishSingleUseCommandBuffer(commandbuffer);
+    if (!CommandBuffer)
+        FinishSingleUseCommandBuffer(commandbuffer);
 }
 
 void MythRenderVulkan::CopyBuffer(VkBuffer Src, VkBuffer Dst, VkDeviceSize Size, VkCommandBuffer CommandBuffer)

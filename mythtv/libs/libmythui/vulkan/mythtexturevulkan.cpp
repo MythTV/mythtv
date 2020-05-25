@@ -8,11 +8,12 @@
 #define LOC QString("VulkanTex: ")
 
 MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice Device,
-                                             QVulkanDeviceFunctions* Functions, QImage *Image, VkSampler Sampler)
+                                             QVulkanDeviceFunctions* Functions, QImage *Image,
+                                             VkSampler Sampler, VkCommandBuffer CommandBuffer)
 {
     MythTextureVulkan* result = nullptr;
     if (Image)
-        result = new MythTextureVulkan(Render, Device, Functions, Image, Sampler);
+        result = new MythTextureVulkan(Render, Device, Functions, Image, Sampler, CommandBuffer);
 
     if (result && !result->m_valid)
     {
@@ -24,7 +25,8 @@ MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice 
 
 MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
                                      QVulkanDeviceFunctions* Functions,
-                                     QImage *Image, VkSampler Sampler)
+                                     QImage *Image, VkSampler Sampler,
+                                     VkCommandBuffer CommandBuffer)
   : MythVulkanObject(Render, Device, Functions),
     MythComboBufferVulkan(Image->width(), Image->height()),
     m_width(static_cast<uint32_t>(Image->width())),
@@ -47,11 +49,9 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
     auto data = Image->constBits();
 
     // Create staging buffer
-    VkBuffer stagingbuf;
-    VkDeviceMemory stagingmem;
     if (!Render->CreateBuffer(datasize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                              stagingbuf, stagingmem))
+                              m_stagingBuffer, m_stagingMemory))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create staging buffer");
         return;
@@ -59,20 +59,24 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
 
     // Map memory and copy data
     void* memory;
-    Functions->vkMapMemory(Device, stagingmem, 0, datasize, 0, &memory);
+    Functions->vkMapMemory(Device, m_stagingMemory, 0, datasize, 0, &memory);
     memcpy(memory, data, static_cast<size_t>(datasize));
-    Functions->vkUnmapMemory(Device, stagingmem);
+    Functions->vkUnmapMemory(Device, m_stagingMemory);
 
     // Create image
     if (Render->CreateImage(Image->size(), VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
                             VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_image, m_deviceMemory))
     {
+        VkCommandBuffer commandbuffer = CommandBuffer ? CommandBuffer : Render->CreateSingleUseCommandBuffer();
+
         // Transition
-        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        Render->CopyBufferToImage(stagingbuf, m_image, static_cast<uint32_t>(Image->width()),
-                                  static_cast<uint32_t>(Image->height()));
-        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_UNDEFINED,
+                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, commandbuffer);
+        Render->CopyBufferToImage(m_stagingBuffer, m_image, static_cast<uint32_t>(Image->width()),
+                                  static_cast<uint32_t>(Image->height()), commandbuffer);
+        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandbuffer);
 
         // Create sampler if needed
         if (!Sampler)
@@ -101,14 +105,19 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
 
         m_dataSize = datasize;
         m_valid = m_sampler && m_view;
+
+        if (!CommandBuffer)
+            Render->FinishSingleUseCommandBuffer(commandbuffer);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create texture image");
     }
 
-    Functions->vkDestroyBuffer(Device, stagingbuf, nullptr);
-    Functions->vkFreeMemory(Device, stagingmem, nullptr);
+    // If this is a single use command buffer, staging is complete and we can
+    // release the staging resources
+    if (!CommandBuffer)
+        StagingFinished();
 }
 
 MythTextureVulkan::~MythTextureVulkan()
@@ -118,12 +127,21 @@ MythTextureVulkan::~MythTextureVulkan()
 
     if (m_device && m_devFuncs)
     {
+        StagingFinished();
         if (m_createdSampler)
             m_devFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
         m_devFuncs->vkDestroyImageView(m_device, m_view, nullptr);
         m_devFuncs->vkDestroyImage(m_device, m_image, nullptr);
         m_devFuncs->vkFreeMemory(m_device, m_deviceMemory, nullptr);
     }
+}
+
+void MythTextureVulkan::StagingFinished(void)
+{
+    m_devFuncs->vkDestroyBuffer(m_device, m_stagingBuffer, nullptr);
+    m_devFuncs->vkFreeMemory(m_device, m_stagingMemory, nullptr);
+    m_stagingBuffer = nullptr;
+    m_stagingMemory = nullptr;
 }
 
 VkDescriptorImageInfo MythTextureVulkan::GetDescriptorImage(void) const

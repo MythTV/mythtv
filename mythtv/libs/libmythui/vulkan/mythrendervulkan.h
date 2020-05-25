@@ -52,8 +52,11 @@ class MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public My
     bool            CreateImage(QSize Size, VkFormat Format, VkImageTiling Tiling,
                                 VkImageUsageFlags Usage, VkMemoryPropertyFlags Properties,
                                 VkImage& Image, VkDeviceMemory& ImageMemory);
-    void            TransitionImageLayout(VkImage &Image, VkImageLayout OldLayout, VkImageLayout NewLayout);
-    void            CopyBufferToImage(VkBuffer Buffer, VkImage Image, uint32_t Width, uint32_t Height);
+    void            TransitionImageLayout(VkImage &Image, VkImageLayout OldLayout,
+                                          VkImageLayout NewLayout, VkCommandBuffer CommandBuffer = nullptr);
+    void            CopyBufferToImage(VkBuffer Buffer, VkImage Image,
+                                      uint32_t Width, uint32_t Height,
+                                      VkCommandBuffer CommandBuffer = nullptr);
     bool            CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage,
                                  VkMemoryPropertyFlags Properties, VkBuffer& Buffer,
                                  VkDeviceMemory& Memory);
