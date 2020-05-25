@@ -205,8 +205,6 @@ bool XMLTVParser::parseFile(
     QString aggregatedTitle;
     QString aggregatedDesc;
     bool haveReadTV = false;
-    QString last_channel = ""; //xmltvId of the last program element we read
-    QDateTime last_starttime; //starttime of the last program element we read
     while (!xml.atEnd() && !xml.hasError() && (! (xml.isEndElement() && xml.name() == "tv")))
     {
         if (xml.readNextStartElement())
@@ -709,23 +707,6 @@ bool XMLTVParser::parseFile(
                 else
                 {
                     // so we have a (relatively) clean program element now, which is good enough to process or to store
-                    if (pginfo->m_channel != last_channel) {
-                        //we have a channel change here
-                        last_channel = pginfo->m_channel;
-                        last_starttime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)); //initialize it to a time far, far away ...
-                    }
-                    else {
-                        //we are still on the same channel
-                        if (pginfo->m_starttime >= last_starttime) {
-                            last_starttime = pginfo->m_starttime;
-                        }
-                        else {
-                            LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, program out of order at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
-                            delete pginfo;
-                            return false;
-                        }
-                    }
-
                     if (pginfo->m_clumpidx.isEmpty())
                         (*proglist)[pginfo->m_channel].push_back(*pginfo);
                     else
