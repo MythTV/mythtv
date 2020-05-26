@@ -330,7 +330,7 @@ QString MythDRMDevice::FindBestDevice(void)
         return QString();
     }
 
-    foreach (const auto & dev, devices)
+    for (const auto& dev : qAsConst(devices))
     {
         QString device = root + dev;
         if (!ConfirmDevice(device))

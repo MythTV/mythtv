@@ -459,7 +459,7 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &Renderer)
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(Renderer).arg(m_lastVideoRenderer));
 
-    foreach (const auto & group, s_safe_renderer_group)
+    for (const auto& group : qAsConst(s_safe_renderer_group))
         if (group.contains(m_lastVideoRenderer) && group.contains(Renderer))
             return true;
     return false;
@@ -769,7 +769,7 @@ QStringList VideoDisplayProfile::GetDecoderNames(void)
     QStringList list;
 
     const QStringList decs = GetDecoders();
-    foreach (const auto & dec, decs)
+    for (const auto& dec : qAsConst(decs))
         list += GetDecoderName(dec);
 
     return list;
@@ -1333,7 +1333,7 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, co
         .arg(Decoder).arg(dec_list.join(",")));
     QStringList new_list;
 
-    foreach (const auto & dec, dec_list)
+    for (const auto& dec : qAsConst(dec_list))
         if (Renderers.contains(dec))
             new_list.push_back(dec);
 
@@ -1348,7 +1348,7 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
     uint    top_priority = 0;
     QString top_renderer;
 
-    foreach (const auto & renderer, Renderers)
+    for (const auto& renderer : qAsConst(Renderers))
     {
         QMap<QString,uint>::const_iterator p = s_safe_renderer_priority.find(renderer);
         if ((p != s_safe_renderer_priority.end()) && (*p >= top_priority))
@@ -1407,10 +1407,12 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
     AvFormatDecoder::GetDecoders(options);
     MythVideoOutput::GetRenderOptions(options);
 
-    foreach(QString decoder, s_safe_decoders)
+    for (const QString& decoder : qAsConst(s_safe_decoders))
+    {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("decoder<->render support: %1%2")
                 .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
+    }
 
     s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_NONE,   QObject::tr("None")));
     s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_LOW,    QObject::tr("Low quality")));

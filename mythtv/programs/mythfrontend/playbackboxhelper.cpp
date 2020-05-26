@@ -125,7 +125,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
     list.push_back(QString::number(tm.second()));
     list.push_back(QString::number(tm.msec()));
 
-    foreach (auto type, cats)
+    for (auto type : qAsConst(cats))
     {
         if (type == kCheckForCache && cats.size() > 1)
             continue;
@@ -389,7 +389,7 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
     QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
 
     QMutexLocker locker(&m_lock);
-    foreach (auto & fsInfo, fsInfos)
+    for (const auto& fsInfo : qAsConst(fsInfos))
     {
         if (fsInfo.getPath() == "TotalDiskSpace")
         {

@@ -451,10 +451,10 @@ void MythCCExtractorPlayer::Ingest708Caption(
     cc708win[windowIdx].text = winContent;
 
     QMap<uint, QStringList> orderedContent;
-    foreach (const auto & ccIt, cc708win)
+    for (const auto& ccIt : qAsConst(cc708win))
     {
         uint idx = ccIt.row * 1000 + ccIt.column;
-        foreach (const auto & str, ccIt.text)
+        for (const auto& str : qAsConst(ccIt.text))
         {
             orderedContent[idx] += str;
         }

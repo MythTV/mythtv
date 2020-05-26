@@ -232,7 +232,7 @@ class APHTTPRequest
 
     QByteArray GetQueryValue(const QByteArray& key)
     {
-        foreach (auto & query, m_queries)
+        for (const auto& query : qAsConst(m_queries))
             if (query.first == key)
                 return query.second;
         return "";
@@ -242,7 +242,7 @@ class APHTTPRequest
     {
         QMap<QByteArray,QByteArray> result;
         QList<QByteArray> lines = m_body.split('\n');;
-        foreach (QByteArray line, lines)
+        for (const QByteArray& line : qAsConst(lines))
         {
             int index = line.indexOf(":");
             if (index > 0)
@@ -432,7 +432,7 @@ void MythAirplayServer::Teardown(void)
     m_bonjour = nullptr;
 
     // disconnect connections
-    foreach (QTcpSocket* connection, m_sockets)
+    for (QTcpSocket* connection : qAsConst(m_sockets))
     {
         disconnect(connection, nullptr, nullptr, nullptr);
         delete connection;
@@ -440,7 +440,7 @@ void MythAirplayServer::Teardown(void)
     m_sockets.clear();
 
     // remove all incoming buffers
-    foreach (APHTTPRequest* request, m_incoming)
+    for (APHTTPRequest* request : qAsConst(m_incoming))
     {
         delete request;
     }

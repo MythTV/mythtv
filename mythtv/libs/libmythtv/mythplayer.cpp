@@ -140,7 +140,7 @@ void MythMultiLocker::Unlock(void)
 
 void MythMultiLocker::Relock(void)
 {
-    foreach (auto lock, m_locks)
+    for (auto *lock : qAsConst(m_locks))
         if (lock)
             lock->lock();
 }

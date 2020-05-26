@@ -89,7 +89,7 @@ void MythMenu::AddItem(MythMenuItem *item, bool selected, MythMenu *subMenu)
 
 void MythMenu::SetSelectedByTitle(const QString& title)
 {
-    foreach (auto & item, m_menuItems)
+    for (auto *item : qAsConst(m_menuItems))
     {
         if (!item)
             continue;
@@ -104,7 +104,7 @@ void MythMenu::SetSelectedByTitle(const QString& title)
 
 void MythMenu::SetSelectedByData(const QVariant& data)
 {
-    foreach (auto & item, m_menuItems)
+    for (auto *item : qAsConst(m_menuItems))
     {
         if (!item)
             continue;

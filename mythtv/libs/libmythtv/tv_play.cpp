@@ -1452,7 +1452,7 @@ void TV::GetStatus(void)
             QList<long long> chapters;
             ctx->m_player->GetChapterTimes(chapters);
             QVariantList var;
-            foreach (long long chapter, chapters)
+            for (long long chapter : qAsConst(chapters))
                 var << QVariant(chapter);
             status.insert("chaptertimes", var);
         }
@@ -2007,7 +2007,7 @@ void TV::HandleOSDAskAllow(PlayerContext *ctx, const QString& action)
     }
     else if (action == "CANCELCONFLICTING")
     {
-        foreach (auto & pgm, m_askAllowPrograms)
+        for (const auto& pgm : qAsConst(m_askAllowPrograms))
         {
             if (pgm.m_isConflicting)
                 RemoteCancelNextRecording(pgm.m_info->GetInputID(), true);
@@ -4112,7 +4112,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
     else
     {
         handled = false;
-        foreach (const auto & action, actions)
+        for (const auto& action : qAsConst(actions))
         {
             if (action.length() == 1 && action[0].isDigit())
             {
@@ -7719,7 +7719,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
                     chanid = get_chanid(ctx, ctx->GetCardID(), chan);
                 tunable_on = IsTunableOn(ctx, chanid);
             }
-            foreach (const auto & rec, tmp)
+            for (const auto& rec : qAsConst(tmp))
             {
                 if ((chanid == 0U) || tunable_on.contains(rec.toUInt()))
                     reclist.push_back(rec);
@@ -8403,7 +8403,7 @@ bool TV::IsTunable(uint chanid)
 static QString toCommaList(const QSet<uint> &list)
 {
     QString ret = "";
-    foreach (uint i, list)
+    for (uint i : qAsConst(list))
         ret += QString("%1,").arg(i);
 
     if (ret.length())
@@ -12344,7 +12344,7 @@ bool TV::HandleJumpToProgramAction(
         return true;
     }
 
-    foreach (const auto & action, actions)
+    for (const auto& action : qAsConst(actions))
     {
         if (!action.startsWith("JUMPPROG"))
             continue;

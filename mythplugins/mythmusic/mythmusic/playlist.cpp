@@ -758,7 +758,7 @@ void Playlist::fillSonglistFromQuery(const QString& whereClause,
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
             bool bFound = false;
             QString tempList;
-            foreach (auto & song, list)
+            for (const auto& song : qAsConst(list))
             {
                 int an_int = song.toInt();
                 tempList += "," + song;

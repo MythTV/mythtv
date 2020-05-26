@@ -417,7 +417,7 @@ public:
         if (!copy)
             return;
         // copy all the segments across
-        foreach (auto old, m_segments)
+        for (auto *old : qAsConst(m_segments))
         {
             auto *segment = new HLSSegment(*old);
             AppendSegment(segment);
@@ -426,7 +426,7 @@ public:
 
     ~HLSStream()
     {
-        foreach (auto & segment, m_segments)
+        for (const auto & segment : qAsConst(m_segments))
             delete segment;
     }
 
@@ -773,7 +773,7 @@ public:
     void Cancel(void)
     {
         QMutexLocker lock(&m_lock);
-        foreach (auto & segment, m_segments)
+        for (const auto & segment : qAsConst(m_segments))
         {
             if (segment)
             {
@@ -1754,7 +1754,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
         return QString();
 
     QStringList list = line.mid(p+1).split(',');
-    foreach (auto & it, list)
+    for (const auto& it : qAsConst(list))
     {
         QString arg = it.trimmed();
         if (arg.startsWith(attr))
