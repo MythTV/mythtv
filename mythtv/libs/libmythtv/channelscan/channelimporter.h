@@ -145,7 +145,7 @@ class MTV_PUBLIC ChannelImporter
     static void MergeSameFrequency(ScanDTVTransportList &transports);
     static void RemoveDuplicates(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates);
     void FilterServices(ScanDTVTransportList &transports) const;
-    void FilterRelocatedServices(ScanDTVTransportList &transports) const;
+    static void FilterRelocatedServices(ScanDTVTransportList &transports);
 
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList &transports) const;

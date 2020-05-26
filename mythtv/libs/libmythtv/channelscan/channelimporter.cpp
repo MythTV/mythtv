@@ -1093,7 +1093,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
     }
 }
 
-void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports) const
+void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports)
 {
     QMap<uint64_t, bool> rs;
     QElapsedTimer timer;
