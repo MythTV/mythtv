@@ -37,7 +37,7 @@
 
 static QString coderate_inner(uint coderate);
 
-extern QString dvb_decode_text(const unsigned char *src, uint length,
+MTV_PUBLIC QString dvb_decode_text(const unsigned char *src, uint length,
                                const unsigned char *encoding_override,
                                uint encoding_override_length);
 
@@ -1514,7 +1514,7 @@ class DSNGDescriptor : public MPEGDescriptor
 };
 
 // DVB Bluebook A038 (Sept 2011) p 58
-class ExtendedEventDescriptor : public MPEGDescriptor
+class MTV_PUBLIC ExtendedEventDescriptor : public MPEGDescriptor
 {
   public:
     explicit ExtendedEventDescriptor(const unsigned char *data, int len = 300) :

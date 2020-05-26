@@ -10,7 +10,7 @@
 #include "programdata.h"
 
 /// EIT Fix Up Functions
-class EITFixUp
+class MTV_PUBLIC EITFixUp
 {
   protected:
     // max length of subtitle field in db.
