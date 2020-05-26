@@ -744,7 +744,7 @@ class VideoDialogPrivate
         if (metadata && !m_ratingToPl.empty())
         {
             QString rating = metadata->GetRating();
-            for (parental_level_map::const_iterator p = m_ratingToPl.begin();
+            for (auto p = m_ratingToPl.begin();
                     !rating.isEmpty() && p != m_ratingToPl.end(); ++p)
             {
                 if (rating.indexOf(p->first) != -1)
@@ -867,7 +867,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, const QString& lname,
 VideoDialog::~VideoDialog()
 {
     if (!m_d->m_switchingLayout)
-        m_d->DelayVideoListDestruction(m_d->m_videoList);
+        VideoDialogPrivate::DelayVideoListDestruction(m_d->m_videoList);
 
     SavePosition();
 

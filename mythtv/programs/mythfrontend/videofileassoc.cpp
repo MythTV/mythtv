@@ -231,7 +231,7 @@ class FileAssocDialogPrivate
         MythUIButtonListItem *item = buttonList->GetItemCurrent();
         if (item)
         {
-            UIDToFAPair key = item->GetData().value<UIDToFAPair>();
+            auto key = item->GetData().value<UIDToFAPair>();
             if (key.m_fileAssoc)
             {
                 return key.m_fileAssoc;
@@ -387,23 +387,23 @@ void FileAssocDialog::OnFASelected(MythUIButtonListItem *item)
 
 void FileAssocDialog::OnUseDefaltChanged()
 {
-    if (m_private->GetCurrentFA(m_extensionList))
-        m_private->GetCurrentFA(m_extensionList)->
-                SetDefault(m_defaultCheck->GetBooleanCheckState());
+    FileAssociationWrap *wrap = FileAssocDialogPrivate::GetCurrentFA(m_extensionList);
+    if (wrap != nullptr)
+        wrap->SetDefault(m_defaultCheck->GetBooleanCheckState());
 }
 
 void FileAssocDialog::OnIgnoreChanged()
 {
-    if (m_private->GetCurrentFA(m_extensionList))
-        m_private->GetCurrentFA(m_extensionList)->
-                SetIgnore(m_ignoreCheck->GetBooleanCheckState());
+    FileAssociationWrap *wrap = FileAssocDialogPrivate::GetCurrentFA(m_extensionList);
+    if (wrap != nullptr)
+        wrap->SetIgnore(m_ignoreCheck->GetBooleanCheckState());
 }
 
 void FileAssocDialog::OnPlayerCommandChanged()
 {
-    if (m_private->GetCurrentFA(m_extensionList))
-        m_private->GetCurrentFA(m_extensionList)->
-                SetCommand(m_commandEdit->GetText());
+    FileAssociationWrap *wrap = FileAssocDialogPrivate::GetCurrentFA(m_extensionList);
+    if (wrap != nullptr)
+        wrap->SetCommand(m_commandEdit->GetText());
 }
 
 void FileAssocDialog::OnDonePressed()
@@ -417,7 +417,7 @@ void FileAssocDialog::OnDeletePressed()
     MythUIButtonListItem *item = m_extensionList->GetItemCurrent();
     if (item)
     {
-        UIDToFAPair key = item->GetData().value<UIDToFAPair>();
+        auto key = item->GetData().value<UIDToFAPair>();
         if (key.m_fileAssoc && m_private->DeleteExtension(key.m_uid))
             delete item;
     }
@@ -475,7 +475,7 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         MythUIButtonListItem *current_item = m_extensionList->GetItemCurrent();
         if (current_item)
         {
-            UIDToFAPair key = current_item->GetData().value<UIDToFAPair>();
+            auto key = current_item->GetData().value<UIDToFAPair>();
             if (key.m_fileAssoc)
             {
                 selected_id = key.m_uid;
@@ -505,7 +505,7 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         current_item = m_extensionList->GetItemCurrent();
         if (current_item)
         {
-            UIDToFAPair key = current_item->GetData().value<UIDToFAPair>();
+            auto key = current_item->GetData().value<UIDToFAPair>();
             if (key.m_fileAssoc)
             {
                 m_commandEdit->SetVisible(true);
