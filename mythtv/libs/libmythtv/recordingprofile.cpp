@@ -1118,6 +1118,12 @@ class VideoCompressionSettings : public GroupSetting
                         m_codecName->addTargetedChild(*Icodec, bit_medium);
                         m_codecName->addTargetedChild(*Icodec, bit_high);
                     }
+                    else
+                    {
+                        // These are only referenced when dynamic_res is true.
+                        delete bit_medium;
+                        delete bit_high;
+                    }
                 }
             }
         }
