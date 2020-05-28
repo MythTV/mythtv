@@ -800,7 +800,7 @@ void ProgDetails::loadPage(void)
                 }
             }
         }
-        if (record->m_searchType != kManualSearch &&
+        if (record && record->m_searchType != kManualSearch &&
             record->m_description != m_progInfo.GetDescription())
             searchPhrase = record->m_description;
     }
