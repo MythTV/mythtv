@@ -3,6 +3,7 @@
 
 // C++ headers
 #include <iostream>
+#include <memory>
 using namespace std;
 
 // Qt headers
@@ -106,15 +107,12 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    auto *lookup = new LookerUpper();
+    std::unique_ptr<LookerUpper> lookup {new LookerUpper};
 
     LOG(VB_GENERAL, LOG_INFO,
             "Testing grabbers and metadata sites for functionality...");
     if (!LookerUpper::AllOK())
-    {
-        delete lookup;
         return GENERIC_EXIT_NOT_OK;
-    }
     LOG(VB_GENERAL, LOG_INFO,
             "All grabbers tested and working.  Continuing...");
 
@@ -163,8 +161,6 @@ int main(int argc, char *argv[])
         sleep(1);
         qApp->processEvents();
     }
-
-    delete lookup;
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythMetadataLookup run complete.");
 
