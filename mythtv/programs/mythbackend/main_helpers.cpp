@@ -631,7 +631,10 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             sched = new Scheduler(true, &tvList);
             int err = sched->GetError();
             if (err)
+            {
+                delete sched;
                 return err;
+            }
 
             if (cmdline.toBool("nosched"))
                 sched->DisableScheduling();
