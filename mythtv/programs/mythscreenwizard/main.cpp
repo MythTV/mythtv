@@ -56,8 +56,6 @@ namespace
 
         ReferenceCounter::PrintDebug();
 
-        delete QCoreApplication::instance();
-
         SignalHandler::Done();
     }
 }
@@ -122,7 +120,7 @@ int main(int argc, char **argv)
     }
 
     MythDisplay::ConfigureQtGUI();
-    new QApplication(argc, argv);
+    QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSCREENWIZARD);
 
     QString mask("general");
