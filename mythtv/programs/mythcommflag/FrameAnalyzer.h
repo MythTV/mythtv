@@ -10,6 +10,8 @@
 /* Base class for commercial flagging video frame analyzers. */
 
 #include <climits>
+#include <memory>
+
 #include <QMap>
 #include "mythframe.h"
 

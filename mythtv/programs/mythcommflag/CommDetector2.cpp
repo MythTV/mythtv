@@ -299,12 +299,17 @@ CommDetector2::CommDetector2(
 {
     FrameAnalyzerItem        pass0;
     FrameAnalyzerItem        pass1;
-    PGMConverter            *pgmConverter = nullptr;
-    BorderDetector          *borderDetector = nullptr;
-    HistogramAnalyzer       *histogramAnalyzer = nullptr;
 
     if (useDB)
         m_debugdir = debugDirectory(chanid, m_recstartts);
+
+    std::shared_ptr<PGMConverter> pgmConverter =
+        std::make_shared<PGMConverter>();
+    std::shared_ptr<BorderDetector> borderDetector =
+        std::make_shared<BorderDetector>();
+    std::shared_ptr<HistogramAnalyzer> histogramAnalyzer =
+        std::make_shared<HistogramAnalyzer>(pgmConverter, borderDetector,
+                                           m_debugdir);
 
     /*
      * Look for blank frames to use as delimiters between commercial and
@@ -312,18 +317,6 @@ CommDetector2::CommDetector2(
      */
     if ((m_commDetectMethod & COMM_DETECT_2_BLANK))
     {
-        if (!pgmConverter)
-            pgmConverter = new PGMConverter();
-
-        if (!borderDetector)
-            borderDetector = new BorderDetector();
-
-        if (!histogramAnalyzer)
-        {
-            histogramAnalyzer = new HistogramAnalyzer(pgmConverter,
-                    borderDetector, m_debugdir);
-        }
-
         if (!m_blankFrameDetector)
         {
             m_blankFrameDetector = new BlankFrameDetector(histogramAnalyzer,
@@ -338,18 +331,6 @@ CommDetector2::CommDetector2(
      */
     if ((m_commDetectMethod & COMM_DETECT_2_SCENE))
     {
-        if (!pgmConverter)
-            pgmConverter = new PGMConverter();
-
-        if (!borderDetector)
-            borderDetector = new BorderDetector();
-
-        if (!histogramAnalyzer)
-        {
-            histogramAnalyzer = new HistogramAnalyzer(pgmConverter,
-                    borderDetector, m_debugdir);
-        }
-
         if (!m_sceneChangeDetector)
         {
             m_sceneChangeDetector = new SceneChangeDetector(histogramAnalyzer,
@@ -366,13 +347,8 @@ CommDetector2::CommDetector2(
      */
     if ((m_commDetectMethod & COMM_DETECT_2_LOGO))
     {
-        if (!pgmConverter)
-            pgmConverter = new PGMConverter();
-
-        if (!borderDetector)
-            borderDetector = new BorderDetector();
-
-        auto *cannyEdgeDetector = new CannyEdgeDetector();
+        std::shared_ptr<CannyEdgeDetector> cannyEdgeDetector =
+            std::make_shared<CannyEdgeDetector>();
 
         if (!m_logoFinder)
         {

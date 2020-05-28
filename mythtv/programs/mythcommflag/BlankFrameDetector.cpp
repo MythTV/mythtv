@@ -370,8 +370,9 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
 
 };  /* namespace */
 
-BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, const QString &debugdir)
-    : m_histogramAnalyzer(ha)
+BlankFrameDetector::BlankFrameDetector(std::shared_ptr<HistogramAnalyzer>ha,
+                                       const QString &debugdir)
+    : m_histogramAnalyzer(std::move(ha))
 {
     /*
      * debugLevel:

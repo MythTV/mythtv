@@ -31,7 +31,9 @@ class TemplateFinder : public FrameAnalyzer
 {
 public:
     /* Ctor/dtor. */
-    TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
+    TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
+                   std::shared_ptr<BorderDetector> bd,
+                   std::shared_ptr<EdgeDetector> ed,
             MythPlayer *player, int proglen, const QString& debugdir);
     ~TemplateFinder(void) override;
 
@@ -54,9 +56,9 @@ public:
 private:
     int resetBuffers(int newwidth, int newheight);
 
-    PGMConverter   *m_pgmConverter     {nullptr};
-    BorderDetector *m_borderDetector   {nullptr};
-    EdgeDetector   *m_edgeDetector     {nullptr};
+    std::shared_ptr<PGMConverter>   m_pgmConverter     {nullptr};
+    std::shared_ptr<BorderDetector> m_borderDetector   {nullptr};
+    std::shared_ptr<EdgeDetector>   m_edgeDetector     {nullptr};
 
     unsigned int    m_sampleTime       {20 * 60}; /* amount of time to analyze */
     int             m_frameInterval;              /* analyze every <Interval> frames */

@@ -16,7 +16,7 @@ class BlankFrameDetector : public FrameAnalyzer
 {
 public:
     /* Ctor/dtor. */
-    BlankFrameDetector(HistogramAnalyzer *ha, const QString& debugdir);
+    BlankFrameDetector(std::shared_ptr<HistogramAnalyzer> ha, const QString& debugdir);
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer
@@ -37,7 +37,7 @@ public:
     int computeBreaks(FrameMap *breaks);
 
 private:
-    HistogramAnalyzer      *m_histogramAnalyzer;
+    std::shared_ptr<HistogramAnalyzer> m_histogramAnalyzer;
     float                   m_fps        {0.0F};
 
     FrameAnalyzer::FrameMap m_blankMap;

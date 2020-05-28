@@ -12,6 +12,7 @@ using namespace std;
 // Qt headers
 #include <QFile>
 #include <QFileInfo>
+#include <utility>
 
 // MythTV headers
 #include "mythplayer.h"
@@ -306,10 +307,11 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 
 };  /* namespace */
 
-TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
+TemplateMatcher::TemplateMatcher(std::shared_ptr<PGMConverter> pgmc,
+                                 std::shared_ptr<EdgeDetector> ed,
                                  TemplateFinder *tf, const QString& debugdir) :
-    m_pgmConverter(pgmc),
-    m_edgeDetector(ed),   m_templateFinder(tf),
+    m_pgmConverter(std::move(pgmc)),
+    m_edgeDetector(std::move(ed)),   m_templateFinder(tf),
     m_debugDir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
     m_debugData(debugdir + "/TemplateMatcher-pgm.txt")

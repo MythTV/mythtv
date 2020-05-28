@@ -32,7 +32,8 @@ class TemplateMatcher : public FrameAnalyzer
 {
 public:
     /* Ctor/dtor. */
-    TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
+    TemplateMatcher(std::shared_ptr<PGMConverter> pgmc,
+                    std::shared_ptr<EdgeDetector> ed, TemplateFinder *tf,
             const QString& debugdir);
     ~TemplateMatcher(void) override;
 
@@ -55,8 +56,8 @@ public:
     int computeBreaks(FrameMap *breaks);
 
 private:
-    PGMConverter           *m_pgmConverter      {nullptr};
-    EdgeDetector           *m_edgeDetector      {nullptr};
+    std::shared_ptr<PGMConverter> m_pgmConverter {nullptr};
+    std::shared_ptr<EdgeDetector> m_edgeDetector {nullptr};
     TemplateFinder         *m_templateFinder    {nullptr};
     const struct AVFrame   *m_tmpl              {nullptr};  /* template image */
     int                     m_tmplRow           {-1};       /* template location */

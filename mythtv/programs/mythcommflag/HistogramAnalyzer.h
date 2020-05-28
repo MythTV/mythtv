@@ -17,7 +17,8 @@ class HistogramAnalyzer
 {
 public:
     /* Ctor/dtor. */
-    HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
+    HistogramAnalyzer(std::shared_ptr<PGMConverter> pgmc,
+                      std::shared_ptr<BorderDetector> bd,
             const QString& debugdir);
     ~HistogramAnalyzer();
 
@@ -40,8 +41,8 @@ public:
     const unsigned char *getMonochromatics(void) const { return m_monochromatic; }
 
 private:
-    PGMConverter         *m_pgmConverter   {nullptr};
-    BorderDetector       *m_borderDetector {nullptr};
+    std::shared_ptr<PGMConverter>   m_pgmConverter   {nullptr};
+    std::shared_ptr<BorderDetector> m_borderDetector {nullptr};
 
     TemplateFinder       *m_logoFinder     {nullptr};
     const struct AVFrame *m_logo           {nullptr};

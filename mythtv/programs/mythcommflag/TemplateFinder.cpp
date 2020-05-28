@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+#include <utility>
 
 // MythTV headers
 #include "mythplayer.h"
@@ -695,12 +696,14 @@ writeTemplate(const QString& tmplfile, const AVFrame *tmpl, const QString& dataf
 
 };  /* namespace */
 
-TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
-        EdgeDetector *ed, MythPlayer *player, int proglen,
+TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
+                               std::shared_ptr<BorderDetector> bd,
+                               std::shared_ptr<EdgeDetector> ed,
+                               MythPlayer *player, int proglen,
         const QString& debugdir)
-    : m_pgmConverter(pgmc)
-    , m_borderDetector(bd)
-    , m_edgeDetector(ed)
+    : m_pgmConverter(std::move(pgmc))
+    , m_borderDetector(std::move(bd))
+    , m_edgeDetector(std::move(ed))
     , m_debugDir(debugdir)
     , m_debugData(debugdir + "/TemplateFinder.txt")
     , m_debugTmpl(debugdir + "/TemplateFinder.pgm")

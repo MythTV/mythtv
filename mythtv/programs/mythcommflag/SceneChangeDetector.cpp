@@ -1,6 +1,7 @@
 // ANSI C headers
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
@@ -91,9 +92,9 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 
 };  /* namespace */
 
-SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
+SceneChangeDetector::SceneChangeDetector(std::shared_ptr<HistogramAnalyzer> ha,
         const QString& debugdir)
-    : m_histogramAnalyzer(ha)
+    : m_histogramAnalyzer(std::move(ha))
     , m_debugData(debugdir + "/SceneChangeDetector.txt")
 {
     LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");

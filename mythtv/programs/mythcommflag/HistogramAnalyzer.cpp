@@ -3,6 +3,7 @@
 
 // ANSI C headers
 #include <cmath>
+#include <utility>
 
 // MythTV headers
 #include "mythcorecontext.h"
@@ -139,10 +140,11 @@ writeData(const QString& filename, float *mean, unsigned char *median, float *st
 
 };  /* namespace */
 
-HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
+HistogramAnalyzer::HistogramAnalyzer(std::shared_ptr<PGMConverter> pgmc,
+                                     std::shared_ptr<BorderDetector> bd,
         const QString& debugdir)
-    : m_pgmConverter(pgmc)
-    , m_borderDetector(bd)
+    : m_pgmConverter(std::move(pgmc))
+    , m_borderDetector(std::move(bd))
 #ifdef PGM_CONVERT_GREYSCALE
     , m_debugdata(debugdir + "/HistogramAnalyzer-pgm.txt")
 #else  /* !PGM_CONVERT_GREYSCALE */
