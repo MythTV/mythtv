@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
+#include <memory>
 using namespace std;
 
 #include <QFile>
@@ -312,8 +313,6 @@ namespace
         gContext = nullptr;
 
         ReferenceCounter::PrintDebug();
-
-        delete QCoreApplication::instance();
 
         SignalHandler::Done();
     }
@@ -1859,12 +1858,11 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    CleanupGuard callCleanup(cleanup);
     MythDisplay::ConfigureQtGUI();
     QApplication::setSetuidAllowed(true);
-    new QApplication(argc, argv);
+    QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
-
+    CleanupGuard callCleanup(cleanup);
 
 #ifdef Q_OS_MAC
     QString path = QCoreApplication::applicationDirPath();
@@ -2114,11 +2112,11 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_THEME;
     }
     fe_sd_notify("STATUS=Loading theme updates");
-    ThemeUpdateChecker *themeUpdateChecker = nullptr;
+    std::unique_ptr<ThemeUpdateChecker> themeUpdateChecker;
     if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
-        themeUpdateChecker = new ThemeUpdateChecker();
+        themeUpdateChecker = make_unique<ThemeUpdateChecker>();
 
-    auto *sysEventHandler = new MythSystemEventHandler();
+    MythSystemEventHandler sysEventHandler {};
 
     BackendConnectionManager bcm;
 
@@ -2194,8 +2192,6 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;
-    delete themeUpdateChecker;
-    delete sysEventHandler;
 
     g_pmanager->DestroyAllPlugins();
 
