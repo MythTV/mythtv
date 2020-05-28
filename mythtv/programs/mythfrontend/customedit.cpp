@@ -123,6 +123,7 @@ void CustomEdit::loadData(void)
 
     if (result.exec())
     {
+        // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
         while (result.next())
         {
             QString trimTitle = result.value(1).toString();

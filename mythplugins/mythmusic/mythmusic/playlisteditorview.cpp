@@ -1413,6 +1413,7 @@ void PlaylistEditorView::getSmartPlaylistCategories(MusicGenericTree *node)
     {
         if (query.isActive() && query.size() > 0)
         {
+            // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
             while (query.next())
             {
                 // No memory leak. MusicGenericTree adds the new node
@@ -1441,6 +1442,7 @@ void PlaylistEditorView::getSmartPlaylists(MusicGenericTree *node)
     {
         if (query.isActive() && query.size() > 0)
         {
+            // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
             while (query.next())
             {
                 // No memory leak. MusicGenericTree adds the new node
@@ -1575,6 +1577,7 @@ void PlaylistEditorView::getPlaylists(MusicGenericTree *node)
 {
     QList<Playlist*> *playlists = gMusicData->m_all_playlists->getPlaylists();
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     for (int x =0; x < playlists->count(); x++)
     {
         Playlist *playlist = playlists->at(x);

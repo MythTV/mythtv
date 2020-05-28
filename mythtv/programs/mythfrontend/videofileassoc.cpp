@@ -488,6 +488,7 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         m_extensionList->SetVisible(true);
         m_extensionList->Reset();
 
+        // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
         for (auto & fad : tmp_list)
         {
             if (fad.m_fileAssoc)

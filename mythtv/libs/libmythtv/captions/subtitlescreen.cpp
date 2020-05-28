@@ -488,6 +488,7 @@ void SubtitleFormat::Load(const QString &family,
     // to a list of children in its base class constructor.
     if (!resultBG)
         resultBG = providerBaseShape;
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     MythFontProperties *testFont = negParent->GetFont(prefix);
     if (!testFont)
         testFont = negFont;

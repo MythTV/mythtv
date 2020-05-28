@@ -157,6 +157,7 @@ bool setupTVs(bool ismaster, bool &error)
 
     QWriteLocker tvlocker(&TVRec::s_inputsLock);
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     for (size_t i = 0; i < cardids.size(); i++)
     {
         if (hosts[i] == localhostname) {
