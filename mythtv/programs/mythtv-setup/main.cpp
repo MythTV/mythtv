@@ -62,8 +62,6 @@ static void cleanup()
     delete gContext;
     gContext = nullptr;
 
-    delete QCoreApplication::instance();
-
     SignalHandler::Done();
 }
 
@@ -294,16 +292,17 @@ int main(int argc, char *argv[])
         use_display = false;
     }
 
+    std::unique_ptr<QCoreApplication> app {nullptr};
     CleanupGuard callCleanup(cleanup);
 
     if (use_display)
     {
         MythDisplay::ConfigureQtGUI();
-        new QApplication(argc, argv);
+        app = std::make_unique<QApplication>(argc, argv);
     }
     else
     {
-        new QCoreApplication(argc, argv);
+        app = std::make_unique<QCoreApplication>(argc, argv);
     }
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
