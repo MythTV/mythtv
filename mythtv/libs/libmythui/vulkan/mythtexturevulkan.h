@@ -20,7 +20,7 @@ class MythTextureVulkan : protected MythVulkanObject, public MythComboBufferVulk
                                      VkCommandBuffer CommandBuffer = nullptr);
    ~MythTextureVulkan();
 
-    void                  StagingFinished         (void);
+    void                  StagingFinished    (void);
     VkDescriptorImageInfo GetDescriptorImage (void) const;
     VkDescriptorSet       TakeDescriptor     (void);
     void                  AddDescriptor      (VkDescriptorSet Descriptor);

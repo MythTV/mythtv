@@ -40,8 +40,10 @@ MythDebugVulkan::MythDebugVulkan(MythRenderVulkan *Render, VkDevice Device,
                 m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerBeginEXT"));
     m_endRegion = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(
                 m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerEndEXT"));
+    m_nameObject = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(
+                m_window->vulkanInstance()->getInstanceProcAddr("vkDebugMarkerSetObjectNameEXT"));
 
-    m_valid = m_beginRegion && m_endRegion;
+    m_valid = m_beginRegion && m_endRegion && m_nameObject;
     if (!m_valid)
         LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to load procs");
 }
@@ -57,4 +59,14 @@ void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, f
 void MythDebugVulkan::EndRegion(VkCommandBuffer CmdBuffer)
 {
     m_endRegion(CmdBuffer);
+}
+
+void MythDebugVulkan::NameObject(uint64_t Object, VkDebugReportObjectTypeEXT Type, const char *Name)
+{
+    VkDebugMarkerObjectNameInfoEXT info { };
+    info.sType       = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+    info.objectType  = Type;
+    info.object      = Object;
+    info.pObjectName = Name;
+    m_nameObject(m_device, &info);
 }
