@@ -229,19 +229,19 @@ class MythServiceCache( metaclass=ParameterizedSingleton ):
                         if t.get('type') is not None:
                             type_ns, type_value = t.get('type').split(':')
                             if (t.get('maxOccurs', '') == 'unbounded'):
-                                # add arrays immediately
                                 if type_ns == 'xs':
-                                    # basic type, add conversion rule
+                                    # basic type, add conversion rule for the elements
                                     t_value = _get_type(t.get('type'),
                                               t.get('nillable', None))
                                 else:
+                                    # add arrays of type 'tns' immediately
                                     t_value = type_value
                                 d_list.append({item.get('name') : [t_value]})
                                 continue
                             elif (type_ns == 'xs'):
                                 element_dict[t.get('name')] = \
-                                    _get_type(t.get('type'),
-                                              t.get('nillable', None))
+                                                        _get_type(t.get('type'),
+                                                        t.get('nillable', None))
                             else:
                                 element_dict[t.get('name')] = type_value
                         else:
@@ -252,8 +252,8 @@ class MythServiceCache( metaclass=ParameterizedSingleton ):
                             type_ns, type_value = t.get('type').split(':')
                             if (type_ns == 'xs'):
                                 element_dict[t.get('name')] = \
-                                    _get_type(t.get('type'),
-                                              t.get('nillable', None))
+                                                       _get_type(t.get('type'),
+                                                       t.get('nillable', None))
                             else:
                                 element_dict[t.get('name')] = type_value
 
@@ -369,12 +369,17 @@ class MythServiceData( DictData ):
                     # handle 'ArrayOf', 'MapOf', '.Type' explicitely
                     if tvalue.startswith('ArrayOf'):
                         arr = []
-                        for c in child.getchildren():
-                            i = MythServiceData(self.service,
-                                                self.host,
-                                                port=self.port,
-                                                xml_etree=c)
-                            arr.append(i)
+                        if isinstance(self.schema_dict[tvalue][0], int):
+                            # array of basic type 'xs', type already known:
+                            for c in child.getchildren():
+                                arr.append(c.text)
+                        else:
+                            for c in child.getchildren():
+                                i = MythServiceData(self.service,
+                                                    self.host,
+                                                    port=self.port,
+                                                    xml_etree=c)
+                                arr.append(i)
                         self.data.append(arr)
                         self._field_order.append(child.tag.lower())
                         # 'ArrayOf' has it's own type representation:
