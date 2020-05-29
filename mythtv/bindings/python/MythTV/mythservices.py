@@ -567,14 +567,16 @@ class MythTVService( MythServiceData ):
     See 'MythTV/services_api/send.py' for logging of the services_api.
     """
 
-    def __init__(self, service, host, port=6544, opname=None, optype=None, **opdata):
+    def __init__(self, service, host, port=6544, opname=None, optype=None, timeout=None, **opdata):
         self.service = service
         self.host = host
         self.port = port
         self.operation = None
+        # set timeout globally for that session:
+        self.operation_timeout = timeout
         self.operation_result = None
         MythServiceData.__init__(self, service, host, port=port)
-        # initialize connection via MythServiceAPI
+        # initialize connection via MythServiceAPI:
         self.request = ServiceAPI(host, port)
         # evaluate operation kwargs (needs python 3.6+):
         if opname and optype:
@@ -587,7 +589,7 @@ class MythTVService( MythServiceData ):
                 else:
                     op["opdata"] = {}
                 opdict = self.encode_operation(op)
-                self.perform_operation(opdict)
+                self.perform_operation(opdict, timeout=timeout)
             except:
                 raise MythError("Unable to perform operation '%s': '%s': '%s'!"
                                 %(opname, optype, opdata))
@@ -654,7 +656,7 @@ class MythTVService( MythServiceData ):
             self._process(self.data)
         return(res)
 
-    def perform_operation(self, opdict):
+    def perform_operation(self, opdict, timeout=None):
         """
         Actually performs the operation given by a dictionary.
         like http://<hostip>:6544/Dvr/GetRecordedList?Descending=True&Count=3
@@ -667,9 +669,17 @@ class MythTVService( MythServiceData ):
           Complex responses will be objectified within this class.
           The version of these responses is stored in 'self.operation_version'.
         The result of this method is stored in 'self.operation_result'.
+        Optionally, a 'timeout' value can be set for this operation.
         """
         self.operation = opdict['opname']
         messagetype = opdict['optype']
+        # define session options valid for 'POST' and 'GET' operations:
+        opts = {'rawxml': True}
+        if self.operation_timeout:
+            opts['timeout'] = self.operation_timeout
+        if timeout:
+            opts['timeout'] = timeout
+
         with self.request as api_request:
             result = None
             if messagetype == 'GET':
@@ -680,7 +690,6 @@ class MythTVService( MythServiceData ):
                     rest = urlencode(opdict['opdata'])
                 else:
                     rest = None
-                opts = {'rawxml': True}
                 try:
                     result = api_request(endpoint=endpoint, rest=rest, opts = opts)
                 except RuntimeWarning as warning:
@@ -692,6 +701,8 @@ class MythTVService( MythServiceData ):
                        return(result)
                     else:
                        raise MythError("Unknown result from 'send' operation")
+                except RuntimeError as e:
+                    raise MythError(e.args)
                 eroot = etree.fromstring(result)
                 #print(etree.tostring(eroot, pretty_print=True, encoding='unicode'))
                 if eroot.tag in self.schema_dict.keys():
@@ -701,7 +712,7 @@ class MythTVService( MythServiceData ):
                     result = self._eval_response(eroot)
             elif messagetype == 'POST':
                 endpoint = '%s/%s'%(self.service, self.operation)
-                opts = {'rawxml': True, 'wrmi': True}
+                opts['wrmi'] = True
                 if opdict['opdata'] is not None:
                     post = opdict['opdata']
                 else:
