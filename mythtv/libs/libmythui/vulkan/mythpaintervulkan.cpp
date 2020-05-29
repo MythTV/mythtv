@@ -298,7 +298,16 @@ void MythPainterVulkan::Begin(QPaintDevice* /*Parent*/)
             m_debugAvailable = false;
     }
 
-    DeleteTextures();
+    // Sometimes the UI engine will mark images as 'changed' when moving between
+    // screens. These are then often released here whilst still in use for the
+    // previous frame. To avoid validation errors, wait for the last frame to
+    // complete before continuing - though this feels like a hack and surely
+    // the last frame should already be complete at this point?
+    if (!m_texturesToDelete.empty())
+    {
+        m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
+        DeleteTextures();
+    }
     m_frameStarted = true;
 }
 
