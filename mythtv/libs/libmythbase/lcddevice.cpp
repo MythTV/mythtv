@@ -253,7 +253,6 @@ void LCD::ReadyRead(void)
 
     QString lineFromServer;
     QStringList aList;
-    QStringList::Iterator it;
 
     // This gets activated automatically by the MythSocket class whenever
     // there's something to read.
