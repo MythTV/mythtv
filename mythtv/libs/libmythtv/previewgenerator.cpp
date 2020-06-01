@@ -542,11 +542,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
     {
         file.close();
         struct utimbuf times {};
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        times.actime = times.modtime = dt.toTime_t();
-#else
         times.actime = times.modtime = dt.toSecsSinceEpoch();
-#endif
         utime(m_outFileName.toLocal8Bit().constData(), &times);
         LOG(VB_FILE, LOG_INFO, LOC + QString("Saved: '%1'").arg(m_outFileName));
     }
@@ -707,11 +703,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
         // Backdate file to start of preview time in case a bookmark was made
         // while we were generating the preview.
         struct utimbuf times {};
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        times.actime = times.modtime = dt.toTime_t();
-#else
         times.actime = times.modtime = dt.toSecsSinceEpoch();
-#endif
         utime(outname.toLocal8Bit().constData(), &times);
     }
 

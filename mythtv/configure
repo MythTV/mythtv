@@ -6507,9 +6507,7 @@ qt_opengles_check() {
     "qt_opengles_check $@" >> $logfile 2>&1
     check_ecxx ${qt_inc} <<EOF
 #include <QtCore/QtCore>
-#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
 #include <QtGui/qtguiglobal.h>
-#endif
 #if !defined(QT_OPENGL_ES_2)
 No OpenGL ES here!
 #endif

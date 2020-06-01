@@ -151,9 +151,7 @@ bool MythDRMDevice::Initialise(void)
 
     // Find the serial number of the display we are connected to
     auto serial = QString();
-#if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
     serial = m_screen->serialNumber();
-#endif
     if (serial.isEmpty())
     {
         // No serial number either means an older version of Qt or the EDID
@@ -321,9 +319,7 @@ QString MythDRMDevice::FindBestDevice(void)
 
     // Use the serial number from the current QScreen to select a suitable device
     auto serial = QString();
-#if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
     serial = m_screen->serialNumber();
-#endif
     if (serial.isEmpty())
     {
         LOG(VB_GENERAL, m_verbose, LOC + "No serial number to search for");

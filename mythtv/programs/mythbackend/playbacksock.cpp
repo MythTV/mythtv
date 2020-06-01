@@ -314,11 +314,7 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 
     if (!strlist.empty() && !strlist[0].isEmpty() && (strlist[0] != "BAD"))
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        return MythDate::fromTime_t(strlist[0].toUInt());
-#else
         return MythDate::fromSecsSinceEpoch(strlist[0].toLongLong());
-#endif
     }
 
     return QDateTime();
@@ -455,13 +451,8 @@ RecStatus::Type PlaybackSock::StartRecording(int capturecardnum,
     if (SendReceiveStringList(strlist, 3))
     {
         pginfo->SetRecordingID(strlist[1].toUInt());
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        pginfo->SetRecordingStartTime(
-            MythDate::fromTime_t(strlist[2].toUInt()));
-#else
         pginfo->SetRecordingStartTime(
             MythDate::fromSecsSinceEpoch(strlist[2].toLongLong()));
-#endif
         return RecStatus::Type(strlist[0].toInt());
     }
 

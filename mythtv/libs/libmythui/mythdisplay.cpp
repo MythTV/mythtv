@@ -91,12 +91,9 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
                 s_display = new MythDisplayRPI();
 #endif
 #ifdef USING_DRM
-#if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
             // this will only work by validating the screen's serial number
-            // - which is only available with Qt 5.9
             if (!s_display)
                 s_display = new MythDisplayDRM();
-#endif
 #endif
 #if defined(Q_OS_MAC)
             if (!s_display)
@@ -148,11 +145,7 @@ QStringList MythDisplay::GetDescription(void)
         if (!first)
             result.append("");
         first = false;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
         QString id = QString("(%1)").arg(screen->manufacturer());
-#else
-        QString id;
-#endif
         if (screen == current && !spanall)
             result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
         else
@@ -194,9 +187,7 @@ MythDisplay::MythDisplay()
 
     connect(guiapp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
     connect(guiapp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     connect(guiapp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
-#endif
 }
 
 MythDisplay::~MythDisplay()
@@ -466,7 +457,6 @@ bool MythDisplay::SpanAllScreens(void)
 
 QString MythDisplay::GetExtraScreenInfo(QScreen *qScreen)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
     QString mfg = qScreen->manufacturer();
     if (mfg.isEmpty())
         mfg = "Unknown";
@@ -474,10 +464,6 @@ QString MythDisplay::GetExtraScreenInfo(QScreen *qScreen)
     if (model.isEmpty())
         model = "Unknown";
     return QString("(Make: %1 Model: %2)").arg(mfg).arg(model);
-#else
-    Q_UNUSED(qScreen);
-    return QString();
-#endif
 }
 
 void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)

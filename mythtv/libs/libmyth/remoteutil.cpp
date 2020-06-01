@@ -221,13 +221,8 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 
     if (!strlist.isEmpty() && !strlist[0].isEmpty() && (strlist[0] != "BAD"))
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint timet = strlist[0].toUInt();
-        return MythDate::fromTime_t(timet);
-#else
         qint64 timet = strlist[0].toLongLong();
         return MythDate::fromSecsSinceEpoch(timet);
-#endif
     }
 
     return QDateTime();
@@ -246,11 +241,7 @@ QDateTime RemoteGetPreviewIfModified(
 
     QStringList strlist("QUERY_PIXMAP_GET_IF_MODIFIED");
     strlist << ((cacheLastModified.isValid()) ? // unix secs, UTC
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                QString::number(cacheLastModified.toTime_t()) :
-#else
                 QString::number(cacheLastModified.toSecsSinceEpoch()) :
-#endif
                 QString("-1"));
     strlist << QString::number(200 * 1024); // max size of preview file
     pginfo.ToStringList(strlist);
@@ -276,11 +267,7 @@ QDateTime RemoteGetPreviewIfModified(
     qlonglong timet = strlist[0].toLongLong();
     if (timet >= 0)
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        retdatetime = MythDate::fromTime_t(timet);
-#else
         retdatetime = MythDate::fromSecsSinceEpoch(timet);
-#endif
     }
 
     if (strlist.size() < 4)

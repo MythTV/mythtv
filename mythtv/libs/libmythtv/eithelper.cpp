@@ -693,11 +693,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     uint version   = cit->Version();
     uint contentid = cit->ContentID();
     // fake endtime
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint endtime   = MythDate::current().addDays(1).toTime_t();
-#else
     uint endtime   = MythDate::current().addDays(1).toSecsSinceEpoch();
-#endif
 
     // Find Transmissions
     desc_list_t transmissions =
@@ -778,13 +774,8 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     if (!chanid)
         return;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    QDateTime starttime = MythDate::fromTime_t(
-        event.m_startTime + GPS_EPOCH + m_gpsOffset);
-#else
     QDateTime starttime = MythDate::fromSecsSinceEpoch(
         event.m_startTime + GPS_EPOCH + m_gpsOffset);
-#endif
 
     // fix starttime only if the duration is a multiple of a minute
     if (!(event.m_length % 60))

@@ -243,15 +243,9 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
 
     if (im.IsDevice())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        CreateButton(tr("Last scan"),
-                     MythDate::toString(QDateTime::fromTime_t(im.m_date),
-                                        MythDate::kDateTimeFull | MythDate::kAddYear));
-#else
         CreateButton(tr("Last scan"),
                      MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
-#endif
     }
 
     if (im.IsDirectory())
@@ -259,15 +253,9 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
 
     if (!im.IsDevice())
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        CreateButton(tr("Modified"),
-                     MythDate::toString(QDateTime::fromTime_t(im.m_modTime),
-                                        MythDate::kDateTimeFull | MythDate::kAddYear));
-#else
         CreateButton(tr("Modified"),
                      MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
-#endif
     }
 
     if (im.IsFile())

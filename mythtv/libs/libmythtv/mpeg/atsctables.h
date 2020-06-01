@@ -567,11 +567,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     QDateTime StartTimeGPS(uint i) const
     {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        return MythDate::fromTime_t(GPS_EPOCH + StartTimeRaw(i));
-#else
         return MythDate::fromSecsSinceEpoch(GPS_EPOCH + StartTimeRaw(i));
-#endif
     }
     //   reserved               2   6.0    3
     //   ETM_location           2   6.2
@@ -713,11 +709,7 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     }
     QDateTime SystemTimeGPS(void) const
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        return MythDate::fromTime_t(GPS_EPOCH + GPSRaw());
-#else
         return MythDate::fromSecsSinceEpoch(GPS_EPOCH + GPSRaw());
-#endif
     }
     time_t GPSUnix(void) const
         { return GPS_EPOCH + GPSRaw(); }

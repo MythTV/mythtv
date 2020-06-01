@@ -321,11 +321,7 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
             weight = DEFAULT_WEIGHT;
         else
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-            QDateTime timestamp = QDateTime::fromTime_t(im->m_date);
-#else
             QDateTime timestamp = QDateTime::fromSecsSinceEpoch(im->m_date);
-#endif
             QDateTime curYearAnniversary =
                     QDateTime(QDate(now.date().year(),
                                     timestamp.date().month(),

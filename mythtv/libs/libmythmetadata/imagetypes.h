@@ -94,17 +94,9 @@ public:
     int              m_device      { 0 }; //!< Id of media device. Always 0 (SG) for remotes, 1+ for local devices
     int              m_parentId    { 0 }; //!< Id of parent dir
     int              m_type        { 0 }; //!< Type of node: dir, video etc
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint             m_modTime     { 0 }; //!< Filesystem modified datestamp
-#else
     qint64           m_modTime     { 0 }; //!< Filesystem modified datestamp
-#endif
     int              m_size        { 0 }; //!< Filesize (files only)
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint             m_date;        //!< Image creation date, from Exif metadata
-#else
     qint64           m_date        { 0 }; //!< Image creation date, from Exif metadata
-#endif
     int              m_orientation { 0 }; //!< Image orientation
     QString          m_comment;     //!< User comment, from Exif metadata
 

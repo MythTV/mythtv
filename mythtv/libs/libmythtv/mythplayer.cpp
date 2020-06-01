@@ -3562,30 +3562,12 @@ void MythPlayer::SetWatched(bool forceWatched)
 
         // If the recording is stopped early we need to use the recording end
         // time, not the programme end time
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint endtime;
-        if (m_playerCtx->m_playingInfo->GetRecordingEndTime().toTime_t() <
-            m_playerCtx->m_playingInfo->GetScheduledEndTime().toTime_t())
-        {
-            endtime = m_playerCtx->m_playingInfo->GetRecordingEndTime().toTime_t();
-        }
-        else
-        {
-            endtime = m_playerCtx->m_playingInfo->GetScheduledEndTime().toTime_t();
-        }
-
-        numFrames = (long long)
-            ((endtime -
-              m_playerCtx->m_playingInfo->GetRecordingStartTime().toTime_t()) *
-             m_videoFrameRate);
-#else
         ProgramInfo *pi = m_playerCtx->m_playingInfo;
         qint64 starttime = pi->GetRecordingStartTime().toSecsSinceEpoch();
         qint64 endactual = pi->GetRecordingEndTime().toSecsSinceEpoch();
         qint64 endsched = pi->GetScheduledEndTime().toSecsSinceEpoch();
         qint64 endtime = min(endactual, endsched);
         numFrames = (long long) ((endtime - starttime) * m_videoFrameRate);
-#endif
     }
 
     int offset = (int) round(0.14 * (numFrames / m_videoFrameRate));

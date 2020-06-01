@@ -264,7 +264,6 @@ class TestProgramInfo : public QObject
         ProgramInfo lrigrepus23(program_list);
         QVERIFY(m_supergirl23 == lrigrepus23);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
         // Test accepting an empty string for an invalid QDateTime
         program_list.clear();
         m_supergirl23.ToStringList(program_list);
@@ -272,7 +271,6 @@ class TestProgramInfo : public QObject
         program_list[51] = "";
         ProgramInfo lrigrepus23b(program_list);
         QVERIFY(m_supergirl23 == lrigrepus23b);
-#endif
 
         // Test a failure
         program_list.clear();

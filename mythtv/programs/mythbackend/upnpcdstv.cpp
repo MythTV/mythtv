@@ -1201,15 +1201,9 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         // recordedmarkup
         if (nDurationMS == 0)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-            uint uiStart = dtStartTime.toTime_t();
-            uint uiEnd   = dtEndTime.toTime_t();
-            nDurationMS  = (uiEnd - uiStart) * 1000; // To milliseconds
-#else
             qint64 uiStart = dtStartTime.toMSecsSinceEpoch();
             qint64 uiEnd   = dtEndTime.toMSecsSinceEpoch();
             nDurationMS  = (uiEnd - uiStart);
-#endif
             nDurationMS  = (nDurationMS > 0) ? nDurationMS : 0;
         }
 

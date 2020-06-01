@@ -522,18 +522,12 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
 
     int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
     bool useclear = !Frame || dummy || ((m_render->GetExtraFeatures() & kGLTiled) != 0);
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-    // Qt < 5.8 uses a different QRegion API. Just clear and remove this code
-    // when 5.8 is standard
-    useclear = true;
-#endif
 
     if (useclear)
     {
         m_render->SetBackground(gray, gray, gray, 255);
         m_render->ClearFramebuffer();
     }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
     // avoid clearing the framebuffer if it will be entirely overwritten by video
     else if (!m_window.VideoIsFullScreen())
     {
@@ -551,7 +545,6 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
                 m_render->ClearRect(nullptr, rect, gray);
         }
     }
-#endif
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "CLEAR_END");

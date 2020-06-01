@@ -207,11 +207,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     {
                         // first song
                         playcountMin = playcountMax = mdata->PlayCount();
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                        lastplayMin = lastplayMax = mdata->LastPlay().toTime_t();
-#else
                         lastplayMin = lastplayMax = mdata->LastPlay().toSecsSinceEpoch();
-#endif
                     }
                     else
                     {
@@ -220,18 +216,11 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                         else if (mdata->PlayCount() > playcountMax)
                             playcountMax = mdata->PlayCount();
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                        if (mdata->LastPlay().toTime_t() < lastplayMin)
-                            lastplayMin = mdata->LastPlay().toTime_t();
-                        else if (mdata->LastPlay().toTime_t() > lastplayMax)
-                            lastplayMax = mdata->LastPlay().toTime_t();
-#else
                         double lastplaysecs = mdata->LastPlay().toSecsSinceEpoch();
                         if (lastplaysecs < lastplayMin)
                             lastplayMin = lastplaysecs;
                         else if (lastplaysecs > lastplayMax)
                             lastplayMax = lastplaysecs;
-#endif
                     }
                 }
             }
@@ -248,11 +237,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 {
                     int rating = mdata->Rating();
                     int playcount = mdata->PlayCount();
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                    double lastplaydbl = mdata->LastPlay().toTime_t();
-#else
                     double lastplaydbl = mdata->LastPlay().toSecsSinceEpoch();
-#endif
                     double ratingValue = (double)(rating) / 10;
                     double playcountValue = NAN;
                     double lastplayValue = NAN;

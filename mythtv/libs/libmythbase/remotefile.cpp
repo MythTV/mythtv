@@ -1257,14 +1257,10 @@ QDateTime RemoteFile::LastModified(const QString &url)
     gCoreContext->SendReceiveStringList(strlist);
 
     if (strlist.size() > 1) {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        result = MythDate::fromTime_t(strlist[1].toUInt());
-#else
         if (!strlist[1].isEmpty() && (strlist[1].toInt() != -1))
             result = MythDate::fromSecsSinceEpoch(strlist[1].toLongLong());
         else
             result = QDateTime();;
-#endif
     }
 
     return result;

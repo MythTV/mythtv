@@ -466,13 +466,8 @@ class META_PUBLIC AllMusic
 
     int                      m_playCountMin    {0};
     int                      m_playCountMax    {0};
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    double                   m_lastPlayMin     {0.0};
-    double                   m_lastPlayMax     {0.0};
-#else
     qint64                   m_lastPlayMin     {0};
     qint64                   m_lastPlayMax     {0};
-#endif
 };
 
 using StreamList = QList<MusicMetadata*>;

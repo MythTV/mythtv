@@ -814,14 +814,12 @@ bool VideoOutWindow::VideoIsFullScreen(void) const
  *
  *  \note This assumes VideoIsFullScreen has already been checked
 */
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
 QRegion VideoOutWindow::GetBoundingRegion(void) const
 {
     QRegion visible(m_windowRect);
     QRegion video(m_displayVideoRect);
     return visible.subtracted(video);
 }
-#endif
 
 /*
  * \brief Determines PIP Window size and Position.

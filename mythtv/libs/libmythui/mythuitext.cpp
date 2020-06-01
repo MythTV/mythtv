@@ -549,10 +549,8 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
             .arg(fontname));
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
     if (!formats.empty())
         layout->setFormats(formats);
-#endif
 
     return res;
 }

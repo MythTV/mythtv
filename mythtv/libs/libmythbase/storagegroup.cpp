@@ -398,15 +398,11 @@ QStringList StorageGroup::GetFileInfo(const QString &lfilename)
         QFileInfo fInfo(filename);
 
         details << filename;
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        details << QString("%1").arg(fInfo.lastModified().toTime_t());
-#else
         if (fInfo.lastModified().isValid()) {
             details << QString("%1").arg(fInfo.lastModified().toSecsSinceEpoch());
         } else {
             details << QString(UINT_MAX);
         }
-#endif
         details << QString("%1").arg(fInfo.size());
     }
 

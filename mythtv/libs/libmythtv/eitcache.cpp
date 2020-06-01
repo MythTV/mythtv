@@ -21,11 +21,7 @@ const uint EITCache::kVersionMax = 31;
 EITCache::EITCache()
 {
     // 24 hours ago
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    m_lastPruneTime = MythDate::current().toUTC().toTime_t() - 86400;
-#else
     m_lastPruneTime = MythDate::current().toUTC().toSecsSinceEpoch() - 86400;
-#endif
 }
 
 EITCache::~EITCache()
@@ -154,11 +150,7 @@ static bool lock_channel(uint chanid, uint endtime)
                 .arg(chanid));
         return false;
     }
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint now = MythDate::current().toTime_t();
-#else
     uint now = MythDate::current().toSecsSinceEpoch();
-#endif
     qstr = "INSERT INTO eit_cache "
            "       ( chanid,  endtime,  status) "
            "VALUES (:CHANID, :ENDTIME, :STATUS)";
@@ -194,11 +186,7 @@ static void unlock_channel(uint chanid, uint updated)
         MythDB::DBError("Error deleting channel lock", query);
 
     // inserting statistics
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint now = MythDate::current().toTime_t();
-#else
     uint now = MythDate::current().toSecsSinceEpoch();
-#endif
     qstr = "REPLACE INTO eit_cache "
            "       ( chanid,  eventid,  endtime,  status) "
            "VALUES (:CHANID, :EVENTID, :ENDTIME, :STATUS)";
@@ -417,11 +405,7 @@ uint EITCache::PruneOldEntries(uint timestamp)
 {
     if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
     {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        QDateTime tmptime = MythDate::fromTime_t(timestamp);
-#else
         QDateTime tmptime = MythDate::fromSecsSinceEpoch(timestamp);
-#endif
         LOG(VB_EIT, LOG_INFO,
             LOC + "Pruning all entries that ended before UTC " +
             tmptime.toString(Qt::ISODate));

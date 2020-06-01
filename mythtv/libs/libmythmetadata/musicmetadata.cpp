@@ -1596,20 +1596,12 @@ void AllMusic::resync()
             {
                 // first song
                 m_playCountMin = m_playCountMax = query.value(13).toInt();
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                m_lastPlayMin  = m_lastPlayMax  = query.value(14).toDateTime().toTime_t();
-#else
                 m_lastPlayMin  = m_lastPlayMax  = query.value(14).toDateTime().toSecsSinceEpoch();
-#endif
             }
             else
             {
                 int playCount = query.value(13).toInt();
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-                double lastPlay = query.value(14).toDateTime().toTime_t();
-#else
                 qint64 lastPlay = query.value(14).toDateTime().toSecsSinceEpoch();
-#endif
 
                 m_playCountMin = min(playCount, m_playCountMin);
                 m_playCountMax = max(playCount, m_playCountMax);

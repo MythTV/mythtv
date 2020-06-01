@@ -398,29 +398,6 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
             {
                 if (screen->NeedsRedraw())
                 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-                    QRegion topDirty = screen->GetDirtyArea();
-                    QVector<QRect> wrects = topDirty.rects();
-                    for (int i = 0; i < wrects.size(); i++)
-                    {
-                        bool foundThisRect = false;
-                        QVector<QRect> drects = m_repaintRegion.rects();
-                        for (int j = 0; j < drects.size(); j++)
-                        {
-                            // Can't use QRegion::contains because it only
-                            // checks for overlap.  QRect::contains checks
-                            // if fully contained.
-                            if (drects[j].contains(wrects[i]))
-                            {
-                                foundThisRect = true;
-                                break;
-                            }
-                        }
-
-                        if (!foundThisRect)
-                            return;
-                    }
-#else
                     for (const QRect& wrect: screen->GetDirtyArea())
                     {
                         bool foundThisRect = false;
@@ -439,7 +416,6 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
                         if (!foundThisRect)
                             return;
                     }
-#endif
                 }
             }
         }
@@ -463,15 +439,8 @@ void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
     if (!Painter->SupportsClipping())
         m_repaintRegion = QRegion(d->m_uiScreenRect);
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-    QVector<QRect> rects = m_repaintRegion.rects();
-    for (int i = 0; i < rects.size(); i++)
-    {
-        const QRect& rect = rects[i];
-#else
     for (const QRect& rect : m_repaintRegion)
     {
-#endif
         if (rect.width() == 0 || rect.height() == 0)
             continue;
 

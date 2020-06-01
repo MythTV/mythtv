@@ -1251,9 +1251,6 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
 
 #define INT_TO_LIST(x)       do { list << QString::number(x); } while (false)
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-#define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
-#else
 #define DATETIME_TO_LIST(x)  do {                                         \
                                  if ((x).isValid()) {                     \
                                      INT_TO_LIST((x).toSecsSinceEpoch()); \
@@ -1261,7 +1258,6 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
                                      INT_TO_LIST(kInvalidDateTime);       \
                                  }                                        \
                              } while (false)
-#endif
 
 #define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (false)
 
@@ -1351,13 +1347,6 @@ void ProgramInfo::ToStringList(QStringList &list) const
 #define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (false)
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (false)
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-#define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR();                                                    \
-         x = (ts.toUInt() == kInvalidDateTime ?                         \
-              QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
-    } while (false)
-#else
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          if (ts.isEmpty() or (ts.toUInt() == kInvalidDateTime)) {       \
@@ -1366,7 +1355,6 @@ void ProgramInfo::ToStringList(QStringList &list) const
               (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
          }                                                              \
     } while (false)
-#endif
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
@@ -1574,13 +1562,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["recstartdate"] = MythDate::toString(m_recStartTs, kDateShort);
         progMap["recendtime"] = MythDate::toString(m_recEndTs, kTime);
         progMap["recenddate"] = MythDate::toString(m_recEndTs, kDateShort);
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        progMap["startts"] = QString::number(m_startTs.toTime_t());
-        progMap["endts"]   = QString::number(m_endTs.toTime_t());
-#else
         progMap["startts"] = QString::number(m_startTs.toSecsSinceEpoch());
         progMap["endts"]   = QString::number(m_endTs.toSecsSinceEpoch());
-#endif
         if (timeNow.toLocalTime().date().year() !=
             m_startTs.toLocalTime().date().year())
             progMap["startyear"] = m_startTs.toLocalTime().toString("yyyy");

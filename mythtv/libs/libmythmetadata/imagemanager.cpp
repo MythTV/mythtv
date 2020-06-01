@@ -345,25 +345,15 @@ ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
     if (parentId == GALLERY_DB_ID)
     {
         // Import devices show time of import, other devices show 'last scan time'
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        im->m_date    = im->m_filePath.contains(IMPORTDIR)
-                ? fi.lastModified().toTime_t()
-                : QDateTime::currentMSecsSinceEpoch() / 1000;
-#else
         im->m_date    = im->m_filePath.contains(IMPORTDIR)
                 ? fi.lastModified().toSecsSinceEpoch()
                 : QDateTime::currentSecsSinceEpoch();
-#endif
         im->m_modTime = im->m_date;
         im->m_type    = kDevice;
         return im;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    im->m_modTime = fi.lastModified().toTime_t();
-#else
     im->m_modTime = fi.lastModified().toSecsSinceEpoch();
-#endif
 
     if (fi.isDir())
     {
@@ -428,11 +418,7 @@ ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
 
     // Strip SG path & leading / to leave a relative path
     im->m_filePath = fi.absoluteFilePath().mid(base.size() + 1);
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    im->m_modTime  = fi.lastModified().toTime_t();
-#else
     im->m_modTime  = fi.lastModified().toSecsSinceEpoch();
-#endif
 
     if (fi.isDir())
     {
@@ -2325,11 +2311,7 @@ QString ImageManagerFe::LongDateOf(const ImagePtrK& im)
     if (im->m_id == GALLERY_DB_ID)
         return "";
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint secs = 0;
-#else
     qint64 secs = 0;
-#endif
     uint format = MythDate::kDateFull | MythDate::kAddYear;
 
     if (im->m_date > 0)
@@ -2340,11 +2322,7 @@ QString ImageManagerFe::LongDateOf(const ImagePtrK& im)
     else
         secs = im->m_modTime;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    return MythDate::toString(QDateTime::fromTime_t(secs), format);
-#else
     return MythDate::toString(QDateTime::fromSecsSinceEpoch(secs), format);
-#endif
 }
 
 
@@ -2359,13 +2337,8 @@ QString ImageManagerFe::ShortDateOf(const ImagePtrK& im) const
     if (im->m_id == GALLERY_DB_ID)
         return "";
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    uint secs(im->m_date > 0 ? im->m_date : im->m_modTime);
-    return QDateTime::fromTime_t(secs).date().toString(m_dateFormat);
-#else
     qint64 secs(im->m_date > 0 ? im->m_date : im->m_modTime);
     return QDateTime::fromSecsSinceEpoch(secs).date().toString(m_dateFormat);
-#endif
 }
 
 

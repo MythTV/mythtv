@@ -236,11 +236,7 @@ void LoggingItem::setThreadTid(void)
 /// \brief Convert numerical timestamp to a readable date and time.
 QString LoggingItem::getTimestamp (void) const
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    QDateTime epoch = QDateTime::fromTime_t(m_epoch).toUTC();
-#else
     QDateTime epoch = QDateTime::fromSecsSinceEpoch(m_epoch);
-#endif
     QString timestamp = epoch.toString("yyyy-MM-dd HH:mm:ss");
     return timestamp;
 }

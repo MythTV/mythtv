@@ -686,16 +686,8 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
         // Replace this item with a set of cut-outs.
         it = m_display.erase(it);
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-        QVector<QRect> rects =
-            (QRegion(imageRect) - QRegion(m_videoDisplayRect)).rects();
-        for (uint j = 0; j < (uint)rects.size(); j++)
-        {
-            const QRect &rect = rects[j];
-#else
         for (const QRect& rect : QRegion(imageRect)-QRegion(m_videoDisplayRect))
         {
-#endif
             QImage image =
                 data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
                                    rect.width(), rect.height());

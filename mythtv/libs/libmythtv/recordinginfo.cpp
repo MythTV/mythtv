@@ -1202,15 +1202,9 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
     {
         m_recStatus = RecStatus::Recorded;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint starttime = m_recStartTs.toTime_t();
-        uint endtime   = m_recEndTs.toTime_t();
-        int64_t duration = ((int64_t)endtime - (int64_t)starttime) * 1000000;
-#else
         qint64 starttime = m_recStartTs.toSecsSinceEpoch();
         qint64 endtime   = m_recEndTs.toSecsSinceEpoch();
         int64_t duration = (endtime - starttime) * 1000000;
-#endif
         SaveTotalDuration(duration);
 
         QString msg = "Finished recording";
