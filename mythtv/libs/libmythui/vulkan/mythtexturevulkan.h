@@ -44,8 +44,6 @@ class MythTextureVulkan : protected MythVulkanObject, public MythComboBufferVulk
     bool             m_createdSampler { false   };
     VkSampler        m_sampler        { nullptr };
     VkImageView      m_view           { nullptr };
-    uint32_t         m_width          { 0       };
-    uint32_t         m_height         { 0       };
 };
 
 #endif

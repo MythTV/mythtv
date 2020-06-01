@@ -23,12 +23,13 @@ class MythComboBufferVulkan
     MythComboBufferVulkan(float Width, float Height);
 
     const void* Data(void) const;
-    void        Update(const QMatrix4x4 &Transform, const QRect& Source,
-                       const QRect& Destination, int Alpha);
+    void        PushData(const QMatrix4x4 &Transform, const QRect& Source,
+                         const QRect& Destination, int Alpha);
+    void        PopData(void);
 
-    Buffer m_data;
-    float  m_parentWidth  { 0.0F };
-    float  m_parentHeight { 0.0F };
+    std::vector<Buffer> m_data;
+    float  m_width  { 0.0F };
+    float  m_height { 0.0F };
 };
 
 #endif

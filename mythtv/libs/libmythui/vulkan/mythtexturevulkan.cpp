@@ -1,6 +1,3 @@
-// Std
-#include <algorithm>
-
 // MythTV
 #include "mythlogging.h"
 #include "vulkan/mythtexturevulkan.h"
@@ -28,9 +25,7 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
                                      QImage *Image, VkSampler Sampler,
                                      VkCommandBuffer CommandBuffer)
   : MythVulkanObject(Render, Device, Functions),
-    MythComboBufferVulkan(Image->width(), Image->height()),
-    m_width(static_cast<uint32_t>(Image->width())),
-    m_height(static_cast<uint32_t>(Image->height()))
+    MythComboBufferVulkan(Image->width(), Image->height())
 {
     if (!(Render && Device && Functions))
         return;

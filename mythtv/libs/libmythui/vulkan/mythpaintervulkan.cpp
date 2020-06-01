@@ -355,7 +355,7 @@ void MythPainterVulkan::End(void)
     m_devFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                         m_textureLayout, 0, 1, &m_projectionDescriptor, 0, nullptr);
 
-    for (auto const * texture : m_queuedTextures)
+    for (auto * texture : m_queuedTextures)
     {
         // Bind descriptor set 1 for this texture - sampler
         m_devFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -364,6 +364,7 @@ void MythPainterVulkan::End(void)
         // Push constants - transform, vertex data and color (alpha)
         m_devFuncs->vkCmdPushConstants(currentcmdbuf, m_textureLayout,
                                        VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE, texture->Data());
+        texture->PopData();
 
         // Draw
         m_devFuncs->vkCmdDraw(currentcmdbuf, 4, 1, 0, 0);
@@ -385,7 +386,7 @@ void MythPainterVulkan::DrawImage(const QRect &Dest, MythImage *Image, const QRe
     if (texture)
     {
         // Update push constant buffer
-        texture->Update(m_transforms.top(), Source, Dest, Alpha);
+        texture->PushData(m_transforms.top(), Source, Dest, Alpha);
         // Queue
         m_queuedTextures.emplace_back(texture);
     }

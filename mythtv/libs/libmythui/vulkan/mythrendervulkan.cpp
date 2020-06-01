@@ -582,8 +582,8 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     colorblendattachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
     colorblendattachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     colorblendattachment.colorBlendOp        = VK_BLEND_OP_ADD;
-    colorblendattachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    colorblendattachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    colorblendattachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    colorblendattachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     colorblendattachment.alphaBlendOp        = VK_BLEND_OP_ADD;
     colorblendattachment.colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
                                                VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
