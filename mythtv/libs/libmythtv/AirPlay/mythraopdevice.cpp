@@ -3,6 +3,7 @@
 #include <QNetworkInterface>
 #include <QCoreApplication>
 #include <QtAlgorithms>
+#include <QTcpSocket>
 
 #include "mthread.h"
 #include "mythlogging.h"
