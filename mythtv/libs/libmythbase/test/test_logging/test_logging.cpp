@@ -103,7 +103,7 @@ void TestLogging::test_verboseArgParse_kwd_data (void)
     QTest::addColumn<int>("expectedExit");
     QTest::addColumn<QString>("expectedOutput");
 
-    QTest::newRow("empty")     << ""          << GENERIC_EXIT_INVALID_CMDLINE << "Unknown argument";
+    QTest::newRow("empty")     << ""          << GENERIC_EXIT_OK << "";
     QTest::newRow("nextarg")   << "-x"        << GENERIC_EXIT_INVALID_CMDLINE << "Invalid or missing";
     QTest::newRow("help")      << "help"      << GENERIC_EXIT_INVALID_CMDLINE << "Verbose debug levels";
     QTest::newRow("important") << "important" << GENERIC_EXIT_OK << R"("important" log mask)";

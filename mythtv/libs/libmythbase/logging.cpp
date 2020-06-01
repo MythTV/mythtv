@@ -8,7 +8,7 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVariantMap>
 #include <iostream>
 
@@ -653,9 +653,7 @@ void logPropagateCalc(void)
 {
     logPropagateArgList.clear();
 
-    QString mask = verboseString.trimmed();
-    mask.replace(QRegExp(" "), ",");
-    mask.remove(QRegExp("^,"));
+    QString mask = verboseString.simplified().replace(' ', ',');
     logPropagateArgs = " --verbose " + mask;
     logPropagateArgList << "--verbose" << mask;
 
@@ -945,9 +943,7 @@ void verboseInit(void)
 ///        (for --verbose help)
 void verboseHelp(void)
 {
-    QString m_verbose = userDefaultValueStr.trimmed();
-    m_verbose.replace(QRegExp(" "), ",");
-    m_verbose.remove(QRegExp("^,"));
+    QString m_verbose = userDefaultValueStr.simplified().replace(' ', ',');
 
     cerr << "Verbose debug levels.\n"
             "Accepts any combination (separated by comma) of:\n\n";
@@ -1005,9 +1001,8 @@ int verboseArgParse(const QString& arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    QStringList verboseOpts = arg.split(QRegExp("[^\\w:]+",
-                                                Qt::CaseInsensitive,
-                                                QRegExp::RegExp2));
+    QStringList verboseOpts = arg.split(QRegularExpression("[^\\w:]+"),
+                                        QString::SkipEmptyParts);
     for (const auto& opt : qAsConst(verboseOpts))
     {
         option = opt.toLower();
