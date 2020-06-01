@@ -1,6 +1,8 @@
 #ifndef MYTH_THREAD_H
 #define MYTH_THREAD_H
 
+#include <climits>
+
 #include <QThread>
 
 #include "mythbaseexp.h"
