@@ -16,7 +16,6 @@
 
 // Qt headers
 #include <QApplication>
-#include <QRegExp>
 #include <QTextStream>
 #include <QTextCodec>
 #include <QByteArray>
@@ -723,7 +722,7 @@ LCD::~LCD()
 QString LCD::quotedString(const QString &string)
 {
     QString sRes = string;
-    sRes.replace(QRegExp("\""), QString("\"\""));
+    sRes.replace(QString("\""), QString("\"\""));
     sRes = "\"" + sRes + "\"";
 
     return(sRes);
