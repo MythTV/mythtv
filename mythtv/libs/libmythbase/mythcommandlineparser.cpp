@@ -47,6 +47,7 @@ using namespace std;
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QSize>
 #include <QString>
 #include <QTextStream>
@@ -1880,10 +1881,10 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                                 QString::SkipEmptyParts);
                         if (tokens.size() == 2)
                         {
-                            tokens[0].replace(QRegExp("^[\"']"), "");
-                            tokens[0].replace(QRegExp("[\"']$"), "");
-                            tokens[1].replace(QRegExp("^[\"']"), "");
-                            tokens[1].replace(QRegExp("[\"']$"), "");
+                            tokens[0].remove(QRegularExpression("^[\"']"));
+                            tokens[0].remove(QRegularExpression("[\"']$"));
+                            tokens[1].remove(QRegularExpression("^[\"']"));
+                            tokens[1].remove(QRegularExpression("[\"']$"));
                             if (!tokens[0].isEmpty())
                                 smap[tokens[0]] = tokens[1];
                         }
