@@ -183,7 +183,10 @@ MythDisplay::MythDisplay()
     m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
     if (m_screen)
+    {
         connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
+        connect(m_screen, &QScreen::physicalDotsPerInchChanged, this, &MythDisplay::PhysicalDPIChanged);
+    }
 
     connect(qGuiApp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
     connect(qGuiApp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
@@ -389,8 +392,16 @@ void MythDisplay::ScreenChanged(QScreen *qScreen)
     DebugScreen(qScreen, "Changed to");
     m_screen = qScreen;
     connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
+    connect(m_screen, &QScreen::physicalDotsPerInchChanged, this, &MythDisplay::PhysicalDPIChanged);
     Initialise();
     emit CurrentScreenChanged(qScreen);
+}
+
+void MythDisplay::PhysicalDPIChanged(qreal DPI)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt screen pixel ratio changed to %1")
+        .arg(DPI, 2, 'f', 2, '0'));
+    emit CurrentDPIChanged(DPI);
 }
 
 void MythDisplay::PrimaryScreenChanged(QScreen* qScreen)
@@ -475,7 +486,8 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
         .arg(Message).arg(qScreen->name()).arg(extra));
-
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt screen pixel ratio: %1")
+        .arg(qScreen->devicePixelRatio(), 2, 'f', 2, '0'));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry: %1x%2+%3+%4 Size(Qt): %5mmx%6mm")
         .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top())
         .arg(qScreen->physicalSize().width()).arg(qScreen->physicalSize().height()));
