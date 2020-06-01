@@ -27,7 +27,6 @@
 // Qt headers
 #include <QByteArray>
 #include <QIODevice>
-#include <QRegExp>
 #include <QStringList>
 #include <utility>
 
@@ -220,6 +219,6 @@ MythSystem *MythSystem::Create(
     Priority diskPriority)
 {
     return MythSystem::Create(
-        args.split(QRegExp("\\s+")), flags, startPath,
+        args.simplified().split(' '), flags, startPath,
         cpuPriority, diskPriority);
 }
