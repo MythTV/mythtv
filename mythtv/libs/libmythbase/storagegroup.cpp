@@ -1,6 +1,5 @@
 #include <QDir>
 #include <QFile>
-#include <QRegExp>
 #include <QUrl>
 
 #include "storagegroup.h"
@@ -572,8 +571,7 @@ bool StorageGroup::FindDirs(const QString &group, const QString &hostname,
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
-            dirname.replace(QRegExp("^\\s*"), "");
-            dirname.replace(QRegExp("\\s*$"), "");
+            dirname = dirname.trimmed();
             if (dirname.endsWith("/"))
                 dirname.remove(dirname.length() - 1, 1);
 
@@ -757,9 +755,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
          * value using QString::fromUtf8() to prevent corruption. */
         dirname = QString::fromUtf8(query.value(1)
                                     .toByteArray().constData());
-
-        dirname.replace(QRegExp("^\\s*"), "");
-        dirname.replace(QRegExp("\\s*$"), "");
+        dirname = dirname.trimmed();
 
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("Checking directory '%1' in group '%2'.")
