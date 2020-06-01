@@ -20,7 +20,7 @@
 */
 
 #include <QStringList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QThread>
 
 #include "Engine.h"
@@ -1192,7 +1192,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
 bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 {
     QString csFeat = QString::fromUtf8((const char *)feature.Bytes(), feature.Size());
-    QStringList strings = csFeat.split(QRegExp(R"([\(\,\)])"));
+    QStringList strings = csFeat.split(QRegularExpression(R"([\(\,\)])"));
 
     MHLOG(MHLogNotifications, "NOTE GetEngineSupport " + csFeat);
 
