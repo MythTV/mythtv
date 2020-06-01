@@ -49,3 +49,5 @@ GPATH
 GRTAGS
 GTAGS
 compile_commands.json
+qdbusxml2cpp_wrapper.sh
+uic_wrapper.sh
