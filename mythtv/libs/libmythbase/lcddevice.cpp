@@ -266,8 +266,6 @@ void LCD::ReadyRead(void)
     m_socket->read(data.data(), dataSize);
 
     lineFromServer = data;
-    lineFromServer = lineFromServer.replace( QRegExp("\n"), " " );
-    lineFromServer = lineFromServer.replace( QRegExp("\r"), " " );
     lineFromServer = lineFromServer.simplified();
 
     // Make debugging be less noisy
