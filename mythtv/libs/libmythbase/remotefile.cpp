@@ -3,6 +3,7 @@ using namespace std;
 
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QUrl>
 
 // POSIX C headers
@@ -1297,7 +1298,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host,
 
 /**
  *  \brief Search all BE's for files in the give storage group
- *  \param filename the partial path and filename to look for or regex
+ *  \param filename the partial path and filename to look for or regular espression (QRegularExpression)
  *  \param host search this host first if given or default to the master BE if empty
  *  \param storageGroup the name of the storage group to search
  *  \param useRegex if true filename is assumed to be a regex expression of files to find
@@ -1344,7 +1345,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
                                                .arg(x).arg(files[x]));
             }
 
-            QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
+            QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
                 strList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
