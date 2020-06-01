@@ -5,6 +5,7 @@
 // QT headers
 #include <QRect>
 #include <QPainter>
+#include <QPainterPath>
 
 // libmythbase headers
 #include "mythlogging.h"
