@@ -169,6 +169,7 @@ enum LCDFunctionSet {
 class MBASE_PUBLIC LCD : public QObject
 {
     Q_OBJECT
+    friend class TestLcdDevice;
 
   protected:
     LCD();
