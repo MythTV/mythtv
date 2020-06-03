@@ -45,10 +45,13 @@ extern MBASE_PUBLIC QStringList logPropagateArgList;
 extern MBASE_PUBLIC QString     logPropagateArgs;
 extern MBASE_PUBLIC QString     verboseString;
 
+MBASE_PUBLIC void resetLogging(void);
+
 MBASE_PUBLIC void logStart(const QString& logfile, bool progress = false,
                            int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
-                           bool dblog = true, bool propagate = false);
+                           bool dblog = true, bool propagate = false,
+                           bool testHarness = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);

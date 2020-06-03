@@ -114,6 +114,18 @@ void loglevelAdd(int value, QString name, char shortname);
 void verboseInit(void);
 void verboseHelp(void);
 
+/// \brief Intended for use only by the test harness.
+void resetLogging(void)
+{
+    verboseMask = verboseDefaultInt;
+    verboseString = QString(verboseDefaultStr);
+    userDefaultValueInt = verboseDefaultInt;
+    userDefaultValueStr = QString(verboseDefaultStr);
+    haveUserDefaultValues = false;
+
+    verboseInit();
+}
+
 void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 {
 #if HAVE_GETTIMEOFDAY
@@ -709,8 +721,10 @@ bool logPropagateQuiet(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
+/// \param  testHarness Should always be false. Set to true when
+///                     invoked by the testing code.
 void logStart(const QString& logfile, bool progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate)
+              LogLevel_t level, bool dblog, bool propagate, bool testHarness)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -732,6 +746,8 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     }
 
     logPropagateCalc();
+    if (testHarness)
+        return;
 
     QString table = dblog ? QString("logging") : QString("");
 
