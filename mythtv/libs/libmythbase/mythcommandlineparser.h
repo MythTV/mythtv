@@ -15,6 +15,7 @@
 #include "referencecounter.h"
 
 class MythCommandLineParser;
+class TestCommandLineParser;
 
 class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 {
@@ -114,6 +115,8 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 class MBASE_PUBLIC MythCommandLineParser
 {
   public:
+    friend TestCommandLineParser;
+
     enum class Result {
         kEnd          = 0,
         kEmpty        = 1,
