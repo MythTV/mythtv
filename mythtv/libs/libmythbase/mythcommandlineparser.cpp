@@ -67,16 +67,6 @@ using namespace std;
 
 #define TERMWIDTH 79
 
-const int kEnd          = 0,
-          kEmpty        = 1,
-          kOptOnly      = 2,
-          kOptVal       = 3,
-          kCombOptVal   = 4,
-          kArg          = 5,
-          kPassthrough  = 6,
-          kInvalid      = 7;
-
-const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
 int GetTermWidth(void);
@@ -111,32 +101,32 @@ QByteArray strip_quotes (QByteArray val)
 /** \fn NamedOptType
  *  \brief Return character string describing type of result from parser pass
  */
-const char* NamedOptType(int type)
+const char* MythCommandLineParser::NamedOptType(Result type)
 {
     switch (type)
     {
-      case kEnd:
+      case Result::kEnd:
         return "kEnd";
 
-      case kEmpty:
+      case Result::kEmpty:
         return "kEmpty";
 
-      case kOptOnly:
+      case Result::kOptOnly:
         return "kOptOnly";
 
-      case kOptVal:
+      case Result::kOptVal:
         return "kOptVal";
 
-      case kCombOptVal:
+      case Result::kCombOptVal:
         return "kCombOptVal";
 
-      case kArg:
+      case Result::kArg:
         return "kArg";
 
-      case kPassthrough:
+      case Result::kPassthrough:
         return "kPassthrough";
 
-      case kInvalid:
+      case Result::kInvalid:
         return "kInvalid";
 
       default:
@@ -1360,7 +1350,7 @@ QString MythCommandLineParser::GetHelpString(void) const
 
 /** \brief Internal use. Pull next key/value pair from argv.
  */
-int MythCommandLineParser::getOpt(int argc, const char * const * argv,
+MythCommandLineParser::Result MythCommandLineParser::getOpt(int argc, const char * const * argv,
                                   int &argpos, QString &opt, QByteArray &val)
 {
     opt.clear();
@@ -1368,18 +1358,18 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
 
     if (argpos >= argc)
         // this shouldnt happen, return and exit
-        return kEnd;
+        return Result::kEnd;
 
     QByteArray tmp(argv[argpos]);
     if (tmp.isEmpty())
         // string is empty, return and loop
-        return kEmpty;
+        return Result::kEmpty;
 
     if (m_passthroughActive)
     {
         // pass through has been activated
         val = tmp;
-        return kArg;
+        return Result::kArg;
     }
 
     if (tmp.startsWith('-') && tmp.size() > 1)
@@ -1388,7 +1378,7 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
         {
             // all options beyond this will be passed as a single string
             m_passthroughActive = true;
-            return kPassthrough;
+            return Result::kPassthrough;
         }
 
         if (tmp.contains('='))
@@ -1400,39 +1390,39 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
             {
                 // more than one '=' in option, this is not handled
                 opt = QString(tmp);
-                return kInvalid;
+                return Result::kInvalid;
             }
 
             opt = QString(strip_quotes(blist[0]));
             val = strip_quotes(blist[1]);
-            return kCombOptVal;
+            return Result::kCombOptVal;
         }
 
         opt = QString(tmp);
 
         if (argpos+1 >= argc)
             // end of input, option only
-            return kOptOnly;
+            return Result::kOptOnly;
 
         tmp = QByteArray(argv[++argpos]);
         if (tmp.isEmpty())
             // empty string, option only
-            return kOptOnly;
+            return Result::kOptOnly;
 
         if (tmp.startsWith("-") && tmp.size() > 1)
         {
             // no value found for option, backtrack
             argpos--;
-            return kOptOnly;
+            return Result::kOptOnly;
         }
 
         val = tmp;
-        return kOptVal;
+        return Result::kOptVal;
     }
 
     // input is not an option string, return as arg
     val = tmp;
-    return kArg;
+    return Result::kArg;
 }
 
 /** \brief Loop through argv and populate arguments with values
@@ -1443,7 +1433,7 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
  */
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
-    int res = kEnd;
+    Result res = Result::kEnd;
     QString opt;
     QByteArray val;
     CommandLineArg *argdef = nullptr;
@@ -1467,7 +1457,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
 
         // '--' found on command line, enable passthrough mode
-        if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
+        if (res == Result::kPassthrough && !m_namedArgs.contains("_passthrough"))
         {
             cerr << "Received '--' but passthrough has not been enabled" << endl;
             SetValue("showhelp", "");
@@ -1475,16 +1465,16 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
 
         // end of options found, terminate loop
-        if (res == kEnd)
+        if (res == Result::kEnd)
             break;
 
         // GetOpt pulled an empty option, this shouldnt happen by ignore
         // it and continue
-        if (res == kEmpty)
+        if (res == Result::kEmpty)
             continue;
 
         // more than one equal found in key/value pair, fault out
-        if (res == kInvalid)
+        if (res == Result::kInvalid)
         {
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
@@ -1500,7 +1490,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
 
         // argument with no preceeding '-' encountered, add to stringlist
-        if (res == kArg)
+        if (res == Result::kArg)
         {
             if (!m_namedArgs.contains("_args"))
             {
@@ -1545,7 +1535,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 tmp += '=';
                 tmp += val;
                 val = tmp;
-                res = kOptVal;
+                res = Result::kOptVal;
             }
             else
             {
@@ -1576,7 +1566,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                  << endl;
 
         // argument is keyword only, no value
-        if (res == kOptOnly)
+        if (res == Result::kOptOnly)
         {
             if (!argdef->Set(opt))
             {
@@ -1585,13 +1575,13 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             }
         }
         // argument has keyword and value
-        else if ((res == kOptVal) || (res == kCombOptVal))
+        else if ((res == Result::kOptVal) || (res == Result::kCombOptVal))
         {
             if (!argdef->Set(opt, val))
             {
                 // if option and value were combined with a '=', abort directly
                 // otherwise, attempt processing them independenly
-                if ((res == kCombOptVal) || !argdef->Set(opt))
+                if ((res == Result::kCombOptVal) || !argdef->Set(opt))
                 {
                     SetValue("showhelp", "");
                     return false;
