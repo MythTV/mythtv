@@ -80,6 +80,7 @@ const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
 int GetTermWidth(void);
+QByteArray strip_quotes (QByteArray val);
 
 /** \fn GetTermWidth(void)
  *  \brief returns terminal width, or 79 on error
@@ -96,6 +97,15 @@ int GetTermWidth(void)
 
     return (int)ws.ws_col;
 #endif
+}
+
+QByteArray strip_quotes (QByteArray val)
+{
+    if (val.startsWith('"') && val.endsWith('"'))
+        return val.mid(1,val.size()-2);
+    if (val.startsWith('\'') && val.endsWith('\''))
+        return val.mid(1,val.size()-2);
+    return val;
 }
 
 /** \fn NamedOptType
@@ -519,7 +529,7 @@ bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
 
         if (!m_stored.isNull())
             vmap = m_stored.toMap();
-        vmap[QString(blist[0])] = QVariant(blist[1]);
+        vmap[QString(strip_quotes(blist[0]))] = QVariant(strip_quotes(blist[1]));
         m_stored = QVariant(vmap);
         break;
 
@@ -1393,8 +1403,8 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
                 return kInvalid;
             }
 
-            opt = QString(blist[0]);
-            val = blist[1];
+            opt = QString(strip_quotes(blist[0]));
+            val = strip_quotes(blist[1]);
             return kCombOptVal;
         }
 
