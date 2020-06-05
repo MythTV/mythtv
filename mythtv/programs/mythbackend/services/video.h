@@ -114,6 +114,8 @@ class Video : public VideoServices
 
         DTC::BlurayInfo*          GetBluray          ( const QString  &Path      ) override; // VideoServices
 
+        DTC::VideoStreamInfoList* GetStreamInfo ( const QString &StorageGroup,
+                                                  const QString &FileName  ) override;  // VideoServices
 };
 
 // --------------------------------------------------------------------------
