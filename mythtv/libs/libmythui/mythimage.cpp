@@ -7,7 +7,6 @@
 
 // QT headers
 #include <QImageReader>
-#include <QMatrix>
 #include <QNetworkReply>
 #include <QPainter>
 #include <QRgb>
@@ -199,19 +198,19 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
                  BoundaryWanted::No, fillDirection);
     mirrorImage.setAlphaChannel(alphaChannel);
 
-    QMatrix shearMatrix;
+    QTransform shearTransform;
     if (axis == ReflectAxis::Vertical)
     {
-        shearMatrix.scale(1,(float)scale/100);
-        shearMatrix.shear((float)shear/100,0);
+        shearTransform.scale(1,(float)scale/100);
+        shearTransform.shear((float)shear/100,0);
     }
     else if (axis == ReflectAxis::Horizontal)
     {
-        shearMatrix.scale((float)scale/100,1);
-        shearMatrix.shear(0,(float)shear/100);
+        shearTransform.scale((float)scale/100,1);
+        shearTransform.shear(0,(float)shear/100);
     }
 
-    mirrorImage = mirrorImage.transformed(shearMatrix, Qt::SmoothTransformation);
+    mirrorImage = mirrorImage.transformed(shearTransform, Qt::SmoothTransformation);
 
     QSize newsize;
     if (axis == ReflectAxis::Vertical)
