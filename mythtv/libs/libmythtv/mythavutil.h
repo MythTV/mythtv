@@ -16,6 +16,7 @@ extern "C" {
 
 #include <QMap>
 #include <QMutex>
+#include <QVector>
 
 struct AVFilterGraph;
 struct AVFilterContext;
@@ -198,4 +199,39 @@ private:
     float               m_ar;
     bool                m_errored       {false};
 };
+
+
+class MTV_PUBLIC MythStreamInfo {
+public:
+    // These are for All types
+    char                m_codecType {' '};   // V=video, A=audio, S=subtitle
+    QString             m_codecName;
+    int64_t             m_duration {0};
+    // These are for Video only
+    int                 m_width {0};
+    int                 m_height {0};
+    float               m_SampleAspectRatio {0.0};
+    // AV_FIELD_TT,          //< Top coded_first, top displayed first
+    // AV_FIELD_BB,          //< Bottom coded first, bottom displayed first
+    // AV_FIELD_TB,          //< Top coded first, bottom displayed first
+    // AV_FIELD_BT,          //< Bottom coded first, top displayed first
+    QString             m_fieldOrder {"UN"};   // UNknown, PRogressive, TT, BB, TB, BT
+    float               m_frameRate {0.0};
+    float               m_avgFrameRate {0.0};
+    // This is for audio only
+    int                 m_channels {0};
+};
+
+
+/*
+*   Class to get stream info, used by service Video/GetStreamInfo
+*/
+class MTV_PUBLIC MythStreamInfoList {
+public:
+    MythStreamInfoList(QString filename);
+    int                     m_errorCode         {0};
+    QString                 m_errorMsg;
+    QVector<MythStreamInfo> m_streamInfoList;
+};
+
 #endif

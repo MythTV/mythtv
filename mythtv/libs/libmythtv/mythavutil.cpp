@@ -20,6 +20,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 #include <QMutexLocker>
+#include <QFile>
 
 AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
@@ -575,4 +576,141 @@ void MythCodecMap::freeAllCodecContexts()
         ++i;
         freeCodecContext(stream);
     }
+}
+
+MythStreamInfoList::MythStreamInfoList(QString filename)
+{
+    const int probeBufferSize = 8 * 1024;
+    AVInputFormat *fmt      = nullptr;
+    AVProbeData probe;
+    memset(&probe, 0, sizeof(AVProbeData));
+    probe.filename = "";
+    probe.buf = new unsigned char[probeBufferSize + AVPROBE_PADDING_SIZE];
+    probe.buf_size = probeBufferSize;
+    memset(probe.buf, 0, probeBufferSize + AVPROBE_PADDING_SIZE);
+    av_log_set_level(AV_LOG_FATAL);
+    m_errorCode = 0;
+    if (filename == "")
+        m_errorCode = 97;
+    QFile infile(filename);
+    if (m_errorCode == 0 && !infile.open(QIODevice::ReadOnly))
+        m_errorCode = 99;
+    if (m_errorCode==0) {
+        int64_t leng = infile.read(reinterpret_cast<char*>(probe.buf), probeBufferSize);
+        probe.buf_size = static_cast<int>(leng);
+        infile.close();
+        fmt = av_probe_input_format(&probe, static_cast<int>(true));
+        if (fmt == nullptr)
+            m_errorCode = 98;
+    }
+    AVFormatContext *ctx = nullptr;
+    if (m_errorCode==0)
+    {
+        ctx = avformat_alloc_context();
+        m_errorCode = avformat_open_input(&ctx, filename.toUtf8(), fmt, nullptr);
+    }
+    if (m_errorCode==0)
+        m_errorCode = avformat_find_stream_info(ctx, nullptr);
+
+    if (m_errorCode==0)
+    {
+        for (uint ix = 0; ix < ctx->nb_streams; ix++)
+        {
+            AVStream *stream = ctx->streams[ix];
+            if (stream == nullptr)
+                continue;
+            AVCodecParameters *codecpar = stream->codecpar;
+            const AVCodecDescriptor* desc = nullptr;
+            if (codecpar != nullptr)
+                desc = avcodec_descriptor_get(codecpar->codec_id);
+            MythStreamInfo info;
+            info.m_codecType = ' ';
+            switch (codecpar->codec_type)
+            {
+                case AVMEDIA_TYPE_VIDEO:
+                    info.m_codecType = 'V';
+                    break;
+                case AVMEDIA_TYPE_AUDIO:
+                    info.m_codecType = 'A';
+                    break;
+                case AVMEDIA_TYPE_SUBTITLE:
+                    info.m_codecType = 'S';
+                    break;
+                default:
+                    continue;
+            }
+            if (desc != nullptr)
+                info.m_codecName = desc->name;
+            info.m_duration  = stream->duration * stream->time_base.num / stream->time_base.den;
+            if (info.m_codecType == 'V')
+            {
+                if (codecpar != nullptr)
+                {
+                    info.m_width  = codecpar->width;
+                    info.m_height = codecpar->height;
+                    info.m_SampleAspectRatio = static_cast<float>(codecpar->sample_aspect_ratio.num)
+                        / static_cast<float>(codecpar->sample_aspect_ratio.den);
+                    switch (codecpar->field_order)
+                    {
+                        case AV_FIELD_PROGRESSIVE:
+                            info.m_fieldOrder = "PR";
+                            break;
+                        case AV_FIELD_TT:
+                            info.m_fieldOrder = "TT";
+                            break;
+                        case AV_FIELD_BB:
+                            info.m_fieldOrder = "BB";
+                            break;
+                        case AV_FIELD_TB:
+                            info.m_fieldOrder = "TB";
+                            break;
+                        case AV_FIELD_BT:
+                            info.m_fieldOrder = "BT";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                info.m_frameRate = static_cast<float>(stream->r_frame_rate.num)
+                    / static_cast<float>(stream->r_frame_rate.den);
+                info.m_avgFrameRate = static_cast<float>(stream->avg_frame_rate.num)
+                    / static_cast<float>(stream->avg_frame_rate.den);
+            }
+            if (info.m_codecType == 'A')
+                info.m_channels = codecpar->channels;
+            m_streamInfoList.append(info);
+        }
+    }
+    if (m_errorCode != 0)
+    {
+        switch(m_errorCode) {
+            case 97:
+                m_errorMsg = "File Not Found";
+                break;
+            case 98:
+                m_errorMsg = "av_probe_input_format returned no result";
+                break;
+            case 99:
+                m_errorMsg = "File could not be opened";
+                break;
+            default:
+                char errbuf[256];
+                if (av_strerror(m_errorCode, errbuf, sizeof errbuf) == 0)
+                    m_errorMsg = QString(errbuf);
+                else
+                    m_errorMsg = "UNKNOWN";
+        }
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythStreamInfoList failed for %1. Error code:%2 Message:%3")
+            .arg(filename).arg(m_errorCode).arg(m_errorMsg));
+
+    }
+
+    if (ctx != nullptr)
+    {
+        avformat_close_input(&ctx);
+        avformat_free_context(ctx);
+    }
+    if (probe.buf != nullptr)
+        delete probe.buf;
 }
