@@ -125,6 +125,16 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
             compilation = true;
         }
     }
+    else if (tag->contains("ALBUMARTIST"))
+    {
+        QString compilation_artist = TStringToQString(
+            tag->fieldListMap()["ALBUMARTIST"].toString()).trimmed();
+        if (compilation_artist != metadata->Artist())
+        {
+            metadata->setCompilationArtist(compilation_artist);
+            compilation = true;
+        }
+    }
 
     if (!compilation && tag->contains("MUSICBRAINZ_ALBUMARTISTID"))
     {

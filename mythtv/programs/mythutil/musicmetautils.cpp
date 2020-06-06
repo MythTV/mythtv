@@ -178,9 +178,9 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-static int ScanMusic(const MythUtilCommandLineParser &/*cmdline*/)
+static int ScanMusic(const MythUtilCommandLineParser &cmdline)
 {
-    auto *fscan = new MusicFileScanner();
+    auto *fscan = new MusicFileScanner(cmdline.toBool("musicforce"));
     QStringList dirList;
 
     if (!StorageGroup::FindDirs("Music", gCoreContext->GetHostName(), &dirList))
