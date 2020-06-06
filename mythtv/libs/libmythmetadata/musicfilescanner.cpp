@@ -13,7 +13,7 @@
 #include <metaio.h>
 #include <musicfilescanner.h>
 
-MusicFileScanner::MusicFileScanner()
+MusicFileScanner::MusicFileScanner(bool force) : m_forceupdate{force}
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -318,6 +318,10 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
                 data->setAlbumId(m_albumid[album_cache_string]);
         }
 
+        int caid = m_artistid[data->CompilationArtist().toLower()];
+        if (caid > 0)
+            data->setCompilationArtistId(caid);
+
         int gid = m_genreid[data->Genre().toLower()];
         if (gid > 0)
             data->setGenreId(gid);
@@ -328,6 +332,9 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
         // Update the cache
         m_artistid[data->Artist().toLower()] =
             data->getArtistId();
+
+        m_artistid[data->CompilationArtist().toLower()] =
+            data->getCompilationArtistId();
 
         m_genreid[data->Genre().toLower()] =
             data->getGenreId();
@@ -599,6 +606,10 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
                 disk_meta->setAlbumId(m_albumid[album_cache_string]);
         }
 
+        int caid = m_artistid[disk_meta->CompilationArtist().toLower()];
+        if (caid > 0)
+            disk_meta->setCompilationArtistId(caid);
+
         int gid = m_genreid[disk_meta->Genre().toLower()];
         if (gid > 0)
             disk_meta->setGenreId(gid);
@@ -613,6 +624,8 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
         // Update the cache
         m_artistid[disk_meta->Artist().toLower()]
             = disk_meta->getArtistId();
+        m_artistid[disk_meta->CompilationArtist().toLower()]
+            = disk_meta->getCompilationArtistId();
         m_genreid[disk_meta->Genre().toLower()]
             = disk_meta->getGenreId();
         album_cache_string = QString::number(disk_meta->getArtistId()) + "#" +
@@ -803,7 +816,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
-                if (HasFileChanged(name, query.value(1).toString()))
+                if (m_forceupdate || HasFileChanged(name, query.value(1).toString()))
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
                 else
                 {

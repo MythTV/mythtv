@@ -537,11 +537,20 @@ int MusicMetadata::getArtistId()
             }
             m_artistId = query.lastInsertId().toInt();
         }
+    }
+
+    return m_artistId;
+}
+
+int MusicMetadata::getCompilationArtistId()
+{
+    if (m_compartistId < 0) {
+        MSqlQuery query(MSqlQuery::InitCon());
 
         // Compilation Artist
         if (m_artist == m_compilationArtist)
         {
-            m_compartistId = m_artistId;
+            m_compartistId = getArtistId();
         }
         else
         {
@@ -572,7 +581,7 @@ int MusicMetadata::getArtistId()
         }
     }
 
-    return m_artistId;
+    return m_compartistId;
 }
 
 int MusicMetadata::getAlbumId()
@@ -667,11 +676,16 @@ QString MusicMetadata::Url(uint index)
 
 void MusicMetadata::dumpToDatabase()
 {
+    checkEmptyFields();
+
     if (m_directoryId < 0)
         getDirectoryId();
 
     if (m_artistId < 0)
         getArtistId();
+
+    if (m_compartistId < 0)
+        getCompilationArtistId();
 
     if (m_albumId < 0)
         getAlbumId();
@@ -764,10 +778,14 @@ void MusicMetadata::dumpToDatabase()
     if (m_albumArt)
         m_albumArt->dumpToDatabase();
 
-    // make sure the compilation flag is updated
-    query.prepare("UPDATE music_albums SET compilation = :COMPILATION, year = :YEAR "
+    // update the album
+    query.prepare("UPDATE music_albums SET album_name = :ALBUM_NAME, "
+                  "artist_id = :COMP_ARTIST_ID, compilation = :COMPILATION, "
+                  "year = :YEAR "
                   "WHERE music_albums.album_id = :ALBUMID");
     query.bindValue(":ALBUMID", m_albumId);
+    query.bindValue(":ALBUM_NAME", m_album);
+    query.bindValue(":COMP_ARTIST_ID", m_compartistId);
     query.bindValue(":COMPILATION", m_compilation);
     query.bindValue(":YEAR", m_year);
 
@@ -849,16 +867,28 @@ inline QString MusicMetadata::formatReplaceSymbols(const QString &format)
 void MusicMetadata::checkEmptyFields()
 {
     if (m_artist.isEmpty())
+    {
         m_artist = tr("Unknown Artist", "Default artist if no artist");
+        m_artistId = -1;
+    }
     // This should be the same as Artist if it's a compilation track or blank
     if (!m_compilation || m_compilationArtist.isEmpty())
+    {
         m_compilationArtist = m_artist;
+        m_compartistId = -1;
+    }
     if (m_album.isEmpty())
+    {
         m_album = tr("Unknown Album", "Default album if no album");
+        m_albumId = -1;
+    }
     if (m_title.isEmpty())
         m_title = m_filename;
     if (m_genre.isEmpty())
+    {
         m_genre = tr("Unknown Genre", "Default genre if no genre");
+        m_genreId = -1;
+    }
     ensureSortFields();
 }
 
@@ -1537,6 +1567,7 @@ void AllMusic::resync()
 
             dbMeta->setDirectoryId(query.value(11).toInt());
             dbMeta->setArtistId(query.value(1).toInt());
+            dbMeta->setCompilationArtistId(query.value(3).toInt());
             dbMeta->setAlbumId(query.value(4).toInt());
             dbMeta->setTrackCount(query.value(19).toInt());
             dbMeta->setFileSize(query.value(20).toULongLong());
