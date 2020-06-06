@@ -80,28 +80,30 @@ bool MythVDPAUHelper::ProfileCheck(VdpDecoderProfile Profile, uint32_t &Level,
         return false;
 
     INIT_ST
-    VdpBool supported = 0;
+    VdpBool supported = VDP_FALSE;
     status = m_vdpDecoderQueryCapabilities(m_device, Profile, &supported,
                                            &Level, &Macros, &Width, &Height);
     CHECK_ST
 
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("ProfileCheck: Prof %1 Supp %2 Level %3 Macros %4 Width %5 Height %6 Status %7")
+        .arg(Profile).arg(supported).arg(Level).arg(Macros).arg(Width).arg(Height).arg(status));
+
     if (((supported != VDP_TRUE) || (status != VDP_STATUS_OK)) &&
         (Profile == VDP_DECODER_PROFILE_H264_CONSTRAINED_BASELINE))
     {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Driver does not report support for H264 Constrained Baseline...");
+
         // H264 Constrained baseline is reported as not supported on older chipsets but
         // works due to support for H264 Main. Test for H264 main if constrained baseline
         // fails - which mimics the fallback in FFmpeg.
         status = m_vdpDecoderQueryCapabilities(m_device, VDP_DECODER_PROFILE_H264_MAIN, &supported,
                                                &Level, &Macros, &Width, &Height);
-        if (supported > 0)
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Driver does not report support for H264 Constrained Baseline");
-            LOG(VB_GENERAL, LOG_INFO, LOC + " - but assuming available as H264 Main is supported");
-        }
         CHECK_ST
+        if (supported == VDP_TRUE)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "... but assuming available as H264 Main is supported");
     }
 
-    return supported > 0;
+    return supported == VDP_TRUE;
 }
 
 const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
