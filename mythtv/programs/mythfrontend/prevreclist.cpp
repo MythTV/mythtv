@@ -777,8 +777,17 @@ void PrevRecordedList::DeleteOldSeries(bool ok)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM oldrecorded "
-                  "WHERE title = :TITLE AND future = 0");
+                  "WHERE title = :TITLE "
+                  "      AND recstatus <> :PENDING "
+                  "      AND recstatus <> :TUNING "
+                  "      AND recstatus <> :RECORDING "
+                  "      AND recstatus <> :FAILING "
+                  "      AND future = 0");
     query.bindValue(":TITLE", title);
+    query.bindValue(":PENDING", RecStatus::Pending);
+    query.bindValue(":TUNING", RecStatus::Tuning);
+    query.bindValue(":RECORDING", RecStatus::Recording);
+    query.bindValue(":FAILING", RecStatus::Failing);
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);
 
@@ -793,7 +802,11 @@ void PrevRecordedList::DeleteOldSeries(bool ok)
     auto it = m_showData.begin();
     while (pos < (int)m_showData.size())
     {
-        if ((*it)->GetTitle() == title)
+        if ((*it)->GetTitle() == title
+            && (*it)->GetRecordingStatus() != RecStatus::Pending
+            && (*it)->GetRecordingStatus() != RecStatus::Tuning
+            && (*it)->GetRecordingStatus() != RecStatus::Recording
+            && (*it)->GetRecordingStatus() != RecStatus::Failing)
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Deleting %1 at pos %2")
                 .arg(title).arg(pos));
