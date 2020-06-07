@@ -1449,7 +1449,9 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                 m_ioErrCnt = 0;
                 if (!okay)
                     level = LOG_WARNING;
-                else if (command.startsWith("SendBytes"))
+                else if (command.startsWith("SendBytes") ||
+                         (command.startsWith("TuneStatus") &&
+                          result == "OK:InProgress"))
                     level = LOG_DEBUG;
 
                 LOG(VB_RECORD, level,
