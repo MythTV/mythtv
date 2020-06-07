@@ -305,6 +305,7 @@ Q_SLOT void MythExternRecApp::DataStarted(void)
         return;
 
     QString cmd = m_onDataStart;
+    cmd.replace("%CHANNUM%", m_tunedChannel);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString(" Data started, finishing tune: '%1'").arg(cmd));
