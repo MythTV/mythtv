@@ -29,6 +29,9 @@ void TestLcdDevice::test_singleton (void)
     LCD *lcd3 = LCD::Get();
     QVERIFY(lcd2 != nullptr);
     QVERIFY(lcd3 != nullptr);
+    // Make clang-tidy NullDereference check happy with this next test.
+    if ((lcd2 == nullptr) || (lcd3 == nullptr))
+        return;
     QVERIFY(lcd2->m_retryTimer->parent() == lcd3->m_ledTimer->parent());
 }
 
