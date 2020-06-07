@@ -3,15 +3,6 @@
 #include <cstdint> // for intptr_t
 #include "tspacket.h"
 
-const unsigned int TSHeader::kHeaderSize       = 4;
-
-const unsigned int TSPacket::kSize             = 188;
-const unsigned int TSPacket::kPayloadSize      = 188-4;
-
-const unsigned int TSPacket::kDVBEmissionSize  = 204;
-const unsigned int TSPacket::kISDBEmissionSize = 204;
-const unsigned int TSPacket::k8VSBEmissionSize = 208;
-
 const unsigned char TSHeader::kPayloadOnlyHeader[4] =
 {
     SYNC_BYTE,

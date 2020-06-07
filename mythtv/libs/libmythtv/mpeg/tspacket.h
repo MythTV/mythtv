@@ -152,7 +152,7 @@ class MTV_PUBLIC TSHeader
     const unsigned char* data(void) const { return m_tsData; }
     unsigned char* data(void) { return m_tsData; }
 
-    static const unsigned int kHeaderSize;
+    static constexpr unsigned int kHeaderSize {4};
     static const unsigned char kPayloadOnlyHeader[4];
   private:
     unsigned char m_tsData[4] {};
@@ -217,11 +217,11 @@ class MTV_PUBLIC TSPacket : public TSHeader
 
     QString toString(void) const;
 
-    static const unsigned int kSize;
-    static const unsigned int kPayloadSize;
-    static const unsigned int kDVBEmissionSize;
-    static const unsigned int kISDBEmissionSize;
-    static const unsigned int k8VSBEmissionSize;
+    static constexpr unsigned int kSize             {188};
+    static constexpr unsigned int kPayloadSize      {188-4};
+    static constexpr unsigned int kDVBEmissionSize  {204};
+    static constexpr unsigned int kISDBEmissionSize {204};
+    static constexpr unsigned int k8VSBEmissionSize {208};
     static const TSPacket    *kNullPacket;
   private:
     unsigned char m_tsPayload[184] {};

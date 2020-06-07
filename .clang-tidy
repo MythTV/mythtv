@@ -110,10 +110,9 @@ Checks: '-*,
         # Needs work. ,
        -cppcoreguidelines-avoid-goto,
 
+        # Good. ,
         cppcoreguidelines-init-variables,
-
-        # One instance. ,
-       -cppcoreguidelines-interfaces-global-init,
+        cppcoreguidelines-interfaces-global-init,
 
         # Tons of warnings.  Most complaining that #define should
         # become a constexpr. ,
