@@ -812,10 +812,9 @@ DTC::VideoStreamInfoList* Video::GetStreamInfo
     pVideoStreamInfos->setErrorCode     ( infos.m_errorCode   );
     pVideoStreamInfos->setErrorMsg      ( infos.m_errorMsg    );
 
-    for( int n = 0; n < infos.m_streamInfoList.size() ; n++ )
+    for (const auto & info : qAsConst(infos.m_streamInfoList))
     {
         DTC::VideoStreamInfo *pVideoStreamInfo = pVideoStreamInfos->AddNewVideoStreamInfo();
-        const MythStreamInfo &info = infos.m_streamInfoList.at(n);
         pVideoStreamInfo->setCodecType       ( QString(QChar(info.m_codecType)) );
         pVideoStreamInfo->setCodecName       ( info.m_codecName   );
         pVideoStreamInfo->setWidth           ( info.m_width 			   );

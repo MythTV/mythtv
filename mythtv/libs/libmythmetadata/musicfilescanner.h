@@ -70,7 +70,7 @@ class META_PUBLIC MusicFileScanner
         uint m_coverartRemoved   {0};
         uint m_coverartUpdated   {0};
 
-        bool m_forceupdate;
+        bool m_forceupdate       {false};
 };
 
 #endif // MUSICFILESCANNER_H

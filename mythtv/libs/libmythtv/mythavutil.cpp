@@ -708,6 +708,5 @@ MythStreamInfoList::MythStreamInfoList(QString filename)
         avformat_close_input(&ctx);
         avformat_free_context(ctx);
     }
-    if (probe.buf != nullptr)
-        delete probe.buf;
+    delete [] probe.buf;
 }
