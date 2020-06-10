@@ -354,7 +354,7 @@ class DequeBuffer( object ):
             # get IO mode from pipe
             mode = pipe.mode
 
-        if (cls._pollingthread is None) or not cls._pollingthread.isAlive():
+        if (cls._pollingthread is None) or not cls._pollingthread.is_alive():
             # create new thread, and set it to not block shutdown
             cls._pollingthread = _PollingThread()
             cls._pollingthread.daemon = True
