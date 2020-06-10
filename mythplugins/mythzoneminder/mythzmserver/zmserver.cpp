@@ -747,8 +747,8 @@ void ZMServer::handleGetServerStatus(void)
     ADD_STR(outStr, status)
 
     // get load averages
-    double loads[3];
-    if (getloadavg(loads, 3) == -1)
+    array<double,3> loads {};
+    if (getloadavg(loads.data(), 3) == -1)
     {
         ADD_STR(outStr, "Unknown")
     }

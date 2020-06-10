@@ -99,12 +99,12 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 {
     QStringList strlist;
 
-#ifdef Q_OS_ANDROID
+#if defined(_WIN32) || defined(Q_OS_ANDROID)
     strlist << "ERROR";
-    strlist << "getloadavg() not supported in Android";
-#elif !defined(_WIN32)
-    double loads[3];
-    if (getloadavg(loads,3) == -1)
+    strlist << "getloadavg() not supported";
+#else
+    loadArray loads = getLoadAvgs();
+    if (loads[0] == -1)
     {
         strlist << "ERROR";
         strlist << "getloadavg() failed";
@@ -115,9 +115,6 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
                 << QString::number(loads[1])
                 << QString::number(loads[2]);
     }
-#else
-    strlist << "ERROR";
-    strlist << "getloadavg() not supported on Windows";
 #endif
 
     sock->WriteStringList(strlist);

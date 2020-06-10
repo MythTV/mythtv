@@ -34,6 +34,7 @@
 #include "scheduler.h"
 #include "mainserver.h"
 #include "cardutil.h"
+#include "mythmiscutil.h"
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "jobqueue.h"
@@ -520,9 +521,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     load.setAttribute("avg2", 1);
     load.setAttribute("avg3", 2);
 #else
-    double rgdAverages[3];
-
-    if (getloadavg(rgdAverages, 3) != -1)
+    loadArray rgdAverages = getLoadAvgs();
+    if (rgdAverages[0] != -1)
     {
         load.setAttribute("avg1", rgdAverages[0]);
         load.setAttribute("avg2", rgdAverages[1]);

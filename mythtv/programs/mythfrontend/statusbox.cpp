@@ -1335,8 +1335,7 @@ void StatusBox::doMachineStatus()
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     auto UpdateLoad = [](StatusBoxItem* Item)
     {
-        double loads[3] = { 0.0 };
-        getloadavg(loads, 3);
+        loadArray loads = getLoadAvgs();
         Item->SetText(QString("   %1: %2 %3 %4").arg(tr("Load")).arg(loads[0], 1, 'f', 2)
                 .arg(loads[1], 1, 'f', 2).arg(loads[2], 1, 'f', 2));
     };

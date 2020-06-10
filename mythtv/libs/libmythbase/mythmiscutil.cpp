@@ -166,6 +166,22 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 #endif
 }
 
+/** \fn getLoadAvgs()
+ *  \brief Returns the system load averages.
+ *  \return A std::array<double,3> containing the system load
+ *          averages.  If the system call fails or is unsupported,
+ *          returns array containing all -1.
+ */
+loadArray getLoadAvgs (void)
+{
+#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
+    loadArray loads;
+    if (getloadavg(loads.data(), loads.size()) != -1)
+        return loads;
+#endif
+    return {-1, -1, -1};
+}
+
 /**
  * \brief Guess whether a string is UTF-8
  *

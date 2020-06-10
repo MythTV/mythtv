@@ -992,16 +992,11 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("load", nc->getArg(1)))
     {
         QString str;
-#if defined(_WIN32) || defined(Q_OS_ANDROID)
-        str = QString("getloadavg() failed");
-#else
-        double  loads[3];
-
-        if (getloadavg(loads,3) == -1)
+        loadArray loads = getLoadAvgs();
+        if (loads[0] == -1)
             str = QString("getloadavg() failed");
         else
             str = QString("%1 %2 %3").arg(loads[0]).arg(loads[1]).arg(loads[2]);
-#endif
         return str;
     }
     else if (is_abbrev("memstats", nc->getArg(1)))

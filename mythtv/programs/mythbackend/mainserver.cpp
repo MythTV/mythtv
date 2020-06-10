@@ -3463,11 +3463,11 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 
     QStringList strlist;
 
-#ifdef Q_OS_ANDROID
+#if defined(_WIN32) || defined(Q_OS_ANDROID)
     strlist << "0" << "0" << "0";
 #else
-    double loads[3];
-    if (getloadavg(loads,3) == -1)
+    loadArray loads = getLoadAvgs();
+    if (loads[0] == -1)
     {
         strlist << "ERROR";
         strlist << "getloadavg() failed";

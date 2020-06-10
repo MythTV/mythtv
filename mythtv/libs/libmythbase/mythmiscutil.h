@@ -2,6 +2,7 @@
 #define MYTHMISCUTIL_H_
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <ctime>
 
@@ -17,6 +18,8 @@ class QFile;
 MBASE_PUBLIC bool getUptime(time_t &uptime);
 MBASE_PUBLIC bool getMemStats(
     int &totalMB, int &freeMB, int &totalVM, int &freeVM);
+using loadArray = std::array<double,3>;
+MBASE_PUBLIC loadArray getLoadAvgs(void);
 
 MBASE_PUBLIC bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
