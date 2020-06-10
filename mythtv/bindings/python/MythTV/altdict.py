@@ -107,7 +107,7 @@ class DictData( OrdDict ):
                 lambda x: datetime.fromRfc(x, datetime.UTCTZ())\
                                   .astimezone(datetime.localTZ())]
     _inv_trans = [  str,
-                    lambda x: locale.format("%0.6f", x),
+                    lambda x: locale.format_string("%0.6f", x),
                     lambda x: str(int(x)),
                     lambda x: x,
                     lambda x: str(int(x.timestamp())),
