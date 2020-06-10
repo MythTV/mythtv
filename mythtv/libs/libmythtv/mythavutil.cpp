@@ -618,23 +618,25 @@ MythStreamInfoList::MythStreamInfoList(QString filename)
                 continue;
             AVCodecParameters *codecpar = stream->codecpar;
             const AVCodecDescriptor* desc = nullptr;
-            if (codecpar != nullptr)
-                desc = avcodec_descriptor_get(codecpar->codec_id);
             MythStreamInfo info;
             info.m_codecType = ' ';
-            switch (codecpar->codec_type)
+            if (codecpar != nullptr)
             {
-                case AVMEDIA_TYPE_VIDEO:
-                    info.m_codecType = 'V';
-                    break;
-                case AVMEDIA_TYPE_AUDIO:
-                    info.m_codecType = 'A';
-                    break;
-                case AVMEDIA_TYPE_SUBTITLE:
-                    info.m_codecType = 'S';
-                    break;
-                default:
-                    continue;
+                desc = avcodec_descriptor_get(codecpar->codec_id);
+                switch (codecpar->codec_type)
+                {
+                    case AVMEDIA_TYPE_VIDEO:
+                        info.m_codecType = 'V';
+                        break;
+                    case AVMEDIA_TYPE_AUDIO:
+                        info.m_codecType = 'A';
+                        break;
+                    case AVMEDIA_TYPE_SUBTITLE:
+                        info.m_codecType = 'S';
+                        break;
+                   default:
+                       continue;
+                }
             }
             if (desc != nullptr)
                 info.m_codecName = desc->name;
