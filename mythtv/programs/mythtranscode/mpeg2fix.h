@@ -83,6 +83,10 @@ class PTSOffsetQueue
 };
 
 //container for all multiplex related variables
+using RingbufferArray = std::array<ringbuffer,N_AUDIO>;
+using ExtTypeIntArray = std::array<int,N_AUDIO>;
+using AudioFrameArray = std::array<audio_frame_t,N_AUDIO>;
+
 class MPEG2replex
 {
   public:
@@ -94,16 +98,16 @@ class MPEG2replex
     QString         m_outfile;
     int             m_otype                   {0};
     ringbuffer      m_vrBuf                   {};
-    ringbuffer      m_extrbuf[N_AUDIO]        {};
+    RingbufferArray m_extrbuf                 {};
     ringbuffer      m_indexVrbuf              {};
-    ringbuffer      m_indexExtrbuf[N_AUDIO]   {};
+    RingbufferArray m_indexExtrbuf            {};
     int             m_extCount                {0};
-    int             m_exttype[N_AUDIO]        {0};
-    int             m_exttypcnt[N_AUDIO]      {0};
+    ExtTypeIntArray m_exttype                 {0};
+    ExtTypeIntArray m_exttypcnt               {0};
 
     pthread_mutex_t m_mutex                   {};
     pthread_cond_t  m_cond                    {};
-    audio_frame_t   m_extframe[N_AUDIO]       {};
+    AudioFrameArray m_extframe                {};
     sequence_t      m_seq_head                {};
 
   private:

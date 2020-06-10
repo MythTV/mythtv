@@ -560,9 +560,9 @@ void MPEG2replex::Start()
 
     m_mplex = &mx;
 
-    init_multiplex(&mx, &m_seq_head, m_extframe, m_exttype, m_exttypcnt,
+    init_multiplex(&mx, &m_seq_head, m_extframe.data(), m_exttype.data(), m_exttypcnt.data(),
                    video_delay, audio_delay, fd_out, fill_buffers,
-                   &m_vrBuf, &m_indexVrbuf, m_extrbuf, m_indexExtrbuf, m_otype);
+                   &m_vrBuf, &m_indexVrbuf, m_extrbuf.data(), m_indexExtrbuf.data(), m_otype);
     setup_multiplex(&mx);
 
     while (true)
@@ -598,8 +598,8 @@ void MPEG2fixup::InitReplex()
     ring_init(&m_rx.m_vrBuf, memsize);
     ring_init(&m_rx.m_indexVrbuf, INDEX_BUF);
 
-    memset(m_rx.m_exttype, 0, sizeof(m_rx.m_exttype));
-    memset(m_rx.m_exttypcnt, 0, sizeof(m_rx.m_exttypcnt));
+    m_rx.m_exttype.fill(0);
+    m_rx.m_exttypcnt.fill(0);
     int mp2_count = 0;
     int ac3_count = 0;
     for (auto it = m_aFrame.begin(); it != m_aFrame.end(); it++)
