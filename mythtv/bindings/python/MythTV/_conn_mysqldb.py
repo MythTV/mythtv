@@ -24,6 +24,7 @@ def dbconnect(dbconn, log):
                            use_unicode=True,
                            charset='utf8')
     db.autocommit(True)
+    db.set_sql_mode("")    # reset default sql_mode
     return db
 
 class LoggedCursor( MySQLdb.cursors.Cursor ):
