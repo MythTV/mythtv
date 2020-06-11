@@ -7926,10 +7926,7 @@ EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> $TMPMAK
 
-# Should be done on all platforms, but for the time being limit it to mac only
-if enabled darwin; then
-  echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $TMPMAK
-fi
+echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $TMPMAK
 
 cp_if_changed $TMPH $MYTH_CONFIG_H
 

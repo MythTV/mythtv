@@ -10,6 +10,7 @@ darwin {
     LIBS += -lexpat -liconv -lz
 } else {
     INCLUDEPATH += . ./include ./include/exiv2 ./src ./xmpsdk/include
+    LIBS += -lexpat
 }
 
 contains(CC, gcc) {
