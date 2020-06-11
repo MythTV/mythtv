@@ -5042,7 +5042,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         }
         else
         {
-            QString fmt = (playbackLen >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss";
+            QString fmt = (playbackLen >= ONEHOURINSEC) ? "H:mm:ss" : "m:ss";
             text1 = MythFormatTime(secsplayed, fmt);
             text2 = MythFormatTime(playbackLen, fmt);
 
@@ -5052,7 +5052,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
             }
             else if (secsbehind >= ONEMININSEC)
             {
-                text3 = MythFormatTime(secsbehind, "mm:ss");
+                text3 = MythFormatTime(secsbehind, "m:ss");
             }
             else
             {
