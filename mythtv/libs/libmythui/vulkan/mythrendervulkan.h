@@ -6,6 +6,7 @@
 #include <QVulkanDeviceFunctions>
 
 // MythTV
+#include "mythuiexp.h"
 #include "mythrender_base.h"
 
 class MythImage;
@@ -24,15 +25,19 @@ class MythVulkanObject
     QVulkanDeviceFunctions* m_devFuncs { nullptr };
 };
 
-class MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public MythRender
+class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public MythRender
 {
     Q_OBJECT
 
   public:
+
+    static MythRenderVulkan* GetVulkanRender(void);
+
     MythRenderVulkan();
    ~MythRenderVulkan() override;
 
     void SetVulkanWindow           (MythWindowVulkan *VulkanWindow);
+    MythWindowVulkan* GetVulkanWindow(void);
     void SetFrameExpected          (void);
     bool GetFrameExpected          (void);
     bool GetFrameStarted           (void);

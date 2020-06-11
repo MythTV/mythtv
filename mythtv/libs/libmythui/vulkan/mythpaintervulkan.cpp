@@ -319,14 +319,7 @@ void MythPainterVulkan::End(void)
     // Complete any texture updates first
     if (m_textureUploadCmd)
     {
-        m_devFuncs->vkEndCommandBuffer(m_textureUploadCmd);
-        VkSubmitInfo submitinfo { };
-        submitinfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitinfo.commandBufferCount = 1;
-        submitinfo.pCommandBuffers = &m_textureUploadCmd;
-        m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, VK_NULL_HANDLE);
-        m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
-        m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &m_textureUploadCmd);
+        m_render->FinishSingleUseCommandBuffer(m_textureUploadCmd);
         m_textureUploadCmd = nullptr;
 
         // release staging buffers which are no longer needed
@@ -335,13 +328,19 @@ void MythPainterVulkan::End(void)
         m_stagedTextures.clear();
     }
 
-    // Tell the renderer that we are requesting a frame start
-    m_render->SetFrameExpected();
+    if (m_queuedTextures.empty())
+        return;
 
-    // Signal DIRECTLY to the window to start the frame - which ensures
-    // the event is not delayed and we can start to render immediately.
-    QEvent update(QEvent::UpdateRequest);
-    QGuiApplication::sendEvent(m_window, &update);
+    if (m_master)
+    {
+        // Tell the renderer that we are requesting a frame start
+        m_render->SetFrameExpected();
+
+        // Signal DIRECTLY to the window to start the frame - which ensures
+        // the event is not delayed and we can start to render immediately.
+        QEvent update(QEvent::UpdateRequest);
+        QGuiApplication::sendEvent(m_window, &update);
+    }
 
     // Retrieve the command buffer
     VkCommandBuffer currentcmdbuf = m_window->currentCommandBuffer();
@@ -374,7 +373,9 @@ void MythPainterVulkan::End(void)
         m_debugMarker->EndRegion(currentcmdbuf);
 
     m_queuedTextures.clear();
-    m_render->EndFrame();
+
+    if (m_master)
+        m_render->EndFrame();
 }
 
 void MythPainterVulkan::DrawImage(const QRect &Dest, MythImage *Image, const QRect &Source, int Alpha)
@@ -534,6 +535,11 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
     //    .arg(m_hardwareCacheSize / (1024 * 1024)).arg(m_maxHardwareCacheSize / (1024 * 1024)));
 
     return texture;
+}
+
+void MythPainterVulkan::SetMaster(bool Master)
+{
+    m_master = Master;
 }
 
 void MythPainterVulkan::DeleteTextures(void)

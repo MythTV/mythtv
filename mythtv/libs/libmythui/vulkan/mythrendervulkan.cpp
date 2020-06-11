@@ -4,6 +4,7 @@
 // MythTV
 #include "mythlogging.h"
 #include "mythimage.h"
+#include "mythmainwindow.h"
 #include "vulkan/mythwindowvulkan.h"
 #include "vulkan/mythshadervulkan.h"
 #include "vulkan/mythtexturevulkan.h"
@@ -18,6 +19,20 @@ MythVulkanObject::MythVulkanObject(MythRenderVulkan *Render, VkDevice Device, QV
 {
     if (!(Render && Device && Functions))
         LOG(VB_GENERAL, LOG_ERR, "VulkanBase: Invalid Myth vulkan object");
+}
+
+MythRenderVulkan* MythRenderVulkan::GetVulkanRender(void)
+{
+    MythRenderVulkan* result = nullptr;
+
+    // Don't try and create the window
+    if (!HasMythMainWindow())
+        return result;
+
+    MythMainWindow* window = MythMainWindow::getMainWindow();
+    if (window)
+        result = dynamic_cast<MythRenderVulkan*>(window->GetRenderDevice());
+    return result;
 }
 
 MythRenderVulkan::MythRenderVulkan()
@@ -47,6 +62,11 @@ bool MythRenderVulkan::Init(void)
 void MythRenderVulkan::SetVulkanWindow(MythWindowVulkan *VulkanWindow)
 {
     m_window = VulkanWindow;
+}
+
+MythWindowVulkan* MythRenderVulkan::GetVulkanWindow(void)
+{
+    return m_window;
 }
 
 void MythRenderVulkan::preInitResources(void)

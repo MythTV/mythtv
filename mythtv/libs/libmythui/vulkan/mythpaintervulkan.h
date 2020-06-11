@@ -5,6 +5,7 @@
 #include <QStack>
 
 // MythTV
+#include "mythuiexp.h"
 #include "mythpainter.h"
 #include "mythuianimation.h"
 #include "vulkan/mythrendervulkan.h"
@@ -15,7 +16,7 @@ class MythUniformBufferVulkan;
 
 #define MAX_TEXTURE_COUNT (1000)
 
-class MythPainterVulkan : public QObject, public MythPainter
+class MUI_PUBLIC MythPainterVulkan : public QObject, public MythPainter
 {
     Q_OBJECT
 
@@ -35,6 +36,7 @@ class MythPainterVulkan : public QObject, public MythPainter
     void    PopTransformation(void) override;
 
     void    DeleteTextures    (void);
+    void    SetMaster         (bool Master);
 
   public slots:
     void    DoFreeResources   (void);
@@ -50,6 +52,7 @@ class MythPainterVulkan : public QObject, public MythPainter
     void ClearCache(void);
     MythTextureVulkan* GetTextureFromCache(MythImage *Image);
 
+    bool              m_master           { true    };
     MythWindowVulkan* m_window           { nullptr };
     MythRenderVulkan* m_render           { nullptr };
     VkDevice          m_device           { nullptr };

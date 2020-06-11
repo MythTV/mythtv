@@ -2,9 +2,10 @@
 #define MYTHDEBUGVULKAN_H
 
 // MythTV
+#include "mythuiexp.h"
 #include "vulkan/mythrendervulkan.h"
 
-class MythDebugVulkan : protected MythVulkanObject
+class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
 {
   public:
     static float s_DebugRed[4];
