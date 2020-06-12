@@ -6802,9 +6802,9 @@ elif enabled gcc; then
         check_cflags -Wshadow
     fi
 elif enabled llvm_gcc; then
-    check_cflags -mllvm -stack-alignment=16
+    check_cflags -mllvm -mstack-alignment=16
 elif enabled clang; then
-    check_cflags -mllvm -stack-alignment=16
+    check_cflags -mllvm -mstack-alignment=16
     check_cflags -mstack-alignment=16
     check_cflags -Qunused-arguments
     check_cflags -Werror=implicit-function-declaration

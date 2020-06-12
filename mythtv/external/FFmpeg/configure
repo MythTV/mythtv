@@ -6807,7 +6807,7 @@ elif enabled gcc; then
         esac
     fi
 elif enabled llvm_gcc; then
-    check_cflags -mllvm -stack-alignment=16
+    check_cflags -mllvm -mstack-alignment=16
 elif enabled clang; then
     if enabled x86_32; then
         # Clang doesn't support maintaining alignment without assuming the
@@ -6820,12 +6820,12 @@ elif enabled clang; then
             disable aligned_stack
             ;;
         *)
-            check_cflags -mllvm -stack-alignment=16
+            check_cflags -mllvm -mstack-alignment=16
             check_cflags -mstack-alignment=16
             ;;
         esac
     else
-        check_cflags -mllvm -stack-alignment=16
+        check_cflags -mllvm -mstack-alignment=16
         check_cflags -mstack-alignment=16
     fi
     check_cflags -Qunused-arguments
