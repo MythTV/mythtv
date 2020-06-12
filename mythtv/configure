@@ -3306,12 +3306,14 @@ case "$toolchain" in
         TMPDIR=.
     ;;
     gcov)
-        add_cflags  -fprofile-arcs -ftest-coverage
-        add_ldflags -fprofile-arcs -ftest-coverage
+        add_cflags   -fprofile-arcs -ftest-coverage
+        add_cxxflags -fprofile-arcs -ftest-coverage
+        add_ldflags  --coverage
     ;;
     llvm-cov)
-        add_cflags -fprofile-arcs -ftest-coverage
-        add_ldflags --coverage
+        add_cflags   -fprofile-instr-generate -fcoverage-mapping
+        add_cxxflags -fprofile-instr-generate -fcoverage-mapping
+        add_ldflags  --coverage
     ;;
     hardened)
         add_cppflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
