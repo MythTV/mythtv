@@ -194,6 +194,8 @@ bool FillData::GrabData(const Source& source, int offset)
         {
             m_interrupted = true;
             status = QObject::tr("FAILED: XMLTV grabber ran but was interrupted.");
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("XMLTV grabber ran but was interrupted."));
         }
         else
         {
