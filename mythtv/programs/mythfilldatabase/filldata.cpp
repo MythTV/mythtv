@@ -201,7 +201,7 @@ bool FillData::GrabData(const Source& source, int offset)
         {
             status = QObject::tr("FAILED: XMLTV grabber returned error code %1.")
                             .arg(systemcall_status);
-            LOG(VB_GENERAL, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("XMLTV grabber returned error code %1")
                     .arg(systemcall_status));
         }
