@@ -1205,7 +1205,7 @@ void ProgInfo::Squeeze(void)
  */
 uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 {
-    LOG(VB_XMLTV, LOG_INFO,
+    LOG(VB_XMLTV, LOG_DEBUG,
         QString("Inserting new program    : %1 - %2 %3 %4")
             .arg(m_starttime.toString(Qt::ISODate))
             .arg(m_endtime.toString(Qt::ISODate))
@@ -1426,14 +1426,14 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
                 tokeep = it, todelete = cur;
 
 
-            LOG(VB_XMLTV, LOG_INFO,
+            LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Removing conflicting program: %1 - %2 %3 %4")
                     .arg((*todelete)->m_starttime.toString(Qt::ISODate))
                     .arg((*todelete)->m_endtime.toString(Qt::ISODate))
                     .arg((*todelete)->m_channel)
                     .arg((*todelete)->m_title));
 
-            LOG(VB_XMLTV, LOG_INFO,
+            LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Conflicted with            : %1 - %2 %3 %4")
                     .arg((*tokeep)->m_starttime.toString(Qt::ISODate))
                     .arg((*tokeep)->m_endtime.toString(Qt::ISODate))
@@ -1684,7 +1684,7 @@ bool ProgramData::IsUnchanged(
 bool ProgramData::DeleteOverlaps(
     MSqlQuery &query, uint chanid, const ProgInfo &pi)
 {
-    if (VERBOSE_LEVEL_CHECK(VB_XMLTV, LOG_INFO))
+    if (VERBOSE_LEVEL_CHECK(VB_XMLTV, LOG_DEBUG))
     {
         // Get overlaps..
         query.prepare(
@@ -1705,7 +1705,7 @@ bool ProgramData::DeleteOverlaps(
 
         do
         {
-            LOG(VB_XMLTV, LOG_INFO,
+            LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Removing existing program: %1 - %2 %3 %4")
                 .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate))
                 .arg(MythDate::as_utc(query.value(2).toDateTime()).toString(Qt::ISODate))
