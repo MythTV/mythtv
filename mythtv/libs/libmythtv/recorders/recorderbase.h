@@ -52,6 +52,7 @@ private:
 };
 
 enum class SCAN_t : uint8_t {
+    UNKNOWN_SCAN,
     INTERLACED,
     PROGRESSIVE,
     VARIABLE
@@ -287,6 +288,10 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     /** \brief Note a change in video frame rate in the recordedmark table
      */
     void FrameRateChange(uint framerate, uint64_t frame);
+
+    /** \brief Note a change in video scan type in the recordedmark table
+     */
+    void VideoScanChange(SCAN_t scan, uint64_t frame);
 
     /** \brief Note a change in video codec
      */

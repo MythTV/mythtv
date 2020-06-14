@@ -67,6 +67,7 @@ enum MarkTypes {
     MARK_ASPECT_16_9   = 12,
     MARK_ASPECT_2_21_1 = 13,
     MARK_ASPECT_CUSTOM = 14,
+    MARK_SCAN_PROGRESSIVE = 15,
     MARK_VIDEO_WIDTH   = 30,
     MARK_VIDEO_HEIGHT  = 31,
     MARK_VIDEO_RATE    = 32,
@@ -182,18 +183,22 @@ enum AudioProps {
 /// recordedprogram has to changed accordingly
 enum VideoProps {
     // For backwards compatibility do not change 0 or 1
-    VID_UNKNOWN       = 0x00,
-    VID_HDTV          = 0x01,
-    VID_WIDESCREEN    = 0x02,
-    VID_AVC           = 0x04,
-    VID_720           = 0x08,
-    VID_1080          = 0x10,
-    VID_DAMAGED       = 0x20,
-    VID_3DTV          = 0x40,
-}; // has 7 bits in ProgramInfo::properties
-#define kVideoPropertyBits 7
+    VID_UNKNOWN       = 0x000,
+    VID_WIDESCREEN    = 0x001,
+    VID_HDTV          = 0x002,
+    VID_MPEG2         = 0x004,
+    VID_AVC           = 0x008,
+    VID_HEVC          = 0x010,
+    VID_720           = 0x020,
+    VID_1080          = 0x040,
+    VID_4K            = 0x080,
+    VID_3DTV          = 0x100,
+    VID_PROGRESSIVE   = 0x200,
+    VID_DAMAGED       = 0x400,
+}; // has 11 bits in ProgramInfo::properties
+#define kVideoPropertyBits 11
 #define kVideoPropertyOffset kAudioPropertyBits
-#define kVideoPropertyMask (0x7f<<kVideoPropertyOffset)
+#define kVideoPropertyMask (0x7ff<<kVideoPropertyOffset)
 
 /// if SubtitleTypes changes, the subtitletypes column in program and
 /// recordedprogram has to changed accordingly

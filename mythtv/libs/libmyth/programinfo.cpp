@@ -4111,6 +4111,31 @@ void ProgramInfo::SaveFrameRate(uint64_t frame, uint framerate)
 }
 
 
+/// \brief Store the Progressive/Interlaced state in the recordedmarkup table
+/// \note  All frames until the next one with a stored Scan type
+///        are assumed to have the same scan type
+void ProgramInfo::SaveVideoScanType(uint64_t frame, bool progressive)
+{
+    if (!IsRecording())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
+    query.bindValue(":MARK", (quint64)frame);
+    query.bindValue(":TYPE", MARK_SCAN_PROGRESSIVE);
+    query.bindValue(":DATA", progressive);
+
+    if (!query.exec())
+        MythDB::DBError("Video scan type insert", query);
+}
+
+
 /// \brief Store the Total Duration at frame 0 in the recordedmarkup table
 void ProgramInfo::SaveTotalDuration(int64_t duration)
 {
@@ -4318,6 +4343,17 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
         return MARK_UNSET;
 
     return static_cast<MarkTypes>(query.value(0).toInt());
+}
+
+/** \brief If present in recording this loads average video scan type of the
+ *         main video stream from database's stream markup table.
+ *  \note Saves loaded value for future reference by
+ *        QueryAverageScanProgressive().
+ */
+bool ProgramInfo::QueryAverageScanProgressive(void) const
+{
+    return static_cast<bool>(load_markup_datum(MARK_SCAN_PROGRESSIVE,
+                                               m_chanId, m_recStartTs));
 }
 
 /** \brief If present this loads the total duration in milliseconds

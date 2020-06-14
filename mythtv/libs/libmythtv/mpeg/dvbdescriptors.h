@@ -404,19 +404,19 @@ class ComponentDescriptor : public MPEGDescriptor
     }
     bool IsSubtitle(void) const { return 0x3 == StreamContent(); }
 
-    unsigned char VideoProperties(void) const
+    uint VideoProperties(void) const
     {
         if (0x1 == StreamContent())
             return MPEG2Properties();
         if (0x5 == StreamContent())
             return VID_AVC | AVCProperties();
         if (0x9 == StreamContent())
-            return /* VID_HEVC | */ HEVCProperties();
+            return VID_HEVC | HEVCProperties();
 
         return VID_UNKNOWN;
     }
 
-    unsigned char MPEG2Properties(void) const
+    uint MPEG2Properties(void) const
     {
         switch(ComponentType())
         {
@@ -434,7 +434,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char AVCProperties(void) const
+    uint AVCProperties(void) const
     {
         switch(ComponentType())
         {
@@ -452,7 +452,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char HEVCProperties(void) const
+    uint HEVCProperties(void) const
     {
         switch(ComponentType())
         {
@@ -467,7 +467,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char AudioProperties(void) const
+    uint AudioProperties(void) const
     {
         switch (StreamContent())
         {
@@ -482,7 +482,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char MP2Properties(void) const
+    uint MP2Properties(void) const
     {
         switch (ComponentType())
         {
@@ -501,7 +501,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char AC3Properties(void) const
+    uint AC3Properties(void) const
     {
         unsigned char properties = AUD_UNKNOWN;
 
@@ -530,7 +530,7 @@ class ComponentDescriptor : public MPEGDescriptor
         return properties;
     }
 
-    unsigned char HEAACProperties(void) const
+    uint HEAACProperties(void) const
     {
         switch (ComponentType())
         {
@@ -552,7 +552,7 @@ class ComponentDescriptor : public MPEGDescriptor
         }
     }
 
-    unsigned char SubtitleType(void) const
+    uint SubtitleType(void) const
     {
         if (!IsSubtitle())
             return SUB_UNKNOWN;

@@ -3681,6 +3681,20 @@ static bool doUpgradeTVDatabaseSchema(void)
         if (!UpdateDBVersionNumber("MythTV", "DBSchemaVer", "1361", dbver))
             return false;
     }
+    if (dbver == "1361")
+    {
+        DBUpdates updates {
+            "ALTER TABLE program CHANGE COLUMN videoprop videoprop "
+            "    SET('WIDESCREEN', 'HDTV', 'MPEG2', 'AVC', 'HEVC') NOT NULL; ",
+            "ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "
+            "    SET('WIDESCREEN', 'HDTV', 'MPEG2', 'AVC', 'HEVC', "
+            "        '720', '1080', '4K', '3DTV', 'PROGRESSIVE', "
+            "        'DAMAGED') NOT NULL; ",
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1362", dbver))
+            return false;
+    }
 
     return true;
 }

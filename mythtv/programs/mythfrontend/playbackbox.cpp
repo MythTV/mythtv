@@ -1,4 +1,3 @@
-
 #include "playbackbox.h"
 
 // QT
@@ -778,7 +777,7 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
     disp_flag_stat[8] = ((pginfo->GetProgramFlags() & FL_TRANSCODED) != 0U);
 
     for (size_t i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
-        item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+        item->DisplayState(disp_flag_stat[i] ? "yes" : "no", disp_flags[i]);
 }
 
 void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
@@ -903,21 +902,20 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
     if (item->GetText("is_item_initialized").isNull())
     {
         QMap<AudioProps, QString> audioFlags;
-        audioFlags[AUD_DOLBY] = "dolby";
+        audioFlags[AUD_DOLBY]    = "dolby";
         audioFlags[AUD_SURROUND] = "surround";
-        audioFlags[AUD_STEREO] = "stereo";
-        audioFlags[AUD_MONO] = "mono";
+        audioFlags[AUD_STEREO]   = "stereo";
+        audioFlags[AUD_MONO]     = "mono";
 
-        QMap<VideoProps, QString> videoFlags;
-        videoFlags[VID_1080] = "hd1080";
-        videoFlags[VID_720] = "hd720";
-        videoFlags[VID_HDTV] = "hdtv";
-        videoFlags[VID_WIDESCREEN] = "widescreen";
+        QMap<VideoProps, QString> codecFlags;
+        codecFlags[VID_MPEG2] = "mpeg2";
+        codecFlags[VID_AVC]   = "avc";
+        codecFlags[VID_HEVC]  = "hevc";
 
         QMap<SubtitleType, QString> subtitleFlags;
-        subtitleFlags[SUB_SIGNED] = "deafsigned";
+        subtitleFlags[SUB_SIGNED]   = "deafsigned";
         subtitleFlags[SUB_ONSCREEN] = "onscreensub";
-        subtitleFlags[SUB_NORMAL] = "subtitles";
+        subtitleFlags[SUB_NORMAL]   = "subtitles";
         subtitleFlags[SUB_HARDHEAR] = "cc";
 
         QString groupname =
@@ -956,11 +954,43 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
                 item->DisplayState(ait.value(), "audioprops");
         }
 
-        QMap<VideoProps, QString>::iterator vit;
-        for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
+        uint props = pginfo->GetVideoProperties();
+
+        QMap<VideoProps, QString>::iterator cit;
+        for (cit = codecFlags.begin(); cit != codecFlags.end(); ++cit)
         {
-            if (pginfo->GetVideoProperties() & vit.key())
-                item->DisplayState(vit.value(), "videoprops");
+            if (props & cit.key())
+            {
+                item->DisplayState(cit.value(), "videoprops");
+                item->DisplayState(cit.value(), "codecprops");
+            }
+        }
+
+        if (props & VID_PROGRESSIVE)
+        {
+            item->DisplayState("progressive", "videoprops");
+            if (props & VID_4K)
+                item->DisplayState("uhd4Kp", "videoprops");
+            if (props & VID_1080)
+                item->DisplayState("hd1080p", "videoprops");
+        }
+        else
+        {
+            if (props & VID_4K)
+                item->DisplayState("uhd4Ki", "videoprops");
+            if (props & VID_1080)
+                item->DisplayState("hd1080i", "videoprops");
+        }
+        if (props & VID_720)
+            item->DisplayState("hd720", "videoprops");
+        if (!(props & (VID_4K | VID_1080 | VID_720)))
+        {
+            if (props & VID_HDTV)
+                item->DisplayState("hdtv", "videoprops");
+            else if (props & VID_WIDESCREEN)
+                item->DisplayState("widescreen", "videoprops");
+            else
+                item->DisplayState("sd", "videoprops");
         }
 
         QMap<SubtitleType, QString>::iterator sit;
@@ -1134,10 +1164,10 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
     iconMap.clear();
     // Add prefix to ensure iteration order in case 2 or more properties set
-    iconMap["1dolby"]  = AUD_DOLBY;
-    iconMap["2surround"]  = AUD_SURROUND;
-    iconMap["3stereo"] = AUD_STEREO;
-    iconMap["4mono"] = AUD_MONO;
+    iconMap["1dolby"]    = AUD_DOLBY;
+    iconMap["2surround"] = AUD_SURROUND;
+    iconMap["3stereo"]   = AUD_STEREO;
+    iconMap["4mono"]     = AUD_MONO;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("audioprops"));
     bool haveIcon = false;
@@ -1159,20 +1189,31 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     if (iconState && !haveIcon)
         iconState->Reset();
 
-    iconMap.clear();
-    iconMap["avchd"] = VID_AVC;
-    iconMap["hd1080"] = VID_1080;
-    iconMap["hd720"] = VID_720;
-    iconMap["hdtv"] = VID_HDTV;
-    iconMap["widescreen"] = VID_WIDESCREEN;
-
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
-    haveIcon = false;
     if (pginfo && iconState)
     {
+        haveIcon = false;
+        uint props = pginfo->GetVideoProperties();
+
+        iconMap.clear();
+        if (props & VID_PROGRESSIVE)
+        {
+            iconMap["uhd4Kp"]  = VID_4K;
+            iconMap["hd1080p"] = VID_1080;
+        }
+        else
+        {
+            iconMap["uhd4Ki"]  = VID_4K;
+            iconMap["hd1080i"] = VID_1080;
+        }
+        iconMap["hd1080"]     = VID_1080;
+        iconMap["hd720"]      = VID_720;
+        iconMap["hdtv"]       = VID_HDTV;
+        iconMap["widescreen"] = VID_WIDESCREEN;
+
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo->GetVideoProperties() & (*it))
+            if (props & (*it))
             {
                 if (iconState->DisplayState(it.key()))
                 {
@@ -1181,10 +1222,10 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
                 }
             }
         }
-    }
 
-    if (iconState && !haveIcon)
-        iconState->Reset();
+        if (iconState && !haveIcon)
+            iconState->Reset();
+    }
 
     iconMap.clear();
     iconMap["damaged"] = VID_DAMAGED;
@@ -5513,6 +5554,7 @@ bool HelpPopup::Create()
 
     BuildFocusList();
 
+    addItem("watched",     tr("Recording has been watched"));
     addItem("commflagged", tr("Commercials are flagged"));
     addItem("cutlist",     tr("An editing cutlist is present"));
     addItem("autoexpire",  tr("The program is able to auto-expire"));
@@ -5532,13 +5574,17 @@ bool HelpPopup::Create()
     addItem("subtitles",   tr("Recording has Subtitles Available"));
     addItem("onscreensub", tr("Recording is Subtitled"));
 
-    addItem("hd1080",      tr("Recording is in 1080i/p High Definition"));
-    addItem("hd720",       tr("Recording is in 720p High Definition"));
-    addItem("hdtv",        tr("Recording is in High Definition"));
+    addItem("SD",          tr("Recording is in Standard Definition"));
     addItem("widescreen",  tr("Recording is Widescreen"));
-    addItem("avchd",       tr("Recording is in HD using H.264 codec"));
-
-    addItem("watched",     tr("Recording has been watched"));
+    addItem("hdtv",        tr("Recording is in High Definition"));
+    addItem("hd720",       tr("Recording is in 720p High Definition"));
+    addItem("hd1080i",     tr("Recording is in 1080i High Definition"));
+    addItem("hd1080p",     tr("Recording is in 1080p High Definition"));
+    addItem("uhd4Ki",      tr("Recording is in 4k(interlaced) UHD resolution"));
+    addItem("uhd4Kp",      tr("Recording is in 4k UHD resolution"));
+    addItem("mpeg2",       tr("Recording is using MPEG-2 codec"));
+    addItem("avchd",       tr("Recording is using AVC/H.264 codec"));
+    addItem("hevc",        tr("Recording is using HEVC/H.265 codec"));
 //    addItem("preserved",   tr("Recording is preserved"));
 
     return true;

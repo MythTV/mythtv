@@ -437,6 +437,10 @@ void RecorderBase::FinishRecording(void)
     {
         if (m_primaryVideoCodec == AV_CODEC_ID_H264)
             m_curRecording->SaveVideoProperties(VID_AVC, VID_AVC);
+        else if (m_primaryVideoCodec == AV_CODEC_ID_H265)
+            m_curRecording->SaveVideoProperties(VID_HEVC, VID_HEVC);
+        else if (m_primaryVideoCodec == AV_CODEC_ID_MPEG2VIDEO)
+            m_curRecording->SaveVideoProperties(VID_MPEG2, VID_MPEG2);
 
         RecordingFile *recFile = m_curRecording->GetRecordingFile();
         if (recFile)
@@ -803,6 +807,12 @@ void RecorderBase::FrameRateChange(uint framerate, uint64_t frame)
         }
         m_curRecording->SaveFrameRate(frame, framerate);
     }
+}
+
+void RecorderBase::VideoScanChange(SCAN_t scan, uint64_t frame)
+{
+    if (m_curRecording)
+        m_curRecording->SaveVideoScanType(frame, scan != SCAN_t::INTERLACED);
 }
 
 void RecorderBase::VideoCodecChange(AVCodecID vCodec)

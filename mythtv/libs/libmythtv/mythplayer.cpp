@@ -2111,7 +2111,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 {
     if (m_allPaused)
         return;
-   
+
     bool ispip = m_playerCtx->IsPIP();
     if (ispip)
     {
@@ -4656,13 +4656,16 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
         return;
 
     bool interlaced = is_interlaced(m_scan);
-    if (width == 1920 || height == 1080 || height == 1088)
+    if (height > 2100)
+        infoMap["videodescrip"] = interlaced ? "UHD_4K_I" : "UHD_4K_P";
+    else if (width == 1920 || height == 1080 || height == 1088)
         infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
     else if ((width == 1280 || height == 720) && !interlaced)
         infoMap["videodescrip"] = "HD_720_P";
     else if (height >= 720)
         infoMap["videodescrip"] = "HD";
-    else infoMap["videodescrip"] = "SD";
+    else
+        infoMap["videodescrip"] = "SD";
 }
 
 bool MythPlayer::GetRawAudioState(void) const

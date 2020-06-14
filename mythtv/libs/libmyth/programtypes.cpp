@@ -48,6 +48,7 @@ QString toString(MarkTypes type)
         case MARK_ASPECT_16_9:  return "ASPECT_16_9";
         case MARK_ASPECT_2_21_1:return "ASPECT_2_21_1";
         case MARK_ASPECT_CUSTOM:return "ASPECT_CUSTOM";
+        case MARK_SCAN_PROGRESSIVE: return "PROGRESSIVE";
         case MARK_VIDEO_WIDTH:  return "VIDEO_WIDTH";
         case MARK_VIDEO_HEIGHT: return "VIDEO_HEIGHT";
         case MARK_VIDEO_RATE:   return "VIDEO_RATE";

@@ -899,9 +899,14 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     // Get the width and set the videoprops
     MarkTypes aspectRatio = curRec->QueryAverageAspectRatio();
     uint avg_height = curRec->QueryAverageHeight();
-    curRec->SaveVideoProperties(
-        VID_1080 | VID_720 | VID_DAMAGED | VID_WIDESCREEN,
-        ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
+    bool progressive = curRec->QueryAverageScanProgressive();
+    curRec->SaveVideoProperties
+        (VID_4K | VID_1080 | VID_720 | VID_DAMAGED |
+         VID_WIDESCREEN | VID_PROGRESSIVE,
+        ((avg_height > 2000) ? VID_4K :
+         ((avg_height > 1000) ? VID_1080 :
+          ((avg_height > 700) ? VID_720 : 0))) |
+         (progressive ? VID_PROGRESSIVE : 0) |
         ((is_good) ? 0 : VID_DAMAGED) |
         (((aspectRatio == MARK_ASPECT_16_9) ||
           (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0));

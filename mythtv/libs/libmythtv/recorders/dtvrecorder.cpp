@@ -841,6 +841,7 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
     uint height = 0;
     uint width = 0;
     FrameRate frameRate(0);
+    SCAN_t scantype(SCAN_t::UNKNOWN_SCAN);
 
     bool hasFrame = false;
     bool hasKeyFrame = false;
@@ -912,7 +913,7 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
         if (!m_pesSynced)
             break;
 
-        // scan for a NAL unit start code
+        // scan the NAL units
         uint32_t bytes_used = m_h2645Parser->addBytes
                               (tspacket->data() + i, TSPacket::kSize - i,
                                m_ringBuffer->GetWritePosition());
@@ -930,6 +931,7 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                 width = m_h2645Parser->pictureWidth();
                 height = m_h2645Parser->pictureHeight();
                 aspectRatio = m_h2645Parser->aspectRatio();
+                scantype = m_h2645Parser->GetScanType();
                 m_h2645Parser->getFrameRate(frameRate);
             }
         }
@@ -1003,6 +1005,16 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                       .arg( frameRate.toDouble() * 1000 ) );
         m_frameRate = frameRate;
         FrameRateChange(frameRate.toDouble() * 1000, m_framesWrittenCount);
+    }
+
+    if (scantype != SCAN_t::UNKNOWN_SCAN && scantype != m_scanType)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("FindH2645Keyframes: scan type: %1")
+            .arg(scantype == SCAN_t::INTERLACED ?
+                 "Interlaced" : "Progressive"));
+        m_scanType = scantype;
+        VideoScanChange(m_scanType, m_framesWrittenCount);
     }
 
     return m_seenSps;

@@ -199,6 +199,7 @@ class DTVRecorder :
     double                   m_tdBase                     {0.0};
     uint64_t                 m_tdTickCount                {0};
     FrameRate                m_tdTickFramerate            {0};
+    SCAN_t                   m_scanType                   {SCAN_t::UNKNOWN_SCAN};
 
     // Music Choice
     // Comcast Music Choice uses 3 frames every 6 seconds and no key frames

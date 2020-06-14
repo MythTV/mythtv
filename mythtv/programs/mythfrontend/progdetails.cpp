@@ -448,10 +448,26 @@ void ProgDetails::loadPage(void)
         attr += tr("Widescreen") + ", ";
     if  (videoprop & VID_AVC)
         attr += tr("AVC/H.264") + ", ";
+    if  (videoprop & VID_HEVC)
+        attr += tr("HEVC/H.265") + ", ";
     if  (videoprop & VID_720)
         attr += tr("720p Resolution") + ", ";
-    if  (videoprop & VID_1080)
-        attr += tr("1080i/p Resolution") + ", ";
+
+    if (videoprop & VID_PROGRESSIVE)
+    {
+        if  (videoprop & VID_1080)
+             attr += tr("1080p Resolution") + ", ";
+        if  (videoprop & VID_4K)
+            attr += tr("4K Resolution") + ", ";
+    }
+    else
+    {
+        if  (videoprop & VID_1080)
+            attr += tr("1080i Resolution") + ", ";
+        if  (videoprop & VID_4K)
+            attr += tr("4Ki Resolution") + ", ";
+    }
+
     if  (videoprop & VID_DAMAGED)
         attr += tr("Damaged") + ", ";
 
