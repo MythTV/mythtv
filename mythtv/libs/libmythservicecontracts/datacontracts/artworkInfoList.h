@@ -32,7 +32,7 @@ class SERVICE_PUBLIC ArtworkInfoList : public QObject
 
     Q_CLASSINFO( "ArtworkInfos", "type=DTC::ArtworkInfo");
 
-    Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos )
 
     PROPERTYIMP_RO_REF( QVariantList, ArtworkInfos );
 

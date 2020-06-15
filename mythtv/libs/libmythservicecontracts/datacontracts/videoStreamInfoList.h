@@ -39,7 +39,7 @@ class SERVICE_PUBLIC VideoStreamInfoList : public QObject
     Q_PROPERTY( int          ErrorCode      READ ErrorCode       WRITE setErrorCode      )
     Q_PROPERTY( QString      ErrorMsg       READ ErrorMsg        WRITE setErrorMsg       )
 
-    Q_PROPERTY( QVariantList VideoStreamInfos READ VideoStreamInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList VideoStreamInfos READ VideoStreamInfos )
 
     PROPERTYIMP       ( int         , Count           )
     PROPERTYIMP       ( QDateTime   , AsOf            )

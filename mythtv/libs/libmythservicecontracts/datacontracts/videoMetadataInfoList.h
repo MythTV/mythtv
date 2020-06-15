@@ -41,7 +41,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList VideoMetadataInfos READ VideoMetadataInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList VideoMetadataInfos READ VideoMetadataInfos )
 
     PROPERTYIMP       ( int         , StartIndex      )
     PROPERTYIMP       ( int         , Count           )

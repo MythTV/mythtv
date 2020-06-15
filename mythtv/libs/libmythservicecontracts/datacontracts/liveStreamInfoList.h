@@ -21,7 +21,7 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
 
     Q_CLASSINFO( "LiveStreamInfos", "type=DTC::LiveStreamInfo");
 
-    Q_PROPERTY( QVariantList LiveStreamInfos READ LiveStreamInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList LiveStreamInfos READ LiveStreamInfos )
 
     PROPERTYIMP_RO_REF( QVariantList, LiveStreamInfos );
 

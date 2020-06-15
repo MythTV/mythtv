@@ -18,10 +18,10 @@ namespace DTC
 
         Q_PROPERTY(QString Name READ Name WRITE setName)
         Q_PROPERTY(QString Version READ Version WRITE setVersion)
-        Q_PROPERTY(QVariantMap State READ State DESIGNABLE true)
-        Q_PROPERTY(QVariantList ChapterTimes READ ChapterTimes DESIGNABLE true)
-        Q_PROPERTY(QVariantMap SubtitleTracks READ SubtitleTracks DESIGNABLE true)
-        Q_PROPERTY(QVariantMap AudioTracks READ AudioTracks DESIGNABLE true)
+        Q_PROPERTY(QVariantMap State READ State)
+        Q_PROPERTY(QVariantList ChapterTimes READ ChapterTimes)
+        Q_PROPERTY(QVariantMap SubtitleTracks READ SubtitleTracks)
+        Q_PROPERTY(QVariantMap AudioTracks READ AudioTracks)
 
         PROPERTYIMP(QString, Name)
         PROPERTYIMP(QString, Version)

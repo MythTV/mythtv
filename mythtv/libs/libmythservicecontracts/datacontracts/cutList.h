@@ -32,7 +32,7 @@ class SERVICE_PUBLIC CutList : public QObject
 
     Q_CLASSINFO( "Cuttings", "type=DTC::Cutting");
 
-    Q_PROPERTY( QVariantList Cuttings READ Cuttings DESIGNABLE true )
+    Q_PROPERTY( QVariantList Cuttings READ Cuttings )
 
     PROPERTYIMP_RO_REF( QVariantList, Cuttings );
 

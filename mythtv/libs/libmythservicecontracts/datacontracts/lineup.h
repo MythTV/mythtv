@@ -73,7 +73,7 @@ class SERVICE_PUBLIC LineupList : public QObject
 
     Q_CLASSINFO( "Lineups", "type=DTC::Lineup");
 
-    Q_PROPERTY( QVariantList Lineups READ Lineups DESIGNABLE true )
+    Q_PROPERTY( QVariantList Lineups READ Lineups )
 
     PROPERTYIMP_RO_REF( QVariantList, Lineups );
 

@@ -23,7 +23,7 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
 
     Q_CLASSINFO( "ChannelGroups", "type=DTC::ChannelGroup");
 
-    Q_PROPERTY( QVariantList ChannelGroups READ ChannelGroups DESIGNABLE true )
+    Q_PROPERTY( QVariantList ChannelGroups READ ChannelGroups )
 
     PROPERTYIMP_RO_REF( QVariantList, ChannelGroups );
 

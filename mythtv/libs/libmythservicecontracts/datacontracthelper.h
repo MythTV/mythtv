@@ -34,6 +34,9 @@
 //  * DESIGNABLE in Q_PROPERTY is used to indicate if it should be Serialized 
 //    (can specify a propery to support runtime logic)
 //
+//    N.B., DESIGNABLE was removed in v32-Pre to prepare for Qt 6.
+//
+//
 //  * Q_CLASSINFO( "defaultProp", "<propname>" ) is used to indicate the 
 //    default property (used for node text in XML)
 //

@@ -37,7 +37,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList VideoLookups READ VideoLookups DESIGNABLE true )
+    Q_PROPERTY( QVariantList VideoLookups READ VideoLookups )
 
     PROPERTYIMP       ( int         , Count           )
     PROPERTYIMP       ( QDateTime   , AsOf            )

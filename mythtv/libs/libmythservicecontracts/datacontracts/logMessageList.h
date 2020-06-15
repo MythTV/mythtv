@@ -24,9 +24,9 @@ class SERVICE_PUBLIC LogMessageList : public QObject
     Q_CLASSINFO( "Applications", "type=DTC::LabelValue");
     Q_CLASSINFO( "LogMessages", "type=DTC::LogMessage");
 
-    Q_PROPERTY( QVariantList HostNames    READ HostNames    DESIGNABLE true )
-    Q_PROPERTY( QVariantList Applications READ Applications DESIGNABLE true )
-    Q_PROPERTY( QVariantList LogMessages  READ LogMessages  DESIGNABLE true )
+    Q_PROPERTY( QVariantList HostNames    READ HostNames    )
+    Q_PROPERTY( QVariantList Applications READ Applications )
+    Q_PROPERTY( QVariantList LogMessages  READ LogMessages  )
 
     PROPERTYIMP_RO_REF( QVariantList, HostNames    )
     PROPERTYIMP_RO_REF( QVariantList, Applications )

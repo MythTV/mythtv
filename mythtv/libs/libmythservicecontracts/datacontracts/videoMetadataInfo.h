@@ -64,9 +64,9 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QString         Screenshot      READ Screenshot       WRITE setScreenshot     )
     Q_PROPERTY( QString         Trailer         READ Trailer          WRITE setTrailer        )
 
-    Q_PROPERTY( QObject*        Artwork         READ Artwork     DESIGNABLE SerializeArtwork  )
-    Q_PROPERTY( QObject*        Cast            READ Cast        DESIGNABLE SerializeCast     )
-    Q_PROPERTY( QObject*        Genres          READ Genres      DESIGNABLE SerializeGenres   )
+    Q_PROPERTY( QObject*        Artwork         READ Artwork     )
+    Q_PROPERTY( QObject*        Cast            READ Cast        )
+    Q_PROPERTY( QObject*        Genres          READ Genres      )
 
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP    ( QString    , Title          )

@@ -23,7 +23,7 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
     Q_CLASSINFO( "CastMembers", "type=DTC::CastMember");
 
-    Q_PROPERTY( QVariantList CastMembers READ CastMembers DESIGNABLE true )
+    Q_PROPERTY( QVariantList CastMembers READ CastMembers )
 
     PROPERTYIMP_RO_REF( QVariantList, CastMembers );
 

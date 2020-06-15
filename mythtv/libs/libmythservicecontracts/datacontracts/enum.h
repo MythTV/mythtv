@@ -32,7 +32,7 @@ class SERVICE_PUBLIC Enum : public QObject
     Q_CLASSINFO( "EnumItems", "type=DTC::Enum");
 
     Q_PROPERTY( QString      Type      READ Type       WRITE setType   )
-    Q_PROPERTY( QVariantList EnumItems READ EnumItems  DESIGNABLE true )
+    Q_PROPERTY( QVariantList EnumItems READ EnumItems )
 
 
     PROPERTYIMP       ( QString     , Type      )

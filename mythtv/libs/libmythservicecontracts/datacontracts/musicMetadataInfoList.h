@@ -41,7 +41,7 @@ class SERVICE_PUBLIC MusicMetadataInfoList : public QObject
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList MusicMetadataInfos READ MusicMetadataInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList MusicMetadataInfos READ MusicMetadataInfos )
 
     PROPERTYIMP       ( int         , StartIndex      )
     PROPERTYIMP       ( int         , Count           )

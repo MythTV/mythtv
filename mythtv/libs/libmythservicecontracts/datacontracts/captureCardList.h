@@ -31,7 +31,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
 
     Q_CLASSINFO( "CaptureCards", "type=DTC::CaptureCard");
 
-    Q_PROPERTY( QVariantList CaptureCards READ CaptureCards DESIGNABLE true )
+    Q_PROPERTY( QVariantList CaptureCards READ CaptureCards )
 
     PROPERTYIMP_RO_REF( QVariantList, CaptureCards );
 

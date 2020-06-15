@@ -31,7 +31,7 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
 
     Q_CLASSINFO( "TitleInfos", "type=DTC::TitleInfo");
 
-    Q_PROPERTY( QVariantList TitleInfos READ TitleInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList TitleInfos READ TitleInfos )
 
     PROPERTYIMP_RO_REF( QVariantList, TitleInfos );
 

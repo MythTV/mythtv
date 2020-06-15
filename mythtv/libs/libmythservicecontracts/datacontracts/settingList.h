@@ -31,7 +31,7 @@ class SERVICE_PUBLIC SettingList : public QObject
     Q_CLASSINFO( "Settings", "type=QString;name=String");
 
     Q_PROPERTY( QString     HostName READ HostName WRITE setHostName )
-    Q_PROPERTY( QVariantMap Settings READ Settings DESIGNABLE true )
+    Q_PROPERTY( QVariantMap Settings READ Settings )
 
     PROPERTYIMP       ( QString    , HostName )
     PROPERTYIMP_RO_REF( QVariantMap, Settings )

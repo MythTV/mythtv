@@ -32,7 +32,7 @@ class SERVICE_PUBLIC GenreList : public QObject
 
     Q_CLASSINFO( "GenreList", "type=DTC::Genre");
 
-    Q_PROPERTY( QVariantList GenreList     READ Genres DESIGNABLE true )
+    Q_PROPERTY( QVariantList GenreList     READ Genres )
 
     PROPERTYIMP_RO_REF( QVariantList, Genres );
 

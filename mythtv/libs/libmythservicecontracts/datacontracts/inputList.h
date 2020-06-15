@@ -31,7 +31,7 @@ class SERVICE_PUBLIC InputList : public QObject
 
     Q_CLASSINFO( "Inputs", "type=DTC::Input");
 
-    Q_PROPERTY( QVariantList Inputs READ Inputs DESIGNABLE true )
+    Q_PROPERTY( QVariantList Inputs READ Inputs )
 
     PROPERTYIMP_RO_REF( QVariantList, Inputs );
 

@@ -31,7 +31,7 @@ class SERVICE_PUBLIC FrontendList : public QObject
 
     Q_CLASSINFO( "Frontends", "type=DTC::Frontend");
 
-    Q_PROPERTY( QVariantList Frontends READ Frontends DESIGNABLE true )
+    Q_PROPERTY( QVariantList Frontends READ Frontends )
 
     PROPERTYIMP_RO_REF( QVariantList, Frontends );
 

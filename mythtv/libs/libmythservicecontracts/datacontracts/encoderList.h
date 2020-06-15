@@ -31,7 +31,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
 
     Q_CLASSINFO( "Encoders", "type=DTC::Encoder");
 
-    Q_PROPERTY( QVariantList Encoders READ Encoders DESIGNABLE true )
+    Q_PROPERTY( QVariantList Encoders READ Encoders )
 
     PROPERTYIMP_RO_REF( QVariantList, Encoders );
 

@@ -54,7 +54,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     Q_PROPERTY( QString       Version        READ Version        WRITE setVersion        )
     Q_PROPERTY( QString       ProtoVer       READ ProtoVer       WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList Channels READ Channels DESIGNABLE true )
+    Q_PROPERTY( QVariantList Channels READ Channels )
 
     PROPERTYIMP       ( QDateTime   , StartTime     )
     PROPERTYIMP       ( QDateTime   , EndTime       )

@@ -27,7 +27,7 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
     Q_PROPERTY( QString      Path               READ Path               WRITE setPath           )
     Q_PROPERTY( int          Size               READ Size               WRITE setSize           )
     Q_PROPERTY( QString      Extension          READ Extension          WRITE setExtension      )
-    Q_PROPERTY( QVariantList ImageMetadataInfos READ ImageMetadataInfos DESIGNABLE true )
+    Q_PROPERTY( QVariantList ImageMetadataInfos READ ImageMetadataInfos )
 
     PROPERTYIMP       ( int         , Count           )
     PROPERTYIMP       ( QString     , File            )

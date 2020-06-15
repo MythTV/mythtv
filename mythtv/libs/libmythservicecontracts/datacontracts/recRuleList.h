@@ -30,7 +30,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )
     Q_PROPERTY( QString      ProtoVer       READ ProtoVer        WRITE setProtoVer       )
 
-    Q_PROPERTY( QVariantList RecRules READ RecRules DESIGNABLE true )
+    Q_PROPERTY( QVariantList RecRules READ RecRules )
 
     PROPERTYIMP       ( int         , StartIndex      )
     PROPERTYIMP       ( int         , Count           )

@@ -13,7 +13,7 @@ namespace DTC
 
         Q_CLASSINFO( "ActionList", "type=QString;name=Action"); // is this legal?
 
-        Q_PROPERTY(QVariantMap ActionList READ ActionList DESIGNABLE true)
+        Q_PROPERTY(QVariantMap ActionList READ ActionList )
 
         PROPERTYIMP_RO_REF(QVariantMap, ActionList);
 
