@@ -337,7 +337,9 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     int csp      = Frame->colorspace;
     int primary  = Frame->colorprimaries;
     int transfer = Frame->colortransfer;
+    int chroma   = Frame->chromalocation;
     int raw      = csp;
+    int rawchroma = chroma;
     VideoFrameType frametype = Frame->codec;
     VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
 
@@ -360,9 +362,12 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         primary = (Frame->width < 1280) ? AVCOL_PRI_BT470BG : AVCOL_PRI_BT709;
     if (transfer == AVCOL_TRC_UNSPECIFIED)
         transfer = (Frame->width < 1280) ? AVCOL_TRC_GAMMA28 : AVCOL_TRC_BT709;
+    if (chroma == AVCHROMA_LOC_UNSPECIFIED)
+        chroma = AVCHROMA_LOC_LEFT;
+
     if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) &&
         (m_range == range) && (m_colourShifted == Frame->colorshifted) &&
-        (primary == m_colourPrimaries))
+        (primary == m_colourPrimaries) && (chroma == m_chromaLocation))
     {
         return false;
     }
@@ -373,6 +378,7 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     m_colourShifted    = Frame->colorshifted;
     m_colourPrimaries  = primary;
     m_colourTransfer   = transfer;
+    m_chromaLocation   = chroma;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
@@ -391,6 +397,9 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         .arg(m_fullRange ? "Full" : "Limited")
         .arg(m_customDisplayPrimaries ? "Custom (screen)" :
                 av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chroma location: %1 %2")
+        .arg(av_chroma_location_name(static_cast<AVChromaLocation>(m_chromaLocation)))
+        .arg(rawchroma == m_chromaLocation ? "(Detected)" : "(Guessed)"));
 
     Update();
 
@@ -443,6 +452,16 @@ void VideoColourSpace::SetAlpha(int Value)
 QStringList VideoColourSpace::GetColourMappingDefines(void)
 {
     QStringList result;
+
+    // TODO extend this to handle all non-co-sited chroma locations. Left is the
+    // most common by far - otherwise topleft seems to be used by some 422 content (but
+    // subjectively looks better without adjusting vertically!)
+    if (m_chromaLocation == AVCHROMA_LOC_LEFT || m_chromaLocation == AVCHROMA_LOC_TOPLEFT ||
+        m_chromaLocation == AVCHROMA_LOC_BOTTOMLEFT)
+    {
+        result << "CHROMALEFT";
+    }
+
     if (m_primaryMatrix.isIdentity())
         return result;
 

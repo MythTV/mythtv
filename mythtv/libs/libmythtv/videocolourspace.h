@@ -90,6 +90,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     PrimariesMode     m_primariesMode          { PrimariesRelaxed };
     int               m_colourPrimaries        { AVCOL_PRI_BT709 };
     int               m_displayPrimaries       { AVCOL_PRI_BT709 };
+    int               m_chromaLocation         { AVCHROMA_LOC_LEFT };
     float             m_colourGamma            { 2.2F };
     float             m_displayGamma           { 2.2F };
     QMatrix4x4        m_primaryMatrix          { };
