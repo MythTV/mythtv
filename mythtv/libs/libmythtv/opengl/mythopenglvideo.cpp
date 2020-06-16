@@ -306,7 +306,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
         m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         // ensure we use GL_NEAREST if resizing is already active and needed
-        if (m_resizing & Sampling)
+        if ((m_resizing & Sampling) == Sampling)
         {
             MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
             MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
@@ -861,7 +861,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     else if (!m_resizing && resize)
     {
         // framebuffer will be created as needed below
-        QOpenGLTexture::Filter filter = (resize & Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, filter);
         MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, filter);
         MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, filter);
@@ -875,7 +875,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     // check hardware frames have the correct filtering
     if (hwframes)
     {
-        QOpenGLTexture::Filter filter = (resize & Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
             MythVideoTexture::SetTextureFilters(m_render, inputtextures, filter);
     }
@@ -1073,10 +1073,10 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 QString MythOpenGLVideo::VideoResizeToString(VideoResizing Resize)
 {
     QStringList reasons;
-    if ((Resize & Deinterlacer) != 0U) reasons << "Deinterlacer";
-    if ((Resize & Sampling)     != 0U) reasons << "Sampling";
-    if ((Resize & Performance)  != 0U) reasons << "Performance";
-    if ((Resize & Framebuffer)  != 0U) reasons << "Framebuffer";
+    if ((Resize & Deinterlacer) == Deinterlacer) reasons << "Deinterlacer";
+    if ((Resize & Sampling)     == Sampling)     reasons << "Sampling";
+    if ((Resize & Performance)  == Performance)  reasons << "Performance";
+    if ((Resize & Framebuffer)  == Framebuffer)  reasons << "Framebuffer";
     return reasons.join(",");
 }
 
