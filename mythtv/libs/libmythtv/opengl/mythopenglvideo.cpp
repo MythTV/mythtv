@@ -305,8 +305,8 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
         sizes.emplace_back(QSize(m_videoDim));
         m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
-        // ensure we use GL_NEAREST if resizing is already active
-        if (m_resizing)
+        // ensure we use GL_NEAREST if resizing is already active and needed
+        if (m_resizing & Sampling)
         {
             MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
             MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
@@ -809,7 +809,12 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         // N.B. not needed for the basic deinterlacer
         if (deinterlacing && !basicdeinterlacing && (m_videoDispDim.height() > m_displayVideoRect.height()))
             resize |= Deinterlacer;
-        // UYVY packed pixels must be sampled exactly
+
+        // NB GL_NEAREST introduces some 'minor' chroma sampling errors
+        // for the following 2 cases. For YUY2 this may be better handled in the
+        // shader. For GLES3.0 10bit textures - Vulkan is probably the better solution.
+
+        // UYVY packed pixels must be sampled exactly with GL_NEAREST
         if (FMT_YUY2 == m_outputType)
             resize |= Sampling;
         // unsigned integer texture formats need GL_NEAREST sampling
@@ -856,7 +861,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     else if (!m_resizing && resize)
     {
         // framebuffer will be created as needed below
-        QOpenGLTexture::Filter filter = m_toneMap ? QOpenGLTexture::Linear : QOpenGLTexture::Nearest;
+        QOpenGLTexture::Filter filter = (resize & Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, filter);
         MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, filter);
         MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, filter);
@@ -870,7 +875,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     // check hardware frames have the correct filtering
     if (hwframes)
     {
-        QOpenGLTexture::Filter filter = (resize && !m_toneMap) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = (resize & Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
             MythVideoTexture::SetTextureFilters(m_render, inputtextures, filter);
     }
