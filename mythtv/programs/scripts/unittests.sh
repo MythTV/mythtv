@@ -2,16 +2,6 @@
 #
 # unittests.sh runs all unit tests and returns 0 if all are successful
 
-if test "x$BASH_VERSION" = "x"; then
-    export FF_CONF_EXEC
-    if test "0$FF_CONF_EXEC" -lt 1; then
-        FF_CONF_EXEC=1
-        exec bash "$0" "$@"
-    fi
-    echo "This script needs bash to run."
-    exit 1
-fi
-
 DIRNAME=`which dirname`
 BASENAME=`which basename`
 SED=`which sed`
@@ -22,15 +12,13 @@ TEST_FAILED=0
 if test "x$(uname -s)" = "xFreeBSD"; then
     # Find all shared libraries (".so" on linux/freebsd, ".dylib" on OSX).
     # Eliminate multiples on OSX because of where the suffix is added.
-    declare -a DIRS
+    DIRS=""
     LIBS=$(find $(dirname $(pwd)) -name "*.so" -o -name "*.dylib")
     for lib in $LIBS ; do
         DIR=$(dirname $lib)
-        if [[ ! ${DIRS[*]} =~ ${DIR} ]]; then
-        DIRS+=($DIR)
-        fi
+        DIRS="$DIRS $DIR"
     done
-    export LD_LIBRARY_PATH=$(echo ${DIRS[*]} | tr ' ' ':')
+    export LD_LIBRARY_PATH=$(echo ${DIRS} | tr ' ' ':')
 fi
 
 TESTS=`find . -name "test_*.pro"`
