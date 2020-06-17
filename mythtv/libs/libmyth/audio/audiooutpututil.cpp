@@ -246,7 +246,6 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 {
     MythAVFrame frame;
     bool got_frame = false;
-    char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
     if (!frame)
@@ -271,9 +270,10 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
         ret = 0;
     else if (ret < 0)
     {
+        std::string error;
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("audio decode error: %1 (%2)")
-            .arg(av_make_error_string(error, sizeof(error), ret))
+            .arg(av_make_error_stdstring(error, ret))
             .arg(got_frame));
         return ret;
     }

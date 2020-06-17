@@ -13,6 +13,7 @@
 #include "audiosettings.h"
 #include "audiooutputsettings.h"
 #include "mythcorecontext.h"
+#include "mythaverror.h"
 #include "volumebase.h"
 #include "output.h"
 

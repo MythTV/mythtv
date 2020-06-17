@@ -693,9 +693,9 @@ MythStreamInfoList::MythStreamInfoList(QString filename)
                 m_errorMsg = "File could not be opened";
                 break;
             default:
-                char errbuf[256];
-                if (av_strerror(m_errorCode, errbuf, sizeof errbuf) == 0)
-                    m_errorMsg = QString(errbuf);
+                std::string errbuf;
+                if (av_strerror_stdstring(m_errorCode, errbuf) == 0)
+                    m_errorMsg = QString::fromStdString(errbuf);
                 else
                     m_errorMsg = "UNKNOWN";
         }

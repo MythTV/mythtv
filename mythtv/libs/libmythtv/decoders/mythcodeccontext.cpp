@@ -559,11 +559,11 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythOpenGLInter
         return result;
     }
 
-    char error[AV_ERROR_MAX_STRING_SIZE];
+    std::string error;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Failed to create hardware device '%1'%2 Error '%3'")
         .arg(av_hwdevice_get_type_name(Type))
         .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device))
-        .arg(av_make_error_string(error, sizeof(error), res)));
+        .arg(av_make_error_stdstring(error, res)));
     return nullptr;
 }
 

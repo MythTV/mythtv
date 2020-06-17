@@ -1025,9 +1025,9 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
             err = avformat_open_input(&m_ic, filename, fmt, nullptr);
             if (err < 0)
             {
-                char error[AV_ERROR_MAX_STRING_SIZE];
-                av_make_error_string(error, sizeof(error), err);
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Failed to open input ('%1')").arg(error));
+                std::string error;
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Failed to open input ('%1')")
+                    .arg(av_make_error_stdstring(error, err)));
 
                 // note - m_ic (AVFormatContext) is freed on failure
                 if (retries > 1)
@@ -2519,15 +2519,13 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
     int ret = avcodec_open2(avctx, codec, nullptr);
     if (ret < 0)
     {
-        char error[AV_ERROR_MAX_STRING_SIZE];
-
-        av_make_error_string(error, sizeof(error), ret);
+        std::string error;
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not open codec 0x%1, id(%2) type(%3) "
                     "ignoring. reason %4").arg((uint64_t)avctx,0,16)
             .arg(ff_codec_id_string(avctx->codec_id))
             .arg(ff_codec_type_string(avctx->codec_type))
-            .arg(error));
+            .arg(av_make_error_stdstring(error, ret)));
         return false;
     }
 
@@ -3455,12 +3453,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 
     if (ret < 0 || ret2 < 0)
     {
-        char error[AV_ERROR_MAX_STRING_SIZE];
+        std::string error;
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(av_make_error_stdstring(error, ret))
                 .arg(ret).arg(gotpicture));
         }
 
@@ -3468,7 +3466,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_string(error, sizeof(error), ret2))
+                .arg(av_make_error_stdstring(error, ret2))
                 .arg(ret2).arg(gotpicture));
         }
 
@@ -4937,10 +4935,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
                 SetEof(true);
                 delete pkt;
-                char errbuf[256];
+                std::string errbuf(256,'\0');
                 QString errmsg;
-                if (av_strerror(retval, errbuf, sizeof errbuf) == 0)
-                    errmsg = QString(errbuf);
+                if (av_strerror_stdstring(retval, errbuf) == 0)
+                    errmsg = QString::fromStdString(errbuf);
                 else
                     errmsg = "UNKNOWN";
 

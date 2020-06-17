@@ -898,10 +898,10 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         // received here.
         if (ret < 0)
         {
-            char error[AV_ERROR_MAX_STRING_SIZE];
+            std::string error;
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("video decode error: %1 (%2)")
-                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(av_make_error_stdstring(error, ret))
                 .arg(gotpicture));
         }
         if (!gotpicture)

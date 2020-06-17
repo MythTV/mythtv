@@ -248,10 +248,10 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
         if (ret < 0)
         {
-            char error[AV_ERROR_MAX_STRING_SIZE];
+            std::string error;
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("audio encode error: %1 (%2)")
-                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(av_make_error_stdstring(error, ret))
                 .arg(got_packet));
             return ret;
         }

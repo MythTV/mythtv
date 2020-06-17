@@ -1900,10 +1900,10 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
             len = 0;
         if (len < 0) // Error
         {
-            char error[AV_ERROR_MAX_STRING_SIZE];
+            std::string error;
             LOG(VB_GENERAL, LOG_ERR,
                 QString("[mhi] video decode error: %1 (%2)")
-                .arg(av_make_error_string(error, sizeof(error), len))
+                .arg(av_make_error_stdstring(error, len))
                 .arg(gotPicture));
             goto Close;
         }

@@ -9,6 +9,7 @@
 #include <string.h>
 #endif
 #include "mythtvexp.h" // for MTV_PUBLIC
+#include "mythaverror.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

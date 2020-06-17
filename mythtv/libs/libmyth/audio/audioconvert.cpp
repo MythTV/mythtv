@@ -27,6 +27,7 @@
 
 #include "mythconfig.h"
 #include "mythlogging.h"
+#include "mythaverror.h"
 #include "audioconvert.h"
 
 extern "C" {
@@ -596,10 +597,10 @@ public:
         int ret = swr_init(m_swr);
         if (ret < 0)
         {
-            char error[AV_ERROR_MAX_STRING_SIZE];
+            std::string error;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 QString("error initializing resampler context (%1)")
-                .arg(av_make_error_string(error, sizeof(error), ret)));
+                .arg(av_make_error_stdstring(error, ret)));
             swr_free(&m_swr);
             return;
         }
