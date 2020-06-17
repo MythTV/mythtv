@@ -794,9 +794,10 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
     }
 
     // General override for invalid/misleading EDIDs or multiscreen setups
+    // New default of -1.0 equates to square pixels for modern displays
     bool multiscreen = MythDisplay::SpanAllScreens() && GetScreenCount() > 1;
     double override = gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                                          gCoreContext->GetHostName(), 0.0);
+                                                          gCoreContext->GetHostName(), -1.0);
 
     // Zero (not valid) indicates auto
     if (valid(override))
@@ -816,26 +817,26 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
         }
     }
 
-    // Based on actual physical size if available
-    if (!m_physicalSize.isEmpty())
+    double calculated = m_resolution.isEmpty() ? 0.0 :
+                        static_cast<double>(m_resolution.width()) / m_resolution.height();
+    double detected   = m_physicalSize.isEmpty() ? 0.0 :
+                        static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
+
+    // Assume pixel aspect ratio is 1 (square pixels)
+    if (valid(calculated))
     {
-        double aspect = static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
-        if (valid(aspect))
+        if ((override < 0.0) || !valid(detected))
         {
-            Source = tr("Detected");
-            return aspect;
+            Source = tr("Square pixels");
+            return calculated;
         }
     }
 
-    // Assume pixel aspect ratio is 1 (square pixels)
-    if (!m_resolution.isEmpty())
+    // Based on actual physical size if available
+    if (valid(detected))
     {
-        double aspect = static_cast<double>(m_resolution.width()) / m_resolution.height();
-        if (valid(aspect))
-        {
-            Source = tr("Fallback");
-            return aspect;
-        }
+        Source = tr("Detected");
+        return detected;
     }
 
     // the aspect ratio of last resort

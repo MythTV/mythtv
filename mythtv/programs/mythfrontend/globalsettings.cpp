@@ -2086,7 +2086,8 @@ static HostComboBoxSetting *ScreenAspectRatio()
     auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
     gc->setLabel(AppearanceSettings::tr("Screen aspect ratio"));
-    gc->addSelection(AppearanceSettings::tr("Auto"),    "0.0");
+    gc->addSelection(AppearanceSettings::tr("Auto (Assume square pixels)"), "-1.0");
+    gc->addSelection(AppearanceSettings::tr("Auto (Detect from display)"), "0.0");
     gc->addSelection(AppearanceSettings::tr("16:9"),    "1.7777");
     gc->addSelection(AppearanceSettings::tr("16:10"),   "1.6");
     gc->addSelection(AppearanceSettings::tr("21:9"),    "2.3704"); // N.B. Actually 64:27
@@ -2099,8 +2100,10 @@ static HostComboBoxSetting *ScreenAspectRatio()
     gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
     gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
     gc->setHelpText(AppearanceSettings::tr(
-            "The aspect ratio of the screen (or screens) is usually automatically detected "
-            "from the connected display ('Auto'). If automatic detection fails, the correct "
+            "Most modern displays have square pixels and the aspect ratio of the screen can be "
+            "computed from the resolution (default). "
+            "The aspect ratio can also be automatically detected from the connected display "
+            "- though this may be slightly less accurate. If automatic detection fails, the correct "
             "aspect ratio can be specified here. Note: Some values (e.g 32:10) are "
             "primarily intended for multiscreen setups."));
     return gc;
