@@ -4526,9 +4526,9 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute,
 
     if (frame->interlaced_frame)
     {
-        // Use medium quality - which is currently yadif
+        // Use high quality - which is currently yadif
         frame->deinterlace_double = DEINT_NONE;
-        frame->deinterlace_allowed = frame->deinterlace_single = DEINT_CPU | DEINT_MEDIUM;
+        frame->deinterlace_allowed = frame->deinterlace_single = DEINT_CPU | DEINT_HIGH;
         MythDeinterlacer deinterlacer;
         deinterlacer.Filter(frame, kScan_Interlaced, nullptr, true);
     }
