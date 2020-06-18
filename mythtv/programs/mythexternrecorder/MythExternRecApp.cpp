@@ -271,13 +271,14 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
     if (m_cleanup.isEmpty())
         return;
 
-    QString cmd = m_cleanup;
+    QStringList args = m_cleanup.split(QRegularExpression("\\s+"));
+    QString cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
         QString(" Beginning cleanup: '%1'").arg(cmd));
 
     QProcess cleanup;
-    cleanup.start(cmd);
+    cleanup.start(cmd, args);
     if (!cleanup.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start cleanup process: "
@@ -302,14 +303,15 @@ Q_SLOT void MythExternRecApp::DataStarted(void)
     if (m_onDataStart.isEmpty())
         return;
 
-    QString cmd = m_onDataStart;
+    QStringList args = m_onDataStart.split(QRegularExpression("\\s+"));
+    QString cmd = args.takeFirst();
     cmd.replace("%CHANNUM%", m_tunedChannel);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString(" Data started, finishing tune: '%1'").arg(cmd));
 
     QProcess finish;
-    finish.start(cmd);
+    finish.start(cmd, args);
     if (!finish.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to finish tune process: "
@@ -340,11 +342,12 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 
     if (!m_scanCommand.isEmpty())
     {
-        QString cmd = m_scanCommand;
+        QStringList args = m_scanCommand.split(QRegularExpression("\\s+"));
+        QString cmd = args.takeFirst();
         cmd.replace("%CHANCONF%", m_channelsIni);
 
         QProcess scanner;
-        scanner.start(cmd);
+        scanner.start(cmd, args);
 
         if (!scanner.waitForStarted())
         {
@@ -454,14 +457,15 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 
 void MythExternRecApp::NewEpisodeStarting(const QString & channum)
 {
-    QString cmd = m_newEpisodeCommand;
+    QStringList args = m_newEpisodeCommand.split(QRegularExpression("\\s+"));
+    QString cmd = args.takeFirst();
     cmd.replace("%CHANNUM%", channum);
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
         QString(" New episode starting on current channel: '%1'").arg(cmd));
 
     QProcess proc;
-    proc.start(cmd);
+    proc.start(cmd, args);
     if (!proc.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
@@ -568,8 +572,10 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     if (!m_tuneCommand.isEmpty())
     {
+        QStringList args = tunecmd.split(QRegularExpression("\\s+"));
+        QString cmd = args.takeFirst();
         m_tuningChannel = channum;
-        m_tuneProc.start(tunecmd);
+        m_tuneProc.start(cmd, args);
         if (!m_tuneProc.waitForStarted())
         {
             QString errmsg = QString("Tune `%1` failed: ").arg(tunecmd) + ENO;
@@ -684,7 +690,9 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
         return;
     }
 
-    m_proc.start(m_command, QIODevice::ReadOnly|QIODevice::Unbuffered);
+    QStringList args = m_command.split(QRegularExpression("\\s+"));
+    QString cmd = args.takeFirst();
+    m_proc.start(cmd, args, QIODevice::ReadOnly|QIODevice::Unbuffered);
     m_proc.setTextModeEnabled(false);
     m_proc.setReadChannel(QProcess::StandardOutput);
 
