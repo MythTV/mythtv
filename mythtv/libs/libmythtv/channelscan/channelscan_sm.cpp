@@ -257,7 +257,11 @@ void ChannelScanSM::HandleAllGood(void)
     QMutexLocker locker(&m_lock);
 
     QString cur_chan = (*m_current).m_friendlyName;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList list = cur_chan.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList list = cur_chan.split(" ", Qt::SkipEmptyParts);
+#endif
     QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
 
     QString msg = QObject::tr("Updated Channel %1").arg(cur_chan);

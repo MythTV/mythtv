@@ -403,7 +403,11 @@ void FileSelector::updateFileList()
         {
             // second get a list of file's in the current directory
             filters.clear();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             filters = m_filemask.split(" ", QString::SkipEmptyParts);
+#else
+            filters = m_filemask.split(" ", Qt::SkipEmptyParts);
+#endif
             list = d.entryInfoList(filters, QDir::Files, QDir::Name);
             for (const auto & fi : qAsConst(list))
             {

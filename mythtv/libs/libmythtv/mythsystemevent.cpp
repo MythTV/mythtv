@@ -228,7 +228,11 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 QString MythSystemEventHandler::EventNameToSetting(const QString &name)
 {
     QString result("EventCmd");
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList parts = name.toLower().split('_', QString::SkipEmptyParts);
+#else
+    QStringList parts = name.toLower().split('_', Qt::SkipEmptyParts);
+#endif
 
     QStringList::Iterator it = parts.begin();
     while (it != parts.end())
@@ -282,7 +286,11 @@ void MythSystemEventHandler::customEvent(QEvent *e)
             (!msg.startsWith("LOCAL_SYSTEM_EVENT ")))
             return;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = msg.split(' ', QString::SkipEmptyParts);
+#else
+        QStringList tokens = msg.split(' ', Qt::SkipEmptyParts);
+#endif
 
         // Return if this event is for another host
         if ((tokens.size() >= 4) &&

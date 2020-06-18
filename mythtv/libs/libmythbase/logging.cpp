@@ -997,8 +997,13 @@ int verboseArgParse(const QString& arg)
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList verboseOpts = arg.split(QRegularExpression("[^\\w:]+"),
                                         QString::SkipEmptyParts);
+#else
+    QStringList verboseOpts = arg.split(QRegularExpression("[^\\w:]+"),
+                                        Qt::SkipEmptyParts);
+#endif
     for (const auto& opt : qAsConst(verboseOpts))
     {
         option = opt.toLower();

@@ -1553,7 +1553,11 @@ void MythCoreContext::readyRead(MythSocket *sock)
 
         QString prefix = strlist[0];
         QString message = strlist[1];
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
+#endif
 
         if (prefix == "OK")
         {

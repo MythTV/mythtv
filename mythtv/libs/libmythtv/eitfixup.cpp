@@ -521,8 +521,13 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         if (position > 3)
         {
             QString tmp = event.m_description.left(position-3);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList actors =
                 tmp.split(m_bellActors, QString::SkipEmptyParts);
+#else
+            QStringList actors =
+                tmp.split(m_bellActors, Qt::SkipEmptyParts);
+#endif
             for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
@@ -815,8 +820,13 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
 
     if (!strListEnd.empty())
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList strListSpace = strListEnd[0].split(
             " ", QString::SkipEmptyParts);
+#else
+        QStringList strListSpace = strListEnd[0].split(
+            " ", Qt::SkipEmptyParts);
+#endif
         if (fColon && ((uint)strListSpace.size() > kMaxToTitle))
              return;
         if ((uint)strListSpace.size() > kDotToTitle)
@@ -1259,8 +1269,13 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
         // Actors
         if (list[5].length() > 0)
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             const QStringList actors =
                 list[5].split(m_comHemPersSeparator, QString::SkipEmptyParts);
+#else
+            const QStringList actors =
+                list[5].split(m_comHemPersSeparator, Qt::SkipEmptyParts);
+#endif
             for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor);
         }
@@ -1302,8 +1317,13 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
             continue;
         }
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
             list[2].split(m_comHemPersSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList actors =
+            list[2].split(m_comHemPersSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(role, actor);
 
@@ -1646,8 +1666,13 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         position = tmpExp1.indexIn(event.m_description);
         if (position != -1)
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             const QStringList actors = tmpExp1.cap(2).split(
                 m_mcaActorsSeparator, QString::SkipEmptyParts);
+#else
+            const QStringList actors = tmpExp1.cap(2).split(
+                m_mcaActorsSeparator, Qt::SkipEmptyParts);
+#endif
             for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor.trimmed());
             event.m_description = tmpExp1.cap(1).trimmed();
@@ -1953,8 +1978,13 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
     if (tmpcredits.indexIn(event.m_description) != -1)
     {
         event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors = tmpcredits.cap(2).split(
             ", ", QString::SkipEmptyParts);
+#else
+        const QStringList actors = tmpcredits.cap(2).split(
+            ", ", Qt::SkipEmptyParts);
+#endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
         event.m_description = event.m_description.replace(tmpcredits, "");
@@ -2156,8 +2186,13 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         QString tmpActorsString = tmpActors.cap(0);
         tmpActorsString = tmpActorsString.right(tmpActorsString.length() - 6);
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
             tmpActorsString.split(", ", QString::SkipEmptyParts);
+#else
+        const QStringList actors =
+            tmpActorsString.split(", ", Qt::SkipEmptyParts);
+#endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
         fullinfo = fullinfo.replace(tmpActors.cap(0), "");
@@ -2170,8 +2205,13 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         QString tmpPresString = tmpPres.cap(0);
         tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList presenters =
             tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList presenters =
+            tmpPresString.split(m_nlPersSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & presenter : qAsConst(presenters))
             event.AddPerson(DBPerson::kPresenter, presenter);
         fullinfo = fullinfo.replace(tmpPres.cap(0), "");
@@ -2476,8 +2516,13 @@ void EITFixUp::FixDK(DBEventEIT &event) const
     if (position != -1)
     {
         QString tmpDirectorsString = tmpRegEx.cap(1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList directors =
             tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList directors =
+            tmpDirectorsString.split(m_dkPersonsSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
@@ -2495,8 +2540,13 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         QString tmpActorsString = tmpRegEx.cap(1);
         if (directorPresent)
             tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
             tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList actors =
+            tmpActorsString.split(m_dkPersonsSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
@@ -2621,8 +2671,13 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         QString tmpActorsString = tmpRegEx.cap(1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
             tmpActorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList actors =
+            tmpActorsString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
@@ -2638,8 +2693,13 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         QString tmpDirectorsString = tmpRegEx.cap(1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList directors =
             tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList directors =
+            tmpDirectorsString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
@@ -2658,8 +2718,13 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         QString tmpPresentersString = tmpRegEx.cap(1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList presenters =
             tmpPresentersString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+#else
+        const QStringList presenters =
+            tmpPresentersString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+#endif
         for (const auto & presenter : qAsConst(presenters))
         {
             tmpPresentersString = presenter.split(":").last().trimmed().

@@ -417,15 +417,25 @@ void GalleryThumbView::customEvent(QEvent *event)
 
             if (!extra.isEmpty())
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList idDeleted =
                         extra[0].split(",", QString::SkipEmptyParts);
+#else
+                QStringList idDeleted =
+                        extra[0].split(",", Qt::SkipEmptyParts);
+#endif
 
                 RemoveImages(idDeleted);
             }
             if (extra.size() >= 2)
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList idChanged =
                         extra[1].split(",", QString::SkipEmptyParts);
+#else
+                QStringList idChanged =
+                        extra[1].split(",", Qt::SkipEmptyParts);
+#endif
                 RemoveImages(idChanged, false);
             }
 

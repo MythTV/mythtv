@@ -158,7 +158,11 @@ bool XmlConfiguration::Save( void )
 
 QDomNode XmlConfiguration::FindNode( const QString &sName, bool bCreate )
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList parts = sName.split('/', QString::SkipEmptyParts);
+#else
+    QStringList parts = sName.split('/', Qt::SkipEmptyParts);
+#endif
 
     return FindNode( parts, m_rootNode, bCreate );
 

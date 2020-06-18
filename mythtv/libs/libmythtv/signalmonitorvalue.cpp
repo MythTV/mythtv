@@ -116,7 +116,11 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
         return true;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList vals = longString.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList vals = longString.split(" ", Qt::SkipEmptyParts);
+#endif
 
     if (8 != vals.size() || "(null)" == vals[0])
         return false;

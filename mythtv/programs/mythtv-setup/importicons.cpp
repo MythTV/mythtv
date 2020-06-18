@@ -758,7 +758,11 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("Icon Import: Working findmissing : %1") .arg(str));
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+#else
+    QStringList strSplit = str.split("\n", Qt::SkipEmptyParts);
+#endif
     for (QStringList::const_iterator it = strSplit.begin();
          it != strSplit.end(); ++it)
     {
@@ -806,7 +810,11 @@ bool ImportIconsWizard::submit()
 
     LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
         .arg(str));
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+#else
+    QStringList strSplit = str.split("\n", Qt::SkipEmptyParts);
+#endif
     unsigned atsc = 0;
     unsigned dvb = 0;
     unsigned callsign = 0;
@@ -818,7 +826,11 @@ bool ImportIconsWizard::submit()
         if (*it == "#")
             continue;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList strSplit2=(*it).split(":", QString::SkipEmptyParts);
+#else
+        QStringList strSplit2=(*it).split(":", Qt::SkipEmptyParts);
+#endif
         if (strSplit2.size() < 2)
             continue;
 

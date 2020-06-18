@@ -383,7 +383,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         
         // ------------------------------------------------------------------
         QString     str          = QString(buffer.constData());
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
+#else
+        QStringList lines        = str.split("\r\n", Qt::SkipEmptyParts);
+#endif
         QString     sRequestLine = !lines.empty() ? lines[0] : "";
 
         if (!lines.isEmpty())
@@ -461,7 +465,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
 SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
+#else
+    QStringList tokens = sLine.split(m_procReqLineExp, Qt::SkipEmptyParts);
+#endif
 
     // ----------------------------------------------------------------------
     // if this is actually a response, then sLine's format will be:

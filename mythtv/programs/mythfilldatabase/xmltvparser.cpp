@@ -66,7 +66,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList split = timestr.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList split = timestr.split(" ", Qt::SkipEmptyParts);
+#endif
     QString ts = split[0];
     QDate tmpDate;
     QTime tmpTime;

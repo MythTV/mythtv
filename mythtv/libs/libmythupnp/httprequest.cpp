@@ -1124,7 +1124,11 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
     if (!sParams.isEmpty())
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList params = sParams.split('&', QString::SkipEmptyParts);
+#else
+        QStringList params = sParams.split('&', Qt::SkipEmptyParts);
+#endif
 
         for (const auto & param : qAsConst(params))
         {
@@ -1434,7 +1438,11 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
     m_sRawRequest = sLine;
 
     QString     sToken;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
+#else
+    QStringList tokens = sLine.split(m_procReqLineExp, Qt::SkipEmptyParts);
+#endif
     int         nCount = tokens.count();
 
     // ----------------------------------------------------------------------
@@ -1525,7 +1533,11 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split multiple ranges
     // ----------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList ranges = sRange.split(',', QString::SkipEmptyParts);
+#else
+    QStringList ranges = sRange.split(',', Qt::SkipEmptyParts);
+#endif
 
     if (ranges.count() == 0)
         return false;
@@ -1606,7 +1618,11 @@ void HTTPRequest::ExtractMethodFromURL()
     sRegex.setMinimal(true);
     m_sBaseUrl.replace(sRegex, "/");
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList sList = m_sBaseUrl.split('/', QString::SkipEmptyParts);
+#else
+    QStringList sList = m_sBaseUrl.split('/', Qt::SkipEmptyParts);
+#endif
 
     m_sMethod = "";
 

@@ -536,8 +536,13 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
 {
     setObjectName("ExternSH");
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     m_args = path.split(' ',QString::SkipEmptyParts) +
              logPropagateArgs.split(' ', QString::SkipEmptyParts);
+#else
+    m_args = path.split(' ',Qt::SkipEmptyParts) +
+             logPropagateArgs.split(' ', Qt::SkipEmptyParts);
+#endif
     m_app = m_args.first();
     m_args.removeFirst();
 
@@ -855,7 +860,11 @@ bool ExternalStreamHandler::SetAPIVersion(void)
 
     if (ProcessCommand("APIVersion?", result, 10000))
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = result.split(':', QString::SkipEmptyParts);
+#else
+        QStringList tokens = result.split(':', Qt::SkipEmptyParts);
+#endif
 
         if (tokens.size() > 1)
             m_apiVersion = tokens[1].toUInt();
@@ -1389,7 +1398,11 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             if (!result.isEmpty())
             {
                 raw = result;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 tokens = result.split(':', QString::SkipEmptyParts);
+#else
+                tokens = result.split(':', Qt::SkipEmptyParts);
+#endif
 
                 // Look for result with the serial number of this query
                 if (tokens.size() > 1 && tokens[0].toUInt() >= m_serialNo)
@@ -1504,7 +1517,11 @@ bool ExternalStreamHandler::CheckForError(void)
         {
             if (m_apiVersion > 1)
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList tokens = result.split(':', QString::SkipEmptyParts);
+#else
+                QStringList tokens = result.split(':', Qt::SkipEmptyParts);
+#endif
 
                 tokens.removeFirst();
                 result = tokens.join(':');

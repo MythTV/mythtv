@@ -698,8 +698,13 @@ class VideoDialogPrivate
                 QString ratingstring =
                         gCoreContext->GetSetting(QString("mythvideo.AutoR2PL%1")
                                 .arg(sl.GetLevel()));
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList ratings =
                         ratingstring.split(':', QString::SkipEmptyParts);
+#else
+                QStringList ratings =
+                        ratingstring.split(':', Qt::SkipEmptyParts);
+#endif
 
                 for (QStringList::const_iterator p = ratings.begin();
                     p != ratings.end(); ++p)

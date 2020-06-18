@@ -2465,11 +2465,19 @@ QString ProgramInfo::GetPlaybackURL(
         QUrl    url  = QUrl(fullpath);
         QString path = url.path();
         QString host = url.toString(QUrl::RemovePath).mid(7);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList list = host.split(":", QString::SkipEmptyParts);
+#else
+        QStringList list = host.split(":", Qt::SkipEmptyParts);
+#endif
         if (!list.empty())
         {
             host = list[0];
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             list = host.split("@", QString::SkipEmptyParts);
+#else
+            list = host.split("@", Qt::SkipEmptyParts);
+#endif
             QString group;
             if (!list.empty() && list.size() < 3)
             {

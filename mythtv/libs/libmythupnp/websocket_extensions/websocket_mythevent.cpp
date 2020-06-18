@@ -22,7 +22,11 @@ bool WebSocketMythEvent::HandleTextFrame(const WebSocketFrame &frame)
     if (message.isEmpty())
         return false;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
+#endif
 
     if (tokens[0] == "WS_EVENT_ENABLE") // Only send events if asked
     {
@@ -65,7 +69,11 @@ void WebSocketMythEvent::customEvent(QEvent* event)
         if (message.startsWith("SYSTEM_EVENT"))
             message.remove(0, 13); // Strip SYSTEM_EVENT from the frontend, it's not useful
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
+#endif
 
         if (tokens.isEmpty())
             return;

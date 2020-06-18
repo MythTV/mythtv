@@ -247,8 +247,12 @@ int main(int argc, char *argv[])
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
             for (const auto & cut : qAsConst(cutlist))
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList startend =
                     cut.split("-", QString::SkipEmptyParts);
+#else
+                QStringList startend = cut.split("-", Qt::SkipEmptyParts);
+#endif
                 if (startend.size() == 2)
                 {
                     uint64_t start = startend.first().toULongLong();

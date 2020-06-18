@@ -476,8 +476,13 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         while (query.next())
         {
             QString videostartupdir = query.value(0).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList videodirs = videostartupdir.split(':',
                                             QString::SkipEmptyParts);
+#else
+            QStringList videodirs = videostartupdir.split(':',
+                                            Qt::SkipEmptyParts);
+#endif
             for (const auto& directory : qAsConst(videodirs))
             {
                 if (filename.startsWith(directory))

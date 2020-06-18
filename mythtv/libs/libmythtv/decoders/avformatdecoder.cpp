@@ -4045,7 +4045,11 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
     QTextCodec *codec = QTextCodec::codecForName("utf-8");
     QTextDecoder *dec = codec->makeDecoder();
     QString text      = dec->toUnicode((const char*)pkt->data, pkt->size - 1);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList list  = text.split('\n', QString::SkipEmptyParts);
+#else
+    QStringList list  = text.split('\n', Qt::SkipEmptyParts);
+#endif
     delete dec;
 
     m_parent->GetSubReader(pkt->stream_index + 0x2000)->AddRawTextSubtitle(list, pkt->duration);

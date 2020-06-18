@@ -838,8 +838,13 @@ void HouseKeeper::customEvent(QEvent *e)
         if ((me->Message().left(20) == "HOUSE_KEEPER_RUNNING") ||
             (me->Message().left(23) == "HOUSE_KEEPER_SUCCESSFUL"))
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList tokens = me->Message()
                                     .split(" ", QString::SkipEmptyParts);
+#else
+            QStringList tokens = me->Message()
+                                    .split(" ", Qt::SkipEmptyParts);
+#endif
             if (tokens.size() != 4)
                 return;
 

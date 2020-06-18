@@ -1877,8 +1877,13 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                         if (len >= 1 && buf[len-1]=='\n')
                             buf[len-1] = 0;
                         QString line(buf);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                         QStringList tokens = line.split("=",
                                 QString::SkipEmptyParts);
+#else
+                        QStringList tokens = line.split("=",
+                                Qt::SkipEmptyParts);
+#endif
                         if (tokens.size() == 2)
                         {
                             tokens[0].remove(QRegularExpression("^[\"']"));

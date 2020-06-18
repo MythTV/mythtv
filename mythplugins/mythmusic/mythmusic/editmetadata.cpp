@@ -784,7 +784,11 @@ void EditMetadataDialog::customEvent(QEvent *event)
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
+#endif
 
         if (!tokens.isEmpty())
         {
@@ -1172,7 +1176,11 @@ void EditAlbumartDialog::customEvent(QEvent *event)
         auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
+#endif
 
         if (!tokens.isEmpty())
         {

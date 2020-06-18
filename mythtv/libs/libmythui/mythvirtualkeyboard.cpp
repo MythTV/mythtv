@@ -633,7 +633,11 @@ QString MythUIVirtualKeyboard::getKeyText(const KeyDefinition& key) const
 void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action)
 {
     QString keylist = MythMainWindow::GetKey("Global", action);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList keys = keylist.split(',', QString::SkipEmptyParts);
+#else
+    QStringList keys = keylist.split(',', Qt::SkipEmptyParts);
+#endif
     if (keys.empty())
         return;
 

@@ -226,7 +226,11 @@ bool MythDRMPRIMEContext::HavePrimeDecoders(AVCodecID Codec)
                 // device contexts. None exist yet:)
                 if (config->methods & AV_CODEC_HW_CONFIG_METHOD_INTERNAL)
                 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                     QStringList name = QString(codec->name).split("_", QString::SkipEmptyParts);
+#else
+                    QStringList name = QString(codec->name).split("_", Qt::SkipEmptyParts);
+#endif
                     if (name.size() > 1 && !s_drmPrimeDecoders.contains(name[1]))
                         s_drmPrimeDecoders.append(name[1]);
                     if (!s_supportedCodecs.contains(codec->id))

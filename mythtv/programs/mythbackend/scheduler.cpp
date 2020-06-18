@@ -2307,7 +2307,13 @@ bool Scheduler::HandleReschedule(void)
         QStringList request = m_reschedQueue.dequeue();
         QStringList tokens;
         if (!request.empty())
+        {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             tokens = request[0].split(' ', QString::SkipEmptyParts);
+#else
+            tokens = request[0].split(' ', Qt::SkipEmptyParts);
+#endif
+        }
 
         if (request.empty() || tokens.empty())
         {

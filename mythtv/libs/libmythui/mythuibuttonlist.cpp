@@ -2931,7 +2931,11 @@ bool MythUIButtonList::ParseElement(
             {
                 QString context = element.attribute("context", "");
                 QString keylist = MythMainWindow::GetKey(context, action);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList keys = keylist.split(',', QString::SkipEmptyParts);
+#else
+                QStringList keys = keylist.split(',', Qt::SkipEmptyParts);
+#endif
                 if (!keys.empty())
                     m_actionRemap[trigger] = keys[0];
             }
@@ -3357,7 +3361,11 @@ bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fie
     }
     else
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList fields = fieldList.split(',', QString::SkipEmptyParts);
+#else
+        QStringList fields = fieldList.split(',', Qt::SkipEmptyParts);
+#endif
 
         for (int x = 0; x < fields.count(); ++x)
         {

@@ -31,7 +31,11 @@ void MythSortHelper::MythSortHelperCommon(void)
     }
     m_prefixesRegex = QRegularExpression(m_prefixes);
     m_prefixesRegex2 = QRegularExpression(m_prefixes + "(.*)");
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     m_exclList = m_exclusions.split(";", QString::SkipEmptyParts);
+#else
+    m_exclList = m_exclusions.split(";", Qt::SkipEmptyParts);
+#endif
     for (int i = 0; i < m_exclList.size(); i++)
       m_exclList[i] = m_exclList[i].trimmed();
 }

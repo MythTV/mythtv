@@ -70,8 +70,13 @@ void GameHandler::updateSettings(GameHandler *handler)
         handler->m_screenshots = query.value(3).toString();
         handler->m_gameplayerid = query.value(4).toInt();
         handler->m_gametype = query.value(5).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         handler->m_validextensions = query.value(6).toString().trimmed()
                                         .remove(" ").split(",", QString::SkipEmptyParts);
+#else
+        handler->m_validextensions = query.value(6).toString().trimmed()
+                                        .remove(" ").split(",", Qt::SkipEmptyParts);
+#endif
         handler->m_spandisks = query.value(7).toBool();
     }
 }

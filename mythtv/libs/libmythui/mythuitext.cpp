@@ -881,8 +881,12 @@ void MythUIText::FillCutMessage(void)
         QTextOption textoption(static_cast<Qt::Alignment>(m_Justification));
         textoption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList paragraphs = m_CutMessage.split('\n',
                                                     QString::KeepEmptyParts);
+#else
+        QStringList paragraphs = m_CutMessage.split('\n', Qt::KeepEmptyParts);
+#endif
 
         for (int idx = m_Layouts.size(); idx < paragraphs.size(); ++idx)
             m_Layouts.push_back(new QTextLayout);

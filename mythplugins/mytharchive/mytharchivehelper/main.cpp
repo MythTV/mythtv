@@ -1163,7 +1163,11 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     // copy file to video directory
     QString path = gCoreContext->GetSetting("VideoStartupDir");
     QString origFilename = findNodeText(videoNode, "filename");
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList dirList = origFilename.split("/", QString::SkipEmptyParts);
+#else
+    QStringList dirList = origFilename.split("/", Qt::SkipEmptyParts);
+#endif
     QDir dir;
     for (int x = 0; x < dirList.count() - 1; x++)
     {
@@ -1616,7 +1620,11 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     }
 
     // get list of required thumbs
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList list = thumbList.split(",", QString::SkipEmptyParts);
+#else
+    QStringList list = thumbList.split(",", Qt::SkipEmptyParts);
+#endif
     MythAVFrame frame;
     if (!frame)
     {
@@ -1948,7 +1956,11 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
         {
             case AVMEDIA_TYPE_VIDEO:
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+#else
+                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+#endif
                 QString codec = param[0].remove("Video:", Qt::CaseInsensitive);
                 QDomElement stream = doc.createElement("video");
                 stream.setAttribute("streamindex", i);
@@ -2075,7 +2087,11 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
             case AVMEDIA_TYPE_AUDIO:
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+#else
+                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+#endif
                 QString codec = param[0].remove("Audio:", Qt::CaseInsensitive);
 
                 QDomElement stream = doc.createElement("audio");
@@ -2120,7 +2136,11 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
             case AVMEDIA_TYPE_SUBTITLE:
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+#else
+                QStringList param = QString(buf).split(',', Qt::SkipEmptyParts);
+#endif
                 QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive);
 
                 QDomElement stream = doc.createElement("subtitle");

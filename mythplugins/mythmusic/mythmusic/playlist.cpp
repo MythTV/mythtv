@@ -636,7 +636,11 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
 {
     bool badTrack = false;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList list = songList.split(",", QString::SkipEmptyParts);
+#else
+    QStringList list = songList.split(",", Qt::SkipEmptyParts);
+#endif
     for (const auto & song : qAsConst(list))
     {
         MusicMetadata::IdType id = song.toUInt();
@@ -740,7 +744,11 @@ void Playlist::fillSonglistFromQuery(const QString& whereClause,
 
         case PL_INSERTAFTERCURRENT:
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
+#else
+            QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
+#endif
             bool bFound = false;
             QString tempList;
             for (const auto& song : qAsConst(list))
@@ -809,7 +817,11 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
 
         case PL_INSERTAFTERCURRENT:
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
+#else
+            QStringList list = orig_songlist.split(",", Qt::SkipEmptyParts);
+#endif
             bool bFound = false;
             QString tempList;
             for (const auto & song : qAsConst(list))
@@ -1057,8 +1069,13 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
 
 QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList curList = orig_songlist.split(",", QString::SkipEmptyParts);
     QStringList newList = new_songlist.split(",", QString::SkipEmptyParts);
+#else
+    QStringList curList = orig_songlist.split(",", Qt::SkipEmptyParts);
+    QStringList newList = new_songlist.split(",", Qt::SkipEmptyParts);
+#endif
     QString songlist;
 
     for (const auto & song : qAsConst(newList))

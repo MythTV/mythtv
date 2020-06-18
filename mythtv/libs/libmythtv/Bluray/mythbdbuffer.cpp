@@ -1277,12 +1277,20 @@ bool MythBDBuffer::GetBDStateSnapshot(QString& State)
  */
 bool MythBDBuffer::RestoreBDStateSnapshot(const QString& State)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList states = State.split(",", QString::SkipEmptyParts);
+#else
+    QStringList states = State.split(",", Qt::SkipEmptyParts);
+#endif
     QHash<QString, uint64_t> settings;
 
     for (const QString& state : states)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList keyvalue = state.split(":", QString::SkipEmptyParts);
+#else
+        QStringList keyvalue = state.split(":", Qt::SkipEmptyParts);
+#endif
         if (keyvalue.length() != 2)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Invalid BD state: %1 (%2)")

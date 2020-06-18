@@ -95,7 +95,11 @@ void JobQueue::customEvent(QEvent *e)
             // LOCAL_JOB action type chanid recstartts hostname
             QString msg;
             message = message.simplified();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+#else
+            QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
+#endif
             QString action = tokens[1];
             int jobID = -1;
 
@@ -1961,7 +1965,11 @@ void JobQueue::DoTranscodeThread(int jobID)
     {
         command = m_runningJobs[jobID].command;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = command.split(" ", Qt::SkipEmptyParts);
+#endif
         if (!tokens.empty())
             path = tokens[0];
     }
@@ -2326,7 +2334,11 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     else
     {
         command = m_runningJobs[jobID].command;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = command.split(" ", Qt::SkipEmptyParts);
+#endif
         if (!tokens.empty())
             path = tokens[0];
     }

@@ -88,11 +88,16 @@ QStringList GetVideoDirsByHost(const QString& host)
     if (host.isEmpty())
     {
 #ifdef _WIN32
+        QString seperator = ";";
+#else
+        QString seperator = ":";
+#endif
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
-                    DEFAULT_VIDEOSTARTUP_DIR).split(";", QString::SkipEmptyParts);
+                    DEFAULT_VIDEOSTARTUP_DIR).split(seperator, QString::SkipEmptyParts);
 #else
         QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
-                    DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
+                    DEFAULT_VIDEOSTARTUP_DIR).split(seperator, Qt::SkipEmptyParts);
 #endif
         for (const auto& dir : qAsConst(tmp3))
         {

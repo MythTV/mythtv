@@ -581,7 +581,11 @@ void avfDecoder::checkMetatdata(void)
 
 bool avfDecoderFactory::supports(const QString &source) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList list = extension().split("|", QString::SkipEmptyParts);
+#else
+    QStringList list = extension().split("|", Qt::SkipEmptyParts);
+#endif
     for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
     {
         if (*it == source.right((*it).length()).toLower())

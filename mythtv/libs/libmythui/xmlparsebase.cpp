@@ -76,7 +76,11 @@ bool XMLParseBase::parseBool(QDomElement &element)
 MythPoint XMLParseBase::parsePoint(const QString &text, bool normalize)
 {
     MythPoint retval;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList values = text.split(',', QString::SkipEmptyParts);
+#else
+    QStringList values = text.split(',', Qt::SkipEmptyParts);
+#endif
     if (values.size() == 2)
         retval = MythPoint(values[0], values[1]);
 
@@ -133,7 +137,11 @@ QSize XMLParseBase::parseSize(QDomElement &element, bool normalize)
 MythRect XMLParseBase::parseRect(const QString &text, bool normalize)
 {
     MythRect retval;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList values = text.split(',', QString::SkipEmptyParts);
+#else
+    QStringList values = text.split(',', Qt::SkipEmptyParts);
+#endif
     if (values.size() == 4)
         retval = MythRect(values[0], values[1], values[2], values[3]);
     if (values.size() == 5)

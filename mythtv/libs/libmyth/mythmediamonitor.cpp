@@ -350,7 +350,13 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
     if (ignore.length())
+    {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         m_IgnoreList = ignore.split(',', QString::SkipEmptyParts);
+#else
+        m_IgnoreList = ignore.split(',', Qt::SkipEmptyParts);
+#endif
+    }
     else
         m_IgnoreList = QStringList();  // Force empty list
 

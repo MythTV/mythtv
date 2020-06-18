@@ -211,7 +211,11 @@ bool ProfileItem::IsMatch(const QSize &Size, float Framerate, const QString &Cod
     QString cmp = Get(QString("cond_codecs"));
     if (!cmp.isEmpty())
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList clist = cmp.split(" ", Qt::SkipEmptyParts);
+#endif
         if (!clist.empty())
             match &= clist.contains(CodecName,Qt::CaseInsensitive);
     }

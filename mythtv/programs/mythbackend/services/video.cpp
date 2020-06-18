@@ -733,7 +733,11 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("genres"))
     {
         VideoMetadata::genre_list genres;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList genresList = sGenres.split(',', QString::SkipEmptyParts);
+#else
+        QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
+#endif
 
         for (int x = 0; x < genresList.size(); x++)
         {
@@ -748,7 +752,11 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("cast"))
     {
         VideoMetadata::cast_list cast;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList castList = sCast.split(',', QString::SkipEmptyParts);
+#else
+        QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
+#endif
 
         for (int x = 0; x < castList.size(); x++)
         {
@@ -763,7 +771,11 @@ bool Video::UpdateVideoMetadata ( int           nId,
     if (m_parsedParams.contains("countries"))
     {
         VideoMetadata::country_list countries;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList countryList = sCountries.split(',', QString::SkipEmptyParts);
+#else
+        QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
+#endif
 
         for (int x = 0; x < countryList.size(); x++)
         {

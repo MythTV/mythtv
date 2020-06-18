@@ -233,11 +233,19 @@ static int SetCutList(uint chanid, const QDateTime& starttime, QString newCutLis
 
     newCutList.replace(QRegExp(" "), "");
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = newCutList.split(",", QString::SkipEmptyParts);
+#else
+    QStringList tokens = newCutList.split(",", Qt::SkipEmptyParts);
+#endif
 
     for (int i = 0; i < tokens.size(); i++)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList cutpair = tokens[i].split("-", QString::SkipEmptyParts);
+#else
+        QStringList cutpair = tokens[i].split("-", Qt::SkipEmptyParts);
+#endif
         cutlist[cutpair[0].toInt()] = MARK_CUT_START;
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
     }
@@ -478,7 +486,11 @@ static void incomingCustomEvent(QEvent* e)
         QString message = me->Message();
 
         message = message.simplified();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+#else
+        QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
+#endif
 
         LOG(VB_COMMFLAG, LOG_INFO,
             QString("mythcommflag: Received Event: '%1'") .arg(message));
@@ -737,7 +749,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             // not an integer, attempt comma separated list
             commDetectMethod = COMM_DETECT_UNINIT;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList list = commmethod.split(",", QString::SkipEmptyParts);
+#else
+            QStringList list = commmethod.split(",", Qt::SkipEmptyParts);
+#endif
             for (const auto & it : qAsConst(list))
             {
                 QString val = it.toLower();

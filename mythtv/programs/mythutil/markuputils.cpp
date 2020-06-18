@@ -81,14 +81,22 @@ static int SetMarkupList(const MythUtilCommandLineParser &cmdline,
 
     newList.replace(QRegExp(" "), "");
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = newList.split(",", QString::SkipEmptyParts);
+#else
+    QStringList tokens = newList.split(",", Qt::SkipEmptyParts);
+#endif
 
     if (newList.isEmpty())
         newList = "(EMPTY)";
 
     for (int i = 0; i < tokens.size(); i++)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList cutpair = tokens[i].split("-", QString::SkipEmptyParts);
+#else
+        QStringList cutpair = tokens[i].split("-", Qt::SkipEmptyParts);
+#endif
         if (isCutlist)
         {
             markuplist[cutpair[0].toInt()] = MARK_CUT_START;
