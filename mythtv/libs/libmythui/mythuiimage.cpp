@@ -367,7 +367,7 @@ class ImageLoader
                     imageArea.translate(x, y);
 
                 QImage mask = imProps.GetMaskImageSubset(imageArea);
-                image->setAlphaChannel(mask.alphaChannel());
+                image->setAlphaChannel(mask.convertToFormat(QImage::Format_Alpha8));
             }
 
             if (!imageReader)
