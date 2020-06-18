@@ -1093,10 +1093,6 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
             setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
         }
     }
-
-    // This makes Xlib calls thread-safe which seems to be required for hardware
-    // accelerated Flash playback to work without causing mythfrontend to abort.
-    QApplication::setAttribute(Qt::AA_X11InitThreads);
 #endif
 #ifdef Q_OS_ANDROID
     //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
