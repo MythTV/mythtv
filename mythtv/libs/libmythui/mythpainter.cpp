@@ -257,7 +257,9 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
 
     QPainter tmp(&pm);
     QFont tmpfont = font.face();
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
     tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
+#endif
     tmp.setFont(tmpfont);
 
     QPainterPath path;
@@ -420,7 +422,9 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
         clip.setSize(canvas.size());
 
         QFont tmpfont = font.face();
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
         tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
+#endif
         painter.setFont(tmpfont);
         painter.setRenderHint(QPainter::Antialiasing);
 

@@ -511,8 +511,12 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                 range.start = pos;
                 range.length = -1;  // Need to find the end of the effect
                 range.format.setFont(fnt->face());
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
                 range.format.setFontStyleHint(QFont::SansSerif,
                                               QFont::OpenGLCompatible);
+#else
+                range.format.setFontStyleHint(QFont::SansSerif);
+#endif
                 range.format.setForeground(fnt->GetBrush());
             }
             else
