@@ -38,8 +38,15 @@ VDPAUCodec::VDPAUCodec(MythCodecContext::CodecProfile Profile, QSize Size, uint3
 bool VDPAUCodec::Supported(int Width, int Height, int Level)
 {
     uint32_t macros = static_cast<uint32_t>(((Width + 15) & ~15) * ((Height + 15) & ~15)) / 256;
-    return (Width <= m_maxSize.width()) && (Height <= m_maxSize.height()) &&
-           (macros <= m_maxMacroBlocks) && (static_cast<uint32_t>(Level) <= m_maxLevel);
+    bool result = (Width <= m_maxSize.width()) && (Height <= m_maxSize.height()) &&
+                  (macros <= m_maxMacroBlocks) && (static_cast<uint32_t>(Level) <= m_maxLevel);
+    if (!result)
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Not supported: Size %1x%2 > %3x%4, MBs %5 > %6, Level %7 > %8")
+                .arg(Width).arg(Height).arg(m_maxSize.width()).arg(m_maxSize.height())
+                .arg(macros).arg(m_maxMacroBlocks).arg(Level).arg(m_maxLevel));
+    }
+    return result;
 }
 
 bool MythVDPAUHelper::HaveVDPAU(void)
