@@ -24,6 +24,9 @@ MythPainterVulkan::MythPainterVulkan(MythRenderVulkan *VulkanRender, MythWindowV
 
 MythPainterVulkan::~MythPainterVulkan()
 {
+    if (m_devFuncs && m_window)
+        m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
+
     Teardown();
     MythPainterVulkan::FreeResources();
     DoFreeResources();
@@ -39,6 +42,9 @@ void MythPainterVulkan::FreeResources(void)
 /// \brief Free resources before the render device is released.
 void MythPainterVulkan::DoFreeResources(void)
 {
+    if (m_devFuncs && m_window)
+        m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
+
     LOG(VB_GENERAL, LOG_INFO, LOC + "Releasing Vulkan resources");
 
     delete m_projectionUniform;
