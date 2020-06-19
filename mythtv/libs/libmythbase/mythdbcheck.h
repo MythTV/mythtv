@@ -10,7 +10,7 @@ using DBUpdates = std::vector<std::string>;
 
 MBASE_PUBLIC bool performActualUpdate(
     const QString &component, const QString &versionkey,
-    DBUpdates updates, const QString &version, QString &dbver);
+    const DBUpdates &updates, const QString &version, QString &dbver);
 
 MBASE_PUBLIC bool performUpdateSeries(const QString &component, DBUpdates updates);
 

@@ -101,7 +101,7 @@ bool performUpdateSeries(const QString &component, DBUpdates updates)
     return true;
 }
 
-/** \fn performActualUpdate(DBUpdates, const char*, QString&)
+/** \fn performActualUpdate(const DBUpdates&, const char*, QString&)
  *  \brief Runs a number of SQL commands, and updates the schema version.
  *
  *  \param component  Name of componenet being updated. Used for messages.
@@ -113,7 +113,7 @@ bool performUpdateSeries(const QString &component, DBUpdates updates)
  */
 bool performActualUpdate(
     const QString &component, const QString &versionkey,
-    DBUpdates updates, const QString &version, QString &dbver)
+    const DBUpdates &updates, const QString &version, QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
