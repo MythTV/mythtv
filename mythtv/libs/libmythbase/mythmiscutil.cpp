@@ -45,6 +45,8 @@ using namespace std;
 #include <QUrl>
 #include <QHostAddress>
 #include <QDataStream>
+#include <QRegularExpression>
+#include <QRegularExpressionMatchIterator>
 
 // Myth headers
 #include "mythcorecontext.h"
@@ -1235,6 +1237,36 @@ QString MythFormatTimeMs(int msecs, QString fmt)
 QString MythFormatTime(int secs, QString fmt)
 {
     return QTime::fromMSecsSinceStartOfDay(secs*1000).toString(fmt);
+}
+
+QStringList MythSplitCommandString(const QString &line)
+{
+    // Match anything that starts at the beginning of the line or a separator
+    // Match 1: Any number of characters other than a quote or a separator
+    //          A literal "
+    //          Any number or characters other than a quote or a separator
+    //          A literal "
+    //          Any number or characters other than a quote or a separator
+    //   This should match:
+    //          "abc"
+    //          "abc def"
+    //          abc"def"
+    //          abc"def ghi"jkl
+    // Match 2: One or more characters other than a separator
+    //   This should match:
+    //          abc
+    QRegularExpression re(R"((?:^| )([^ "]*"[^"]*"[^ "]*|[^ ]+))");
+    QRegularExpressionMatchIterator it = re.globalMatch(line.trimmed());
+
+    QStringList fields;
+    while (it.hasNext())
+    {
+        QRegularExpressionMatch match = it.next();
+        if (match.hasMatch())
+            fields.push_back(match.captured(1));
+    }
+
+    return fields;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

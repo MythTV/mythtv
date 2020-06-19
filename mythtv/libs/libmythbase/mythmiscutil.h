@@ -152,4 +152,6 @@ inline void rdtsc(uint64_t &x)
 inline void rdtsc(uint64_t &x) { x = 0ULL; }
 #endif // !MMX
 
+MBASE_PUBLIC QStringList MythSplitCommandString(const QString &line);
+
 #endif // MYTHMISCUTIL_H_

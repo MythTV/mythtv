@@ -21,6 +21,7 @@
 #include <thread>
 #include <csignal>
 #include "commandlineparser.h"
+#include "mythmiscutil.h"
 #include "MythExternRecApp.h"
 
 #include <QElapsedTimer>
@@ -271,7 +272,7 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
     if (m_cleanup.isEmpty())
         return;
 
-    QStringList args = m_cleanup.split(QRegularExpression("\\s+"));
+    QStringList args = MythSplitCommandString(m_cleanup);
     QString cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -303,7 +304,7 @@ Q_SLOT void MythExternRecApp::DataStarted(void)
     if (m_onDataStart.isEmpty())
         return;
 
-    QStringList args = m_onDataStart.split(QRegularExpression("\\s+"));
+    QStringList args = MythSplitCommandString(m_onDataStart);
     QString cmd = args.takeFirst();
     cmd.replace("%CHANNUM%", m_tunedChannel);
 
@@ -342,7 +343,7 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 
     if (!m_scanCommand.isEmpty())
     {
-        QStringList args = m_scanCommand.split(QRegularExpression("\\s+"));
+        QStringList args = MythSplitCommandString(m_scanCommand);
         QString cmd = args.takeFirst();
         cmd.replace("%CHANCONF%", m_channelsIni);
 
@@ -457,7 +458,7 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 
 void MythExternRecApp::NewEpisodeStarting(const QString & channum)
 {
-    QStringList args = m_newEpisodeCommand.split(QRegularExpression("\\s+"));
+    QStringList args = MythSplitCommandString(m_newEpisodeCommand);
     QString cmd = args.takeFirst();
     cmd.replace("%CHANNUM%", channum);
 
@@ -572,7 +573,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     if (!m_tuneCommand.isEmpty())
     {
-        QStringList args = tunecmd.split(QRegularExpression("\\s+"));
+        QStringList args = MythSplitCommandString(tunecmd);
         QString cmd = args.takeFirst();
         m_tuningChannel = channum;
         m_tuneProc.start(cmd, args);
@@ -690,7 +691,7 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
         return;
     }
 
-    QStringList args = m_command.split(QRegularExpression("\\s+"));
+    QStringList args = MythSplitCommandString(m_command);
     QString cmd = args.takeFirst();
     m_proc.start(cmd, args, QIODevice::ReadOnly|QIODevice::Unbuffered);
     m_proc.setTextModeEnabled(false);
