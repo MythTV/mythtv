@@ -16,13 +16,20 @@ class MythPainterWindow : public QWidget
     static QString CreatePainters(MythMainWindow* MainWindow,
                                   MythPainterWindow*& PaintWin,
                                   MythPainter*& Painter);
+    static void    DestroyPainters(MythPainterWindow*& PaintWin,
+                                   MythPainter*& Painter);
 
-    MythPainterWindow(MythMainWindow *MainWin);
     MythRender* GetRenderDevice(void);
     bool        RenderIsShared (void);
 
   protected:
+    MythPainterWindow(MythMainWindow *MainWin);
+   ~MythPainterWindow() override = default;
+
     MythRender* m_render { nullptr };
+
+  private:
+    Q_DISABLE_COPY(MythPainterWindow)
 };
 
 #endif // MYTHPAINTERWINDOW_H

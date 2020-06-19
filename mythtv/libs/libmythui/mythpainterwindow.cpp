@@ -56,6 +56,14 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWindow,
     return warn ? tr("Warning: OpenGL is not available.") : QString();
 }
 
+void MythPainterWindow::DestroyPainters(MythPainterWindow *&PaintWin, MythPainter *&Painter)
+{
+    delete Painter;
+    delete PaintWin;
+    Painter = nullptr;
+    PaintWin = nullptr;
+}
+
 MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
   : QWidget(MainWin)
 {

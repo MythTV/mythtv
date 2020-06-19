@@ -234,9 +234,8 @@ MythMainWindow::~MythMainWindow()
 
     delete m_deviceHandler;
     delete d->m_nc;
-    delete m_painter;
-    delete m_painterWin;
 
+    MythPainterWindow::DestroyPainters(m_painterWin, m_painter);
     MythDisplay::AcquireRelease(false);
 
     delete d;
@@ -930,11 +929,7 @@ void MythMainWindow::ReloadKeys()
 
 void MythMainWindow::ReinitDone(void)
 {
-    delete m_oldPainter;
-    m_oldPainter = nullptr;
-    delete m_oldPainterWin;
-    m_oldPainterWin = nullptr;
-
+    MythPainterWindow::DestroyPainters(m_oldPainterWin, m_oldPainter);
 
     ShowPainterWindow();
     MoveResize(d->m_screenRect);
