@@ -60,8 +60,9 @@ vector<int> iso639_get_language_key_list(void)
     if (s_language_keys.empty())
     {
         const QStringList list = iso639_get_language_list();
-        for (const auto& it : qAsConst(list))
-            s_language_keys.push_back(iso639_str3_to_key(it));
+        std::transform(list.cbegin(), list.cend(),
+                       s_language_keys.end(),
+                       [](const QString &str) -> int {return iso639_str3_to_key(str);});
     }
     return s_language_keys;
 }
