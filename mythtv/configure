@@ -6539,10 +6539,24 @@ disabled opengl || enabled opengles && {
 enabled opengles && enable opengl
 
 # Vulkan requires Qt >5.10 and the Vulkan headers - Qt dynamically loads the libs
-# (but we may need to link to Vulkan if we use any external/helper libraries (e.g. VMA)
-if enabled vulkan; then
-    if [ $qt_version -lt $(version2num "5.10.0") ]; then
-        disable vulkan && echo Vulkan is not supported with this version of Qt
+# (but we may need to link to Vulkan if we use any external/helper libraries (e.g. VMA).
+
+qt_vulkan_check() {
+    log "qt_vulkan_check $@"
+    "qt_vulkan_check $@" >> $logfile 2>&1
+    check_ecxx ${qt_inc} <<EOF
+#include <QtCore/QtCore>
+#include <QtGui/qtguiglobal.h>
+#if QT_CONFIG(vulkan) != 1
+No vulkan here!
+#endif
+int x;
+EOF
+}
+
+if enabled vulkan ; then
+    if !(qt_vulkan_check); then
+        disable vulkan && disable libglslang && echo Vulkan is not supported with this version of Qt
     fi
 fi
 
