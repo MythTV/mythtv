@@ -61,7 +61,7 @@ vector<int> iso639_get_language_key_list(void)
     {
         const QStringList list = iso639_get_language_list();
         std::transform(list.cbegin(), list.cend(),
-                       s_language_keys.end(),
+                       std::back_inserter(s_language_keys),
                        [](const QString &str) -> int {return iso639_str3_to_key(str);});
     }
     return s_language_keys;
