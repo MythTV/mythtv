@@ -304,9 +304,11 @@ Q_SLOT void MythExternRecApp::DataStarted(void)
     if (m_onDataStart.isEmpty())
         return;
 
-    QStringList args = MythSplitCommandString(m_onDataStart);
-    QString cmd = args.takeFirst();
+    QString cmd = m_onDataStart;
     cmd.replace("%CHANNUM%", m_tunedChannel);
+
+    QStringList args = MythSplitCommandString(cmd);
+    cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString(" Data started, finishing tune: '%1'").arg(cmd));
@@ -343,9 +345,11 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 
     if (!m_scanCommand.isEmpty())
     {
-        QStringList args = MythSplitCommandString(m_scanCommand);
-        QString cmd = args.takeFirst();
+        QString cmd = m_scanCommand;
         cmd.replace("%CHANCONF%", m_channelsIni);
+
+        QStringList args = MythSplitCommandString(cmd);
+        cmd = args.takeFirst();
 
         QProcess scanner;
         scanner.start(cmd, args);
@@ -458,9 +462,11 @@ Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 
 void MythExternRecApp::NewEpisodeStarting(const QString & channum)
 {
-    QStringList args = MythSplitCommandString(m_newEpisodeCommand);
-    QString cmd = args.takeFirst();
+    QString cmd = m_newEpisodeCommand;
     cmd.replace("%CHANNUM%", channum);
+
+    QStringList args = MythSplitCommandString(cmd);
+    cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
         QString(" New episode starting on current channel: '%1'").arg(cmd));
