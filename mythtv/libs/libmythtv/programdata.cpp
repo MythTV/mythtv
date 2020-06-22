@@ -64,6 +64,16 @@ DBPerson::DBPerson(const DBPerson &other) :
     m_name.squeeze();
 }
 
+DBPerson& DBPerson::operator=(const DBPerson &rhs)
+{
+    if (this == &rhs)
+        return *this;
+    m_role = rhs.m_role;
+    m_name = rhs.m_name;
+    m_name.squeeze();
+    return *this;
+}
+
 DBPerson::DBPerson(Role role, QString name) :
     m_role(role), m_name(std::move(name))
 {
