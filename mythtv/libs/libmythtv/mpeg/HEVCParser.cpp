@@ -26,7 +26,8 @@ extern "C" {
 
 static uint ceil_log2 (uint32_t v)
 {
-    uint r, shift;
+    uint r;
+    uint shift;
 
     --v;
     r = (v > 0xFFFF) << 4;
@@ -47,6 +48,7 @@ static uint ceil_log2 (uint32_t v)
 
 HEVCParser::HEVCParser(void)
 {
+    H2645Parser::Reset();
     Reset();
 }
 
@@ -213,7 +215,7 @@ uint32_t HEVCParser::addBytes(const uint8_t  *bytes,
             ++startP;
 
             // nal_unit header
-            if ((nal_unit_header & 0x8000) == 1)
+            if (nal_unit_header & 0x8000)
             {
                 LOG(VB_GENERAL, LOG_ERR, "HEVCParser::parseNAL: "
                     "NAL header forbidden_zero_bit is not zero!");
@@ -586,7 +588,8 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                                   bool profilePresentFlag,
                                   int  maxNumSubLayersMinus1)
 {
-    int i, j;
+    int i;
+    int j;
 
     if (profilePresentFlag)
     {
@@ -633,11 +636,8 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
         */
         bool general_progressive_source_flag = get_bits1(gb); // u(1)
         bool general_interlaced_source_flag  = get_bits1(gb); // u(1)
-        if (general_progressive_source_flag &&
-            !general_interlaced_source_flag)
-            m_scanType = SCAN_t::PROGRESSIVE;
-        else if (!general_progressive_source_flag &&
-                 general_interlaced_source_flag)
+        if (!general_progressive_source_flag &&
+            general_interlaced_source_flag)
             m_scanType = SCAN_t::INTERLACED;
         else
             m_scanType = SCAN_t::PROGRESSIVE;
@@ -886,29 +886,29 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
     return true;
 }
 
-bool HEVCParser::getScalingListParams(uint8_t sizeId, uint8_t matrixId,
-                                      ScalingList & dest_scaling_list,
-                                      uint8_t* &sl, uint8_t &size,
-                                      int16_t* &scaling_list_dc_coef_minus8)
+static bool getScalingListParams(uint8_t sizeId, uint8_t matrixId,
+                                 HEVCParser::ScalingList & dest_scaling_list,
+                                 uint8_t* &sl, uint8_t &size,
+                                 int16_t* &scaling_list_dc_coef_minus8)
 {
     switch (sizeId)
     {
-        case QUANT_MATIX_4X4:
+        case HEVCParser::QUANT_MATIX_4X4:
           sl = dest_scaling_list.scaling_lists_4x4[matrixId];
           size = 16;
           break;
-        case QUANT_MATIX_8X8:
+        case HEVCParser::QUANT_MATIX_8X8:
           sl = dest_scaling_list.scaling_lists_8x8[matrixId];
           size = 64;
           break;
-        case QUANT_MATIX_16X16:
+        case HEVCParser::QUANT_MATIX_16X16:
           sl = dest_scaling_list.scaling_lists_16x16[matrixId];
           size = 64;
           if (scaling_list_dc_coef_minus8)
               scaling_list_dc_coef_minus8 =
                   dest_scaling_list.scaling_list_dc_coef_minus8_16x16;
           break;
-        case QUANT_MATIX_32X32:
+        case HEVCParser::QUANT_MATIX_32X32:
           sl = dest_scaling_list.scaling_lists_32x32[matrixId];
           size = 64;
           if (scaling_list_dc_coef_minus8)
@@ -930,7 +930,7 @@ bool HEVCParser::scalingListData(GetBitContext * gb,
                                  bool use_default)
 {
     uint8_t sizeId;
-    uint8_t matrixId;
+    uint    matrixId;
     uint8_t size;
     uint8_t i;
 
@@ -1833,7 +1833,8 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
 */
 bool HEVCParser::parseVPS(GetBitContext *gb)
 {
-    uint i, j;
+    uint i;
+    uint j;
 
     uint8_t vps_id = get_bits(gb, 4);  // vps_video_parameter_set_id u(4)
     get_bits1(gb);    // vps_base_layer_internal_flag u(1)

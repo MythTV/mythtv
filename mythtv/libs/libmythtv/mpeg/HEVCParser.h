@@ -70,7 +70,7 @@ class HEVCParser : public H2645Parser
           bitstream.
         */
         BLA_W_LP    = 16, //
-        BLA_W_RADL  = 17, //  Coded slice segment of a BLA picture
+        BLA_W_RADL  = 17, // Coded slice segment of a BLA picture
         BLA_N_LP    = 18, // slice_segment_layer_rbsp() VCL
 
         /*
@@ -257,10 +257,6 @@ class HEVCParser : public H2645Parser
     bool profileTierLevel(GetBitContext *gb,
                           bool profilePresentFlag,
                           int maxNumSubLayersMinus1);
-    bool getScalingListParams(uint8_t sizeId, uint8_t matrixId,
-                              ScalingList &dest_scaling_list,
-                              uint8_t* &sl, uint8_t &size,
-                              int16_t* &scaling_list_dc_coef_minus8);
     bool scalingListData(GetBitContext * gb,
                          ScalingList & dest_scaling_list,
                          bool use_default);
@@ -275,19 +271,22 @@ class HEVCParser : public H2645Parser
     bool parsePPS(GetBitContext *gb);
 
   private:
+    uint32_t m_maxPicOrderCntLsb          {0};
+    uint32_t m_picOrderCntMsb             {0};
+    uint32_t m_picOrderCntVal             {0};
+    uint32_t m_prevPicOrderCntLsb         {0};
+    uint32_t m_prevPicOrderCntMsb         {0};
+    uint32_t m_resolutionCheck            {0};
+
+    uint     m_nalUnitType                {UNSPEC63};
+
+    uint8_t  m_nalTemperalId              {0};
+    uint8_t  m_nuhLayerId                 {0};
+
     bool     m_firstSliceSegmentInPicFlag {false};
-    uint32_t m_maxPicOrderCntLsb;
-    uint8_t  m_nalTemperalId;
-    uint     m_nalUnitType;
-    bool     m_nextNALisAU               {false};
-    bool     m_noRaslOutputFlag          {false};
-    uint8_t  m_nuhLayerId;
-    uint32_t m_picOrderCntMsb;
-    uint32_t m_picOrderCntVal;
-    uint32_t m_prevPicOrderCntLsb;
-    uint32_t m_prevPicOrderCntMsb;
-    uint32_t m_resolutionCheck {0};
-    bool     m_seenEOS                   {true};
+    bool     m_nextNALisAU                {false};
+    bool     m_noRaslOutputFlag           {false};
+    bool     m_seenEOS                    {true};
 
     std::map<uint, SPS>  m_SPS;
     std::map<uint, PPS>  m_PPS;

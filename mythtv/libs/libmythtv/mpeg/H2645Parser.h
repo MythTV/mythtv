@@ -144,47 +144,49 @@ class H2645Parser {
 
     void vui_parameters(GetBitContext * gb, bool hevc);
 
-    uint8_t   *m_rbspBuffer                  {nullptr};
-    uint8_t    m_aspectRatioIdc              {0};
+    uint64_t   m_framecnt                    {0};
+    uint64_t   m_keyframecnt                 {0};
+    uint64_t   m_totalframecnt               {0};
+    uint64_t   m_totalkeyframecnt            {0};
     uint64_t   m_auOffset                    {0};
-    bool       m_auPending                   {false};
-    int8_t     m_chromaFormatIdc             {1};
-    uint32_t   m_consecutiveZeros            {0};
-    bool       m_fixedRate                   {false};
-    uint       m_frameCropBottomOffset       {0};
-    uint       m_frameCropLeftOffset         {0};
-    uint       m_frameCropRightOffset        {0};
-    uint       m_frameCropTopOffset          {0};
     uint64_t   m_frameStartOffset            {0};
-    bool       m_haveUnfinishedNAL           {false};
-    bool       m_isKeyframe                  {false};
     uint64_t   m_keyframeStartOffset         {0};
-    bool       m_onAU                        {false};
-    bool       m_onFrame                     {false};
-    bool       m_onKeyFrame                  {false};
-    uint       m_picHeight                   {0};
-    uint       m_picWidth                    {0};
     uint64_t   m_pktOffset                   {0};
+    uint64_t   m_spsOffset                   {0};
+
+    uint32_t   m_consecutiveZeros            {0};
     uint32_t   m_rbspBufferSize              {188 * 2};
     uint32_t   m_rbspIndex                   {0};
-    uint       m_sarHeight                   {0};
-    uint       m_sarWidth                    {0};
-    SCAN_t     m_scanType;
-    bool       m_seenSPS                     {false};
-    bool       m_separateColourPlaneFlag     {0};
-    uint64_t   m_spsOffset                   {0};
-    bool       m_stateChanged                {false};
     uint32_t   m_syncAccumulator             {0xffffffff};
     uint32_t   m_timeScale                   {0};
     uint32_t   m_unitsInTick                 {0};
 
+    SCAN_t     m_scanType;
 
+    uint       m_frameCropBottomOffset       {0};
+    uint       m_frameCropLeftOffset         {0};
+    uint       m_frameCropRightOffset        {0};
+    uint       m_frameCropTopOffset          {0};
+    uint       m_picHeight                   {0};
+    uint       m_picWidth                    {0};
+    uint       m_sarHeight                   {0};
+    uint       m_sarWidth                    {0};
 
-    uint64_t   m_framecnt {0};
-    uint64_t   m_keyframecnt {0};
-    uint64_t   m_totalframecnt {0};
-    uint64_t   m_totalkeyframecnt {0};
+    uint8_t   *m_rbspBuffer                  {nullptr};
+    uint8_t    m_aspectRatioIdc              {0};
 
+    int8_t     m_chromaFormatIdc             {1};
+
+    bool       m_auPending                   {false};
+    bool       m_fixedRate                   {false};
+    bool       m_haveUnfinishedNAL           {false};
+    bool       m_isKeyframe                  {false};
+    bool       m_onAU                        {false};
+    bool       m_onFrame                     {false};
+    bool       m_onKeyFrame                  {false};
+    bool       m_seenSPS                     {false};
+    bool       m_separateColourPlaneFlag     {false};
+    bool       m_stateChanged                {false};
 };
 
 #endif /* H2645PARSER_H */

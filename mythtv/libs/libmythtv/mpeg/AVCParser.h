@@ -135,41 +135,45 @@ class AVCParser : public H2645Parser
     void decode_PPS(GetBitContext * gb);
     void decode_SEI(GetBitContext * gb);
 
-    bool       m_auContainsKeyframeMessage   {false};
 
-    int8_t     m_bottomFieldFlag             {-1};
-    uint8_t    m_deltaPicOrderAlwaysZeroFlag {0};
     int        m_deltaPicOrderCntBottom      {0};
     int        m_deltaPicOrderCnt[2]         {0};
-    int8_t     m_fieldPicFlag                {-1};
-    int8_t     m_frameMbsOnlyFlag            {-1};
     int        m_frameNum                    {-1};
-    bool       m_iIsKeyframe                 {true};
+    int        m_picOrderCntLsb              {0};
+    int        m_picParameterSetId           {-1};
+    int        m_prevDeltaPicOrderCntBottom  {0};
+    int        m_prevDeltaPicOrderCnt[2]     {0};
+    int        m_prevFrameNum                {-1};
+    int        m_prevPicOrderCntLsb          {0};
+    int        m_prevPicParameterSetId       {-1};
+
     uint       m_idrPicId                    {65536};
     uint       m_log2MaxFrameNum             {0};
     uint       m_log2MaxPicOrderCntLsb       {0};
-    uint8_t    m_nalRefIdc                   {111}; // != [0|1|2|3]
-    int8_t     m_nalUnitType                 {UNKNOWN};
     uint       m_numRefFrames                {0};
-    int        m_picOrderCntLsb              {0};
-    uint8_t    m_picOrderCntType             {0};
-    int8_t     m_picOrderPresentFlag         {-1};
-    int        m_picParameterSetId           {-1};
-    int8_t     m_prevBottomFieldFlag         {-1};
-    int        m_prevDeltaPicOrderCntBottom  {0};
-    int        m_prevDeltaPicOrderCnt[2]     {0};
-    int8_t     m_prevFieldPicFlag            {-1};
-    int        m_prevFrameNum                {-1};
     uint       m_prevIdrPicId                {65536};
-    uint8_t    m_prevNALRefIdc               {111}; // != [0|1|2|3]
-    int8_t     m_prevNalUnitType             {UNKNOWN};
-    int        m_prevPicOrderCntLsb          {0};
-    uint8_t    m_prevPicOrderCntType         {0};
-    int        m_prevPicParameterSetId       {-1};
     uint       m_redundantPicCnt             {0};
-    int8_t     m_redundantPicCntPresentFlag  {0};
     uint       m_seqParameterSetId           {0};
     uint       m_sliceType                   {SLICE_UNDEF};
+
+    int8_t     m_bottomFieldFlag             {-1};
+    int8_t     m_fieldPicFlag                {-1};
+    int8_t     m_frameMbsOnlyFlag            {-1};
+    int8_t     m_nalUnitType                 {UNKNOWN};
+    int8_t     m_picOrderPresentFlag         {-1};
+    int8_t     m_prevBottomFieldFlag         {-1};
+    int8_t     m_prevFieldPicFlag            {-1};
+    int8_t     m_prevNalUnitType             {UNKNOWN};
+    int8_t     m_redundantPicCntPresentFlag  {0};
+
+    uint8_t    m_deltaPicOrderAlwaysZeroFlag {0};
+    uint8_t    m_nalRefIdc                   {111}; // != [0|1|2|3]
+    uint8_t    m_picOrderCntType             {0};
+    uint8_t    m_prevNALRefIdc               {111}; // != [0|1|2|3]
+    uint8_t    m_prevPicOrderCntType         {0};
+
+    bool       m_auContainsKeyframeMessage   {false};
+    bool       m_iIsKeyframe                 {true};
 };
 
 #endif /* AVCPARSER_H */
