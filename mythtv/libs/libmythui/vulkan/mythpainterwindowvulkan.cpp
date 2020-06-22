@@ -1,5 +1,6 @@
 // Qt
 #include <QLoggingCategory>
+#include <QResizeEvent>
 
 // MythTV
 #include "mythlogging.h"
