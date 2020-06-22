@@ -15,7 +15,13 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet,\
 
 import re
 import locale
-import xml.etree.cElementTree as etree
+
+# TODO: if Python 3.3+ is in use by all distributions, use ElementTree only.
+try:
+    import xml.etree.cElementTree as etree
+except ImportError:
+    import xml.etree.ElementTree as etree
+
 from datetime import date, time
 
 _default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
