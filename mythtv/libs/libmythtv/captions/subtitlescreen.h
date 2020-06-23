@@ -242,6 +242,10 @@ private:
     int             m_textFontZoomPrev    {100};
     int             m_textFontDelayMs     {0}; // valid for text subs
     int             m_textFontDelayMsPrev {0};
+    int             m_textFontMinDurationMs {50};
+    int             m_textFontMinDurationMsPrev {50};
+    int             m_textFontDurationExtensionMs {0};
+    int             m_textFontDurationExtensionMsPrev {0};
     bool            m_refreshModified     {false};
     bool            m_refreshDeleted      {false};
     int             m_fontStretch;
