@@ -332,6 +332,12 @@ typedef CUresult CUDAAPI tcuGetErrorName(CUresult error, const char** pstr);
 typedef CUresult CUDAAPI tcuGetErrorString(CUresult error, const char** pstr);
 typedef CUresult CUDAAPI tcuCtxGetDevice(CUdevice *device);
 
+typedef CUresult CUDAAPI tcuDevicePrimaryCtxRetain(CUcontext *pctx, CUdevice dev);
+typedef CUresult CUDAAPI tcuDevicePrimaryCtxRelease(CUdevice dev);
+typedef CUresult CUDAAPI tcuDevicePrimaryCtxSetFlags(CUdevice dev, unsigned int flags);
+typedef CUresult CUDAAPI tcuDevicePrimaryCtxGetState(CUdevice dev, unsigned int *flags, int *active);
+typedef CUresult CUDAAPI tcuDevicePrimaryCtxReset(CUdevice dev);
+
 typedef CUresult CUDAAPI tcuStreamCreate(CUstream *phStream, unsigned int flags);
 typedef CUresult CUDAAPI tcuStreamQuery(CUstream hStream);
 typedef CUresult CUDAAPI tcuStreamSynchronize(CUstream hStream);

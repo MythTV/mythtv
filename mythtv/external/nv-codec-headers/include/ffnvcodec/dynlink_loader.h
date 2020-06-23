@@ -158,6 +158,12 @@ typedef struct CudaFunctions {
     tcuGetErrorString *cuGetErrorString;
     tcuCtxGetDevice *cuCtxGetDevice;
 
+    tcuDevicePrimaryCtxRetain *cuDevicePrimaryCtxRetain;
+    tcuDevicePrimaryCtxRelease *cuDevicePrimaryCtxRelease;
+    tcuDevicePrimaryCtxSetFlags *cuDevicePrimaryCtxSetFlags;
+    tcuDevicePrimaryCtxGetState *cuDevicePrimaryCtxGetState;
+    tcuDevicePrimaryCtxReset *cuDevicePrimaryCtxReset;
+
     tcuStreamCreate *cuStreamCreate;
     tcuStreamQuery *cuStreamQuery;
     tcuStreamSynchronize *cuStreamSynchronize;
@@ -282,6 +288,12 @@ static inline int cuda_load_functions(CudaFunctions **functions, void *logctx)
     LOAD_SYMBOL(cuGetErrorName, tcuGetErrorName, "cuGetErrorName");
     LOAD_SYMBOL(cuGetErrorString, tcuGetErrorString, "cuGetErrorString");
     LOAD_SYMBOL(cuCtxGetDevice, tcuCtxGetDevice, "cuCtxGetDevice");
+
+    LOAD_SYMBOL(cuDevicePrimaryCtxRetain, tcuDevicePrimaryCtxRetain, "cuDevicePrimaryCtxRetain");
+    LOAD_SYMBOL(cuDevicePrimaryCtxRelease, tcuDevicePrimaryCtxRelease, "cuDevicePrimaryCtxRelease");
+    LOAD_SYMBOL(cuDevicePrimaryCtxSetFlags, tcuDevicePrimaryCtxSetFlags, "cuDevicePrimaryCtxSetFlags");
+    LOAD_SYMBOL(cuDevicePrimaryCtxGetState, tcuDevicePrimaryCtxGetState, "cuDevicePrimaryCtxGetState");
+    LOAD_SYMBOL(cuDevicePrimaryCtxReset, tcuDevicePrimaryCtxReset, "cuDevicePrimaryCtxReset");
 
     LOAD_SYMBOL(cuStreamCreate, tcuStreamCreate, "cuStreamCreate");
     LOAD_SYMBOL(cuStreamQuery, tcuStreamQuery, "cuStreamQuery");

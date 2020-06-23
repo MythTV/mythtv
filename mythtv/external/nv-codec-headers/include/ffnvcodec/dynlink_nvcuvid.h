@@ -1,7 +1,7 @@
 /*
  * This copyright notice applies to this header file only:
  *
- * Copyright (c) 2010-2018 NVIDIA Corporation
+ * Copyright (c) 2010-2019 NVIDIA Corporation
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,7 +28,7 @@
 /********************************************************************************************************************/
 //! \file nvcuvid.h
 //!   NVDECODE API provides video decoding interface to NVIDIA GPU devices.
-//! \date 2015-2018
+//! \date 2015-2019
 //!  This file contains the interface constants, structure definitions and function prototypes.
 /********************************************************************************************************************/
 
@@ -99,7 +99,17 @@ typedef struct
     unsigned char progressive_sequence;     /**< OUT: 0=interlaced, 1=progressive                                      */
     unsigned char bit_depth_luma_minus8;    /**< OUT: high bit depth luma. E.g, 2 for 10-bitdepth, 4 for 12-bitdepth   */
     unsigned char bit_depth_chroma_minus8;  /**< OUT: high bit depth chroma. E.g, 2 for 10-bitdepth, 4 for 12-bitdepth */
-    unsigned char reserved1;                /**< Reserved for future use                                               */
+    unsigned char min_num_decode_surfaces;  /**< OUT: Minimum number of decode surfaces to be allocated for correct
+                                                      decoding. The client can send this value in ulNumDecodeSurfaces
+                                                      (in CUVIDDECODECREATEINFO structure).
+                                                      This guarantees correct functionality and optimal video memory
+                                                      usage but not necessarily the best performance, which depends on
+                                                      the design of the overall application. The optimal number of
+                                                      decode surfaces (in terms of performance and memory utilization)
+                                                      should be decided by experimentation for each application, but it
+                                                      cannot go below min_num_decode_surfaces.
+                                                      If this value is used for ulNumDecodeSurfaces then it must be
+                                                      returned to parser during sequence callback.                     */
     unsigned int coded_width;               /**< OUT: coded frame width in pixels                                      */
     unsigned int coded_height;              /**< OUT: coded frame height in pixels                                     */
    /**
@@ -173,10 +183,13 @@ typedef struct
 //! Used in CUVIDSOURCEDATAPACKET structure
 /***************************************************************/
 typedef enum {
-    CUVID_PKT_ENDOFSTREAM   = 0x01,   /**< Set when this is the last packet for this stream  */
-    CUVID_PKT_TIMESTAMP     = 0x02,   /**< Timestamp is valid                                */
-    CUVID_PKT_DISCONTINUITY = 0x04,   /**< Set when a discontinuity has to be signalled      */
-    CUVID_PKT_ENDOFPICTURE  = 0x08,   /**< Set when the packet contains exactly one frame    */
+    CUVID_PKT_ENDOFSTREAM   = 0x01,   /**< Set when this is the last packet for this stream                              */
+    CUVID_PKT_TIMESTAMP     = 0x02,   /**< Timestamp is valid                                                            */
+    CUVID_PKT_DISCONTINUITY = 0x04,   /**< Set when a discontinuity has to be signalled                                  */
+    CUVID_PKT_ENDOFPICTURE  = 0x08,   /**< Set when the packet contains exactly one frame or one field                   */
+    CUVID_PKT_NOTIFY_EOS    = 0x10,   /**< If this flag is set along with CUVID_PKT_ENDOFSTREAM, an additional (dummy)
+                                           display callback will be invoked with null value of CUVIDPARSERDISPINFO which
+                                           should be interpreted as end of the stream.                                   */
 } CUvideopacketflags;
 
 /*****************************************************************************/
@@ -306,13 +319,14 @@ typedef struct _CUVIDPARSERDISPINFO
 
 /***********************************************************************************************************************/
 //! Parser callbacks
-//! The parser will call these synchronously from within cuvidParseVideoData(), whenever there is seqeuence change or a picture
+//! The parser will call these synchronously from within cuvidParseVideoData(), whenever there is sequence change or a picture
 //! is ready to be decoded and/or displayed. First argument in functions is "void *pUserData" member of structure CUVIDSOURCEPARAMS
-//! Return values from these callbacks are interpreted as:
-//! PFNVIDSEQUENCECALLBACK : 0: fail, 1: suceeded, > 1: override dpb size of parser (set by CUVIDPARSERPARAMS::ulMaxNumDecodeSurfaces
+//! Return values from these callbacks are interpreted as below. If the callbacks return failure, it will be propagated by
+//! cuvidParseVideoData() to the application.
+//! PFNVIDSEQUENCECALLBACK : 0: fail, 1: succeeded, > 1: override dpb size of parser (set by CUVIDPARSERPARAMS::ulMaxNumDecodeSurfaces
 //! while creating parser)
-//! PFNVIDDECODECALLBACK   : 0: fail, >=1: suceeded
-//! PFNVIDDISPLAYCALLBACK  : 0: fail, >=1: suceeded
+//! PFNVIDDECODECALLBACK   : 0: fail, >=1: succeeded
+//! PFNVIDDISPLAYCALLBACK  : 0: fail, >=1: succeeded
 /***********************************************************************************************************************/
 typedef int (CUDAAPI *PFNVIDSEQUENCECALLBACK)(void *, CUVIDEOFORMAT *);
 typedef int (CUDAAPI *PFNVIDDECODECALLBACK)(void *, CUVIDPICPARAMS *);
