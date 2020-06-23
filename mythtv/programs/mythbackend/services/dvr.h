@@ -90,6 +90,8 @@ class Dvr : public DvrServices
 
         bool              RescheduleRecordings( void ) override; // DvrServices
 
+        bool              AllowReRecord       ( int             RecordedId ) override;
+
         bool              UpdateRecordedWatchedStatus ( int   RecordedId,
                                                         int   ChanId,
                                                         const QDateTime &recstarttsRaw,

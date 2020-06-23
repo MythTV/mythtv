@@ -424,6 +424,25 @@ bool Dvr::RescheduleRecordings(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool Dvr::AllowReRecord ( int RecordedId )
+{
+    if (RecordedId <= 0)
+        throw QString("RecordedId param is invalid.");
+
+    RecordingInfo ri = RecordingInfo(RecordedId);
+
+    if (!ri.GetChanID())
+        throw QString("RecordedId %1 not found").arg(RecordedId);
+
+    ri.ForgetHistory();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         int   chanid,
                                         const QDateTime &recstarttsRaw,

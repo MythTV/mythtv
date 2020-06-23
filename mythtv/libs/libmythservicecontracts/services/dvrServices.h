@@ -45,7 +45,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "6.6" )
+    Q_CLASSINFO( "version"    , "6.7" )
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -127,6 +127,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QDateTime &StartTime ) = 0;
 
         virtual bool               RescheduleRecordings  ( void ) = 0;
+
+        virtual bool               AllowReRecord         ( int              RecordedId ) = 0;
 
         virtual bool               UpdateRecordedWatchedStatus ( int              RecordedId,
                                                                  int   ChanId,
