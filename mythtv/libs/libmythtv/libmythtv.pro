@@ -11,6 +11,9 @@ INSTALLS = target
 
 POSTINC =
 
+# Needed for FFmpeg 4.3
+DEFINES += __STDC_CONSTANT_MACROS
+
 contains(INCLUDEPATH, /usr/include) {
   POSTINC += /usr/include
   INCLUDEPATH -= /usr/include
