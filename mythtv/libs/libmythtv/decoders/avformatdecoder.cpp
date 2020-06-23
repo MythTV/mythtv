@@ -3975,10 +3975,15 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     if (!m_parent->GetSubReader(pkt->stream_index))
         return true;
 
-    long long pts = 0;
-
-    if (pkt->dts != AV_NOPTS_VALUE)
-        pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
+    long long pts = pkt->pts;
+    if (pts == AV_NOPTS_VALUE)
+        pts = pkt->dts;
+    if (pts == AV_NOPTS_VALUE)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process subtitle.");
+        return false;
+    }
+    pts = static_cast<long long>(av_q2d(curstream->time_base) * pts * 1000);
 
     m_trackLock.lock();
     int subIdx = m_selectedTrack[kTrackTypeSubtitle].m_av_stream_index;

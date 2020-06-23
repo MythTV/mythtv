@@ -1385,51 +1385,60 @@ SubtitleScreen::~SubtitleScreen(void)
 
 void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
 {
+    int prevType = m_subtitleType;
     m_subtitleType = type;
 
     if (forced_only)
     {
-        SetElementDeleted();
-        SetVisible(true);
+        if (prevType == kDisplayNone)
+        {
+            SetElementDeleted();
+            SetVisible(true);
+            SetArea(MythRect());
+        }
+    }
+    else
+    {
+        if (m_subreader)
+        {
+            m_subreader->EnableAVSubtitles(kDisplayAVSubtitle == m_subtitleType);
+            m_subreader->EnableTextSubtitles(kDisplayTextSubtitle == m_subtitleType);
+            m_subreader->EnableRawTextSubtitles(kDisplayRawTextSubtitle == m_subtitleType);
+        }
+        if (m_cc608reader)
+            m_cc608reader->SetEnabled(kDisplayCC608 == m_subtitleType);
+        if (m_cc708reader)
+            m_cc708reader->SetEnabled(kDisplayCC708 == m_subtitleType);
+        ClearAllSubtitles();
+        SetVisible(m_subtitleType != kDisplayNone);
         SetArea(MythRect());
-        return;
     }
-
-    if (m_subreader)
-    {
-        m_subreader->EnableAVSubtitles(kDisplayAVSubtitle == m_subtitleType);
-        m_subreader->EnableTextSubtitles(kDisplayTextSubtitle == m_subtitleType);
-        m_subreader->EnableRawTextSubtitles(kDisplayRawTextSubtitle == m_subtitleType);
-    }
-    if (m_cc608reader)
-        m_cc608reader->SetEnabled(kDisplayCC608 == m_subtitleType);
-    if (m_cc708reader)
-        m_cc708reader->SetEnabled(kDisplayCC708 == m_subtitleType);
-    ClearAllSubtitles();
-    SetVisible(m_subtitleType != kDisplayNone);
-    SetArea(MythRect());
-    switch (m_subtitleType)
-    {
-    case kDisplayTextSubtitle:
-    case kDisplayRawTextSubtitle:
-        m_family = kSubFamilyText;
-        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
-        break;
-    case kDisplayCC608:
-        m_family = kSubFamily608;
-        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
-        break;
-    case kDisplayCC708:
-        m_family = kSubFamily708;
-        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
-        break;
-    case kDisplayAVSubtitle:
-        m_family = kSubFamilyAV;
-        m_textFontZoom = gCoreContext->GetNumSetting("OSDAVSubZoom", 100);
-        break;
+    if (!forced_only || m_family.isEmpty()) {
+        switch (m_subtitleType)
+        {
+        case kDisplayTextSubtitle:
+        case kDisplayRawTextSubtitle:
+            m_family = kSubFamilyText;
+            m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+            break;
+        case kDisplayCC608:
+            m_family = kSubFamily608;
+            m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+            break;
+        case kDisplayCC708:
+            m_family = kSubFamily708;
+            m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+            break;
+        case kDisplayAVSubtitle:
+            m_family = kSubFamilyAV;
+            m_textFontZoom = gCoreContext->GetNumSetting("OSDAVSubZoom", 100);
+            break;
+        }
     }
     m_textFontZoomPrev = m_textFontZoom;
     m_textFontDelayMsPrev = m_textFontDelayMs;
+    m_textFontMinDurationMsPrev = m_textFontMinDurationMs;
+    m_textFontDurationExtensionMsPrev = m_textFontDurationExtensionMs;
 }
 
 void SubtitleScreen::DisableForcedSubtitles(void)
@@ -1770,6 +1779,8 @@ void SubtitleScreen::Pulse(void)
     MythScreenType::Pulse();
     m_textFontZoomPrev = m_textFontZoom;
     m_textFontDelayMsPrev = m_textFontDelayMs;
+    m_textFontMinDurationMsPrev = m_textFontMinDurationMs;
+    m_textFontDurationExtensionMsPrev = m_textFontDurationExtensionMs;
     ResetElementState();
 }
 
@@ -2109,6 +2120,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
     bool changed = (m_textFontZoom != m_textFontZoomPrev);
     changed |= (m_textFontDelayMs != m_textFontDelayMsPrev);
+    changed |= (m_textFontMinDurationMsPrev != m_textFontMinDurationMs);
+    changed |= (m_textFontDurationExtensionMsPrev != m_textFontDurationExtensionMs);
     MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
