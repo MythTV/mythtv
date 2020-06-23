@@ -26,8 +26,8 @@ extern "C" {
 
 static uint ceil_log2 (uint32_t v)
 {
-    uint r;
-    uint shift;
+    uint r = 0;
+    uint shift = 0;
 
     --v;
     r = (v > 0xFFFF) << 4;
@@ -44,12 +44,6 @@ static uint ceil_log2 (uint32_t v)
     r |= (v >> 1);
 
     return r + 1;
-}
-
-HEVCParser::HEVCParser(void)
-{
-    H2645Parser::Reset();
-    Reset();
 }
 
 void HEVCParser::Reset(void)
@@ -588,8 +582,8 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
                                   bool profilePresentFlag,
                                   int  maxNumSubLayersMinus1)
 {
-    int i;
-    int j;
+    int i = 0;
+    int j = 0;
 
     if (profilePresentFlag)
     {
@@ -925,14 +919,14 @@ static bool getScalingListParams(uint8_t sizeId, uint8_t matrixId,
   7.3.4 Scaling list data syntax
   We dont' need any of this data. We just need to get past the bits.
 */
-bool HEVCParser::scalingListData(GetBitContext * gb,
-                                 ScalingList & dest_scaling_list,
-                                 bool use_default)
+static bool scalingListData(GetBitContext * gb,
+                            HEVCParser::ScalingList & dest_scaling_list,
+                            bool use_default)
 {
-    uint8_t sizeId;
-    uint    matrixId;
-    uint8_t size;
-    uint8_t i;
+    uint8_t sizeId   = 0;
+    uint    matrixId = 0;
+    uint8_t size     = 0;
+    uint8_t i        = 0;
 
     for (sizeId = 0; sizeId < 4; ++sizeId)
     {
@@ -1065,19 +1059,20 @@ bool HEVCParser::scalingListData(GetBitContext * gb,
   7.3.7 Short-term reference picture set syntax
   We don't any of this data, but we have to get past the bits
 */
-bool HEVCParser::shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
-                                    int num_short_term_ref_pic_sets,
-                                    HEVCShortTermRefPicSet * stRPS,
-                                    uint8_t max_dec_pic_buffering_minus1)
+static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
+                               int num_short_term_ref_pic_sets,
+                               HEVCParser::ShortTermRefPicSet * stRPS,
+                               uint8_t max_dec_pic_buffering_minus1)
 {
     int16_t  deltaRPS = 0;
-    bool use_delta_flag[16];
-    bool used_by_curr_pic_flag[16] = { 0 };
+    bool use_delta_flag[16]        = { false };
+    bool used_by_curr_pic_flag[16] = { false };
     uint32_t delta_poc_s0_minus1[16] = { 0 };
     uint32_t delta_poc_s1_minus1[16] = { 0 };
-    uint i, j = 0;
-    int  k = 0;
-    int dPoc;
+    uint i   = 0;
+    uint j   = 0;
+    int  k   = 0;
+    int dPoc = 0;
 
     /* 7.4.8 inter_ref_pic_set_prediction_flag equal to 1 specifies
        that the stRPSIdx-th candidate short-term RPS is predicted from
@@ -1087,7 +1082,7 @@ bool HEVCParser::shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
        inferred to be equal to 0.
     */
     bool inter_ref_pic_set_prediction_flag = (stRPSIdx != 0) ?
-                                             get_bits1(gb) : 0; // u(1)
+                                             get_bits1(gb) : false; // u(1)
 
     if (inter_ref_pic_set_prediction_flag)
     {
@@ -1116,7 +1111,7 @@ bool HEVCParser::shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
           RefRPSIdx = stRPSIdx − ( delta_idx_minus1 + 1)
         */
         int RefRPSIdx = stRPSIdx - (delta_idx_minus1 + 1);
-        HEVCShortTermRefPicSet *RefRPS = &stRPS[RefRPSIdx];
+        HEVCParser::ShortTermRefPicSet *RefRPS = &stRPS[RefRPSIdx];
 
         for (j = 0; j <= RefRPS->NumDeltaPocs; ++j)
         {
@@ -1257,7 +1252,7 @@ bool HEVCParser::parseSliceSegmentLayer(GetBitContext *gb)
 */
 bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
 {
-    uint i;
+    uint i = 0;
     uint16_t slice_pic_order_cnt_lsb = 0;
     bool dependent_slice_segment_flag = false; // check!
 
@@ -1580,8 +1575,8 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
 */
 bool HEVCParser::parseSPS(GetBitContext *gb)
 {
-    uint i;
-    static HEVCShortTermRefPicSet short_term_ref_pic_set[65];
+    uint i = 0;
+    static ShortTermRefPicSet short_term_ref_pic_set[65];
 
     static uint     sub_layer_size = 0;
     static uint8_t* max_dec_pic_buffering_minus1 = nullptr;
@@ -1833,8 +1828,8 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
 */
 bool HEVCParser::parseVPS(GetBitContext *gb)
 {
-    uint i;
-    uint j;
+    uint i = 0;
+    uint j = 0;
 
     uint8_t vps_id = get_bits(gb, 4);  // vps_video_parameter_set_id u(4)
     get_bits1(gb);    // vps_base_layer_internal_flag u(1)

@@ -91,11 +91,6 @@ static const float eps = 1E-5;
 
 */
 
-AVCParser::AVCParser(void)
-{
-    Reset();
-}
-
 void AVCParser::Reset(void)
 {
     H2645Parser::Reset();

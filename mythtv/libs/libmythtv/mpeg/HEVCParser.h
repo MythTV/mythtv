@@ -162,20 +162,21 @@ class HEVCParser : public H2645Parser
         int     sps_id;
     };
 
-    using HEVCShortTermRefPicSet = struct {
-        bool     inter_ref_pic_set_prediction_flag;
-        uint8_t  delta_idx_minus1;
-        uint8_t  delta_rps_sign;
-        uint16_t abs_delta_rps_minus1;
-
+    using ShortTermRefPicSet = struct {
         /* calculated values */
+        int32_t DeltaPocS0[16];
+        int32_t DeltaPocS1[16];
+        uint8_t UsedByCurrPicS0[16];
+        uint8_t UsedByCurrPicS1[16];
         uint8_t NumDeltaPocs;
         uint8_t NumNegativePics;
         uint8_t NumPositivePics;
-        uint8_t UsedByCurrPicS0[16];
-        uint8_t UsedByCurrPicS1[16];
-        int32_t DeltaPocS0[16];
-        int32_t DeltaPocS1[16];
+
+        // Parsed values
+        uint16_t abs_delta_rps_minus1;
+        bool     inter_ref_pic_set_prediction_flag;
+        uint8_t  delta_idx_minus1;
+        uint8_t  delta_rps_sign;
     };
 
 
@@ -208,7 +209,7 @@ class HEVCParser : public H2645Parser
     };
 
 
-    HEVCParser(void);
+    HEVCParser(void) { ; }
     HEVCParser(const HEVCParser& rhs);
     ~HEVCParser(void) override { ; }
 
@@ -257,13 +258,6 @@ class HEVCParser : public H2645Parser
     bool profileTierLevel(GetBitContext *gb,
                           bool profilePresentFlag,
                           int maxNumSubLayersMinus1);
-    bool scalingListData(GetBitContext * gb,
-                         ScalingList & dest_scaling_list,
-                         bool use_default);
-    bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
-                            int num_short_term_ref_pic_sets,
-                            HEVCShortTermRefPicSet * stRPS,
-                            uint8_t max_dec_pic_buffering_minus1);
     bool parseSliceSegmentLayer(GetBitContext *gb);
     bool parseSliceSegmentHeader(GetBitContext *gb);
     bool parseSPS(GetBitContext *gb);

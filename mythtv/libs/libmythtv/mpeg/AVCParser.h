@@ -67,7 +67,7 @@ class AVCParser : public H2645Parser
       the current value of slice_type or equal to the current value of
       slice_type – 5.
     */
-    AVCParser(void);
+    AVCParser(void) { ; }
     AVCParser(const AVCParser& rhs);
     ~AVCParser(void) { ; }
 
