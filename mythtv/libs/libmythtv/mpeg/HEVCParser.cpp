@@ -933,7 +933,7 @@ static bool scalingListData(GetBitContext * gb,
         for (matrixId = 0; matrixId < ((sizeId == 3) ? 2 : 6); ++matrixId)
         {
             int16_t *scaling_list_dc_coef_minus8 = nullptr;
-            uint8_t *sl;
+            uint8_t *sl = nullptr;
 
             if (!getScalingListParams(sizeId, matrixId,
                                       dest_scaling_list, sl, size,
@@ -1386,15 +1386,21 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
                 if ((slice_pic_order_cnt_lsb < m_prevPicOrderCntLsb) &&
                     ((m_prevPicOrderCntLsb - slice_pic_order_cnt_lsb) >=
                      (MaxPicOrderCntLsb / 2)))
+                {
                     m_picOrderCntMsb = m_prevPicOrderCntMsb +
                                        MaxPicOrderCntLsb;
+                }
                 else if ((slice_pic_order_cnt_lsb > m_prevPicOrderCntLsb) &&
                          ((slice_pic_order_cnt_lsb - m_prevPicOrderCntLsb) >
                           (MaxPicOrderCntLsb / 2)))
+                {
                     m_picOrderCntMsb = m_prevPicOrderCntMsb -
                                        MaxPicOrderCntLsb;
+                }
                 else
+                {
                     m_picOrderCntMsb = m_prevPicOrderCntMsb;
+                }
             }
             m_picOrderCntVal = m_picOrderCntMsb + slice_pic_order_cnt_lsb;
 
@@ -1586,7 +1592,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     uint vps_id = get_bits(gb, 4); // sps_video_parameter_set_id u(4)
 
     uint ext_or_max_sub_layers_minus1 = get_bits(gb, 3); // u(3)
-    uint max_sub_layers_minus1;
+    uint max_sub_layers_minus1 = 0;
 
     if (m_nuhLayerId == 0)
         max_sub_layers_minus1 = ext_or_max_sub_layers_minus1;
@@ -1782,10 +1788,14 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
         num_short_term_ref_pic_sets = 64;
     }
     for(i = 0; i < num_short_term_ref_pic_sets; ++i)
+    {
         if (!shortTermRefPicSet(gb, i, num_short_term_ref_pic_sets,
                                 short_term_ref_pic_set,
                         max_dec_pic_buffering_minus1[max_sub_layers_minus1]))
+        {
             return false;
+        }
+    }
 
     if (get_bits1(gb)) // long_term_ref_pics_present_flag u(1)
     {
