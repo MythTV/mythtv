@@ -127,7 +127,7 @@ void MPEG2frame::set_pkt(AVPacket *newpkt)
 {
     // TODO: Don't free + copy, attempt to re-use existing buffer
     av_packet_unref(&m_pkt);
-    av_copy_packet(&m_pkt, newpkt);
+    av_packet_ref(&m_pkt, newpkt);
 }
 
 PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
@@ -1778,7 +1778,7 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
             continue;
         
         //pkt = spare->m_pkt;
-        av_copy_packet(&pkt, &(spare->m_pkt));
+        av_packet_ref(&pkt, &(spare->m_pkt));
         //pkt.data is a newly malloced area
 
         QString fname;
@@ -1818,7 +1818,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     if ((spare = DecodeToFrame(frameNum, 0)) == nullptr)
         return -1;
 
-    av_copy_packet(&pkt, &spare->m_pkt);
+    av_packet_ref(&pkt, &spare->m_pkt);
     //pkt.data is a newly malloced area
 
     {
@@ -2299,7 +2299,7 @@ int MPEG2fixup::Start()
                 if (!Lreorder.isEmpty())
                 {
                     av_packet_unref(&lastRealvPkt);
-                    av_copy_packet(&lastRealvPkt, &Lreorder.last()->m_pkt);
+                    av_packet_ref(&lastRealvPkt, &Lreorder.last()->m_pkt);
                 }
 
                 if (markedFrame || !m_discard)
