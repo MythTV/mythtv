@@ -15,7 +15,6 @@ enum RenderType
 {
     kRenderUnknown = 0,
     kRenderDirect3D9,
-    kRenderVDPAU,
     kRenderOpenGL,
     kRenderVulkan
 };

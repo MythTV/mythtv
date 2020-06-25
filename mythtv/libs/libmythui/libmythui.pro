@@ -16,7 +16,6 @@ DEPENDPATH  += ./opengl ./platforms ./devices ./vulkan
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
-INCLUDEPATH += ../.. ../../external/FFmpeg
 
 LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 
