@@ -106,7 +106,8 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     }
 
     auto* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
-    if (av_vdpau_bind_context(Context, vdpaudevicectx->device, vdpaudevicectx->get_proc_address, 0) != 0)
+    if (av_vdpau_bind_context(Context, vdpaudevicectx->device,
+                              vdpaudevicectx->get_proc_address, AV_HWACCEL_FLAG_IGNORE_LEVEL) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to bind VDPAU context");
         av_buffer_unref(&hwdeviceref);
