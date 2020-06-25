@@ -283,7 +283,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         }
         AVCodecContext *avctx = avcodec_alloc_context3(pCodec);
         avcodec_parameters_to_context(avctx, st->codecpar);
-        av_codec_set_pkt_timebase(avctx, st->time_base);
+        avctx->pkt_timebase = st->time_base;
 
         avcodec_string(buf, sizeof(buf), avctx, static_cast<int>(false));
 
