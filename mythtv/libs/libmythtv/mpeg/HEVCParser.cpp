@@ -137,13 +137,14 @@ uint32_t HEVCParser::addBytes(const uint8_t  *bytes,
     m_onFrame      = false;
     m_onKeyFrame   = false;
 
+#if 0
     static MythTimer timer(MythTimer::kStartRunning);
     static int nexttime = 60000;
 
     if (timer.elapsed() > nexttime)
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("Frames %1 KeyFrames %2 Total Frames %3 KeyFrames %4")
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("Frames %1 KeyFrames %2 | Total Frames %3 KeyFrames %4")
             .arg(m_framecnt)
             .arg(m_keyframecnt)
             .arg(m_totalframecnt)
@@ -153,6 +154,7 @@ uint32_t HEVCParser::addBytes(const uint8_t  *bytes,
         m_keyframecnt = 0;
         nexttime += 60000;
     }
+#endif
 
     while (!m_onFrame && (startP < bytes + byte_count))
     {
