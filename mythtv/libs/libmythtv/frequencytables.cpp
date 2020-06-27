@@ -457,13 +457,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // New Zealand
     fmap["dvbt_ofdm_nz0"] = new FrequencyTable(
-        474000000, 858000000, 8000000, "Channel %1", 21,
+        474000000, 690000000, 8000000, "Channel %1", 21,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFEC_3_4,
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionMode8K,
         DTVGuardInterval::kGuardInterval_1_16, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAM64, 0 , 0); // UHF 21-69
+        DTVModulation::kModulationQAM64, 0 , 0); // UHF 21-48
 
     // France
     fmap["dvbt_ofdm_fr0"] = new FrequencyTable(
@@ -487,13 +487,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Netherlands
     fmap["dvbt_ofdm_nl0"] = new FrequencyTable(
-        474000000, 786000000, 8000000, "Channel %1", 21,
+        474000000, 690000000, 8000000, "Channel %1", 21,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionModeAuto,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-60
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-48
 
     // Chile (ISDB-Tb)
     fmap["dvbt_ofdm_cl0"] = new FrequencyTable(
