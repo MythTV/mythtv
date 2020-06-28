@@ -14,7 +14,7 @@ float MythDebugVulkan::s_DebugBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 MythDebugVulkan* MythDebugVulkan::Create(MythRenderVulkan *Render, VkDevice Device,
                                          QVulkanDeviceFunctions *Functions, MythWindowVulkan *Window)
 {
-    MythDebugVulkan* result = new MythDebugVulkan(Render, Device, Functions, Window);
+    auto* result = new MythDebugVulkan(Render, Device, Functions, Window);
     if (result && !result->m_valid)
     {
         delete result;
@@ -48,7 +48,7 @@ MythDebugVulkan::MythDebugVulkan(MythRenderVulkan *Render, VkDevice Device,
         LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to load procs");
 }
 
-void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, float *Color)
+void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const float *Color)
 {
     VkDebugMarkerMarkerInfoEXT begin =
         { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, nullptr, Name,

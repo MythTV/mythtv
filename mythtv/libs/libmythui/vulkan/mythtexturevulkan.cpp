@@ -41,7 +41,7 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
     if (datasize != static_cast<VkDeviceSize>(datasize2))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Inconsistent image data size");
 
-    auto data = Image->constBits();
+    const auto *data = Image->constBits();
 
     // Create staging buffer
     if (!Render->CreateBuffer(datasize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -53,7 +53,7 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
     }
 
     // Map memory and copy data
-    void* memory;
+    void* memory = nullptr;
     Functions->vkMapMemory(Device, m_stagingMemory, 0, datasize, 0, &memory);
     memcpy(memory, data, static_cast<size_t>(datasize));
     Functions->vkUnmapMemory(Device, m_stagingMemory);

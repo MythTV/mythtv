@@ -171,7 +171,7 @@ bool MythPainterVulkan::Ready(void)
 
     if (!m_projectionDescriptorPool)
     {
-        auto & sizes = m_textureShader->GetPoolSizes(0);
+        const auto & sizes = m_textureShader->GetPoolSizes(0);
         VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
                                           0, 1, static_cast<uint32_t>(sizes.size()), sizes.data() };
         if (m_devFuncs->vkCreateDescriptorPool(m_device, &pool, nullptr, &m_projectionDescriptorPool) != VK_SUCCESS)
@@ -226,10 +226,10 @@ bool MythPainterVulkan::Ready(void)
 
     if (!m_textureDescriptorPool)
     {
-        auto & sizes = m_textureShader->GetPoolSizes(1);
+        const auto & sizes = m_textureShader->GetPoolSizes(1);
         // match total number of individual descriptors with pool size
         std::vector<VkDescriptorPoolSize> adjsizes;
-        for (auto & size : sizes)
+        for (const auto & size : sizes)
             adjsizes.push_back( { size.type, MAX_TEXTURE_COUNT } );
         VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
                                           0, MAX_TEXTURE_COUNT, static_cast<uint32_t>(adjsizes.size()), adjsizes.data() };

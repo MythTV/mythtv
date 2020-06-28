@@ -19,9 +19,7 @@ MythWindowVulkan::MythWindowVulkan(MythRenderVulkan *Render)
         setDeviceExtensions(QByteArrayList() << VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 }
 
-MythWindowVulkan::~MythWindowVulkan()
-{
-}
+MythWindowVulkan::~MythWindowVulkan() = default;
 
 QVulkanWindowRenderer* MythWindowVulkan::createRenderer(void)
 {
@@ -42,7 +40,7 @@ bool MythWindowVulkan::event(QEvent *Event)
         {
             // Log these for now - they may be important (e.g. QVulkanWindow::grab)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring spontaneous update request");
-            return QWindow::event(Event);
+            return QVulkanWindow::event(Event);
         }
     }
     return QVulkanWindow::event(Event);

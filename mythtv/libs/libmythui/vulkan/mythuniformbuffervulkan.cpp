@@ -6,7 +6,7 @@ MythUniformBufferVulkan* MythUniformBufferVulkan::Create(MythRenderVulkan *Rende
                                                          QVulkanDeviceFunctions *Functions,
                                                          VkDeviceSize Size)
 {
-    MythUniformBufferVulkan* result = new MythUniformBufferVulkan(Render, Device, Functions, Size);
+    auto* result = new MythUniformBufferVulkan(Render, Device, Functions, Size);
     if (result && !result->m_valid)
     {
         delete result;

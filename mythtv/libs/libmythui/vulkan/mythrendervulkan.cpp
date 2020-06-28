@@ -124,10 +124,10 @@ void MythRenderVulkan::DebugVulkan(void)
                                   .arg(VK_VERSION_PATCH(Version));
     };
 
-    auto * props = reinterpret_cast<const VkPhysicalDeviceProperties*>(m_window->physicalDeviceProperties());
+    const auto * props = reinterpret_cast<const VkPhysicalDeviceProperties*>(m_window->physicalDeviceProperties());
     if (!props)
         return;
-    auto & limits = props->limits;
+    const auto & limits = props->limits;
     auto devextensions = m_window->supportedDeviceExtensions();
     auto instextensions = m_window->vulkanInstance()->supportedExtensions();
 
@@ -173,16 +173,16 @@ void MythRenderVulkan::DebugVulkan(void)
     if (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
     {
         LOG(VB_GENERAL, LOG_INFO, QString("%1 device extensions supported:").arg(devextensions.size()));
-        for (auto extension : devextensions)
+        for (const auto& extension : devextensions)
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 Version: %2").arg(extension.name.constData()).arg(extension.version));
 
         LOG(VB_GENERAL, LOG_INFO, QString("%1 instance extensions supported:").arg(instextensions.size()));
-        for (auto extension : instextensions)
+        for (const auto& extension : instextensions)
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 Version: %2").arg(extension.name.constData()).arg(extension.version));
 
         auto layers = m_window->vulkanInstance()->supportedLayers();
         LOG(VB_GENERAL, LOG_INFO, QString("%1 layer types supported:").arg(layers.size()));
-        for (auto layer : layers)
+        for (const auto& layer : layers)
             LOG(VB_GENERAL, LOG_INFO, QString("%1 Version: %2").arg(layer.name.constData()).arg(layer.version));
     }
 }
@@ -227,12 +227,12 @@ void MythRenderVulkan::SetFrameExpected(void)
     m_frameExpected = true;
 }
 
-bool MythRenderVulkan::GetFrameExpected(void)
+bool MythRenderVulkan::GetFrameExpected(void) const
 {
     return m_frameExpected;
 }
 
-bool MythRenderVulkan::GetFrameStarted(void)
+bool MythRenderVulkan::GetFrameStarted(void) const
 {
     return m_frameStarted;
 }
@@ -256,8 +256,8 @@ void MythRenderVulkan::BeginFrame(void)
     m_frameStarted = true;
 
     // clear the framebuffer
-    VkClearColorValue clearColor = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    VkClearDepthStencilValue clearDS = { 1.0f, 0 };
+    VkClearColorValue clearColor = {{ 0.0F, 0.0F, 0.0F, 1.0F }};
+    VkClearDepthStencilValue clearDS = { 1.0F, 0 };
     VkClearValue clearValues[2];
     memset(clearValues, 0, sizeof(clearValues));
     clearValues[0].color        = clearColor;
@@ -519,7 +519,7 @@ VkCommandBuffer MythRenderVulkan::CreateSingleUseCommandBuffer(void)
     allocinfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocinfo.commandPool = m_window->graphicsCommandPool();
     allocinfo.commandBufferCount = 1;
-    VkCommandBuffer commandbuffer;
+    VkCommandBuffer commandbuffer = nullptr;
     m_devFuncs->vkAllocateCommandBuffers(m_device, &allocinfo, &commandbuffer);
     VkCommandBufferBeginInfo begininfo { };
     begininfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -560,8 +560,8 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     viewport.y        = static_cast<float>(Viewport.left());
     viewport.width    = static_cast<float>(Viewport.width());
     viewport.height   = static_cast<float>(Viewport.height());
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    viewport.minDepth = 0.0F;
+    viewport.maxDepth = 1.0F;
 
     VkRect2D scissor { };
     scissor.offset = { Viewport.left(), Viewport.top() };
@@ -614,10 +614,10 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     colorBlending.logicOp           = VK_LOGIC_OP_COPY;
     colorBlending.attachmentCount   = 1;
     colorBlending.pAttachments      = &colorblendattachment;
-    colorBlending.blendConstants[0] = 0.0f;
-    colorBlending.blendConstants[1] = 0.0f;
-    colorBlending.blendConstants[2] = 0.0f;
-    colorBlending.blendConstants[3] = 0.0f;
+    colorBlending.blendConstants[0] = 0.0F;
+    colorBlending.blendConstants[1] = 0.0F;
+    colorBlending.blendConstants[2] = 0.0F;
+    colorBlending.blendConstants[3] = 0.0F;
 
     // rasterizer
     VkPipelineRasterizationStateCreateInfo rasterizer { };
@@ -625,7 +625,7 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     rasterizer.depthClampEnable        = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode             = VK_POLYGON_MODE_FILL;
-    rasterizer.lineWidth               = 1.0f;
+    rasterizer.lineWidth               = 1.0F;
     rasterizer.cullMode                = VK_CULL_MODE_NONE;
     rasterizer.frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable         = VK_FALSE;
@@ -642,8 +642,8 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     depthstencil.stencilTestEnable     = VK_FALSE;
     depthstencil.front                 = { };
     depthstencil.back                  = { };
-    depthstencil.minDepthBounds        = 0.0f;
-    depthstencil.maxDepthBounds        = 1.0f;
+    depthstencil.minDepthBounds        = 0.0F;
+    depthstencil.maxDepthBounds        = 1.0F;
 
     // and breathe
     VkGraphicsPipelineCreateInfo pipelinecreate { };

@@ -51,7 +51,7 @@ class MythShaderVulkan : protected MythVulkanObject
 #endif
     bool CreateShaderFromSPIRV (const std::vector<MythSPIRVStage> &Stages);
 
-    VkVertexInputBindingDescription              m_vertexBindingDesc;
+    VkVertexInputBindingDescription              m_vertexBindingDesc{};
     MythVertexAttrs                              m_vertexAttributes;
     std::vector<VkPipelineShaderStageCreateInfo> m_stages;
     std::vector<uint32_t*>                       m_spirv;

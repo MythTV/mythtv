@@ -44,7 +44,7 @@ MythPainterWindowVulkan::MythPainterWindowVulkan(MythMainWindow *MainWindow)
     }
 
     // Create the Vulkan renderer
-    MythRenderVulkan* render = new MythRenderVulkan();
+    auto* render = new MythRenderVulkan();
     m_render = render;
 
     // Create the the Vulkan window

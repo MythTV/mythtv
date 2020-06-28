@@ -39,9 +39,9 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     void SetVulkanWindow           (MythWindowVulkan *VulkanWindow);
     MythWindowVulkan* GetVulkanWindow(void);
     void SetFrameExpected          (void);
-    bool GetFrameExpected          (void);
-    bool GetFrameStarted           (void);
-    bool Init                      (void);
+    bool GetFrameExpected          (void) const;
+    bool GetFrameStarted           (void) const;
+    static bool Init               (void);
     void EndFrame                  (void);
     QStringList GetDescription(void) override;
 
