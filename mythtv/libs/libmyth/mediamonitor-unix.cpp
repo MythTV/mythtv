@@ -461,7 +461,11 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                 l = line.split('\t', QString::SkipEmptyParts);
+#else
+                l = line.split('\t', Qt::SkipEmptyParts);
+#endif
                 l.pop_front();   // Remove 'drive name:' field
                 break;           // file should only contain one drive table?
             }
@@ -854,7 +858,11 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         qBuffer.append(buffer);
         size = read(m_fifo, buffer, 255);
     }
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
+#else
+    const QStringList list = qBuffer.split('\n', Qt::SkipEmptyParts);
+#endif
     for (const auto& notif : qAsConst(list))
     {
         if (notif.startsWith("add"))
