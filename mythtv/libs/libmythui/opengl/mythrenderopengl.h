@@ -143,7 +143,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     void  DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
-                     QOpenGLShaderProgram *Program, int Alpha = 255);
+                     QOpenGLShaderProgram *Program, int Alpha = 255, qreal Scale = 1.0);
     void  DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                      QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
@@ -171,7 +171,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
     static bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                      const QRect &Destination, int Rotation);
+                                      const QRect &Destination, int Rotation, qreal Scale = 1.0);
     GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
     void  ExpireVertices(int Max = 0);
     void  GetCachedVBO(GLuint Type, const QRect &Area);
