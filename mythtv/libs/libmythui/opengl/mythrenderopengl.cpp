@@ -804,7 +804,7 @@ void MythRenderOpenGL::ClearFramebuffer(void)
 
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
-                                  QOpenGLShaderProgram *Program, int Alpha)
+                                  QOpenGLShaderProgram *Program, int Alpha, qreal Scale)
 {
     makeCurrent();
 
@@ -827,7 +827,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 
     QOpenGLBuffer* buffer = Texture->m_vbo;
     buffer->bind();
-    if (UpdateTextureVertices(Texture, Source, Destination, 0))
+    if (UpdateTextureVertices(Texture, Source, Destination, 0, Scale))
     {
         if (m_extraFeaturesUsed & kGLBufferMap)
         {
@@ -1262,7 +1262,7 @@ QStringList MythRenderOpenGL::GetDescription(void)
 }
 
 bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                             const QRect &Destination, int Rotation)
+                                             const QRect &Destination, int Rotation, qreal Scale)
 {
     if (!Texture || (Texture && Texture->m_size.isEmpty()))
         return false;
@@ -1301,8 +1301,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
     data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
 
-    width  = Texture->m_crop ? min(width, Destination.width())   : Destination.width();
-    height = Texture->m_crop ? min(height, Destination.height()) : Destination.height();
+    width  = Texture->m_crop ? min(static_cast<int>(width * Scale), Destination.width())   : Destination.width();
+    height = Texture->m_crop ? min(static_cast<int>(height * Scale), Destination.height()) : Destination.height();
 
     data[2] = data[0] = Destination.left();
     data[5] = data[1] = Destination.top();

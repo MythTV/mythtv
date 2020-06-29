@@ -20,10 +20,20 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
 
     if (!m_render)
         LOG(VB_GENERAL, LOG_ERR, "OpenGL painter has no render device");
+
+#ifdef Q_OS_MACOS
+     m_display = MythDisplay::AcquireRelease();
+     CurrentDPIChanged(m_parent->devicePixelRatioF());
+     connect(m_display, &MythDisplay::CurrentDPIChanged, this, &MythOpenGLPainter::CurrentDPIChanged);
+#endif
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
+#ifdef Q_OS_MACOS
+    MythDisplay::AcquireRelease(false);
+#endif
+
     if (!m_render)
         return;
     if (!m_render->IsReady())
@@ -84,6 +94,13 @@ void MythOpenGLPainter::ClearCache(void)
     m_imageToTextureMap.clear();
 }
 
+void MythOpenGLPainter::CurrentDPIChanged(qreal DPI)
+{
+    m_pixelRatio = DPI;
+    m_usingHighDPI = !qFuzzyCompare(m_pixelRatio, 1.0);
+    LOG(VB_GENERAL, LOG_INFO, QString("High DPI scaling %1").arg(m_usingHighDPI ? "enabled" : "disabled"));
+}
+
 void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
     MythPainter::Begin(Parent);
@@ -109,13 +126,17 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
             buf = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
     }
 
+    QSize currentsize = m_parent->size();
+
     // check if we need to adjust cache sizes
-    if (m_lastSize != m_parent->size())
+    // NOTE - don't use the scaled size if using high DPI. Our images are at the lower
+    // resolution
+    if (m_lastSize != currentsize)
     {
         // This will scale the cache depending on the resolution in use
         static const int s_onehd = 1920 * 1080;
         static const int s_basesize = 64;
-        m_lastSize = m_parent->size();
+        m_lastSize = currentsize;
         float hdscreens = (static_cast<float>(m_lastSize.width() + 1) * m_lastSize.height()) / s_onehd;
         int cpu = qMax(static_cast<int>(hdscreens * s_basesize), s_basesize);
         int gpu = cpu * 3 / 2;
@@ -130,8 +151,11 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 
     if (m_target || m_swapControl)
     {
+        // If we are master and using high DPI then scale the viewport
+        if (m_swapControl && m_usingHighDPI)
+            currentsize *= m_pixelRatio;
         m_render->BindFramebuffer(m_target);
-        m_render->SetViewPort(QRect(0, 0, m_parent->width(), m_parent->height()));
+        m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
         m_render->SetBackground(0, 0, 0, 0);
         m_render->ClearFramebuffer();
     }
@@ -221,12 +245,25 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     return texture;
 }
 
+#ifdef Q_OS_MACOS
+#define DEST dest
+#else
+#define DEST Dest
+#endif
+
 void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
                                   const QRect &Source, int Alpha)
 {
     if (m_render)
     {
-        // Drawing an image  multiple times with the same VBO will stall most GPUs as
+#ifdef Q_OS_MACOS
+        QRect dest = QRect(static_cast<int>(Dest.left()   * m_pixelRatio),
+                           static_cast<int>(Dest.top()    * m_pixelRatio),
+                           static_cast<int>(Dest.width()  * m_pixelRatio),
+                           static_cast<int>(Dest.height() * m_pixelRatio));
+#endif
+
+        // Drawing an image multiple times with the same VBO will stall most GPUs as
         // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
         MythGLTexture *texture = GetTextureFromCache(Image);
         if (texture && m_mappedTextures.contains(texture))
@@ -234,7 +271,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
             QOpenGLBuffer *vbo = texture->m_vbo;
             texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx];
             texture->m_destination = QRect();
-            m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
+            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
             texture->m_destination = QRect();
             texture->m_vbo = vbo;
             if (++m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
@@ -242,17 +279,26 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
         }
         else
         {
-            m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
+            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
             m_mappedTextures.append(texture);
         }
     }
 }
 
+/*! \brief Draw a rectangle
+ *
+ * If it is a simple rectangle, then use our own shaders for rendering (which
+ * saves texture memory but may not be as accurate as Qt rendering) otherwise
+ * fallback to Qt painting to a QImage, which is uploaded as a texture.
+ *
+ * \note If high DPI scaling is in use, just use Qt painting rather than
+ * handling all of the adjustments required for pen width etc etc.
+*/
 void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
                                  const QPen &LinePen, int Alpha)
 {
     if ((FillBrush.style() == Qt::SolidPattern ||
-         FillBrush.style() == Qt::NoBrush) && m_render)
+         FillBrush.style() == Qt::NoBrush) && m_render && !m_usingHighDPI)
     {
         m_render->DrawRect(m_target, Area, FillBrush, LinePen, Alpha);
         return;
@@ -265,7 +311,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
                                       const QPen &LinePen, int Alpha)
 {
     if ((FillBrush.style() == Qt::SolidPattern ||
-         FillBrush.style() == Qt::NoBrush) && m_render)
+         FillBrush.style() == Qt::NoBrush) && m_render && !m_usingHighDPI)
     {
         m_render->DrawRoundRect(m_target, Area, CornerRadius, FillBrush,
                                   LinePen, Alpha);

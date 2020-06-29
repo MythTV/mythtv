@@ -38,6 +38,11 @@
 
 #define LOC QString("VideoWin: ")
 
+#define SCALED_RECT(SRC, SCALE) QRect{ static_cast<int>(SRC.left()   * SCALE), \
+                                       static_cast<int>(SRC.top()    * SCALE), \
+                                       static_cast<int>(SRC.width()  * SCALE), \
+                                       static_cast<int>(SRC.height() * SCALE) }
+
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
@@ -63,6 +68,14 @@ void VideoOutWindow::ScreenChanged(QScreen */*screen*/)
     MoveResize();
 }
 
+void VideoOutWindow::PhysicalDPIChanged(qreal /*DPI*/)
+{
+    // PopulateGeometry will update m_devicePixelRatio
+    PopulateGeometry();
+    m_windowRect = m_displayVisibleRect = SCALED_RECT(m_rawWindowRect, m_devicePixelRatio);
+    MoveResize();
+}
+
 void VideoOutWindow::PopulateGeometry(void)
 {
     if (!m_display)
@@ -71,6 +84,10 @@ void VideoOutWindow::PopulateGeometry(void)
     QScreen *screen = m_display->GetCurrentScreen();
     if (!screen)
         return;
+
+#ifdef Q_OS_MACOS
+    m_devicePixelRatio = screen->devicePixelRatio();
+#endif
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
@@ -416,6 +433,9 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     {
         m_display = Display;
         connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
+#ifdef Q_OS_MACOS
+        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &VideoOutWindow::PhysicalDPIChanged);
+#endif
     }
 
     if (m_display)
@@ -429,7 +449,8 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
 
     // N.B. we are always confined to the window size so use that for the initial
     // displayVisibleRect
-    m_windowRect = m_displayVisibleRect = WindowRect;
+    m_rawWindowRect = WindowRect;
+    m_windowRect = m_displayVisibleRect = SCALED_RECT(WindowRect, m_devicePixelRatio);
 
     int pbp_width = m_displayVisibleRect.width() / 2;
     if (m_pipState == kPBPLeft || m_pipState == kPBPRight)
@@ -613,12 +634,13 @@ void VideoOutWindow::SetDisplayAspect(float DisplayAspect)
 
 void VideoOutWindow::SetWindowSize(QSize Size)
 {
-    if (Size != m_windowRect.size())
+    if (Size != m_rawWindowRect.size())
     {
-        QRect rect(m_windowRect.topLeft(), Size);
+        QRect rect(m_rawWindowRect.topLeft(), Size);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New window rect: %1x%2+%3+%4")
             .arg(rect.width()).arg(rect.height()).arg(rect.left()).arg(rect.top()));
-        m_windowRect = m_displayVisibleRect = rect;
+        m_rawWindowRect = rect;
+        m_windowRect = m_displayVisibleRect = SCALED_RECT(rect, m_devicePixelRatio);
         MoveResize();
     }
 }

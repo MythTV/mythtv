@@ -1020,7 +1020,7 @@ void MythVideoOutput::InitDisplayMeasurements(void)
         .arg(displayaspect).arg(source));
 
     // Get the window and screen resolutions
-    QSize window = m_window.GetWindowRect().size();
+    QSize window = m_window.GetRawWindowRect().size();
     QSize screen = m_display->GetResolution();
 
     // If not running fullscreen, adjust for window size and ignore any video

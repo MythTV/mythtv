@@ -45,6 +45,7 @@ class VideoOutWindow : public QObject
 
   public slots:
     void ScreenChanged          (QScreen *screen);
+    void PhysicalDPIChanged     (qreal  /*DPI*/);
 
     // Sets
     void InputChanged           (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
@@ -74,6 +75,7 @@ class VideoOutWindow : public QObject
     float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
     QRect    GetDisplayVisibleRect(void)   const { return m_displayVisibleRect; }
     QRect    GetWindowRect(void)           const { return m_windowRect; }
+    QRect    GetRawWindowRect(void)        const { return m_rawWindowRect; }
     QRect    GetScreenGeometry(void)       const { return m_screenGeometry; }
     QRect    GetVideoRect(void)            const { return m_videoRect; }
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
@@ -115,6 +117,7 @@ class VideoOutWindow : public QObject
     bool    m_dbScalingAllowed {true};  ///< disable this to prevent overscan/underscan
     bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
     QRect   m_screenGeometry   {0,0,1024,768}; ///< Full screen geometry
+    qreal   m_devicePixelRatio {1.0};
 
     // Manual Zoom
     float   m_manualVertScale  {1.0F}; ///< Manually applied vertical scaling.
@@ -147,6 +150,8 @@ class VideoOutWindow : public QObject
     QRect   m_displayVisibleRect {0,0,0,0};
     /// Rectangle describing QWidget bounds.
     QRect   m_windowRect {0,0,0,0};
+    /// Rectangle describing QWidget bounds - not adjusted for high DPI scaling (macos)
+    QRect   m_rawWindowRect {0,0,0,0};
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
     QRect   m_tmpDisplayVisibleRect {0,0,0,0};

@@ -29,8 +29,10 @@ class UIEffects;
 using LayoutVector = QVector<QTextLayout *>;
 using FormatVector = QVector<QTextLayout::FormatRange>;
 
-class MUI_PUBLIC MythPainter
+class MUI_PUBLIC MythPainter : public QObject
 {
+    Q_OBJECT
+
   public:
     MythPainter();
     /** MythPainter destructor.
