@@ -1239,33 +1239,68 @@ QString MythFormatTime(int secs, QString fmt)
     return QTime::fromMSecsSinceStartOfDay(secs*1000).toString(fmt);
 }
 
+/*
+ * States for the command line parser.
+ */
+enum states {
+    START,     // No current token.
+    INTEXT,    // Collecting token text.
+    INSQUOTE,  // Collecting token, inside single quotes.
+    INDQUOTE,  // Collecting token, inside double quotes.
+    ESCTEXT,   // Saw backslash. Returns to generic text.
+    ESCSQUOTE, // Saw backslash. Returns to single quotes.
+    ESCDQUOTE, // Saw backslash. Returns to double quotes.
+};
+
+/*
+ * Parse a string into separate tokens. This function understands
+ * quoting and the escape character.
+ */
 QStringList MythSplitCommandString(const QString &line)
 {
-    // Match anything that starts at the beginning of the line or a separator
-    // Match 1: Any number of characters other than a quote or a separator
-    //          A literal "
-    //          Any number or characters other than a quote or a separator
-    //          A literal "
-    //          Any number or characters other than a quote or a separator
-    //   This should match:
-    //          "abc"
-    //          "abc def"
-    //          abc"def"
-    //          abc"def ghi"jkl
-    // Match 2: One or more characters other than a separator
-    //   This should match:
-    //          abc
-    QRegularExpression re(R"((?:^| )([^ "]*"[^"]*"[^ "]*|[^ ]+))");
-    QRegularExpressionMatchIterator it = re.globalMatch(line.trimmed());
-
     QStringList fields;
-    while (it.hasNext())
+    states state = START;
+    int tokenStart = -1;
+
+    for (int i = 0; i < line.size(); i++)
     {
-        QRegularExpressionMatch match = it.next();
-        if (match.hasMatch())
-            fields.push_back(match.captured(1));
+        const QChar c = line.at(i);
+
+        switch (state) {
+          case START:
+            tokenStart = i;
+            if      (c.isSpace()) break;
+            if      (c == '\'') state = INSQUOTE;
+            else if (c == '\"') state = INDQUOTE;
+            else if (c == '\\') state = ESCTEXT;
+            else                state = INTEXT;
+            break;
+          case INTEXT:
+            if (c.isSpace()) {
+                fields += line.mid(tokenStart, i - tokenStart);
+                state = START;
+                break;
+            }
+            else if (c == '\'') state = INSQUOTE;
+            else if (c == '\"') state = INDQUOTE;
+            else if (c == '\\') state = ESCTEXT;
+            break;
+          case INSQUOTE:
+            if      (c == '\'') state = INTEXT;
+            else if (c == '\\') state = ESCSQUOTE;
+            break;
+          case INDQUOTE:
+            if      (c == '\"') state = INTEXT;
+            else if (c == '\\') state = ESCDQUOTE;
+            break;
+          case ESCTEXT:   state = INTEXT;   break;
+          case ESCSQUOTE: state = INSQUOTE; break;
+          case ESCDQUOTE: state = INDQUOTE; break;
+        }
     }
 
+    if (state != START)
+        fields += line.mid(tokenStart);
     return fields;
 }
 

@@ -46,6 +46,42 @@ void TestMiscUtil::test_parse_cmdline_data(void)
                         R"(--arg1="whatever")",
                         R"(--arg2="multi-word argument")",
                         R"(--arg3)"});
+    QTest::newRow("mixedquotes")
+        << R"(cmd --arg1 first-value --arg2 "second 'value'")"
+        << QStringList({R"(cmd)",
+                        R"(--arg1)",
+                        R"(first-value)",
+                        R"(--arg2)",
+                        R"("second 'value'")"});
+    QTest::newRow("mixeduneven")
+        << R"(cmd --arg1 first-value --arg2 "second 'value")"
+        << QStringList({R"(cmd)",
+                        R"(--arg1)",
+                        R"(first-value)",
+                        R"(--arg2)",
+                        R"("second 'value")"});
+    QTest::newRow("1escapedquote")
+        << R"(cmd -d --arg1 first-value --arg2 \"second)"
+        << QStringList({R"(cmd)",
+                        R"(-d)",
+                        R"(--arg1)",
+                        R"(first-value)",
+                        R"(--arg2)",
+                        R"(\"second)"});
+    QTest::newRow("nestedquotes")
+        << R"(cmd --arg1 first-value --arg2 "second \"value\"")"
+        << QStringList({R"(cmd)",
+                        R"(--arg1)",
+                        R"(first-value)",
+                        R"(--arg2)",
+                        R"("second \"value\"")"});
+    QTest::newRow("unfinishedquote")
+        << R"(cmd --arg1 first-value --arg2 "second \"value\")"
+        << QStringList({R"(cmd)",
+                        R"(--arg1)",
+                        R"(first-value)",
+                        R"(--arg2)",
+                        R"("second \"value\")"});
 }
 
 void TestMiscUtil::test_parse_cmdline(void)
