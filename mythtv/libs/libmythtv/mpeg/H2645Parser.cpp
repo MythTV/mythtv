@@ -91,7 +91,6 @@ static const float eps = 1E-5;
 */
 
 H2645Parser::H2645Parser(void)
-    : m_scanType(SCAN_t::PROGRESSIVE)
 {
     m_rbspBuffer = new uint8_t[m_rbspBufferSize];
     if (m_rbspBuffer == nullptr)

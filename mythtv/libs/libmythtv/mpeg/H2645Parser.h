@@ -36,6 +36,7 @@
 #include <cstdint>
 #include "mythconfig.h"
 #include "compat.h" // for uint on Darwin, MinGW
+#include "recorders/recorderbase.h" // for ScanType
 
 #if 1
 #include "mythlogging.h"
@@ -161,7 +162,7 @@ class H2645Parser {
     uint32_t   m_timeScale                   {0};
     uint32_t   m_unitsInTick                 {0};
 
-    SCAN_t     m_scanType;
+    SCAN_t     m_scanType                    {SCAN_t::PROGRESSIVE};
 
     uint       m_frameCropBottomOffset       {0};
     uint       m_frameCropLeftOffset         {0};
