@@ -15,8 +15,6 @@ extern "C" {
 #include <cmath>
 #include <strings.h>
 
-static const float eps = 1E-5;
-
 /*
   Most of the comments below were cut&paste from ITU-T Rec. H.264
   as found here:  http://www.itu.int/rec/T-REC-H.264/e
