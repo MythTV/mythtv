@@ -38,10 +38,10 @@
 
 #define LOC QString("VideoWin: ")
 
-#define SCALED_RECT(SRC, SCALE) QRect{ static_cast<int>(SRC.left()   * SCALE), \
-                                       static_cast<int>(SRC.top()    * SCALE), \
-                                       static_cast<int>(SRC.width()  * SCALE), \
-                                       static_cast<int>(SRC.height() * SCALE) }
+#define SCALED_RECT(SRC, SCALE) QRect{ static_cast<int>((SRC).left()   * (SCALE)), \
+                                       static_cast<int>((SRC).top()    * (SCALE)), \
+                                       static_cast<int>((SRC).width()  * (SCALE)), \
+                                       static_cast<int>((SRC).height() * (SCALE)) }
 
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
