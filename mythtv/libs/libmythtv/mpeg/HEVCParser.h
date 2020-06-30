@@ -173,8 +173,8 @@ class HEVCParser : public H2645Parser
         uint8_t NumPositivePics;
 
         // Parsed values
-        uint16_t abs_delta_rps_minus1;
         bool     inter_ref_pic_set_prediction_flag;
+        uint16_t abs_delta_rps_minus1;
         uint8_t  delta_idx_minus1;
         uint8_t  delta_rps_sign;
     };
