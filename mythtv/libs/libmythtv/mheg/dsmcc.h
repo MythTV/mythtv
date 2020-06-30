@@ -72,8 +72,10 @@
    this code builds the filing system as the information appears.
 */
 
+class TestMhegDsmcc;
 class Dsmcc
 {
+    friend TestMhegDsmcc;
   public:
     Dsmcc() = default;
     ~Dsmcc() { Reset(); }

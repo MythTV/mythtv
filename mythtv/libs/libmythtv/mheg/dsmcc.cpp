@@ -38,11 +38,11 @@ static uint32_t crc32(const unsigned char *data, int len);
  */
 ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
 {
-    for (auto *car : qAsConst(m_carousels))
-    {
-        if (car && car->m_id == carouselId)
-            return car;
-    }
+    auto it = std::find_if(m_carousels.cbegin(), m_carousels.cend(),
+                           [carouselId](ObjCarousel const * const car) -> bool
+                               { return car->m_id == carouselId; });
+    if (it != m_carousels.cend())
+        return *it;
     return nullptr;
 }
 
