@@ -119,7 +119,7 @@ bool MythVDPAUHelper::ProfileCheck(VdpDecoderProfile Profile, uint32_t &Level,
 
 const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
 {
-    static const VdpDecoderProfile MainProfiles[] =
+    static const std::array<const VdpDecoderProfile,15> MainProfiles
     {
         VDP_DECODER_PROFILE_MPEG1, VDP_DECODER_PROFILE_MPEG2_SIMPLE, VDP_DECODER_PROFILE_MPEG2_MAIN,
         VDP_DECODER_PROFILE_MPEG4_PART2_SP, VDP_DECODER_PROFILE_MPEG4_PART2_ASP,
@@ -129,7 +129,7 @@ const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
         VDP_DECODER_PROFILE_H264_CONSTRAINED_HIGH, VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE
     };
 
-    static const VdpDecoderProfile HEVCProfiles[] =
+    static const std::array<const VdpDecoderProfile,4> HEVCProfiles
     {
         VDP_DECODER_PROFILE_HEVC_MAIN, VDP_DECODER_PROFILE_HEVC_MAIN_10,
         VDP_DECODER_PROFILE_HEVC_MAIN_STILL, VDP_DECODER_PROFILE_HEVC_MAIN_444
@@ -248,8 +248,7 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
 
 static const char* DummyGetError(VdpStatus /*status*/)
 {
-    static constexpr char kDummy[] = "Unknown";
-    return &kDummy[0];
+    return "Unknown";
 }
 
 MythVDPAUHelper::MythVDPAUHelper(void)
