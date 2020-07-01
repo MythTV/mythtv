@@ -759,7 +759,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     uint Modulation(void) const { return m_data[8]; }
     QString ModulationString(void) const
     {
-        static QString ms[] =
+        static std::array<QString,6> ms
             { "auto", "qam_16", "qam_32", "qam_64", "qam_128", "qam_256" };
         return (Modulation() <= kModulationQAM256) ?
             ms[Modulation()] : QString("auto");
@@ -830,7 +830,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint Polarization(void)       const { return (m_data[8]>>5)&0x3; }
     QString PolarizationString()  const
     {
-        static QString ps[] = { "h", "v", "l", "r" };
+        static std::array<QString,4> ps { "h", "v", "l", "r" };
         return ps[Polarization()];
     }
     bool IsCircularPolarization(void) const       { return ((m_data[8]>>6)&0x1) != 0; }
@@ -848,7 +848,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint RollOff(void) const { return (m_data[8]>>3)&0x3; }
     QString RollOffString(void) const
     {
-        static QString ro[] = { "0.35", "0.20", "0.25", "auto" };
+        static std::array<QString,4> ro { "0.35", "0.20", "0.25", "auto" };
         return ro[RollOff()];
     }
     // modulation system        1   8.5
@@ -869,7 +869,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint Modulation(void) const { return m_data[8]&0x03; }
     QString ModulationString(void) const
     {
-        static QString ms[] = { "qpsk", "qpsk", "8psk", "qam_16" };
+        static std::array<QString,4> ms { "qpsk", "qpsk", "8psk", "qam_16" };
         return ms[Modulation()];
     }
     // symbol_rate             28   9.0
@@ -931,7 +931,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint BandwidthHz(void) const { return (8 - Bandwidth()) * 1000000; }
     QString BandwidthString(void) const
     {
-        static QString bs[] = { "8", "7", "6", "5" };
+        static std::array<QString,4> bs { "8", "7", "6", "5" };
         return (Bandwidth() <= kBandwidth5Mhz) ? bs[Bandwidth()] : "auto";
     }
     // priority                 1   6.3
@@ -952,7 +952,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint Constellation(void) const { return m_data[7]>>6; }
     QString ConstellationString(void) const
     {
-        static QString cs[] = { "qpsk", "qam_16", "qam_64", "qam_256" };
+        static std::array<QString,4> cs { "qpsk", "qam_16", "qam_64", "qam_256" };
         return (Constellation() <= kConstellationQAM256) ?
             cs[Constellation()] : "auto";
     }
@@ -973,7 +973,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     /// \bug returns "a" for values >= 4 for compatibility with siparser.cpp
     QString HierarchyString(void) const
     {
-        static QString hs[] = { "n", "1", "2", "4", "a", "a", "a", "a" };
+        static std::array<QString,8> hs { "n", "1", "2", "4", "a", "a", "a", "a" };
         return hs[Hierarchy()];
     }
     bool NativeInterleaver(void) const { return ( m_data[7] & 0x20 ) != 0; }
@@ -994,7 +994,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint CodeRateHP(void) const { return m_data[7] & 0x7; }
     QString CodeRateHPString(void) const
     {
-        static QString cr[] = {
+        static std::array<QString,8> cr {
             "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
         };
         return cr[CodeRateHP()];
@@ -1003,7 +1003,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint CodeRateLP(void) const { return (m_data[8]>>5) & 0x7; }
     QString CodeRateLPString(void) const
     {
-        static QString cr[] = {
+        static std::array<QString,8> cr {
             "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
         };
         return cr[CodeRateLP()];
@@ -1019,7 +1019,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint GuardInterval(void) const { return (m_data[8]>>3) & 0x3; }
     QString GuardIntervalString(void) const
     {
-        static QString gi[] = { "1/32", "1/16", "1/8", "1/4" };
+        static std::array<QString,4> gi { "1/32", "1/16", "1/8", "1/4" };
         return gi[GuardInterval()];
     }
     // transmission_mode        2   8.5
@@ -1032,7 +1032,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint TransmissionMode(void) const { return (m_data[8]>>1) & 0x3; }
     QString TransmissionModeString(void) const
     {
-        static QString tm[] = { "2", "8", "4", "auto" };
+        static std::array<QString,4> tm { "2", "8", "4", "auto" };
         return tm[TransmissionMode()];
     }
     // other_frequency_flag     1   8.7
@@ -1120,7 +1120,8 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     uint SisoMiso(void) const { return (m_data[6] >> 6) & 0x3; }
     QString SisoMisoString(void) const
     {
-        static QString sm[] = { "SISO", "MISO", "reserved", "reserved" };
+        static const std::array<const QString,4> sm
+            { "SISO", "MISO", "reserved", "reserved" };
         return sm[SisoMiso()];
     }
 
@@ -1137,12 +1138,14 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     uint Bandwidth(void) const { return (m_data[6] >> 2) & 0xF; }
     uint BandwidthHz(void) const
     {
-        static uint bw[] = { 8000000, 7000000, 6000000, 5000000, 10000000, 1712000 };
+        static constexpr std::array<const uint,6> bw
+            { 8000000, 7000000, 6000000, 5000000, 10000000, 1712000 };
         return (Bandwidth() <= kBandwidth1712kHz ? bw[Bandwidth()] : 0);
     }
     QString BandwidthString(void) const
     {
-        static QString bs[] = { "8", "7", "6", "5", "10", "1.712" };
+        static const std::array<const QString,6> bs
+            { "8", "7", "6", "5", "10", "1.712" };
         return (Bandwidth() <= kBandwidth1712kHz) ? bs[Bandwidth()] : "0";
     }
 
@@ -1160,7 +1163,8 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     uint GuardInterval(void) const { return (m_data[7]>>5) & 0x7; }
     QString GuardIntervalString(void) const
     {
-        static QString gi[] = { "1/32", "1/16", "1/8", "1/4", "1/128", "19/128", "19/256", "reserved" };
+        static const std::array<const QString,8> gi
+            { "1/32", "1/16", "1/8", "1/4", "1/128", "19/128", "19/256", "reserved" };
         return gi[GuardInterval()];
     }
 
@@ -1177,7 +1181,8 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     uint TransmissionMode(void) const { return (m_data[7]>>2) & 0x7; }
     QString TransmissionModeString(void) const
     {
-        static QString tm[] = { "2k", "8k", "4k", "1k", "16k", "32k", "reserved", "reserved" };
+        static const std::array<const QString,8> tm
+            { "2k", "8k", "4k", "1k", "16k", "32k", "reserved", "reserved" };
         return tm[TransmissionMode()];
     }
     uint OtherFrequencyFlag(void) const { return (m_data[7]>>1) & 0x1; }

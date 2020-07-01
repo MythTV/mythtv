@@ -120,7 +120,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 {
     // Only some of the QTextCodec calls are reentrant.
     // If you use this please verify that you are using a reentrant call.
-    static const QTextCodec *s_iso8859Codecs[16] =
+    static const std::array<QTextCodec *,16>s_iso8859Codecs
     {
         QTextCodec::codecForName("Latin1"),
         QTextCodec::codecForName("ISO8859-1"),  // Western
@@ -236,7 +236,7 @@ ProgramInfo::CategoryType ContentDescriptor::GetMythCategory(uint i) const
     return ProgramInfo::kCategoryTVShow;
 }
 
-const char *linkage_types[] =
+const std::array<const std::string,14> linkage_types
 {
     "Reserved(0x00)",
     "Information Service",
@@ -257,8 +257,8 @@ const char *linkage_types[] =
 
 QString LinkageDescriptor::LinkageTypeString(void) const
 {
-    if (LinkageType() < (sizeof(linkage_types) / sizeof(const char*)))
-        return QString(linkage_types[LinkageType()]);
+    if (LinkageType() < linkage_types.size())
+        return QString::fromStdString(linkage_types[LinkageType()]);
     if ((LinkageType() <= 0x7f) || (LinkageType() == 0x7f))
         return QString("Reserved(0x%1)").arg(LinkageType(),2,16,QChar('0'));
     return QString("User Defined(0x%1)").arg(LinkageType(),2,16,QChar('0'));

@@ -236,26 +236,26 @@ QString ContentAdvisoryDescriptor::toString() const
 
 QString AudioStreamDescriptor::SampleRateCodeString(void) const
 {
-    static const char* s_asd[] =
+    static const std::array<const std::string,8> s_asd
     {
         "48kbps", "44.1kbps", "32kbps", "Reserved",
         "48kbps or 44.1kbps", "48kbps or 32kbps",
         "44.1kbps or 32kbps", "48kbps or 44.1kbps or 32kbps"
     };
-    return QString(s_asd[SampleRateCode()]);
+    return QString::fromStdString(s_asd[SampleRateCode()]);
 }
 
 QString AudioStreamDescriptor::BitRateCodeString(void) const
 {
     // cppcheck-suppress variableScope
-    static const char* s_ebr[19] =
+    static const std::array<const std::string,19> s_ebr
     {
         "=32kbps",  "=40kbps",  "=48kbps",  "=56kbps",  "=64kbps",
         "=80kbps",  "=96kbps",  "=112kbps", "=128kbps", "=160kbps",
         "=192kbps", "=224kbps", "=256kbps", "=320kbps", "=384kbps",
         "=448kbps", "=512kbps", "=576kbps", "=640kbps"
     };
-    static const char* s_ubr[19] =
+    static const std::array<const std::string,19> s_ubr
     {
         "<=32kbps",  "<=40kbps", "<=48kbps",  "<=56kbps",  "<=64kbps",
         "<=80kbps",  "<=96kbps", "<=112kbps", "<=128kbps", "<=160kbps",
@@ -264,34 +264,34 @@ QString AudioStreamDescriptor::BitRateCodeString(void) const
     };
 
     if (BitRateCode() <= 18)
-        return QString(s_ebr[BitRateCode()]);
+        return QString::fromStdString(s_ebr[BitRateCode()]);
     if ((BitRateCode() >= 32) && (BitRateCode() <= 50))
-        return QString(s_ubr[BitRateCode()-32]);
+        return QString::fromStdString(s_ubr[BitRateCode()-32]);
     return QString("Unknown Bit Rate Code");
 }
 
 QString AudioStreamDescriptor::SurroundModeString(void) const
 {
-    static const char* s_sms[] =
+    static const std::array<const std::string,4> s_sms
     {
         "Not indicated",
         "Not Dolby surround encoded",
         "Dolby surround encoded",
         "Reserved",
     };
-    return QString(s_sms[SurroundMode()]);
+    return QString::fromStdString(s_sms[SurroundMode()]);
 }
 
 QString AudioStreamDescriptor::ChannelsString(void) const
 {
-    static const char* s_cs[] =
+    static const std::array<const std::string,16> s_cs
     {
         "1 + 1",    "1/0",      "2/0",      "3/0",
         "2/1",      "3/1",      "2/2 ",     "3/2",
         "1",        "<= 2",     "<= 3",     "<= 4",
         "<= 5",     "<= 6",     "Reserved", "Reserved"
     };
-    return s_cs[Channels()];
+    return QString::fromStdString(s_cs[Channels()]);
 }
 
 QString AudioStreamDescriptor::toString() const

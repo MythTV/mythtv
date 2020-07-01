@@ -11,6 +11,8 @@
 #include <vector>
 using namespace std;
 
+using AspectArray = std::array<float,16>;
+
 #include "tspacket.h"
 #include "mythlogging.h"
 
@@ -237,9 +239,9 @@ class SequenceHeader
     ~SequenceHeader() {;}
 
     unsigned char m_data[11] {};
-    static const float kMpeg1Aspect[16];
-    static const float kMpeg2Aspect[16];
-    static const float kMpeg2Fps[16];
+    static const AspectArray kMpeg1Aspect;
+    static const AspectArray kMpeg2Aspect;
+    static const AspectArray kMpeg2Fps;
 };
 
 #endif // PES_PACKET_H

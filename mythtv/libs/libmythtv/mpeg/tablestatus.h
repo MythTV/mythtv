@@ -5,6 +5,7 @@
 
 // C++
 #include <cstdint>  // uint64_t
+#include <array>
 #include <vector>
 using namespace std;
 
@@ -28,7 +29,7 @@ public:
     sections_t  m_sections;
 
 private:
-    static const uint8_t kInitBits[8];
+    static const std::array<const uint8_t,8> kInitBits;
 };
 
 

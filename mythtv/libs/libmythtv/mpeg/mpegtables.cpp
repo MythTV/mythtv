@@ -35,7 +35,7 @@ const unsigned char DEFAULT_PMT_HEADER[12] =
     0x00, 0x00, // Program Info Length
 };
 
-static const uint len_for_alloc[] =
+static const std::array<const uint,4> len_for_alloc
 {
     TSPacket::kPayloadSize
     - 1 /* for start of field pointer */

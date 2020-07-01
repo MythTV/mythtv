@@ -3,6 +3,7 @@
 #ifndef ATSC_DESCRIPTORS_H
 #define ATSC_DESCRIPTORS_H
 
+#include <array>
 #include <vector>
 using namespace std;
 

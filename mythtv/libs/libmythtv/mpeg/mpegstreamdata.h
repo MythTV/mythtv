@@ -309,7 +309,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     mutable QMutex            m_siTimeLock;
     uint                      m_siTimeOffsetCnt             {0};
     uint                      m_siTimeOffsetIndx            {0};
-    double                    m_siTimeOffsets[16]           {0.0};
+    std::array<double,16>     m_siTimeOffsets               {0.0};
 
     // Generic EIT stuff used for ATSC and DVB
     EITHelper                *m_eitHelper                   {nullptr};

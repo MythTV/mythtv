@@ -164,7 +164,7 @@ bool PESPacket::VerifyCRC(void) const
 }
 
 // These are pixel aspect ratios
-const float SequenceHeader::kMpeg1Aspect[16] =
+const AspectArray SequenceHeader::kMpeg1Aspect
 {
     0.0000F,       1.0000F,       0.6735F,       0.7031F,
     0.7615F,       0.8055F,       0.8437F,       0.8935F,
@@ -174,7 +174,7 @@ const float SequenceHeader::kMpeg1Aspect[16] =
 
 /// The negative values are screen aspect ratios,
 /// while the positive ones are pixel aspect ratios
-const float SequenceHeader::kMpeg2Aspect[16] =
+const AspectArray SequenceHeader::kMpeg2Aspect
 {
     0.0000F,       1.0000F,      -3.0F/4.0F,    -9.0F/16.0F,
    -1.0F/2.21F,    0.0000F,       0.0000F,       0.0000F,
@@ -182,7 +182,7 @@ const float SequenceHeader::kMpeg2Aspect[16] =
     0.0000F,       0.0000F,       0.0000F,       0.0000F,
 };
 
-const float SequenceHeader::kMpeg2Fps[16] =
+const AspectArray SequenceHeader::kMpeg2Fps
 {
     0.0F,          24000/1001.0F, 24.0F,        25.0F,
     30000/1001.0F, 30.0F,         50.0F,        60000/1001.0F,

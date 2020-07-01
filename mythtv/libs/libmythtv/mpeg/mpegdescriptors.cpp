@@ -223,7 +223,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
 
 #define EMPTY_STR_16 "","","","", "","","","", "","","","", "","","","",
 
-const char *descriptor_tag_strings[256] =
+const std::array<const std::string,256> descriptor_tag_strings
 {
     /* 0x00 */ "",                      /* 0x01 */ "",
     /* 0x02 */ "Video",                 /* 0x03 */ "Audio",
@@ -348,7 +348,7 @@ static void comma_list_append(QString &str, const QString& extra)
 
 QString MPEGDescriptor::DescriptorTagString(void) const
 {
-    QString str = descriptor_tag_strings[DescriptorTag()];
+    QString str = QString::fromStdString(descriptor_tag_strings[DescriptorTag()]);
 
     switch (DescriptorTag())
     {

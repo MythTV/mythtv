@@ -1886,7 +1886,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         const uint_vec_t &pids = m_encryptionPnumToPids[pnum];
         if (!pids.empty())
         {
-            uint enc_cnt[3] = { 0, 0, 0 };
+            std::array<uint,3> enc_cnt { 0, 0, 0 };
             for (uint pid2 : pids)
             {
                 CryptStatus stat = m_encryptionPidToInfo[pid2].m_status;
