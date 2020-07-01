@@ -299,6 +299,7 @@ class MBASE_PUBLIC MythCommandLineParser
     void addPIDFile(void);
     void addJob(void);
     void addInFile(bool addOutFile = false);
+    void addPlatform(void);
 
   private:
     Result getOpt(int argc, const char * const * argv, int &argpos,

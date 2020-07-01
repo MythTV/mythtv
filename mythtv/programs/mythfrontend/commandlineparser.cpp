@@ -18,6 +18,7 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addDisplay();
     addUPnP();
     addLogging();
+    addPlatform();
 
     add(QStringList{"-r", "--reset"}, "reset", false,
         "Resets appearance settings and language.", "");

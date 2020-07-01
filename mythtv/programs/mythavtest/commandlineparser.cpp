@@ -28,6 +28,7 @@ void MythAVTestCommandLineParser::LoadArguments(void)
     addDisplay();
     addLogging();
     addInFile();
+    addPlatform();
     add(QStringList{"-t", "--test"}, "test", false,
                     "Test video performance.",
                     "Test and debug video playback performance."

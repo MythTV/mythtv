@@ -2476,6 +2476,13 @@ void MythCommandLineParser::addInFile(bool addOutFile)
         add("--outfile", "outfile", "", "Output file URI", "");
 }
 
+/** \brief Pass through the platform argument to Qt for GUI applications
+ */
+void MythCommandLineParser::addPlatform(void)
+{
+    add("-platform", "platform", "", "Qt (QPA) platform argument", "Qt platform argument that is passed through to Qt");
+}
+
 /** \brief Helper utility for logging interface to pull path from --logpath
  */
 QString MythCommandLineParser::GetLogFilePath(void)

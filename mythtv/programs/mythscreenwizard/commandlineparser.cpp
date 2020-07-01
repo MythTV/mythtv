@@ -22,5 +22,6 @@ void MythScreenWizardCommandLineParser::LoadArguments(void)
     addLogging();
     addMouse();
     addDisplay();
+    addPlatform();
 }
 

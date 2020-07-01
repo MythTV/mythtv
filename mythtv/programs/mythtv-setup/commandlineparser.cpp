@@ -25,6 +25,7 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
     addGeometry();
     addDisplay();
     addLogging();
+    addPlatform();
 
     add("--expert", "expert", false, "", "Expert mode.");
     add("--scan-list", "scanlist", false, "", "no help");
