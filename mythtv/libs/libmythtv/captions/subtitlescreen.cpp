@@ -390,7 +390,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
             "TeX Gyre Chorus", // cursive
             "Droid Serif"      // small caps, QFont::SmallCaps will be applied
         };
-        font->GetFace()->setFamily(s_cc708Fonts[attr.m_fontTag & 0x7]);
+        font->GetFace()->setFamily(QString::fromStdString(s_cc708Fonts[attr.m_fontTag & 0x7]));
     }
     else if (family == kSubFamilyText)
     {
@@ -2368,17 +2368,7 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*
     static QMutex s_stringLock;
     s_stringLock.lock();
 
-    char str[1024];
-    int bytes = vsnprintf(str, sizeof str, fmt, vl);
-    // check for truncated messages and fix them
-    int truncated = bytes - ((sizeof str)-1);
-    if (truncated > 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("libASS log output truncated %1 of %2 bytes written")
-            .arg(truncated).arg(bytes));
-    }
-
+    QString str = QString::vasprintf(fmt, vl);
     LOG(verbose_mask, verbose_level, QString("libass: %1").arg(str));
     s_stringLock.unlock();
 }
