@@ -16,7 +16,7 @@ class MythUniformBufferVulkan;
 
 #define MAX_TEXTURE_COUNT (1000)
 
-class MUI_PUBLIC MythPainterVulkan : public QObject, public MythPainter
+class MUI_PUBLIC MythPainterVulkan : public MythPainter
 {
     Q_OBJECT
 
