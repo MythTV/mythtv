@@ -60,8 +60,8 @@
 
 using namespace std;
 
-static MIMETypes g_MIMETypes[] =
-{
+static std::array<const MIMETypes,63> g_MIMETypes
+{{
     // Image Mime Types
     { "gif" , "image/gif"                  },
     { "ico" , "image/x-icon"               },
@@ -130,7 +130,7 @@ static MIMETypes g_MIMETypes[] =
     { "ts"  , "video/mp2t"                 }, // RFC 3555
     { "vob" , "video/mpeg"                 }, // Also video/dvd
     { "wmv" , "video/x-ms-wmv"             }
-};
+}};
 
 // NOTE 1
 // This formerly was video/x-matroska, but got changed due to #8643
@@ -1028,7 +1028,7 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 {
     QString ext;
 
-    for (auto & type : g_MIMETypes)
+    for (const auto & type : g_MIMETypes)
     {
         ext = type.pszExtension;
 
@@ -1047,7 +1047,7 @@ QStringList HTTPRequest::GetSupportedMimeTypes()
 {
     QStringList mimeTypes;
 
-    for (auto & type : g_MIMETypes)
+    for (const auto & type : g_MIMETypes)
     {
         if (!mimeTypes.contains( type.pszType ))
             mimeTypes.append( type.pszType );
