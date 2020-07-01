@@ -53,57 +53,57 @@ static const float sqrt_2_3 = 0.816496580927726F;        // SQRT(2/3)
 static const float sqrt_2_3by3db = 0.577350269189626F;   // SQRT(2/3)*-3dB = SQRT(2/3)*SQRT(1/2)=SQRT(1/3)
 static const float msqrt_1_3bym3db = 0.408248290463863F; // -SQRT(1/3)*-3dB = -SQRT(1/3)*SQRT(1/2) = -SQRT(1/6)
 
-int matrix[4][2] = { { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 } };
-
-static const float stereo_matrix[8][8][2] =
-{
+using two_speaker_ratio = std::array<float,2>;
+using two_speaker_set   = std::array<two_speaker_ratio,8>;
+static const std::array<two_speaker_set,8> stereo_matrix
+{{
 //1F      L                R
-    {
+    {{
         { 1,               1 },                 // M
-    },
+    }},
 
 //2F      L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
-    },
+    }},
 
 //3F      L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { 1,               1 },                 // C
-    },
+    }},
 
 //3F1R    L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
         { mm3db,           m3db },              // S
-    },
+    }},
 
 //3F2R    L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    },
+    }},
 
 //3F2R.1  L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
         { 0,               0 },                 // LFE
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    },
+    }},
 
 // 3F3R.1 L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
@@ -111,10 +111,10 @@ static const float stereo_matrix[8][8][2] =
         { m6db,            m6db },              // Cs
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    },
+    }},
 
 // 3F4R.1 L                R
-    {
+    {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
@@ -123,25 +123,27 @@ static const float stereo_matrix[8][8][2] =
         { msqrt_1_3bym3db, sqrt_2_3by3db },     // Rrs
         { sqrt_2_3by3db,   msqrt_1_3bym3db },   // LS
         { msqrt_1_3bym3db, sqrt_2_3by3db },     // RS
-    }
-};
+    }}
+}};
 
-static const float s51_matrix[3][8][6] =
-{
+using six_speaker_ratio = std::array<float,6>;
+using six_speaker_set   = std::array<six_speaker_ratio,8>;
+static const std::array<six_speaker_set,3> s51_matrix
+{{
     // 3F2R.1 in -> 3F2R.1 out
     // L  R  C  LFE         LS       RS
-    {
+    {{
         { 1, 0, 0, 0,       0,       0 },     // L
         { 0, 1, 0, 0,       0,       0 },     // R
         { 0, 0, 1, 0,       0,       0 },     // C
         { 0, 0, 0, 1,       0,       0 },     // LFE
         { 0, 0, 0, 0,       1,       0 },     // LS
         { 0, 0, 0, 0,       0,       1 },     // RS
-    },
+    }},
     // 3F3R.1 in -> 3F2R.1 out
     // Used coefficient found at http://www.yamahaproaudio.com/training/self_training/data/smqr_en.pdf
     // L  R  C  LFE         LS       RS
-    {
+    {{
         { 1, 0, 0, 0,       0,       0 },     // L
         { 0, 1, 0, 0,       0,       0 },     // R
         { 0, 0, 1, 0,       0,       0 },     // C
@@ -149,10 +151,10 @@ static const float s51_matrix[3][8][6] =
         { 0, 0, 0, 0,       m3db,    m3db },  // Cs
         { 0, 0, 0, 0,       1,       0 },     // LS
         { 0, 0, 0, 0,       0,       1 },     // RS
-    },
+    }},
     // 3F4R.1 -> 3F2R.1 out
     // L  R  C  LFE         LS       RS
-    {
+    {{
         { 1, 0, 0, 0,       0,       0 },     // L
         { 0, 1, 0, 0,       0,       0 },     // R
         { 0, 0, 1, 0,       0,       0 },     // C
@@ -161,8 +163,8 @@ static const float s51_matrix[3][8][6] =
         { 0, 0, 0, 0,       0,       m3db },  // Rrs
         { 0, 0, 0, 0,       m3db,    0 },     // LS
         { 0, 0, 0, 0,       0,       m3db },  // RS
-    }
-};
+    }}
+}};
 
 int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
                                       float *dst, const float *src, int frames)

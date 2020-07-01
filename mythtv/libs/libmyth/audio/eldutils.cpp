@@ -45,8 +45,6 @@
 #define LE_INT64(v)      (*((uint64_t *)(v)))
 #endif
 
-#define SIZE_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
-
 enum eld_versions
 {
     ELD_VER_CEA_861D    = 2,
@@ -62,7 +60,7 @@ enum cea_edid_versions
     CEA_EDID_VER_RESERVED  = 4,
 };
 
-static const char *cea_speaker_allocation_names[] = {
+static const std::array<const QString,11> cea_speaker_allocation_names {
     /*  0 */ "FL/FR",
     /*  1 */ "LFE",
     /*  2 */ "FC",
@@ -76,7 +74,7 @@ static const char *cea_speaker_allocation_names[] = {
     /* 10 */ "FCH",
 };
 
-static const char *eld_connection_type_names[4] = {
+static const std::array<const QString,4> eld_connection_type_names {
     "HDMI",
     "DisplayPort",
     "2-reserved",
@@ -92,7 +90,7 @@ enum cea_audio_coding_xtypes
     XTYPE_FIRST_RESERVED = 4,
 };
 
-static const char *audiotype_names[] = {
+static const std::array<const QString,18> audiotype_names {
     /*  0 */ "undefined",
     /*  1 */ "LPCM",
     /*  2 */ "AC3",
@@ -136,7 +134,7 @@ static const char *audiotype_names[] = {
 #define SNDRV_PCM_RATE_176400           (1<<11)         /* 176400Hz */
 #define SNDRV_PCM_RATE_192000           (1<<12)         /* 192000Hz */
 
-static int cea_sampling_frequencies[8] = {
+static const std::array<const int,8> cea_sampling_frequencies {
     0,                       /* 0: Refer to Stream Header */
     SNDRV_PCM_RATE_32000,    /* 1:  32000Hz */
     SNDRV_PCM_RATE_44100,    /* 2:  44100Hz */
@@ -322,12 +320,12 @@ int ELD::update_eld(const char *buf, int size)
  */
 QString ELD::print_pcm_rates(int pcm)
 {
-    unsigned int rates[] = {
+    static const std::array<const uint32_t,12> rates {
         5512, 8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200,
         96000, 176400, 192000 };
     QString result = QString();
 
-    for (size_t i = 0; i < SIZE_ARRAY(rates); i++)
+    for (size_t i = 0; i < rates.size(); i++)
     {
         if ((pcm & (1 << i)) != 0)
         {
@@ -343,10 +341,10 @@ QString ELD::print_pcm_rates(int pcm)
  */
 QString ELD::print_pcm_bits(int pcm)
 {
-    unsigned int bits[] = { 16, 20, 24 };
+    static const std::array<const uint8_t,3> bits { 16, 20, 24 };
     QString result = QString();
 
-    for (size_t i = 0; i < SIZE_ARRAY(bits); i++)
+    for (size_t i = 0; i < bits.size(); i++)
     {
         if ((pcm & (1 << i)) != 0)
         {
@@ -384,7 +382,7 @@ QString ELD::channel_allocation_desc() const
 {
     QString result = QString();
 
-    for (size_t i = 0; i < sizeof(cea_speaker_allocation_names) / sizeof(char *); i++)
+    for (size_t i = 0; i < cea_speaker_allocation_names.size(); i++)
     {
         if ((m_e.spk_alloc & (1 << i)) != 0)
         {
@@ -500,7 +498,7 @@ QString ELD::codecs_desc() const
 {
     QString result = QString();
     bool found_one = false;
-    for (size_t i = 0; i < SIZE_ARRAY(audiotype_names); i++)
+    for (size_t i = 0; i < audiotype_names.size(); i++)
     {
         if ((m_e.formats & (1 << i)) != 0)
         {

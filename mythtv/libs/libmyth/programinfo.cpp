@@ -123,26 +123,21 @@ static QString determineURLType(const QString& url)
     return result;
 }
 
+static const std::array<const QString,ProgramInfo::kNumCatTypes> s_cattype
+{ "", "movie", "series", "sports", "tvshow" };
+
 QString myth_category_type_to_string(ProgramInfo::CategoryType category_type)
 {
-    static constexpr int kNumCatTypes = 5;
-    static const char *s_cattype[] =
-        { "", "movie", "series", "sports", "tvshow", };
-
     if ((category_type > ProgramInfo::kCategoryNone) &&
-        ((int)category_type < kNumCatTypes))
-        return QString(s_cattype[category_type]);
+        (category_type < s_cattype.size()))
+        return s_cattype[category_type];
 
     return "";
 }
 
 ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_type)
 {
-    static constexpr int kNumCatTypes = 5;
-    static const char *s_cattype[] =
-        { "", "movie", "series", "sports", "tvshow", };
-
-    for (int i = 1; i < kNumCatTypes; i++)
+    for (size_t i = 1; i < s_cattype.size(); i++)
         if (category_type == s_cattype[i])
             return (ProgramInfo::CategoryType) i;
     return ProgramInfo::kCategoryNone;
@@ -5249,11 +5244,11 @@ void ProgramInfo::SubstituteMatches(QString &str)
     str.replace(QString("%PARTTOTAL%"), QString::number(m_partTotal));
     str.replace(QString("%ORIGINALAIRDATE%"),
                 m_originalAirDate.toString(Qt::ISODate));
-    static const char *s_timeStr[] =
+    static const std::array<const QString,4> s_timeStr
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
-    const QDateTime *time_dtr[] =
+    static const std::array<const QDateTime *,4> time_dtr
         { &m_recStartTs, &m_recEndTs, &m_startTs, &m_endTs, };
-    for (size_t i = 0; i < sizeof(s_timeStr)/sizeof(char*); i++)
+    for (size_t i = 0; i < s_timeStr.size(); i++)
     {
         str.replace(QString("%%1%").arg(s_timeStr[i]),
                     (time_dtr[i]->toLocalTime()).toString("yyyyMMddhhmmss"));

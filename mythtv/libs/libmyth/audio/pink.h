@@ -1,6 +1,7 @@
 #ifndef AUDIOPINK
 #define AUDIOPINK
 
+#include <array>
 #include "mythexp.h"
 
 #define PINK_DEFAULT_ROWS      (12)
@@ -10,7 +11,7 @@
 
 struct pink_noise_t
 {
-  int32_t   pink_rows[PINK_MAX_RANDOM_ROWS];
+  std::array<int32_t,PINK_MAX_RANDOM_ROWS> pink_rows;
   int32_t   pink_running_sum;  /* Used to optimize summing of generators. */
   int32_t   pink_index;        /* Incremented each sample. */
   int32_t   pink_index_mask;   /* Index wrapped by ANDing with this mask. */

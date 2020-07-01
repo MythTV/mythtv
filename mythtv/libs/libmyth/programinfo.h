@@ -68,6 +68,7 @@ class MPUBLIC ProgramInfo
 {
     friend int pginfo_init_statics(void);
   public:
+    static constexpr int kNumCatTypes = 5;
     enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
                         kCategorySports, kCategoryTVShow };
 

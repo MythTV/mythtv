@@ -9,6 +9,7 @@
 #ifndef AUDIO_OUTPUT_SETTINGS_H
 #define AUDIO_OUTPUT_SETTINGS_H
 
+#include <array>
 #include <vector>
 
 #include "mythexp.h"

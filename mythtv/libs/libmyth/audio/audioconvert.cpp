@@ -732,7 +732,7 @@ void AudioConvert::MonoToStereo(void* dst, const void* src, int samples)
 template <class AudioDataType>
 void tDeinterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames)
 {
-    AudioDataType* outp[8];
+    std::array<AudioDataType*,8> outp {};
 
     for (int i = 0; i < channels; i++)
     {
@@ -782,7 +782,7 @@ template <class AudioDataType>
 void tInterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
                        const AudioDataType*  const* inp = nullptr)
 {
-    const AudioDataType* my_inp[8];
+    std::array<const AudioDataType*,8> my_inp {};
 
     if (channels == 1)
     {
