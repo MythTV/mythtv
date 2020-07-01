@@ -1,6 +1,4 @@
-extern "C" {
 #include "vbitext/vbi.h"
-}
 
 #include <algorithm>
 using namespace std;
