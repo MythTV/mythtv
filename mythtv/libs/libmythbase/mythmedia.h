@@ -114,8 +114,8 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
                                  const QString& extensions);
 
 
-    static const char* MediaStatusStrings[];
-    static const char* MediaErrorStrings[];
+    static const std::array<const QString,9> MediaStatusStrings;
+    static const std::array<const QString,3> MediaErrorStrings;
 
     void clearData();
 

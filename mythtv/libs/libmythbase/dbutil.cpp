@@ -57,8 +57,8 @@ int DBUtil::CompareDBMSVersion(int major, int minor, int point)
            return kUnknownVersionNumber;
 
     int result = 0;
-    int version[3] = {m_versionMajor, m_versionMinor, m_versionPoint};
-    int compareto[3] = {major, minor, point};
+    std::array<int,3> version {m_versionMajor, m_versionMinor, m_versionPoint};
+    std::array<int,3> compareto {major, minor, point};
     for (int i = 0; i < 3 && !result; i++)
     {
         if ((version[i] > -1) || (compareto[i] != 0))
@@ -781,7 +781,7 @@ bool DBUtil::ParseDBMSVersion()
     QString section;
     int pos = 0;
     int i = 0;
-    int version[3] = {-1, -1, -1};
+    std::array<int,3> version = {-1, -1, -1};
     QRegExp digits("(\\d+)");
 
     while ((i < 3) && ((pos = digits.indexIn(m_versionString, pos)) > -1))

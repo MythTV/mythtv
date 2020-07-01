@@ -41,7 +41,7 @@ static const QString PATHTO_MOUNTS("/proc/mounts");
 #   define USE_MOUNT_COMMAND
 #endif
 
-const char* MythMediaDevice::MediaStatusStrings[] =
+const std::array<const QString,9> MythMediaDevice::MediaStatusStrings
 {
     "MEDIASTAT_ERROR",
     "MEDIASTAT_UNKNOWN",
@@ -54,7 +54,7 @@ const char* MythMediaDevice::MediaStatusStrings[] =
     "MEDIASTAT_MOUNTED"
 };
 
-const char* MythMediaDevice::MediaErrorStrings[] =
+const std::array<const QString,3> MythMediaDevice::MediaErrorStrings
 {
     "MEDIAERR_OK",
     "MEDIAERR_FAILED",
