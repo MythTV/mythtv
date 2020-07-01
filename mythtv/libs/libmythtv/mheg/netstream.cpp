@@ -964,7 +964,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     for (const auto& h : qAsConst(headers))
     {
         // RFC 1123 date format: Thu, 01 Dec 1994 16:00:00 GMT
-        static constexpr char kSzFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+        static const QString kSzFormat { "ddd, dd MMM yyyy HH:mm:ss 'GMT'" };
 
         QString const first(h.first.toLower());
         if (first == "cache-control")

@@ -30,7 +30,7 @@ class DsmccSectionHeader
   public:
     char           m_tableId;  /* always 0x3B */
 
-    unsigned char  m_flags[2];
+    std::array<uint8_t,2> m_flags;
 
     unsigned short m_tableIdExtension;
 
