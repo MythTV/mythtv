@@ -1,7 +1,7 @@
 #include "captions/vbilut.h"
 
-const unsigned char lang_chars[1+8+8][16] =
-{
+const std::array<const std::array<const uint8_t,16>,1+8+8> lang_chars
+{{
     { 0, 0x23,0x24,0x40,0x5b,0x5c,0x5d,0x5e,0x5f,0x60,0x7b,0x7c,0x7d,0x7e },
 
     // for latin-1 font
@@ -39,15 +39,15 @@ const unsigned char lang_chars[1+8+8][16] =
     { 0, 0x23,0xf9,0xe8,0xbb,0xbe,0xfd,0xed,0xf8,0xe9,0xe1,0xec,0xfa,0xb9 }, // #ùè»¾ýíøéáìú¹
     // Rumanian (95%)
     { 0, 0x23,0xa2,0xde,0xc2,0xaa,0xc3,0xce,0x69,0xfe,0xe2,0xba,0xe3,0xee }, // #¢ÞÂªÃÎiþâºãî
-};
+}};
 
 // TODO - Add the rest...page 107
-const unsigned char chartab_original[13] =
+const std::array<const uint8_t,13> chartab_original =
 {
   0x23,0xa4,0x40,0x5b,0x5c,0x5d,0x5e,0x5f,0x27,0x7b,0x7c,0x7d,0x7e // #¤@[\\]^_\'{|}~
 };
 
-const unsigned short hammtab[256] =
+const std::array<const uint16_t,256> hammtab
 {
     0x0101, 0x100f, 0x0001, 0x0101, 0x100f, 0x0100, 0x0101, 0x100f,
     0x100f, 0x0102, 0x0101, 0x100f, 0x010a, 0x100f, 0x100f, 0x0107,
@@ -83,7 +83,7 @@ const unsigned short hammtab[256] =
     0x100f, 0x010e, 0x010f, 0x100f, 0x010e, 0x000e, 0x100f, 0x010e,
 };
 
-const uint8_t hamm84tab[256] =
+const std::array<const uint8_t,256> hamm84tab
 {
     255,255,255,255,255,255,255,255,255,  0, //   0 -   9
     255,  8,255,255,255,255,255,255,255,255, //  10 -  19
@@ -113,7 +113,7 @@ const uint8_t hamm84tab[256] =
     255,255,255,255,255,255 };                // 250 - 255
 
 
-const uint8_t unham84tab[256] =
+const std::array<const uint8_t,256> unham84tab
 {
     0x01, 0xff, 0x81, 0x01, 0xff, 0x00, 0x01, 0xff, // 0x
     0xff, 0x02, 0x01, 0xff, 0x0a, 0xff, 0xff, 0x07,
@@ -149,7 +149,7 @@ const uint8_t unham84tab[256] =
     0xff, 0x0e, 0x0f, 0xff, 0x0e, 0x8e, 0xff, 0x0e,
 };
 
-const uint8_t vbi_bit_reverse[256] =
+const std::array<const uint8_t,256> vbi_bit_reverse
 {
     0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
     0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
@@ -185,7 +185,7 @@ const uint8_t vbi_bit_reverse[256] =
     0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
 
-const char *formats[8] =
+const std::array<const std::string, 8> formats
 {
     "Full format 4:3, 576 lines",
     "Letterbox 14:9 centre, 504 lines",
@@ -197,7 +197,7 @@ const char *formats[8] =
     "Anamorphic 16:9, 576 lines"
 };
 
-const char *subtitles[4] =
+const std::array<const std::string,4> subtitles
 {
     "none",
     "in active image area",
@@ -209,8 +209,8 @@ const char *subtitles[4] =
  *  bit 0 is for test A, 1 for B, ...
  *  thanks to R. Gancarz for this fine table *g*
  */
-const char hamm24par[3][256] =
-{
+const std::array<const std::array<const uint8_t,256>,3> hamm24par
+{{
     { // parities of first byte
          0, 33, 34,  3, 35,  2,  1, 32, 36,  5,  6, 39,  7, 38, 37,  4,
         37,  4,  7, 38,  6, 39, 36,  5,  1, 32, 35,  2, 34,  3,  0, 33,
@@ -265,11 +265,11 @@ const char hamm24par[3][256] =
         30, 47, 44, 29, 45, 28, 31, 46, 42, 27, 24, 41, 25, 40, 43, 26,
         43, 26, 25, 40, 24, 41, 42, 27, 31, 46, 45, 28, 44, 29, 30, 47
     }
-};
+}};
 
 
 /// Table to extract the lower 4 bit from hamm24/18 encoded bytes
-const char hamm24val[256] =
+const std::array<const uint8_t,256> hamm24val
 {
       0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0,  1,  1,  1,  1,
       2,  2,  2,  2,  3,  3,  3,  3,  2,  2,  2,  2,  3,  3,  3,  3,
@@ -295,7 +295,7 @@ const char hamm24val[256] =
  *  results return by hamm24.
  *  (0 = no error, 0x0100 = single bit error, 0x1000 = double error)
  */
-const short hamm24err[64] =
+const std::array<const uint16_t, 64> hamm24err
 {
     0x0000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
     0x1000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
@@ -311,7 +311,7 @@ const short hamm24err[64] =
 /** Mapping from parity checks made by table hamm24par to faulty bit
  *  in the decoded 18 bit word.
  */
-const int hamm24cor[64] =
+const std::array<const int32_t, 64> hamm24cor
 {
     0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000,
     0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000,

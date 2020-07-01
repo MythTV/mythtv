@@ -60,13 +60,13 @@ void CC608Decoder::GetServices(uint seconds, bool seen[4]) const
         seen[i] = (m_lastSeen[i] >= then);
 }
 
-static const int rowdata[] =
+static const std::array<const int,16> rowdata =
 {
     11, -1, 1, 2, 3, 4, 12, 13,
     14, 15, 5, 6, 7, 8,  9, 10
 };
 
-static const QChar specialchar[] =
+static const std::array<const QChar,16> specialchar =
 {
     QLatin1Char(0xAE), QLatin1Char(0xB0), QLatin1Char(0xBD), QLatin1Char(0xBF), // ®°½¿
     0x2122,            QLatin1Char(0xA2), QLatin1Char(0xA3), 0x266A,            // ™¢£♪
@@ -74,7 +74,7 @@ static const QChar specialchar[] =
     QLatin1Char(0xEA), QLatin1Char(0xEE), QLatin1Char(0xF4), QLatin1Char(0xFB)  // êîôû
 };
 
-static const QChar extendedchar2[] =
+static const std::array<const QChar,32> extendedchar2 =
 {
     QLatin1Char(0xC1), QLatin1Char(0xC9),  QLatin1Char(0xD3), QLatin1Char(0xDA), // ÁÉÓÚ
     QLatin1Char(0xDC), QLatin1Char(0xFC),  QLatin1Char('`'),  QLatin1Char(0xA1), // Üü`¡
@@ -86,7 +86,7 @@ static const QChar extendedchar2[] =
     QLatin1Char(0xF9), QLatin1Char(0xDB),  QLatin1Char(0xAB), QLatin1Char(0xBB)  // ùÛ«»
 };
 
-static const QChar extendedchar3[] =
+static const std::array<const QChar,32> extendedchar3 =
 {
     QLatin1Char(0xC3), QLatin1Char(0xE3), QLatin1Char(0xCD), QLatin1Char(0xCC), // ÃãÍÌ
     QLatin1Char(0xEC), QLatin1Char(0xD2), QLatin1Char(0xF2), QLatin1Char(0xD5), // ìÒòÕ
@@ -913,7 +913,7 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
 
 void CC608Decoder::DecodeWSS(const unsigned char *buf)
 {
-    static const int kWssBits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
+    static const std::array<const int,8> kWssBits { 0, 0, 0, 1, 0, 1, 1, 1 };
     uint wss = 0;
 
     for (uint i = 0; i < 16; i++)
@@ -933,13 +933,13 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
             QString("WSS: %1; %2 mode; %3 color coding;\n\t\t\t"
                     "     %4 helper; reserved b7=%5; %6\n\t\t\t"
                     "      open subtitles: %7; %scopyright %8; copying %9")
-            .arg(formats[wss & 7])
+            .arg(QString::fromStdString(formats[wss & 7]))
             .arg((wss & 0x0010) ? "film"                 : "camera")
             .arg((wss & 0x0020) ? "MA/CP"                : "standard")
             .arg((wss & 0x0040) ? "modulated"            : "no")
             .arg(!!(wss & 0x0080))
             .arg((wss & 0x0100) ? "have TTX subtitles; " : "")
-            .arg(subtitles[(wss >> 9) & 3])
+            .arg(QString::fromStdString(subtitles[(wss >> 9) & 3]))
             .arg((wss & 0x0800) ? "surround sound; "     : "")
             .arg((wss & 0x1000) ? "asserted"             : "unknown")
             .arg((wss & 0x2000) ? "restricted"           : "not restricted"));
@@ -1013,14 +1013,14 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
 
-    QString prefix[4] = { "MPAA-", "TV-", "CE-", "CF-" };
-    QString mainStr[4][8] =
-    {
+    const std::array<const QString,4> prefix { "MPAA-", "TV-", "CE-", "CF-" };
+    const std::array<const std::array<const QString,8>,4> mainStr
+    {{
         { "NR", "G", "PG",  "PG-13", "R",   "NC-17", "X",   "NR" },
         { "NR", "Y", "Y7",  "G",     "PG",  "14",    "MA",  "NR" },
         { "E",  "C", "C8+", "G",     "PG",  "14+",   "18+", "NR" },
         { "E",  "G", "8+",  "13+",   "16+", "18+",   "NR",  "NR" },
-    };
+    }};
 
     QString main = prefix[i] + mainStr[i][GetRating(i, future)];
 
@@ -1105,7 +1105,7 @@ QString CC608Decoder::GetXDS(const QString &key) const
     return QString();
 }
 
-static int b1_to_service[16] =
+static std::array<const int,16> b1_to_service
 { -1, // 0x0
   0, 0, //0x1,0x2 -- Current
   1, 1, //0x3,0x4 -- Future

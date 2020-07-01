@@ -311,7 +311,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
         return list;
 
     bool createdNonblankStrings = false;
-    QChar chars[k708MaxColumns];
+    std::array<QChar,k708MaxColumns> chars {};
     for (uint j = 0; j < m_row_count; j++)
     {
         bool inLeadingSpaces = true;
@@ -385,7 +385,7 @@ void CC708Window::DisposeStrings(vector<CC708String*> &strings)
 
 void CC708Window::SetWindowStyle(uint style)
 {
-    const uint style2justify[] =
+    static const std::array<const uint,8> style2justify
     {
         k708JustifyLeft, k708JustifyLeft, k708JustifyLeft,   k708JustifyCenter,
         k708JustifyLeft, k708JustifyLeft, k708JustifyCenter, k708JustifyLeft,
@@ -615,7 +615,8 @@ void CC708Window::LimitPenLocation(void)
 
 void CC708Pen::SetPenStyle(uint style)
 {
-    static const uint kStyle2Font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
+    static const std::array<const uint8_t,8> kStyle2Font
+        { 0, 0, 1, 2, 3, 4, 3, 4 };
 
     if ((style < 1) || (style > 7))
         return;
@@ -664,6 +665,6 @@ QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
-    static constexpr int kX[] = {0, 96, 255, 255};
+    static constexpr std::array<const uint8_t,4> kX {0, 96, 255, 255};
     return {kX[(eia708color>>4)&3], kX[(eia708color>>2)&3], kX[eia708color&3]};
 }

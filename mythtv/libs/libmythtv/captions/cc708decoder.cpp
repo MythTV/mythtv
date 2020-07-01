@@ -26,7 +26,7 @@ enum kCCTypes
     DTVCC_PACKET_START = 3,
 };
 
-const char* cc_types[4] =
+const std::array<const std::string, 4> cc_types =
 {
     "NTSC line 21 field 1 closed captions"
     "NTSC line 21 field 2 closed captions"
@@ -103,10 +103,11 @@ enum C1
     DF0,      DF1, DF2, DF3, DF4, DF5, DF6, DF7,
 };
 
-extern ushort CCtableG0[0x60];
-extern ushort CCtableG1[0x60];
-extern ushort CCtableG2[0x60];
-extern ushort CCtableG3[0x60];
+using cc_table = std::array<const uint16_t, 0x60>;
+extern const cc_table CCtableG0;
+extern const cc_table CCtableG1;
+extern const cc_table CCtableG2;
+extern const cc_table CCtableG3;
 
 static void append_character(CC708Reader *cc, uint service_num, short ch);
 static void parse_cc_service_stream(CC708Reader *cc, uint service_num);
@@ -729,7 +730,7 @@ static void append_character(CC708Reader *cc, uint service_num, short ch)
     }
 }
 
-ushort CCtableG0[0x60] =
+const cc_table CCtableG0 =
 {
 //   0    1    2    3       4    5    6    7
 //   8    9    a    b       c    d    e    f
@@ -749,7 +750,7 @@ ushort CCtableG0[0x60] =
     'x', 'y', 'z', '{',    '|', '}', '~',  0x266a, // music note/* 0x78-0x7f */
 };
 
-ushort CCtableG1[0x60] =
+const cc_table CCtableG1 =
 {
 //          0           1           2           3
 //          4           5           6           7
@@ -784,7 +785,7 @@ ushort CCtableG1[0x60] =
     0xFC /* ü */, 0xFD /* ý */, 0xFE /* þ */, 0xFF /* ÿ */,
 };
 
-ushort CCtableG2[0x60] =
+const cc_table CCtableG2 =
 {
     ' ', /* transparent space */
                         0xA0, /* non-breaking transparent space */
@@ -833,7 +834,7 @@ ushort CCtableG2[0x60] =
     0x2518, /*line _|*/ 0x250c, /*line |~ */ /* 0x7c-0x7f */
 };
 
-ushort CCtableG3[0x60] =
+const cc_table CCtableG3 =
 {
 //   0 1  2  3    4  5  6  7     8  9  a  b    c  d  e  f
     '#', /* [CC] closed captioning logo */

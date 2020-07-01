@@ -380,7 +380,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     }
     else if (family == kSubFamily708)
     {
-        static const char *s_cc708Fonts[] = {
+        static const std::array<const std::string,8> s_cc708Fonts {
             "FreeMono",        // default
             "FreeMono",        // mono serif
             "Droid Serif",     // prop serif
@@ -1223,7 +1223,7 @@ void FormattedTextSubtitle608::Layout(void)
 
 void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
 {
-    static const QColor kClr[8] =
+    static const std::array<const QColor,8> kClr
     {
         Qt::white,   Qt::green,   Qt::blue,    Qt::cyan,
         Qt::red,     Qt::yellow,  Qt::magenta, Qt::white,
