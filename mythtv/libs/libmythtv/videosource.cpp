@@ -468,8 +468,8 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     setLabel(QObject::tr("Channel frequency table"));
     addSelection("default");
 
-    for (uint i = 0; gChanLists[i].name; i++)
-        addSelection(gChanLists[i].name);
+    for (const auto & chanlist : gChanLists)
+        addSelection(chanlist.name);
 
     setHelpText(QObject::tr("Use default unless this source uses a "
                 "different frequency table than the system wide table "
@@ -481,8 +481,8 @@ TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
 {
     setLabel(QObject::tr("Channel frequency table"));
 
-    for (uint i = 0; gChanLists[i].name; i++)
-        addSelection(gChanLists[i].name);
+    for (const auto & chanlist : gChanLists)
+        addSelection(chanlist.name);
 }
 
 void TransFreqTableSelector::Load(void)

@@ -7,6 +7,7 @@
 
 // MythTV headers
 #include "dtvchannel.h"
+#include "frequencies.h"
 
 #ifdef USING_V4L2
 #include "videodev2.h" // needed for v4l2_std_id type
@@ -101,7 +102,7 @@ class V4LChannel : public DTVChannel
     QString           m_driverName;
     QMap<QString,int> m_pictAttrDefault;
 
-    struct CHANLIST *m_curList            {nullptr};
+    CHANLIST_vec     m_curList            {};
     int              m_totalChannels      {0};
 
     bool             m_hasStreamIO        {false};

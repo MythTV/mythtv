@@ -2525,15 +2525,13 @@ bool ChannelScanSM::AddToList(uint mplexid)
     if (modulation == "8vsb")
     {
         QString chan = QString("%1 Hz").arg(frequency);
-        struct CHANLIST *curList = gChanLists[0].list;
-        int totalChannels = gChanLists[0].count;
         int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-        for (int x = 0 ; x < totalChannels ; ++x)
+        for (const auto & list : gChanLists[0].list)
         {
-            if ((curList[x].freq <= findFrequency + 200) &&
-                (curList[x].freq >= findFrequency - 200))
+            if ((list.freq <= findFrequency + 200) &&
+                (list.freq >= findFrequency - 200))
             {
-                chan = QString("%1").arg(curList[x].name);
+                chan = QString("%1").arg(list.name);
             }
         }
         fn = QObject::tr("ATSC Channel %1").arg(chan);

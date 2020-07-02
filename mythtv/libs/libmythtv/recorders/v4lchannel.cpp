@@ -299,7 +299,7 @@ int V4LChannel::SetDefaultFreqTable(const QString &name)
 void V4LChannel::SetFreqTable(const int index)
 {
     m_curList = gChanLists[index].list;
-    m_totalChannels = gChanLists[index].count;
+    m_totalChannels = m_curList.size();
 }
 
 int V4LChannel::SetFreqTable(const QString &tablename)
@@ -310,7 +310,7 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     int i = 0;
     char *listname = (char *)gChanLists[i].name;
 
-    m_curList = nullptr;
+    m_curList.clear();
     while (listname != nullptr)
     {
         if (use_default)

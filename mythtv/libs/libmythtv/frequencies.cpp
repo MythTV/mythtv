@@ -6,7 +6,7 @@
 /* --------------------------------------------------------------------- */
 
 /* US broadcast */
-static CHANLIST ntsc_bcast[] = {
+static const CHANLIST_vec ntsc_bcast {
     { "2",       55250 },
     { "3",       61250 },
     { "4",       67250 },
@@ -63,7 +63,7 @@ static CHANLIST ntsc_bcast[] = {
 };
 
 /* US cable */
-static CHANLIST ntsc_cable[] = {
+static const CHANLIST_vec ntsc_cable {
     { "2",       55250 },
     { "3",       61250 },
     { "4",       67250 },
@@ -203,7 +203,7 @@ static CHANLIST ntsc_cable[] = {
 };
 
 /* US HRC */
-static CHANLIST ntsc_hrc[] = {
+static const CHANLIST_vec ntsc_hrc {
     { "1",        72004 },
 
     { "2",        54003 },
@@ -337,7 +337,7 @@ static CHANLIST ntsc_hrc[] = {
 };
 
 /** US IRC http://www.jneuhaus.com/fccindex/cablech.html */
-static CHANLIST ntsc_irc[] = {
+static const CHANLIST_vec ntsc_irc {
     { "1",       73263 },
     { "2",       55263 },
     { "3",       61263 },
@@ -471,7 +471,7 @@ static CHANLIST ntsc_irc[] = {
 /* --------------------------------------------------------------------- */
 
 /* JP broadcast */
-static CHANLIST ntsc_bcast_jp[] = {
+static const CHANLIST_vec ntsc_bcast_jp {
     { "1",   91250 },
     { "2",   97250 },
     { "3",  103250 },
@@ -539,7 +539,7 @@ static CHANLIST ntsc_bcast_jp[] = {
 };
 
 /* JP cable */
-static CHANLIST ntsc_cable_jp[] = {
+static const CHANLIST_vec ntsc_cable_jp {
     { "13",     109250 },
     { "14",     115250 },
     { "15",     121250 },
@@ -597,7 +597,7 @@ static CHANLIST ntsc_cable_jp[] = {
 /* --------------------------------------------------------------------- */
 
 /* australia */
-static CHANLIST pal_australia[] = {
+static const CHANLIST_vec pal_australia {
     { "0",       46250 },
     { "1",       57250 },
     { "2",       64250 },
@@ -653,7 +653,7 @@ static CHANLIST pal_australia[] = {
     { "69",     814250 },
 };
 
-static CHANLIST pal_australia_optus[] = {
+static const CHANLIST_vec pal_australia_optus {
    { "1",  138250 },
    { "2",  147250 },
    { "3",  154250 },
@@ -878,7 +878,7 @@ static CHANLIST pal_australia_optus[] = {
     { "68",  847250 },  \
     { "69",  855250 }
 
-static CHANLIST europe_west[] = {
+static const CHANLIST_vec europe_west {
     FREQ_CCIR_I_III,
     FREQ_CCIR_SL_SH,
     FREQ_CCIR_H,
@@ -886,7 +886,7 @@ static CHANLIST europe_west[] = {
     FREQ_UHF
 };
 
-static CHANLIST europe_east[] = {
+static const CHANLIST_vec europe_east {
     FREQ_OIRT_I_III,
     FREQ_OIRT_SL_SH,
     FREQ_CCIR_I_III,
@@ -896,7 +896,7 @@ static CHANLIST europe_east[] = {
     FREQ_UHF
 };
 
-static CHANLIST pal_italy[] = {
+static const CHANLIST_vec pal_italy {
     { "A",       53750 },
     { "B",       62250 },
     { "C",       82250 },
@@ -910,7 +910,7 @@ static CHANLIST pal_italy[] = {
     FREQ_UHF
 };
 
-static CHANLIST pal_ireland[] = {
+static const CHANLIST_vec pal_ireland {
     { "A0",    45750 },
     { "A1",    48000 },
     { "A2",    53750 },
@@ -951,7 +951,7 @@ static CHANLIST pal_ireland[] = {
     FREQ_UHF,
 };
 
-static CHANLIST secam_france[] = {
+static const CHANLIST_vec secam_france {
     { "K01",    47750 },
     { "K02",    55750 },
     { "K03",    60500 },
@@ -1002,7 +1002,7 @@ static CHANLIST secam_france[] = {
 
 /* --------------------------------------------------------------------- */
 
-static CHANLIST pal_newzealand[] = {
+static const CHANLIST_vec pal_newzealand {
     { "1",        45250 },
     { "2",        55250 },
     { "3",        62250 },
@@ -1020,7 +1020,7 @@ static CHANLIST pal_newzealand[] = {
 /* --------------------------------------------------------------------- */
 
 /* China broadcast */
-static CHANLIST pal_bcast_cn[] = {
+static const CHANLIST_vec pal_bcast_cn {
     { "1",      49750 },
     { "2",      57750 },
     { "3",      65750 },
@@ -1120,7 +1120,7 @@ static CHANLIST pal_bcast_cn[] = {
 /* --------------------------------------------------------------------- */
 /* South Africa Broadcast */
 
-static CHANLIST pal_bcast_za[] ={
+static const CHANLIST_vec pal_bcast_za {
     { "4", 175250 },
     { "5", 183250 },
     { "6", 191250 },
@@ -1136,7 +1136,7 @@ static CHANLIST pal_bcast_za[] ={
 
 /* --------------------------------------------------------------------- */
 /* Singapore broadcast added by Teo En Ming on 16 July 2006 */
-static CHANLIST pal_bcast_sg[] = {
+static const CHANLIST_vec pal_bcast_sg {
     { "1", 175250 },
     { "2", 196250 },
     { "3", 224250 },
@@ -1148,7 +1148,7 @@ static CHANLIST pal_bcast_sg[] = {
 
 /* --------------------------------------------------------------------- */
 /* Malaysia broadcast added by Andrew Chuah on 26 Sept 2006 */
-static CHANLIST pal_bcast_my[] = {
+static const CHANLIST_vec pal_bcast_my {
     { "1", 175500 },
     { "2", 217500 },
     { "3", 535000 },
@@ -1158,7 +1158,7 @@ static CHANLIST pal_bcast_my[] = {
 };
 /* --------------------------------------------------------------------- */
 
-static CHANLIST argentina[] = {
+static const CHANLIST_vec argentina {
     { "001",   56250 },
     { "002",   62250 },
     { "003",   68250 },
@@ -1254,7 +1254,7 @@ static CHANLIST argentina[] = {
     { "093",  644250 },
 };
 
-static CHANLIST try_all [] = {
+static const CHANLIST_vec try_all  {
         { "1" , 44000 } ,
         { "2" , 45000 } ,
         { "3" , 46000 } ,
@@ -2176,7 +2176,7 @@ static CHANLIST try_all [] = {
    three companies that have recently joined to form HOT - matav, tevel, and
    Golden Channels. This is the frequency table used in Matav. */
 /* Added by Max Timchenko [www.maxvt.net], 04/04/2007 */
-static CHANLIST israel_hot_matav[] = {
+static const CHANLIST_vec israel_hot_matav {
     {  "1", 184250 },
     {  "2", 192250 },
     {  "3", 200250 },
@@ -2227,27 +2227,26 @@ static CHANLIST israel_hot_matav[] = {
 
 /* --------------------------------------------------------------------- */
 
-struct CHANLISTS gChanLists[] = {
-    { "us-bcast",         ntsc_bcast,        CHAN_COUNT(ntsc_bcast)        },
-    { "us-cable",         ntsc_cable,        CHAN_COUNT(ntsc_cable)        },
-    { "us-cable-hrc",     ntsc_hrc,          CHAN_COUNT(ntsc_hrc)          },
-    { "us-cable-irc",     ntsc_irc,          CHAN_COUNT(ntsc_irc)          },
-    { "japan-bcast",      ntsc_bcast_jp,     CHAN_COUNT(ntsc_bcast_jp)     },
-    { "japan-cable",      ntsc_cable_jp,     CHAN_COUNT(ntsc_cable_jp)     },
-    { "europe-west",      europe_west,       CHAN_COUNT(europe_west)       },
-    { "europe-east",      europe_east,       CHAN_COUNT(europe_east)       },
-    { "italy",            pal_italy,         CHAN_COUNT(pal_italy)         },
-    { "newzealand",       pal_newzealand,    CHAN_COUNT(pal_newzealand)    },
-    { "australia",        pal_australia,     CHAN_COUNT(pal_australia)     },
-    { "ireland",          pal_ireland,       CHAN_COUNT(pal_ireland)       },
-    { "france",           secam_france,      CHAN_COUNT(secam_france)      },
-    { "china-bcast",      pal_bcast_cn,      CHAN_COUNT(pal_bcast_cn)      },
-    { "southafrica",      pal_bcast_za,      CHAN_COUNT(pal_bcast_za)      },
-    { "argentina",        argentina,         CHAN_COUNT(argentina)         },
-    { "australia-optus",  pal_australia_optus, CHAN_COUNT(pal_australia_optus) },
-    { "singapore",        pal_bcast_sg,      CHAN_COUNT(pal_bcast_sg)      },
-    { "malaysia",         pal_bcast_my,      CHAN_COUNT(pal_bcast_my)      },
-    { "israel-hot-matav", israel_hot_matav,  CHAN_COUNT(israel_hot_matav)  },
-    { "try-all",          try_all,           CHAN_COUNT(try_all)           },
-    { nullptr, nullptr, 0 } /* EOF */
+const CHANLISTS_vec gChanLists {
+    { "us-bcast",         ntsc_bcast          },
+    { "us-cable",         ntsc_cable          },
+    { "us-cable-hrc",     ntsc_hrc            },
+    { "us-cable-irc",     ntsc_irc            },
+    { "japan-bcast",      ntsc_bcast_jp       },
+    { "japan-cable",      ntsc_cable_jp       },
+    { "europe-west",      europe_west         },
+    { "europe-east",      europe_east         },
+    { "italy",            pal_italy           },
+    { "newzealand",       pal_newzealand      },
+    { "australia",        pal_australia       },
+    { "ireland",          pal_ireland         },
+    { "france",           secam_france        },
+    { "china-bcast",      pal_bcast_cn        },
+    { "southafrica",      pal_bcast_za        },
+    { "argentina",        argentina           },
+    { "australia-optus",  pal_australia_optus },
+    { "singapore",        pal_bcast_sg        },
+    { "malaysia",         pal_bcast_my        },
+    { "israel-hot-matav", israel_hot_matav    },
+    { "try-all",          try_all             }
 };

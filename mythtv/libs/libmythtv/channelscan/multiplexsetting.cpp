@@ -57,15 +57,13 @@ void MultiplexSetting::Load(void)
         {
             QString ChannelNumber =
                 QString("Freq %1").arg(query.value(3).toInt());
-            CHANLIST* curList = gChanLists[0].list;
-            int totalChannels = gChanLists[0].count;
             int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-            for (int x = 0 ; x < totalChannels ; ++x)
+            for (const auto & list : gChanLists[0].list)
             {
-                if ((curList[x].freq <= findFrequency + 200) &&
-                    (curList[x].freq >= findFrequency - 200))
+                if ((list.freq <= findFrequency + 200) &&
+                    (list.freq >= findFrequency - 200))
                 {
-                    ChannelNumber = QString("%1").arg(curList[x].name);
+                    ChannelNumber = QString("%1").arg(list.name);
                 }
             }
 

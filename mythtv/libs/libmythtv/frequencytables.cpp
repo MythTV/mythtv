@@ -584,12 +584,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVModulation::kModulation8VSB);
 #endif // !DEBUG_DVB_OFFSETS
 
-    QString modStr[] = { "vsb8",  "qam256",   "qam128",   "qam64",   };
-    DTVModulation::Types mod[] = { DTVModulation::kModulation8VSB,
+    const std::array<const QString,4> modStr {
+        "vsb8", "qam256", "qam128", "qam64" };
+    const std::array<const DTVModulation::Types,4> mod {
+                         DTVModulation::kModulation8VSB,
                          DTVModulation::kModulationQAM256,
                          DTVModulation::kModulationQAM128,
                          DTVModulation::kModulationQAM64, };
-    QString desc[]   = { "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
+    const std::array<const QString,4> desc {
+        "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
 
 #define FREQ(A,B, C,D, E,F,G, H, I) \
     fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
@@ -703,15 +706,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
     }
 
     // create old school frequency tables...
-    for (CHANLISTS *ptr = gChanLists; ptr->name ; ptr++)
+    for (const auto & ptr : gChanLists)
     {
-        QString tbl_name = ptr->name;
-        for (uint i = 0; i < (uint)ptr->count; i++)
+        QString tbl_name = ptr.name;
+        for (uint i = 0; i < (uint)ptr.list.size(); i++)
         {
-            uint64_t freq = (ptr->list[i].freq * 1000LL) + 1750000;
+            uint64_t freq = (ptr.list[i].freq * 1000LL) + 1750000;
             fmap[QString("analog_analog_%1%2").arg(tbl_name).arg(i)] =
                 new FrequencyTable(
-                    QString("%1 %2").arg(tbl_name).arg(ptr->list[i].name), i+2,
+                    QString("%1 %2").arg(tbl_name).arg(ptr.list[i].name), i+2,
                     freq, freq + 3000000,
                     6000000, DTVModulation::kModulationAnalog);
         }
