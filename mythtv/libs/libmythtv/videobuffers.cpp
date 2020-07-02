@@ -1170,7 +1170,7 @@ void VideoBuffers::Clear(void)
  *******************************/
 
 #define DBG_STR_ARR_SIZE 40
-QString dbg_str_arr[DBG_STR_ARR_SIZE] =
+const std::array<const QString,DBG_STR_ARR_SIZE> dbg_str_arr
 {
     "A       ",    " B      ",    "  C     ",    "   D    ",
     "    E   ",    "     F  ",    "      G ",    "       H", // 8
@@ -1183,7 +1183,7 @@ QString dbg_str_arr[DBG_STR_ARR_SIZE] =
     "i       ",    " j      ",    "  k     ",    "   l    ",
     "    m   ",    "     n  ",    "      o ",    "       p", // 40
 };
-QString dbg_str_arr_short[DBG_STR_ARR_SIZE] =
+const std::array<const QString,DBG_STR_ARR_SIZE> dbg_str_arr_short
 {
     "A","B","C","D","E","F","G","H", // 8
     "a","b","c","d","e","f","g","h", // 16

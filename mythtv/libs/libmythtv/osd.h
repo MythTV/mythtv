@@ -208,7 +208,7 @@ class OSD
     QDateTime       m_nextPulseUpdate   { };
     bool            m_refresh           { false };
     bool            m_visible           { false };
-    int             m_timeouts[4]       { -1,3000,5000,13000 };
+    std::array<int,4> m_timeouts        { -1,3000,5000,13000 };
     bool            m_uiScaleOverride   { false };
     float           m_savedWMult        { 1.0F };
     float           m_savedHMult        { 1.0F };

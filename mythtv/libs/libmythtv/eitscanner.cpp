@@ -65,8 +65,8 @@ void EITScanner::TeardownAll(void)
  */
 void EITScanner::run(void)
 {
-    static constexpr uint  kSz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static constexpr float kRt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
+    static constexpr std::array<const uint,5>  kSz { 2000, 1800, 1600, 1400, 1200, };
+    static constexpr std::array<const float,5> kRt { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
     m_lock.lock();
 

@@ -48,15 +48,16 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
     const int halfLimit = static_cast<int>((height * (1 - m_player->GetVideoAspect() * 9 / 14) / 2) * m_detectLetterboxLimit / 100);
 
     // Lines to scan for black letterbox edge
-    const int xPos[] = { Frame->width / 4, Frame->width / 2, Frame->width * 3 / 4} ;
+    const std::array<int,3> xPos
+        { Frame->width / 4, Frame->width / 2, Frame->width * 3 / 4} ;
     int topHits     = 0;
     int bottomHits  = 0;
     int minTop      = 0;
     int minBottom   = 0;
     int maxTop      = 0;
     int maxBottom   = 0;
-    int topHit[]    = { 0, 0, 0 };
-    int bottomHit[] = { 0, 0, 0 };
+    std::array<int,3> topHit    = { 0, 0, 0 };
+    std::array<int,3> bottomHit = { 0, 0, 0 };
 
     switch (Frame->codec)
     {

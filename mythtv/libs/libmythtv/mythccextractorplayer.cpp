@@ -107,7 +107,7 @@ static QString progress_string(
             .arg(m_myFramesPlayed,7);
     }
 
-    static constexpr char kSpinChars[] = "/-\\|";
+    static const std::string kSpinChars { R"(/-\|)" };
     static uint s_spinCnt = 0;
 
     double elapsed = flagTime.elapsed() * 0.001;
@@ -298,7 +298,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 
 void MythCCExtractorPlayer::Ingest608Captions(void)
 {
-    static constexpr int kCcIndexTbl[7] =
+    static constexpr std::array<int,7> kCcIndexTbl
     {
         0, // CC_CC1
         1, // CC_CC2

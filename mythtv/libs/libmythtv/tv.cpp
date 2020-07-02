@@ -1,6 +1,7 @@
 
 #include "tv.h"
 
+#include <array>
 #include <QObject>  // for QObject::tr()
 
 /**
@@ -47,7 +48,7 @@ QString StateToString(TVState state)
 
 QString toTypeString(PictureAdjustType type)
 {
-    const QString kPicAdjType[] =
+    const std::array<const QString,4> kPicAdjType
     {
         "",
         "",
@@ -60,7 +61,7 @@ QString toTypeString(PictureAdjustType type)
 
 QString toTitleString(PictureAdjustType type)
 {
-    const QString kPicAdjTitles[] =
+    const std::array<const QString,4> kPicAdjTitles
     {
         "",
         QObject::tr("Adjust Playback"),
@@ -73,7 +74,7 @@ QString toTitleString(PictureAdjustType type)
 
 QString toString(CommSkipMode type)
 {
-    const QString kCommSkipTitles[] =
+    const std::array<const QString,3> kCommSkipTitles
     {
         QObject::tr("Auto-Skip OFF"),
         QObject::tr("Auto-Skip ON"),

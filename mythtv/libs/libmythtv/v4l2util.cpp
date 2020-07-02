@@ -512,14 +512,14 @@ void V4L2util::SetDefaultOptions(DriverOption::Options& options)
 bool V4L2util::GetFormats(QStringList& formats)
 {
     struct v4l2_fmtdesc vid_fmtdesc {};
-    const char *flags[] = {"uncompressed", "compressed"};
+    const std::array<const QString,2> flags {"uncompressed", "compressed"};
 
     vid_fmtdesc.index = 0;
     vid_fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     while(ioctl(m_fd, VIDIOC_ENUM_FMT, &vid_fmtdesc) == 0)
     {
         formats << QString("%1 (%2)").arg((char *)vid_fmtdesc.description)
-                                    .arg((char *)flags[vid_fmtdesc.flags]);
+                                    .arg(flags[vid_fmtdesc.flags]);
 
         /* Convert the pixelformat attributes from FourCC into 'human readab
            fprintf(stdout, "  pixelformat  :%c%c%c%c\\n",

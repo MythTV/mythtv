@@ -1875,11 +1875,12 @@ QString JobQueue::PrettyPrint(off_t bytes)
 {
     // Pretty print "bytes" as KB, MB, GB, TB, etc., subject to the desired
     // number of units
-    static const struct {
+    struct PpTab_t {
         const char   *m_suffix;
         unsigned int  m_max;
         int           m_precision;
-    } kPpTab[] = {
+    };
+    static constexpr array<const PpTab_t,9> kPpTab {{
         { "bytes", 9999, 0 },
         { "kB", 999, 0 },
         { "MB", 999, 1 },
@@ -1889,7 +1890,7 @@ QString JobQueue::PrettyPrint(off_t bytes)
         { "EB", 999, 1 },
         { "ZB", 999, 1 },
         { "YB", 0, 0 },
-    };
+    }};
     float fbytes = bytes;
 
     unsigned int ii = 0;

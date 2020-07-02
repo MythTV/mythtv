@@ -19,7 +19,7 @@ using namespace std;
 
 #define LOC      QString("ProgramData: ")
 
-static const char *roles[] =
+static const std::array<const std::string,DBPerson::kGuest+1> roles
 {
     "",
     "actor",     "director",    "producer", "executive_producer",
@@ -85,9 +85,10 @@ DBPerson::DBPerson(const QString &role, QString name) :
 {
     if (!role.isEmpty())
     {
-        for (size_t i = 0; i < sizeof(roles) / sizeof(char *); i++)
+        std::string rolestr = role.toStdString();
+        for (size_t i = 0; i < roles.size(); i++)
         {
-            if (role == QString(roles[i]))
+            if (rolestr == roles[i])
                 m_role = (Role) i;
         }
     }
@@ -98,7 +99,7 @@ QString DBPerson::GetRole(void) const
 {
     if ((m_role < kActor) || (m_role > kGuest))
         return "guest";
-    return roles[m_role];
+    return QString::fromStdString(roles[m_role]);
 }
 
 uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,

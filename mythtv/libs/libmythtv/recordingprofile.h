@@ -5,8 +5,8 @@
 #include "standardsettings.h"
 #include "mythdbcon.h"
 
-const QString availProfiles[] =
-      {"Default", "Live TV", "High Quality", "Low Quality", "" };
+const std::array<QString,4> kAvailProfiles
+      {"Default", "Live TV", "High Quality", "Low Quality" };
 
 class RecordingProfile;
 class VideoCompressionSettings;

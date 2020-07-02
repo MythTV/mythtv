@@ -665,7 +665,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     }
 
     // We have a partial match, so we try to do better...
-    QString theQueries[2] =
+    std::array<QString,2> theQueries
     {
         QString("SELECT a.mplexid "
                 "FROM dtv_multiplex a, dtv_multiplex b "
@@ -1997,7 +1997,7 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
     QString fec_url0;
     QString fec_url1;
     IPTVTuningData::FECType fec_type = IPTVTuningData::kNone;
-    uint bitrate[3] = { 0, 0, 0, };
+    std::array<uint,3> bitrate { 0, 0, 0, };
     while (query.next())
     {
         IPTVTuningData::IPTVType type = (IPTVTuningData::IPTVType)

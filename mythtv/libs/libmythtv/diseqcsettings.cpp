@@ -689,7 +689,7 @@ class lnb_preset
     bool                       m_polInv;
 };
 
-static lnb_preset lnb_presets[] =
+static const std::array<const lnb_preset,7> lnb_presets
 {
 
     /* description, type, LOF switch, LOF low, LOF high, inverted polarity */
@@ -955,7 +955,7 @@ void LNBConfig::SetPreset(const QString &value)
     if (index >= (sizeof(lnb_presets) / sizeof(lnb_preset)))
         return;
 
-    lnb_preset &preset = lnb_presets[index];
+    const lnb_preset &preset = lnb_presets[index];
     if (preset.m_name.isEmpty())
     {
         m_type->setEnabled(true);

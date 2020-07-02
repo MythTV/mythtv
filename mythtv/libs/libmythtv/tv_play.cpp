@@ -1076,8 +1076,8 @@ void TV::InitFromDB(void)
     kv["PlaybackScreenPressKeyMap"]     = "P,Up,Z,],Left,Return,Return,Right,A,Down,Q,[";
     kv["LiveTVScreenPressKeyMap"]     = "P,Up,Z,S,Left,Return,Return,Right,A,Down,Q,F";
 
-    int ff_rew_def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
-    for (size_t i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
+    constexpr std::array<const int,8> ff_rew_def { 3, 5, 10, 20, 30, 60, 120, 180 };
+    for (size_t i = 0; i < ff_rew_def.size(); i++)
         kv[QString("FFRewSpeed%1").arg(i)] = QString::number(ff_rew_def[i]);
 
     MythDB::getMythDB()->GetSettings(kv);
@@ -10382,7 +10382,7 @@ void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap)
     }
     modifiable["channame"] = infoMap["channame"].isEmpty();
 
-    const QString xds_keys[2] = { "callsign", "channame", };
+    const std::array<const QString,2> xds_keys { "callsign", "channame", };
     for (const auto & key : xds_keys)
     {
         if (!modifiable[key])
@@ -11371,11 +11371,12 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     }
     else if (matchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
     {
-        static struct {
+        struct speed {
             int     m_speedX100;
             QString m_suffix;
             QString m_trans;
-        } s_speeds[] = {
+        };
+        static const std::array<const speed,9> s_speeds {{
             {  0, "",    tr("Adjust")},
             { 50, "0.5", tr("0.5x")},
             { 90, "0.9", tr("0.9x")},
@@ -11385,8 +11386,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {130, "1.3", tr("1.3x")},
             {140, "1.4", tr("1.4x")},
             {150, "1.5", tr("1.5x")},
-        };
-        for (auto & speed : s_speeds)
+        }};
+        for (const auto & speed : s_speeds)
         {
             QString action = prefix + speed.m_suffix;
             active = (m_tvmSpeedX100 == speed.m_speedX100);
@@ -11423,7 +11424,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
-            static constexpr uint kCasOrd[] = { 0, 2, 1 };
+            static constexpr std::array<const uint,3> kCasOrd { 0, 2, 1 };
             for (uint csm : kCasOrd)
             {
                 const auto mode = (CommSkipMode) csm;

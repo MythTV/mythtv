@@ -2324,8 +2324,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     LOG(VB_GENERAL, LOG_DEBUG, QString("CheckChannelPrefix(%1)").arg(prefix));
 #endif
 
-    static const uint kSpacerListSize = 5;
-    static const char* s_spacers[kSpacerListSize] = { "", "_", "-", "#", "." };
+    static const std::array<const QString,5> s_spacers = { "", "_", "-", "#", "." };
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString basequery = QString(
@@ -2335,7 +2334,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         "      channel.channum LIKE '%1%'            AND "
         "      channel.sourceid = capturecard.sourceid");
 
-    QString inputquery[2] =
+    const std::array<const QString,2> inputquery
     {
         QString(" AND capturecard.cardid  = '%1'").arg(m_inputId),
         QString(" AND capturecard.cardid != '%1'").arg(m_inputId),
@@ -2348,10 +2347,10 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     for (const auto & str : inputquery)
     {
-        for (auto & spacer : s_spacers)
+        for (const auto & spacer : s_spacers)
         {
             QString qprefix = add_spacer(
-                prefix, (QString(spacer) == "_") ? "\\_" : spacer);
+                prefix, (spacer == "_") ? "\\_" : spacer);
             query.prepare(basequery.arg(qprefix) + str);
 
             if (!query.exec() || !query.isActive())
