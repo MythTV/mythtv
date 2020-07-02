@@ -32,6 +32,7 @@
 #ifndef DTVCONFPARSERHELPERS_H
 #define DTVCONFPARSERHELPERS_H
 
+#include <vector>
 #include <QString>
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
@@ -45,6 +46,8 @@ struct DTVParamHelperStruct
     QString symbol;
     int     value;
 };
+using DTVParamHelperVec = std::vector<DTVParamHelperStruct>;
+using DTVParamStringVec = std::vector<std::string>;
 
 /** \class DTVParamHelper
  *  \brief Helper abstract template to do some of the mundane portions
@@ -62,10 +65,9 @@ class DTVParamHelper
 
   protected:
     static bool ParseParam(const QString &symbol, int &value,
-                           const DTVParamHelperStruct *table);
+                           const DTVParamHelperVec &table);
 
-    static QString toString(const char *strings[], int index,
-                            uint strings_size);
+    static QString toString(const DTVParamStringVec &strings, int index);
 
   protected:
     int m_value;
@@ -73,7 +75,7 @@ class DTVParamHelper
 
 class DTVTunerType : public DTVParamHelper
 {
-    static const DTVParamHelperStruct kParseTable[];
+    static const DTVParamHelperVec kParseTable;
 
   public:
     // WARNING: kTunerTypes cannot be defined by a C++03 enum
@@ -158,11 +160,10 @@ class DTVTunerType : public DTVParamHelper
 class DTVInversion : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 3;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -208,17 +209,16 @@ class DTVInversion : public DTVParamHelper
         }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVBandwidth : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 7;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -272,17 +272,16 @@ class DTVBandwidth : public DTVParamHelper
         }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVCodeRate : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 12;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -340,17 +339,16 @@ class DTVCodeRate : public DTVParamHelper
     QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVModulation : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 13;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -417,18 +415,17 @@ class DTVModulation : public DTVParamHelper
             return "invalid";
         if (kModulationAnalog == _value)
             return "analog";
-        return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt);
+        return DTVParamHelper::toString(kParseStrings, _value);
     }
 };
 
 class DTVTransmitMode : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 7;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -482,17 +479,16 @@ class DTVTransmitMode : public DTVParamHelper
         }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVGuardInterval : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 8;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -542,17 +538,16 @@ class DTVGuardInterval : public DTVParamHelper
     QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVHierarchy : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 5;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -602,15 +597,14 @@ class DTVHierarchy : public DTVParamHelper
         }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVPolarity : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 4;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum PolarityValues
@@ -642,17 +636,16 @@ class DTVPolarity : public DTVParamHelper
         }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVModulationSystem : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 19;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -726,17 +719,16 @@ class DTVModulationSystem : public DTVParamHelper
     QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 class DTVRollOff : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct kConfTable[];
-    static const DTVParamHelperStruct kVdrTable[];
-    static const DTVParamHelperStruct kParseTable[];
-    static const uint kDBStrCnt = 4;
-    static const char *s_dbStr[kDBStrCnt];
+    static const DTVParamHelperVec kConfTable;
+    static const DTVParamHelperVec kVdrTable;
+    static const DTVParamHelperVec kParseTable;
+    static const DTVParamStringVec kParseStrings;
 
   public:
     enum Types
@@ -776,7 +768,7 @@ class DTVRollOff : public DTVParamHelper
     QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
+        { return DTVParamHelper::toString(kParseStrings, _value); }
 };
 
 #endif // DTVCONFPARSERHELPERS_H
