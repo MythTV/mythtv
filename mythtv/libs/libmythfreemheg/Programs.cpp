@@ -29,6 +29,8 @@
 #include "Logging.h"
 #include "freemheg.h"
 
+#include <QDateTime>
+#include <QLocale>
 #include <QStringList>
 #include <QUrl>
 #include <QUrlQuery>
@@ -226,13 +228,13 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 int time = GetInt(args.GetAt(2), engine);
                 // Convert to a Unix date (secs since 1st Jan 1970) but adjusted for time zone.
                 time_t timet = (date - 40587) * (24 * 60 * 60) + time;
-                struct tm *timeStr = gmtime(&timet);
+                QDateTime dt = QDateTime::fromMSecsSinceEpoch(timet);
                 MHOctetString result;
 
                 for (int i = 0; i < format.Size(); i++)
                 {
                     unsigned char ch = format.GetAt(i);
-                    char buffer[5]; // Largest text is 4 chars for a year + null terminator
+                    QString buffer {};
 
                     if (ch == '%')
                     {
@@ -244,101 +246,37 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                         }
 
                         ch = format.GetAt(i);
-                        buffer[0] = 0;
 
                         switch (ch)
                         {
-                            case 'Y':
-                                sprintf(buffer, "%04d", timeStr->tm_year + 1900);
-                                break;
-                            case 'y':
-                                sprintf(buffer, "%02d", timeStr->tm_year % 100);
-                                break;
-                            case 'X':
-                                sprintf(buffer, "%02d", timeStr->tm_mon + 1);
-                                break;
-                            case 'x':
-                                sprintf(buffer, "%1d", timeStr->tm_mon + 1);
-                                break;
-                            case 'D':
-                                sprintf(buffer, "%02d", timeStr->tm_mday);
-                                break;
-                            case 'd':
-                                sprintf(buffer, "%1d", timeStr->tm_mday);
-                                break;
-                            case 'H':
-                                sprintf(buffer, "%02d", timeStr->tm_hour);
-                                break;
-                            case 'h':
-                                sprintf(buffer, "%1d", timeStr->tm_hour);
-                                break;
+                            case 'Y': buffer = dt.toString("yyyy"); break;
+                            case 'y': buffer = dt.toString("yy");   break;
+                            case 'X': buffer = dt.toString("MM");   break;
+                            case 'x': buffer = dt.toString("M");    break;
+                            case 'D': buffer = dt.toString("dd");   break;
+                            case 'd': buffer = dt.toString("d");    break;
+                            case 'H': buffer = dt.toString("HH");   break;
+                            case 'h': buffer = dt.toString("H");    break;
                             case 'I':
-
-                                if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0)
-                                {
-                                    strcpy(buffer, "12");
-                                }
-                                else
-                                {
-                                    sprintf(buffer, "%02d", timeStr->tm_hour % 12);
-                                }
-
+                                // Need AM/PM to get hours as 1-12
+                                buffer = dt.toString("HH AP");
+                                buffer.chop(3);
                                 break;
                             case 'i':
-
-                                if (timeStr->tm_hour == 12 || timeStr->tm_hour == 0)
-                                {
-                                    strcpy(buffer, "12");
-                                }
-                                else
-                                {
-                                    sprintf(buffer, "%1d", timeStr->tm_hour % 12);
-                                }
-
+                                buffer = dt.toString("H AP");
+                                buffer.chop(3);
                                 break;
-                            case 'M':
-                                sprintf(buffer, "%02d", timeStr->tm_min);
-                                break;
-                            case 'm':
-                                sprintf(buffer, "%1d", timeStr->tm_min);
-                                break;
-                            case 'S':
-                                sprintf(buffer, "%02d", timeStr->tm_sec);
-                                break;
-                            case 's':
-                                sprintf(buffer, "%1d", timeStr->tm_sec);
-                                break;
-                                // TODO: These really should be localised.
-                            case 'A':
-
-                                if (timeStr->tm_hour < 12)
-                                {
-                                    strcpy(buffer, "AM");
-                                }
-                                else
-                                {
-                                    strcpy(buffer, "PM");
-                                }
-
-                                break;
-                            case 'a':
-
-                                if (timeStr->tm_hour < 12)
-                                {
-                                    strcpy(buffer, "am");
-                                }
-                                else
-                                {
-                                    strcpy(buffer, "pm");
-                                }
-
-                                break;
+                            case 'M': buffer = dt.toString("mm");   break;
+                            case 'm': buffer = dt.toString("m");    break;
+                            case 'S': buffer = dt.toString("ss");   break;
+                            case 's': buffer = dt.toString("s");    break;
+                            case 'A': buffer = dt.toString("AP");   break;
+                            case 'a': buffer = dt.toString("ap");   break;
                             default:
-                                buffer[0] = ch;
-                                buffer[1] = 0;
+                                buffer= ch;
                         }
 
-                        result.Append(buffer);
+                        result.Append(qPrintable(buffer));
                     }
                     else
                     {
