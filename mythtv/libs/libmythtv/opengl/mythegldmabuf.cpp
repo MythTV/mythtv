@@ -99,19 +99,19 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
                 break;
         }
 
-        static constexpr EGLint kPlaneFd[4] =
+        static constexpr std::array<EGLint,4> kPlaneFd
             { EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
               EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT };
-        static constexpr EGLint kPlaneOffset[4] =
+        static constexpr std::array<EGLint,4> kPlaneOffset
             { EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
               EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT };
-        static constexpr EGLint kPlanePitch[4] =
+        static constexpr std::array<EGLint,4> kPlanePitch
             { EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
               EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT };
-        static constexpr EGLint kPlaneModlo[4] =
+        static constexpr std::array<EGLint,4> kPlaneModlo
             { EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
               EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT };
-        static constexpr EGLint kPlaneModhi[4] =
+        static constexpr std::array<EGLint,4> kPlaneModhi
             { EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
               EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT };
 

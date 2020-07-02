@@ -362,7 +362,7 @@ bool MythRenderOpenGL::Init(void)
     // For now this just includes Broadcom VideoCoreIV.
     // Other Tile Based Deferred Rendering GPUS - PowerVR5/6/7, Apple (PowerVR as well?)
     // Other Tile Based Immediate Mode Rendering GPUS - ARM Mali, Qualcomm Adreno
-    static const QByteArray kTiled[3] = { "videocore", "vc4", "v3d" };
+    static const std::array<const QByteArray,3> kTiled { "videocore", "vc4", "v3d" };
     auto renderer = QByteArray(reinterpret_cast<const char*>(glGetString(GL_RENDERER))).toLower();
     for (const auto & name : kTiled)
     {
@@ -1191,7 +1191,7 @@ void MythRenderOpenGL::Init2DState(void)
 
 QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
 {
-    static const QString kExts[4] = { "", "ARB", "EXT", "OES" };
+    static const std::array<const QString,4> kExts { "", "ARB", "EXT", "OES" };
     QFunctionPointer result = nullptr;
     for (const auto & ext : kExts)
     {

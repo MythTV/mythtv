@@ -371,7 +371,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
             return result;
 
         // Get a framebuffer config
-        int fbattribs[] = {
+        const std::array<const int,23> fbattribs {
                 GLX_RENDER_TYPE, GLX_RGBA_BIT,
                 GLX_X_RENDERABLE, True,
                 GLX_BIND_TO_TEXTURE_RGBA_EXT, True,
@@ -385,7 +385,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
                 GLX_ALPHA_SIZE, 8,
                 None };
         int fbcount = 0;
-        GLXFBConfig *fbs = glXChooseFBConfig(display, DefaultScreen(display), fbattribs, &fbcount);
+        GLXFBConfig *fbs = glXChooseFBConfig(display, DefaultScreen(display), fbattribs.data(), &fbcount);
         if (!fbcount)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve GLX framebuffer config");
@@ -408,12 +408,12 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
             return result;
         }
 
-        const int attribs[] = {
+        const std::array<const int,7> attribs {
                 GLX_TEXTURE_TARGET_EXT, GLX_TEXTURE_2D_EXT,
                 GLX_TEXTURE_FORMAT_EXT, xwattribs.depth == 32 ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT,
                 GLX_MIPMAP_TEXTURE_EXT, False, None};
 
-        m_glxPixmap = glXCreatePixmap(display, fbconfig, m_pixmap, attribs);
+        m_glxPixmap = glXCreatePixmap(display, fbconfig, m_pixmap, attribs.data());
         if (!m_glxPixmap)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLXPixmap");
