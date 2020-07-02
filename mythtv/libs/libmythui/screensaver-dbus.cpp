@@ -1,6 +1,7 @@
 #include "screensaver-dbus.h"
 
 #include <cstdint>
+#include <string>
 
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -11,20 +12,20 @@
 
 #define LOC                 QString("ScreenSaverDBus: ")
 
-const char m_app[]         = "MythTV";
-const char m_reason[]      = "Watching TV";
-const char m_dbusInhibit[] = "Inhibit";
+const std::string kApp         = "MythTV";
+const std::string kReason      = "Watching TV";
+const std::string kDbusInhibit = "Inhibit";
 
 #define NUM_DBUS_METHODS 4
 // Thanks to vlc for the set of dbus services to use.
-const char m_dbusService[][40] = {
+const std::array<const QString,NUM_DBUS_METHODS> kDbusService {
     "org.freedesktop.ScreenSaver", /**< KDE >= 4 and GNOME >= 3.10 */
     "org.freedesktop.PowerManagement.Inhibit", /**< KDE and GNOME <= 2.26 */
     "org.mate.SessionManager", /**< >= 1.0 */
     "org.gnome.SessionManager", /**< GNOME 2.26..3.4 */
 };
 
-const char m_dbusPath[][33] = {
+const std::array<const QString,NUM_DBUS_METHODS> kDbusPath {
     "/ScreenSaver",
     "/org/freedesktop/PowerManagement",
     "/org/mate/SessionManager",
@@ -33,7 +34,7 @@ const char m_dbusPath[][33] = {
 
 // Service name is also the interface name in all cases
 
-const char m_dbusUnInhibit[][10] = {
+const std::array<const QString,NUM_DBUS_METHODS> kDbusUnInhibit {
     "UnInhibit",
     "UnInhibit",
     "Uninhibit",
@@ -70,7 +71,9 @@ class ScreenSaverDBusPrivate
         if (m_interface->isValid())
         {
             // method uint org.freedesktop.ScreenSaver.Inhibit(QString application_name, QString reason_for_inhibit)
-            QDBusMessage msg = m_interface->call(QDBus::Block, m_dbusInhibit , m_app, m_reason);
+            QDBusMessage msg = m_interface->call(QDBus::Block,
+                                                 kDbusInhibit.c_str(),
+                                                 kApp.c_str(), kReason.c_str());
             if (msg.type() == QDBusMessage::ReplyMessage)
             {
                 QList<QVariant> replylist = msg.arguments();
@@ -123,8 +126,8 @@ ScreenSaverDBus::ScreenSaverDBus() :
     // service, path, interface, bus - note that interface = service, hence it is used twice
     for (uint i=0; i < NUM_DBUS_METHODS; i++) {
         auto *ssdbp =
-            new ScreenSaverDBusPrivate(m_dbusService[i], m_dbusPath[i], m_dbusService[i], &m_bus);
-        ssdbp->SetUnInhibit(m_dbusUnInhibit[i]);
+            new ScreenSaverDBusPrivate(kDbusService[i], kDbusPath[i], kDbusService[i], &m_bus);
+        ssdbp->SetUnInhibit(kDbusUnInhibit[i]);
         m_dbusPrivateInterfaces.push_back(ssdbp);
     }
 }

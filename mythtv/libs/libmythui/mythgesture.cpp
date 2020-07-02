@@ -28,6 +28,7 @@
 
 #include "mythgesture.h"
 
+#include <array>
 #include <cmath>
 #include <algorithm>
 #include <complex>
@@ -335,7 +336,7 @@ bool MythGesture::record(const QPoint & pt)
 }
 
 
-static const char *gesturename[] = {
+static const std::array<const std::string,23> gesturename {
     "Unknown",
     "Up",
     "Down",
@@ -364,5 +365,5 @@ static const char *gesturename[] = {
 /* comments in header */
 MythGestureEvent::operator QString() const
 {
-    return gesturename[m_gesture];
+    return QString::fromStdString(gesturename[m_gesture]);
 }

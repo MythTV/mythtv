@@ -1,6 +1,9 @@
 #ifndef MYTHEDID_H
 #define MYTHEDID_H
 
+// C++
+#include <array>
+
 // Qt
 #include <QSize>
 #include <QStringList>

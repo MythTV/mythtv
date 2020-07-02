@@ -118,8 +118,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     QList<UIGTCon*> *m_allData  {nullptr};
     UIGTCon m_selectedItem;
 
-    MythUIImage *m_recImages[RECSTATUSSIZE]    {};
-    MythUIImage *m_arrowImages[ARROWIMAGESIZE] {};
+    std::array<MythUIImage*,RECSTATUSSIZE> m_recImages    {};
+    std::array<MythUIImage*,ARROWIMAGESIZE> m_arrowImages {};
 
     // themeable settings
     int    m_channelCount       {5};

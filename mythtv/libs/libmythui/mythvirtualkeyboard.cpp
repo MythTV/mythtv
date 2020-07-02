@@ -22,9 +22,7 @@
 
 #define LOC      QString("MythUIVirtualKeyboard: ")
 
-static const int numcomps = 95;
-
-static const QString comps[numcomps][3] = {
+static const std::array<std::array<QString,3>,95> comps {{
         {"!", "!", (QChar)0xa1},    {"c", "/", (QChar)0xa2},
         {"l", "-", (QChar)0xa3},    {"o", "x", (QChar)0xa4},
         {"y", "-", (QChar)0xa5},    {"|", "|", (QChar)0xa6},
@@ -73,7 +71,7 @@ static const QString comps[numcomps][3] = {
         {"u", "^", (QChar)0xfb},    {"u", "\"", (QChar)0xfc},
         {"y", "'", (QChar)0xfd},    {"t", "h", (QChar)0xfe},
         {"y", "\"", (QChar)0xff}
-};
+}};
 
 MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythUITextEdit *parentEdit)
           : MythScreenType(parentStack, "MythUIVirtualKeyboard")

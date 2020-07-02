@@ -1,6 +1,8 @@
 
 #include "x11colors.h"
 
+#include <vector>
+
 #include <QMutex>
 #include <QMutexLocker>
 #include <QMap>
@@ -19,7 +21,7 @@ QColor createColor(const QString &color)
     QMutexLocker locker(&s_x11ColorMapLock);
     if (s_x11ColorMap.empty())
     {
-        static const colormap kCMap[] = {
+        static const std::vector<colormap> kCMap {{
         { "snow", 255, 250, 250},
         { "ghost", 248, 248, 255},
         { "ghostwhite", 248, 248, 255},
@@ -772,7 +774,7 @@ QColor createColor(const QString &color)
         { "darkred", 139, 0, 0},
         { "light", 144, 238, 144},
         { "lightgreen", 144, 238, 144}
-        };
+        }};
 
         for (auto entry : kCMap)
         {

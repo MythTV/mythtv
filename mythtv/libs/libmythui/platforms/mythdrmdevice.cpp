@@ -121,12 +121,12 @@ static QString GetConnectorName(drmModeConnector *Connector)
 {
     if (!Connector)
         return "Unknown";
-    static const QString connectorNames[DRM_MODE_CONNECTOR_DPI + 1] =
+    static const std::array<const std::string,DRM_MODE_CONNECTOR_DPI + 1> connectorNames
         { "None", "VGA", "DVI", "DVI",  "DVI",  "Composite", "TV", "LVDS",
           "CTV",  "DIN", "DP",  "HDMI", "HDMI", "TV", "eDP", "Virtual", "DSI", "DPI"
     };
     uint32_t type = qMin(Connector->connector_type, static_cast<uint32_t>(DRM_MODE_CONNECTOR_DPI));
-    return QString("%1%2").arg(connectorNames[type]).arg(Connector->connector_type_id);
+    return QString("%1%2").arg(QString::fromStdString(connectorNames[type])).arg(Connector->connector_type_id);
 }
 
 void MythDRMDevice::Authenticate(void)
