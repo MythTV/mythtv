@@ -2000,7 +2000,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         QList<QByteArray> updates_ba;
 
         // Convert DATE and TIME in record into DATETIME
-        const char *pre_sql[] = {
+        const std::array<const std::string,2> pre_sql {
             "CREATE TEMPORARY TABLE recordupdate ("
             "recid INT, starttime DATETIME, endtime DATETIME)",
             "INSERT INTO recordupdate (recid, starttime, endtime) "
@@ -2008,22 +2008,22 @@ static bool doUpgradeTVDatabaseSchema(void)
             "       CONCAT(startdate, ' ', starttime), "
             "       CONCAT(enddate, ' ', endtime) FROM record",
         };
-        for (auto & pre : pre_sql)
-            updates_ba.push_back(QByteArray(pre));
+        for (const auto & pre : pre_sql)
+            updates_ba.push_back(QByteArray::fromStdString(pre));
 
         // Convert various DATETIME fields from local time to UTC
         if (0 != utc_offset)
         {
-            const char *with_endtime[] = {
+            const std::array<const std::string,4> with_endtime {
                 "program", "recorded", "oldrecorded", "recordupdate",
             };
-            const char *without_endtime[] = {
+            const std::array<const std::string,4> without_endtime {
                 "programgenres", "programrating", "credits",
                 "jobqueue",
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (auto & field : with_endtime)
+            for (const auto & field : with_endtime)
             {
                 updates_ba.push_back(
                          QString("UPDATE %1 "
@@ -2032,18 +2032,18 @@ static bool doUpgradeTVDatabaseSchema(void)
                                  "    endtime   = "
                                  "    CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                                  "ORDER BY %4")
-                         .arg(field)
+                         .arg(QString::fromStdString(field))
                          .arg(order).toLocal8Bit());
             }
 
-            for (auto & field : without_endtime)
+            for (const auto & field : without_endtime)
             {
                 updates_ba.push_back(
                           QString("UPDATE %1 "
                                   "SET starttime = "
                                   "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                                   "ORDER BY %3")
-                          .arg(field).arg(order)
+                          .arg(QString::fromStdString(field)).arg(order)
                           .toLocal8Bit());
             }
 
@@ -2065,7 +2065,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         }
 
         // Convert DATETIME back to separate DATE and TIME in record table
-        const char *post_sql[] = {
+        const std::array<const std::string,2> post_sql {
             "UPDATE record, recordupdate "
             "SET record.startdate = DATE(recordupdate.starttime), "
             "    record.starttime = TIME(recordupdate.starttime), "
@@ -2079,8 +2079,8 @@ static bool doUpgradeTVDatabaseSchema(void)
             "DROP TABLE recordupdate",
         };
 
-        for (auto & post : post_sql)
-            updates_ba.push_back(QByteArray(post));
+        for (const auto & post : post_sql)
+            updates_ba.push_back(QByteArray::fromStdString(post));
 
         // Convert update ByteArrays to NULL terminated char**
         DBUpdates updates;
@@ -2105,32 +2105,32 @@ static bool doUpgradeTVDatabaseSchema(void)
         // Convert various DATETIME fields from local time to UTC
         if (0 != utc_offset)
         {
-            const char *with_endtime[] = {
+            const std::array<const std::string,1> with_endtime = {
                 "recordedprogram",
             };
-            const char *without_endtime[] = {
+            const std::array<const std::string,4> without_endtime = {
                 "recordedseek", "recordedmarkup", "recordedrating",
                 "recordedcredits",
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
-            for (auto & field : with_endtime)
+            for (const auto & field : with_endtime)
             {
                 updates_ba.push_back(
                      QString("UPDATE %1 "
                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
                      "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                      "ORDER BY %4")
-                     .arg(field).arg(order).toLocal8Bit());
+                     .arg(QString::fromStdString(field)).arg(order).toLocal8Bit());
             }
 
-            for (auto & field : without_endtime)
+            for (const auto & field : without_endtime)
             {
                 updates_ba.push_back(
                       QString("UPDATE %1 "
                       "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                       "ORDER BY %3")
-                      .arg(field).arg(order).toLocal8Bit());
+                      .arg(QString::fromStdString(field)).arg(order).toLocal8Bit());
             }
         }
 
