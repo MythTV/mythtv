@@ -177,11 +177,9 @@ void DTVRecorder::ClearStatistics(void)
 {
     RecorderBase::ClearStatistics();
 
-    memset(m_tsCount, 0, sizeof(m_tsCount));
-    for (int64_t & ts : m_tsLast)
-        ts = -1LL;
-    for (int64_t & ts : m_tsFirst)
-        ts = -1LL;
+    m_tsCount.fill(0);
+    m_tsLast.fill(-1LL);
+    m_tsFirst.fill(-1LL);
     //m_tsFirst_dt -- doesn't need to be cleared only used if m_tsFirst>=0
     m_packetCount.fetchAndStoreRelaxed(0);
     m_continuityErrorCount.fetchAndStoreRelaxed(0);
@@ -360,7 +358,7 @@ static QDateTime ts_to_qdatetime(
     return dt.addMSecs((pts - pts_first)/90);
 }
 
-static const FrameRate frameRateMap[16] = {
+static const std::array<const FrameRate,16> frameRateMap = {
     FrameRate(0),  FrameRate(24000, 1001), FrameRate(24),
     FrameRate(25), FrameRate(30000, 1001), FrameRate(30),
     FrameRate(50), FrameRate(60000, 1001), FrameRate(60),

@@ -35,32 +35,32 @@ using namespace std;
 #define LOC QString("MPEGRec[%1](%2): ") \
             .arg(m_tvrec ? m_tvrec->GetInputId() : -1).arg(m_videodevice)
 
-const int MpegRecorder::kAudRateL1[] =
+const std::array<const int,14> MpegRecorder::kAudRateL1
 {
-    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0
+    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
 };
 
-const int MpegRecorder::kAudRateL2[] =
+const std::array<const int,14> MpegRecorder::kAudRateL2
 {
-    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0
+    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384
 };
 
-const int MpegRecorder::kAudRateL3[] =
+const std::array<const int,14> MpegRecorder::kAudRateL3
 {
-    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
 };
 
-const char* MpegRecorder::kStreamType[] =
+const std::array<const std::string,15> MpegRecorder::kStreamType
 {
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
+    "SVCD",      "DVD-Special 1", "DVD-Special 2"
 };
 
-const char* MpegRecorder::kAspectRatio[] =
+const std::array<const std::string,4> MpegRecorder::kAspectRatio
 {
-    "Square", "4:3", "16:9", "2.21:1", nullptr
+    "Square", "4:3", "16:9", "2.21:1"
 };
 
 void MpegRecorder::TeardownAll(void)
@@ -89,9 +89,9 @@ void MpegRecorder::TeardownAll(void)
 
 }
 
-static int find_index(const int *audio_rate, int value)
+static int find_index(const std::array<const int,14> &audio_rate, int value)
 {
-    for (uint i = 0; audio_rate[i] != 0; i++)
+    for (uint i = 0; i < audio_rate.size(); i++)
     {
         if (audio_rate[i] == value)
             return i;
@@ -175,18 +175,19 @@ void MpegRecorder::SetOption(const QString &opt, int value)
 
 void MpegRecorder::SetOption(const QString &opt, const QString &value)
 {
+    std::string value_ss = value.toStdString();
     if (opt == "mpeg2streamtype")
     {
         bool found = false;
-        for (size_t i = 0; i < sizeof(kStreamType) / sizeof(char*); i++)
+        for (size_t i = 0; i < kStreamType.size(); i++)
         {
-            if (QString(kStreamType[i]) == value)
+            if (kStreamType[i] == value_ss)
             {
-                if (QString(kStreamType[i]) == "MPEG-2 TS")
+                if (kStreamType[i] == "MPEG-2 TS")
                 {
                      m_containerFormat = formatMPEG2_TS;
                 }
-                else if (QString(kStreamType[i]) == "MPEG-2 PS")
+                else if (kStreamType[i] == "MPEG-2 PS")
                 {
                      m_containerFormat = formatMPEG2_PS;
                 }
@@ -221,9 +222,9 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else if (opt == "mpeg2aspectratio")
     {
         bool found = false;
-        for (int i = 0; kAspectRatio[i] != nullptr; i++)
+        for (size_t i = 0; i < kAspectRatio.size(); i++)
         {
-            if (QString(kAspectRatio[i]) == value)
+            if (kAspectRatio[i] == value_ss)
             {
                 m_aspectRatio = i + 1;
                 found = true;
@@ -594,7 +595,9 @@ uint MpegRecorder::GetFilteredStreamType(void) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Stream type '%1'\n\t\t\t"
                     "is not supported by %2 driver, using '%3' instead.")
-                .arg(kStreamType[m_streamType]).arg(m_driver).arg(kStreamType[st]));
+                .arg(QString::fromStdString(kStreamType[m_streamType]))
+                .arg(m_driver)
+                .arg(QString::fromStdString(kStreamType[st])));
     }
 
     return st;

@@ -26,27 +26,27 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-const char* V4L2encStreamHandler::kStreamTypes[] =
+const std::array<const std::string,15> V4L2encStreamHandler::kStreamTypes
 {
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
+    "SVCD",      "DVD-Special 1", "DVD-Special 2"
 };
 
-const int V4L2encStreamHandler::kAudioRateL1[] =
+const std::array<const int,14> V4L2encStreamHandler::kAudioRateL1
 {
-    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0
+    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
 };
 
-const int V4L2encStreamHandler::kAudioRateL2[] =
+const std::array<const int,14> V4L2encStreamHandler::kAudioRateL2
 {
-    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0
+    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384
 };
 
-const int V4L2encStreamHandler::kAudioRateL3[] =
+const std::array<const int,14> V4L2encStreamHandler::kAudioRateL3
 {
-    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
 };
 
 #define LOC      QString("V4L2SH[%1](%2): ").arg(m_inputId).arg(m_device)
@@ -687,9 +687,9 @@ bool V4L2encStreamHandler::SetLanguageMode(void)
     return m_v4l2.SetLanguageMode(m_langMode);
 }
 
-static int find_index(const int *audio_rate, int value)
+static int find_index(const std::array<const int,14> &audio_rate, int value)
 {
-    for (uint i = 0; audio_rate[i] != 0; ++i)
+    for (size_t i = 0; i < audio_rate.size(); ++i)
     {
         if (audio_rate[i] == value)
             return i;
@@ -825,9 +825,9 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         m_vbiDevice = value;
     else if (opt == "mpeg2streamtype")
     {
-        for (size_t i = 0; i < sizeof(kStreamTypes) / sizeof(char*); ++i)
+        for (size_t i = 0; i < kStreamTypes.size(); ++i)
         {
-            if (QString(kStreamTypes[i]) == value)
+            if (QString::fromStdString(kStreamTypes[i]) == value)
             {
                 m_desiredStreamType = i;
                 return true;

@@ -177,18 +177,18 @@ class DTVRecorder :
     // TS recorder stuff
     bool                     m_recordMpts                 {false};
     bool                     m_recordMptsOnly             {false};
-    unsigned char            m_streamId[0x1fff + 1]       {0};
-    unsigned char            m_pidStatus[0x1fff + 1]      {0};
-    unsigned char            m_continuityCounter[0x1fff + 1] {0};
+    std::array<uint8_t,0x1fff + 1> m_streamId             {0};
+    std::array<uint8_t,0x1fff + 1> m_pidStatus            {0};
+    std::array<uint8_t,0x1fff + 1> m_continuityCounter    {0};
     vector<TSPacket>         m_scratch;
 
     // Statistics
     int                      m_minimumRecordingQuality    {95};
     bool                     m_use_pts                    {false}; // vs use dts
-    uint64_t                 m_tsCount[256]               {0};
-    int64_t                  m_tsLast[256]                {};
-    int64_t                  m_tsFirst[256]               {};
-    QDateTime                m_tsFirstDt[256];
+    std::array<uint64_t,256> m_tsCount                    {0};
+    std::array<int64_t,256>  m_tsLast                     {};
+    std::array<int64_t,256>  m_tsFirst                    {};
+    std::array<QDateTime,256>m_tsFirstDt                  {};
     mutable QAtomicInt       m_packetCount                {0};
     mutable QAtomicInt       m_continuityErrorCount       {0};
     unsigned long long       m_framesSeenCount            {0};
