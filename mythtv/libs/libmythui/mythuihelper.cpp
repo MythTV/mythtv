@@ -45,7 +45,6 @@
 
 static MythUIHelper *mythui = nullptr;
 static QMutex uiLock;
-QString MythUIHelper::x11_display;
 
 MythUIHelper *MythUIHelper::getMythUI(void)
 {
@@ -1426,18 +1425,6 @@ bool MythUIHelper::GetScreenIsAsleep(void)
         return false;
 
     return d->m_screensaver->Asleep();
-}
-
-/// This needs to be set before MythUIHelper is initialized so
-/// that the MythUIHelper::Init() can detect Xinerama setups.
-void MythUIHelper::SetX11Display(const QString &display)
-{
-    x11_display = display;
-}
-
-QString MythUIHelper::GetX11Display(void)
-{
-    return x11_display;
 }
 
 void MythUIHelper::AddCurrentLocation(const QString& location)

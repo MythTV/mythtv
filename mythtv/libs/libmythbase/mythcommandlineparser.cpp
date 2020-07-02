@@ -2361,16 +2361,6 @@ void MythCommandLineParser::addGeometry(void)
         ->SetGroup("User Interface");
 }
 
-/** \brief Canned argument definition for -display. Only works on X11 systems.
- */
-void MythCommandLineParser::addDisplay(void)
-{
-#ifdef USING_X11
-    add("-display", "display", "", "Specify X server to use.", "")
-        ->SetGroup("User Interface");
-#endif
-}
-
 /** \brief Canned argument definition for --noupnp
  */
 void MythCommandLineParser::addUPnP(void)
@@ -2476,11 +2466,24 @@ void MythCommandLineParser::addInFile(bool addOutFile)
         add("--outfile", "outfile", "", "Output file URI", "");
 }
 
+/** \brief Canned argument definition for -display. Only works on X11 systems.
+ */
+void MythCommandLineParser::addDisplay(void)
+{
+#ifdef USING_X11
+    add(QStringList{"-display", "--display"}, "display", "",
+        "Qt (QPA) X11 connection name when using xcb (X11) platform plugin", "")
+        ->SetGroup("Qt");
+#endif
+}
+
 /** \brief Pass through the platform argument to Qt for GUI applications
  */
 void MythCommandLineParser::addPlatform(void)
 {
-    add("-platform", "platform", "", "Qt (QPA) platform argument", "Qt platform argument that is passed through to Qt");
+    add(QStringList{"-platform", "--platform"}, "platform", "", "Qt (QPA) platform argument",
+        "Qt platform argument that is passed through to Qt")
+        ->SetGroup("Qt");;
 }
 
 /** \brief Helper utility for logging interface to pull path from --logpath

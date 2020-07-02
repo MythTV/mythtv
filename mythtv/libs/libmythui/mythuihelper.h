@@ -113,11 +113,6 @@ class MUI_PUBLIC MythUIHelper
     bool GetScreensaverEnabled(void);
     bool GetScreenIsAsleep(void);
 
-    static void SetX11Display(const QString &display);
-    static QString GetX11Display(void);
-
-    static QString x11_display;
-
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 

@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
         swapinterval = 0;
     }
 
-    MythDisplay::ConfigureQtGUI(swapinterval);
+    MythDisplay::ConfigureQtGUI(swapinterval, cmdline.toString("display"));
 
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
@@ -217,15 +217,8 @@ int main(int argc, char *argv[])
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    if (!cmdline.toString("display").isEmpty())
-    {
-        MythUIHelper::SetX11Display(cmdline.toString("display"));
-    }
-
     if (!cmdline.toString("geometry").isEmpty())
-    {
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
-    }
 
     QString filename = "";
     if (!cmdline.toString("infile").isEmpty())

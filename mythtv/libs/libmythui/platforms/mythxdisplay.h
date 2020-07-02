@@ -23,6 +23,8 @@ class MUI_PUBLIC MythXDisplay
   public:
 
     static MythXDisplay* OpenMythXDisplay(bool Warn = true);
+    static void          SetQtX11Display (const QString &Display);
+
     MythXDisplay() = default;
     ~MythXDisplay();
     Display *GetDisplay(void)          { return m_disp;        }
@@ -43,6 +45,8 @@ class MUI_PUBLIC MythXDisplay
   private:
     bool CheckErrors(Display *Disp = nullptr);
     void CheckOrphanedErrors(void);
+
+    static QString s_QtX11Display;
 
     Display      *m_disp       { nullptr };
     int           m_screenNum  { 0 };

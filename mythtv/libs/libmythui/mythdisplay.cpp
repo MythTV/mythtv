@@ -1047,7 +1047,7 @@ void MythDisplay::DebugModes(void) const
  * \note This function must be called before Qt/QPA is initialised i.e. before
  * any call to QApplication.
 */
-void MythDisplay::ConfigureQtGUI(int SwapInterval)
+void MythDisplay::ConfigureQtGUI(int SwapInterval, QString Display)
 {
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;
@@ -1100,4 +1100,10 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval)
 
     // Ignore desktop scaling
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+
+#ifdef USING_X11
+    MythXDisplay::SetQtX11Display(Display);
+#else
+    (void)Display;
+#endif
 }

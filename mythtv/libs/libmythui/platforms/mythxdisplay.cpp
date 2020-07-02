@@ -21,6 +21,8 @@ using XErrorVectorType = std::vector<XErrorEvent>;
 static std::map<Display*, XErrorVectorType>   xerrors;
 static std::map<Display*, XErrorCallbackType> xerror_handlers;
 
+QString MythXDisplay::s_QtX11Display;
+
 static int ErrorHandler(Display *d, XErrorEvent *xeev)
 {
     xerrors[d].push_back(*xeev);
@@ -59,6 +61,11 @@ MythXDisplay* MythXDisplay::OpenMythXDisplay(bool Warn /*= true*/)
     return nullptr;
 }
 
+void MythXDisplay::SetQtX11Display(const QString &Display)
+{
+    s_QtX11Display = Display;
+}
+
 MythXDisplay::~MythXDisplay()
 {
     MythXLocker locker(this);
@@ -70,11 +77,23 @@ MythXDisplay::~MythXDisplay()
     }
 }
 
+/*! \brief Open the display
+ *
+ * \note If the '-display' command line argument is not set both this function
+ * and Qt's xcb platform plugin will pass a null string to XOpenDisplay - which
+ * will in turn use the DISPLAY environment variable to determince which X11
+ * connection to open. If the '-display' command line argument is used, we set
+ * s_QtX11Display and the argument is also passed through to the xcb platform
+ * plugin by Qt (via the QApplication constructor).
+ * So in all cases, the following code should open the same display that is in use by Qt
+ * (and avoids linking to QX11Extras or including private Qt platform headers).
+ *
+*/
 bool MythXDisplay::Open(void)
 {
     MythXLocker locker(this);
 
-    m_displayName = MythUIHelper::GetX11Display();
+    m_displayName = s_QtX11Display;
     const char *dispCStr = nullptr;
     if (!m_displayName.isEmpty())
         dispCStr = m_displayName.toLatin1().constData();

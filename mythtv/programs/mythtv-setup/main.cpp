@@ -245,7 +245,6 @@ static int reloadTheme(void)
 int main(int argc, char *argv[])
 {
     QString geometry;
-    QString display;
     bool    doScan   = false;
     bool    doScanList = false;
     bool    doScanSaveOnly = false;
@@ -297,7 +296,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        MythDisplay::ConfigureQtGUI();
+        MythDisplay::ConfigureQtGUI(1, cmdline.toString("display"));
         app = std::make_unique<QApplication>(argc, argv);
     }
     else
@@ -317,8 +316,6 @@ int main(int argc, char *argv[])
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
-    if (cmdline.toBool("display"))
-        display = cmdline.toString("display");
     if (cmdline.toBool("geometry"))
         geometry = cmdline.toString("geometry");
 
@@ -382,11 +379,6 @@ int main(int argc, char *argv[])
         region = cmdline.toString("region").toLower();
     if (cmdline.toBool("inputname"))
         scanInputName = cmdline.toString("inputname");
-
-    if (!display.isEmpty())
-    {
-        MythUIHelper::SetX11Display(display);
-    }
 
     if (!geometry.isEmpty())
     {

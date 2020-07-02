@@ -19,6 +19,7 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVersion();
     addLogging();
+    addDisplay();
 
     add(QStringList{"-s", "--setup"}, "setup", false,
             "Run setup for mythshutdown.", "");

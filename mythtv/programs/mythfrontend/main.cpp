@@ -1858,7 +1858,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    MythDisplay::ConfigureQtGUI();
+    MythDisplay::ConfigureQtGUI(1, cmdline.toString("display"));
     QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
@@ -1900,15 +1900,8 @@ int main(int argc, char **argv)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
-    if (!cmdline.toString("display").isEmpty())
-    {
-        MythUIHelper::SetX11Display(cmdline.toString("display"));
-    }
-
     if (!cmdline.toString("geometry").isEmpty())
-    {
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
-    }
 
     fe_sd_notify("STATUS=Connecting to database.");
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
