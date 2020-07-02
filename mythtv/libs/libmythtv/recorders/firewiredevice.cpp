@@ -396,7 +396,7 @@ vector<AVCInfo> FirewireDevice::GetSTBList(void)
 
 static void fw_init(QMap<uint64_t,QString> &id_to_model)
 {
-    const uint64_t sa_vendor_ids[] =
+    const std::array<const uint64_t,16> sa_vendor_ids
     {
         0x0a73,    0x0f21,    0x11e6,    0x14f8,    0x1692,    0x1868,
         0x1947,    0x1ac3,    0x1bd7,    0x1cea,    0x1e6b,    0x21be,
@@ -411,7 +411,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[vendor_id << 32 | 0x22ce] = "SA8300HD";
     }
 
-    const uint64_t motorola_vendor_ids[] =
+    const std::array<uint64_t,59> motorola_vendor_ids
     {
         /* DCH-3200, DCX-3200 */
         0x1c11,    0x1cfb,    0x1fc4,    0x23a3,    0x23ee,    0x25f1,
@@ -441,7 +441,6 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x1626,    0x18c0,    0x1ade,    0x1cfb,    0x2040,    0x2180,
         0x2210,    0x230b,    0x2375,    0x2395,    0x23a2,    0x23ed,
         0x23ee,    0x23a0,    0x23a1,
-
     };
 
     for (uint64_t vendor_id : motorola_vendor_ids)
@@ -469,7 +468,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[vendor_id << 32 | 0x0001] = "QIP-7100";
     }
 
-    const uint64_t pace_vendor_ids[] =
+    const std::array<const uint64_t,2> pace_vendor_ids
     {
         /* PACE 550-HD & 779 */
         0x1cc3, 0x5094,

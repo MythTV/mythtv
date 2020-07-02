@@ -22,6 +22,7 @@
 
 */
 
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -40,7 +41,7 @@ static mmx_t RTjpeg_zero;
 //#define SHOWBLOCK 1
 #define BETTERCOMPRESSION 1
 
-static const unsigned char RTjpeg_ZZ[64]={
+static const std::array<const uint8_t,64> RTjpeg_ZZ {
 0,
 8, 1,
 2, 9, 16,
@@ -57,7 +58,7 @@ static const unsigned char RTjpeg_ZZ[64]={
 62, 55,
 63 };
 
-static const uint64_t RTjpeg_aan_tab[64]={
+static const std::array<const uint64_t,64> RTjpeg_aan_tab {
 4294967296ULL, 5957222912ULL, 5611718144ULL, 5050464768ULL, 4294967296ULL, 3374581504ULL, 2324432128ULL, 1184891264ULL,
 5957222912ULL, 8263040512ULL, 7783580160ULL, 7005009920ULL, 5957222912ULL, 4680582144ULL, 3224107520ULL, 1643641088ULL,
 5611718144ULL, 7783580160ULL, 7331904512ULL, 6598688768ULL, 5611718144ULL, 4408998912ULL, 3036936960ULL, 1548224000ULL,
@@ -68,7 +69,7 @@ static const uint64_t RTjpeg_aan_tab[64]={
 1184891264ULL, 1643641088ULL, 1548224000ULL, 1393296000ULL, 1184891264ULL, 931136000ULL, 641204288ULL, 326894240ULL,
 };
 
-static const unsigned char RTjpeg_lum_quant_tbl[64] = {
+static const std::array<const uint8_t,64> RTjpeg_lum_quant_tbl {
     16,  11,  10,  16,  24,  40,  51,  61,
     12,  12,  14,  19,  26,  58,  60,  55,
     14,  13,  16,  24,  40,  57,  69,  56,
@@ -79,7 +80,7 @@ static const unsigned char RTjpeg_lum_quant_tbl[64] = {
     72,  92,  95,  98, 112, 100, 103,  99
  };
 
-static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
+static const std::array<const uint8_t,64> RTjpeg_chrom_quant_tbl {
     17,  18,  24,  47,  99,  99,  99,  99,
     18,  21,  26,  66,  99,  99,  99,  99,
     24,  26,  56,  99,  99,  99,  99,  99,
