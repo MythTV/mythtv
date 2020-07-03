@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = 'v31git';
+    $VERSION = 'v32git';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
@@ -116,7 +116,7 @@ package MythTV;
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1362";
+    our $SCHEMA_VERSION = "1363";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
