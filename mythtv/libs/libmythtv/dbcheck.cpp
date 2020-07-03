@@ -3696,6 +3696,37 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1362")
+    {
+        MSqlQuery select(MSqlQuery::InitCon());
+        select.prepare(
+            QString("select index_name from information_schema.statistics "
+            "where table_schema = '%1' "
+            "and table_name = 'recordedartwork' "
+            "and seq_in_index = 1 "
+            "and column_name = 'inetref'")
+            .arg(gCoreContext->GetDatabaseParams().m_dbName));
+
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve index values.", select);
+            return false;
+        }
+
+        DBUpdates updates {
+            "CREATE INDEX recordedartwork_ix1 ON recordedartwork (inetref); "
+        };
+
+        // do not create index if already done.
+        if (select.size() > 0) {
+            updates.clear();
+        }
+
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1363", dbver))
+            return false;
+    }
+
     return true;
 }
 
