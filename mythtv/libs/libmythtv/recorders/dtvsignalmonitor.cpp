@@ -13,7 +13,7 @@ using namespace std;
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSigMon[%1](%2)::%3: %4").arg(m_inputid) \
+    QString("DTVSigMon[%1](%2): %3 %4").arg(m_inputid) \
     .arg(m_channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSigMon[%1](%2): ") \
@@ -310,6 +310,14 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         uint tsid = pat->TransportStreamID();
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         // END HACK HACK HACK
+
+        // Discard PAT if we are still on the wrong transport
+        if (m_transportID > 0 && tsid != m_transportID)
+        {
+            DBG_SM("HandlePAT()", QString("Discard PAT for tsid %1 waiting for tsid %2")
+                .arg(tsid).arg(m_transportID));
+            return;
+        }
 
         if (insert_crc(m_seen_table_crc, *pat))
         {
