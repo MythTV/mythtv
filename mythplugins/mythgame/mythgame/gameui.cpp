@@ -112,7 +112,7 @@ void GameUI::BuildTree()
     {
         QString system = GameHandler::getHandler(i)->SystemName();
         if (i == 0)
-            systemFilter = "system in ('" + system + "'";
+            systemFilter = "`system` in ('" + system + "'";
         else
             systemFilter += ",'" + system + "'";
     }
@@ -655,7 +655,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     if ((childLevel == "gamename") && (m_gameShowFileName))
     {
         columns = childIsLeaf
-                    ? "romname,system,year,genre,gamename"
+                    ? "romname,`system`,year,genre,gamename"
                     : "romname";
 
         if (m_showHashed)
@@ -665,7 +665,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     else if ((childLevel == "gamename") && (layer.length() == 1))
     {
         columns = childIsLeaf
-                    ? childLevel + ",system,year,genre,gamename"
+                    ? childLevel + ",`system`,year,genre,gamename"
                     : childLevel;
 
         if (m_showHashed)
@@ -680,7 +680,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     {
 
         columns = childIsLeaf
-                    ? childLevel + ",system,year,genre,gamename"
+                    ? childLevel + ",`system`,year,genre,gamename"
                     : childLevel;
     }
 
