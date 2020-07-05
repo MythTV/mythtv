@@ -47,7 +47,8 @@ const uint DTVRecorder::kMaxKeyFrameDistance = 80;
  */
 
 DTVRecorder::DTVRecorder(TVRec *rec) :
-    RecorderBase(rec)
+    RecorderBase(rec),
+    m_h2645Parser(reinterpret_cast<H2645Parser *>(new AVCParser))
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     m_payloadBuffer.reserve(TSPacket::kSize * (50 + 1));
@@ -824,6 +825,12 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
     if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "FindH2645Keyframes: No ringbuffer");
+        return m_firstKeyframe >= 0;
+    }
+
+    if (!m_h2645Parser)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FindH2645Keyframes: m_h2645Parser not present");
         return m_firstKeyframe >= 0;
     }
 
