@@ -57,7 +57,7 @@ void MythPainterVulkan::DoFreeResources(void)
         m_devFuncs->vkDestroyDescriptorPool(m_device, m_textureDescriptorPool, nullptr);
         m_devFuncs->vkDestroyDescriptorPool(m_device, m_projectionDescriptorPool, nullptr);
         m_devFuncs->vkDestroySampler(m_device, m_textureSampler, nullptr);
-        if (m_textureUploadCmd)
+        if (m_textureUploadCmd && m_window)
             m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &m_textureUploadCmd);
     }
 
@@ -130,6 +130,9 @@ bool MythPainterVulkan::Ready(void)
     {
         return true;
     }
+
+    if (!m_window || !m_render)
+        return false;
 
     // we need device, functions, shader, pipeline etc
     if (!m_device)
