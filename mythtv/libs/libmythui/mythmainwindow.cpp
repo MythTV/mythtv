@@ -1879,7 +1879,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             auto* qmw = dynamic_cast<QWheelEvent*>(e);
             if (qmw == nullptr)
                 return false;
-            int delta = qmw->delta();
+            int delta = qmw->angleDelta().y();
             if (delta>0)
             {
                 qmw->accept();
