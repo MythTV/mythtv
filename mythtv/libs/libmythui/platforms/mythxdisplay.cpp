@@ -61,9 +61,9 @@ MythXDisplay* MythXDisplay::OpenMythXDisplay(bool Warn /*= true*/)
     return nullptr;
 }
 
-void MythXDisplay::SetQtX11Display(const QString &Display)
+void MythXDisplay::SetQtX11Display(const QString &_Display)
 {
-    s_QtX11Display = Display;
+    s_QtX11Display = _Display;
 }
 
 MythXDisplay::~MythXDisplay()
