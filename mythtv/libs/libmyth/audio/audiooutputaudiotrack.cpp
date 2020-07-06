@@ -1,8 +1,6 @@
 
 #include "config.h"
 
-using namespace std;
-
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 #include <android/log.h>
