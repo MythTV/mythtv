@@ -218,6 +218,9 @@ class PrivateDescriptorID
         dish_event_vchip               = 0x95, /* implemented */
         dish_event_tags                = 0x96, /* implemented */
 
+        // Private -- SES
+        nordig_content_protection      = 0xA0,
+
         // Private -- CH UPC Cablecom
         upc_event_episode_title        = 0xA7,
 
@@ -259,13 +262,17 @@ class PrivateDataSpecifierID
   public:
     enum
     {
+        SES    = 0x00000001,    // Société Européenne des Satellites
         BSB1   = 0x00000002,    // UK Sky (Astra 28.2E), Sky New Zealand (Optus D1 160E0)
         CASEMA = 0x00000016,    // NL Casema
         EACEM  = 0x00000028,    // NL Ziggo
         NORDIG = 0x00000029,    // EU Nordig
+        ORS    = 0x000001B0,    // ORS comm GmbH & Co KG
         UPC1   = 0x00000600,    // UPC Cablecom
         ITC    = 0x0000233A,    // Independent Television Commission
+        IRDETO = 0x00362275,    // Irdeto
         FSAT   = 0x46534154,    // UK BBC FreeSat on Astra 28.2E
+        OTV    = 0x4f545600,    // OpenTV
     };
 };
 

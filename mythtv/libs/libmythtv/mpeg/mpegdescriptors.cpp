@@ -567,8 +567,18 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     }
     //
     // User Defined DVB descriptors, range 0x80-0xFE
+    else if (priv_dsid == PrivateDataSpecifierID::SES &&
+             PrivateDescriptorID::nordig_content_protection == DescriptorTag())
+    {
+        str = descrDump("NorDig Content Protection");
+    }
+    else if (priv_dsid == PrivateDataSpecifierID::OTV &&
+             0x80 <= DescriptorTag() && DescriptorTag() < 0xFF)
+    {
+        str = descrDump("OpenTV Private ");
+    }
     else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
-             PrivateDescriptorID::sky_lcn_table== DescriptorTag())
+             PrivateDescriptorID::sky_lcn_table == DescriptorTag())
     {
         SET_STRING(SkyLCNDescriptor);
     }
@@ -578,19 +588,19 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
         SET_STRING(FreesatRegionDescriptor);
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
-             PrivateDescriptorID::freesat_lcn_table== DescriptorTag())
+             PrivateDescriptorID::freesat_lcn_table == DescriptorTag())
     {
         SET_STRING(FreesatLCNDescriptor);
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
-             PrivateDescriptorID::freesat_callsign== DescriptorTag())
+             PrivateDescriptorID::freesat_callsign == DescriptorTag())
     {
         SET_STRING(FreesatCallsignDescriptor);
     }
     else if (priv_dsid == PrivateDataSpecifierID::CASEMA &&
-             PrivateDescriptorID::casema_video_on_demand== DescriptorTag())
+             PrivateDescriptorID::casema_video_on_demand == DescriptorTag())
     {
-        descrDump("Video on Demand");
+        str = descrDump("Video on Demand");
     }
     else if ((priv_dsid == PrivateDataSpecifierID::EACEM  ||
               priv_dsid == PrivateDataSpecifierID::NORDIG ||
