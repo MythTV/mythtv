@@ -425,7 +425,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         .arg(m_fullcommand).arg(args.join(" ")));
 
     grabber.Run();
-    if (grabber.Wait(60) != GENERIC_EXIT_OK)
+    if (grabber.Wait(180) != GENERIC_EXIT_OK)
         return list;
 
     QByteArray result = grabber.ReadAll();
