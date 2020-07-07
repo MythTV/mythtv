@@ -96,8 +96,9 @@ int main(int argc, char **argv)
 #ifdef Q_OS_MAC
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
-           QString("%1/../Resources/lib/python2.6/site-packages:%2")
+           QString("%1/../Resources/lib/%2/site-packages:%3")
            .arg(path)
+           .arg(QFileInfo(PYTHON_EXE).fileName())
            .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
            .toUtf8().constData(), 1);
 #endif
