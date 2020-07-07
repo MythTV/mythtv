@@ -706,18 +706,16 @@ static void init_freq_tables(freq_table_map_t &fmap)
     }
 
     // create old school frequency tables...
-    for (const auto & ptr : gChanLists)
+    for (const auto & [name, list] : gChanLists)
     {
-        QString tbl_name = ptr.name;
-        for (uint i = 0; i < (uint)ptr.list.size(); i++)
+        for (uint i = 0; i < (uint)list.size(); i++)
         {
-            uint64_t freq = (ptr.list[i].freq * 1000LL) + 1750000;
-            fmap[QString("analog_analog_%1%2").arg(tbl_name).arg(i)] =
+            uint64_t freq = (list[i].freq * 1000LL) + 1750000;
+            fmap[QString("analog_analog_%1%2").arg(name).arg(i)] =
                 new FrequencyTable(
-                    QString("%1 %2").arg(tbl_name).arg(ptr.list[i].name), i+2,
+                    QString("%1 %2").arg(name).arg(list[i].name), i+2,
                     freq, freq + 3000000,
                     6000000, DTVModulation::kModulationAnalog);
         }
     }
-
 }

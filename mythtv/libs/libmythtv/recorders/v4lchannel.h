@@ -103,7 +103,6 @@ class V4LChannel : public DTVChannel
     QMap<QString,int> m_pictAttrDefault;
 
     CHANLIST_vec     m_curList            {};
-    int              m_totalChannels      {0};
 
     bool             m_hasStreamIO        {false};
     bool             m_hasStdIO           {false};

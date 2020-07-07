@@ -299,7 +299,6 @@ int V4LChannel::SetDefaultFreqTable(const QString &name)
 void V4LChannel::SetFreqTable(const int index)
 {
     m_curList = gChanLists[index].list;
-    m_totalChannels = m_curList.size();
 }
 
 int V4LChannel::SetFreqTable(const QString &tablename)
@@ -307,15 +306,14 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     const QString& name = tablename;
     bool use_default = (name.toLower() == "default" || name.isEmpty());
 
-    int i = 0;
-    char *listname = (char *)gChanLists[i].name;
-
     m_curList.clear();
-    while (listname != nullptr)
+    for (size_t i = 0; i < gChanLists.size(); i++)
     {
+        char *listname = (char *)gChanLists[i].name;
+
         if (use_default)
         {
-            if (i == m_defaultFreqTable)
+            if (i == static_cast<size_t>(m_defaultFreqTable))
             {
                 SetFreqTable(i);
                 return i;
@@ -326,8 +324,6 @@ int V4LChannel::SetFreqTable(const QString &tablename)
             SetFreqTable(i);
             return i;
         }
-        i++;
-        listname = (char *)gChanLists[i].name;
     }
 
     LOG(VB_CHANNEL, LOG_ERR,
@@ -340,7 +336,7 @@ int V4LChannel::SetFreqTable(const QString &tablename)
 
 int V4LChannel::GetCurrentChannelNum(const QString &channame)
 {
-    for (int i = 0; i < m_totalChannels; i++)
+    for (size_t i = 0; i < m_curList.size(); i++)
     {
         if (channame == m_curList[i].name)
             return i;

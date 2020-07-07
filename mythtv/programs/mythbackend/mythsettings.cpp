@@ -84,8 +84,8 @@ static void fill_setting(
         else if (MythSetting::kFrequencyTable == setting->m_dtype)
         {
             setting->m_data_list.clear();
-            for (uint i = 0; gChanLists[i].name; i++)
-                setting->m_data_list.push_back(gChanLists[i].name);
+            for (const auto &list : gChanLists)
+                setting->m_data_list.push_back(list.name);
             setting->m_display_list = setting->m_data_list;
             do_option_check = true;
         }
