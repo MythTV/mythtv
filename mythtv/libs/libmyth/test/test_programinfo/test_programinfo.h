@@ -104,16 +104,16 @@ class TestProgramInfo : public QObject
     QString m_flash34List = "The Flash (2014)|The New Rogues|Barry continues to "
         "train Jesse ...|3|4|23|syndicatedepisode|Drama|1514|514|WNUVDT|"
         "WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|"
-        "1477439880|1477443720|0|localhost|0|0|0|0|0|0|0|15|8|1477439880|"
+        "1477440000|1477443600|0|localhost|0|0|0|0|0|0|0|15|8|1477439880|"
         "1477443720|0|Default||EP01922936|EP019229360055|ttvdb.py_279121|"
-        "1477444354|0|2016-10-25|Default|0|0|Default|0|0|0|2016|0|0|4|715|"
+        "1477444354|0|2016-10-26|Default|0|0|Default|0|0|0|2016|0|0|4|715|"
         "Prime A-1|4294967295";
     QString m_supergirl23List = "Supergirl|Welcome to Earth|An attack is made "
         "on the President as hot-button...|2|3|23|syndicatedepisode|Drama|"
         "1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161024235800.ts|"
-        "6056109670|1477353480|1477357320|0|localhost|0|0|0|0|0|0|0|15|8|"
+        "6056109670|1477353600|1477357200|0|localhost|0|0|0|0|0|0|0|15|8|"
         "1477353480|1477357320|0|Default||EP02185451|EP021854510025|"
-        "ttvdb.py_295759|1477444354|0|2016-10-24|Default|0|0|Default|0|0|0|"
+        "ttvdb.py_295759|1477444354|0|2016-10-25|Default|0|0|Default|0|0|0|"
         "2016|0|0|4|711|Prime A-0|4294967295";
     ProgramInfo m_dracula;
     ProgramInfo m_flash34;
@@ -135,11 +135,11 @@ class TestProgramInfo : public QObject
              "localhost", "Default",
              "EP01922936", "EP019229360055", "ttvdb.py_279121",
              ProgramInfo::kCategoryTVShow, 0, 6056109800,
+             MythDate::fromString("2016-10-26 00:00:00"),
+             MythDate::fromString("2016-10-26 01:00:00"),
              MythDate::fromString("2016-10-25 23:58:00"),
              MythDate::fromString("2016-10-26 01:02:00"),
-             MythDate::fromString("2016-10-25 23:58:00"),
-             MythDate::fromString("2016-10-26 01:02:00"),
-             0.0, 2016, 0, 0, QDate(2016,10,25),
+             0.0, 2016, 0, 0, QDate(2016,10,26),
              MythDate::fromString("2016-10-26 01:12:34"),
              RecStatus::Unknown, 0,
              kDupsInAll, kDupCheckSubThenDesc,
@@ -157,11 +157,11 @@ class TestProgramInfo : public QObject
              "localhost", "Default",
              "EP02185451", "EP021854510025", "ttvdb.py_295759",
              ProgramInfo::kCategoryTVShow, 0, 6056109670,
+             MythDate::fromString("2016-10-25 00:00:00"),
+             MythDate::fromString("2016-10-25 01:00:00"),
              MythDate::fromString("2016-10-24 23:58:00"),
              MythDate::fromString("2016-10-25 01:02:00"),
-             MythDate::fromString("2016-10-24 23:58:00"),
-             MythDate::fromString("2016-10-25 01:02:00"),
-             0.0, 2016, 0, 0, QDate(2016,10,24),
+             0.0, 2016, 0, 0, QDate(2016,10,25),
              MythDate::fromString("2016-10-26 01:12:34"),
              RecStatus::Unknown, 0,
              kDupsInAll, kDupCheckSubThenDesc,
