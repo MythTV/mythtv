@@ -299,6 +299,21 @@ MythCoreContext::~MythCoreContext()
     d = nullptr;
 }
 
+void MythCoreContext::setTestIntSettings(QMap<QString,int> &overrides)
+{
+    m_testOverrideInts = std::move(overrides);
+}
+
+void MythCoreContext::setTestFloatSettings(QMap<QString,double> &overrides)
+{
+    m_testOverrideFloats = std::move(overrides);
+}
+
+void MythCoreContext::setTestStringSettings(QMap<QString,QString> &overrides)
+{
+    m_testOverrideStrings = std::move(overrides);
+}
+
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
                                          const QString &announcement,
                                          uint timeout_in_ms,
@@ -901,6 +916,8 @@ bool MythCoreContext::SaveSettingOnHost(const QString &key,
 QString MythCoreContext::GetSetting(const QString &key,
                                     const QString &defaultval)
 {
+    if (!m_testOverrideStrings.empty())
+        return m_testOverrideStrings[key];
     return d->m_database->GetSetting(key, defaultval);
 }
 
@@ -912,11 +929,15 @@ bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
 
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
 {
+    if (!m_testOverrideInts.empty())
+        return m_testOverrideInts[key];
     return d->m_database->GetNumSetting(key, defaultval);
 }
 
 double MythCoreContext::GetFloatSetting(const QString &key, double defaultval)
 {
+    if (!m_testOverrideFloats.empty())
+        return m_testOverrideFloats[key];
     return d->m_database->GetFloatSetting(key, defaultval);
 }
 
@@ -924,6 +945,8 @@ QString MythCoreContext::GetSettingOnHost(const QString &key,
                                           const QString &host,
                                           const QString &defaultval)
 {
+    if (!m_testOverrideStrings.empty())
+        return m_testOverrideStrings[key];
     return d->m_database->GetSettingOnHost(key, host, defaultval);
 }
 
@@ -939,6 +962,8 @@ int MythCoreContext::GetNumSettingOnHost(const QString &key,
                                          const QString &host,
                                          int defaultval)
 {
+    if (!m_testOverrideInts.empty())
+        return m_testOverrideInts[key];
     return d->m_database->GetNumSettingOnHost(key, host, defaultval);
 }
 
@@ -946,6 +971,8 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
                                               const QString &host,
                                               double defaultval)
 {
+    if (!m_testOverrideFloats.empty())
+        return m_testOverrideFloats[key];
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 

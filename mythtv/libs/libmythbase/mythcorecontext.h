@@ -240,6 +240,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void UnregisterFileForWrite(const QString &file);
     bool IsRegisteredFileForWrite(const QString &file);
 
+    // Test Harness help
+    void setTestIntSettings(QMap<QString,int>& overrides);
+    void setTestFloatSettings(QMap<QString,double>& overrides);
+    void setTestStringSettings(QMap<QString,QString>& overrides);
+
     // signal related methods
     void WaitUntilSignals(const char *signal1, ...);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
@@ -271,6 +276,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void connectionFailed(MythSocket *sock) override { (void)sock; } //MythSocketCBs
     void connectionClosed(MythSocket *sock) override; // MythSocketCBs
     void readyRead(MythSocket *sock) override; // MythSocketCBs
+
+    QMap<QString,int>     m_testOverrideInts    {};
+    QMap<QString,double>  m_testOverrideFloats  {};
+    QMap<QString,QString> m_testOverrideStrings {};
 };
 
 /// This global variable contains the MythCoreContext instance for the app
