@@ -18,8 +18,10 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <iostream>
 #include <QtTest/QtTest>
 
+#include "mythcorecontext.h"
 #include "programinfo.h"
 #include "programtypes.h"
 
@@ -119,9 +121,15 @@ class TestProgramInfo : public QObject
     ProgramInfo m_flash34;
     ProgramInfo m_supergirl23;
 
+    QMap<QString,int> m_intOverrides {};
+
   private slots:
     void initTestCase()
     {
+        gCoreContext = new MythCoreContext("test_programinfo_1.0", nullptr);
+        m_intOverrides["AlwaysStreamFiles"] = 0;
+        gCoreContext->setTestIntSettings(m_intOverrides);
+
         m_dracula = ProgramInfo(mockMovie ("11868", "tt0051554", "Dracula", 1958));
         m_flash34 = ProgramInfo
             (715,
@@ -304,5 +312,49 @@ class TestProgramInfo : public QObject
         QCOMPARE (m_flash34.GetSortTitle(), QString("flash (2014)"));
         QCOMPARE (m_flash34.GetSortSubtitle(), QString("new rogues"));
         QVERIFY (m_flash34.GetSortTitle() < m_supergirl23.GetSortTitle());
+    }
+
+    static void SubstituteMatches_compile_test(void)
+    {
+        QDateTime startTs    {MythDate::current(true)};
+        QDateTime endTs      {startTs};
+        QDateTime recStartTs {startTs};
+        QDateTime recEndTs   {startTs};
+
+        static const std::array<const QString,4> s_timeStr
+            { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
+        static const std::array<const QDateTime *,4> time_dtr
+            { &recStartTs, &recEndTs, &startTs, &endTs, };
+        QCOMPARE(s_timeStr.size(), (size_t)4);
+        QCOMPARE(time_dtr.size(), (size_t)4);
+    }
+
+    static void SubstituteMatches_test_data(void)
+    {
+        QTest::addColumn<QString>("input");
+        QTest::addColumn<QString>("expected");
+
+        QTest::newRow("title")    << R"(%TITLE%)" << "The Flash (2014)";
+        QTest::newRow("subtitle") << R"(%SUBTITLE%)" << "The New Rogues";
+        QTest::newRow("episode")  << R"(S%SEASON%E%EPISODE%)" << "S3E4";
+        QTest::newRow("times1utc") << R"(%STARTTIMEUTC% to %ENDTIMEUTC%)"
+                                   << "20161025235800 to 20161026010200";
+        QTest::newRow("times1isoutc") << R"(%STARTTIMEISOUTC% to %ENDTIMEISOUTC%)"
+                                      << "2016-10-25T23:58:00Z to 2016-10-26T01:02:00Z";
+        QTest::newRow("times2utc") << R"(%PROGSTARTUTC% to %PROGENDUTC%)"
+                                   << "20161026000000 to 20161026010000";
+        QTest::newRow("times2isoutc") << R"(%PROGSTARTISOUTC% to %PROGENDISOUTC%)"
+                                      << "2016-10-26T00:00:00Z to 2016-10-26T01:00:00Z";
+
+
+    }
+    void SubstituteMatches_test(void)
+    {
+        QFETCH(QString, input);
+        QFETCH(QString, expected);
+
+        QString output = input;
+        m_flash34.SubstituteMatches(output);
+        QCOMPARE(output, expected);
     }
 };
