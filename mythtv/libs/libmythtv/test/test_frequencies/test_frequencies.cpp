@@ -43,7 +43,7 @@ void TestFrequencies::test_gchanlists(void)
     std::string country2 = country.toStdString();
     auto it = std::find_if(gChanLists.cbegin(),gChanLists.cend(),
                            [country2] (const CHANLISTS &chanlist) -> bool
-                               { return country2.compare(chanlist.name) == 0; });
+                               { return country2 == chanlist.name; });
     QCOMPARE(it != gChanLists.end(), expected);
 }
 
