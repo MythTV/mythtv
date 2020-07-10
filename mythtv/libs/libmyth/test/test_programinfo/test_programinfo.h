@@ -345,9 +345,12 @@ class TestProgramInfo : public QObject
                                    << "20161026000000 to 20161026010000";
         QTest::newRow("times2isoutc") << R"(%PROGSTARTISOUTC% to %PROGENDISOUTC%)"
                                       << "2016-10-26T00:00:00Z to 2016-10-26T01:00:00Z";
+        QTest::newRow("dirfile") << R"(%DIR% %FILE%)"
+                                 << "myth://localhost/1514_20161025235800.ts 1514_20161025235800.ts";
 
 
     }
+
     void SubstituteMatches_test(void)
     {
         QFETCH(QString, input);
@@ -355,6 +358,38 @@ class TestProgramInfo : public QObject
 
         QString output = input;
         m_flash34.SubstituteMatches(output);
+        QCOMPARE(output, expected);
+    }
+
+    static void SubstituteMatches2_test_data(void)
+    {
+        QTest::addColumn<QString>("input");
+        QTest::addColumn<QString>("expected");
+
+        QTest::newRow("title")    << R"(%TITLE%)" << "Supergirl";
+        QTest::newRow("subtitle") << R"(%SUBTITLE%)" << "Welcome to Earth";
+        QTest::newRow("episode")  << R"(S%SEASON%E%EPISODE%)" << "S2E3";
+        QTest::newRow("times1utc") << R"(%STARTTIMEUTC% to %ENDTIMEUTC%)"
+                                   << "20161024235800 to 20161025010200";
+        QTest::newRow("times1isoutc") << R"(%STARTTIMEISOUTC% to %ENDTIMEISOUTC%)"
+                                      << "2016-10-24T23:58:00Z to 2016-10-25T01:02:00Z";
+        QTest::newRow("times2utc") << R"(%PROGSTARTUTC% to %PROGENDUTC%)"
+                                   << "20161025000000 to 20161025010000";
+        QTest::newRow("times2isoutc") << R"(%PROGSTARTISOUTC% to %PROGENDISOUTC%)"
+                                      << "2016-10-25T00:00:00Z to 2016-10-25T01:00:00Z";
+        QTest::newRow("dirfile") << R"(%DIR% %FILE%)"
+                                 << "myth://localhost/1514_20161024235800.ts 1514_20161024235800.ts";
+
+
+    }
+
+    void SubstituteMatches2_test(void)
+    {
+        QFETCH(QString, input);
+        QFETCH(QString, expected);
+
+        QString output = input;
+        m_supergirl23.SubstituteMatches(output);
         QCOMPARE(output, expected);
     }
 };

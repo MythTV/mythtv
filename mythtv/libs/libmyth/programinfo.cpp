@@ -5246,7 +5246,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
                 m_originalAirDate.toString(Qt::ISODate));
     static const std::array<const QString,4> s_timeStr
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
-    static const std::array<const QDateTime *,4> time_dtr
+    const std::array<const QDateTime *,4> time_dtr
         { &m_recStartTs, &m_recEndTs, &m_startTs, &m_endTs, };
     for (size_t i = 0; i < s_timeStr.size(); i++)
     {
