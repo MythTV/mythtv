@@ -65,6 +65,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
     MYTH_VDPAUREGOUTSURFNV m_registerNV     { nullptr };
     MYTH_VDPAUSURFACCESSNV m_accessNV       { nullptr };
     MYTH_VDPAUMAPSURFNV m_mapNV             { nullptr };
+    MYTH_VDPAUMAPSURFNV m_unmapNV           { nullptr };
     MythCodecID         m_codec             { kCodec_NONE };
     bool                m_preempted         { false   };
     bool                m_preemptedWarning  { false   };
