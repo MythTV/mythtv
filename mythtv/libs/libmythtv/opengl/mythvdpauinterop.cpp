@@ -109,7 +109,7 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
     if (!DeviceContext || !m_context)
         return false;
 
-    if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV &&
+    if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV && m_unmapNV &&
         m_helper && m_helper->IsValid())
         return true;
 
@@ -119,11 +119,12 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
     m_registerNV = reinterpret_cast<MYTH_VDPAUREGOUTSURFNV>(m_context->GetProcAddress("glVDPAURegisterOutputSurfaceNV"));
     m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_context->GetProcAddress("glVDPAUSurfaceAccessNV"));
     m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("glVDPAUMapSurfacesNV"));
+    m_unmapNV    = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("glVDPAUUnmapSurfacesNV"));
 
     delete m_helper;
     m_helper = nullptr;
 
-    if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV)
+    if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV && m_unmapNV)
     {
         m_helper = new MythVDPAUHelper(DeviceContext);
         if (m_helper->IsValid())
@@ -198,7 +199,6 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
             else
             {
                 m_accessNV(m_outputSurfaceReg, QOpenGLBuffer::ReadOnly);
-                m_mapNV(1, &m_outputSurfaceReg);
             }
         }
         return true;
@@ -347,9 +347,11 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Render surface
+    m_unmapNV(1, &m_outputSurfaceReg);
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
                           Frame->interlaced_reversed ? !Frame->top_field_first :
                           Frame->top_field_first, m_referenceFrames);
+    m_mapNV(1, &m_outputSurfaceReg);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 
