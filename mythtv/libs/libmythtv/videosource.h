@@ -379,8 +379,105 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
   private:
     HDHomeRunConfigurationGroup &m_group;
 };
+#endif  // USING_HDHOMERUN
 
-#endif
+#ifdef USING_SATIP
+
+class SatIPDevice
+{
+  public:
+    QString m_mythDeviceId;
+    QString m_deviceId;
+    QString m_friendlyName;
+    QString m_cardIP;
+    QString m_tunerNo;
+    QString m_tunerType;
+    bool    m_inUse      {false};
+    bool    m_discovered {false};
+};
+
+using SatIPDeviceList = QMap<QString, SatIPDevice>;
+
+class SatIPDeviceIDList;
+class SatIPDeviceID;
+class SatIPDeviceAttribute;
+class SatIPConfigurationGroup : public GroupSetting
+{
+    Q_OBJECT
+
+  public:
+    SatIPConfigurationGroup(CaptureCard &parent, CardType &cardtype);
+
+  private:
+    void FillDeviceList(void);
+
+  private:
+    CaptureCard           &m_parent;
+    GroupSetting          *desc            {nullptr};
+    SatIPDeviceIDList     *m_deviceIdList  {nullptr};
+    SatIPDeviceID         *m_deviceId      {nullptr};
+    SatIPDeviceAttribute  *m_friendlyName  {nullptr};
+    SatIPDeviceAttribute  *m_tunerType     {nullptr};
+    SatIPDeviceAttribute  *m_tunerIndex    {nullptr};
+    SatIPDeviceList        m_deviceList;
+};
+
+class SatIPDeviceIDList : public TransMythUIComboBoxSetting
+{
+    Q_OBJECT
+
+  public:
+    SatIPDeviceIDList(SatIPDeviceID *deviceId,
+                      SatIPDeviceAttribute *friendlyName,
+                      SatIPDeviceAttribute *tunerType,
+                      SatIPDeviceAttribute *tunerIndex,
+                      SatIPDeviceList *deviceList,
+                      const CaptureCard &parent);
+
+    void fillSelections(const QString &current);
+
+    void Load(void) override; // StandardSetting
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  signals:
+    void NewTuner(const QString&);
+
+  private:
+    SatIPDeviceID        *m_deviceId;
+    SatIPDeviceAttribute *m_friendlyName;
+    SatIPDeviceAttribute *m_tunerType;
+    SatIPDeviceAttribute *m_tunerIndex;
+    SatIPDeviceList      *m_deviceList;
+    const CaptureCard    &m_parent;
+};
+
+class SatIPDeviceID : public MythUITextEditSetting
+{
+    Q_OBJECT
+
+  public:
+    explicit SatIPDeviceID(const CaptureCard &parent);
+
+    void Load(void) override; // StandardSetting
+
+  public slots:
+    void SetTuner(const QString&);
+
+  private:
+    const CaptureCard &m_parent;
+};
+
+class SatIPDeviceAttribute : public GroupSetting
+{
+    Q_OBJECT
+
+  public:
+    SatIPDeviceAttribute(const QString& label,
+                         const QString& helpText);
+};
+#endif // USING_SATIP
 
 class VBoxDevice
 {

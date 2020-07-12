@@ -30,16 +30,17 @@
  *
  */
 
+// C++ includes
 #include <vector>
 using namespace std;
 
+// MythTV includes
 #include "transporteditor.h"
 #include "videosource.h"
 #include "sourceutil.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-
-#define LOC QString("DTVMux: ")
+#include "satiputils.h"
 
 class MultiplexID : public AutoIncrementSetting
 {
@@ -116,6 +117,12 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
                 nType = CardUtil::DVBC;
             else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
                 nType = CardUtil::DVBT2;
+        }
+
+        if (nType == CardUtil::SATIP)
+        {
+            QString deviceid = CardUtil::GetVideoDevice(cardid);
+            nType = SatIP::toDVBInputType(deviceid);
         }
 
         if ((CardUtil::ERROR_OPEN    == nType) ||

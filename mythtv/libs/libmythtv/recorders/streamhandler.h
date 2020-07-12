@@ -100,7 +100,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     /// Write out a copy of the raw MPTS
-    void WriteMPTS(unsigned char * buffer, uint len);
+    void WriteMPTS(const unsigned char * buffer, uint len);
     /// At minimum this sets _running_desired, this may also send
     /// signals to anything that might be blocking the run() loop.
     /// \note: The _start_stop_lock must be held when this is called.

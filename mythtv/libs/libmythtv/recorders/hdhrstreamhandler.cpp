@@ -244,7 +244,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
     }
 
 #ifdef DEBUG_PID_FILTERS
-    LOG(VB_RECORD, LOG_INFO, LOC + "UpdateFilters()");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "UpdateFilters()");
 #endif // DEBUG_PID_FILTERS
     QMutexLocker locker(&m_pidLock);
 
@@ -287,7 +287,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
     if (filter != new_filter)
         msg += QString("\n\t\t\t\t'%2'").arg(new_filter);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + msg);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + msg);
 #endif // DEBUG_PID_FILTERS
 
     return filter == new_filter;

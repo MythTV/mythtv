@@ -44,6 +44,7 @@ using namespace std;
 #include "cardutil.h"
 #include "compat.h"
 #include "inputinfo.h"
+#include "satipchannel.h"
 
 #define LOC QString("ChannelBase[%1]: ").arg(m_inputId)
 
@@ -721,12 +722,18 @@ ChannelBase *ChannelBase::CreateChannel(
         Q_UNUSED(fwOpt);
 #endif
     }
+#ifdef USING_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {
-#ifdef USING_HDHOMERUN
         channel = new HDHRChannel(tvrec, genOpt.m_videoDev);
-#endif
     }
+#endif
+#ifdef USING_SATIP
+    else if (genOpt.m_inputType == "SATIP")
+    {
+        channel = new SatIPChannel(tvrec, genOpt.m_videoDev);
+    }
+#endif
     else if ((genOpt.m_inputType == "IMPORT") ||
              (genOpt.m_inputType == "DEMO") ||
              (genOpt.m_inputType == "MPEG" &&

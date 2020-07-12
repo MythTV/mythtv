@@ -124,6 +124,7 @@ Advanced options (experts only):
   --disable-hdhomerun      disable support for HDHomeRun boxes
   --disable-vbox           disable support for V@Box TV Gateway boxes
   --disable-ceton          disable support for Ceton cards
+  --disable-satip          disable support for Sat>IP
   --disable-v4l2           disable Video4Linux support
   --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-hdpvr          disable HD-PVR support
@@ -1963,6 +1964,7 @@ MYTHTV_CONFIG_LIST='
     firewire
     frontend
     hdhomerun
+    satip
     vbox
     ceton
     hdpvr
@@ -2609,6 +2611,7 @@ firewire_deps="backend"
 ivtv_deps="backend v4l2"
 hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
+satip_deps="backend"
 vbox_deps="backend"
 ceton_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
@@ -2757,6 +2760,7 @@ enable ffmpeg_pthreads
 enable firewire
 enable frontend
 enable hdhomerun
+enable satip
 enable vbox
 enable ceton
 enable hdpvr
@@ -7444,6 +7448,7 @@ if enabled backend; then
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
+  echo "Sat>IP support            ${satip-no}"
   echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
   echo "DVEO ASI support          ${asi-no}"

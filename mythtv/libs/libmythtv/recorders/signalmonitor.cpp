@@ -37,6 +37,11 @@ extern "C" {
 #   include "hdhrchannel.h"
 #endif
 
+#ifdef USING_SATIP
+#   include "satipsignalmonitor.h"
+#   include "satipchannel.h"
+#endif
+
 #ifdef USING_IPTV
 #   include "iptvsignalmonitor.h"
 #   include "iptvchannel.h"
@@ -131,6 +136,15 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
         if (hdhrc)
             signalMonitor = new HDHRSignalMonitor(db_cardnum, hdhrc,
                                                   release_stream);
+    }
+#endif
+
+#ifdef USING_SATIP
+    else if (cardtype.toUpper() == "SATIP")
+    {
+        SatIPChannel *satipchan = dynamic_cast<SatIPChannel*>(channel);
+        if (satipchan)
+            signalMonitor = new SatIPSignalMonitor(db_cardnum, satipchan);
     }
 #endif
 

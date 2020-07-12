@@ -190,7 +190,7 @@ bool StreamHandler::AddPIDFilter(PIDInfo *info)
 {
 #ifdef DEBUG_PID_FILTERS
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("AddPIDFilter(0x%1)")
-            .arg(info->_pid, 0, 16));
+            .arg(info->m_pid, 0, 16));
 #endif // DEBUG_PID_FILTERS
 
     QMutexLocker writing_locker(&m_pidLock);
@@ -346,7 +346,7 @@ PIDPriority StreamHandler::GetPIDPriority(uint pid) const
     return tmp;
 }
 
-void StreamHandler::WriteMPTS(unsigned char * buffer, uint len)
+void StreamHandler::WriteMPTS(const unsigned char * buffer, uint len)
 {
     if (m_mptsTfw == nullptr)
         return;

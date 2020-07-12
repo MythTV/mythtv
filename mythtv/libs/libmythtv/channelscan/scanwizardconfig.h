@@ -104,7 +104,11 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
         ExternRecImport
     };
 
-    ScanTypeSetting() { setLabel(QObject::tr("Scan Type")); }
+    ScanTypeSetting()
+    {
+        setLabel(QObject::tr("Scan Type"));
+        setHelpText(QObject::tr("For scan type 'Full Scan' select a country to get the correct set of frequencies."));
+    }
 
   protected slots:
     void SetInput(const QString &cardids_inputname);

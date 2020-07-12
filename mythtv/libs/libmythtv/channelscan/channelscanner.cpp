@@ -46,6 +46,7 @@ using namespace std;
 #include "iptvchannel.h"
 #include "ExternalChannel.h"
 #include "cardutil.h"
+#include "satipchannel.h"
 
 #define LOC QString("ChScan: ")
 
@@ -469,6 +470,13 @@ void ChannelScanner::PreScanCommon(
         m_channel = new HDHRChannel(nullptr, device);
     }
 #endif // USING_HDHOMERUN
+
+#ifdef USING_SATIP
+    if ("SATIP" == card_type)
+    {
+        m_channel = new SatIPChannel(NULL, device);
+    }
+#endif
 
 #ifdef USING_ASI
     if ("ASI" == card_type)

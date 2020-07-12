@@ -21,6 +21,10 @@
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
+#ifdef USING_SATIP
+#include "satiputils.h"
+#endif
+
 void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
     const QString& default_inputname)
@@ -211,6 +215,14 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     m_hw_cardid     = cardid;
     QString subtype = CardUtil::ProbeSubTypeName(m_hw_cardid);
     int nCardType   = CardUtil::toInputType(subtype);
+
+#ifdef USING_SATIP
+    if (nCardType == CardUtil::SATIP)
+    {
+        nCardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
+    }
+#endif
+
     clearSelections();
 
     switch (nCardType)

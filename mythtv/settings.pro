@@ -13,6 +13,7 @@ win32-msvc* {
   CONFIG *= using_backend using_frontend
   CONFIG *= using_opengl
   CONFIG *= using_hdhomerun
+  CONFIG *= using_satip
 
   CONFIG_LIBMPEG2EXTERNAL = yes
   CONFIG_QTDBUS = no
