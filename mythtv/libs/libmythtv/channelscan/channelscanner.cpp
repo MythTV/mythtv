@@ -474,7 +474,7 @@ void ChannelScanner::PreScanCommon(
 #ifdef USING_SATIP
     if ("SATIP" == card_type)
     {
-        m_channel = new SatIPChannel(NULL, device);
+        m_channel = new SatIPChannel(nullptr, device);
     }
 #endif
 
