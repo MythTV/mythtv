@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// C+++ headers
+#include <thread>
+
 // Qt headers
 #include <QString>
 #include <QMap>
