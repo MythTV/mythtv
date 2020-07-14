@@ -50,7 +50,8 @@ bool SatIPChannel::Open(void)
 
 void SatIPChannel::Close()
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
+    LOG(VB_CHANNEL, LOG_INFO, QString("SatIPChan[%1](%2): Close()")
+        .arg(m_inputId).arg(SatIPChannel::GetDevice()));
     CloseStreamHandler();
 }
 

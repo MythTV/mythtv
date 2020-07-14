@@ -49,7 +49,7 @@ QStringList SatIP::doUPNPsearch(void)
 {
     QStringList result;
 
-    SSDPCacheEntries *satipservers = SSDP::Instance()->Find(SATIP_URI);
+    SSDPCacheEntries *satipservers = SSDP::Find(SATIP_URI);
 
     if (!satipservers)
     {
