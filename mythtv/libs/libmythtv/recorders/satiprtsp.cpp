@@ -136,10 +136,10 @@ bool SatIPRTSP::Play(QStringList &pids)
     url.setQuery("");
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
-    QString pids_str = QString("pids=%1").arg(pids.size() > 0 ? pids.join(",") : "none");
+    QString pids_str = QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none");
     LOG(VB_RECORD, LOG_DEBUG, LOC + pids_str);
 
-    url.setQuery(QString("pids=%1").arg(pids.size() > 0 ? pids.join(",") : "none"));
+    url.setQuery(QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none"));
 
     if (!sendMessage(url, "PLAY"))
     {
@@ -228,7 +228,7 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
 
     headers.append("\r\n");
 
-    for (auto requestLine : headers)
+    for (const auto& requestLine : headers)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + "sendMessage " +
             QString("write: %1").arg(requestLine.simplified()));
@@ -240,7 +240,7 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
     QRegExp firstLineRegex(
         "^RTSP/1.0 (\\d+) ([^\r\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
     QRegExp headerRegex(
-        "^([^:]+):\\s*([^\\r\\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
+        R"(^([^:]+):\s*([^\r\n]+))", Qt::CaseSensitive, QRegExp::RegExp2);
     QRegExp blankLineRegex(
         "^[\\r\\n]*$", Qt::CaseSensitive, QRegExp::RegExp2);
 
@@ -271,7 +271,7 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
 
             QStringList parts = firstLineRegex.capturedTexts();
             int responseCode = parts.at(1).toInt();
-            QString responseMsg = parts.at(2);
+            const QString& responseMsg = parts.at(2);
 
             if (responseCode != 200)
             {
@@ -430,7 +430,7 @@ void SatIPRTCPReadHelper::ReadPending()
 
         while (!found && i < data.length())
         {
-            QString item = data.at(i);
+            const QString& item = data.at(i);
 
             if (item.startsWith("tuner="))
             {
@@ -464,7 +464,7 @@ SatIPRTSPWriteHelper::SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler
     m_timer = startTimer(200);
 }
 
-void SatIPRTSPWriteHelper::timerEvent(QTimerEvent*)
+void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
 {
     while (m_parent->m_buffer->HasAvailablePacket())
     {

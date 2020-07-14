@@ -67,10 +67,10 @@ class SatIPRTSPWriteHelper : QObject
     Q_OBJECT
 
   public:
-    SatIPRTSPWriteHelper(SatIPRTSP*, SatIPStreamHandler*);
+    SatIPRTSPWriteHelper(SatIPRTSP* /*parent*/, SatIPStreamHandler* /*handler*/);
 
   protected:
-    void timerEvent(QTimerEvent*) override; // QObject
+    void timerEvent(QTimerEvent* /*event*/) override; // QObject
 
   private:
     SatIPRTSP          *m_parent                      {nullptr};
@@ -93,7 +93,7 @@ class SatIPRTSP : QObject
     Q_OBJECT
 
   public:
-    explicit SatIPRTSP(SatIPStreamHandler*);
+    explicit SatIPRTSP(SatIPStreamHandler* /*handler*/);
     ~SatIPRTSP();
 
     bool Setup(QUrl url);
@@ -104,7 +104,7 @@ class SatIPRTSP : QObject
     int  GetSignalStrength();
 
   protected:
-    void timerEvent(QTimerEvent*) override;   // QObject
+    void timerEvent(QTimerEvent* /*timerEvent*/) override;   // QObject
     void SetSigmonValues(bool lock, int level);
 
   signals:

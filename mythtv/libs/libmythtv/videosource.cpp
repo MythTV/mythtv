@@ -4028,11 +4028,11 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     {
         QString dev = *it;
         QStringList devparts = dev.split(" ");
-        QString id = devparts.at(0);
-        QString name = devparts.at(1);
-        QString ip = devparts.at(2);
-        QString tunerno = devparts.at(3);
-        QString tunertype = devparts.at(4);
+        const QString& id = devparts.at(0);
+        const QString& name = devparts.at(1);
+        const QString& ip = devparts.at(2);
+        const QString& tunerno = devparts.at(3);
+        const QString& tunertype = devparts.at(4);
 
         SatIPDevice device;
         device.m_deviceId = id;
@@ -4054,7 +4054,7 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     // Now find configured devices
     // Returns each devices as "deviceid friendlyname ip tunerno tunertype"
     QStringList db = CardUtil::GetVideoDevices("SATIP");
-    for (auto dev : db)
+    for (const auto& dev : db)
     {
         auto dit = m_deviceList.find(dev);
         if (dit != m_deviceList.end())
@@ -4112,7 +4112,7 @@ void SatIPDeviceIDList::fillSelections(const QString &cur)
     vector<QString> devs;
     QMap<QString, bool> in_use;
 
-    QString current = cur;
+    const QString& current = cur;
     QString sel;
 
     SatIPDeviceList::iterator it = m_deviceList->begin();
@@ -4126,7 +4126,7 @@ void SatIPDeviceIDList::fillSelections(const QString &cur)
         in_use[it.key()] = (*it).m_inUse;
     }
 
-    for (auto it2s : devs)
+    for (const auto& it2s : devs)
     {
         sel = (current == it2s) ? it2s : sel;
     }

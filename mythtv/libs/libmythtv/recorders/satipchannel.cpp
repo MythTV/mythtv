@@ -1,6 +1,9 @@
+// C++ includes
+#include <utility>
+
 // Qt includes
-#include <QString>
 #include <QMutexLocker>
+#include <QString>
 
 // MythTV includes
 #include "mythlogging.h"
@@ -11,8 +14,8 @@
 
 #define LOC  QString("SatIPChan[%1](%2): ").arg(m_inputId).arg(GetDevice())
 
-SatIPChannel::SatIPChannel(TVRec *parent, const QString & device) :
-    DTVChannel(parent), m_device(device)
+SatIPChannel::SatIPChannel(TVRec *parent, QString  device) :
+    DTVChannel(parent), m_device(std::move(device))
 {
 }
 

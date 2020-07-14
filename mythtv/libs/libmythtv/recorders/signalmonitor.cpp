@@ -142,7 +142,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_SATIP
     else if (cardtype.toUpper() == "SATIP")
     {
-        SatIPChannel *satipchan = dynamic_cast<SatIPChannel*>(channel);
+        auto *satipchan = dynamic_cast<SatIPChannel*>(channel);
         if (satipchan)
             signalMonitor = new SatIPSignalMonitor(db_cardnum, satipchan);
     }

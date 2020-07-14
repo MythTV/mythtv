@@ -30,7 +30,7 @@ class SatIPStreamHandler : public StreamHandler
     friend class SatIPSignalMonitor;
 
   public:
-    static SatIPStreamHandler *Get(const QString &devicename, int inputid);
+    static SatIPStreamHandler *Get(const QString &devname, int inputid);
     static void Return(SatIPStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,
@@ -46,7 +46,7 @@ class SatIPStreamHandler : public StreamHandler
     void Tune(const DTVMultiplex &tuning);
 
   private:
-    SatIPStreamHandler(const QString &, int inputid);
+    SatIPStreamHandler(const QString & /*device*/, int inputid);
 
     bool Open(void);
     void Close(void);
@@ -62,7 +62,7 @@ class SatIPStreamHandler : public StreamHandler
     static uint s_cseq;
 
   protected:
-    SatIPRTSP   *m_rtsp;
+    SatIPRTSP   *m_rtsp           {nullptr};
 
   public:
     int          m_inputId;

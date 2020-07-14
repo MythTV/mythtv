@@ -12,7 +12,7 @@
 class SatIPChannel : public DTVChannel
 {
   public:
-    SatIPChannel(TVRec *parent, const QString & device);
+    SatIPChannel(TVRec *parent, QString  device);
     ~SatIPChannel(void);
 
     // Commands
@@ -20,7 +20,7 @@ class SatIPChannel : public DTVChannel
     void Close(void) override;  // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex&) override;    // DTVChannel
+    bool Tune(const DTVMultiplex& /*tuning*/) override;    // DTVChannel
     bool Tune(const QString &channum) override; // DTVChannel
 
     // Gets

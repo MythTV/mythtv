@@ -439,7 +439,7 @@ class SatIPDeviceIDList : public TransMythUIComboBoxSetting
     void Load(void) override; // StandardSetting
 
   public slots:
-    void UpdateDevices(const QString&);
+    void UpdateDevices(const QString& /*v*/);
 
   signals:
     void NewTuner(const QString&);
@@ -463,7 +463,7 @@ class SatIPDeviceID : public MythUITextEditSetting
     void Load(void) override; // StandardSetting
 
   public slots:
-    void SetTuner(const QString&);
+    void SetTuner(const QString& /*tuner*/);
 
   private:
     const CaptureCard &m_parent;

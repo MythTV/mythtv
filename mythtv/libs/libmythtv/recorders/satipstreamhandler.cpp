@@ -33,7 +33,7 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
 
     if (it == s_handlers.end())
     {
-        SatIPStreamHandler *newhandler = new SatIPStreamHandler(devname, inputid);
+        auto *newhandler = new SatIPStreamHandler(devname, inputid);
         newhandler->Open();
         s_handlers[devname] = newhandler;
         s_handlersRefCnt[devname] = 1;
