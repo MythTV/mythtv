@@ -551,7 +551,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Unexpected result: shows don't "
                         "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
-                    .arg(m_title.left(35))
+                    .arg(m_title.left(35), 35)
                     .arg(m_starttime.toString(Qt::ISODate))
                     .arg(m_endtime.toString(Qt::ISODate))
                     .arg(programs[i].m_title.left(35), 35)
