@@ -1,3 +1,10 @@
+
+#if defined ANDROID && __ANDROID_API__ < 24
+// ftello and fseeko do not exist in android before api level 24
+#define ftello ftell
+#define fseeko fseek
+#endif
+
 // POSIX headers
 #include <unistd.h>
 #include <sys/time.h> // for gettimeofday

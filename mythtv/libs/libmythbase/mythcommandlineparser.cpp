@@ -20,6 +20,12 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 
+#if defined ANDROID && __ANDROID_API__ < 24
+// ftello and fseeko do not exist in android before api level 24
+#define ftello ftell
+#define fseeko fseek
+#endif
+
 // C++ headers
 #include <algorithm>
 #include <csignal>
