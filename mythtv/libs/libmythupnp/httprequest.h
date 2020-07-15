@@ -19,7 +19,7 @@
 #include <QBuffer>
 #include <QDateTime>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTcpSocket>
 #include <QTextStream>
 
@@ -110,8 +110,8 @@ class UPNP_PUBLIC HTTPRequest
 
         static const char  *s_szServerHeaders;
 
-        QRegExp             m_procReqLineExp    {"[ \r\n][ \r\n]*"};
-        QRegExp             m_parseRangeExp     {"(\\d|\\-)"};
+        QRegularExpression  m_procReqLineExp    {"\\s+"};
+        QRegularExpression  m_parseRangeExp     {"(\\d|\\-)"};
 
     public:
 

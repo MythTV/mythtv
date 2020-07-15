@@ -569,15 +569,14 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     // -=>TODO: This DOES NOT handle ('s or other complex expressions
     // ----------------------------------------------------------------------
 
-    QRegExp  rMatch( "\\b(or|and)\\b" );
-    rMatch.setCaseSensitivity(Qt::CaseInsensitive);
+    QRegularExpression re {"\\b(or|and)\\b", QRegularExpression::CaseInsensitiveOption};
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     request.m_sSearchList  = request.m_sSearchCriteria.split(
-        rMatch, QString::SkipEmptyParts);
+        re, QString::SkipEmptyParts);
 #else
     request.m_sSearchList  = request.m_sSearchCriteria.split(
-        rMatch, Qt::SkipEmptyParts);
+        re, Qt::SkipEmptyParts);
 #endif
     request.m_sSearchClass = "object";  // Default to all objects.
 
