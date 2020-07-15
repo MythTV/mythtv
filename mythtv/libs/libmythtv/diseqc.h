@@ -9,6 +9,7 @@
 
 // C++ headers
 #include <cinttypes>
+#include <climits>
 #include <vector>
 using namespace std;
 
