@@ -117,7 +117,7 @@ QStringList SatIP::doUPNPsearch(void)
     }
 
     satipservers->DecrRef();
-    satipservers = NULL;
+    satipservers = nullptr;
 
     return result;
 };

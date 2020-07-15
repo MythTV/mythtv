@@ -74,7 +74,7 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -98,7 +98,7 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
     }
 
     s_handlersRefCnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
@@ -296,7 +296,7 @@ bool SatIPStreamHandler::Open(void)
         QString deviceId = QString("uuid:%1").arg(devinfo.at(1));
 
         QString ip = SatIP::findDeviceIP(deviceId);
-        if (ip != NULL)
+        if (ip != nullptr)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + QString("Discovered device %1 at %2").arg(deviceId).arg(ip));
         }

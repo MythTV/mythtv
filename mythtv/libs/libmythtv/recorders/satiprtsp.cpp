@@ -218,7 +218,7 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
         headers.append(QString("Session: %1").arg(m_sessionid));
     }
 
-    if (additionalheaders != NULL)
+    if (additionalheaders != nullptr)
     {
         for (int i = 0; i < additionalheaders->count(); i++)
         {
