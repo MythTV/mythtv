@@ -2206,7 +2206,7 @@ bool CardUtil::GetV4LInfo(
 #endif // USING_V4L2
 
     if (!driver.isEmpty())
-        driver.remove( QRegExp("\\[[0-9]\\]$") );
+        driver.remove( QRegularExpression(R"(\[[0-9]\]$)") );
 
     return !input.isEmpty();
 }

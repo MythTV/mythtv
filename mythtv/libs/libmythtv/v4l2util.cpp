@@ -4,6 +4,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <climits>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -68,7 +69,7 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     }
 
     if (!m_driverName.isEmpty())
-        m_driverName.remove( QRegExp("\\[[0-9]\\]$") );
+        m_driverName.remove( QRegularExpression(R"(\[[0-9]\]$)") );
 
     OpenVBI(vbi_dev_name);
 

@@ -1447,7 +1447,7 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
 {
     // first try to base it on the channel number for human readability
     uint chanid = 0;
-    int chansep = chan_num.indexOf(QRegExp("\\D"));
+    int chansep = chan_num.indexOf(QRegularExpression(R"(\D)"));
     if (chansep > 0)
     {
         chanid =
@@ -2170,7 +2170,7 @@ inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
 {
     static QMutex s_sepExprLock;
-    static const QRegExp kSepExpr(ChannelUtil::kATSCSeparators);
+    static const QRegularExpression kSepExpr(ChannelUtil::kATSCSeparators);
 
     bool isIntA = false;
     bool isIntB = false;

@@ -101,7 +101,7 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         QMap<QString,uint> counts;
-        const QRegExp sepExpr("(_|-|#|\\.)");
+        const QRegularExpression sepExpr(R"((_|-|#|\.))");
         while (query.next())
         {
             const QString channum = query.value(0).toString();
