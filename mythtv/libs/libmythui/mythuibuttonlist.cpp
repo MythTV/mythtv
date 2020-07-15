@@ -1,12 +1,13 @@
 #include "mythuibuttonlist.h"
 
 #include <cmath>
+#include <utility>
 
 // QT headers
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QKeyEvent>
-#include <utility>
+#include <QRegularExpression>
 
 // libmyth headers
 #include "mythlogging.h"
@@ -748,7 +749,6 @@ bool MythUIButtonList::DistributeButtons(void)
     int bottom_height = 0;
 
     QList<int> row_heights;
-    QList<int>::iterator Iheight;
 
     LOG(VB_GUI, LOG_DEBUG, QString("DistributeButtons: "
                                    "selected item %1 total items %2")
@@ -3706,31 +3706,29 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
             QString newText = text->GetTemplateText();
 
-            QRegExp regexp(R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+))?%)");
-            regexp.setMinimal(true);
+            QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
 
-            if (!newText.isEmpty() && newText.contains(regexp))
+            if (!newText.isEmpty() && newText.contains(re))
             {
-                int pos = 0;
                 QString tempString = newText;
 
-                while ((pos = regexp.indexIn(newText, pos)) != -1)
-                {
-                    QString key = regexp.cap(4).toLower().trimmed();
+                QRegularExpressionMatchIterator i = re.globalMatch(newText);
+                while (i.hasNext()) {
+                    QRegularExpressionMatch match = i.next();
+                    QString key = match.captured(4).toLower().trimmed();
                     QString replacement;
                     QString value = m_strings.value(key).text;
 
                     if (!value.isEmpty())
                     {
                         replacement = QString("%1%2%3%4")
-                                      .arg(regexp.cap(2))
-                                      .arg(regexp.cap(3))
+                                      .arg(match.captured(2))
+                                      .arg(match.captured(3))
                                       .arg(m_strings.value(key).text)
-                                      .arg(regexp.cap(6));
+                                      .arg(match.captured(6));
                     }
 
-                    tempString.replace(regexp.cap(0), replacement);
-                    pos += regexp.matchedLength();
+                    tempString.replace(match.captured(0), replacement);
                 }
 
                 newText = tempString;

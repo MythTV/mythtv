@@ -9,6 +9,7 @@
 #include <QFontMetrics>
 #include <QString>
 #include <QHash>
+#include <QRegularExpression>
 
 #include "mythlogging.h"
 
@@ -101,28 +102,25 @@ void MythUIText::ResetMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp(R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+))?%)");
-    regexp.setMinimal(true);
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
 
     bool replaced = map.contains(objectName());
 
-    if (!replaced && !newText.isEmpty() && newText.contains(regexp))
+    if (!replaced && !newText.isEmpty() && newText.contains(re))
     {
-        int pos = 0;
-
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
                                                      newText.toUtf8());
 
-        while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
-        {
-            QString key = regexp.cap(4).toLower().trimmed();
+        QRegularExpressionMatchIterator i = re.globalMatch(translatedTemplate);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            QString key = match.captured(4).toLower().trimmed();
 
             if (map.contains(key))
             {
                 replaced = true;
                 break;
             }
-            pos += regexp.matchedLength();
         }
     }
 
@@ -162,22 +160,20 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegExp regexp(R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+))?%)");
-    regexp.setMinimal(true);
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
 
-    if (!newText.isEmpty() && newText.contains(regexp))
+    if (!newText.isEmpty() && newText.contains(re))
     {
-        int pos = 0;
-
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
                                                      newText.toUtf8());
 
         QString tempString = translatedTemplate;
         bool replaced = map.contains(objectName());
 
-        while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
-        {
-            QString key = regexp.cap(4).toLower().trimmed();
+        QRegularExpressionMatchIterator i = re.globalMatch(translatedTemplate);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            QString key = match.captured(4).toLower().trimmed();
             QString replacement;
 
             if (map.contains(key))
@@ -187,14 +183,13 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
             if (!map.value(key).isEmpty())
             {
                 replacement = QString("%1%2%3%4")
-                .arg(regexp.cap(2))
-                .arg(regexp.cap(3))
+                .arg(match.captured(2))
+                .arg(match.captured(3))
                 .arg(map.value(key))
-                .arg(regexp.cap(6));
+                .arg(match.captured(6));
             }
 
-            tempString.replace(regexp.cap(0), replacement);
-            pos += regexp.matchedLength();
+            tempString.replace(match.captured(0), replacement);
         }
         if (replaced)
         {
