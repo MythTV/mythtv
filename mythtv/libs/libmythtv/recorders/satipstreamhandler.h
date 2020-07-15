@@ -3,8 +3,6 @@
 #ifndef _SATIPSTREAMHANDLER_H_
 #define _SATIPSTREAMHANDLER_H_
 
-using namespace std;
-
 // Qt headers
 #include <QString>
 #include <QStringList>
