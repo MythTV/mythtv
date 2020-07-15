@@ -7,11 +7,19 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <QOpenGLExtraFunctions>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLTexture>
 #include <QOpenGLBuffer>
 #include <QOpenGLDebugLogger>
+#else
+#include <QtOpenGL/QOpenGLTexture>
+#include <QtOpenGL/QOpenGLShaderProgram>
+#include <QtOpenGL/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLBuffer>
+#include <QtOpenGL/QOpenGLDebugLogger>
+#endif
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>

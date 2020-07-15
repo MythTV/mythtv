@@ -3,7 +3,11 @@
 
 // Qt
 #include <QVector>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QOpenGLTimeMonitor>
+#else
+#include <QtOpenGL/QOpenGLTimeMonitor>
+#endif
 
 // QOpenGLTimeMonitor is not available with Qt GLES2 builds
 #if defined(QT_OPENGL_ES_2)
