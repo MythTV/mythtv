@@ -1,7 +1,7 @@
 include ( ../../settings.pro )
 
 QT += xml sql network widgets
-using_qtwebkit {
+using_qtwebkit: contains(QT_MAJOR_VERSION, 5): {
     QT += webkitwidgets
 }
 android: QT += androidextras

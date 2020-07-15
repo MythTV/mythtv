@@ -1,6 +1,7 @@
 include ( ../../settings.pro )
 
-QT += network xml sql script widgets
+QT += network xml sql widgets
+contains(QT_MAJOR_VERSION, 5): QT += script
 android: QT += androidextras
 
 TEMPLATE = lib
