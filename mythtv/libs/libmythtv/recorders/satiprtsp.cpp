@@ -4,6 +4,7 @@
 #include <chrono>
 
 // Qt includes
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QTcpSocket>
@@ -237,12 +238,9 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
     QString request = headers.join("\r\n");
     ctrl_socket.write(request.toLatin1());
 
-    QRegExp firstLineRegex(
-        "^RTSP/1.0 (\\d+) ([^\r\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
-    QRegExp headerRegex(
-        R"(^([^:]+):\s*([^\r\n]+))", Qt::CaseSensitive, QRegExp::RegExp2);
-    QRegExp blankLineRegex(
-        "^[\\r\\n]*$", Qt::CaseSensitive, QRegExp::RegExp2);
+    QRegularExpression firstLineRE {  "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
+    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"    };
+    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                 };
 
     bool firstLine = true;
     while (true)
@@ -262,14 +260,16 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
         LOG(VB_RECORD, LOG_DEBUG, LOC + "sendMessage " +
             QString("read: %1").arg(line.simplified()));
 
+        QRegularExpressionMatch match;
         if (firstLine)
         {
-            if (firstLineRegex.indexIn(line) == -1)
+            match = firstLineRE.match(line);
+            if (!match.hasMatch())
             {
                 return false;
             }
 
-            QStringList parts = firstLineRegex.capturedTexts();
+            QStringList parts = match.capturedTexts();
             int responseCode = parts.at(1).toInt();
             //const QString& responseMsg = parts.at(2);
 
@@ -281,13 +281,15 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
             continue;
         }
 
-        if (blankLineRegex.indexIn(line) != -1) break;
+        match = blankLineRE.match(line);
+        if (match.hasMatch()) break;
 
-        if (headerRegex.indexIn(line) == -1)
+        match = headerRE.match(line);
+        if (!match.hasMatch())
         {
             return false;
         }
-        QStringList parts = headerRegex.capturedTexts();
+        QStringList parts = match.capturedTexts();
         m_headers.insert(parts.at(1).toUpper(), parts.at(2));
     }
 

@@ -162,8 +162,9 @@ QString VBox::getIPFromVideoDevice(const QString& dev)
     QString id = devItems.at(0).trimmed();
 
     // if we already have an ip address use that
-    QRegExp ipRegExp(R"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})");
-    if (id.indexOf(ipRegExp) == 0)
+    QRegularExpression ipRE { R"(^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$)" };
+    auto match = ipRE.match(id);
+    if (match.hasMatch())
         return id;
 
     // we must have a vbox id so look it up to find the ip address

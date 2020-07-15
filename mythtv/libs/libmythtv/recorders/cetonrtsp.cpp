@@ -4,6 +4,7 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTcpSocket>
 #include <QUrl>
@@ -121,12 +122,9 @@ bool CetonRTSP::ProcessRequest(
     if (!waitforanswer)
         return true;
 
-    QRegExp firstLineRegex(
-        "^RTSP/1.0 (\\d+) ([^\r\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
-    QRegExp headerRegex(
-        R"(^([^:]+):\s*([^\r\n]+))", Qt::CaseSensitive, QRegExp::RegExp2);
-    QRegExp blankLineRegex(
-        "^[\\r\\n]*$", Qt::CaseSensitive, QRegExp::RegExp2);
+    QRegularExpression firstLineRE {  "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
+    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"    };
+    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                 };
 
     bool firstLine = true;
     while (true)
@@ -145,9 +143,11 @@ bool CetonRTSP::ProcessRequest(
         QString line = m_socket->readLine();
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("read: %1").arg(line));
 
+        QRegularExpressionMatch match;
         if (firstLine)
         {
-            if (firstLineRegex.indexIn(line) == -1)
+            match = firstLineRE.match(line);
+            if (!match.hasMatch())
             {
                 m_responseCode = -1;
                 m_responseMessage =
@@ -156,7 +156,7 @@ bool CetonRTSP::ProcessRequest(
                 return false;
             }
 
-            QStringList parts = firstLineRegex.capturedTexts();
+            QStringList parts = match.capturedTexts();
             m_responseCode = parts.at(1).toInt();
             m_responseMessage = parts.at(2);
 
@@ -171,16 +171,18 @@ bool CetonRTSP::ProcessRequest(
             continue;
         }
 
-        if (blankLineRegex.indexIn(line) != -1) break;
+        match = blankLineRE.match(line);
+        if (match.hasMatch()) break;
 
-        if (headerRegex.indexIn(line) == -1)
+        match = headerRE.match(line);
+        if (!match.hasMatch())
         {
             m_responseCode = -1;
             m_responseMessage = QString("Could not parse response header: '%1'")
                 .arg(line);
             return false;
         }
-        QStringList parts = headerRegex.capturedTexts();
+        QStringList parts = match.capturedTexts();
         m_responseHeaders.insert(parts.at(1), parts.at(2));
     }
 
@@ -241,7 +243,7 @@ bool CetonRTSP::GetOptions(QStringList &options)
 {
     if (ProcessRequest("OPTIONS"))
     {
-        options = m_responseHeaders.value("Public").split(QRegExp(",\\s*"));
+        options = m_responseHeaders.value("Public").split(QRegularExpression(",\\s*"));
         m_canGetParameter = options.contains("GET_PARAMETER");
 
         return true;
