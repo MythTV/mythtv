@@ -5,8 +5,7 @@
 #ifndef DSMCC_OBJCAROUSEL_H
 #define DSMCC_OBJCAROUSEL_H
 
-#include <QLinkedList>
-
+#include <list>
 #include <vector>
 using namespace std;
 
@@ -70,7 +69,7 @@ class ObjCarousel
     void AddModuleData(DsmccDb *ddb, const unsigned char *data);
 
     DSMCCCache                         m_fileCache;
-    QLinkedList<DSMCCCacheModuleData*> m_Cache;
+    std::list<DSMCCCacheModuleData*>   m_Cache;
     /// Component tags matched to this carousel.
     vector<unsigned short>             m_Tags;
     unsigned long                      m_id        {0};

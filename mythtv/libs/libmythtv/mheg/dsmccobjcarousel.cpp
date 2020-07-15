@@ -146,7 +146,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
 ObjCarousel::~ObjCarousel()
 {
-    for (const auto & cache : qAsConst(m_Cache))
+    for (const auto & cache : m_Cache)
         delete cache;
     m_Cache.clear();
 }
@@ -216,7 +216,7 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
         status->AddTap(tag, cachep->CarouselId());
 
         // Add this module to the cache.
-        m_Cache.append(cachep);
+        m_Cache.push_back(cachep);
     }
 }
 
@@ -230,7 +230,7 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
     LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
-    for (auto *cachep : qAsConst(m_Cache))
+    for (auto *cachep : m_Cache)
     {
         if (cachep->CarouselId() == m_id &&
             (cachep->ModuleId() == ddb->m_moduleId))

@@ -5,7 +5,8 @@
 #ifndef LIBDSMCC_H
 #define LIBDSMCC_H
 
-#include <QLinkedList>
+#include <list>
+
 #include <QStringList>
 
 #include "dsmccreceiver.h"
@@ -110,7 +111,7 @@ class Dsmcc
     ObjCarousel *GetCarouselById(unsigned int carouselId);
 
     // Known carousels.
-    QLinkedList<ObjCarousel*> m_carousels;
+    std::list<ObjCarousel*> m_carousels;
 
     // Initial stream
     unsigned short m_startTag {0};

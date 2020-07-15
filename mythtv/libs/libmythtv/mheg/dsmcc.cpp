@@ -63,7 +63,7 @@ ObjCarousel *Dsmcc::AddTap(unsigned short componentTag, unsigned carouselId)
     if (car == nullptr)
     { // Need to make a new one.
         car = new ObjCarousel(this);
-        m_carousels.append(car);
+        m_carousels.push_back(car);
         car->m_id = carouselId;
     }
 
@@ -454,7 +454,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
             .arg(carouselId).arg(dataBroadcastId,0,16));
 
     bool found = false;
-    for (auto *car : qAsConst(m_carousels))
+    for (auto *car : m_carousels)
     {
         // Is the component tag one of the ones we know?
         vector<unsigned short>::iterator it2;
@@ -536,7 +536,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 void Dsmcc::Reset()
 {
     LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Resetting carousel");
-    for (const auto & carousel : qAsConst(m_carousels))
+    for (const auto & carousel : m_carousels)
         delete carousel;
     m_carousels.clear();
     m_startTag = 0;
@@ -544,8 +544,7 @@ void Dsmcc::Reset()
 
 int Dsmcc::GetDSMCCObject(QStringList &objectPath, QByteArray &result)
 {
-    QLinkedList<ObjCarousel*>::iterator it = m_carousels.begin();
-
+    auto it = m_carousels.begin();
     if (it == m_carousels.end())
         return 1; // Not yet loaded.
 
