@@ -43,7 +43,6 @@ class SatIPChannel : public DTVChannel
     QStringList         m_args;
     mutable QMutex      m_tuneLock;
     mutable QMutex      m_streamLock;
-    volatile bool       m_firstTune           {true};
     SatIPStreamHandler *m_streamHandler       {nullptr};
     MPEGStreamData     *m_streamData          {nullptr};
     QString             m_videodev;

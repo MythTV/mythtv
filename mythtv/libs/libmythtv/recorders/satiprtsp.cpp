@@ -271,7 +271,7 @@ bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheader
 
             QStringList parts = firstLineRegex.capturedTexts();
             int responseCode = parts.at(1).toInt();
-            const QString& responseMsg = parts.at(2);
+            //const QString& responseMsg = parts.at(2);
 
             if (responseCode != 200)
             {
