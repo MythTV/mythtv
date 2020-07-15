@@ -20,6 +20,7 @@ using namespace std;
 #include <QFile>
 #include <QKeyEvent>
 #include <QRegExp>
+#include <QRegularExpression>
 #include <QRunnable>
 #include <QTimerEvent>
 #include <utility>
@@ -5017,7 +5018,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 ChangeChannel(ctx, CHANNEL_DIRECTION_UP);
             else if (tokens[2] == "DOWN")
                 ChangeChannel(ctx, CHANNEL_DIRECTION_DOWN);
-            else if (tokens[2].contains(QRegExp("^[-\\.\\d_#]+$")))
+            else if (tokens[2].contains(QRegularExpression(R"(^[-\.\d_#]+$)")))
                 ChangeChannel(ctx, 0, tokens[2]);
         }
     }
@@ -5045,22 +5046,18 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             float tmpSpeed = 1.0F;
             bool ok = false;
 
-            if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
+            if (tokens[2].contains(QRegularExpression(R"(^\-*(\d*\.)?\d+x$)")))
             {
                 QString speed = tokens[2].left(tokens[2].length()-1);
                 tmpSpeed = speed.toFloat(&ok);
             }
-            else if (tokens[2].contains(QRegExp(R"(^\-*\d*\.\d+x$)")))
-            {
-                QString speed = tokens[2].left(tokens[2].length() - 1);
-                tmpSpeed = speed.toFloat(&ok);
-            }
             else
             {
-                QRegExp re = QRegExp(R"(^(\-*\d+)\/(\d+)x$)");
-                if (tokens[2].contains(re))
+                QRegularExpression re { R"(^(\-*\d+)\/(\d+)x$)" };
+                auto match = re.match(tokens[2]);
+                if (match.hasMatch())
                 {
-                    QStringList matches = re.capturedTexts();
+                    QStringList matches = match.capturedTexts();
                     int numerator = matches[1].toInt(&ok);
                     int denominator = matches[2].toInt(&ok);
 
@@ -5177,7 +5174,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         else if ((tokens[2] == "POSITION" ||
                   tokens[2] == "POSITIONWITHCUTLIST") &&
                  (tokens.size() == 4) &&
-                 (tokens[3].contains(QRegExp("^\\d+$"))))
+                 (tokens[3].contains(QRegularExpression("^\\d+$"))))
         {
             DoSeekAbsolute(ctx, tokens[3].toInt(),
                            tokens[2] == "POSITIONWITHCUTLIST");
@@ -5260,10 +5257,11 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
     {
-        QRegExp re = QRegExp("(\\d+)%");
-        if (tokens[2].contains(re))
+        QRegularExpression re { "(\\d+)%" };
+        auto match = re.match(tokens[2]);
+        if (match.hasMatch())
         {
-            QStringList matches = re.capturedTexts();
+            QStringList matches = match.capturedTexts();
 
             LOG(VB_GENERAL, LOG_INFO, QString("Set Volume to %1%")
                     .arg(matches[1]));
@@ -5317,10 +5315,11 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             }
             else
             {
-                QRegExp re = QRegExp("Play (.*)x");
-                if (ctx->GetPlayMessage().contains(re))
+                QRegularExpression re { "Play (.*)x" };
+                auto match = re.match(ctx->GetPlayMessage());
+                if (match.hasMatch())
                 {
-                    QStringList matches = re.capturedTexts();
+                    QStringList matches = match.capturedTexts();
                     speedStr = QString("%1x").arg(matches[1]);
                 }
                 else
