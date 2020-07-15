@@ -150,7 +150,7 @@ void SatIPStreamHandler::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
-    QTime last_update;
+    QElapsedTimer last_update;
 
     while (m_runningDesired && !m_bError)
     {
