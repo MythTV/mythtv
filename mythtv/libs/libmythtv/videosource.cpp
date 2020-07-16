@@ -1192,7 +1192,7 @@ class DVBEITScan : public MythUICheckBoxSetting
         setHelpText(
             QObject::tr("If enabled, activate active scanning for "
                         "program data (EIT). When this option is enabled "
-                        "the DVB card is constantly in-use."));
+                        "the DVB card is constantly in use."));
     };
 };
 
@@ -1386,12 +1386,12 @@ class HDHomeRunEITScan : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_eitscan"))
     {
-        setLabel(QObject::tr("Use HD HomeRun for active EIT scan"));
+        setLabel(QObject::tr("Use HDHomeRun for active EIT scan"));
         setValue(true);
         setHelpText(
             QObject::tr("If enabled, activate active scanning for "
                         "program data (EIT). When this option is enabled "
-                        "the HD HomeRun is constantly in-use."));
+                        "the HDHomeRun is constantly in use."));
     };
 };
 
@@ -4009,6 +4009,7 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     a_cardtype.addTargetedChild("SATIP", m_deviceId);
     a_cardtype.addTargetedChild("SATIP", new SignalTimeout(m_parent, 7000, 1000));
     a_cardtype.addTargetedChild("SATIP", new ChannelTimeout(m_parent, 10000, 2000));
+    a_cardtype.addTargetedChild("SATIP", new DVBEITScan(m_parent));
 
     connect(m_deviceIdList, SIGNAL(NewTuner(const QString&)),
             m_deviceId,     SLOT(  SetTuner(const QString&)));
