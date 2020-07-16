@@ -77,12 +77,13 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
     : DTVChannel(parent), m_device(std::move(aDevice))
 {
     s_master_map_lock.lockForWrite();
-    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
+    m_key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
     if (m_pParent)
-        key += QString(":%1")
+        m_key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    s_master_map[key].push_back(this); // == RegisterForMaster
-    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
+
+    s_master_map[m_key].push_back(this); // == RegisterForMaster
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
     if (master == this)
     {
         m_dvbCam = new DVBCam(m_device);
@@ -103,17 +104,13 @@ DVBChannel::~DVBChannel()
     // set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     s_master_map_lock.lockForWrite();
-    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
-    if (m_pParent)
-        key += QString(":%1")
-            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
     if (master == this)
     {
-        s_master_map[key].pop_front();
+        s_master_map[m_key].pop_front();
         DVBChannel *new_master = nullptr;
-        if (!s_master_map[key].empty())
-            new_master = dynamic_cast<DVBChannel*>(s_master_map[key].front());
+        if (!s_master_map[m_key].empty())
+            new_master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
         if (new_master)
         {
             QMutexLocker master_locker(&(master->m_hwLock));
@@ -123,7 +120,7 @@ DVBChannel::~DVBChannel()
     }
     else
     {
-        s_master_map[key].removeAll(this);
+        s_master_map[m_key].removeAll(this);
     }
     s_master_map_lock.unlock();
 
@@ -131,7 +128,7 @@ DVBChannel::~DVBChannel()
 
     // if we're the last one out delete dvbcam
     s_master_map_lock.lockForRead();
-    MasterMap::iterator mit = s_master_map.find(key);
+    MasterMap::iterator mit = s_master_map.find(m_key);
     if ((*mit).empty())
         delete m_dvbCam;
     m_dvbCam = nullptr;
@@ -1358,11 +1355,7 @@ void DVBChannel::ReturnMasterLock(DVBChannel* &dvbm)
 
 DVBChannel *DVBChannel::GetMasterLock(void) const
 {
-    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
-    if (m_pParent)
-        key += QString(":%1")
-            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DTVChannel *master = DTVChannel::GetMasterLock(key);
+    DTVChannel *master = DTVChannel::GetMasterLock(m_key);
     auto *dvbm = dynamic_cast<DVBChannel*>(master);
     if (master && !dvbm)
         DTVChannel::ReturnMasterLock(master);
