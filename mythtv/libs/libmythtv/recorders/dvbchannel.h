@@ -162,7 +162,8 @@ class DVBChannel : public DTVChannel
     // Other State
                       /// File descriptor for tuning hardware
     int               m_fdFrontend          {-1};
-    QString           m_device;      ///< DVB Device
+    QString           m_device;                 // DVB Device
+    QString           m_key;                    // master lock key
                       /// true iff our driver munges PMT
     bool              m_hasCrcBug           {false};
 
