@@ -87,10 +87,9 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
 
             // loop through different types of grabber scripts and the 
             // directories they are stored in
-            QMap<GrabberType, GrabberOpts>::const_iterator it;
-            for (it = grabberTypes.begin(); it != grabberTypes.end(); ++it)
+            for (const auto& grabberType : qAsConst(grabberTypes))
             {
-                QString path = (it->m_path).arg(GetShareDir());
+                QString path = (grabberType.m_path).arg(GetShareDir());
                 QStringList scripts = QDir(path).entryList(QDir::Executable | QDir::Files);
                 if (scripts.count() == 0)
                     // no scripts found
