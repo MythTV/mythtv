@@ -165,21 +165,21 @@ bool InitializeDatabase()
         updates << QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                 .arg(gContext->GetDatabaseParams().m_dbName) <<
             "ALTER TABLE weatherdatalayout"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY location varchar(64) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY dataitem varchar(64) CHARACTER SET utf8 NOT NULL;" <<
             "ALTER TABLE weatherscreens"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY container varchar(64) CHARACTER SET utf8 NOT NULL,"
-            "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL;" <<
+            "  MODIFY hostname varchar(64) CHARACTER SET utf8 NULL;" <<
             "ALTER TABLE weathersourcesettings"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY source_name varchar(64) CHARACTER SET utf8 NOT NULL,"
-            "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL,"
-            "  MODIFY path varchar(255) CHARACTER SET utf8 default NULL,"
-            "  MODIFY author varchar(128) CHARACTER SET utf8 default NULL,"
-            "  MODIFY version varchar(32) CHARACTER SET utf8 default NULL,"
-            "  MODIFY email varchar(255) CHARACTER SET utf8 default NULL,"
+            "  MODIFY hostname varchar(64) CHARACTER SET utf8 NULL,"
+            "  MODIFY path varchar(255) CHARACTER SET utf8 NULL,"
+            "  MODIFY author varchar(128) CHARACTER SET utf8 NULL,"
+            "  MODIFY version varchar(32) CHARACTER SET utf8 NULL,"
+            "  MODIFY email varchar(255) CHARACTER SET utf8 NULL,"
             "  MODIFY types mediumtext CHARACTER SET utf8;";
 
         if (!performActualUpdate(updates, "1003", dbver))

@@ -788,49 +788,49 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                     .arg(gContext->GetDatabaseParams().m_dbName),
             // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY filename varchar(255) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_albums"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY album_name varchar(255) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_artists"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY artist_name varchar(255) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_directories"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY path text CHARACTER SET utf8 NOT NULL;",
             "ALTER TABLE music_genres"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY genre varchar(255) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_playlists"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY playlist_name varchar(255) CHARACTER SET utf8 NOT NULL default '',"
             "  MODIFY playlist_songs text CHARACTER SET utf8 NOT NULL,"
             "  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_smartplaylist_categories"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL;",
             "ALTER TABLE music_smartplaylist_items"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY field varchar(50) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY operator varchar(20) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY value1 varchar(255) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY value2 varchar(255) CHARACTER SET utf8 NOT NULL;",
             "ALTER TABLE music_smartplaylists"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY orderby varchar(128) CHARACTER SET utf8 NOT NULL default '';",
             "ALTER TABLE music_songs"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
             "  MODIFY name varchar(255) CHARACTER SET utf8 NOT NULL default '',"
             "  MODIFY format varchar(4) CHARACTER SET utf8 NOT NULL default '0',"
-            "  MODIFY mythdigest varchar(255) CHARACTER SET utf8 default NULL,"
-            "  MODIFY description varchar(255) CHARACTER SET utf8 default NULL,"
-            "  MODIFY comment varchar(255) CHARACTER SET utf8 default NULL,"
-            "  MODIFY eq_preset varchar(255) CHARACTER SET utf8 default NULL;",
+            "  MODIFY mythdigest varchar(255) CHARACTER SET utf8 NULL,"
+            "  MODIFY description varchar(255) CHARACTER SET utf8 NULL,"
+            "  MODIFY comment varchar(255) CHARACTER SET utf8 NULL,"
+            "  MODIFY eq_preset varchar(255) CHARACTER SET utf8 NULL;",
             "ALTER TABLE music_stats"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SEt utf8,"
             "  MODIFY total_time varchar(12) CHARACTER SET utf8 NOT NULL default '0',"
             "  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';",
             ""

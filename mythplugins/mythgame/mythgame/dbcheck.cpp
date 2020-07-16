@@ -343,7 +343,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
         .arg(gContext->GetDatabaseParams().m_dbName),
 "ALTER TABLE gamemetadata"
-"  DEFAULT CHARACTER SET default,"
+"  DEFAULT CHARACTER SET utf8,"
 "  MODIFY `system` varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY romname varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY gamename varchar(128) CHARACTER SET utf8 NOT NULL default '',"
@@ -356,7 +356,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  MODIFY crc_value varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY version varchar(64) CHARACTER SET utf8 NOT NULL default '';",
 "ALTER TABLE gameplayers"
-"  DEFAULT CHARACTER SET default,"
+"  DEFAULT CHARACTER SET utf8,"
 "  MODIFY playername varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY workingpath varchar(255) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY rompath varchar(255) CHARACTER SET utf8 NOT NULL default '',"
@@ -365,7 +365,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  MODIFY gametype varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY extensions varchar(128) CHARACTER SET utf8 NOT NULL default '';",
 "ALTER TABLE romdb"
-"  DEFAULT CHARACTER SET default,"
+"  DEFAULT CHARACTER SET utf8,"
 "  MODIFY crc varchar(64) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY description varchar(128) CHARACTER SET utf8 NOT NULL default '',"

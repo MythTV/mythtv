@@ -143,12 +143,12 @@ bool UpgradeArchiveDatabaseSchema(void)
             QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                     .arg(gContext->GetDatabaseParams().m_dbName),
             "ALTER TABLE archiveitems"
-            "  DEFAULT CHARACTER SET default,"
-            "  MODIFY title varchar(128) CHARACTER SET utf8 default NULL,"
-            "  MODIFY subtitle varchar(128) CHARACTER SET utf8 default NULL,"
+            "  DEFAULT CHARACTER SET utf8,"
+            "  MODIFY title varchar(128) CHARACTER SET utf8 NULL,"
+            "  MODIFY subtitle varchar(128) CHARACTER SET utf8 NULL,"
             "  MODIFY description text CHARACTER SET utf8,"
-            "  MODIFY startdate varchar(30) CHARACTER SET utf8 default NULL,"
-            "  MODIFY starttime varchar(30) CHARACTER SET utf8 default NULL,"
+            "  MODIFY startdate varchar(30) CHARACTER SET utf8 NULL,"
+            "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL,"
             "  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
             "  MODIFY cutlist text CHARACTER SET utf8;",
             ""
