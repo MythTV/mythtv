@@ -6472,19 +6472,7 @@ EOF
 
 qt_compiler_check Q_COMPILER_NULLPTR && enable enforce_nullptr
 case "$cc_type" in
-    gcc)
-        # Gcc < 6 doesn't seem to ignore warnings in system headers
-        if [ $gxx_major -lt 6 ] ; then
-            disable enforce_nullptr
-        fi
-        ;;
     clang)
-        if [ $clangxx_major -lt 6 ]; then
-            # The zero-as-null-pointer-constant warning wasn't added
-            # until clang 5.0, and clang < 6 doesn't seem to ignore
-            # warnings in all system headers.
-            disable enforce_nullptr
-        fi
         # Clang on FreeBSD doesn't ignore warnings in system headers.
         # A trivial test shows that Clang defaults /usr/local/include
         # to a system directory, but somehow this gets messed up in
@@ -6580,12 +6568,6 @@ enable enforce_wshadow
 case $target_os in
     android)
         disable enforce_wshadow
-        ;;
-    linux)
-        . /etc/os-release
-        if test $ID = "centos" && test $VERSION_ID -le 7; then
-            disable enforce_wshadow
-        fi
         ;;
 esac
 
