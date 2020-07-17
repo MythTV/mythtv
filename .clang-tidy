@@ -158,9 +158,6 @@ Checks: '-*,
 
     modernize-*,
 
-        # Lots of changes to be done. ,
-       -modernize-avoid-c-arrays,
-
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
