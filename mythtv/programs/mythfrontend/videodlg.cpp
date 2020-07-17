@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <set>
 #include <map>
 #include <functional>   //not2
@@ -405,7 +407,7 @@ namespace
                 else
                 {
                     if (fanartLoader == nullptr)
-                        fanartLoader.reset(new FanartLoader);
+                        fanartLoader = std::make_unique<FanartLoader>();
                     fanartLoader->LoadImage(filename, image);
                 }
             }
