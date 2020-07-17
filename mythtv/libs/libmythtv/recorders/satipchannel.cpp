@@ -12,16 +12,26 @@
 #include "satiputils.h"
 #include "satipchannel.h"
 
-#define LOC  QString("SatIPChan[%1](%2): ").arg(m_inputId).arg(GetDevice())
+#define LOC  QString("SatIPChan[%1](%2): ").arg(m_inputId).arg(SatIPChannel::GetDevice())
 
 SatIPChannel::SatIPChannel(TVRec *parent, QString  device) :
     DTVChannel(parent), m_device(std::move(device))
 {
+    RegisterForMaster(m_device);
 }
 
 SatIPChannel::~SatIPChannel(void)
 {
     SatIPChannel::Close();
+    DeregisterForMaster(m_device);
+}
+
+bool SatIPChannel::IsMaster(void) const
+{
+    DTVChannel *master = DTVChannel::GetMasterLock(m_device);
+    bool is_master = (master == static_cast<const DTVChannel*>(this));
+    DTVChannel::ReturnMasterLock(master);
+    return is_master;
 }
 
 bool SatIPChannel::Open(void)
@@ -44,26 +54,16 @@ bool SatIPChannel::Open(void)
         Close();
         return false;
     }
-    OpenStreamHandler();
+
+    m_streamHandler = SatIPStreamHandler::Get(m_device, GetInputID());
+
     return true;
 }
 
 void SatIPChannel::Close()
 {
-    LOG(VB_CHANNEL, LOG_INFO, QString("SatIPChan[%1](%2): Close()")
-        .arg(m_inputId).arg(SatIPChannel::GetDevice()));
-    CloseStreamHandler();
-}
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Close()");
 
-void SatIPChannel::OpenStreamHandler(void)
-{
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC + "OpenStreamHandler()");
-    m_streamHandler = SatIPStreamHandler::Get(m_device, GetInputID());
-}
-
-void SatIPChannel::CloseStreamHandler(void)
-{
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC + "CloseStreamHandler()");
     QMutexLocker locker(&m_streamLock);
     if (m_streamHandler)
     {

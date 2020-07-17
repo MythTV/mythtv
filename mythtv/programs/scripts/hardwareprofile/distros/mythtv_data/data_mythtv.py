@@ -423,7 +423,7 @@ class _Mythtv_data(object):
 
         cardtypes = {}
         virtual = [0,0]
-        virtualtypes = ('DVB', 'HDHOMERUN', 'ASI')
+        virtualtypes = ('DVB', 'HDHOMERUN', 'SATIP', 'ASI')
 
         for card in CaptureCard.getAllEntries(db=_DB):
             isvirt = (card.cardtype in virtualtypes)

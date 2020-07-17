@@ -1910,9 +1910,9 @@ uint CardUtil::CreateDeviceInputGroup(uint inputid,
                                       const QString &device)
 {
     QString name = host + '|' + device;
-    if (type == "FREEBOX" || type == "IMPORT" ||
-        type == "DEMO"    || type == "EXTERNAL" ||
-        type == "HDHOMERUN")
+    if (type == "FREEBOX"   || type == "IMPORT"   ||
+        type == "DEMO"      || type == "EXTERNAL" ||
+        type == "HDHOMERUN" || type == "SATIP")
         name += QString("|%1").arg(inputid);
     return CreateInputGroup(name);
 }

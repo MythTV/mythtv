@@ -29,14 +29,9 @@ class SatIPChannel : public DTVChannel
        { return m_device; }
     bool IsPIDTuningSupported(void) const override  // DTVChannel
         { return true; }
-    bool IsMaster(void) const override              // DTVChannel
-        { return true; }
+    bool IsMaster(void) const override;             // DTVChannel
     
     SatIPStreamHandler *GetStreamHandler(void) const { return m_streamHandler; }
-
-  private:
-    void OpenStreamHandler(void);
-    void CloseStreamHandler(void);
 
   private:
     QString             m_device;
