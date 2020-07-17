@@ -8,17 +8,14 @@
 bool DTVParamHelper::ParseParam(const QString &symbol, int &value,
                                 const DTVParamHelperVec &table)
 {
-    for (const auto & item : table)
-    {
-        if (item.symbol == symbol) //.left(p->symbol.length()))
-        {
-            //symbol = symbol.mid(p->symbol.length());
-            value = item.value;
-            return true;
-        }
-    }
+    auto it = std::find_if(table.cbegin(), table.cend(),
+                           [symbol](const auto& item) -> bool
+                               {return item.symbol == symbol;});
+    if (it == table.cend())
+        return false;
 
-    return false;
+    value = it->value;
+    return true;
 }
 
 QString DTVParamHelper::toString(const DTVParamStringVec &strings, int index)
