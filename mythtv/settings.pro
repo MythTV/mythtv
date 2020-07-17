@@ -28,6 +28,10 @@ win32-msvc* {
 CONFIG += $$CCONFIG
 CONFIG += c++17
 
+# Make sure all the Qt header files are marked as system headers
+QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
+INCLUDEPATH += $$[QT_INSTALL_HEADERS]
+
 defineReplace(avLibName) {
         NAME = $$1
 

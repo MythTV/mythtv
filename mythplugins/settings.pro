@@ -1,6 +1,10 @@
 CONFIG += $$CCONFIG
 CONFIG += c++17
 
+# Make sure all the Qt header files are marked as system headers
+QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
+INCLUDEPATH += $$[QT_INSTALL_HEADERS]
+
 LIBVERSION = 32
 
 MY_INSTALL_INCLUDE = $${SYSROOT}$${PREFIX}/include
