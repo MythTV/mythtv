@@ -9,8 +9,8 @@ class MythOpticalBuffer : public MythMediaBuffer
   public:
     explicit MythOpticalBuffer(MythBufferType Type);
 
-    bool         IsInMenu            (void) const override final;
-    bool         IsStreamed          (void) override final { return true; }
+    bool         IsInMenu            (void) const override;
+    bool         IsStreamed          (void) override { return true; }
     virtual bool GetNameAndSerialNum (QString& Name, QString& SerialNumber) = 0;
 
   protected:
