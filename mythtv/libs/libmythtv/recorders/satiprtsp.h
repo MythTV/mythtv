@@ -22,7 +22,7 @@
 
 class SatIPRTSP;
 class SatIPStreamHandler;
-typedef QMap<QString, QString> Headers;
+using Headers = QMap<QString, QString>;
 
 class SatIPRTSPReadHelper : QObject
 {
