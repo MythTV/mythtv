@@ -42,7 +42,7 @@ class MUI_PUBLIC MythPainter : public QObject
      *  DeleteImagePriv() is a pure virtual in this class. Instead
      *  children should call MythPainter::Teardown() for cleanup.
      */
-    virtual ~MythPainter() = default;
+    ~MythPainter() override = default;
 
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;

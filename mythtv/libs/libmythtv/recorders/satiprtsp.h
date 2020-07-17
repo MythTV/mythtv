@@ -31,7 +31,7 @@ class SatIPRTSPReadHelper : QObject
 
   public:
     SatIPRTSPReadHelper(SatIPRTSP *p);
-    ~SatIPRTSPReadHelper();
+    ~SatIPRTSPReadHelper() override;
 
   public slots:
     void ReadPending(void);
@@ -50,7 +50,7 @@ class SatIPRTCPReadHelper : QObject
 
   public:
     SatIPRTCPReadHelper(SatIPRTSP *p);
-    ~SatIPRTCPReadHelper();
+    ~SatIPRTCPReadHelper() override;
 
   public slots:
     void ReadPending(void);
@@ -94,7 +94,7 @@ class SatIPRTSP : QObject
 
   public:
     explicit SatIPRTSP(SatIPStreamHandler* /*handler*/);
-    ~SatIPRTSP();
+    ~SatIPRTSP() override;
 
     bool Setup(QUrl url);
     bool Play(QStringList &pids);

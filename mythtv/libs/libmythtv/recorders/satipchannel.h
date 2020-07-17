@@ -13,7 +13,7 @@ class SatIPChannel : public DTVChannel
 {
   public:
     SatIPChannel(TVRec *parent, QString  device);
-    ~SatIPChannel(void);
+    ~SatIPChannel(void) override;
 
     // Commands
     bool Open(void) override;   // ChannelBase

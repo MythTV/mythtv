@@ -13,7 +13,7 @@ class SatIPSignalMonitor : public DTVSignalMonitor
   public:
     SatIPSignalMonitor(int db_cardnum, SatIPChannel* channel,
         uint64_t flags = 0);
-    ~SatIPSignalMonitor();
+    ~SatIPSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 

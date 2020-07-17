@@ -69,7 +69,7 @@ class AVCParser : public H2645Parser
     */
     AVCParser(void) { ; }
     AVCParser(const AVCParser& rhs);
-    ~AVCParser(void) { ; }
+    ~AVCParser(void) override { ; }
 
     uint32_t addBytes(const uint8_t  *bytes,
                       uint32_t  byte_count,
