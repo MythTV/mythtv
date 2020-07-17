@@ -196,14 +196,11 @@ bool CetonRTSP::ProcessRequest(
     {
         // Handle broken implementation, such as VLC
         // doesn't respect the case of "CSeq", so find it regardless of the spelling
-        for (const QString& key : m_responseHeaders.keys())
-        {
-            if (key.compare("CSeq", Qt::CaseInsensitive) == 0)
-            {
-                cSeq = m_responseHeaders.value(key);
-                break;
-            }
-        }
+        auto it = std::find_if(m_responseHeaders.cbegin(), m_responseHeaders.cend(),
+                               [](QString key) -> bool
+                                   {return key.compare("CSeq", Qt::CaseInsensitive) == 0;});
+        if (it != m_responseHeaders.cend())
+            cSeq = it.value();
     }
     if (cSeq != QString("%1").arg(m_sequenceNumber))
     {
