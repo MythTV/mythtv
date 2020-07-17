@@ -122,7 +122,7 @@ QStringList SatIP::doUPNPsearch(void)
     return result;
 };
 
-QString SatIP::findDeviceIP(QString deviceuuid)
+QString SatIP::findDeviceIP(const QString& deviceuuid)
 {
     QStringList devs = SatIP::probeDevices();
 
@@ -139,7 +139,7 @@ QString SatIP::findDeviceIP(QString deviceuuid)
     return nullptr;
 }
 
-CardUtil::INPUT_TYPES SatIP::toDVBInputType(QString deviceid)
+CardUtil::INPUT_TYPES SatIP::toDVBInputType(const QString& deviceid)
 {
     QStringList dev = deviceid.split(":");
     if (dev.length() < 3)
@@ -171,7 +171,7 @@ CardUtil::INPUT_TYPES SatIP::toDVBInputType(QString deviceid)
     return CardUtil::ERROR_UNKNOWN;
 }
 
-int SatIP::toTunerType(QString deviceid)
+int SatIP::toTunerType(const QString& deviceid)
 {
     QStringList devinfo = deviceid.split(":");
     if (devinfo.length() < 3)

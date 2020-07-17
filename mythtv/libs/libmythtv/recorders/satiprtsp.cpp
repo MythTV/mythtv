@@ -62,7 +62,7 @@ SatIPRTSP::~SatIPRTSP()
     delete m_buffer;
 }
 
-bool SatIPRTSP::Setup(QUrl url)
+bool SatIPRTSP::Setup(const QUrl& url)
 {
     m_request_url = url;
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + QString("SETUP"));
@@ -195,7 +195,7 @@ void SatIPRTSP::SetSigmonValues(bool lock, int level)
     m_signalStrength = level;
 }
 
-bool SatIPRTSP::sendMessage(QUrl url, QString msg, QStringList *additionalheaders)
+bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *additionalheaders)
 {
     QMutexLocker locker(&m_ctrlsocket_lock);
 

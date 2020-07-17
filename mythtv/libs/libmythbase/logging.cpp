@@ -612,7 +612,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if (!item)
         return;
 
-    item->m_message = message;
+    item->m_message = std::move(message);
 
     QMutexLocker qLock(&logQueueMutex);
 

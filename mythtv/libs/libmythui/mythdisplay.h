@@ -29,7 +29,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     virtual bool  UsingVideoModes(void) { return false; }
     virtual const vector<MythDisplayMode>& GetVideoModes(void);
 
-    static void  ConfigureQtGUI        (int SwapInterval = 1, QString Display = QString());
+    static void  ConfigureQtGUI        (int SwapInterval = 1, const QString& Display = QString());
     static bool  SpanAllScreens        (void);
     static QString GetExtraScreenInfo  (QScreen *qScreen);
 

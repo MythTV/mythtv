@@ -9,6 +9,7 @@
 #include "mythuibuttonlist.h"
 
 // Std
+#include <utility>
 #include <vector> // For std::vector
 using namespace std;
 
@@ -26,7 +27,7 @@ class StatusBoxItem : public QTimer, public MythUIButtonListItem
 
   public:
     StatusBoxItem(MythUIButtonList *lbtype, const QString& text, QVariant data)
-      : MythUIButtonListItem (lbtype, text, data) { }
+      : MythUIButtonListItem (lbtype, text, std::move(data)) { }
 
     void Start(int Interval = 1); // Seconds
 

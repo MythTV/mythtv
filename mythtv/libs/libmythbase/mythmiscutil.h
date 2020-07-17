@@ -108,7 +108,7 @@ MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
  *     See QTime::toString for the a definition fo valid formatting
  *     characters.
  */
-MBASE_PUBLIC QString MythFormatTimeMs(int msecs, QString fmt);
+MBASE_PUBLIC QString MythFormatTimeMs(int msecs, const QString& fmt);
 
 /**
  * \brief Format a seconds time value
@@ -121,7 +121,7 @@ MBASE_PUBLIC QString MythFormatTimeMs(int msecs, QString fmt);
  *     See QTime::toString for the a definition fo valid formatting
  *     characters.
  */
-MBASE_PUBLIC QString MythFormatTime(int secs, QString fmt);
+MBASE_PUBLIC QString MythFormatTime(int secs, const QString& fmt);
 
 // CPU Tick timing function
 #ifdef MMX

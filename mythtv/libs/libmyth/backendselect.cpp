@@ -285,7 +285,7 @@ void BackendSelection::RemoveItem(const QString& USN)
     m_mutex.unlock();
 }
 
-bool BackendSelection::TryDBfromURL(const QString &error, QString URL)
+bool BackendSelection::TryDBfromURL(const QString &error, const QString& URL)
 {
     if (ShowOkPopup(error + tr("Shall I attempt to connect to this"
                     " host with default database parameters?")))

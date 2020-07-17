@@ -1047,7 +1047,7 @@ void MythDisplay::DebugModes(void) const
  * \note This function must be called before Qt/QPA is initialised i.e. before
  * any call to QApplication.
 */
-void MythDisplay::ConfigureQtGUI(int SwapInterval, QString _Display)
+void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
 {
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;

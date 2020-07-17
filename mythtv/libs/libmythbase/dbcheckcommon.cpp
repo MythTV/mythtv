@@ -78,7 +78,7 @@ bool UpdateDBVersionNumber(const QString &component, const QString &versionkey,
  *  \param updates  array of SQL commands to issue, terminated by a NULL string.
  *  \return true on success, false on failure
  */
-bool performUpdateSeries(const QString &component, DBUpdates updates)
+bool performUpdateSeries(const QString &component, const DBUpdates& updates)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

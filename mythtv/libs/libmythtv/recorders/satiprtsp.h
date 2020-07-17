@@ -96,7 +96,7 @@ class SatIPRTSP : QObject
     explicit SatIPRTSP(SatIPStreamHandler* /*handler*/);
     ~SatIPRTSP() override;
 
-    bool Setup(QUrl url);
+    bool Setup(const QUrl& url);
     bool Play(QStringList &pids);
     bool Teardown();
 
@@ -120,7 +120,7 @@ class SatIPRTSP : QObject
     PacketBuffer *m_buffer  {nullptr};
 
   private:
-    bool sendMessage(QUrl url, QString msg, QStringList* additionalHeaders = nullptr);
+    bool sendMessage(const QUrl& url, const QString& msg, QStringList* additionalHeaders = nullptr);
 
   private:
     const SatIPStreamHandler *m_streamHandler {nullptr};

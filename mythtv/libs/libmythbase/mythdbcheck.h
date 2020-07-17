@@ -12,7 +12,7 @@ MBASE_PUBLIC bool performActualUpdate(
     const QString &component, const QString &versionkey,
     const DBUpdates &updates, const QString &version, QString &dbver);
 
-MBASE_PUBLIC bool performUpdateSeries(const QString &component, DBUpdates updates);
+MBASE_PUBLIC bool performUpdateSeries(const QString &component, const DBUpdates& updates);
 
 MBASE_PUBLIC bool UpdateDBVersionNumber(const QString &component, const QString &versionkey,
                                         const QString &newnumber, QString &dbver);

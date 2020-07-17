@@ -12,9 +12,9 @@ class SatIP
 {
   public:
     static QStringList probeDevices(void);
-    static QString findDeviceIP(QString deviceuuid);
-    static CardUtil::INPUT_TYPES toDVBInputType(QString deviceid);
-    static int toTunerType(QString deviceid);
+    static QString findDeviceIP(const QString& deviceuuid);
+    static CardUtil::INPUT_TYPES toDVBInputType(const QString& deviceid);
+    static int toTunerType(const QString& deviceid);
     static QString freq(uint64_t freq);
     static QString bw(DTVBandwidth bw);
     static QString msys(DTVModulationSystem msys);
