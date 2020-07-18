@@ -102,7 +102,8 @@ void MythUIText::ResetMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+                           QRegularExpression::DotMatchesEverythingOption};
 
     bool replaced = map.contains(objectName());
 
@@ -160,7 +161,8 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (newText.isEmpty())
         newText = GetDefaultText();
 
-    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+                           QRegularExpression::DotMatchesEverythingOption};
 
     if (!newText.isEmpty() && newText.contains(re))
     {

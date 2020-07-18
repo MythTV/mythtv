@@ -3706,7 +3706,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
             QString newText = text->GetTemplateText();
 
-            QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)"};
+            QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+                                   QRegularExpression::DotMatchesEverythingOption};
 
             if (!newText.isEmpty() && newText.contains(re))
             {
