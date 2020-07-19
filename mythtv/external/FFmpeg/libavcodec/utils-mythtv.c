@@ -117,8 +117,6 @@ const char *ff_codec_id_string(enum AVCodecID codec_id)
         case AV_CODEC_ID_TRUEMOTION2:      return "TRUEMOTION2";
         case AV_CODEC_ID_BMP:              return "BMP";
         case AV_CODEC_ID_VP8:              return "VP8";
-        case AV_CODEC_ID_VP9:              return "VP9";
-        case AV_CODEC_ID_AV1:              return "AV1";
 
             /* various pcm "codecs" */
         case AV_CODEC_ID_PCM_S16LE:        return "PCM_S16LE";

@@ -29,6 +29,10 @@
 
 #include <stdint.h>
 
+/* MythTV: Prevent "ISO C++17 does not allow ‘register’ storage class
+ * specifier" warning. */
+#define register
+
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
@@ -238,9 +242,9 @@ static inline void refill_32(GetBitContext *s, int is_le)
 #endif
 
     if (is_le)
-    s->cache       = (uint64_t)AV_RL32(s->buffer + (s->index >> 3)) << s->bits_left | s->cache;
+        s->cache = (uint64_t)AV_RL32(s->buffer + (s->index >> 3)) << s->bits_left | s->cache;
     else
-    s->cache       = s->cache | (uint64_t)AV_RB32(s->buffer + (s->index >> 3)) << (32 - s->bits_left);
+        s->cache = s->cache | (uint64_t)AV_RB32(s->buffer + (s->index >> 3)) << (32 - s->bits_left);
     s->index     += 32;
     s->bits_left += 32;
 }
@@ -253,9 +257,9 @@ static inline void refill_64(GetBitContext *s, int is_le)
 #endif
 
     if (is_le)
-    s->cache = AV_RL64(s->buffer + (s->index >> 3));
+        s->cache = AV_RL64(s->buffer + (s->index >> 3));
     else
-    s->cache = AV_RB64(s->buffer + (s->index >> 3));
+        s->cache = AV_RB64(s->buffer + (s->index >> 3));
     s->index += 64;
     s->bits_left = 64;
 }
@@ -331,8 +335,8 @@ static inline int get_xbits(GetBitContext *s, int n)
 
     return ((((uint32_t)(sign ^ cache)) >> (32 - n)) ^ sign) - sign;
 #else
-    int sign;
-    int32_t cache;
+    register int sign;
+    register int32_t cache;
     OPEN_READER(re, s);
     av_assert2(n>0 && n<=25);
     UPDATE_CACHE(re, s);
@@ -362,7 +366,7 @@ static inline int get_xbits_le(GetBitContext *s, int n)
 
 static inline int get_sbits(GetBitContext *s, int n)
 {
-    int tmp;
+    register int tmp;
 #if CACHED_BITSTREAM_READER
     av_assert2(n>0 && n<=25);
     tmp = sign_extend(get_bits(s, n), n);
@@ -382,7 +386,7 @@ static inline int get_sbits(GetBitContext *s, int n)
  */
 static inline unsigned int get_bits(GetBitContext *s, int n)
 {
-    unsigned int tmp;
+    register unsigned int tmp;
 #if CACHED_BITSTREAM_READER
 
     av_assert2(n>0 && n<=32);
@@ -404,8 +408,8 @@ static inline unsigned int get_bits(GetBitContext *s, int n)
 #else
     OPEN_READER(re, s);
     av_assert2(n>0 && n<=25);
-    /* clang-tidy warns "Access to field 'l' results in a dereference
-     * of a null pointer" in this next macro.  No plans to investigate.
+    /* MythTV: clang-tidy warns "Access to field 'l' results in a
+     * dereference of a null pointer".  No plans to investigate.
      * NOLINTNEXTLINE(clang-analyzer-core.NullDereference) */
     UPDATE_CACHE(re, s);
     tmp = SHOW_UBITS(re, s, n);
@@ -436,7 +440,7 @@ static inline unsigned int get_bits_le(GetBitContext *s, int n)
 
     return get_val(s, n, 1);
 #else
-    int tmp;
+    register int tmp;
     OPEN_READER(re, s);
     av_assert2(n>0 && n<=25);
     UPDATE_CACHE_LE(re, s);
@@ -452,7 +456,7 @@ static inline unsigned int get_bits_le(GetBitContext *s, int n)
  */
 static inline unsigned int show_bits(GetBitContext *s, int n)
 {
-    unsigned int tmp;
+    register unsigned int tmp;
 #if CACHED_BITSTREAM_READER
     if (n > s->bits_left)
 #ifdef BITSTREAM_READER_LE
@@ -651,6 +655,7 @@ static inline int init_get_bits_xe(GetBitContext *s, const uint8_t *buffer,
     s->bits_left          = 0;
     refill_64(s, is_le);
 #else
+    /* MythTV: Fix unused parameter warning. */
     (void)is_le;
 #endif
 

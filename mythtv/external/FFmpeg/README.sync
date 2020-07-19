@@ -20,7 +20,8 @@ Procedure for FFmpeg resync
 git pull
 - Clone MythTV FFmpeg fork into a new directory:
 git clone git@github.com:MythTV/FFmpeg.git
-- create a branch to track the current ffmpeg release branch (e.g release/4.0)
+- create a branch to track the latest ffmpeg release branch (e.g release/4.2)
+git branch --track release/4.2 remotes/origin/release/4.2
 - Add a remote for main FFmpeg
 git remote add ffmpeg git@github.com:FFmpeg/FFmpeg.git
 git fetch ffmpeg
@@ -74,60 +75,14 @@ git branch -a
 
 This file (README.sync) will no longer contain details of each FFmpeg resync
 
-List of files modified from original FFmpeg:
+Procedure for making FFMpeg changes
+===================================
 
-	modified:   Makefile
-	new file:   README.sync
-	modified:   configure
-	modified:   ffbuild/common.mak
-	modified:   ffbuild/library.mak
-	modified:   fftools/Makefile
-	modified:   libavcodec/Makefile
-	modified:   libavcodec/audiotoolboxdec.c
-	modified:   libavcodec/avcodec.h
-	modified:   libavcodec/codec_desc.c
-	modified:   libavcodec/dvbsub_parser.c
-	modified:   libavcodec/dvbsubdec.c
-	modified:   libavcodec/dvdsubdec.c
-	modified:   libavcodec/get_bits.h
-	modified:   libavcodec/golomb.h
-	modified:   libavcodec/h264_refs.c
-	modified:   libavcodec/internal.h
-	modified:   libavcodec/libavcodec.v
-	modified:   libavcodec/mpeg12dec.c
-	modified:   libavcodec/mpeg4videodec.c
-	modified:   libavcodec/mpegaudio_parser.c
-	modified:   libavcodec/mpegaudiodec_template.c
-	modified:   libavcodec/mpegaudiodecheader.c
-	modified:   libavcodec/mpegaudiodecheader.h
-	modified:   libavcodec/mpegvideo.c
-	modified:   libavcodec/mpegvideo.h
-	modified:   libavcodec/pcm.c
-	modified:   libavcodec/pgssubdec.c
-	new file:   libavcodec/utils-mythtv.c
-	modified:   libavdevice/opengl_enc.c
-	modified:   libavformat/Makefile
-	modified:   libavformat/allformats.c
-	modified:   libavformat/avformat.h
-	modified:   libavformat/format.c
-	modified:   libavformat/isom.h
-	modified:   libavformat/libavformat.v
-	modified:   libavformat/mov.c
-	modified:   libavformat/mpeg.c
-	modified:   libavformat/mpeg.h
-	new file:   libavformat/mpegts-mythtv.c
-	new file:   libavformat/mpegts-mythtv.h
-	modified:   libavformat/mpegts.c
-	modified:   libavformat/mpegts.h
-	modified:   libavformat/os_support.h
-	modified:   libavformat/rtpdec_mpegts.c
-	modified:   libavformat/rtsp.c
-	new file:   libavformat/utils-mythtv.c
-	modified:   libavformat/utils.c
-	modified:   libavformat/wtvdec.c
-	modified:   libavutil/frame.c
-	modified:   libavutil/frame.h
-	modified:   libavutil/timer.h
-	modified:   libpostproc/Makefile
-	modified:   libpostproc/postprocess.c
+- Apply changes to the MythTV/FFmpeg repository, master branch.
+- Cherry-pick them into the MythTV/FFmpeg repository, release/4.3 branch.
+- Copy the code into the MythTV/mythtv repository, master branch
 
+Note: The code in MythTV/mythtv repository master branch, FFmpeg directory is a copy of the code
+in MythTV/FFmpeg repository, latest branch. so after making changes in MythTV/FFmpeg
+repository and cherry-picking into release/4.3 you can just copy the modules over
+into the MythTv/mythtv repository master branch without fear of losing any changes.
