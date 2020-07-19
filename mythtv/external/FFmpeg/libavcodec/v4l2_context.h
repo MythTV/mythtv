@@ -92,6 +92,8 @@ typedef struct V4L2Context {
      */
     int done;
 
+    AVBufferRef *frames_ref;
+
 } V4L2Context;
 
 /**

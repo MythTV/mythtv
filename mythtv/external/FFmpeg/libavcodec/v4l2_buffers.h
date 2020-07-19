@@ -27,6 +27,7 @@
 #include <stdatomic.h>
 #include <linux/videodev2.h>
 
+#include "libavutil/hwcontext_drm.h"
 #include "avcodec.h"
 
 enum V4L2Buffer_status {
@@ -41,6 +42,9 @@ enum V4L2Buffer_status {
 typedef struct V4L2Buffer {
     /* each buffer needs to have a reference to its context */
     struct V4L2Context *context;
+
+    /* DRM descriptor */
+    AVDRMFrameDescriptor drm_frame;
 
     /* This object is refcounted per-plane, so we need to keep track
      * of how many context-refs we are holding. */

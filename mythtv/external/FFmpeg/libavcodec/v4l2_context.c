@@ -303,8 +303,8 @@ static V4L2Buffer* v4l2_dequeue_v4l2buf(V4L2Context *ctx, int timeout)
                                                 "packets/frames.\n");
     }
 
-    /* if we are draining and there are no more capture buffers queued in the driver we are done */
-    if (!V4L2_TYPE_IS_OUTPUT(ctx->type) && ctx_to_m2mctx(ctx)->draining) {
+    /* if there are no more capture buffers queued in the driver, skip polling */
+    if (!V4L2_TYPE_IS_OUTPUT(ctx->type)) {
         for (i = 0; i < ctx->num_buffers; i++) {
             /* capture buffer initialization happens during decode hence
              * detection happens at runtime
@@ -315,7 +315,9 @@ static V4L2Buffer* v4l2_dequeue_v4l2buf(V4L2Context *ctx, int timeout)
             if (ctx->buffers[i].status == V4L2BUF_IN_DRIVER)
                 goto start;
         }
-        ctx->done = 1;
+        /* if we were waiting to drain, all done! */
+        if (ctx_to_m2mctx(ctx)->draining)
+            ctx->done = 1;
         return NULL;
     }
 
@@ -457,20 +459,51 @@ static int v4l2_release_buffers(V4L2Context* ctx)
         .type = ctx->type,
         .count = 0, /* 0 -> unmaps buffers from the driver */
     };
-    int i, j;
+    int ret, i, j;
 
     for (i = 0; i < ctx->num_buffers; i++) {
         V4L2Buffer *buffer = &ctx->buffers[i];
 
         for (j = 0; j < buffer->num_planes; j++) {
             struct V4L2Plane_info *p = &buffer->plane_info[j];
+
+            if (V4L2_TYPE_IS_OUTPUT(ctx->type)) {
+                /* output buffers are not EXPORTED */
+                goto unmap;
+            }
+
+            if (ctx_to_m2mctx(ctx)->output_drm) {
+                /* use the DRM frame to close */
+                if (buffer->drm_frame.objects[j].fd >= 0) {
+                    if (close(buffer->drm_frame.objects[j].fd) < 0) {
+                        av_log(logger(ctx), AV_LOG_ERROR, "%s close drm fd "
+                            "[buffer=%2d, plane=%d, fd=%2d] - %s \n",
+                            ctx->name, i, j, buffer->drm_frame.objects[j].fd,
+                            av_err2str(AVERROR(errno)));
+                    }
+                }
+            }
+unmap:
             if (p->mm_addr && p->length)
                 if (munmap(p->mm_addr, p->length) < 0)
                     av_log(logger(ctx), AV_LOG_ERROR, "%s unmap plane (%s))\n", ctx->name, av_err2str(AVERROR(errno)));
         }
     }
 
-    return ioctl(ctx_to_m2mctx(ctx)->fd, VIDIOC_REQBUFS, &req);
+    ret = ioctl(ctx_to_m2mctx(ctx)->fd, VIDIOC_REQBUFS, &req);
+    if (ret < 0) {
+            av_log(logger(ctx), AV_LOG_ERROR, "release all %s buffers (%s)\n",
+                ctx->name, av_err2str(AVERROR(errno)));
+
+            if (ctx_to_m2mctx(ctx)->output_drm)
+                av_log(logger(ctx), AV_LOG_ERROR,
+                    "Make sure the DRM client releases all FB/GEM objects before closing the codec (ie):\n"
+                    "for all buffers: \n"
+                    "  1. drmModeRmFB(..)\n"
+                    "  2. drmIoctl(.., DRM_IOCTL_GEM_CLOSE,... )\n");
+    }
+
+    return ret;
 }
 
 static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfmt)
