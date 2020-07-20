@@ -391,7 +391,7 @@ class CommMethod : public MythUIComboBoxSetting
 class Visible : public MythUIComboBoxSetting
 {
   public:
-    Visible(const ChannelID &id) :
+    explicit Visible(const ChannelID &id) :
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "visible"))
     {
         setValue(kChannelVisible);

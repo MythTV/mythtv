@@ -23,7 +23,7 @@ class MythPainterWindow : public QWidget
     bool        RenderIsShared (void);
 
   protected:
-    MythPainterWindow(MythMainWindow *MainWin);
+    explicit MythPainterWindow(MythMainWindow *MainWin);
    ~MythPainterWindow() override = default;
 
     MythRender* m_render { nullptr };

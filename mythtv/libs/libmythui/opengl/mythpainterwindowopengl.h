@@ -12,7 +12,7 @@ class MythPainterWindowOpenGL : public MythPainterWindow
     Q_OBJECT
 
   public:
-    MythPainterWindowOpenGL(MythMainWindow *MainWin);
+    explicit MythPainterWindowOpenGL(MythMainWindow *MainWin);
    ~MythPainterWindowOpenGL() override;
 
     bool          IsValid    (void) const;

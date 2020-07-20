@@ -30,7 +30,7 @@ class SatIPRTSPReadHelper : QObject
     Q_OBJECT
 
   public:
-    SatIPRTSPReadHelper(SatIPRTSP *p);
+    explicit SatIPRTSPReadHelper(SatIPRTSP *p);
     ~SatIPRTSPReadHelper() override;
 
   public slots:
@@ -49,7 +49,7 @@ class SatIPRTCPReadHelper : QObject
     Q_OBJECT
 
   public:
-    SatIPRTCPReadHelper(SatIPRTSP *p);
+    explicit SatIPRTCPReadHelper(SatIPRTSP *p);
     ~SatIPRTCPReadHelper() override;
 
   public slots:

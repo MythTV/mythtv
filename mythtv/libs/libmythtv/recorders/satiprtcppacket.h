@@ -15,7 +15,7 @@
 class SatIPRTCPPacket
 {
   public:
-    SatIPRTCPPacket(QByteArray &data);
+    explicit SatIPRTCPPacket(QByteArray &data);
 
     bool IsValid() const { return m_satipData.length() > 0; };
     QString Data() const { return m_satipData; };

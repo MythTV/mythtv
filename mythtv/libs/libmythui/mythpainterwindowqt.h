@@ -9,7 +9,7 @@ class MythPainterWindowQt : public MythPainterWindow
     Q_OBJECT
 
   public:
-    MythPainterWindowQt(MythMainWindow *MainWin);
+    explicit MythPainterWindowQt(MythMainWindow *MainWin);
 
     void paintEvent(QPaintEvent *Event) override;
 

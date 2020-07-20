@@ -59,7 +59,7 @@ public:
 class FormattedTextLine
 {
 public:
-    FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
+    explicit FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
         : m_xIndent(x), m_yIndent(y), m_origX(o_x), m_origY(o_y) {}
 
     QSize CalcSize(float layoutSpacing = 0.0F) const;
@@ -127,7 +127,7 @@ private:
 class FormattedTextSubtitle608 : public FormattedTextSubtitle
 {
 public:
-    FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
+    explicit FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
                              const QString &base = "",
                              const QRect &safearea = QRect(),
                              SubtitleScreen *p = nullptr) :

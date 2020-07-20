@@ -220,7 +220,7 @@ public:
 */
 class MTV_PUBLIC MythStreamInfoList {
 public:
-    MythStreamInfoList(const QString& filename);
+    explicit MythStreamInfoList(const QString& filename);
     int                     m_errorCode         {0};
     QString                 m_errorMsg;
     QVector<MythStreamInfo> m_streamInfoList;
