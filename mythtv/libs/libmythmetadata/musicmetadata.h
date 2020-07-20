@@ -41,7 +41,7 @@ class META_PUBLIC AlbumArtImage
   public:
     AlbumArtImage(void) :
             m_filename(""), m_hostname(""), m_description("") {}
-    AlbumArtImage(AlbumArtImage *image) :
+    explicit AlbumArtImage(const AlbumArtImage * const image) :
             m_id(image->m_id), m_filename(image->m_filename),
             m_hostname(image->m_hostname), m_imageType(image->m_imageType),
             m_description(image->m_description), m_embedded(image->m_embedded) {}
@@ -525,7 +525,7 @@ class META_PUBLIC AlbumArtImages
     ~AlbumArtImages();
 
     void           scanForImages(void);
-    void           addImage(const AlbumArtImage &newImage);
+    void           addImage(const AlbumArtImage * const newImage);
     uint           getImageCount() { return m_imageList.size(); }
     AlbumArtImage *getImage(ImageType type);
     AlbumArtImage *getImageByID(int imageID);
