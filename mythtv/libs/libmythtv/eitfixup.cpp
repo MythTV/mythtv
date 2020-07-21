@@ -198,6 +198,7 @@ EITFixUp::EITFixUp()
       m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_html("</?EM>", Qt::CaseInsensitive),
+      m_grRating("(?:(\\[[KΚ](?:(|8|12|16|18)\\]\\s*)))", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
       m_grActors("(?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
@@ -211,7 +212,7 @@ EITFixUp::EITFixUp()
       m_grCountry("(?:\\W|\\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ]))",Qt::CaseInsensitive),
       m_grlongEp("\\b(?:Επ.|επεισ[οό]διο:?)\\s*(\\d+)(?:\\W?)",Qt::CaseInsensitive),
       m_grSeasonAsRomanNumerals(",\\s*([MDCLXVIΙΧ]+)$",Qt::CaseInsensitive),
-      m_grSeason("(?:\\W-?)*(?:\\(-\\s*)?\\b(([Α-Ω]{1,2})(?:'|΄)?|(\\d{1,2})(?:ος|ου|oς|os)?)(?:\\s*κ[υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
+      m_grSeason("(?:\\W-?)*(?:\\(-\\s*)?\\b(([Α-Ω|A|B|E|Z|H|I|K|M|N]{1,2})(?:'|΄)?|(\\d{1,2})(?:ος|ου|oς|os)?)(?:\\s*[ΚκKk][υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
       m_grRealTitleinDescription(R"((?:^\()([A-Za-z\s\d-]+)(?:\))(?:\s*))"),
       // cap1 = real title
       // cap0 = real title in parentheses.
@@ -2601,9 +2602,23 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event)
 
 void EITFixUp::FixGreekEIT(DBEventEIT &event) const
 {
-    //Live show
+
+    int position;
     QRegExp tmpRegEx;
-    int position = event.m_title.indexOf("(Ζ)");
+
+    // Program ratings
+    tmpRegEx = m_grRating;
+    position = event.m_title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      EventRating prograting;
+      prograting.m_system="GR"; prograting.m_rating = tmpRegEx.cap(1);
+      event.m_ratings.push_back(prograting);
+      event.m_title = event.m_title.replace(tmpRegEx.cap(1), "").trimmed();
+    }
+
+    //Live show
+    position = event.m_title.indexOf("(Ζ)");
     if (position != -1)
     {
         event.m_title = event.m_title.replace("(Ζ)", "");
@@ -2773,8 +2788,49 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
     int position1 = tmpSeries.indexIn(event.m_title);
+    if (position1 != -1)
+    {
+        if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
+        {
+            //sometimes Nat. TV writes numbers as letters, i.e Α=1, Β=2, Γ=3, etc
+            //must convert them to numbers.
+            int tmpinteger = tmpSeries.cap(2).toUInt();
+            if (tmpinteger < 1)
+            {
+                if (tmpSeries.cap(2) == "ΣΤ") // 6, don't ask!
+                    event.m_season = 6;
+                else
+                {
+                    QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
+                    tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                    if (tmpinteger != -1)
+                        event.m_season = tmpinteger;
+                    else
+                    //sometimes they use english letters instead of greek. Compensating:
+                    {
+                        LettToNumber = "0ABΓΔE6ZHΘIKΛMN";
+                        tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                        if (tmpinteger != -1)
+                           event.m_season = tmpinteger;
+                    }
+                }
+            }
+        }
+        else if (!tmpSeries.cap(3).isEmpty()) //number
+        {
+            event.m_season = tmpSeries.cap(3).toUInt();
+        }
+        series = true;
+        event.m_title.replace(tmpSeries.cap(0),"");
+    }
+
+    // I have to search separately for season in title and description because it wouldn't work when in both.
+    series  = false;
+    tmpSeries = m_grSeason;
+    // cap(2) is the season for ΑΒΓΔ
+    // cap(3) is the season for 1234
     int position2 = tmpSeries.indexIn(event.m_description);
-    if ((position1 != -1) || (position2 != -1))
+    if (position2 != -1)
     {
         if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
         {
@@ -2799,11 +2855,10 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
             event.m_season = tmpSeries.cap(3).toUInt();
         }
         series = true;
-        if (position1 != -1)
-            event.m_title.replace(tmpSeries.cap(0),"");
-        if (position2 != -1)
-            event.m_description.replace(tmpSeries.cap(0),"");
+        event.m_description.replace(tmpSeries.cap(0),"");
     }
+
+
     // If Season is in Roman Numerals (I,II,etc)
     tmpSeries = m_grSeasonAsRomanNumerals;
     if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
@@ -2954,6 +3009,8 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     {
         event.m_categoryType = ProgramInfo::kCategorySeries;
     }
+    // clear double commas.
+    event.m_description.replace(",,", ",");
     // just for luck, retrim fields.
     event.m_description = event.m_description.trimmed();
     event.m_title       = event.m_title.trimmed();

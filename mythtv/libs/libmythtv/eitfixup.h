@@ -263,6 +263,7 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_auFreeviewYC;//year, cast
     const QRegExp m_auFreeviewSYC;//subtitle, year, cast
     const QRegExp m_html;
+    const QRegExp m_grRating; // Greek new parental rating system
     const QRegExp m_grReplay; //Greek rerun
     const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
     const QRegExp m_grActors; //Greek actors
