@@ -519,6 +519,11 @@ void MythUIType::SetPosition(int x, int y)
     SetPosition(MythPoint(x, y));
 }
 
+void MythUIType::SetPosition(QPoint point)
+{
+    SetPosition(MythPoint(point));
+}
+
 void MythUIType::SetPosition(const MythPoint &point)
 {
     MythPoint  pos(point);

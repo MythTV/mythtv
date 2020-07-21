@@ -257,6 +257,13 @@ MythPoint MythRect::topLeft(void) const
     return point;
 }
 
+void MythRect::moveTopLeft(const QPoint &point)
+{
+    // No need to convert coordinates to strings and back since there
+    // is no percent scaling on a raw QPoint.
+    QRect::moveTopLeft(point);
+}
+
 void MythRect::moveTopLeft(const MythPoint &point)
 {
     moveLeft(point.getX());
@@ -372,6 +379,32 @@ MythPoint::MythPoint(const QString &sX, const QString &sY)
     setX(sX);
     setY(sY);
 }
+
+/*
+ * An explicit assignment operator from QPoint to MythPoint.  This
+ * takes the place of an implicitly converting from a QPoint to a
+ * MythPoint and then calling the compiler generated default
+ * assignment operator.
+ */
+MythPoint& MythPoint::operator= (const QPoint& other)
+{
+    if (this == &other)
+        return *this;
+
+    // Set coords from the point.
+    QPoint::setX(other.x());
+    QPoint::setY(other.y());
+
+    // Restore everything else to default.
+    m_percentX    = 0.0F;
+    m_percentY    = 0.0F;
+    m_offsetX     = 0;
+    m_offsetY     = 0;
+    m_needsUpdate = true;
+    m_parentArea  = {};
+    m_valid       = true;
+    return *this;
+};
 
 void MythPoint::CalculatePoint(const MythRect & parentArea)
 {

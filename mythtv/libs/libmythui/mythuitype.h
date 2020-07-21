@@ -109,6 +109,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     /// Convenience method, calls SetPosition(const MythPoint&)
     /// Override that instead to change functionality.
     void SetPosition(int x, int y);
+    void SetPosition(QPoint point);
     virtual void SetPosition(const MythPoint &point);
     virtual MythPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
