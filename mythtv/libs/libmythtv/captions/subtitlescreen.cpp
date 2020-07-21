@@ -50,7 +50,7 @@ public:
                   MythUIType *parent, const QString &name,
                   int whichImageCache, long long expireTime) :
         MythUISimpleText(text, font, rect, align, parent, name),
-        SubWrapper(rect, expireTime, whichImageCache) {}
+        SubWrapper(MythRect(rect), expireTime, whichImageCache) {}
 };
 
 class SubShape : public MythUIShape, public SubWrapper
@@ -1821,7 +1821,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
         MythUIType *img = i.next();
         auto *wrapper = dynamic_cast<SubWrapper *>(img);
         if (wrapper && img->IsVisible())
-            img->SetArea(wrapper->GetOrigArea().translated(left, top));
+            img->SetArea(MythRect(wrapper->GetOrigArea().translated(left, top)));
     }
 }
 

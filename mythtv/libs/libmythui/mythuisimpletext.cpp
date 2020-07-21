@@ -26,7 +26,7 @@ MythUISimpleText::MythUISimpleText(const QString &text,
       m_Font(font),
       m_Message(text.trimmed())
 {
-    SetArea(rect);
+    SetArea(MythRect(rect));
     m_Font = font;
 }
 

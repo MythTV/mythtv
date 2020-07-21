@@ -67,7 +67,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_textCursor = -1;
     m_EnableInitiator = true;
 
-    MythUIText::SetArea(displayRect);
+    MythUIText::SetArea(MythRect(displayRect));
     m_FontStates.insert("default", font);
     *m_Font = m_FontStates["default"];
 }
@@ -1022,7 +1022,7 @@ void MythUIText::FillCutMessage(void)
     if (m_MinSize.isValid())
     {
         // Record the minimal area needed for the message.
-        SetMinArea(min_rect.toRect());
+        SetMinArea(MythRect(min_rect.toRect()));
     }
 }
 

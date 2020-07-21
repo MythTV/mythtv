@@ -51,7 +51,7 @@ bool MythFlashPlayer::Create(void)
 {
     if (!m_browser)
         m_browser = new MythUIWebBrowser(this, "mythflashplayer");
-    m_browser->SetArea(GetMythMainWindow()->GetUIScreenRect());
+    m_browser->SetArea(MythRect(GetMythMainWindow()->GetUIScreenRect()));
     m_browser->Init();
     m_browser->SetActive(true);
     m_browser->Show();

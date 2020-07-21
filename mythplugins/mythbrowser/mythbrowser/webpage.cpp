@@ -23,7 +23,7 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
                                         MythUIButtonListItem::CantCheck, false);
 
     m_browser = new MythUIWebBrowser(parent, name);
-    m_browser->SetArea(area);
+    m_browser->SetArea(MythRect(area));
     m_browser->Init();
 
     connect(m_browser, SIGNAL(loadStarted()),

@@ -850,7 +850,7 @@ void MythUIType::SetMinArea(const MythRect &rect)
         m_Parent->SetMinAreaParent(m_MinArea, m_Area, this);
 }
 
-void MythUIType::ExpandArea(const MythRect &rect)
+void MythUIType::ExpandArea(const QRect &rect)
 {
     QSize childSize = rect.size();
     QSize size = m_Area.size();

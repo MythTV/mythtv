@@ -125,7 +125,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual MythRect GetArea(void) const;
     virtual MythRect GetFullArea(void) const;
     virtual void RecalculateArea(bool recurse = true);
-    void ExpandArea(const MythRect &rect);
+    void ExpandArea(const QRect &rect);
 
     virtual QRegion GetDirtyArea(void) const;
 

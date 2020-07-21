@@ -138,7 +138,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
     while (i.hasNext())
     {
         MythUIType *img = i.next();
-        img->SetArea(img->GetArea().translated(left, top));
+        img->SetArea(MythRect(img->GetArea().translated(left, top)));
     }
 }
 

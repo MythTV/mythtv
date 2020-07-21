@@ -11,6 +11,38 @@ MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
     setRect(sX,sY,sWidth,sHeight,baseRes);
 }
 
+/*
+ * An explicit assignment operator from QRect to MythRect.  This
+ * takes the place of an implicitly converting from a QRect to a
+ * MythRect and then calling the compiler generated default
+ * assignment operator.
+ */
+MythRect& MythRect::operator= (const QRect& other)
+{
+    if (this == &other)
+        return *this;
+
+    // Set coords from the point.
+    QRect::setX(other.x());
+    QRect::setY(other.y());
+    QRect::setWidth(other.width());
+    QRect::setHeight(other.height());
+
+    // Restore everything else to default.
+    m_percentWidth  = 0.0F;
+    m_percentHeight = 0.0F;
+    m_percentX      = 0.0F;
+    m_percentY      = 0.0F;
+    m_offsetWidth   = 0;
+    m_offsetHeight  = 0;
+    m_offsetX       = 0;
+    m_offsetY       = 0;
+    m_needsUpdate   = true;
+    m_parentArea    = {0,0,0,0};
+
+    return *this;
+};
+
 bool MythRect::operator== (const MythRect &other) const
 {
     return ((m_percentWidth == other.m_percentWidth) &&
@@ -29,13 +61,12 @@ void MythRect::Reset(void)
     m_parentArea.setRect(0, 0, 0, 0);
 }
 
-void MythRect::CalculateArea(const MythRect & parentArea)
+void MythRect::CalculateArea(const QRect & parentArea)
 {
-    QRect area  = parentArea.toQRect();
-    if ((m_parentArea == area && !m_needsUpdate) || !parentArea.isValid())
+    if ((m_parentArea == parentArea && !m_needsUpdate) || !parentArea.isValid())
         return;
 
-    m_parentArea = area;
+    m_parentArea = parentArea;
 
     int w = width();
     int h = height();
@@ -68,6 +99,11 @@ void MythRect::CalculateArea(const MythRect & parentArea)
     QRect::setRect(X,Y,w,h);
 
     m_needsUpdate = false;
+}
+
+void MythRect::CalculateArea(const MythRect & parentArea)
+{
+    CalculateArea(parentArea.toQRect());
 }
 
 void MythRect::NormRect(void)
@@ -406,13 +442,12 @@ MythPoint& MythPoint::operator= (const QPoint& other)
     return *this;
 };
 
-void MythPoint::CalculatePoint(const MythRect & parentArea)
+void MythPoint::CalculatePoint(const QRect & parentArea)
 {
-    QRect area  = parentArea.toQRect();
-    if ((m_parentArea == area && !m_needsUpdate) || !parentArea.isValid())
+    if ((m_parentArea == parentArea && !m_needsUpdate) || !parentArea.isValid())
         return;
 
-    m_parentArea  = area;
+    m_parentArea  = parentArea;
 
     int X = x();
     int Y = y();
@@ -427,6 +462,11 @@ void MythPoint::CalculatePoint(const MythRect & parentArea)
 
     m_needsUpdate = false;
     m_valid = true;
+}
+
+void MythPoint::CalculatePoint(const MythRect & parentArea)
+{
+    CalculatePoint(parentArea.toQRect());
 }
 
 void MythPoint::NormPoint(void)
