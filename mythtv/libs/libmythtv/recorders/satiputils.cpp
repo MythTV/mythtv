@@ -207,6 +207,10 @@ int SatIP::toTunerType(const QString& deviceid)
 
 QString SatIP::bw(DTVBandwidth bw)
 {
+    if (bw == DTVBandwidth::kBandwidth5MHz)
+    {
+        return "5";
+    }
     if (bw == DTVBandwidth::kBandwidth6MHz)
     {
         return "6";
@@ -219,8 +223,19 @@ QString SatIP::bw(DTVBandwidth bw)
     {
         return "8";
     }
-    // Not supported yet: other bandwidth values and "auto"
-    return "8";
+    if (bw == DTVBandwidth::kBandwidth10MHz)
+    {
+        return "10";
+    }
+    if (bw == DTVBandwidth::kBandwidth1712kHz)
+    {
+        return "1.712";
+    }
+    if (bw == DTVBandwidth::kBandwidthAuto)
+    {
+        return "auto";
+    }
+    return "auto";
 }
 
 QString SatIP::freq(uint64_t freq)
@@ -251,7 +266,7 @@ QString SatIP::msys(DTVModulationSystem msys)
         return "dvbc";
     }
     // Not supported yet: DVB-C2
-    return "unsupported";
+    return "auto";
 }
 
 QString SatIP::mtype(DTVModulation mtype)
@@ -284,7 +299,7 @@ QString SatIP::mtype(DTVModulation mtype)
     {
         return "256qam";
     }
-    return "unknownqam";
+    return "auto";
 }
 
 QString SatIP::tmode(DTVTransmitMode tmode)
@@ -313,7 +328,7 @@ QString SatIP::tmode(DTVTransmitMode tmode)
     {
         return "32k";
     }
-    return "auto"; // Not in the spec.
+    return "auto";
 }
 
 QString SatIP::gi(DTVGuardInterval gi)
@@ -346,7 +361,7 @@ QString SatIP::gi(DTVGuardInterval gi)
     {
         return "19256";
     }
-    return "auto"; // Not in the spec.
+    return "auto";
 }
 
 QString SatIP::fec(DTVCodeRate fec)
@@ -391,7 +406,7 @@ QString SatIP::fec(DTVCodeRate fec)
     {
         return "910";
     }
-    return "auto"; // Not in the spec but observed on the Telestar Digibit R1
+    return "auto";
 }
 
 QString SatIP::ro(DTVRollOff ro)
@@ -412,7 +427,7 @@ QString SatIP::ro(DTVRollOff ro)
     {
         return "auto";
     }
-    return "unknownro";
+    return "auto";
 }
 
 QString SatIP::pol(DTVPolarity pol)
@@ -433,5 +448,5 @@ QString SatIP::pol(DTVPolarity pol)
     {
         return "l";
     }
-    return "unknownpol";
+    return "auto";
 }
