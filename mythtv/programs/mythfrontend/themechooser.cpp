@@ -166,7 +166,7 @@ void ThemeChooser::Load(void)
     }
 
     // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
-    QString MythVersion(MYTH_SOURCE_VERSION);
+    QString MythVersion(GetMythSourceVersion());
     QRegExp trunkver("v[0-9]+-pre.*",Qt::CaseInsensitive);
     QRegExp validver("v[0-9]+.*",Qt::CaseInsensitive);
 
@@ -196,7 +196,7 @@ void ThemeChooser::Load(void)
         // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
         QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
         // This captures the subversion, i.e. the number after a dot
-        int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
+        int pos = subexp.indexIn(GetMythSourceVersion());
         if (pos > -1)
         {
             QString subversion;
@@ -1001,7 +1001,7 @@ bool ThemeChooser::removeThemeDir(const QString &dirname)
 ThemeUpdateChecker::ThemeUpdateChecker(void) :
     m_updateTimer(new QTimer(this))
 {
-    QString version = MYTH_SOURCE_PATH;
+    QString version = GetMythSourcePath();
 
     if (!version.isEmpty() && !version.startsWith("fixes/"))
     {
@@ -1015,7 +1015,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
 
         // If a version of the theme for this tag exists, use it...
         QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
-        int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
+        int pos = subexp.indexIn(GetMythSourceVersion());
         if (pos > -1)
         {
             QString subversion;

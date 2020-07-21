@@ -355,8 +355,8 @@ void MythThemedMenu::aboutScreen()
     }
 
     QString label = tr("Revision: %1\n Branch: %2\n %3")
-                        .arg(MYTH_SOURCE_VERSION)
-                        .arg(MYTH_SOURCE_PATH)
+                        .arg(GetMythSourceVersion())
+                        .arg(GetMythSourcePath())
                         .arg(distro_line);
 
     MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();

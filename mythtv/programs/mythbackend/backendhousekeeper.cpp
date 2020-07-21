@@ -407,7 +407,7 @@ bool ThemeUpdateTask::DoCheckRun(const QDateTime& now)
 bool ThemeUpdateTask::DoRun(void)
 {
     bool    result = false;
-    QString MythVersion = MYTH_SOURCE_PATH;
+    QString MythVersion = GetMythSourcePath();
 
     // Treat devel branches as master
     if (!MythVersion.isEmpty() && !MythVersion.startsWith("fixes/"))
@@ -430,7 +430,7 @@ bool ThemeUpdateTask::DoRun(void)
 
         // If a version of the theme for this tag exists, use it...
         QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
-        int pos = subexp.indexIn(MYTH_SOURCE_VERSION);
+        int pos = subexp.indexIn(GetMythSourceVersion());
         if (pos > -1)
         {
             QString subversion;

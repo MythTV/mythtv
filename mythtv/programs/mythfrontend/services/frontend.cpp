@@ -35,7 +35,7 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
     MythUIStateTracker::GetFreshState(status->State());
 
     status->setName(gCoreContext->GetHostName());
-    status->setVersion(MYTH_SOURCE_VERSION);
+    status->setVersion(GetMythSourceVersion());
 
     status->Process();
     return status;

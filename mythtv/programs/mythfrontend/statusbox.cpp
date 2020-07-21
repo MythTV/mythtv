@@ -546,8 +546,8 @@ void StatusBox::doListingsStatus()
 
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
 
-    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
-               .arg(MYTH_SOURCE_VERSION), helpmsg);
+    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(GetMythSourcePath())
+               .arg(GetMythSourceVersion()), helpmsg);
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
     tmp = tr("Started:   %1").arg(
         MythDate::toString(

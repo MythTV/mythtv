@@ -1268,8 +1268,8 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
 void MythCommandLineParser::PrintVersion(void)
 {
     cout << "Please attach all output as a file in bug reports." << endl;
-    cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;
-    cout << "MythTV Branch : " << MYTH_SOURCE_PATH << endl;
+    cout << "MythTV Version : " << GetMythSourceVersion() << endl;
+    cout << "MythTV Branch : " << GetMythSourcePath() << endl;
     cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
     cout << "Library API : " << MYTH_BINARY_VERSION << endl;
     cout << "QT Version : " << QT_VERSION_STR << endl;
@@ -1298,7 +1298,7 @@ QString MythCommandLineParser::GetHelpString(void) const
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
 
     QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-        .arg(m_appname).arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION);
+        .arg(m_appname).arg(GetMythSourcePath()).arg(GetMythSourceVersion());
     msg << versionStr << endl;
 
     if (toString("showhelp").isEmpty())
@@ -2624,7 +2624,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
     LOG(VB_GENERAL, LOG_CRIT,
         QString("%1 version: %2 [%3] www.mythtv.org")
         .arg(QCoreApplication::applicationName())
-        .arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION));
+        .arg(GetMythSourcePath()).arg(GetMythSourceVersion()));
     LOG(VB_GENERAL, LOG_CRIT, QString("Qt version: compile: %1, runtime: %2")
         .arg(QT_VERSION_STR).arg(qVersion()));
     LOG(VB_GENERAL, LOG_INFO, QString("%1 (%2)")

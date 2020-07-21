@@ -4,7 +4,6 @@
 #include <qglobal.h>
 #include "mythbaseexp.h"
 #include "mythconfig.h"
-#include "version.h"
 
 #if ( QT_VERSION < QT_MIN_VERSION )
 #error "You need a newer version of Qt to compile MythTV. Please re-run 'configure'."
@@ -78,5 +77,6 @@
 #define MYTH_DATABASE_VERSION "1364"
 
 MBASE_PUBLIC  const char *GetMythSourceVersion();
+MBASE_PUBLIC  const char *GetMythSourcePath();
 
 #endif

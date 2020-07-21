@@ -968,8 +968,8 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         int dbSchema = gCoreContext->GetNumSetting("DBSchemaVer");
 
         return QString("VERSION: %1/%2 %3 %4 QT/%5 DBSchema/%6")
-                       .arg(MYTH_SOURCE_VERSION)
-                       .arg(MYTH_SOURCE_PATH)
+                       .arg(GetMythSourceVersion())
+                       .arg(GetMythSourcePath())
                        .arg(MYTH_BINARY_VERSION)
                        .arg(MYTH_PROTO_VERSION)
                        .arg(QT_VERSION_STR)

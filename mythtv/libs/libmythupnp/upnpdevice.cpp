@@ -686,7 +686,7 @@ QString UPnpDeviceDesc::GetHostName() const
 
 UPnpDevice::UPnpDevice() :
     m_sModelNumber(MYTH_BINARY_VERSION),
-    m_sSerialNumber(MYTH_SOURCE_VERSION),
+    m_sSerialNumber(GetMythSourceVersion()),
     m_protocolVersion(MYTH_PROTO_VERSION)
 {
 
