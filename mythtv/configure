@@ -6175,7 +6175,7 @@ check_func_headers "windows.h" CreateDIBSection "$gdigrab_indev_extralibs"
 
 # Check VA1 support before enabling in FFmpeg
 enabled libaom   && use_pkg_config libaom "aom >= 1.0.0" aom/aom_codec.h aom_codec_version || disable libaom
-enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.2.1" "dav1d/dav1d.h" dav1d_version || disable libdav1d
+enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.4.0" "dav1d/dav1d.h" dav1d_version || disable libdav1d
 
 enabled vaapi && enabled opengl &&
     check_header GL/glx.h &&
