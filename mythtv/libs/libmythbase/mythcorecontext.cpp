@@ -1888,34 +1888,22 @@ MythScheduler *MythCoreContext::GetScheduler(void)
 }
 
 /**
- * \fn void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
- * Wait until either of the provided signals have been received.
- * signal1 being declared as SIGNAL(SignalName(args,..))
+ * Wait until any of the provided signals have been received.
+ * signals being declared as SIGNAL(SignalName(args,..))
  */
-void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
+void MythCoreContext::WaitUntilSignals(std::vector<const char *> & sigs)
 {
-    if (!signal1)
+    if (sigs.empty())
         return;
 
     QEventLoop eventLoop;
-    va_list vl;
-
-    LOG(VB_GENERAL, LOG_DEBUG, LOC +
-        QString("Waiting for signal %1")
-        .arg(signal1));
-    connect(this, signal1, &eventLoop, SLOT(quit()));
-
-    va_start(vl, signal1);
-    const char *s = va_arg(vl, const char *);
-    while (s)
+    for (const auto *s : sigs)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Waiting for signal %1")
             .arg(s));
         connect(this, s, &eventLoop, SLOT(quit()));
-        s = va_arg(vl, const char *);
     }
-    va_end(vl);
 
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
 }

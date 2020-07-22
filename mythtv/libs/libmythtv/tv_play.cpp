@@ -207,21 +207,8 @@ int TV::ConfiguredTunerCards(void)
     return count;
 }
 
-static void multi_lock(QMutex *mutex0, ...)
+static void multi_lock(std::vector<QMutex *> mutex)
 {
-    vector<QMutex*> mutex;
-    mutex.push_back(mutex0);
-
-    va_list argp;
-    va_start(argp, mutex0);
-    QMutex *cur = va_arg(argp, QMutex*);
-    while (cur)
-    {
-        mutex.push_back(cur);
-        cur = va_arg(argp, QMutex*);
-    }
-    va_end(argp);
-
     for (bool success = false; !success;)
     {
         success = true;
@@ -5747,7 +5734,7 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
         if (is_using_null)
         {
             addCondition = true;
-            multi_lock(&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock, nullptr);
+            multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
             if (mctx->m_player && pipctx->m_player)
             {
                 PIPLocation loc = mctx->m_player->GetNextPIPLocation();
@@ -5780,7 +5767,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
         return false;
 
     bool ok = false;
-    multi_lock(&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock, nullptr);
+    multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
     if (mctx->m_player && pipctx->m_player)
         ok = mctx->m_player->RemovePIPPlayer(pipctx->m_player);
     mctx->m_deletePlayerLock.unlock();
@@ -5983,7 +5970,7 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
     {
         QRect rect;
 
-        multi_lock(&mctx->m_deletePlayerLock, &ctx->m_deletePlayerLock, (QMutex*)nullptr);
+        multi_lock( {&mctx->m_deletePlayerLock, &ctx->m_deletePlayerLock} );
         if (mctx->m_player && ctx->m_player)
         {
             PIPLocation loc = mctx->m_player->GetNextPIPLocation();
@@ -6197,7 +6184,7 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
 
     m_lockTimerOn = false;
 
-    multi_lock(&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock, nullptr);
+    multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
     if (!mctx->m_player   || !mctx->m_player->IsPlaying() ||
         !pipctx->m_player || !pipctx->m_player->IsPlaying())
     {

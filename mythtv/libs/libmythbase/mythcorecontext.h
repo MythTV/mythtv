@@ -1,6 +1,8 @@
 #ifndef MYTHCORECONTEXT_H_
 #define MYTHCORECONTEXT_H_
 
+#include <vector>
+
 #include <QObject>
 #include <QString>
 #include <QHostAddress>
@@ -246,7 +248,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void setTestStringSettings(QMap<QString,QString>& overrides);
 
     // signal related methods
-    void WaitUntilSignals(const char *signal1, ...);
+    void WaitUntilSignals(std::vector<const char *> & sigs);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
     void emitTVPlaybackStopped(void)            { emit TVPlaybackStopped(); }
     void emitTVPlaybackSought(qint64 position)  { emit TVPlaybackSought(position); }
