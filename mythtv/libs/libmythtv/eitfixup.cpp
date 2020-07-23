@@ -2602,13 +2602,9 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event)
 
 void EITFixUp::FixGreekEIT(DBEventEIT &event) const
 {
-
-    int position;
-    QRegExp tmpRegEx;
-
     // Program ratings
-    tmpRegEx = m_grRating;
-    position = event.m_title.indexOf(tmpRegEx);
+    QRegExp tmpRegEx = m_grRating;
+    int position = event.m_title.indexOf(tmpRegEx);
     if (position != -1)
     {
       EventRating prograting;

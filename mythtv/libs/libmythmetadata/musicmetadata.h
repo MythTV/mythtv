@@ -525,7 +525,7 @@ class META_PUBLIC AlbumArtImages
     ~AlbumArtImages();
 
     void           scanForImages(void);
-    void           addImage(const AlbumArtImage * const newImage);
+    void           addImage(const AlbumArtImage * newImage);
     uint           getImageCount() { return m_imageList.size(); }
     AlbumArtImage *getImage(ImageType type);
     AlbumArtImage *getImageByID(int imageID);
