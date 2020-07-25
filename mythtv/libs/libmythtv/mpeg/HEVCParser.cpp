@@ -885,30 +885,28 @@ bool HEVCParser::profileTierLevel(GetBitContext *gb,
 static bool getScalingListParams(uint8_t sizeId, uint8_t matrixId,
                                  HEVCParser::ScalingList & dest_scaling_list,
                                  uint8_t* &sl, uint8_t &size,
-                                 int16_t* &scaling_list_dc_coef_minus8)
+                                 std::vector<int16_t> &scaling_list_dc_coef_minus8)
 {
     switch (sizeId)
     {
         case HEVCParser::QUANT_MATIX_4X4:
-          sl = dest_scaling_list.scaling_lists_4x4[matrixId];
-          size = 16;
+          sl = dest_scaling_list.scaling_lists_4x4[matrixId].data();
+          size = dest_scaling_list.scaling_lists_4x4[matrixId].size();;
           break;
         case HEVCParser::QUANT_MATIX_8X8:
-          sl = dest_scaling_list.scaling_lists_8x8[matrixId];
-          size = 64;
+          sl = dest_scaling_list.scaling_lists_8x8[matrixId].data();
+          size = dest_scaling_list.scaling_lists_8x8[matrixId].size();
           break;
         case HEVCParser::QUANT_MATIX_16X16:
-          sl = dest_scaling_list.scaling_lists_16x16[matrixId];
-          size = 64;
-          if (scaling_list_dc_coef_minus8)
-              scaling_list_dc_coef_minus8 =
+          sl = dest_scaling_list.scaling_lists_16x16[matrixId].data();
+          size = dest_scaling_list.scaling_lists_16x16[matrixId].size();
+          scaling_list_dc_coef_minus8 =
                   dest_scaling_list.scaling_list_dc_coef_minus8_16x16;
           break;
         case HEVCParser::QUANT_MATIX_32X32:
-          sl = dest_scaling_list.scaling_lists_32x32[matrixId];
-          size = 64;
-          if (scaling_list_dc_coef_minus8)
-              scaling_list_dc_coef_minus8 =
+          sl = dest_scaling_list.scaling_lists_32x32[matrixId].data();
+          size = dest_scaling_list.scaling_lists_32x32[matrixId].size();
+          scaling_list_dc_coef_minus8 =
                   dest_scaling_list.scaling_list_dc_coef_minus8_32x32;
           break;
         default:
@@ -934,7 +932,7 @@ static bool scalingListData(GetBitContext * gb,
     {
         for (matrixId = 0; matrixId < ((sizeId == 3) ? 2 : 6); ++matrixId)
         {
-            int16_t *scaling_list_dc_coef_minus8 = nullptr;
+            std::vector<int16_t> scaling_list_dc_coef_minus8 {};
             uint8_t *sl = nullptr;
 
             if (!getScalingListParams(sizeId, matrixId,
@@ -992,7 +990,7 @@ static bool scalingListData(GetBitContext * gb,
                                               scaling_list_pred_matrix_id_delta;
                         if (!getScalingListParams(dest_scaling_list, sizeId,
                                                   refMatrixId, &temp_sl,
-                                                  NULL, NULL))
+                                                  NULL, {}))
                         {
                             LOG(VB_RECORD, LOG_WARNING, LOC +
                                 QString("Failed to process scaling "

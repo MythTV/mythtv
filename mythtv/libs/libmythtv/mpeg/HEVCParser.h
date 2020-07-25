@@ -191,13 +191,13 @@ class HEVCParser : public H2645Parser
        scaling_lists_32x32: 32x32 scaling list
      */
     using ScalingList = struct {
-        int16_t scaling_list_dc_coef_minus8_16x16[6];
-        int16_t scaling_list_dc_coef_minus8_32x32[2];
+        std::vector<int16_t> scaling_list_dc_coef_minus8_16x16 {6,0};
+        std::vector<int16_t> scaling_list_dc_coef_minus8_32x32 {2,0};
 
-        uint8_t scaling_lists_4x4 [6][16];
-        uint8_t scaling_lists_8x8 [6][64];
-        uint8_t scaling_lists_16x16 [6][64];
-        uint8_t scaling_lists_32x32 [2][64];
+        std::array<std::array<uint8_t,16>,6> scaling_lists_4x4   {};
+        std::array<std::array<uint8_t,64>,6> scaling_lists_8x8   {};
+        std::array<std::array<uint8_t,64>,6> scaling_lists_16x16 {};
+        std::array<std::array<uint8_t,64>,2> scaling_lists_32x32 {};
     };
 
     using QuantMatrixSize = enum
