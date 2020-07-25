@@ -55,42 +55,42 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount,
                     bool AllowEject);
 
-    const QString& getMountPath() const { return m_MountPath; }
-    void setMountPath(const char *path) { m_MountPath = path; }
+    const QString& getMountPath() const { return m_mountPath; }
+    void setMountPath(const char *path) { m_mountPath = path; }
 
-    const QString& getDevicePath() const { return m_DevicePath; }
+    const QString& getDevicePath() const { return m_devicePath; }
 
     const QString& getRealDevice() const
-    { return m_RealDevice.length() ? m_RealDevice : m_DevicePath; }
+    { return m_realDevice.length() ? m_realDevice : m_devicePath; }
 
 
-    const QString& getDeviceModel() const  { return m_DeviceModel;  }
-    void setDeviceModel(const char *model) { m_DeviceModel = model; }
+    const QString& getDeviceModel() const  { return m_deviceModel;  }
+    void setDeviceModel(const char *model) { m_deviceModel = model; }
 
-    MythMediaStatus getStatus() const { return m_Status; }
+    MythMediaStatus getStatus() const { return m_status; }
 
-    const QString& getVolumeID() const { return m_VolumeID; }
-    void  setVolumeID(const char *vol)  { m_VolumeID = vol; }
+    const QString& getVolumeID() const { return m_volumeID; }
+    void  setVolumeID(const char *vol)  { m_volumeID = vol; }
 
-    const QString& getKeyID() const { return m_KeyID; }
+    const QString& getKeyID() const { return m_keyID; }
 
-    bool getAllowEject() const { return m_AllowEject; }
+    bool getAllowEject() const { return m_allowEject; }
 
-    bool getLocked() const { return m_Locked; }
+    bool getLocked() const { return m_locked; }
 
     bool isDeviceOpen() const;
 
     /// Is this device "ready", for a plugin to access?
     bool isUsable() const
     {
-        return m_Status == MEDIASTAT_USEABLE
-            || m_Status == MEDIASTAT_MOUNTED
-            || m_Status == MEDIASTAT_NOTMOUNTED;
+        return m_status == MEDIASTAT_USEABLE
+            || m_status == MEDIASTAT_MOUNTED
+            || m_status == MEDIASTAT_NOTMOUNTED;
     }
 
-    MythMediaType getMediaType() const { return m_MediaType; }
+    MythMediaType getMediaType() const { return m_mediaType; }
 
-    bool isSuperMount()      const { return m_SuperMount; }
+    bool isSuperMount()      const { return m_superMount; }
 
     virtual MythMediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
     virtual bool openDevice();
@@ -114,8 +114,8 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
                                  const QString& extensions);
 
 
-    static const std::array<const QString,9> MediaStatusStrings;
-    static const std::array<const QString,3> MediaErrorStrings;
+    static const std::array<const QString,9> kMediaStatusStrings;
+    static const std::array<const QString,3> kMediaErrorStrings;
 
     void clearData();
 
@@ -134,7 +134,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     {
         MythMediaType type = DetectMediaType();
         if (type != MEDIATYPE_UNKNOWN)
-            m_MediaType = type;
+            m_mediaType = type;
     }
 
     /// Override this to perform any post unmount logic.
@@ -145,34 +145,34 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
 
     MythMediaStatus setStatus(MythMediaStatus newStat, bool CloseIt=false);
 
-    QString m_DeviceModel;   ///< The device Manufacturer/Model. Read/write
-    QString m_DevicePath;    ///< The path to this media's device.
+    QString m_deviceModel;   ///< The device Manufacturer/Model. Read/write
+    QString m_devicePath;    ///< The path to this media's device.
                              ///  (e.g. /dev/cdrom) Read only
-    QString m_KeyID;         ///< KeyID of the media. Read only
+    QString m_keyID;         ///< KeyID of the media. Read only
                              ///  (For ISO9660, volumeid + creation_date)
-    QString m_MountPath;     ///< The path to this media's mount point.
+    QString m_mountPath;     ///< The path to this media's mount point.
                              ///  (e.g. /mnt/cdrom) Read/write
-    QString m_RealDevice;    ///< If m_DevicePath is a symlink, its target.
+    QString m_realDevice;    ///< If m_devicePath is a symlink, its target.
                              ///  (e.g. /dev/hdc) Read only
-    QString m_VolumeID;      ///< The volume ID of the media. Read/write
+    QString m_volumeID;      ///< The volume ID of the media. Read/write
 
-    MythMediaStatus m_Status {MEDIASTAT_UNKNOWN};
+    MythMediaStatus m_status {MEDIASTAT_UNKNOWN};
                              ///< The status of the media as of the
                              ///  last call to checkMedia. Read only
-    MythMediaType   m_MediaType {MEDIATYPE_UNKNOWN};
+    MythMediaType   m_mediaType {MEDIATYPE_UNKNOWN};
                              ///< The type of media. Read only
 
-    bool m_AllowEject;       ///< Allow the user to eject the media?. Read only
-    bool m_Locked {false};   ///< Is this media locked?.              Read only
+    bool m_allowEject;       ///< Allow the user to eject the media?. Read only
+    bool m_locked {false};   ///< Is this media locked?.              Read only
 
-    bool m_SuperMount;       ///< Is this a supermount device?.       Read only
+    bool m_superMount;       ///< Is this a supermount device?.       Read only
                              ///  The OS handles mounting/unmounting of
                              ///  'supermount' devices.  Myth only need to give
                              ///  derived classes a chance to perform their
                              ///  mount/unmount logic.
 
 
-    int  m_DeviceHandle {-1};///< A file handle for opening and closing
+    int  m_deviceHandle {-1};///< A file handle for opening and closing
                              ///  the device, ioctls(), et c. This should
                              ///  be private, but a subclass of a
                              ///  subclass needs it (MythCDRomLinux)
@@ -184,17 +184,17 @@ class MBASE_PUBLIC MythMediaEvent : public QEvent
 {
   public:
     MythMediaEvent(MythMediaStatus oldStatus, MythMediaDevice *pDevice) :
-        QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
+        QEvent(kEventType), m_oldStatus(oldStatus), m_device(pDevice) {}
     ~MythMediaEvent() override;
 
-    MythMediaStatus getOldStatus(void) const { return m_OldStatus; }
-    MythMediaDevice* getDevice(void) { return m_Device; }
+    MythMediaStatus getOldStatus(void) const { return m_oldStatus; }
+    MythMediaDevice* getDevice(void) { return m_device; }
 
     static Type kEventType;
 
   protected:
-    MythMediaStatus m_OldStatus;
-    QPointer<MythMediaDevice> m_Device;
+    MythMediaStatus m_oldStatus;
+    QPointer<MythMediaDevice> m_device;
 };
 
 #endif

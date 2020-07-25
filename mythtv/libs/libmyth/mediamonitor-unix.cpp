@@ -158,7 +158,7 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
 
     endfsent();
 
-    return !m_Devices.isEmpty();
+    return !m_devices.isEmpty();
 #else
     return false;
 #endif
@@ -250,7 +250,7 @@ bool MediaMonitorUnix::CheckMountable(void)
 
                 MythMediaDevice* pDevice = nullptr;
                 if (DeviceProperty(entry, "DeviceIsRemovable").toBool())
-                    pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
+                    pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_allowEject);
                 else
                     pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
@@ -587,7 +587,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    for (const auto *device : qAsConst(m_Devices))
+    for (const auto *device : qAsConst(m_devices))
     {
         if (stat(device->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
@@ -608,12 +608,12 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 
     LookupModel(pDevice);
 
-    QMutexLocker locker(&m_DevicesLock);
+    QMutexLocker locker(&m_devicesLock);
 
     connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
             this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
-    m_Devices.push_back( pDevice );
-    m_UseCount[pDevice] = 0;
+    m_devices.push_back( pDevice );
+    m_useCount[pDevice] = 0;
     LOG(VB_MEDIA, LOG_INFO, LOC + ":AddDevice() - Added " + path);
 
     return true;
@@ -673,7 +673,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     {
         if (is_cdrom)
             pDevice = MythCDROM::get(this, mep->fs_spec,
-                                     is_supermount, m_AllowEject);
+                                     is_supermount, m_allowEject);
     }
     else
     {
@@ -694,7 +694,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
             devstr[len] = 0;
             if (is_cdrom)
                 pDevice = MythCDROM::get(this, devstr,
-                                         is_supermount, m_AllowEject);
+                                         is_supermount, m_allowEject);
         }
         else
             return false;
@@ -730,7 +730,7 @@ void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o)
 
         MythMediaDevice* pDevice = nullptr;
         if (DeviceProperty(o, "DeviceIsRemovable").toBool())
-            pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
+            pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_allowEject);
         else
             pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
@@ -819,7 +819,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     {
         // found cdrom device
             pDevice = MythCDROM::get(
-                this, device_file.toLatin1().constData(), false, m_AllowEject);
+                this, device_file.toLatin1().constData(), false, m_allowEject);
     }
     else
     {

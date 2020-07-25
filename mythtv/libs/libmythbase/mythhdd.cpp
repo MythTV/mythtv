@@ -31,9 +31,9 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
                  bool SuperMount, bool AllowEject)
     : MythMediaDevice(par, DevicePath, SuperMount, AllowEject)
 {
-    LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_DevicePath);
-    m_Status = MEDIASTAT_NOTMOUNTED;
-    m_MediaType = MEDIATYPE_UNKNOWN;
+    LOG(VB_MEDIA, LOG_INFO, "MythHDD::MythHDD " + m_devicePath);
+    m_status = MEDIASTAT_NOTMOUNTED;
+    m_mediaType = MEDIATYPE_UNKNOWN;
 }
 
 /** \fn MythHDD::checkMedia(void)
@@ -41,19 +41,19 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
  */
 MythMediaStatus MythHDD::checkMedia(void)
 {
-    if (m_Status == MEDIASTAT_ERROR)
-        return m_Status;
+    if (m_status == MEDIASTAT_ERROR)
+        return m_status;
 
     if (isMounted())
     {
         // A lazy way to present volume name for the user to eject.
         // Hotplug devices are usually something like /media/VOLUME
-        m_VolumeID = m_MountPath;
+        m_volumeID = m_mountPath;
 
         // device is mounted, trigger event
-        if (m_Status != MEDIASTAT_MOUNTED)
+        if (m_status != MEDIASTAT_MOUNTED)
         {
-            m_Status = MEDIASTAT_NOTMOUNTED;
+            m_status = MEDIASTAT_NOTMOUNTED;
             onDeviceMounted();
         }
 
@@ -61,12 +61,12 @@ MythMediaStatus MythHDD::checkMedia(void)
     }
 
     // device is not mounted
-    switch (m_Status)
+    switch (m_status)
     {
         case MEDIASTAT_NOTMOUNTED:
             // a removable device was just plugged in try to mount it.
             LOG(VB_MEDIA, LOG_INFO, "MythHDD::checkMedia try mounting " +
-                m_DevicePath);
+                m_devicePath);
 
             if (mount())
                 return setStatus(MEDIASTAT_MOUNTED);
@@ -80,7 +80,7 @@ MythMediaStatus MythHDD::checkMedia(void)
 
         default:
             // leave device state as is
-            return m_Status;
+            return m_status;
     }
 }
 

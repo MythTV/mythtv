@@ -54,51 +54,51 @@ MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
 
 void MythCDROM::onDeviceMounted()
 {
-    if (!QDir(m_MountPath).exists())
+    if (!QDir(m_mountPath).exists())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Mountpoint '%1' doesn't exist")
-                                     .arg(m_MountPath));
-        m_MediaType = MEDIATYPE_UNKNOWN;
-        m_Status    = MEDIASTAT_ERROR;
+                                     .arg(m_mountPath));
+        m_mediaType = MEDIATYPE_UNKNOWN;
+        m_status    = MEDIASTAT_ERROR;
         return;
     }
 
-    QFileInfo audio = QFileInfo(m_MountPath + PATHTO_AUDIO_DETECT);
-    QDir        dvd = QDir(m_MountPath  + PATHTO_DVD_DETECT);
-    QDir       svcd = QDir(m_MountPath  + PATHTO_SVCD_DETECT);
-    QDir        vcd = QDir(m_MountPath  + PATHTO_VCD_DETECT);
-    QDir    bad_dvd = QDir(m_MountPath  + PATHTO_BAD_DVD_MOUNT);
-    QDir         bd = QDir(m_MountPath  + PATHTO_BD_DETECT);
+    QFileInfo audio = QFileInfo(m_mountPath + PATHTO_AUDIO_DETECT);
+    QDir        dvd = QDir(m_mountPath  + PATHTO_DVD_DETECT);
+    QDir       svcd = QDir(m_mountPath  + PATHTO_SVCD_DETECT);
+    QDir        vcd = QDir(m_mountPath  + PATHTO_VCD_DETECT);
+    QDir    bad_dvd = QDir(m_mountPath  + PATHTO_BAD_DVD_MOUNT);
+    QDir         bd = QDir(m_mountPath  + PATHTO_BD_DETECT);
 
     // Default is data media
-    m_MediaType = MEDIATYPE_DATA;
+    m_mediaType = MEDIATYPE_DATA;
 
     // Default is mounted media
-    m_Status = MEDIASTAT_MOUNTED;
+    m_status = MEDIASTAT_MOUNTED;
 
     if (dvd.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable DVD detected.");
-        m_MediaType = MEDIATYPE_DVD;
-        m_Status = MEDIASTAT_USEABLE;
+        m_mediaType = MEDIATYPE_DVD;
+        m_status = MEDIASTAT_USEABLE;
     }
     else if (bd.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable Blu-ray detected.");
-        m_MediaType = MEDIATYPE_BD;
-        m_Status = MEDIASTAT_USEABLE;
+        m_mediaType = MEDIATYPE_BD;
+        m_status = MEDIASTAT_USEABLE;
     }
     else if (audio.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable Audio CD detected.");
-        m_MediaType = MEDIATYPE_AUDIO;
-        m_Status = MEDIASTAT_USEABLE;
+        m_mediaType = MEDIATYPE_AUDIO;
+        m_status = MEDIASTAT_USEABLE;
     }
     else if (vcd.exists() || svcd.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable VCD/SVCD detected.");
-        m_MediaType = MEDIATYPE_VCD;
-        m_Status = MEDIASTAT_USEABLE;
+        m_mediaType = MEDIATYPE_VCD;
+        m_status = MEDIASTAT_USEABLE;
     }
     else if (bad_dvd.exists())
     {
@@ -108,7 +108,7 @@ void MythCDROM::onDeviceMounted()
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-                QString("CD/DVD '%1' contained none of\n").arg(m_MountPath) +
+                QString("CD/DVD '%1' contained none of\n").arg(m_mountPath) +
                 QString("\t\t\t%1, %2, %3 or %4").arg(PATHTO_DVD_DETECT)
                 .arg(PATHTO_AUDIO_DETECT).arg(PATHTO_VCD_DETECT)
                 .arg(PATHTO_SVCD_DETECT));
@@ -116,15 +116,15 @@ void MythCDROM::onDeviceMounted()
     }
 
     // If not DVD/AudioCD/VCD/SVCD, use parent's more generic version
-    if (MEDIATYPE_DATA == m_MediaType)
+    if (MEDIATYPE_DATA == m_mediaType)
         MythMediaDevice::onDeviceMounted();
 
     // Unlock the door, and if appropriate unmount the media,
     // so the user can press the manual eject button
-    if (m_AllowEject)
+    if (m_allowEject)
     {
         unlock();
-        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD)
+        if (m_mediaType == MEDIATYPE_DVD || m_mediaType == MEDIATYPE_VCD)
             unmount();
     }
 }

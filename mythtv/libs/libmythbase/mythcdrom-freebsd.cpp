@@ -35,7 +35,7 @@ MythMediaError MythCDROMFreeBSD::eject(bool open_close)
         openDevice();
 
     if (open_close)
-        return (ioctl(m_DeviceHandle, CDIOCEJECT) == 0) ? MEDIAERR_OK :
+        return (ioctl(m_deviceHandle, CDIOCEJECT) == 0) ? MEDIAERR_OK :
                                                           MEDIAERR_FAILED;
     else
         return MEDIAERR_UNSUPPORTED;
@@ -72,7 +72,7 @@ MythMediaError MythCDROMFreeBSD::lock()
 {
     MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
-        ioctl(m_DeviceHandle, CDIOCPREVENT);
+        ioctl(m_deviceHandle, CDIOCPREVENT);
 
     return ret;
 }
@@ -84,7 +84,7 @@ MythMediaError MythCDROMFreeBSD::unlock()
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, "Unlocking CDROM door");
 #endif
-        ioctl(m_DeviceHandle, CDIOCALLOW);
+        ioctl(m_deviceHandle, CDIOCALLOW);
     }
     else
     {
