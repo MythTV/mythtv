@@ -1067,10 +1067,10 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
                                uint8_t max_dec_pic_buffering_minus1)
 {
     int16_t  deltaRPS = 0;
-    bool use_delta_flag[16]        = { false };
-    bool used_by_curr_pic_flag[16] = { false };
-    uint32_t delta_poc_s0_minus1[16] = { 0 };
-    uint32_t delta_poc_s1_minus1[16] = { 0 };
+    std::array<bool,16>     use_delta_flag          { false };
+    std::array<bool,16>     used_by_curr_pic_flag   { false };
+    std::array<uint32_t,16> delta_poc_s0_minus1     { 0 };
+    std::array<uint32_t,16> delta_poc_s1_minus1     { 0 };
     uint i   = 0;
     uint j   = 0;
     int  k   = 0;
@@ -2052,8 +2052,8 @@ bool HEVCParser::parsePPS(GetBitContext *gb)
 // Following the lead of AVCParser, ignore the left cropping.
 uint HEVCParser::pictureWidthCropped(void) const
 {
-    const uint subwc[] = {1, 2, 2, 1, 1};
-    const uint crop_unit_x = subwc[m_chromaFormatIdc];
+    static const std::array<const uint8_t,5> subwc {1, 2, 2, 1, 1};
+    const uint8_t crop_unit_x = subwc[m_chromaFormatIdc];
     // uint crop_rect_x = m_frameCropLeftOffset * crop_unit_x;
 
     return m_picWidth - ((/* m_frameCropLeftOffset + */
@@ -2063,8 +2063,8 @@ uint HEVCParser::pictureWidthCropped(void) const
 // Following the lead of AVCParser, ignore the top cropping.
 uint HEVCParser::pictureHeightCropped(void) const
 {
-    const uint subhc[] = {1, 2, 1, 1, 1};
-    const uint crop_unit_y = subhc[m_chromaFormatIdc];
+    static const std::array<const uint8_t,5> subhc {1, 2, 1, 1, 1};
+    const uint8_t crop_unit_y = subhc[m_chromaFormatIdc];
     // uint crop_rect_y = m_frameCropTopOffset * crop_unit_y;
 
     return m_picHeight - ((/* m_frameCropTopOffset + */

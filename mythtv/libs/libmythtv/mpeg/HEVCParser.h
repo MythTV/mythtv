@@ -164,10 +164,10 @@ class HEVCParser : public H2645Parser
 
     using ShortTermRefPicSet = struct {
         /* calculated values */
-        int32_t DeltaPocS0[16];
-        int32_t DeltaPocS1[16];
-        uint8_t UsedByCurrPicS0[16];
-        uint8_t UsedByCurrPicS1[16];
+        std::array<int32_t,16> DeltaPocS0;
+        std::array<int32_t,16> DeltaPocS1;
+        std::array<uint8_t,16> UsedByCurrPicS0;
+        std::array<uint8_t,16> UsedByCurrPicS1;
         uint8_t NumDeltaPocs;
         uint8_t NumNegativePics;
         uint8_t NumPositivePics;
