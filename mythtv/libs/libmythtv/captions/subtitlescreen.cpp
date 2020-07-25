@@ -69,7 +69,7 @@ public:
              long long expireTime) :
         MythUIImage(parent, name),
         SubWrapper(area, expireTime) {}
-    MythImage *GetImage(void) { return m_Images[0]; }
+    MythImage *GetImage(void) { return m_images[0]; }
 };
 
 ////////////////////////////////////////////////////////////////////////////

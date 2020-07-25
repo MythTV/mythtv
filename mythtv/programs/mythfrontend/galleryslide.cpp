@@ -421,7 +421,7 @@ bool Slide::LoadSlide(const ImagePtrK& im, int direction, bool notifyCompletion)
 */
 void Slide::SlideLoaded()
 {
-    m_state = m_Images[0] ? kLoaded : kFailed;
+    m_state = m_images[0] ? kLoaded : kFailed;
     if (m_state == kFailed)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to load %1").arg(m_data->m_filePath));
@@ -531,7 +531,7 @@ void Slide::SetPan(QPoint pos)
     }
 
     // Determine zoom of largest dimension
-    QRect imageArea = m_Images[m_CurPos]->rect();
+    QRect imageArea = m_images[m_curPos]->rect();
     float hRatio    = float(imageArea.height()) / m_area.height();
     float wRatio    = float(imageArea.width()) / m_area.width();
     float ratio     = qMax(hRatio, wRatio);

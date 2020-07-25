@@ -105,7 +105,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage() override;
 
-    QString GetFilename(void) { return m_Filename; }
+    QString GetFilename(void) { return m_filename; }
 
     /** Must be followed by a call to Load() to load the image. */
     void SetFilename(const QString &filename);
@@ -164,21 +164,21 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     void FindRandomImage(void);
 
-    QString m_Filename;
-    QString m_OrigFilename;
+    QString m_filename;
+    QString m_origFilename;
 
-    QHash<int, MythImage *> m_Images;
-    QHash<int, int>         m_Delays;
-    QMutex                  m_ImagesLock;
+    QHash<int, MythImage *> m_images;
+    QHash<int, int>         m_delays;
+    QMutex                  m_imagesLock;
 
-    int m_Delay;
-    int m_LowNum;
-    int m_HighNum;
+    int m_delay;
+    int m_lowNum;
+    int m_highNum;
 
-    unsigned int    m_CurPos             {0};
-    QTime           m_LastDisplay        {QTime::currentTime()};
+    unsigned int    m_curPos             {0};
+    QTime           m_lastDisplay        {QTime::currentTime()};
 
-    bool            m_NeedLoad           {false};
+    bool            m_needLoad           {false};
 
     ImageProperties m_imageProperties;
 
