@@ -28,21 +28,21 @@
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    m_Message = "";
-    m_Filter = FilterNone;
+    m_message = "";
+    m_filter = FilterNone;
 
     m_isPassword = false;
 
     m_blinkInterval = 0;
     m_cursorBlinkRate = 40;
 
-    m_Position = -1;
+    m_position = -1;
 
     m_maxLength = 255;
 
     m_backgroundState = nullptr;
     m_cursorImage = nullptr;
-    m_Text = nullptr;
+    m_text = nullptr;
 
     m_keyboardPosition = VK_POSBELOWEDIT;
 
@@ -149,14 +149,14 @@ void MythUITextEdit::Finalize()
 
     // Give it something to chew on, so it can position the initial
     // cursor in the right place.  Toggle text, to force an area recalc.
-    if (m_Text)
+    if (m_text)
     {
-        m_Text->SetText(".");
-        m_Text->SetText("");
+        m_text->SetText(".");
+        m_text->SetText("");
     }
 
-    if (m_cursorImage && m_Text)
-        m_cursorImage->SetPosition(m_Text->CursorPosition(0));
+    if (m_cursorImage && m_text)
+        m_cursorImage->SetPosition(m_text->CursorPosition(0));
 }
 
 void MythUITextEdit::SetInitialStates()
@@ -166,12 +166,12 @@ void MythUITextEdit::SetInitialStates()
 
     m_initialized = true;
 
-    m_Text        = dynamic_cast<MythUIText *>(GetChild("text"));
+    m_text        = dynamic_cast<MythUIText *>(GetChild("text"));
     m_cursorImage = dynamic_cast<MythUIImage *>(GetChild("cursor"));
     m_backgroundState =
         dynamic_cast<MythUIStateType *>(GetChild("background"));
 
-    if (!m_Text)
+    if (!m_text)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Missing text element.");
 
     if (!m_cursorImage)
@@ -180,9 +180,9 @@ void MythUITextEdit::SetInitialStates()
     if (!m_backgroundState)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Missing background element.");
 
-    if (!m_Text || !m_cursorImage)
+    if (!m_text || !m_cursorImage)
     {
-        m_Text = nullptr;
+        m_text = nullptr;
         m_cursorImage = nullptr;
         m_backgroundState = nullptr;
         return;
@@ -190,9 +190,9 @@ void MythUITextEdit::SetInitialStates()
 
     if (m_backgroundState && !m_backgroundState->DisplayState("active"))
         LOG(VB_GENERAL, LOG_ERR, LOC + "active state doesn't exist");
-    m_Text->SetCutDown(Qt::ElideNone);
+    m_text->SetCutDown(Qt::ElideNone);
 
-    QFontMetrics fm(m_Text->GetFontProperties()->face());
+    QFontMetrics fm(m_text->GetFontProperties()->face());
     int height = fm.height();
 
     if (height > 0)
@@ -215,20 +215,20 @@ void MythUITextEdit::SetMaxLength(const int length)
 
 void MythUITextEdit::SetText(const QString &text, bool moveCursor)
 {
-    if (!m_Text || (m_Message == text))
+    if (!m_text || (m_message == text))
         return;
 
-    m_Message = text;
+    m_message = text;
 
     if (m_isPassword)
     {
         QString obscured;
 
-        obscured.fill('*', m_Message.size());
-        m_Text->SetText(obscured);
+        obscured.fill('*', m_message.size());
+        m_text->SetText(obscured);
     }
     else
-        m_Text->SetText(m_Message);
+        m_text->SetText(m_message);
 
     if (moveCursor)
         MoveCursor(MoveEnd);
@@ -238,7 +238,7 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
 
 void MythUITextEdit::InsertText(const QString &text)
 {
-    if (!m_Text)
+    if (!m_text)
         return;
 
     for (auto c : qAsConst(text))
@@ -249,10 +249,10 @@ void MythUITextEdit::InsertText(const QString &text)
 
 bool MythUITextEdit::InsertCharacter(const QString &character)
 {
-    if (m_maxLength != 0 && m_Message.length() == m_maxLength)
+    if (m_maxLength != 0 && m_message.length() == m_maxLength)
         return false;
 
-    QString newmessage = m_Message;
+    QString newmessage = m_message;
 
     const QChar *unichar = character.unicode();
 
@@ -260,19 +260,19 @@ bool MythUITextEdit::InsertCharacter(const QString &character)
     if (!unichar->isPrint())
         return false;
 
-    if ((m_Filter & FilterAlpha) && unichar->isLetter())
+    if ((m_filter & FilterAlpha) && unichar->isLetter())
         return false;
 
-    if ((m_Filter & FilterNumeric) && unichar->isNumber())
+    if ((m_filter & FilterNumeric) && unichar->isNumber())
         return false;
 
-    if ((m_Filter & FilterSymbols) && unichar->isSymbol())
+    if ((m_filter & FilterSymbols) && unichar->isSymbol())
         return false;
 
-    if ((m_Filter & FilterPunct) && unichar->isPunct())
+    if ((m_filter & FilterPunct) && unichar->isPunct())
         return false;
 
-    newmessage.insert(m_Position + 1, character);
+    newmessage.insert(m_position + 1, character);
     SetText(newmessage, false);
     MoveCursor(MoveRight);
 
@@ -281,75 +281,75 @@ bool MythUITextEdit::InsertCharacter(const QString &character)
 
 void MythUITextEdit::RemoveCharacter(int position)
 {
-    if (m_Message.isEmpty() || position < 0 || position >= m_Message.size())
+    if (m_message.isEmpty() || position < 0 || position >= m_message.size())
         return;
 
-    QString newmessage = m_Message;
+    QString newmessage = m_message;
 
     newmessage.remove(position, 1);
     SetText(newmessage, false);
 
-    if (position == m_Position)
+    if (position == m_position)
         MoveCursor(MoveLeft);
 }
 
 bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 {
-    if (!m_Text || !m_cursorImage)
+    if (!m_text || !m_cursorImage)
         return false;
 
     switch (moveDir)
     {
         case MoveLeft:
-            if (m_Position < 0)
+            if (m_position < 0)
                 return false;
-            m_Position--;
+            m_position--;
             break;
         case MoveRight:
-            if (m_Position == (m_Message.size() - 1))
+            if (m_position == (m_message.size() - 1))
                 return false;
-            m_Position++;
+            m_position++;
             break;
         case MoveUp:
         {
-            int newPos = m_Text->MoveCursor(-1);
+            int newPos = m_text->MoveCursor(-1);
             if (newPos == -1)
                 return false;
-            m_Position = newPos - 1;
+            m_position = newPos - 1;
             break;
         }
         case MoveDown:
         {
-            int newPos = m_Text->MoveCursor(1);
+            int newPos = m_text->MoveCursor(1);
             if (newPos == -1)
                 return false;
-            m_Position = newPos - 1;
+            m_position = newPos - 1;
             break;
         }
         case MovePageUp:
         {
-            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
-            int newPos = m_Text->MoveCursor(-lines);
+            int lines = m_text->m_Area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int newPos = m_text->MoveCursor(-lines);
             if (newPos == -1)
                 return false;
-            m_Position = newPos - 1;
+            m_position = newPos - 1;
             break;
         }
         case MovePageDown:
         {
-            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
-            int newPos = m_Text->MoveCursor(lines);
+            int lines = m_text->m_Area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int newPos = m_text->MoveCursor(lines);
             if (newPos == -1)
                 return false;
-            m_Position = newPos - 1;
+            m_position = newPos - 1;
             break;
         }
         case MoveEnd:
-            m_Position = m_Message.size() - 1;
+            m_position = m_message.size() - 1;
             break;
     }
 
-    m_cursorImage->SetPosition(m_Text->CursorPosition(m_Position + 1));
+    m_cursorImage->SetPosition(m_text->CursorPosition(m_position + 1));
 
     SetRedraw();
     return true;
@@ -365,7 +365,7 @@ void MythUITextEdit::CopyTextToClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
 
-    clipboard->setText(m_Message);
+    clipboard->setText(m_message);
 }
 
 void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
@@ -506,16 +506,16 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "DELETE")
         {
-            RemoveCharacter(m_Position + 1);
+            RemoveCharacter(m_position + 1);
         }
         else if (action == "BACKSPACE")
         {
-            RemoveCharacter(m_Position);
+            RemoveCharacter(m_position);
         }
         else if (action == "NEWLINE")
         {
-            QString newmessage = m_Message;
-            newmessage.insert(m_Position + 1, '\n');
+            QString newmessage = m_message;
+            newmessage.insert(m_position + 1, '\n');
             SetText(newmessage, false);
             MoveCursor(MoveRight);
         }
@@ -580,13 +580,13 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
         return;
     }
 
-    m_Message.clear();
-    m_Position = -1;
+    m_message.clear();
+    m_position = -1;
 
     m_blinkInterval = textedit->m_blinkInterval;
     m_cursorBlinkRate = textedit->m_cursorBlinkRate;
     m_maxLength = textedit->m_maxLength;
-    m_Filter = textedit->m_Filter;
+    m_filter = textedit->m_filter;
     m_keyboardPosition = textedit->m_keyboardPosition;
 
     MythUIType::CopyFrom(base);

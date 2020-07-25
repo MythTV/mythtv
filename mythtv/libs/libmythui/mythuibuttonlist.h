@@ -323,8 +323,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     MythUIStateType *m_buttontemplate {nullptr};
 
-    QVector<MythUIStateType *> m_ButtonList;
-    QMap<int, MythUIButtonListItem *> m_ButtonToItem;
+    QVector<MythUIStateType *> m_buttonList;
+    QMap<int, MythUIButtonListItem *> m_buttonToItem;
     QHash<QString, QString> m_actionRemap;
 
     bool m_initialized                {false};

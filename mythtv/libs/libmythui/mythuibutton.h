@@ -36,7 +36,7 @@ class MUI_PUBLIC MythUIButton : public MythUIType
 
     void Push(bool lock=false);
 
-    void SetLockable(bool lockable) { m_Lockable = lockable; };
+    void SetLockable(bool lockable) { m_lockable = lockable; };
     void SetLocked(bool locked);
 
   protected slots:
@@ -59,16 +59,16 @@ class MUI_PUBLIC MythUIButton : public MythUIType
     void SetInitialStates(void);
     void SetState(const QString& state);
 
-    QString m_Message;
-    QString m_ValueText;
+    QString m_message;
+    QString m_valueText;
 
-    MythUIStateType *m_BackgroundState {nullptr};
-    MythUIText *m_Text                 {nullptr};
+    MythUIStateType *m_backgroundState {nullptr};
+    MythUIText *m_text                 {nullptr};
 
     QString m_state;
 
-    bool m_Pushed                      {false};
-    bool m_Lockable                    {false};
+    bool m_pushed                      {false};
+    bool m_lockable                    {false};
     class QTimer *m_clickTimer         {nullptr};
 };
 

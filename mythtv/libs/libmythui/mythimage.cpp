@@ -30,8 +30,8 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
     if (!parent)
         LOG(VB_GENERAL, LOG_ERR, "Image created without parent!");
 
-    m_Parent = parent;
-    m_FileName = "";
+    m_parent = parent;
+    m_fileName = "";
 
     if (!s_ui)
         s_ui = GetMythUI();
@@ -39,8 +39,8 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
 
 MythImage::~MythImage()
 {
-    if (m_Parent)
-        m_Parent->DeleteFormatImage(this);
+    if (m_parent)
+        m_parent->DeleteFormatImage(this);
 }
 
 int MythImage::IncrRef(void)

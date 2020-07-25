@@ -44,9 +44,9 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void SetText(const QString &text, bool moveCursor = true);
     void InsertText(const QString &text);
-    QString GetText(void) const { return m_Message; }
+    QString GetText(void) const { return m_message; }
 
-    void SetFilter(InputFilter filter) { m_Filter = filter; }
+    void SetFilter(InputFilter filter) { m_filter = filter; }
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
     void SetMaxLength(int length);
 
@@ -92,9 +92,9 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     int m_maxLength;
 
-    QString m_Message;
-    InputFilter m_Filter;
-    int m_Position;
+    QString m_message;
+    InputFilter m_filter;
+    int m_position;
 
     bool m_isPassword;
 
@@ -102,7 +102,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     MythUIStateType *m_backgroundState;
     MythUIImage *m_cursorImage;
-    MythUIText  *m_Text;
+    MythUIText  *m_text;
 
     int m_composeKey;
 };
