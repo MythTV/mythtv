@@ -196,7 +196,7 @@ void RomInfo::setField(const QString& field, const QString& data)
     else if (field == "publisher")
         m_publisher = data;
     else if (field == "crc_value")
-        m_crc_value = data;
+        m_crcValue = data;
     else if (field == "inetref")
         m_inetref = data;
     else if (field == "diskcount")

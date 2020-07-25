@@ -127,10 +127,10 @@ class GameHandler : public QObject
     QStringList m_validextensions;
 
     RomDBMap    m_romDB;
-    GameScanMap m_GameMap;
+    GameScanMap m_gameMap;
 
-    bool m_RemoveAll       {false};
-    bool m_KeepAll         {false};
+    bool m_removeAll       {false};
+    bool m_keepAll         {false};
 
   private:
     void CreateProgress(const QString& message);

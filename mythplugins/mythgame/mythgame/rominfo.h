@@ -35,7 +35,7 @@ class RomInfo
                 m_fanart = std::move(lfanart);
                 m_boxart = std::move(lboxart);
                 m_country = std::move(lcountry);
-                m_crc_value = std::move(lcrc_value);
+                m_crcValue = std::move(lcrc_value);
                 m_diskcount = ldiskcount;
                 m_gametype = std::move(lgametype);
                 m_romcount = lromcount;
@@ -60,7 +60,7 @@ class RomInfo
                 m_fanart = lhs.m_fanart;
                 m_boxart = lhs.m_boxart;
                 m_country = lhs.m_country;
-                m_crc_value = lhs.m_crc_value;
+                m_crcValue = lhs.m_crcValue;
                 m_diskcount = lhs.m_diskcount;
                 m_gametype = lhs.m_gametype;
                 m_romcount = lhs.m_romcount;
@@ -117,8 +117,8 @@ class RomInfo
     int DiskCount() const { return m_diskcount; }
     void setDiskCount(const int &ldiskcount) { m_diskcount = ldiskcount; }
 
-    QString CRC_VALUE() const { return m_crc_value; }
-    void setCRC_VALUE(const QString &lcrc_value) { m_crc_value = lcrc_value; }
+    QString CRC_VALUE() const { return m_crcValue; }
+    void setCRC_VALUE(const QString &lcrc_value) { m_crcValue = lcrc_value; }
 
     QString Plot() const { return m_plot; }
     void setPlot(const QString &lplot) { m_plot = lplot; }
@@ -154,7 +154,7 @@ class RomInfo
     QString m_gamename;
     QString m_genre;
     QString m_country;
-    QString m_crc_value;
+    QString m_crcValue;
     QString m_gametype;
     QString m_allsystems;
     QString m_plot;
