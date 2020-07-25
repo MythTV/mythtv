@@ -287,10 +287,10 @@ struct piano_key_data {
     vector<QRect>   m_rects            {};
     QSize           m_size;
 
-    unsigned long   m_offset_processed {0};
+    unsigned long   m_offsetProcessed  {0};
 
-    piano_key_data *m_piano_data       {nullptr};
-    piano_audio    *m_audio_data       {nullptr};
+    piano_key_data *m_pianoData        {nullptr};
+    piano_audio    *m_audioData        {nullptr};
 
     vector<double>  m_magnitude        {};
 };
