@@ -16,11 +16,11 @@
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
     : MythUIText(parent, name)
 {
-    m_DateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMM yyyy");
-    m_ShortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd M/d");
-    m_TimeFormat = GetMythDB()->GetSetting("TimeFormat", "h:mm ap");
+    m_dateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMM yyyy");
+    m_shortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd M/d");
+    m_timeFormat = GetMythDB()->GetSetting("TimeFormat", "h:mm ap");
 
-    m_Format = QString("%1, %2").arg(m_DateFormat).arg(m_TimeFormat);
+    m_format = QString("%1, %2").arg(m_dateFormat).arg(m_timeFormat);
 }
 
 MythUIClock::~MythUIClock()
@@ -34,29 +34,29 @@ MythUIClock::~MythUIClock()
  */
 void MythUIClock::Pulse(void)
 {
-    m_Time = MythDate::current();
+    m_time = MythDate::current();
 
-    if (m_nextUpdate.isNull() || (m_Time >= m_nextUpdate))
+    if (m_nextUpdate.isNull() || (m_time >= m_nextUpdate))
         MythUIText::SetText(GetTimeText());
 
     MythUIText::Pulse();
 }
 
-/** \brief This creates a string based on m_Time, and sets m_nextUpdate
- *         to the second following m_Time.
+/** \brief This creates a string based on m_time, and sets m_nextUpdate
+ *         to the second following m_time.
  *
  *  It's important to note that this function do not look up the
- *  wall clock time, but depends on m_Time being set ahead of time.
+ *  wall clock time, but depends on m_time being set ahead of time.
  *
  */
 QString MythUIClock::GetTimeText(void)
 {
-    QDateTime dt = m_Time.toLocalTime();
-    QString newMsg = gCoreContext->GetQLocale().toString(dt, m_Format);
+    QDateTime dt = m_time.toLocalTime();
+    QString newMsg = gCoreContext->GetQLocale().toString(dt, m_format);
 
-    m_nextUpdate = m_Time.addSecs(1);
-    m_nextUpdate = QDateTime(m_Time.date(),
-                             m_Time.time().addMSecs(m_Time.time().msec()),
+    m_nextUpdate = m_time.addSecs(1);
+    m_nextUpdate = QDateTime(m_time.date(),
+                             m_time.time().addMSecs(m_time.time().msec()),
                              Qt::UTC);
 
     return newMsg;
@@ -71,7 +71,7 @@ void MythUIClock::SetText(const QString &text)
 
     if (txt.isEmpty())
     {
-        m_Time = MythDate::current();
+        m_time = MythDate::current();
         txt = GetTimeText();
     }
 
@@ -89,15 +89,15 @@ bool MythUIClock::ParseElement(
     {
         QString format = parseText(element);
         format = QCoreApplication::translate("ThemeUI", format.toUtf8());
-        format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
-        format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
-        format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
-        m_Format = format;
-        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
+        format.replace("%TIME%", m_timeFormat, Qt::CaseInsensitive);
+        format.replace("%DATE%", m_dateFormat, Qt::CaseInsensitive);
+        format.replace("%SHORTDATE%", m_shortDateFormat, Qt::CaseInsensitive);
+        m_format = format;
+        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_format);
     }
     else
     {
-        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
+        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_format);
         return MythUIText::ParseElement(filename, element, showWarnings);
     }
 
@@ -117,15 +117,15 @@ void MythUIClock::CopyFrom(MythUIType *base)
         return;
     }
 
-    m_Time = clock->m_Time;
+    m_time = clock->m_time;
     m_nextUpdate = clock->m_nextUpdate;
 
-    m_Format = clock->m_Format;
-    m_TimeFormat = clock->m_TimeFormat;
-    m_DateFormat = clock->m_DateFormat;
-    m_ShortDateFormat = clock->m_ShortDateFormat;
+    m_format = clock->m_format;
+    m_timeFormat = clock->m_timeFormat;
+    m_dateFormat = clock->m_dateFormat;
+    m_shortDateFormat = clock->m_shortDateFormat;
 
-    m_Flash = clock->m_Flash;
+    m_flash = clock->m_flash;
 
     MythUIText::CopyFrom(base);
 }

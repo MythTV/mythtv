@@ -22,21 +22,21 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
 
 void MythUICheckBox::SetInitialStates()
 {
-    m_BackgroundState = dynamic_cast<MythUIStateType *>(GetChild("background"));
-    m_CheckState = dynamic_cast<MythUIStateType *>(GetChild("checkstate"));
+    m_backgroundState = dynamic_cast<MythUIStateType *>(GetChild("background"));
+    m_checkState = dynamic_cast<MythUIStateType *>(GetChild("checkstate"));
 
-    if (!m_CheckState || !m_BackgroundState)
+    if (!m_checkState || !m_backgroundState)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Checkbox %1 is missing required elements")
             .arg(objectName()));
     }
 
-    if (m_CheckState)
-        m_CheckState->DisplayState(m_currentCheckState);
+    if (m_checkState)
+        m_checkState->DisplayState(m_currentCheckState);
 
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    if (m_backgroundState)
+        m_backgroundState->DisplayState(m_state);
 }
 
 
@@ -55,8 +55,8 @@ void MythUICheckBox::toggleCheckState()
         onOff = false;
     }
 
-    if (m_CheckState)
-        m_CheckState->DisplayState(m_currentCheckState);
+    if (m_checkState)
+        m_checkState->DisplayState(m_currentCheckState);
 
     emit DependChanged(!onOff);
     emit toggled(onOff);
@@ -66,8 +66,8 @@ void MythUICheckBox::toggleCheckState()
 void MythUICheckBox::SetCheckState(MythUIStateType::StateType state)
 {
     m_currentCheckState = state;
-    if (m_CheckState)
-        m_CheckState->DisplayState(state);
+    if (m_checkState)
+        m_checkState->DisplayState(state);
 
     if (state == MythUIStateType::Off)
         emit DependChanged(true);
@@ -87,8 +87,8 @@ void MythUICheckBox::SetCheckState(bool onOff)
         m_currentCheckState = MythUIStateType::Off;
     }
 
-    if (m_CheckState)
-        m_CheckState->DisplayState(m_currentCheckState);
+    if (m_checkState)
+        m_checkState->DisplayState(m_currentCheckState);
 
     emit toggled(onOff);
     emit DependChanged(!onOff);
@@ -111,8 +111,8 @@ void MythUICheckBox::Select()
         return;
 
     m_state = "selected";
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    if (m_backgroundState)
+        m_backgroundState->DisplayState(m_state);
 }
 
 void MythUICheckBox::Deselect()
@@ -122,22 +122,22 @@ void MythUICheckBox::Deselect()
     else
         m_state = "disabled";
 
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    if (m_backgroundState)
+        m_backgroundState->DisplayState(m_state);
 }
 
 void MythUICheckBox::Enable()
 {
     m_state = "active";
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    if (m_backgroundState)
+        m_backgroundState->DisplayState(m_state);
 }
 
 void MythUICheckBox::Disable()
 {
     m_state = "disabled";
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    if (m_backgroundState)
+        m_backgroundState->DisplayState(m_state);
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the

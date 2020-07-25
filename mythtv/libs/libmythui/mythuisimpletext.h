@@ -36,9 +36,9 @@ class MUI_PUBLIC MythUISimpleText : public MythUIType
     void CopyFrom(MythUIType *base) override; // MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    Qt::Alignment m_Justification {Qt::AlignLeft | Qt::AlignTop};
-    MythFontProperties m_Font;
-    QString m_Message;
+    Qt::Alignment m_justification {Qt::AlignLeft | Qt::AlignTop};
+    MythFontProperties m_font;
+    QString m_message;
 };
 
 #endif

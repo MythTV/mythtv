@@ -90,7 +90,7 @@ void MythOpenGLPainter::ClearCache(void)
     {
         it.next();
         m_textureDeleteList.push_back(m_imageToTextureMap[it.key()]);
-        m_ImageExpireList.remove(it.key());
+        m_imageExpireList.remove(it.key());
     }
     m_imageToTextureMap.clear();
 }
@@ -192,8 +192,8 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     {
         if (!Image->IsChanged())
         {
-            m_ImageExpireList.remove(Image);
-            m_ImageExpireList.push_back(Image);
+            m_imageExpireList.remove(Image);
+            m_imageExpireList.push_back(Image);
             return m_imageToTextureMap[Image];
         }
         DeleteFormatImagePriv(Image);
@@ -223,8 +223,8 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
 
         while (m_hardwareCacheSize > m_maxHardwareCacheSize)
         {
-            MythImage *expiredIm = m_ImageExpireList.front();
-            m_ImageExpireList.pop_front();
+            MythImage *expiredIm = m_imageExpireList.front();
+            m_imageExpireList.pop_front();
             DeleteFormatImagePriv(expiredIm);
             DeleteTextures();
         }
@@ -233,12 +233,12 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     CheckFormatImage(Image);
     m_hardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
     m_imageToTextureMap[Image] = texture;
-    m_ImageExpireList.push_back(Image);
+    m_imageExpireList.push_back(Image);
 
     while (m_hardwareCacheSize > m_maxHardwareCacheSize)
     {
-        MythImage *expiredIm = m_ImageExpireList.front();
-        m_ImageExpireList.pop_front();
+        MythImage *expiredIm = m_imageExpireList.front();
+        m_imageExpireList.pop_front();
         DeleteFormatImagePriv(expiredIm);
         DeleteTextures();
     }
@@ -328,7 +328,7 @@ void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)
         QMutexLocker locker(&m_textureDeleteLock);
         m_textureDeleteList.push_back(m_imageToTextureMap[Image]);
         m_imageToTextureMap.remove(Image);
-        m_ImageExpireList.remove(Image);
+        m_imageExpireList.remove(Image);
     }
 }
 

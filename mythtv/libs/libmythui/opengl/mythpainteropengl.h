@@ -69,7 +69,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     bool              m_usingHighDPI { false   };
 
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
-    std::list<MythImage *>     m_ImageExpireList;
+    std::list<MythImage *>     m_imageExpireList;
     std::list<MythGLTexture*>  m_textureDeleteList;
     QMutex                     m_textureDeleteLock;
 

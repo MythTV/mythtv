@@ -22,12 +22,12 @@ MythUISimpleText::MythUISimpleText(const QString &text,
                                    const QRect & rect, Qt::Alignment align,
                                    MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
-      m_Justification(align),
-      m_Font(font),
-      m_Message(text.trimmed())
+      m_justification(align),
+      m_font(font),
+      m_message(text.trimmed())
 {
     SetArea(MythRect(rect));
-    m_Font = font;
+    m_font = font;
 }
 
 void MythUISimpleText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
@@ -39,7 +39,7 @@ void MythUISimpleText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     int alpha = CalcAlpha(alphaMod);
 
     p->SetClipRect(clipRect);
-    p->DrawText(area, m_Message, m_Justification, m_Font, alpha, area);
+    p->DrawText(area, m_message, m_justification, m_font, alpha, area);
 }
 
 void MythUISimpleText::CopyFrom(MythUIType *base)
@@ -52,9 +52,9 @@ void MythUISimpleText::CopyFrom(MythUIType *base)
         return;
     }
 
-    m_Justification = text->m_Justification;
-    m_Message = text->m_Message;
-    m_Font = text->m_Font;
+    m_justification = text->m_justification;
+    m_message = text->m_message;
+    m_font = text->m_font;
 
     MythUIType::CopyFrom(base);
 }
