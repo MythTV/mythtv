@@ -23,7 +23,7 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
     QString key = name.toLower();
 
-    if (m_ObjectsByName.contains(key) || !image)
+    if (m_objectsByName.contains(key) || !image)
         return false;
 
     // Uses name, not key which is lower case otherwise we break
@@ -38,14 +38,14 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
     QString key = name.toLower();
 
-    if (m_ObjectsByName.contains(key) || !object)
+    if (m_objectsByName.contains(key) || !object)
         return false;
 
     object->SetVisible(false);
-    m_ObjectsByName[key] = object;
+    m_objectsByName[key] = object;
 
     MythRect objectArea = object->GetArea();
-    objectArea.CalculateArea(m_ParentArea);
+    objectArea.CalculateArea(m_parentArea);
 
     ExpandArea(objectArea);
 
@@ -54,7 +54,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 
 bool MythUIStateType::AddImage(StateType type, MythImage *image)
 {
-    if (m_ObjectsByState.contains((int)type) || !image)
+    if (m_objectsByState.contains((int)type) || !image)
         return false;
 
     QString name = QString("stateimage%1").arg(type);
@@ -67,14 +67,14 @@ bool MythUIStateType::AddImage(StateType type, MythImage *image)
 
 bool MythUIStateType::AddObject(StateType type, MythUIType *object)
 {
-    if (m_ObjectsByState.contains((int)type) || !object)
+    if (m_objectsByState.contains((int)type) || !object)
         return false;
 
     object->SetVisible(false);
-    m_ObjectsByState[(int)type] = object;
+    m_objectsByState[(int)type] = object;
 
     MythRect objectArea = object->GetArea();
-    objectArea.CalculateArea(m_ParentArea);
+    objectArea.CalculateArea(m_parentArea);
 
     ExpandArea(objectArea);
 
@@ -86,78 +86,78 @@ bool MythUIStateType::DisplayState(const QString &name)
     if (name.isEmpty())
         return false;
 
-    MythUIType *old = m_CurrentState;
+    MythUIType *old = m_currentState;
 
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
+    QMap<QString, MythUIType *>::Iterator i = m_objectsByName.find(name.toLower());
 
-    if (i != m_ObjectsByName.end())
-        m_CurrentState = i.value();
+    if (i != m_objectsByName.end())
+        m_currentState = i.value();
     else
         return false;
 
-    if (m_CurrentState != old)
+    if (m_currentState != old)
     {
-        if (m_ShowEmpty || m_CurrentState)
+        if (m_showEmpty || m_currentState)
         {
-            if (m_deferload && m_CurrentState)
-                m_CurrentState->LoadNow();
+            if (m_deferload && m_currentState)
+                m_currentState->LoadNow();
 
             if (old)
                 old->SetVisible(false);
 
-            if (m_CurrentState)
-                m_CurrentState->SetVisible(true);
+            if (m_currentState)
+                m_currentState->SetVisible(true);
         }
     }
     AdjustDependence();
 
-    return (m_CurrentState != nullptr);
+    return (m_currentState != nullptr);
 }
 
 bool MythUIStateType::DisplayState(StateType type)
 {
-    MythUIType *old = m_CurrentState;
+    MythUIType *old = m_currentState;
 
-    QMap<int, MythUIType *>::Iterator i = m_ObjectsByState.find((int)type);
+    QMap<int, MythUIType *>::Iterator i = m_objectsByState.find((int)type);
 
-    if (i != m_ObjectsByState.end())
-        m_CurrentState = i.value();
+    if (i != m_objectsByState.end())
+        m_currentState = i.value();
     else
-        m_CurrentState = nullptr;
+        m_currentState = nullptr;
 
-    if (m_CurrentState != old)
+    if (m_currentState != old)
     {
-        if (m_ShowEmpty || m_CurrentState)
+        if (m_showEmpty || m_currentState)
         {
-            if (m_deferload && m_CurrentState)
-                m_CurrentState->LoadNow();
+            if (m_deferload && m_currentState)
+                m_currentState->LoadNow();
 
             if (old)
                 old->SetVisible(false);
 
-            if (m_CurrentState)
-                m_CurrentState->SetVisible(true);
+            if (m_currentState)
+                m_currentState->SetVisible(true);
         }
     }
     AdjustDependence();
 
-    return (m_CurrentState != nullptr);
+    return (m_currentState != nullptr);
 }
 
 MythUIType *MythUIStateType::GetState(const QString &name)
 {
     QString lcname = name.toLower();
 
-    if (m_ObjectsByName.contains(lcname))
-        return m_ObjectsByName[lcname];
+    if (m_objectsByName.contains(lcname))
+        return m_objectsByName[lcname];
 
     return nullptr;
 }
 
 MythUIType *MythUIStateType::GetState(StateType state)
 {
-    if (m_ObjectsByState.contains(state))
-        return m_ObjectsByState[state];
+    if (m_objectsByState.contains(state))
+        return m_objectsByState[state];
 
     return nullptr;
 }
@@ -167,27 +167,27 @@ MythUIType *MythUIStateType::GetState(StateType state)
  */
 void MythUIStateType::Clear()
 {
-    if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
+    if (m_objectsByName.isEmpty() && m_objectsByState.isEmpty())
         return;
 
     QMap<QString, MythUIType *>::Iterator i;
 
-    for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
+    for (i = m_objectsByName.begin(); i != m_objectsByName.end(); ++i)
     {
         DeleteChild(i.value());
     }
 
     QMap<int, MythUIType *>::Iterator j;
 
-    for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
+    for (j = m_objectsByState.begin(); j != m_objectsByState.end(); ++j)
     {
         DeleteChild(j.value());
     }
 
-    m_ObjectsByName.clear();
-    m_ObjectsByState.clear();
+    m_objectsByName.clear();
+    m_objectsByState.clear();
 
-    m_CurrentState = nullptr;
+    m_currentState = nullptr;
     SetRedraw();
 }
 
@@ -200,10 +200,10 @@ void MythUIStateType::Reset()
     {
         if (!DisplayState(None))
         {
-            if (m_CurrentState)
-                m_CurrentState->SetVisible(false);
+            if (m_currentState)
+                m_currentState->SetVisible(false);
 
-            m_CurrentState = nullptr;
+            m_currentState = nullptr;
         }
     }
 
@@ -215,7 +215,7 @@ bool MythUIStateType::ParseElement(
 {
     QMap<QString, QString> dependsMap;
     if (element.tagName() == "showempty")
-        m_ShowEmpty = parseBool(element);
+        m_showEmpty = parseBool(element);
     else if (element.tagName() == "state")
     {
         QString name = element.attribute("name", "");
@@ -244,12 +244,12 @@ bool MythUIStateType::ParseElement(
             else if (type == "full")
                 stype = Full;
 
-            if (uitype && !m_ObjectsByState.contains((int)stype))
+            if (uitype && !m_objectsByState.contains((int)stype))
                 AddObject(stype, uitype);
         }
         else if (!name.isEmpty())
         {
-            if (uitype && !m_ObjectsByName.contains(name))
+            if (uitype && !m_objectsByName.contains(name))
                 AddObject(name, uitype);
         }
     }
@@ -268,13 +268,13 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     if (!st)
         return;
 
-    m_ShowEmpty = st->m_ShowEmpty;
+    m_showEmpty = st->m_showEmpty;
 
     MythUIType::CopyFrom(base);
 
     QMap<QString, MythUIType *>::iterator i;
 
-    for (i = st->m_ObjectsByName.begin(); i != st->m_ObjectsByName.end(); ++i)
+    for (i = st->m_objectsByName.begin(); i != st->m_objectsByName.end(); ++i)
     {
         MythUIType *other = i.value();
         const QString& key = i.key();
@@ -286,7 +286,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
 
     QMap<int, MythUIType *>::iterator j;
 
-    for (j = st->m_ObjectsByState.begin(); j != st->m_ObjectsByState.end(); ++j)
+    for (j = st->m_objectsByState.begin(); j != st->m_objectsByState.end(); ++j)
     {
         MythUIType *other = j.value();
         int key = j.key();
@@ -314,17 +314,17 @@ void MythUIStateType::EnsureStateLoaded(const QString &name)
     if (name.isEmpty())
         return;
 
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
+    QMap<QString, MythUIType *>::Iterator i = m_objectsByName.find(name);
 
-    if (i != m_ObjectsByName.end())
+    if (i != m_objectsByName.end())
         i.value()->LoadNow();
 }
 
 void MythUIStateType::EnsureStateLoaded(StateType type)
 {
-    QMap<int, MythUIType *>::Iterator i = m_ObjectsByState.find((int)type);
+    QMap<int, MythUIType *>::Iterator i = m_objectsByState.find((int)type);
 
-    if (i != m_ObjectsByState.end())
+    if (i != m_objectsByState.end())
         i.value()->LoadNow();
 }
 
@@ -341,16 +341,16 @@ void MythUIStateType::RecalculateArea(bool recurse)
         if (objectName().startsWith("buttonlist button"))
         {
             auto *list = dynamic_cast<MythUIButtonList *>(m_parent);
-            m_ParentArea = list->GetButtonArea();
+            m_parentArea = list->GetButtonArea();
         }
         else
-            m_ParentArea = m_parent->GetFullArea();
+            m_parentArea = m_parent->GetFullArea();
     }
     else
-        m_ParentArea = GetMythMainWindow()->GetUIScreenRect();
+        m_parentArea = GetMythMainWindow()->GetUIScreenRect();
 
     m_area.Reset();
-    m_area.CalculateArea(m_ParentArea);
+    m_area.CalculateArea(m_parentArea);
 
     if (recurse)
     {
@@ -361,12 +361,12 @@ void MythUIStateType::RecalculateArea(bool recurse)
 
 void MythUIStateType::AdjustDependence(void)
 {
-    if (m_CurrentState == nullptr || !m_CurrentState->IsVisible())
+    if (m_currentState == nullptr || !m_currentState->IsVisible())
     {
         emit DependChanged(true);
         return;
     }
-    QList<MythUIType *> *children = m_CurrentState->GetAllChildren();
+    QList<MythUIType *> *children = m_currentState->GetAllChildren();
     for (auto *child : qAsConst(*children))
     {
         if (child->IsVisible())
@@ -380,12 +380,12 @@ void MythUIStateType::AdjustDependence(void)
 
 void MythUIStateType::SetTextFromMap(const InfoMap &infoMap)
 {
-    if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
+    if (m_objectsByName.isEmpty() && m_objectsByState.isEmpty())
         return;
 
     QMap<QString, MythUIType *>::Iterator i;
 
-    for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
+    for (i = m_objectsByName.begin(); i != m_objectsByName.end(); ++i)
     {
         MythUIType *type = i.value();
 
@@ -400,7 +400,7 @@ void MythUIStateType::SetTextFromMap(const InfoMap &infoMap)
 
     QMap<int, MythUIType *>::Iterator j;
 
-    for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
+    for (j = m_objectsByState.begin(); j != m_objectsByState.end(); ++j)
     {
         MythUIType *type = j.value();
 

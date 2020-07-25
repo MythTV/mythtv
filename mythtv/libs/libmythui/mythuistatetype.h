@@ -27,7 +27,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     MythUIStateType(MythUIType *parent, const QString &name);
    ~MythUIStateType() override = default;
 
-    void SetShowEmpty(bool showempty) { m_ShowEmpty = showempty; }
+    void SetShowEmpty(bool showempty) { m_showEmpty = showempty; }
 
     bool AddImage(const QString &name, MythImage *image);
     bool AddImage(StateType type, MythImage *image);
@@ -38,7 +38,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     bool DisplayState(const QString &name);
     bool DisplayState(StateType type);
 
-    MythUIType* GetCurrentState() { return m_CurrentState; }
+    MythUIType* GetCurrentState() { return m_currentState; }
     MythUIType* GetState(const QString &name);
     MythUIType* GetState(StateType state);
 
@@ -61,13 +61,13 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     void Finalize(void) override; // MythUIType
     virtual void AdjustDependence(void);
 
-    QMap<QString, MythUIType *> m_ObjectsByName;
-    QMap<int, MythUIType *> m_ObjectsByState;
+    QMap<QString, MythUIType *> m_objectsByName;
+    QMap<int, MythUIType *> m_objectsByState;
 
-    MythUIType *m_CurrentState {nullptr};
-    MythRect    m_ParentArea;
+    MythUIType *m_currentState {nullptr};
+    MythRect    m_parentArea;
 
-    bool        m_ShowEmpty    {true};
+    bool        m_showEmpty    {true};
 
   friend class MythUIButtonList;
 };
