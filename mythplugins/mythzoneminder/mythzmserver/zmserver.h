@@ -162,6 +162,54 @@ struct SharedData32
     char alarm_cause[256];
 };
 
+// shared data for ZM version 1.34.x
+struct SharedData34
+{
+    uint32_t size;
+    uint32_t last_write_index;
+    uint32_t last_read_index;
+    uint32_t state;
+    uint64_t last_event;
+    uint32_t action;
+    int32_t brightness;
+    int32_t hue;
+    int32_t colour;
+    int32_t contrast;
+    int32_t alarm_x;
+    int32_t alarm_y;
+    uint8_t valid;
+    uint8_t active;
+    uint8_t signal;
+    uint8_t format;
+    uint32_t imagesize;
+    uint32_t epadding1;
+     union {
+      time_t startup_time;
+      uint64_t extrapad1;
+    };
+    union {                     /* +72   */
+      time_t zmc_heartbeat_time;                        /* Constantly updated by zmc.  Used to determine if the process is alive or hung or dead */
+      uint64_t extrapad2;
+    };
+    union {                     /* +80   */
+      time_t zma_heartbeat_time;                        /* Constantly updated by zma.  Used to determine if the process is alive or hung or dead */
+      uint64_t extrapad3;
+    };
+    union {
+      time_t last_write_time;
+      uint64_t extrapad4;
+    };
+    union {
+      time_t last_read_time;
+      uint64_t extrapad5;
+    };
+    uint8_t control_state[256];
+
+    char alarm_cause[256];
+};
+
+
+
 enum TriggerState { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF };
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
@@ -175,7 +223,7 @@ struct TriggerData
     char trigger_showtext[256];
 };
 
-// Triggerdata for ZM version 1.26.x and 1.32.x
+// Triggerdata for ZM version 1.26.x , 1.32.x and 1.34.x
 struct TriggerData26
 {
     uint32_t size;
@@ -187,7 +235,7 @@ struct TriggerData26
     char trigger_showtext[256];
 };
 
-// VideoStoreData for ZM version 1.32.x
+// VideoStoreData for ZM version 1.32.x and 1.34.x
 struct VideoStoreData
 {
     uint32_t size;
@@ -234,6 +282,7 @@ class MONITOR
     SharedData    *m_sharedData         {nullptr};
     SharedData26  *m_sharedData26       {nullptr};
     SharedData32  *m_sharedData32       {nullptr};
+    SharedData34  *m_sharedData34       {nullptr};
     string         m_id                 {};
 };
 
