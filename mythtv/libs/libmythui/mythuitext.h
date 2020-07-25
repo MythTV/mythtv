@@ -40,13 +40,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void ResetMap(const InfoMap &map);
 
     virtual void SetText(const QString &text);
-    QString GetText(void) const { return m_Message; }
-    QString GetDefaultText(void) const { return m_DefaultMessage; }
+    QString GetText(void) const { return m_message; }
+    QString GetDefaultText(void) const { return m_defaultMessage; }
 
     void SetTextFromMap(const InfoMap &map);
 
-    void SetTemplateText(const QString &text) { m_TemplateText = text; }
-    QString GetTemplateText(void) const { return m_TemplateText; }
+    void SetTemplateText(const QString &text) { m_templateText = text; }
+    QString GetTemplateText(void) const { return m_templateText; }
 
 #if 0 // Not currently used
     void UseAlternateArea(bool useAlt);
@@ -76,16 +76,16 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void Finalize(void) override; // MythUIType
 
     void SetFontProperties(const MythFontProperties &fontProps);
-    const MythFontProperties* GetFontProperties() { return m_Font; }
+    const MythFontProperties* GetFontProperties() { return m_font; }
 
     void CycleColor(const QColor& startColor, const QColor& endColor, int numSteps);
     void StopCycling();
 
     int GetJustification(void) const;
     void SetCutDown(Qt::TextElideMode mode);
-    Qt::TextElideMode GetCutDown(void) const { return m_Cutdown; }
+    Qt::TextElideMode GetCutDown(void) const { return m_cutdown; }
     void SetMultiLine(bool multiline);
-    bool GetMultiLine(void) const { return m_MultiLine; }
+    bool GetMultiLine(void) const { return m_multiLine; }
 
     void SetArea(const MythRect &rect) override; // MythUIType
     void SetPosition(const MythPoint &pos) override; // MythUIType
@@ -106,37 +106,37 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
                         const QTextOption & textoption, qreal & width);
     void FillCutMessage(void);
 
-    int      m_Justification      {Qt::AlignLeft | Qt::AlignTop};
-    MythRect m_OrigDisplayRect;
-    MythRect m_AltDisplayRect;
-    MythRect m_Canvas;
+    int      m_justification      {Qt::AlignLeft | Qt::AlignTop};
+    MythRect m_origDisplayRect;
+    MythRect m_altDisplayRect;
+    MythRect m_canvas;
     MythRect m_drawRect;
     QPoint   m_cursorPos          {-1,-1};
 
-    QString m_Message;
-    QString m_CutMessage;
-    QString m_DefaultMessage;
-    QString m_TemplateText;
+    QString m_message;
+    QString m_cutMessage;
+    QString m_defaultMessage;
+    QString m_templateText;
 
 #if 0 // Not currently used
     bool m_usingAltArea           {false};
 #endif
-    bool m_ShrinkNarrow           {true};
-    Qt::TextElideMode m_Cutdown   {Qt::ElideRight};
-    bool m_MultiLine              {false};
-    int  m_Ascent                 {0};
-    int  m_Descent                {0};
+    bool m_shrinkNarrow           {true};
+    Qt::TextElideMode m_cutdown   {Qt::ElideRight};
+    bool m_multiLine              {false};
+    int  m_ascent                 {0};
+    int  m_descent                {0};
     int  m_leftBearing            {0};
     int  m_rightBearing           {0};
-    int  m_Leading                {1};
+    int  m_leading                {1};
     int  m_extraLeading           {0};
     int  m_lineHeight             {0};
     int  m_textCursor             {-1};
 
-    QVector<QTextLayout *> m_Layouts;
+    QVector<QTextLayout *> m_layouts;
 
-    MythFontProperties* m_Font    {nullptr};
-    FontStates          m_FontStates;
+    MythFontProperties* m_font    {nullptr};
+    FontStates          m_fontStates;
 
     bool   m_colorCycling         {false};
     QColor m_startColor;

@@ -25,8 +25,8 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
 
 MythUIClock::~MythUIClock()
 {
-    delete m_Font;
-    m_Font = nullptr;
+    delete m_font;
+    m_font = nullptr;
 }
 
 /** \brief Looks up the time and sets the clock if the current time is
@@ -93,11 +93,11 @@ bool MythUIClock::ParseElement(
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
         m_Format = format;
-        m_Message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
+        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
     }
     else
     {
-        m_Message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
+        m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
         return MythUIText::ParseElement(filename, element, showWarnings);
     }
 

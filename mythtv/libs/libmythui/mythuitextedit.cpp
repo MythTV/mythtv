@@ -328,7 +328,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         }
         case MovePageUp:
         {
-            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_leading);
             int newPos = m_text->MoveCursor(-lines);
             if (newPos == -1)
                 return false;
@@ -337,7 +337,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         }
         case MovePageDown:
         {
-            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_leading);
             int newPos = m_text->MoveCursor(lines);
             if (newPos == -1)
                 return false;
