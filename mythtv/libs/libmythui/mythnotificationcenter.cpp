@@ -62,7 +62,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
         if (deleteScreen)
         {
             screen->SetDeleting(true);
-            m_ToDelete.push_back(screen);
+            m_toDelete.push_back(screen);
         }
         screen->AdjustAlpha(1, -kFadeVal);
     }

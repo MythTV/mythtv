@@ -78,8 +78,8 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
 
-    bool IsLoading(void) const { return m_IsLoading; }
-    bool IsLoaded(void) const { return m_IsLoaded; }
+    bool IsLoading(void) const { return m_isLoading; }
+    bool IsLoaded(void) const { return m_isLoaded; }
 
     MythPainter *GetPainter(void) override; // MythUIType
 
@@ -111,24 +111,24 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     void SetBusyPopupMessage(const QString &message);
     void ResetBusyPopup(void);
 
-    bool m_FullScreen                {false};
-    bool m_IsDeleting                {false};
+    bool m_fullScreen                {false};
+    bool m_isDeleting                {false};
 
-    QSemaphore m_LoadLock            {1};
-    volatile bool m_IsLoading        {false};
-    volatile bool m_IsLoaded         {false};
-    bool m_IsInitialized             {false};
+    QSemaphore m_loadLock            {1};
+    volatile bool m_isLoading        {false};
+    volatile bool m_isLoaded         {false};
+    bool m_isInitialized             {false};
 
-    MythUIType *m_CurrentFocusWidget {nullptr};
+    MythUIType *m_currentFocusWidget {nullptr};
     //TODO We are currently dependant on the internal sorting of QMap for
     //     entries to be iterated in the correct order, this should probably
     //     be changed.
-    QMap<int, MythUIType *> m_FocusWidgetList;
+    QMap<int, MythUIType *> m_focusWidgetList;
 
-    MythScreenStack  *m_ScreenStack  {nullptr};
-    MythUIBusyDialog *m_BusyPopup    {nullptr};
+    MythScreenStack  *m_screenStack  {nullptr};
+    MythUIBusyDialog *m_busyPopup    {nullptr};
 
-    QRegion m_SavedMask;
+    QRegion m_savedMask;
 
     friend class XMLParseBase;
 };

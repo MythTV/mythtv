@@ -268,8 +268,8 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
         SendEvent(m_buttonList->GetItemPos(item), item->GetText(), item->GetData());
     }
 
-    if (m_ScreenStack)
-        m_ScreenStack->PopScreen(nullptr, false);
+    if (m_screenStack)
+        m_screenStack->PopScreen(nullptr, false);
 }
 
 void MythDialogBox::SetReturnEvent(QObject *retobject,

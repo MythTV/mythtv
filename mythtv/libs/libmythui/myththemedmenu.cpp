@@ -282,7 +282,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
     m_ignorekeys = false;
 
     if (m_wantpop)
-        m_ScreenStack->PopScreen();
+        m_screenStack->PopScreen();
 
     return handled;
 }

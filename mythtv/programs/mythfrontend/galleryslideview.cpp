@@ -618,7 +618,7 @@ void GallerySlideView::SlideAvailable(int count)
 */
 void GallerySlideView::TransitionComplete()
 {
-    if (m_IsDeleting)
+    if (m_isDeleting)
         return;
 
     m_transitioning = false;

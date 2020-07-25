@@ -49,9 +49,9 @@ class ScreenLoadTask : public QRunnable
     void run(void) override // QRunnable
     {
         m_parent.Load();
-        m_parent.m_IsLoaded = true;
-        m_parent.m_IsLoading = false;
-        m_parent.m_LoadLock.release();
+        m_parent.m_isLoaded = true;
+        m_parent.m_isLoading = false;
+        m_parent.m_loadLock.release();
     }
 
     MythScreenType &m_parent;
@@ -61,9 +61,9 @@ MythScreenType::MythScreenType(
     MythScreenStack *parent, const QString &name, bool fullscreen) :
     MythUIComposite(parent, name)
 {
-    m_FullScreen = fullscreen;
+    m_fullScreen = fullscreen;
 
-    m_ScreenStack = parent;
+    m_screenStack = parent;
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
@@ -77,7 +77,7 @@ MythScreenType::MythScreenType(
     MythUIType *parent, const QString &name, bool fullscreen) :
     MythUIComposite(parent, name)
 {
-    m_FullScreen = fullscreen;
+    m_fullScreen = fullscreen;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
@@ -93,34 +93,34 @@ MythScreenType::~MythScreenType()
                 QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
 
     // locking ensures background screen load can finish running
-    SemaphoreLocker locker(&m_LoadLock);
+    SemaphoreLocker locker(&m_loadLock);
 
-    m_CurrentFocusWidget = nullptr;
+    m_currentFocusWidget = nullptr;
     emit Exiting();
 }
 
 bool MythScreenType::IsFullscreen(void) const
 {
-    return m_FullScreen;
+    return m_fullScreen;
 }
 
 void MythScreenType::SetFullscreen(bool full)
 {
-    m_FullScreen = full;
+    m_fullScreen = full;
 }
 
 MythUIType *MythScreenType::GetFocusWidget(void) const
 {
-    return m_CurrentFocusWidget;
+    return m_currentFocusWidget;
 }
 
 bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
     if (!widget || !widget->IsVisible(true))
     {
-        QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
+        QMap<int, MythUIType *>::iterator it = m_focusWidgetList.begin();
 
-        while (it != m_FocusWidgetList.end())
+        while (it != m_focusWidgetList.end())
         {
             MythUIType *current = *it;
 
@@ -136,17 +136,17 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
     if (!widget)
         return false;
 
-    if (m_CurrentFocusWidget == widget)
+    if (m_currentFocusWidget == widget)
         return true;
 
     MythUIText *helpText = dynamic_cast<MythUIText *>(GetChild("helptext"));
     if (helpText)
         helpText->Reset();
 
-    if (m_CurrentFocusWidget)
-        m_CurrentFocusWidget->LoseFocus();
-    m_CurrentFocusWidget = widget;
-    m_CurrentFocusWidget->TakeFocus();
+    if (m_currentFocusWidget)
+        m_currentFocusWidget->LoseFocus();
+    m_currentFocusWidget = widget;
+    m_currentFocusWidget->TakeFocus();
 
     if (helpText && !widget->GetHelpText().isEmpty())
         helpText->SetText(widget->GetHelpText());
@@ -156,19 +156,19 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 
 bool MythScreenType::NextPrevWidgetFocus(bool up)
 {
-    if (!m_CurrentFocusWidget || m_FocusWidgetList.isEmpty())
+    if (!m_currentFocusWidget || m_focusWidgetList.isEmpty())
         return SetFocusWidget(nullptr);
 
     bool reachedCurrent = false;
     bool looped = false;
 
-    QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
+    QMap<int, MythUIType *>::iterator it = m_focusWidgetList.begin();
 
     // There is probably a more efficient way to do this, but the list
     // is never going to be that big so it will do for now
     if (up)
     {
-        while (it != m_FocusWidgetList.end())
+        while (it != m_focusWidgetList.end())
         {
             MythUIType *current = *it;
 
@@ -176,24 +176,24 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
                 current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
 
-            if (current == m_CurrentFocusWidget)
+            if (current == m_currentFocusWidget)
                 reachedCurrent = true;
 
             ++it;
 
-            if (it == m_FocusWidgetList.end())
+            if (it == m_focusWidgetList.end())
             {
                 if (looped)
                     return false;
                 looped = true;
-                it = m_FocusWidgetList.begin();
+                it = m_focusWidgetList.begin();
             }
         }
     }
     else
     {
-        it = m_FocusWidgetList.end() - 1;
-        while (it != m_FocusWidgetList.begin() - 1)
+        it = m_focusWidgetList.end() - 1;
+        while (it != m_focusWidgetList.begin() - 1)
         {
             MythUIType *current = *it;
 
@@ -201,17 +201,17 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
                 current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
 
-            if (current == m_CurrentFocusWidget)
+            if (current == m_currentFocusWidget)
                 reachedCurrent = true;
 
             --it;
 
-            if (it == m_FocusWidgetList.begin() - 1)
+            if (it == m_focusWidgetList.begin() - 1)
             {
                 if (looped)
                     return false;
                 looped = true;
-                it = m_FocusWidgetList.end() - 1;
+                it = m_focusWidgetList.end() - 1;
             }
         }
     }
@@ -221,30 +221,30 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 
 void MythScreenType::BuildFocusList(void)
 {
-    m_FocusWidgetList.clear();
-    m_CurrentFocusWidget = nullptr;
+    m_focusWidgetList.clear();
+    m_currentFocusWidget = nullptr;
 
-    AddFocusableChildrenToList(m_FocusWidgetList);
+    AddFocusableChildrenToList(m_focusWidgetList);
 
-    if (!m_FocusWidgetList.empty())
+    if (!m_focusWidgetList.empty())
         SetFocusWidget();
 }
 
 MythScreenStack *MythScreenType::GetScreenStack(void) const
 {
-    return m_ScreenStack;
+    return m_screenStack;
 }
 
 void MythScreenType::aboutToHide(void)
 {
-    if (!m_FullScreen)
+    if (!m_fullScreen)
     {
         if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
         {
             // remove this screen's area from the mask so any embedded video is
             // shown which was covered by this screen
-            if (!m_SavedMask.isEmpty())
-                GetMythMainWindow()->GetPaintWindow()->setMask(m_SavedMask);
+            if (!m_savedMask.isEmpty())
+                GetMythMainWindow()->GetPaintWindow()->setMask(m_savedMask);
         }
     }
 
@@ -253,14 +253,14 @@ void MythScreenType::aboutToHide(void)
 
 void MythScreenType::aboutToShow(void)
 {
-    if (!m_FullScreen)
+    if (!m_fullScreen)
     {
         if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
         {
             // add this screens area to the mask so any embedded video isn't
             // shown in front of this screen
             QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
-            m_SavedMask = region;
+            m_savedMask = region;
             region = region.united(QRegion(m_Area));
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
@@ -271,12 +271,12 @@ void MythScreenType::aboutToShow(void)
 
 bool MythScreenType::IsDeleting(void) const
 {
-    return m_IsDeleting;
+    return m_isDeleting;
 }
 
 void MythScreenType::SetDeleting(bool deleting)
 {
-    m_IsDeleting = deleting;
+    m_isDeleting = deleting;
 }
 
 bool MythScreenType::Create(void)
@@ -301,12 +301,12 @@ void MythScreenType::Load(void)
 
 void MythScreenType::LoadInBackground(const QString& message)
 {
-    m_LoadLock.acquire();
+    m_loadLock.acquire();
 
-    m_IsLoading = true;
-    m_IsLoaded = false;
+    m_isLoading = true;
+    m_isLoaded = false;
 
-    m_ScreenStack->AllowReInit();
+    m_screenStack->AllowReInit();
 
     OpenBusyPopup(message);
 
@@ -316,26 +316,26 @@ void MythScreenType::LoadInBackground(const QString& message)
 
 void MythScreenType::LoadInForeground(void)
 {
-    SemaphoreLocker locker(&m_LoadLock);
+    SemaphoreLocker locker(&m_loadLock);
 
-    m_IsLoading = true;
-    m_IsLoaded = false;
+    m_isLoading = true;
+    m_isLoaded = false;
 
-    m_ScreenStack->AllowReInit();
+    m_screenStack->AllowReInit();
     Load();
-    m_IsLoaded = true;
-    m_IsLoading = false;
+    m_isLoaded = true;
+    m_isLoading = false;
 }
 
 void MythScreenType::ReloadInBackground(void)
 {
-    m_IsInitialized = false;
+    m_isInitialized = false;
     LoadInBackground();
 }
 
 void MythScreenType::OpenBusyPopup(const QString& message)
 {
-    if (m_BusyPopup)
+    if (m_busyPopup)
         return;
 
     QString msg(tr("Loading..."));
@@ -344,30 +344,30 @@ void MythScreenType::OpenBusyPopup(const QString& message)
 
     MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
-    m_BusyPopup =
+    m_busyPopup =
         new MythUIBusyDialog(msg, popupStack, "mythscreentypebusydialog");
 
-    if (m_BusyPopup->Create())
-        popupStack->AddScreen(m_BusyPopup, false);
+    if (m_busyPopup->Create())
+        popupStack->AddScreen(m_busyPopup, false);
 }
 
 void MythScreenType::CloseBusyPopup(void)
 {
-    if (m_BusyPopup)
-        m_BusyPopup->Close();
-    m_BusyPopup = nullptr;
+    if (m_busyPopup)
+        m_busyPopup->Close();
+    m_busyPopup = nullptr;
 }
 
 void MythScreenType::SetBusyPopupMessage(const QString &message)
 {
-    if (m_BusyPopup)
-        m_BusyPopup->SetMessage(message);
+    if (m_busyPopup)
+        m_busyPopup->SetMessage(message);
 }
 
 void MythScreenType::ResetBusyPopup(void)
 {
-    if (m_BusyPopup)
-        m_BusyPopup->Reset();
+    if (m_busyPopup)
+        m_busyPopup->Reset();
 }
 
 /**
@@ -375,16 +375,16 @@ void MythScreenType::ResetBusyPopup(void)
  */
 bool MythScreenType::IsInitialized(void) const
 {
-    return m_IsInitialized;
+    return m_isInitialized;
 }
 
 void MythScreenType::doInit(void)
 {
-    SemaphoreLocker locker(&m_LoadLock); // don't run while loading..
+    SemaphoreLocker locker(&m_loadLock); // don't run while loading..
 
     CloseBusyPopup();
     Init();
-    m_IsInitialized = true;
+    m_isInitialized = true;
 }
 
 /**
@@ -413,8 +413,8 @@ void MythScreenType::ShowMenu(void)
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)
 {
-    if (!GetMythMainWindow()->IsExitingToMain() && m_CurrentFocusWidget &&
-        m_CurrentFocusWidget->keyPressEvent(event))
+    if (!GetMythMainWindow()->IsExitingToMain() && m_currentFocusWidget &&
+        m_currentFocusWidget->keyPressEvent(event))
         return true;
 
     bool handled = false;
@@ -504,7 +504,7 @@ bool MythScreenType::ParseElement(
 
         SetArea(rectN);
 
-        m_FullScreen = (m_Area.width()  >= screenArea.width() &&
+        m_fullScreen = (m_Area.width()  >= screenArea.width() &&
                         m_Area.height() >= screenArea.height());
     }
     else
@@ -527,8 +527,8 @@ void MythScreenType::CopyFrom(MythUIType *base)
         return;
     }
 
-    m_FullScreen = st->m_FullScreen;
-    m_IsDeleting = false;
+    m_fullScreen = st->m_fullScreen;
+    m_isDeleting = false;
 
     MythUIType::CopyFrom(base);
 
@@ -552,7 +552,7 @@ MythPainter* MythScreenType::GetPainter(void)
 {
     if (m_Painter)
         return m_Painter;
-    if (m_ScreenStack)
+    if (m_screenStack)
         return MythScreenStack::GetPainter();
     return GetMythPainter();
 }
