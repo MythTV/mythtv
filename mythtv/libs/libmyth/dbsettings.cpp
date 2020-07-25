@@ -11,7 +11,7 @@
 
 DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
 {
-    m_DBhostOverride = DBhostOverride;
+    m_dbHostOverride = DBhostOverride;
 
     setLabel(DatabaseSettings::tr("Database Configuration"));
 
@@ -153,7 +153,7 @@ void DatabaseSettings::Load(void)
     if (params.m_dbHostName.isEmpty())
     {
         m_dbHostName->setLabel("* " + m_dbHostName->getLabel());
-        m_dbHostName->setValue(m_DBhostOverride);
+        m_dbHostName->setValue(m_dbHostOverride);
     }
     else
         m_dbHostName->setValue(params.m_dbHostName);

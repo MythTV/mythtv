@@ -35,7 +35,7 @@ class MPUBLIC DatabaseSettings : public GroupSetting
     TransMythUISpinBoxSetting  *m_wolReconnect  {nullptr};
     TransMythUISpinBoxSetting  *m_wolRetry      {nullptr};
     TransTextEditSetting       *m_wolCommand    {nullptr};
-    QString                     m_DBhostOverride;
+    QString                     m_dbHostOverride;
 };
 
 
