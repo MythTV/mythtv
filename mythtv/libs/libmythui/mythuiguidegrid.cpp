@@ -335,7 +335,7 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, int xoffset, int yoffset, UIGT
 {
     int breakin = 2;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(m_area.x(), m_area.y());	// Adjust within parent
     area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
     int status = data->m_recStat;
@@ -405,7 +405,7 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
 {
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(m_area.x(), m_area.y());	// Adjust within parent
     area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
 
@@ -494,7 +494,7 @@ void MythUIGuideGrid::drawBox(MythPainter *p, int xoffset, int yoffset, UIGTCon 
 {
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(m_area.x(), m_area.y());	// Adjust within parent
     area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
 
@@ -527,7 +527,7 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
 
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(m_area.x(), m_area.y());	// Adjust within parent
     QColor fillColor;
 
     if (m_drawCategoryColors && data->m_categoryColor.isValid())
@@ -629,7 +629,7 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
         msg += QString(" (%1)").arg(data->m_category);
 
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(m_area.x(), m_area.y());	// Adjust within parent
     area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(m_textOffset.x(), m_textOffset.y(),
                 -m_textOffset.x(), -m_textOffset.y());
@@ -807,9 +807,9 @@ void MythUIGuideGrid::ResetRow(int row)
 void MythUIGuideGrid::SetProgPast(int ppast)
 {
     if (m_verticalLayout)
-        m_progPastCol = m_Area.y() + (m_Area.height() * ppast / 100);
+        m_progPastCol = m_area.y() + (m_area.height() * ppast / 100);
     else
-        m_progPastCol = m_Area.x() + (m_Area.width() * ppast / 100);
+        m_progPastCol = m_area.x() + (m_area.width() * ppast / 100);
 
     SetRedraw();
 }

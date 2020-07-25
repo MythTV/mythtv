@@ -290,9 +290,9 @@ Slide::Slide(MythUIType *parent, const QString& name, MythUIImage *image)
     {
         // Slides sit on top of parent image area
         SetArea(MythRect(image->GetArea().toQRect()));
-        m_Area.moveTo(0, 0);
+        m_area.moveTo(0, 0);
         setParent(image);
-        m_Parent = image;
+        m_parent = image;
         image->AddChild(this);
     }
 
@@ -477,12 +477,12 @@ void Slide::Zoom(int percentage)
 void Slide::SetZoom(float zoom)
 {
     m_zoom          = zoom;
-    m_Effects.m_hzoom = m_Effects.m_vzoom = zoom;
+    m_effects.m_hzoom = m_effects.m_vzoom = zoom;
 
     // TODO
     // MythUIImage displaces widget or doesn't centre for some combinations of
     // zoom centre/cropping so frig centre for now.
-    m_Effects.m_centre = zoom < 1.0F ? UIEffects::Middle : UIEffects::TopLeft;
+    m_effects.m_centre = zoom < 1.0F ? UIEffects::Middle : UIEffects::TopLeft;
 
     SetPan(m_pan);
 }
@@ -532,16 +532,16 @@ void Slide::SetPan(QPoint pos)
 
     // Determine zoom of largest dimension
     QRect imageArea = m_Images[m_CurPos]->rect();
-    float hRatio    = float(imageArea.height()) / m_Area.height();
-    float wRatio    = float(imageArea.width()) / m_Area.width();
+    float hRatio    = float(imageArea.height()) / m_area.height();
+    float wRatio    = float(imageArea.width()) / m_area.width();
     float ratio     = qMax(hRatio, wRatio);
 
     if (m_zoom != 0.0F)
         ratio /= m_zoom;
 
     // Determine crop area
-    int h = qMin(int(roundf(m_Area.height() * ratio)), imageArea.height());
-    int w = qMin(int(roundf(m_Area.width() * ratio)), imageArea.width());
+    int h = qMin(int(roundf(m_area.height() * ratio)), imageArea.height());
+    int w = qMin(int(roundf(m_area.width() * ratio)), imageArea.width());
     int x = imageArea.center().x() - w / 2;
     int y = imageArea.center().y() - h / 2;
 

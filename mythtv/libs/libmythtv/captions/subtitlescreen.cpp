@@ -1563,7 +1563,7 @@ int SubtitleScreen::GetDelay(void) const
 
 void SubtitleScreen::Clear708Cache(uint64_t mask)
 {
-    QList<MythUIType *> list = m_ChildrenList;
+    QList<MythUIType *> list = m_childrenList;
     QList<MythUIType *>::iterator it;
     for (it = list.begin(); it != list.end(); ++it)
     {
@@ -1722,7 +1722,7 @@ void SubtitleScreen::Pulse(void)
     long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); it = itNext)
+    for (it = m_childrenList.begin(); it != m_childrenList.end(); it = itNext)
     {
         itNext = it + 1;
         MythUIType *child = *it;
@@ -1796,7 +1796,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
         return;
 
     QRegion visible;
-    QListIterator<MythUIType *> i(m_ChildrenList);
+    QListIterator<MythUIType *> i(m_childrenList);
     while (i.hasNext())
     {
         MythUIType *img = i.next();

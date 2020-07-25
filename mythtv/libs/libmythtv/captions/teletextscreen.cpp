@@ -117,7 +117,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
     }
 
     QRegion visible;
-    QListIterator<MythUIType *> i(m_ChildrenList);
+    QListIterator<MythUIType *> i(m_childrenList);
     while (i.hasNext())
     {
         MythUIType *img = i.next();

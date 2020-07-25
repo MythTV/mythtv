@@ -66,7 +66,7 @@ MythScreenType::MythScreenType(
     m_screenStack = parent;
 
     // Can be overridden, of course, but default to full sized.
-    m_Area = GetMythMainWindow()->GetUIScreenRect();
+    m_area = GetMythMainWindow()->GetUIScreenRect();
 
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
         gCoreContext->SendSystemEvent(
@@ -79,7 +79,7 @@ MythScreenType::MythScreenType(
 {
     m_fullScreen = fullscreen;
 
-    m_Area = GetMythMainWindow()->GetUIScreenRect();
+    m_area = GetMythMainWindow()->GetUIScreenRect();
 
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
         gCoreContext->SendSystemEvent(
@@ -261,7 +261,7 @@ void MythScreenType::aboutToShow(void)
             // shown in front of this screen
             QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
             m_savedMask = region;
-            region = region.united(QRegion(m_Area));
+            region = region.united(QRegion(m_area));
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
     }
@@ -504,8 +504,8 @@ bool MythScreenType::ParseElement(
 
         SetArea(rectN);
 
-        m_fullScreen = (m_Area.width()  >= screenArea.width() &&
-                        m_Area.height() >= screenArea.height());
+        m_fullScreen = (m_area.width()  >= screenArea.width() &&
+                        m_area.height() >= screenArea.height());
     }
     else
     {
@@ -550,8 +550,8 @@ void MythScreenType::CreateCopy(MythUIType * /*parent*/)
 
 MythPainter* MythScreenType::GetPainter(void)
 {
-    if (m_Painter)
-        return m_Painter;
+    if (m_painter)
+        return m_painter;
     if (m_screenStack)
         return MythScreenStack::GetPainter();
     return GetMythPainter();

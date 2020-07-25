@@ -562,7 +562,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
     m_HighNum = high;
 
     m_Delay = delayms;
-    m_EnableInitiator = true;
+    m_enableInitiator = true;
 
     d = new MythUIImagePrivate(this);
     emit DependChanged(false);
@@ -578,7 +578,7 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
     m_LowNum = 0;
     m_HighNum = 0;
     m_Delay = -1;
-    m_EnableInitiator = true;
+    m_enableInitiator = true;
 
     d = new MythUIImagePrivate(this);
     emit DependChanged(false);
@@ -590,7 +590,7 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
     m_LowNum = 0;
     m_HighNum = 0;
     m_Delay = -1;
-    m_EnableInitiator = true;
+    m_enableInitiator = true;
 
     d = new MythUIImagePrivate(this);
 }
@@ -795,7 +795,7 @@ void MythUIImage::SetImage(MythImage *img)
     m_ImagesLock.unlock();
 
     m_CurPos = 0;
-    m_Initiator = m_EnableInitiator;
+    m_initiator = m_enableInitiator;
     SetRedraw();
 
     d->m_updateLock.unlock();
@@ -868,7 +868,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_CurPos = 0;
     m_animatedImage = true;
-    m_Initiator = m_EnableInitiator;
+    m_initiator = m_enableInitiator;
     SetRedraw();
 }
 
@@ -968,7 +968,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 {
     d->m_updateLock.lockForRead();
 
-    m_Initiator = m_EnableInitiator;
+    m_initiator = m_enableInitiator;
 
     QString bFilename = m_imageProperties.m_filename;
 
@@ -1255,7 +1255,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         // Centre image in available space, accounting for zoom
         int x = 0;
         int y = 0;
-        QRect visibleImage = m_Effects.GetExtent(currentImageArea.size());
+        QRect visibleImage = m_effects.GetExtent(currentImageArea.size());
 
         if (area.width() > visibleImage.width())
             x = area.width() / 2 + visibleImage.topLeft().x();
@@ -1326,7 +1326,7 @@ bool MythUIImage::ParseElement(
     else if (element.tagName() == "area")
     {
         SetArea(parseRect(element));
-        m_imageProperties.m_forceSize = m_Area.size();
+        m_imageProperties.m_forceSize = m_area.size();
     }
     else if (element.tagName() == "preserveaspect")
         m_imageProperties.m_preserveAspect = parseBool(element);
@@ -1416,7 +1416,7 @@ bool MythUIImage::ParseElement(
 
     m_NeedLoad = true;
 
-    if (m_Parent && m_Parent->IsDeferredLoading(true))
+    if (m_parent && m_parent->IsDeferredLoading(true))
         m_NeedLoad = false;
 
     return true;
@@ -1461,7 +1461,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     // We need to update forceSize in case the parent area has changed
     // however we only want to set forceSize if it was previously in use
     if (!m_imageProperties.m_forceSize.isNull())
-        m_imageProperties.m_forceSize = m_Area.size();
+        m_imageProperties.m_forceSize = m_area.size();
 
     m_NeedLoad = im->m_NeedLoad;
 

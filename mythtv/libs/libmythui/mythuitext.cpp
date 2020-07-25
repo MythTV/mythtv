@@ -25,7 +25,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
       m_Font(new MythFontProperties())
 {
-    m_EnableInitiator = true;
+    m_enableInitiator = true;
 
     m_FontStates.insert("default", MythFontProperties());
     *m_Font = m_FontStates["default"];
@@ -65,7 +65,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_extraLeading = 0;
     m_lineHeight = 0;
     m_textCursor = -1;
-    m_EnableInitiator = true;
+    m_enableInitiator = true;
 
     MythUIText::SetArea(MythRect(displayRect));
     m_FontStates.insert("default", font);
@@ -325,14 +325,14 @@ void MythUIText::SetArea(const MythRect &rect)
     MythUIType::SetArea(rect);
     m_CutMessage.clear();
 
-    m_drawRect = m_Area;
+    m_drawRect = m_area;
     FillCutMessage();
 }
 
 void MythUIText::SetPosition(const MythPoint &pos)
 {
     MythUIType::SetPosition(pos);
-    m_drawRect.moveTopLeft(m_Area.topLeft());
+    m_drawRect.moveTopLeft(m_area.topLeft());
 }
 
 void MythUIText::SetCanvasPosition(int x, int y)
@@ -594,7 +594,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         height += m_lineHeight;
         if (!overflow)
         {
-            if (height > m_Area.height())
+            if (height > m_area.height())
             {
                 LOG(VB_GUI, num_lines ? LOG_DEBUG : LOG_NOTICE,
                     QString("'%1' (%2): height overflow. line height %3 "
@@ -603,7 +603,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                     .arg(GetXMLLocation())
                     .arg(line.height())
                     .arg(height)
-                    .arg(m_Area.height()));
+                    .arg(m_area.height()));
 
                 if (!m_MultiLine)
                     m_drawRect.setHeight(height);
@@ -707,8 +707,8 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     m_Cutdown = Qt::ElideNone;
 
     int line_height = m_Leading + m_lineHeight;
-    width = m_Area.width() / 2.0;
-    int best_width = m_Area.width();
+    width = m_area.width() / 2.0;
+    int best_width = m_area.width();
     int too_narrow = 0;
 
     for (int attempt = 0; attempt < 10; ++attempt)
@@ -747,7 +747,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             if (best_width > width)
                 best_width = width;
 
-            qreal lines = floor((m_Area.height() - height) / line_height);
+            qreal lines = floor((m_area.height() - height) / line_height);
             if (lines >= 1)
             {
                 // Too wide?
@@ -758,7 +758,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
                     return true;
                 }
             }
-            else if (last_line_width < m_Area.width())
+            else if (last_line_width < m_area.width())
             {
                 // Is the last line fully used?
                 width -= (1.0 - last_line_width / width) / num_lines;
@@ -788,7 +788,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
 void MythUIText::FillCutMessage(void)
 {
-    if (m_Area.isNull())
+    if (m_area.isNull())
         return;
 
     QRectF min_rect;
@@ -833,10 +833,10 @@ void MythUIText::FillCutMessage(void)
         (*Ilayout)->setText("");
         (*Ilayout)->beginLayout();
         line = (*Ilayout)->createLine();
-        line.setLineWidth(m_Area.width());
+        line.setLineWidth(m_area.width());
         line.setPosition(QPointF(0, 0));
         (*Ilayout)->endLayout();
-        m_drawRect.setWidth(m_Area.width());
+        m_drawRect.setWidth(m_area.width());
         m_drawRect.setHeight(m_lineHeight);
 
         for (++Ilayout ; Ilayout != m_Layouts.end(); ++Ilayout)
@@ -894,10 +894,10 @@ void MythUIText::FillCutMessage(void)
 
         qreal width = NAN;
         if (m_MultiLine && m_ShrinkNarrow &&
-            m_MinSize.isValid() && !m_CutMessage.isEmpty())
+            m_minSize.isValid() && !m_CutMessage.isEmpty())
             GetNarrowWidth(paragraphs, textoption, width);
         else
-            width = m_Area.width();
+            width = m_area.width();
 
         qreal height = 0;
         m_leftBearing = m_rightBearing = 0;
@@ -929,8 +929,8 @@ void MythUIText::FillCutMessage(void)
         {
             if (m_Canvas.width() > m_drawRect.width())
             {
-                m_drawRect.setX(m_Area.x());
-                m_drawRect.setWidth(m_Area.width());
+                m_drawRect.setX(m_area.x());
+                m_drawRect.setWidth(m_area.width());
                 m_scrollOffset = m_drawRect.x() - m_Canvas.x();
             }
         }
@@ -938,8 +938,8 @@ void MythUIText::FillCutMessage(void)
         {
             if (m_Canvas.height() > m_drawRect.height())
             {
-                m_drawRect.setY(m_Area.y());
-                m_drawRect.setHeight(m_Area.height());
+                m_drawRect.setY(m_area.y());
+                m_drawRect.setHeight(m_area.height());
                 m_scrollOffset = m_drawRect.y() - m_Canvas.y();
             }
         }
@@ -948,78 +948,78 @@ void MythUIText::FillCutMessage(void)
     // If any of hcenter|vcenter|Justify, center it all, then adjust
     if ((m_Justification & (Qt::AlignCenter|Qt::AlignJustify)) != 0U)
     {
-        m_drawRect.moveCenter(m_Area.center());
-        min_rect.moveCenter(m_Area.center());
+        m_drawRect.moveCenter(m_area.center());
+        min_rect.moveCenter(m_area.center());
     }
 
     // Adjust horizontal
     if (m_Justification & Qt::AlignLeft)
     {
         // If text size is less than allowed min size, center it
-        if (m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
-            min_rect.width() < m_MinSize.x())
+        if (m_ShrinkNarrow && m_minSize.isValid() && min_rect.isValid() &&
+            min_rect.width() < m_minSize.x())
         {
-            m_drawRect.moveLeft(m_Area.x() +
-                                (((m_MinSize.x() - min_rect.width() +
+            m_drawRect.moveLeft(m_area.x() +
+                                (((m_minSize.x() - min_rect.width() +
                                    fm.averageCharWidth()) / 2)));
-            min_rect.setWidth(m_MinSize.x());
+            min_rect.setWidth(m_minSize.x());
         }
         else
-            m_drawRect.moveLeft(m_Area.x());
+            m_drawRect.moveLeft(m_area.x());
 
-        min_rect.moveLeft(m_Area.x());
+        min_rect.moveLeft(m_area.x());
     }
     else if (m_Justification & Qt::AlignRight)
     {
         // If text size is less than allowed min size, center it
-        if (m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
-            min_rect.width() < m_MinSize.x())
+        if (m_ShrinkNarrow && m_minSize.isValid() && min_rect.isValid() &&
+            min_rect.width() < m_minSize.x())
         {
-            m_drawRect.moveRight(m_Area.x() + m_Area.width() -
-                                (((m_MinSize.x() - min_rect.width() +
+            m_drawRect.moveRight(m_area.x() + m_area.width() -
+                                (((m_minSize.x() - min_rect.width() +
                                    fm.averageCharWidth()) / 2)));
-            min_rect.setWidth(m_MinSize.x());
+            min_rect.setWidth(m_minSize.x());
         }
         else
-            m_drawRect.moveRight(m_Area.x() + m_Area.width());
+            m_drawRect.moveRight(m_area.x() + m_area.width());
 
-        min_rect.moveRight(m_Area.x() + m_Area.width());
+        min_rect.moveRight(m_area.x() + m_area.width());
     }
 
     // Adjust vertical
     if (m_Justification & Qt::AlignTop)
     {
         // If text size is less than allowed min size, center it
-        if (!m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
-            min_rect.height() < m_MinSize.y())
+        if (!m_ShrinkNarrow && m_minSize.isValid() && min_rect.isValid() &&
+            min_rect.height() < m_minSize.y())
         {
-            m_drawRect.moveTop(m_Area.y() +
-                               ((m_MinSize.y() - min_rect.height()) / 2));
-            min_rect.setHeight(m_MinSize.y());
+            m_drawRect.moveTop(m_area.y() +
+                               ((m_minSize.y() - min_rect.height()) / 2));
+            min_rect.setHeight(m_minSize.y());
         }
         else
-            m_drawRect.moveTop(m_Area.y());
+            m_drawRect.moveTop(m_area.y());
 
-        min_rect.moveTop(m_Area.y());
+        min_rect.moveTop(m_area.y());
     }
     else if (m_Justification & Qt::AlignBottom)
     {
         // If text size is less than allowed min size, center it
-        if (!m_ShrinkNarrow && m_MinSize.isValid() && min_rect.isValid() &&
-            min_rect.height() < m_MinSize.y())
+        if (!m_ShrinkNarrow && m_minSize.isValid() && min_rect.isValid() &&
+            min_rect.height() < m_minSize.y())
         {
-            m_drawRect.moveBottom(m_Area.y() + m_Area.height() -
-                                  ((m_MinSize.y() - min_rect.height()) / 2));
-            min_rect.setHeight(m_MinSize.y());
+            m_drawRect.moveBottom(m_area.y() + m_area.height() -
+                                  ((m_minSize.y() - min_rect.height()) / 2));
+            min_rect.setHeight(m_minSize.y());
         }
         else
-            m_drawRect.moveBottom(m_Area.y() + m_Area.height());
+            m_drawRect.moveBottom(m_area.y() + m_area.height());
 
-        min_rect.moveBottom(m_Area.y() + m_Area.height());
+        min_rect.moveBottom(m_area.y() + m_area.height());
     }
 
-    m_Initiator = m_EnableInitiator;
-    if (m_MinSize.isValid())
+    m_initiator = m_enableInitiator;
+    if (m_minSize.isValid())
     {
         // Record the minimal area needed for the message.
         SetMinArea(MythRect(min_rect.toRect()));
@@ -1111,7 +1111,7 @@ int MythUIText::MoveCursor(int lines)
 QPoint MythUIText::CursorPosition(int text_offset)
 {
     if (m_Layouts.empty())
-        return m_Area.topLeft().toQPoint();
+        return m_area.topLeft().toQPoint();
 
     if (text_offset == m_textCursor)
         return m_cursorPos;
@@ -1141,7 +1141,7 @@ QPoint MythUIText::CursorPosition(int text_offset)
             QString("'%1' (%2) CursorPosition offset %3 not found in "
                     "ANY paragraph!")
             .arg(objectName()).arg(GetXMLLocation()).arg(text_offset));
-        return m_Area.topLeft().toQPoint();
+        return m_area.topLeft().toQPoint();
     }
 
     int mid = m_drawRect.width() / 2;
@@ -1159,15 +1159,15 @@ QPoint MythUIText::CursorPosition(int text_offset)
     }
 
     int line_height = m_lineHeight + m_Leading;
-    mid = m_Area.height() / 2;
+    mid = m_area.height() / 2;
     mid -= (mid % line_height);
     y = pos.y() - mid;
 
-    if (y <= 0 || m_Canvas.height() <= m_Area.height()) // Top of buffer
+    if (y <= 0 || m_Canvas.height() <= m_area.height()) // Top of buffer
         y = 0;
-    else if (y + m_Area.height() > m_Canvas.height()) // Bottom of buffer
+    else if (y + m_area.height() > m_Canvas.height()) // Bottom of buffer
     {
-        int visible_lines = ((m_Area.height() / line_height) * line_height);
+        int visible_lines = ((m_area.height() / line_height) * line_height);
         y = m_Canvas.height() - visible_lines;
         pos.setY(visible_lines - (m_Canvas.height() - pos.y()));
     }
@@ -1180,9 +1180,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
     m_Canvas.moveTopLeft(QPoint(-x, -y));
 
     // Compensate for vertical alignment
-    pos.setY(pos.y() + m_drawRect.y() - m_Area.y());
+    pos.setY(pos.y() + m_drawRect.y() - m_area.y());
 
-    pos += m_Area.topLeft().toQPoint();
+    pos += m_area.topLeft().toQPoint();
     m_cursorPos = pos;
 
     return pos;
@@ -1384,7 +1384,7 @@ bool MythUIText::ParseElement(
     if (element.tagName() == "area")
     {
         SetArea(parseRect(element));
-        m_OrigDisplayRect = m_Area;
+        m_OrigDisplayRect = m_area;
     }
     //    else if (element.tagName() == "altarea") // Unused, but maybe in future?
     //        m_AltDisplayRect = parseRect(element);

@@ -866,8 +866,8 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
 
                 // We want the relative position of the click
                 QPoint position = event->GetPosition();
-                if (m_Parent)
-                    position -= m_Parent->GetArea().topLeft();
+                if (m_parent)
+                    position -= m_parent->GetArea().topLeft();
 
                 MythUIType *type = GetChildAt(position, false, false);
 
@@ -2657,7 +2657,7 @@ void GuideGrid::EmbedTVWindow(void)
     m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
     if (!m_usingNullVideo)
     {
-        QRegion r1 = QRegion(m_Area);
+        QRegion r1 = QRegion(m_area);
         QRegion r2 = QRegion(m_videoRect);
         GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
     }

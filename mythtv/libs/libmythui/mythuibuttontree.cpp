@@ -42,8 +42,8 @@ void MythUIButtonTree::Init()
 
     m_listTemplate->SetVisible(false);
 
-    int width = (m_Area.width() - (m_listSpacing * (m_numLists - 1))) / m_numLists;
-    int height = m_Area.height();
+    int width = (m_area.width() - (m_listSpacing * (m_numLists - 1))) / m_numLists;
+    int height = m_area.height();
 
     int i = 0;
 
@@ -628,7 +628,7 @@ bool MythUIButtonTree::gestureEvent(MythGestureEvent *event)
     {
         // We want the relative position of the click
         QPoint position = event->GetPosition() -
-                          m_Parent->GetArea().topLeft();
+                          m_parent->GetArea().topLeft();
 
         MythUIType *type = GetChildAt(position, false, false);
 

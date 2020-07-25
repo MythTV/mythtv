@@ -49,7 +49,7 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
     connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
 
-    m_CanHaveFocus = true;
+    m_canHaveFocus = true;
 
     m_initialized = false;
 
@@ -80,7 +80,7 @@ void MythUITextEdit::Pulse(void)
     if (!m_cursorImage)
         return;
 
-    if (m_HasFocus)
+    if (m_hasFocus)
     {
         if (m_lastKeyPress.elapsed() < 500)
         {
@@ -328,7 +328,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         }
         case MovePageUp:
         {
-            int lines = m_text->m_Area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_Leading);
             int newPos = m_text->MoveCursor(-lines);
             if (newPos == -1)
                 return false;
@@ -337,7 +337,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         }
         case MovePageDown:
         {
-            int lines = m_text->m_Area.height() / (m_text->m_lineHeight + m_text->m_Leading);
+            int lines = m_text->m_area.height() / (m_text->m_lineHeight + m_text->m_Leading);
             int newPos = m_text->MoveCursor(lines);
             if (newPos == -1)
                 return false;

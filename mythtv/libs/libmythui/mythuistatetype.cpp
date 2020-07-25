@@ -336,30 +336,26 @@ void MythUIStateType::LoadNow(void)
 
 void MythUIStateType::RecalculateArea(bool recurse)
 {
-    if (m_Parent)
+    if (m_parent)
     {
         if (objectName().startsWith("buttonlist button"))
         {
-            auto *list = dynamic_cast<MythUIButtonList *>(m_Parent);
+            auto *list = dynamic_cast<MythUIButtonList *>(m_parent);
             m_ParentArea = list->GetButtonArea();
         }
         else
-            m_ParentArea = m_Parent->GetFullArea();
+            m_ParentArea = m_parent->GetFullArea();
     }
     else
         m_ParentArea = GetMythMainWindow()->GetUIScreenRect();
 
-    m_Area.Reset();
-    m_Area.CalculateArea(m_ParentArea);
+    m_area.Reset();
+    m_area.CalculateArea(m_ParentArea);
 
     if (recurse)
     {
-        QList<MythUIType *>::iterator it;
-
-        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
-        {
-            (*it)->RecalculateArea(recurse);
-        }
+        for (auto * child : qAsConst(m_childrenList))
+            child->RecalculateArea(recurse);
     }
 }
 

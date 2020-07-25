@@ -189,9 +189,9 @@ void MythUIButton::UnPush()
 
     m_pushed = false;
 
-    if (m_HasFocus)
+    if (m_hasFocus)
         SetState("selected");
-    else if (m_Enabled)
+    else if (m_enabled)
         SetState("active");
     else
         SetState("disabled");
@@ -214,9 +214,9 @@ void MythUIButton::SetLocked(bool locked)
     {
         m_pushed = false;
 
-        if (m_HasFocus)
+        if (m_hasFocus)
             SetState("selected");
-        else if (m_Enabled)
+        else if (m_enabled)
             SetState("active");
         else
             SetState("disabled");

@@ -185,7 +185,7 @@ void MythUIProgressBar::CreateCopy(MythUIType *parent)
 
 void MythUIProgressBar::SetVisible(bool visible)
 {
-    if (m_firstdepend || visible != m_Visible)
+    if (m_firstdepend || visible != m_visible)
     {
         emit DependChanged(!visible);
         m_firstdepend = false;

@@ -43,9 +43,9 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
       m_showArrow(showArrow), m_showScrollBar(showScrollBar)
 {
     // Parent members
-    m_Area      = area;
-    m_Initiator = true;
-    m_EnableInitiator = true;
+    m_area      = area;
+    m_initiator = true;
+    m_enableInitiator = true;
 
     connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
     connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
@@ -1243,8 +1243,8 @@ bool MythUIButtonList::DistributeButtons(void)
     else
         m_topPosition = first_item;
 
-    m_Initiator = m_EnableInitiator;
-    if (m_MinSize.isValid())
+    m_initiator = m_enableInitiator;
+    if (m_minSize.isValid())
     {
         // Record the minimal area needed for the button list
         SetMinArea(min_rect);
@@ -1630,7 +1630,7 @@ MythRect MythUIButtonList::GetButtonArea(void) const
 {
     if (m_contentsRect.isValid())
         return m_contentsRect;
-    return m_Area;
+    return m_area;
 }
 
 MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
@@ -2382,7 +2382,7 @@ void MythUIButtonList::Init()
     if (m_scrollBar)
         m_scrollBar->SetVisible(m_showScrollBar);
 
-    m_contentsRect.CalculateArea(m_Area);
+    m_contentsRect.CalculateArea(m_area);
 
     m_buttontemplate = dynamic_cast<MythUIStateType *>(GetChild("buttonitem"));
 
@@ -2631,7 +2631,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
             {
                 // We want the relative position of the click
                 QPoint position = event->GetPosition() -
-                                m_Parent->GetArea().topLeft();
+                                m_parent->GetArea().topLeft();
 
                 MythUIType *type = GetChildAt(position, false, false);
 
@@ -2825,10 +2825,10 @@ void MythUIButtonList::SetButtonArea(const MythRect &rect)
 
     m_contentsRect = rect;
 
-    if (m_Area.isValid())
-        m_contentsRect.CalculateArea(m_Area);
-    else if (m_Parent)
-        m_contentsRect.CalculateArea(m_Parent->GetFullArea());
+    if (m_area.isValid())
+        m_contentsRect.CalculateArea(m_area);
+    else if (m_parent)
+        m_contentsRect.CalculateArea(m_parent->GetFullArea());
     else
         m_contentsRect.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 }
@@ -3043,7 +3043,7 @@ void MythUIButtonList::SetLCDTitles(const QString &title, const QString &columnL
 
 void MythUIButtonList::updateLCD(void)
 {
-    if (!m_HasFocus)
+    if (!m_hasFocus)
         return;
 
     LCD *lcddev = LCD::Get();

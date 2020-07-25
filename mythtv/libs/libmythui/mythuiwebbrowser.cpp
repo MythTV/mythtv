@@ -883,11 +883,11 @@ void MythUIWebBrowser::Init(void)
         return;
 
     m_actualBrowserArea = m_browserArea;
-    m_actualBrowserArea.CalculateArea(m_Area);
-    m_actualBrowserArea.translate(m_Area.x(), m_Area.y());
+    m_actualBrowserArea.CalculateArea(m_area);
+    m_actualBrowserArea.translate(m_area.x(), m_area.y());
 
     if (!m_actualBrowserArea.isValid())
-        m_actualBrowserArea = m_Area;
+        m_actualBrowserArea = m_area;
 
     m_browser = new MythWebView(GetMythMainWindow()->GetPaintWindow(), this);
     m_browser->setPalette(QApplication::style()->standardPalette());
