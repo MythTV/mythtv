@@ -91,8 +91,8 @@ class MTV_PUBLIC EITFixUp
 
   private:
     void FixBellExpressVu(DBEventEIT &event) const; // Canada DVB-S
-    void SetUKSubtitle(DBEventEIT &event) const;
-    void FixUK(DBEventEIT &event) const;            // UK DVB-T
+    static void SetUKSubtitle(DBEventEIT &event);
+    static void FixUK(DBEventEIT &event);           // UK DVB-T
     static void FixPBS(DBEventEIT &event);          // USA ATSC
     void FixComHem(DBEventEIT &event,
                    bool process_subtitle) const;    // Sweden DVB-C
@@ -103,21 +103,21 @@ class MTV_PUBLIC EITFixUp
     static void FixAUDescription(DBEventEIT &event);
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
-    void FixPRO7(DBEventEIT &event) const;          // Pro7/Sat1 Group
-    void FixDisneyChannel(DBEventEIT &event) const; // Disney Channel
-    void FixATV(DBEventEIT &event) const;           // ATV/ATV2
+    static void FixPRO7(DBEventEIT &event);         // Pro7/Sat1 Group
+    static void FixDisneyChannel(DBEventEIT &event);// Disney Channel
+    static void FixATV(DBEventEIT &event);          // ATV/ATV2
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
-    void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
+    static void FixPremiere(DBEventEIT &event);     // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
     static void FixCategory(DBEventEIT &event);     // Generic Category fixes
     void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
     void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
     void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
-    void FixStripHTML(DBEventEIT &event) const;     // Strip HTML tags
+    static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
     void FixGreekEIT(DBEventEIT &event) const;
     void FixGreekCategories(DBEventEIT &event) const; // Greek categories from descr.
-    void FixUnitymedia(DBEventEIT &event) const;    // handle cast/crew from Unitymedia
+    static void FixUnitymedia(DBEventEIT &event);     // handle cast/crew from Unitymedia
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -139,35 +139,6 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_dishDescriptionPremiere;
     const QRegExp m_dishDescriptionPremiere2;
     const QRegExp m_dishPPVCode;
-    const QRegExp m_ukThen;
-    const QRegExp m_ukNew;
-    const QRegExp m_ukNewTitle;
-    const QRegExp m_ukAlsoInHD;
-    const QRegExp m_ukCEPQ;
-    const QRegExp m_ukColonPeriod;
-    const QRegExp m_ukDotSpaceStart;
-    const QRegExp m_ukDotEnd;
-    const QRegExp m_ukSpaceColonStart;
-    const QRegExp m_ukSpaceStart;
-    const QRegExp m_ukPart;
-    const QRegExp m_ukSeries;
-    const QRegExp m_ukCC;
-    const QRegExp m_ukYear;
-    const QRegExp m_uk24ep;
-    const QRegExp m_ukStarring;
-    const QRegExp m_ukBBC7rpt;
-    const QRegExp m_ukDescriptionRemove;
-    const QRegExp m_ukTitleRemove;
-    const QRegExp m_ukDoubleDotEnd;
-    const QRegExp m_ukDoubleDotStart;
-    const QRegExp m_ukTime;
-    const QRegExp m_ukBBC34;
-    const QRegExp m_ukYearColon;
-    const QRegExp m_ukExclusionFromSubtitle;
-    const QRegExp m_ukCompleteDots;
-    const QRegExp m_ukQuotedSubtitle;
-    const QRegExp m_ukAllNew;
-    const QRegExp m_ukLaONoSplit;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
@@ -201,24 +172,12 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_rtlSubtitle3;
     const QRegExp m_rtlSubtitle4;
     const QRegExp m_rtlSubtitle5;
-    const QRegExp m_pro7Subtitle;
-    const QRegExp m_pro7Crew;
-    const QRegExp m_pro7CrewOne;
-    const QRegExp m_pro7Cast;
-    const QRegExp m_pro7CastOne;
-    const QRegExp m_atvSubtitle;
-    const QRegExp m_disneyChannelSubtitle;
     const QRegExp m_rtlEpisodeNo1;
     const QRegExp m_rtlEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
     const QRegExp m_fiAgeLimit;
     const QRegExp m_fiFilm;
-    const QRegExp m_dePremiereLength;
-    const QRegExp m_dePremiereAirdate;
-    const QRegExp m_dePremiereCredits;
-    const QRegExp m_dePremiereOTitle;
-    const QRegExp m_deSkyDescriptionSeasonEpisode;
     const QRegExp m_nlTxt;
     const QRegExp m_nlWide;
     const QRegExp m_nlRepeat;
@@ -239,7 +198,6 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_noColonSubtitle;
     const QRegExp m_noNRKCategories;
     const QRegExp m_noPremiere;
-    const QRegExp m_stereo;
     const QRegExp m_dkEpisode;
     const QRegExp m_dkPart;
     const QRegExp m_dkSubtitle1;
@@ -262,7 +220,6 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_auFreeviewY;//year
     const QRegExp m_auFreeviewYC;//year, cast
     const QRegExp m_auFreeviewSYC;//subtitle, year, cast
-    const QRegExp m_html;
     const QRegExp m_grRating; // Greek new parental rating system
     const QRegExp m_grReplay; //Greek rerun
     const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
@@ -305,7 +262,6 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_grCategSciFi;  // Greek category for Science Fiction
     const QRegExp m_grCategHealth; //Greek category for Health
     const QRegExp m_grCategSpecial; //Greek category for specials.
-    const QRegExp m_unitymediaImdbrating; ///< IMDb Rating
 };
 
 #endif // EITFIXUP_H

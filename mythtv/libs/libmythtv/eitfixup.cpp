@@ -1,5 +1,6 @@
 // C++ headers
 #include <algorithm>
+#include <array>
 
 // MythTV headers
 #include "eitfixup.h"
@@ -45,6 +46,65 @@ const QString shortContext =
         QString(R"((?:^|\.)(\s*\(*\s*%1[\s)]*(?:[).:]|$)))").arg(shortEp);
 
 
+static const QRegularExpression kAtvSubtitle { R"(,{0,1}\sFolge\s(\d{1,3})$)" };
+static const QRegularExpression kDeDisneyChannelSubtitle { R"(,([^,]+?)\s{0,1}(\d{4})$)" };
+static const QRegularExpression kDePremiereAirdate { R"(\s?([^\s^\.]+)\s((?:1|2)[0-9]{3})\.)" };
+static const QRegularExpression kDePremiereCredits { R"(\sVon\s([^,]+)(?:,|\su\.\sa\.)\smit\s([^\.]*)\.)" };
+static const QRegularExpression kDePremiereLength  { R"(\s?[0-9]+\sMin\.)" };
+static const QRegularExpression kDePremiereOTitle  { R"(\s*\(([^\)]*)\)$)" };
+static const QRegularExpression kDeSkyDescriptionSeasonEpisode { R"(^(\d{1,2}).\sStaffel,\sFolge\s(\d{1,2}):\s)" };
+static const QRegularExpression kHtml { "</?EM>", QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kPro7Cast     { "\n\nDarsteller:\n(.*)$",
+                                                QRegularExpression::DotMatchesEverythingOption };
+static const QRegularExpression kPro7CastOne  { R"(^([^\(]*?)\((.*)\)$)" };
+static const QRegularExpression kPro7Crew     { "\n\n(Regie:.*)$",
+                                                QRegularExpression::DotMatchesEverythingOption };
+static const QRegularExpression kPro7CrewOne  { R"(^(.*?):\s+(.*)$)" };
+static const QRegularExpression kPro7Subtitle { R"(,{0,1}([^,]*?),([^,]+?)\s{0,1}(\d{4})$)" };
+static const QRegularExpression kStereo { R"(\b\(?[sS]tereo\)?\b)" };
+static const QRegularExpression kUK24ep { R"(^\d{1,2}:00[ap]m to \d{1,2}:00[ap]m: )" };
+static const QRegularExpression kUKAllNew { R"(All New To 4Music!\s?)" };
+static const QRegularExpression kUKAlsoInHD { R"(\s*Also in HD\.)",
+                                              QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKBBC34 { R"(BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\.)",
+                                           QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKBBC7rpt { R"(\[Rptd?[^]]+?\d{1,2}\.\d{1,2}[ap]m\]\.)" };
+static const QRegularExpression kUKCC { R"(\[(?:(AD|SL|S|W|HD),?)+\])" };
+static const QRegularExpression kUKCEPQ { R"([:\!\.\?]\s)" };
+static const QRegularExpression kUKColonPeriod { R"([:\.])" };
+static const QRegularExpression kUKCompleteDots { R"(^\.\.+$)" };
+static const QRegularExpression kUKDescriptionRemove { R"(^(?:CBBC\s*?\.|CBeebies\s*?\.|Class TV\s*?:|BBC Switch\.))" };
+static const QRegularExpression kUKDotEnd { R"(\.$)" };
+static const QRegularExpression kUKDotSpaceStart { R"(^\. )" };
+static const QRegularExpression kUKDoubleDotEnd   { R"(\.\.+$)" };
+static const QRegularExpression kUKDoubleDotStart { R"(^\.\.+)" };
+static const QRegularExpression kUKExclusionFromSubtitle { "(starring|stars\\s|drama|seres|sitcom)",
+                                                           QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKLaONoSplit { "^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|UK|You the Jury)" };
+static const QRegularExpression kUKNew { R"((New\.|\s*?(Brand New|New)\s*?(Series|Episode)\s*?[:\.\-]))",
+                                         QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKNewTitle { R"(^(Brand New|New:)\s*)",
+                                              QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKPart { R"([-(\:,.]\s*(?:Part|Pt)\s*(\d+)\s*(?:(?:of|/)\s*(\d+))?\s*[-):,.])",
+                                          QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKQuotedSubtitle { R"((?:^')([\w\s\-,]+?)(?:\.' ))" };
+// Prefer long format resorting to short format
+// cap0 = long match to remove, cap1 = long season, cap2 = long ep, cap3 = long total,
+// cap4 = short match to remove, cap5 = short ep, cap6 = short total
+static const QRegularExpression kUKSeries { "(?:" + longContext + "|" + shortContext + ")",
+                                            QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKSpaceColonStart { R"(^[ |:]*)" };
+static const QRegularExpression kUKSpaceStart { "^ " };
+static const QRegularExpression kUKStarring { R"((?:Western\s)?[Ss]tarring ([\w\s\-']+?)[Aa]nd\s([\w\s\-']+?)[\.|,](?:\s)*(\d{4})?(?:\.\s)?)" };
+static const QRegularExpression kUKThen { R"(\s*?(Then|Followed by) 60 Seconds\.)",
+                                          QRegularExpression::CaseInsensitiveOption };
+static const QRegularExpression kUKTime { R"(\d{1,2}[\.:]\d{1,2}\s*(am|pm|))" };
+static const QRegularExpression kUKTitleRemove { "^(?:[tT]4:|Schools\\s*?:)" };
+static const QRegularExpression kUKYear { R"([\[\(]([\d]{4})[\)\]])" };
+static const QRegularExpression kUKYearColon { R"(^[\d]{4}:)" };
+static const QRegularExpression kUnitymediaImdbrating { R"(\s*IMDb Rating: (\d\.\d)\s?/10$)" };
+
+
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
       m_bellActors("\\set\\s|,"),
@@ -64,38 +124,6 @@ EITFixUp::EITFixUp()
       m_dishDescriptionPremiere(R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)"),
       m_dishDescriptionPremiere2(R"(\s*(Premier|Premiere)\.\s*)"),
       m_dishPPVCode(R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)"),
-      m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
-      m_ukNew(R"((New\.|\s*(Brand New|New)\s*(Series|Episode)\s*[:\.\-]))",Qt::CaseInsensitive),
-      m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
-      m_ukAlsoInHD("\\s*Also in HD\\.",Qt::CaseInsensitive),
-      m_ukCEPQ(R"([:\!\.\?]\s)"),
-      m_ukColonPeriod("[:\\.]"),
-      m_ukDotSpaceStart("^\\. "),
-      m_ukDotEnd("\\.$"),
-      m_ukSpaceColonStart("^[ |:]*"),
-      m_ukSpaceStart("^ "),
-      m_ukPart(R"([-(\:,.]\s*(?:Part|Pt)\s*(\d+)\s*(?:(?:of|/)\s*(\d+))?\s*[-):,.])", Qt::CaseInsensitive),
-      // Prefer long format resorting to short format
-      // cap0 = long match to remove, cap1 = long season, cap2 = long ep, cap3 = long total,
-      // cap4 = short match to remove, cap5 = short ep, cap6 = short total
-      m_ukSeries("(?:" + longContext + "|" + shortContext + ")", Qt::CaseInsensitive),
-      m_ukCC("\\[(?:(AD|SL|S|W|HD),?)+\\]"),
-      m_ukYear(R"([\[\(]([\d]{4})[\)\]])"),
-      m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
-      m_ukStarring(R"((?:Western\s)?[Ss]tarring ([\w\s\-']+)[Aa]nd\s([\w\s\-']+)[\.|,](?:\s)*(\d{4})?(?:\.\s)?)"),
-      m_ukBBC7rpt(R"(\[Rptd?[^]]+\d{1,2}\.\d{1,2}[ap]m\]\.)"),
-      m_ukDescriptionRemove(R"(^(?:CBBC\s*\.|CBeebies\s*\.|Class TV\s*:|BBC Switch\.))"),
-      m_ukTitleRemove("^(?:[tT]4:|Schools\\s*:)"),
-      m_ukDoubleDotEnd("\\.\\.+$"),
-      m_ukDoubleDotStart("^\\.\\.+"),
-      m_ukTime(R"(\d{1,2}[\.:]\d{1,2}\s*(am|pm|))"),
-      m_ukBBC34("BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\\.",Qt::CaseInsensitive),
-      m_ukYearColon("^[\\d]{4}:"),
-      m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
-      m_ukCompleteDots("^\\.\\.+$"),
-      m_ukQuotedSubtitle(R"((?:^')([\w\s\-,]+)(?:\.' ))"),
-      m_ukAllNew("All New To 4Music!\\s?"),
-      m_ukLaONoSplit("^Law & Order: (?:Criminal Intent|LA|Special Victims Unit|Trial by Jury|UK|You the Jury)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfr\xE5n\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -133,24 +161,12 @@ EITFixUp::EITFixUp()
       m_rtlSubtitle3(R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{,5}[^\.]{,120})[\?!\.]\s*)"),
       m_rtlSubtitle4(R"(^Thema.{0,5}:\s([^\.]+)\.\s*)"),
       m_rtlSubtitle5("^'(.+)'\\.\\s*"),
-      m_pro7Subtitle(",{0,1}([^,]*),([^,]+)\\s{0,1}(\\d{4})$"),
-      m_pro7Crew("\n\n(Regie:.*)$"),
-      m_pro7CrewOne("^(.*):\\s+(.*)$"),
-      m_pro7Cast("\n\nDarsteller:\n(.*)$"),
-      m_pro7CastOne(R"(^([^\(]*)\((.*)\)$)"),
-      m_atvSubtitle(R"(,{0,1}\sFolge\s(\d{1,3})$)"),
-      m_disneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
       m_rtlEpisodeNo1(R"(^(Folge\s\d{1,4})\.*\s*)"),
       m_rtlEpisodeNo2(R"(^(\d{1,2}\/[IVX]+)\.*\s*)"),
       m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
       m_fiRerun2("\\([Uu]\\)"),
       m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
       m_fiFilm("^(Film|Elokuva): "),
-      m_dePremiereLength(R"(\s?[0-9]+\sMin\.)"),
-      m_dePremiereAirdate(R"(\s?([^\s^\.]+)\s((?:1|2)[0-9]{3})\.)"),
-      m_dePremiereCredits(R"(\sVon\s([^,]+)(?:,|\su\.\sa\.)\smit\s([^\.]*)\.)"),
-      m_dePremiereOTitle(R"(\s*\(([^\)]*)\)$)"),
-      m_deSkyDescriptionSeasonEpisode(R"(^(\d{1,2}).\sStaffel,\sFolge\s(\d{1,2}):\s)"),
       m_nlTxt("txt"),
       m_nlWide("breedbeeld"),
       m_nlRepeat("herh."),
@@ -174,7 +190,6 @@ EITFixUp::EITFixUp()
                         "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
                         "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
       m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
-      m_stereo(R"(\b\(?[sS]tereo\)?\b)"),
       m_dkEpisode("\\(([0-9]+)\\)"),
       m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
       m_dkSubtitle1("^([^:]+): (.+)"),
@@ -197,7 +212,6 @@ EITFixUp::EITFixUp()
       m_auFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
       m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
-      m_html("</?EM>", Qt::CaseInsensitive),
       m_grRating("(?:(\\[[KΚ](?:(|8|12|16|18)\\]\\s*)))", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
@@ -246,8 +260,7 @@ EITFixUp::EITFixUp()
       m_grCategNature("(?:\\W)?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))(?:\\W)?",Qt::CaseInsensitive),
       m_grCategSciFi("(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
       m_grCategHealth("(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive),
-      m_unitymediaImdbrating(R"(\s*IMDb Rating: (\d\.\d)\s?/10$)")
+      m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive)
 {
 }
 
@@ -547,11 +560,12 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    position = event.m_description.indexOf(m_stereo);
-    if (position != -1)
+    auto match = kStereo.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_audioProps |= AUD_STEREO;
-        event.m_description = event.m_description.replace(m_stereo, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
     // Check for "title (All Day, HD)" in the title
@@ -714,7 +728,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 /** \fn EITFixUp::SetUKSubtitle(DBEventEIT&) const
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
-void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
+void EITFixUp::SetUKSubtitle(DBEventEIT &event)
 {
     QStringList strListColon = event.m_description.split(":");
     QStringList strListEnd;
@@ -780,11 +794,12 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
              fColon = true;
          }
     }
-    QRegExp tmpQuotedSubtitle = m_ukQuotedSubtitle;
-    if (tmpQuotedSubtitle.indexIn(event.m_description) != -1)
+    auto match = kUKQuotedSubtitle.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_subtitle = tmpQuotedSubtitle.cap(1);
-        event.m_description.remove(m_ukQuotedSubtitle);
+        event.m_subtitle = match.captured(1);
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
         fQuotedSubtitle = true;
     }
     QStringList strListPeriod;
@@ -832,13 +847,13 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
              return;
         if ((uint)strListSpace.size() > kDotToTitle)
              return;
-        if (strListSpace.filter(m_ukExclusionFromSubtitle).empty())
+        if (strListSpace.filter(kUKExclusionFromSubtitle).empty())
         {
              event.m_subtitle = strListEnd[0]+strEnd;
-             event.m_subtitle.remove(m_ukSpaceColonStart);
+             event.m_subtitle.remove(kUKSpaceColonStart);
              event.m_description=
                           event.m_description.mid(strListEnd[0].length()+1);
-             event.m_description.remove(m_ukSpaceColonStart);
+             event.m_description.remove(kUKSpaceColonStart);
         }
     }
 }
@@ -847,43 +862,38 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
 /** \fn EITFixUp::FixUK(DBEventEIT&) const
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
-void EITFixUp::FixUK(DBEventEIT &event) const
+void EITFixUp::FixUK(DBEventEIT &event)
 {
     QString strFull;
 
     bool isMovie = event.m_category.startsWith("Movie",Qt::CaseInsensitive) ||
                    event.m_category.startsWith("Film",Qt::CaseInsensitive);
     // BBC three case (could add another record here ?)
-    event.m_description = event.m_description.remove(m_ukThen);
-    event.m_description = event.m_description.remove(m_ukNew);
-    event.m_title = event.m_title.remove(m_ukNewTitle);
+    event.m_description = event.m_description.remove(kUKThen);
+    event.m_description = event.m_description.remove(kUKNew);
+    event.m_title = event.m_title.remove(kUKNewTitle);
 
     // Removal of Class TV, CBBC and CBeebies etc..
-    event.m_title = event.m_title.remove(m_ukTitleRemove);
-    event.m_description = event.m_description.remove(m_ukDescriptionRemove);
+    event.m_title = event.m_title.remove(kUKTitleRemove);
+    event.m_description = event.m_description.remove(kUKDescriptionRemove);
 
     // Removal of BBC FOUR and BBC THREE
-    event.m_description = event.m_description.remove(m_ukBBC34);
+    event.m_description = event.m_description.remove(kUKBBC34);
 
     // BBC 7 [Rpt of ...] case.
-    event.m_description = event.m_description.remove(m_ukBBC7rpt);
+    event.m_description = event.m_description.remove(kUKBBC7rpt);
 
     // "All New To 4Music!
-    event.m_description = event.m_description.remove(m_ukAllNew);
+    event.m_description = event.m_description.remove(kUKAllNew);
 
     // Removal of 'Also in HD' text
- 	event.m_description = event.m_description.remove(m_ukAlsoInHD);
+    event.m_description = event.m_description.remove(kUKAlsoInHD);
 
     // Remove [AD,S] etc.
-    bool    ccMatched = false;
-    QRegExp tmpCC = m_ukCC;
-    int position1 = 0;
-    while ((position1 = tmpCC.indexIn(event.m_description, position1)) != -1)
+    auto match = kUKCC.match(event.m_description);
+    while (match.hasMatch())
     {
-        ccMatched = true;
-        position1 += tmpCC.matchedLength();
-
-        QStringList tmpCCitems = tmpCC.cap(0).remove("[").remove("]").split(",");
+        QStringList tmpCCitems = match.captured(0).remove("[").remove("]").split(",");
         if (tmpCCitems.contains("AD"))
             event.m_audioProps |= AUD_VISUALIMPAIR;
         if (tmpCCitems.contains("HD"))
@@ -894,60 +904,65 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             event.m_subtitleType |= SUB_SIGNED;
         if (tmpCCitems.contains("W"))
             event.m_videoProps |= VID_WIDESCREEN;
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
+        match = kUKCC.match(event.m_description, match.capturedStart(0));
     }
-
-    if(ccMatched)
-        event.m_description = event.m_description.remove(m_ukCC);
 
     event.m_title       = event.m_title.trimmed();
     event.m_description = event.m_description.trimmed();
 
     // Work out the season and episode numbers (if any)
     // Matching pattern "Season 2 Episode|Ep 3 of 14|3/14" etc
-    bool    series  = false;
-    QRegExp tmpSeries = m_ukSeries;
-    int position2 = 0;
-    if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
-            || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
+    bool series  = false;
+    bool fromTitle = true;
+    match = kUKSeries.match(event.m_title);
+    if (!match.hasMatch())
     {
-        if (!tmpSeries.cap(1).isEmpty())
+        fromTitle = false;
+        match = kUKSeries.match(event.m_description);
+    }
+    if (match.hasMatch())
+    {
+        if (!match.captured(1).isEmpty())
         {
-            event.m_season = tmpSeries.cap(1).toUInt();
+            event.m_season = match.captured(1).toUInt();
             series = true;
         }
 
-        if (!tmpSeries.cap(2).isEmpty())
+        if (!match.captured(2).isEmpty())
         {
-            event.m_episode = tmpSeries.cap(2).toUInt();
+            event.m_episode = match.captured(2).toUInt();
             series = true;
         }
-        else if (!tmpSeries.cap(5).isEmpty())
+        else if (!match.captured(5).isEmpty())
         {
-            event.m_episode = tmpSeries.cap(5).toUInt();
+            event.m_episode = match.captured(5).toUInt();
             series = true;
         }
 
-        if (!tmpSeries.cap(3).isEmpty())
+        if (!match.captured(3).isEmpty())
         {
-            event.m_totalepisodes = tmpSeries.cap(3).toUInt();
+            event.m_totalepisodes = match.captured(3).toUInt();
             series = true;
         }
-        else if (!tmpSeries.cap(6).isEmpty())
+        else if (!match.captured(6).isEmpty())
         {
-            event.m_totalepisodes = tmpSeries.cap(6).toUInt();
+            event.m_totalepisodes = match.captured(6).toUInt();
             series = true;
         }
 
         // Remove long or short match. Short text doesn't start at position2
-        int form = tmpSeries.cap(4).isEmpty() ? 0 : 4;
+        int form = match.captured(4).isEmpty() ? 0 : 4;
 
-        if (position1 != -1)
+        if (fromTitle)
         {
             LOG(VB_EIT, LOG_DEBUG, QString("Extracted S%1E%2/%3 from title (%4) \"%5\"")
                 .arg(event.m_season).arg(event.m_episode).arg(event.m_totalepisodes)
                 .arg(event.m_title, event.m_description));
 
-            event.m_title.remove(tmpSeries.cap(form));
+            event.m_title.remove(match.capturedStart(form),
+                                 match.capturedLength(form));
         }
         else
         {
@@ -955,11 +970,12 @@ void EITFixUp::FixUK(DBEventEIT &event) const
                 .arg(event.m_season).arg(event.m_episode).arg(event.m_totalepisodes)
                 .arg(event.m_title, event.m_description));
 
-            if (position2 == 0)
+            if (match.capturedStart(form) == 0)
             {
-     		    // Remove from the start of the description.
-		        // Otherwise it ends up in the subtitle.
-                event.m_description.remove(tmpSeries.cap(form));
+                // Remove from the start of the description.
+                // Otherwise it ends up in the subtitle.
+                event.m_description.remove(match.capturedStart(form),
+                                 match.capturedLength(form));
             }
         }
     }
@@ -971,22 +987,24 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     // Multi-part episodes, or films (e.g. ITV film split by news)
     // Matches Part 1, Pt 1/2, Part 1 of 2 etc.
-    QRegExp tmpPart = m_ukPart;
-    if (tmpPart.indexIn(event.m_title) != -1)
+    match = kUKPart.match(event.m_title);
+    auto match2 = kUKPart.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_partnumber = tmpPart.cap(1).toUInt();
-        event.m_parttotal  = tmpPart.cap(2).toUInt();
+        event.m_partnumber = match.captured(1).toUInt();
+        event.m_parttotal  = match.captured(2).toUInt();
 
         LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from title (%3)")
             .arg(event.m_partnumber).arg(event.m_parttotal).arg(event.m_title));
 
         // Remove from the title
-        event.m_title = event.m_title.remove(tmpPart.cap(0));
+        event.m_title.remove(match.capturedStart(0),
+                             match.capturedLength(0));
     }
-    else if ((position1 = tmpPart.indexIn(event.m_description)) != -1)
+    else if (match2.hasMatch())
     {
-        event.m_partnumber = tmpPart.cap(1).toUInt();
-        event.m_parttotal  = tmpPart.cap(2).toUInt();
+        event.m_partnumber = match2.captured(1).toUInt();
+        event.m_parttotal  = match2.captured(2).toUInt();
 
         LOG(VB_EIT, LOG_DEBUG, QString("Extracted Part %1/%2 from description (%3) \"%4\"")
             .arg(event.m_partnumber).arg(event.m_parttotal)
@@ -994,24 +1012,24 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
         // Remove from the start of the description.
         // Otherwise it ends up in the subtitle.
-        if (position1 == 0)
+        if (match2.capturedStart(0) == 0)
         {
             // Retain a single colon (subtitle separator) if we remove any
-            QString sub = tmpPart.cap(0).contains(":") ? ":" : "";
-            event.m_description = event.m_description.replace(tmpPart.cap(0), sub);
+            QString sub = match2.captured(0).contains(":") ? ":" : "";
+            event.m_description = event.m_description.replace(match2.captured(0), sub);
         }
     }
 
-    QRegExp tmpStarring = m_ukStarring;
-    if (tmpStarring.indexIn(event.m_description) != -1)
+    match = kUKStarring.match(event.m_description);
+    if (match.hasMatch())
     {
         // if we match this we've captured 2 actors and an (optional) airdate
-        event.AddPerson(DBPerson::kActor, tmpStarring.cap(1));
-        event.AddPerson(DBPerson::kActor, tmpStarring.cap(2));
-        if (tmpStarring.cap(3).length() > 0)
+        event.AddPerson(DBPerson::kActor, match.captured(1));
+        event.AddPerson(DBPerson::kActor, match.captured(2));
+        if (match.captured(3).length() > 0)
         {
             bool ok = false;
-            uint y = tmpStarring.cap(3).toUInt(&ok);
+            uint y = match.captured(3).toUInt(&ok);
             if (ok)
             {
                 event.m_airdate = y;
@@ -1020,53 +1038,58 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
     }
 
-    QRegExp tmp24ep = m_uk24ep;
     if (!event.m_title.startsWith("CSI:") && !event.m_title.startsWith("CD:") &&
-        !event.m_title.contains(m_ukLaONoSplit) &&
+        !event.m_title.contains(kUKLaONoSplit) &&
         !event.m_title.startsWith("Mission: Impossible"))
     {
-        if ((event.m_title.indexOf(m_ukDoubleDotEnd) != -1) &&
-            (event.m_description.indexOf(m_ukDoubleDotStart) != -1))
+        if ((event.m_title.indexOf(kUKDoubleDotEnd) != -1) &&
+            (event.m_description.indexOf(kUKDoubleDotStart) != -1))
         {
-            QString strPart=event.m_title.remove(m_ukDoubleDotEnd)+" ";
-            strFull = strPart + event.m_description.remove(m_ukDoubleDotStart);
+            QString strPart=event.m_title.remove(kUKDoubleDotEnd)+" ";
+            strFull = strPart + event.m_description.remove(kUKDoubleDotStart);
+            int position1 = -1;
             if (isMovie &&
-                ((position1 = strFull.indexOf(m_ukCEPQ,strPart.length())) != -1))
+                ((position1 = strFull.indexOf(kUKCEPQ,strPart.length())) != -1))
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?'
                   || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.m_title = strFull.left(position1);
                  event.m_description = strFull.mid(position1 + 1);
-                 event.m_description.remove(m_ukSpaceStart);
+                 event.m_description.remove(kUKSpaceStart);
             }
-            else if ((position1 = strFull.indexOf(m_ukCEPQ)) != -1)
+            else if ((position1 = strFull.indexOf(kUKCEPQ)) != -1)
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?'
                   || (position1>2 && strFull[position1] == '.' && strFull[position1-2] == '.'))
                      position1++;
                  event.m_title = strFull.left(position1);
                  event.m_description = strFull.mid(position1 + 1);
-                 event.m_description.remove(m_ukSpaceStart);
+                 event.m_description.remove(kUKSpaceStart);
                  SetUKSubtitle(event);
             }
         }
-        else if ((position1 = tmp24ep.indexIn(event.m_description)) != -1)
+        else if (event.m_description.indexOf(kUK24ep) != -1)
         {
-            // Special case for episodes of 24.
-            // -2 from the length cause we don't want ": " on the end
-            event.m_subtitle = event.m_description.mid(position1,
-                                tmp24ep.cap(0).length() - 2);
-            event.m_description = event.m_description.remove(tmp24ep.cap(0));
-        }
-        else if (event.m_description.indexOf(m_ukTime) == -1)
-        {
-            if (!isMovie && (event.m_title.indexOf(m_ukYearColon) < 0))
+            auto match24 = kUK24ep.match(event.m_description);
+            if (match24.hasMatch())
             {
+                // Special case for episodes of 24.
+                // -2 from the length cause we don't want ": " on the end
+                event.m_subtitle = event.m_description.mid(match24.capturedStart(0),
+                                                           match24.captured(0).length() - 2);
+                event.m_description = event.m_description.remove(match24.captured(0));
+            }
+        }
+        else if (event.m_description.indexOf(kUKTime) == -1)
+        {
+            if (!isMovie && (event.m_title.indexOf(kUKYearColon) < 0))
+            {
+                int position1 = -1;
                 if (((position1 = event.m_title.indexOf(":")) != -1) &&
                     (event.m_description.indexOf(":") < 0 ))
                 {
-                    if (event.m_title.mid(position1+1).indexOf(m_ukCompleteDots)==0)
+                    if (event.m_title.mid(position1+1).indexOf(kUKCompleteDots)==0)
                     {
                         SetUKSubtitle(event);
                         QString strTmp = event.m_title.mid(position1+1);
@@ -1088,9 +1111,11 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     if (!isMovie && event.m_subtitle.isEmpty() &&
         !event.m_title.startsWith("The X-Files"))
     {
-        if ((position1=event.m_description.indexOf(m_ukTime)) != -1)
+        int position1 = -1;
+        int position2 = -1;
+        if ((position1=event.m_description.indexOf(kUKTime)) != -1)
         {
-            position2 = event.m_description.indexOf(m_ukColonPeriod);
+            position2 = event.m_description.indexOf(kUKColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
         }
@@ -1099,7 +1124,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
             if ((uint)position1 < kSubtitleMaxLen)
             {
                 event.m_subtitle = event.m_title.mid(position1 + 1);
-                event.m_subtitle.remove(m_ukSpaceColonStart);
+                event.m_subtitle.remove(kUKSpaceColonStart);
                 event.m_title = event.m_title.left(position1);
             }
         }
@@ -1108,14 +1133,13 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
 
     // Work out the year (if any)
-    QRegExp tmpUKYear = m_ukYear;
-    if ((position1 = tmpUKYear.indexIn(event.m_description)) != -1)
+    match = kUKYear.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString stmp = event.m_description;
-        int     itmp = position1 + tmpUKYear.cap(0).length();
-        event.m_description = stmp.left(position1) + stmp.mid(itmp);
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
         bool ok = false;
-        uint y = tmpUKYear.cap(1).toUInt(&ok);
+        uint y = match.captured(1).toUInt(&ok);
         if (ok)
         {
             event.m_airdate = y;
@@ -1124,9 +1148,9 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
 
     // Trim leading/trailing '.'
-    event.m_subtitle.remove(m_ukDotSpaceStart);
+    event.m_subtitle.remove(kUKDotSpaceStart);
     if (event.m_subtitle.lastIndexOf("..") != (event.m_subtitle.length()-2))
-        event.m_subtitle.remove(m_ukDotEnd);
+        event.m_subtitle.remove(kUKDotEnd);
 
     // Reverse the subtitle and empty description
     if (event.m_description.isEmpty() && !event.m_subtitle.isEmpty())
@@ -1796,78 +1820,70 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     }
 }
 
+// FIXME add more jobs
+static const QMap<QString,DBPerson::Role> deCrewTitle {
+    { "Regie",    DBPerson::kDirector },
+    { "Drehbuch", DBPerson::kWriter },
+    { "Autor",    DBPerson::kWriter },
+};
+
 /** \fn EITFixUp::FixPRO7(DBEventEIT&) const
  *  \brief Use this to standardise the PRO7/Sat1 group guide in Germany.
  */
-void EITFixUp::FixPRO7(DBEventEIT &event) const
+void EITFixUp::FixPRO7(DBEventEIT &event)
 {
-    QRegExp tmp = m_pro7Subtitle;
-
-    int pos = tmp.indexIn(event.m_subtitle);
-    if (pos != -1)
+    auto match = kPro7Subtitle.match(event.m_subtitle);
+    if (match.hasMatch())
     {
         if (event.m_airdate == 0)
         {
-            event.m_airdate = tmp.cap(3).toUInt();
+            event.m_airdate = match.captured(3).toUInt();
         }
-        event.m_subtitle.replace(tmp, "");
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
     }
 
     /* handle cast, the very last in description */
-    tmp = m_pro7Cast;
-    pos = tmp.indexIn(event.m_description);
-    if (pos != -1)
+    match = kPro7Cast.match(event.m_description);
+    if (match.hasMatch())
     {
-        QStringList cast = tmp.cap(1).split("\n");
-        QRegExp tmpOne = m_pro7CastOne;
-        QStringListIterator i(cast);
-        while (i.hasNext())
+        QStringList cast = match.captured(1).split("\n");
+        for (const auto& line : qAsConst(cast))
         {
-            pos = tmpOne.indexIn (i.next());
-            if (pos != -1)
+            auto match2 = kPro7CastOne.match(line);
+            if (match2.hasMatch())
             {
-                event.AddPerson (DBPerson::kActor, tmpOne.cap(1).simplified());
+                event.AddPerson (DBPerson::kActor, match2.captured(1).simplified());
             }
         }
-        event.m_description.replace(tmp, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
     /* handle crew, the new very last in description
      * format: "Role: Name" or "Role: Name1, Name2"
      */
-    tmp = m_pro7Crew;
-    pos = tmp.indexIn(event.m_description);
-    if (pos != -1)
+    match = kPro7Crew.match(event.m_description);
+    if (match.hasMatch())
     {
-        QStringList crew = tmp.cap(1).split("\n");
-        QRegExp tmpOne = m_pro7CrewOne;
-        QStringListIterator i(crew);
-        while (i.hasNext())
+        QStringList crew = match.captured(1).split("\n");
+        for (const auto& line : qAsConst(crew))
         {
-            pos = tmpOne.indexIn (i.next());
-            if (pos != -1)
+            auto match2 = kPro7CrewOne.match(line);
+            if (match2.hasMatch())
             {
                 DBPerson::Role role = DBPerson::kUnknown;
-                if (QString::compare (tmpOne.cap(1), "Regie") == 0)
+                if (deCrewTitle.contains(match2.captured(1)))
+                    role = deCrewTitle[match2.captured(1)];
+                QStringList names = match2.captured(2).simplified().split(R"(\s*,\s*)");
+                for (const auto & name : qAsConst(names))
                 {
-                    role = DBPerson::kDirector;
-                }
-                else if ((QString::compare (tmpOne.cap(1), "Drehbuch") == 0) ||
-                         (QString::compare (tmpOne.cap(1), "Autor") == 0))
-                {
-                    role = DBPerson::kWriter;
-                }
-                // FIXME add more jobs
-
-                QStringList names = tmpOne.cap(2).simplified().split("\\s*,\\s*");
-                QStringListIterator j(names);
-                while (j.hasNext())
-                {
-                    event.AddPerson (role, j.next());
+                    event.AddPerson (role, name);
                 }
             }
         }
-        event.m_description.replace(tmp, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
     /* FIXME unless its Jamie Oliver, then there is neither Crew nor Cast only
@@ -1878,34 +1894,35 @@ void EITFixUp::FixPRO7(DBEventEIT &event) const
 /** \fn EITFixUp::FixDisneyChannel(DBEventEIT&) const
 *  \brief Use this to standardise the Disney Channel guide in Germany.
 */
-void EITFixUp::FixDisneyChannel(DBEventEIT &event) const
+void EITFixUp::FixDisneyChannel(DBEventEIT &event)
 {
-    QRegExp tmp = m_disneyChannelSubtitle;
-    int pos = tmp.indexIn(event.m_subtitle);
-    if (pos != -1)
+    auto match = kDeDisneyChannelSubtitle.match(event.m_subtitle);
+    if (match.hasMatch())
     {
         if (event.m_airdate == 0)
         {
-            event.m_airdate = tmp.cap(3).toUInt();
+            event.m_airdate = match.captured(3).toUInt();
         }
-	event.m_subtitle.replace(tmp, "");
+	event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
     }
-    tmp = QRegExp("\\s[^\\s]+-(Serie)");
-    pos = tmp.indexIn(event.m_subtitle);
-    if (pos != -1)
+    QRegularExpression tmp { R"(\s[^\s]+?-(Serie))" };
+    match = tmp.match(event.m_subtitle);
+    if (match.hasMatch())
     {
         event.m_categoryType = ProgramInfo::kCategorySeries;
-        event.m_category=tmp.cap(0).trimmed();
-        event.m_subtitle.replace(tmp, "");
+        event.m_category=match.captured(0).trimmed();
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
     }
 }
 
 /** \fn EITFixUp::FixATV(DBEventEIT&) const
 *  \brief Use this to standardise the ATV/ATV2 guide in Germany.
 **/
-void EITFixUp::FixATV(DBEventEIT &event) const
+void EITFixUp::FixATV(DBEventEIT &event)
 {
-    event.m_subtitle.replace(m_atvSubtitle, "");
+    event.m_subtitle.replace(kAtvSubtitle, "");
 }
 
 
@@ -1929,11 +1946,12 @@ void EITFixUp::FixFI(DBEventEIT &event) const
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    position = event.m_description.indexOf(m_stereo);
-    if (position != -1)
+    auto match = kStereo.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_audioProps |= AUD_STEREO;
-        event.m_description = event.m_description.replace(m_stereo, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
     // Remove age limit in parenthesis at end of title
@@ -1956,59 +1974,61 @@ void EITFixUp::FixFI(DBEventEIT &event) const
  *  \brief Use this to standardize DVB-C guide in Germany
  *         for the providers Kabel Deutschland and Premiere.
  */
-void EITFixUp::FixPremiere(DBEventEIT &event) const
+void EITFixUp::FixPremiere(DBEventEIT &event)
 {
     QString country = "";
 
-    QRegExp tmplength =  m_dePremiereLength;
-    QRegExp tmpairdate =  m_dePremiereAirdate;
-    QRegExp tmpcredits =  m_dePremiereCredits;
+    event.m_description = event.m_description.replace(kDePremiereLength, "");
 
-    event.m_description = event.m_description.replace(tmplength, "");
-
-    if (tmpairdate.indexIn(event.m_description) != -1)
+    auto match = kDePremiereAirdate.match(event.m_description);
+    if ( match.hasMatch())
     {
-        country = tmpairdate.cap(1).trimmed();
+        country = match.captured(1).trimmed();
         bool ok = false;
-        uint y = tmpairdate.cap(2).toUInt(&ok);
+        uint y = match.captured(2).toUInt(&ok);
         if (ok)
             event.m_airdate = y;
-        event.m_description = event.m_description.replace(tmpairdate, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
-    if (tmpcredits.indexIn(event.m_description) != -1)
+    match = kDePremiereCredits.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
+        event.AddPerson(DBPerson::kDirector, match.captured(1));
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        const QStringList actors = tmpcredits.cap(2).split(
+        const QStringList actors = match.captured(2).split(
             ", ", QString::SkipEmptyParts);
 #else
-        const QStringList actors = tmpcredits.cap(2).split(
+        const QStringList actors = match.captured(2).split(
             ", ", Qt::SkipEmptyParts);
 #endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
-        event.m_description = event.m_description.replace(tmpcredits, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 
     event.m_description = event.m_description.replace("\u000A$", "");
     event.m_description = event.m_description.replace("\u000A", " ");
 
     // move the original titel from the title to subtitle
-    QRegExp tmpOTitle = m_dePremiereOTitle;
-    if (tmpOTitle.indexIn(event.m_title) != -1)
+    match = kDePremiereOTitle.match(event.m_title);
+    if (match.hasMatch())
     {
-        event.m_subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
-        event.m_title = event.m_title.replace(tmpOTitle, "");
+        event.m_subtitle = QString("%1, %2").arg(match.captured(1)).arg(country);
+        event.m_title.remove(match.capturedStart(0),
+                             match.capturedLength(0));
     }
 
     // Find infos about season and episode number
-    QRegExp tmpSeasonEpisode =  m_deSkyDescriptionSeasonEpisode;
-    if (tmpSeasonEpisode.indexIn(event.m_description) != -1)
+    match = kDeSkyDescriptionSeasonEpisode.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_season = tmpSeasonEpisode.cap(1).trimmed().toUInt();
-        event.m_episode = tmpSeasonEpisode.cap(2).trimmed().toUInt();
-        event.m_description.replace(tmpSeasonEpisode, "");
+        event.m_season = match.captured(1).trimmed().toUInt();
+        event.m_episode = match.captured(2).trimmed().toUInt();
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 }
 
@@ -2113,10 +2133,11 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     }
 
     // Get stereo info
-    if (fullinfo.indexOf(m_stereo) != -1)
+    auto match = kStereo.match(fullinfo);
+    if (match.hasMatch())
     {
         event.m_audioProps |= AUD_STEREO;
-        fullinfo = fullinfo.replace(m_stereo, ".");
+        fullinfo.remove(match.capturedStart(0), match.capturedLength(0));
     }
 
     //Get widescreen info
@@ -2575,10 +2596,10 @@ void EITFixUp::FixDK(DBEventEIT &event) const
 /** \fn EITFixUp::FixStripHTML(DBEventEIT&) const
  *  \brief Use this to clean HTML Tags from EIT Data
  */
-void EITFixUp::FixStripHTML(DBEventEIT &event) const
+void EITFixUp::FixStripHTML(DBEventEIT &event)
 {
     LOG(VB_EIT, LOG_INFO, QString("Applying html strip to %1").arg(event.m_title));
-    event.m_title.remove(m_html);
+    event.m_title.remove(kHtml);
 }
 
 // Moves the subtitle field into the description since it's just used
@@ -3115,7 +3136,7 @@ void EITFixUp::FixGreekCategories(DBEventEIT &event) const
 
 }
 
-void EITFixUp::FixUnitymedia(DBEventEIT &event) const
+void EITFixUp::FixUnitymedia(DBEventEIT &event)
 {
     // TODO handle scraping the category and category_type from localized text in the short/long description
     // TODO remove short description (stored as episode title) which is just the beginning of the long description (actual description)
@@ -3169,11 +3190,12 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event) const
     }
 
     // handle star rating in the description
-    QRegExp tmp = m_unitymediaImdbrating;
-    if (event.m_description.indexOf (tmp) != -1)
+    auto match = kUnitymediaImdbrating.match(event.m_description);
+    if (match.hasMatch())
     {
-        float stars = tmp.cap(1).toFloat();
+        float stars = match.captured(1).toFloat();
         event.m_stars = stars / 10.0F;
-        event.m_description.replace (m_unitymediaImdbrating, "");
+        event.m_description.remove(match.capturedStart(0),
+                                   match.capturedLength(0));
     }
 }
