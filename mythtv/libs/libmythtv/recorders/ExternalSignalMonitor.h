@@ -34,12 +34,12 @@ class ExternalSignalMonitor: public DTVSignalMonitor
     int GetLockTimeout(void);
 
 //    void AddHandlerListener(MPEGStreamData *data)
-//        { m_stream_handler->AddListener(data); }
+//        { m_streamHandler->AddListener(data); }
 
   protected:
-    ExternalStreamHandler *m_stream_handler         {nullptr};
-    bool                   m_stream_handler_started {false};
-    int                    m_lock_timeout           {0};
+    ExternalStreamHandler *m_streamHandler          {nullptr};
+    bool                   m_streamHandlerStarted   {false};
+    int                    m_lockTimeout            {0};
     QString                m_loc;
 };
 

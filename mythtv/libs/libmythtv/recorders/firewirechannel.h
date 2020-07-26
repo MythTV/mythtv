@@ -52,9 +52,9 @@ class FirewireChannel : public DTVChannel
 
   protected:
     QString            m_videodevice;
-    FireWireDBOptions  m_fw_opts;
+    FireWireDBOptions  m_fwOpts;
     FirewireDevice    *m_device          {nullptr};
-    uint               m_current_channel {0};
+    uint               m_currentChannel {0};
     bool               m_isopen          {false};
 };
 

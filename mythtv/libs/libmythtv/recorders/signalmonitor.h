@@ -66,9 +66,9 @@ class SignalMonitor : protected MThread
 
     /// \brief Returns whether or not a SIGNAL MythEvent is being sent
     ///        regularly to the frontend.
-    bool GetNotifyFrontend() const { return m_notify_frontend; }
+    bool GetNotifyFrontend() const { return m_notifyFrontend; }
     /// \brief Returns milliseconds between signal monitoring events.
-    int GetUpdateRate() const { return m_update_rate; }
+    int GetUpdateRate() const { return m_updateRate; }
     virtual QStringList GetStatusList(void) const;
     int GetSignalStrength(void) { return m_signalStrength.GetNormalizedValue(0,100); }
 
@@ -91,7 +91,7 @@ class SignalMonitor : protected MThread
      *  \param notify if true SIGNAL MythEvents are sent to the frontend,
      *         otherwise they are not.
      */
-    void SetNotifyFrontend(bool notify) { m_notify_frontend = notify; }
+    void SetNotifyFrontend(bool notify) { m_notifyFrontend = notify; }
 
     /** \brief Indicate if table monitoring is needed
      *  \param parent The TVRec* that this signal monitor is attached to.
@@ -100,7 +100,7 @@ class SignalMonitor : protected MThread
      *         after the channel is tuned.
      */
     void SetMonitoring(TVRec * parent, bool EITscan, bool monitor)
-        { m_pParent = parent; m_eit_scan = EITscan, m_tablemon = monitor; }
+        { m_pParent = parent; m_eitScan = EITscan, m_tablemon = monitor; }
 
     /** \brief Sets the number of milliseconds between signal monitoring
      *         attempts in the signal monitoring thread.
@@ -109,7 +109,7 @@ class SignalMonitor : protected MThread
      *  \param msec Milliseconds between signal monitoring events.
      */
     void SetUpdateRate(int msec)
-        { m_update_rate = max(msec, (int)m_minimum_update_rate); }
+        { m_updateRate = max(msec, (int)m_minimumUpdateRate); }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Listeners   // // // // // // // // // // // // // // // // // // //
@@ -204,13 +204,13 @@ class SignalMonitor : protected MThread
     TVRec             *m_pParent             {nullptr};
     int                m_inputid;
     volatile uint64_t  m_flags;
-    bool               m_release_stream;
-    int                m_update_rate         {25};
-    uint               m_minimum_update_rate {5};
-    bool               m_update_done         {false};
-    bool               m_notify_frontend     {true};
+    bool               m_releaseStream;
+    int                m_updateRate          {25};
+    uint               m_minimumUpdateRate   {5};
+    bool               m_updateDone          {false};
+    bool               m_notifyFrontend      {true};
     bool               m_tablemon            {false};
-    bool               m_eit_scan            {false};
+    bool               m_eitScan             {false};
 
     // not to be confused with StreamHandler::m_bError.
     QString            m_error;

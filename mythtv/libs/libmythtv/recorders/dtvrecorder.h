@@ -184,7 +184,7 @@ class DTVRecorder :
 
     // Statistics
     int                      m_minimumRecordingQuality    {95};
-    bool                     m_use_pts                    {false}; // vs use dts
+    bool                     m_usePts                     {false}; // vs use dts
     std::array<uint64_t,256> m_tsCount                    {0};
     std::array<int64_t,256>  m_tsLast                     {};
     std::array<int64_t,256>  m_tsFirst                    {};

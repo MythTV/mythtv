@@ -50,7 +50,7 @@ using namespace std;
 
 ChannelBase::~ChannelBase(void)
 {
-    QMutexLocker locker(&m_system_lock);
+    QMutexLocker locker(&m_systemLock);
     if (m_system)
         KillScript();
 }
@@ -260,7 +260,7 @@ bool ChannelBase::IsInputAvailable(
     return true;
 }
 
-/// \note m_system_lock must be held when this is called
+/// \note m_systemLock must be held when this is called
 bool ChannelBase::KillScript(void)
 {
     if (!m_system)
@@ -273,10 +273,10 @@ bool ChannelBase::KillScript(void)
     return true;
 }
 
-/// \note m_system_lock must NOT be held when this is called
+/// \note m_systemLock must NOT be held when this is called
 void ChannelBase::HandleScript(const QString &freqid)
 {
-    QMutexLocker locker(&m_system_lock);
+    QMutexLocker locker(&m_systemLock);
 
     bool ok = true;
     m_systemStatus = 0; // unknown
@@ -405,7 +405,7 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
 #endif
 }
 
-/// \note m_system_lock must be held when this is called
+/// \note m_systemLock must be held when this is called
 bool ChannelBase::ChangeExternalChannel(const QString &changer,
                                         const QString &freqid)
 {
@@ -431,7 +431,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
         return m_systemStatus;
 
     if (!holding_lock)
-        m_system_lock.lock();
+        m_systemLock.lock();
 
     m_systemStatus = m_system->Wait();
     if (m_systemStatus != GENERIC_EXIT_RUNNING &&
@@ -467,12 +467,12 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
     m_systemStatus = ret;
 
     if (!holding_lock)
-        m_system_lock.unlock();
+        m_systemLock.unlock();
 
     return ret;
 }
 
-/// \note m_system_lock must be held when this is called
+/// \note m_systemLock must be held when this is called
 void ChannelBase::HandleScriptEnd(bool ok)
 {
     if (ok)

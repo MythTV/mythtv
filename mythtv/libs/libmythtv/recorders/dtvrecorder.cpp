@@ -603,10 +603,10 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         return;
     }
 
-    if ((dts < 0) && !m_use_pts)
+    if ((dts < 0) && !m_usePts)
     {
         m_tsLast[stream_id] = -1;
-        m_use_pts = true;
+        m_usePts = true;
         LOG(VB_RECORD, LOG_DEBUG,
             "Switching from dts tracking to pts tracking." +
             QString("TS count is %1").arg(m_tsCount[stream_id]));
@@ -614,7 +614,7 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
 
     int64_t ts = dts;
     int64_t gap_threshold = 90000; // 1 second
-    if (m_use_pts)
+    if (m_usePts)
     {
         ts = dts;
         gap_threshold = 2*90000; // two seconds, compensate for GOP ordering

@@ -103,7 +103,7 @@ void HDHRSignalMonitor::UpdateValues(void)
 
         // TODO dtv signals...
 
-        m_update_done = true;
+        m_updateDone = true;
         return;
     }
 
@@ -144,5 +144,5 @@ void HDHRSignalMonitor::UpdateValues(void)
         m_streamHandlerStarted = true;
     }
 
-    m_update_done = true;
+    m_updateDone = true;
 }

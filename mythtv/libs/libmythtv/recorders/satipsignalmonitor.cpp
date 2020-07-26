@@ -64,7 +64,7 @@ void SatIPSignalMonitor::UpdateValues(void)
         if (!m_streamHandler->IsRunning())
         {
             m_error = tr("Error: stream handler died");
-            m_update_done = true;
+            m_updateDone = true;
             return;
         }
 
@@ -78,7 +78,7 @@ void SatIPSignalMonitor::UpdateValues(void)
         int signalStrength = m_streamHandler->m_rtsp->GetSignalStrength();
         m_signalStrength.SetValue(signalStrength);
 
-        m_update_done = true;
+        m_updateDone = true;
         return;
     }
 
@@ -109,5 +109,5 @@ void SatIPSignalMonitor::UpdateValues(void)
         m_streamHandlerStarted = true;
     }
 
-    m_update_done = true;
+    m_updateDone = true;
 }

@@ -23,7 +23,7 @@
 #include "satiprtcppacket.h"
 
 #define LOC  QString("SatIPRTSP[%1]: ").arg(m_streamHandler->m_inputId)
-#define LOC2 QString("SatIPRTSP[%1](%2): ").arg(m_streamHandler->m_inputId).arg(m_request_url.toString())
+#define LOC2 QString("SatIPRTSP[%1](%2): ").arg(m_streamHandler->m_inputId).arg(m_requestUrl.toString())
 
 SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     : m_streamHandler(handler)
@@ -45,8 +45,8 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
     uint port = m_readhelper->m_socket->localPort() + 1;
 
-    m_rtcp_readhelper = new SatIPRTCPReadHelper(this);
-    if (!m_rtcp_readhelper->m_socket->bind(QHostAddress::AnyIPv4,
+    m_rtcpReadhelper = new SatIPRTCPReadHelper(this);
+    if (!m_rtcpReadhelper->m_socket->bind(QHostAddress::AnyIPv4,
                                            port,
                                            QAbstractSocket::DefaultForPlatform))
     {
@@ -56,7 +56,7 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
 SatIPRTSP::~SatIPRTSP()
 {
-    delete m_rtcp_readhelper;
+    delete m_rtcpReadhelper;
     delete m_writehelper;
     delete m_readhelper;
     delete m_buffer;
@@ -64,7 +64,7 @@ SatIPRTSP::~SatIPRTSP()
 
 bool SatIPRTSP::Setup(const QUrl& url)
 {
-    m_request_url = url;
+    m_requestUrl = url;
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + QString("SETUP"));
 
     if (url.port() != 554)
@@ -83,7 +83,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
         QString("Transport: RTP/AVP;unicast;client_port=%1-%2")
         .arg(m_readhelper->m_socket->localPort()).arg(m_readhelper->m_socket->localPort() + 1));
 
-    if (!sendMessage(m_request_url, "SETUP", &headers))
+    if (!sendMessage(m_requestUrl, "SETUP", &headers))
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Failed to send SETUP message");
         return false;
@@ -133,7 +133,7 @@ bool SatIPRTSP::Play(QStringList &pids)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + "PLAY");
 
-    QUrl url = QUrl(m_request_url);
+    QUrl url = QUrl(m_requestUrl);
     url.setQuery("");
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
@@ -156,7 +156,7 @@ bool SatIPRTSP::Teardown(void)
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + "TEARDOWN");
     emit(stopKeepalive());
 
-    QUrl url = QUrl(m_request_url);
+    QUrl url = QUrl(m_requestUrl);
     url.setQuery("");
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
@@ -178,26 +178,26 @@ bool SatIPRTSP::Teardown(void)
 
 bool SatIPRTSP::HasLock()
 {
-    QMutexLocker locker(&m_sigmon_lock);
+    QMutexLocker locker(&m_sigmonLock);
     return m_hasLock;
 }
 
 int SatIPRTSP::GetSignalStrength()
 {
-    QMutexLocker locker(&m_sigmon_lock);
+    QMutexLocker locker(&m_sigmonLock);
     return m_signalStrength;
 }
 
 void SatIPRTSP::SetSigmonValues(bool lock, int level)
 {
-    QMutexLocker locker(&m_sigmon_lock);
+    QMutexLocker locker(&m_sigmonLock);
     m_hasLock = lock;
     m_signalStrength = level;
 }
 
 bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *additionalheaders)
 {
-    QMutexLocker locker(&m_ctrlsocket_lock);
+    QMutexLocker locker(&m_ctrlSocketLock);
 
     QTcpSocket ctrl_socket;
     ctrl_socket.connectToHost(url.host(), url.port());
@@ -331,7 +331,7 @@ void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
     (void) timerEvent;
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Sending KeepAlive timer %1").arg(timerEvent->timerId()));
 
-    QUrl url = QUrl(m_request_url);
+    QUrl url = QUrl(m_requestUrl);
     url.setPath("/");
     url.setQuery("");
 
@@ -343,7 +343,7 @@ void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
 // Receive RTP packets with stream data on UDP socket
 // Read packets when signalled via readyRead on QUdpSocket
 //
-#define LOC_RH QString("SatIPRTSP_RH(%1): ").arg(m_parent->m_request_url.toString())
+#define LOC_RH QString("SatIPRTSP_RH(%1): ").arg(m_parent->m_requestUrl.toString())
 
 SatIPRTSPReadHelper::SatIPRTSPReadHelper(SatIPRTSP* p)
     : QObject(p)
@@ -382,7 +382,7 @@ void SatIPRTSPReadHelper::ReadPending()
 // Receive RTCP packets with control messages on UDP socket
 // Receive tuner state: lock and signal strength
 //
-#define LOC_RTCP QString("SatIPRTCP_RH(%1): ").arg(m_parent->m_request_url.toString())
+#define LOC_RTCP QString("SatIPRTCP_RH(%1): ").arg(m_parent->m_requestUrl.toString())
 
 SatIPRTCPReadHelper::SatIPRTCPReadHelper(SatIPRTSP* p)
     : QObject(p)

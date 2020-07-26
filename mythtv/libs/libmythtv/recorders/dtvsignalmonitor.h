@@ -57,7 +57,7 @@ class DTVSignalMonitor : public SignalMonitor,
     virtual void SetStreamData(MPEGStreamData* data);
 
     /// Returns the MPEG stream data if it exists
-    MPEGStreamData *GetStreamData()      { return m_stream_data; }
+    MPEGStreamData *GetStreamData()      { return m_streamData; }
     /// Returns the ATSC stream data if it exists
     ATSCStreamData *GetATSCStreamData();
     /// Returns the DVB stream data if it exists
@@ -66,7 +66,7 @@ class DTVSignalMonitor : public SignalMonitor,
     ScanStreamData *GetScanStreamData();
 
     /// Returns the MPEG stream data if it exists
-    const MPEGStreamData *GetStreamData() const { return m_stream_data; }
+    const MPEGStreamData *GetStreamData() const { return m_streamData; }
     /// Returns the ATSC stream data if it exists
     const ATSCStreamData *GetATSCStreamData() const;
     /// Returns the DVB stream data if it exists
@@ -100,7 +100,7 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandleNIT(const NetworkInformationTable *nit) override; // DVBMainStreamListener
     void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt) override; // DVBMainStreamListener
 
-    void IgnoreEncrypted(bool ignore) { m_ignore_encrypted = ignore; }
+    void IgnoreEncrypted(bool ignore) { m_ignoreEncrypted = ignore; }
 
   protected:
     DTVChannel *GetDTVChannel(void);
@@ -108,8 +108,8 @@ class DTVSignalMonitor : public SignalMonitor,
     void UpdateListeningForEIT(void);
 
   protected:
-    MPEGStreamData    *m_stream_data         {nullptr};
-    vector<uint>       m_eit_pids;
+    MPEGStreamData    *m_streamData         {nullptr};
+    vector<uint>       m_eitPids;
     SignalMonitorValue m_seenPAT;
     SignalMonitorValue m_seenPMT;
     SignalMonitorValue m_seenMGT;
@@ -137,9 +137,9 @@ class DTVSignalMonitor : public SignalMonitor,
     // MPEG/DVB/ATSC tuning info
     int                m_programNumber       {-1};
     // table_id & CRC of tables already seen
-    QList<uint64_t>    m_seen_table_crc;
+    QList<uint64_t>    m_seenTableCrc;
 
-    bool               m_ignore_encrypted    {false};
+    bool               m_ignoreEncrypted     {false};
 };
 
 #endif // DTVSIGNALMONITOR_H

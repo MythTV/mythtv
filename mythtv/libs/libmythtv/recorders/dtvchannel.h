@@ -158,7 +158,7 @@ class DTVChannel : public ChannelBase
     void HandleScriptEnd(bool ok) override; // ChannelBase
 
   protected:
-    mutable QMutex m_dtvinfo_lock;
+    mutable QMutex m_dtvinfoLock;
 
     DTVTunerType   m_tunerType {DTVTunerType::kTunerTypeUnknown};
                    /// PSIP table standard: MPEG, DVB, ATSC, OpenCable

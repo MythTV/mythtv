@@ -116,7 +116,7 @@ class SatIPRTSP : QObject
     void stopKeepaliveRequested(void);
 
   protected:
-    QUrl m_request_url;
+    QUrl m_requestUrl;
     PacketBuffer *m_buffer  {nullptr};
 
   private:
@@ -133,15 +133,15 @@ class SatIPRTSP : QObject
     int   m_timer         {0};
     int   m_timeout       {0};
 
-    QMutex m_ctrlsocket_lock;
-    QMutex m_sigmon_lock;
+    QMutex m_ctrlSocketLock;
+    QMutex m_sigmonLock;
 
     bool m_hasLock          {false};
     int  m_signalStrength   {0};
 
     SatIPRTSPReadHelper  *m_readhelper        {nullptr};
     SatIPRTSPWriteHelper *m_writehelper       {nullptr};
-    SatIPRTCPReadHelper  *m_rtcp_readhelper   {nullptr};
+    SatIPRTCPReadHelper  *m_rtcpReadhelper   {nullptr};
 };
 
 #endif // SATIPRTSP_H

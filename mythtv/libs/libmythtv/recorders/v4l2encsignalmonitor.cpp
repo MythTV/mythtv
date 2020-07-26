@@ -115,7 +115,7 @@ void V4L2encSignalMonitor::UpdateValues(void)
         if (IsAllGood())
             SendMessageAllGood();
 
-        m_update_done = true;
+        m_updateDone = true;
         return;
     }
 
@@ -155,7 +155,7 @@ void V4L2encSignalMonitor::UpdateValues(void)
         }
     }
 
-    m_update_done = true;
+    m_updateDone = true;
 }
 
 bool V4L2encSignalMonitor::HasLock(void)

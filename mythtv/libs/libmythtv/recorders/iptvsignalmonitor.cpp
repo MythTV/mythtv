@@ -95,7 +95,7 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (IsAllGood())
         SendMessageAllGood();
 
-    m_update_done = true;
+    m_updateDone = true;
 
     if (m_streamHandlerStarted)
         return;

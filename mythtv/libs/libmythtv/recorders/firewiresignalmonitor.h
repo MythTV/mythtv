@@ -64,16 +64,16 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
   protected:
     volatile bool      m_dtvMonitorRunning           {false};
     FirewireTableMonitorThread *m_tableMonitorThread {nullptr};
-    bool               m_stb_needs_retune            {true};
-    bool               m_stb_needs_to_wait_for_pat   {false};
-    bool               m_stb_needs_to_wait_for_power {false};
-    MythTimer          m_stb_wait_for_pat_timer;
-    MythTimer          m_stb_wait_for_power_timer;
+    bool               m_stbNeedsRetune              {true};
+    bool               m_stbNeedsToWaitForPat        {false};
+    bool               m_stbNeedsToWaitForPower      {false};
+    MythTimer          m_stbWaitForPatTimer;
+    MythTimer          m_stbWaitForPowerTimer;
 
     vector<unsigned char> m_buffer;
 
-    static QMap<void*,uint> s_pat_keys;
-    static QMutex           s_pat_keys_lock;
+    static QMap<void*,uint> s_patKeys;
+    static QMutex           s_patKeysLock;
 };
 
 #endif // FIREWIRESIGNALMONITOR_H

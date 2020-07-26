@@ -116,9 +116,9 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     LOG(VB_CHANNEL, LOG_INFO, LOC + "DVBSignalMonitor::ctor " +
             QString("initial flags %1").arg(sm_flags_to_string(m_flags)));
 
-    m_minimum_update_rate = _channel->GetMinSignalMonitorDelay();
-    if (m_minimum_update_rate > 30)
-        usleep(m_minimum_update_rate * 1000);
+    m_minimumUpdateRate = _channel->GetMinSignalMonitorDelay();
+    if (m_minimumUpdateRate > 30)
+        usleep(m_minimumUpdateRate * 1000);
 
     m_streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }
@@ -235,7 +235,7 @@ void DVBSignalMonitor::UpdateValues(void)
         if (!m_streamHandler->IsRunning())
         {
             m_error = tr("Error: stream handler died");
-            m_update_done = true;
+            m_updateDone = true;
             return;
         }
 
@@ -265,7 +265,7 @@ void DVBSignalMonitor::UpdateValues(void)
         if (IsAllGood())
             SendMessageAllGood();
 
-        m_update_done = true;
+        m_updateDone = true;
         return;
     }
 
@@ -355,7 +355,7 @@ void DVBSignalMonitor::UpdateValues(void)
         m_streamHandlerStarted = true;
     }
 
-    m_update_done = true;
+    m_updateDone = true;
 }
 
 /** \fn DVBSignalMonitor::EmitStatus(void)

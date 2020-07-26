@@ -231,7 +231,7 @@ bool DarwinFirewireDevice::OpenPort(void)
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())
     {
-        m_open_port_cnt++;
+        m_openPortCnt++;
         return true;
     }
 
@@ -288,7 +288,7 @@ bool DarwinFirewireDevice::OpenPort(void)
         }
     }
 
-    m_open_port_cnt++;
+    m_openPortCnt++;
 
     return true;
 }
@@ -299,12 +299,12 @@ bool DarwinFirewireDevice::ClosePort(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "ClosePort()");
 
-    if (m_open_port_cnt < 1)
+    if (m_openPortCnt < 1)
         return false;
 
-    m_open_port_cnt--;
+    m_openPortCnt--;
 
-    if (m_open_port_cnt != 0)
+    if (m_openPortCnt != 0)
         return true;
 
     if (GetInfoPtr() && GetInfoPtr()->IsPortOpen())

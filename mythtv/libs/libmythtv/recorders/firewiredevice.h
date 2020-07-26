@@ -207,7 +207,7 @@ class FirewireDevice
 
     // Gets
     virtual bool IsPortOpen(void) const = 0;
-    bool IsSTBBufferCleared(void) const { return m_buffer_cleared; }
+    bool IsSTBBufferCleared(void) const { return m_bufferCleared; }
 
     // non-const Gets
     virtual PowerState GetPowerState(void);
@@ -233,17 +233,17 @@ class FirewireDevice
     uint64_t                 m_guid;
     uint                     m_subunitid;
     uint                     m_speed;
-    uint                     m_last_channel   {0};
-    uint                     m_last_crc       {0};
-    bool                     m_buffer_cleared {true};
+    uint                     m_lastChannel    {0};
+    uint                     m_lastCrc        {0};
+    bool                     m_bufferCleared  {true};
 
-    uint                     m_open_port_cnt  {0};
+    uint                     m_openPortCnt    {0};
     vector<TSDataListener*>  m_listeners;
     mutable QMutex           m_lock;
 
     /// Vendor ID + Model ID to FirewireDevice STB model string
-    static QMap<uint64_t,QString> s_id_to_model;
-    static QMutex                 s_static_lock;
+    static QMap<uint64_t,QString> s_idToModel;
+    static QMutex                 s_staticLock;
 };
 
 #endif // FIREWIRE_DEVICE_H

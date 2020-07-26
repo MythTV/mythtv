@@ -45,8 +45,8 @@ AudioInputOSS::AudioInputOSS(const QString &device) : AudioInput(device)
 
 bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
 {
-    m_audio_sample_bits = sample_bits;
-    m_audio_sample_rate = sample_rate;
+    m_audioSampleBits = sample_bits;
+    m_audioSampleRate = sample_rate;
     //m_audio_channels = channels;
 
     if (IsOpen())
@@ -105,8 +105,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     // sample size
-    m_audio_sample_bits = choice = sample_bits;
-    if (ioctl(m_dspFd, SNDCTL_DSP_SAMPLESIZE, &m_audio_sample_bits) < 0)
+    m_audioSampleBits = choice = sample_bits;
+    if (ioctl(m_dspFd, SNDCTL_DSP_SAMPLESIZE, &m_audioSampleBits) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio sample bits to %1: ")
@@ -114,43 +114,43 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         Close();
         return false;
     }
-    if (m_audio_sample_bits != choice)
+    if (m_audioSampleBits != choice)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 sample bits, got %2")
-                            .arg(choice).arg(m_audio_sample_bits));
+                            .arg(choice).arg(m_audioSampleBits));
     }
     // channels
-    m_audio_channels = choice = channels;
-    if (ioctl(m_dspFd, SNDCTL_DSP_CHANNELS, &m_audio_channels) < 0)
+    m_audioChannels = choice = channels;
+    if (ioctl(m_dspFd, SNDCTL_DSP_CHANNELS, &m_audioChannels) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio channels to %1: ").arg(channels)+ENO);
         Close();
         return false;
     }
-    if (m_audio_channels != choice)
+    if (m_audioChannels != choice)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 channels, got %2")
-                .arg(choice).arg(m_audio_channels));
+                .arg(choice).arg(m_audioChannels));
     }
 
     // sample rate
     int choice_sample_rate = sample_rate;
-    m_audio_sample_rate = choice_sample_rate;
-    if (ioctl(m_dspFd, SNDCTL_DSP_SPEED, &m_audio_sample_rate) < 0)
+    m_audioSampleRate = choice_sample_rate;
+    if (ioctl(m_dspFd, SNDCTL_DSP_SPEED, &m_audioSampleRate) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set sample rate to %1: ").arg(sample_rate)+ENO);
         Close();
         return false;
     }
-    if (m_audio_sample_rate != choice_sample_rate)
+    if (m_audioSampleRate != choice_sample_rate)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested sample rate %1, got %2")
-                .arg(choice_sample_rate).arg(m_audio_sample_rate));
+                .arg(choice_sample_rate).arg(m_audioSampleRate));
     }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "device open");
     return true;
@@ -161,9 +161,9 @@ void AudioInputOSS::Close(void)
     if (IsOpen())
         close(m_dspFd);
     m_dspFd = -1;
-    m_audio_sample_bits = 0;
-    m_audio_sample_rate = 0;
-    m_audio_channels = 0;
+    m_audioSampleBits = 0;
+    m_audioSampleRate = 0;
+    m_audioChannels = 0;
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "device closed");
 }
 

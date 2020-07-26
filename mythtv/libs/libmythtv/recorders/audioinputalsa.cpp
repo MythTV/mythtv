@@ -34,9 +34,9 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     (void)AlsaBad(snd_config_update_free_global(), "failed to update snd config");
-    m_audio_sample_rate = sample_rate;
-    m_audio_channels = channels;
-    m_audio_sample_bits = sample_bits;
+    m_audioSampleRate = sample_rate;
+    m_audioChannels = channels;
+    m_audioSampleBits = sample_bits;
     if (AlsaBad(snd_pcm_open(&m_pcmHandle, m_alsaDevice.constData(),
                              SND_PCM_STREAM_CAPTURE, 0), // blocking mode
                 "pcm open failed"))
@@ -142,7 +142,7 @@ bool AudioInputALSA::PrepHwParams(void)
                 "failed to set interleaved rw io"))
         return false;
     snd_pcm_format_t format =
-        (m_audio_sample_bits > 8) ? SND_PCM_FORMAT_S16 : SND_PCM_FORMAT_U8;
+        (m_audioSampleBits > 8) ? SND_PCM_FORMAT_S16 : SND_PCM_FORMAT_U8;
     if (AlsaBad(snd_pcm_hw_params_set_format(m_pcmHandle, hwparams, format),
                 QString("failed to set sample format %1")
                         .arg(snd_pcm_format_description(format))))
@@ -159,24 +159,24 @@ bool AudioInputALSA::PrepHwParams(void)
             max_chans = 0;
         LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV +
             QString("min channels %1, max channels %2, myth requests %3")
-                          .arg(min_chans).arg(max_chans).arg(m_audio_channels));
+                          .arg(min_chans).arg(max_chans).arg(m_audioChannels));
     }
     if (AlsaBad(snd_pcm_hw_params_set_channels(m_pcmHandle, hwparams,
-                m_audio_channels), QString("failed to set channels to %1")
-                                           .arg(m_audio_channels)))
+                m_audioChannels), QString("failed to set channels to %1")
+                                           .arg(m_audioChannels)))
     {
         return false;
     }
     if (AlsaBad(snd_pcm_hw_params_set_rate(m_pcmHandle, hwparams,
-                m_audio_sample_rate, 0), QString("failed to set sample rate %1")
-                                                 .arg(m_audio_sample_rate)))
+                m_audioSampleRate, 0), QString("failed to set sample rate %1")
+                                                 .arg(m_audioSampleRate)))
     {
         uint rate_num = 0;
         uint rate_den = 0;
         if (!AlsaBad(snd_pcm_hw_params_get_rate_numden(hwparams, &rate_num,
                      &rate_den), "snd_pcm_hw_params_get_rate_numden failed"))
         {
-            if (m_audio_sample_rate != (int)(rate_num / rate_den))
+            if (m_audioSampleRate != (int)(rate_num / rate_den))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("device reports sample rate as %1")
@@ -204,8 +204,8 @@ bool AudioInputALSA::PrepHwParams(void)
     m_mythBlockBytes = snd_pcm_frames_to_bytes(m_pcmHandle, m_periodSize);
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV +
             QString("channels %1, sample rate %2, buffer_time %3 msec, period "
-                    "size %4").arg(m_audio_channels)
-                .arg(m_audio_sample_rate).arg(buffer_time / 1000.0, -1, 'f', 1)
+                    "size %4").arg(m_audioChannels)
+                .arg(m_audioSampleRate).arg(buffer_time / 1000.0, -1, 'f', 1)
                 .arg(m_periodSize));
     LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV + QString("myth block size %1")
                                            .arg(m_mythBlockBytes));

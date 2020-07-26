@@ -22,19 +22,19 @@ FirewireChannel::FirewireChannel(TVRec *parent, QString _videodevice,
                                  FireWireDBOptions firewire_opts) :
     DTVChannel(parent),
     m_videodevice(std::move(_videodevice)),
-    m_fw_opts(std::move(firewire_opts))
+    m_fwOpts(std::move(firewire_opts))
 {
     uint64_t guid = string_to_guid(m_videodevice);
     uint subunitid = 0; // we only support first tuner on STB...
 
 #ifdef USING_LINUX_FIREWIRE
     m_device = new LinuxFirewireDevice(
-        guid, subunitid, m_fw_opts.m_speed,
-        LinuxFirewireDevice::kConnectionP2P == (uint) m_fw_opts.m_connection);
+        guid, subunitid, m_fwOpts.m_speed,
+        LinuxFirewireDevice::kConnectionP2P == (uint) m_fwOpts.m_connection);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE
-    m_device = new DarwinFirewireDevice(guid, subunitid, m_fw_opts.m_speed);
+    m_device = new DarwinFirewireDevice(guid, subunitid, m_fwOpts.m_speed);
 #endif // USING_OSX_FIREWIRE
 }
 
@@ -60,11 +60,11 @@ bool FirewireChannel::Open(void)
     if (!m_inputId)
         return false;
 
-    if (!FirewireDevice::IsSTBSupported(m_fw_opts.m_model) &&
+    if (!FirewireDevice::IsSTBSupported(m_fwOpts.m_model) &&
         !IsExternalChannelChangeInUse())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Model: '%1' is not supported.").arg(m_fw_opts.m_model));
+            QString("Model: '%1' is not supported.").arg(m_fwOpts.m_model));
 
         return false;
     }
@@ -130,9 +130,9 @@ bool FirewireChannel::Retune(void)
         return false;
     }
 
-    if (m_current_channel)
+    if (m_currentChannel)
     {
-        QString freqid = QString::number(m_current_channel);
+        QString freqid = QString::number(m_currentChannel);
         return Tune(freqid, 0);
     }
 
@@ -156,10 +156,10 @@ bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
         return true; // signal monitor will call retune later...
     }
 
-    if (!m_device->SetChannel(m_fw_opts.m_model, 0, channel))
+    if (!m_device->SetChannel(m_fwOpts.m_model, 0, channel))
         return false;
 
-    m_current_channel = channel;
+    m_currentChannel = channel;
 
     return true;
 }
