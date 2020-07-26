@@ -28,7 +28,7 @@ class UPnpEventTask : public Task
 {
     protected: 
 
-        QHostAddress m_PeerAddress;
+        QHostAddress m_peerAddress;
         int          m_nPeerPort;
         QByteArray  *m_pPayload {nullptr};
 

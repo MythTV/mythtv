@@ -134,7 +134,7 @@ void BufferedSocketDevice::SetSocketDevice( MSocketDevice *pSocket )
 void BufferedSocketDevice::SetDestAddress(
     QHostAddress hostAddress, quint16 nPort)
 {
-    m_DestHostAddress = std::move(hostAddress);
+    m_destHostAddress = std::move(hostAddress);
     m_nDestPort       = nPort;
 }
 
@@ -285,7 +285,7 @@ void BufferedSocketDevice::Flush()
             }
 
             if (m_nDestPort != 0)
-                nwritten = m_pSocket->writeBlock( out.data(), i, m_DestHostAddress, m_nDestPort );
+                nwritten = m_pSocket->writeBlock( out.data(), i, m_destHostAddress, m_nDestPort );
             else
                 nwritten = m_pSocket->writeBlock( out.data(), i );
         } 
@@ -295,7 +295,7 @@ void BufferedSocketDevice::Flush()
             i = a->size() - m_nWriteIndex;
 
             if (m_nDestPort != 0)
-                nwritten = m_pSocket->writeBlock( a->data() + m_nWriteIndex, i, m_DestHostAddress, m_nDestPort );
+                nwritten = m_pSocket->writeBlock( a->data() + m_nWriteIndex, i, m_destHostAddress, m_nDestPort );
             else
                 nwritten = m_pSocket->writeBlock( a->data() + m_nWriteIndex, i );
         }
@@ -533,7 +533,7 @@ qlonglong BufferedSocketDevice::WriteBlockDirect(
     Flush();
 
     if (m_nDestPort != 0)
-        nWritten = m_pSocket->writeBlock( data, len, m_DestHostAddress, m_nDestPort );
+        nWritten = m_pSocket->writeBlock( data, len, m_destHostAddress , m_nDestPort );
     else
         nWritten = m_pSocket->writeBlock( data, len );
 

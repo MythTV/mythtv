@@ -258,7 +258,7 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
         QMutex              m_mutex;
 
         QString             m_sEventMethodName;
-        Subscribers         m_Subscribers;
+        Subscribers         m_subscribers;
 
         int                 m_nSubscriptionDuration {1800};
 

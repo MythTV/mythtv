@@ -74,9 +74,9 @@ Eventing::Eventing(const QString &sExtensionName,
 
 Eventing::~Eventing()
 {
-    for (const auto *subscriber : qAsConst(m_Subscribers))
+    for (const auto *subscriber : qAsConst(m_subscribers))
         delete subscriber;
-    m_Subscribers.clear();
+    m_subscribers.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -238,13 +238,13 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         pInfo = new SubscriberInfo( sCallBack, nDuration );
 
-        Subscribers::iterator it = m_Subscribers.find(pInfo->m_sUUID);
-        if (it != m_Subscribers.end())
+        Subscribers::iterator it = m_subscribers.find(pInfo->m_sUUID);
+        if (it != m_subscribers.end())
         {
             delete *it;
-            m_Subscribers.erase(it);
+            m_subscribers.erase(it);
         }
-        m_Subscribers[pInfo->m_sUUID] = pInfo;
+        m_subscribers[pInfo->m_sUUID] = pInfo;
 
         // Use PostProcess Hook to Send Initial FULL Notification...
         //      *** Must send this response first then notify.
@@ -262,7 +262,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
         if ( sSID.length() != 0 )   
         {
             sSID  = sSID.mid( 5 );
-            pInfo = m_Subscribers[sSID];
+            pInfo = m_subscribers[sSID];
         }
 
     }
@@ -302,11 +302,11 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 
     sSID = sSID.mid( 5 );
 
-    Subscribers::iterator it = m_Subscribers.find(sSID);
-    if (it != m_Subscribers.end())
+    Subscribers::iterator it = m_subscribers.find(sSID);
+    if (it != m_subscribers.end())
     {
         delete *it;
-        m_Subscribers.erase(it);
+        m_subscribers.erase(it);
         pRequest->m_nResponseStatus = 200;
     }
 }
@@ -322,8 +322,8 @@ void Eventing::Notify()
 
     m_mutex.lock();
 
-    Subscribers::iterator it = m_Subscribers.begin();
-    while (it != m_Subscribers.end())
+    Subscribers::iterator it = m_subscribers.begin();
+    while (it != m_subscribers.end())
     { 
         if (!(*it))
         {   // This should never happen, but if someone inserted bad data...
@@ -341,7 +341,7 @@ void Eventing::Notify()
         {
             // Time to expire this subscription. Remove subscriber from list.
             delete *it;
-            it = m_Subscribers.erase(it);
+            it = m_subscribers.erase(it);
         }
     }
 

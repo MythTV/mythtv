@@ -249,7 +249,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
                                                              RequestTypeHead);
             }
 
-            m_Methods.insert( oInfo.m_sName, oInfo );
+            m_methods.insert( oInfo.m_sName, oInfo );
         }
     }
 
@@ -359,7 +359,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             QString sMethodName  = pRequest->m_sMethod;
             bool    bMethodFound = false;
 
-            if (m_Methods.contains(sMethodName))
+            if (m_methods.contains(sMethodName))
                 bMethodFound = true;
             else
             {
@@ -383,13 +383,13 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                         break;
                 }
 
-                if (m_Methods.contains(sMethodName))
+                if (m_methods.contains(sMethodName))
                     bMethodFound = true;
             }
 
             if (bMethodFound)
             {
-                MethodInfo oInfo = m_Methods.value( sMethodName );
+                MethodInfo oInfo = m_methods.value( sMethodName );
 
                 if (( pRequest->m_eType & oInfo.m_eRequestType ) != 0)
                 {

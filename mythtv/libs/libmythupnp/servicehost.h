@@ -66,7 +66,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
         QString             m_sBaseUrl;
 
         QMetaObject         m_oMetaObject {};
-        MetaInfoMap         m_Methods;
+        MetaInfoMap         m_methods;
 
     protected:
 
@@ -89,7 +89,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
         virtual QString    GetServiceControlURL() { return m_sBaseUrl.mid( 1 ); }
 
         const QMetaObject& GetServiceMetaObject() { return m_oMetaObject; }
-        const MetaInfoMap& GetMethods          () { return m_Methods;     }
+        const MetaInfoMap& GetMethods          () { return m_methods;     }
 
 };
 

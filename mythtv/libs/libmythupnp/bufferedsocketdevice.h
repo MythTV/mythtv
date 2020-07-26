@@ -47,7 +47,7 @@ class BufferedSocketDevice
 
         bool                    m_bHandleSocketDelete {true};
 
-        QHostAddress            m_DestHostAddress;
+        QHostAddress            m_destHostAddress;
         quint16                 m_nDestPort           {0};
 
         MMembuf                 m_bufRead;

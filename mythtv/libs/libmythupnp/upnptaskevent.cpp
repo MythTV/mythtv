@@ -32,7 +32,7 @@ UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
                               QByteArray  *pPayload ) :
     Task("UPnpEventTask")
 {
-    m_PeerAddress = std::move(peerAddress);
+    m_peerAddress = std::move(peerAddress);
     m_nPeerPort   = nPeerPort;
     m_pPayload    = pPayload;  // We take ownership of this pointer.
 } 
@@ -60,7 +60,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
 
     sockDev.setBlocking( true );
 
-    if (sock.Connect( m_PeerAddress, m_nPeerPort ))
+    if (sock.Connect( m_peerAddress, m_nPeerPort ))
     {
         // ------------------------------------------------------------------
         // Send NOTIFY message
@@ -84,7 +84,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
                     LOG(VB_UPNP, LOG_INFO,
                         QString("UPnpEventTask::Execute - NOTIFY to "
                                 "%1:%2 returned %3.")
-                            .arg(m_PeerAddress.toString()) .arg(m_nPeerPort)
+                            .arg(m_peerAddress.toString()) .arg(m_nPeerPort)
                             .arg(sResponseLine));
 #if 0
                 }
@@ -95,14 +95,14 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
                 LOG(VB_UPNP, LOG_ERR,
                     QString("UPnpEventTask::Execute - Timeout reading first "
                             "line of reply from %1:%2.")
-                        .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
+                        .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
             }
         }
         else
         {
             LOG(VB_UPNP, LOG_ERR,
                 QString("UPnpEventTask::Execute - Error sending to %1:%2.")
-                    .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
+                    .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
         }
 
         sock.Close();
@@ -111,7 +111,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
     {
         LOG(VB_UPNP, LOG_ERR,
             QString("UPnpEventTask::Execute - Error sending to %1:%2.")
-                .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
+                .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
     }
 }
 

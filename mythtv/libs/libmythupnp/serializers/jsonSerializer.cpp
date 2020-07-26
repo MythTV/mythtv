@@ -34,7 +34,7 @@ void JSONSerializer::BeginSerialize( QString &/*sName*/ )
 {
     m_bCommaNeeded = false;
 
-    m_Stream << "{";
+     m_stream << "{";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -45,9 +45,9 @@ void JSONSerializer::EndSerialize()
 {
     m_bCommaNeeded = false;
     
-    m_Stream << "}";
+    m_stream << "}";
 
-    m_Stream.flush();
+    m_stream.flush();
 }
 
 
@@ -59,7 +59,7 @@ void JSONSerializer::BeginObject( const QString &sName, const QObject  */*pObjec
 {
     m_bCommaNeeded = false;
     
-    m_Stream << "\"" << sName << "\": {";
+    m_stream << "\"" << sName << "\": {";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ void JSONSerializer::EndObject  ( const QString &/*sName*/, const QObject  */*pO
 {
     m_bCommaNeeded = false;
     
-    m_Stream << "}";
+    m_stream << "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -83,9 +83,9 @@ void JSONSerializer::AddProperty( const QString       &sName,
                                   const QMetaProperty */*pMetaProp*/ )
 {
     if (m_bCommaNeeded)
-        m_Stream << ", ";
+        m_stream << ", ";
 
-    m_Stream << "\"" << sName << "\": ";
+    m_stream << "\"" << sName << "\": ";
 
     RenderValue( vValue );
 
@@ -110,9 +110,9 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         bool bSavedCommaNeeded = m_bCommaNeeded;
         m_bCommaNeeded = false;
 
-        m_Stream << "{";
+        m_stream << "{";
         SerializeObjectProperties( pObject );
-        m_Stream << "}";
+        m_stream << "}";
 
         m_bCommaNeeded = bSavedCommaNeeded;
 
@@ -130,14 +130,14 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
         case QVariant::DateTime:
         {
-            m_Stream << "\"" << Encode( 
+            m_stream << "\"" << Encode( 
                 MythDate::toString( vValue.toDateTime(), MythDate::ISODate ) )
                 << "\"";
             break;
         }
         default:
         {
-            m_Stream << "\"" << Encode( vValue.toString() ) << "\"";
+            m_stream << "\"" << Encode( vValue.toString() ) << "\"";
             break;
         }
     }
@@ -151,7 +151,7 @@ void JSONSerializer::RenderList( const QVariantList &list )
 {
     bool bFirst = true;
 
-    m_Stream << "[";
+    m_stream << "[";
 
     QListIterator< QVariant > it( list );
 
@@ -160,12 +160,12 @@ void JSONSerializer::RenderList( const QVariantList &list )
         if (bFirst)
             bFirst = false;
         else
-            m_Stream << ",";
+            m_stream << ",";
 
         RenderValue( it.next() );
     }
 
-    m_Stream << "]";
+    m_stream << "]";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ void JSONSerializer::RenderStringList( const QStringList &list )
 {
     bool bFirst = true;
 
-    m_Stream << "[";
+    m_stream << "[";
 
     QListIterator< QString > it( list );
 
@@ -185,12 +185,12 @@ void JSONSerializer::RenderStringList( const QStringList &list )
         if (bFirst)
             bFirst = false;
         else
-            m_Stream << ",";
+            m_stream << ",";
 
-          m_Stream << "\"" << Encode( it.next() ) << "\"";
+          m_stream << "\"" << Encode( it.next() ) << "\"";
     }
 
-    m_Stream << "]";
+    m_stream << "]";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
 {
     bool bFirst = true;
 
-    m_Stream << "{";
+    m_stream << "{";
 
     QMapIterator< QString, QVariant > it( map );
 
@@ -212,13 +212,13 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
         if (bFirst)
             bFirst = false;
         else
-            m_Stream << ",";
+            m_stream << ",";
 
-        m_Stream << "\"" << it.key() << "\":";
-        m_Stream << "\"" << Encode( it.value().toString() ) << "\"";
+        m_stream << "\"" << it.key() << "\":";
+        m_stream << "\"" << Encode( it.value().toString() ) << "\"";
     }
 
-    m_Stream << "}";
+    m_stream << "}";
 }
 
 //////////////////////////////////////////////////////////////////////////////
