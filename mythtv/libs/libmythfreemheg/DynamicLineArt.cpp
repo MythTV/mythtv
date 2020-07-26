@@ -127,7 +127,7 @@ void MHDynamicLineArt::GetLineColour(MHRoot *pResult)
     }
     else
     {
-        pResult->SetVariableValue(m_LineColour.m_ColStr);
+        pResult->SetVariableValue(m_LineColour.m_colStr);
     }
 }
 
@@ -139,7 +139,7 @@ void MHDynamicLineArt::GetFillColour(MHRoot *pResult)
     }
     else
     {
-        pResult->SetVariableValue(m_FillColour.m_ColStr);
+        pResult->SetVariableValue(m_FillColour.m_colStr);
     }
 }
 

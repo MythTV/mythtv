@@ -41,41 +41,41 @@ template <class BASE> class MHSequence {
     public:
         MHSequence() = default;
         // The destructor frees the vector but not the elements.
-        ~MHSequence() { free(m_Values); }
+        ~MHSequence() { free(m_values); }
         // Get the current size.
-        int Size() const { return m_VecSize; }
+        int Size() const { return m_vecSize; }
         // Get an element at a particular index.
-        BASE GetAt(int i) const { MHASSERT(i >= 0 && i < m_VecSize); return m_Values[i]; }
+        BASE GetAt(int i) const { MHASSERT(i >= 0 && i < m_vecSize); return m_values[i]; }
         BASE operator[](int i) const { return GetAt(i); }
         // Add a new element at position n and move the existing element at that position
         // and anything above it up one place.
         void InsertAt(BASE b, int n) {
-            MHASSERT(n >= 0 && n <= m_VecSize);
+            MHASSERT(n >= 0 && n <= m_vecSize);
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
-            BASE *ptr = (BASE*)realloc(m_Values, (m_VecSize+1) * sizeof(BASE));
+            BASE *ptr = (BASE*)realloc(m_values, (m_vecSize+1) * sizeof(BASE));
             if (ptr == nullptr) throw "Out of Memory";
-            m_Values = ptr;
-            for (int i = m_VecSize; i > n; i--) m_Values[i] = m_Values[i-1];
-            m_Values[n] = b;
-            m_VecSize++;
+            m_values = ptr;
+            for (int i = m_vecSize; i > n; i--) m_values[i] = m_values[i-1];
+            m_values[n] = b;
+            m_vecSize++;
         }
         // Add an element to the end of the sequence.
-        void Append(BASE b) { InsertAt(b, m_VecSize); }
+        void Append(BASE b) { InsertAt(b, m_vecSize); }
         // Remove an element and shift all the others down.
         void RemoveAt(int i) {
-            MHASSERT(i >= 0 && i < m_VecSize);
-            for (int j = i+1; j < m_VecSize; j++) m_Values[j-1] = m_Values[j];
-            m_VecSize--;
+            MHASSERT(i >= 0 && i < m_vecSize);
+            for (int j = i+1; j < m_vecSize; j++) m_values[j-1] = m_values[j];
+            m_vecSize--;
         }
     protected:
-        int   m_VecSize {0};
-        BASE *m_Values  {nullptr};
+        int   m_vecSize {0};
+        BASE *m_values  {nullptr};
 };
 
 // As above, but it deletes the pointers when the sequence is destroyed.
 template <class BASE> class MHOwnPtrSequence: public MHSequence<BASE*> {
     public:
-        ~MHOwnPtrSequence() { for(int i = 0; i < MHSequence<BASE*>::m_VecSize; i++) delete(MHSequence<BASE*>::GetAt(i)); }
+        ~MHOwnPtrSequence() { for(int i = 0; i < MHSequence<BASE*>::m_vecSize; i++) delete(MHSequence<BASE*>::GetAt(i)); }
 };
 
 
@@ -86,15 +86,15 @@ template <class BASE> class MHStack: protected MHSequence<BASE> {
         bool Empty() const { return Size() == 0; }
         // Pop an item from the stack.
         BASE Pop() {
-            MHASSERT(MHSequence<BASE>::m_VecSize > 0);
-            return MHSequence<BASE>::m_Values[--MHSequence<BASE>::m_VecSize];
+            MHASSERT(MHSequence<BASE>::m_vecSize > 0);
+            return MHSequence<BASE>::m_values[--MHSequence<BASE>::m_vecSize];
         }
         // Push an element on the stack.
         void Push(BASE b) { this->Append(b); }
         // Return the top of the stack.
         BASE Top() { 
-            MHASSERT(MHSequence<BASE>::m_VecSize > 0);
-            return MHSequence<BASE>::m_Values[MHSequence<BASE>::m_VecSize-1];
+            MHASSERT(MHSequence<BASE>::m_vecSize > 0);
+            return MHSequence<BASE>::m_values[MHSequence<BASE>::m_vecSize-1];
         }
         int Size() const { return MHSequence<BASE>::Size(); }
 };
@@ -140,10 +140,10 @@ class MHColour {
     MHColour() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
-    bool IsSet() const { return m_nColIndex >= 0 || m_ColStr.Size() != 0; }
+    bool IsSet() const { return m_nColIndex >= 0 || m_colStr.Size() != 0; }
     void SetFromString(const char *str, int nLen);
     void Copy(const MHColour &col);
-    MHOctetString m_ColStr;
+    MHOctetString m_colStr;
     int           m_nColIndex {-1};
 };
 
@@ -160,13 +160,13 @@ class MHObjectRef
     MHObjectRef& operator=(const MHObjectRef&) = default;
 
     // Sometimes the object reference is optional.  This tests if it has been set
-    bool IsSet() const { return (m_nObjectNo != 0 || m_GroupId.Size() != 0); }
+    bool IsSet() const { return (m_nObjectNo != 0 || m_groupId.Size() != 0); }
     void PrintMe(FILE *fd, int nTabs) const;
     bool Equal(const MHObjectRef &objr, MHEngine *engine) const;
     QString Printable() const;
 
     int           m_nObjectNo {0};
-    MHOctetString m_GroupId;
+    MHOctetString m_groupId;
 };
 
 // A content reference gives the location (e.g. file name) to find the content.
@@ -178,14 +178,14 @@ class MHContentRef
     MHContentRef& operator=(const MHContentRef&) = default;
 
     void Initialise(MHParseNode *p, MHEngine *engine);
-    void PrintMe(FILE *fd, int nTabs) const { m_ContentRef.PrintMe(fd, nTabs); }
-    void Copy(const MHContentRef &cr) { m_ContentRef.Copy(cr.m_ContentRef); }
-    bool IsSet() const { return m_ContentRef.Size() != 0; }
+    void PrintMe(FILE *fd, int nTabs) const { m_contentRef.PrintMe(fd, nTabs); }
+    void Copy(const MHContentRef &cr) { m_contentRef.Copy(cr.m_contentRef); }
+    bool IsSet() const { return m_contentRef.Size() != 0; }
     bool Equal(const MHContentRef &cr, MHEngine *engine) const;
     static MHContentRef Null;
-    QString Printable() const { return m_ContentRef.Printable(); }
+    QString Printable() const { return m_contentRef.Printable(); }
 
-    MHOctetString m_ContentRef;
+    MHOctetString m_contentRef;
 };
 
 // "Generic" versions of int, bool etc can be either the value or an indirect reference.
@@ -195,7 +195,7 @@ class MHGenericBase
     MHObjectRef *GetReference(); // Return the indirect reference or fail if it's direct
     bool    m_fIsDirect {false};
 protected:
-    MHObjectRef m_Indirect;
+    MHObjectRef m_indirect;
 };
 
 class MHGenericBoolean: public MHGenericBase
@@ -228,7 +228,7 @@ class MHGenericOctetString: public MHGenericBase
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHOctetString &str, MHEngine *engine) const; // Return the value, looking up any indirect ref.
 protected:
-    MHOctetString   m_Direct;
+    MHOctetString   m_direct;
 };
 
 class MHGenericObjectRef: public MHGenericBase
@@ -239,7 +239,7 @@ class MHGenericObjectRef: public MHGenericBase
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHObjectRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
 protected:
-    MHObjectRef m_ObjRef;
+    MHObjectRef m_objRef;
 };
 
 class MHGenericContentRef: public MHGenericBase
@@ -250,7 +250,7 @@ class MHGenericContentRef: public MHGenericBase
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHContentRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
 protected:
-    MHContentRef    m_Direct;
+    MHContentRef    m_direct;
 };
 
 // In certain cases (e.g. parameters to Call) we have values which are the union of the base types.
@@ -271,11 +271,11 @@ class MHParameter
         P_Null
     } m_Type { P_Null }; // Null is used when this is optional
 
-    MHGenericInteger        m_IntVal;
-    MHGenericBoolean        m_BoolVal;
-    MHGenericOctetString    m_StrVal;
-    MHGenericObjectRef      m_ObjRefVal;
-    MHGenericContentRef     m_ContentRefVal;
+    MHGenericInteger        m_intVal;
+    MHGenericBoolean        m_boolVal;
+    MHGenericOctetString    m_strVal;
+    MHGenericObjectRef      m_objRefVal;
+    MHGenericContentRef     m_contentRefVal;
 };
 
 // A union type.  Returned when a parameter is evaluated.
@@ -285,9 +285,9 @@ class MHUnion
     MHUnion() = default;
     MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal) {}
     MHUnion(bool fVal) : m_Type(U_Bool),  m_fBoolVal(fVal)  {}
-    MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_StrVal.Copy(strVal); }
-    MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_ObjRefVal.Copy(objVal); };
-    MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_ContentRefVal.Copy(cnVal); }
+    MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_strVal.Copy(strVal); }
+    MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_objRefVal.Copy(objVal); };
+    MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_contentRefVal.Copy(cnVal); }
 
     MHUnion& operator=(const MHUnion&) = default;
 
@@ -300,9 +300,9 @@ class MHUnion
 
     int             m_nIntVal  {0};
     bool            m_fBoolVal {false};
-    MHOctetString   m_StrVal;
-    MHObjectRef     m_ObjRefVal;
-    MHContentRef    m_ContentRefVal;
+    MHOctetString   m_strVal;
+    MHObjectRef     m_objRefVal;
+    MHContentRef    m_contentRefVal;
 };
 
 class MHFontBody {
@@ -311,11 +311,11 @@ class MHFontBody {
     MHFontBody() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
-    bool IsSet() const { return m_DirFont.Size() != 0 || m_IndirFont.IsSet(); }
+    bool IsSet() const { return m_dirFont.Size() != 0 || m_indirFont.IsSet(); }
     void Copy(const MHFontBody &fb);
 protected:
-    MHOctetString m_DirFont;
-    MHObjectRef m_IndirFont;
+    MHOctetString m_dirFont;
+    MHObjectRef m_indirFont;
 };
 
 // This is used only in DynamicLineArt

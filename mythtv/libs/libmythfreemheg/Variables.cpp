@@ -224,15 +224,15 @@ void MHIntegerVar::SetVariableValue(const MHUnion &value)
         int p = 0;
         bool fNegative = false;
 
-        if (value.m_StrVal.Size() > 0 && value.m_StrVal.GetAt(0) == '-')
+        if (value.m_strVal.Size() > 0 && value.m_strVal.GetAt(0) == '-')
         {
             p++;
             fNegative = true;
         }
 
-        for (; p < value.m_StrVal.Size(); p++)
+        for (; p < value.m_strVal.Size(); p++)
         {
-            unsigned char ch =  value.m_StrVal.GetAt(p);
+            unsigned char ch =  value.m_strVal.GetAt(p);
 
             if (ch < '0' || ch > '9')
             {
@@ -302,7 +302,7 @@ void MHOctetStrVar::Preparation(MHEngine *engine)
 void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 {
     parm.CheckType(MHUnion::U_String);
-    int nRes = m_Value.Compare(parm.m_StrVal);
+    int nRes = m_Value.Compare(parm.m_strVal);
     bool fRes = false;
 
     switch (nOp)
@@ -322,7 +322,7 @@ void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
     }
 
     MHOctetString sample1(m_Value, 0, 10);
-    MHOctetString sample2(parm.m_StrVal, 0, 10);
+    MHOctetString sample2(parm.m_strVal, 0, 10);
     MHLOG(MHLogDetail, QString("Comparison %1 %2 and %3 => %4").arg(TestToText(nOp))
           .arg(sample1.Printable()).arg(sample2.Printable()).arg(fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
@@ -332,7 +332,7 @@ void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 void MHOctetStrVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_String;
-    value.m_StrVal.Copy(m_Value);
+    value.m_strVal.Copy(m_Value);
 }
 
 // Implement the SetVariable action.
@@ -348,7 +348,7 @@ void MHOctetStrVar::SetVariableValue(const MHUnion &value)
     else
     {
         value.CheckType(MHUnion::U_String);
-        m_Value.Copy(value.m_StrVal);
+        m_Value.Copy(value.m_strVal);
     }
 
     // Debug
@@ -409,10 +409,10 @@ void MHObjectRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine
     switch (nOp)
     {
         case TC_Equal:
-            fRes = m_Value.Equal(parm.m_ObjRefVal, engine);
+            fRes = m_Value.Equal(parm.m_objRefVal, engine);
             break;
         case TC_NotEqual:
-            fRes = ! m_Value.Equal(parm.m_ObjRefVal, engine);
+            fRes = ! m_Value.Equal(parm.m_objRefVal, engine);
             break;
         default:
             MHERROR("Invalid comparison for object ref");
@@ -425,14 +425,14 @@ void MHObjectRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine
 void MHObjectRefVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_ObjRef;
-    value.m_ObjRefVal.Copy(m_Value);
+    value.m_objRefVal.Copy(m_Value);
 }
 
 // Implement the SetVariable action.
 void MHObjectRefVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_ObjRef);
-    m_Value.Copy(value.m_ObjRefVal);
+    m_Value.Copy(value.m_objRefVal);
     MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_Value.Printable()));
 }
 
@@ -488,10 +488,10 @@ void MHContentRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engin
     switch (nOp)
     {
         case TC_Equal:
-            fRes = m_Value.Equal(parm.m_ContentRefVal, engine);
+            fRes = m_Value.Equal(parm.m_contentRefVal, engine);
             break;
         case TC_NotEqual:
-            fRes = !m_Value.Equal(parm.m_ContentRefVal, engine);
+            fRes = !m_Value.Equal(parm.m_contentRefVal, engine);
             break;
         default:
             MHERROR("Invalid comparison for content ref");
@@ -504,14 +504,14 @@ void MHContentRefVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engin
 void MHContentRefVar::GetVariableValue(MHUnion &value, MHEngine * /*engine*/)
 {
     value.m_Type = MHUnion::U_ContentRef;
-    value.m_ContentRefVal.Copy(m_Value);
+    value.m_contentRefVal.Copy(m_Value);
 }
 
 // Implement the SetVariable action.
 void MHContentRefVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_ContentRef);
-    m_Value.Copy(value.m_ContentRefVal);
+    m_Value.Copy(value.m_contentRefVal);
     MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_Value.Printable()));
 }
 
@@ -595,6 +595,6 @@ void MHAppend::Perform(MHEngine *engine)
     // Get the string to append.
     MHOctetString toAppend;
     m_Operand.GetValue(toAppend, engine);
-    targetVal.m_StrVal.Append(toAppend); // Add it on the end
+    targetVal.m_strVal.Append(toAppend); // Add it on the end
     pTarget->SetVariableValue(targetVal); // Set the target to the result.
 }

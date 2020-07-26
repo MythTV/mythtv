@@ -105,7 +105,7 @@ int MHEngine::RunAll()
         // object can also be explicitly given in the
         MHObjectRef startObj;
         startObj.m_nObjectNo = 0;
-        startObj.m_GroupId.Copy(MHOctetString("~//a"));
+        startObj.m_groupId.Copy(MHOctetString("~//a"));
 
         // Launch will block until either it finds the appropriate object and
         // begins the application or discovers that the file definitely isn't
@@ -113,7 +113,7 @@ int MHEngine::RunAll()
         // if one of the containing directories is updated.
         if (! Launch(startObj))
         {
-            startObj.m_GroupId.Copy(MHOctetString("~//startup"));
+            startObj.m_groupId.Copy(MHOctetString("~//startup"));
 
             if (! Launch(startObj))
             {
@@ -279,8 +279,8 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         return false;
     }
 
-    if (target.m_GroupId.Size() == 0) return false; // No file name.
-    QString csPath = GetPathName(target.m_GroupId); // Get path relative to root.
+    if (target.m_groupId.Size() == 0) return false; // No file name.
+    QString csPath = GetPathName(target.m_groupId); // Get path relative to root.
     MHLOG(MHLogNotifications, "NOTE Launching " + csPath);
 
     // Check that the file exists before we commit to the transition.
@@ -425,12 +425,12 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
         return;
     }
 
-    if (target.m_GroupId.Size() == 0)
+    if (target.m_groupId.Size() == 0)
     {
         return;    // No file name.
     }
 
-    QString csPath = GetPathName(target.m_GroupId);
+    QString csPath = GetPathName(target.m_groupId);
 
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
@@ -578,11 +578,11 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
     MHGroup *pScene = CurrentScene();
     MHGroup *pApp = CurrentApp();
 
-    if (pScene && GetPathName(pScene->m_ObjectReference.m_GroupId) == GetPathName(oRef.m_GroupId))
+    if (pScene && GetPathName(pScene->m_ObjectReference.m_groupId) == GetPathName(oRef.m_groupId))
     {
         pSearch = pScene;
     }
-    else if (pApp && GetPathName(pApp->m_ObjectReference.m_GroupId) == GetPathName(oRef.m_GroupId))
+    else if (pApp && GetPathName(pApp->m_ObjectReference.m_groupId) == GetPathName(oRef.m_groupId))
     {
         pSearch = pApp;
     }
@@ -978,7 +978,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     // Remove any existing content requests for this ingredient.
     CancelExternalContentRequest(pRequester);
 
-    QString csPath = GetPathName(pRequester->m_ContentRef.m_ContentRef);
+    QString csPath = GetPathName(pRequester->m_ContentRef.m_contentRef);
 
     if (csPath.isEmpty())
     {

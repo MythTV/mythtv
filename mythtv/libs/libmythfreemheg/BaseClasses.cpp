@@ -241,7 +241,7 @@ void MHColour::Initialise(MHParseNode *p, MHEngine * /*engine*/)
     }
     else
     {
-        p->GetStringValue(m_ColStr);
+        p->GetStringValue(m_colStr);
     }
 }
 
@@ -253,24 +253,24 @@ void MHColour::PrintMe(FILE *fd, int nTabs) const
     }
     else
     {
-        m_ColStr.PrintMe(fd, nTabs);
+        m_colStr.PrintMe(fd, nTabs);
     }
 }
 
 void MHColour::SetFromString(const char *str, int nLen)
 {
     m_nColIndex = -1;
-    m_ColStr.Copy(MHOctetString(str, nLen));
+    m_colStr.Copy(MHOctetString(str, nLen));
 }
 
 void MHColour::Copy(const MHColour &col)
 {
     m_nColIndex = col.m_nColIndex;
-    m_ColStr.Copy(col.m_ColStr);
+    m_colStr.Copy(col.m_colStr);
 }
 
 // An object reference is used to identify and refer to an object.
-// Internal objects have the m_GroupId field empty.
+// Internal objects have the m_groupId field empty.
 
 MHObjectRef MHObjectRef::Null; // This has zero for the object number and an empty group id.
 
@@ -281,13 +281,13 @@ void MHObjectRef::Initialise(MHParseNode *p, MHEngine *engine)
     {
         m_nObjectNo = p->GetIntValue();
         // Set the group id to the id of this group.
-        m_GroupId.Copy(engine->GetGroupId());
+        m_groupId.Copy(engine->GetGroupId());
     }
     else if (p->m_nNodeType == MHParseNode::PNSeq)
     {
         MHParseNode *pFirst = p->GetSeqN(0);
         MHOctetString groupId;
-        pFirst->GetStringValue(m_GroupId);
+        pFirst->GetStringValue(m_groupId);
         m_nObjectNo = p->GetSeqN(1)->GetIntValue();
     }
     else
@@ -298,44 +298,44 @@ void MHObjectRef::Initialise(MHParseNode *p, MHEngine *engine)
 
 void MHObjectRef::PrintMe(FILE *fd, int nTabs) const
 {
-    if (m_GroupId.Size() == 0)
+    if (m_groupId.Size() == 0)
     {
         fprintf(fd, " %d ", m_nObjectNo);
     }
     else
     {
         fprintf(fd, " ( ");
-        m_GroupId.PrintMe(fd, nTabs);
+        m_groupId.PrintMe(fd, nTabs);
         fprintf(fd, " %d ) ", m_nObjectNo);
     }
 }
 
 QString MHObjectRef::Printable() const
 {
-    if (m_GroupId.Size() == 0)
+    if (m_groupId.Size() == 0)
     {
         return QString(" %1 ").arg(m_nObjectNo);
     }
-    return QString(" ( ") + m_GroupId.Printable() + QString(" %1 ").arg(m_nObjectNo);
+    return QString(" ( ") + m_groupId.Printable() + QString(" %1 ").arg(m_nObjectNo);
 }
 
 // Make a copy of an object reference.
 void MHObjectRef::Copy(const MHObjectRef &objr)
 {
     m_nObjectNo = objr.m_nObjectNo;
-    m_GroupId.Copy(objr.m_GroupId);
+    m_groupId.Copy(objr.m_groupId);
 }
 
 // The object references may not be identical but may nevertheless refer to the same
 // object.  The only safe way to do this is to compare the canonical paths.
 bool MHObjectRef::Equal(const MHObjectRef &objr, MHEngine *engine) const
 {
-    return m_nObjectNo == objr.m_nObjectNo && engine->GetPathName(m_GroupId) == engine->GetPathName(objr.m_GroupId);
+    return m_nObjectNo == objr.m_nObjectNo && engine->GetPathName(m_groupId) == engine->GetPathName(objr.m_groupId);
 }
 
 bool MHContentRef::Equal(const MHContentRef &cr, MHEngine *engine) const
 {
-    return engine->GetPathName(m_ContentRef) == engine->GetPathName(cr.m_ContentRef);
+    return engine->GetPathName(m_contentRef) == engine->GetPathName(cr.m_contentRef);
 }
 
 // "Generic" versions of int, bool etc can be either the value or the an indirect reference.
@@ -346,7 +346,7 @@ void MHGenericBoolean::Initialise(MHParseNode *pArg, MHEngine *engine)
     {
         // Indirect reference.
         m_fIsDirect = false;
-        m_Indirect.Initialise(pArg->GetArgN(0), engine);
+        m_indirect.Initialise(pArg->GetArgN(0), engine);
     }
     else   // Simple integer value.
     {
@@ -364,7 +364,7 @@ void MHGenericBoolean::PrintMe(FILE *fd, int nTabs) const
     else
     {
         fprintf(fd, ":IndirectRef ");
-        m_Indirect.PrintMe(fd, nTabs + 1);
+        m_indirect.PrintMe(fd, nTabs + 1);
     }
 }
 
@@ -377,7 +377,7 @@ bool MHGenericBoolean::GetValue(MHEngine *engine) const
     }
 
     MHUnion result;
-    MHRoot *pBase = engine->FindObject(m_Indirect);
+    MHRoot *pBase = engine->FindObject(m_indirect);
     pBase->GetVariableValue(result, engine);
     result.CheckType(MHUnion::U_Bool);
     return result.m_fBoolVal;
@@ -391,7 +391,7 @@ MHObjectRef *MHGenericBase::GetReference()
         MHERROR("Expected indirect reference");
     }
 
-    return &m_Indirect;
+    return &m_indirect;
 }
 
 void MHGenericInteger::Initialise(MHParseNode *pArg, MHEngine *engine)
@@ -400,7 +400,7 @@ void MHGenericInteger::Initialise(MHParseNode *pArg, MHEngine *engine)
     {
         // Indirect reference.
         m_fIsDirect = false;
-        m_Indirect.Initialise(pArg->GetArgN(0), engine);
+        m_indirect.Initialise(pArg->GetArgN(0), engine);
     }
     else   // Simple integer value.
     {
@@ -418,7 +418,7 @@ void MHGenericInteger::PrintMe(FILE *fd, int nTabs) const
     else
     {
         fprintf(fd, ":IndirectRef ");
-        m_Indirect.PrintMe(fd, nTabs + 1);
+        m_indirect.PrintMe(fd, nTabs + 1);
     }
 }
 
@@ -431,7 +431,7 @@ int MHGenericInteger::GetValue(MHEngine *engine) const
     }
 
     MHUnion result;
-    MHRoot *pBase = engine->FindObject(m_Indirect);
+    MHRoot *pBase = engine->FindObject(m_indirect);
     pBase->GetVariableValue(result, engine);
 
     // From my reading of the MHEG documents implicit conversion is only
@@ -444,15 +444,15 @@ int MHGenericInteger::GetValue(MHEngine *engine) const
         int p = 0;
         bool fNegative = false;
 
-        if (result.m_StrVal.Size() > 0 && result.m_StrVal.GetAt(0) == '-')
+        if (result.m_strVal.Size() > 0 && result.m_strVal.GetAt(0) == '-')
         {
             p++;
             fNegative = true;
         }
 
-        for (; p < result.m_StrVal.Size(); p++)
+        for (; p < result.m_strVal.Size(); p++)
         {
-            unsigned char ch =  result.m_StrVal.GetAt(p);
+            unsigned char ch =  result.m_strVal.GetAt(p);
 
             if (ch < '0' || ch > '9')
             {
@@ -479,12 +479,12 @@ void MHGenericOctetString::Initialise(MHParseNode *pArg, MHEngine *engine)
     {
         // Indirect reference.
         m_fIsDirect = false;
-        m_Indirect.Initialise(pArg->GetArgN(0), engine);
+        m_indirect.Initialise(pArg->GetArgN(0), engine);
     }
     else   // Simple string value.
     {
         m_fIsDirect = true;
-        pArg->GetStringValue(m_Direct);
+        pArg->GetStringValue(m_direct);
     }
 }
 
@@ -492,12 +492,12 @@ void MHGenericOctetString::PrintMe(FILE *fd, int /*nTabs*/) const
 {
     if (m_fIsDirect)
     {
-        m_Direct.PrintMe(fd, 0);
+        m_direct.PrintMe(fd, 0);
     }
     else
     {
         fprintf(fd, ":IndirectRef ");
-        m_Indirect.PrintMe(fd, 0);
+        m_indirect.PrintMe(fd, 0);
     }
 }
 
@@ -506,12 +506,12 @@ void MHGenericOctetString::GetValue(MHOctetString &str, MHEngine *engine) const
 {
     if (m_fIsDirect)
     {
-        str.Copy(m_Direct);
+        str.Copy(m_direct);
     }
     else
     {
         MHUnion result;
-        MHRoot *pBase = engine->FindObject(m_Indirect);
+        MHRoot *pBase = engine->FindObject(m_indirect);
         pBase->GetVariableValue(result, engine);
 
         // From my reading of the MHEG documents implicit conversion is only
@@ -531,7 +531,7 @@ void MHGenericOctetString::GetValue(MHOctetString &str, MHEngine *engine) const
         else
         {
             result.CheckType(MHUnion::U_String);
-            str.Copy(result.m_StrVal);
+            str.Copy(result.m_strVal);
         }
     }
 }
@@ -542,12 +542,12 @@ void MHGenericObjectRef::Initialise(MHParseNode *pArg, MHEngine *engine)
     {
         // Indirect reference.
         m_fIsDirect = false;
-        m_Indirect.Initialise(pArg->GetArgN(0), engine);
+        m_indirect.Initialise(pArg->GetArgN(0), engine);
     }
     else   // Direct reference.
     {
         m_fIsDirect = true;
-        m_ObjRef.Initialise(pArg, engine);
+        m_objRef.Initialise(pArg, engine);
     }
 }
 
@@ -555,12 +555,12 @@ void MHGenericObjectRef::PrintMe(FILE *fd, int nTabs) const
 {
     if (m_fIsDirect)
     {
-        m_ObjRef.PrintMe(fd, nTabs + 1);
+        m_objRef.PrintMe(fd, nTabs + 1);
     }
     else
     {
         fprintf(fd, ":IndirectRef ");
-        m_Indirect.PrintMe(fd, nTabs + 1);
+        m_indirect.PrintMe(fd, nTabs + 1);
     }
 }
 
@@ -569,17 +569,17 @@ void MHGenericObjectRef::GetValue(MHObjectRef &ref, MHEngine *engine) const
 {
     if (m_fIsDirect)
     {
-        ref.Copy(m_ObjRef);
+        ref.Copy(m_objRef);
     }
     else
     {
-        // LVR - Hmm I don't think this is right. Should be: ref.Copy(m_Indirect);
+        // LVR - Hmm I don't think this is right. Should be: ref.Copy(m_indirect);
         // But it's used in several places so workaround in Stream::MHActionGenericObjectRefFix
         MHUnion result;
-        MHRoot *pBase = engine->FindObject(m_Indirect);
+        MHRoot *pBase = engine->FindObject(m_indirect);
         pBase->GetVariableValue(result, engine);
         result.CheckType(MHUnion::U_ObjRef);
-        ref.Copy(result.m_ObjRefVal);
+        ref.Copy(result.m_objRefVal);
     }
 }
 
@@ -589,12 +589,12 @@ void MHGenericContentRef::Initialise(MHParseNode *pArg, MHEngine *engine)
     {
         // Indirect reference.
         m_fIsDirect = false;
-        m_Indirect.Initialise(pArg->GetArgN(0), engine);
+        m_indirect.Initialise(pArg->GetArgN(0), engine);
     }
     else if (pArg->GetTagNo() == C_CONTENT_REFERENCE)  // Direct reference.
     {
         m_fIsDirect = true;
-        m_Direct.Initialise(pArg->GetArgN(0), engine);
+        m_direct.Initialise(pArg->GetArgN(0), engine);
     }
     else
     {
@@ -606,12 +606,12 @@ void MHGenericContentRef::PrintMe(FILE *fd, int /*nTabs*/) const
 {
     if (m_fIsDirect)
     {
-        m_Direct.PrintMe(fd, 0);
+        m_direct.PrintMe(fd, 0);
     }
     else
     {
         fprintf(fd, ":IndirectRef ");
-        m_Indirect.PrintMe(fd, 0);
+        m_indirect.PrintMe(fd, 0);
     }
 }
 
@@ -620,15 +620,15 @@ void MHGenericContentRef::GetValue(MHContentRef &ref, MHEngine *engine) const
 {
     if (m_fIsDirect)
     {
-        ref.Copy(m_Direct);
+        ref.Copy(m_direct);
     }
     else
     {
         MHUnion result;
-        MHRoot *pBase = engine->FindObject(m_Indirect);
+        MHRoot *pBase = engine->FindObject(m_indirect);
         pBase->GetVariableValue(result, engine);
         result.CheckType(MHUnion::U_ContentRef);
-        ref.Copy(result.m_ContentRefVal);
+        ref.Copy(result.m_contentRefVal);
     }
 }
 
@@ -639,23 +639,23 @@ void MHUnion::GetValueFrom(const MHParameter &value, MHEngine *engine)
     {
         case MHParameter::P_Int:
             m_Type = U_Int;
-            m_nIntVal = value.m_IntVal.GetValue(engine);
+            m_nIntVal = value.m_intVal.GetValue(engine);
             break;
         case MHParameter::P_Bool:
             m_Type = U_Bool;
-            m_fBoolVal = value.m_BoolVal.GetValue(engine);
+            m_fBoolVal = value.m_boolVal.GetValue(engine);
             break;
         case MHParameter::P_String:
             m_Type = U_String;
-            value.m_StrVal.GetValue(m_StrVal, engine);
+            value.m_strVal.GetValue(m_strVal, engine);
             break;
         case MHParameter::P_ObjRef:
             m_Type = U_ObjRef;
-            value.m_ObjRefVal.GetValue(m_ObjRefVal, engine);
+            value.m_objRefVal.GetValue(m_objRefVal, engine);
             break;
         case MHParameter::P_ContentRef:
             m_Type = U_ContentRef;
-            value.m_ContentRefVal.GetValue(m_ContentRefVal, engine);
+            value.m_contentRefVal.GetValue(m_contentRefVal, engine);
             break;
         case MHParameter::P_Null:
             m_Type = U_None;
@@ -698,9 +698,9 @@ QString MHUnion::Printable() const
     {
     case U_Int: return QString::number(m_nIntVal);
     case U_Bool: return m_fBoolVal ? "true" : "false";
-    case U_String: return m_StrVal.Printable();
-    case U_ObjRef: return m_ObjRefVal.Printable();
-    case U_ContentRef: return m_ContentRefVal.Printable();
+    case U_String: return m_strVal.Printable();
+    case U_ObjRef: return m_objRefVal.Printable();
+    case U_ContentRef: return m_contentRefVal.Printable();
     case U_None: break;
     }
     return "";
@@ -713,23 +713,23 @@ void MHParameter::Initialise(MHParseNode *p, MHEngine *engine)
     {
         case C_NEW_GENERIC_BOOLEAN:
             m_Type = P_Bool;
-            m_BoolVal.Initialise(p->GetArgN(0), engine);
+            m_boolVal.Initialise(p->GetArgN(0), engine);
             break;
         case C_NEW_GENERIC_INTEGER:
             m_Type = P_Int;
-            m_IntVal.Initialise(p->GetArgN(0), engine);
+            m_intVal.Initialise(p->GetArgN(0), engine);
             break;
         case C_NEW_GENERIC_OCTETSTRING:
             m_Type = P_String;
-            m_StrVal.Initialise(p->GetArgN(0), engine);
+            m_strVal.Initialise(p->GetArgN(0), engine);
             break;
         case C_NEW_GENERIC_OBJECT_REF:
             m_Type = P_ObjRef;
-            m_ObjRefVal.Initialise(p->GetArgN(0), engine);
+            m_objRefVal.Initialise(p->GetArgN(0), engine);
             break;
         case C_NEW_GENERIC_CONTENT_REF:
             m_Type = P_ContentRef;
-            m_ContentRefVal.Initialise(p->GetArgN(0), engine);
+            m_contentRefVal.Initialise(p->GetArgN(0), engine);
             break;
         default:
             MHParseNode::Failure("Expected generic");
@@ -745,23 +745,23 @@ void MHParameter::PrintMe(FILE *fd, int nTabs) const
             // Direct values.
         case P_Int:
             fprintf(fd, ":GInteger ");
-            m_IntVal.PrintMe(fd, 0);
+            m_intVal.PrintMe(fd, 0);
             break;
         case P_Bool:
             fprintf(fd, ":GBoolean ");
-            m_BoolVal.PrintMe(fd, 0);
+            m_boolVal.PrintMe(fd, 0);
             break;
         case P_String:
             fprintf(fd, ":GOctetString ");
-            m_StrVal.PrintMe(fd, 0);
+            m_strVal.PrintMe(fd, 0);
             break;
         case P_ObjRef:
             fprintf(fd, ":GObjectRef ");
-            m_ObjRefVal.PrintMe(fd, 0);
+            m_objRefVal.PrintMe(fd, 0);
             break;
         case P_ContentRef:
             fprintf(fd, ":GObjectRef ");
-            m_ContentRefVal.PrintMe(fd, 0);
+            m_contentRefVal.PrintMe(fd, 0);
             break;
         case P_Null:
             break;
@@ -776,15 +776,15 @@ MHObjectRef *MHParameter::GetReference()
     switch (m_Type)
     {
         case P_Int:
-            return m_IntVal.GetReference();
+            return m_intVal.GetReference();
         case P_Bool:
-            return m_BoolVal.GetReference();
+            return m_boolVal.GetReference();
         case P_String:
-            return m_StrVal.GetReference();
+            return m_strVal.GetReference();
         case P_ObjRef:
-            return m_ObjRefVal.GetReference();
+            return m_objRefVal.GetReference();
         case P_ContentRef:
-            return m_ContentRefVal.GetReference();
+            return m_contentRefVal.GetReference();
         case P_Null:
             return nullptr;
     }
@@ -797,37 +797,37 @@ MHContentRef MHContentRef::Null; // This is the empty string.
 
 void MHContentRef::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
-    p->GetStringValue(m_ContentRef);
+    p->GetStringValue(m_contentRef);
 }
 
 void MHFontBody::Initialise(MHParseNode *p, MHEngine *engine)
 {
     if (p->m_nNodeType == MHParseNode::PNString)
     {
-        p->GetStringValue(m_DirFont);
+        p->GetStringValue(m_dirFont);
     }
     else
     {
-        m_IndirFont.Initialise(p, engine);
+        m_indirFont.Initialise(p, engine);
     }
 }
 
 void MHFontBody::PrintMe(FILE *fd, int nTabs) const
 {
-    if (m_DirFont.Size() > 0)
+    if (m_dirFont.Size() > 0)
     {
-        m_DirFont.PrintMe(fd, nTabs);
+        m_dirFont.PrintMe(fd, nTabs);
     }
     else
     {
-        m_IndirFont.PrintMe(fd, nTabs);
+        m_indirFont.PrintMe(fd, nTabs);
     }
 }
 
 void MHFontBody::Copy(const MHFontBody &fb)
 {
-    m_DirFont.Copy(fb.m_DirFont);
-    m_IndirFont.Copy(fb.m_IndirFont);
+    m_dirFont.Copy(fb.m_dirFont);
+    m_indirFont.Copy(fb.m_indirFont);
 }
 
 void MHPointArg::Initialise(MHParseNode *p, MHEngine *engine)

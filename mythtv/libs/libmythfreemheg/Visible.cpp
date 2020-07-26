@@ -161,7 +161,7 @@ MHRgba MHVisible::GetColour(const MHColour &colour)
     int alpha = 0;
     if (colour.IsSet())
     {
-        int cSize = colour.m_ColStr.Size();
+        int cSize = colour.m_colStr.Size();
 
         if (cSize != 4)
         {
@@ -171,22 +171,22 @@ MHRgba MHVisible::GetColour(const MHColour &colour)
         // Just in case the length is short we handle those properly.
         if (cSize > 0)
         {
-            red = colour.m_ColStr.GetAt(0);
+            red = colour.m_colStr.GetAt(0);
         }
 
         if (cSize > 1)
         {
-            green = colour.m_ColStr.GetAt(1);
+            green = colour.m_colStr.GetAt(1);
         }
 
         if (cSize > 2)
         {
-            blue = colour.m_ColStr.GetAt(2);
+            blue = colour.m_colStr.GetAt(2);
         }
 
         if (cSize > 3)
         {
-            alpha = 255 - colour.m_ColStr.GetAt(3);    // Convert transparency to alpha
+            alpha = 255 - colour.m_colStr.GetAt(3);    // Convert transparency to alpha
         }
     }
 
@@ -1162,7 +1162,7 @@ void MHSetColour::Perform(MHEngine *engine)
         {
             MHOctetString colour;
             m_Absolute.GetValue(colour, engine);
-            newColour.m_ColStr.Copy(colour);
+            newColour.m_colStr.Copy(colour);
             break;
         }
         case CT_Indexed:

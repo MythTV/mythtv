@@ -51,13 +51,13 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
     MHRoot::Initialise(p, engine);
 
     // Must be an external reference with an object number of zero.
-    if (m_ObjectReference.m_nObjectNo != 0 || m_ObjectReference.m_GroupId.Size() == 0)
+    if (m_ObjectReference.m_nObjectNo != 0 || m_ObjectReference.m_groupId.Size() == 0)
     {
         MHERROR("Object reference for a group object must be zero and external");
     }
 
     // Set the group id for the rest of the group to this.
-    engine->GetGroupId().Copy(m_ObjectReference.m_GroupId);
+    engine->GetGroupId().Copy(m_ObjectReference.m_groupId);
     // Some of the information is irrelevant.
     //  MHParseNode *pStdId = p->GetNamedArg(C_STANDARD_IDENTIFIER);
     //  MHParseNode *pStdVersion = p->GetNamedArg(C_STANDARD_VERSION);
@@ -422,7 +422,7 @@ int MHGroup::CheckTimers(MHEngine *engine)
 void MHGroup::MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine)
 {
     MHIngredient *pClone = pTarget->Clone(engine); // Clone it.
-    pClone->m_ObjectReference.m_GroupId.Copy(m_ObjectReference.m_GroupId); // Group id is the same as this.
+    pClone->m_ObjectReference.m_groupId.Copy(m_ObjectReference.m_groupId); // Group id is the same as this.
     pClone->m_ObjectReference.m_nObjectNo = ++m_nLastId; // Create a new object id.
     m_Items.Append(pClone);
     // Set the object reference result to the newly constructed ref.

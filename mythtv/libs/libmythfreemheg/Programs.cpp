@@ -154,7 +154,7 @@ static void GetString(MHParameter *parm, MHOctetString &str, MHEngine *engine)
     MHUnion un;
     un.GetValueFrom(*parm, engine);
     un.CheckType(MHUnion::U_String);
-    str.Copy(un.m_StrVal);
+    str.Copy(un.m_strVal);
 }
 
 void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, const MHSequence<MHParameter *> &args, MHEngine *engine)
@@ -337,7 +337,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
                 MHContentRef result;
-                result.m_ContentRef.Copy(string);
+                result.m_contentRef.Copy(string);
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
@@ -353,7 +353,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 3)
             {
                 MHObjectRef result;
-                GetString(args.GetAt(0), result.m_GroupId, engine);
+                GetString(args.GetAt(0), result.m_groupId, engine);
                 result.m_nObjectNo = GetInt(args.GetAt(1), engine);
                 engine->FindObject(*(args.GetAt(2)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
@@ -641,8 +641,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 un.GetValueFrom(*(args.GetAt(0)), engine);
                 un.CheckType(MHUnion::U_ContentRef);
                 MHContentRef fileName;
-                fileName.Copy(un.m_ContentRefVal);
-                QString csPath = engine->GetPathName(fileName.m_ContentRef);
+                fileName.Copy(un.m_contentRefVal);
+                QString csPath = engine->GetPathName(fileName.m_contentRef);
                 bool result = false;
                 QByteArray text;
 
@@ -753,13 +753,13 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                         message.append(un.m_fBoolVal ? "True" : "False");
                         break;
                     case MHUnion::U_String:
-                        message.append(QString::fromUtf8((const char *)un.m_StrVal.Bytes(), un.m_StrVal.Size()));
+                        message.append(QString::fromUtf8((const char *)un.m_strVal.Bytes(), un.m_strVal.Size()));
                         break;
                     case MHUnion::U_ObjRef:
-                        message.append(un.m_ObjRefVal.Printable());
+                        message.append(un.m_objRefVal.Printable());
                         break;
                     case MHUnion::U_ContentRef:
-                        message.append(un.m_ContentRefVal.Printable());
+                        message.append(un.m_contentRefVal.Printable());
                         break;
                     case MHUnion::U_None:
                         break;

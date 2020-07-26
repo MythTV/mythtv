@@ -202,7 +202,7 @@ void MHIngredient::SetData(const MHOctetString &included, MHEngine *engine)
     // this should be the file name for referenced content.
     if (m_ContentType == IN_ReferencedContent)
     {
-        m_ContentRef.m_ContentRef.Copy(included);
+        m_ContentRef.m_contentRef.Copy(included);
     }
     else if (m_ContentType == IN_IncludedContent)
     {
@@ -402,7 +402,7 @@ void MHClone::CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef)
 {
     // We need to get the group (scene or application) that contains the target.
     MHObjectRef groupRef;
-    groupRef.m_GroupId.Copy(pTarget->m_ObjectReference.m_GroupId);
+    groupRef.m_groupId.Copy(pTarget->m_ObjectReference.m_groupId);
     groupRef.m_nObjectNo = 0; // The group always has object ref zero.
     MHRoot *pGroup = engine->FindObject(groupRef);
     // Get the group to make the clone and add it to its ingredients.

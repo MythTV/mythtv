@@ -62,7 +62,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
                     m_EventData.m_Type = MHUnion::U_Int;
                     break;
                 case MHParseNode::PNString:
-                    pEventData->GetStringValue(m_EventData.m_StrVal);
+                    pEventData->GetStringValue(m_EventData.m_strVal);
                     m_EventData.m_Type = MHUnion::U_String;
                     break;
                 default:
@@ -111,7 +111,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
                     m_EventData.m_Type = MHUnion::U_Int;
                     break;
                 case MHParseNode::PNString:
-                    pEventDataArg->GetStringValue(m_EventData.m_StrVal);
+                    pEventDataArg->GetStringValue(m_EventData.m_strVal);
                     m_EventData.m_Type = MHUnion::U_String;
                     break;
                 default:
@@ -215,7 +215,7 @@ void MHLink::PrintMe(FILE *fd, int nTabs) const
         case MHUnion::U_String:
             PrintTabs(fd, nTabs + 1);
             fprintf(fd, ":EventData");
-            m_EventData.m_StrVal.PrintMe(fd, nTabs);
+            m_EventData.m_strVal.PrintMe(fd, nTabs);
             fprintf(fd, "\n");
             break;
         default:
@@ -295,7 +295,7 @@ void MHLink::MatchEvent(const MHObjectRef &sourceRefRef, enum EventType ev, cons
                 fMatch = evData.m_Type == MHUnion::U_Int && evData.m_nIntVal == m_EventData.m_nIntVal;
                 break;
             case MHUnion::U_String:
-                fMatch = evData.m_Type == MHUnion::U_String && evData.m_StrVal.Equal(m_EventData.m_StrVal);
+                fMatch = evData.m_Type == MHUnion::U_String && evData.m_strVal.Equal(m_EventData.m_strVal);
                 break;
             default:
                 fMatch = false;
