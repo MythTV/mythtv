@@ -413,7 +413,6 @@ class SatIPConfigurationGroup : public GroupSetting
 
   private:
     CaptureCard           &m_parent;
-    GroupSetting          *desc            {nullptr};
     SatIPDeviceIDList     *m_deviceIdList  {nullptr};
     SatIPDeviceID         *m_deviceId      {nullptr};
     SatIPDeviceAttribute  *m_friendlyName  {nullptr};
