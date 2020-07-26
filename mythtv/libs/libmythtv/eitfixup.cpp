@@ -2821,7 +2821,6 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     }
 
     // I have to search separately for season in title and description because it wouldn't work when in both.
-    series  = false;
     tmpSeries = m_grSeason;
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
