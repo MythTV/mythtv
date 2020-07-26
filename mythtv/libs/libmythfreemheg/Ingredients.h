@@ -68,14 +68,14 @@ class MHIngredient : public MHRoot
     bool    m_fShared                  {false};
     // Original content.  The original included content and the other fields are
     // mutually exclusive.
-    enum { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_ContentType {IN_NoContent};
-    MHOctetString   m_OrigIncludedContent;
-    MHContentRef    m_OrigContentRef;
+    enum { IN_NoContent, IN_IncludedContent, IN_ReferencedContent } m_contentType {IN_NoContent};
+    MHOctetString   m_origIncludedContent;
+    MHContentRef    m_origContentRef;
     int             m_nOrigContentSize {0};
     int             m_nOrigCCPrio      {127};  // Default.
     // Internal attributes
-    MHOctetString   m_IncludedContent;
-    MHContentRef    m_ContentRef;
+    MHOctetString   m_includedContent;
+    MHContentRef    m_contentRef;
     int             m_nContentSize     {0};
     int             m_nCCPrio          {0};
     friend class MHEngine;
@@ -137,10 +137,10 @@ class MHSetData: public MHElemAction
     bool m_fIsIncluded        {false};
     bool m_fSizePresent       {false};
     bool m_fCCPriorityPresent {false};
-    MHGenericOctetString m_Included;
-    MHGenericContentRef m_Referenced;
-    MHGenericInteger m_ContentSize;
-    MHGenericInteger m_CCPriority;
+    MHGenericOctetString m_included;
+    MHGenericContentRef m_referenced;
+    MHGenericInteger m_contentSize;
+    MHGenericInteger m_ccPriority;
 };
 
 // Preload and unload

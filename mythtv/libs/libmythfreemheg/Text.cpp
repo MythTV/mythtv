@@ -331,14 +331,14 @@ void MHText::ContentPreparation(MHEngine *engine)
 {
     MHVisible::ContentPreparation(engine);
 
-    if (m_ContentType == IN_NoContent)
+    if (m_contentType == IN_NoContent)
     {
         MHERROR("Text object must have content");
     }
 
-    if (m_ContentType == IN_IncludedContent)
+    if (m_contentType == IN_IncludedContent)
     {
-        CreateContent(m_IncludedContent.Bytes(), m_IncludedContent.Size(), engine);
+        CreateContent(m_includedContent.Bytes(), m_includedContent.Size(), engine);
     }
 }
 

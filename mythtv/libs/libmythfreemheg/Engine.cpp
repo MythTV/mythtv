@@ -970,7 +970,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 {
     // It seems that some MHEG applications contain active ingredients with empty contents
     // This isn't correct but we simply ignore that.
-    if (! pRequester->m_ContentRef.IsSet())
+    if (! pRequester->m_contentRef.IsSet())
     {
         return;
     }
@@ -978,7 +978,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     // Remove any existing content requests for this ingredient.
     CancelExternalContentRequest(pRequester);
 
-    QString csPath = GetPathName(pRequester->m_ContentRef.m_contentRef);
+    QString csPath = GetPathName(pRequester->m_contentRef.m_contentRef);
 
     if (csPath.isEmpty())
     {

@@ -206,7 +206,7 @@ MHRoot *MHStream::FindByObjectNo(int n)
 void MHStream::BeginPlaying(MHEngine *engine)
 {
     QString stream;
-    MHOctetString &str = m_ContentRef.m_contentRef;
+    MHOctetString &str = m_contentRef.m_contentRef;
     if (str.Size() != 0) stream = QString::fromUtf8((const char *)str.Bytes(), str.Size());
     if ( !engine->GetContext()->BeginStream(stream, this))
         engine->EventTriggered(this, EventEngineEvent, 204); // StreamRefError

@@ -102,13 +102,13 @@ void MHBitmap::ContentPreparation(MHEngine *engine)
 {
     MHVisible::ContentPreparation(engine);
 
-    if (m_ContentType == IN_NoContent)
+    if (m_contentType == IN_NoContent)
     {
         MHERROR("Bitmap must contain a content");
     }
 
-    if (m_ContentType == IN_IncludedContent)
-        CreateContent(m_IncludedContent.Bytes(), m_IncludedContent.Size(), engine);
+    if (m_contentType == IN_IncludedContent)
+        CreateContent(m_includedContent.Bytes(), m_includedContent.Size(), engine);
 }
 
 // Decode the content.

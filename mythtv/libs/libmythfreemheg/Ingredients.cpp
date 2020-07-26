@@ -35,9 +35,9 @@ MHIngredient::MHIngredient(const MHIngredient &ref): MHRoot(ref)
     // Don't copy the object reference since that's set separately.
     m_fInitiallyActive = ref.m_fInitiallyActive;
     m_nContentHook = ref.m_nContentHook;
-    m_ContentType = ref.m_ContentType;
-    m_OrigIncludedContent.Copy(ref.m_OrigIncludedContent);
-    m_OrigContentRef.Copy(ref.m_OrigContentRef);
+    m_contentType = ref.m_contentType;
+    m_origIncludedContent.Copy(ref.m_origIncludedContent);
+    m_origContentRef.Copy(ref.m_origContentRef);
     m_nOrigContentSize = ref.m_nOrigContentSize;
     m_nOrigCCPrio = ref.m_nOrigCCPrio;
     m_fShared = ref.m_fShared;
@@ -72,14 +72,14 @@ void MHIngredient::Initialise(MHParseNode *p, MHEngine *engine)
         // Either a string - included content.
         if (pArg->m_nNodeType == MHParseNode::PNString)
         {
-            m_ContentType = IN_IncludedContent;
-            pArg->GetStringValue(m_OrigIncludedContent);
+            m_contentType = IN_IncludedContent;
+            pArg->GetStringValue(m_origIncludedContent);
         }
         else   // or a sequence - referenced content.
         {
             // In the text version this is tagged with :ContentRef
-            m_ContentType = IN_ReferencedContent;
-            m_OrigContentRef.Initialise(pArg->GetArgN(0), engine);
+            m_contentType = IN_ReferencedContent;
+            m_origContentRef.Initialise(pArg->GetArgN(0), engine);
             MHParseNode *pContentSize = pArg->GetNamedArg(C_CONTENT_SIZE);
 
             if (pContentSize)
@@ -121,18 +121,18 @@ void MHIngredient::PrintMe(FILE *fd, int nTabs) const
     }
 
     // Original content
-    if (m_ContentType == IN_IncludedContent)
+    if (m_contentType == IN_IncludedContent)
     {
         PrintTabs(fd, nTabs);
         fprintf(fd, ":OrigContent ");
-        m_OrigIncludedContent.PrintMe(fd, nTabs + 1);
+        m_origIncludedContent.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
-    else if (m_ContentType == IN_ReferencedContent)
+    else if (m_contentType == IN_ReferencedContent)
     {
         PrintTabs(fd, nTabs);
         fprintf(fd, ":OrigContent (");
-        m_OrigContentRef.PrintMe(fd, nTabs + 1);
+        m_origContentRef.PrintMe(fd, nTabs + 1);
 
         if (m_nOrigContentSize)
         {
@@ -164,8 +164,8 @@ void MHIngredient::Preparation(MHEngine *engine)
     }
 
     // Initialise the content information if any.
-    m_IncludedContent.Copy(m_OrigIncludedContent);
-    m_ContentRef.Copy(m_OrigContentRef);
+    m_includedContent.Copy(m_origIncludedContent);
+    m_contentRef.Copy(m_origContentRef);
     m_nContentSize = m_nOrigContentSize;
     m_nCCPrio = m_nOrigCCPrio;
     // Prepare the base class.
@@ -180,12 +180,12 @@ void MHIngredient::Destruction(MHEngine *engine)
 
 void MHIngredient::ContentPreparation(MHEngine *engine)
 {
-    if (m_ContentType == IN_IncludedContent)
+    if (m_contentType == IN_IncludedContent)
     {
         // Included content is there - generate ContentAvailable.
         engine->EventTriggered(this, EventContentAvailable);
     }
-    else if (m_ContentType == IN_ReferencedContent)
+    else if (m_contentType == IN_ReferencedContent)
     {
         // We are requesting external content
         engine->CancelExternalContentRequest(this);
@@ -200,13 +200,13 @@ void MHIngredient::SetData(const MHOctetString &included, MHEngine *engine)
     // and similarly for Referenced content.  I've seen cases where SetData
     // with included content has been used erroneously with the intention that
     // this should be the file name for referenced content.
-    if (m_ContentType == IN_ReferencedContent)
+    if (m_contentType == IN_ReferencedContent)
     {
-        m_ContentRef.m_contentRef.Copy(included);
+        m_contentRef.m_contentRef.Copy(included);
     }
-    else if (m_ContentType == IN_IncludedContent)
+    else if (m_contentType == IN_IncludedContent)
     {
-        m_IncludedContent.Copy(included);
+        m_includedContent.Copy(included);
 
     }
     else
@@ -219,12 +219,12 @@ void MHIngredient::SetData(const MHOctetString &included, MHEngine *engine)
 
 void MHIngredient::SetData(const MHContentRef &referenced, bool /*fSizeGiven*/, int size, bool fCCGiven, int /*cc*/, MHEngine *engine)
 {
-    if (m_ContentType != IN_ReferencedContent)
+    if (m_contentType != IN_ReferencedContent)
     {
         MHERROR("SetData with referenced content applied to an ingredient without referenced content");
     }
 
-    m_ContentRef.Copy(referenced);
+    m_contentRef.Copy(referenced);
     m_nContentSize = size;
 
     if (fCCGiven)
@@ -299,7 +299,7 @@ void MHSetData::Initialise(MHParseNode *p, MHEngine *engine)
         // Referenced content.
         m_fIsIncluded = false;
         m_fSizePresent = m_fCCPriorityPresent = false;
-        m_Referenced.Initialise(pContent->GetSeqN(0), engine);
+        m_referenced.Initialise(pContent->GetSeqN(0), engine);
 
         if (pContent->GetSeqCount() > 1)
         {
@@ -313,7 +313,7 @@ void MHSetData::Initialise(MHParseNode *p, MHEngine *engine)
                 if (pVal->m_nNodeType == MHParseNode::PNInt)
                 {
                     m_fSizePresent = true;
-                    m_ContentSize.Initialise(pVal, engine);
+                    m_contentSize.Initialise(pVal, engine);
                 }
             }
         }
@@ -329,14 +329,14 @@ void MHSetData::Initialise(MHParseNode *p, MHEngine *engine)
                 if (pVal->m_nNodeType == MHParseNode::PNInt)
                 {
                     m_fCCPriorityPresent = true;
-                    m_CCPriority.Initialise(pVal, engine);
+                    m_ccPriority.Initialise(pVal, engine);
                 }
             }
         }
     }
     else
     {
-        m_Included.Initialise(pContent, engine);
+        m_included.Initialise(pContent, engine);
         m_fIsIncluded = true;
     }
 }
@@ -345,22 +345,22 @@ void MHSetData::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     if (m_fIsIncluded)
     {
-        m_Included.PrintMe(fd, 0);
+        m_included.PrintMe(fd, 0);
     }
     else
     {
-        m_Referenced.PrintMe(fd, 0);
+        m_referenced.PrintMe(fd, 0);
 
         if (m_fSizePresent)
         {
             fprintf(fd, " :NewContentSize ");
-            m_ContentSize.PrintMe(fd, 0);
+            m_contentSize.PrintMe(fd, 0);
         }
 
         if (m_fCCPriorityPresent)
         {
             fprintf(fd, " :NewCCPriority ");
-            m_CCPriority.PrintMe(fd, 0);
+            m_ccPriority.PrintMe(fd, 0);
         }
     }
 }
@@ -373,7 +373,7 @@ void MHSetData::Perform(MHEngine *engine)
     if (m_fIsIncluded)   // Included content
     {
         MHOctetString included;
-        m_Included.GetValue(included, engine);
+        m_included.GetValue(included, engine);
         engine->FindObject(target)->SetData(included, engine);
     }
     else
@@ -381,16 +381,16 @@ void MHSetData::Perform(MHEngine *engine)
         MHContentRef referenced;
         int size = 0;
         int cc = 0;
-        m_Referenced.GetValue(referenced, engine);
+        m_referenced.GetValue(referenced, engine);
 
         if (m_fSizePresent)
         {
-            size = m_ContentSize.GetValue(engine);
+            size = m_contentSize.GetValue(engine);
         }
 
         if (m_fCCPriorityPresent)
         {
-            cc = m_CCPriority.GetValue(engine);
+            cc = m_ccPriority.GetValue(engine);
         }
 
         engine->FindObject(target)->SetData(referenced, m_fSizePresent, size, m_fCCPriorityPresent, cc, engine);
