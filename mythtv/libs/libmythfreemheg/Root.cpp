@@ -124,7 +124,7 @@ MHRoot *MHRoot::FindByObjectNo(int n)
 void MHGetAvailabilityStatus::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_ResultVar.Initialise(p->GetArgN(1), engine);
+    m_rsultVar.Initialise(p->GetArgN(1), engine);
 }
 
 void MHGetAvailabilityStatus::Perform(MHEngine *engine)
@@ -140,5 +140,5 @@ void MHGetAvailabilityStatus::Perform(MHEngine *engine)
         fResult = pObject->GetAvailabilityStatus();
     }
 
-    engine->FindObject(m_ResultVar)->SetVariableValue(fResult);
+    engine->FindObject(m_rsultVar)->SetVariableValue(fResult);
 }

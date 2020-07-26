@@ -263,8 +263,8 @@ class MHGetAvailabilityStatus: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_ResultVar.PrintMe(fd, 0); }
-    MHObjectRef m_ResultVar;
+        { m_rsultVar.PrintMe(fd, 0); }
+    MHObjectRef m_rsultVar;
 };
 
 // Get Running Status - Is the object running?.
