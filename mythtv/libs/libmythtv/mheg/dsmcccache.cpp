@@ -273,7 +273,7 @@ DSMCCCacheDir *DSMCCCache::FindGateway(const DSMCCCacheReference &ref)
 // the object or one of the parent files.
 int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 {
-    DSMCCCacheDir *dir = FindGateway(m_GatewayRef);
+    DSMCCCacheDir *dir = FindGateway(m_gatewayRef);
     if (dir == nullptr)
         return 1; // No gateway yet.
 
@@ -319,10 +319,10 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 // Set the gateway reference from a DSI message.
 void DSMCCCache::SetGateway(const DSMCCCacheReference &ref)
 {
-    if (!m_GatewayRef.Equal(ref))
+    if (!m_gatewayRef.Equal(ref))
     {
         LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] Setting gateway to reference %1")
             .arg(ref.toString()));
-        m_GatewayRef = ref;
+        m_gatewayRef = ref;
     }
 }

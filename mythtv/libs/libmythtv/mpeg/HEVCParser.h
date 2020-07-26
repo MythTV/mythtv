@@ -282,10 +282,10 @@ class HEVCParser : public H2645Parser
     bool     m_noRaslOutputFlag           {false};
     bool     m_seenEOS                    {true};
 
-    std::map<uint, SPS>  m_SPS;
-    std::map<uint, PPS>  m_PPS;
-    std::map<uint, VPS>  m_VPS;
-    std::map<uint, uint> m_POC;
+    std::map<uint, SPS>  m_sps;
+    std::map<uint, PPS>  m_pps;
+    std::map<uint, VPS>  m_vps;
+    std::map<uint, uint> m_poc;
 };
 
 #endif /* HEVCPARSER_H */

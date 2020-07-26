@@ -195,7 +195,7 @@ class MHIContext : public MHContext, public QRunnable
     MHEG            *m_engine; // Pointer to the MHEG engine
 
     mutable QMutex   m_runLock;
-    QWaitCondition   m_engine_wait; // protected by m_runLock
+    QWaitCondition   m_engineWait; // protected by m_runLock
     bool             m_stop           {false}; // protected by m_runLock
     QMutex           m_displayLock;
     bool             m_updated        {false};

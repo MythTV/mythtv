@@ -113,7 +113,7 @@ class DSMCCCache
     DSMCCCacheDir *FindDir(const DSMCCCacheReference &ref);
     DSMCCCacheDir *FindGateway(const DSMCCCacheReference &ref);
 
-    DSMCCCacheReference m_GatewayRef; // Reference to the gateway
+    DSMCCCacheReference m_gatewayRef; // Reference to the gateway
 
     // The set of directories, files and gateways.
     QMap<DSMCCCacheReference, DSMCCCacheDir*> m_directories;

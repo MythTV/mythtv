@@ -196,9 +196,9 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     uint            m_buttonVersion         { 1       };
     int             m_buttonStreamID        { 0       };
     uint32_t        m_clut[16]              { 0       };
-    uint8_t         m_button_color[4]       { 0       };
-    uint8_t         m_button_alpha[4]       { 0       };
-    QRect           m_hl_button             { 0, 0, 0, 0 };
+    uint8_t         m_buttonColor[4]        { 0       };
+    uint8_t         m_buttonAlpha[4]        { 0       };
+    QRect           m_hlButton              { 0, 0, 0, 0 };
     uint8_t        *m_menuSpuPkt            { nullptr };
     int             m_menuBuflength         { 0       };
     AVSubtitle      m_dvdMenuButton         {         };

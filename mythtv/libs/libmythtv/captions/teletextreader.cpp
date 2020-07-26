@@ -37,7 +37,7 @@ bool TeletextReader::KeyPress(const QString &key)
         key == ACTION_9)
     {
         numeric_input = true;
-        m_curpage_showheader = true;
+        m_curpageShowHeader = true;
         if (m_pageinput[0] == ' ')
             m_pageinput[0] = '0' + key.toInt();
         else if (m_pageinput[1] == ' ')
@@ -65,7 +65,7 @@ bool TeletextReader::KeyPress(const QString &key)
         if (ttpage)
             newPage = ttpage->pagenum;
         newSubPage = -1;
-        m_curpage_showheader = true;
+        m_curpageShowHeader = true;
     }
     else if (key == ACTION_PREVPAGE)
     {
@@ -73,21 +73,21 @@ bool TeletextReader::KeyPress(const QString &key)
         if (ttpage)
             newPage = ttpage->pagenum;
         newSubPage = -1;
-        m_curpage_showheader = true;
+        m_curpageShowHeader = true;
     }
     else if (key == ACTION_NEXTSUBPAGE)
     {
         TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, 1);
         if (ttpage)
             newSubPage = ttpage->subpagenum;
-        m_curpage_showheader = true;
+        m_curpageShowHeader = true;
     }
     else if (key == ACTION_PREVSUBPAGE)
     {
         TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage, -1);
         if (ttpage)
             newSubPage = ttpage->subpagenum;
-        m_curpage_showheader = true;
+        m_curpageShowHeader = true;
     }
     else if (key == ACTION_TOGGLEBACKGROUND)
     {
@@ -108,7 +108,7 @@ bool TeletextReader::KeyPress(const QString &key)
         {
             newPage = page->pagenum;
             newSubPage = -1;
-            m_curpage_showheader = true;
+            m_curpageShowHeader = true;
         }
     }
     else if (key == ACTION_MENUGREEN)
@@ -120,7 +120,7 @@ bool TeletextReader::KeyPress(const QString &key)
         {
             newPage = page->pagenum;
             newSubPage = -1;
-            m_curpage_showheader = true;
+            m_curpageShowHeader = true;
         }
     }
     else if (key == ACTION_MENUYELLOW)
@@ -132,7 +132,7 @@ bool TeletextReader::KeyPress(const QString &key)
         {
             newPage = page->pagenum;
             newSubPage = -1;
-            m_curpage_showheader = true;
+            m_curpageShowHeader = true;
         }
     }
     else if (key == ACTION_MENUBLUE)
@@ -144,7 +144,7 @@ bool TeletextReader::KeyPress(const QString &key)
         {
             newPage = page->pagenum;
             newSubPage = -1;
-            m_curpage_showheader = true;
+            m_curpageShowHeader = true;
         }
     }
     else if (key == ACTION_MENUWHITE)
@@ -156,7 +156,7 @@ bool TeletextReader::KeyPress(const QString &key)
         {
             newPage = page->pagenum;
             newSubPage = -1;
-            m_curpage_showheader = true;
+            m_curpageShowHeader = true;
         }
     }
     else
@@ -284,7 +284,7 @@ void TeletextReader::Reset(void)
 
     m_curpage    = 0x100;
     m_cursubpage = -1;
-    m_curpage_showheader = true;
+    m_curpageShowHeader = true;
 
     m_pageinput[0] = '1';
     m_pageinput[1] = '0';
@@ -507,7 +507,7 @@ void TeletextReader::PageUpdated(int page, int subpage)
         return;
     if (subpage != m_cursubpage && m_cursubpage != -1)
         return;
-    m_page_changed = true;
+    m_pageChanged = true;
 }
 
 void TeletextReader::HeaderUpdated(
@@ -520,10 +520,10 @@ void TeletextReader::HeaderUpdated(
     if (page_ptr == nullptr)
         return;
 
-    if (!m_curpage_showheader)
+    if (!m_curpageShowHeader)
         return;
 
-    m_header_changed = true;
+    m_headerChanged = true;
 }
 
 const TeletextPage *TeletextReader::FindPageInternal(

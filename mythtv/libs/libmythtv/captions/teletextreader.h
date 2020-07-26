@@ -82,12 +82,12 @@ class TeletextReader
     QString GetPage(void);
     void SetPage(int page, int subpage);
     void SetSubPage(int subpage)        { m_cursubpage = subpage;      }
-    bool PageChanged(void) const        { return m_page_changed;       }
-    void SetPageChanged(bool changed)   { m_page_changed = changed;    }
-    void SetShowHeader(bool show)       { m_curpage_showheader = show; }
-    void SetHeaderChanged(bool changed) { m_header_changed = changed;  }
-    bool IsSubtitle(void) const         { return m_curpage_issubtitle; }
-    void SetIsSubtitle(bool sub)        { m_curpage_issubtitle = sub;  }
+    bool PageChanged(void) const        { return m_pageChanged;        }
+    void SetPageChanged(bool changed)   { m_pageChanged = changed;     }
+    void SetShowHeader(bool show)       { m_curpageShowHeader = show;  }
+    void SetHeaderChanged(bool changed) { m_headerChanged = changed;   }
+    bool IsSubtitle(void) const         { return m_curpageIsSubtitle;  }
+    void SetIsSubtitle(bool sub)        { m_curpageIsSubtitle = sub;   }
     bool IsTransparent(void) const      { return m_transparent;        }
     bool RevealHidden(void) const       { return m_revealHidden;       }
     int  GetPageInput(uint num) const   { return m_pageinput[num];     }
@@ -126,14 +126,14 @@ class TeletextReader
 
     int              m_curpage            {0x100};
     int              m_cursubpage         {-1};
-    bool             m_curpage_showheader {true};
-    bool             m_curpage_issubtitle {false};
+    bool             m_curpageShowHeader  {true};
+    bool             m_curpageIsSubtitle  {false};
     int              m_pageinput[3]       {0};
     bool             m_transparent        {false};
     bool             m_revealHidden       {false};
     uint8_t          m_header[40]         {0};
-    bool             m_header_changed     {false};
-    bool             m_page_changed       {false};
+    bool             m_headerChanged      {false};
+    bool             m_pageChanged        {false};
     TeletextMagazine m_magazines[8]       { };
     unsigned char    m_bitswap[256]       {};
     int              m_fetchpage          {0};

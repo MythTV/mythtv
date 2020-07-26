@@ -1266,15 +1266,15 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
     }
 
     int pps_id = get_ue_golomb(gb); // slice_pic_parameter_set_id; ue(v)
-    if (m_PPS.find(pps_id) == m_PPS.end())
+    if (m_pps.find(pps_id) == m_pps.end())
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC +
             QString("PPS Id %1 not valid yet. Skipping parsing of slice.")
             .arg(pps_id));
         return false;
     }
-    PPS* pps = &m_PPS[pps_id];
-    SPS* sps = &m_SPS[pps->sps_id];
+    PPS* pps = &m_pps[pps_id];
+    SPS* sps = &m_sps[pps->sps_id];
 
     if (!m_firstSliceSegmentInPicFlag)
     {
@@ -1600,7 +1600,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
         max_sub_layers_minus1 = ext_or_max_sub_layers_minus1;
     else
     {
-        if (m_VPS.find(vps_id) == m_VPS.end())
+        if (m_vps.find(vps_id) == m_vps.end())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Could not find VPS[%1]").arg(vps_id));
@@ -1615,7 +1615,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
               sps_ext_or_max_sub_layers_minus1
             */
             max_sub_layers_minus1 = (ext_or_max_sub_layers_minus1 == 7) ?
-                                    m_VPS[vps_id].max_sub_layers :
+                                    m_vps[vps_id].max_sub_layers :
                                     ext_or_max_sub_layers_minus1;
         }
     }
@@ -1642,7 +1642,7 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     }
 
     uint sps_id = get_ue_golomb(gb); // sps_seq_parameter_set_id ue(v);
-    SPS* sps = &m_SPS[sps_id];
+    SPS* sps = &m_sps[sps_id];
 
     if (MultiLayerExtSpsFlag)
     {
@@ -1811,9 +1811,9 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
               number of bits used to represent lt_ref_pic_poc_lsb_sps[
               i ] is equal to log2_max_pic_order_cnt_lsb_minus4 + 4.
             */
-            m_POC[i] = get_bits(gb, sps->log2_max_pic_order_cnt_lsb); // u(v)
+            m_poc[i] = get_bits(gb, sps->log2_max_pic_order_cnt_lsb); // u(v)
             LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("POC[%1] %2").arg(i).arg(m_POC[i]));
+                QString("POC[%1] %2").arg(i).arg(m_poc[i]));
             get_bits1(gb); // used_by_curr_pic_lt_sps_flag[i] u(1)
         }
     }
@@ -1852,7 +1852,7 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
 
     /* uint16_t check = */ get_bits(gb, 16); //  vps_reserved_0xffff_16bits u(16)
 
-    m_VPS[vps_id].max_sub_layers = max_sub_layers_minus1 + 1;
+    m_vps[vps_id].max_sub_layers = max_sub_layers_minus1 + 1;
     if (!profileTierLevel(gb, true, max_sub_layers_minus1))
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -1969,7 +1969,7 @@ bool HEVCParser::parseVPS(GetBitContext *gb)
 bool HEVCParser::parsePPS(GetBitContext *gb)
 {
     uint pps_id = get_ue_golomb(gb); // pps_pic_parameter_set_id ue(v)
-    PPS* pps = &m_PPS[pps_id];
+    PPS* pps = &m_pps[pps_id];
 
     pps->sps_id = get_ue_golomb(gb); // pps_seq_parameter_set_id; ue(v)
     pps->dependent_slice_segments_enabled_flag = get_bits1(gb); // u(1)

@@ -158,7 +158,7 @@ void MHIContext::StopEngine(void)
 
     m_stop = true;
     m_runLock.lock();
-    m_engine_wait.wakeAll();
+    m_engineWait.wakeAll();
     m_runLock.unlock();
 
     m_engineThread->wait();
@@ -265,7 +265,7 @@ void MHIContext::run(void)
         toWait = (toWait > 1000 || toWait <= 0) ? 1000 : toWait;
 
         if (!m_stop && (toWait > 0))
-            m_engine_wait.wait(locker.mutex(), toWait);
+            m_engineWait.wait(locker.mutex(), toWait);
     }
 }
 
@@ -305,7 +305,7 @@ void MHIContext::QueueDSMCCPacket(
                                              componentTag, carouselId,
                                              dataBroadcastId));
     }
-    m_engine_wait.wakeAll();
+    m_engineWait.wakeAll();
 }
 
 // A NetworkBootInfo sub-descriptor is present in the PMT.
@@ -330,7 +330,7 @@ void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
     if (m_lastNbiVersion == NBI_VERSION_UNSET)
         m_lastNbiVersion = data[0];
     else
-        m_engine_wait.wakeAll();
+        m_engineWait.wakeAll();
 }
 
 // Called only by m_engineThread
@@ -510,7 +510,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
         // some more packets.  We should eventually find out if this item is
         // present.
         ProcessDSMCCQueue();
-        m_engine_wait.wait(&m_runLock, 300);
+        m_engineWait.wait(&m_runLock, 300);
     }
     return false; // Stop has been set.  Say the object isn't present.
 }
@@ -625,7 +625,7 @@ bool MHIContext::OfferKey(const QString& key)
         .arg(key).arg(action).arg(m_keyQueue.size()) );
     { QMutexLocker locker(&m_keyLock);
     m_keyQueue.enqueue(action);}
-    m_engine_wait.wakeAll();
+    m_engineWait.wakeAll();
     return true;
 }
 

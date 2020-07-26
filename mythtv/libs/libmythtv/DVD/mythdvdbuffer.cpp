@@ -1436,7 +1436,7 @@ QRect MythDVDBuffer::GetButtonCoords(void)
     QRect rect(0,0,0,0);
     if (!m_buttonExists)
         return rect;
-    rect.setRect(m_hl_button.x(), m_hl_button.y(), m_hl_button.width(), m_hl_button.height());
+    rect.setRect(m_hlButton.x(), m_hlButton.y(), m_hlButton.width(), m_hlButton.height());
     return rect;
 }
 
@@ -1592,7 +1592,7 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                     Subtitle->rects[1]->type = SUBTITLE_BITMAP;
                     Subtitle->rects[1]->data[1] = static_cast<uint8_t*>(av_malloc(4 *4));
                     GuessPalette(reinterpret_cast<uint32_t*>(Subtitle->rects[1]->data[1]),
-                                 m_button_color, m_button_alpha);
+                                 m_buttonColor, m_buttonAlpha);
                 }
                 else
                     FindSmallestBoundingRectangle(Subtitle);
@@ -1641,8 +1641,8 @@ bool MythDVDBuffer::DVDButtonUpdate(bool ButtonMode)
 
     for (uint i = 0 ; i < 4 ; i++)
     {
-        m_button_alpha[i] = 0xf & (highlight.palette >> (4 * i));
-        m_button_color[i] = 0xf & (highlight.palette >> (16 + 4 * i));
+        m_buttonAlpha[i] = 0xf & (highlight.palette >> (4 * i));
+        m_buttonColor[i] = 0xf & (highlight.palette >> (16 + 4 * i));
     }
 
     // If the button overlay has already been decoded, make sure
@@ -1650,10 +1650,10 @@ bool MythDVDBuffer::DVDButtonUpdate(bool ButtonMode)
     if (m_dvdMenuButton.rects && (m_dvdMenuButton.num_rects > 1))
     {
         GuessPalette(reinterpret_cast<uint32_t*>(m_dvdMenuButton.rects[1]->data[1]),
-                     m_button_color, m_button_alpha);
+                     m_buttonColor, m_buttonAlpha);
     }
 
-    m_hl_button.setCoords(highlight.sx, highlight.sy, highlight.ex, highlight.ey);
+    m_hlButton.setCoords(highlight.sx, highlight.sy, highlight.ex, highlight.ey);
     return ((highlight.sx + highlight.sy) > 0) &&
             (highlight.sx < videowidth && highlight.sy < videoheight);
 }
@@ -1692,7 +1692,7 @@ void MythDVDBuffer::ClearMenuSPUParameters(void)
 
     av_free(m_menuSpuPkt);
     m_menuBuflength = 0;
-    m_hl_button.setRect(0, 0, 0, 0);
+    m_hlButton.setRect(0, 0, 0, 0);
 }
 
 int MythDVDBuffer::NumMenuButtons(void) const
