@@ -57,10 +57,10 @@ class MHLink : public MHIngredient
     virtual void MatchEvent(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &evData, MHEngine *engine);
 
   protected:
-    MHObjectRef m_EventSource;
+    MHObjectRef m_eventSource;
     enum EventType m_nEventType {EventIsAvailable};
-    MHUnion m_EventData;
-    MHActionSequence m_LinkEffect;
+    MHUnion m_eventData;
+    MHActionSequence m_linkEffect;
 };
 
 // Actions.

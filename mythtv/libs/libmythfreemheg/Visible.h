@@ -74,13 +74,13 @@ class MHVisible : public MHPresentable
     int m_nOriginalBoxHeight {-1};
     int m_nOriginalPosX      {0};
     int m_nOriginalPosY      {0};
-    MHObjectRef m_OriginalPaletteRef; // Optional palette ref
+    MHObjectRef m_originalPaletteRef; // Optional palette ref
     // Internal attributes
     int m_nBoxWidth          {0};
     int m_nBoxHeight         {0};
     int m_nPosX              {0};
     int m_nPosY              {0};
-    MHObjectRef m_PaletteRef;
+    MHObjectRef m_paletteRef;
 
     // Return the colour, looking up in the palette if necessary.
     static MHRgba GetColour(const MHColour &colour);
@@ -110,12 +110,12 @@ class MHLineArt : public MHVisible
     bool    m_fBorderedBBox      {true}; // Does it have lines round or not?
     int     m_nOriginalLineWidth {1};
     enum { LineStyleSolid = 1, LineStyleDashed = 2, LineStyleDotted = 3 };
-    int     m_OriginalLineStyle  {LineStyleSolid};
-    MHColour    m_OrigLineColour, m_OrigFillColour; 
+    int     m_originalLineStyle  {LineStyleSolid};
+    MHColour    m_origLineColour, m_origFillColour;
     // Internal attributes
     int     m_nLineWidth         {0};
-    int     m_LineStyle          {0};
-    MHColour    m_LineColour, m_FillColour;
+    int     m_lineStyle          {0};
+    MHColour    m_lineColour, m_fillColour;
 };
 
 class MHRectangle : public MHLineArt  
@@ -203,7 +203,7 @@ class MHSlider : public MHVisible, public MHInteractible
     void Step(int nbSteps, MHEngine *engine) override; // MHRoot
     void SetSliderValue(int newValue, MHEngine *engine) override; // MHRoot
     int GetSliderValue(void) override // MHRoot
-        { return m_slider_value; }
+        { return m_sliderValue; }
     void SetPortion(int newPortion, MHEngine *engine) override; // MHRoot
     int GetPortion(void) override // MHRoot
         { return m_portion; }
@@ -221,11 +221,11 @@ class MHSlider : public MHVisible, public MHInteractible
     // Orientation and direction of increasing value.
     enum SliderOrientation { SliderLeft = 1, SliderRight, SliderUp, SliderDown }
         m_orientation     {SliderLeft};
-    int m_initial_value   {1};
-    int m_initial_portion {0};
-    int m_orig_max_value  {-1};
-    int m_orig_min_value  {1};
-    int m_orig_step_size  {1};
+    int m_initialValue    {1};
+    int m_initialPortion  {0};
+    int m_origMaxValue    {-1};
+    int m_origMinValue    {1};
+    int m_origStepSize    {1};
     // Style of slider.  Normal represents a mark on a scale,
     // Thermometer a range from the start up to the mark and Proportional
     // a range from the slider to the portion.
@@ -234,10 +234,10 @@ class MHSlider : public MHVisible, public MHInteractible
     MHColour m_sliderRefColour;
     // Internal attributes
     // In UK MHEG min_value, max_value and step_size can be changed.
-    int m_max_value       {0};
-    int m_min_value       {0};
-    int m_step_size       {0};
-    int m_slider_value    {0};
+    int m_maxValue        {0};
+    int m_minValue        {0};
+    int m_stepSize        {0};
+    int m_sliderValue     {0};
     int m_portion         {0};
 };
 
@@ -321,7 +321,7 @@ class MHSwitchButton : public MHPushButton
 class MHSetColour: public MHElemAction
 {
   public:
-    explicit MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
+    explicit MHSetColour(const char *name): MHElemAction(name), m_colourType(CT_None) { }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
@@ -329,9 +329,9 @@ class MHSetColour: public MHElemAction
     virtual void SetColour(const MHColour &colour, MHEngine *engine) = 0;
     // The colour can be specified as either an index or an absolute colour.
     // It's optional for the fill colour.
-    enum { CT_None, CT_Indexed, CT_Absolute } m_ColourType;
-    MHGenericInteger m_Indexed;
-    MHGenericOctetString m_Absolute;
+    enum { CT_None, CT_Indexed, CT_Absolute } m_colourType;
+    MHGenericInteger m_indexed;
+    MHGenericOctetString m_absolute;
 };
 
 class MHSetLineColour: public MHSetColour {

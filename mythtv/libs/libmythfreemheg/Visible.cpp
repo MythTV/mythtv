@@ -43,7 +43,7 @@ MHVisible::MHVisible(const MHVisible &ref): MHPresentable(ref)
     m_nBoxHeight = ref.m_nBoxHeight;
     m_nPosX = ref.m_nPosX;
     m_nPosY = ref.m_nPosY;
-    m_OriginalPaletteRef.Copy(ref.m_OriginalPaletteRef);
+    m_originalPaletteRef.Copy(ref.m_originalPaletteRef);
 }
 
 
@@ -77,7 +77,7 @@ void MHVisible::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOriginalPaletteRef)
     {
-        m_OriginalPaletteRef.Initialise(pOriginalPaletteRef->GetArgN(0), engine);
+        m_originalPaletteRef.Initialise(pOriginalPaletteRef->GetArgN(0), engine);
     }
 }
 
@@ -93,11 +93,11 @@ void MHVisible::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":OrigPosition %d %d\n", m_nOriginalPosX, m_nOriginalPosY);
     }
 
-    if (m_OriginalPaletteRef.IsSet())
+    if (m_originalPaletteRef.IsSet())
     {
         PrintTabs(fd, nTabs);
         fprintf(fd, ":OrigPaletteRef");
-        m_OriginalPaletteRef.PrintMe(fd, nTabs + 1);
+        m_originalPaletteRef.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 }
@@ -113,7 +113,7 @@ void MHVisible::Preparation(MHEngine *engine)
     m_nBoxHeight = m_nOriginalBoxHeight;
     m_nPosX = m_nOriginalPosX;
     m_nPosY = m_nOriginalPosY;
-    m_PaletteRef.Copy(m_OriginalPaletteRef);
+    m_paletteRef.Copy(m_originalPaletteRef);
     // Add a reference to this to the display stack.
     engine->AddToDisplayStack(this);
     MHIngredient::Preparation(engine);
@@ -239,7 +239,7 @@ void MHVisible::GetBoxSize(MHRoot *pWidthDest, MHRoot *pHeightDest)
 
 void MHVisible::SetPaletteRef(const MHObjectRef newPalette, MHEngine *engine)
 {
-    m_PaletteRef.Copy(newPalette);
+    m_paletteRef.Copy(newPalette);
     engine->Redraw(GetVisibleArea());
 }
 
@@ -268,11 +268,11 @@ MHLineArt::MHLineArt(const MHLineArt &ref): MHVisible(ref)
 {
     m_fBorderedBBox = ref.m_fBorderedBBox;
     m_nOriginalLineWidth = ref.m_nOriginalLineWidth;
-    m_OriginalLineStyle = ref.m_OriginalLineStyle;
-    m_OrigLineColour.Copy(ref.m_OrigLineColour);
-    m_OrigFillColour.Copy(ref.m_OrigFillColour);
+    m_originalLineStyle = ref.m_originalLineStyle;
+    m_origLineColour.Copy(ref.m_origLineColour);
+    m_origFillColour.Copy(ref.m_origFillColour);
     m_nLineWidth = ref.m_nLineWidth;
-    m_LineStyle = ref.m_LineStyle;
+    m_lineStyle = ref.m_lineStyle;
 }
 
 void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)
@@ -299,7 +299,7 @@ void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOls)
     {
-        m_OriginalLineStyle = pOls->GetArgN(0)->GetIntValue();
+        m_originalLineStyle = pOls->GetArgN(0)->GetIntValue();
     }
 
     // Line colour.
@@ -307,7 +307,7 @@ void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOrlc)
     {
-        m_OrigLineColour.Initialise(pOrlc->GetArgN(0), engine);
+        m_origLineColour.Initialise(pOrlc->GetArgN(0), engine);
     }
 
     // Fill colour
@@ -315,7 +315,7 @@ void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOrfc)
     {
-        m_OrigFillColour.Initialise(pOrfc->GetArgN(0), engine);
+        m_origFillColour.Initialise(pOrfc->GetArgN(0), engine);
     }
 }
 
@@ -335,25 +335,25 @@ void MHLineArt::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":OrigLineWidth %d\n", m_nOriginalLineWidth);
     }
 
-    if (m_OriginalLineStyle != LineStyleSolid)
+    if (m_originalLineStyle != LineStyleSolid)
     {
         PrintTabs(fd, nTabs);
-        fprintf(fd, ":OrigLineStyle %d\n", m_OriginalLineStyle);
+        fprintf(fd, ":OrigLineStyle %d\n", m_originalLineStyle);
     }
 
-    if (m_OrigLineColour.IsSet())
+    if (m_origLineColour.IsSet())
     {
         PrintTabs(fd, nTabs);
         fprintf(fd, ":OrigRefLineColour ");
-        m_OrigLineColour.PrintMe(fd, nTabs + 1);
+        m_origLineColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_OrigFillColour.IsSet())
+    if (m_origFillColour.IsSet())
     {
         PrintTabs(fd, nTabs);
         fprintf(fd, ":OrigRefFillColour ");
-        m_OrigFillColour.PrintMe(fd, nTabs + 1);
+        m_origFillColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 }
@@ -367,24 +367,24 @@ void MHLineArt::Preparation(MHEngine *engine)
 
     // Set up the internal attributes.
     m_nLineWidth = m_nOriginalLineWidth;
-    m_LineStyle = m_OriginalLineStyle;
+    m_lineStyle = m_originalLineStyle;
 
-    if (m_OrigLineColour.IsSet())
+    if (m_origLineColour.IsSet())
     {
-        m_LineColour.Copy(m_OrigLineColour);
+        m_lineColour.Copy(m_origLineColour);
     }
     else
     {
-        m_LineColour.SetFromString("\000\000\000\000", 4);    // Default is black
+        m_lineColour.SetFromString("\000\000\000\000", 4);    // Default is black
     }
 
-    if (m_OrigFillColour.IsSet())
+    if (m_origFillColour.IsSet())
     {
-        m_FillColour.Copy(m_OrigFillColour);
+        m_fillColour.Copy(m_origFillColour);
     }
     else
     {
-        m_FillColour.SetFromString("\000\000\000\377", 4);    // Default is transparent
+        m_fillColour.SetFromString("\000\000\000\377", 4);    // Default is transparent
     }
 
     MHVisible::Preparation(engine); // Prepare the base class.
@@ -394,13 +394,13 @@ void MHLineArt::Preparation(MHEngine *engine)
 // Set the colours
 void MHLineArt::SetFillColour(const MHColour &colour, MHEngine *engine)
 {
-    m_FillColour.Copy(colour);
+    m_fillColour.Copy(colour);
     engine->Redraw(GetVisibleArea());
 }
 
 void MHLineArt::SetLineColour(const MHColour &colour, MHEngine *engine)
 {
-    m_LineColour.Copy(colour);
+    m_lineColour.Copy(colour);
     engine->Redraw(GetVisibleArea());
 }
 
@@ -412,7 +412,7 @@ void MHLineArt::SetLineWidth(int nWidth, MHEngine *engine)
 
 void MHLineArt::SetLineStyle(int nStyle, MHEngine *engine)
 {
-    m_LineStyle = nStyle;
+    m_lineStyle = nStyle;
     engine->Redraw(GetVisibleArea());
 }
 
@@ -434,8 +434,8 @@ QRegion MHRectangle::GetOpaqueArea()
         return QRegion();
     }
 
-    MHRgba lineColour = GetColour(m_LineColour);
-    MHRgba fillColour = GetColour(m_FillColour);
+    MHRgba lineColour = GetColour(m_lineColour);
+    MHRgba fillColour = GetColour(m_fillColour);
 
     // If the fill is transparent or semi-transparent we return an empty region and
     // ignore the special case where the surrounding box is opaque.
@@ -471,8 +471,8 @@ void MHRectangle::Display(MHEngine *engine)
 
     // The bounding box is assumed always to be True.
 
-    MHRgba lineColour = GetColour(m_LineColour);
-    MHRgba fillColour = GetColour(m_FillColour);
+    MHRgba lineColour = GetColour(m_lineColour);
+    MHRgba fillColour = GetColour(m_fillColour);
     MHContext *d = engine->GetContext();
 
     // Fill the centre.
@@ -606,55 +606,55 @@ void MHSlider::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pMin)
     {
-        m_orig_min_value = pMin->GetArgN(0)->GetIntValue();
+        m_origMinValue = pMin->GetArgN(0)->GetIntValue();
     }
     else
     {
-        m_orig_min_value = 1;
+        m_origMinValue = 1;
     }
 
     MHParseNode *pMax = p->GetNamedArg(C_MAX_VALUE);
 
     if (pMax)
     {
-        m_orig_max_value = pMax->GetArgN(0)->GetIntValue();
+        m_origMaxValue = pMax->GetArgN(0)->GetIntValue();
     }
     else
     {
-        m_orig_max_value = m_orig_min_value - 1;    // Unset
+        m_origMaxValue = m_origMinValue - 1;    // Unset
     }
 
     MHParseNode *pInit = p->GetNamedArg(C_INITIAL_VALUE);
 
     if (pInit)
     {
-        m_initial_value = pInit->GetArgN(0)->GetIntValue();
+        m_initialValue = pInit->GetArgN(0)->GetIntValue();
     }
     else
     {
-        m_initial_value = m_orig_min_value;    // Default is m_min_value
+        m_initialValue = m_origMinValue;    // Default is m_minValue
     }
 
     MHParseNode *pPortion = p->GetNamedArg(C_INITIAL_PORTION);
 
     if (pPortion)
     {
-        m_initial_portion = pPortion->GetArgN(0)->GetIntValue();
+        m_initialPortion = pPortion->GetArgN(0)->GetIntValue();
     }
     else
     {
-        m_initial_portion = m_orig_min_value - 1;    // Unset
+        m_initialPortion = m_origMinValue - 1;    // Unset
     }
 
     MHParseNode *pStep = p->GetNamedArg(C_STEP_SIZE);
 
     if (pStep)
     {
-        m_orig_step_size = pStep->GetArgN(0)->GetIntValue();
+        m_origStepSize = pStep->GetArgN(0)->GetIntValue();
     }
     else
     {
-        m_orig_step_size = 1;    // Unset
+        m_origStepSize = 1;    // Unset
     }
 
     MHParseNode *pStyle = p->GetNamedArg(C_SLIDER_STYLE);
@@ -732,34 +732,34 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs);
     fprintf(fd, ":Orientation %s\n", rchOrientation[m_orientation-1]);
 
-    if (m_initial_value >= m_orig_min_value)
+    if (m_initialValue >= m_origMinValue)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":InitialValue %d\n", m_initial_value);
+        fprintf(fd, ":InitialValue %d\n", m_initialValue);
     }
 
-    if (m_orig_min_value != 1)
+    if (m_origMinValue != 1)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":MinValue %d\n", m_orig_min_value);
+        fprintf(fd, ":MinValue %d\n", m_origMinValue);
     }
 
-    if (m_orig_max_value > m_orig_min_value)
+    if (m_origMaxValue > m_origMinValue)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":MaxValue %d\n", m_orig_max_value);
+        fprintf(fd, ":MaxValue %d\n", m_origMaxValue);
     }
 
-    if (m_initial_portion >= m_orig_min_value)
+    if (m_initialPortion >= m_origMinValue)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":InitialPortion %d\n", m_initial_portion);
+        fprintf(fd, ":InitialPortion %d\n", m_initialPortion);
     }
 
-    if (m_orig_step_size != 1)
+    if (m_origStepSize != 1)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":StepSize %d\n", m_orig_step_size);
+        fprintf(fd, ":StepSize %d\n", m_origStepSize);
     }
 
     if (m_style != SliderNormal)
@@ -785,11 +785,11 @@ void MHSlider::PrintMe(FILE *fd, int nTabs) const
 void MHSlider::Preparation(MHEngine *engine)
 {
     MHVisible::Preparation(engine);
-    m_max_value = m_orig_max_value;
-    m_min_value = m_orig_min_value;
-    m_step_size = m_orig_step_size;
-    m_slider_value = m_initial_value;
-    m_portion = m_initial_portion;
+    m_maxValue = m_origMaxValue;
+    m_minValue = m_origMinValue;
+    m_stepSize = m_origStepSize;
+    m_sliderValue = m_initialValue;
+    m_portion = m_initialPortion;
 }
 
 void MHSlider::Display(MHEngine *engine)
@@ -810,7 +810,7 @@ void MHSlider::Display(MHEngine *engine)
     if (m_orientation == SliderLeft || m_orientation == SliderRight)
         major = m_nBoxWidth;
 
-    if (m_max_value <= m_min_value)
+    if (m_maxValue <= m_minValue)
     {
         return;    // Avoid divide by zero if error.
     }
@@ -819,7 +819,7 @@ void MHSlider::Display(MHEngine *engine)
     {
         // This is drawn as a 9 pixel wide "thumb" at the position.
         major -= 9; // Width of "thumb"
-        int posn = major * (m_slider_value - m_min_value) / (m_max_value - m_min_value);
+        int posn = major * (m_sliderValue - m_minValue) / (m_maxValue - m_minValue);
 
         switch (m_orientation)
         {
@@ -843,12 +843,12 @@ void MHSlider::Display(MHEngine *engine)
         // run from the start to the position, proportional sliders from the
         // position for the "portion".
         int start = 0;
-        int end = major * (m_slider_value - m_min_value) / (m_max_value - m_min_value);
+        int end = major * (m_sliderValue - m_minValue) / (m_maxValue - m_minValue);
 
         if (m_style == SliderProp)
         {
             start = end;
-            end = major * (m_slider_value + m_portion - m_min_value) / (m_max_value - m_min_value);
+            end = major * (m_sliderValue + m_portion - m_minValue) / (m_maxValue - m_minValue);
         }
 
         switch (m_orientation)
@@ -958,9 +958,9 @@ void MHSlider::KeyEvent(MHEngine *engine, int nCode)
 
 void MHSlider::Increment(MHEngine *engine)
 {
-    if (m_slider_value + m_step_size <= m_max_value)
+    if (m_sliderValue + m_stepSize <= m_maxValue)
     {
-        m_slider_value += m_step_size;
+        m_sliderValue += m_stepSize;
         engine->Redraw(GetVisibleArea());
         engine->EventTriggered(this, EventSliderValueChanged);
     }
@@ -968,9 +968,9 @@ void MHSlider::Increment(MHEngine *engine)
 
 void MHSlider::Decrement(MHEngine *engine)
 {
-    if (m_slider_value - m_step_size >= m_min_value)
+    if (m_sliderValue - m_stepSize >= m_minValue)
     {
-        m_slider_value -= m_step_size;
+        m_sliderValue -= m_stepSize;
         engine->Redraw(GetVisibleArea());
         engine->EventTriggered(this, EventSliderValueChanged);
     }
@@ -978,7 +978,7 @@ void MHSlider::Decrement(MHEngine *engine)
 
 void MHSlider::Step(int nbSteps, MHEngine *engine)
 {
-    m_step_size = nbSteps;
+    m_stepSize = nbSteps;
 
     if (m_fRunning)
     {
@@ -990,7 +990,7 @@ void MHSlider::Step(int nbSteps, MHEngine *engine)
 
 void MHSlider::SetSliderValue(int newValue, MHEngine *engine)
 {
-    m_slider_value = newValue;
+    m_sliderValue = newValue;
 
     if (m_fRunning)
     {
@@ -1015,10 +1015,10 @@ void MHSlider::SetPortion(int newPortion, MHEngine *engine)
 // Additional action defined in UK MHEG.
 void MHSlider::SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine)
 {
-    m_min_value = newMin;
-    m_max_value = newMax;
-    m_step_size = newStep;
-    m_slider_value = newMin;
+    m_minValue = newMin;
+    m_maxValue = newMax;
+    m_stepSize = newStep;
+    m_sliderValue = newMin;
 
     if (m_fRunning)
     {
@@ -1119,28 +1119,28 @@ void MHSetColour::Initialise(MHParseNode *p, MHEngine *engine)
 
         if (pIndexed)
         {
-            m_ColourType = CT_Indexed;
-            m_Indexed.Initialise(pIndexed->GetArgN(0), engine);
+            m_colourType = CT_Indexed;
+            m_indexed.Initialise(pIndexed->GetArgN(0), engine);
         }
         else if (pAbsolute)
         {
-            m_ColourType = CT_Absolute;
-            m_Absolute.Initialise(pAbsolute->GetArgN(0), engine);
+            m_colourType = CT_Absolute;
+            m_absolute.Initialise(pAbsolute->GetArgN(0), engine);
         }
     }
 }
 
 void MHSetColour::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
-    if (m_ColourType == CT_Indexed)
+    if (m_colourType == CT_Indexed)
     {
         fprintf(fd, ":NewColourIndex ");
-        m_Indexed.PrintMe(fd, 0);
+        m_indexed.PrintMe(fd, 0);
     }
-    else if (m_ColourType == CT_Absolute)
+    else if (m_colourType == CT_Absolute)
     {
         fprintf(fd, ":NewAbsoluteColour ");
-        m_Absolute.PrintMe(fd, 0);
+        m_absolute.PrintMe(fd, 0);
     }
 }
 
@@ -1150,7 +1150,7 @@ void MHSetColour::Perform(MHEngine *engine)
     m_target.GetValue(target, engine); // Get the item to set.
     MHColour newColour;
 
-    switch (m_ColourType)
+    switch (m_colourType)
     {
         case CT_None:
         {
@@ -1161,12 +1161,12 @@ void MHSetColour::Perform(MHEngine *engine)
         case CT_Absolute:
         {
             MHOctetString colour;
-            m_Absolute.GetValue(colour, engine);
+            m_absolute.GetValue(colour, engine);
             newColour.m_colStr.Copy(colour);
             break;
         }
         case CT_Indexed:
-            newColour.m_nColIndex = m_Indexed.GetValue(engine);
+            newColour.m_nColIndex = m_indexed.GetValue(engine);
     }
 
     SetColour(newColour, engine); // Set the colour of the appropriate portion of the visible

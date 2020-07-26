@@ -59,7 +59,7 @@ class MHDynamicLineArt : public MHLineArt
     void GetLineWidth(MHRoot *pResult) override // MHRoot
         { pResult->SetVariableValue(m_nLineWidth); }
     void GetLineStyle(MHRoot *pResult) override // MHRoot
-        { pResult->SetVariableValue(m_LineStyle); }
+        { pResult->SetVariableValue(m_lineStyle); }
     void GetLineColour(MHRoot *pResult) override; // MHRoot
     void GetFillColour(MHRoot *pResult) override; // MHRoot
     void DrawArcSector(bool fIsSector, int x, int y, int width, int height, int start, int arc, MHEngine *engine) override; // MHRoot

@@ -33,7 +33,7 @@
 
 MHLink::MHLink()
 {
-    m_EventData.m_Type = MHUnion::U_None;
+    m_eventData.m_Type = MHUnion::U_None;
 }
 
 void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
@@ -44,7 +44,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pLinkCond)   // Only in binary.
     {
-        m_EventSource.Initialise(pLinkCond->GetArgN(0), engine); // Event source
+        m_eventSource.Initialise(pLinkCond->GetArgN(0), engine); // Event source
         m_nEventType = (enum EventType)pLinkCond->GetArgN(1)->GetEnumValue(); // Event type
         // The event data is optional and type-dependent.
         if (pLinkCond->GetArgCount() >= 3)
@@ -54,16 +54,16 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
             switch (pEventData->m_nNodeType)
             {
                 case MHParseNode::PNBool:
-                    m_EventData.m_fBoolVal = pEventData->GetBoolValue();
-                    m_EventData.m_Type = MHUnion::U_Bool;
+                    m_eventData.m_fBoolVal = pEventData->GetBoolValue();
+                    m_eventData.m_Type = MHUnion::U_Bool;
                     break;
                 case MHParseNode::PNInt:
-                    m_EventData.m_nIntVal = pEventData->GetIntValue();
-                    m_EventData.m_Type = MHUnion::U_Int;
+                    m_eventData.m_nIntVal = pEventData->GetIntValue();
+                    m_eventData.m_Type = MHUnion::U_Int;
                     break;
                 case MHParseNode::PNString:
-                    pEventData->GetStringValue(m_EventData.m_strVal);
-                    m_EventData.m_Type = MHUnion::U_String;
+                    pEventData->GetStringValue(m_eventData.m_strVal);
+                    m_eventData.m_Type = MHUnion::U_String;
                     break;
                 default:
                     MHParseNode::Failure("Unknown type of event data");
@@ -80,7 +80,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
         }
         else
         {
-            m_EventSource.Initialise(pEventSource->GetArgN(0), engine);
+            m_eventSource.Initialise(pEventSource->GetArgN(0), engine);
         }
 
         MHParseNode *pEventType = p->GetNamedArg(P_EVENT_TYPE); // Event type
@@ -103,16 +103,16 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
             switch (pEventDataArg->m_nNodeType)
             {
                 case MHParseNode::PNBool:
-                    m_EventData.m_fBoolVal = pEventDataArg->GetBoolValue();
-                    m_EventData.m_Type = MHUnion::U_Bool;
+                    m_eventData.m_fBoolVal = pEventDataArg->GetBoolValue();
+                    m_eventData.m_Type = MHUnion::U_Bool;
                     break;
                 case MHParseNode::PNInt:
-                    m_EventData.m_nIntVal = pEventDataArg->GetIntValue();
-                    m_EventData.m_Type = MHUnion::U_Int;
+                    m_eventData.m_nIntVal = pEventDataArg->GetIntValue();
+                    m_eventData.m_Type = MHUnion::U_Int;
                     break;
                 case MHParseNode::PNString:
-                    pEventDataArg->GetStringValue(m_EventData.m_strVal);
-                    m_EventData.m_Type = MHUnion::U_String;
+                    pEventDataArg->GetStringValue(m_eventData.m_strVal);
+                    m_eventData.m_Type = MHUnion::U_String;
                     break;
                 default:
                     MHParseNode::Failure("Unknown type of event data");
@@ -124,7 +124,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pLinkEffect)
     {
-        m_LinkEffect.Initialise(pLinkEffect, engine);
+        m_linkEffect.Initialise(pLinkEffect, engine);
     }
 }
 
@@ -195,27 +195,27 @@ void MHLink::PrintMe(FILE *fd, int nTabs) const
     MHIngredient::PrintMe(fd, nTabs + 1);
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":EventSource ");
-    m_EventSource.PrintMe(fd, nTabs + 1);
+    m_eventSource.PrintMe(fd, nTabs + 1);
     fprintf(fd, "\n");
     MHASSERT(m_nEventType > 0 && m_nEventType <= (int)(sizeof(rchEventType) / sizeof(rchEventType[0])));
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":EventType %s\n", rchEventType[m_nEventType-1]);
 
     // The event data is optional and its format depends on the event type.
-    switch (m_EventData.m_Type)
+    switch (m_eventData.m_Type)
     {
         case MHUnion::U_Bool:
             PrintTabs(fd, nTabs + 1);
-            fprintf(fd, ":EventData %s\n", m_EventData.m_fBoolVal ? "true" : "false");
+            fprintf(fd, ":EventData %s\n", m_eventData.m_fBoolVal ? "true" : "false");
             break;
         case MHUnion::U_Int:
             PrintTabs(fd, nTabs + 1);
-            fprintf(fd, ":EventData %d\n", m_EventData.m_nIntVal);
+            fprintf(fd, ":EventData %d\n", m_eventData.m_nIntVal);
             break;
         case MHUnion::U_String:
             PrintTabs(fd, nTabs + 1);
             fprintf(fd, ":EventData");
-            m_EventData.m_strVal.PrintMe(fd, nTabs);
+            m_eventData.m_strVal.PrintMe(fd, nTabs);
             fprintf(fd, "\n");
             break;
         default:
@@ -224,7 +224,7 @@ void MHLink::PrintMe(FILE *fd, int nTabs) const
 
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":LinkEffect (\n");
-    m_LinkEffect.PrintMe(fd, nTabs + 2);
+    m_linkEffect.PrintMe(fd, nTabs + 2);
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ")\n");
     PrintTabs(fd, nTabs);
@@ -279,23 +279,23 @@ void MHLink::Activate(bool fActivate, MHEngine *engine)
 // any event data the link fires whatever the value of the data.
 void MHLink::MatchEvent(const MHObjectRef &sourceRefRef, enum EventType ev, const MHUnion &evData, MHEngine *engine)
 {
-    if (m_fRunning && m_nEventType == ev && sourceRefRef.Equal(m_EventSource, engine))   // Source and event type match.
+    if (m_fRunning && m_nEventType == ev && sourceRefRef.Equal(m_eventSource, engine))   // Source and event type match.
     {
         bool fMatch = false;
 
-        switch (m_EventData.m_Type)
+        switch (m_eventData.m_Type)
         {
             case MHUnion::U_None:
                 fMatch = true;
                 break; // No data specified - always matches.
             case MHUnion::U_Bool:
-                fMatch = evData.m_Type == MHUnion::U_Bool && evData.m_fBoolVal == m_EventData.m_fBoolVal;
+                fMatch = evData.m_Type == MHUnion::U_Bool && evData.m_fBoolVal == m_eventData.m_fBoolVal;
                 break;
             case MHUnion::U_Int:
-                fMatch = evData.m_Type == MHUnion::U_Int && evData.m_nIntVal == m_EventData.m_nIntVal;
+                fMatch = evData.m_Type == MHUnion::U_Int && evData.m_nIntVal == m_eventData.m_nIntVal;
                 break;
             case MHUnion::U_String:
-                fMatch = evData.m_Type == MHUnion::U_String && evData.m_strVal.Equal(m_EventData.m_strVal);
+                fMatch = evData.m_Type == MHUnion::U_String && evData.m_strVal.Equal(m_eventData.m_strVal);
                 break;
             default:
                 fMatch = false;
@@ -306,7 +306,7 @@ void MHLink::MatchEvent(const MHObjectRef &sourceRefRef, enum EventType ev, cons
         if (fMatch)
         {
             MHLOG(MHLogLinks, QString("Link fired - %1").arg(m_ObjectReference.Printable()));
-            engine->AddActions(m_LinkEffect);
+            engine->AddActions(m_linkEffect);
         }
     }
 }
