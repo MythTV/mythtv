@@ -44,11 +44,11 @@ BackendConnectionManager::BackendConnectionManager()
     gCoreContext->addListener(this);
 
     uint reconnect_timeout = 1;
-    m_reconnect_timer = new QTimer(this);
-    m_reconnect_timer->setSingleShot(true);
-    connect(m_reconnect_timer, SIGNAL(timeout()),
+    m_reconnectTimer = new QTimer(this);
+    m_reconnectTimer->setSingleShot(true);
+    connect(m_reconnectTimer, SIGNAL(timeout()),
             this,              SLOT(ReconnectToBackend()));
-    m_reconnect_timer->start(reconnect_timeout);
+    m_reconnectTimer->start(reconnect_timeout);
 }
 
 BackendConnectionManager::~BackendConnectionManager()
@@ -84,7 +84,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
             else
             {
                 LOG(VB_SOCKET, LOG_INFO, "Already reconnecting");
-                m_reconnect_again = true;
+                m_reconnectAgain = true;
             }
         }
         else if ((message == "RECONNECT_SUCCESS") ||
@@ -96,25 +96,25 @@ void BackendConnectionManager::customEvent(QEvent *event)
             delete m_reconnecting;
             m_reconnecting = nullptr;
 
-            if (!m_reconnect_again)
+            if (!m_reconnectAgain)
             {
-                m_reconnect_again = message == "RECONNECT_FAILURE";
+                m_reconnectAgain = message == "RECONNECT_FAILURE";
             }
-            reconnect = m_reconnect_again;
-            m_reconnect_again = message == "RECONNECT_FAILURE";
+            reconnect = m_reconnectAgain;
+            m_reconnectAgain = message == "RECONNECT_FAILURE";
         }
     }
 
     if (reconnect)
     {
-        if (!m_reconnect_timer)
+        if (!m_reconnectTimer)
         {
-            m_reconnect_timer = new QTimer(this);
-            m_reconnect_timer->setSingleShot(true);
-            connect(m_reconnect_timer, SIGNAL(timeout()),
+            m_reconnectTimer = new QTimer(this);
+            m_reconnectTimer->setSingleShot(true);
+            connect(m_reconnectTimer, SIGNAL(timeout()),
                     this,              SLOT(ReconnectToBackend()));
         }
-        m_reconnect_timer->start(reconnect_timeout);
+        m_reconnectTimer->start(reconnect_timeout);
     }
 }
 
