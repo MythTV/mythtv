@@ -177,10 +177,6 @@ Checks: '-*,
         # Not investigated yet. ,
        -readability-function-size,
 
-        # A couple of instances in libsoundtouch. Convert that to c++
-        # then fix. ,
-       -readability-identifier-naming,
-
         # Wants to rewrite lots of implicit nullptr tests. ,
        -readability-implicit-bool-conversion,
 
