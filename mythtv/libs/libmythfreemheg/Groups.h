@@ -67,16 +67,16 @@ class MHGroup : public MHRoot
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     // Standard ID, Standard version, Object information aren't recorded.
     int m_nOrigGCPriority {127};
-    MHActionSequence m_StartUp, m_CloseDown;
-    MHOwnPtrSequence <MHIngredient> m_Items; // Array of items.
+    MHActionSequence m_startUp, m_closeDown;
+    MHOwnPtrSequence <MHIngredient> m_items; // Array of items.
     bool m_fIsApp {false};
     friend class MHEngine;
 
     // Timers are an attribute of the scene class in the standard but have been moved
     // to the group in UK MHEG.  We start this timer when that the group starts
     // running so we know how to calculate expiration times.
-    QElapsedTimer m_RunTime;
-    QList<MHTimer*> m_Timers;
+    QElapsedTimer m_runTime;
+    QList<MHTimer*> m_timers;
     int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
                         // next event or zero if there aren't any.
     int m_nLastId {0}; // Highest numbered ingredient.  Used to make new ids for clones.
@@ -127,29 +127,29 @@ class MHApplication : public MHGroup
         { return true; } // The application is "shared".
     void Activation(MHEngine *engine) override; // MHGroup
   protected:
-    MHActionSequence m_OnSpawnCloseDown, m_OnRestart;
+    MHActionSequence m_onSpawnCloseDown, m_onRestart;
     // Default attributes.
     int         m_nCharSet      {0};
-    MHColour    m_BGColour, m_TextColour, m_ButtonRefColour, m_HighlightRefColour, m_SliderRefColour;
+    MHColour    m_bgColour, m_textColour, m_buttonRefColour, m_highlightRefColour, m_sliderRefColour;
     int         m_nTextCHook    {0};
     int         m_nIPCHook      {0};
     int         m_nStrCHook     {0};
     int         m_nBitmapCHook  {0};
     int         m_nLineArtCHook {0};
-    MHFontBody  m_Font;
-    MHOctetString   m_FontAttrs;
-    int         m_tuneinfo      {0};
+    MHFontBody  m_font;
+    MHOctetString   m_fontAttrs;
+    int         m_tuneInfo      {0};
 
     // Internal attributes and additional state
     int         m_nLockCount    {0}; // Count for locking the screen
     // Display stack.  Visible items with the lowest item in the stack first.
     // Later items may obscure earlier.
-    MHSequence <MHVisible *> m_DisplayStack;
+    MHSequence <MHVisible *> m_displayStack;
     int FindOnStack(const MHRoot *pVis); // Returns the index on the stack or -1 if it's not there.
 
     MHScene    *m_pCurrentScene {nullptr};
     bool        m_fRestarting   {false};
-    QString m_Path; // Path from the root directory to this application.  Either the null string or
+    QString m_path; // Path from the root directory to this application.  Either the null string or
                     // a string of the form /a/b/c .
 
     friend class MHEngine;
@@ -179,9 +179,9 @@ class MHSendEvent: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
-    MHGenericObjectRef m_EventSource; // Event source
-    enum EventType m_EventType { EventIsAvailable }; // Event type
-    MHParameter m_EventData; // Optional - Null means not specified.  Can only be bool, int or string.
+    MHGenericObjectRef m_eventSource; // Event source
+    enum EventType m_eventType { EventIsAvailable }; // Event type
+    MHParameter m_eventData; // Optional - Null means not specified.  Can only be bool, int or string.
 };
 
 class MHSetTimer: public MHElemAction
@@ -192,16 +192,16 @@ class MHSetTimer: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
-    MHGenericInteger m_TimerId;
+    MHGenericInteger m_timerId;
     // A new timer may not be specified in which case this cancels the timer.
     // If the timer is specified the "absolute" flag is optional.
     enum {
         ST_NoNewTimer,
         ST_TimerAbsolute,
         ST_TimerRelative
-    } m_TimerType { ST_NoNewTimer };
-    MHGenericInteger m_TimerValue;
-    MHGenericBoolean m_AbsFlag;
+    } m_timerType { ST_NoNewTimer };
+    MHGenericInteger m_timerValue;
+    MHGenericBoolean m_absFlag;
 };
 
 class MHSpawn: public MHElemAction
@@ -221,9 +221,9 @@ class MHPersistent: public MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsLoad;
-    MHObjectRef     m_Succeeded;
-    MHOwnPtrSequence<MHObjectRef> m_Variables;
-    MHGenericOctetString    m_FileName;
+    MHObjectRef     m_succeeded;
+    MHOwnPtrSequence<MHObjectRef> m_variables;
+    MHGenericOctetString    m_fileName;
 };
 
 
@@ -264,9 +264,9 @@ class MHGetEngineSupport: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_Feature.PrintMe(fd, 0);  m_Answer.PrintMe(fd, 0); }
-    MHGenericOctetString m_Feature;
-    MHObjectRef m_Answer;
+        { m_feature.PrintMe(fd, 0);  m_answer.PrintMe(fd, 0); }
+    MHGenericOctetString m_feature;
+    MHObjectRef m_answer;
 };
 
 // Actions added in UK MHEG profile.

@@ -322,7 +322,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         {
             if (fIsSpawn)   // Run the CloseDown actions.
             {
-                AddActions(CurrentApp()->m_CloseDown);
+                AddActions(CurrentApp()->m_closeDown);
                 RunActions();
             }
 
@@ -340,16 +340,16 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         }
 
         // Save the path we use for this app.
-        pProgram->m_Path = csPath; // Record the path
-        int nPos = pProgram->m_Path.lastIndexOf('/');
+        pProgram->m_path = csPath; // Record the path
+        int nPos = pProgram->m_path.lastIndexOf('/');
 
         if (nPos < 0)
         {
-            pProgram->m_Path = "";
+            pProgram->m_path = "";
         }
         else
         {
-            pProgram->m_Path = pProgram->m_Path.left(nPos);
+            pProgram->m_path = pProgram->m_path.left(nPos);
         }
 
         // Have now got the application.
@@ -459,9 +459,9 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Deactivate any non-shared ingredients in the application.
     MHApplication *pApp = CurrentApp();
 
-    for (int i = pApp->m_Items.Size(); i > 0; i--)
+    for (int i = pApp->m_items.Size(); i > 0; i--)
     {
-        MHIngredient *pItem = pApp->m_Items.GetAt(i - 1);
+        MHIngredient *pItem = pApp->m_items.GetAt(i - 1);
 
         if (! pItem->IsShared())
         {
@@ -548,7 +548,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
         // Add the current application's path name
         if (CurrentApp())
         {
-            csPath = CurrentApp()->m_Path + csPath;
+            csPath = CurrentApp()->m_path + csPath;
         }
     }
 
@@ -738,7 +738,7 @@ void MHEngine::AddToDisplayStack(MHVisible *pVis)
         return;    // Return if it's already there.
     }
 
-    CurrentApp()->m_DisplayStack.Append(pVis);
+    CurrentApp()->m_displayStack.Append(pVis);
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -752,7 +752,7 @@ void MHEngine::RemoveFromDisplayStack(MHVisible *pVis)
         return;
     }
 
-    CurrentApp()->m_DisplayStack.RemoveAt(nPos);
+    CurrentApp()->m_displayStack.RemoveAt(nPos);
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -767,8 +767,8 @@ void MHEngine::BringToFront(const MHRoot *p)
     }
 
     auto *pVis = (MHVisible *)p; // Can now safely cast it.
-    CurrentApp()->m_DisplayStack.RemoveAt(nPos); // Remove it from its present posn
-    CurrentApp()->m_DisplayStack.Append(pVis); // Push it on the top.
+    CurrentApp()->m_displayStack.RemoveAt(nPos); // Remove it from its present posn
+    CurrentApp()->m_displayStack.Append(pVis); // Push it on the top.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -782,8 +782,8 @@ void MHEngine::SendToBack(const MHRoot *p)
     }
 
     auto *pVis = (MHVisible *)p; // Can now safely cast it.
-    CurrentApp()->m_DisplayStack.RemoveAt(nPos); // Remove it from its present posn
-    CurrentApp()->m_DisplayStack.InsertAt(pVis, 0); // Put it on the bottom.
+    CurrentApp()->m_displayStack.RemoveAt(nPos); // Remove it from its present posn
+    CurrentApp()->m_displayStack.InsertAt(pVis, 0); // Put it on the bottom.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -804,14 +804,14 @@ void MHEngine::PutBefore(const MHRoot *p, const MHRoot *pRef)
         return;    // If the reference visible isn't there do nothing.
     }
 
-    CurrentApp()->m_DisplayStack.RemoveAt(nPos);
+    CurrentApp()->m_displayStack.RemoveAt(nPos);
 
     if (nRef >= nPos)
     {
         nRef--;    // The position of the reference may have shifted
     }
 
-    CurrentApp()->m_DisplayStack.InsertAt(pVis, nRef + 1);
+    CurrentApp()->m_displayStack.InsertAt(pVis, nRef + 1);
     // Redraw the area occupied by the moved item.  We might be able to reduce
     // the area to be redrawn by looking at the way it is affected by other items
     // in the stack.  We could also see whether it's currently active.
@@ -835,14 +835,14 @@ void MHEngine::PutBehind(const MHRoot *p, const MHRoot *pRef)
     }
 
     auto *pVis = (MHVisible *)p; // Can now safely cast it.
-    CurrentApp()->m_DisplayStack.RemoveAt(nPos);
+    CurrentApp()->m_displayStack.RemoveAt(nPos);
 
     if (nRef >= nPos)
     {
         nRef--;    // The position of the reference may have shifted
     }
 
-    CurrentApp()->m_DisplayStack.InsertAt(pVis, nRef); // Shift the reference and anything above up.
+    CurrentApp()->m_displayStack.InsertAt(pVis, nRef); // Shift the reference and anything above up.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -858,7 +858,7 @@ void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 
     while (nStackPos >= 0)
     {
-        MHVisible *pItem = CurrentApp()->m_DisplayStack.GetAt(nStackPos);
+        MHVisible *pItem = CurrentApp()->m_displayStack.GetAt(nStackPos);
         // Work out how much of the area we want to draw is included in this visible.
         // The visible area will be empty if the item is transparent or not active.
         QRegion drawArea = pItem->GetVisibleArea() & toDraw;
@@ -890,7 +890,7 @@ void MHEngine::DrawDisplay(QRegion toDraw)
         return;
     }
 
-    int nTopStack = CurrentApp() == nullptr ? -1 : CurrentApp()->m_DisplayStack.Size() - 1;
+    int nTopStack = CurrentApp() == nullptr ? -1 : CurrentApp()->m_displayStack.Size() - 1;
     DrawRegion(toDraw, nTopStack);
 }
 
@@ -1360,9 +1360,9 @@ void MHEngine::GetDefaultBGColour(MHColour &colour)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_BGColour.IsSet())
+    if (pApp && pApp->m_bgColour.IsSet())
     {
-        colour.Copy(pApp->m_BGColour);
+        colour.Copy(pApp->m_bgColour);
     }
     else
     {
@@ -1374,9 +1374,9 @@ void MHEngine::GetDefaultTextColour(MHColour &colour)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_TextColour.IsSet())
+    if (pApp && pApp->m_textColour.IsSet())
     {
-        colour.Copy(pApp->m_TextColour);
+        colour.Copy(pApp->m_textColour);
     }
     else
     {
@@ -1388,9 +1388,9 @@ void MHEngine::GetDefaultButtonRefColour(MHColour &colour)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_ButtonRefColour.IsSet())
+    if (pApp && pApp->m_buttonRefColour.IsSet())
     {
-        colour.Copy(pApp->m_ButtonRefColour);
+        colour.Copy(pApp->m_buttonRefColour);
     }
     else
     {
@@ -1402,9 +1402,9 @@ void MHEngine::GetDefaultHighlightRefColour(MHColour &colour)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_HighlightRefColour.IsSet())
+    if (pApp && pApp->m_highlightRefColour.IsSet())
     {
-        colour.Copy(pApp->m_HighlightRefColour);
+        colour.Copy(pApp->m_highlightRefColour);
     }
     else
     {
@@ -1416,9 +1416,9 @@ void MHEngine::GetDefaultSliderRefColour(MHColour &colour)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_SliderRefColour.IsSet())
+    if (pApp && pApp->m_sliderRefColour.IsSet())
     {
-        colour.Copy(pApp->m_SliderRefColour);
+        colour.Copy(pApp->m_sliderRefColour);
     }
     else
     {
@@ -1463,9 +1463,9 @@ void MHEngine::GetDefaultFontAttrs(MHOctetString &str)
 {
     MHApplication *pApp = CurrentApp();
 
-    if (pApp && pApp->m_FontAttrs.Size() > 0)
+    if (pApp && pApp->m_fontAttrs.Size() > 0)
     {
-        str.Copy(pApp->m_FontAttrs);
+        str.Copy(pApp->m_fontAttrs);
     }
     else
     {

@@ -39,9 +39,9 @@
 
 MHGroup::~MHGroup()
 {
-    while (!m_Timers.isEmpty())
+    while (!m_timers.isEmpty())
     {
-        delete m_Timers.takeFirst();
+        delete m_timers.takeFirst();
     }
 }
 
@@ -67,14 +67,14 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOnStartUp)
     {
-        m_StartUp.Initialise(pOnStartUp, engine);
+        m_startUp.Initialise(pOnStartUp, engine);
     }
 
     MHParseNode *pOnCloseDown = p->GetNamedArg(C_ON_CLOSE_DOWN);
 
     if (pOnCloseDown)
     {
-        m_CloseDown.Initialise(pOnCloseDown, engine);
+        m_closeDown.Initialise(pOnCloseDown, engine);
     }
 
     MHParseNode *pOriginalGCPrio = p->GetNamedArg(C_ORIGINAL_GC_PRIORITY);
@@ -199,7 +199,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
                 }
 
                 // Add it to the ingedients of this group.
-                m_Items.Append(pIngredient);
+                m_items.Append(pIngredient);
             }
         }
         catch (...)
@@ -218,20 +218,20 @@ void MHGroup::PrintMe(FILE *fd, int nTabs) const
 {
     MHRoot::PrintMe(fd, nTabs);
 
-    if (m_StartUp.Size() != 0)
+    if (m_startUp.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":OnStartUp (\n");
-        m_StartUp.PrintMe(fd, nTabs + 2);
+        m_startUp.PrintMe(fd, nTabs + 2);
         PrintTabs(fd, nTabs + 2);
         fprintf(fd, ")\n");
     }
 
-    if (m_CloseDown.Size() != 0)
+    if (m_closeDown.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":OnCloseDown (\n");
-        m_CloseDown.PrintMe(fd, nTabs + 2);
+        m_closeDown.PrintMe(fd, nTabs + 2);
         PrintTabs(fd, nTabs + 2);
         fprintf(fd, ")\n");
     }
@@ -245,9 +245,9 @@ void MHGroup::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":Items ( \n");
 
-    for (int i = 0; i < m_Items.Size(); i++)
+    for (int i = 0; i < m_items.Size(); i++)
     {
-        m_Items.GetAt(i)->PrintMe(fd, nTabs + 2);
+        m_items.GetAt(i)->PrintMe(fd, nTabs + 2);
     }
 
     PrintTabs(fd, nTabs + 1);
@@ -258,9 +258,9 @@ void MHGroup::PrintMe(FILE *fd, int nTabs) const
 void MHGroup::Preparation(MHEngine *engine)
 {
     // Prepare the ingredients first if they are initially active or are initially available programs.
-    for (int i = 0; i < m_Items.Size(); i++)
+    for (int i = 0; i < m_items.Size(); i++)
     {
-        MHIngredient *pIngredient = m_Items.GetAt(i);
+        MHIngredient *pIngredient = m_items.GetAt(i);
 
         if (pIngredient->InitiallyActive() || pIngredient->InitiallyAvailable())
         {
@@ -281,13 +281,13 @@ void MHGroup::Activation(MHEngine *engine)
 
     MHRoot::Activation(engine);
     // Run any start-up actions.
-    engine->AddActions(m_StartUp);
+    engine->AddActions(m_startUp);
     engine->RunActions();
 
     // Activate the ingredients in order.
-    for (int i = 0; i < m_Items.Size(); i++)
+    for (int i = 0; i < m_items.Size(); i++)
     {
-        MHIngredient *pIngredient = m_Items.GetAt(i);
+        MHIngredient *pIngredient = m_items.GetAt(i);
 
         if (pIngredient->InitiallyActive())
         {
@@ -297,7 +297,7 @@ void MHGroup::Activation(MHEngine *engine)
 
     m_fRunning = true;
     // Start the timer here.  This is the basis for expiration..
-    m_RunTime.start();
+    m_runTime.start();
     // Don't generate IsRunning here - that's done by the sub-classes.
 }
 
@@ -310,7 +310,7 @@ void MHGroup::Deactivation(MHEngine *engine)
     }
 
     // Run any close-down actions.
-    engine->AddActions(m_CloseDown);
+    engine->AddActions(m_closeDown);
     engine->RunActions();
     MHRoot::Deactivation(engine);
 }
@@ -318,9 +318,9 @@ void MHGroup::Deactivation(MHEngine *engine)
 // Destruction - deletes the run-time representation.  Clears m_fAvailable.
 void MHGroup::Destruction(MHEngine *engine)
 {
-    for (int i = m_Items.Size(); i > 0; i--)
+    for (int i = m_items.Size(); i > 0; i--)
     {
-        m_Items.GetAt(i - 1)->Destruction(engine);
+        m_items.GetAt(i - 1)->Destruction(engine);
     }
 
     MHRoot::Destruction(engine);
@@ -334,9 +334,9 @@ MHRoot *MHGroup::FindByObjectNo(int n)
         return this;
     }
 
-    for (int i = m_Items.Size(); i > 0; i--)
+    for (int i = m_items.Size(); i > 0; i--)
     {
-        MHRoot *pResult = m_Items.GetAt(i - 1)->FindByObjectNo(n);
+        MHRoot *pResult = m_items.GetAt(i - 1)->FindByObjectNo(n);
 
         if (pResult)
         {
@@ -351,30 +351,30 @@ MHRoot *MHGroup::FindByObjectNo(int n)
 void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * /*engine*/)
 {
     // First remove any existing timer with the same Id.
-    for (int i = 0; i < m_Timers.size(); i++)
+    for (int i = 0; i < m_timers.size(); i++)
     {
-        MHTimer *pTimer = m_Timers.at(i);
+        MHTimer *pTimer = m_timers.at(i);
 
         if (pTimer->m_nTimerId == nTimerId)
         {
-            delete m_Timers.takeAt(i);
+            delete m_timers.takeAt(i);
             break;
         }
     }
 
     // If the time has passed we don't set up a timer.
-    if (nMilliSecs < 0 || (fAbsolute && m_RunTime.hasExpired(nMilliSecs)))
+    if (nMilliSecs < 0 || (fAbsolute && m_runTime.hasExpired(nMilliSecs)))
     {
         return;
     }
 
     auto *pTimer = new MHTimer;
-    m_Timers.append(pTimer);
+    m_timers.append(pTimer);
     pTimer->m_nTimerId = nTimerId;
 
     if (fAbsolute)
     {
-        QTime startTime = QTime::currentTime().addMSecs(-m_RunTime.elapsed());
+        QTime startTime = QTime::currentTime().addMSecs(-m_runTime.elapsed());
         pTimer->m_Time = startTime.addMSecs(nMilliSecs);
     }
     else
@@ -387,10 +387,10 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
 int MHGroup::CheckTimers(MHEngine *engine)
 {
     QTime currentTime = QTime::currentTime(); // Get current time
-    QList<MHTimer *>::iterator it = m_Timers.begin();
+    QList<MHTimer *>::iterator it = m_timers.begin();
     int nMSecs = 0;
 
-    while (it != m_Timers.end())
+    while (it != m_timers.end())
     {
         MHTimer *pTimer = *it;
 
@@ -399,7 +399,7 @@ int MHGroup::CheckTimers(MHEngine *engine)
             // If the time has passed trigger the event and remove the timer from the queue.
             engine->EventTriggered(this, EventTimerFired, pTimer->m_nTimerId);
             delete pTimer;
-            it = m_Timers.erase(it);
+            it = m_timers.erase(it);
         }
         else
         {
@@ -424,7 +424,7 @@ void MHGroup::MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine)
     MHIngredient *pClone = pTarget->Clone(engine); // Clone it.
     pClone->m_ObjectReference.m_groupId.Copy(m_ObjectReference.m_groupId); // Group id is the same as this.
     pClone->m_ObjectReference.m_nObjectNo = ++m_nLastId; // Create a new object id.
-    m_Items.Append(pClone);
+    m_items.Append(pClone);
     // Set the object reference result to the newly constructed ref.
     pRef->SetVariableValue(pClone->m_ObjectReference);
     pClone->Preparation(engine); // Prepare the clone.
@@ -443,7 +443,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOnSpawn)
     {
-        m_OnSpawnCloseDown.Initialise(pOnSpawn, engine);
+        m_onSpawnCloseDown.Initialise(pOnSpawn, engine);
     }
 
     // OnRestart
@@ -451,7 +451,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pOnRestart)
     {
-        m_OnRestart.Initialise(pOnRestart, engine);
+        m_onRestart.Initialise(pOnRestart, engine);
     }
 
     // Default attributes.  These are encoded in a group in binary.
@@ -475,35 +475,35 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pBGColour)
     {
-        m_BGColour.Initialise(pBGColour->GetArgN(0), engine);
+        m_bgColour.Initialise(pBGColour->GetArgN(0), engine);
     }
 
     MHParseNode *pTextColour = pDefattrs->GetNamedArg(C_TEXT_COLOUR);
 
     if (pTextColour)
     {
-        m_TextColour.Initialise(pTextColour->GetArgN(0), engine);
+        m_textColour.Initialise(pTextColour->GetArgN(0), engine);
     }
 
     MHParseNode *pButtonRefColour = pDefattrs->GetNamedArg(C_BUTTON_REF_COLOUR);
 
     if (pButtonRefColour)
     {
-        m_ButtonRefColour.Initialise(pButtonRefColour->GetArgN(0), engine);
+        m_buttonRefColour.Initialise(pButtonRefColour->GetArgN(0), engine);
     }
 
     MHParseNode *pHighlightRefColour = pDefattrs->GetNamedArg(C_HIGHLIGHT_REF_COLOUR);
 
     if (pHighlightRefColour)
     {
-        m_HighlightRefColour.Initialise(pHighlightRefColour->GetArgN(0), engine);
+        m_highlightRefColour.Initialise(pHighlightRefColour->GetArgN(0), engine);
     }
 
     MHParseNode *pSliderRefColour = pDefattrs->GetNamedArg(C_SLIDER_REF_COLOUR);
 
     if (pSliderRefColour)
     {
-        m_SliderRefColour.Initialise(pSliderRefColour->GetArgN(0), engine);
+        m_sliderRefColour.Initialise(pSliderRefColour->GetArgN(0), engine);
     }
 
     // Content hooks
@@ -554,7 +554,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pFont)
     {
-        m_Font.Initialise(pFont->GetArgN(0), engine);
+        m_font.Initialise(pFont->GetArgN(0), engine);
     }
 
     // Font attributes.
@@ -562,7 +562,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pFontAttrs)
     {
-        pFontAttrs->GetArgN(0)->GetStringValue(m_FontAttrs);
+        pFontAttrs->GetArgN(0)->GetStringValue(m_fontAttrs);
     }
 }
 
@@ -572,19 +572,19 @@ void MHApplication::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, "{:Application ");
     MHGroup::PrintMe(fd, nTabs);
 
-    if (m_OnSpawnCloseDown.Size() != 0)
+    if (m_onSpawnCloseDown.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":OnSpawnCloseDown");
-        m_OnSpawnCloseDown.PrintMe(fd, nTabs + 1);
+        m_onSpawnCloseDown.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_OnRestart.Size() != 0)
+    if (m_onRestart.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":OnRestart");
-        m_OnRestart.PrintMe(fd, nTabs + 1);
+        m_onRestart.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
@@ -594,11 +594,11 @@ void MHApplication::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":CharacterSet %d\n", m_nCharSet);
     }
 
-    if (m_BGColour.IsSet())
+    if (m_bgColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":BackgroundColour ");
-        m_BGColour.PrintMe(fd, nTabs + 1);
+        m_bgColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
@@ -608,27 +608,27 @@ void MHApplication::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":TextCHook %d\n", m_nTextCHook);
     }
 
-    if (m_TextColour.IsSet())
+    if (m_textColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":TextColour");
-        m_TextColour.PrintMe(fd, nTabs + 1);
+        m_textColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_Font.IsSet())
+    if (m_font.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":Font ");
-        m_Font.PrintMe(fd, nTabs + 1);
+        m_font.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_FontAttrs.Size() > 0)
+    if (m_fontAttrs.Size() > 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":FontAttributes ");
-        m_FontAttrs.PrintMe(fd, nTabs + 1);
+        m_fontAttrs.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
@@ -656,27 +656,27 @@ void MHApplication::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":LineArtCHook %d\n", m_nLineArtCHook);
     }
 
-    if (m_ButtonRefColour.IsSet())
+    if (m_buttonRefColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":ButtonRefColour ");
-        m_ButtonRefColour.PrintMe(fd, nTabs + 1);
+        m_buttonRefColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_HighlightRefColour.IsSet())
+    if (m_highlightRefColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":HighlightRefColour ");
-        m_HighlightRefColour.PrintMe(fd, nTabs + 1);
+        m_highlightRefColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_SliderRefColour.IsSet())
+    if (m_sliderRefColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":SliderRefColour ");
-        m_SliderRefColour.PrintMe(fd, nTabs + 1);
+        m_sliderRefColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
@@ -697,7 +697,7 @@ void MHApplication::Activation(MHEngine *engine)
 
     if (m_fRestarting)   // Set by Quit
     {
-        engine->AddActions(m_OnRestart);
+        engine->AddActions(m_onRestart);
         engine->RunActions();
     }
 
@@ -706,9 +706,9 @@ void MHApplication::Activation(MHEngine *engine)
 
 int MHApplication::FindOnStack(const MHRoot *pVis) // Returns the index on the stack or -1 if it's not there.
 {
-    for (int i = 0; i < m_DisplayStack.Size(); i++)
+    for (int i = 0; i < m_displayStack.Size(); i++)
     {
-        if (m_DisplayStack.GetAt(i) == pVis)
+        if (m_displayStack.GetAt(i) == pVis)
         {
             return i;
         }
@@ -805,26 +805,26 @@ void MHScene::SetInputRegister(int nReg, MHEngine *engine)
 void MHSendEvent::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine); // Target
-    m_EventSource.Initialise(p->GetArgN(1), engine);
-    m_EventType = (enum EventType)p->GetArgN(2)->GetEnumValue();
+    m_eventSource.Initialise(p->GetArgN(1), engine);
+    m_eventType = (enum EventType)p->GetArgN(2)->GetEnumValue();
 
     if (p->GetArgCount() >= 4)
     {
         // TODO: We could check here that we only have bool, int or string and not object ref or content ref.
-        m_EventData.Initialise(p->GetArgN(3), engine);
+        m_eventData.Initialise(p->GetArgN(3), engine);
     }
 }
 
 void MHSendEvent::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
-    m_EventSource.PrintMe(fd, 0);
-    QByteArray tmp = MHLink::EventTypeToString(m_EventType).toLatin1();
+    m_eventSource.PrintMe(fd, 0);
+    QByteArray tmp = MHLink::EventTypeToString(m_eventType).toLatin1();
     fprintf(fd, "%s", tmp.constData());
     fprintf(fd, " ");
 
-    if (m_EventData.m_Type != MHParameter::P_Null)
+    if (m_eventData.m_Type != MHParameter::P_Null)
     {
-        m_EventData.PrintMe(fd, 0);
+        m_eventData.PrintMe(fd, 0);
     }
 }
 
@@ -834,55 +834,55 @@ void MHSendEvent::Perform(MHEngine *engine)
     MHObjectRef target;
     MHObjectRef source;
     m_target.GetValue(target, engine); // TODO: Check this is the scene?
-    m_EventSource.GetValue(source, engine);
+    m_eventSource.GetValue(source, engine);
 
     // Generate the event.
-    if (m_EventData.m_Type == MHParameter::P_Null)
+    if (m_eventData.m_Type == MHParameter::P_Null)
     {
-        engine->EventTriggered(engine->FindObject(source), m_EventType);
+        engine->EventTriggered(engine->FindObject(source), m_eventType);
     }
     else
     {
         MHUnion data;
-        data.GetValueFrom(m_EventData, engine);
-        engine->EventTriggered(engine->FindObject(source), m_EventType, data);
+        data.GetValueFrom(m_eventData, engine);
+        engine->EventTriggered(engine->FindObject(source), m_eventType, data);
     }
 }
 
 void MHSetTimer::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_TimerId.Initialise(p->GetArgN(1), engine); // The timer id
+    m_timerId.Initialise(p->GetArgN(1), engine); // The timer id
 
     if (p->GetArgCount() > 2)
     {
         MHParseNode *pNewTimer = p->GetArgN(2);
-        m_TimerValue.Initialise(pNewTimer->GetSeqN(0), engine);
+        m_timerValue.Initialise(pNewTimer->GetSeqN(0), engine);
 
         if (pNewTimer->GetSeqCount() > 1)
         {
-            m_TimerType = ST_TimerAbsolute; // May be absolute - depends on the value.
-            m_AbsFlag.Initialise(pNewTimer->GetSeqN(1), engine);
+            m_timerType = ST_TimerAbsolute; // May be absolute - depends on the value.
+            m_absFlag.Initialise(pNewTimer->GetSeqN(1), engine);
         }
         else
         {
-            m_TimerType = ST_TimerRelative;
+            m_timerType = ST_TimerRelative;
         }
     }
 }
 
 void MHSetTimer::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
-    m_TimerId.PrintMe(fd, 0);
+    m_timerId.PrintMe(fd, 0);
 
-    if (m_TimerType != ST_NoNewTimer)
+    if (m_timerType != ST_NoNewTimer)
     {
         fprintf(fd, "( ");
-        m_TimerValue.PrintMe(fd, 0);
+        m_timerValue.PrintMe(fd, 0);
 
-        if (m_TimerType == ST_TimerAbsolute)
+        if (m_timerType == ST_TimerAbsolute)
         {
-            m_AbsFlag.PrintMe(fd, 0);
+            m_absFlag.PrintMe(fd, 0);
         }
 
         fprintf(fd, ") ");
@@ -891,21 +891,21 @@ void MHSetTimer::PrintArgs(FILE *fd, int /*nTabs*/) const
 
 void MHSetTimer::Perform(MHEngine *engine)
 {
-    int nTimerId = m_TimerId.GetValue(engine);
+    int nTimerId = m_timerId.GetValue(engine);
     bool fAbsolute = false; // Defaults to relative time.
     int newTime = -1;
 
-    switch (m_TimerType)
+    switch (m_timerType)
     {
         case ST_NoNewTimer:
             fAbsolute = true;
             newTime = -1;
             break; // We treat an absolute time of -1 as "cancel"
         case ST_TimerAbsolute:
-            fAbsolute = m_AbsFlag.GetValue(engine);
+            fAbsolute = m_absFlag.GetValue(engine);
             [[clang::fallthrough]];
         case ST_TimerRelative:
-            newTime = m_TimerValue.GetValue(engine);
+            newTime = m_timerValue.GetValue(engine);
     }
 
     Target(engine)->SetTimer(nTimerId, fAbsolute, newTime, engine);
@@ -914,31 +914,31 @@ void MHSetTimer::Perform(MHEngine *engine)
 void MHPersistent::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine); // Target
-    m_Succeeded.Initialise(p->GetArgN(1), engine);
+    m_succeeded.Initialise(p->GetArgN(1), engine);
     MHParseNode *pVarSeq = p->GetArgN(2);
 
     for (int i = 0; i < pVarSeq->GetSeqCount(); i++)
     {
         auto *pVar = new MHObjectRef;
-        m_Variables.Append(pVar);
+        m_variables.Append(pVar);
         pVar->Initialise(pVarSeq->GetSeqN(i), engine);
     }
 
-    m_FileName.Initialise(p->GetArgN(3), engine);
+    m_fileName.Initialise(p->GetArgN(3), engine);
 }
 
 void MHPersistent::PrintArgs(FILE *fd, int nTabs) const
 {
-    m_Succeeded.PrintMe(fd, nTabs);
+    m_succeeded.PrintMe(fd, nTabs);
     fprintf(fd, " ( ");
 
-    for (int i = 0; i < m_Variables.Size(); i++)
+    for (int i = 0; i < m_variables.Size(); i++)
     {
-        m_Variables.GetAt(i)->PrintMe(fd, 0);
+        m_variables.GetAt(i)->PrintMe(fd, 0);
     }
 
     fprintf(fd, " ) ");
-    m_FileName.PrintMe(fd, nTabs);
+    m_fileName.PrintMe(fd, nTabs);
 }
 
 void MHPersistent::Perform(MHEngine *engine)
@@ -946,9 +946,9 @@ void MHPersistent::Perform(MHEngine *engine)
     MHObjectRef target;
     m_target.GetValue(target, engine); // Get the target - this should always be the application
     MHOctetString fileName;
-    m_FileName.GetValue(fileName, engine);
-    bool fResult = engine->LoadStorePersistent(m_fIsLoad, fileName, m_Variables);
-    engine->FindObject(m_Succeeded)->SetVariableValue(fResult);
+    m_fileName.GetValue(fileName, engine);
+    bool fResult = engine->LoadStorePersistent(m_fIsLoad, fileName, m_variables);
+    engine->FindObject(m_succeeded)->SetVariableValue(fResult);
 }
 
 MHTransitionTo::MHTransitionTo(): MHElemAction(":TransitionTo")
@@ -1033,14 +1033,14 @@ void MHUnlockScreen::Perform(MHEngine *engine)
 void MHGetEngineSupport::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_Feature.Initialise(p->GetArgN(1), engine);
-    m_Answer.Initialise(p->GetArgN(2), engine);
+    m_feature.Initialise(p->GetArgN(1), engine);
+    m_answer.Initialise(p->GetArgN(2), engine);
 }
 
 void MHGetEngineSupport::Perform(MHEngine *engine)
 {
     // Ignore the target which isn't used.
     MHOctetString feature;
-    m_Feature.GetValue(feature, engine);
-    engine->FindObject(m_Answer)->SetVariableValue(engine->GetEngineSupport(feature));
+    m_feature.GetValue(feature, engine);
+    engine->FindObject(m_answer)->SetVariableValue(engine->GetEngineSupport(feature));
 }

@@ -161,8 +161,8 @@ class MHEngine: public MHEG {
     MHInteractible *GetInteraction(void) { return m_Interacting; }
     void SetInteraction(MHInteractible *p) { m_Interacting = p; }
 
-    int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneinfo : 0; }
-    void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneinfo = tuneinfo; }
+    int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneInfo : 0; }
+    void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneInfo = tuneinfo; }
 
   protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);
