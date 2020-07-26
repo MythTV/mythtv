@@ -84,12 +84,12 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     {
         m_params.phasemode = 1;
         m_params.center_width = 25;
-        m_params.dimension = 0.5;
+        m_params.dimension = 50;
     }
     else
     {
         m_params.center_width = 65;
-        m_params.dimension = 0.3;
+        m_params.dimension = 30;
     }
     switch (m_surroundMode)
     {
