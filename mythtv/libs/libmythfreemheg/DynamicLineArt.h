@@ -152,7 +152,7 @@ class MHDrawPoly: public MHElemAction {
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsPolygon;
-    MHOwnPtrSequence<MHPointArg> m_Points; // List of points
+    MHOwnPtrSequence<MHPointArg> m_points; // List of points
 };
 
 #endif

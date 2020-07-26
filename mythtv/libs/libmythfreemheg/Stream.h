@@ -56,7 +56,7 @@ class MHStream : public MHPresentable
     void SetSpeed(int speed, MHEngine *engine) override; // MHRoot
 
   protected:
-    MHOwnPtrSequence <MHPresentable> m_Multiplex;
+    MHOwnPtrSequence <MHPresentable> m_multiplex;
     enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage {ST_Stream};
     int         m_nLooping {0}; // Infinity
 };
@@ -114,7 +114,7 @@ class MHVideo : public MHVisible
 
   protected:
     int m_nComponentTag      {0};
-    enum Termination { VI_Freeze = 1, VI_Disappear } m_Termination {VI_Disappear};
+    enum Termination { VI_Freeze = 1, VI_Disappear } m_termination {VI_Disappear};
     // Added in UK MHEG
     int     m_nXDecodeOffset {0};
     int     m_nYDecodeOffset {0};
@@ -204,15 +204,15 @@ public:
         base::Initialise(p, engine);
         MHParseNode *pn = p->GetArgN(1);
         if (pn->m_nNodeType == MHParseNode::PNSeq) pn = pn->GetArgN(0);
-        m_Argument.Initialise(pn, engine);
+        m_argument.Initialise(pn, engine);
     }
     void Perform(MHEngine *engine) override { // MHElemAction
-        Target(engine)->SetSpeed(m_Argument.GetValue(engine), engine);
+        Target(engine)->SetSpeed(m_argument.GetValue(engine), engine);
     }
 protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_Argument.PrintMe(fd, 0); }
-    MHGenericInteger m_Argument;
+        { m_argument.PrintMe(fd, 0); }
+    MHGenericInteger m_argument;
 };
 
 

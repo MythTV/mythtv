@@ -45,7 +45,7 @@ MHEG *MHCreateEngine(MHContext *context)
     return new MHEngine(context);
 }
 
-MHEngine::MHEngine(MHContext *context): m_Context(context)
+MHEngine::MHEngine(MHContext *context): m_context(context)
 {
     // Required for BBC Freeview iPlayer
     auto *pEntry = new MHPSEntry;
@@ -53,24 +53,24 @@ MHEngine::MHEngine(MHContext *context): m_Context(context)
     pEntry->m_Data.Append(new MHUnion(true)); // Default true
     // The next value must be true to enable Freeview interaction channel
     pEntry->m_Data.Append(new MHUnion(true)); // Default false
-    m_PersistentStore.Append(pEntry);
+    m_persistentStore.Append(pEntry);
 }
 
 MHEngine::~MHEngine()
 {
-    while (!m_ApplicationStack.isEmpty())
+    while (!m_applicationStack.isEmpty())
     {
-        delete m_ApplicationStack.pop();
+        delete m_applicationStack.pop();
     }
 
-    while (!m_EventQueue.isEmpty())
+    while (!m_eventQueue.isEmpty())
     {
-        delete m_EventQueue.dequeue();
+        delete m_eventQueue.dequeue();
     }
 
-    while (!m_ExternContentTable.isEmpty())
+    while (!m_externContentTable.isEmpty())
     {
-        delete m_ExternContentTable.takeFirst();
+        delete m_externContentTable.takeFirst();
     }
 }
 
@@ -84,22 +84,22 @@ int MHEngine::RunAll()
     if (m_fBooting)
     {
         // Reset everything
-        while (!m_ApplicationStack.isEmpty())
+        while (!m_applicationStack.isEmpty())
         {
-            delete m_ApplicationStack.pop();
+            delete m_applicationStack.pop();
         }
 
-        while (!m_EventQueue.isEmpty())
+        while (!m_eventQueue.isEmpty())
         {
-            delete m_EventQueue.dequeue();
+            delete m_eventQueue.dequeue();
         }
 
-        while (!m_ExternContentTable.isEmpty())
+        while (!m_externContentTable.isEmpty())
         {
-            delete m_ExternContentTable.takeFirst();
+            delete m_externContentTable.takeFirst();
         }
 
-        m_LinkTable.clear();
+        m_linkTable.clear();
 
         // UK MHEG applications boot from ~//a or ~//startup.  Actually the initial
         // object can also be explicitly given in the
@@ -130,7 +130,7 @@ int MHEngine::RunAll()
     do
     {
         // Check to see if we need to close.
-        if (m_Context->CheckStop())
+        if (m_context->CheckStop())
         {
             return 0;
         }
@@ -158,7 +158,7 @@ int MHEngine::RunAll()
             }
         }
 
-        if (! m_ExternContentTable.isEmpty())
+        if (! m_externContentTable.isEmpty())
         {
             // If we have an outstanding request for external content we need to set a timer.
             if (nNextTime == 0 || nNextTime > CONTENT_CHECK_TIME)
@@ -167,9 +167,9 @@ int MHEngine::RunAll()
             }
         }
 
-        if (! m_EventQueue.isEmpty())
+        if (! m_eventQueue.isEmpty())
         {
-            MHAsynchEvent *pEvent = m_EventQueue.dequeue();
+            MHAsynchEvent *pEvent = m_eventQueue.dequeue();
             MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
                   .arg(MHLink::EventTypeToString(pEvent->m_eventType))
                   .arg(pEvent->m_pEventSource->m_ObjectReference.Printable()));
@@ -178,12 +178,12 @@ int MHEngine::RunAll()
             delete pEvent;
         }
     }
-    while (! m_EventQueue.isEmpty() || ! m_ActionStack.isEmpty());
+    while (! m_eventQueue.isEmpty() || ! m_actionStack.isEmpty());
 
     // Redraw the display if necessary.
     if (! m_redrawRegion.isEmpty())
     {
-        m_Context->RequireRedraw(m_redrawRegion);
+        m_context->RequireRedraw(m_redrawRegion);
         m_redrawRegion = QRegion();
     }
 
@@ -286,7 +286,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
     QByteArray text;
-    if (! m_Context->GetCarouselData(csPath, text))
+    if (! m_context->GetCarouselData(csPath, text))
     {
         if (!m_fBooting)
             EngineEvent(2); // GroupIDRefError
@@ -312,7 +312,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     }
 
     // Clear the action queue of anything pending.
-    m_ActionStack.clear();
+    m_actionStack.clear();
 
     m_fInTransition = true; // Starting a transition
 
@@ -335,7 +335,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
 
             if (!fIsSpawn)
             {
-                delete m_ApplicationStack.pop();    // Pop and delete the current app.
+                delete m_applicationStack.pop();    // Pop and delete the current app.
             }
         }
 
@@ -353,13 +353,13 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         }
 
         // Have now got the application.
-        m_ApplicationStack.push(pProgram);
+        m_applicationStack.push(pProgram);
 
         // This isn't in the standard as far as I can tell but we have to do this because
         // we may have events referring to the old application.
-        while (!m_EventQueue.isEmpty())
+        while (!m_eventQueue.isEmpty())
         {
-            delete m_EventQueue.dequeue();
+            delete m_eventQueue.dequeue();
         }
 
         // Activate the application. ....
@@ -394,15 +394,15 @@ void MHEngine::Quit()
 
     // This isn't in the standard as far as I can tell but we have to do this because
     // we may have events referring to the old application.
-    while (!m_EventQueue.isEmpty())
+    while (!m_eventQueue.isEmpty())
     {
-        delete m_EventQueue.dequeue();
+        delete m_eventQueue.dequeue();
     }
 
-    delete m_ApplicationStack.pop();
+    delete m_applicationStack.pop();
 
     // If the stack is now empty we return to boot mode.
-    if (m_ApplicationStack.isEmpty())
+    if (m_applicationStack.isEmpty())
     {
         m_fBooting = true;
     }
@@ -435,7 +435,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
     QByteArray text;
-    if (! m_Context->GetCarouselData(csPath, text)) {
+    if (! m_context->GetCarouselData(csPath, text)) {
         EngineEvent(2); // GroupIDRefError
         return;
     }
@@ -453,7 +453,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     }
 
     // Clear the action queue of anything pending.
-    m_ActionStack.clear();
+    m_actionStack.clear();
 
     // At this point we have managed to load the scene.
     // Deactivate any non-shared ingredients in the application.
@@ -488,8 +488,8 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // This was causing crashes with leftover events being invalid.
     // Changed to clear all events at this point.
 
-    while (!m_EventQueue.isEmpty())
-        delete m_EventQueue.dequeue();
+    while (!m_eventQueue.isEmpty())
+        delete m_eventQueue.dequeue();
 
     // Can now actually delete the old scene.
     if (pApp->m_pCurrentScene)
@@ -498,7 +498,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
         pApp->m_pCurrentScene = nullptr;
     }
 
-    m_Interacting = nullptr;
+    m_interacting = nullptr;
 
     // Switch to the new scene.
     CurrentApp()->m_pCurrentScene = dynamic_cast< MHScene* >(pProgram);
@@ -517,7 +517,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
 
 void MHEngine::SetInputRegister(int nReg)
 {
-    m_Context->SetInputRegister(nReg); // Enable the appropriate buttons
+    m_context->SetInputRegister(nReg); // Enable the appropriate buttons
 }
 
 // Create a canonical path name.  The rules are given in the UK MHEG document.
@@ -613,10 +613,10 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
 // Run queued actions.
 void MHEngine::RunActions()
 {
-    while (! m_ActionStack.isEmpty())
+    while (! m_actionStack.isEmpty())
     {
         // Remove the first action.
-        MHElemAction *pAction = m_ActionStack.pop();
+        MHElemAction *pAction = m_actionStack.pop();
 
         // Run it.  If it fails and throws an exception catch it and continue with the next.
         try
@@ -691,7 +691,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
             pEvent->m_pEventSource = pSource;
             pEvent->m_eventType = ev;
             pEvent->m_eventData = evData;
-            m_EventQueue.enqueue(pEvent);
+            m_eventQueue.enqueue(pEvent);
         }
         break;
     }
@@ -705,19 +705,19 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
 // Check all the links in the application and scene and fire any that match this event.
 void MHEngine::CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un)
 {
-    for (auto *link : qAsConst(m_LinkTable))
+    for (auto *link : qAsConst(m_linkTable))
         link->MatchEvent(sourceRef, ev, un, this);
 }
 
 // Add and remove links to and from the active link table.
 void MHEngine::AddLink(MHLink *pLink)
 {
-    m_LinkTable.append(pLink);
+    m_linkTable.append(pLink);
 }
 
 void MHEngine::RemoveLink(MHLink *pLink)
 {
-    m_LinkTable.removeAll(pLink);
+    m_linkTable.removeAll(pLink);
 }
 
 // Called when a link fires to add the actions to the action stack.
@@ -726,7 +726,7 @@ void MHEngine::AddActions(const MHActionSequence &actions)
     // Put them on the stack in reverse order so that we will pop the first.
     for (int i = actions.Size(); i > 0; i--)
     {
-        m_ActionStack.push(actions.GetAt(i - 1));
+        m_actionStack.push(actions.GetAt(i - 1));
     }
 }
 
@@ -879,7 +879,7 @@ void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 
     // We've drawn all the visibles and there's still some undrawn area.
     // Fill it with black.
-    m_Context->DrawBackground(toDraw);
+    m_context->DrawBackground(toDraw);
 }
 
 // Redraw an area of the display.  This will be called via the context from Redraw.
@@ -942,9 +942,9 @@ void MHEngine::GenerateUserAction(int nCode)
 
     // If we are interacting with an interactible send the key
     // there otherwise generate a user event.
-    if (m_Interacting)
+    if (m_interacting)
     {
-        m_Interacting->KeyEvent(this, nCode);
+        m_interacting->KeyEvent(this, nCode);
     }
     else
     {
@@ -986,11 +986,11 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
         return;
     }
     
-    if (m_Context->CheckCarouselObject(csPath))
+    if (m_context->CheckCarouselObject(csPath))
     {
         // Available now - pass it to the ingredient.
         QByteArray text;
-        if (m_Context->GetCarouselData(csPath, text))
+        if (m_context->GetCarouselData(csPath, text))
         {
             // If the content is not recognized catch the exception and continue
             try
@@ -1020,16 +1020,16 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
         pContent->m_FileName = csPath;
         pContent->m_pRequester = pRequester;
         pContent->m_time.start();
-        m_ExternContentTable.append(pContent);
+        m_externContentTable.append(pContent);
     }
 }
 
 // Remove any pending requests from the queue.
 void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 {
-    QList<MHExternContent *>::iterator it = m_ExternContentTable.begin();
+    QList<MHExternContent *>::iterator it = m_externContentTable.begin();
 
-    while (it != m_ExternContentTable.end())
+    while (it != m_externContentTable.end())
     {
         MHExternContent *pContent = *it;
 
@@ -1037,7 +1037,7 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
         {
             MHLOG(MHLogNotifications, QString("Cancelled wait for %1")
                 .arg(pRequester->m_ObjectReference.Printable()) );
-            it = m_ExternContentTable.erase(it);
+            it = m_externContentTable.erase(it);
             delete pContent;
             return;
         }
@@ -1048,17 +1048,17 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 // See if we can satisfy any of the outstanding requests.
 void MHEngine::CheckContentRequests()
 {
-    QList<MHExternContent*>::iterator it = m_ExternContentTable.begin();
-    while (it != m_ExternContentTable.end())
+    QList<MHExternContent*>::iterator it = m_externContentTable.begin();
+    while (it != m_externContentTable.end())
     {
         MHExternContent *pContent = *it;
-        if (m_Context->CheckCarouselObject(pContent->m_FileName))
+        if (m_context->CheckCarouselObject(pContent->m_FileName))
         {
             // Remove from the list.
-            it = m_ExternContentTable.erase(it);
+            it = m_externContentTable.erase(it);
 
             QByteArray text;
-            if (m_Context->GetCarouselData(pContent->m_FileName, text))
+            if (m_context->GetCarouselData(pContent->m_FileName, text))
             {
                 MHLOG(MHLogNotifications, QString("Received %1 len %2")
                     .arg(pContent->m_pRequester->m_ObjectReference.Printable())
@@ -1088,7 +1088,7 @@ void MHEngine::CheckContentRequests()
         else if (pContent->m_time.elapsed() > 60000) // TODO Get this from carousel
         {
             // Remove from the list.
-            it = m_ExternContentTable.erase(it);
+            it = m_externContentTable.erase(it);
 
             MHLOG(MHLogWarning, QString("WARN File timed out %1 <= %2")
                 .arg(pContent->m_pRequester->m_ObjectReference.Printable())
@@ -1116,9 +1116,9 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
     MHPSEntry *pEntry = nullptr;
     int i = 0;
 
-    for (i = 0; i < m_PersistentStore.Size(); i++)
+    for (i = 0; i < m_persistentStore.Size(); i++)
     {
-        pEntry = m_PersistentStore.GetAt(i);
+        pEntry = m_persistentStore.GetAt(i);
 
         if (pEntry->m_FileName.Equal(fileName))
         {
@@ -1126,7 +1126,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         }
     }
 
-    if (i == m_PersistentStore.Size())   // Not there.
+    if (i == m_persistentStore.Size())   // Not there.
     {
         // If we're loading then we've failed.
         if (fIsLoad)
@@ -1140,7 +1140,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         // If we're storing we make a new entry.
         pEntry = new MHPSEntry;
         pEntry->m_FileName.Copy(fileName);
-        m_PersistentStore.Append(pEntry);
+        m_persistentStore.Append(pEntry);
     }
 
     // This should never happen
@@ -1290,12 +1290,12 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
             return true;
         }
 
-        if (strings[1] == m_Context->GetReceiverId())
+        if (strings[1] == m_context->GetReceiverId())
         {
             return true;
         }
 
-        if (strings[1] == m_Context->GetDSMCCId())
+        if (strings[1] == m_context->GetDSMCCId())
         {
             return true;
         }

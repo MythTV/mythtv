@@ -44,19 +44,19 @@ void MHStream::Initialise(MHParseNode *p, MHEngine *engine)
             if (pItem->GetTagNo() == C_AUDIO)
             {
                 auto *pAudio = new MHAudio;
-                m_Multiplex.Append(pAudio);
+                m_multiplex.Append(pAudio);
                 pAudio->Initialise(pItem, engine);
             }
             else if (pItem->GetTagNo() == C_VIDEO)
             {
                 auto *pVideo = new MHVideo;
-                m_Multiplex.Append(pVideo);
+                m_multiplex.Append(pVideo);
                 pVideo->Initialise(pItem, engine);
             }
             else if (pItem->GetTagNo() == C_RTGRAPHICS)
             {
                 auto *pRtGraph = new MHRTGraphics;
-                m_Multiplex.Append(pRtGraph);
+                m_multiplex.Append(pRtGraph);
                 pRtGraph->Initialise(pItem, engine);
             }
             else
@@ -91,9 +91,9 @@ void MHStream::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":Multiplex (\n");
 
-    for (int i = 0; i < m_Multiplex.Size(); i++)
+    for (int i = 0; i < m_multiplex.Size(); i++)
     {
-        m_Multiplex.GetAt(i)->PrintMe(fd, nTabs + 2);
+        m_multiplex.GetAt(i)->PrintMe(fd, nTabs + 2);
     }
 
     PrintTabs(fd, nTabs + 1);
@@ -122,9 +122,9 @@ void MHStream::Preparation(MHEngine *engine)
         return;    // Already prepared
     }
 
-    for (int i = 0; i < m_Multiplex.Size(); i++)
+    for (int i = 0; i < m_multiplex.Size(); i++)
     {
-        MHPresentable *pItem = m_Multiplex.GetAt(i);
+        MHPresentable *pItem = m_multiplex.GetAt(i);
 
         if (pItem->InitiallyActive())
         {
@@ -138,9 +138,9 @@ void MHStream::Preparation(MHEngine *engine)
 void MHStream::Destruction(MHEngine *engine)
 {
     // Apply Destruction in reverse order.
-    for (int j = m_Multiplex.Size(); j > 0; j--)
+    for (int j = m_multiplex.Size(); j > 0; j--)
     {
-        m_Multiplex.GetAt(j - 1)->Destruction(engine);
+        m_multiplex.GetAt(j - 1)->Destruction(engine);
     }
 
     MHPresentable::Destruction(engine);
@@ -190,9 +190,9 @@ MHRoot *MHStream::FindByObjectNo(int n)
         return this;
     }
 
-    for (int i = m_Multiplex.Size(); i > 0; i--)
+    for (int i = m_multiplex.Size(); i > 0; i--)
     {
-        MHRoot *pResult = m_Multiplex.GetAt(i - 1)->FindByObjectNo(n);
+        MHRoot *pResult = m_multiplex.GetAt(i - 1)->FindByObjectNo(n);
 
         if (pResult)
         {
@@ -212,8 +212,8 @@ void MHStream::BeginPlaying(MHEngine *engine)
         engine->EventTriggered(this, EventEngineEvent, 204); // StreamRefError
 
     // Start playing all active stream components.
-    for (int i = 0; i < m_Multiplex.Size(); i++)
-        m_Multiplex.GetAt(i)->BeginPlaying(engine);
+    for (int i = 0; i < m_multiplex.Size(); i++)
+        m_multiplex.GetAt(i)->BeginPlaying(engine);
 
     //engine->EventTriggered(this, EventStreamPlaying);
 }
@@ -221,8 +221,8 @@ void MHStream::BeginPlaying(MHEngine *engine)
 void MHStream::StopPlaying(MHEngine *engine)
 {
     // Stop playing all active Stream components
-    for (int i = 0; i < m_Multiplex.Size(); i++)
-        m_Multiplex.GetAt(i)->StopPlaying(engine);
+    for (int i = 0; i < m_multiplex.Size(); i++)
+        m_multiplex.GetAt(i)->StopPlaying(engine);
     engine->GetContext()->EndStream();
     engine->EventTriggered(this, EventStreamStopped);
 }
@@ -354,7 +354,7 @@ void MHVideo::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pTerm)
     {
-        m_Termination = (enum Termination)pTerm->GetArgN(0)->GetEnumValue();
+        m_termination = (enum Termination)pTerm->GetArgN(0)->GetEnumValue();
     }
 }
 
@@ -366,7 +366,7 @@ void MHVideo::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":ComponentTag %d\n", m_nComponentTag);
 
-    if (m_Termination != VI_Disappear)
+    if (m_termination != VI_Disappear)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, "Termination freeze ");

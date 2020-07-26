@@ -60,7 +60,7 @@ void MHProgram::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pCmdNode)
     {
-        pCmdNode->GetArgN(0)->GetStringValue(m_Name);    // Program name
+        pCmdNode->GetArgN(0)->GetStringValue(m_name);    // Program name
     }
 
     MHParseNode *pAvail = p->GetNamedArg(C_INITIALLY_AVAILABLE);
@@ -80,7 +80,7 @@ void MHProgram::PrintMe(FILE *fd, int nTabs) const
     MHIngredient::PrintMe(fd, nTabs);
     PrintTabs(fd, nTabs);
     fprintf(fd, ":Name ");
-    m_Name.PrintMe(fd, 0);
+    m_name.PrintMe(fd, 0);
     fprintf(fd, "\n");
 
     if (! m_fInitiallyAvailable)
@@ -166,12 +166,12 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
     //  if (m_fRunning) return; // Strictly speaking there should be only one instance of a program running at a time.
     Activation(engine);
-    MHLOG(MHLogDetail, QString("Calling program %1").arg(m_Name.Printable()));
+    MHLOG(MHLogDetail, QString("Calling program %1").arg(m_name.Printable()));
 
     try
     {
         // Run the code.
-        if (m_Name.Equal("GCD"))   // GetCurrentDate - returns local time.
+        if (m_name.Equal("GCD"))   // GetCurrentDate - returns local time.
         {
             if (args.Size() == 2)
             {
@@ -217,7 +217,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("FDa"))   // FormatDate
+        else if (m_name.Equal("FDa"))   // FormatDate
         {
             if (args.Size() == 4)
             {
@@ -294,7 +294,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("GDW"))   // GetDayOfWeek - returns the day of week that the date occurred on.
+        else if (m_name.Equal("GDW"))   // GetDayOfWeek - returns the day of week that the date occurred on.
         {
             if (args.Size() == 2)
             {
@@ -312,7 +312,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("Rnd"))   // Random
+        else if (m_name.Equal("Rnd"))   // Random
         {
             if (args.Size() == 2)
             {
@@ -329,7 +329,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("CTC"))   // CastToContentRef
+        else if (m_name.Equal("CTC"))   // CastToContentRef
         {
             // Converts a string to a ContentRef.
             if (args.Size() == 2)
@@ -347,7 +347,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("CTO"))   // CastToObjectRef
+        else if (m_name.Equal("CTO"))   // CastToObjectRef
         {
             // Converts a string and an integer to an ObjectRef.
             if (args.Size() == 3)
@@ -364,7 +364,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("GSL"))   // GetStringLength
+        else if (m_name.Equal("GSL"))   // GetStringLength
         {
             if (args.Size() == 2)
             {
@@ -381,7 +381,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("GSS"))   // GetSubString
+        else if (m_name.Equal("GSS"))   // GetSubString
         {
             if (args.Size() == 4)   // Extract a sub-string from a string.
             {
@@ -422,7 +422,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("SSS"))   // SearchSubString
+        else if (m_name.Equal("SSS"))   // SearchSubString
         {
             if (args.Size() == 4)
             {
@@ -479,7 +479,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("SES"))   // SearchAndExtractSubString
+        else if (m_name.Equal("SES"))   // SearchAndExtractSubString
         {
             if (args.Size() == 5)
             {
@@ -542,7 +542,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("GSI"))   // SI_GetServiceIndex
+        else if (m_name.Equal("GSI"))   // SI_GetServiceIndex
         {
             // Returns an index indicating the service
             if (args.Size() == 2)
@@ -564,7 +564,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
-        else if (m_Name.Equal("TIn"))   // SI_TuneIndex - Fork not allowed
+        else if (m_name.Equal("TIn"))   // SI_TuneIndex - Fork not allowed
         {
             // Tunes to an index returned by GSI
             if (args.Size() == 1)
@@ -579,7 +579,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 SetSuccessFlag(success, false, engine);
             }
         }
-        else if (m_Name.Equal("TII"))   // SI_TuneIndexInfo
+        else if (m_name.Equal("TII"))   // SI_TuneIndexInfo
         {
             // Indicates whether to perform a subsequent TIn quietly or normally.
             if (args.Size() == 1)
@@ -593,7 +593,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 SetSuccessFlag(success, false, engine);
             }
         }
-        else if (m_Name.Equal("BSI"))   // SI_GetBasicSI
+        else if (m_name.Equal("BSI"))   // SI_GetBasicSI
         {
             // Returns basic SI information about the service indicated by an index
             // returned by GSI.
@@ -624,12 +624,12 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 SetSuccessFlag(success, false, engine);
             }
         }
-        else if (m_Name.Equal("GBI"))   // GetBootInfo
+        else if (m_name.Equal("GBI"))   // GetBootInfo
         {
             // Gets the NB_info field.
             MHERROR("GetBootInfo ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("CCR"))   // CheckContentRef
+        else if (m_name.Equal("CCR"))   // CheckContentRef
         {
             // Sees if an item with a particular content reference is available
             // in the carousel.  This looks like it should block until the file
@@ -665,34 +665,34 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 SetSuccessFlag(success, false, engine);
             }
         }
-        else if (m_Name.Equal("CGR"))   // CheckGroupIDRef
+        else if (m_name.Equal("CGR"))   // CheckGroupIDRef
         {
             // Sees if an application or scene with a particular group id
             // is available in the carousel.
             MHERROR("CheckGroupIDRef ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("VTG"))   // VideoToGraphics
+        else if (m_name.Equal("VTG"))   // VideoToGraphics
         {
             // Video to graphics transformation.
             MHERROR("VideoToGraphics ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("SWA"))   // SetWidescreenAlignment
+        else if (m_name.Equal("SWA"))   // SetWidescreenAlignment
         {
             // Sets either LetterBox or Centre-cut-out mode.
             // Seems to be concerned with aligning a 4:3 scene with an underlying 16:9 video
             MHERROR("SetWidescreenAlignment ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("GDA"))   // GetDisplayAspectRatio
+        else if (m_name.Equal("GDA"))   // GetDisplayAspectRatio
         {
             // Returns the aspcet ratio.  4:3 => 1, 16:9 => 2
             MHERROR("GetDisplayAspectRatio ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("CIS"))   // CI_SendMessage
+        else if (m_name.Equal("CIS"))   // CI_SendMessage
         {
             // Sends a message to a DVB CI application
             MHERROR("CI_SendMessage ResidentProgram is not implemented");
         }
-        else if (m_Name.Equal("SSM"))   // SetSubtitleMode
+        else if (m_name.Equal("SSM"))   // SetSubtitleMode
         {
             // Enable or disable subtitles in addition to MHEG.
             if (args.Size() == 1) {
@@ -705,7 +705,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             else SetSuccessFlag(success, false, engine);
         }
 
-        else if (m_Name.Equal("WAI"))   // WhoAmI
+        else if (m_name.Equal("WAI"))   // WhoAmI
         {
             // Return a concatenation of the strings we respond to in
             // GetEngineSupport(UKEngineProfile(X))
@@ -735,7 +735,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         // Optional resident programs
-        else if (m_Name.Equal("DBG"))   // Debug - optional
+        else if (m_name.Equal("DBG"))   // Debug - optional
         {
             QString message = "DEBUG: ";
 
@@ -770,7 +770,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         // NativeApplicationExtension
-        else if (m_Name.Equal("SBI"))   // SetBroadcastInterrupt
+        else if (m_name.Equal("SBI"))   // SetBroadcastInterrupt
         {
             // Required for NativeApplicationExtension
             // En/dis/able program interruptions e.g. green button
@@ -785,7 +785,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         // InteractionChannelExtension
-        else if (m_Name.Equal("GIS")) { // GetICStatus
+        else if (m_name.Equal("GIS")) { // GetICStatus
             if (args.Size() == 1)
             {
                 int ICstatus = engine->GetContext()->GetICStatus();
@@ -797,7 +797,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("RDa")) { // ReturnData
+        else if (m_name.Equal("RDa")) { // ReturnData
             if (args.Size() >= 3)
             {
                 MHOctetString string;
@@ -837,7 +837,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("SHF")) { // SetHybridFileSystem
+        else if (m_name.Equal("SHF")) { // SetHybridFileSystem
             if (args.Size() == 2)
             {
                 MHOctetString string;
@@ -852,7 +852,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("PST")) { // PersistentStorageInfo
+        else if (m_name.Equal("PST")) { // PersistentStorageInfo
             if (args.Size() == 1)
             {
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
@@ -860,7 +860,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("SCk")) { // SetCookie
+        else if (m_name.Equal("SCk")) { // SetCookie
             if (args.Size() == 4)
             {
                 MHOctetString string;
@@ -876,12 +876,12 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("GCk")) { // GetCookie
+        else if (m_name.Equal("GCk")) { // GetCookie
             MHERROR("GetCookie ResidentProgram is not implemented");
         }
 
         // ICStreamingExtension
-        else if (m_Name.Equal("MSP")) // MeasureStreamPerformance
+        else if (m_name.Equal("MSP")) // MeasureStreamPerformance
         {
             if (args.Size() == 2)
             {
@@ -897,7 +897,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("PFG")) { // PromptForGuidance
+        else if (m_name.Equal("PFG")) { // PromptForGuidance
             if (args.Size() == 2)
             {
                 MHOctetString string;
@@ -911,8 +911,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             else SetSuccessFlag(success, false, engine);
 
         }
-        else if (m_Name.Equal("GAP") || // GetAudioDescPref
-                 m_Name.Equal("GSP")) { // GetSubtitlePref
+        else if (m_name.Equal("GAP") || // GetAudioDescPref
+                 m_name.Equal("GSP")) { // GetSubtitlePref
             if (args.Size() == 1)
             {
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(false);
@@ -920,7 +920,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
-        else if (m_Name.Equal("GPS")) { // GetPINSupport
+        else if (m_name.Equal("GPS")) { // GetPINSupport
             if (args.Size() == 1)
             {
                 // -1= PIN is not supported
@@ -933,7 +933,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         // Undocumented functions
-        else if (m_Name.Equal("XBM")) {
+        else if (m_name.Equal("XBM")) {
             // BBC Freeview passes 1 boolean arg
             // Required for BBC Freeview iPlayer
             MHLOG(MHLogNotifications, "NOTE Undocumented ResidentProgram XBM" );
@@ -944,7 +944,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
         else
         {
-            MHERROR(QString("Unknown ResidentProgram %1").arg(m_Name.Printable()));
+            MHERROR(QString("Unknown ResidentProgram %1").arg(m_name.Printable()));
         }
     }
     catch (...)
@@ -1008,26 +1008,26 @@ void MHInterChgProgram::PrintMe(FILE *fd, int nTabs) const
 void MHCall::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine); // Target
-    m_Succeeded.Initialise(p->GetArgN(1), engine); // Call/fork succeeded flag
+    m_succeeded.Initialise(p->GetArgN(1), engine); // Call/fork succeeded flag
     // Arguments.
     MHParseNode *args = p->GetArgN(2);
 
     for (int i = 0; i < args->GetSeqCount(); i++)
     {
         auto *pParm = new MHParameter;
-        m_Parameters.Append(pParm);
+        m_parameters.Append(pParm);
         pParm->Initialise(args->GetSeqN(i), engine);
     }
 }
 
 void MHCall::PrintArgs(FILE *fd, int nTabs) const
 {
-    m_Succeeded.PrintMe(fd, nTabs);
+    m_succeeded.PrintMe(fd, nTabs);
     fprintf(fd, " ( ");
 
-    for (int i = 0; i < m_Parameters.Size(); i++)
+    for (int i = 0; i < m_parameters.Size(); i++)
     {
-        m_Parameters.GetAt(i)->PrintMe(fd, 0);
+        m_parameters.GetAt(i)->PrintMe(fd, 0);
     }
 
     fprintf(fd, " )");
@@ -1036,5 +1036,5 @@ void MHCall::PrintArgs(FILE *fd, int nTabs) const
 void MHCall::Perform(MHEngine *engine)
 {
     // Output parameters are handled by IndirectRefs so we don't evaluate the parameters here.
-    Target(engine)->CallProgram(m_fIsFork, m_Succeeded, m_Parameters, engine);
+    Target(engine)->CallProgram(m_fIsFork, m_succeeded, m_parameters, engine);
 }

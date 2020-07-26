@@ -150,16 +150,16 @@ class MHEngine: public MHEG {
     void GetDefaultFontAttrs(MHOctetString &str);
     void SetInputRegister(int nReg);
 
-    MHOctetString &GetGroupId() { return m_CurrentGroupId; }
-    MHContext *GetContext() { return m_Context; }
+    MHOctetString &GetGroupId() { return m_currentGroupId; }
+    MHContext *GetContext() { return m_context; }
 
     QString GetPathName(const MHOctetString &str); // Return a path relative to the home directory
 
     static const char *MHEGEngineProviderIdString;
 
     // Interaction: Set if an Interactible has the focus and is receiving key presses.
-    MHInteractible *GetInteraction(void) { return m_Interacting; }
-    void SetInteraction(MHInteractible *p) { m_Interacting = p; }
+    MHInteractible *GetInteraction(void) { return m_interacting; }
+    void SetInteraction(MHInteractible *p) { m_interacting = p; }
 
     int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneInfo : 0; }
     void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneInfo = tuneinfo; }
@@ -172,43 +172,43 @@ class MHEngine: public MHEG {
     QRegion m_redrawRegion; // The accumulation of repaints when the screen is locked.
 
     // Application stack and functions to get the current application and scene.
-    QStack<MHApplication*> m_ApplicationStack;
+    QStack<MHApplication*> m_applicationStack;
     MHApplication *CurrentApp() {
-        if (m_ApplicationStack.isEmpty())
+        if (m_applicationStack.isEmpty())
             return nullptr;
-        return m_ApplicationStack.top();
+        return m_applicationStack.top();
     }
     MHScene *CurrentScene() { return CurrentApp() == nullptr ? nullptr : CurrentApp()->m_pCurrentScene; }
 
     // Action stack.  Actions may generate synchronous events which fire links and add
     // new actions.  These new actions have to be processed before we continue with other
     // actions.
-    QStack<MHElemAction*> m_ActionStack;
+    QStack<MHElemAction*> m_actionStack;
 
     // Asynchronous event queue.  Asynchronous events are added to this queue and handled
     // once the action stack is empty.
-    QQueue<MHAsynchEvent*> m_EventQueue;
+    QQueue<MHAsynchEvent*> m_eventQueue;
 
     // Active Link set.  Active links are included in this table.
-    QList<MHLink*> m_LinkTable;
+    QList<MHLink*> m_linkTable;
 
     // Pending external content.  If we have requested external content that has not yet arrived
     // we make an entry in this table.
-    QList<MHExternContent*> m_ExternContentTable;
+    QList<MHExternContent*> m_externContentTable;
     void CheckContentRequests();
 
-    MHOwnPtrSequence <MHPSEntry> m_PersistentStore;
+    MHOwnPtrSequence <MHPSEntry> m_persistentStore;
 
     bool m_fInTransition {false}; // If we get a TransitionTo, Quit etc during OnStartUp and OnCloseDown we ignore them.
 
     // To canonicalise the object ids we set this to the group id of the current scene or app
     // and use that wherever we get an object id without a group id.
-    MHOctetString   m_CurrentGroupId;
+    MHOctetString   m_currentGroupId;
 
-    MHContext       *m_Context {nullptr}; // Pointer to the context providing drawing and other operations
+    MHContext       *m_context {nullptr}; // Pointer to the context providing drawing and other operations
     bool            m_fBooting {true};
 
-    MHInteractible  *m_Interacting {nullptr}; // Set to current interactive object if any.
+    MHInteractible  *m_interacting {nullptr}; // Set to current interactive object if any.
 };
 
 #endif

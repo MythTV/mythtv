@@ -47,7 +47,7 @@ class MHProgram : public MHIngredient
     void Stop(MHEngine *engine) override // MHRoot
         { Deactivation(engine); }
   protected:
-    MHOctetString m_Name; // Name of the program
+    MHOctetString m_name; // Name of the program
     bool          m_fInitiallyAvailable {true};
 };
 
@@ -97,8 +97,8 @@ class MHCall: public MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     bool m_fIsFork;
-    MHObjectRef m_Succeeded; // Boolean variable set to call result
-    MHOwnPtrSequence<MHParameter> m_Parameters; // Arguments.
+    MHObjectRef m_succeeded; // Boolean variable set to call result
+    MHOwnPtrSequence<MHParameter> m_parameters; // Arguments.
 };
 
 #endif

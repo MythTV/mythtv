@@ -185,20 +185,20 @@ void MHDrawPoly::Initialise(MHParseNode *p, MHEngine *engine)
     for (int i = 0; i < args->GetSeqCount(); i++)
     {
         auto *pPoint = new MHPointArg;
-        m_Points.Append(pPoint);
+        m_points.Append(pPoint);
         pPoint->Initialise(args->GetSeqN(i), engine);
     }
 }
 
 void MHDrawPoly::Perform(MHEngine *engine)
 {
-    int nPoints = m_Points.Size();
+    int nPoints = m_points.Size();
     int *xArray = new int[nPoints];
     int *yArray = new int[nPoints];
 
     for (int i = 0; i < nPoints; i++)
     {
-        MHPointArg *pPoint = m_Points[i];
+        MHPointArg *pPoint = m_points[i];
         xArray[i] = pPoint->m_x.GetValue(engine);
         yArray[i] = pPoint->m_y.GetValue(engine);
     }
@@ -212,9 +212,9 @@ void MHDrawPoly::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
     fprintf(fd, " ( ");
 
-    for (int i = 0; i < m_Points.Size(); i++)
+    for (int i = 0; i < m_points.Size(); i++)
     {
-        m_Points[i]->PrintMe(fd, 0);
+        m_points[i]->PrintMe(fd, 0);
     }
 
     fprintf(fd, " )\n");
