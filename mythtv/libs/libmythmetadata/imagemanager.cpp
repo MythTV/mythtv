@@ -1065,7 +1065,7 @@ void ImageDbLocal::DropTable()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("DROP TABLE IF EXISTS %1;").arg(m_table));
     if (query.exec())
-        m_DbExists = false;
+        m_dbExists = false;
     else
         MythDB::DBError(DBLOC, query);
 }
@@ -1076,7 +1076,7 @@ void ImageDbLocal::DropTable()
 */
 bool ImageDbLocal::CreateTable()
 {
-    if (m_DbExists)
+    if (m_dbExists)
         return true;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1089,7 +1089,7 @@ bool ImageDbLocal::CreateTable()
         query.prepare(QString("ALTER TABLE %1 ENGINE = MEMORY;").arg(m_table));
         if (query.exec())
         {
-            m_DbExists = true;
+            m_dbExists = true;
             LOG(VB_FILE, LOG_DEBUG, QString("Created Db table %1").arg(m_table));
             return true;
         }
@@ -1790,7 +1790,7 @@ int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
     int count = 0;
     if (!ImageItem::IsLocalId(id))
         count = m_remote->GetDirectory(id, parent, files, dirs, m_refineClause);
-    if (m_DbExists && ImageItem::IsLocalParent(id))
+    if (m_dbExists && ImageItem::IsLocalParent(id))
         count += ImageHandler::GetDirectory(id, parent, files, dirs, m_refineClause);
 
     if (id == GALLERY_DB_ID)
@@ -1821,7 +1821,7 @@ int ImageDbReader::GetImages(const ImageIdList& ids,
 
     if (!lists.second.isEmpty())
         return m_remote->GetImages(lists.second, files, dirs, m_refineClause);
-    if (m_DbExists && !lists.first.isEmpty())
+    if (m_dbExists && !lists.first.isEmpty())
         return ImageHandler::GetImages(lists.first, files, dirs, m_refineClause);
     return 0;
 }
@@ -1840,7 +1840,7 @@ int ImageDbReader::GetChildren(int id, ImageList &files, ImageList &dirs) const
     if (!ImageItem::IsLocalId(id))
         count = m_remote->GetChildren(QString::number(id), files, dirs,
                                       m_refineClause);
-    if (m_DbExists && ImageItem::IsLocalParent(id))
+    if (m_dbExists && ImageItem::IsLocalParent(id))
         count += ImageHandler::GetChildren(QString::number(id), files, dirs,
                                            m_refineClause);
     return count;
@@ -1861,7 +1861,7 @@ void ImageDbReader::GetDescendants(const ImageIdList &ids,
 
     if (!lists.second.isEmpty())
         m_remote->GetDescendants(lists.second, files, dirs);
-    if (m_DbExists && !lists.first.isEmpty())
+    if (m_dbExists && !lists.first.isEmpty())
         ImageHandler::GetDescendants(lists.first, files, dirs);
 }
 
@@ -1876,7 +1876,7 @@ void ImageDbReader::GetImageTree(int id, ImageList &files) const
 {
     if (!ImageItem::IsLocalId(id))
         m_remote->GetImageTree(id, files, m_refineClause);
-    if (m_DbExists && ImageItem::IsLocalParent(id))
+    if (m_dbExists && ImageItem::IsLocalParent(id))
         ImageHandler::GetImageTree(id, files, m_refineClause);
 }
 
@@ -1896,7 +1896,7 @@ void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
     {
         // Sum both unfiltered tables
         m_remote->GetDescendantCount(id, true, dirs, pics, videos, sizeKb);
-        if (m_DbExists)
+        if (m_dbExists)
             ImageHandler::GetDescendantCount(id, true, dirs, pics, videos, sizeKb);
     }
     else if (!ImageItem::IsLocalId(id))
@@ -1905,7 +1905,7 @@ void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
         m_remote->GetDescendantCount(id, id == PHOTO_DB_ID,
                                      dirs, pics, videos, sizeKb);
     }
-    else if (m_DbExists)
+    else if (m_dbExists)
     {
         // Always filter on device/dir
         ImageHandler::GetDescendantCount(id, false, dirs, pics, videos, sizeKb);

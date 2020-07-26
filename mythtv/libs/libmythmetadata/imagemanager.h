@@ -326,7 +326,7 @@ protected:
     ImageDbLocal();
     ~ImageDbLocal() override          { DropTable(); }
     bool CreateTable();
-    bool m_DbExists { false };
+    bool m_dbExists { false };
 
 private:
     void DropTable();
