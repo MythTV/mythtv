@@ -37,24 +37,24 @@ class PaneAll : public GroupSetting
 {
   public:
     PaneAll(const QString &target, StandardSetting *setting) :
-        m_ignore_signal_timeout(new IgnoreSignalTimeout()),
-        m_follow_nit(new FollowNITSetting())
+        m_ignoreSignalTimeout(new IgnoreSignalTimeout()),
+        m_followNit(new FollowNITSetting())
     {
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
-                                      m_ignore_signal_timeout,
-                                      m_follow_nit});
+                                      m_ignoreSignalTimeout,
+                                      m_followNit});
     }
 
     bool ignoreSignalTimeout(void) const
-        { return m_ignore_signal_timeout->getValue().toInt() != 0; }
+        { return m_ignoreSignalTimeout->getValue().toInt() != 0; }
     bool GetFollowNIT(void) const
-        { return m_follow_nit->getValue().toInt() != 0; }
+        { return m_followNit->getValue().toInt() != 0; }
 
   protected:
-    IgnoreSignalTimeout *m_ignore_signal_timeout {nullptr};
-    FollowNITSetting    *m_follow_nit {nullptr};
+    IgnoreSignalTimeout *m_ignoreSignalTimeout {nullptr};
+    FollowNITSetting    *m_followNit {nullptr};
 };
 
 #endif // PANE_ALL_H

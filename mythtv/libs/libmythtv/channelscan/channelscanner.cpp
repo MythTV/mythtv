@@ -92,11 +92,11 @@ void ChannelScanner::Teardown(void)
 #endif
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    if (m_ExternRecScanner)
+    if (m_externRecScanner)
     {
-        m_ExternRecScanner->Stop();
-        delete m_ExternRecScanner;
-        m_ExternRecScanner = nullptr;
+        m_externRecScanner->Stop();
+        delete m_externRecScanner;
+        m_externRecScanner = nullptr;
     }
 #endif
 
@@ -242,7 +242,7 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::IPTVImportMPTS == scantype)
     {
-        if (m_iptv_channels.empty())
+        if (m_iptvChannels.empty())
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC + "IPTVImportMPTS: no channels");
         }
@@ -251,7 +251,7 @@ void ChannelScanner::Scan(
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("ScanIPTVChannels(%1) IPTV MPTS").arg(sourceid));
 
-            if ((ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptv_channels)))
+            if ((ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptvChannels)))
                 m_scanMonitor->ScanPercentComplete(0);
             else
             {
@@ -349,7 +349,7 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
     m_iptvScanner->Scan();
 
     if (is_mpts)
-        m_iptv_channels = m_iptvScanner->GetChannels();
+        m_iptvChannels = m_iptvScanner->GetChannels();
 
     return true;
 }
@@ -386,14 +386,14 @@ bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
         m_scanMonitor = new ScanMonitor(this);
 
     // Create a External Recorder Channel Fetcher
-    m_ExternRecScanner = new ExternRecChannelScanner(cardid,
+    m_externRecScanner = new ExternRecChannelScanner(cardid,
                                                      inputname,
                                                      sourceid,
                                                      m_scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
-    m_ExternRecScanner->Scan();
+    m_externRecScanner->Scan();
 
     return true;
 #else

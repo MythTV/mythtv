@@ -114,7 +114,7 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
     void SetInput(const QString &cardids_inputname);
 
   protected:
-    uint    m_hw_cardid {0};
+    uint    m_hwCardId {0};
 };
 
 class ScanOptionalConfig : public GroupSetting

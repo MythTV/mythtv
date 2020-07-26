@@ -209,11 +209,11 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     // Only refresh if we really have to. If we do it too often
     // Then we end up fighting the scan routine when we want to
     // check the type of dvb card :/
-    if (cardid == m_hw_cardid)
+    if (cardid == m_hwCardId)
         return;
 
-    m_hw_cardid     = cardid;
-    QString subtype = CardUtil::ProbeSubTypeName(m_hw_cardid);
+    m_hwCardId     = cardid;
+    QString subtype = CardUtil::ProbeSubTypeName(m_hwCardId);
     int nCardType   = CardUtil::toInputType(subtype);
 
 #ifdef USING_SATIP

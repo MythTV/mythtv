@@ -162,7 +162,7 @@ class AvFormatDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
-        { m_AVCParser->use_I_forKeyframes(!value); }
+        { m_avcParser->use_I_forKeyframes(!value); }
 
     int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
@@ -266,7 +266,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool               m_isDbIgnored;
 
-    AVCParser         *m_AVCParser                    {nullptr};
+    AVCParser         *m_avcParser                    {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
     MythCodecMap       m_codecMap                     { };

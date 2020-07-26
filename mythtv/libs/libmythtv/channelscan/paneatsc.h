@@ -20,32 +20,32 @@ class PaneATSC : public GroupSetting
 
   public:
     PaneATSC(const QString &target, StandardSetting *setting) :
-        m_atsc_table(new ScanFrequencyTable()),
-        m_atsc_modulation(new ScanATSCModulation())
+        m_atscTable(new ScanFrequencyTable()),
+        m_atscModulation(new ScanATSCModulation())
     {
         setVisible(false);
 
-        connect(m_atsc_table, SIGNAL(valueChanged(    const QString&)),
+        connect(m_atscTable, SIGNAL(valueChanged(    const QString&)),
                 this,       SLOT(  FreqTableChanged(const QString&)));
 
-        connect(m_atsc_modulation, SIGNAL(valueChanged(     const QString&)),
+        connect(m_atscModulation, SIGNAL(valueChanged(     const QString&)),
                 this,            SLOT(  ModulationChanged(const QString&)));
 
         auto *range = new GroupSetting();
-        m_transport_start = new TransMythUIComboBoxSetting();
-        m_transport_end   = new TransMythUIComboBoxSetting();
-        m_transport_count = new TransTextEditSetting();
+        m_transportStart = new TransMythUIComboBoxSetting();
+        m_transportEnd   = new TransMythUIComboBoxSetting();
+        m_transportCount = new TransTextEditSetting();
         range->setLabel(tr("Scanning Range"));
-        range->addChild(m_transport_start);
-        range->addChild(m_transport_end);
-        range->addChild(m_transport_count);
+        range->addChild(m_transportStart);
+        range->addChild(m_transportEnd);
+        range->addChild(m_transportCount);
 
         setting->addTargetedChildren(target,
-                                     {this, m_atsc_table, m_atsc_modulation, range});
+                                     {this, m_atscTable, m_atscModulation, range});
 
-        connect(m_transport_start, SIGNAL(valueChanged(       const QString&)),
+        connect(m_transportStart, SIGNAL(valueChanged(       const QString&)),
                 this,            SLOT(  TransportRangeChanged(const QString&)));
-        connect(m_transport_end,   SIGNAL(valueChanged(       const QString&)),
+        connect(m_transportEnd,   SIGNAL(valueChanged(       const QString&)),
                 this,            SLOT(  TransportRangeChanged(const QString&)));
 
         ResetTransportRange();
@@ -61,20 +61,20 @@ class PaneATSC : public GroupSetting
     }
 
     void SetFrequencyTable(const QString &atsc_table)
-        { m_atsc_table->setValue(atsc_table); }
+        { m_atscTable->setValue(atsc_table); }
 
     QString GetFrequencyTable(void) const
-        { return m_atsc_table->getValue(); }
+        { return m_atscTable->getValue(); }
     QString GetModulation(void) const
-        { return m_atsc_modulation->getValue(); }
+        { return m_atscModulation->getValue(); }
     bool GetFrequencyTableRange(
         QString &start, QString &end) const
     {
-        if (!m_transport_start->size() || !m_transport_end->size())
+        if (!m_transportStart->size() || !m_transportEnd->size())
             return false;
 
-        start = m_transport_start->getValue();
-        end   = m_transport_end->getValue();
+        start = m_transportStart->getValue();
+        end   = m_transportEnd->getValue();
 
         return !start.isEmpty() && !end.isEmpty();
     }
@@ -83,9 +83,9 @@ class PaneATSC : public GroupSetting
     void FreqTableChanged(const QString &freqtbl)
     {
         if (freqtbl == "us")
-            m_atsc_modulation->setValue(0);
-        else if (m_atsc_modulation->getValue() == "vsb8")
-            m_atsc_modulation->setValue(1);
+            m_atscModulation->setValue(0);
+        else if (m_atscModulation->getValue() == "vsb8")
+            m_atscModulation->setValue(1);
 
         ResetTransportRange();
     }
@@ -97,24 +97,24 @@ class PaneATSC : public GroupSetting
 
     void TransportRangeChanged(const QString &/*range*/)
     {
-        int a = m_transport_start->getValueIndex(m_transport_start->getValue());
-        int b = m_transport_end->getValueIndex(m_transport_end->getValue());
+        int a = m_transportStart->getValueIndex(m_transportStart->getValue());
+        int b = m_transportEnd->getValueIndex(m_transportEnd->getValue());
         if (b < a)
         {
-            m_transport_end->setValue(m_transport_start->getValue());
+            m_transportEnd->setValue(m_transportStart->getValue());
             b = a;
         }
 
         int diff = max(b + 1 - a, 0);
-        m_transport_count->setValue(QString::number(diff));
+        m_transportCount->setValue(QString::number(diff));
     }
 
   protected:
     void ResetTransportRange(void)
     {
-        m_transport_start->clearSelections();
-        m_transport_end->clearSelections();
-        m_transport_count->setValue(QString::number(0));
+        m_transportStart->clearSelections();
+        m_transportEnd->clearSelections();
+        m_transportCount->setValue(QString::number(0));
 
         FetchFrequencyTables();
 
@@ -134,12 +134,12 @@ class PaneATSC : public GroupSetting
                 if (strNameFormat.indexOf("%") >= 0)
                     name = strNameFormat.arg(name_num);
 
-                m_transport_start->addSelection(name, name, first);
+                m_transportStart->addSelection(name, name, first);
                 first = false;
 
                 bool last = (next == m_tables.end()) &&
                     ((freq + ft.m_frequencyStep) >= ft.m_frequencyEnd);
-                m_transport_end->addSelection(name, name, last);
+                m_transportEnd->addSelection(name, name, last);
 
                 name_num++;
                 freq += ft.m_frequencyStep;
@@ -156,7 +156,7 @@ class PaneATSC : public GroupSetting
         const QString new_tables_sig =
             QString("%1_%2_%3").arg(format).arg(modulation).arg(country);
 
-        if (new_tables_sig != m_tables_sig)
+        if (new_tables_sig != m_tablesSig)
         {
             while (!m_tables.empty())
             {
@@ -164,7 +164,7 @@ class PaneATSC : public GroupSetting
                 m_tables.pop_back();
             }
 
-            m_tables_sig = new_tables_sig;
+            m_tablesSig = new_tables_sig;
 
             m_tables = get_matching_freq_tables(
                 format, modulation, country);
@@ -172,13 +172,12 @@ class PaneATSC : public GroupSetting
     }
 
   protected:
-    ScanFrequencyTable         *m_atsc_table      {nullptr};
-    ScanATSCModulation         *m_atsc_modulation {nullptr};
-    TransMythUIComboBoxSetting *m_transport_start {nullptr};
-    TransMythUIComboBoxSetting *m_transport_end   {nullptr};
-    TransTextEditSetting       *m_transport_count {nullptr};
-//  QString                     m_old_freq_table;
-    QString                     m_tables_sig;
+    ScanFrequencyTable         *m_atscTable       {nullptr};
+    ScanATSCModulation         *m_atscModulation  {nullptr};
+    TransMythUIComboBoxSetting *m_transportStart  {nullptr};
+    TransMythUIComboBoxSetting *m_transportEnd    {nullptr};
+    TransTextEditSetting       *m_transportCount  {nullptr};
+    QString                     m_tablesSig;
     freq_table_list_t           m_tables;
 };
 

@@ -45,10 +45,10 @@ class PaneDVBT : public GroupSetting
                                       m_pbandwidth      = new ScanBandwidth(),
                                       m_pinversion      = new ScanInversion(),
                                       m_pconstellation  = new ScanConstellation(),
-                                      m_pcoderate_lp    = new ScanCodeRateLP(),
-                                      m_pcoderate_hp    = new ScanCodeRateHP(),
-                                      m_ptrans_mode     = new ScanTransmissionMode(),
-                                      m_pguard_interval = new ScanGuardInterval(),
+                                      m_pcoderateLp     = new ScanCodeRateLP(),
+                                      m_pcoderateHp     = new ScanCodeRateHP(),
+                                      m_ptransMode      = new ScanTransmissionMode(),
+                                      m_pguardInterval  = new ScanGuardInterval(),
                                       m_phierarchy      = new ScanHierarchy()});
     }
 
@@ -56,20 +56,20 @@ class PaneDVBT : public GroupSetting
     QString bandwidth(void)      const { return m_pbandwidth->getValue();     }
     QString inversion(void)      const { return m_pinversion->getValue();     }
     QString constellation(void)  const { return m_pconstellation->getValue(); }
-    QString coderate_lp(void)    const { return m_pcoderate_lp->getValue();   }
-    QString coderate_hp(void)    const { return m_pcoderate_hp->getValue();   }
-    QString trans_mode(void)     const { return m_ptrans_mode->getValue();    }
-    QString guard_interval(void) const { return m_pguard_interval->getValue();}
+    QString coderate_lp(void)    const { return m_pcoderateLp->getValue();    }
+    QString coderate_hp(void)    const { return m_pcoderateHp->getValue();    }
+    QString trans_mode(void)     const { return m_ptransMode->getValue();     }
+    QString guard_interval(void) const { return m_pguardInterval->getValue(); }
     QString hierarchy(void)      const { return m_phierarchy->getValue();     }
 
     void setFrequency(uint frequency)                    { m_pfrequency->setValue(frequency);          }
     void setBandwidth(const QString& bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
     void setInversion(const QString& inversion)          { m_pinversion->setValue(inversion);          }
     void setConstellation(const QString& constellation)  { m_pconstellation->setValue(constellation);  }
-    void setCodeRateLP(const QString& coderate_lp)       { m_pcoderate_lp->setValue(coderate_lp);      }
-    void setCodeRateHP(const QString& coderate_hp)       { m_pcoderate_hp->setValue(coderate_hp);      }
-    void setTransmode(const QString& trans_mode)         { m_ptrans_mode->setValue(trans_mode);        }
-    void setGuardInterval(const QString& guard_interval) { m_pguard_interval->setValue(guard_interval);}
+    void setCodeRateLP(const QString& coderate_lp)       { m_pcoderateLp->setValue(coderate_lp);       }
+    void setCodeRateHP(const QString& coderate_hp)       { m_pcoderateHp->setValue(coderate_hp);       }
+    void setTransmode(const QString& trans_mode)         { m_ptransMode->setValue(trans_mode);         }
+    void setGuardInterval(const QString& guard_interval) { m_pguardInterval->setValue(guard_interval); }
     void setHierarchy(const QString& hierarchy)          { m_phierarchy->setValue(hierarchy);          }
 
   protected:
@@ -77,10 +77,10 @@ class PaneDVBT : public GroupSetting
     ScanInversion        *m_pinversion      {nullptr};
     ScanBandwidth        *m_pbandwidth      {nullptr};
     ScanConstellation    *m_pconstellation  {nullptr};
-    ScanCodeRateLP       *m_pcoderate_lp    {nullptr};
-    ScanCodeRateHP       *m_pcoderate_hp    {nullptr};
-    ScanTransmissionMode *m_ptrans_mode     {nullptr};
-    ScanGuardInterval    *m_pguard_interval {nullptr};
+    ScanCodeRateLP       *m_pcoderateLp     {nullptr};
+    ScanCodeRateHP       *m_pcoderateHp     {nullptr};
+    ScanTransmissionMode *m_ptransMode      {nullptr};
+    ScanGuardInterval    *m_pguardInterval  {nullptr};
     ScanHierarchy        *m_phierarchy      {nullptr};
 };
 

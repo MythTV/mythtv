@@ -126,14 +126,14 @@ class MTV_PUBLIC ChannelScanner
 
     /// imported channels
     DTVChannelList           m_channels;
-    fbox_chan_map_t          m_iptv_channels;
+    fbox_chan_map_t          m_iptvChannels;
 
     // vbox support
 #ifdef USING_VBOX
     VBoxChannelFetcher      *m_vboxScanner         {nullptr};
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    ExternRecChannelScanner *m_ExternRecScanner    {nullptr};
+    ExternRecChannelScanner *m_externRecScanner    {nullptr};
 #endif
 
     /// Only fta channels desired post scan?

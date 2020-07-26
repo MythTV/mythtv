@@ -7,18 +7,18 @@
 #include "videosource.h"
 
 PaneAnalog::PaneAnalog(const QString &target, StandardSetting *setting) :
-    m_freq_table(new TransFreqTableSelector(0))
+    m_freqTable(new TransFreqTableSelector(0))
 {
     setVisible(false);
-    setting->addTargetedChildren(target, {this, m_freq_table});
+    setting->addTargetedChildren(target, {this, m_freqTable});
 }
 
 void PaneAnalog::SetSourceID(uint sourceid)
 {
-    m_freq_table->SetSourceID(sourceid);
+    m_freqTable->SetSourceID(sourceid);
 }
 
 QString PaneAnalog::GetFrequencyTable(void) const
 {
-    return m_freq_table->getValue();
+    return m_freqTable->getValue();
 }
