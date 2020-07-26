@@ -525,9 +525,9 @@ void MHRTGraphics::PrintMe(FILE *fd, int nTabs) const
 void MHActionGenericObjectRefFix::Perform(MHEngine *engine)
 {
     MHObjectRef ref;
-    if (m_RefObject.m_fIsDirect)
-        m_RefObject.GetValue(ref, engine);
+    if (m_refObject.m_fIsDirect)
+        m_refObject.GetValue(ref, engine);
     else
-        ref.Copy(*m_RefObject.GetReference());
+        ref.Copy(*m_refObject.GetReference());
     CallAction(engine, Target(engine), engine->FindObject(ref));
 }

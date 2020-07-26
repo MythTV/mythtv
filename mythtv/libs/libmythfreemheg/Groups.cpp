@@ -833,7 +833,7 @@ void MHSendEvent::Perform(MHEngine *engine)
     // The target is always the current scene so we ignore it here.
     MHObjectRef target;
     MHObjectRef source;
-    m_Target.GetValue(target, engine); // TODO: Check this is the scene?
+    m_target.GetValue(target, engine); // TODO: Check this is the scene?
     m_EventSource.GetValue(source, engine);
 
     // Generate the event.
@@ -944,7 +944,7 @@ void MHPersistent::PrintArgs(FILE *fd, int nTabs) const
 void MHPersistent::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target - this should always be the application
+    m_target.GetValue(target, engine); // Get the target - this should always be the application
     MHOctetString fileName;
     m_FileName.GetValue(fileName, engine);
     bool fResult = engine->LoadStorePersistent(m_fIsLoad, fileName, m_Variables);
@@ -1001,14 +1001,14 @@ void MHTransitionTo::PrintArgs(FILE *fd, int /*nTabs*/) const
 void MHTransitionTo::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target
+    m_target.GetValue(target, engine); // Get the target
     engine->TransitionToScene(target);
 }
 
 void MHLaunch::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine);
+    m_target.GetValue(target, engine);
     engine->Launch(target);
 }
 void MHQuit::Perform(MHEngine *engine)
@@ -1018,7 +1018,7 @@ void MHQuit::Perform(MHEngine *engine)
 void MHSpawn::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine);
+    m_target.GetValue(target, engine);
     engine->Spawn(target);
 }
 void MHLockScreen::Perform(MHEngine *engine)

@@ -34,7 +34,7 @@ class MHRoot;
 class MHElemAction
 {
   public:
-    explicit MHElemAction(const char *name): m_ActionName(name) {}
+    explicit MHElemAction(const char *name): m_actionName(name) {}
     virtual ~MHElemAction() = default;
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -42,8 +42,8 @@ class MHElemAction
   protected:
     virtual void PrintArgs(FILE */*file*/, int /*nTabs*/) const {}
     MHRoot *Target(MHEngine *engine); // Look up the target
-    const char        *m_ActionName {nullptr};
-    MHGenericObjectRef m_Target;
+    const char        *m_actionName {nullptr};
+    MHGenericObjectRef m_target;
 };
 
 
@@ -54,11 +54,11 @@ class MHActionInt: public MHElemAction
     explicit MHActionInt(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_Argument.PrintMe(fd, 0); }
+        { m_argument.PrintMe(fd, 0); }
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) = 0;
   protected:
-    MHGenericInteger m_Argument;
+    MHGenericInteger m_argument;
 };
 
 // Base class for actions with a pair of integer arguments.
@@ -68,11 +68,11 @@ class MHActionIntInt: public MHElemAction
     explicit MHActionIntInt(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int/* nTabs*/) const override // MHElemAction
-        { m_Argument1.PrintMe(fd, 0); m_Argument2.PrintMe(fd, 0); }
+        { m_argument1.PrintMe(fd, 0); m_argument2.PrintMe(fd, 0); }
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) = 0;
   protected:
-    MHGenericInteger m_Argument1, m_Argument2;
+    MHGenericInteger m_argument1, m_argument2;
 };
 
 // Base class for actions with three integers.  Used for SetSliderParameters
@@ -85,7 +85,7 @@ class MHActionInt3: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3) = 0;
   protected:
-    MHGenericInteger m_Argument1, m_Argument2, m_Argument3;
+    MHGenericInteger m_argument1, m_argument2, m_argument3;
 };
 
 // Base class for actions with four integers.  Used in the DynamicLineArt class
@@ -98,7 +98,7 @@ class MHActionInt4: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4) = 0;
   protected:
-    MHGenericInteger m_Argument1, m_Argument2, m_Argument3, m_Argument4;
+    MHGenericInteger m_argument1, m_argument2, m_argument3, m_argument4;
 };
 
 // Base class for actions with six integers.  Used in the DynamicLineArt class
@@ -111,7 +111,7 @@ class MHActionInt6: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3, int nArg4, int nArg5, int nArg6) = 0;
   protected:
-    MHGenericInteger m_Argument1, m_Argument2, m_Argument3, m_Argument4, m_Argument5, m_Argument6;
+    MHGenericInteger m_argument1, m_argument2, m_argument3, m_argument4, m_argument5, m_argument6;
 };
 
 
@@ -152,8 +152,8 @@ class MHActionGenericObjectRef: public MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pObj) = 0;
   protected:
     void PrintArgs(FILE *fd, int/* nTabs*/) const override // MHElemAction
-        { m_RefObject.PrintMe(fd, 0); }
-    MHGenericObjectRef m_RefObject;
+        { m_refObject.PrintMe(fd, 0); }
+    MHGenericObjectRef m_refObject;
 };
 
 
@@ -164,11 +164,11 @@ class MHActionBool: public MHElemAction
     explicit MHActionBool(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_Argument.PrintMe(fd, 0); }
+        { m_argument.PrintMe(fd, 0); }
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool fArg) = 0;
   protected:
-    MHGenericBoolean m_Argument;
+    MHGenericBoolean m_argument;
 };
 
 #endif

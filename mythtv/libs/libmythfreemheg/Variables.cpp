@@ -525,7 +525,7 @@ void MHSetVariable::Initialise(MHParseNode *p, MHEngine *engine)
 void MHSetVariable::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target
+    m_target.GetValue(target, engine); // Get the target
     MHUnion newValue;
     newValue.GetValueFrom(m_NewValue, engine); // Get the actual value to set.
     engine->FindObject(target)->SetVariableValue(newValue); // Set the value.
@@ -548,7 +548,7 @@ void MHTestVariable::PrintArgs(FILE *fd, int /*nTabs*/) const
 void MHTestVariable::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target
+    m_target.GetValue(target, engine); // Get the target
     MHUnion testValue;
     testValue.GetValueFrom(m_Comparison, engine); // Get the actual value to compare.
     engine->FindObject(target)->TestVariable(m_nOperator, testValue, engine); // Do the test.
@@ -566,7 +566,7 @@ void MHIntegerAction::Perform(MHEngine *engine)
     MHUnion targetVal;
     // Find the target and get its current value.  The target can be an indirect reference.
     MHObjectRef parm;
-    m_Target.GetValue(parm, engine);
+    m_target.GetValue(parm, engine);
     MHRoot *pTarget = engine->FindObject(parm);
     pTarget->GetVariableValue(targetVal, engine);
     targetVal.CheckType(MHUnion::U_Int);
@@ -588,7 +588,7 @@ void MHAppend::Perform(MHEngine *engine)
     MHUnion targetVal;
     // Find the target and get its current value.  The target can be an indirect reference.
     MHObjectRef parm;
-    m_Target.GetValue(parm, engine);
+    m_target.GetValue(parm, engine);
     MHRoot *pTarget = engine->FindObject(parm);
     pTarget->GetVariableValue(targetVal, engine);
     targetVal.CheckType(MHUnion::U_String);

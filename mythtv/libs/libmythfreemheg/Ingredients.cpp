@@ -368,7 +368,7 @@ void MHSetData::PrintArgs(FILE *fd, int /*nTabs*/) const
 void MHSetData::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target
+    m_target.GetValue(target, engine); // Get the target
 
     if (m_fIsIncluded)   // Included content
     {

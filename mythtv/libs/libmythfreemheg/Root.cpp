@@ -131,7 +131,7 @@ void MHGetAvailabilityStatus::Perform(MHEngine *engine)
 {
     // This is a special case.  If the object does not exist we set the result to false.
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the target
+    m_target.GetValue(target, engine); // Get the target
     MHRoot *pObject = engine->FindObject(target, false);
     bool fResult = false; // Default result.
 

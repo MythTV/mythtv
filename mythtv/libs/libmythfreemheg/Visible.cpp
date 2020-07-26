@@ -1147,7 +1147,7 @@ void MHSetColour::PrintArgs(FILE *fd, int /*nTabs*/) const
 void MHSetColour::Perform(MHEngine *engine)
 {
     MHObjectRef target;
-    m_Target.GetValue(target, engine); // Get the item to set.
+    m_target.GetValue(target, engine); // Get the item to set.
     MHColour newColour;
 
     switch (m_ColourType)
