@@ -91,7 +91,7 @@ class MHOctetStrVar : public MHVariable
         { return "OctetStringVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
-    virtual void Prepare() { m_Value.Copy(m_OriginalValue); }
+    virtual void Prepare() { m_value.Copy(m_originalValue); }
 
     // Internal behaviours.
     void Preparation(MHEngine *engine) override; // MHIngredient
@@ -101,7 +101,7 @@ class MHOctetStrVar : public MHVariable
     void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
-    MHOctetString m_OriginalValue, m_Value;
+    MHOctetString m_originalValue, m_value;
 };
 
 class MHObjectRefVar : public MHVariable  
@@ -112,7 +112,7 @@ class MHObjectRefVar : public MHVariable
         { return "ObjectRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
-    virtual void Prepare() { m_Value.Copy(m_OriginalValue); }
+    virtual void Prepare() { m_value.Copy(m_originalValue); }
 
     // Internal behaviours.
     void Preparation(MHEngine *engine) override; // MHIngredient
@@ -122,7 +122,7 @@ class MHObjectRefVar : public MHVariable
     void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
-    MHObjectRef m_OriginalValue, m_Value;
+    MHObjectRef m_originalValue, m_value;
 };
 
 class MHContentRefVar : public MHVariable  
@@ -133,7 +133,7 @@ class MHContentRefVar : public MHVariable
         { return "ContentRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
     void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
-    virtual void Prepare() { m_Value.Copy(m_OriginalValue); }
+    virtual void Prepare() { m_value.Copy(m_originalValue); }
 
     // Internal behaviours.
     void Preparation(MHEngine *engine) override; // MHIngredient
@@ -143,7 +143,7 @@ class MHContentRefVar : public MHVariable
     void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
-    MHContentRef m_OriginalValue, m_Value;
+    MHContentRef m_originalValue, m_value;
 };
 
 
@@ -156,8 +156,8 @@ class MHSetVariable: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_NewValue.PrintMe(fd, 0); }
-    MHParameter m_NewValue; // New value to store.
+        { m_newValue.PrintMe(fd, 0); }
+    MHParameter m_newValue; // New value to store.
 };
 
 // Compare a variable with a value and generate a TestEvent event on the result.
@@ -170,7 +170,7 @@ class MHTestVariable: public MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     int m_nOperator {0};
-    MHParameter m_Comparison; // Value to compare with.
+    MHParameter m_comparison; // Value to compare with.
 };
 
 // Integer actions.
@@ -184,9 +184,9 @@ class MHIntegerAction: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_Operand.PrintMe(fd, 0); }
+        { m_operand.PrintMe(fd, 0); }
     virtual int DoOp(int arg1, int arg2) = 0; // Do the operation.
-    MHGenericInteger m_Operand; // Value to add, subtract etc.
+    MHGenericInteger m_operand; // Value to add, subtract etc.
 };
 
 class MHAdd: public MHIntegerAction {
@@ -240,8 +240,8 @@ class MHAppend: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const  override // MHElemAction
-        { m_Operand.PrintMe(fd, 0); }
-    MHGenericOctetString m_Operand; // Value to append.
+        { m_operand.PrintMe(fd, 0); }
+    MHGenericOctetString m_operand; // Value to append.
 };
 
 #endif

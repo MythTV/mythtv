@@ -52,7 +52,7 @@ class MHText : public MHVisible
     // Actions.
     // Extract the text from an object.  This can be used to load content from a file.
     void GetTextData(MHRoot *pDestination, MHEngine */*engine*/) override // MHRoot
-        { pDestination->SetVariableValue(m_Content); }
+        { pDestination->SetVariableValue(m_content); }
     MHIngredient *Clone(MHEngine */*engine*/) override // MHRoot
         { return new MHText(*this); } // Create a clone of this ingredient.
     void SetBackgroundColour(const MHColour &colour, MHEngine *engine) override; // MHRoot
@@ -71,25 +71,25 @@ class MHText : public MHVisible
   protected:
     void Redraw();
 
-    MHFontBody      m_OrigFont;
-    MHOctetString   m_OriginalFontAttrs;
-    MHColour        m_OriginalTextColour, m_OriginalBgColour;
+    MHFontBody      m_origFont;
+    MHOctetString   m_originalFontAttrs;
+    MHColour        m_originalTextColour, m_originalBgColour;
     int             m_nCharSet        {-1};
 
     enum Justification   { Start = 1, End, Centre, Justified };
     enum LineOrientation { Vertical = 1, Horizontal };
     enum StartCorner     { UpperLeft = 1, UpperRight, LowerLeft, LowerRight };
-    Justification   m_HorizJ          {Start};
-    Justification   m_VertJ           {Start};
-    LineOrientation m_LineOrientation {Horizontal};
-    StartCorner     m_StartCorner     {UpperLeft};
+    Justification   m_horizJ          {Start};
+    Justification   m_vertJ           {Start};
+    LineOrientation m_lineOrientation {Horizontal};
+    StartCorner     m_startCorner     {UpperLeft};
     bool            m_fTextWrap       {false};
     // Internal attributes.  The font colour, background colour and font attributes are
     // internal attributes in UK MHEG.
-//  MHFontBody      m_Font;
+//  MHFontBody      m_font;
     MHColour        m_textColour, m_bgColour;
     MHOctetString   m_fontAttrs;
-    MHOctetString   m_Content; // The content as an octet string
+    MHOctetString   m_content; // The content as an octet string
 
     MHTextDisplay   *m_pDisplay       {nullptr}; // Pointer to the display object.
     bool            m_fNeedsRedraw    {false};
@@ -155,8 +155,8 @@ class MHSetFontAttributes: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
-        { m_FontAttrs.PrintMe(fd, 0); }
-    MHGenericOctetString m_FontAttrs; // New font attributes.
+        { m_fontAttrs.PrintMe(fd, 0); }
+    MHGenericOctetString m_fontAttrs; // New font attributes.
 };
 
 

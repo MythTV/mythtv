@@ -34,15 +34,15 @@
 
 MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for cloning.
 {
-    m_OrigFont.Copy(ref.m_OrigFont);
-    m_OriginalFontAttrs.Copy(ref.m_OriginalFontAttrs);
-    m_OriginalTextColour.Copy(ref.m_OriginalTextColour);
-    m_OriginalBgColour.Copy(ref.m_OriginalBgColour);
+    m_origFont.Copy(ref.m_origFont);
+    m_originalFontAttrs.Copy(ref.m_originalFontAttrs);
+    m_originalTextColour.Copy(ref.m_originalTextColour);
+    m_originalBgColour.Copy(ref.m_originalBgColour);
     m_nCharSet = ref.m_nCharSet;
-    m_HorizJ = ref.m_HorizJ;
-    m_VertJ = ref.m_VertJ;
-    m_LineOrientation = ref.m_LineOrientation;
-    m_StartCorner = ref.m_StartCorner;
+    m_horizJ = ref.m_horizJ;
+    m_vertJ = ref.m_vertJ;
+    m_lineOrientation = ref.m_lineOrientation;
+    m_startCorner = ref.m_startCorner;
     m_fTextWrap = ref.m_fTextWrap;
     m_pDisplay = nullptr;
     m_fNeedsRedraw = ref.m_fNeedsRedraw;
@@ -62,14 +62,14 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pFontBody)
     {
-        m_OrigFont.Initialise(pFontBody->GetArgN(0), engine);
+        m_origFont.Initialise(pFontBody->GetArgN(0), engine);
     }
 
     MHParseNode *pFontAttrs = p->GetNamedArg(C_FONT_ATTRIBUTES);
 
     if (pFontAttrs)
     {
-        pFontAttrs->GetArgN(0)->GetStringValue(m_OriginalFontAttrs);
+        pFontAttrs->GetArgN(0)->GetStringValue(m_originalFontAttrs);
     }
 
     // Colours
@@ -77,14 +77,14 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pTextColour)
     {
-        m_OriginalTextColour.Initialise(pTextColour->GetArgN(0), engine);
+        m_originalTextColour.Initialise(pTextColour->GetArgN(0), engine);
     }
 
     MHParseNode *pBGColour = p->GetNamedArg(C_BACKGROUND_COLOUR);
 
     if (pBGColour)
     {
-        m_OriginalBgColour.Initialise(pBGColour->GetArgN(0), engine);
+        m_originalBgColour.Initialise(pBGColour->GetArgN(0), engine);
     }
 
     // Character set
@@ -100,14 +100,14 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pHJust)
     {
-        m_HorizJ = (enum Justification)pHJust->GetArgN(0)->GetEnumValue();
+        m_horizJ = (enum Justification)pHJust->GetArgN(0)->GetEnumValue();
     }
 
     MHParseNode *pVJust = p->GetNamedArg(C_VERTICAL_JUSTIFICATION);
 
     if (pVJust)
     {
-        m_VertJ = (enum Justification)pVJust->GetArgN(0)->GetEnumValue();
+        m_vertJ = (enum Justification)pVJust->GetArgN(0)->GetEnumValue();
     }
 
     // Line orientation
@@ -115,7 +115,7 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pLineO)
     {
-        m_LineOrientation = (enum LineOrientation)pLineO->GetArgN(0)->GetEnumValue();
+        m_lineOrientation = (enum LineOrientation)pLineO->GetArgN(0)->GetEnumValue();
     }
 
     // Start corner
@@ -123,7 +123,7 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pStartC)
     {
-        m_StartCorner = (enum StartCorner)pStartC->GetArgN(0)->GetEnumValue();
+        m_startCorner = (enum StartCorner)pStartC->GetArgN(0)->GetEnumValue();
     }
 
     // Text wrapping
@@ -206,35 +206,35 @@ void MHText::PrintMe(FILE *fd, int nTabs) const
     fprintf(fd, "{:Text ");
     MHVisible::PrintMe(fd, nTabs + 1);
 
-    if (m_OrigFont.IsSet())
+    if (m_origFont.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":OrigFont ");
-        m_OrigFont.PrintMe(fd, nTabs + 1);
+        m_origFont.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_OriginalFontAttrs.Size() > 0)
+    if (m_originalFontAttrs.Size() > 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":FontAttributes ");
-        m_OriginalFontAttrs.PrintMe(fd, nTabs + 1);
+        m_originalFontAttrs.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_OriginalTextColour.IsSet())
+    if (m_originalTextColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":TextColour ");
-        m_OriginalTextColour.PrintMe(fd, nTabs + 1);
+        m_originalTextColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
-    if (m_OriginalBgColour.IsSet())
+    if (m_originalBgColour.IsSet())
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":BackgroundColour ");
-        m_OriginalBgColour.PrintMe(fd, nTabs + 1);
+        m_originalBgColour.PrintMe(fd, nTabs + 1);
         fprintf(fd, "\n");
     }
 
@@ -244,28 +244,28 @@ void MHText::PrintMe(FILE *fd, int nTabs) const
         fprintf(fd, ":CharacterSet %d\n", m_nCharSet);
     }
 
-    if (m_HorizJ != Start)
+    if (m_horizJ != Start)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":HJustification %s\n", rchJustification[m_HorizJ-1]);
+        fprintf(fd, ":HJustification %s\n", rchJustification[m_horizJ-1]);
     }
 
-    if (m_VertJ != Start)
+    if (m_vertJ != Start)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":VJustification %s\n", rchJustification[m_VertJ-1]);
+        fprintf(fd, ":VJustification %s\n", rchJustification[m_vertJ-1]);
     }
 
-    if (m_LineOrientation != Horizontal)
+    if (m_lineOrientation != Horizontal)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":LineOrientation %s\n", rchlineOrientation[m_LineOrientation-1]);
+        fprintf(fd, ":LineOrientation %s\n", rchlineOrientation[m_lineOrientation-1]);
     }
 
-    if (m_StartCorner != UpperLeft)
+    if (m_startCorner != UpperLeft)
     {
         PrintTabs(fd, nTabs + 1);
-        fprintf(fd, ":StartCorner %s\n", rchStartCorner[m_StartCorner-1]);
+        fprintf(fd, ":StartCorner %s\n", rchStartCorner[m_startCorner-1]);
     }
 
     if (m_fTextWrap)
@@ -286,29 +286,29 @@ void MHText::Preparation(MHEngine *engine)
     }
 
     // Set the colours and font up from the originals if specified otherwise use the application defaults.
-    //  if (m_OrigFont.IsSet()) m_Font.Copy(m_OrigFont);
-    //  else m_Font.Copy(engine->m_DefaultFont);
-    if (m_OriginalTextColour.IsSet())
+    //  if (m_origFont.IsSet()) m_font.Copy(m_origFont);
+    //  else m_font.Copy(engine->m_DefaultFont);
+    if (m_originalTextColour.IsSet())
     {
-        m_textColour.Copy(m_OriginalTextColour);
+        m_textColour.Copy(m_originalTextColour);
     }
     else
     {
         engine->GetDefaultTextColour(m_textColour);
     }
 
-    if (m_OriginalBgColour.IsSet())
+    if (m_originalBgColour.IsSet())
     {
-        m_bgColour.Copy(m_OriginalBgColour);
+        m_bgColour.Copy(m_originalBgColour);
     }
     else
     {
         engine->GetDefaultBGColour(m_bgColour);
     }
 
-    if (m_OriginalFontAttrs.Size() > 0)
+    if (m_originalFontAttrs.Size() > 0)
     {
-        m_fontAttrs.Copy(m_OriginalFontAttrs);
+        m_fontAttrs.Copy(m_originalFontAttrs);
     }
     else
     {
@@ -347,7 +347,7 @@ void MHText::ContentArrived(const unsigned char *data, int length, MHEngine *eng
 {
     CreateContent(data, length, engine);
     MHLOG(MHLogDetail, QString("Content arrived %1 := '%2'")
-        .arg(m_ObjectReference.Printable()).arg(m_Content.Printable()) );
+        .arg(m_ObjectReference.Printable()).arg(m_content.Printable()) );
     // Now signal that the content is available.
     engine->EventTriggered(this, EventContentAvailable);
     m_fNeedsRedraw = true;
@@ -356,10 +356,10 @@ void MHText::ContentArrived(const unsigned char *data, int length, MHEngine *eng
 //
 void MHText::CreateContent(const unsigned char *p, int s, MHEngine *engine)
 {
-    m_Content.Copy(MHOctetString((const char *)p, s));
+    m_content.Copy(MHOctetString((const char *)p, s));
     engine->Redraw(GetVisibleArea()); // Have to redraw if the content has changed.
     m_fNeedsRedraw = true;
-    //  fprintf(fd, "Text content is now "); m_Content.PrintMe(0); fprintf(fd, "\n");
+    //  fprintf(fd, "Text content is now "); m_content.PrintMe(0); fprintf(fd, "\n");
 }
 
 void MHText::SetTextColour(const MHColour &colour, MHEngine *engine)
@@ -563,12 +563,12 @@ void MHText::Redraw()
     colourStack.Push(textColour);
     pCurrItem->m_colour = textColour;
 
-//  FILE *fd=stdout; fprintf(fd, "Redraw Text "); m_Content.PrintMe(fd, 0); fprintf(fd, "\n");
+//  FILE *fd=stdout; fprintf(fd, "Redraw Text "); m_content.PrintMe(fd, 0); fprintf(fd, "\n");
     int i = 0;
 
-    while (i < m_Content.Size())
+    while (i < m_content.Size())
     {
-        unsigned char ch = m_Content.GetAt(i++);
+        unsigned char ch = m_content.GetAt(i++);
 
         if (ch == 0x09) // Tab - start a new item if we have any text in the existing one.
         {
@@ -577,7 +577,7 @@ void MHText::Redraw()
                 pCurrItem = pCurrItem->NewItem();
                 pCurrLine->m_items.Append(pCurrItem);
             }
-            if (m_HorizJ == Start)
+            if (m_horizJ == Start)
                 pCurrItem->m_nTabCount++;
         }
 
@@ -593,27 +593,27 @@ void MHText::Redraw()
 
         else if (ch == 0x1b)   // Escape - special codes.
         {
-            if (i == m_Content.Size())
+            if (i == m_content.Size())
             {
                 break;
             }
 
-            unsigned char code = m_Content.GetAt(i);
+            unsigned char code = m_content.GetAt(i);
             // The only codes we are interested in are the start and end of colour.
             // TODO: We may also need "bold" and some hypertext colours.
 
             if (code >= 0x40 && code <= 0x5e)   // Start code
             {
                 // Start codes are followed by a parameter count and a number of parameter bytes.
-                if (++i == m_Content.Size())
+                if (++i == m_content.Size())
                 {
                     break;
                 }
 
-                unsigned char paramCount = m_Content.GetAt(i);
+                unsigned char paramCount = m_content.GetAt(i);
                 i++;
 
-                if (code == 0x43 && paramCount == 4 && i + paramCount <= m_Content.Size())
+                if (code == 0x43 && paramCount == 4 && i + paramCount <= m_content.Size())
                 {
                     // Start of colour.
                     if (pCurrItem->m_text.Size() != 0)
@@ -622,8 +622,8 @@ void MHText::Redraw()
                         pCurrLine->m_items.Append(pCurrItem);
                     }
 
-                    pCurrItem->m_colour = MHRgba(m_Content.GetAt(i), m_Content.GetAt(i + 1),
-                                                 m_Content.GetAt(i + 2), 255 - m_Content.GetAt(i + 3));
+                    pCurrItem->m_colour = MHRgba(m_content.GetAt(i), m_content.GetAt(i + 1),
+                                                 m_content.GetAt(i + 2), 255 - m_content.GetAt(i + 3));
                     // Push this colour onto the colour stack.
                     colourStack.Push(pCurrItem->m_colour);
                 }
@@ -670,12 +670,12 @@ void MHText::Redraw()
         {
             int nStart = i - 1;
 
-            while (i < m_Content.Size() && m_Content.GetAt(i) >= 0x20)
+            while (i < m_content.Size() && m_content.GetAt(i) >= 0x20)
             {
                 i++;
             }
 
-            pCurrItem->m_text.Append(MHOctetString(m_Content, nStart, i - nStart));
+            pCurrItem->m_text.Append(MHOctetString(m_content, nStart, i - nStart));
         }
     }
 
@@ -796,11 +796,11 @@ void MHText::Redraw()
 
     do
     {
-        if (m_VertJ == End)
+        if (m_vertJ == End)
         {
             yOffset = m_nBoxHeight - nNumLines * lineSpace;
         }
-        else if (m_VertJ == Centre)
+        else if (m_vertJ == Centre)
         {
             yOffset = (m_nBoxHeight - nNumLines * lineSpace) / 2;
         }
@@ -817,11 +817,11 @@ void MHText::Redraw()
         MHTextLine *pLine = theText.GetAt(i);
         int xOffset = 0;
 
-        if (m_HorizJ == End)
+        if (m_horizJ == End)
         {
             xOffset = m_nBoxWidth - pLine->m_nLineWidth;
         }
-        else if (m_HorizJ == Centre)
+        else if (m_horizJ == Centre)
         {
             xOffset = (m_nBoxWidth - pLine->m_nLineWidth) / 2;
         }
@@ -909,13 +909,13 @@ void MHHyperText::PrintMe(FILE *fd, int nTabs) const
 void MHSetFontAttributes::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine); // Target
-    m_FontAttrs.Initialise(p->GetArgN(1), engine); // New font attrs
+    m_fontAttrs.Initialise(p->GetArgN(1), engine); // New font attrs
 }
 
 void MHSetFontAttributes::Perform(MHEngine *engine)
 {
     // Get the new font attributes.
     MHOctetString newAttrs;
-    m_FontAttrs.GetValue(newAttrs, engine);
+    m_fontAttrs.GetValue(newAttrs, engine);
     Target(engine)->SetFontAttributes(newAttrs, engine);
 }

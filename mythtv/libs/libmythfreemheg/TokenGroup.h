@@ -51,7 +51,7 @@ class MHMovement
   public:
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
-    MHSequence <int> m_Movement;
+    MHSequence <int> m_movement;
 };
 
 // TokenGroup.  The standard defines a TokenManager class but that is incorporated in
@@ -80,9 +80,9 @@ class MHTokenGroup : public MHPresentable
     void PrintContents(FILE *fd, int nTabs) const;
     void TransferToken(int newPos, MHEngine *engine);
 
-    MHOwnPtrSequence <MHMovement> m_MovementTable;
-    MHOwnPtrSequence <MHTokenGroupItem> m_TokenGrpItems;
-    MHOwnPtrSequence <MHActionSequence> m_NoTokenActionSlots;
+    MHOwnPtrSequence <MHMovement> m_movementTable;
+    MHOwnPtrSequence <MHTokenGroupItem> m_tokenGrpItems;
+    MHOwnPtrSequence <MHActionSequence> m_noTokenActionSlots;
 
     // Internal attributes
     int m_nTokenPosition {1};  // Initial value
@@ -126,7 +126,7 @@ class MHListGroup : public MHTokenGroup
     void GetFirstItem(MHRoot *pResult, MHEngine */*engine*/) override // MHRoot
         { pResult->SetVariableValue(m_nFirstItem); }
     void GetListSize(MHRoot *pResult, MHEngine */*engine*/) override // MHRoot
-        { pResult->SetVariableValue(m_ItemList.size()); }
+        { pResult->SetVariableValue(m_itemList.size()); }
 
   protected:
     // MHEG Internal attributes.
@@ -136,11 +136,11 @@ class MHListGroup : public MHTokenGroup
     int AdjustIndex(int nIndex); // Added in the MHEG corrigendum
 
     // Exchanged attributes
-    MHSequence <QPoint> m_Positions;
+    MHSequence <QPoint> m_positions;
     bool    m_fWrapAround        {false};
     bool    m_fMultipleSelection {false};
     //Internal attributes
-    QList<MHListItem*> m_ItemList; // Items found by looking up the object refs
+    QList<MHListItem*> m_itemList; // Items found by looking up the object refs
     int  m_nFirstItem {1}; // First item displayed - N.B. MHEG indexes from 1.
     bool m_fFirstItemDisplayed   {false};
     bool m_fLastItemDisplayed    {false};
@@ -189,8 +189,8 @@ class MHAddItem: public MHElemAction {
     void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    MHGenericInteger m_Index;
-    MHGenericObjectRef m_Item;
+    MHGenericInteger m_index;
+    MHGenericObjectRef m_item;
 
 };
 
@@ -208,29 +208,29 @@ class MHGetListActionData: public MHElemAction {
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
   protected:
-    MHGenericInteger m_Index;
-    MHObjectRef m_Result;
+    MHGenericInteger m_index;
+    MHObjectRef m_result;
 };
 
 class MHGetCellItem: public MHGetListActionData {
   public:
     MHGetCellItem(): MHGetListActionData(":GetCellItem") {}
     void Perform(MHEngine *engine) override // MHElemAction
-        { Target(engine)->GetCellItem(m_Index.GetValue(engine), m_Result, engine); }
+        { Target(engine)->GetCellItem(m_index.GetValue(engine), m_result, engine); }
 };
 
 class MHGetListItem: public MHGetListActionData {
   public:
     MHGetListItem(): MHGetListActionData(":GetListItem") {}
     void Perform(MHEngine *engine) override // MHElemAction
-        { Target(engine)->GetListItem(m_Index.GetValue(engine), m_Result, engine); }
+        { Target(engine)->GetListItem(m_index.GetValue(engine), m_result, engine); }
 };
 
 class MHGetItemStatus: public MHGetListActionData {
   public:
     MHGetItemStatus(): MHGetListActionData(":GetItemStatus") {}
     void Perform(MHEngine *engine) override // MHElemAction
-        { Target(engine)->GetItemStatus(m_Index.GetValue(engine), m_Result, engine); }
+        { Target(engine)->GetItemStatus(m_index.GetValue(engine), m_result, engine); }
 };
 
 class MHSelectItem: public MHActionInt {

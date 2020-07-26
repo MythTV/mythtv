@@ -97,7 +97,7 @@ void MHMovement::Initialise(MHParseNode *p, MHEngine * /*engine*/)
 {
     for (int i = 0; i < p->GetSeqCount(); i++)
     {
-        m_Movement.Append(p->GetSeqN(i)->GetIntValue());
+        m_movement.Append(p->GetSeqN(i)->GetIntValue());
     }
 }
 
@@ -106,9 +106,9 @@ void MHMovement::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs);
     fprintf(fd, "( ");
 
-    for (int i = 0; i < m_Movement.Size(); i++)
+    for (int i = 0; i < m_movement.Size(); i++)
     {
-        fprintf(fd, "%d ", m_Movement.GetAt(i));
+        fprintf(fd, "%d ", m_movement.GetAt(i));
     }
 
     fprintf(fd, ")\n");
@@ -124,7 +124,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
         for (int i = 0; i < pMovements->GetArgCount(); i++)
         {
             auto *pMove = new MHMovement;
-            m_MovementTable.Append(pMove);
+            m_movementTable.Append(pMove);
             pMove->Initialise(pMovements->GetArgN(i), engine);
         }
     }
@@ -136,7 +136,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
         for (int i = 0; i < pTokenGrp->GetArgCount(); i++)
         {
             auto *pToken = new MHTokenGroupItem;
-            m_TokenGrpItems.Append(pToken);
+            m_tokenGrpItems.Append(pToken);
             pToken->Initialise(pTokenGrp->GetArgN(i), engine);
         }
     }
@@ -149,7 +149,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
         {
             MHParseNode *pAct = pNoToken->GetArgN(i);
             auto *pActions = new MHActionSequence;
-            m_NoTokenActionSlots.Append(pActions);
+            m_noTokenActionSlots.Append(pActions);
 
             // The action slot entry may be NULL.
             if (pAct->m_nNodeType != MHParseNode::PNNull)
@@ -165,42 +165,42 @@ void MHTokenGroup::PrintContents(FILE *fd, int nTabs) const
 {
     MHPresentable::PrintMe(fd, nTabs + 1);
 
-    if (m_MovementTable.Size() != 0)
+    if (m_movementTable.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":MovementTable (\n");
 
-        for (int i = 0; i < m_MovementTable.Size(); i++)
+        for (int i = 0; i < m_movementTable.Size(); i++)
         {
-            m_MovementTable.GetAt(i)->PrintMe(fd, nTabs + 2);
+            m_movementTable.GetAt(i)->PrintMe(fd, nTabs + 2);
         }
 
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ")\n");
     }
 
-    if (m_TokenGrpItems.Size() != 0)
+    if (m_tokenGrpItems.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":TokenGroupItems (\n");
 
-        for (int i = 0; i < m_TokenGrpItems.Size(); i++)
+        for (int i = 0; i < m_tokenGrpItems.Size(); i++)
         {
-            m_TokenGrpItems.GetAt(i)->PrintMe(fd, nTabs + 2);
+            m_tokenGrpItems.GetAt(i)->PrintMe(fd, nTabs + 2);
         }
 
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ")\n");
     }
 
-    if (m_NoTokenActionSlots.Size() != 0)
+    if (m_noTokenActionSlots.Size() != 0)
     {
         PrintTabs(fd, nTabs + 1);
         fprintf(fd, ":NoTokenActionSlots (\n");
 
-        for (int i = 0; i < m_NoTokenActionSlots.Size(); i++)
+        for (int i = 0; i < m_noTokenActionSlots.Size(); i++)
         {
-            MHActionSequence *pActions = m_NoTokenActionSlots.GetAt(i);
+            MHActionSequence *pActions = m_noTokenActionSlots.GetAt(i);
 
             if (pActions->Size() == 0)
             {
@@ -240,9 +240,9 @@ void MHTokenGroup::Activation(MHEngine *engine)
 
     // We're supposed to apply Activation to each of the "items" but it isn't clear
     // exactly what that means.  Assume it means each of the visibles.
-    for (int i = 0; i < m_TokenGrpItems.Size(); i++)
+    for (int i = 0; i < m_tokenGrpItems.Size(); i++)
     {
-        MHObjectRef *pObject = &m_TokenGrpItems.GetAt(i)->m_Object;
+        MHObjectRef *pObject = &m_tokenGrpItems.GetAt(i)->m_Object;
 
         // The object reference may be the null reference.
         // Worse: it seems that sometimes in BBC's MHEG the reference simply doesn't exist.
@@ -250,7 +250,7 @@ void MHTokenGroup::Activation(MHEngine *engine)
         {
             try
             {
-                engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object)->Activation(engine);
+                engine->FindObject(m_tokenGrpItems.GetAt(i)->m_Object)->Activation(engine);
             }
             catch (...)
             {
@@ -290,16 +290,16 @@ void MHTokenGroup::CallActionSlot(int n, MHEngine *engine)
 {
     if (m_nTokenPosition == 0)   // No slot has the token.
     {
-        if (n > 0 && n <= m_NoTokenActionSlots.Size())
+        if (n > 0 && n <= m_noTokenActionSlots.Size())
         {
-            engine->AddActions(*(m_NoTokenActionSlots.GetAt(n - 1)));
+            engine->AddActions(*(m_noTokenActionSlots.GetAt(n - 1)));
         }
     }
     else
     {
-        if (m_nTokenPosition > 0 && m_nTokenPosition <= m_TokenGrpItems.Size())
+        if (m_nTokenPosition > 0 && m_nTokenPosition <= m_tokenGrpItems.Size())
         {
-            MHTokenGroupItem *pGroup = m_TokenGrpItems.GetAt(m_nTokenPosition - 1);
+            MHTokenGroupItem *pGroup = m_tokenGrpItems.GetAt(m_nTokenPosition - 1);
 
             if (n > 0 && n <= pGroup->m_ActionSlots.Size())
             {
@@ -311,13 +311,13 @@ void MHTokenGroup::CallActionSlot(int n, MHEngine *engine)
 
 void MHTokenGroup::Move(int n, MHEngine *engine)
 {
-    if (m_nTokenPosition == 0 || n < 1 || n > m_MovementTable.Size())
+    if (m_nTokenPosition == 0 || n < 1 || n > m_movementTable.Size())
     {
         TransferToken(0, engine);    // Not in the standard
     }
     else
     {
-        TransferToken(m_MovementTable.GetAt(n - 1)->m_Movement.GetAt(m_nTokenPosition - 1), engine);
+        TransferToken(m_movementTable.GetAt(n - 1)->m_movement.GetAt(m_nTokenPosition - 1), engine);
     }
 }
 
@@ -326,9 +326,9 @@ void MHTokenGroup::Move(int n, MHEngine *engine)
 
 MHListGroup::~MHListGroup()
 {
-    while (!m_ItemList.isEmpty())
+    while (!m_itemList.isEmpty())
     {
-        delete m_ItemList.takeFirst();
+        delete m_itemList.takeFirst();
     }
 }
 
@@ -343,7 +343,7 @@ void MHListGroup::Initialise(MHParseNode *p, MHEngine *engine)
         {
             MHParseNode *pPos = pPositions->GetArgN(i);
             QPoint pos(pPos->GetSeqN(0)->GetIntValue(), pPos->GetSeqN(1)->GetIntValue());
-            m_Positions.Append(pos);
+            m_positions.Append(pos);
         }
     }
 
@@ -370,9 +370,9 @@ void MHListGroup::PrintMe(FILE *fd, int nTabs) const
     PrintTabs(fd, nTabs + 1);
     fprintf(fd, ":Positions (");
 
-    for (int i = 0; i < m_Positions.Size(); i++)
+    for (int i = 0; i < m_positions.Size(); i++)
     {
-        fprintf(fd, " ( %d %d )", m_Positions.GetAt(i).x(), m_Positions.GetAt(i).y());
+        fprintf(fd, " ( %d %d )", m_positions.GetAt(i).x(), m_positions.GetAt(i).y());
     }
 
     fprintf(fd, ")\n");
@@ -397,15 +397,15 @@ void MHListGroup::Preparation(MHEngine *engine)
 {
     MHTokenGroup::Preparation(engine);
 
-    for (int i = 0; i < m_TokenGrpItems.Size(); i++)
+    for (int i = 0; i < m_tokenGrpItems.Size(); i++)
     {
         // Find the item and add it to the list if it isn't already there.
         try
         {
-            MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
+            MHRoot *pItem = engine->FindObject(m_tokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
 
-            for (auto *item : qAsConst(m_ItemList))
+            for (auto *item : qAsConst(m_itemList))
             {
                 p = item;
 
@@ -417,7 +417,7 @@ void MHListGroup::Preparation(MHEngine *engine)
 
             if (!p)
             {
-                m_ItemList.append(new MHListItem(pItem));
+                m_itemList.append(new MHListItem(pItem));
             }
         }
         catch (...)  // Ignore invalid or null objects.
@@ -429,7 +429,7 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    for (auto *item : qAsConst(m_ItemList))
+    for (auto *item : qAsConst(m_itemList))
         item->m_pVisible->ResetPosition();
 
     MHTokenGroup::Destruction(engine);
@@ -446,7 +446,7 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    for (auto *item : qAsConst(m_ItemList))
+    for (auto *item : qAsConst(m_itemList))
         item->m_pVisible->Deactivation(engine);
 
     MHTokenGroup::Deactivation(engine);
@@ -456,7 +456,7 @@ void MHListGroup::Deactivation(MHEngine *engine)
 // which aren't.
 void MHListGroup::Update(MHEngine *engine)
 {
-    if (m_ItemList.isEmpty())   // Special cases when the list becomes empty
+    if (m_itemList.isEmpty())   // Special cases when the list becomes empty
     {
         if (m_fFirstItemDisplayed)
         {
@@ -472,12 +472,12 @@ void MHListGroup::Update(MHEngine *engine)
     }
     else   // Usual case.
     {
-        for (int i = 0; i < m_ItemList.size(); i++)
+        for (int i = 0; i < m_itemList.size(); i++)
         {
-            MHRoot *pVis = m_ItemList.at(i)->m_pVisible;
+            MHRoot *pVis = m_itemList.at(i)->m_pVisible;
             int nCell = i + 1 - m_nFirstItem; // Which cell does this item map onto?
 
-            if (nCell >= 0 && nCell < m_Positions.Size())
+            if (nCell >= 0 && nCell < m_positions.Size())
             {
                 if (i == 0 && ! m_fFirstItemDisplayed)
                 {
@@ -485,7 +485,7 @@ void MHListGroup::Update(MHEngine *engine)
                     engine->EventTriggered(this, EventFirstItemPresented, true);
                 }
 
-                if (i == m_ItemList.size() - 1 && ! m_fLastItemDisplayed)
+                if (i == m_itemList.size() - 1 && ! m_fLastItemDisplayed)
                 {
                     m_fLastItemDisplayed = true;
                     engine->EventTriggered(this, EventLastItemPresented, true);
@@ -493,7 +493,7 @@ void MHListGroup::Update(MHEngine *engine)
 
                 try
                 {
-                    pVis->SetPosition(m_Positions.GetAt(i - m_nFirstItem + 1).x(), m_Positions.GetAt(i - m_nFirstItem + 1).y(), engine);
+                    pVis->SetPosition(m_positions.GetAt(i - m_nFirstItem + 1).x(), m_positions.GetAt(i - m_nFirstItem + 1).y(), engine);
                 }
                 catch (...) {}
 
@@ -510,7 +510,7 @@ void MHListGroup::Update(MHEngine *engine)
                     engine->EventTriggered(this, EventFirstItemPresented, false);
                 }
 
-                if (i == m_ItemList.size() - 1 && m_fLastItemDisplayed)
+                if (i == m_itemList.size() - 1 && m_fLastItemDisplayed)
                 {
                     m_fLastItemDisplayed = false;
                     engine->EventTriggered(this, EventLastItemPresented, false);
@@ -532,12 +532,12 @@ void MHListGroup::Update(MHEngine *engine)
         engine->EventTriggered(this, EventHeadItems, m_nFirstItem);
     }
 
-    if (m_nLastCount - m_nLastFirstItem != m_ItemList.size() - m_nFirstItem)
+    if (m_nLastCount - m_nLastFirstItem != m_itemList.size() - m_nFirstItem)
     {
-        engine->EventTriggered(this, EventTailItems, m_ItemList.size() - m_nFirstItem);
+        engine->EventTriggered(this, EventTailItems, m_itemList.size() - m_nFirstItem);
     }
 
-    m_nLastCount = m_ItemList.size();
+    m_nLastCount = m_itemList.size();
     m_nLastFirstItem = m_nFirstItem;
 }
 
@@ -545,7 +545,7 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    for (auto *item : qAsConst(m_ItemList))
+    for (auto *item : qAsConst(m_itemList))
     {
         if (item->m_pVisible == pItem)
         {
@@ -554,15 +554,15 @@ void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
     }
 
     // Ignore this if the index is out of range
-    if (nIndex < 1 || nIndex > m_ItemList.size() + 1)
+    if (nIndex < 1 || nIndex > m_itemList.size() + 1)
     {
         return;
     }
 
     // Insert it at the appropriate position (MHEG indexes count from 1).
-    m_ItemList.insert(nIndex - 1, new MHListItem(pItem));
+    m_itemList.insert(nIndex - 1, new MHListItem(pItem));
 
-    if (nIndex <= m_nFirstItem && m_nFirstItem < m_ItemList.size())
+    if (nIndex <= m_nFirstItem && m_nFirstItem < m_itemList.size())
     {
         m_nFirstItem++;
     }
@@ -574,11 +574,11 @@ void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 void MHListGroup::DelItem(MHRoot *pItem, MHEngine * /*engine*/)
 {
     // See if the item is already there and ignore this if it is.
-    for (int i = 0; i < m_ItemList.size(); i++)
+    for (int i = 0; i < m_itemList.size(); i++)
     {
-        if (m_ItemList.at(i)->m_pVisible == pItem)   // Found it - remove it from the list and reset the posn.
+        if (m_itemList.at(i)->m_pVisible == pItem)   // Found it - remove it from the list and reset the posn.
         {
-            delete m_ItemList.takeAt(i);
+            delete m_itemList.takeAt(i);
             pItem->ResetPosition();
 
             if (i + 1 < m_nFirstItem && m_nFirstItem > 1)
@@ -594,7 +594,7 @@ void MHListGroup::DelItem(MHRoot *pItem, MHEngine * /*engine*/)
 // Set the selection status of the item to true
 void MHListGroup::Select(int nIndex, MHEngine *engine)
 {
-    MHListItem *pListItem = m_ItemList.at(nIndex - 1);
+    MHListItem *pListItem = m_itemList.at(nIndex - 1);
 
     if (pListItem == nullptr || pListItem->m_fSelected)
     {
@@ -604,9 +604,9 @@ void MHListGroup::Select(int nIndex, MHEngine *engine)
     if (! m_fMultipleSelection)
     {
         // Deselect any existing selections.
-        for (int i = 0; i < m_ItemList.size(); i++)
+        for (int i = 0; i < m_itemList.size(); i++)
         {
-            if (m_ItemList.at(i)->m_fSelected)
+            if (m_itemList.at(i)->m_fSelected)
             {
                 Deselect(i + 1, engine);
             }
@@ -620,7 +620,7 @@ void MHListGroup::Select(int nIndex, MHEngine *engine)
 // Set the selection status of the item to false
 void MHListGroup::Deselect(int nIndex, MHEngine *engine)
 {
-    MHListItem *pListItem = m_ItemList.at(nIndex - 1);
+    MHListItem *pListItem = m_itemList.at(nIndex - 1);
 
     if (pListItem == nullptr || ! pListItem->m_fSelected)
     {
@@ -639,16 +639,16 @@ void MHListGroup::GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *
         nCell = 1;    // First cell
     }
 
-    if (nCell > m_Positions.Size())
+    if (nCell > m_positions.Size())
     {
-        nCell = m_Positions.Size();    // Last cell.
+        nCell = m_positions.Size();    // Last cell.
     }
 
     int nVisIndex = nCell + m_nFirstItem - 2;
 
-    if (nVisIndex >= 0 && nVisIndex < m_ItemList.size())
+    if (nVisIndex >= 0 && nVisIndex < m_itemList.size())
     {
-        MHRoot *pVis = m_ItemList.at(nVisIndex)->m_pVisible;
+        MHRoot *pVis = m_itemList.at(nVisIndex)->m_pVisible;
         engine->FindObject(itemDest)->SetVariableValue(pVis->m_ObjectReference);
     }
     else
@@ -659,7 +659,7 @@ void MHListGroup::GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *
 
 int MHListGroup::AdjustIndex(int nIndex) // Added in the MHEG corrigendum
 {
-    int nItems = m_ItemList.size();
+    int nItems = m_itemList.size();
 
     if (nItems == 0)
     {
@@ -684,12 +684,12 @@ void MHListGroup::GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;    // Ignore it if it's out of range and not wrapping
     }
 
-    engine->FindObject(itemDest)->SetVariableValue(m_ItemList.at(nCell - 1)->m_pVisible->m_ObjectReference);
+    engine->FindObject(itemDest)->SetVariableValue(m_itemList.at(nCell - 1)->m_pVisible->m_ObjectReference);
 }
 
 void MHListGroup::GetItemStatus(int nCell, const MHObjectRef &itemDest, MHEngine *engine)
@@ -699,12 +699,12 @@ void MHListGroup::GetItemStatus(int nCell, const MHObjectRef &itemDest, MHEngine
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
 
-    engine->FindObject(itemDest)->SetVariableValue(m_ItemList.at(nCell - 1)->m_fSelected);
+    engine->FindObject(itemDest)->SetVariableValue(m_itemList.at(nCell - 1)->m_fSelected);
 }
 
 void MHListGroup::SelectItem(int nCell, MHEngine *engine)
@@ -714,7 +714,7 @@ void MHListGroup::SelectItem(int nCell, MHEngine *engine)
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
@@ -729,7 +729,7 @@ void MHListGroup::DeselectItem(int nCell, MHEngine *engine)
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
@@ -744,12 +744,12 @@ void MHListGroup::ToggleItem(int nCell, MHEngine *engine)
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
 
-    if (m_ItemList.at(nCell - 1)->m_fSelected)
+    if (m_itemList.at(nCell - 1)->m_fSelected)
     {
         Deselect(nCell, engine);
     }
@@ -768,7 +768,7 @@ void MHListGroup::ScrollItems(int nCell, MHEngine *engine)
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
@@ -784,7 +784,7 @@ void MHListGroup::SetFirstItem(int nCell, MHEngine *engine)
         nCell = AdjustIndex(nCell);
     }
 
-    if (nCell < 1 || nCell > m_ItemList.size())
+    if (nCell < 1 || nCell > m_itemList.size())
     {
         return;
     }
@@ -799,32 +799,32 @@ void MHListGroup::SetFirstItem(int nCell, MHEngine *engine)
 void MHAddItem::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_Index.Initialise(p->GetArgN(1), engine);
-    m_Item.Initialise(p->GetArgN(2), engine);
+    m_index.Initialise(p->GetArgN(1), engine);
+    m_item.Initialise(p->GetArgN(2), engine);
 }
 
 void MHAddItem::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
-    m_Index.PrintMe(fd, 0);
-    m_Item.PrintMe(fd, 0);
+    m_index.PrintMe(fd, 0);
+    m_item.PrintMe(fd, 0);
 }
 
 void MHAddItem::Perform(MHEngine *engine)
 {
     MHObjectRef item;
-    m_Item.GetValue(item, engine);
-    Target(engine)->AddItem(m_Index.GetValue(engine), engine->FindObject(item), engine);
+    m_item.GetValue(item, engine);
+    Target(engine)->AddItem(m_index.GetValue(engine), engine->FindObject(item), engine);
 }
 
 void MHGetListActionData::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
-    m_Index.Initialise(p->GetArgN(1), engine);
-    m_Result.Initialise(p->GetArgN(2), engine);
+    m_index.Initialise(p->GetArgN(1), engine);
+    m_result.Initialise(p->GetArgN(2), engine);
 }
 
 void MHGetListActionData::PrintArgs(FILE *fd, int /*nTabs*/) const
 {
-    m_Index.PrintMe(fd, 0);
-    m_Result.PrintMe(fd, 0);
+    m_index.PrintMe(fd, 0);
+    m_result.PrintMe(fd, 0);
 }
