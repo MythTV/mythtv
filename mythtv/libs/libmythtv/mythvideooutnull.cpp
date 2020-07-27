@@ -1,16 +1,20 @@
-#include <map>
-#include <iostream>
-using namespace std;
-
+// MythTV
 #include "mythlogging.h"
 #include "mythvideooutnull.h"
 #include "videodisplayprofile.h"
+
+// Std
+#include <map>
+#include <iostream>
+using namespace std;
 
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 
-void MythVideoOutputNull::GetRenderOptions(RenderOptions &Options)
+#define LOC QString("VidOutNull: ")
+
+void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
 {
     Options.renderers->append("null");
     (*Options.safe_renderers)["dummy"].append("null");
@@ -50,13 +54,11 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions &Options)
 
 MythVideoOutputNull::MythVideoOutputNull()
 {
-    LOG(VB_PLAYBACK, LOG_INFO, "VideoOutputNull()");
     memset(&m_avPauseFrame, 0, sizeof(m_avPauseFrame));
 }
 
 MythVideoOutputNull::~MythVideoOutputNull()
 {
-    LOG(VB_PLAYBACK, LOG_INFO, "~VideoOutputNull()");
     QMutexLocker locker(&m_globalLock);
 
     if (m_avPauseFrame.buf)
@@ -77,7 +79,7 @@ void MythVideoOutputNull::CreatePauseFrame(void)
     }
 
     init(&m_avPauseFrame, FMT_YV12,
-         new unsigned char[m_videoBuffers.GetScratchFrame()->size + 128],
+         new unsigned char[static_cast<unsigned long>(m_videoBuffers.GetScratchFrame()->size + 128)],
          m_videoBuffers.GetScratchFrame()->width,
          m_videoBuffers.GetScratchFrame()->height,
          m_videoBuffers.GetScratchFrame()->size);
@@ -87,39 +89,37 @@ void MythVideoOutputNull::CreatePauseFrame(void)
     clear(&m_avPauseFrame);
 }
 
-bool MythVideoOutputNull::InputChanged(const QSize &video_dim_buf,
-                                       const QSize &video_dim_disp,
-                                       float        aspect,
-                                       MythCodecID  av_codec_id,
-                                       bool        &aspect_only,
+bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
+                                       const QSize& VideoDispDim,
+                                       float        Aspect,
+                                       MythCodecID  CodecID,
+                                       bool&        AspectOnly,
                                        MythMultiLocker* Locks,
                                        int          ReferenceFrames,
                                        bool         ForceChange)
 {
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("InputChanged(WxH = %1x%2, aspect = %3)")
-            .arg(video_dim_disp.width())
-            .arg(video_dim_disp.height()).arg(static_cast<qreal>(aspect)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(WxH = %1x%2, aspect = %3)")
+            .arg(VideoDispDim.width()).arg(VideoDispDim.height()).arg(static_cast<qreal>(Aspect)));
 
-    if (!codec_is_std(av_codec_id))
+    if (!codec_is_std(CodecID))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("VideoOutputNull::InputChanged(): "
-                                         "new video codec is not supported."));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("VideoOutputNull::InputChanged(): new video codec is not supported."));
         m_errorState = kError_Unknown;
         return false;
     }
 
     QMutexLocker locker(&m_globalLock);
 
-    if (video_dim_disp == m_window.GetVideoDim())
+    if (VideoDispDim == m_window.GetVideoDim())
     {
         m_videoBuffers.Clear();
         MoveResize();
         return true;
     }
 
-    MythVideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                                  aspect, av_codec_id, aspect_only, Locks,
+    MythVideoOutput::InputChanged(VideoDim, VideoDispDim,
+                                  Aspect, CodecID, AspectOnly, Locks,
                                   ReferenceFrames, ForceChange);
     m_videoBuffers.DeleteBuffers();
 
@@ -130,8 +130,8 @@ bool MythVideoOutputNull::InputChanged(const QSize &video_dim_buf,
     bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
     if (!ok)
     {
-        LOG(VB_GENERAL, LOG_ERR, "VideoOutputNull::InputChanged(): "
-                                 "Failed to recreate buffers");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "VideoOutputNull::InputChanged(): Failed to recreate buffers");
         m_errorState = kError_Unknown;
     }
     else
@@ -145,33 +145,29 @@ bool MythVideoOutputNull::InputChanged(const QSize &video_dim_buf,
     return ok;
 }
 
-bool MythVideoOutputNull::Init(const QSize &video_dim_buf, const QSize &video_dim_disp,
-                               float aspect, MythDisplay *Display,
-                               const QRect &win_rect, MythCodecID codec_id)
+bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
+                               float Aspect, MythDisplay* Display,
+                               const QRect& DisplayVisibleRect, MythCodecID CodecID)
 {
-    if ((video_dim_disp.width() <= 0) || (video_dim_disp.height() <= 0))
+    if (VideoDispDim.isEmpty())
         return false;
 
-    if (!codec_is_std(codec_id))
+    if (!codec_is_std(CodecID))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Cannot create VideoOutputNull for codec %1")
-            .arg(toString(codec_id)));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Cannot create VideoOutputNull for codec %1")
+            .arg(toString(CodecID)));
         return false;
     }
 
     QMutexLocker locker(&m_globalLock);
 
-    MythVideoOutput::Init(video_dim_buf, video_dim_disp,
-                          aspect, Display, win_rect, codec_id);
-
+    MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecID);
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall);
+                        kPrebufferFramesNormal, kPrebufferFramesSmall);
 
-    // XXX should this be GetActualVideoDim() ?
-    const QSize video_dim = m_window.GetVideoDim();
+    const QSize videodim = m_window.GetVideoDim();
 
-    if (!m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height()))
+    if (!m_videoBuffers.CreateBuffers(FMT_YV12, videodim.width(), videodim.height()))
         return false;
 
     CreatePauseFrame();
@@ -184,11 +180,11 @@ bool MythVideoOutputNull::Init(const QSize &video_dim_buf, const QSize &video_di
     return true;
 }
 
-void MythVideoOutputNull::EmbedInWidget(const QRect &rect)
+void MythVideoOutputNull::EmbedInWidget(const QRect& EmbedRect)
 {
     QMutexLocker locker(&m_globalLock);
     if (!m_window.IsEmbedding())
-        MythVideoOutput::EmbedInWidget(rect);
+        MythVideoOutput::EmbedInWidget(EmbedRect);
 }
 
 void MythVideoOutputNull::StopEmbedding(void)
@@ -208,46 +204,46 @@ void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDei
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 
-void MythVideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t, OSD *osd)
+void MythVideoOutputNull::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/, OSD* /*Osd*/)
 {
-    (void)osd;
-    (void)t;
-
-    if (!buffer)
-        buffer = m_videoBuffers.GetScratchFrame();
-
-    m_framesPlayed = buffer->frameNumber + 1;
+    if (!Frame)
+        Frame = m_videoBuffers.GetScratchFrame();
+    if (Frame)
+        m_framesPlayed = Frame->frameNumber + 1;
+    else
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No frame in PrepareFrame!");
 }
 
-void MythVideoOutputNull::Show(FrameScanType  /*scan*/)
+void MythVideoOutputNull::Show(FrameScanType /*Scan*/)
 {
 }
 
-void MythVideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType /*Scan*/)
+void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType /*Scan*/)
 {
     QMutexLocker locker(&m_globalLock);
 
     // Try used frame first, then fall back to scratch frame.
     m_videoBuffers.BeginLock(kVideoBuffer_used);
-    VideoFrame *used_frame = nullptr;
+    VideoFrame *used = nullptr;
     if (m_videoBuffers.Size(kVideoBuffer_used) > 0)
-        used_frame = m_videoBuffers.Head(kVideoBuffer_used);
+        used = m_videoBuffers.Head(kVideoBuffer_used);
 
-    if (used_frame)
-        CopyFrame(&m_avPauseFrame, used_frame);
+    if (used)
+        CopyFrame(&m_avPauseFrame, used);
     m_videoBuffers.EndLock();
 
-    if (!used_frame)
+    if (!used)
     {
         m_videoBuffers.GetScratchFrame()->frameNumber = m_framesPlayed - 1;
         CopyFrame(&m_avPauseFrame, m_videoBuffers.GetScratchFrame());
     }
 
-    disp_timecode = m_avPauseFrame.disp_timecode;
+    DisplayTimecode = m_avPauseFrame.disp_timecode;
 }
 
-void MythVideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD* /*Osd*/,
-                                       const PIPMap & /*PipPlayers*/, FrameScanType Scan)
+void MythVideoOutputNull::ProcessFrame(VideoFrame* Frame, OSD* /*Osd*/,
+                                       const PIPMap& /*PiPPlayers*/,
+                                       FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
         m_deinterlacer.Filter(Frame, Scan, nullptr);

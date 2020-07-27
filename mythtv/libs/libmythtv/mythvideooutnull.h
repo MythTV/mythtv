@@ -7,39 +7,34 @@
 class MythVideoOutputNull : public MythVideoOutput
 {
   public:
-    static void GetRenderOptions(RenderOptions &Options);
+    static void GetRenderOptions(RenderOptions& Options);
     MythVideoOutputNull();
    ~MythVideoOutputNull() override;
 
-    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp,
-              float aspect, MythDisplay *Display,
-              const QRect &win_rect, MythCodecID codec_id) override;
+    bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
+              float Aspect, MythDisplay* Display,
+              const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
-    void PrepareFrame(VideoFrame *buffer, FrameScanType t, OSD *osd) override; // VideoOutput
-    void Show(FrameScanType scan) override; // VideoOutput
+    void PrepareFrame(VideoFrame* Frame, FrameScanType Scan, OSD*) override;
+    void Show(FrameScanType Scan) override;
+    bool InputChanged(const QSize& VideoDim,   const QSize& VideoDispDim,
+                      float        Aspect,     MythCodecID  CodecID,
+                      bool&        AspectOnly, MythMultiLocker* Locks,
+                      int          ReferenceFrames, bool ForceChange) override;
+    void EmbedInWidget(const QRect& EmbedRect) override;
+    void StopEmbedding(void) override;
+    void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
+    void ProcessFrame(VideoFrame* Frame, OSD* Osd,
+                      const PIPMap& PiPPlayers,
+                      FrameScanType Scan) override;
+    bool SetupVisualisation(AudioPlayer* /*Audio*/, MythRender* /*Render*/,
+                            const QString& /*Name*/) override { return false; }
+
+
     void CreatePauseFrame(void);
-    bool InputChanged(const QSize &video_dim_buf,
-                      const QSize &video_dim_disp,
-                      float        aspect,
-                      MythCodecID  av_codec_id,
-                      bool        &aspect_only,
-                      MythMultiLocker* Locks,
-                      int ReferenceFrames,
-                      bool ForceChange) override; // VideoOutput
-    void EmbedInWidget(const QRect &rect) override; // VideoOutput
-    void StopEmbedding(void) override; // VideoOutput
-    void UpdatePauseFrame(int64_t &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      const PIPMap &pipPlayers,
-                      FrameScanType scan) override; // VideoOutput
-    static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
-                                           const QSize &video_dim);
-    bool SetupVisualisation(AudioPlayer */*Audio*/, MythRender */*Render*/,
-                            const QString &/*Name*/) override // VideoOutput
-        { return false; }
 
   private:
-    QMutex     m_globalLock   {QMutex::Recursive};
-    VideoFrame m_avPauseFrame {};
+    QMutex     m_globalLock   { QMutex::Recursive };
+    VideoFrame m_avPauseFrame { };
 };
 #endif
