@@ -157,7 +157,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
             currentsize *= m_pixelRatio;
         m_render->BindFramebuffer(m_target);
         m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
-        m_render->SetBackground(0, 0, 0, 0);
+        m_render->SetBackground(0, 0, 0, 255);
         m_render->ClearFramebuffer();
     }
 }
