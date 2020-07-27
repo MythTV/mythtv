@@ -29,7 +29,6 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     explicit MythOpenGLPainter(MythRenderOpenGL *Render = nullptr, QWidget *Parent = nullptr);
    ~MythOpenGLPainter() override;
 
-    void SetTarget(QOpenGLFramebufferObject* NewTarget) { m_target = NewTarget; }
     void SetSwapControl(bool Swap) { m_swapControl = Swap; }
     void DeleteTextures(void);
 
@@ -63,7 +62,6 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
   protected:
     QWidget          *m_widget { nullptr };
     MythRenderOpenGL *m_render { nullptr };
-    QOpenGLFramebufferObject* m_target { nullptr };
     bool              m_swapControl { true };
     QSize             m_lastSize { };
     qreal             m_pixelRatio   { 1.0     };

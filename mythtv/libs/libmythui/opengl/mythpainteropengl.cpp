@@ -150,12 +150,12 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     DeleteTextures();
     m_render->makeCurrent();
 
-    if (m_target || m_swapControl)
+    if (m_swapControl)
     {
         // If we are master and using high DPI then scale the viewport
         if (m_swapControl && m_usingHighDPI)
             currentsize *= m_pixelRatio;
-        m_render->BindFramebuffer(m_target);
+        m_render->BindFramebuffer(nullptr);
         m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
         m_render->SetBackground(0, 0, 0, 255);
         m_render->ClearFramebuffer();
@@ -172,7 +172,7 @@ void MythOpenGLPainter::End(void)
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_END");
-    if (m_target == nullptr && m_swapControl)
+    if (m_swapControl)
     {
         m_render->Flush();
         m_render->swapBuffers();
@@ -272,7 +272,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
             QOpenGLBuffer *vbo = texture->m_vbo;
             texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx];
             texture->m_destination = QRect();
-            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
+            m_render->DrawBitmap(texture, nullptr, Source, DEST, nullptr, Alpha, m_pixelRatio);
             texture->m_destination = QRect();
             texture->m_vbo = vbo;
             if (++m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
@@ -280,7 +280,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
         }
         else
         {
-            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
+            m_render->DrawBitmap(texture, nullptr, Source, DEST, nullptr, Alpha, m_pixelRatio);
             m_mappedTextures.append(texture);
         }
     }
@@ -301,7 +301,7 @@ void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
     if ((FillBrush.style() == Qt::SolidPattern ||
          FillBrush.style() == Qt::NoBrush) && m_render && !m_usingHighDPI)
     {
-        m_render->DrawRect(m_target, Area, FillBrush, LinePen, Alpha);
+        m_render->DrawRect(nullptr, Area, FillBrush, LinePen, Alpha);
         return;
     }
     MythPainter::DrawRect(Area, FillBrush, LinePen, Alpha);
@@ -314,7 +314,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
     if ((FillBrush.style() == Qt::SolidPattern ||
          FillBrush.style() == Qt::NoBrush) && m_render && !m_usingHighDPI)
     {
-        m_render->DrawRoundRect(m_target, Area, CornerRadius, FillBrush,
+        m_render->DrawRoundRect(nullptr, Area, CornerRadius, FillBrush,
                                   LinePen, Alpha);
         return;
     }
