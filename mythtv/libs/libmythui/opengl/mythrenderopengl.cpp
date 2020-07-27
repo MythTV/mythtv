@@ -607,7 +607,7 @@ void MythRenderOpenGL::SetBlend(bool Enable)
     doneCurrent();
 }
 
-void MythRenderOpenGL::SetBackground(int Red, int Green, int Blue, int Alpha)
+void MythRenderOpenGL::SetBackground(uint8_t Red, uint8_t Green, uint8_t Blue, uint8_t Alpha)
 {
     int32_t tmp = (Red << 24) + (Green << 16) + (Blue << 8) + Alpha;
     if (tmp == m_background)

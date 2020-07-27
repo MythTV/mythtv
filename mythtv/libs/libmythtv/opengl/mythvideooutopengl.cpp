@@ -520,10 +520,9 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "CLEAR_START");
 
-    int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
-    bool useclear = !Frame || dummy || ((m_render->GetExtraFeatures() & kGLTiled) != 0);
+    uint8_t gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
 
-    if (useclear)
+    if (!Frame || dummy || ((m_render->GetExtraFeatures() & kGLTiled) != 0))
     {
         m_render->SetBackground(gray, gray, gray, 255);
         m_render->ClearFramebuffer();

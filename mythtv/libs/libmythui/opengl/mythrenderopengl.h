@@ -121,7 +121,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  PopTransformation(void);
     void  Flush(void);
     void  SetBlend(bool Enable);
-    void  SetBackground(int Red, int Green, int Blue, int Alpha);
+    void  SetBackground(uint8_t Red, uint8_t Green, uint8_t Blue, uint8_t Alpha);
     QFunctionPointer GetProcAddress(const QString &Proc) const;
 
     static const GLuint kVertexSize;
