@@ -1063,7 +1063,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
-#if defined (Q_OS_LINUX) && defined (USING_EGL)
+#if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
     // can use zero copy video buffers for the best performance (N.B. not tested
     // on AMD desktops). To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION'
@@ -1079,7 +1079,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
     bool ignore = soft == "1" || soft.compare("true", Qt::CaseInsensitive) == 0;
     bool allow = qgetenv("MYTHTV_NO_EGL").isEmpty() && !ignore;
     bool force = !qgetenv("MYTHTV_FORCE_EGL").isEmpty();
-    if (force || allow)
+    if ((force || allow) && MythDisplayX11::IsAvailable())
     {
         // N.B. By default, ignore EGL if vendor string is not returned
         QString vendor = MythEGL::GetEGLVendor();
