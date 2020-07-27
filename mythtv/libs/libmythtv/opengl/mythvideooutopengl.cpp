@@ -778,18 +778,12 @@ void MythVideoOutputOpenGL::ClearAfterSeek(void)
 }
 
 /*! \brief Generate a list of supported OpenGL profiles.
- *
- * \note This list could be filtered based upon current feature support. This
- * would however assume an OpenGL render device (not currently a given) but more
- * importantly, filtering out a selected profile encourages the display profile
- * code to use a higher priority, non-OpenGL renderer (such as VDPAU). By not
- * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
- * alternative.
 */
 QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize& /*VideoDim*/)
 {
     QStringList allowed;
-    if (getenv("NO_OPENGL"))
+
+    if (MythRenderOpenGL::GetOpenGLRender() == nullptr)
         return allowed;
 
     if (codec_sw_copy(CodecId))
