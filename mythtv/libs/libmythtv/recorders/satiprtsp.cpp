@@ -157,7 +157,7 @@ bool SatIPRTSP::Teardown(void)
     emit(stopKeepalive());
 
     QUrl url = QUrl(m_requestUrl);
-    url.setQuery("");
+    url.setQuery(QString());
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
     bool result = sendMessage(url, "TEARDOWN");
