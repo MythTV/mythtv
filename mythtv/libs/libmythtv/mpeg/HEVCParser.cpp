@@ -1061,7 +1061,7 @@ static bool scalingListData(GetBitContext * gb,
 */
 static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
                                int num_short_term_ref_pic_sets,
-                               HEVCParser::ShortTermRefPicSet * stRPS,
+                               std::array<HEVCParser::ShortTermRefPicSet,65> & stRPS,
                                uint8_t max_dec_pic_buffering_minus1)
 {
     int16_t  deltaRPS = 0;
@@ -1137,16 +1137,16 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
             dPoc = RefRPS->DeltaPocS1[k] + deltaRPS;
             if (dPoc < 0 && use_delta_flag[RefRPS->NumNegativePics + k])
             {
-                stRPS->DeltaPocS0[i] = dPoc;
-                stRPS->UsedByCurrPicS0[i++] =
+                stRPS[stRPSIdx].DeltaPocS0[i] = dPoc;
+                stRPS[stRPSIdx].UsedByCurrPicS0[i++] =
                     used_by_curr_pic_flag[RefRPS->NumNegativePics + k];
             }
         }
 
         if (deltaRPS < 0 && use_delta_flag[RefRPS->NumDeltaPocs])
         {
-            stRPS->DeltaPocS0[i] = deltaRPS;
-            stRPS->UsedByCurrPicS0[i++] =
+            stRPS[stRPSIdx].DeltaPocS0[i] = deltaRPS;
+            stRPS[stRPSIdx].UsedByCurrPicS0[i++] =
                 used_by_curr_pic_flag[RefRPS->NumDeltaPocs];
         }
 
@@ -1155,11 +1155,11 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
             dPoc = RefRPS->DeltaPocS0[j] + deltaRPS;
             if (dPoc < 0 && use_delta_flag[j])
             {
-                stRPS->DeltaPocS0[i] = dPoc;
-                stRPS->UsedByCurrPicS0[i++] = used_by_curr_pic_flag[j];
+                stRPS[stRPSIdx].DeltaPocS0[i] = dPoc;
+                stRPS[stRPSIdx].UsedByCurrPicS0[i++] = used_by_curr_pic_flag[j];
             }
         }
-        stRPS->NumNegativePics = i;
+        stRPS[stRPSIdx].NumNegativePics = i;
 
         i = 0;
         for (k = (RefRPS->NumNegativePics - 1); k >= 0; --k)
@@ -1167,15 +1167,15 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
             dPoc = RefRPS->DeltaPocS0[k] + deltaRPS;
             if (dPoc > 0 && use_delta_flag[k])
             {
-                stRPS->DeltaPocS1[i] = dPoc;
-                stRPS->UsedByCurrPicS1[i++] = used_by_curr_pic_flag[k];
+                stRPS[stRPSIdx].DeltaPocS1[i] = dPoc;
+                stRPS[stRPSIdx].UsedByCurrPicS1[i++] = used_by_curr_pic_flag[k];
             }
         }
 
         if (deltaRPS > 0 && use_delta_flag[RefRPS->NumDeltaPocs])
         {
-            stRPS->DeltaPocS1[i] = deltaRPS;
-            stRPS->UsedByCurrPicS1[i++] =
+            stRPS[stRPSIdx].DeltaPocS1[i] = deltaRPS;
+            stRPS[stRPSIdx].UsedByCurrPicS1[i++] =
                 used_by_curr_pic_flag[RefRPS->NumDeltaPocs];
         }
 
@@ -1184,40 +1184,40 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
             dPoc = RefRPS->DeltaPocS1[j] + deltaRPS;
             if (dPoc > 0 && use_delta_flag[RefRPS->NumNegativePics + j])
             {
-                stRPS->DeltaPocS1[i] = dPoc;
-                stRPS->UsedByCurrPicS1[i++] =
+                stRPS[stRPSIdx].DeltaPocS1[i] = dPoc;
+                stRPS[stRPSIdx].UsedByCurrPicS1[i++] =
                     used_by_curr_pic_flag[RefRPS->NumNegativePics + j];
             }
         }
-        stRPS->NumPositivePics= i;
+        stRPS[stRPSIdx].NumPositivePics= i;
     }
     else
     {
-        stRPS->NumNegativePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
+        stRPS[stRPSIdx].NumNegativePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
                                           max_dec_pic_buffering_minus1);
-        stRPS->NumPositivePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
+        stRPS[stRPSIdx].NumPositivePics = std::min((uint8_t)get_ue_golomb(gb), // ue(v)
                                           max_dec_pic_buffering_minus1);
 
-        for (i = 0; i < stRPS->NumNegativePics; ++i)
+        for (i = 0; i < stRPS[stRPSIdx].NumNegativePics; ++i)
         {
             delta_poc_s0_minus1[i] = get_ue_golomb(gb); // ue(v)
             get_bits1(gb); // used_by_curr_pic_s0_flag[i]; u(1)
 
             if (i == 0)
-                stRPS->DeltaPocS0[i] = -(delta_poc_s0_minus1[i] + 1);
+                stRPS[stRPSIdx].DeltaPocS0[i] = -(delta_poc_s0_minus1[i] + 1);
             else
-                stRPS->DeltaPocS0[i] = stRPS->DeltaPocS0[i - 1] -
+                stRPS[stRPSIdx].DeltaPocS0[i] = stRPS[stRPSIdx].DeltaPocS0[i - 1] -
                                        (delta_poc_s0_minus1[i] + 1);
         }
-        for (i = 0; i < stRPS->NumPositivePics; ++i)
+        for (i = 0; i < stRPS[stRPSIdx].NumPositivePics; ++i)
         {
             delta_poc_s1_minus1[i] = get_ue_golomb(gb); // ue(v)
             get_bits1(gb); // used_by_curr_pic_s1_flag[i]; u(1)
 
             if (i == 0)
-                stRPS->DeltaPocS1[i] = delta_poc_s1_minus1[i] + 1;
+                stRPS[stRPSIdx].DeltaPocS1[i] = delta_poc_s1_minus1[i] + 1;
             else
-                stRPS->DeltaPocS1[i] = stRPS->DeltaPocS1[i - 1] +
+                stRPS[stRPSIdx].DeltaPocS1[i] = stRPS[stRPSIdx].DeltaPocS1[i - 1] +
                                        (delta_poc_s1_minus1[i] + 1);
         }
     }
@@ -1227,8 +1227,8 @@ static bool shortTermRefPicSet(GetBitContext * gb, int stRPSIdx,
       NumDeltaPocs[ stRPSIdx ] = NumNegativePics[ stRPSIdx ] +
       NumPositivePics[ stRPSIdx ]
     */
-    stRPS->NumDeltaPocs = stRPS->NumNegativePics +
-                          stRPS->NumPositivePics;
+    stRPS[stRPSIdx].NumDeltaPocs = stRPS[stRPSIdx].NumNegativePics +
+                          stRPS[stRPSIdx].NumPositivePics;
     return true;
 }
 
@@ -1582,7 +1582,7 @@ bool HEVCParser::parseSliceSegmentHeader(GetBitContext *gb)
 bool HEVCParser::parseSPS(GetBitContext *gb)
 {
     uint i = 0;
-    static ShortTermRefPicSet short_term_ref_pic_set[65];
+    static std::array<ShortTermRefPicSet,65> short_term_ref_pic_set;
 
     static uint     sub_layer_size = 0;
     static uint8_t* max_dec_pic_buffering_minus1 = nullptr;
@@ -1780,12 +1780,12 @@ bool HEVCParser::parseSPS(GetBitContext *gb)
     }
 
     uint num_short_term_ref_pic_sets = get_ue_golomb(gb); //  ue(v);
-    if (num_short_term_ref_pic_sets > 64)
+    if (num_short_term_ref_pic_sets > short_term_ref_pic_set.size() - 1 )
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
             QString("num_short_term_ref_pic_sets %1 > 64")
             .arg(num_short_term_ref_pic_sets));
-        num_short_term_ref_pic_sets = 64;
+        num_short_term_ref_pic_sets = short_term_ref_pic_set.size() - 1;
     }
     for(i = 0; i < num_short_term_ref_pic_sets; ++i)
     {
