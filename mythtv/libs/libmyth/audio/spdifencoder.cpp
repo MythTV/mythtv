@@ -40,7 +40,8 @@ SPDIFEncoder::SPDIFEncoder(const QString& muxer, AVCodecID codec_id)
     }
     m_oc->oformat = fmt;
 
-    m_oc->pb = avio_alloc_context(m_buffer, sizeof(m_buffer), 1,
+    auto *buffer = (unsigned char *)av_malloc(AudioOutput::kMaxSizeBuffer);
+    m_oc->pb = avio_alloc_context(buffer, AudioOutput::kMaxSizeBuffer, 1,
                                   this, nullptr, funcIO, nullptr);
     if (!m_oc->pb)
     {
@@ -119,14 +120,34 @@ void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
  */
 int SPDIFEncoder::GetData(unsigned char *buffer, size_t &dest_size)
 {
+    if ((m_oc == nullptr) || (m_oc->pb == nullptr))
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "GetData");
+        return -1;
+    }
+
     if(m_size > 0)
     {
-        memcpy(buffer, m_buffer, m_size);
+        memcpy(buffer, m_oc->pb->buffer, m_size);
         dest_size = m_size;
         m_size = 0;
         return dest_size;
     }
     return -1;
+}
+
+int SPDIFEncoder::GetProcessedSize()
+{
+    if ((m_oc == nullptr) || (m_oc->pb == nullptr))
+        return -1;
+    return m_size;
+}
+
+unsigned char *SPDIFEncoder::GetProcessedBuffer()
+{
+    if ((m_oc == nullptr) || (m_oc->pb == nullptr))
+        return nullptr;
+    return m_oc->pb->buffer;
 }
 
 /**
@@ -160,7 +181,13 @@ int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
 {
     auto *enc = (SPDIFEncoder *)opaque;
 
-    memcpy(enc->m_buffer + enc->m_size, buf, size);
+    if ((enc->m_oc == nullptr) || (enc->m_oc->pb == nullptr))
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "funcIO");
+        return 0;
+    }
+
+    memcpy(enc->m_oc->pb->buffer + enc->m_size, buf, size);
     enc->m_size += size;
     return size;
 }
@@ -181,6 +208,7 @@ void SPDIFEncoder::Destroy()
     {
         if (m_oc->pb)
         {
+            av_free(m_oc->pb->buffer);
             av_freep(&m_oc->pb);
         }
         avformat_free_context(m_oc);
