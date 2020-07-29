@@ -1051,6 +1051,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
 {
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;
+    format.setAlphaBufferSize(0);
     format.setDepthBufferSize(0);
     format.setStencilBufferSize(0);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
@@ -1063,6 +1064,20 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
+
+    // If Wayland decorations are enabled, the default framebuffer format is forced
+    // to use alpha. This framebuffer is rendered with alpha blending by the wayland
+    // compositor - so any translucent areas of our UI will allow the underlying
+    // window to bleed through.
+    // N.B. this is probably not the most performant solution as compositors MAY
+    // still render hidden windows. A better solution is probably to call
+    // wl_surface_set_opaque_region on the wayland surface. This is confirmed to work
+    // and should allow the compositor to optimise rendering for opaque areas. It does
+    // however require linking to libwayland-client AND including private Qt headers
+    // to retrieve the surface and compositor structures (the latter being a significant issue).
+    // see also setAlphaBufferSize above
+    setenv("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1", 0);
+
 #if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
     // can use zero copy video buffers for the best performance (N.B. not tested
