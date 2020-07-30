@@ -1787,7 +1787,7 @@ nullptr
 " ADD COLUMN tid INT(11) NOT NULL DEFAULT '0' AFTER pid, "
 " ADD COLUMN filename VARCHAR(255) NOT NULL DEFAULT '' AFTER thread, "
 " ADD COLUMN line INT(11) NOT NULL DEFAULT '0' AFTER filename, "
-" ADD COLUMN function VARCHAR(255) NOT NULL DEFAULT '' AFTER line;",
+" ADD COLUMN `function` VARCHAR(255) NOT NULL DEFAULT '' AFTER line;",
 nullptr
 };
 
