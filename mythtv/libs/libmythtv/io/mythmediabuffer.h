@@ -234,11 +234,6 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     /// Condition to signal that the read ahead thread is running
     QWaitCondition         m_generalWait; // protected by rwLock
 
-  public:
-    static QMutex      s_subExtLock;
-    static QStringList s_subExt;
-    static QStringList s_subExtNoCheck;
-
   private:
     bool m_bitrateInitialized { false };
 };

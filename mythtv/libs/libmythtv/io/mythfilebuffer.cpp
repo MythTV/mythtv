@@ -43,6 +43,10 @@ static int posix_fadvise(int, off_t, off_t, int) { return 0; }
 
 #define LOC QString("FileRingBuf(%1): ").arg(m_filename)
 
+static const QStringList kSubExt        {".ass", ".srt", ".ssa", ".sub", ".txt"};
+static const QStringList kSubExtNoCheck {".ass", ".srt", ".ssa", ".sub", ".txt", ".gif", ".png"};
+
+
 MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
   : MythMediaBuffer(kMythBufferFile)
 {
@@ -121,17 +125,10 @@ static bool CheckPermissions(const QString &Filename)
 
 static bool IsSubtitlePossible(const QString &Extension)
 {
-    QMutexLocker locker(&MythMediaBuffer::s_subExtLock);
-    bool nosubtitle = false;
-    for (int i = 0; i < MythMediaBuffer::s_subExtNoCheck.size(); i++)
-    {
-        if (Extension.contains(MythMediaBuffer::s_subExtNoCheck[i].right(3)))
-        {
-            nosubtitle = true;
-            break;
-        }
-    }
-    return !nosubtitle;
+    auto it = std::find_if(kSubExtNoCheck.cbegin(), kSubExtNoCheck.cend(),
+                           [Extension] (const QString& ext) -> bool
+                               {return ext.contains(Extension);});
+    return (it != nullptr);
 }
 
 static QString LocalSubtitleFilename(QFileInfo &FileInfo)
@@ -154,8 +151,7 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
                                              .replace("(", "?")
                                              .replace(")", "?");
 
-        QMutexLocker locker(&MythMediaBuffer::s_subExtLock);
-        for (const auto & ext : MythMediaBuffer::s_subExt)
+        for (const auto & ext : kSubExt)
             list += findBaseName + ext;
     }
 
@@ -332,8 +328,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
 
             if (IsSubtitlePossible(extension))
             {
-                QMutexLocker locker(&s_subExtLock);
-                for (const auto & ext : s_subExt)
+                for (const auto & ext : kSubExt)
                     auxFiles += baseName + ext;
             }
         }

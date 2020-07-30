@@ -45,10 +45,6 @@ const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
 
 #define LOC      QString("RingBuf(%1): ").arg(m_filename)
 
-QMutex      MythMediaBuffer::s_subExtLock;
-QStringList MythMediaBuffer::s_subExt;
-QStringList MythMediaBuffer::s_subExtNoCheck;
-
 
 /*
   Locking relations:
@@ -204,23 +200,6 @@ MythMediaBuffer::MythMediaBuffer(MythBufferType Type)
   : MThread("RingBuffer"),
     m_type(Type)
 {
-    s_subExtLock.lock();
-    if (s_subExt.empty())
-    {
-        // Possible subtitle file extensions '.srt', '.sub', '.txt'
-        // since #9294 also .ass and .ssa
-        s_subExt += ".ass";
-        s_subExt += ".srt";
-        s_subExt += ".ssa";
-        s_subExt += ".sub";
-        s_subExt += ".txt";
-
-        // Extensions for which a subtitle file should not exist
-        s_subExtNoCheck = s_subExt;
-        s_subExtNoCheck += ".gif";
-        s_subExtNoCheck += ".png";
-    }
-    s_subExtLock.unlock();
 }
 
 MythBufferType MythMediaBuffer::GetType(void) const
