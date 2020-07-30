@@ -108,12 +108,12 @@ class SatIPRTSP : QObject
     void SetSigmonValues(bool lock, int level);
 
   signals:
-    void startKeepalive(int timeout);
-    void stopKeepalive(void);
+    void startKeepAlive(int timeout);
+    void stopKeepAlive(void);
 
   protected slots:
-    void startKeepaliveRequested(int timeout);
-    void stopKeepaliveRequested(void);
+    void startKeepAliveRequested(int timeout);
+    void stopKeepAliveRequested(void);
 
   protected:
     QUrl m_requestUrl;

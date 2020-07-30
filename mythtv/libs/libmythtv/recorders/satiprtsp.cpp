@@ -28,8 +28,8 @@
 SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     : m_streamHandler(handler)
 {
-    connect(this, SIGNAL(startKeepalive(int)), this, SLOT(startKeepaliveRequested(int)));
-    connect(this, SIGNAL(stopKeepalive()), this, SLOT(stopKeepaliveRequested()));
+    connect(this, SIGNAL(startKeepAlive(int)), this, SLOT(startKeepAliveRequested(int)));
+    connect(this, SIGNAL(stopKeepAlive()), this, SLOT(stopKeepAliveRequested()));
 
     // Use RTPPacketBuffer if buffering and re-ordering needed
     m_buffer = new UDPPacketBuffer(0);
@@ -56,6 +56,8 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
 SatIPRTSP::~SatIPRTSP()
 {
+    stopKeepAliveRequested();
+
     delete m_rtcpReadhelper;
     delete m_writehelper;
     delete m_readhelper;
@@ -124,7 +126,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Setup completed, sessionID = %1, streamID = %2, timeout = %3s")
             .arg(m_sessionid).arg(m_streamid).arg(m_timeout / 1000));
-    emit(startKeepalive(m_timeout));
+    emit(startKeepAlive(m_timeout));
 
     return true;
 }
@@ -154,7 +156,7 @@ bool SatIPRTSP::Play(QStringList &pids)
 bool SatIPRTSP::Teardown(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + "TEARDOWN");
-    emit(stopKeepalive());
+    emit(stopKeepAlive());
 
     QUrl url = QUrl(m_requestUrl);
     url.setQuery(QString());
@@ -314,16 +316,22 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
     return true;
 }
 
-void SatIPRTSP::startKeepaliveRequested(int timeout)
+void SatIPRTSP::startKeepAliveRequested(int timeout)
 {
+    if (m_timer)
+        return;
     m_timer = startTimer(timeout);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("startKeepaliveRequested(%1) m_timer:%2").arg(timeout).arg(m_timer));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("startKeepAliveRequested(%1) m_timer:%2").arg(timeout).arg(m_timer));
 }
 
-void SatIPRTSP::stopKeepaliveRequested()
+void SatIPRTSP::stopKeepAliveRequested()
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("stopKeepaliveRequested() m_timer:%1").arg(m_timer));
-    killTimer(m_timer);
+    if (m_timer)
+    {
+        killTimer(m_timer);
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("stopKeepAliveRequested() m_timer:%1").arg(m_timer));
+    }
+    m_timer = 0;
 }
 
 void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
