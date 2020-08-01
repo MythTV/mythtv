@@ -1232,6 +1232,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   }
 #endif
 
+  demuxstr->subtitles = first;
   // No memory leak of 'sub' here.  'Sub' always points to an element in 'first'.
   // NOLINT(clang-analyzer-unix.Malloc)
   return first;
