@@ -163,7 +163,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
     switch (state) {
 
     case 0: /* find "START=" */
-      s_s = strstr (s_s, "Start=");
+      s_s = strcasestr (s_s, "Start=");
       if (s_s) {
         current->start = strtol (s_s + 6, &s_s, 0) / 10;
         state = 1; continue;
@@ -171,7 +171,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
       break;
 
     case 1: /* find "<P" */
-      if ((s_s = strstr (s_s, "<P"))) { s_s += 2; state = 2; continue; }
+      if ((s_s = strcasestr (s_s, "<P"))) { s_s += 2; state = 2; continue; }
       break;
 
     case 2: /* find ">" */
@@ -180,7 +180,6 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
 
     case 3: /* get all text until '<' appears */
       if (*s_s == '\0') { break; }
-      else if (*s_s == '<') { state = 4; }
       else if (strncasecmp (s_s, "&nbsp;", 6) == 0) { *p++ = ' '; s_s += 6; }
       else if (*s_s == '\r') { s_s++; }
       else if (strncasecmp (s_s, "<br>", 4) == 0 || *s_s == '\n') {
@@ -189,11 +188,12 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
           current->text[current->lines++] = strdup (text);
         if (*s_s == '\n') s_s++; else s_s += 4;
       }
+      else if (*s_s == '<') { state = 4; }
       else *p++ = *s_s++;
       continue;
 
     case 4: /* get current->end or skip <TAG> */
-      char *q = strstr (s_s, "Start=");
+      char *q = strcasestr (s_s, "start=");
       if (q) {
         current->end = strtol (q + 6, &q, 0) / 10 - 1;
         *p = '\0'; trail_space (text);
