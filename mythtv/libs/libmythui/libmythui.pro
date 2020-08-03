@@ -33,7 +33,7 @@ HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
-HEADERS += themeinfo.h platforms/mythxdisplay.h mythdisplaymode.h
+HEADERS += themeinfo.h mythdisplaymode.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
@@ -57,7 +57,7 @@ SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
-SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp mythdisplaymode.cpp
+SOURCES += themeinfo.cpp mythdisplaymode.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
@@ -101,10 +101,12 @@ INSTALLS += inc
 
 using_x11 {
     DEFINES += USING_X11
-    HEADERS += screensaver-x11.h
-    SOURCES += screensaver-x11.cpp
+    HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
+    HEADERS += screensaver-x11.h
+    SOURCES += platforms/mythxdisplay.cpp
     SOURCES += platforms/mythdisplayx11.cpp
+    SOURCES += screensaver-x11.cpp
 }
 
 using_drm {

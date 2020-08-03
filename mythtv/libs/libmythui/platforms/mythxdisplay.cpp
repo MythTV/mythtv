@@ -2,8 +2,6 @@
 #include "config.h"
 #include "mythlogging.h"
 #include "mythuihelper.h"
-
-#ifdef USING_X11
 #include "mythxdisplay.h"
 
 // Std
@@ -187,5 +185,3 @@ void MythXDisplay::CheckOrphanedErrors(void)
         if (!xerror_handlers.count(xerror.first))
             CheckErrors(xerror.first);
 }
-
-#endif // USING_X11

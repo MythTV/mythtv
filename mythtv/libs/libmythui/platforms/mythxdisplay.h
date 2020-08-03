@@ -4,14 +4,14 @@
 // Qt
 #include <QString>
 #include <QMutex>
-
-#ifdef USING_X11
 #include <QSize>
 #include <QRect>
-#include <X11/Xlib.h>
 
 // MythTV
 #include "mythuiexp.h"
+
+// X11
+#include <X11/Xlib.h>
 
 // Std
 #include <vector>
@@ -54,8 +54,6 @@ class MUI_PUBLIC MythXDisplay
     QMutex        m_lock       { QMutex::Recursive };
     QString       m_displayName{ };
 };
-
-#endif // USING_X11
 
 // These X11 defines conflict with the QT key event enum values
 #undef KeyPress
