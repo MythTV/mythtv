@@ -136,6 +136,8 @@ class SatIPRTSP : QObject
     QMutex m_ctrlSocketLock;
     QMutex m_sigmonLock;
 
+    bool m_valid            {false};
+    bool m_validOld         {false};
     bool m_hasLock          {false};
     int  m_signalStrength   {0};
 

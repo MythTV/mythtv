@@ -56,8 +56,6 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
 SatIPRTSP::~SatIPRTSP()
 {
-    stopKeepAliveRequested();
-
     delete m_rtcpReadhelper;
     delete m_writehelper;
     delete m_readhelper;
@@ -150,6 +148,9 @@ bool SatIPRTSP::Play(QStringList &pids)
         return false;
     }
 
+    // Start processing packets when pids are specified
+    m_valid = !pids.empty();
+
     return true;
 }
 
@@ -174,6 +175,10 @@ bool SatIPRTSP::Teardown(void)
         m_sessionid = "";
         m_streamid = "";
     }
+
+    // Discard all RTP packets until the next lock
+    m_valid = false;
+    m_validOld = false;
 
     return result;
 }
@@ -326,10 +331,10 @@ void SatIPRTSP::startKeepAliveRequested(int timeout)
 
 void SatIPRTSP::stopKeepAliveRequested()
 {
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("stopKeepAliveRequested() m_timer:%1").arg(m_timer));
     if (m_timer)
     {
         killTimer(m_timer);
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("stopKeepAliveRequested() m_timer:%1").arg(m_timer));
     }
     m_timer = 0;
 }
@@ -509,9 +514,11 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
 
 #if 0
             LOG(VB_RECORD, LOG_INFO, LOC_WH +
-                QString("Processing RTP packet(seq:%1 ts:%2, ts_data_size:%3)")
-                .arg(m_lastSequenceNumber).arg(m_lastTimeStamp).arg(ts_packet.GetTSDataSize()));
+                QString("Processing RTP packet(seq:%1 ts:%2, ts_data_size:%3) %4")
+                .arg(m_lastSequenceNumber).arg(m_lastTimeStamp).arg(ts_packet.GetTSDataSize())
+                .arg((m_parent->m_valid && m_parent->m_validOld)?"processed":"discarded"));
 #endif
+            if (m_parent->m_valid && m_parent->m_validOld)
             {
                 int remainder = 0;
                 if (m_streamHandler)
@@ -542,4 +549,5 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
         }
         m_parent->m_buffer->FreePacket(pkt);
     }
+    m_parent->m_validOld = m_parent->m_valid;
 }
