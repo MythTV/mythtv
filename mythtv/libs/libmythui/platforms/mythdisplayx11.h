@@ -8,9 +8,8 @@
 #include "mythdisplay.h"
 #include "mythxdisplay.h"
 
-#ifdef USING_XRANDR
+// X11
 #include <X11/extensions/Xrandr.h> // always last
-#endif
 
 class MythDisplayX11 : public MythDisplay
 {
@@ -19,8 +18,6 @@ class MythDisplayX11 : public MythDisplay
    ~MythDisplayX11() override = default;
     static bool IsAvailable(void);
     void UpdateCurrentMode(void) override;
-
-#ifdef USING_XRANDR
     bool VideoModesAvailable(void) override { return true; }
     bool UsingVideoModes(void) override;
     const std::vector<MythDisplayMode>& GetVideoModes(void) override;
@@ -29,7 +26,6 @@ class MythDisplayX11 : public MythDisplay
   private:
     static XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
                              QScreen* qScreen, RROutput* Output = nullptr);
-#endif
 
   private:
     void GetEDID(MythXDisplay* mDisplay);

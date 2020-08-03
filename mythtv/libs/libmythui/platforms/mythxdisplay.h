@@ -35,9 +35,7 @@ class MUI_PUBLIC MythXDisplay
     int      GetDepth(void) const      { return m_depth;       }
     Window   GetRoot(void) const       { return m_root;        }
     bool     Open(void);
-    QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);
-    double   GetRefreshRate(void);
     void     Sync(bool Flush = false);
     void     StartLog(void);
     bool     StopLog(void);

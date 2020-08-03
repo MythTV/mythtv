@@ -138,7 +138,6 @@ Advanced options (experts only):
   --enable-vulkan          enable Vulkan rendering
   --enable-libglslang      enable runtime GLSL compilation for Vulkan (development only)
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
-  --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
@@ -1994,7 +1993,6 @@ MYTHTV_CONFIG_LIST='
     x11
     libexiv2_external
     libbluray_external
-    xrandr
     profiletype
     debugtype
     systemd_notify
@@ -2623,7 +2621,6 @@ v4l2_deps="linux_videodev2_h"
 v4l2prime_deps="v4l2 drm"
 v4l1_deps="backend v4l2 linux_videodev_h"
 vulkan_deps="vulkan_vulkan_core_h"
-xrandr_deps="x11"
 asi_deps="backend"
 
 # default parameters
@@ -2790,7 +2787,6 @@ enable v4l1
 enable v4l2
 enable v4l2prime
 enable x11
-enable xrandr
 disable indevs
 enable libfftw3
 enable taglib
@@ -6697,12 +6693,9 @@ if enabled taglib; then
 fi
 
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
-enabled xrandr && check_lib Xrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr || disable xrandr
 
 if enabled x11; then
-    require libXxf86vm "X11/Xdefs.h X11/Xlib.h X11/extensions/xf86vmode.h" XF86VidModeSetClientVersion -lXxf86vm
-    require libXinerama X11/extensions/Xinerama.h XineramaQueryExtension -lXinerama
-    require libXext "X11/Xdefs.h X11/Xlib.h X11/extensions/Xext.h" XMissingExtension -lXext
+    require libXrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr
 fi
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
@@ -7450,13 +7443,12 @@ if enabled frontend; then
   echo "libfftw3 support          ${libfftw3-no}"
   echo
   echo "# Video Output Support"
-  echo "x11 support               ${x11-no}"
+  echo "x11/xrandr support        ${x11-no}"
 if enabled x11 ; then
-  echo "xrandr support            ${xrandr-no}"
   echo "VDPAU support             ${vdpau-no}"
-  echo "VAAPI support             ${vaapi-no}"
   echo "NVDEC support             ${nvdec-no}"
 fi
+  echo "VAAPI support             ${vaapi-no}"
   echo "DRM support               ${drm-no}"
   echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"

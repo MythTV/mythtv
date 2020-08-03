@@ -174,10 +174,6 @@ using_libcec {
     SOURCES += devices/mythcecadapter.cpp
 }
 
-using_xrandr {
-    DEFINES += USING_XRANDR
-}
-
 cygwin:DEFINES += _WIN32
 mingw :DEFINES += USING_MINGW
 

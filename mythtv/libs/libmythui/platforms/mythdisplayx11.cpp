@@ -48,7 +48,6 @@ void MythDisplayX11::UpdateCurrentMode(void)
     MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
     if (display)
     {
-#ifdef USING_XRANDR
         // XRANDR should always be accurate
         GetEDID(display);
         XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
@@ -85,17 +84,13 @@ void MythDisplayX11::UpdateCurrentMode(void)
             break;
         }
         XRRFreeScreenResources(res);
-#else
-        // Use Qt version apart from refresh rate
-        m_refreshRate  = display->GetRefreshRate();
-#endif
+
         delete display;
         m_modeComplete = true;
         return;
     }
 }
 
-#ifdef USING_XRANDR
 bool MythDisplayX11::UsingVideoModes(void)
 {
     if (gCoreContext)
@@ -276,11 +271,9 @@ XRROutputInfo* MythDisplayX11::GetOutput(XRRScreenResources* Resources,
     XRRFreeOutputInfo(result);
     return nullptr;
 }
-#endif // USING_XRANDR
 
 void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
 {
-#ifdef USING_XRANDR
     if (!mDisplay)
     {
         m_edid = MythEDID();
@@ -334,8 +327,4 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
     }
     XRRFreeOutputInfo(output);
     XRRFreeScreenResources(res);
-#else
-    (void)mDisplay;
-    m_edid = MythEDID();
-#endif
 }
