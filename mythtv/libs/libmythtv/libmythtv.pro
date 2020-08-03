@@ -464,7 +464,7 @@ using_frontend {
         DEFINES += USING_V4L2PRIME
     }
 
-    using_vdpau {
+    using_vdpau:using_x11 {
         DEFINES += USING_VDPAU
         HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
         SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
@@ -497,8 +497,6 @@ using_frontend {
         SOURCES += visualisations/videovisualspectrum.cpp
     }
 
-    using_x11:DEFINES += USING_X11
-
     HEADERS += decoders/mythdrmprimecontext.h
     SOURCES += decoders/mythdrmprimecontext.cpp
 
@@ -522,7 +520,7 @@ using_frontend {
             SOURCES += opengl/mythvaapiinterop.cpp opengl/mythvaapiglxinterop.cpp
         }
 
-        using_vdpau {
+        using_vdpau:using_x11 {
             HEADERS += opengl/mythvdpauinterop.h
             SOURCES += opengl/mythvdpauinterop.cpp
         }
