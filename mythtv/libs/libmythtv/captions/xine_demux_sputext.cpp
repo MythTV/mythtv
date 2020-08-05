@@ -647,7 +647,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
 
   while (num < SUB_MAX_TEXT) {
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
-      return nullptr;
+      return (num > 0) ? current : nullptr;
 
     char *p=line;
     while (isspace(*p))
@@ -664,7 +664,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     *q='\0';
     if (strlen(p)) {
       current->text[num]=strdup(p);
-      printf(">%s<\n",p);
+      /* printf(">%s<\n",p); */
       current->lines = ++num;
     } else {
       if (num)
