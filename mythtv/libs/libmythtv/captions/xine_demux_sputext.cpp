@@ -101,14 +101,9 @@ static inline void trail_space(char *s) {
 static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t len) {
   off_t nread = 0;
 
-  // Since our RemoteFile code sleeps 200ms whenever we get back less data
-  // than requested, but this code just keeps trying to read until it gets
-  // an error back, we check for empty reads so that we can stop reading
-  // when there is no more data to read
-  if (demuxstr->emptyReads == 0 && (len - demuxstr->buflen) > 512) {
+  if ((len - demuxstr->buflen) > 512) {
     nread = len - demuxstr->buflen;
-    if (nread > demuxstr->rbuffer_len - demuxstr->rbuffer_cur)
-        nread = demuxstr->rbuffer_len - demuxstr->rbuffer_cur;
+    nread = std::min(nread, demuxstr->rbuffer_len - demuxstr->rbuffer_cur);
     if (nread < 0) {
       printf("read failed.\n");
       return nullptr;
@@ -117,13 +112,9 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
            &demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
            nread);
     demuxstr->rbuffer_cur += nread;
+    demuxstr->buflen += nread;
+    demuxstr->buf[demuxstr->buflen] = '\0';
   }
-
-  if (!nread)
-    demuxstr->emptyReads++;
-
-  demuxstr->buflen += nread;
-  demuxstr->buf[demuxstr->buflen] = '\0';
 
   char *s = strchr(demuxstr->buf, '\n');
 
@@ -1144,7 +1135,6 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   /* Rewind (sub_autodetect() needs to read input from the beginning) */
   demuxstr->rbuffer_cur = 0;
   demuxstr->buflen = 0;
-  demuxstr->emptyReads = 0;
 
   demuxstr->format=sub_autodetect (demuxstr);
   if (demuxstr->format==FORMAT_UNKNOWN) {
@@ -1156,7 +1146,6 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   /* Rewind */
   demuxstr->rbuffer_cur = 0;
   demuxstr->buflen = 0;
-  demuxstr->emptyReads = 0;
 
   demuxstr->num=0;
   int n_max=32;
@@ -1188,7 +1177,6 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
     if (!sub) {
       break;   /* EOF */
     }
-    demuxstr->emptyReads = 0;
 
     if (sub==ERR)
       ++demuxstr->errs;

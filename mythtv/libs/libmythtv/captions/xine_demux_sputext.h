@@ -29,7 +29,6 @@ struct demux_sputext_t {
 
   char               buf[SUB_BUFSIZE];
   off_t              buflen;
-  off_t              emptyReads;
 
   float              mpsub_position;
 
