@@ -728,6 +728,19 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
         if (!read_line_from_input(demuxstr, line1, LINE_LEN)) {
             return nullptr;
         }
+        // Support continuation lines
+        if (strlen(line1) >= 2) {
+            while ((line1[strlen(line1)-2] == '\\') && (line1[strlen(line1)-1] == '\n')) {
+                int newlen = strlen(line1)-2;
+                if (!read_line_from_input(demuxstr, line2, LINE_LEN - newlen))
+                    return nullptr;
+                p = line2;
+                while ((*p == ' ') || (*p == '\t')) {
+                    ++p;
+                }
+                strcpy(line1+newlen, p);
+            }
+        }
         if (sscanf
             (line1, "%u:%u:%u.%u %u:%u:%u.%u %" LINE_LEN_QUOT "[^\n\r]", &a1, &a2, &a3, &a4,
              &b1, &b2, &b3, &b4, line2) < 9) {
