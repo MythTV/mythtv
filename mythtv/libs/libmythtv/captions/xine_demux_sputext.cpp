@@ -1209,7 +1209,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
     }
   }
 
-#ifdef DEBUG_XINE_DEMUX_SPUTEXT
+#if DEBUG_XINE_DEMUX_SPUTEXT
   {
     char buffer[1024];
 
