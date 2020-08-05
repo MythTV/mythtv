@@ -56,22 +56,6 @@
  * Demuxer code start
  */
 
-#define FORMAT_UNKNOWN   (-1)
-#define FORMAT_MICRODVD   0
-#define FORMAT_SUBRIP     1
-#define FORMAT_SUBVIEWER  2
-#define FORMAT_SAMI       3
-#define FORMAT_VPLAYER    4
-#define FORMAT_RT         5
-#define FORMAT_SSA        6 /* Sub Station Alpha */
-#define FORMAT_PJS        7
-#define FORMAT_MPSUB      8
-#define FORMAT_AQTITLE    9
-#define FORMAT_JACOBSUB   10
-#define FORMAT_SUBVIEWER2 11
-#define FORMAT_SUBRIP09   12
-#define FORMAT_MPL2       13 /*Mplayer sub 2 ?*/
-
 static bool eol(char p) {
   return (p=='\r' || p=='\n' || p=='\0');
 }

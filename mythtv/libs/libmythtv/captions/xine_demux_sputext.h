@@ -9,6 +9,22 @@
 
 #define DEBUG_XINE_DEMUX_SPUTEXT 0
 
+#define FORMAT_UNKNOWN   (-1)
+#define FORMAT_MICRODVD   0
+#define FORMAT_SUBRIP     1
+#define FORMAT_SUBVIEWER  2
+#define FORMAT_SAMI       3 /* Microsoft Synchronized Accessible Media Interchange */
+#define FORMAT_VPLAYER    4 /* Windows Application */
+#define FORMAT_RT         5 /* RealText */
+#define FORMAT_SSA        6 /* Sub Station Alpha */
+#define FORMAT_PJS        7 /* Phoenix Japanimation Society */
+#define FORMAT_MPSUB      8 /* MPlayer */
+#define FORMAT_AQTITLE    9 /* Czech subtitling community */
+#define FORMAT_JACOBSUB   10 /* Amiga - Japanese Animation Club of Orlando */
+#define FORMAT_SUBVIEWER2 11
+#define FORMAT_SUBRIP09   12
+#define FORMAT_MPL2       13 /*Mplayer sub 2 ?*/
+
 struct subtitle_t {
 
     int lines; ///< Count of text lines in this subtitle set.
