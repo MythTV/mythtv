@@ -1022,6 +1022,7 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
 static int sub_autodetect (demux_sputext_t *demuxstr) {
 
   char line[LINE_LEN + 1];
+  char line2[LINE_LEN + 1];
   int  i = 0;
   int  j = 0;
   char p = 0;
@@ -1056,7 +1057,13 @@ static int sub_autodetect (demux_sputext_t *demuxstr) {
       demuxstr->uses_time=1;
       return FORMAT_SAMI;
     }
-    if (sscanf (line, "%d:%d:%d:",     &i, &i, &i )==3) {
+    // Sscanf stops looking at the format string once it populates the
+    // last argument, so it never validates the colon after the
+    // seconds.  Add a final "the rest of the line" argument to get
+    // that validation, so that JACO subtitles can be distinguished
+    // from this format.
+    if (sscanf (line, "%d:%d:%d:%" LINE_LEN_QUOT "[^\n\r]",
+                &i, &i, &i, line2 )==4) {
       demuxstr->uses_time=1;
       return FORMAT_VPLAYER;
     }
