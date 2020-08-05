@@ -1084,7 +1084,7 @@ static int sub_autodetect (demux_sputext_t *demuxstr) {
      * A RealText format is a markup language, starts with <window> tag,
      * options (behaviour modifiers) are possible.
      */
-    if ( strcasecmp(line, "<window") == 0 ) {
+    if ( strncasecmp(line, "<window", 7) == 0 ) {
       demuxstr->uses_time=1;
       return FORMAT_RT;
     }
