@@ -1,10 +1,11 @@
 #ifndef XINE_DEMUX_SPUTEXT_H
 #define XINE_DEMUX_SPUTEXT_H
 
+#include <vector>
+
 #include "io/mythmediabuffer.h"
 
 #define SUB_BUFSIZE   1024
-#define SUB_MAX_TEXT  5
 #define MAX_TIMEOUT 4
 
 #define DEBUG_XINE_DEMUX_SPUTEXT 0
@@ -27,12 +28,10 @@
 
 struct subtitle_t {
 
-    int lines; ///< Count of text lines in this subtitle set.
-
     long start; ///< Starting time in msec or starting frame
     long end;   ///< Ending time in msec or starting frame
 
-    char *text[SUB_MAX_TEXT]; ///< The subtitle text lines.
+    std::vector<std::string> text; ///< The subtitle text lines.
 };
 
 struct demux_sputext_t {

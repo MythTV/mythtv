@@ -43,10 +43,10 @@ void TextXineDemux::test_captions_microdvd(void)
     QCOMPARE(sub_data.format, FORMAT_MICRODVD);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 17);
-    QCOMPARE(sub_data.subtitles[0].lines, 1);
-    QCOMPARE(sub_data.subtitles[14].lines, 2);
-    QCOMPARE(sub_data.subtitles[15].lines, 2);
-    QCOMPARE(sub_data.subtitles[16].lines, 1);
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[14].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[15].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[16].text.size(), static_cast<size_t>(1));
 }
 
 void TextXineDemux::test_captions_srt(void)
@@ -66,9 +66,9 @@ void TextXineDemux::test_captions_srt(void)
     QCOMPARE(sub_data.format, FORMAT_SUBRIP);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 4);
-    QCOMPARE(sub_data.subtitles[3].lines, 3);
-    QVERIFY(!QString(sub_data.subtitles[3].text[1]).contains("{\\i1}"));
-    QVERIFY(!QString(sub_data.subtitles[3].text[1]).contains("</i>"));
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(3));
+    QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("{\\i1}"));
+    QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("</i>"));
 }
 
 void TextXineDemux::test_captions_subviewer_data(void)
@@ -100,10 +100,10 @@ void TextXineDemux::test_captions_subviewer(void)
     QCOMPARE(sub_data.format, format);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 4);
-    QCOMPARE(sub_data.subtitles[1].lines, 2);
-    QCOMPARE(sub_data.subtitles[2].lines, 3);
-    QCOMPARE(sub_data.subtitles[3].lines, 1);
-    QVERIFY(QString(sub_data.subtitles[2].text[0]).contains("String3"));
+    QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(3));
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(1));
+    QVERIFY(QString::fromStdString(sub_data.subtitles[2].text[0]).contains("String3"));
 }
 
 void TextXineDemux::test_captions_smi(void)
@@ -125,8 +125,8 @@ void TextXineDemux::test_captions_smi(void)
     QCOMPARE(sub_data.format, FORMAT_SAMI);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 4);
-    QCOMPARE(sub_data.subtitles[3].lines, 3);
-    QVERIFY(!QString(sub_data.subtitles[3].text[1]).contains("</i>"));
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(3));
+    QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("</i>"));
 }
 
 void TextXineDemux::test_captions_vplayer(void)
@@ -146,7 +146,7 @@ void TextXineDemux::test_captions_vplayer(void)
     QCOMPARE(sub_data.format, FORMAT_VPLAYER);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 5);
-    QCOMPARE(sub_data.subtitles[3].lines, 1);
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(1));
 }
 
 void TextXineDemux::test_captions_rt(void)
@@ -239,8 +239,8 @@ void TextXineDemux::test_captions_mpsub(void)
     QCOMPARE(sub_data.format, FORMAT_MPSUB);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 3);
-    QCOMPARE(sub_data.subtitles[0].lines, 1);
-    QCOMPARE(sub_data.subtitles[1].lines, 2);
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
 }
 
 void TextXineDemux::test_captions_aqtitle(void)
@@ -260,9 +260,9 @@ void TextXineDemux::test_captions_aqtitle(void)
     QCOMPARE(sub_data.format, FORMAT_AQTITLE);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 6);
-    QCOMPARE(sub_data.subtitles[0].lines, 2);
-    QCOMPARE(sub_data.subtitles[4].lines, 2);
-    QCOMPARE(sub_data.subtitles[5].lines, 1);
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[4].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(1));
 }
 
 void TextXineDemux::test_captions_jaco(void)
@@ -284,11 +284,11 @@ void TextXineDemux::test_captions_jaco(void)
     QCOMPARE(sub_data.num, 37);
     // Lines containing the "RLB" directive are skipped, altering the
     // line numbers compared to the original file.
-    QCOMPARE(sub_data.subtitles[0].lines, 3);
-    QCOMPARE(sub_data.subtitles[4].lines, 1);
-    QVERIFY(QString(sub_data.subtitles[4].text[0]).startsWith("(And"));
-    QCOMPARE(sub_data.subtitles[5].lines, 3);
-    QCOMPARE(sub_data.subtitles[6].lines, 2);
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(3));
+    QCOMPARE(sub_data.subtitles[4].text.size(), static_cast<size_t>(1));
+    QVERIFY(QString::fromStdString(sub_data.subtitles[4].text[0]).startsWith("(And"));
+    QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(3));
+    QCOMPARE(sub_data.subtitles[6].text.size(), static_cast<size_t>(2));
 }
 
 void TextXineDemux::test_captions_subrip09(void)
@@ -308,9 +308,9 @@ void TextXineDemux::test_captions_subrip09(void)
     QCOMPARE(sub_data.format, FORMAT_SUBRIP09);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 4);
-    QCOMPARE(sub_data.subtitles[2].lines, 3);
-    QCOMPARE(sub_data.subtitles[3].lines, 2);
-    QVERIFY(QString(sub_data.subtitles[3].text[1]).contains("fleece"));
+    QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(3));
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(2));
+    QVERIFY(QString::fromStdString(sub_data.subtitles[3].text[1]).contains("fleece"));
 }
 
 void TextXineDemux::test_captions_mpl2(void) // MPL
@@ -330,10 +330,10 @@ void TextXineDemux::test_captions_mpl2(void) // MPL
     QCOMPARE(sub_data.format, FORMAT_MPL2);
     QVERIFY(loaded_subs != nullptr);
     QCOMPARE(sub_data.num, 6);
-    QCOMPARE(sub_data.subtitles[0].lines, 1);
-    QCOMPARE(sub_data.subtitles[1].lines, 2);
-    QCOMPARE(sub_data.subtitles[2].lines, 1);
-    QCOMPARE(sub_data.subtitles[5].lines, 2);
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(2));
 }
 
 void TextXineDemux::cleanupTestCase()

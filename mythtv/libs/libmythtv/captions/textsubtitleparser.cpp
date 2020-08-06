@@ -390,17 +390,15 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
             newsub.m_end *= 10;
         }
 
-        for (int line = 0; line < sub->lines; ++line)
+        for (size_t line = 0; line < sub->text.size(); ++line)
         {
-            const char *subLine = sub->text[line];
+            const char *subLine = sub->text[line].c_str();
             QString str;
             if (textCodec)
                 str = dec->toUnicode(subLine, strlen(subLine));
             else
                 str = QString(subLine);
             newsub.m_textLines.push_back(str);
-
-            free(sub->text[line]);
         }
         target.AddSubtitle(newsub);
     }
