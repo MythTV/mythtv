@@ -138,9 +138,14 @@ bool SatIPRTSP::Play(QStringList &pids)
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
     QString pids_str = QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none");
-    LOG(VB_RECORD, LOG_DEBUG, LOC + pids_str);
 
-    url.setQuery(QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none"));
+    // Telestar Digibit R1 Sat>IP box cannot handle a lot of pids
+    if (pids.size() > 32)
+    {
+        pids_str = QString("pids=all");
+    }
+    url.setQuery(pids_str);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + pids_str);
 
     if (!sendMessage(url, "PLAY"))
     {
