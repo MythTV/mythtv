@@ -358,8 +358,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
-    if (!loaded_subs)
+    if (!sub_read_file(&sub_data))
     {
         // Don't delete[] sub_data.rbuffer_text; because the
         // QByteArray destructor will clean up.
@@ -379,10 +378,9 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     if (textCodec)
         dec.reset(textCodec->makeDecoder());
 
-    for (int sub_i = 0; sub_i < sub_data.num; ++sub_i)
+    for (const auto& sub : sub_data.subtitles)
     {
-        const subtitle_t *sub = &loaded_subs[sub_i];
-        text_subtitle_t newsub(sub->start, sub->end);
+        text_subtitle_t newsub(sub.start, sub.end);
 
         if (!target.IsFrameBasedTiming())
         {
@@ -390,9 +388,9 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
             newsub.m_end *= 10;
         }
 
-        for (size_t line = 0; line < sub->text.size(); ++line)
+        for (const auto & line : sub.text)
         {
-            const char *subLine = sub->text[line].c_str();
+            const char *subLine = line.c_str();
             QString str;
             if (textCodec)
                 str = dec->toUnicode(subLine, strlen(subLine));
@@ -405,7 +403,6 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
     // textCodec object is managed by Qt, do not delete...
 
-    free(loaded_subs);
     // Don't delete[] sub_data.rbuffer_text; because the QByteArray
     // destructor will clean up.
 

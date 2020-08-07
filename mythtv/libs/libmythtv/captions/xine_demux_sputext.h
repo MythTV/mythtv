@@ -49,7 +49,7 @@ struct demux_sputext_t {
 
   int                uses_time;
   int                errs;
-  subtitle_t        *subtitles;
+  std::vector<subtitle_t> subtitles;
   int                num;            /* number of subtitle structs */
   int                cur;            /* current subtitle           */
   int                format;         /* constants see below        */
@@ -58,6 +58,6 @@ struct demux_sputext_t {
 };
 
 
-subtitle_t *sub_read_file (demux_sputext_t *demuxstr);
+bool sub_read_file (demux_sputext_t *demuxstr);
 
 #endif

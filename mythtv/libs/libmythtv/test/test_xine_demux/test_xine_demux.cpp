@@ -38,10 +38,10 @@ void TextXineDemux::test_captions_microdvd(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_MICRODVD);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 17);
     QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
     QCOMPARE(sub_data.subtitles[14].text.size(), static_cast<size_t>(2));
@@ -61,10 +61,10 @@ void TextXineDemux::test_captions_srt(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_SUBRIP);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
     QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(3));
     QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("{\\i1}"));
@@ -95,10 +95,10 @@ void TextXineDemux::test_captions_subviewer(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, format);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
     QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
     QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(3));
@@ -118,12 +118,12 @@ void TextXineDemux::test_captions_smi(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     // Loses first blank line.
     // Loses last line (regardless of if blank).
     QCOMPARE(sub_data.format, FORMAT_SAMI);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
     QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(3));
     QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("</i>"));
@@ -141,10 +141,10 @@ void TextXineDemux::test_captions_vplayer(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_VPLAYER);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 5);
     QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(1));
 }
@@ -161,10 +161,10 @@ void TextXineDemux::test_captions_rt(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_RT);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 8);
 }
 
@@ -193,12 +193,12 @@ void TextXineDemux::test_captions_ssa_ass(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     // Loses first blank line.
     // Loses last line (regardless of if blank).
     QCOMPARE(sub_data.format, FORMAT_SSA);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, expectedLines);
 }
 
@@ -215,10 +215,10 @@ void TextXineDemux::test_captions_pjs(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_PJS);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 2);
 }
 
@@ -234,10 +234,10 @@ void TextXineDemux::test_captions_mpsub(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_MPSUB);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 3);
     QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
     QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
@@ -255,10 +255,10 @@ void TextXineDemux::test_captions_aqtitle(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_AQTITLE);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 6);
     QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(2));
     QCOMPARE(sub_data.subtitles[4].text.size(), static_cast<size_t>(2));
@@ -277,10 +277,10 @@ void TextXineDemux::test_captions_jaco(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_JACOBSUB);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 37);
     // Lines containing the "RLB" directive are skipped, altering the
     // line numbers compared to the original file.
@@ -303,10 +303,10 @@ void TextXineDemux::test_captions_subrip09(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_SUBRIP09);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
     QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(3));
     QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(2));
@@ -325,10 +325,10 @@ void TextXineDemux::test_captions_mpl2(void) // MPL
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    subtitle_t *loaded_subs = sub_read_file(&sub_data);
+    bool loaded = sub_read_file(&sub_data);
 
     QCOMPARE(sub_data.format, FORMAT_MPL2);
-    QVERIFY(loaded_subs != nullptr);
+    QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 6);
     QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
     QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));

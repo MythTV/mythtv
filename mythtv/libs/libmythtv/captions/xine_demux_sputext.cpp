@@ -236,8 +236,6 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
   char line[LINE_LEN + 1];
   char line2[LINE_LEN + 1];
 
-  memset (current, 0, sizeof(subtitle_t));
-
   current->end=-1;
   do {
     if (!read_line_from_input (demuxstr, line, LINE_LEN)) return nullptr;
@@ -261,8 +259,6 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
 
   char line[LINE_LEN + 1];
   int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
-
-  memset (current, 0, sizeof(subtitle_t));
 
   while (true) {
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
@@ -297,7 +293,6 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
   int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
   int i = 0;
 
-  memset(current,0,sizeof(subtitle_t));
   do {
     if(!read_line_from_input(demuxstr,line,LINE_LEN))
       return nullptr;
@@ -376,8 +371,6 @@ static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *c
   char line[LINE_LEN + 1];
   int a1=0,a2=0,a3=0,b1=0,b2=0,b3=0; // NOLINT(readability-isolate-declaration)
 
-  memset (current, 0, sizeof(subtitle_t));
-
   while (current->text.empty()) {
     if( demuxstr->next_line[0] == '\0' ) { /* if the buffer is empty.... */
       if( !read_line_from_input(demuxstr, line, LINE_LEN) ) return nullptr;
@@ -429,8 +422,6 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
   char line[LINE_LEN + 1];
   int a1=0,a2=0,a3=0,a4=0,b1=0,b2=0,b3=0,b4=0; // NOLINT(readability-isolate-declaration)
   int plen = 0;
-
-  memset (current, 0, sizeof(subtitle_t));
 
   while (current->text.empty()) {
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
@@ -543,8 +534,6 @@ static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *cur
   char *s = nullptr;
   char *d = nullptr;
 
-  memset (current, 0, sizeof(subtitle_t));
-
   if (!read_line_from_input(demuxstr, line, LINE_LEN))
     return nullptr;
   for (s = line; *s && isspace(*s); s++);
@@ -623,8 +612,6 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
 static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
 
-  memset (current, 0, sizeof(subtitle_t));
-
   while (true) {
     /* try to locate next subtitle_t */
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
@@ -665,7 +652,6 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
     static unsigned s_jacoTimeRes = 30;
     static int s_jacoShift = 0;
 
-    memset(current, 0, sizeof(subtitle_t));
     memset(line1, 0, LINE_LEN+1);
     memset(line2, 0, LINE_LEN+1);
     memset(directive, 0, LINE_LEN+1);
@@ -905,8 +891,6 @@ static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t
   int m = 0;
   int s = 0;
 
-  memset (current, 0, sizeof(subtitle_t));
-
   do {
     if (!read_line_from_input (demuxstr, line, LINE_LEN)) return nullptr;
   } while (sscanf (line, "[%d:%d:%d]", &h, &m, &s) != 3);
@@ -935,7 +919,6 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
   char line[LINE_LEN+1];
   char line2[LINE_LEN+1];
 
-  memset (current, 0, sizeof(subtitle_t));
   do {
      if (!read_line_from_input (demuxstr, line, LINE_LEN)) return nullptr;
   } while ((sscanf (line,
@@ -1055,12 +1038,11 @@ static int sub_autodetect (demux_sputext_t *demuxstr) {
   return FORMAT_UNKNOWN;  /* too many bad lines */
 }
 
-subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
-
-  // These functions all return either 1) nullptr, 2) (subtitle_t*)ERR,
-  // or 3) a pointer to the dest parameter.
-  subtitle_t * (*func[])(demux_sputext_t *demuxstr,subtitle_t *dest)=
-  {
+// These functions all return either 1) nullptr, 2) (subtitle_t*)ERR,
+// or 3) a pointer to the dest parameter.
+using read_func_ptr = subtitle_t* (*)(demux_sputext_t *demuxstr,subtitle_t *dest);
+const std::array<read_func_ptr, 14> read_func
+{
     sub_read_line_microdvd,
     sub_read_line_subrip,
     sub_read_line_subviewer,
@@ -1074,8 +1056,10 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
     sub_read_line_jacobsub,
     sub_read_line_subviewer2,
     sub_read_line_subrip09,
-    sub_read_line_mpl2,
-  };
+    sub_read_line_mpl2
+};
+
+bool sub_read_file (demux_sputext_t *demuxstr) {
 
   /* Rewind (sub_autodetect() needs to read input from the beginning) */
   demuxstr->rbuffer_cur = 0;
@@ -1083,7 +1067,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
   demuxstr->format=sub_autodetect (demuxstr);
   if (demuxstr->format==FORMAT_UNKNOWN) {
-    return nullptr;
+    return false;
   }
 
   /*printf("Detected subtitle file format: %d\n", demuxstr->format);*/
@@ -1093,32 +1077,14 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   demuxstr->buflen = 0;
 
   demuxstr->num=0;
-  int n_max=32;
-  auto *first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));
-  if(!first) return nullptr;
-  memset(first, 0, n_max*sizeof(subtitle_t));
   int timeout = MAX_TIMEOUT;
 
   if (demuxstr->uses_time) timeout *= 100;
   else timeout *= 10;
 
   while(true) {
-    if(demuxstr->num>=n_max){
-      int old_size = n_max*sizeof(subtitle_t);
-      n_max+=16;
-      auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
-      if (new_first == nullptr) {
-          // clang-tidy-11 says this is fine.  ct-9 produces a weird
-          // warning here.  NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
-          free(first);
-          return nullptr;
-      }
-      // Clear only the new space at the end of the array.
-      memset((char*)new_first + old_size, 0, 16*sizeof(subtitle_t));
-      first = new_first;
-    }
-
-    subtitle_t *sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
+    subtitle_t dummy {};
+    subtitle_t *sub = read_func[demuxstr->format] (demuxstr, &dummy);
     if (!sub) {
       break;   /* EOF */
     }
@@ -1126,27 +1092,28 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
     if (sub==ERR)
       ++demuxstr->errs;
     else {
-      if (demuxstr->num > 0 && first[demuxstr->num-1].end == -1) {
+      demuxstr->subtitles.push_back(*sub);
+      if (demuxstr->num > 0 && demuxstr->subtitles[demuxstr->num-1].end == -1) {
         /* end time not defined in the subtitle */
         if (timeout > 0) {
           /* timeout */
-          if (timeout > sub->start - first[demuxstr->num-1].start) {
-            first[demuxstr->num-1].end = sub->start;
+          if (timeout > sub->start - demuxstr->subtitles[demuxstr->num-1].start) {
+            demuxstr->subtitles[demuxstr->num-1].end = sub->start;
           } else
-            first[demuxstr->num-1].end = first[demuxstr->num-1].start + timeout;
+            demuxstr->subtitles[demuxstr->num-1].end = demuxstr->subtitles[demuxstr->num-1].start + timeout;
         } else {
           /* no timeout */
-          first[demuxstr->num-1].end = sub->start;
+          demuxstr->subtitles[demuxstr->num-1].end = sub->start;
         }
       }
       ++demuxstr->num; /* Error vs. Valid */
     }
   }
   /* timeout of last subtitle */
-  if (demuxstr->num > 0 && first[demuxstr->num-1].end == -1)
+  if (demuxstr->num > 0 && demuxstr->subtitles[demuxstr->num-1].end == -1)
   {
     if (timeout > 0) {
-      first[demuxstr->num-1].end = first[demuxstr->num-1].start + timeout;
+      demuxstr->subtitles[demuxstr->num-1].end = demuxstr->subtitles[demuxstr->num-1].start + timeout;
     }
   }
 
@@ -1165,8 +1132,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   }
 #endif
 
-  demuxstr->subtitles = first;
   // No memory leak of 'sub' here.  'Sub' always points to an element in 'first'.
   // NOLINT(clang-analyzer-unix.Malloc)
-  return first;
+  return true;
 }
