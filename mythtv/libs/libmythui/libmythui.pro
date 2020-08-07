@@ -107,6 +107,7 @@ using_x11 {
     SOURCES += platforms/mythxdisplay.cpp
     SOURCES += platforms/mythdisplayx11.cpp
     SOURCES += screensaver-x11.cpp
+    freebsd:LIBS += -lXext -lXxf86vm
 }
 
 using_drm {
