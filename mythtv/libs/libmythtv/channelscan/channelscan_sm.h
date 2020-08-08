@@ -137,7 +137,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // MPEG
     void HandlePAT(const ProgramAssociationTable *pat) override; // MPEGStreamListener
-    void HandleCAT(const ConditionalAccessTable */*cat*/) override { } // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable *cat) override; // MPEGStreamListener
     void HandlePMT(uint program_num, const ProgramMapTable *pmt) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint pnum, bool encrypted) override; // MPEGStreamListener
 

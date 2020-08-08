@@ -1175,15 +1175,13 @@ QString ProgramMapTable::StreamDescription(uint i, const QString& sistandard) co
 QString ConditionalAccessTable::toString(void) const
 {
     QString str =
-        QString("Condiditional Access Section %1")
+        QString("Conditional Access Section %1")
         .arg(PSIPTable::toString());
 
     vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (auto & gd : gdesc)
         str += "  " + MPEGDescriptor(gd, 300).toString() + "\n";
-
-    str += "\n";
 
     return str;
 }

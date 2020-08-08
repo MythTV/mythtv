@@ -392,6 +392,16 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
     }
 }
 
+void ChannelScanSM::HandleCAT(const ConditionalAccessTable *cat)
+{
+    QMutexLocker locker(&m_lock);
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Got a Conditional Access Table for %1")
+            .arg((*m_current).m_friendlyName));
+    LogLines(cat->toString());
+}
+
 void ChannelScanSM::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
