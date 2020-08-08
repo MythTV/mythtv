@@ -206,7 +206,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
  * nullptr ig the end of te string was reached, or "(char*)-1" on
  * error.
  */
-static char *sub_readtext(char *source, char **dest) {
+static char *sub_readtext(char *source, std::string& dest) {
   int len=0;
   char *p=source;
 
@@ -214,15 +214,7 @@ static char *sub_readtext(char *source, char **dest) {
     p++,len++;
   }
 
-  if (!dest)
-    return (char*)ERR;
-
-  *dest= (char *)malloc (len+1);
-  if (!(*dest))
-    return (char*)ERR;
-
-  strncpy(*dest, source, len);
-  (*dest)[len]=0;
+  dest.assign(source, len);
 
   while (*p=='\r' || *p=='\n' || *p=='|')
     p++;
@@ -245,8 +237,8 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
 
   char *p=line2;
   char *next=p;
-  char *out { nullptr };
-  while ((next = sub_readtext (next, &out))) {
+  std::string out {};
+  while ((next = sub_readtext (next, out))) {
     if (next==ERR) return (subtitle_t *)ERR;
     current->text.push_back(out);
   }
@@ -402,8 +394,8 @@ static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *c
     }
 
     char *next=p;
-    char *out { nullptr };
-    while( (next = sub_readtext( next, &out )) ) {
+    std::string out {};
+    while( (next = sub_readtext( next, out )) ) {
       if (next==ERR)
         return (subtitle_t *)ERR;
       current->text.push_back(out);
@@ -444,8 +436,8 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
     current->end   = b1*360000+b2*6000+b3*100+b4/10;
     /* TODO: I don't know what kind of convention is here for marking multiline subs, maybe <br/> like in xml? */
     char *next = strstr(line,"<clear/>")+8;
-    char *out {nullptr};
-    while ((next = sub_readtext (next, &out))) {
+    std::string out {};
+    while ((next = sub_readtext (next, out))) {
       if (next==ERR)
           return (subtitle_t *)ERR;
       current->text.push_back(out);
@@ -623,15 +615,15 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
   if (!read_line_from_input(demuxstr, line, LINE_LEN))
     return nullptr;
 
-  char *out {nullptr};
-  sub_readtext((char *) &line,&out);
+  std::string out {};
+  sub_readtext((char *) &line,out);
   current->text.push_back(out);
   current->end = -1;
 
   if (!read_line_from_input(demuxstr, line, LINE_LEN))
     return current;;
 
-  sub_readtext((char *) &line,&out);
+  sub_readtext((char *) &line,out);
   current->text.push_back(out);
 
   if ((current->text[0][0]==0) && (current->text[1][0]==0)) {
@@ -901,8 +893,8 @@ static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t
   current->end = -1;
 
   char *next=line;
-  char *out {nullptr};
-  while ((next = sub_readtext (next, &out))) {
+  std::string out {};
+  while ((next = sub_readtext (next, out))) {
     if (next==ERR) return (subtitle_t *)ERR;
     current->text.push_back(out);
   }
@@ -929,8 +921,8 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
 
   char *p=line2;
   char *next=p;
-  char *out {nullptr};
-  while ((next = sub_readtext (next, &out))) {
+  std::string out {};
+  while ((next = sub_readtext (next, out))) {
       if (next == ERR) {return (subtitle_t *)ERR;}
       current->text.push_back(out);
     }
