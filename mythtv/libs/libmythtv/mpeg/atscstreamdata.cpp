@@ -460,8 +460,20 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::BAT:
         case TableID::TDT:
         case TableID::TOT:
+        case TableID::DVBCA_81:
         case TableID::DVBCA_82:
         case TableID::DVBCA_83:
+        case TableID::DVBCA_84:
+        case TableID::DVBCA_85:
+        case TableID::DVBCA_86:
+        case TableID::DVBCA_87:
+        case TableID::DVBCA_88:
+        case TableID::DVBCA_89:
+        case TableID::DVBCA_8a:
+        case TableID::DVBCA_8b:
+        case TableID::DVBCA_8c:
+        case TableID::DVBCA_8d:
+        case TableID::DVBCA_8e:
         {
             // All DVB specific tables, not handled here
             return false;
@@ -470,8 +482,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         default:
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("ATSCStreamData::HandleTables(): Unknown table 0x%1")
-                    .arg(psip.TableID(),0,16));
+                QString("ATSCStreamData::HandleTables(): Unknown table 0x%1 version:%2 pid:%3 0x%4")
+                    .arg(psip.TableID(),0,16).arg(psip.Version()).arg(pid).arg(pid,0,16));
             break;
         }
     }

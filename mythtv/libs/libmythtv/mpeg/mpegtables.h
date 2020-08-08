@@ -283,8 +283,20 @@ class MTV_PUBLIC TableID
 
         // DVB Conditional Access
         DVBCAbeg = 0x80,
+        DVBCA_81 = 0x81,
         DVBCA_82 = 0x82,
         DVBCA_83 = 0x83,
+        DVBCA_84 = 0x84,
+        DVBCA_85 = 0x85,
+        DVBCA_86 = 0x86,
+        DVBCA_87 = 0x87,
+        DVBCA_88 = 0x88,
+        DVBCA_89 = 0x89,
+        DVBCA_8a = 0x8a,
+        DVBCA_8b = 0x8b,
+        DVBCA_8c = 0x8c,
+        DVBCA_8d = 0x8d,
+        DVBCA_8e = 0x8e,
         DVBCAend = 0x8f,
 
         // Dishnet Longterm EIT data
