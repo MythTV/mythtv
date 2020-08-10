@@ -805,7 +805,7 @@ QRect MythVideoOutput::GetImageRect(const QRect &Rect, QRect *DisplayRect)
     QRect rect1 = Rect;
     if (DisplayRect && DisplayRect->isValid())
     {
-        QMatrix m0;
+        QTransform m0;
         m0.scale(static_cast<qreal>(image_width)  / DisplayRect->width(),
                  static_cast<qreal>(image_height) / DisplayRect->height());
         rect1 = m0.mapRect(rect1);
@@ -825,13 +825,13 @@ QRect MythVideoOutput::GetImageRect(const QRect &Rect, QRect *DisplayRect)
 
     qreal vscale = static_cast<qreal>(dvr_rec.width()) / image_width;
     hscale = static_cast<qreal>(dvr_rec.height()) / image_height;
-    QMatrix m1;
+    QTransform m1;
     m1.translate(dvr_rec.left(), dvr_rec.top());
     m1.scale(vscale, hscale);
 
     vscale = static_cast<qreal>(image_width) / vid_rec.width();
     hscale = static_cast<qreal>(image_height) / vid_rec.height();
-    QMatrix m2;
+    QTransform m2;
     m2.scale(vscale, hscale);
     m2.translate(-vid_rec.left(), -vid_rec.top());
 
