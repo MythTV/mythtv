@@ -82,6 +82,10 @@ int main(int argc, char *argv[])
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
+    if (cmdline.toBool("ddgraball"))
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Invalid option, see: mythfilldatabase --help dd-grab-all");
+
     if (cmdline.toBool("manual"))
     {
         cout << "###\n";

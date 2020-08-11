@@ -164,4 +164,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     add("--mark-repeats", "oldmarkrepeats", "", "", "")
         ->SetRemoved("This is now the default behavior. Use\n"
            "          --no-mark-repeats to disable.", "0.25");
+    add("--dd-grab-all", "ddgraball", false, "", "")
+        ->SetDeprecated("It's no longer valid with Schedules Direct XMLTV.\n"
+          "          Remove in mythtv-setup General -> Program Schedule\n"
+          "          -> Downloading Options -> Guide Data Arguements");
 }
