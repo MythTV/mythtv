@@ -28,8 +28,8 @@
 
 struct subtitle_t {
 
-    long start; ///< Starting time in msec or starting frame
-    long end;   ///< Ending time in msec or starting frame
+    int64_t start; ///< Starting time in msec or starting frame
+    int64_t end;   ///< Ending time in msec or starting frame
 
     std::vector<std::string> text; ///< The subtitle text lines.
 };
@@ -53,8 +53,8 @@ struct demux_sputext_t {
   int                num;            /* number of subtitle structs */
   int                cur;            /* current subtitle           */
   int                format;         /* constants see below        */
-  char               next_line[SUB_BUFSIZE]; /* a buffer for next line read from file */
-
+  std::string        next_line;      /* a buffer for next line read from file */
+                                     /* only used by vplayer */
 };
 
 
