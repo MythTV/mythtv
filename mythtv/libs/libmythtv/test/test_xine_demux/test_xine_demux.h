@@ -20,6 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <iostream>
+#include "captions/xine_demux_sputext.h"
 
 class TextXineDemux : public QObject
 {
@@ -27,6 +28,7 @@ class TextXineDemux : public QObject
 
 private slots:
     static void initTestCase();
+    static void open_file(const QString& filename, demux_sputext_t& sub_data, bool& loaded);
     static void test_captions_microdvd(void);
     static void test_captions_srt(void);
     static void test_captions_subviewer_data(void);

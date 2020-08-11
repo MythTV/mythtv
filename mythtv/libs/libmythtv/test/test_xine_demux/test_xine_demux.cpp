@@ -17,20 +17,19 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
-#include <iostream>
 #include "test_xine_demux.h"
-#include "captions/xine_demux_sputext.h"
 
 void TextXineDemux::initTestCase()
 {
     QDir::setCurrent("libmythtv/test/test_xine_demux");
 }
 
-void TextXineDemux::test_captions_microdvd(void)
-{
-    demux_sputext_t sub_data {};
 
-    QFile file("samples/microdvd.sub");
+void TextXineDemux::open_file(const QString& filename,
+                              demux_sputext_t& sub_data,
+                              bool& loaded)
+{
+    QFile file(filename);
     QCOMPARE(file.exists(), true);
     QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
 
@@ -38,8 +37,15 @@ void TextXineDemux::test_captions_microdvd(void)
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    bool loaded = sub_read_file(&sub_data);
+    loaded = sub_read_file(&sub_data);
+}
 
+void TextXineDemux::test_captions_microdvd(void)
+{
+    demux_sputext_t sub_data {};
+    bool loaded = false;
+
+    open_file("samples/microdvd.sub", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_MICRODVD);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 17);
@@ -52,17 +58,9 @@ void TextXineDemux::test_captions_microdvd(void)
 void TextXineDemux::test_captions_srt(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/subrip.srt");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/subrip.srt", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_SUBRIP);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
@@ -86,17 +84,9 @@ void TextXineDemux::test_captions_subviewer(void)
     QFETCH(int, format);
 
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file(filename);
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file(filename, sub_data, loaded);
     QCOMPARE(sub_data.format, format);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
@@ -109,17 +99,9 @@ void TextXineDemux::test_captions_subviewer(void)
 void TextXineDemux::test_captions_smi(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/sami.smi");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/sami.smi", sub_data, loaded);
     // Loses first blank line.
     // Loses last line (regardless of if blank).
     QCOMPARE(sub_data.format, FORMAT_SAMI);
@@ -132,17 +114,9 @@ void TextXineDemux::test_captions_smi(void)
 void TextXineDemux::test_captions_vplayer(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/vplayer.txt");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/vplayer.txt", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_VPLAYER);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 5);
@@ -152,17 +126,9 @@ void TextXineDemux::test_captions_vplayer(void)
 void TextXineDemux::test_captions_rt(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/realtext.txt");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/realtext.txt", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_RT);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 8);
@@ -184,17 +150,9 @@ void TextXineDemux::test_captions_ssa_ass(void)
     QFETCH(int, expectedLines);
 
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file(filename);
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file(filename, sub_data, loaded);
     // Loses first blank line.
     // Loses last line (regardless of if blank).
     QCOMPARE(sub_data.format, FORMAT_SSA);
@@ -206,17 +164,9 @@ void TextXineDemux::test_captions_ssa_ass(void)
 void TextXineDemux::test_captions_pjs(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/phoenixjapanimationsociety.pjs");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/phoenixjapanimationsociety.pjs", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_PJS);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 2);
@@ -225,17 +175,9 @@ void TextXineDemux::test_captions_pjs(void)
 void TextXineDemux::test_captions_mpsub(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/mpsub.sub");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/mpsub.sub", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_MPSUB);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 3);
@@ -246,17 +188,9 @@ void TextXineDemux::test_captions_mpsub(void)
 void TextXineDemux::test_captions_aqtitle(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/aqtitles.aqt.sub");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/aqtitles.aqt.sub", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_AQTITLE);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 6);
@@ -268,17 +202,9 @@ void TextXineDemux::test_captions_aqtitle(void)
 void TextXineDemux::test_captions_jaco(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/jaco.sub");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/jaco.sub", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_JACOBSUB);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 37);
@@ -294,17 +220,9 @@ void TextXineDemux::test_captions_jaco(void)
 void TextXineDemux::test_captions_subrip09(void)
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/subrip09.srt");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/subrip09.srt", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_SUBRIP09);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 4);
@@ -316,17 +234,9 @@ void TextXineDemux::test_captions_subrip09(void)
 void TextXineDemux::test_captions_mpl2(void) // MPL
 {
     demux_sputext_t sub_data {};
+    bool loaded = false;
 
-    QFile file("samples/mpl2.mpl.sub");
-    QCOMPARE(file.exists(), true);
-    QCOMPARE(file.open(QIODevice::ReadOnly | QIODevice::Text), true);
-
-    QByteArray ba = file.readAll();
-    sub_data.rbuffer_text = ba.data();
-    sub_data.rbuffer_len = ba.size();
-
-    bool loaded = sub_read_file(&sub_data);
-
+    open_file("samples/mpl2.mpl.sub", sub_data, loaded);
     QCOMPARE(sub_data.format, FORMAT_MPL2);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 6);
