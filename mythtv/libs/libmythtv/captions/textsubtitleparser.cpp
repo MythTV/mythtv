@@ -358,12 +358,19 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     sub_data.rbuffer_text = ba.data();
     sub_data.rbuffer_len = ba.size();
 
-    if (!sub_read_file(&sub_data))
+    try
     {
-        // Don't delete[] sub_data.rbuffer_text; because the
-        // QByteArray destructor will clean up.
-        LOG(VB_VBI, LOG_ERR, QString("Failed to read subtitles from '%1'")
-            .arg(fileName));
+        if (!sub_read_file(&sub_data))
+        {
+            // Don't delete[] sub_data.rbuffer_text; because the
+            // QByteArray destructor will clean up.
+            LOG(VB_VBI, LOG_ERR, QString("Failed to read subtitles from '%1'")
+                .arg(fileName));
+            return;
+        }
+    } catch (std::exception& e) {
+        LOG(VB_VBI, LOG_ERR,
+            QString("Exception reading subtitles file (%1)").arg(e.what()));
         return;
     }
 
