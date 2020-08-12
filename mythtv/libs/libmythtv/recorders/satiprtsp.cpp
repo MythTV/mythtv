@@ -126,6 +126,10 @@ bool SatIPRTSP::Setup(const QUrl& url)
             .arg(m_sessionid).arg(m_streamid).arg(m_timeout / 1000));
     emit(startKeepAlive(m_timeout));
 
+    // Reset tuner lock status
+    QMutexLocker locker(&m_sigmonLock);
+    m_hasLock = false;
+
     return true;
 }
 
@@ -184,6 +188,10 @@ bool SatIPRTSP::Teardown(void)
     // Discard all RTP packets until the next lock
     m_valid = false;
     m_validOld = false;
+
+    // Reset tuner lock status
+    QMutexLocker locker(&m_sigmonLock);
+    m_hasLock = false;
 
     return result;
 }
