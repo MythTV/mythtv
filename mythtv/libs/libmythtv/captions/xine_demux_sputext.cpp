@@ -82,34 +82,29 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, std::string& line) 
   off_t nread = 0;
 
   line.reserve(LINE_LEN);
-  if ((line.capacity() - demuxstr->buflen) > 512) {
-    nread = line.capacity() - demuxstr->buflen;
+  if ((line.capacity() - demuxstr->buf.size()) > 512) {
+    nread = line.capacity() - demuxstr->buf.size();
     nread = std::min(nread, demuxstr->rbuffer_len - demuxstr->rbuffer_cur);
     if (nread < 0) {
       printf("read failed.\n");
       return nullptr;
     }
-    memcpy(&demuxstr->buf[demuxstr->buflen],
-           &demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
-           nread);
-    demuxstr->rbuffer_cur += nread;
-    demuxstr->buflen += nread;
-    demuxstr->buf[demuxstr->buflen] = '\0';
+    if (nread > 0) {
+      demuxstr->buf.append(&demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
+                           nread);
+      demuxstr->rbuffer_cur += nread;
+    }
   }
 
-  char *s = strchr(demuxstr->buf, '\n');
-
-  if (s || (demuxstr->buflen > 0)) {
-
-    size_t linelen = s ? (s - demuxstr->buf) + 1 : demuxstr->buflen;
-    linelen = std::min(linelen, line.capacity());
-
-    line.resize(linelen);
-    memcpy(line.data(), demuxstr->buf, linelen);
-
-    memmove(demuxstr->buf, &demuxstr->buf[linelen], SUB_BUFSIZE - linelen);
-    demuxstr->buflen -= linelen;
-
+  size_t index = demuxstr->buf.find('\n');
+  if (index != std::string::npos) {
+    line.assign(demuxstr->buf, 0, index+1);
+    demuxstr->buf.erase(0, index+1);
+    return line.data();
+  }
+  if (!demuxstr->buf.empty()) {
+    line = demuxstr->buf;
+    demuxstr->buf.clear();
     return line.data();
   }
 
@@ -1039,7 +1034,8 @@ bool sub_read_file (demux_sputext_t *demuxstr) {
 
   /* Rewind (sub_autodetect() needs to read input from the beginning) */
   demuxstr->rbuffer_cur = 0;
-  demuxstr->buflen = 0;
+  demuxstr->buf.clear();
+  demuxstr->buf.reserve(SUB_BUFSIZE);
 
   demuxstr->format=sub_autodetect (demuxstr);
   if (demuxstr->format==FORMAT_UNKNOWN) {
@@ -1050,7 +1046,7 @@ bool sub_read_file (demux_sputext_t *demuxstr) {
 
   /* Rewind */
   demuxstr->rbuffer_cur = 0;
-  demuxstr->buflen = 0;
+  demuxstr->buf.clear();
 
   demuxstr->num=0;
   int timeout = MAX_TIMEOUT;

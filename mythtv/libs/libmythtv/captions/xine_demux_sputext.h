@@ -42,7 +42,7 @@ struct demux_sputext_t {
 
   int                status;
 
-  char               buf[SUB_BUFSIZE];
+  std::string        buf;
   off_t              buflen;
 
   float              mpsub_position;
