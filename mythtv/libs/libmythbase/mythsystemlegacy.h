@@ -44,8 +44,6 @@
 #include <cstdint>
 #include <ctime>
 
-#ifdef __cplusplus
-
 #include "exitcodes.h"  // included for GENERIC_EXIT_OK
 #include "mythsystem.h" // included for MythSystemFlag and MythSignal
 
@@ -198,12 +196,6 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 MBASE_PUBLIC uint myth_system(const QString &command,
                               uint flags = kMSNone,
                               uint timeout = 0);
-#endif // __cplusplus
-
-#ifdef __cplusplus
-extern "C"
-#endif // __cplusplus
-MBASE_PUBLIC uint myth_system_c(char *command, uint flags, uint timeout);
 
 #endif // MYTHSYSTEMLEGACY_H
 /*
