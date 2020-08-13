@@ -2,7 +2,7 @@
 
 #include <set>
 #include <map>
-#include <functional>   //not2
+#include <functional>   //binary_negate
 #include <memory>
 
 #include <QApplication>
@@ -715,7 +715,7 @@ class VideoDialogPrivate
                         parental_level_map::value_type(*p, sl.GetLevel()));
                 }
             }
-            m_ratingToPl.sort(std::not2(rating_to_pl_less()));
+            m_ratingToPl.sort(std::binary_negate(rating_to_pl_less()));
         }
 
         m_rememberPosition =
