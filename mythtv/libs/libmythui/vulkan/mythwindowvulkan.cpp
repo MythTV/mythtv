@@ -40,7 +40,7 @@ bool MythWindowVulkan::event(QEvent *Event)
         {
             // Log these for now - they may be important (e.g. QVulkanWindow::grab)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring spontaneous update request");
-            return QWindow::event(Event);
+            return QWindow::event(Event); // NOLINT(bugprone-parent-virtual-call)
         }
     }
     return QVulkanWindow::event(Event);
