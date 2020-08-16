@@ -219,6 +219,7 @@ void ManualSchedule::recordClicked(void)
     auto *record = new RecordingRule();
     record->LoadByProgram(&p);
     record->m_searchType = kManualSearch;
+    record->m_dupMethod = kDupCheckNone;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *schededit = new ScheduleEditor(mainStack, record);

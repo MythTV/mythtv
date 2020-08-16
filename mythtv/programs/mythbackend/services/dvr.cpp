@@ -1160,7 +1160,10 @@ uint Dvr::AddRecordSchedule   (
 
     rule.m_type = recTypeFromString(sType);
     rule.m_searchType = searchTypeFromString(sSearchType);
-    rule.m_dupMethod = dupMethodFromString(sDupMethod);
+    if (rule.m_searchType == kManualSearch)
+        rule.m_dupMethod = kDupCheckNone;
+    else
+        rule.m_dupMethod = dupMethodFromString(sDupMethod);
     rule.m_dupIn = dupInFromString(sDupIn);
 
     if (sRecProfile.isEmpty())
@@ -1303,7 +1306,10 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
 
     pRule.m_type = recTypeFromString(sType);
     pRule.m_searchType = searchTypeFromString(sSearchType);
-    pRule.m_dupMethod = dupMethodFromString(sDupMethod);
+    if (pRule.m_searchType == kManualSearch)
+        pRule.m_dupMethod = kDupCheckNone;
+    else
+        pRule.m_dupMethod = dupMethodFromString(sDupMethod);
     pRule.m_dupIn = dupInFromString(sDupIn);
 
     if (sRecProfile.isEmpty())

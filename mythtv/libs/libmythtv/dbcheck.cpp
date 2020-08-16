@@ -3780,6 +3780,17 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1364")
+    {
+        // Set depmethod to none for all manual, recording rules.
+        DBUpdates updates {
+            "UPDATE record SET dupmethod = 1 WHERE search = 5"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1365", dbver))
+            return false;
+    }
+
     return true;
 }
 

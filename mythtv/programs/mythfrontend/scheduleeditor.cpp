@@ -2138,6 +2138,7 @@ void SchedOptMixin::RuleChanged(void)
                         m_rule->m_type != kDontRecord);
     bool isSingle = (m_rule->m_type == kSingleRecord ||
                      m_rule->m_type == kOverrideRecord);
+    bool isManual = (m_rule->m_searchType == kManualSearch);
 
     if (m_prioritySpin)
         m_prioritySpin->SetEnabled(isScheduled);
@@ -2146,7 +2147,9 @@ void SchedOptMixin::RuleChanged(void)
     if (m_endoffsetSpin)
         m_endoffsetSpin->SetEnabled(isScheduled);
     if (m_dupmethodList)
-        m_dupmethodList->SetEnabled(isScheduled && !isSingle);
+        m_dupmethodList->SetEnabled(
+            isScheduled && !isSingle &&
+            (!isManual || m_rule->m_dupMethod != kDupCheckNone));
     if (m_dupscopeList)
         m_dupscopeList->SetEnabled(isScheduled && !isSingle &&
                                    m_rule->m_dupMethod != kDupCheckNone);
