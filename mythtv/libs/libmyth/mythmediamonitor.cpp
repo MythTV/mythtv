@@ -460,7 +460,7 @@ void MediaMonitor::StartMonitoring(void)
     if (m_Active)
         return;
     if (!gCoreContext->GetBoolSetting("MonitorDrives", false)) {
-        LOG(VB_MEDIA, LOG_NOTICE, "MediaMonitor diasabled by user setting.");
+        LOG(VB_MEDIA, LOG_NOTICE, "MediaMonitor disabled by user setting.");
         return;
     }
 
