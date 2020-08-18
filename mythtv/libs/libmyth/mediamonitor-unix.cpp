@@ -38,6 +38,7 @@ using namespace std;
 #include "mythmediamonitor.h"
 #include "mediamonitor-unix.h"
 #include "mythconfig.h"
+#include "mythcorecontext.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
 #include "mythlogging.h"
@@ -119,7 +120,13 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
                 : MediaMonitor(par, interval, allowEject)
 {
     CheckFileSystemTable();
-    CheckMountable();
+    if (!gCoreContext->GetBoolSetting("MonitorDrives", false)) {
+        LOG(VB_GENERAL, LOG_NOTICE, "MediaMonitor disabled by user setting.");
+    }
+    else
+    {
+        CheckMountable();
+    }
 
     LOG(VB_MEDIA, LOG_INFO, "Initial device list...\n" + listDevices());
 }
