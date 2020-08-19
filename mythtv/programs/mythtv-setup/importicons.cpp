@@ -1,5 +1,5 @@
 #include <QCoreApplication>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QBuffer>
 #include <QDir>
 #include <QFileInfo>
@@ -341,6 +341,7 @@ bool ImportIconsWizard::initialLoad(const QString& name)
             {
                 entry.strChanId=query.value(0).toString();
                 entry.strName=query.value(1).toString();
+                entry.strName.remove(QRegularExpression("(-DT|-HD|-SD)"));
                 entry.strXmlTvId=query.value(2).toString();
                 entry.strCallsign=query.value(3).toString();
                 entry.strTransportId=query.value(4).toString();
@@ -487,7 +488,7 @@ bool ImportIconsWizard::doLoad()
 
 QString ImportIconsWizard::escape_csv(const QString& str)
 {
-    QRegExp rxDblForEscape("\"");
+    QRegularExpression rxDblForEscape("\"");
     QString str2 = str;
     str2.replace(rxDblForEscape,"\\\"");
     return "\""+str2+"\"";
@@ -544,7 +545,7 @@ QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
     req->setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
     req->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
 
-    LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: posting to: %1, params: ")
+    LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: posting to: %1, params: %2")
                                        .arg(url.toString()).arg(strParam));
 
     if (GetMythDownloadManager()->post(req, &data))
