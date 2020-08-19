@@ -279,6 +279,9 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
 
 bool RecordingRule::LoadTemplate(const QString& category, const QString& categoryType)
 {
+    QString lcategory = category.isEmpty() ? "Default" : category;
+    QString lcategoryType = categoryType.isEmpty() ? "Default" : categoryType;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recordid, category, "
                   "       (category = :CAT1) AS catmatch, "
@@ -290,10 +293,10 @@ bool RecordingRule::LoadTemplate(const QString& category, const QString& categor
                   "ORDER BY catmatch DESC, typematch DESC"
                   );
     query.bindValue(":TEMPLATE", kTemplateRecord);
-    query.bindValue(":CAT1", category);
-    query.bindValue(":CAT2", category);
-    query.bindValue(":CATTYPE1", categoryType);
-    query.bindValue(":CATTYPE2", categoryType);
+    query.bindValue(":CAT1", lcategory);
+    query.bindValue(":CAT2", lcategory);
+    query.bindValue(":CATTYPE1", lcategoryType);
+    query.bindValue(":CATTYPE2", lcategoryType);
 
     if (!query.exec())
     {
