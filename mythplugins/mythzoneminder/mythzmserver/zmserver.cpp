@@ -243,7 +243,14 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
     if (!m_enabled)
         return;
 
-    if (checkVersion(1, 32, 0))
+    if (checkVersion(1, 34, 0))
+    {
+        shared_data_size = sizeof(SharedData34) +
+            sizeof(TriggerData26) +
+            ((m_imageBufferCount) * (sizeof(struct timeval))) +
+            ((m_imageBufferCount) * frame_size) + 64;
+    }
+    else if (checkVersion(1, 32, 0))
     {
         shared_data_size = sizeof(SharedData32) +
             sizeof(TriggerData26) +
@@ -345,11 +352,29 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
         }
     }
 
-    if (checkVersion(1, 32, 0))
+    if (checkVersion(1, 34, 0))
+    {
+        m_sharedData = nullptr;
+        m_sharedData26 = nullptr;
+        m_sharedData32 = nullptr;
+        m_sharedData34 = (SharedData34*)m_shmPtr;
+
+        m_sharedImages = (unsigned char*) m_shmPtr +
+            sizeof(SharedData34) + sizeof(TriggerData26) + sizeof(VideoStoreData) +
+            ((m_imageBufferCount) * sizeof(struct timeval)) ;
+
+        if (((unsigned long)m_sharedImages % 64) != 0)
+        {
+            // align images buffer to nearest 64 byte boundary
+            m_sharedImages = (unsigned char*)((unsigned long)m_sharedImages + (64 - ((unsigned long)m_sharedImages % 64)));
+        }
+    }
+    else if (checkVersion(1, 32, 0))
     {
         m_sharedData = nullptr;
         m_sharedData26 = nullptr;
         m_sharedData32 = (SharedData32*)m_shmPtr;
+        m_sharedData34 = nullptr;
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData32) + sizeof(TriggerData26) + sizeof(VideoStoreData) +
@@ -366,6 +391,7 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
         m_sharedData = nullptr;
         m_sharedData26 = (SharedData26*)m_shmPtr;
         m_sharedData32 = nullptr;
+        m_sharedData34 = nullptr;
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData26) + sizeof(TriggerData26) +
@@ -382,6 +408,7 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
         m_sharedData = (SharedData*)m_shmPtr;
         m_sharedData26 = nullptr;
         m_sharedData32 = nullptr;
+        m_sharedData34 = nullptr;
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData) + sizeof(TriggerData) +
@@ -391,6 +418,9 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
 
 bool MONITOR::isValid(void)
 {
+    if (checkVersion(1, 34, 0))
+        return m_sharedData34 != nullptr && m_sharedImages != nullptr;
+
     if (checkVersion(1, 32, 0))
         return m_sharedData32 != nullptr && m_sharedImages != nullptr;
 
@@ -424,6 +454,9 @@ int MONITOR::getLastWriteIndex(void)
     if (m_sharedData32)
         return m_sharedData32->last_write_index;
 
+    if (m_sharedData34)
+        return m_sharedData34->last_write_index;
+
     return 0;
 }
 
@@ -437,6 +470,9 @@ int MONITOR::getState(void)
 
     if (m_sharedData32)
         return m_sharedData32->state;
+
+    if (m_sharedData34)
+        return m_sharedData34->state;
 
     return 0;
 }
@@ -456,6 +492,9 @@ int MONITOR::getSubpixelOrder(void)
     if (m_sharedData32)
       return m_sharedData32->format;
 
+    if (m_sharedData34)
+      return m_sharedData34->format;
+
     return ZM_SUBPIX_ORDER_NONE;
 }
 
@@ -469,6 +508,9 @@ int MONITOR::getFrameSize(void)
 
     if (m_sharedData32)
       return m_sharedData32->imagesize;
+
+    if (m_sharedData34)
+      return m_sharedData34->imagesize;
 
     return 0;
 }
@@ -952,7 +994,8 @@ void ZMServer::handleGetMonitorStatus(void)
     ADD_STR(outStr, "OK")
 
     // get monitor list
-    string sql("SELECT Id, Name, Type, Device, Host, Channel, Function, Enabled "
+    // Function is reserverd word so but ticks around it
+    string sql("SELECT Id, Name, Type, Device, Host, Channel, `Function`, Enabled "
                "FROM Monitors;");
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
@@ -1675,8 +1718,9 @@ void ZMServer::getMonitorList(void)
     m_monitors.clear();
     m_monitorMap.clear();
 
+    // Function is reserverd word so but ticks around it
     string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette, ");
-    sql += " Type, Function, Enabled, Device, Host, Controllable, TrackMotion";
+    sql += " Type, `Function`, Enabled, Device, Host, Controllable, TrackMotion";
 
     if (checkVersion(1, 26, 0))
         sql += ", Colours";
@@ -1746,12 +1790,12 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     (void) bufferSize;
 
     // is there a new frame available?
-    if (monitor->getLastWriteIndex() == monitor->m_lastRead)
+    if (monitor->getLastWriteIndex() == monitor->m_lastRead )
         return 0;
 
     // sanity check last_read
     if (monitor->getLastWriteIndex() < 0 ||
-            monitor->getLastWriteIndex() >= monitor->m_imageBufferCount)
+            monitor->getLastWriteIndex() >= (monitor->m_imageBufferCount - 1))
         return 0;
 
     monitor->m_lastRead = monitor->getLastWriteIndex();
@@ -1837,7 +1881,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
 
         case ZM_SUBPIX_ORDER_RGBA:
         {
-            for (wpos = 0, rpos = 0; wpos < (unsigned int) (monitor->m_width * monitor->m_height * 3); wpos += 3, rpos += 4)
+            for (wpos = 0, rpos = 0; wpos < (unsigned int) (monitor->m_width * monitor->m_height * 3 ); wpos += 3, rpos += 4)
             {
                 buffer[wpos + 0] = data[rpos + 0]; // r
                 buffer[wpos + 1] = data[rpos + 1]; // g

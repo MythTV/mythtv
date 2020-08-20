@@ -231,13 +231,13 @@ int main(int argc, char **argv)
     // load the override config
     loadZMConfig(zmoverideconfig);
 
-    // check we have a version (default to 1.32.3 if not found)
+    // check we have a version (default to 1.34.16 if not found)
     if (g_zmversion.length() == 0)
     {
-        cout << "ZM version not found. Assuming at least v1.32.0 is installed" << endl;
+        cout << "ZM version not found. Assuming at least v1.34.16 is installed" << endl;
         g_majorVersion = 1;
-        g_minorVersion = 32;
-        g_revisionVersion = 3;
+        g_minorVersion = 34;
+        g_revisionVersion = 16;
     }
     else
     {
