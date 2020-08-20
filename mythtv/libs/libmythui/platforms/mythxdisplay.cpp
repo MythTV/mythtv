@@ -58,6 +58,35 @@ void MythXDisplay::SetQtX11Display(const QString &_Display)
     s_QtX11Display = _Display;
 }
 
+/// \brief Determine if we are running a remote X11 session
+bool MythXDisplay::DisplayIsRemote(void)
+{
+    bool result = false;
+    auto * display = MythXDisplay::OpenMythXDisplay(false);
+
+    if (display)
+    {
+        QString displayname(DisplayString(display->GetDisplay()));
+
+        // DISPLAY=:x or DISPLAY=unix:x are local
+        // DISPLAY=hostname:x is remote
+        // DISPLAY=/xxx/xxx/.../org.macosforge.xquartz:x is local OS X
+        // x can be numbers n or n.n
+        // Anything else including DISPLAY not set is assumed local,
+        // in that case we are probably not running under X11
+        if (!displayname.isEmpty() && !displayname.startsWith(":") &&
+            !displayname.startsWith("unix:") && !displayname.startsWith("/") &&
+             displayname.contains(':'))
+        {
+            result = true;
+        }
+
+        delete display;
+    }
+
+    return result;
+}
+
 MythXDisplay::~MythXDisplay()
 {
     MythXLocker locker(this);

@@ -24,6 +24,7 @@ class MUI_PUBLIC MythXDisplay
 
     static MythXDisplay* OpenMythXDisplay(bool Warn = true);
     static void          SetQtX11Display (const QString &Display);
+    static bool          DisplayIsRemote (void);
 
     MythXDisplay() = default;
     ~MythXDisplay();
