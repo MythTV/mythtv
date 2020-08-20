@@ -414,6 +414,8 @@ void ChannelScanSM::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
     if (!m_currentTestingDecryption &&
         pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()))
         m_currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
+
+    UpdateChannelInfo(true);
 }
 
 void ChannelScanSM::HandleVCT(uint /*pid*/, const VirtualChannelTable *vct)
