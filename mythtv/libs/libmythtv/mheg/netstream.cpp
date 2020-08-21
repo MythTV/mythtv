@@ -8,7 +8,7 @@
 using std::getenv;
 #include <cstddef>
 #include <cstdio>
-#include <inttypes.h>
+#include <cinttypes>
 #include <utility>
 
 // Qt
