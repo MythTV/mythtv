@@ -2147,9 +2147,11 @@ void SchedOptMixin::RuleChanged(void)
     if (m_endoffsetSpin)
         m_endoffsetSpin->SetEnabled(isScheduled);
     if (m_dupmethodList)
+    {
         m_dupmethodList->SetEnabled(
             isScheduled && !isSingle &&
             (!isManual || m_rule->m_dupMethod != kDupCheckNone));
+    }
     if (m_dupscopeList)
         m_dupscopeList->SetEnabled(isScheduled && !isSingle &&
                                    m_rule->m_dupMethod != kDupCheckNone);
