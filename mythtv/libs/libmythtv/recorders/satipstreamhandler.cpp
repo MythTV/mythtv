@@ -104,9 +104,9 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
 
 SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
     : StreamHandler(device, inputid)
+    , m_rtsp(new SatIPRTSP(this))
     , m_inputId(inputid)
     , m_device(device)
-    , m_rtsp(new SatIPRTSP(this))
 {
     setObjectName("SatIPStreamHandler");
 
