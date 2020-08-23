@@ -1,4 +1,9 @@
+// C++ includes
+#include <chrono>
+#include <thread>
+
 // MythTV includes
+#include "tsstreamdata.h"
 #include "satipstreamhandler.h"
 #include "satiprecorder.h"
 #include "satipchannel.h"
@@ -25,6 +30,15 @@ bool SatIPRecorder::Open(void)
 
     ResetForNewFile();
 
+    if (m_channel->GetFormat().compare("MPTS") == 0)
+    {
+        // MPTS only.  Use TSStreamData to write out unfiltered data.
+        LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
+        SetStreamData(new TSStreamData(m_inputId));
+        m_recordMptsOnly = true;
+        m_recordMpts = false;
+    }
+
     m_streamHandler = SatIPStreamHandler::Get(m_channel->GetDevice(), m_inputId);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "SatIP opened successfully");
@@ -42,14 +56,17 @@ void SatIPRecorder::Close(void)
 
 void SatIPRecorder::StartNewFile(void)
 {
-    if (m_recordMpts)
+    if (!m_recordMptsOnly)
     {
-        m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
-    }
+        if (m_recordMpts)
+        {
+            m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
+        }
 
-    // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
-    HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
+        // Make sure the first things in the file are a PAT & PMT
+        HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
+    }
 }
 
 void SatIPRecorder::run(void)
@@ -70,6 +87,12 @@ void SatIPRecorder::run(void)
         m_recording = true;
         m_recordingWait.wakeAll();
     }
+
+    // Listen for time table on DVB standard streams
+    if (m_channel && (m_channel->GetSIStandard() == "dvb"))
+        m_streamData->AddListeningPID(DVB_TDT_PID);
+    if (m_recordMptsOnly)
+        m_streamData->AddListeningPID(0x2000);
 
     StartNewFile();
 
@@ -95,11 +118,11 @@ void SatIPRecorder::run(void)
             m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!m_inputPmt)
+        if (!m_inputPmt && !m_recordMptsOnly)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
-            usleep(5000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             continue;
         }
 

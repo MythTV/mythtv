@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
-// C+++ headers
+// C++ headers
+#include <chrono>
 #include <thread>
 
 // Qt headers
@@ -33,17 +34,14 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
 
     if (it == s_handlers.end())
     {
+        LOG(VB_RECORD, LOG_INFO,
+            QString("SatIPSH[%1]: Creating new stream handler for %2")
+            .arg(inputid).arg(devname));
+
         auto *newhandler = new SatIPStreamHandler(devname, inputid);
         newhandler->Open();
         s_handlers[devname] = newhandler;
         s_handlersRefCnt[devname] = 1;
-
-        // SatIPRTSP per instance
-        newhandler->m_rtsp = new SatIPRTSP(newhandler);
-
-        LOG(VB_RECORD, LOG_INFO,
-            QString("SatIPSH[%1]: Creating new stream handler for %2")
-            .arg(inputid).arg(devname));
     }
     else
     {
@@ -67,7 +65,11 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
 
     QMap<QString, uint>::iterator rit = s_handlersRefCnt.find(devname);
     if (rit == s_handlersRefCnt.end())
+    {
+        LOG(VB_RECORD, LOG_ERR, QString("SatIPSH[%1]: Return(%2) not found")
+            .arg(inputid).arg(devname));
         return;
+    }
 
     LOG(VB_RECORD, LOG_INFO, QString("SatIPSH[%1]: Return(%2) has %3 handlers")
         .arg(inputid).arg(devname).arg(*rit));
@@ -84,9 +86,8 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
     {
         LOG(VB_RECORD, LOG_INFO, QString("SatIPSH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
-        ref->Stop();
-        ref->Close();
-        delete (*it)->m_rtsp;
+        (*it)->Stop();
+        (*it)->Close();
         delete *it;
         s_handlers.erase(it);
     }
@@ -105,6 +106,7 @@ SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
     : StreamHandler(device, inputid)
     , m_inputId(inputid)
     , m_device(device)
+    , m_rtsp(new SatIPRTSP(this))
 {
     setObjectName("SatIPStreamHandler");
 
@@ -122,12 +124,18 @@ bool SatIPStreamHandler::UpdateFilters(void)
 
     QStringList pids;
 
-    PIDInfoMap::const_iterator it = m_pidInfo.begin();
-    for (; it != m_pidInfo.end(); ++it)
+    if (m_pidInfo.contains(0x2000))
     {
-        pids.append(QString("%1").arg(it.key()));
+        pids.append("all");
     }
-
+    else
+    {
+        PIDInfoMap::const_iterator it = m_pidInfo.begin();
+        for (; it != m_pidInfo.end(); ++it)
+        {
+            pids.append(QString("%1").arg(it.key()));
+        }
+    }
 #ifdef DEBUG_PID_FILTERS
     QString msg = QString("PIDS: '%1'").arg(pids.join(","));
     LOG(VB_RECORD, LOG_DEBUG, LOC + msg);
@@ -184,7 +192,7 @@ void SatIPStreamHandler::run(void)
         }
 
         // Delay to avoid busy wait loop
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
@@ -201,7 +209,6 @@ void SatIPStreamHandler::run(void)
     }
 
     SetRunning(false, false, false);
-
     RunEpilog();
 }
 
@@ -220,8 +227,6 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
         qry.append(QString("sr=%1").arg(tuning.m_symbolRate / 1000)); // symbolrate in ksymb/s
         qry.append("msys=dvbc");
         qry.append(QString("mtype=%1").arg(SatIP::mtype(tuning.m_modulation)));
-
-        // TODO: DVB-C2 parameters
     }
     else if (m_tunerType == DTVTunerType::kTunerTypeDVBT || m_tunerType == DTVTunerType::kTunerTypeDVBT2)
     {
@@ -232,8 +237,6 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
         qry.append(QString("mtype=%1").arg(SatIP::mtype(tuning.m_modulation)));
         qry.append(QString("gi=%1").arg(SatIP::gi(tuning.m_guardInterval)));
         qry.append(QString("fec=%1").arg(SatIP::fec(tuning.m_fec)));
-
-        // TODO: DVB-T2 parameters
     }
     else if (m_tunerType == DTVTunerType::kTunerTypeDVBS1 || m_tunerType == DTVTunerType::kTunerTypeDVBS2)
     {
@@ -244,13 +247,11 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
         qry.append(QString("mtype=%1").arg(SatIP::mtype(tuning.m_modulation)));
         qry.append(QString("sr=%1").arg(tuning.m_symbolRate / 1000));               // symbolrate in ksymb/s
         qry.append(QString("fec=%1").arg(SatIP::fec(tuning.m_fec)));
-
-        // TODO DVB-S2 parameters
         qry.append(QString("plts=auto"));                                           // pilot tones
     }
     else
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("TODO unhandled m_tunerType %1 %2").arg(m_tunerType).arg(m_tunerType.toString()));
+        LOG(VB_RECORD, LOG_ERR, LOC + QString("Unhandled m_tunerType %1 %2").arg(m_tunerType).arg(m_tunerType.toString()));
     }
 
     QUrl url = QUrl(m_baseurl);

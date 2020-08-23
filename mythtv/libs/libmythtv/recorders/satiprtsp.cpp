@@ -489,7 +489,7 @@ SatIPRTSPWriteHelper::SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler
     : m_parent(parent)
     , m_streamHandler(handler)
 {
-    m_timer = startTimer(200);
+    m_timer = startTimer(20);
 }
 
 void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
