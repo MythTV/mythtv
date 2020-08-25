@@ -1,0 +1,88 @@
+name: master
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: build
+    strategy:
+      matrix:
+        os: ['ubuntu-18.04', 'ubuntu-20.04', 'macos-10.15']
+        cc: ['gcc', 'clang']
+        include:
+          - cc: 'gcc'
+            cxx: 'g++'
+          - cc: 'clang'
+            cxx: 'clang++'  
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout master
+      uses: actions/checkout@v2
+      
+    - name: Setup build environment
+      run: echo "::set-env name=MYTHTV_CONFIG::--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}"
+      
+    - name: Check ccache
+      uses: actions/cache@v2
+      with:
+        path: ~/.ccache
+        key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
+        restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
+  
+    # N.B. These dependencies are for the master branch. Unlike the ansible playlists they do not include old dependencies that may
+    # be required for older versions. The list is intended to provide as much code coverage as possible (i.e. enable as many options as possible)
+    - name: Install core dependencies (linux)
+      run: sudo apt install ccache qt5-qmake qtscript5-dev nasm libsystemd-dev libfreetype6-dev libmp3lame-dev libx264-dev libx265-dev
+           libxrandr-dev libxml2-dev libavahi-compat-libdnssd-dev libasound2-dev liblzo2-dev libhdhomerun-dev libsamplerate0-dev libva-dev
+           libdrm-dev libvdpau-dev libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj
+           libgnutls28-dev libqt5webkit5-dev libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future
+           libdbi-perl libdbd-mysql-perl libnet-upnp-perl libio-socket-inet6-perl libxml-simple-perl
+      if: runner.os == 'Linux'
+      
+    - name: Install core dependencies (macOS)
+      run: |
+        brew install pkg-config ccache qt5 nasm libsamplerate taglib lzo libcec libbluray fftw libass libhdhomerun dav1d x264 x265 libvpx openssl
+        brew link qt5 --force
+        echo "::set-env name=MYTHTV_CONFIG::$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib"
+      if: runner.os == 'macOS'
+      
+    - name: Configure core
+      working-directory: ./mythtv
+      run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava
+      
+    - name: Make core
+      working-directory: ./mythtv
+      run: make all_no_test -j4
+    
+    - name: Install core
+      working-directory: ./mythtv
+      run: make install
+      
+    # currently disabled due to strange failures
+    - name: Unit test core
+      working-directory: ./mythtv
+      run: make test
+      if: matrix.os == 'disabled'
+    
+    - name: Install plugin dependencies (linux)
+      run: sudo apt install libvorbis-dev libflac++-dev libminizip-dev libcdio-dev libcdio-paranoia-dev python3-oauth python3-pycurl
+           libxml-xpath-perl libdate-manip-perl libdatetime-format-iso8601-perl libsoap-lite-perl libjson-perl libimage-size-perl
+      if: runner.os == 'Linux'
+      
+    - name: Install plugin dependencies (macOS)
+      run: brew install minizip flac libvorbis libcdio
+      if: runner.os == 'macOS'
+      
+    - name: Configure plugins
+      working-directory: ./mythplugins
+      run: ./configure $MYTHTV_CONFIG
+    
+    - name: Make plugins
+      working-directory: ./mythplugins
+      run: make -j4
