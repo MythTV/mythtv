@@ -5866,22 +5866,28 @@ fi
 
 enabled ffmpeg_pthreads && enable pthreads
 
-# Check for taglib for libmythmetadata
+# Check for taglib for libmythmetadata. MSYS2 uses taglib-config.cmd
+TAGLIB_CONFIG=""
 if enabled taglib; then
-    taglib_minor="0"
     if test x`which taglib-config` != x"" ; then
-        taglib_minor=`taglib-config --version | cut -d. -f2`
+        TAGLIB_CONFIG="taglib-config"
+    elif test x`which taglib-config.cmd` != x"" ; then
+        TAGLIB_CONFIG="taglib-config.cmd"
+    fi
+    taglib_minor="0"
+    if test $TAGLIB_CONFIG ; then
+        taglib_minor=`$TAGLIB_CONFIG --version | cut -d. -f2`
         if test x"$taglib_minor" = x"" ; then
             echo "Can't find taglib-config. Assuming 1.7 or later."
             taglib_minor="7"
         fi
         if test $target_os = android ; then
-            tagprefix=`taglib-config --prefix`
+            tagprefix=`$TAGLIB_CONFIG --prefix`
         else
-            tagprefix=${sysroot}`taglib-config --prefix`
+            tagprefix=${sysroot}`$TAGLIB_CONFIG --prefix`
         fi
         tagincludes="-I${tagprefix}/include"
-        taglibs=`taglib-config --libs`
+        taglibs=`$TAGLIB_CONFIG --libs`
         if test $target_os = android ; then
             taglibs="$taglibs -lz -lm"
         fi
@@ -6688,8 +6694,8 @@ int main(void) {
 EOF
 
 if enabled taglib; then
-    taglib_include=`taglib-config --prefix`/include/taglib
-    taglib_libs=`taglib-config --libs`
+    taglib_include=`$TAGLIB_CONFIG --prefix`/include/taglib
+    taglib_libs=`$TAGLIB_CONFIG --libs`
 fi
 
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
