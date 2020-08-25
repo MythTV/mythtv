@@ -258,8 +258,7 @@ void MythRenderVulkan::BeginFrame(void)
     // clear the framebuffer
     VkClearColorValue clearColor = {{ 0.0F, 0.0F, 0.0F, 1.0F }};
     VkClearDepthStencilValue clearDS = { 1.0F, 0 };
-    VkClearValue clearValues[2];
-    memset(clearValues, 0, sizeof(clearValues));
+    std::array<VkClearValue,2> clearValues {};
     clearValues[0].color        = clearColor;
     clearValues[1].depthStencil = clearDS;
 
@@ -272,7 +271,7 @@ void MythRenderVulkan::BeginFrame(void)
     rpBeginInfo.renderPass       = m_window->defaultRenderPass();
     rpBeginInfo.framebuffer      = m_window->currentFramebuffer();
     rpBeginInfo.clearValueCount  = 2;
-    rpBeginInfo.pClearValues     = clearValues;
+    rpBeginInfo.pClearValues     = clearValues.data();
     rpBeginInfo.renderArea.extent.width = static_cast<uint32_t>(size.width());
     rpBeginInfo.renderArea.extent.height = static_cast<uint32_t>(size.height());
     m_devFuncs->vkCmdBeginRenderPass(commandbuffer, &rpBeginInfo, VK_SUBPASS_CONTENTS_INLINE);

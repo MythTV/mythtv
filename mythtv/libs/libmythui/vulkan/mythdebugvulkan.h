@@ -5,20 +5,22 @@
 #include "mythuiexp.h"
 #include "vulkan/mythrendervulkan.h"
 
+using VulkanDebugColor = std::array<float,4>;
+
 class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
 {
   public:
-    static float s_DebugRed[4];
-    static float s_DebugGreen[4];
-    static float s_DebugBlue[4];
-    static float s_DebugGray[4];
-    static float s_DebugBlack[4];
+    static const VulkanDebugColor s_DebugRed;
+    static const VulkanDebugColor s_DebugGreen;
+    static const VulkanDebugColor s_DebugBlue;
+    static const VulkanDebugColor s_DebugGray;
+    static const VulkanDebugColor s_DebugBlack;
 
     static MythDebugVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
                                    QVulkanDeviceFunctions* Functions,
                                    MythWindowVulkan* Window);
 
-    void BeginRegion (VkCommandBuffer CmdBuffer, const char* Name, const float *Color);
+    void BeginRegion (VkCommandBuffer CmdBuffer, const char* Name, const VulkanDebugColor& Color);
     void EndRegion   (VkCommandBuffer CmdBuffer);
     void NameObject  (uint64_t Object, VkDebugReportObjectTypeEXT Type, const char *Name);
 

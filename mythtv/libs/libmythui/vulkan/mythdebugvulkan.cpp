@@ -5,11 +5,11 @@
 
 #define LOC QString("VulkanMarker: ")
 
-float MythDebugVulkan::s_DebugRed[4]   = { 1.0, 0.0, 0.0, 1.0 };
-float MythDebugVulkan::s_DebugGreen[4] = { 0.0, 1.0, 0.0, 1.0 };
-float MythDebugVulkan::s_DebugBlue[4]  = { 0.0, 0.0, 1.0, 1.0 };
-float MythDebugVulkan::s_DebugGray[4]  = { 0.5, 0.5, 0.5, 1.0 };
-float MythDebugVulkan::s_DebugBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
+VulkanDebugColor const MythDebugVulkan::s_DebugRed   { 1.0, 0.0, 0.0, 1.0 };
+VulkanDebugColor const MythDebugVulkan::s_DebugGreen { 0.0, 1.0, 0.0, 1.0 };
+VulkanDebugColor const MythDebugVulkan::s_DebugBlue  { 0.0, 0.0, 1.0, 1.0 };
+VulkanDebugColor const MythDebugVulkan::s_DebugGray  { 0.5, 0.5, 0.5, 1.0 };
+VulkanDebugColor const MythDebugVulkan::s_DebugBlack { 0.0, 0.0, 0.0, 1.0 };
 
 MythDebugVulkan* MythDebugVulkan::Create(MythRenderVulkan *Render, VkDevice Device,
                                          QVulkanDeviceFunctions *Functions, MythWindowVulkan *Window)
@@ -48,7 +48,7 @@ MythDebugVulkan::MythDebugVulkan(MythRenderVulkan *Render, VkDevice Device,
         LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to load procs");
 }
 
-void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const float *Color)
+void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const VulkanDebugColor& Color)
 {
     VkDebugMarkerMarkerInfoEXT begin =
         { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, nullptr, Name,
