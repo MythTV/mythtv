@@ -2010,7 +2010,6 @@ MYTHTV_HAVE_LIST='
     gettimeofday
     posix_fadvise
     libudev
-    libuuid
     stdint_h
     sync_file_range
     sys_endian_h
@@ -4799,7 +4798,6 @@ case $target_os in
         enable  windows
         disable x11
         disable qtdbus
-        disable libuuid
         disable ffserver
         ###### Standard ffmpeg configure stuff follows:
         if test $target_os = "mingw32ce"; then
@@ -4910,7 +4908,6 @@ case $target_os in
         enable backend
         ! disabled joystick_menu && enable joystick_menu
         enable libudev
-        enable libuuid
         enable pic
         enable drm
 	if [ x`uname -m` = x"armv7l" ]; then
