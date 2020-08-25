@@ -74,6 +74,13 @@ const int k708MaxWindows = 8;
 const int k708MaxRows    = 16; // 4-bit field in DefineWindow
 const int k708MaxColumns = 64; // 6-bit field in DefineWindow
 
+// Weird clang-tidy error from cc708window.cpp:212 that the attribute
+// assignment is using zero allocated memory. Changing that code to
+// explicitly copy each field of the structure, and then changing the
+// first copy statement to assign a constant instead, shows that the
+// warning is about the left side of the assignment statement. That
+// should overwrite any zero-allocated memory, not reference it.
+// NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDelete)
 class CC708CharacterAttribute
 {
   public:
@@ -159,7 +166,7 @@ class CC708Pen
         m_attr.m_boldface  = false;
     }
   public:
-    CC708CharacterAttribute m_attr;
+    CC708CharacterAttribute m_attr {};
 
     uint m_row    {0};
     uint m_column {0};
@@ -171,7 +178,7 @@ class CC708Character
   public:
     CC708Character() = default;
     explicit CC708Character(const CC708Window &win);
-    CC708CharacterAttribute m_attr;
+    CC708CharacterAttribute m_attr {};
     QChar                   m_character {' '};
 };
 
@@ -181,7 +188,7 @@ class CC708String
     uint                    m_x {0};
     uint                    m_y {0};
     QString                 m_str;
-    CC708CharacterAttribute m_attr;
+    CC708CharacterAttribute m_attr {};
 };
 
 class MTV_PUBLIC CC708Window
@@ -269,7 +276,7 @@ class MTV_PUBLIC CC708Window
     uint            m_true_column_count {0};
 
     CC708Character *m_text              {nullptr};
-    CC708Pen        m_pen;
+    CC708Pen        m_pen               {};
 
  private:
     /// set to false when DeleteWindow is called on the window.

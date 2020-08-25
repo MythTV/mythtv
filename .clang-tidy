@@ -79,9 +79,6 @@ Checks: '-*,
         # One instance in mpegdescriptors.h ,
        -clang-analyzer-core.NullDereference,
 
-        # One instance in cc708window.h. ,
-       -clang-analyzer-cplusplus.NewDelete,
-
         # The "safe" versions functions were optional in the standard
         # and were never implemented by GCC or Clang.  There has been
         # a move to have these functions removed from the standard as
