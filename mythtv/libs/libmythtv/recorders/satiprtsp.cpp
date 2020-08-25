@@ -534,7 +534,6 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
             if (m_parent->m_valid && m_parent->m_validOld)
             {
                 int remainder = 0;
-                if (m_streamHandler)
                 {
                     QMutexLocker locker(&m_streamHandler->m_listenerLock);
                     auto streamDataList = m_streamHandler->m_streamDataList;
