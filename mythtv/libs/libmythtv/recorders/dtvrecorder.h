@@ -177,6 +177,7 @@ class DTVRecorder :
     // TS recorder stuff
     bool                     m_recordMpts                 {false};
     bool                     m_recordMptsOnly             {false};
+    MythTimer                m_recordMptsTimer;
     std::array<uint8_t,0x1fff + 1> m_streamId             {0};
     std::array<uint8_t,0x1fff + 1> m_pidStatus            {0};
     std::array<uint8_t,0x1fff + 1> m_continuityCounter    {0};

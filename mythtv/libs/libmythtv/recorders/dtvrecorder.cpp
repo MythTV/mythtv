@@ -1499,17 +1499,15 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
          * unprocessed we cannot wait for a keyframe to trigger the
          * writes. */
 
-        static MythTimer s_timer;
-
         if (m_framesSeenCount++ == 0)
-            s_timer.start();
+            m_recordMptsTimer.start();
 
-        if (s_timer.elapsed() > 500) // 0.5 seconds
+        if (m_recordMptsTimer.elapsed() > 500) // 0.5 seconds
         {
             UpdateFramesWritten();
             m_lastKeyframeSeen = m_framesSeenCount;
             HandleKeyframe(m_payloadBuffer.size());
-            s_timer.addMSecs(-500);
+            m_recordMptsTimer.addMSecs(-500);
         }
     }
     else if (m_streamId[pid] == 0)
