@@ -764,7 +764,8 @@ void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInform
                 case DescriptorID::terrestrial_delivery_system:
                 {
                     const TerrestrialDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz();
+                    if (cd.IsValid())
+                        frequency = cd.FrequencyHz();
                     tt = DTVTunerType::kTunerTypeDVBT;
                     break;
                 }
@@ -784,7 +785,8 @@ void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInform
                 case DescriptorID::satellite_delivery_system:
                 {
                     const SatelliteDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencykHz();
+                    if (cd.IsValid())
+                        frequency = cd.FrequencykHz();
                     tt = DTVTunerType::kTunerTypeDVBS1;
                     break;
                 }
@@ -796,7 +798,8 @@ void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInform
                 case DescriptorID::cable_delivery_system:
                 {
                     const CableDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz();
+                    if (cd.IsValid())
+                        frequency = cd.FrequencyHz();
                     tt = DTVTunerType::kTunerTypeDVBC;
                     break;
                 }

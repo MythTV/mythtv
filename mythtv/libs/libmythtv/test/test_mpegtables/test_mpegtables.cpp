@@ -246,6 +246,9 @@ void TestMPEGTables::PrivateDataSpecifierDescriptor_test (void)
         0x5f, 0x04, 0x00, 0x00, 0x06, 0x00
     };
     PrivateDataSpecifierDescriptor desc(si_data);
+    QCOMPARE (desc.IsValid(), true);
+    if (!desc.IsValid())
+        return;
     QCOMPARE (desc.PrivateDataSpecifier(), (uint32_t) PrivateDataSpecifierID::UPC1);
 }
 
@@ -257,6 +260,9 @@ void TestMPEGTables::PrivateUPCCablecomEpisodetitleDescriptor_test (void)
     };
 
     PrivateUPCCablecomEpisodeTitleDescriptor descriptor(si_data);
+    QCOMPARE (descriptor.IsValid(), true);
+    if (!descriptor.IsValid())
+        return;
     QCOMPARE (descriptor.CanonicalLanguageString(), QString("ger"));
     QCOMPARE (descriptor.TextLength(), (uint) 16);
     QCOMPARE (descriptor.Text(), QString("Krank vor Liebe"));
@@ -307,6 +313,9 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
         0x55, 0x04, 0x47, 0x42, 0x52, 0x0B
     };
     ParentalRatingDescriptor desc(si_data);
+    QCOMPARE (desc.IsValid(), true);
+    if (!desc.IsValid())
+        return;
     QCOMPARE (desc.Count(), 1U);
     QCOMPARE (desc.CountryCodeString(0), QString("GBR"));
     QCOMPARE (desc.Rating(0), 14);

@@ -1050,7 +1050,7 @@ class ImageIconDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
         {
-            if (DescriptorTagExtension() != DescriptorID::image_icon)
+            if (IsValid() && (DescriptorTagExtension() != DescriptorID::image_icon))
             {
                 m_data = nullptr;
             }
@@ -1225,7 +1225,7 @@ class SHDeliverySystemDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::sh_delivery_system)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::sh_delivery_system))
         {
             m_data = nullptr;
         }
@@ -1250,7 +1250,7 @@ class SupplementaryAudioDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::supplementary_audio)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::supplementary_audio))
         {
             m_data = nullptr;
         }
@@ -1289,7 +1289,7 @@ class NetworkChangeNotifyDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::network_change_notify)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::network_change_notify))
         {
             m_data = nullptr;
         }
@@ -1310,7 +1310,7 @@ class MessageDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::supplementary_audio)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::supplementary_audio))
         {
             m_data = nullptr;
         }
@@ -1344,7 +1344,7 @@ class TargetRegionDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::target_region)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::target_region))
         {
             m_data = nullptr;
         }
@@ -1377,7 +1377,7 @@ class TargetRegionNameDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::target_region_name)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::target_region_name))
         {
             m_data = nullptr;
         }
@@ -1417,7 +1417,7 @@ class ServiceRelocatedDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::service_relocated)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::service_relocated))
         {
             m_data = nullptr;
         }
@@ -1445,7 +1445,7 @@ class C2DeliverySystemDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::c2_delivery_system)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::c2_delivery_system))
         {
             m_data = nullptr;
         }
@@ -1489,7 +1489,7 @@ class S2XSatelliteDeliverySystemDescriptor : public MPEGDescriptor
         const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extension)
     {
-        if (DescriptorTagExtension() != DescriptorID::s2x_satellite_delivery_system)
+        if (IsValid() && (DescriptorTagExtension() != DescriptorID::s2x_satellite_delivery_system))
         {
             m_data = nullptr;
         }

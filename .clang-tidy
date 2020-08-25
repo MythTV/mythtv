@@ -76,9 +76,6 @@ Checks: '-*,
        -cert-str34-c,
 
     clang-analyzer-*,
-        # One instance in mpegdescriptors.h ,
-       -clang-analyzer-core.NullDereference,
-
         # The "safe" versions functions were optional in the standard
         # and were never implemented by GCC or Clang.  There has been
         # a move to have these functions removed from the standard as
