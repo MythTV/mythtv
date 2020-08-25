@@ -32,9 +32,9 @@ class SatIPStreamHandler : public StreamHandler
     static void Return(SatIPStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,
-            bool /*allow_section_reader*/ = false,
-            bool /*needs_drb*/            = false,
-        QString output_file = QString()) override
+                     bool /*allow_section_reader*/ = false,
+                     bool /*needs_drb*/            = false,
+                     QString output_file = QString()) override // StreamHandler
     {
         StreamHandler::AddListener(data, false, false, output_file);
     } // StreamHandler
@@ -43,7 +43,7 @@ class SatIPStreamHandler : public StreamHandler
     void Tune(const DTVMultiplex &tuning);
 
   private:
-    SatIPStreamHandler(const QString & /*device*/, int inputid);
+    explicit SatIPStreamHandler(const QString & device, int inputid);
 
     bool Open(void);
     void Close(void);
@@ -54,9 +54,6 @@ class SatIPStreamHandler : public StreamHandler
     static QMap<QString, SatIPStreamHandler*> s_handlers;
     static QMap<QString, uint>                s_handlersRefCnt;
     static QMutex                             s_handlersLock;
-
-    static QMutex s_cseq_lock;
-    static uint s_cseq;
 
   protected:
     SatIPRTSP   *m_rtsp           {nullptr};
