@@ -299,6 +299,7 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setEndOffset      (  pRule->m_endOffset              );
     pRecRule->setDupMethod      (  toRawString(pRule->m_dupMethod) );
     pRecRule->setDupIn          (  toRawString(pRule->m_dupIn)     );
+    pRecRule->setNewEpisOnly    (  newEpifromDupIn(pRule->m_dupIn) );
     pRecRule->setFilter         (  pRule->m_filter                 );
     pRecRule->setRecProfile     (  pRule->m_recProfile             );
     pRecRule->setRecGroup       (  RecordingInfo::GetRecgroupString(pRule->m_recGroupID) );

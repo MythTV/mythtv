@@ -15,7 +15,7 @@ namespace DTC
 class SERVICE_PUBLIC RecRule : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.00" );
+    Q_CLASSINFO( "version"    , "2.10" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( int             ParentId        READ ParentId         WRITE setParentId       )
@@ -46,6 +46,7 @@ class SERVICE_PUBLIC RecRule : public QObject
     Q_PROPERTY( int             EndOffset       READ EndOffset        WRITE setEndOffset      )
     Q_PROPERTY( QString         DupMethod       READ DupMethod        WRITE setDupMethod      )
     Q_PROPERTY( QString         DupIn           READ DupIn            WRITE setDupIn          )
+    Q_PROPERTY( bool            NewEpisOnly     READ NewEpisOnly      WRITE setNewEpisOnly    )
     Q_PROPERTY( uint            Filter          READ Filter           WRITE setFilter         )
 
     Q_PROPERTY( QString         RecProfile      READ RecProfile       WRITE setRecProfile     )
@@ -97,6 +98,7 @@ class SERVICE_PUBLIC RecRule : public QObject
     PROPERTYIMP    ( int        , EndOffset      )
     PROPERTYIMP    ( QString    , DupMethod      )
     PROPERTYIMP    ( QString    , DupIn          )
+    PROPERTYIMP    ( bool       , NewEpisOnly    )
     PROPERTYIMP    ( uint       , Filter         )
     PROPERTYIMP    ( QString    , RecProfile     )
     PROPERTYIMP    ( QString    , RecGroup       )
@@ -135,6 +137,7 @@ class SERVICE_PUBLIC RecRule : public QObject
               m_PreferredInput( 0      ),
               m_StartOffset   ( 0      ),
               m_EndOffset     ( 0      ),
+              m_NewEpisOnly   ( false  ),
               m_Filter        ( 0      ),
               m_AutoExpire    ( false  ),
               m_MaxEpisodes   ( 0      ),
@@ -179,6 +182,7 @@ class SERVICE_PUBLIC RecRule : public QObject
             m_EndOffset     = src->m_EndOffset     ;
             m_DupMethod     = src->m_DupMethod     ;
             m_DupIn         = src->m_DupIn         ;
+            m_NewEpisOnly   = src->m_NewEpisOnly   ;
             m_Filter        = src->m_Filter        ;
             m_RecProfile    = src->m_RecProfile    ;
             m_RecGroup      = src->m_RecGroup      ;

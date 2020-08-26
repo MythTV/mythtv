@@ -161,6 +161,8 @@ QString toString(RecordingDupInType recdupin)
             return QObject::tr("Previous Recordings");
         case kDupsInAll:
             return QObject::tr("All Recordings");
+        // TODO: This is wrong, kDupsNewEpi is returned in conjunction with
+        // one of the other values.
         case kDupsNewEpi:
             return QObject::tr("New Episodes Only");
         default:
@@ -179,6 +181,8 @@ QString toDescription(RecordingDupInType recdupin)
         case kDupsInAll:
             return QObject::tr("Look for duplicates in current and previous "
                                "recordings");
+        // TODO: This is wrong, kDupsNewEpi is returned in conjunction with
+        // one of the other values.
         case kDupsNewEpi:
             return QObject::tr("Record new episodes only");
         default:
@@ -188,6 +192,8 @@ QString toDescription(RecordingDupInType recdupin)
 
 QString toRawString(RecordingDupInType recdupin)
 {
+    // Remove "New Episodes" flag
+    recdupin = (RecordingDupInType) (recdupin & (-1 - kDupsNewEpi));
     switch (recdupin)
     {
         case kDupsInRecorded:
@@ -196,11 +202,15 @@ QString toRawString(RecordingDupInType recdupin)
             return QString("Previous Recordings");
         case kDupsInAll:
             return QString("All Recordings");
-        case kDupsNewEpi:
-            return QString("New Episodes Only");
         default:
             return QString("Unknown");
     }
+}
+
+// New Episodes Only is a flag added to DupIn
+bool newEpifromDupIn(RecordingDupInType recdupin)
+{
+    return (recdupin & kDupsNewEpi);
 }
 
 RecordingDupInType dupInFromString(const QString& type)
@@ -212,8 +222,15 @@ RecordingDupInType dupInFromString(const QString& type)
     if (type.toLower() == "all recordings" || type.toLower() == "all")
         return kDupsInAll;
     if (type.toLower() == "new episodes only" || type.toLower() == "new")
-        return kDupsNewEpi;
+        return static_cast<RecordingDupInType> (kDupsInAll | kDupsNewEpi);
     return kDupsInAll;
+}
+
+RecordingDupInType dupInFromStringAndBool(const QString& type, bool newEpisodesOnly) {
+    RecordingDupInType result = dupInFromString(type);
+    if (newEpisodesOnly)
+        result = static_cast<RecordingDupInType> (result | kDupsNewEpi);
+    return result;
 }
 
 QString toString(RecordingDupMethodType duptype)

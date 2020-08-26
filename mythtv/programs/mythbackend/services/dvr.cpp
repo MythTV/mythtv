@@ -1095,6 +1095,7 @@ uint Dvr::AddRecordSchedule   (
                                QDateTime lastrectsRaw,
                                QString   sDupMethod,
                                QString   sDupIn,
+                               bool      bNewEpisOnly,
                                uint      nFilter,
                                QString   sRecProfile,
                                QString   sRecGroup,
@@ -1145,7 +1146,7 @@ uint Dvr::AddRecordSchedule   (
         rule.m_dupMethod = kDupCheckNone;
     else
         rule.m_dupMethod = dupMethodFromString(sDupMethod);
-    rule.m_dupIn = dupInFromString(sDupIn);
+    rule.m_dupIn = dupInFromStringAndBool(sDupIn, bNewEpisOnly);
 
     if (sRecProfile.isEmpty())
         sRecProfile = "Default";
@@ -1242,6 +1243,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  int       nEndOffset,
                                  QString   sDupMethod,
                                  QString   sDupIn,
+                                 bool      bNewEpisOnly,
                                  uint      nFilter,
                                  QString   sRecProfile,
                                  QString   sRecGroup,
@@ -1291,7 +1293,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
         pRule.m_dupMethod = kDupCheckNone;
     else
         pRule.m_dupMethod = dupMethodFromString(sDupMethod);
-    pRule.m_dupIn = dupInFromString(sDupIn);
+    pRule.m_dupIn = dupInFromStringAndBool(sDupIn, bNewEpisOnly);
 
     if (sRecProfile.isEmpty())
         sRecProfile = "Default";
