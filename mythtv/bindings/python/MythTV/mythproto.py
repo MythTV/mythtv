@@ -288,7 +288,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
             for sg in sgs:
                 if sg.dirname in path:
                     if sg.local:
-                        return open(sg.dirname+filename, mode)
+                        return open(sg.dirname+filename, mode+'b')
                     else:
                         return protoopen(host, filename, sgroup)
 
@@ -307,9 +307,9 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                 path = sg.dirname+filename.rsplit('/',1)[0]
                 if not os.access(path, os.F_OK):
                     os.makedirs(path)
-            log(log.FILE, log.INFO, 'Opening local file (w)',
+            log(log.FILE, log.INFO, 'Opening local file (wb)',
                 sg.dirname+filename)
-            return open(sg.dirname+filename, mode)
+            return open(sg.dirname+filename, mode+'b')
 
         # fallback to remote write
         else:
@@ -322,9 +322,9 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
         sg = findfile(filename, sgroup, db)
         if sg is not None:
             # file found, open local
-            log(log.FILE, log.INFO, 'Opening local file (r)',
+            log(log.FILE, log.INFO, 'Opening local file (rb)',
                 sg.dirname+filename)
-            return open(sg.dirname+filename, mode)
+            return open(sg.dirname+filename, mode+'b')
         else:
         # file not found, open remote
             return protoopen(host, filename, sgroup)
