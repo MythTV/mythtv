@@ -50,7 +50,9 @@ enum RecordingDupInType
 MPUBLIC QString toString(RecordingDupInType rectype);
 MPUBLIC QString toDescription(RecordingDupInType rectype);
 MPUBLIC QString toRawString(RecordingDupInType rectype);
+MPUBLIC bool newEpifromDupIn(RecordingDupInType recdupin);
 MPUBLIC RecordingDupInType dupInFromString(const QString& type);
+MPUBLIC RecordingDupInType dupInFromStringAndBool(const QString& type, bool newEpisodesOnly);
 
 enum RecordingDupMethodType
 {
