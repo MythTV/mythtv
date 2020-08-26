@@ -341,7 +341,6 @@ bool ImportIconsWizard::initialLoad(const QString& name)
             {
                 entry.strChanId=query.value(0).toString();
                 entry.strName=query.value(1).toString();
-                entry.strName.remove(QRegularExpression("(-DT|-HD|-SD)"));
                 entry.strXmlTvId=query.value(2).toString();
                 entry.strCallsign=query.value(3).toString();
                 entry.strTransportId=query.value(4).toString();
