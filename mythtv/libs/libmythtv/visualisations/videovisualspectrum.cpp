@@ -4,8 +4,7 @@
 
 #define FFTW_N 512
 extern "C" {
-void *av_malloc(unsigned int size);
-void av_free(void *ptr);
+#include "libavutil/mem.h"
 }
 
 VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer *audio, MythRender *render)
