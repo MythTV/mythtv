@@ -264,7 +264,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
         ChannelInfo dbChan = FindMatchingChannel(*i, existingChannels);
         if (dbChan.m_chanId > 0) // Channel exists, updating
         {
-            LOG(VB_XMLTV, LOG_NOTICE,
+            LOG(VB_XMLTV, LOG_DEBUG,
                     QString("Match found for xmltvid %1 to channel %2 (%3)")
                         .arg((*i).m_xmltvId).arg(dbChan.m_name).arg(dbChan.m_chanId));
             if (m_interactive)
