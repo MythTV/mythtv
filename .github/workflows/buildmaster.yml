@@ -42,7 +42,7 @@ jobs:
            libxrandr-dev libxml2-dev libavahi-compat-libdnssd-dev libasound2-dev liblzo2-dev libhdhomerun-dev libsamplerate0-dev libva-dev
            libdrm-dev libvdpau-dev libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj
            libgnutls28-dev libqt5webkit5-dev libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future
-           libdbi-perl libdbd-mysql-perl libnet-upnp-perl libio-socket-inet6-perl libxml-simple-perl
+           libdbi-perl libdbd-mysql-perl libnet-upnp-perl libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql
       if: runner.os == 'Linux'
       
     - name: Install core dependencies (macOS)
@@ -64,11 +64,11 @@ jobs:
       working-directory: ./mythtv
       run: make install
       
-    # currently disabled due to strange failures
+    # QTest requires a QT SQL plugin - but there are currently none available via brew on macOS
     - name: Unit test core
       working-directory: ./mythtv
       run: make test
-      if: matrix.os == 'disabled'
+      if: runner.os == 'Linux'
     
     - name: Install plugin dependencies (linux)
       run: sudo apt install libvorbis-dev libflac++-dev libminizip-dev libcdio-dev libcdio-paranoia-dev python3-oauth python3-pycurl
