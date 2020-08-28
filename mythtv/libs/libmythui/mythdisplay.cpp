@@ -14,23 +14,26 @@
 #include "mythegl.h"
 #include "mythmainwindow.h"
 
+#ifdef USING_DBUS
+#include "platforms/mythdisplaymutter.h"
+#endif
 #ifdef Q_OS_ANDROID
-#include "mythdisplayandroid.h"
+#include "platforms/mythdisplayandroid.h"
 #endif
 #if defined(Q_OS_MAC)
-#include "mythdisplayosx.h"
+#include "platforms/mythdisplayosx.h"
 #endif
 #ifdef USING_X11
-#include "mythdisplayx11.h"
+#include "platforms/mythdisplayx11.h"
 #endif
 #ifdef USING_DRM
-#include "mythdisplaydrm.h"
+#include "platforms/mythdisplaydrm.h"
 #endif
 #if defined(Q_OS_WIN)
-#include "mythdisplaywindows.h"
+#include "platforms/mythdisplaywindows.h"
 #endif
 #ifdef USING_MMAL
-#include "mythdisplayrpi.h"
+#include "platforms/mythdisplayrpi.h"
 #endif
 
 #define LOC QString("Display: ")
@@ -85,6 +88,12 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 #ifdef USING_X11
             if (MythDisplayX11::IsAvailable())
                 s_display = new MythDisplayX11();
+#endif
+#ifdef USING_DBUS
+            /* disabled until testing can be completed (add docs on subclass choice when done)
+            if (!s_display)
+                s_display = MythDisplayMutter::Create();
+            */
 #endif
 #ifdef USING_MMAL
             if (!s_display)

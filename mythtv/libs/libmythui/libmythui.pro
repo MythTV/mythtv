@@ -133,6 +133,8 @@ using_qtdbus {
     DEFINES += USING_DBUS
     HEADERS += screensaver-dbus.h
     SOURCES += screensaver-dbus.cpp
+    HEADERS += platforms/mythdisplaymutter.h
+    SOURCES += platforms/mythdisplaymutter.cpp
 }
 
 macx {
