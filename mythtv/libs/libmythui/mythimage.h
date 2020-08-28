@@ -112,8 +112,8 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     MythPainter   *m_parent        {nullptr};
 
     bool           m_isGradient    {false};
-    QColor         m_gradBegin     {"#000000"};
-    QColor         m_gradEnd       {"#FFFFFF"};
+    QColor         m_gradBegin     {0x00, 0x00, 0x00};
+    QColor         m_gradEnd       {0xFF, 0xFF, 0xFF};
     int            m_gradAlpha     {255};
     FillDirection  m_gradDirection {FillDirection::TopToBottom};
 

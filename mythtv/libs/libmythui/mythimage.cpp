@@ -194,7 +194,7 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     }
 
     QImage alphaChannel(mirrorImage.size(), QImage::Format_ARGB32);
-    MakeGradient(alphaChannel, QColor("#AAAAAA"), QColor("#000000"), 255,
+    MakeGradient(alphaChannel, QColor(0xAA, 0xAA, 0xAA), QColor(0x00, 0x00, 0x00), 255,
                  BoundaryWanted::No, fillDirection);
     mirrorImage.setAlphaChannel(alphaChannel);
 
