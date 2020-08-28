@@ -450,7 +450,6 @@ void ThemeChooser::Init(void)
             item->SetData(QVariant::fromValue(themeinfo));
 
             QString thumbnail = themeinfo->GetPreviewPath();
-            QFileInfo fInfo(thumbnail);
             // Downloadable themeinfos have thumbnail copies of their preview images
             if (!themeinfo->GetDownloadURL().isEmpty())
                 thumbnail = thumbnail.append(".thumb.jpg");
@@ -1018,7 +1017,6 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
         int pos = subexp.indexIn(GetMythSourceVersion());
         if (pos > -1)
         {
-            QString subversion;
             for (int idx = subexp.cap(1).toInt(); idx > 0; --idx)
                 m_mythVersions << version + "." + QString::number(idx);
         }

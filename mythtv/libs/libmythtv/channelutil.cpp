@@ -2118,12 +2118,10 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         chan.m_xmltvId = query.value(12).toString();      /* xmltvid    */
 
         QStringList inputIDs = query.value(11).toString().split(",");
-        QString inputid;
         while (!inputIDs.isEmpty())
                 chan.AddInputId(inputIDs.takeFirst().toUInt());
 
         QStringList groupIDs = query.value(10).toString().split(",");
-        QString groupid;
         while (!groupIDs.isEmpty())
                 chan.AddGroupId(groupIDs.takeFirst().toUInt());
 
@@ -2546,12 +2544,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         channelInfo.m_chanId            = query.value(27).toUInt();
 
         QStringList groupIDs = query.value(28).toString().split(",");
-        QString groupid;
         while (!groupIDs.isEmpty())
                 channelInfo.AddGroupId(groupIDs.takeFirst().toUInt());
 
         QStringList inputIDs = query.value(29).toString().split(",");
-        QString inputid;
         while (!inputIDs.isEmpty())
                 channelInfo.AddInputId(inputIDs.takeFirst().toUInt());
 

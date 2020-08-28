@@ -240,7 +240,6 @@ QString VirtualChannelTable::toStringXML(uint indent_level) const
 {
     QString indent_0 = xml_indent(indent_level);
     QString indent_1 = xml_indent(indent_level + 1);
-    QString indent_2 = xml_indent(indent_level + 2);
 
     QString section_name = QString("%1VirtualChannelSection")
         .arg((TableID::TVCT == TableID()) ? "Terrestrial" : "Cable");

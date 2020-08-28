@@ -473,8 +473,6 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 
 bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QFileInfo& oInfo )
 {
-    QString sName = oInfo.absoluteFilePath();
-
     if (oInfo.exists())
     {
         if (oInfo.isSymLink())

@@ -7510,7 +7510,6 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
     else if (StateIsLiveTV(GetState(ctx)))
     {
         QString channum = GetQueuedChanNum();
-        QString chaninput = GetQueuedInput();
         if (m_browseHelper->IsBrowsing())
         {
             uint sourceid = 0;
@@ -8815,7 +8814,6 @@ void TV::EnableUpmix(PlayerContext *ctx, bool enable, bool toggle)
 {
     if (!ctx->m_player || !ctx->m_player->HasAudioOut())
         return;
-    QString text;
 
     bool enabled = false;
 
@@ -12253,7 +12251,6 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
     if (!action.startsWith("DEINTERLACER"))
         return;
 
-    QString deint = action.mid(13);
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     //if (ctx->m_player)
     //    ctx->m_player->ForceDeinterlacer(deint);
@@ -12828,7 +12825,6 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
     if (!ContextIsPaused(ctx, __FILE__, __LINE__))
         DoTogglePause(ctx, false);
 
-    QString message;
     QString videotype;
 
     if (StateIsLiveTV(GetState(ctx)))

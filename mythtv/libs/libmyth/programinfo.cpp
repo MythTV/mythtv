@@ -3452,7 +3452,6 @@ void ProgramInfo::SaveMarkupMap(
     for (it = marks.begin(); it != marks.end(); ++it)
     {
         uint64_t frame = it.key();
-        QString querystr;
 
         if ((min_frame >= 0) && (frame < (uint64_t)min_frame))
             continue;
@@ -4924,7 +4923,6 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
         }
         else if (m_inUseForWhat.isEmpty())
         {
-            QString oldInUseForWhat = m_inUseForWhat;
             m_inUseForWhat = QString("%1 [%2]")
                 .arg(QObject::tr("Unknown")).arg(getpid());
             LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -5820,7 +5818,6 @@ bool LoadFromRecorded(
 {
     destination.clear();
 
-    QString     fs_db_name = "";
     QDateTime   rectime    = MythDate::current().addSecs(
         -gCoreContext->GetNumSetting("RecordOverTime"));
 

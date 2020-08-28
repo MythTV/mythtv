@@ -790,7 +790,7 @@ bool GameUI::isLeaf(MythGenericTree *node)
 
 void GameUI::fillNode(MythGenericTree *node)
 {
-    QString layername = node->GetText();
+//  QString layername = node->GetText();
     auto *romInfo = node->GetData().value<RomInfo *>();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1014,10 +1014,6 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
         return;
 
     ArtworkMap map;
-
-    QString inetref = metadata->Inetref();
-    QString system = metadata->System();
-    QString title = metadata->Gamename();
 
     if (metadata->Boxart().isEmpty() && !coverart.empty())
     {

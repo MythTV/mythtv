@@ -110,11 +110,7 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
 
 
     auto *sa4 = (struct sockaddr_in *)sa;
-
-    QHostAddress a(ntohl(sa4->sin_addr.s_addr));
-
     *port = ntohs(sa4->sin_port);
-
     *addr = QHostAddress(ntohl(sa4->sin_addr.s_addr));
 }
 

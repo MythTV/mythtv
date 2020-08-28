@@ -452,7 +452,6 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     if (!selected)
         return;
 
-    QString txt = selected->GetText();
     if (GetFocusWidget() == m_activeList)
     {
         auto *si = selected->GetData().value<ScreenListInfo *>();

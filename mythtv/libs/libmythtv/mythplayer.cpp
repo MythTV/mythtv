@@ -1374,7 +1374,6 @@ int MythPlayer::SetTrack(uint type, int trackNo)
     ret = m_decoder->SetTrack(type, trackNo);
     if (kTrackTypeAudio == type)
     {
-        QString msg = "";
         if (m_decoder)
             SetOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
                           kOSDTimeout_Med);

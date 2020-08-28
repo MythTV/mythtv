@@ -567,7 +567,6 @@ int ExternalStreamHandler::StreamingCount(void) const
 
 void ExternalStreamHandler::run(void)
 {
-    QString    cmd;
     QString    result;
     QString    ready_cmd;
     QByteArray buffer;

@@ -633,8 +633,8 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         return false;
 
 #ifndef Q_OS_ANDROID
-    QString devicePath( mep->fs_spec );
 #if 0
+    QString devicePath( mep->fs_spec );
     LOG(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
 #endif
 

@@ -1602,7 +1602,7 @@ void ProgLister::customEvent(QEvent *event)
         auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
-        QString resulttext = dce->GetResultText();
+//      QString resulttext = dce->GetResultText();
         int     buttonnum  = dce->GetResult();
 
         if (resultid == "sortmenu")

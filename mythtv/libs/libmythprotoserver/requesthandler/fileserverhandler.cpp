@@ -69,8 +69,6 @@ QString FileServerHandler::LocalFilePath(const QString &path,
     if (lpath.section('/', -2, -2) == "channels")
     {
         // This must be an icon request. Check channel.icon to be safe.
-        QString querytext;
-
         QString file = lpath.section('/', -1);
         lpath = "";
 

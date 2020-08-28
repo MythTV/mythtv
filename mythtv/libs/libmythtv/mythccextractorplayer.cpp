@@ -156,8 +156,6 @@ bool MythCCExtractorPlayer::run(void)
 
     m_curTime = 0;
 
-    QString currDir = QFileInfo(m_fileName).path();
-
     if (DecoderGetFrame(kDecodeVideo))
         OnGotNewFrame();
 
@@ -500,8 +498,6 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 
                 QString service_key = QString("service-%1")
                     .arg(idx, 2, 10, QChar('0'));
-                QString id = iso639_is_key_undefined(langCode) ?
-                    service_key : lang;
                 QString filename = QString("%1.%2%3-%4.%5.srt")
                     .arg(m_baseName).arg(stream_id_str).arg("708")
                     .arg(service_key).arg(lang);

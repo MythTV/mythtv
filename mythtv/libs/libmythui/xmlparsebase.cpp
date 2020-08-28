@@ -847,7 +847,6 @@ bool XMLParseBase::LoadBaseTheme(void)
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    QMap<QString, QString> dependsMap;
     for (const auto & dir : qAsConst(searchpath))
     {
         QString themefile = dir + "base.xml";

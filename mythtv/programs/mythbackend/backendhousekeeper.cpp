@@ -307,7 +307,6 @@ void CleanupTask::CleanupChannelTables(void)
 void CleanupTask::CleanupProgramListings(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr;
     // Keep as many days of listings data as we keep matching, non-recorded
     // oldrecorded entries to allow for easier post-mortem analysis
     int offset = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);

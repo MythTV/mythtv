@@ -3153,8 +3153,6 @@ MythMenu* PlaybackBox::createJobMenu()
 
     auto *menu = new MythMenu(title, this, "slotmenu");
 
-    QString command;
-
     const std::array<const bool,kMaxJobs> add
     {
         true,

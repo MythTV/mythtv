@@ -409,7 +409,6 @@ bool RemoteGetRecordingStatus(
 
     for (uint inputid : inputlist)
     {
-        QString     status      = "";
         int         state       = kState_ChangingState;
         QString     channelName = "";
         QString     title       = "";

@@ -459,7 +459,6 @@ int MusicMetadata::getDirectoryId()
     if (m_directoryId < 0)
     {
         QString sqldir = m_filename.section('/', 0, -2);
-        QString sqlfilename = m_filename.section('/', -1);
 
         checkEmptyFields();
 
@@ -733,7 +732,6 @@ void MusicMetadata::dumpToDatabase()
                    "WHERE song_id= :ID ;";
     }
 
-    QString sqldir = m_filename.section('/', 0, -2);
     QString sqlfilename = m_filename.section('/', -1);
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1510,12 +1508,6 @@ void AllMusic::resync()
                      "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
                      "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
                      "ORDER BY music_songs.song_id;";
-
-    QString filename;
-    QString artist;
-    QString album;
-    QString title;
-    QString compartist;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(aquery))

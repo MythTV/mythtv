@@ -176,7 +176,6 @@ static void exec_program_tv_cb(const QString &cmd)
 
         strlist = QStringList(QString("FREE_TUNER %1").arg(cardid));
         gCoreContext->SendReceiveStringList(strlist);
-        QString ret = strlist[0];
     }
     else
     {
@@ -1515,7 +1514,6 @@ void MythContextPrivate::loadSettingsCacheOverride(void) const
     // Prevent power off TV after temporary window
     gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", nullptr);
 
-    QString language = gCoreContext->GetSetting("Language",QString());
     MythTranslation::load("mythfrontend");
 }
 

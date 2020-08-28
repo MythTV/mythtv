@@ -525,7 +525,6 @@ void StatusBox::doListingsStatus()
     QDateTime mfdLastRunEnd;
     QDateTime mfdNextRunStart;
     QString mfdLastRunStatus;
-    QString querytext;
     QDateTime qdtNow;
     QDateTime GuideDataThrough;
 
@@ -870,8 +869,6 @@ void StatusBox::doTunerStatus()
         gCoreContext->SendReceiveStringList(strlist);
         int state = strlist[0].toInt();
 
-        QString status;
-        QString fontstate;
         if (state == kState_Error)
         {
             strlist.clear();

@@ -317,7 +317,6 @@ qint64 HTTPRequest::SendResponse( void )
             if (m_sFileName.isEmpty() || !m_response.buffer().isEmpty())
                 break;
             {
-                QByteArray fileBuffer;
                 QFile file(m_sFileName);
                 if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -1436,7 +1435,6 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 {
     m_sRawRequest = sLine;
 
-    QString     sToken;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
 #else

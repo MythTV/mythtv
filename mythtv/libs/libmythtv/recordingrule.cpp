@@ -510,7 +510,6 @@ bool RecordingRule::Delete(bool sendSig)
     if (m_recordID < 0)
         return false;
 
-    QString querystr;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM record WHERE recordid = :RECORDID");
     query.bindValue(":RECORDID", m_recordID);
@@ -590,7 +589,6 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     QDateTime startts(m_startdate, m_starttime, Qt::UTC);
     QDateTime endts(m_enddate, m_endtime, Qt::UTC);
 
-    QString length;
     int seconds = startts.secsTo(endts);
     int minutes = seconds / 60;
     int hours   = minutes / 60;

@@ -342,9 +342,6 @@ void ProgFinder::updateInfo(void)
 
     if (GetFocusWidget() == m_alphabetList)
     {
-        QString title;
-        QString description;
-
         if (m_showList->GetCount() == 0)
         {
             if (m_help1Text)

@@ -616,7 +616,6 @@ void MythWebView::customEvent(QEvent *event)
             if (resulttext == tr("Play the file"))
             {
                 QFileInfo fi(m_downloadRequest.url().path());
-                QString basename(fi.baseName());
                 QString extension = fi.suffix();
                 QString mimeType = getReplyMimetype();
 
@@ -696,7 +695,6 @@ void MythWebView::customEvent(QEvent *event)
 void MythWebView::showDownloadMenu(void)
 {
     QFileInfo fi(m_downloadRequest.url().path());
-    QString basename(fi.baseName());
     QString extension = fi.suffix();
     QString mimeType = getReplyMimetype();
 

@@ -245,7 +245,6 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         }
 
         bool download = m_download->GetCheckState() == MythUIStateType::Full;
-        QDateTime updated = MythDate::current();
         QString filename("");
 
         if (!file.isEmpty())

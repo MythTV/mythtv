@@ -626,7 +626,6 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
 
 void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
 {
-    QString fn_log_tag = "_ContextStateCallback, ";
     auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     switch (pa_context_get_state(c))
     {
@@ -645,7 +644,6 @@ void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
 
 void AudioOutputPulseAudio::StreamStateCallback(pa_stream *s, void *arg)
 {
-    QString fn_log_tag = "StreamStateCallback, ";
     auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     switch (pa_stream_get_state(s))
     {

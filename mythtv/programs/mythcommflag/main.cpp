@@ -842,7 +842,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     if (commDetectMethod == COMM_DETECT_OFF)
         return GENERIC_EXIT_OK;
 
-    frm_dir_map_t blanks;
     recorder = nullptr;
 
 /*

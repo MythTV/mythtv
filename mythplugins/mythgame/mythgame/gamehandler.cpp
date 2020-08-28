@@ -148,7 +148,6 @@ void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString*
                               QString* Fanart, QString* Boxart)
 {
     QString key;
-    QString tmpcrc;
 
     *CRC32 = crcinfo(rom, handler->GameType(), &key, &m_romDB);
 
@@ -406,8 +405,6 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString Fanart;
     QString Boxart;
     QString ScreenShot;
-    QString thequery;
-    QString queryvalues;
 
     int removalprompt = gCoreContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gCoreContext->GetSetting("GameDeepScan").toInt();
@@ -582,7 +579,6 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
          it != List.end(); ++it)
     {
         QFileInfo Info = *it;
-        QString RomName = Info.fileName();
 
         if (Info.isDir())
         {
@@ -688,7 +684,6 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
 
 void GameHandler::processGames(GameHandler *handler)
 {
-    QString thequery;
     int maxcount = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -953,7 +948,7 @@ void GameHandler::customEvent(QEvent *event)
     if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
         QString resultid   = dce->GetId();
-        QString resulttext = dce->GetResultText();
+//      QString resulttext = dce->GetResultText();
 
         if (resultid == "removalPopup")
         {

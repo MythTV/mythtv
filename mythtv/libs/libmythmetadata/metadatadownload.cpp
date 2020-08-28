@@ -819,7 +819,6 @@ static QString getNameWithExtension(const QString &filename, const QString &type
     {
         newname = filename.left(filename.size() - ext.size()) + type;
     }
-    QUrl xurl(newname);
 
     if (RemoteFile::Exists(newname))
         ret = newname;

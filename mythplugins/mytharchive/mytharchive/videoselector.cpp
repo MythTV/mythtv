@@ -392,8 +392,6 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     if (query.exec() && query.size())
     {
         auto *videoList = new vector<VideoInfo*>;
-        QString artist;
-        QString genre;
         QString episode;
         while (query.next())
         {

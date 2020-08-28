@@ -999,7 +999,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         QString        sDescription = query.value( 5).toString();
         QString        sCategory    = query.value( 6).toString();
         QString        sHostName    = query.value( 7).toString();
-        QString        sRecGroup    = query.value( 8).toString();
+//      QString        sRecGroup    = query.value( 8).toString();
         uint64_t       nFileSize    = query.value( 9).toULongLong();
         QString        sBaseName    = query.value(10).toString();
 

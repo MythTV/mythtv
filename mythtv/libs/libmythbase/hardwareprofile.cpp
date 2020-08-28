@@ -117,7 +117,6 @@ QString HardwareProfile::GetPublicUUIDFromFile() const
     QString ret;
 
     QString pubuuid_file = GetConfDir() + "/HardwareProfile/uuiddb.cfg";
-    QString pubuuid;
     QFile pubfile(pubuuid_file);
     if (pubfile.open( QIODevice::ReadOnly ))
     {

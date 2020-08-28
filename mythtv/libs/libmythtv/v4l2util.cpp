@@ -820,8 +820,6 @@ int V4L2util::GetStreamType(void) const
 
 bool V4L2util::SetStreamType(int value)
 {
-    QString desc;
-
     if (DriverName().startsWith("saa7164") ||
         DriverName().startsWith("ivtv"))
     {

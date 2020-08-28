@@ -467,7 +467,6 @@ bool FillData::Run(SourceList &sourcelist)
                     qCurrentDate = newDate;
                 }
 
-                QString prevDate(qCurrentDate.addDays(i-1).toString());
                 QString currDate(qCurrentDate.addDays(i).toString());
 
                 LOG(VB_GENERAL, LOG_INFO, ""); // add a space between days

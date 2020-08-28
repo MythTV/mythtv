@@ -439,7 +439,6 @@ bool ThumbFinder::getThumbImages()
     else
         chapterLen = m_finalDuration;
 
-    QString thumbList = "";
     m_updateFrame = false;
 
     // add title thumb

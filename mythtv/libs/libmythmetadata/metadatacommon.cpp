@@ -1178,7 +1178,6 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
     ArtworkMap artwork;
 
     // Get the easy parses
-    QString titletmp;
     if (item.tagName() == "movie")
         title = Parse::UnescapeHTML(item.firstChildElement("title").text());
     else if (item.tagName() == "episodedetails")

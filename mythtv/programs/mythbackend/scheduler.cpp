@@ -811,7 +811,6 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
             RecordingInfo *recp = *j;
             if (recp->GetRecordingStatus() == RecStatus::Pending)
             {
-                QString schedid = recp->MakeUniqueSchedulerKey();
                 recp->SetRecordingStatus(RecStatus::Conflict);
                 recp->AddHistory(false, false, true);
                 m_recListChanged = true;
@@ -912,7 +911,6 @@ void Scheduler::SlaveDisconnected(uint cardid)
         {
             if (rp->GetRecordingStatus() == RecStatus::Pending)
             {
-                QString schedid = rp->MakeUniqueSchedulerKey();
                 rp->SetRecordingStatus(RecStatus::Missed);
                 rp->AddHistory(false, false, true);
             }
@@ -2663,8 +2661,6 @@ bool Scheduler::HandleRecording(
                             nextrectime.addSecs(-prerollseconds - 60));
         return true;
     }
-
-    QString schedid = ri.MakeUniqueSchedulerKey();
 
     if (ri.GetRecordingStartTime() > m_lastPrepareTime)
     {
@@ -4777,8 +4773,6 @@ void Scheduler::AddNotListed(void) {
             .arg(result.size())
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
-
-    QDateTime now = MythDate::current();
 
     while (result.next())
     {

@@ -949,8 +949,6 @@ QString CardUtil::ProbeSubTypeName(uint inputid)
     if ("DVB" != type)
         return type;
 
-    QString device = GetVideoDevice(inputid);
-
     DTVTunerType tunertype;
     int fd_frontend = OpenVideoDevice(inputid);
     if (fd_frontend < 0)
@@ -2452,7 +2450,6 @@ QString CardUtil::GetDeviceLabel(const QString &inputtype,
 
 QString CardUtil::GetDeviceLabel(uint inputid)
 {
-    QString devlabel;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice "
                   "FROM capturecard WHERE cardid = :INPUTID ");

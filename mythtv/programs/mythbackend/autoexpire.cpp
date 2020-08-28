@@ -653,8 +653,6 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     QMap<QString, int> episodeParts;
     QString episodeKey;
 
-    QString fileprefix = gCoreContext->GetFilePrefix();
-
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recordid, maxepisodes, title "
                   "FROM record WHERE maxepisodes > 0 "

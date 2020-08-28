@@ -1134,8 +1134,6 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     QList<LCDTextItem>::iterator it = textItems->begin();
     LCDTextItem *curItem = &(*it);
 
-    QString aString;
-
     if ( m_lcdShowGeneric )
         setPriority("Generic", TOP);
 

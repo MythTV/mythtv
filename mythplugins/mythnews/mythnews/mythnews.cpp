@@ -171,7 +171,7 @@ void MythNews::loadSites(void)
     {
         QString name = query.value(0).toString();
         QString url  = query.value(1).toString();
-        QString icon = query.value(2).toString();
+//      QString icon = query.value(2).toString();
         QDateTime time = MythDate::fromSecsSinceEpoch(query.value(3).toLongLong());
         bool podcast = query.value(4).toBool();
         m_newsSites.push_back(new NewsSite(name, url, time, podcast));

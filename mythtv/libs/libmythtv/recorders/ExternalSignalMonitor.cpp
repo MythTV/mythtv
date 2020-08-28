@@ -42,8 +42,6 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
                                              uint64_t _flags)
     : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
-    QString result;
-
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     m_streamHandler = ExternalStreamHandler::Get(m_channel->GetDevice(),
                                                   m_channel->GetInputID(),
@@ -72,8 +70,6 @@ ExternalSignalMonitor::~ExternalSignalMonitor()
  */
 void ExternalSignalMonitor::Stop(void)
 {
-    QString result;
-
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
 
     SignalMonitor::Stop();

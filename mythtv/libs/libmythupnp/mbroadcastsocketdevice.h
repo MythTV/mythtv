@@ -32,7 +32,6 @@ class MBroadcastSocketDevice : public MSocketDevice
         m_address.setAddress( sAddress );
         m_port = nPort;
 
-        QByteArray addr = sAddress.toLatin1();
         setProtocol(IPv4);
         setSocket(createNewSocket(), MSocketDevice::Datagram);
 

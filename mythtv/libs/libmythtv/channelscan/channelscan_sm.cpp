@@ -755,7 +755,7 @@ void ChannelScanSM::UpdateScanTransports(uint nit_frequency, const NetworkInform
             uint64_t frequency = 0;
             const MPEGDescriptor desc(item);
             uint tag = desc.DescriptorTag();
-            QString tagString = desc.DescriptorTagString();
+//          QString tagString = desc.DescriptorTagString();
 
             DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
             switch (tag)

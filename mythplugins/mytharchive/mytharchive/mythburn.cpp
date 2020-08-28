@@ -1138,7 +1138,6 @@ void BurnMenu::doBurn(int mode)
         return;
 
     QString logDir = tempDir + "logs";
-    QString configDir = tempDir + "config";
     QString commandline;
 
     // remove existing progress.log if present

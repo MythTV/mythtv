@@ -176,9 +176,6 @@ void ViewScheduleDiff::fillList(void)
 {
     m_inFill = true;
 
-    QString callsign;
-    QDateTime startts;
-    QDateTime recstartts;
     bool dummy = false;
 
     LoadFromScheduler(m_recListBefore, dummy);

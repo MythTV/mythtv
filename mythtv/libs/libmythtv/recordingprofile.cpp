@@ -1765,7 +1765,6 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
 
     if (group == RecordingProfile::TranscoderGroup && foldautodetect)
     {
-        QString id = QString::number(RecordingProfile::kTranscoderAutodetect);
         auto *profile = new GroupSetting();
         profile->setLabel(QObject::tr("Autodetect"));
         setting->addChild(profile);

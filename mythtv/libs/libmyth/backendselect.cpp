@@ -185,7 +185,6 @@ void BackendSelection::AddItem(DeviceLocation *dev)
  */
 bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 {
-    QString          error;
     QString          message;
 
     m_usn   = dev->m_sUSN;

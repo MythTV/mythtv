@@ -122,8 +122,6 @@ void ExternalRecorder::run(void)
 
 bool ExternalRecorder::Open(void)
 {
-    QString result;
-
     if (IsOpen())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Card already open");
@@ -156,8 +154,6 @@ bool ExternalRecorder::Open(void)
 
 void ExternalRecorder::Close(void)
 {
-    QString result;
-
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())

@@ -398,7 +398,6 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
     auto *channelItem = item->GetData().value<ChannelInfo *>();
     if (!m_channelData.isEmpty() && channelItem)
     {
-        QString rectype;
         if (m_iconImage)
         {
             QString iconUrl = gCoreContext->GetMasterHostPrefix("ChannelIcons", channelItem->m_icon);

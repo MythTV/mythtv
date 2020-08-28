@@ -431,12 +431,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     // drive space   ---------------------
 
     QStringList strlist;
-    QString dirs;
     QString hostname;
     QString directory;
     QString isLocalstr;
     QString fsID;
-    QString ids;
 
     if (m_pMainServer)
         m_pMainServer->BackendQueryDiskSpace(strlist, true, m_bIsMaster);

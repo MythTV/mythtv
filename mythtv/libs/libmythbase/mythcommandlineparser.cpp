@@ -2497,9 +2497,6 @@ QString MythCommandLineParser::GetLogFilePath(void)
     if (logfile.isEmpty())
         return logfile;
 
-    QString logdir;
-    QString filepath;
-
     QFileInfo finfo(logfile);
     if (!finfo.isDir())
     {
@@ -2509,7 +2506,7 @@ QString MythCommandLineParser::GetLogFilePath(void)
         return QString();
     }
 
-    logdir  = finfo.filePath();
+    QString logdir  = finfo.filePath();
     logfile = QCoreApplication::applicationName() + "." +
         MythDate::toString(MythDate::current(), MythDate::kFilename) +
         QString(".%1").arg(pid) + ".log";

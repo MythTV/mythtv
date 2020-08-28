@@ -105,7 +105,6 @@ AudioOutputALSA::~AudioOutputALSA()
 
 int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
 {
-    QString real_device;
     QByteArray dev_ba;
     int err = -1;
 

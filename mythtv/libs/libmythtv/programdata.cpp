@@ -1100,7 +1100,6 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         " :INETREF ) ");
 
     QString cattype = myth_category_type_to_string(m_categoryType);
-    QString empty("");
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":TITLE",       denullify(m_title));
     query.bindValue(":SUBTITLE",    denullify(m_subtitle));

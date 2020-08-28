@@ -290,7 +290,6 @@ class XMLTVGrabber : public MythUIComboBoxSetting
 #else
 
         QString loc = "XMLTVGrabber::Load: ";
-        QString loc_err = "XMLTVGrabber::Load, Error: ";
 
         QStringList name_list;
         QStringList prog_list;
@@ -2301,7 +2300,6 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     int idx2 = path.indexOf(' ', idx1);
 
     QString   ci;
-    QString   cs;
     QFileInfo fileInfo(path.mid(idx1, idx2 - idx1));
 
     if (fileInfo.exists())

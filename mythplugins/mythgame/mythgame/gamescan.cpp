@@ -67,7 +67,6 @@ void GameScannerThread::verifyFiles()
     for (const auto *info : qAsConst(m_dbgames))
     {
         QString romfile = info->Romname();
-        QString system = info->System();
         QString gametype = info->GameType();
         if (!romfile.isEmpty())
         {

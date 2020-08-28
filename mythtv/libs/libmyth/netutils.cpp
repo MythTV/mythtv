@@ -489,7 +489,7 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
         QString     subtitle = query.value(1).toString();
         QString     desc = query.value(2).toString();
         QString     URL = query.value(3).toString();
-        QString     feedtype = query.value(4).toString();
+//      QString     feedtype = query.value(4).toString();
         QString     thumbnail = query.value(5).toString();
         QString     mediaURL = query.value(6).toString();
         QString     author = query.value(7).toString();

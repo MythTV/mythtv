@@ -1124,7 +1124,6 @@ static QString extract_cc608(QString &text, int &color,
                              bool &isItalic, bool &isUnderline)
 {
     QString result;
-    QString orig(text);
 
     // Handle an initial control sequence.
     if (text.length() >= 1 && text[0] >= 0x7000)

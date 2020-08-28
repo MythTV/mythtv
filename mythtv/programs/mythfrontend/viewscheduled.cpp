@@ -266,7 +266,6 @@ void ViewScheduled::LoadList(bool useExistingData)
         LoadFromScheduler(m_recList, m_conflictBool);
 
     auto pit = m_recList.begin();
-    QString currentDate;
     m_recgroupList[m_defaultGroup] = ProgramList(false);
     m_recgroupList[m_defaultGroup].setAutoDelete(false);
     while (pit != m_recList.end())

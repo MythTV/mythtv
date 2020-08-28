@@ -5150,7 +5150,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t totalKB = -1;
     int64_t usedKB = -1;
     QMap <QString, bool>foundDirs;
-    QString driveKey;
     QString localStr = "1";
     struct statfs statbuf {};
     QStringList groups(StorageGroup::kSpecialGroups);
@@ -5243,8 +5242,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     if (allHosts)
     {
         QMap <QString, bool> backendsCounted;
-        QString pbsHost;
-
         list<PlaybackSock *> localPlaybackList;
 
         m_sockListLock.lockForRead();
@@ -8062,8 +8059,6 @@ QString MainServer::LocalFilePath(const QString &path, const QString &wantgroup)
     if (lpath.section('/', -2, -2) == "channels")
     {
         // This must be an icon request. Check channel.icon to be safe.
-        QString querytext;
-
         QString file = lpath.section('/', -1);
         lpath = "";
 

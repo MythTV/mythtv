@@ -405,8 +405,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     {
         if (IsAudioNeeded())
         {
-            // cppcheck-suppress unreadVariable
-            QString errMsg = audio->ReinitAudio();
+            static_cast<void>(audio->ReinitAudio());
         }
     }
     else if (m_pipState == kPBPRight)

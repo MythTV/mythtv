@@ -195,7 +195,6 @@ void VideoScannerThread::run()
             {
                 QUrl sgurl = *iter;
                 QString host = sgurl.host().toLower();
-                QString path = sgurl.path();
 
                 m_liveSGHosts.removeAll(host);
 

@@ -114,8 +114,6 @@ void MHBitmap::ContentPreparation(MHEngine *engine)
 // Decode the content.
 void MHBitmap::ContentArrived(const unsigned char *data, int length, MHEngine *engine)
 {
-    QRegion updateArea = GetVisibleArea(); // If there's any content already we have to redraw it.
-
     if (! m_pContent)
     {
         return;    // Shouldn't happen.

@@ -160,7 +160,6 @@ int main(int argc, char *argv[])
     bool mpeg2 = false;
     bool fifo_info = false;
     bool cleanCut = false;
-    QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
     frm_pos_map_t posMap; ///< position of keyframes
     frm_pos_map_t durMap; ///< duration from beginning of keyframes

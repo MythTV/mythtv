@@ -1422,9 +1422,6 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 int GuideGrid::FindChannel(uint chanid, const QString &channum,
                            bool exact) const
 {
-    static QMutex s_chanSepRegExpLock;
-    static QRegExp s_chanSepRegExp(ChannelUtil::kATSCSeparators);
-
     // first check chanid
     uint i = (chanid) ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); ++i)

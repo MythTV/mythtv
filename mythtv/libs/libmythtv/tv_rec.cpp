@@ -3573,9 +3573,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuningShutdowns(%1)")
         .arg(request.toString()));
 
-    QString channum;
-    QString inputname;
-
     if (m_scanner && !(request.m_flags & kFlagEITScan) &&
         HasFlags(kFlagEITScannerRunning))
     {
@@ -4645,7 +4642,6 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
 
     RecordingInfo *pginfo = nullptr;
     MythMediaBuffer *buffer = nullptr;
-    QString        inputName;
 
     if (!m_channel ||
         !m_channel->CheckChannel(channum))
@@ -4701,7 +4697,6 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
 
     RecordingInfo *pginfo = nullptr;
     MythMediaBuffer *buffer = nullptr;
-    QString        inputName;
 
     if (!m_channel ||
         !m_channel->CheckChannel(channum))

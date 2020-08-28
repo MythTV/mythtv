@@ -521,7 +521,6 @@ void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, 
 
 void Playlist::loadPlaylist(const QString& a_name, const QString& a_host)
 {
-    QString thequery;
     QString rawSonglist;
 
     if (a_host.isEmpty())
