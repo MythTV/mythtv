@@ -20,6 +20,7 @@ MythDisplayDRM::~MythDisplayDRM()
     delete m_device;
 }
 
+// FIXME - I doubt this slot is being called correctly
 void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
 {
     MythDisplay::ScreenChanged(qScreen);
