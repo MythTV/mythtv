@@ -7,6 +7,8 @@
 
 class MythMainWindow;
 
+#define MYTH_PAINTER_OPENGL QString("OpenGL")
+
 class MythPainterWindowOpenGL : public MythPainterWindow
 {
     Q_OBJECT

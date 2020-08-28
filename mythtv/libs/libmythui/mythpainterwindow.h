@@ -5,6 +5,7 @@
 #include <QWidget>
 
 // MythTV
+#include "mythuiexp.h"
 #include "mythrender_base.h"
 
 class MythMainWindow;
@@ -13,17 +14,19 @@ class MythPainter;
 class MythPainterWindow : public QWidget
 {
   public:
-    static QString CreatePainters(MythMainWindow* MainWindow,
+    static MUI_PUBLIC QString GetDefaultPainter();
+    static MUI_PUBLIC const QStringList GetPainters();
+    static QString CreatePainters(MythMainWindow* MainWin,
                                   MythPainterWindow*& PaintWin,
-                                  MythPainter*& Painter);
+                                  MythPainter*& Paint);
     static void    DestroyPainters(MythPainterWindow*& PaintWin,
                                    MythPainter*& Painter);
 
-    MythRender* GetRenderDevice(void);
-    bool        RenderIsShared (void);
+    MythRender* GetRenderDevice();
+    bool        RenderIsShared ();
 
   protected:
-    explicit MythPainterWindow(MythMainWindow *MainWin);
+    explicit MythPainterWindow(MythMainWindow* MainWin);
    ~MythPainterWindow() override = default;
 
     MythRender* m_render { nullptr };

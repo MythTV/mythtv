@@ -49,6 +49,7 @@
 #include "decoders/mythvaapicontext.h"
 #endif
 #include "mythpower.h"
+#include "mythpainterwindow.h"
 
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
@@ -1466,6 +1467,28 @@ static HostCheckBoxSetting *FFRewReverse()
                                          "switch to play mode if the speed "
                                          "can't be decreased further."));
     return gc;
+}
+
+static void AddPaintEngine(GroupSetting* Group)
+{
+    if (!Group)
+        return;
+
+    const QStringList options = MythPainterWindow::GetPainters();
+
+    // Don't show an option if there is no choice. Do not offer Qt painter (but
+    // MythPainterWindow will accept 'Qt' if overriden from the command line)
+    if (options.size() <= 1)
+        return;
+
+    QString pref = GetMythDB()->GetSetting("PaintEngine", MythPainterWindow::GetDefaultPainter());
+    HostComboBoxSetting* paint = new HostComboBoxSetting("PaintEngine");
+    paint->setLabel(AppearanceSettings::tr("Paint engine"));
+    for (auto & option : options)
+        paint->addSelection(option, option, option == pref);
+
+    paint->setHelpText(AppearanceSettings::tr("This selects what MythTV uses to draw. "));
+    Group->addChild(paint);
 }
 
 static HostComboBoxSetting *MenuTheme()
@@ -4578,6 +4601,7 @@ AppearanceSettings::AppearanceSettings()
     screen->setLabel(tr("Theme / Screen Settings"));
     addChild(screen);
 
+    AddPaintEngine(screen);
     screen->addChild(MenuTheme());
     screen->addChild(GUIRGBLevels());
 

@@ -7,6 +7,8 @@
 class QVulkanInstance;
 class MythWindowVulkan;
 
+#define MYTH_PAINTER_VULKAN QString("Vulkan")
+
 class MythPainterWindowVulkan : public MythPainterWindow
 {
   public:
