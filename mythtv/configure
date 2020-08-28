@@ -6703,18 +6703,6 @@ if enabled x11; then
     require libXrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr
 fi
 
-# CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
-# This checks for it, and some other calls that the module needs
-if test $target_os = darwin; then
-    cat > $TMPC << EOF
-#include <AGL/agl.h>
-int main( void ) { return aglGetCGLContext(0,0L); }
-EOF
-    if $cc -o $TMPE $TMPC -framework AGL > /dev/null 2>&1; then
-        mac_corevideo="yes"
-    fi
-fi
-
 if test $target_os = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
@@ -7772,10 +7760,6 @@ test -n "$assert_level" &&
 
 test -n "$malloc_prefix" &&
     echo "#define MALLOC_PREFIX $malloc_prefix" >>$TMPH
-
-if enabled mac_corevideo; then
-  append CCONFIG "using_corevideo"
-fi
 
 if enabled cygwin ; then
   echo "#ifndef llrint" >> $TMPH
