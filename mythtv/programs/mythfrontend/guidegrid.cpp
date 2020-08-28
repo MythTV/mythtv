@@ -404,13 +404,13 @@ private:
     GuideGrid        *m_guide   {nullptr};
     GuideUpdaterBase *m_updater {nullptr};
 
-    static QMutex                s_lock;
-    static QWaitCondition        s_wait;
-    static QMap<GuideGrid*,uint> s_loading;
+    static QMutex                 s_lock;
+    static QWaitCondition         s_wait;
+    static QHash<GuideGrid*,uint> s_loading;
 };
-QMutex                GuideHelper::s_lock;
-QWaitCondition        GuideHelper::s_wait;
-QMap<GuideGrid*,uint> GuideHelper::s_loading;
+QMutex                 GuideHelper::s_lock;
+QWaitCondition         GuideHelper::s_wait;
+QHash<GuideGrid*,uint> GuideHelper::s_loading;
 
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
                                 const QDateTime &startTime,

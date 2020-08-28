@@ -29,7 +29,7 @@ class OSD;
 class AudioPlayer;
 class MythRender;
 
-using PIPMap = QMap<MythPlayer*,PIPLocation>;
+using PIPMap = QHash<MythPlayer*,PIPLocation>;
 
 class MythMultiLocker;
 

@@ -43,7 +43,7 @@ using namespace std;
 #define kNoDataTimeout            50   /* msec */
 #define kResetTimeout             1000 /* msec */
 
-using handle_to_lfd_t = QMap<raw1394handle_t,LinuxFirewireDevice*>;
+using handle_to_lfd_t = QHash<raw1394handle_t,LinuxFirewireDevice*>;
 
 class LFDPriv
 {

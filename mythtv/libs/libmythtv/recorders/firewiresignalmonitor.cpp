@@ -27,8 +27,8 @@ void FirewireTableMonitorThread::run(void)
 const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */
 const uint FirewireSignalMonitor::kBufferTimeout = 5000; /* ms */
 
-QMap<void*,uint> FirewireSignalMonitor::s_patKeys;
-QMutex           FirewireSignalMonitor::s_patKeysLock;
+QHash<void*,uint> FirewireSignalMonitor::s_patKeys;
+QMutex            FirewireSignalMonitor::s_patKeysLock;
 
 /** \fn FirewireSignalMonitor::FirewireSignalMonitor(int,FirewireChannel*,uint64_t)
  *  \brief Initializes signal lock and signal values.

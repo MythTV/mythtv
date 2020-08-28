@@ -5604,7 +5604,7 @@ static unsigned dbg_ident(const MythPlayer *player)
 {
     static QMutex   s_dbgLock;
     static unsigned s_dbgNextIdent = 0;
-    using DbgMapType = QMap<const MythPlayer*, unsigned>;
+    using DbgMapType = QHash<const MythPlayer*, unsigned>;
     static DbgMapType s_dbgIdent;
 
     QMutexLocker locker(&s_dbgLock);

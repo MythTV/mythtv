@@ -601,10 +601,9 @@ public:
         m_segments.removeAt(segnum);
     }
 
-    void RemoveListSegments(QMap<HLSSegment*,bool> &table)
+    void RemoveListSegments(QHash<HLSSegment*,bool> &table)
     {
-        QMap<HLSSegment*,bool>::iterator it;
-        for (it = table.begin(); it != table.end(); ++it)
+        for (auto it = table.begin(); it != table.end(); ++it)
         {
             bool todelete   = *it;
             HLSSegment *p   = it.key();
@@ -1436,7 +1435,7 @@ private:
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("updated hls stream (program-id=%1, bitrate=%2) has %3 segments")
             .arg(hls_new->Id()).arg(hls_new->Bitrate()).arg(count));
-        QMap<HLSSegment*,bool> table;
+        QHash<HLSSegment*,bool> table;
 
         for (int n = 0; n < count; n++)
         {

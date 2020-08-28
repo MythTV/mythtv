@@ -71,7 +71,7 @@ struct LoggerListItem {
 using  ClientMap = QMap<QString, LoggerListItem *>;
 
 using  ClientList = QList<QString>;
-using  RevClientMap = QMap<LoggerBase *, ClientList *>;
+using  RevClientMap = QHash<LoggerBase *, ClientList *>;
 
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;

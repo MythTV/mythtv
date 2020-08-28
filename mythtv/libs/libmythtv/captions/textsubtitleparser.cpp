@@ -72,13 +72,13 @@ class SubtitleLoadHelper : public QRunnable
     const QString &m_fileName;
     TextSubtitles *m_target;
 
-    static QMutex                    s_lock;
-    static QWaitCondition            s_wait;
-    static QMap<TextSubtitles*,uint> s_loading;
+    static QMutex                     s_lock;
+    static QWaitCondition             s_wait;
+    static QHash<TextSubtitles*,uint> s_loading;
 };
-QMutex                    SubtitleLoadHelper::s_lock;
-QWaitCondition            SubtitleLoadHelper::s_wait;
-QMap<TextSubtitles*,uint> SubtitleLoadHelper::s_loading;
+QMutex                     SubtitleLoadHelper::s_lock;
+QWaitCondition             SubtitleLoadHelper::s_wait;
+QHash<TextSubtitles*,uint> SubtitleLoadHelper::s_loading;
 
 // Work around the fact that RemoteFile doesn't work when the target
 // file is actually local.

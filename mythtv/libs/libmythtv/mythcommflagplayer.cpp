@@ -54,13 +54,13 @@ class RebuildSaver : public QRunnable
     uint64_t     m_first;
     uint64_t     m_last;
 
-    static QMutex                  s_lock;
-    static QWaitCondition          s_wait;
-    static QMap<DecoderBase*,uint> s_cnt;
+    static QMutex                   s_lock;
+    static QWaitCondition           s_wait;
+    static QHash<DecoderBase*,uint> s_cnt;
 };
-QMutex                  RebuildSaver::s_lock;
-QWaitCondition          RebuildSaver::s_wait;
-QMap<DecoderBase*,uint> RebuildSaver::s_cnt;
+QMutex                   RebuildSaver::s_lock;
+QWaitCondition           RebuildSaver::s_wait;
+QHash<DecoderBase*,uint> RebuildSaver::s_cnt;
 
 bool MythCommFlagPlayer::RebuildSeekTable(
     bool showPercentage, StatusCallback cb, void* cbData)

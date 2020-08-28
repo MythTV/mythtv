@@ -72,8 +72,8 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
     vector<unsigned char> m_buffer;
 
-    static QMap<void*,uint> s_patKeys;
-    static QMutex           s_patKeysLock;
+    static QHash<void*,uint> s_patKeys;
+    static QMutex            s_patKeysLock;
 };
 
 #endif // FIREWIRESIGNALMONITOR_H

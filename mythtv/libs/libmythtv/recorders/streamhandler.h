@@ -138,7 +138,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     QString             m_mptsBaseFile;
     QMutex              m_mptsLock;
 
-    using StreamDataList = QMap<MPEGStreamData*,QString>;
+    using StreamDataList = QHash<MPEGStreamData*,QString>;
     mutable QMutex      m_listenerLock         {QMutex::Recursive};
     StreamDataList      m_streamDataList;
 };
