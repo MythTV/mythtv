@@ -1101,8 +1101,8 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
     // NOTE We have no Qt platform information, window/surface or logging when this is called.
     QString soft = qgetenv("LIBGL_ALWAYS_SOFTWARE");
     bool ignore = soft == "1" || soft.compare("true", Qt::CaseInsensitive) == 0;
-    bool allow = qgetenv("MYTHTV_NO_EGL").isEmpty() && !ignore;
-    bool force = !qgetenv("MYTHTV_FORCE_EGL").isEmpty();
+    bool allow = qEnvironmentVariableIsEmpty("MYTHTV_NO_EGL") && !ignore;
+    bool force = !qEnvironmentVariableIsEmpty("MYTHTV_FORCE_EGL");
     if ((force || allow) && MythDisplayX11::IsAvailable())
     {
         // N.B. By default, ignore EGL if vendor string is not returned

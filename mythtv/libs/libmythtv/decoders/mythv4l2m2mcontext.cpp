@@ -26,7 +26,7 @@ extern "C" {
 
 #define LOC QString("V4L2_M2M: ")
 
-static bool s_useV4L2Request = !qgetenv("MYTHTV_V4L2_REQUEST").isEmpty();
+static bool s_useV4L2Request = !qEnvironmentVariableIsEmpty("MYTHTV_V4L2_REQUEST");
 
 /*! \class MythV4L2M2MContext
  * \brief A handler for V4L2 Memory2Memory codecs.

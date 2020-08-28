@@ -93,8 +93,8 @@ MythRenderOpenGL* MythRenderOpenGL::Create(QWidget *Widget)
 #endif
 
     // N.B the core profiles below are designed to target compute shader availability
-    bool opengles = !qgetenv("MYTHTV_OPENGL_ES").isEmpty();
-    bool core     = !qgetenv("MYTHTV_OPENGL_CORE").isEmpty();
+    bool opengles = !qEnvironmentVariableIsEmpty("MYTHTV_OPENGL_ES");
+    bool core     = !qEnvironmentVariableIsEmpty("MYTHTV_OPENGL_CORE");
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     if (core)
     {
@@ -230,7 +230,7 @@ bool MythRenderOpenGL::Init(void)
             QOpenGLDebugLogger::LoggingMode mode = QOpenGLDebugLogger::AsynchronousLogging;
 
             // this will impact performance but can be very useful
-            if (!qgetenv("MYTHTV_OPENGL_SYNCHRONOUS").isEmpty())
+            if (!qEnvironmentVariableIsEmpty("MYTHTV_OPENGL_SYNCHRONOUS"))
                 mode = QOpenGLDebugLogger::SynchronousLogging;
 
             m_openglDebugger->startLogging(mode);
