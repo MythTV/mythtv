@@ -5870,7 +5870,7 @@ TAGLIB_CONFIG=""
 if enabled taglib; then
     if test x`which taglib-config` != x"" ; then
         TAGLIB_CONFIG="taglib-config"
-    elif test x`which taglib-config.cmd` != x"" ; then
+    elif test $target_os = mingw32 ; then
         TAGLIB_CONFIG="taglib-config.cmd"
     fi
     taglib_minor="0"
