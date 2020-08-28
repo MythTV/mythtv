@@ -68,12 +68,15 @@ macx {
     LIBS += -framework CoreFoundation
     LIBS += -framework OpenGL
     LIBS += -framework IOKit
-    LIBS += -framework CoreVideo
-    LIBS += -framework VideoToolbox
-    LIBS += -framework IOSurface
-    DEFINES += USING_VTB
-    HEADERS += decoders/mythvtbcontext.h
-    SOURCES += decoders/mythvtbcontext.cpp
+
+    using_videotoolbox {
+        DEFINES += USING_VTB
+        LIBS += -framework CoreVideo
+        LIBS += -framework VideoToolbox
+        LIBS += -framework IOSurface
+        HEADERS += decoders/mythvtbcontext.h
+        SOURCES += decoders/mythvtbcontext.cpp
+    }
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -428,7 +431,8 @@ using_frontend {
     SOURCES += mheg/interactivescreen.cpp
 
     # Video output
-    HEADERS += mythvideoout.h           mythvideooutnull.h
+    HEADERS += mythvideoout.h
+    HEADERS += mythvideooutnull.h
     HEADERS += videobuffers.h
     HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
@@ -437,7 +441,8 @@ using_frontend {
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
     HEADERS += mythdeinterlacer.h
-    SOURCES += mythvideoout.cpp         mythvideooutnull.cpp
+    SOURCES += mythvideoout.cpp
+    SOURCES += mythvideooutnull.cpp
     SOURCES += videobuffers.cpp
     SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
@@ -536,7 +541,7 @@ using_frontend {
             SOURCES += opengl/mythmediacodecinterop.cpp
         }
 
-        macx {
+        macx:using_videotoolbox {
             HEADERS += opengl/mythvtbinterop.h
             SOURCES += opengl/mythvtbinterop.cpp
         }

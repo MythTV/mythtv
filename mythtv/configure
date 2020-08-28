@@ -2052,6 +2052,7 @@ USING_LIST='
     mmal
     vulkan
     libglslang
+    videotoolbox
 '
 
 CMDLINE_SELECT="
@@ -4741,6 +4742,7 @@ case $target_os in
         enable  appleremote
         enable  backend
         enable  darwin
+        enable  videotoolbox
         disable dvb
         disable v4l1
         disable v4l2
@@ -7287,6 +7289,13 @@ if ! grep "^CONFIG_NVDEC=yes$" external/FFmpeg/ffbuild/config.mak ; then
     disable nvdec
 fi
 
+# If ffmpeg disabled videotoolbox then disable it
+if test x"$target_os" = x"darwin" ; then
+    if ! grep "^CONFIG_VIDEOTOOLBOX=yes$" external/FFmpeg/ffbuild/config.mak ; then
+        disable videotoolbox
+    fi
+fi
+
 if test "$quiet" != "yes"; then
 
 echo
@@ -7450,6 +7459,9 @@ if enabled frontend; then
 if enabled x11 ; then
   echo "VDPAU support             ${vdpau-no}"
   echo "NVDEC support             ${nvdec-no}"
+fi
+if test x"$target_os" = x"darwin" ; then
+  echo "VideoToolBox support      ${videotoolbox-no}"
 fi
   echo "VAAPI support             ${vaapi-no}"
   echo "DRM support               ${drm-no}"
