@@ -22,8 +22,12 @@ MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(VideoFrameType Format)
     if (!context)
         return Unsupported;
 
-    if (context->hasExtension("GL_NV_vdpau_interop") && MythVDPAUHelper::HaveVDPAU())
-        return VDPAU;
+    if (MythVDPAUHelper::HaveVDPAU())
+    {
+        if (context->hasExtension("GL_NV_vdpau_interop"))
+            return VDPAU;
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "GL_NV_vdpau_interop is not available");
+    }
     return Unsupported;
 }
 
