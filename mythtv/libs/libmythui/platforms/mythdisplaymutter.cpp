@@ -17,11 +17,11 @@
 // ApplyConfiguration CRTC output
 struct MythMutterCRTCOut
 {
-    uint32_t id;
-    int32_t  new_mode;
-    int32_t  x;
-    int32_t  y;
-    uint32_t transform;
+    uint32_t id              {};
+    int32_t  new_mode        {};
+    int32_t  x               {};
+    int32_t  y               {};
+    uint32_t transform       {};
     QList<uint32_t> outputs;
     MythMutterMap properties;
 };
@@ -29,7 +29,7 @@ struct MythMutterCRTCOut
 // ApplyConfiguration Outputs out
 struct MythMutterOutputOut
 {
-    uint32_t id;
+    uint32_t id {};
     MythMutterMap properties;
 };
 
@@ -51,7 +51,7 @@ static QDBusArgument &operator<<(QDBusArgument& Argument, const MythMutterOutput
 static QDBusArgument &operator<<(QDBusArgument& Argument, const MythMutterOutputOutList& Outputs)
 {
     Argument.beginArray(qMetaTypeId<MythMutterOutputOut>());
-    for (auto & output : Outputs)
+    for (const auto & output : Outputs)
         Argument << output;
     Argument.endArray();
     return Argument;
@@ -84,7 +84,7 @@ static const QDBusArgument &operator>>(const QDBusArgument& Argument, MythMutter
 static QDBusArgument &operator<<(QDBusArgument& Argument, const MythMutterCRTCOutList& CRTCS)
 {
     Argument.beginArray(qMetaTypeId<MythMutterCRTCOut>());
-    for (auto & crtc : CRTCS)
+    for (const auto & crtc : CRTCS)
         Argument << crtc;
     Argument.endArray();
     return Argument;
@@ -173,7 +173,7 @@ static const QDBusArgument &operator>>(const QDBusArgument& Argument, MythMutter
 
     while (!Argument.atEnd())
     {
-        MythMutterMode mode;
+        MythMutterMode mode {};
         Argument >> mode;
         Modes.append(mode);
     }
@@ -238,7 +238,7 @@ MythDisplayMutter* MythDisplayMutter::Create()
 
     if (s_available)
     {
-        auto result = new MythDisplayMutter();
+        auto *result = new MythDisplayMutter();
         if (result->IsValid())
             return result;
         delete result;
@@ -309,11 +309,15 @@ const vector<MythDisplayMode>& MythDisplayMutter::GetVideoModes()
         bool interlaced = false;
 #ifdef USING_X11
         if (MythDisplayX11::IsAvailable())
+        {
             interlaced = (mmode.flags & RR_Interlace) == RR_Interlace;
+        }
 #endif
 #ifdef USING_DRM
         else
+        {
             interlaced = (mmode.flags & DRM_MODE_FLAG_INTERLACE) == DRM_MODE_FLAG_INTERLACE;
+        }
 #endif
         if (interlaced)
         {
@@ -375,10 +379,7 @@ void MythDisplayMutter::InitialiseInterface()
                 }
                 return;
             }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "GetResources unexpected reply");
-            }
+            LOG(VB_GENERAL, LOG_ERR, LOC + "GetResources unexpected reply");
         }
         else
         {
@@ -500,7 +501,7 @@ void MythDisplayMutter::UpdateResources()
         for (auto mode : output.modes)
             modes.append(QString::number(mode));
         QStringList props;
-        for (auto prop : output.properties)
+        for (const auto& prop : output.properties)
             props.append(QString("%1:%2").arg(prop.first).arg(prop.second.variant().toString()));
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Output %1/%2: CRTC: %3 Possible CRTCs: %4 Name: '%5'")

@@ -15,7 +15,7 @@ class MythPainterWindow : public QWidget
 {
   public:
     static MUI_PUBLIC QString GetDefaultPainter();
-    static MUI_PUBLIC const QStringList GetPainters();
+    static MUI_PUBLIC QStringList GetPainters();
     static QString CreatePainters(MythMainWindow* MainWin,
                                   MythPainterWindow*& PaintWin,
                                   MythPainter*& Paint);

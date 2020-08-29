@@ -30,7 +30,7 @@ QString MythPainterWindow::GetDefaultPainter()
 #endif
 }
 
-const QStringList MythPainterWindow::GetPainters()
+QStringList MythPainterWindow::GetPainters()
 {
     QStringList result;
 #ifdef USING_OPENGL
@@ -54,7 +54,7 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWin,
 
 #ifdef USING_OPENGL
     auto TryOpenGL = [](MythMainWindow *MainWindow, MythPainterWindow *&PaintWindow,
-                        MythPainter *&Painter, bool&)
+                        MythPainter *&Painter, bool& /*unused*/)
     {
         auto* glwindow = new MythPainterWindowOpenGL(MainWindow);
         if (glwindow && glwindow->IsValid())
@@ -76,7 +76,7 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWin,
 
 #ifdef USING_VULKAN
     auto TryVulkan = [](MythMainWindow *MainWindow, MythPainterWindow *&PaintWindow,
-                        MythPainter *&Painter, bool&)
+                        MythPainter *&Painter, bool& /*unused*/)
     {
         auto *vulkan = new MythPainterWindowVulkan(MainWindow);
         if (vulkan && vulkan->IsValid())

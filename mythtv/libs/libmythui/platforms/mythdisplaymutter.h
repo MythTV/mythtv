@@ -19,14 +19,14 @@ using MythMutterProperties = QList<MythMutterProperty>;
 // GetResources CRTCs signature a(uxiiiiiuaua{sv})
 struct MythMutterCRTC
 {
-    uint32_t id;
-    qint64   sys_id; // N.B. needs to be a Qt type here
-    int32_t  x;
-    int32_t  y;
-    int32_t  width;
-    int32_t  height;
-    int32_t  currentmode;
-    uint32_t currenttransform;
+    uint32_t id                     {};
+    qint64   sys_id                 {}; // N.B. needs to be a Qt type here
+    int32_t  x                      {};
+    int32_t  y                      {};
+    int32_t  width                  {};
+    int32_t  height                 {};
+    int32_t  currentmode            {};
+    uint32_t currenttransform       {};
     QList<uint32_t> transforms;
     MythMutterProperties properties;
 };
@@ -34,9 +34,9 @@ struct MythMutterCRTC
 // GetResources Outputs signature a(uxiausauaua{sv})
 struct MythMutterOutput
 {
-    uint32_t id;
-    qint64   sys_id;
-    int32_t  current_crtc;
+    uint32_t id                     {};
+    qint64   sys_id                 {};
+    int32_t  current_crtc           {};
     QList<uint32_t> possible_crtcs;
     QString  name;
     QList<uint32_t> modes;
@@ -46,8 +46,8 @@ struct MythMutterOutput
     // MythTV properties
     QString serialnumber;
     QByteArray edid;
-    int     widthmm;
-    int     heightmm;
+    int     widthmm                 {};
+    int     heightmm                {};
 };
 
 // GetResources Modes signature a(uxuudu)

@@ -1482,9 +1482,9 @@ static void AddPaintEngine(GroupSetting* Group)
         return;
 
     QString pref = GetMythDB()->GetSetting("PaintEngine", MythPainterWindow::GetDefaultPainter());
-    HostComboBoxSetting* paint = new HostComboBoxSetting("PaintEngine");
+    auto* paint = new HostComboBoxSetting("PaintEngine");
     paint->setLabel(AppearanceSettings::tr("Paint engine"));
-    for (auto & option : options)
+    for (const auto & option : options)
         paint->addSelection(option, option, option == pref);
 
     paint->setHelpText(AppearanceSettings::tr("This selects what MythTV uses to draw. "));
