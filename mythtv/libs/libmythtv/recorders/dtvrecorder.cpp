@@ -59,6 +59,8 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
         gCoreContext->GetNumSetting("MinimumRecordingQuality", 95);
 
     m_containerFormat = formatMPEG2_TS;
+
+    m_continuityCounter.fill(0xff);
 }
 
 DTVRecorder::~DTVRecorder(void)
@@ -1477,7 +1479,7 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     uint old_cnt = m_continuityCounter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        if (m_pidErrorCount[pid]++ > 0)
+        if (old_cnt != 0xff)
         {
             int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
             double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);
@@ -1608,7 +1610,7 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     uint old_cnt = m_continuityCounter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        if (m_pidErrorCount[pid]++ > 0)
+        if (old_cnt != 0xff)
         {
             int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
             double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);

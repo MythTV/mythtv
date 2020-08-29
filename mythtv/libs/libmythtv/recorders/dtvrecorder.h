@@ -9,7 +9,6 @@
 #ifndef DTVRECORDER_H
 #define DTVRECORDER_H
 
-#include <map>
 #include <vector>
 
 using namespace std;
@@ -196,7 +195,6 @@ class DTVRecorder :
     unsigned long long       m_framesSeenCount            {0};
     unsigned long long       m_framesWrittenCount         {0};
     double                   m_totalDuration              {0.0}; // usec
-    std::map<uint,uint>      m_pidErrorCount;
     // Calculate m_total_duration as
     // m_td_base + (m_td_tick_count * m_td_tick_framerate / 2)
     double                   m_tdBase                     {0.0};
