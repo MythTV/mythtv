@@ -365,7 +365,7 @@ void NewsSite::parseRSS(const QDomDocument& domDoc)
                     QStringList imageExtensions = QStringList() << ".jpg" << ".jpeg" << ".png" << ".gif";
                     for (int x = 0; x < imageExtensions.count(); x++)
                     {
-                        if (enclosure.toLower().endsWith(imageExtensions[x]))
+                        if (enclosure.endsWith(imageExtensions[x], Qt::CaseInsensitive))
                         {
                             thumbnail = enclosure;
                             enclosure.clear();
