@@ -179,7 +179,7 @@ class PlaybackBox : public ScheduleCommon
 
     void askDelete();
     void Undelete(void);
-    void Delete(DeleteFlags flags = kNoFlags);
+    void Delete(PlaybackBox::DeleteFlags flags = kNoFlags);
     void DeleteForgetHistory(void)      { Delete(kForgetHistory); }
     void DeleteForce(void)              { Delete(kForce);         }
     void DeleteIgnore(void)             { Delete(kIgnore);        }
@@ -195,7 +195,7 @@ class PlaybackBox : public ScheduleCommon
     void toggleAutoExpire();
     void togglePreserveEpisode();
 
-    void toggleView(ViewMask itemMask, bool setOn);
+    void toggleView(PlaybackBox::ViewMask itemMask, bool setOn);
     void toggleTitleView(bool setOn)     { toggleView(VIEW_TITLES, setOn); }
     void toggleCategoryView(bool setOn)  { toggleView(VIEW_CATEGORIES, setOn); }
     void toggleRecGroupView(bool setOn)  { toggleView(VIEW_RECGROUPS, setOn); }

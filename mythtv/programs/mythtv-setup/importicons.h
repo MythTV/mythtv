@@ -145,7 +145,7 @@ class ImportIconsWizard : public MythScreenType
     bool doLoad();
 
   protected slots:
-    void enableControls(dialogState state=STATE_NORMAL);         //!< enable/disable the controls
+    void enableControls(ImportIconsWizard::dialogState state=STATE_NORMAL);         //!< enable/disable the controls
     void manualSearch();           //!< process the manual search
     void menuSelection(MythUIButtonListItem *item);//!< process the icon selection
     void skip();                   //!< skip this icon
