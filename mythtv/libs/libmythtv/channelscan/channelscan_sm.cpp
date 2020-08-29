@@ -387,8 +387,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
     for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
-        if (pat->ProgramPID(i)) // don't add NIT "program", MPEG/ATSC safe.
-            sd->AddListeningPID(pat->ProgramPID(i));
+        sd->AddListeningPID(pat->ProgramPID(i));
     }
 }
 
