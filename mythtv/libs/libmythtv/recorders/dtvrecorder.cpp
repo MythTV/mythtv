@@ -1479,16 +1479,13 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     uint old_cnt = m_continuityCounter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        if (old_cnt != 0xff)
-        {
-            int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
-            double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);
-            LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4%")
-                    .arg(pid,0,16).arg(old_cnt,2)
-                    .arg(tspacket.ContinuityCounter(),2)
-                    .arg(erate));
-        }
+        int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
+        double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4%")
+                .arg(pid,0,16).arg(old_cnt,2)
+                .arg(tspacket.ContinuityCounter(),2)
+                .arg(erate));
     }
 
     // Only create fake keyframe[s] if there are no audio/video streams
@@ -1610,15 +1607,12 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     uint old_cnt = m_continuityCounter[pid];
     if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        if (old_cnt != 0xff)
-        {
-            int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
-            double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);
-            LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4%")
-                    .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
-                    .arg(erate,5,'f',2));
-        }
+        int v = m_continuityErrorCount.fetchAndAddRelaxed(1) + 1;
+        double erate = v * 100.0 / m_packetCount.fetchAndAddRelaxed(0);
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4%")
+                .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
+                .arg(erate,5,'f',2));
     }
 
     if (!(m_pidStatus[pid] & kPayloadStartSeen))
