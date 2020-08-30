@@ -3791,6 +3791,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1365")
+    {
+        DBUpdates updates {
+            "ALTER TABLE channelscan_channel ADD COLUMN service_type INT UNSIGNED NOT NULL DEFAULT 0;"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1366", dbver))
+            return false;
+    }
+
     return true;
 }
 
