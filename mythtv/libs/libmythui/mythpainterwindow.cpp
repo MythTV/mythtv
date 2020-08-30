@@ -83,7 +83,7 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWin,
         {
             PaintWindow = vulkan;
             auto *render = dynamic_cast<MythRenderVulkan*>(vulkan->GetRenderDevice());
-            auto *window = dynamic_cast<MythWindowVulkan*>(vulkan->GetVulkanWindow());
+            auto *window = vulkan->GetVulkanWindow();
             Painter = new MythPainterVulkan(render, window);
             return true;
         }
