@@ -5,11 +5,10 @@
 
 #ifdef USING_DRM
 #include "platforms/mythdrmdevice.h"
+#else
+#ifndef DRM_MODE_FLAG_INTERLACE
+#define DRM_MODE_FLAG_INTERLACE (1<<4)
 #endif
-
-#ifdef USING_X11
-#include "platforms/mythdisplayx11.h"
-#include <X11/extensions/Xrandr.h> // always last
 #endif
 
 #define LOC QString("MutterDisp: ")
@@ -306,20 +305,11 @@ const vector<MythDisplayMode>& MythDisplayMutter::GetVideoModes()
     {
         MythMutterMode& mmode = m_modes[static_cast<int32_t>(mode)];
 
-        bool interlaced = false;
-#ifdef USING_X11
-        if (MythDisplayX11::IsAvailable())
-        {
-            interlaced = (mmode.flags & RR_Interlace) == RR_Interlace;
-        }
-#endif
-#ifdef USING_DRM
-        else
-        {
-            interlaced = (mmode.flags & DRM_MODE_FLAG_INTERLACE) == DRM_MODE_FLAG_INTERLACE;
-        }
-#endif
-        if (interlaced)
+        // the flags field will contain values dependant on enums for the
+        // underlying mechanism in use (i.e. XRandR or libdrm). We should not
+        // however be using this class if X11 is running and fortunately the
+        // values for the different enums match.
+        if ((mmode.flags & DRM_MODE_FLAG_INTERLACE) == DRM_MODE_FLAG_INTERLACE)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
                 .arg(mmode.width).arg(mmode.width).arg(mmode.frequency, 2, 'f', 2, '0'));
