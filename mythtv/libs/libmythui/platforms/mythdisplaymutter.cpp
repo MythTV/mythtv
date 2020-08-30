@@ -223,7 +223,7 @@ MythDisplayMutter* MythDisplayMutter::Create()
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         "org.gnome.Mutter.DisplayConfig.ApplyConfiguration not implemented");
                 }
-                else
+                else if (reply.error().type() == QDBusError::AccessDenied)
                 {
                     s_available = true;
                 }
