@@ -5,16 +5,15 @@ MythTV Project Info
 Useful project links
 -----
 
- - `Trac bug tracker <https://code.mythtv.org/trac>`_
+ - `Bug Reports <https://github.com/MythTV/mythtv/issues>`_
 
-   - Please note: If you create a pull request, we expect a corresponding
-     ticket to be created in Trac with a link to the pull request in it.  
-     Trac is our canonical bug tracking location, and many of our developers
-     may not notice the pull request otherwise.
+   - Please note that we only support code that is from the canonical MythTV
+     repository at https://github.com/MythTV  For other forks of MythTV,
+     please send bug reports to the owners of the fork where the code was
+     committed.
 
-   - Please also note that we only support code that is from the canonical
-     fork at https://github.com/MythTV  For other forks, please send bug
-     reports to the owners of the fork where the code was committed.
+   - Please note: If you create a pull request, please take care to follow
+     the Pull Request checklist.
 
  - `Forums <https://forum.mythtv.org>`_
  - `Documentation wiki <https://www.mythtv.org/wiki>`_
