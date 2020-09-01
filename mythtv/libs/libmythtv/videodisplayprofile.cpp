@@ -904,6 +904,7 @@ QString VideoDisplayProfile::GetVideoRendererName(const QString &Renderer)
         s_rend_name["opengl"]         = QObject::tr("OpenGL");
         s_rend_name["opengl-yv12"]    = QObject::tr("OpenGL YV12");
         s_rend_name["opengl-hw"]      = QObject::tr("OpenGL Hardware");
+        s_rend_name["vulkan"]         = QObject::tr("Vulkan");
     }
 
     QString ret = Renderer;
