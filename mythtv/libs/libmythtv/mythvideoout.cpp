@@ -145,18 +145,26 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
 
         /* these cases are mutually exlusive */
         if (renderer == "null")
+        {
             vo = new MythVideoOutputNull();
+        }
 #ifdef _WIN32
         else if (renderer == "direct3d")
+        {
             vo = new VideoOutputD3D();
+        }
 #endif
 #ifdef USING_OPENGL
         else if (renderer.contains("opengl"))
+        {
             vo = new MythVideoOutputOpenGL(renderer);
+        }
 #endif
 #ifdef USING_VULKAN
+        {
         else if (renderer.contains(VULKAN_RENDERER))
             vo = new MythVideoOutputVulkan();
+        }
 #endif
 
         if (vo)
