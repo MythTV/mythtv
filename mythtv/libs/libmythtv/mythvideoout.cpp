@@ -161,8 +161,8 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
         }
 #endif
 #ifdef USING_VULKAN
-        {
         else if (renderer.contains(VULKAN_RENDERER))
+        {
             vo = new MythVideoOutputVulkan();
         }
 #endif
