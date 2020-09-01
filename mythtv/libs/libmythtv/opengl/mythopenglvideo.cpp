@@ -23,35 +23,48 @@
  * \note MythOpenGLVideo has no knowledge of buffering, timing and other presentation
  * state. Its role is to render video frames on screen.
 */
-MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
-                                 QSize VideoDim, QSize VideoDispDim,
-                                 QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
+MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+                                 const VideoOutWindow& Window,
                                  bool  ViewportControl, QString Profile)
-  : m_profile(std::move(Profile)),
-    m_render(Render),
-    m_videoDispDim(VideoDispDim),
-    m_videoDim(VideoDim),
-    m_masterViewportSize(DisplayVisibleRect.size()),
-    m_displayVideoRect(DisplayVideoRect),
-    m_videoRect(VideoRect),
-    m_videoColourSpace(ColourSpace),
-    m_viewportControl(ViewportControl),
-    m_inputTextureSize(m_videoDim)
+  : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
 {
-    if (!m_render || !m_videoColourSpace)
+    Init();
+}
+
+MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+                QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
+                QRect DisplayVideoRect, QRect VideoRect,
+                bool ViewportControl, QString Profile)
+  : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
+                 DisplayVideoRect, VideoRect, ViewportControl, Profile)
+{
+    Init();
+}
+
+MythOpenGLVideo::~MythOpenGLVideo()
+{
+    if (!m_openglRender)
         return;
 
-    OpenGLLocker ctx_lock(m_render);
-    m_render->IncrRef();
-    if (m_render->isOpenGLES())
-        m_gles = m_render->format().majorVersion();
+    m_openglRender->makeCurrent();
+    ResetFrameFormat();
+    delete m_toneMap;
+    m_openglRender->doneCurrent();
+}
 
-    m_videoColourSpace->IncrRef();
-    connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &MythOpenGLVideo::UpdateColourSpace);
+void MythOpenGLVideo::Init()
+{
+    m_openglRender = dynamic_cast<MythRenderOpenGL*>(m_render);
+    if (!m_openglRender || !m_videoColourSpace)
+        return;
+
+    OpenGLLocker ctx_lock(m_openglRender);
+    if (m_openglRender->isOpenGLES())
+        m_gles = m_openglRender->format().majorVersion();
 
     // Set OpenGL feature support
-    m_features      = m_render->GetFeatures();
-    m_extraFeatures = m_render->GetExtraFeatures();
+    m_features      = m_openglRender->GetFeatures();
+    m_extraFeatures = m_openglRender->GetExtraFeatures();
     m_valid = true;
 
     m_chromaUpsamplingFilter = gCoreContext->GetBoolSetting("ChromaUpsamplingFilter", true);
@@ -59,29 +72,9 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
         .arg(m_chromaUpsamplingFilter ? "enabled" : "disabled"));
 }
 
-MythOpenGLVideo::~MythOpenGLVideo()
+void MythOpenGLVideo::ColourSpaceUpdate(bool PrimariesChanged)
 {
-    if (m_videoColourSpace)
-        m_videoColourSpace->DecrRef();
-
-    if (!m_render)
-        return;
-
-    m_render->makeCurrent();
-    ResetFrameFormat();
-    delete m_toneMap;
-    m_render->doneCurrent();
-    m_render->DecrRef();
-}
-
-bool MythOpenGLVideo::IsValid(void) const
-{
-    return m_valid;
-}
-
-void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
-{
-    OpenGLLocker locker(m_render);
+    OpenGLLocker locker(m_openglRender);
 
     // if input/output type are unset - we haven't created the shaders yet
     if (PrimariesChanged && (m_outputType != FMT_NONE))
@@ -93,10 +86,10 @@ void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
     float colourgamma  = m_videoColourSpace->GetColourGamma();
     float displaygamma = 1.0F / m_videoColourSpace->GetDisplayGamma();
     QMatrix4x4 primary = m_videoColourSpace->GetPrimaryMatrix();
-    for (int i = Progressive; i < ShaderCount; ++i)
+    for (size_t i = Progressive; i < ShaderCount; ++i)
     {
-        m_render->SetShaderProgramParams(m_shaders[i], *m_videoColourSpace, "m_colourMatrix");
-        m_render->SetShaderProgramParams(m_shaders[i], primary, "m_primaryMatrix");
+        m_openglRender->SetShaderProgramParams(m_shaders[i], *m_videoColourSpace, "m_colourMatrix");
+        m_openglRender->SetShaderProgramParams(m_shaders[i], primary, "m_primaryMatrix");
         if (m_shaders[i])
         {
             m_shaders[i]->setUniformValue("m_colourGamma", colourgamma);
@@ -105,71 +98,40 @@ void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
     }
 }
 
-void MythOpenGLVideo::UpdateShaderParameters(void)
+void MythOpenGLVideo::UpdateShaderParameters()
 {
     if (m_inputTextureSize.isEmpty())
         return;
 
-    OpenGLLocker locker(m_render);
+    OpenGLLocker locker(m_openglRender);
     bool rect = m_textureTarget == QOpenGLTexture::TargetRectangle;
     GLfloat lineheight = rect ? 1.0F : 1.0F / m_inputTextureSize.height();
-    GLfloat maxheight  = rect ? m_videoDispDim.height() : m_videoDispDim.height() / static_cast<GLfloat>(m_inputTextureSize.height());
+    GLfloat maxheight  = rect ? m_videoDispDim.height() : m_videoDispDim.height() /
+                                static_cast<GLfloat>(m_inputTextureSize.height());
     GLfloat fieldsize  = rect ? 0.5F : m_inputTextureSize.height() / 2.0F;
     QVector4D parameters(lineheight,                                       /* lineheight */
                          static_cast<GLfloat>(m_inputTextureSize.width()), /* 'Y' select */
                          maxheight - lineheight,                           /* maxheight  */
                          fieldsize                                         /* fieldsize  */);
 
-    for (int i = Progressive; i < ShaderCount; ++i)
+    for (size_t i = Progressive; i < ShaderCount; ++i)
     {
         if (m_shaders[i])
         {
-            m_render->EnableShaderProgram(m_shaders[i]);
+            m_openglRender->EnableShaderProgram(m_shaders[i]);
             m_shaders[i]->setUniformValue("m_frameData", parameters);
         }
     }
 }
 
-void MythOpenGLVideo::SetMasterViewport(QSize Size)
-{
-    m_masterViewportSize = Size;
-}
-
-void MythOpenGLVideo::SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim)
-{
-    m_videoDim = VideoDim;
-    m_videoDispDim = VideoDispDim;
-}
-
-void MythOpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
-{
-    m_displayVideoRect = DisplayVideoRect;
-    m_videoRect = VideoRect;
-}
-
-void MythOpenGLVideo::SetViewportRect(const QRect &DisplayVisibleRect)
-{
-    SetMasterViewport(DisplayVisibleRect.size());
-}
-
-QString MythOpenGLVideo::GetProfile(void) const
+QString MythOpenGLVideo::GetProfile() const
 {
     if (format_is_hw(m_inputType))
         return TypeToProfile(m_inputType);
     return TypeToProfile(m_outputType);
 }
 
-void MythOpenGLVideo::SetProfile(const QString &Profile)
-{
-    m_profile = Profile;
-}
-
-QSize MythOpenGLVideo::GetVideoSize(void) const
-{
-    return m_videoDim;
-}
-
-void MythOpenGLVideo::CleanupDeinterlacers(void)
+void MythOpenGLVideo::CleanupDeinterlacers()
 {
     // If switching off/from basic deinterlacing, then we need to delete and
     // recreate the input textures and sometimes the shaders as well - so start
@@ -191,7 +153,7 @@ void MythOpenGLVideo::CleanupDeinterlacers(void)
     m_deinterlacer2x = false;
 }
 
-bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
+bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Scan,
                                       MythDeintType Filter  /* = DEINT_SHADER */,
                                       bool CreateReferences /* = true */)
 {
@@ -238,11 +200,11 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
         return true;
 
     // Lock
-    OpenGLLocker ctx_lock(m_render);
+    OpenGLLocker ctx_lock(m_openglRender);
 
     // delete old reference textures
-    MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
-    MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
+    MythVideoTexture::DeleteTextures(m_openglRender, m_prevTextures);
+    MythVideoTexture::DeleteTextures(m_openglRender, m_nextTextures);
 
     // For basic deinterlacing of software frames, we now create 2 sets of field
     // based textures - which is the same approach taken by the CPU based onefield/bob
@@ -265,15 +227,15 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
             LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing OpenGL YV12 for basic deinterlacer");
             m_outputType = FMT_YV12;
         }
-        MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
+        MythVideoTexture::DeleteTextures(m_openglRender, m_inputTextures);
         QSize size(m_videoDim.width(), m_videoDim.height() >> 1);
         vector<QSize> sizes;
         sizes.emplace_back(size);
         // N.B. If we are currently resizing, it will be turned off for this
         // deinterlacer, so the default linear texture filtering is OK.
-        m_inputTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        m_inputTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         // nextTextures will hold the other field
-        m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        m_nextTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 single field textures")
             .arg(m_inputTextures.size() * 2));
         // Con VideoOutWindow into display the field only
@@ -281,7 +243,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     }
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
-    int max = m_render->GetMaxTextureUnits();
+    int max = m_openglRender->GetMaxTextureUnits();
     uint refstocreate = ((deinterlacer == DEINT_HIGH) && CreateReferences) ? 2 : 0;
     int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
@@ -303,13 +265,13 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     {
         vector<QSize> sizes;
         sizes.emplace_back(QSize(m_videoDim));
-        m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
-        m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        m_prevTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_nextTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         // ensure we use GL_NEAREST if resizing is already active and needed
         if ((m_resizing & Sampling) == Sampling)
         {
-            MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
-            MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
+            MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Nearest);
+            MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Nearest);
         }
     }
 
@@ -333,12 +295,12 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
 */
 bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
 {
-    if (!m_render || !(m_features & QOpenGLFunctions::Shaders))
+    if (!m_openglRender || !(m_features & QOpenGLFunctions::Shaders))
         return false;
 
     // delete the old
     if (m_shaders[Type])
-        m_render->DeleteShaderProgram(m_shaders[Type]);
+        m_openglRender->DeleteShaderProgram(m_shaders[Type]);
     m_shaders[Type] = nullptr;
 
     QStringList defines;
@@ -495,7 +457,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     }
 
     m_shaderCost[Type] = cost;
-    QOpenGLShaderProgram *program = m_render->CreateShaderProgram(vertex, fragment);
+    QOpenGLShaderProgram *program = m_openglRender->CreateShaderProgram(vertex, fragment);
     if (!program)
         return false;
 
@@ -533,7 +495,7 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     {
         vector<QSize> sizes;
         sizes.push_back(Size);
-        m_inputTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        m_inputTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         if (m_inputTextures.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create input textures");
@@ -558,32 +520,28 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     return true;
 }
 
-void MythOpenGLVideo::ResetFrameFormat(void)
+void MythOpenGLVideo::ResetFrameFormat()
 {
     for (auto & shader : m_shaders)
         if (shader)
-            m_render->DeleteShaderProgram(shader);
+            m_openglRender->DeleteShaderProgram(shader);
     m_shaders.fill(nullptr);
     m_shaderCost.fill(1);
-    MythVideoTexture::DeleteTextures(m_render, m_inputTextures);
-    MythVideoTexture::DeleteTextures(m_render, m_prevTextures);
-    MythVideoTexture::DeleteTextures(m_render, m_nextTextures);
-    m_inputType = FMT_NONE;
-    m_outputType = FMT_NONE;
+    MythVideoTexture::DeleteTextures(m_openglRender, m_inputTextures);
+    MythVideoTexture::DeleteTextures(m_openglRender, m_prevTextures);
+    MythVideoTexture::DeleteTextures(m_openglRender, m_nextTextures);
     m_textureTarget = QOpenGLTexture::Target2D;
-    m_inputTextureSize = QSize();
-    m_deinterlacer = DEINT_NONE;
     m_fallbackDeinterlacer = DEINT_NONE;
-    m_render->DeleteFramebuffer(m_frameBuffer);
-    m_render->DeleteTexture(m_frameBufferTexture);
+    m_openglRender->DeleteFramebuffer(m_frameBuffer);
+    m_openglRender->DeleteTexture(m_frameBufferTexture);
     m_frameBuffer = nullptr;
     m_frameBufferTexture = nullptr;
-    // textures are created with Linear filtering - which matches no resize
-    m_resizing = None;
+
+    MythVideoGPU::ResetFrameFormat();
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
-void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
+void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 {
     if (Frame->codec == FMT_NONE)
         return;
@@ -615,7 +573,7 @@ void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
     }
 
     // lock
-    OpenGLLocker ctx_lock(m_render);
+    OpenGLLocker ctx_lock(m_openglRender);
 
     // check for input changes
     if ((Frame->width  != m_videoDim.width()) ||
@@ -634,7 +592,7 @@ void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
     AddDeinterlacer(Frame, Scan);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_render->logDebugMarker(LOC + "UPDATE_FRAME_START");
+        m_openglRender->logDebugMarker(LOC + "UPDATE_FRAME_START");
 
     m_videoColourSpace->UpdateColourSpace(Frame);
 
@@ -663,35 +621,35 @@ void MythOpenGLVideo::ProcessFrame(VideoFrame *Frame, FrameScanType Scan)
         Frame->pitches[0] = Frame->pitches[0] << 1;
         Frame->pitches[1] = Frame->pitches[1] << 1;
         Frame->pitches[2] = Frame->pitches[2] << 1;
-        MythVideoTexture::UpdateTextures(m_render, Frame, m_inputTextures);
+        MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_inputTextures);
         // second field. Fake the offsets as well.
         FrameOffsets offsets = Frame->offsets;
         Frame->offsets[0] = Frame->offsets[0] + pitches[0];
         Frame->offsets[1] = Frame->offsets[1] + pitches[1];
         Frame->offsets[2] = Frame->offsets[2] + pitches[2];
-        MythVideoTexture::UpdateTextures(m_render, Frame, m_nextTextures);
+        MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_nextTextures);
         Frame->pitches = pitches;
         Frame->offsets = offsets;
     }
     else
     {
-        MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
+        MythVideoTexture::UpdateTextures(m_openglRender, Frame, current ? m_inputTextures : m_nextTextures);
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
+        m_openglRender->logDebugMarker(LOC + "UPDATE_FRAME_END");
 }
 
-void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
-                                   StereoscopicMode Stereo, bool DrawBorder)
+void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
+                                  StereoscopicMode Stereo, bool DrawBorder)
 {
-    if (!m_render)
+    if (!m_openglRender)
         return;
 
-    OpenGLLocker locker(m_render);
+    OpenGLLocker locker(m_openglRender);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_render->logDebugMarker(LOC + "PREP_FRAME_START");
+        m_openglRender->logDebugMarker(LOC + "RENDER_FRAME_START");
 
     // Set required input textures for the last stage
     // ProcessFrame is always called first, which will create/destroy software
@@ -716,7 +674,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (inputtextures.empty())
     {
         // Pull in any hardware frames
-        inputtextures = MythOpenGLInterop::Retrieve(m_render, m_videoColourSpace, Frame, Scan);
+        inputtextures = MythOpenGLInterop::Retrieve(m_openglRender, m_videoColourSpace, Frame, Scan);
         if (!inputtextures.empty())
         {
             hwframes = true;
@@ -757,7 +715,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Nothing to display");
                 // if this is live tv startup and the window rect has changed we
                 // must set the viewport
-                m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
+                m_openglRender->SetViewPort(QRect(QPoint(), m_masterViewportSize));
                 return;
             }
         }
@@ -841,18 +799,18 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         // remove framebuffer
         if (m_frameBufferTexture)
         {
-            m_render->DeleteTexture(m_frameBufferTexture);
+            m_openglRender->DeleteTexture(m_frameBufferTexture);
             m_frameBufferTexture = nullptr;
         }
         if (m_frameBuffer)
         {
-            m_render->DeleteFramebuffer(m_frameBuffer);
+            m_openglRender->DeleteFramebuffer(m_frameBuffer);
             m_frameBuffer = nullptr;
         }
         // set filtering
-        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Linear);
-        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Linear);
-        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Linear);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_inputTextures, QOpenGLTexture::Linear);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Linear);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Linear);
         m_resizing = None;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
@@ -860,9 +818,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     {
         // framebuffer will be created as needed below
         QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
-        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, filter);
-        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, filter);
-        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, filter);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_inputTextures, filter);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, filter);
+        MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, filter);
         m_resizing = resize;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Resizing from %1x%2 to %3x%4 for %5")
             .arg(m_videoDispDim.width()).arg(m_videoDispDim.height())
@@ -875,7 +833,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     {
         QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
-            MythVideoTexture::SetTextureFilters(m_render, inputtextures, filter);
+            MythVideoTexture::SetTextureFilters(m_openglRender, inputtextures, filter);
     }
 
     // texture coordinates
@@ -901,7 +859,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         else if (m_toneMap)
         {
             if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-                m_render->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
+                m_openglRender->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
             nexttexture = m_toneMap->Map(inputtextures, m_displayVideoRect.size());
             trect = QRect(QPoint(0, 0), m_displayVideoRect.size());
         }
@@ -909,7 +867,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         {
             // render to texture stage
             if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-                m_render->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
+                m_openglRender->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
 
             // we need a framebuffer
             if (!m_frameBuffer)
@@ -922,10 +880,10 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
             // and its associated texture
             if (!m_frameBufferTexture)
             {
-                m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_render->CreateFramebufferTexture(m_frameBuffer));
+                m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_openglRender->CreateFramebufferTexture(m_frameBuffer));
                 if (!m_frameBufferTexture)
                     return;
-                m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
+                m_openglRender->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
             }
 
             // coordinates
@@ -935,15 +893,15 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
                 trect2.setWidth(m_videoDispDim.width() >> 1);
 
             // framebuffer
-            m_render->BindFramebuffer(m_frameBuffer);
-            m_render->SetViewPort(vrect);
+            m_openglRender->BindFramebuffer(m_frameBuffer);
+            m_openglRender->SetViewPort(vrect);
 
             // bind correct textures
             vector<MythGLTexture*> textures {};
             BindTextures(deinterlacing, inputtextures, textures);
 
             // render
-            m_render->DrawBitmap(textures, m_frameBuffer,
+            m_openglRender->DrawBitmap(textures, m_frameBuffer,
                                  trect2, vrect, m_shaders[program], 0);
             nexttexture = m_frameBufferTexture;
         }
@@ -957,7 +915,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 
     // render to default framebuffer/screen
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_render->logDebugMarker(LOC + "RENDER_TO_SCREEN");
+        m_openglRender->logDebugMarker(LOC + "RENDER_TO_SCREEN");
 
     // discard stereoscopic fields
     if (kStereoscopicModeSideBySideDiscard == Stereo)
@@ -966,8 +924,8 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         trect = QRect(trect.left(), trect.top() >> 1, trect.width(), trect.height() >> 1);
 
     // bind default framebuffer
-    m_render->BindFramebuffer(nullptr);
-    m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
+    m_openglRender->BindFramebuffer(nullptr);
+    m_openglRender->SetViewPort(QRect(QPoint(), m_masterViewportSize));
 
     // PiP border
     if (DrawBorder)
@@ -975,7 +933,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         QRect piprect = m_displayVideoRect.adjusted(-10, -10, +10, +10);
         static const QPen kNopen(Qt::NoPen);
         static const QBrush kRedBrush(QBrush(QColor(127, 0, 0, 255)));
-        m_render->DrawRect(nullptr, piprect, kRedBrush, kNopen, 255);
+        m_openglRender->DrawRect(nullptr, piprect, kRedBrush, kNopen, 255);
     }
 
     // bind correct textures
@@ -990,25 +948,25 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (tiled)
     {
         // N.B. It's not obvious whether this helps
-        m_render->glEnable(GL_SCISSOR_TEST);
-        m_render->glScissor(m_displayVideoRect.left() - 1, m_displayVideoRect.top() - 1,
+        m_openglRender->glEnable(GL_SCISSOR_TEST);
+        m_openglRender->glScissor(m_displayVideoRect.left() - 1, m_displayVideoRect.top() - 1,
                             m_displayVideoRect.width() + 2, m_displayVideoRect.height() + 2);
     }
 
     // draw
-    m_render->DrawBitmap(textures, nullptr, trect,
+    m_openglRender->DrawBitmap(textures, nullptr, trect,
                          m_displayVideoRect, m_shaders[program], m_lastRotation);
 
     // disable scissoring
     if (tiled)
-        m_render->glDisable(GL_SCISSOR_TEST);
+        m_openglRender->glDisable(GL_SCISSOR_TEST);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_render->logDebugMarker(LOC + "PREP_FRAME_END");
+        m_openglRender->logDebugMarker(LOC + "RENDER_FRAME_END");
 }
 
 /// \brief Clear reference frames after a seek as they will contain old images.
-void MythOpenGLVideo::ResetTextures(void)
+void MythOpenGLVideo::ResetTextures()
 {
     for (auto & texture : m_inputTextures)
         texture->m_valid = false;
@@ -1018,8 +976,8 @@ void MythOpenGLVideo::ResetTextures(void)
         texture->m_valid = false;
 }
 
-void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
-                                   vector<MythGLTexture *>&Textures)
+void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>& Current,
+                                   vector<MythGLTexture*>& Textures)
 {
     bool usecurrent = true;
     if (Deinterlacing)
@@ -1066,16 +1024,6 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
     return "opengl";
 }
 
-QString MythOpenGLVideo::VideoResizeToString(VideoResizing Resize)
-{
-    QStringList reasons;
-    if ((Resize & Deinterlacer) == Deinterlacer) reasons << "Deinterlacer";
-    if ((Resize & Sampling)     == Sampling)     reasons << "Sampling";
-    if ((Resize & Performance)  == Performance)  reasons << "Performance";
-    if ((Resize & Framebuffer)  == Framebuffer)  reasons << "Framebuffer";
-    return reasons.join(",");
-}
-
 QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size)
 {
     // Use a 16bit float framebuffer if necessary and available (not GLES2) to maintain precision.
@@ -1088,5 +1036,5 @@ QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType
     bool sixteenbitvid = ColorDepth(OutputType) > 8;
     if (sixteenbitfb && sixteenbitvid)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Requesting 16bit framebuffer texture");
-    return m_render->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
+    return m_openglRender->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
 }

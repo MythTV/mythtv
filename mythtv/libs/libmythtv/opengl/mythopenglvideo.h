@@ -7,6 +7,7 @@
 
 // MythTV
 #include "mythvideoout.h"
+#include "mythvideogpu.h"
 #include "videoouttypes.h"
 #include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
@@ -20,7 +21,7 @@ using std::map;
 
 class MythOpenGLTonemap;
 
-class MythOpenGLVideo : public QObject
+class MythOpenGLVideo : public MythVideoGPU
 {
     Q_OBJECT
 
@@ -34,90 +35,57 @@ class MythOpenGLVideo : public QObject
         ShaderCount   = 4
     };
 
-    enum VideoResize
-    {
-        None         = 0x000,
-        Deinterlacer = 0x001,
-        Sampling     = 0x002,
-        Performance  = 0x004,
-        Framebuffer  = 0x008,
-        ToneMap      = 0x010
-    };
-
-    Q_DECLARE_FLAGS(VideoResizing, VideoResize)
-
     static QString        TypeToProfile(VideoFrameType Type);
-    static QString        VideoResizeToString(VideoResizing Resize);
 
-    MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+    MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+                    const VideoOutWindow &Window, bool ViewportControl, QString Profile);
+    MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                    QRect DisplayVideoRect, QRect videoRect,
+                    QRect DisplayVideoRect, QRect VideoRect,
                     bool ViewportControl, QString Profile);
-   ~MythOpenGLVideo() override;
+    ~MythOpenGLVideo() override;
 
-    bool    IsValid(void) const;
-    void    ProcessFrame(VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);
-    void    PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
-                         StereoscopicMode Stereo, bool DrawBorder = false);
-    void    SetMasterViewport(QSize Size);
-    QSize   GetVideoSize(void) const;
-    QString GetProfile() const;
-    void    SetProfile(const QString &Profile);
-    void    ResetFrameFormat(void);
-    void    ResetTextures(void);
-
-  signals:
-    void    OutputChanged(QSize VideoDim, QSize VideoDispDim, float);
+    void    StartFrame       () override {}
+    void    PrepareFrame     (VideoFrame* Frame, FrameScanType Scan = kScan_Progressive) override;
+    void    RenderFrame      (VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
+                              StereoscopicMode Stereo, bool DrawBorder = false) override;
+    void    EndFrame         () override {}
+    QString GetProfile       () const override;
+    void    ResetFrameFormat () override;
+    void    ResetTextures    () override;
 
   public slots:
-    void    SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim);
-    void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
-    void    SetViewportRect(const QRect &DisplayVisibleRect);
-    void    UpdateColourSpace(bool PrimariesChanged);
-    void    UpdateShaderParameters(void);
+    void    UpdateShaderParameters();
+
+  protected:
+    void    ColourSpaceUpdate(bool PrimariesChanged) override;
 
   private:
-    bool    SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
-                             QSize Size, GLenum TextureTarget);
+    void    Init             () override;
+    bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType,
+                              QSize Size, GLenum TextureTarget);
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
-    void    BindTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
-                         vector<MythGLTexture *>&Textures);
-    bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan,
-                            MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
+    void    BindTextures     (bool Deinterlacing, vector<MythVideoTexture*>& Current,
+                              vector<MythGLTexture*>& Textures);
+    bool    AddDeinterlacer  (const VideoFrame* Frame,  FrameScanType Scan,
+                              MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
     QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
-    void    CleanupDeinterlacers(void);
+    void    CleanupDeinterlacers();
 
-    bool           m_valid      { false };
-    QString        m_profile;
-    VideoFrameType m_inputType  { FMT_NONE }; ///< Usually YV12 for software, VDPAU etc for hardware
-    VideoFrameType m_outputType { FMT_NONE }; ///< Set by profile for software or decoder for hardware
-    MythRenderOpenGL *m_render  { nullptr };
-    int            m_gles       { 0 };
-    QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
-    QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088
-    QSize          m_masterViewportSize;  ///< Current viewport into which OpenGL is rendered, usually the window size
-    QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
-    QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
-    MythDeintType  m_deinterlacer         { MythDeintType::DEINT_NONE };
-    bool           m_deinterlacer2x       { false };
-    MythDeintType  m_fallbackDeinterlacer { MythDeintType::DEINT_NONE };  ///< Only used if there are insufficient texture units (for kernel)
-    VideoColourSpace *m_videoColourSpace;
-    bool           m_viewportControl;     ///< Video has control over view port
+    MythRenderOpenGL* m_openglRender               { nullptr };
+    int            m_gles                          { 0 };
+    MythDeintType  m_fallbackDeinterlacer          { MythDeintType::DEINT_NONE };
     std::array<QOpenGLShaderProgram*,ShaderCount> m_shaders { nullptr };
-    std::array<int,ShaderCount> m_shaderCost     { 1 };
-    vector<MythVideoTexture*> m_inputTextures; ///< Current textures with raw video data
-    vector<MythVideoTexture*> m_prevTextures;  ///< Previous textures with raw video data
-    vector<MythVideoTexture*> m_nextTextures;  ///< Next textures with raw video data
+    std::array<int,ShaderCount> m_shaderCost       { 1 };
+    vector<MythVideoTexture*> m_inputTextures;
+    vector<MythVideoTexture*> m_prevTextures;
+    vector<MythVideoTexture*> m_nextTextures;
     QOpenGLFramebufferObject* m_frameBuffer        { nullptr };
     MythVideoTexture*         m_frameBufferTexture { nullptr };
-    QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
-    QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
-    int            m_extraFeatures          { 0 };       ///< OR'd list of extra, Myth specific features
-    VideoResizing  m_resizing               { None };
-    GLenum         m_textureTarget          { QOpenGLTexture::Target2D }; ///< Some interops require custom texture targets
-    long long      m_discontinuityCounter   { 0 }; ///< Check when to release reference frames after a skip
-    int            m_lastRotation           { 0 }; ///< Track rotation for pause frame
-    bool           m_chromaUpsamplingFilter { false }; /// Attempt to fix Chroma Upsampling Error in shaders
-    MythOpenGLTonemap* m_toneMap            { nullptr };
+    QOpenGLFunctions::OpenGLFeatures m_features;
+    int            m_extraFeatures                 { 0 };
+    GLenum         m_textureTarget                 { QOpenGLTexture::Target2D };
+    bool           m_chromaUpsamplingFilter        { false };
+    MythOpenGLTonemap* m_toneMap                   { nullptr };
 };
-#endif // MYTH_OPENGL_VIDEO_H_
+#endif

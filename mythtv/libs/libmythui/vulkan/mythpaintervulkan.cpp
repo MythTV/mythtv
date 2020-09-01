@@ -32,7 +32,7 @@ MythPainterVulkan::~MythPainterVulkan()
     DoFreeResources();
 }
 
-void MythPainterVulkan::FreeResources(void)
+void MythPainterVulkan::FreeResources()
 {
     ClearCache();
     DeleteTextures();
@@ -40,7 +40,7 @@ void MythPainterVulkan::FreeResources(void)
 }
 
 /// \brief Free resources before the render device is released.
-void MythPainterVulkan::DoFreeResources(void)
+void MythPainterVulkan::DoFreeResources()
 {
     if (m_devFuncs && m_window)
         m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
@@ -83,22 +83,22 @@ void MythPainterVulkan::DoFreeResources(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Finished releasing resources");
 }
 
-QString MythPainterVulkan::GetName(void)
+QString MythPainterVulkan::GetName()
 {
     return "Vulkan";
 }
 
-bool MythPainterVulkan::SupportsAlpha(void)
+bool MythPainterVulkan::SupportsAlpha()
 {
     return true;
 }
 
-bool MythPainterVulkan::SupportsAnimation(void)
+bool MythPainterVulkan::SupportsAnimation()
 {
     return true;
 }
 
-bool MythPainterVulkan::SupportsClipping(void)
+bool MythPainterVulkan::SupportsClipping()
 {
     return false;
 }
@@ -116,12 +116,12 @@ void MythPainterVulkan::PushTransformation(const UIEffects &Fx, QPointF Center)
     m_transforms.push(newtop);
 }
 
-void MythPainterVulkan::PopTransformation(void)
+void MythPainterVulkan::PopTransformation()
 {
     m_transforms.pop();
 }
 
-bool MythPainterVulkan::Ready(void)
+bool MythPainterVulkan::Ready()
 {
     if (m_window && m_render && m_device && m_devFuncs && m_textureShader &&
         m_texturePipeline && m_textureDescriptorPool && m_textureLayout &&
@@ -320,7 +320,7 @@ void MythPainterVulkan::Begin(QPaintDevice* /*Parent*/)
     m_frameStarted = true;
 }
 
-void MythPainterVulkan::End(void)
+void MythPainterVulkan::End()
 {
     if (!(m_render && m_frameStarted))
         return;
@@ -402,7 +402,7 @@ void MythPainterVulkan::DrawImage(const QRect &Dest, MythImage *Image, const QRe
     }
 }
 
-MythImage* MythPainterVulkan::GetFormatImagePriv(void)
+MythImage* MythPainterVulkan::GetFormatImagePriv()
 {
     return new MythImage(this);
 }
@@ -417,7 +417,7 @@ void MythPainterVulkan::DeleteFormatImagePriv(MythImage *Image)
     }
 }
 
-void MythPainterVulkan::ClearCache(void)
+void MythPainterVulkan::ClearCache()
 {
     LOG(VB_GENERAL, LOG_INFO, "Clearing Vulkan painter cache.");
 
@@ -546,12 +546,7 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
     return texture;
 }
 
-void MythPainterVulkan::SetMaster(bool Master)
-{
-    m_master = Master;
-}
-
-void MythPainterVulkan::DeleteTextures(void)
+void MythPainterVulkan::DeleteTextures()
 {
     if (!m_render || m_texturesToDelete.empty())
         return;
