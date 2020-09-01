@@ -18,7 +18,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
         LegacyFormats = 1
     };
 
-    explicit MythVideoOutputOpenGL(QString Profile = QString());
+    explicit MythVideoOutputOpenGL(QString& Profile);
     ~MythVideoOutputOpenGL() override;
 
     static void   GetRenderOptions (RenderOptions& Options);

@@ -30,9 +30,11 @@ class MythVideoTextureVulkan
                                                           VkCommandBuffer   CommandBuffer,
                                                           vector<MythVideoTextureVulkan*>& Textures);
   protected:
-    MythVideoTextureVulkan();
+    MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format);
+    MythVideoTextureVulkan() = default;
 
   private:
+    Q_DISABLE_COPY(MythVideoTextureVulkan)
     static vector<MythVideoTextureVulkan*> CreateSoftwareTextures(MythRenderVulkan* Render,
                                                                   VkDevice          Device,
                                                                   QVulkanDeviceFunctions* Functions,

@@ -22,6 +22,15 @@ vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateTextures(MythRende
                                   Type, Format, Size);
 }
 
+MythVideoTextureVulkan::MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format)
+{
+    m_frameType = Type;
+    m_frameFormat = Format;
+    m_valid = false;
+    m_plane = 0;
+    m_planeCount = planes(Format);
+}
+
 void MythVideoTextureVulkan::DeleteTextures(MythRenderVulkan* Render, VkDevice Device,
                                             QVulkanDeviceFunctions* Functions,
                                             VkCommandBuffer CommandBuffer,
@@ -100,8 +109,4 @@ vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateSoftwareTextures(M
     }
 
     return result;
-}
-
-MythVideoTextureVulkan::MythVideoTextureVulkan()
-{
 }

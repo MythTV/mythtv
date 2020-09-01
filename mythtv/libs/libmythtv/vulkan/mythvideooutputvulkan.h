@@ -18,7 +18,7 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU
     static void        GetRenderOptions    (RenderOptions& Options);
     static QStringList GetAllowedRenderers (MythCodecID CodecId);
 
-    MythVideoOutputVulkan();
+    MythVideoOutputVulkan(QString& Profile);
    ~MythVideoOutputVulkan() override;
 
     bool IsPIPSupported           () const override { return false; }

@@ -19,7 +19,7 @@
  * \sa MythVideoOutputOpenGL
  * \sa MythVideoOutputVulkan
  */
-MythVideoOutputGPU::MythVideoOutputGPU(const QString& Profile)
+MythVideoOutputGPU::MythVideoOutputGPU(QString& Profile)
   : m_profile(std::move(Profile))
 {
     MythMainWindow* win = MythMainWindow::getMainWindow();

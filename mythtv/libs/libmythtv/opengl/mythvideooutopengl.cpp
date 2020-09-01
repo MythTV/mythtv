@@ -97,7 +97,7 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 #endif
 }
 
-MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
   : MythVideoOutputGPU(Profile)
 {
     // Retrieve render context
@@ -138,7 +138,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
     // Create OpenGLVideo
     m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace,
                                   m_window, true, m_profile);
-    m_video->SetViewportRect(GetDisplayVisibleRect());
+    m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRect());
 }
 
 MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
