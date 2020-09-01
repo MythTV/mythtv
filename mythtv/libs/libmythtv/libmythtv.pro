@@ -655,7 +655,18 @@ using_frontend {
         DEFINES += USING_MHEG
     }
 
+    using_v4l2 {
+        HEADERS += decoders/mythv4l2m2mcontext.h
+        SOURCES += decoders/mythv4l2m2mcontext.cpp
+    }
+
     DEFINES += USING_FRONTEND
+}
+
+using_v4l2:using_backend|using_frontend {
+    HEADERS += v4l2util.h
+    SOURCES += v4l2util.cpp
+    DEFINES += USING_V4L2
 }
 
 using_backend {
@@ -774,9 +785,6 @@ using_backend {
     }
 
     using_v4l2 {
-        HEADERS += v4l2util.h
-        SOURCES += v4l2util.cpp
-
         HEADERS += recorders/v4lchannel.h
         HEADERS += recorders/analogsignalmonitor.h
         SOURCES += recorders/v4lchannel.cpp
@@ -788,10 +796,6 @@ using_backend {
         SOURCES += recorders/v4l2encstreamhandler.cpp
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
-
-        HEADERS += decoders/mythv4l2m2mcontext.h
-        SOURCES += decoders/mythv4l2m2mcontext.cpp
-        DEFINES += USING_V4L2
     }
 
     # Support for cable boxes that provide Firewire out
