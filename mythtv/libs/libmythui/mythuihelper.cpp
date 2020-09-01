@@ -604,7 +604,7 @@ bool MythUIHelper::IsImageInCache(const QString &url)
     if (d->m_imageCache.contains(url))
         return true;
 
-    if (QFileInfo(url).exists())
+    if (QFileInfo::exists(url))
         return true;
 
     return false;
