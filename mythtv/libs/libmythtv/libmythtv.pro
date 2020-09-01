@@ -32,6 +32,7 @@ DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
 DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl ./io ./captions
+DEPENDPATH  += ./vulkan
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -508,6 +509,18 @@ using_frontend {
 
     HEADERS += decoders/mythdrmprimecontext.h
     SOURCES += decoders/mythdrmprimecontext.cpp
+
+    using_vulkan {
+        DEFINES += USING_VULKAN
+        HEADERS += vulkan/mythvideovulkan.h
+        HEADERS += vulkan/mythvideooutputvulkan.h
+        HEADERS += vulkan/mythvideotexturevulkan.h
+        HEADERS += vulkan/mythvideoshadersvulkan.h
+        SOURCES += vulkan/mythvideovulkan.cpp
+        SOURCES += vulkan/mythvideooutputvulkan.cpp
+        SOURCES += vulkan/mythvideotexturevulkan.cpp
+        using_libglslang: DEFINES += USING_GLSLANG
+    }
 
     using_opengl {
         DEFINES += USING_OPENGL
