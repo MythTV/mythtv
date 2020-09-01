@@ -23,7 +23,7 @@
  * \note MythOpenGLVideo has no knowledge of buffering, timing and other presentation
  * state. Its role is to render video frames on screen.
 */
-MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
                                  const VideoOutWindow& Window,
                                  bool  ViewportControl, QString Profile)
   : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
@@ -31,10 +31,10 @@ MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpa
     Init();
 }
 
-MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
-                QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                QRect DisplayVideoRect, QRect VideoRect,
-                bool ViewportControl, QString Profile)
+MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
+                                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
+                                 QRect DisplayVideoRect, QRect VideoRect,
+                                 bool ViewportControl, QString Profile)
   : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
                  DisplayVideoRect, VideoRect, ViewportControl, Profile)
 {

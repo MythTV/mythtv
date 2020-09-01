@@ -4,7 +4,7 @@
 // MythTV
 #include "mythplayer.h"
 #include "mythcorecontext.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "opengl/mythrenderopengl.h"
 #include "mythopenglinterop.h"
 
@@ -162,7 +162,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
 }
 
 vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
-                                                      VideoColourSpace *ColourSpace,
+                                                      MythVideoColourSpace *ColourSpace,
                                                       VideoFrame       *Frame,
                                                       FrameScanType     Scan)
 {
@@ -237,7 +237,7 @@ MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
 }
 
 vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
-                                                     VideoColourSpace* /*ColourSpace*/,
+                                                     MythVideoColourSpace* /*ColourSpace*/,
                                                      VideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
     return vector<MythVideoTexture*>();

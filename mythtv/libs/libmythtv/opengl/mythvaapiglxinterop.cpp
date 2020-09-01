@@ -86,7 +86,7 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
     return flags;
 }
 
-void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
+void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace *ColourSpace)
 {
     m_vaapiColourSpace = 0;
     if (!ColourSpace || !m_vaDisplay)
@@ -132,7 +132,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
     // Set the supported attributes
     ColourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>(supported_controls));
     // and listen for changes
-    connect(ColourSpace, &VideoColourSpace::PictureAttributeChanged, this, &MythVAAPIInteropGLX::SetPictureAttribute);
+    connect(ColourSpace, &MythVideoColourSpace::PictureAttributeChanged, this, &MythVAAPIInteropGLX::SetPictureAttribute);
 
     // create
     delete [] attribs;
@@ -244,7 +244,7 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
 }
 
 vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Context,
-                                                           VideoColourSpace *ColourSpace,
+                                                           MythVideoColourSpace *ColourSpace,
                                                            VideoFrame *Frame,
                                                            FrameScanType Scan)
 {
@@ -340,7 +340,7 @@ MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
 }
 
 vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Context,
-                                                             VideoColourSpace *ColourSpace,
+                                                             MythVideoColourSpace *ColourSpace,
                                                              VideoFrame *Frame,
                                                              FrameScanType Scan)
 {

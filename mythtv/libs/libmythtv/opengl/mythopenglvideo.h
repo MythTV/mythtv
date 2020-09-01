@@ -37,9 +37,9 @@ class MythOpenGLVideo : public MythVideoGPU
 
     static QString        TypeToProfile(VideoFrameType Type);
 
-    MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+    MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
                     const VideoOutWindow &Window, bool ViewportControl, QString Profile);
-    MythOpenGLVideo(MythRender* Render, VideoColourSpace* ColourSpace,
+    MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                     QRect DisplayVideoRect, QRect VideoRect,
                     bool ViewportControl, QString Profile);

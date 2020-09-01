@@ -17,14 +17,14 @@
 using PrimarySpace = std::array<std::array<float,2>,3>;
 using WhiteSpace = std::array<float,2>;
 
-class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
+class MythVideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {
     Q_OBJECT
 
     friend class MythVideoOutput;
 
   public:
-    explicit VideoColourSpace(VideoColourSpace *Parent = nullptr);
+    explicit MythVideoColourSpace(MythVideoColourSpace *Parent = nullptr);
 
     bool          UpdateColourSpace(const VideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
@@ -59,7 +59,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
 
   protected:
-    ~VideoColourSpace() override;
+    ~MythVideoColourSpace() override;
 
   private:
     void  SetFullRange(bool FullRange);
@@ -99,7 +99,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     QMatrix4x4        m_primaryMatrix          { };
     float             m_customDisplayGamma     { 0.0F };
     ColourPrimaries  *m_customDisplayPrimaries { nullptr };
-    VideoColourSpace *m_parent                 { nullptr };
+    MythVideoColourSpace *m_parent                 { nullptr };
 };
 
 #endif

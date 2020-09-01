@@ -19,7 +19,7 @@ extern "C" {
 }
 
 class MythXDisplay;
-class VideoColourSpace;
+class MythVideoColourSpace;
 
 class VDPAUCodec
 {
@@ -65,7 +65,7 @@ class MythVDPAUHelper : public QObject
                                  MythDeintType Deinterlacer = DEINT_BASIC);
     void             MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source, VdpOutputSurface Dest,
                                  FrameScanType Scan, int TopFieldFirst, QVector<AVBufferRef*>& Frames);
-    void             SetCSCMatrix(VdpVideoMixer Mixer, VideoColourSpace *ColourSpace);
+    void             SetCSCMatrix(VdpVideoMixer Mixer, MythVideoColourSpace *ColourSpace);
     void             DeleteOutputSurface(VdpOutputSurface Surface);
     void             DeleteMixer(VdpVideoMixer Mixer);
     QSize            GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma);

@@ -1,6 +1,6 @@
 // MythTV
 #include "mythlogging.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "mythvdpauhelper.h"
 #include "platforms/mythxdisplay.h" // always last
 
@@ -539,7 +539,7 @@ void MythVDPAUHelper::DeleteMixer(VdpVideoMixer Mixer)
     CHECK_ST
 }
 
-void MythVDPAUHelper::SetCSCMatrix(VdpVideoMixer Mixer, VideoColourSpace *ColourSpace)
+void MythVDPAUHelper::SetCSCMatrix(VdpVideoMixer Mixer, MythVideoColourSpace *ColourSpace)
 {
     if (!Mixer || !ColourSpace)
         return;

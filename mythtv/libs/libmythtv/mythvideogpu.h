@@ -8,7 +8,7 @@
 // MythTV
 #include "mythrender_base.h"
 #include "mythframe.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 
 class VideoOutWindow;
 
@@ -31,9 +31,9 @@ class MythVideoGPU : public QObject
 
     static QString VideoResizeToString(VideoResizing Resize);
 
-    MythVideoGPU(MythRender* Render, VideoColourSpace* ColourSpace,
+    MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
                  const VideoOutWindow& Window, bool ViewportControl, QString Profile);
-    MythVideoGPU(MythRender* Render, VideoColourSpace* ColourSpace,
+    MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
                  QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                  QRect DisplayVideoRect, QRect VideoRect,
                  bool ViewportControl, QString Profile);
@@ -77,7 +77,7 @@ class MythVideoGPU : public QObject
     QSize             m_masterViewportSize;
     QRect             m_displayVideoRect;
     QRect             m_videoRect;
-    VideoColourSpace* m_videoColourSpace     { nullptr };
+    MythVideoColourSpace* m_videoColourSpace     { nullptr };
     QSize             m_inputTextureSize;
     VideoResizing     m_resizing             { None };
     int               m_lastRotation         { 0 };

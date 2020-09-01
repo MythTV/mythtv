@@ -1,6 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "mythvdpauhelper.h"
 #include "mythvdpauinterop.h"
 
@@ -219,7 +219,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
  * texture is RGB... We could use GL_NV_vdpau_interop2 to return raw YUV frames.
 */
 vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
-                                                    VideoColourSpace *ColourSpace,
+                                                    MythVideoColourSpace *ColourSpace,
                                                     VideoFrame *Frame,
                                                     FrameScanType Scan)
 {
@@ -335,7 +335,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
             if (m_helper->IsFeatureAvailable(VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX))
             {
                 ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
-                connect(ColourSpace, &VideoColourSpace::Updated, this, &MythVDPAUInterop::UpdateColourSpace);
+                connect(ColourSpace, &MythVideoColourSpace::Updated, this, &MythVDPAUInterop::UpdateColourSpace);
             }
             else
             {

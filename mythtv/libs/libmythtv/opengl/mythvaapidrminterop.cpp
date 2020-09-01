@@ -1,6 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "fourcc.h"
 #include "mythvaapidrminterop.h"
 
@@ -162,7 +162,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::GetReferenceFrames(void)
 }
 
 vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
-                                                       VideoColourSpace *ColourSpace,
+                                                       MythVideoColourSpace *ColourSpace,
                                                        VideoFrame *Frame,
                                                        FrameScanType Scan)
 {

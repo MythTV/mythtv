@@ -1,5 +1,5 @@
 // MythTV
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "fourcc.h"
 #include "mythmmalinterop.h"
 
@@ -92,7 +92,7 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, V
 }
 
 vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
-                                                   VideoColourSpace *ColourSpace,
+                                                   MythVideoColourSpace *ColourSpace,
                                                    VideoFrame *Frame,
                                                    FrameScanType Scan)
 {

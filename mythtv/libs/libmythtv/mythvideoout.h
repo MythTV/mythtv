@@ -17,7 +17,7 @@
 #include "videooutwindow.h"
 #include "mythdisplay.h"
 #include "videodisplayprofile.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "visualisations/videovisual.h"
 #include "mythavutil.h"
 #include "mythdeinterlacer.h"
@@ -157,7 +157,7 @@ class MythVideoOutput
 
     MythDisplay*         m_display            { nullptr };
     VideoOutWindow       m_window;
-    VideoColourSpace     m_videoColourSpace;
+    MythVideoColourSpace m_videoColourSpace;
     AspectOverrideMode   m_dbAspectOverride   { kAspect_Off };
     AdjustFillMode       m_dbAdjustFill       { kAdjustFill_Off };
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };

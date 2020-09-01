@@ -1,7 +1,7 @@
 // MythTV
 #include "mythmainwindow.h"
 #include "mythcorecontext.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "mythvtbinterop.h"
 
 #define LOC QString("VTBInterop: ")
@@ -44,7 +44,7 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace, VideoFrame *Frame)
+CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace, VideoFrame *Frame)
 {
     if (!Frame)
         return nullptr;
@@ -80,7 +80,7 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, VideoColourSp
 }
 
 vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
-                                                  VideoColourSpace *ColourSpace,
+                                                  MythVideoColourSpace *ColourSpace,
                                                   VideoFrame *Frame,
                                                   FrameScanType)
 {
@@ -173,7 +173,7 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 }
 
 vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
-                                                         VideoColourSpace *ColourSpace,
+                                                         MythVideoColourSpace *ColourSpace,
                                                          VideoFrame *Frame,
                                                          FrameScanType Scan)
 {

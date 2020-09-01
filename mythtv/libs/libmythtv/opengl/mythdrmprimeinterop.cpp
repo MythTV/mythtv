@@ -1,5 +1,5 @@
 // MythTV
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "mythdrmprimeinterop.h"
 
 // FFmpeg
@@ -99,7 +99,7 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
 }
 
 vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
-                                                       VideoColourSpace *ColourSpace,
+                                                       MythVideoColourSpace *ColourSpace,
                                                        VideoFrame *Frame,
                                                        FrameScanType Scan)
 {

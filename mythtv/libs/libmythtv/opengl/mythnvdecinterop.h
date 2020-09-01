@@ -23,7 +23,7 @@ class MythNVDECInterop : public MythOpenGLInterop
 
     bool IsValid(void);
     CUcontext GetCUDAContext(void);
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace,
+    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace,
                                       VideoFrame *Frame, FrameScanType Scan) override;
 
   protected:

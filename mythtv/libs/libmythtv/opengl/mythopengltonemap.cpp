@@ -21,7 +21,7 @@
 #define GL_WRITE_ONLY                     0x88B9
 #endif
 
-MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace)
+MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, MythVideoColourSpace *ColourSpace)
 {
     if (Render)
     {
@@ -34,7 +34,7 @@ MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, VideoColourSpace 
     {
         ColourSpace->IncrRef();
         m_colourSpace = ColourSpace;
-        connect(m_colourSpace, &VideoColourSpace::Updated, this, &MythOpenGLTonemap::UpdateColourSpace);
+        connect(m_colourSpace, &MythVideoColourSpace::Updated, this, &MythOpenGLTonemap::UpdateColourSpace);
     }
 }
 

@@ -17,7 +17,7 @@ class MythMMALInterop : public MythOpenGLInterop
   public:
     static MythMMALInterop* Create(MythRenderOpenGL *Context, Type InteropType);
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                              VideoColourSpace *ColourSpace,
+                                              MythVideoColourSpace *ColourSpace,
                                               VideoFrame *Frame, FrameScanType Scan) override;
 
   protected:

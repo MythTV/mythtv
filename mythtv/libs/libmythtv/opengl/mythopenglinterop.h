@@ -16,7 +16,7 @@
 using std::vector;
 
 class MythPlayer;
-class VideoColourSpace;
+class MythVideoColourSpace;
 using FreeAVHWDeviceContext = void (*)(struct AVHWDeviceContext*);
 #define DUMMY_INTEROP_ID 1
 
@@ -46,7 +46,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     static Type        GetInteropType        (VideoFrameType Format, MythPlayer *Player);
     static void        GetInteropTypeCallback(void *Wait, void *Format, void* Result);
     static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
-                                              VideoColourSpace *ColourSpace,
+                                              MythVideoColourSpace *ColourSpace,
                                               VideoFrame *Frame,
                                               FrameScanType Scan);
     static QString     TypeToString          (Type InteropType);
@@ -54,7 +54,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
 
     ~MythOpenGLInterop() override;
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                              VideoColourSpace *ColourSpace,
+                                              MythVideoColourSpace *ColourSpace,
                                               VideoFrame *Frame, FrameScanType Scan);
 
     Type               GetType               (void);

@@ -4,7 +4,7 @@
 #include "mythdisplay.h"
 #include "mythavutil.h"
 #include "mythmainwindow.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 
 // libavutil
 extern "C" {
@@ -15,19 +15,19 @@ extern "C" {
 // Std
 #include <cmath>
 
-const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT709 =
+const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT709 =
     {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_525 =
+const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT610_525 =
     {{{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_625 =
+const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT610_625 =
     {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
+const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT2020 =
     {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
 
 #define LOC QString("ColourSpace: ")
 
-/*! \class VideoColourSpace
- *  \brief VideoColourSpace contains a QMatrix4x4 that can convert YCbCr data to RGB.
+/*! \class MythVideoColourSpace
+ *  \brief MythVideoColourSpace contains a QMatrix4x4 that can convert YCbCr data to RGB.
  *
  * A 4x4 matrix is created that is customised for the source colourspace and user
  * defined adjustments for brightness, contrast, hue, saturation (colour) and 'levels'.
@@ -39,7 +39,7 @@ const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
  * levels will ensure there is no adjustment. In both cases it is assumed the display
  * device is setup appropriately.
  *
- * Each instance may have a parent VideoColourSpace. This configuration is used
+ * Each instance may have a parent MythVideoColourSpace. This configuration is used
  * for Picture In Picture support. The master/parent object will receive requests
  * to update the various attributes and will signal changes to the children. Each
  * instance manages its own underlying video colourspace for the stream it is playing.
@@ -54,14 +54,14 @@ const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
  * a colourspace that has a different reference gamma (e.g. Rec 2020) or when
  * using an HDR display. Futher work is required.
 */
-VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
+MythVideoColourSpace::MythVideoColourSpace(MythVideoColourSpace *Parent)
   : ReferenceCounter("Colour"),
     m_parent(Parent)
 {
     if (m_parent)
     {
         m_parent->IncrRef();
-        connect(m_parent, &VideoColourSpace::PictureAttributeChanged, this, &VideoColourSpace::SetPictureAttribute);
+        connect(m_parent, &MythVideoColourSpace::PictureAttributeChanged, this, &MythVideoColourSpace::SetPictureAttribute);
         m_supportedAttributes = m_parent->SupportedAttributes();
         m_dbSettings[kPictureAttribute_Brightness] = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
         m_dbSettings[kPictureAttribute_Contrast]   = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
@@ -120,14 +120,14 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     Update();
 }
 
-VideoColourSpace::~VideoColourSpace()
+MythVideoColourSpace::~MythVideoColourSpace()
 {
     delete m_customDisplayPrimaries;
     if (m_parent)
         m_parent->DecrRef();
 }
 
-PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
+PictureAttributeSupported MythVideoColourSpace::SupportedAttributes(void) const
 {
     return m_supportedAttributes;
 }
@@ -137,13 +137,13 @@ PictureAttributeSupported VideoColourSpace::SupportedAttributes(void) const
  * This is determined by the video rendering classes and is usually dependant upon
  * the rendering method in use and type of video frame (e.g. hardware decoded or not).
 */
-void VideoColourSpace::SetSupportedAttributes(PictureAttributeSupported Supported)
+void MythVideoColourSpace::SetSupportedAttributes(PictureAttributeSupported Supported)
 {
     m_supportedAttributes = Supported;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1").arg(toString(m_supportedAttributes)));
 }
 
-int VideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
+int MythVideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
 {
     if (m_dbSettings.contains(Attribute))
         return m_dbSettings.value(Attribute);
@@ -151,7 +151,7 @@ int VideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
 }
 
 /// \brief Set the Value for the given PictureAttribute
-int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
+int MythVideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
 {
     if (!(m_supportedAttributes & toMask(Attribute)))
         return -1;
@@ -190,7 +190,7 @@ int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
  * This an expensive task but it is only recalculated when a change is detected
  * or notified.
 */
-void VideoColourSpace::Update(void)
+void MythVideoColourSpace::Update(void)
 {
     if (m_updatesDisabled)
         return;
@@ -298,7 +298,7 @@ void VideoColourSpace::Update(void)
     emit Updated(primchanged);
 }
 
-void VideoColourSpace::Debug(void)
+void MythVideoColourSpace::Debug(void)
 {
     bool primary = !m_primaryMatrix.isIdentity();
 
@@ -329,7 +329,7 @@ void VideoColourSpace::Debug(void)
  * that no colourspace is found we use sensible defaults for standard and high
  * definition content (BT470BG/BT601 and BT709 respectively).
 */
-bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
+bool MythVideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
 {
     if (!Frame)
         return false;
@@ -413,43 +413,43 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     return true;
 }
 
-void VideoColourSpace::SetFullRange(bool FullRange)
+void MythVideoColourSpace::SetFullRange(bool FullRange)
 {
     m_fullRange = FullRange;
     Update();
 }
 
-void VideoColourSpace::SetBrightness(int Value)
+void MythVideoColourSpace::SetBrightness(int Value)
 {
     m_brightness = (Value * 0.02F) - 1.0F;
     Update();
 }
 
-void VideoColourSpace::SetContrast(int Value)
+void MythVideoColourSpace::SetContrast(int Value)
 {
     m_contrast = Value * 0.02F;
     Update();
 }
 
-void VideoColourSpace::SetHue(int Value)
+void MythVideoColourSpace::SetHue(int Value)
 {
     m_hue = Value * -3.6F;
     Update();
 }
 
-void VideoColourSpace::SetSaturation(int Value)
+void MythVideoColourSpace::SetSaturation(int Value)
 {
     m_saturation = Value * 0.02F;
     Update();
 }
 
-void VideoColourSpace::SetAlpha(int Value)
+void MythVideoColourSpace::SetAlpha(int Value)
 {
     m_alpha = 100.0F / Value;
     Update();
 }
 
-QStringList VideoColourSpace::GetColourMappingDefines(void)
+QStringList MythVideoColourSpace::GetColourMappingDefines(void)
 {
     QStringList result;
 
@@ -469,34 +469,34 @@ QStringList VideoColourSpace::GetColourMappingDefines(void)
     return result;
 }
 
-QMatrix4x4 VideoColourSpace::GetPrimaryMatrix(void)
+QMatrix4x4 MythVideoColourSpace::GetPrimaryMatrix(void)
 {
     return m_primaryMatrix;
 }
 
-float VideoColourSpace::GetColourGamma(void) const
+float MythVideoColourSpace::GetColourGamma(void) const
 {
     return m_colourGamma;
 }
 
-float VideoColourSpace::GetDisplayGamma(void) const
+float MythVideoColourSpace::GetDisplayGamma(void) const
 {
     return m_displayGamma;
 }
 
-PrimariesMode VideoColourSpace::GetPrimariesMode(void)
+PrimariesMode MythVideoColourSpace::GetPrimariesMode(void)
 {
     return m_primariesMode;
 }
 
-void VideoColourSpace::SetPrimariesMode(PrimariesMode Mode)
+void MythVideoColourSpace::SetPrimariesMode(PrimariesMode Mode)
 {
     m_primariesMode = Mode;
     Update();
 }
 
 /// \brief Save the PictureAttribute value to the database.
-void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
+void MythVideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
 {
     // parent owns the database settings
     if (m_parent)
@@ -518,7 +518,7 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
     m_dbSettings[AttributeType] = Value;
 }
 
-QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
+QMatrix4x4 MythVideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 {
     // Default to identity
     QMatrix4x4 result;
@@ -554,7 +554,7 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     return (RGBtoXYZ(srcprimaries) * RGBtoXYZ(dstprimaries).inverted());
 }
 
-VideoColourSpace::ColourPrimaries VideoColourSpace::GetPrimaries(int Primary, float &Gamma)
+MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::GetPrimaries(int Primary, float &Gamma)
 {
     auto primary = static_cast<AVColorPrimaries>(Primary);
     Gamma = 2.2F;
@@ -569,7 +569,7 @@ VideoColourSpace::ColourPrimaries VideoColourSpace::GetPrimaries(int Primary, fl
     }
 }
 
-bool VideoColourSpace::Similar(const ColourPrimaries &First, const ColourPrimaries &Second, float Fuzz)
+bool MythVideoColourSpace::Similar(const ColourPrimaries &First, const ColourPrimaries &Second, float Fuzz)
 {
     auto cmp = [=](float One, float Two) { return (abs(One - Two) < Fuzz); };
     return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
@@ -610,7 +610,7 @@ inline float CalcRy(const float By, const float Gy)
  *
  * \note We use QMatrix4x4 because QMatrix3x3 has no inverted method.
  */
-QMatrix4x4 VideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
+QMatrix4x4 MythVideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
 {
     float By = CalcBy(Primaries.primaries, Primaries.whitepoint);
     float Gy = CalcGy(Primaries.primaries, Primaries.whitepoint, By);

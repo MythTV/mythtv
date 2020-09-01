@@ -2,7 +2,7 @@
 #include "videooutwindow.h"
 #include "mythvideogpu.h"
 
-MythVideoGPU::MythVideoGPU(MythRender *Render, VideoColourSpace* ColourSpace,
+MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
                            const VideoOutWindow& Window,
                            bool ViewportControl, QString Profile)
   : m_render(Render),
@@ -24,7 +24,7 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, VideoColourSpace* ColourSpace,
     connect(this,    &MythVideoGPU::OutputChanged,      &Window, &VideoOutWindow::InputChanged);
 }
 
-MythVideoGPU::MythVideoGPU(MythRender* Render, VideoColourSpace* ColourSpace,
+MythVideoGPU::MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
                            QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                            QRect DisplayVideoRect, QRect VideoRect,
                            bool ViewportControl, QString Profile)
@@ -58,7 +58,7 @@ void MythVideoGPU::CommonInit()
     if (m_videoColourSpace)
     {
         m_videoColourSpace->IncrRef();
-        connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &MythVideoGPU::UpdateColourSpace);
+        connect(m_videoColourSpace, &MythVideoColourSpace::Updated, this, &MythVideoGPU::UpdateColourSpace);
     }
 }
 

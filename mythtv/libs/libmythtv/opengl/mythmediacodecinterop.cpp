@@ -1,6 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
-#include "videocolourspace.h"
+#include "mythvideocolourspace.h"
 #include "mythmediacodecinterop.h"
 
 // FFmpeg
@@ -110,7 +110,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
 }
 
 vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
-                                                         VideoColourSpace *ColourSpace,
+                                                         MythVideoColourSpace *ColourSpace,
                                                          VideoFrame *Frame,
                                                          FrameScanType)
 {

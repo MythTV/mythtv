@@ -150,7 +150,7 @@ MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize VideoDim,
                                                           const QRect DisplayVideoRect,
                                                           const QRect VideoRect)
 {
-    auto * colourspace = new VideoColourSpace(&m_videoColourSpace);
+    auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
     auto * result = new MythVideoVulkan(m_render, colourspace,
                                         VideoDim, VideoDispDim,
                                         DisplayVisibleRect, DisplayVideoRect,
