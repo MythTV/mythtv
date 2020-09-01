@@ -189,7 +189,7 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        int percent = result.mid(3).toInt(&ok);
+        int percent = result.midRef(3).toInt(&ok);
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString
@@ -215,7 +215,7 @@ int ExternalSignalMonitor::GetLockTimeout(void)
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        int timeout = result.mid(3).toInt(&ok);
+        int timeout = result.midRef(3).toInt(&ok);
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString

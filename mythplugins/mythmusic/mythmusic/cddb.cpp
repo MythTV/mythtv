@@ -131,7 +131,7 @@ bool Cddb::Query(Matches& res, const Toc& toc)
     cddb = data;
 
     // Check returned status
-    const uint stat = cddb.left(3).toUInt(); // Extract 3 digit status:
+    const uint stat = cddb.leftRef(3).toUInt(); // Extract 3 digit status:
     cddb = cddb.mid(4);
     switch (stat)
     {
@@ -213,7 +213,7 @@ bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
     cddb = data;
 
     // Check returned status
-    const uint stat = cddb.left(3).toUInt(); // Get 3 digit status:
+    const uint stat = cddb.leftRef(3).toUInt(); // Get 3 digit status:
     cddb = cddb.mid(4);
     switch (stat)
     {

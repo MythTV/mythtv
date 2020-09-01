@@ -35,8 +35,8 @@ static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
     if (chansep < 0)
         return;
 
-    major = channum.left(chansep).toInt();
-    minor = channum.right(channum.length() - (chansep + 1)).toInt();
+    major = channum.leftRef(chansep).toInt();
+    minor = channum.rightRef(channum.length() - (chansep + 1)).toInt();
 
     freq = get_center_frequency("atsc", "vsb8", "us", freqid);
 
@@ -168,8 +168,8 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
         if (chansep > 0)
         {
             // Populate xmltvid for scanned ATSC channels
-            uint major = chanInfo.m_chanNum.left(chansep).toInt();
-            uint minor = chanInfo.m_chanNum.right
+            uint major = chanInfo.m_chanNum.leftRef(chansep).toInt();
+            uint minor = chanInfo.m_chanNum.rightRef
                          (chanInfo.m_chanNum.length() - (chansep + 1)).toInt();
 
             for (it = existingChannels.begin();
@@ -481,7 +481,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
                     else
                     {
                         callsign = w1.left(w2.length() == 1 ? 4:3);
-                        callsign += w2.left(5 - callsign.length());
+                        callsign += w2.leftRef(5 - callsign.length());
                     }
                     (*i).m_callSign = callsign;
                 }

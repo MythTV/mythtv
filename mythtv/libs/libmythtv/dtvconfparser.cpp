@@ -96,7 +96,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         if ((str.length() >= 1) && (str.at(0) == '@'))
         {
-            channelNo = str.mid(1).toInt();
+            channelNo = str.midRef(1).toInt();
             line = stream.readLine();
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             list = line.split(":", QString::SkipEmptyParts);

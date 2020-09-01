@@ -284,7 +284,7 @@ bool Commands::process_command(QString & cmd)
     }
     else if (cmd.startsWith("BlockSize"))
     {
-        m_streamer->BlockSize(cmd.mid(10).toInt());
+        m_streamer->BlockSize(cmd.midRef(10).toInt());
         send_status("OK");
     }
     else if (cmd.startsWith("StartStreaming"))

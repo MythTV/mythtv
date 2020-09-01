@@ -324,7 +324,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 
         if (lyric.startsWith("[offset:"))
         {
-            offset = lyric.mid(8,lyric.indexOf("]", 8)-8).toInt();
+            offset = lyric.midRef(8,lyric.indexOf("]", 8)-8).toInt();
         }
 
         if (m_syncronized)
@@ -335,12 +335,12 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                 if (lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\])"), 0) == 0 ||
                     lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\.\d\d\])"), 0) == 0)
                 {
-                    int minutes = lyric.mid(1, 2).toInt();
-                    int seconds = lyric.mid(4, 2).toInt();
+                    int minutes = lyric.midRef(1, 2).toInt();
+                    int seconds = lyric.midRef(4, 2).toInt();
                     int hundredths = 0;
                     if (lyric[6] == '.')
                     {
-                        hundredths = lyric.mid(7, 2).toInt();
+                        hundredths = lyric.midRef(7, 2).toInt();
                         line->m_lyric = lyric.mid(10);
                     }
                     else

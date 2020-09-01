@@ -837,7 +837,7 @@ void MythRAOPConnection::readClient(void)
             m_incomingHeaders.append(line);
             if (line.contains("Content-Length:"))
             {
-                m_incomingSize = line.mid(line.indexOf(" ") + 1).toInt();
+                m_incomingSize = line.midRef(line.indexOf(" ") + 1).toInt();
             }
         }
         while (!line.isNull());

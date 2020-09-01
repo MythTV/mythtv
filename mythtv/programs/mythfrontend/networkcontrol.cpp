@@ -836,9 +836,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             message = "NETWORK_CONTROL SEEK BACKWARD";
         else if (nc->getArg(2).contains(QRegExp(R"(^\d\d:\d\d:\d\d$)")))
         {
-            int hours   = nc->getArg(2).mid(0, 2).toInt();
-            int minutes = nc->getArg(2).mid(3, 2).toInt();
-            int seconds = nc->getArg(2).mid(6, 2).toInt();
+            int hours   = nc->getArg(2).midRef(0, 2).toInt();
+            int minutes = nc->getArg(2).midRef(3, 2).toInt();
+            int seconds = nc->getArg(2).midRef(6, 2).toInt();
             message = QString("NETWORK_CONTROL SEEK POSITION %1")
                               .arg((hours * 3600) + (minutes * 60) + seconds);
         }

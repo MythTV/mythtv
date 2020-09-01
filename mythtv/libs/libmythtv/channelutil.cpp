@@ -1452,8 +1452,8 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
     {
         chanid =
             sourceid * 10000 +
-            chan_num.left(chansep).toInt() * 100 +
-            chan_num.right(chan_num.length() - chansep - 1).toInt();
+            chan_num.leftRef(chansep).toInt() * 100 +
+            chan_num.rightRef(chan_num.length() - chansep - 1).toInt();
     }
     else
     {
@@ -2191,8 +2191,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         bool tmp1 = false;
         bool tmp2 = false;
-        int major = a.m_chanNum.left(idxA).toUInt(&tmp1);
-        int minor = a.m_chanNum.mid(idxA+1).toUInt(&tmp2);
+        int major = a.m_chanNum.leftRef(idxA).toUInt(&tmp1);
+        int minor = a.m_chanNum.midRef(idxA+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
             (a_major = major), (a_minor = minor), (isIntA = false);
     }
@@ -2201,8 +2201,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     {
         bool tmp1 = false;
         bool tmp2 = false;
-        int major = b.m_chanNum.left(idxB).toUInt(&tmp1);
-        int minor = b.m_chanNum.mid(idxB+1).toUInt(&tmp2);
+        int major = b.m_chanNum.leftRef(idxB).toUInt(&tmp1);
+        int minor = b.m_chanNum.midRef(idxB+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
             (b_major = major), (b_minor = minor), (isIntB = false);
     }

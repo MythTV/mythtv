@@ -7424,7 +7424,7 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)))
     {
         bool ok = false;
-        chan.right(1).toUInt(&ok);
+        chan.rightRef(1).toUInt(&ok);
         if (!ok)
         {
             chan = chan.left(chan.length()-1);
@@ -10501,7 +10501,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
     else if (action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead = false;
-        float stretch = action.right(action.length() - 13).toFloat(&floatRead);
+        float stretch = action.rightRef(action.length() - 13).toFloat(&floatRead);
         if (floatRead &&
             stretch <= 2.0F &&
             stretch >= 0.48F)
@@ -10517,7 +10517,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         ChangeTimeStretch(actx, 0, !floatRead);   // just display
     }
     else if (action.startsWith("SELECTSCAN_"))
-        OverrideScan(actx, static_cast<FrameScanType>(action.right(1).toInt()));
+        OverrideScan(actx, static_cast<FrameScanType>(action.rightRef(1).toInt()));
     else if (action.startsWith(ACTION_TOGGELAUDIOSYNC))
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLESUBTITLEZOOM)
@@ -10537,7 +10537,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
     else if (action.startsWith("TOGGLEPICCONTROLS"))
     {
         m_adjustingPictureAttribute = (PictureAttribute)
-            (action.right(1).toInt() - 1);
+            (action.rightRef(1).toInt() - 1);
         DoTogglePictureAttribute(actx, kAdjustingPicture_Playback);
     }
     else if (action == ACTION_TOGGLENIGHTMODE)
@@ -10549,13 +10549,13 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
     else if (action.startsWith("TOGGLEASPECT"))
     {
         ToggleAspectOverride(actx,
-                             (AspectOverrideMode) action.right(1).toInt());
+                             (AspectOverrideMode) action.rightRef(1).toInt());
     }
     else if (action == "TOGGLEFILL")
         ToggleAdjustFill(actx);
     else if (action.startsWith("TOGGLEFILL"))
     {
-        ToggleAdjustFill(actx, (AdjustFillMode) action.right(1).toInt());
+        ToggleAdjustFill(actx, (AdjustFillMode) action.rightRef(1).toInt());
     }
     else if (action == "MENU")
          ShowOSDMenu();
@@ -10657,7 +10657,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
             PopPreviousChannel(actx, true);
         else if (action.startsWith("SWITCHTOINPUT_"))
         {
-            m_switchToInputId = action.mid(14).toUInt();
+            m_switchToInputId = action.midRef(14).toUInt();
             QMutexLocker locker(&m_timerIdLock);
             if (!m_switchToInputTimerId)
                 m_switchToInputTimerId = StartTimer(1, __LINE__);
@@ -10694,17 +10694,17 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         }
         else if (action.startsWith(ACTION_JUMPCHAPTER))
         {
-            int chapter = action.right(3).toInt();
+            int chapter = action.rightRef(3).toInt();
             DoJumpChapter(actx, chapter);
         }
         else if (action.startsWith(ACTION_SWITCHTITLE))
         {
-            int title = action.right(3).toInt();
+            int title = action.rightRef(3).toInt();
             DoSwitchTitle(actx, title);
         }
         else if (action.startsWith(ACTION_SWITCHANGLE))
         {
-            int angle = action.right(3).toInt();
+            int angle = action.rightRef(3).toInt();
             DoSwitchAngle(actx, angle);
         }
         else if (action == "EDIT")
@@ -10717,7 +10717,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         else if (action.startsWith("TOGGLECOMMSKIP"))
         {
             SetAutoCommercialSkip(
-                actx, (CommSkipMode)(action.right(1).toInt()));
+                actx, (CommSkipMode)(action.rightRef(1).toInt()));
         }
         else if (action == "QUEUETRANSCODE")
         {
@@ -12474,7 +12474,7 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
         if (time.length() > 11)
         {
             bool intRead = false;
-            mins = time.right(time.length() - 11).toInt(&intRead);
+            mins = time.rightRef(time.length() - 11).toInt(&intRead);
 
             if (intRead)
             {

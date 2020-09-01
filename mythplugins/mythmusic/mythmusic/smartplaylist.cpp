@@ -130,7 +130,7 @@ static QString evaluateDateValue(QString sDate)
             if (sDate.endsWith(" days"))
                 sDate = sDate.left(sDate.length() - 5);
 
-            int nDays = sDate.mid(8).toInt();
+            int nDays = sDate.midRef(8).toInt();
             if (bNegative)
                 nDays = -nDays;
 
@@ -2053,7 +2053,7 @@ void SmartPLDateDialog::setDate(QString date)
             if (date.endsWith(" days"))
                 date = date.left(date.length() - 5);
 
-            int nDays = date.mid(8).toInt();
+            int nDays = date.midRef(8).toInt();
             if (bNegative)
                 nDays = -nDays;
 
@@ -2066,9 +2066,9 @@ void SmartPLDateDialog::setDate(QString date)
     }
     else
     {
-        int nYear = date.mid(0, 4).toInt();
-        int nMonth = date.mid(5, 2).toInt();
-        int nDay = date.mid(8, 2).toInt();
+        int nYear = date.midRef(0, 4).toInt();
+        int nMonth = date.midRef(5, 2).toInt();
+        int nDay = date.midRef(8, 2).toInt();
 
         m_daySpin->SetValue(nDay);
         m_monthSpin->SetValue(nMonth);

@@ -3436,7 +3436,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
     if (m_channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
         // FIXME This is just horrible
-        int dir     = channum.right(channum.length() - 12).toInt();
+        int dir     = channum.rightRef(channum.length() - 12).toInt();
         uint chanid = m_channel->GetNextChannel(0, static_cast<ChannelChangeDirection>(dir));
         channum     = ChannelUtil::GetChanNum(chanid);
     }

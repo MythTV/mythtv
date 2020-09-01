@@ -385,7 +385,7 @@ bool XMLTVParser::parseFile(
                     {
                         // Movie production year
                         QString date = xml.readElementText(QXmlStreamReader::SkipChildElements);
-                        pginfo->m_airdate = date.left(4).toUInt();
+                        pginfo->m_airdate = date.leftRef(4).toUInt();
                     }
                     else if (xml.name() == "star-rating")
                     {

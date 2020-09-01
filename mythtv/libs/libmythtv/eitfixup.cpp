@@ -523,7 +523,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     {
         // Parse out the year
         bool ok = false;
-        uint y = event.m_description.mid(position + 1, 4).toUInt(&ok);
+        uint y = event.m_description.midRef(position + 1, 4).toUInt(&ok);
         if (ok)
         {
             event.m_originalairdate = QDate(y, 1, 1);

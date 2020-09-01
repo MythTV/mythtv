@@ -620,7 +620,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if ((nPos = sCache.indexOf("=", nPos)) < 0)
         return false;
 
-    int nSecs = sCache.mid( nPos+1 ).toInt();
+    int nSecs = sCache.midRef( nPos+1 ).toInt();
 
     SSDPCache::Instance()->Add( sST, sUSN, sDescURL, nSecs );
 
@@ -658,7 +658,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
         if ((nPos = sCache.indexOf("=", nPos)) < 0)
             return false;
 
-        int nSecs = sCache.mid( nPos+1 ).toInt();
+        int nSecs = sCache.midRef( nPos+1 ).toInt();
 
         SSDPCache::Instance()->Add( sNT, sUSN, sDescURL, nSecs );
 
