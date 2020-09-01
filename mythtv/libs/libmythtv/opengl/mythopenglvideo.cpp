@@ -28,7 +28,7 @@ MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* Colou
                                  bool  ViewportControl, QString Profile)
   : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
 {
-    Init();
+    MythOpenGLVideo::Init();
 }
 
 MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
@@ -38,7 +38,7 @@ MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* Colou
   : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
                  DisplayVideoRect, VideoRect, ViewportControl, Profile)
 {
-    Init();
+    MythOpenGLVideo::Init();
 }
 
 MythOpenGLVideo::~MythOpenGLVideo()
@@ -47,7 +47,7 @@ MythOpenGLVideo::~MythOpenGLVideo()
         return;
 
     m_openglRender->makeCurrent();
-    ResetFrameFormat();
+    MythOpenGLVideo::ResetFrameFormat();
     delete m_toneMap;
     m_openglRender->doneCurrent();
 }

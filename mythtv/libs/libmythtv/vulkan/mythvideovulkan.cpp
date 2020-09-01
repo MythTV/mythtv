@@ -17,7 +17,7 @@ MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* Colou
                                  bool ViewportControl, QString Profile)
   : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
 {
-    Init();
+    MythVideoVulkan::Init();
 }
 
 MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
@@ -27,7 +27,7 @@ MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* Colou
   : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
                  DisplayVideoRect, VideoRect, ViewportControl, Profile)
 {
-    Init();
+    MythVideoVulkan::Init();
 }
 
 MythVideoVulkan::~MythVideoVulkan()
