@@ -52,6 +52,7 @@ class MUI_PUBLIC MythPainter : public QObject
     virtual void Begin(QPaintDevice *parent) { m_parent = parent; }
     virtual void End() { m_parent = nullptr; }
 
+    virtual void SetMaster(bool Master);
     virtual void SetClipRect(const QRect &clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);
     virtual void Clear(QPaintDevice *device, const QRegion &region);
@@ -127,9 +128,10 @@ class MUI_PUBLIC MythPainter : public QObject
 
     void CheckFormatImage(MythImage *im);
 
-    QPaintDevice *m_parent      {nullptr};
-    int m_hardwareCacheSize     {0};
-    int m_maxHardwareCacheSize  {0};
+    QPaintDevice* m_parent      { nullptr };
+    int m_hardwareCacheSize     { 0 };
+    int m_maxHardwareCacheSize  { 0 };
+    bool m_master               { true };
 
   private:
     int64_t m_softwareCacheSize {0};

@@ -43,6 +43,11 @@ void MythPainter::Teardown(void)
     m_allocatedImages.clear();
 }
 
+void MythPainter::SetMaster(bool Master)
+{
+    m_master = Master;
+}
+
 void MythPainter::SetClipRect(const QRect & /*clipRect*/)
 {
 }

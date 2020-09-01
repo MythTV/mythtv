@@ -24,35 +24,33 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
     MythPainterVulkan(MythRenderVulkan *VulkanRender, MythWindowVulkan *VulkanWindow);
    ~MythPainterVulkan() override;
 
-    QString GetName           (void) override;
-    bool    SupportsAnimation (void) override;
-    bool    SupportsAlpha     (void) override;
-    bool    SupportsClipping  (void) override;
-    void    FreeResources     (void) override;
+    QString GetName           () override;
+    bool    SupportsAnimation () override;
+    bool    SupportsAlpha     () override;
+    bool    SupportsClipping  () override;
+    void    FreeResources     () override;
     void    Begin             (QPaintDevice* /*Parent*/) override;
-    void    End               (void) override;
+    void    End               () override;
     void    DrawImage         (const QRect &Dest, MythImage *Image, const QRect &Source, int Alpha) override;
     void    PushTransformation(const UIEffects &Fx, QPointF Center = QPointF()) override;
-    void    PopTransformation(void) override;
+    void    PopTransformation () override;
 
-    void    DeleteTextures    (void);
-    void    SetMaster         (bool Master);
+    void    DeleteTextures    ();
 
   public slots:
-    void    DoFreeResources   (void);
+    void    DoFreeResources   ();
 
   protected:
-    MythImage* GetFormatImagePriv (void) override;
+    MythImage* GetFormatImagePriv () override;
     void    DeleteFormatImagePriv (MythImage *Image) override;
 
   private:
     Q_DISABLE_COPY(MythPainterVulkan)
 
-    bool Ready     (void);
-    void ClearCache(void);
+    bool Ready     ();
+    void ClearCache();
     MythTextureVulkan* GetTextureFromCache(MythImage *Image);
 
-    bool              m_master           { true    };
     MythWindowVulkan* m_window           { nullptr };
     MythRenderVulkan* m_render           { nullptr };
     VkDevice          m_device           { nullptr };
