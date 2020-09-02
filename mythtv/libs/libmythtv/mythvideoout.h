@@ -69,7 +69,6 @@ class MythVideoOutput : public MythVideoBounds
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
                               float& VisibleAspect, float& FontScaling,
                               float ThemeAspect) const;
-    QRect        GetMHEGBounds();
     PictureAttributeSupported GetSupportedPictureAttributes();
     int          ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
     virtual int  SetPictureAttribute(PictureAttribute Attribute, int NewValue);

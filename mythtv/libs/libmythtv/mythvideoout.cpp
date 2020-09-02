@@ -482,11 +482,6 @@ QRect MythVideoOutput::GetTotalOSDBounds() const
     return GetDisplayVisibleRect();
 }
 
-QRect MythVideoOutput::GetMHEGBounds()
-{
-    return GetDisplayVideoRect();
-}
-
 PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()
 {
     return m_videoColourSpace.SupportedAttributes();
