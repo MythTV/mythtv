@@ -603,7 +603,7 @@ void MythBurn::createConfigFile(const QString &filename)
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (auto *thumbImage : a->thumbList)
+            for (auto *thumbImage : qAsConst(a->thumbList))
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
@@ -1028,7 +1028,7 @@ bool ProfileDialog::Create()
         return false;
     }
 
-    for (auto *x : m_profileList)
+    for (auto *x : qAsConst(m_profileList))
     {
         auto *item = new
                 MythUIButtonListItem(m_profileBtnList, x->name);

@@ -194,7 +194,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 
 void TransportListEditor::SetSourceID(uint sourceid)
 {
-    for (auto *setting : m_list)
+    for (auto *setting : qAsConst(m_list))
         removeChild(setting);
     m_list.clear();
 
