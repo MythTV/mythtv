@@ -167,6 +167,9 @@ bool MythOpenGLTonemap::CreateTexture(QSize Size)
         return false;
 
     m_texture = new MythVideoTexture(textureid);
+    if (!m_texture)
+        return false;
+
     m_texture->m_frameType   = FMT_RGBA32;
     m_texture->m_frameFormat = FMT_RGBA32;
     m_texture->m_target      = QOpenGLTexture::Target2D;
@@ -177,5 +180,5 @@ bool MythOpenGLTonemap::CreateTexture(QSize Size)
     m_extra->glTexStorage2D(m_texture->m_target, 1, QOpenGLTexture::RGBA16F,
                             static_cast<GLsizei>(Size.width()), static_cast<GLsizei>(Size.height()));
     m_render->SetTextureFilters(m_texture, QOpenGLTexture::Linear);
-    return m_texture != nullptr;
+    return true;
 }
