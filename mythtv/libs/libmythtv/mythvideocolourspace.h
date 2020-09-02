@@ -26,6 +26,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
   public:
     explicit MythVideoColourSpace(MythVideoColourSpace *Parent = nullptr);
 
+    int           ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
     bool          UpdateColourSpace(const VideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
     void          SetSupportedAttributes(PictureAttributeSupported Supported);
@@ -75,7 +76,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     static QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
 
   private:
-    PictureAttributeSupported  m_supportedAttributes {kPictureAttributeSupported_None};
+    PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };
     QMap<PictureAttribute,int> m_dbSettings;
 
     bool              m_fullRange              { true };
@@ -99,7 +100,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     QMatrix4x4        m_primaryMatrix          { };
     float             m_customDisplayGamma     { 0.0F };
     ColourPrimaries  *m_customDisplayPrimaries { nullptr };
-    MythVideoColourSpace *m_parent                 { nullptr };
+    MythVideoColourSpace *m_parent             { nullptr };
 };
 
 #endif

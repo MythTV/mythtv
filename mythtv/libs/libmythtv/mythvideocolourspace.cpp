@@ -323,6 +323,21 @@ void MythVideoColourSpace::Debug(void)
     }
 }
 
+int MythVideoColourSpace::ChangePictureAttribute(PictureAttribute AttributeType, bool Direction)
+{
+    int current = GetPictureAttribute(AttributeType);
+    if (current < 0)
+        return -1;
+
+    int next = current + ((Direction) ? +1 : -1);
+    if (kPictureAttribute_Hue == AttributeType)
+        next = next % 100;
+    if ((kPictureAttribute_Range == AttributeType) && next > 1)
+        next = 1;
+    next = min(max(next, 0), 100);
+    return SetPictureAttribute(AttributeType, next);
+}
+
 /*! \brief Set the current colourspace to use.
  *
  * We rely on FFmpeg to detect and report the correct colourspace. In the event

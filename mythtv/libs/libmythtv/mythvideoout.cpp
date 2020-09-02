@@ -489,21 +489,7 @@ PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()
 
 int MythVideoOutput::ChangePictureAttribute(PictureAttribute AttributeType, bool Direction)
 {
-    int curVal = GetPictureAttribute(AttributeType);
-    if (curVal < 0)
-        return -1;
-
-    int newVal = curVal + ((Direction) ? +1 : -1);
-
-    if (kPictureAttribute_Hue == AttributeType)
-        newVal = newVal % 100;
-
-    if ((kPictureAttribute_Range == AttributeType) && newVal > 1)
-        newVal = 1;
-
-    newVal = min(max(newVal, 0), 100);
-
-    return SetPictureAttribute(AttributeType, newVal);
+    return m_videoColourSpace.ChangePictureAttribute(AttributeType, Direction);
 }
 
 /**
