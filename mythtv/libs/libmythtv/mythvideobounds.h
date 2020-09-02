@@ -2,11 +2,11 @@
 /*
  *  Copyright (C) Daniel Kristjansson, Jens Rehaag 2008
  *
- *  Copyright notice is in videooutwindow.cpp of the MythTV project.
+ *  Copyright notice is in mythvideobounds.cpp of the MythTV project.
  */
 
-#ifndef VIDEOOUTWINDOW_H_
-#define VIDEOOUTWINDOW_H_
+#ifndef MYTHVIDEOBOUNDS_H_
+#define MYTHVIDEOBOUNDS_H_
 
 // Qt headers
 #include <QSize>
@@ -22,13 +22,13 @@ class QScreen;
 class MythDisplay;
 class MythPlayer;
 
-class VideoOutWindow : public QObject
+class MythVideoBounds : public QObject
 {
     Q_OBJECT
 
   public:
-    VideoOutWindow();
-   ~VideoOutWindow() override = default;
+    MythVideoBounds();
+   ~MythVideoBounds() override = default;
 
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
               float Aspect, const QRect &WindowRect,
@@ -173,4 +173,4 @@ class VideoOutWindow : public QObject
     static const int   kManualZoomMaxMove;
 };
 
-#endif /* VIDEOOUTWINDOW_H_ */
+#endif

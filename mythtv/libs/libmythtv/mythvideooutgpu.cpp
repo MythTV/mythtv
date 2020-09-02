@@ -90,7 +90,7 @@ bool MythVideoOutputGPU::InitGPU(const QSize& VideoDim, const QSize& VideoDispDi
     if ((kCodec_NONE == m_newCodecId) && ((kPIPOff == pip) || (kPBPLeft == pip)) && m_painter)
         m_painter->FreeResources();
 
-    // Default initialisation - mainly VideoOutWindow
+    // Default initialisation - mainly MythVideoBounds
     if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
         return false;
 

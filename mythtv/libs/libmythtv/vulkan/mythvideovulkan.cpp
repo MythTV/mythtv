@@ -13,7 +13,7 @@
 #define LOC QString("VulkanVideo: ")
 
 MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                                 const VideoOutWindow& Window,
+                                 const MythVideoBounds& Window,
                                  bool ViewportControl, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
 {

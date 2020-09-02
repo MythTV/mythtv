@@ -440,7 +440,7 @@ using_frontend {
     HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h
-    HEADERS += videooutwindow.h
+    HEADERS += mythvideobounds.h
     HEADERS += mythvideocolourspace.h
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
@@ -452,7 +452,7 @@ using_frontend {
     SOURCES += videobuffers.cpp
     SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
-    SOURCES += videooutwindow.cpp
+    SOURCES += mythvideobounds.cpp
     SOURCES += mythvideocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
     SOURCES += mythdeinterlacer.cpp

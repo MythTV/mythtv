@@ -1,9 +1,9 @@
 // MythTV
-#include "videooutwindow.h"
+#include "mythvideobounds.h"
 #include "mythvideogpu.h"
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
-                           const VideoOutWindow& Window,
+                           const MythVideoBounds& Window,
                            bool ViewportControl, QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),
@@ -18,10 +18,10 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
 {
     CommonInit();
 
-    connect(&Window, &VideoOutWindow::VideoSizeChanged,  this,   &MythVideoGPU::SetVideoDimensions);
-    connect(&Window, &VideoOutWindow::VideoRectsChanged, this,   &MythVideoGPU::SetVideoRects);
-    connect(&Window, &VideoOutWindow::WindowRectChanged, this,   &MythVideoGPU::SetViewportRect);
-    connect(this,    &MythVideoGPU::OutputChanged,      &Window, &VideoOutWindow::InputChanged);
+    connect(&Window, &MythVideoBounds::VideoSizeChanged,  this,   &MythVideoGPU::SetVideoDimensions);
+    connect(&Window, &MythVideoBounds::VideoRectsChanged, this,   &MythVideoGPU::SetVideoRects);
+    connect(&Window, &MythVideoBounds::WindowRectChanged, this,   &MythVideoGPU::SetViewportRect);
+    connect(this,    &MythVideoGPU::OutputChanged,      &Window, &MythVideoBounds::InputChanged);
 }
 
 MythVideoGPU::MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,

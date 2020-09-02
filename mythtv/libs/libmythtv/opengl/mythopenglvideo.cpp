@@ -24,7 +24,7 @@
  * state. Its role is to render video frames on screen.
 */
 MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                                 const VideoOutWindow& Window,
+                                 const MythVideoBounds& Window,
                                  bool  ViewportControl, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
 {
@@ -238,7 +238,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Sca
         m_nextTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 single field textures")
             .arg(m_inputTextures.size() * 2));
-        // Con VideoOutWindow into display the field only
+        // Con MythVideoBounds into display the field only
         emit OutputChanged(m_videoDim, size, -1.0F);
     }
 

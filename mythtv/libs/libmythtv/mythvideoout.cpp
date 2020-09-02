@@ -1022,7 +1022,7 @@ void MythVideoOutput::ResizeForVideo(QSize Size)
 
 /*! \brief Initialise display measurement
  *
- * The sole intent here is to ensure that VideoOutWindow has the correct aspect
+ * The sole intent here is to ensure that MythVideoBounds has the correct aspect
  * ratio when it calculates the video display rectangle.
 */
 void MythVideoOutput::InitDisplayMeasurements()

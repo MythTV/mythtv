@@ -14,7 +14,7 @@
 #include "videobuffers.h"
 #include "mythcodecid.h"
 #include "videoouttypes.h"
-#include "videooutwindow.h"
+#include "mythvideobounds.h"
 #include "mythdisplay.h"
 #include "videodisplayprofile.h"
 #include "mythvideocolourspace.h"
@@ -156,7 +156,7 @@ class MythVideoOutput
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
     MythDisplay*         m_display            { nullptr };
-    VideoOutWindow       m_window;
+    MythVideoBounds       m_window;
     MythVideoColourSpace m_videoColourSpace;
     AspectOverrideMode   m_dbAspectOverride   { kAspect_Off };
     AdjustFillMode       m_dbAdjustFill       { kAdjustFill_Off };

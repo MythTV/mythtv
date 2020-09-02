@@ -31,12 +31,12 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 #include "mythcorecontext.h"
-#include "videooutwindow.h"
+#include "mythvideobounds.h"
 
 // Std
 #include <cmath>
 
-#define LOC QString("VideoWin: ")
+#define LOC QString("VideoBounds: ")
 
 #define SCALED_RECT(SRC, SCALE) QRect{ static_cast<int>((SRC).left()   * (SCALE)), \
                                        static_cast<int>((SRC).top()    * (SCALE)), \
@@ -46,13 +46,13 @@
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
-const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 4.0F;
-const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 4.0F;
-const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.25F;
-const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
-const int   VideoOutWindow::kManualZoomMaxMove           = 50;
+const float MythVideoBounds::kManualZoomMaxHorizontalZoom = 4.0F;
+const float MythVideoBounds::kManualZoomMaxVerticalZoom   = 4.0F;
+const float MythVideoBounds::kManualZoomMinHorizontalZoom = 0.25F;
+const float MythVideoBounds::kManualZoomMinVerticalZoom   = 0.25F;
+const int   MythVideoBounds::kManualZoomMaxMove           = 50;
 
-VideoOutWindow::VideoOutWindow()
+MythVideoBounds::MythVideoBounds()
 {
     m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
 
@@ -61,13 +61,13 @@ VideoOutWindow::VideoOutWindow()
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 }
 
-void VideoOutWindow::ScreenChanged(QScreen */*screen*/)
+void MythVideoBounds::ScreenChanged(QScreen */*screen*/)
 {
     PopulateGeometry();
     MoveResize();
 }
 
-void VideoOutWindow::PhysicalDPIChanged(qreal /*DPI*/)
+void MythVideoBounds::PhysicalDPIChanged(qreal /*DPI*/)
 {
     // PopulateGeometry will update m_devicePixelRatio
     PopulateGeometry();
@@ -75,7 +75,7 @@ void VideoOutWindow::PhysicalDPIChanged(qreal /*DPI*/)
     MoveResize();
 }
 
-void VideoOutWindow::PopulateGeometry(void)
+void MythVideoBounds::PopulateGeometry(void)
 {
     if (!m_display)
         return;
@@ -102,7 +102,7 @@ void VideoOutWindow::PopulateGeometry(void)
 }
 
 /**
- * \fn VideoOutWindow::MoveResize(void)
+ * \fn MythVideoBounds::MoveResize(void)
  * \brief performs all the calculations for video framing and any resizing.
  *
  * First we apply playback over/underscanning and offsetting,
@@ -111,7 +111,7 @@ void VideoOutWindow::PopulateGeometry(void)
  *
  * \sa Zoom(ZoomDirection), ToggleAdjustFill(int)
  */
-void VideoOutWindow::MoveResize(void)
+void MythVideoBounds::MoveResize(void)
 {
     // for 'portrait' mode, rotate the 'screen' dimensions
     float tempdisplayaspect = m_displayAspect;
@@ -156,7 +156,7 @@ void VideoOutWindow::MoveResize(void)
  * \note To prevent a loss of precision over multiple passes, the original display
  *  aspect ratio should be retained elsewhere.
 */
-void VideoOutWindow::Rotate(void)
+void MythVideoBounds::Rotate(void)
 {
     m_dbMove = QPoint(m_dbMove.y(), m_dbMove.x());
     float temp = m_dbHorizScale;
@@ -191,7 +191,7 @@ void VideoOutWindow::Rotate(void)
  *  into the display window. If no over/underscanning is performed, you just
  *  get the full original image scaled into the full display area.
  */
-void VideoOutWindow::ApplyDBScaleAndMove(void)
+void MythVideoBounds::ApplyDBScaleAndMove(void)
 {
     if (m_dbVertScale > 0)
     {
@@ -291,10 +291,10 @@ void VideoOutWindow::ApplyDBScaleAndMove(void)
 
 }
 
-/** \fn VideoOutWindow::ApplyManualScaleAndMove(void)
+/** \fn MythVideoBounds::ApplyManualScaleAndMove(void)
  *  \brief Apply scales and moves from "Zoom Mode" settings.
  */
-void VideoOutWindow::ApplyManualScaleAndMove(void)
+void MythVideoBounds::ApplyManualScaleAndMove(void)
 {
     if ((m_manualVertScale != 1.0F) || (m_manualHorizScale != 1.0F))
     {
@@ -322,7 +322,7 @@ void VideoOutWindow::ApplyManualScaleAndMove(void)
 
 // Code should take into account the aspect ratios of both the video as
 // well as the actual screen to allow proper letterboxing to take place.
-void VideoOutWindow::ApplyLetterboxing(void)
+void MythVideoBounds::ApplyLetterboxing(void)
 {
     float disp_aspect = fix_aspect(GetDisplayAspect());
     float aspect_diff = disp_aspect - m_videoAspectOverride;
@@ -424,16 +424,16 @@ void VideoOutWindow::ApplyLetterboxing(void)
     }
 }
 
-bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
+bool MythVideoBounds::Init(const QSize &VideoDim, const QSize &VideoDispDim,
                           float Aspect, const QRect &WindowRect,
                           AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill, MythDisplay *Display)
 {
     if (!m_display && Display)
     {
         m_display = Display;
-        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
+        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
 #ifdef Q_OS_MACOS
-        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &VideoOutWindow::PhysicalDPIChanged);
+        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
 #endif
     }
 
@@ -478,7 +478,7 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     return true;
 }
 
-void VideoOutWindow::PrintMoveResizeDebug(void)
+void MythVideoBounds::PrintMoveResizeDebug(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window Rect:  %1x%2+%3+%4")
         .arg(m_windowRect.width()).arg(m_windowRect.height())
@@ -494,13 +494,13 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
 }
 
 /**
- * \brief Sets VideoOutWindow::video_aspect to aspect, and sets
- *        VideoOutWindow::overriden_video_aspect if aspectoverride
+ * \brief Sets MythVideoBounds::video_aspect to aspect, and sets
+ *        MythVideoBounds::overriden_video_aspect if aspectoverride
  *        is set to either 4:3, 14:9 or 16:9.
  *
  * \param aspect video aspect ratio to use
  */
-void VideoOutWindow::SetVideoAspectRatio(float aspect)
+void MythVideoBounds::SetVideoAspectRatio(float aspect)
 {
     m_videoAspect = aspect;
     m_videoAspectOverride = get_aspect_override(m_videoAspectOverrideMode, aspect);
@@ -511,7 +511,7 @@ void VideoOutWindow::SetVideoAspectRatio(float aspect)
  *        then calls MoveResize() to apply changes.
  * \param aspect video aspect ratio to use
  */
-void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
+void MythVideoBounds::VideoAspectRatioChanged(float Aspect)
 {
     if (!qFuzzyCompare(Aspect, m_videoAspect))
     {
@@ -527,7 +527,7 @@ void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-void VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
+void MythVideoBounds::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
     if (Aspect < 0.0F)
         Aspect = m_videoAspect;
@@ -549,7 +549,7 @@ void VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispD
     }
 }
 
-QSize VideoOutWindow::Fix1088(QSize Dimensions)
+QSize MythVideoBounds::Fix1088(QSize Dimensions)
 {
     QSize result = Dimensions;
     // 544 represents a 1088 field
@@ -564,10 +564,10 @@ QSize VideoOutWindow::Fix1088(QSize Dimensions)
 }
 
 /**
- * \fn VideoOutWindow::GetTotalOSDBounds(void) const
+ * \fn MythVideoBounds::GetTotalOSDBounds(void) const
  * \brief Returns total OSD bounds
  */
-QRect VideoOutWindow::GetTotalOSDBounds(void) const
+QRect MythVideoBounds::GetTotalOSDBounds(void) const
 {
     return { QPoint(0, 0), m_videoDispDim };
 }
@@ -578,7 +578,7 @@ QRect VideoOutWindow::GetTotalOSDBounds(void) const
  *        to apply them.
  * \sa Zoom(ZoomDirection), ToggleAspectOverride(AspectOverrideMode)
  */
-void VideoOutWindow::ToggleAdjustFill(AdjustFillMode AdjustFill)
+void MythVideoBounds::ToggleAdjustFill(AdjustFillMode AdjustFill)
 {
     if (AdjustFill == kAdjustFill_Toggle)
         AdjustFill = static_cast<AdjustFillMode>((m_adjustFill + 1) % kAdjustFill_END);
@@ -593,7 +593,7 @@ void VideoOutWindow::ToggleAdjustFill(AdjustFillMode AdjustFill)
 /**
  * \brief Disable or enable underscan/overscan
  */
-void VideoOutWindow::SetVideoScalingAllowed(bool Change)
+void MythVideoBounds::SetVideoScalingAllowed(bool Change)
 {
     float oldvert = m_dbVertScale;
     float oldhoriz = m_dbHorizScale;
@@ -620,7 +620,7 @@ void VideoOutWindow::SetVideoScalingAllowed(bool Change)
     }
 }
 
-void VideoOutWindow::SetDisplayAspect(float DisplayAspect)
+void MythVideoBounds::SetDisplayAspect(float DisplayAspect)
 {
     if (!qFuzzyCompare(DisplayAspect + 10.0F, m_displayAspect + 10.0F))
     {
@@ -631,7 +631,7 @@ void VideoOutWindow::SetDisplayAspect(float DisplayAspect)
     }
 }
 
-void VideoOutWindow::SetWindowSize(QSize Size)
+void MythVideoBounds::SetWindowSize(QSize Size)
 {
     if (Size != m_rawWindowRect.size())
     {
@@ -644,7 +644,7 @@ void VideoOutWindow::SetWindowSize(QSize Size)
     }
 }
 
-void VideoOutWindow::SetITVResize(QRect Rect)
+void MythVideoBounds::SetITVResize(QRect Rect)
 {
     QRect oldrect = m_itvDisplayVideoRect;
     if (Rect.isEmpty())
@@ -670,7 +670,7 @@ void VideoOutWindow::SetITVResize(QRect Rect)
  *
  * \note We only actually care about +- 90 here to enable 'portrait' mode
 */
-void VideoOutWindow::SetRotation(int Rotation)
+void MythVideoBounds::SetRotation(int Rotation)
 {
     if (Rotation == m_rotation)
         return;
@@ -685,7 +685,7 @@ void VideoOutWindow::SetRotation(int Rotation)
 /**
  * \brief Resize Display Window
  */
-void VideoOutWindow::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect)
+void MythVideoBounds::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect)
 {
     if (SaveVisibleRect)
         m_tmpDisplayVisibleRect = m_displayVisibleRect;
@@ -698,7 +698,7 @@ void VideoOutWindow::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect
  * \param Rect new display_video_rect
  * \sa StopEmbedding()
  */
-void VideoOutWindow::EmbedInWidget(const QRect &Rect)
+void MythVideoBounds::EmbedInWidget(const QRect &Rect)
 {
     if (m_embedding && (Rect == m_embeddingRect))
         return;
@@ -715,7 +715,7 @@ void VideoOutWindow::EmbedInWidget(const QRect &Rect)
  * \brief Tells video output to stop embedding video in an existing window.
  * \sa EmbedInWidget(WId, int, int, int, int)
  */
-void VideoOutWindow::StopEmbedding(void)
+void MythVideoBounds::StopEmbedding(void)
 {
     if (!m_embedding)
         return;
@@ -732,7 +732,7 @@ void VideoOutWindow::StopEmbedding(void)
  * \param font_scaling   scaling to apply to fonts
  * \param themeaspect    aspect ration of the theme
  */
-QRect VideoOutWindow::GetVisibleOSDBounds(float &VisibleAspect,
+QRect MythVideoBounds::GetVisibleOSDBounds(float &VisibleAspect,
                                           float &FontScaling,
                                           float ThemeAspect) const
 {
@@ -802,7 +802,7 @@ QRect VideoOutWindow::GetVisibleOSDBounds(float &VisibleAspect,
  *        to apply them.
  * \sa Zoom(ZoomDirection), ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode AspectMode)
+void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)
 {
     if (m_pipState > kPIPOff)
         return;
@@ -824,7 +824,7 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode AspectMode)
  *
  * Used to avoid unnecessary screen clearing when possible.
 */
-bool VideoOutWindow::VideoIsFullScreen(void) const
+bool MythVideoBounds::VideoIsFullScreen(void) const
 {
     if (IsEmbedding())
         return false;
@@ -836,7 +836,7 @@ bool VideoOutWindow::VideoIsFullScreen(void) const
  *
  *  \note This assumes VideoIsFullScreen has already been checked
 */
-QRegion VideoOutWindow::GetBoundingRegion(void) const
+QRegion MythVideoBounds::GetBoundingRegion(void) const
 {
     QRegion visible(m_windowRect);
     QRegion video(m_displayVideoRect);
@@ -846,7 +846,7 @@ QRegion VideoOutWindow::GetBoundingRegion(void) const
 /*
  * \brief Determines PIP Window size and Position.
  */
-QRect VideoOutWindow::GetPIPRect(
+QRect MythVideoBounds::GetPIPRect(
     PIPLocation Location, MythPlayer *PiPPlayer, bool DoPixelAdjustment) const
 {
     QRect position;
@@ -888,7 +888,7 @@ QRect VideoOutWindow::GetPIPRect(
  * \brief Sets up zooming into to different parts of the video.
  * \sa ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutWindow::Zoom(ZoomDirection Direction)
+void MythVideoBounds::Zoom(ZoomDirection Direction)
 {
     float oldvertscale = m_manualVertScale;
     float oldhorizscale = m_manualHorizScale;
@@ -980,7 +980,7 @@ void VideoOutWindow::Zoom(ZoomDirection Direction)
     }
 }
 
-void VideoOutWindow::ToggleMoveBottomLine(void)
+void MythVideoBounds::ToggleMoveBottomLine(void)
 {
     float oldvertscale = m_manualVertScale;
     float oldhorizscale = m_manualHorizScale;
@@ -1017,7 +1017,7 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
     }
 }
 
-void VideoOutWindow::SaveBottomLine(void)
+void MythVideoBounds::SaveBottomLine(void)
 {
     gCoreContext->SaveSetting("OSDMoveXBottomLine", m_manualMove.x());
     gCoreContext->SaveSetting("OSDMoveYBottomLine", m_manualMove.y());
@@ -1025,7 +1025,7 @@ void VideoOutWindow::SaveBottomLine(void)
     gCoreContext->SaveSetting("OSDScaleVBottomLine", static_cast<int>(m_manualVertScale * 100.0F));
 }
 
-QString VideoOutWindow::GetZoomString(void) const
+QString MythVideoBounds::GetZoomString(void) const
 {
     return tr("Zoom %1x%2 @ (%3,%4)")
             .arg(static_cast<double>(m_manualHorizScale), 0, 'f', 2)
@@ -1047,7 +1047,7 @@ static float fix_aspect(float raw)
     return raw;
 }
 
-void VideoOutWindow::SetPIPState(PIPState Setting)
+void MythVideoBounds::SetPIPState(PIPState Setting)
 {
     if (m_pipState != Setting)
     {
