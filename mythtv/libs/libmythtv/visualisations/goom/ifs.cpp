@@ -41,6 +41,7 @@
 #include <cstdlib>
 
 #include "ifs.h"
+#include "goom_core.h"
 
 #define MODE_ifs
 
@@ -279,9 +280,7 @@ init_ifs (int width, int height)
 	Fractal->m_count = 0;
 	Fractal->m_lx = (Fractal->m_width - 1) / 2;
 	Fractal->m_ly = (Fractal->m_height - 1) / 2;
-	// Pseudo-random is good enough. Don't need a true random.
-	// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-	Fractal->m_col = rand () % (width * height);	/* modif by JeKo */
+	Fractal->m_col = goom_rand () % (width * height);	/* modif by JeKo */
 
 	Random_Simis (Fractal, Fractal->m_components, 0, 5 * MAX_SIMI);
 

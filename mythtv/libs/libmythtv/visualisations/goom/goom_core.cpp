@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <random>
 
 #include "goom_core.h"
 #include "goom_tools.h"
@@ -87,9 +88,7 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
         srand ((uintptr_t) pixel);
         if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
         rand_pos = 1 ;
-        // Pseudo-random is good enough. Don't need a true random.
-        // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-        while (rand_pos != 0) rand_tab [rand_pos++] = rand () ;
+        while (rand_pos != 0) rand_tab [rand_pos++] = goom_rand () ;
                 
 	cycle = 0;
 
@@ -978,3 +977,10 @@ void update_message (char *message) {
 	}
 }
 */
+
+guint32 goom_rand (void)
+{
+    static std::random_device rd;
+    static std::mt19937 mt(rd());
+    return mt();
+}

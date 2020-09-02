@@ -29,14 +29,10 @@ void tentacle_new (void) {
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
 	for (auto & tmp : grille) {
-		// Pseudo-random is good enough. Don't need a true random.
-		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-		int z = 45+rand()%30;
-		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-		int x = 85+rand()%5;
+		int z = 45+goom_rand()%30;
+		int x = 85+goom_rand()%5;
 		center.z = z;
-		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-		tmp = grid3d_new (x,definitionx,z,definitionz+rand()%10,center);
+		tmp = grid3d_new (x,definitionx,z,definitionz+goom_rand()%10,center);
 		center.y += 8;
 	}
 }

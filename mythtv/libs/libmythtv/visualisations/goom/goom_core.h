@@ -21,5 +21,6 @@ MTV_PUBLIC void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope
  */
 MTV_PUBLIC guint32 *goom_update (GoomDualData& data, int forceMode);
 MTV_PUBLIC void    goom_close (void);
+MTV_PUBLIC guint32 goom_rand (void);
 
 #endif // GOOMCORE_H
