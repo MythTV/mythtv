@@ -67,4 +67,4 @@ void    goom_lines_set_res (GMLine * gml, int rx, int ry);
 
 void    goom_lines_free (GMLine ** gml);
 
-void    goom_lines_draw (GMLine * line, const GoomSingleData data, unsigned int *p);
+void    goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p);

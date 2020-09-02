@@ -19,7 +19,7 @@ MTV_PUBLIC void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope
  * forceMode == -1 : lock the FX
  * forceMode == 1..NB_FX : force a switch to FX n°forceMode
  */
-MTV_PUBLIC guint32 *goom_update (GoomDualData data, int forceMode);
+MTV_PUBLIC guint32 *goom_update (GoomDualData& data, int forceMode);
 MTV_PUBLIC void    goom_close (void);
 
 #endif // GOOMCORE_H

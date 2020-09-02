@@ -200,7 +200,7 @@ goom_lines_free (GMLine ** l)
 }
 
 void
-goom_lines_draw (GMLine * line, const GoomSingleData data, unsigned int *p)
+goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 {
 	if (line != nullptr) {
 		guint32 color = line->color;

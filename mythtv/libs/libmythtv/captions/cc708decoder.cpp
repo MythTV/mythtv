@@ -35,7 +35,7 @@ const std::array<const std::string, 4> cc_types =
 };
 
 static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt,
-                            cc708_seen_times last_seen);
+                            cc708_seen_times& last_seen);
 
 void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
 {
@@ -620,7 +620,7 @@ static void append_cc(CC708Reader* cc, uint service_num,
 }
 
 static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
-                            cc708_seen_times last_seen)
+                            cc708_seen_times& last_seen)
 {
     const unsigned char* pkt_buf = pkt->data.data();
     const int pkt_size = pkt->size;

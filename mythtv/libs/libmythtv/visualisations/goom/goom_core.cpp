@@ -135,7 +135,7 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-guint32 * goom_update (GoomDualData data, int forceMode) {
+guint32 * goom_update (GoomDualData& data, int forceMode) {
 	static int s_lockVar = 0;		// pour empecher de nouveaux changements
 	static int s_goomVar = 0;		// boucle des gooms
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
