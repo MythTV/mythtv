@@ -391,23 +391,21 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
         return;
 
     if (!IsEmbedding())
-    {
-        m_pxpVideoActive = nullptr;
         ShowPIPs(Frame, PiPPlayers);
-    }
 
     if (Frame)
+    {
         SetRotation(Frame->rotation);
+        if (format_is_hw(Frame->codec) || Frame->dummy)
+            return;
 
-    if ((Frame ? format_is_hw(Frame->codec) : true) || (Frame ? Frame->dummy : false))
-        return;
+        // software deinterlacing
+        m_deinterlacer.Filter(Frame, Scan, m_dbDisplayProfile);
 
-    // software deinterlacing
-    m_deinterlacer.Filter(Frame, Scan, m_dbDisplayProfile);
-
-    // update software textures
-    if (m_video)
-        m_video->PrepareFrame(Frame, Scan);
+        // update software textures
+        if (m_video)
+            m_video->PrepareFrame(Frame, Scan);
+    }
 }
 
 void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd, const QRect& ViewPort)
@@ -631,6 +629,7 @@ VideoVisual* MythVideoOutputGPU::GetVisualisation()
 
 void MythVideoOutputGPU::ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers)
 {
+    m_pxpVideoActive = nullptr;
     for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
         ShowPIP(Frame, it.key(), *it);
 }
