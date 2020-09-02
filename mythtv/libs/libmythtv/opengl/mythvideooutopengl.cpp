@@ -399,11 +399,11 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
     return allowed;
 }
 
-MythVideoGPU* MythVideoOutputOpenGL::CreateSecondaryVideo(const QSize VideoDim,
-                                                          const QSize VideoDispDim,
-                                                          const QRect DisplayVisibleRect,
-                                                          const QRect DisplayVideoRect,
-                                                          const QRect VideoRect)
+MythVideoGPU* MythVideoOutputOpenGL::CreateSecondaryVideo(const QSize& VideoDim,
+                                                          const QSize& VideoDispDim,
+                                                          const QRect& DisplayVisibleRect,
+                                                          const QRect& DisplayVideoRect,
+                                                          const QRect& VideoRect)
 {
     auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
     auto * result = new MythOpenGLVideo(m_openglRender, colourspace,

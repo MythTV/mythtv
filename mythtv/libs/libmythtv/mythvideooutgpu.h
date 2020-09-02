@@ -35,11 +35,11 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            RemovePIP             (MythPlayer* PiPPlayer) override;
 
   protected:
-    virtual MythVideoGPU* CreateSecondaryVideo(const QSize VideoDim,
-                                               const QSize VideoDispDim,
-                                               const QRect DisplayVisibleRect,
-                                               const QRect DisplayVideoRect,
-                                               const QRect VideoRect) = 0;
+    virtual MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
+                                               const QSize& VideoDispDim,
+                                               const QRect& DisplayVisibleRect,
+                                               const QRect& DisplayVideoRect,
+                                               const QRect& VideoRect) = 0;
     virtual QRect   GetDisplayVisibleRect ();
 
     bool            InitGPU               (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
@@ -48,7 +48,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            DestroyBuffers        ();
     void            ProcessFrameGPU       (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan);
     void            RenderFrameGPU        (VideoFrame* Frame, FrameScanType Scan, OSD* Osd,
-                                           const QRect ViewPort);
+                                           const QRect& ViewPort);
     bool            ProcessInputChange    ();
 
     MythRender*     m_render              { nullptr };

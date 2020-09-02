@@ -37,11 +37,11 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     QRect         GetDisplayVisibleRect() override;
 
   private:
-    MythVideoGPU* CreateSecondaryVideo(const QSize VideoDim,
-                                       const QSize VideoDispDim,
-                                       const QRect DisplayVisibleRect,
-                                       const QRect DisplayVideoRect,
-                                       const QRect VideoRect) override;
+    MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
+                                       const QSize& VideoDispDim,
+                                       const QRect& DisplayVisibleRect,
+                                       const QRect& DisplayVideoRect,
+                                       const QRect& VideoRect) override;
 
     MythRenderOpenGL* m_openglRender   { nullptr };
     TextureFormats    m_textureFormats { AllFormats };

@@ -32,11 +32,11 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU
     VideoFrameVec   DirectRenderFormats () override;
 
   private:
-    MythVideoGPU* CreateSecondaryVideo(const QSize VideoDim,
-                                       const QSize VideoDispDim,
-                                       const QRect DisplayVisibleRect,
-                                       const QRect DisplayVideoRect,
-                                       const QRect VideoRect) override;
+    MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
+                                       const QSize& VideoDispDim,
+                                       const QRect& DisplayVisibleRect,
+                                       const QRect& DisplayVideoRect,
+                                       const QRect& VideoRect) override;
 
     MythRenderVulkan*  m_vulkanRender  { nullptr };
     MythWindowVulkan*  m_vulkanWindow  { nullptr };

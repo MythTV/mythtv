@@ -368,7 +368,7 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
         m_video->PrepareFrame(Frame, Scan);
 }
 
-void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd, const QRect ViewPort)
+void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd, const QRect& ViewPort)
 {
     bool dummy = false;
     bool topfieldfirst = false;
@@ -387,18 +387,18 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     }
 
     // Stereoscopic views
-    QRect view1  = ViewPort;
+    QRect view1 = ViewPort;
     QRect view2 = ViewPort;
     bool stereo = (m_stereo == kStereoscopicModeSideBySide) || (m_stereo == kStereoscopicModeTopAndBottom);
 
     if (kStereoscopicModeSideBySide == m_stereo)
     {
-        view1  = QRect(ViewPort.left() / 2,  ViewPort.top(), ViewPort.width() / 2, ViewPort.height());
+        view1 = QRect(ViewPort.left() / 2,  ViewPort.top(), ViewPort.width() / 2, ViewPort.height());
         view2 = view1.translated(ViewPort.width() / 2, 0);
     }
     else if (kStereoscopicModeTopAndBottom == m_stereo)
     {
-        view1  = QRect(ViewPort.left(),  ViewPort.top() / 2, ViewPort.width(), ViewPort.height() / 2);
+        view1 = QRect(ViewPort.left(),  ViewPort.top() / 2, ViewPort.width(), ViewPort.height() / 2);
         view2 = view1.translated(0, ViewPort.height() / 2);
     }
 

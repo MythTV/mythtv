@@ -144,11 +144,11 @@ VideoFrameVec MythVideoOutputVulkan::DirectRenderFormats()
     return s_AllFormats;
 }
 
-MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize VideoDim,
-                                                          const QSize VideoDispDim,
-                                                          const QRect DisplayVisibleRect,
-                                                          const QRect DisplayVideoRect,
-                                                          const QRect VideoRect)
+MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize& VideoDim,
+                                                          const QSize& VideoDispDim,
+                                                          const QRect& DisplayVisibleRect,
+                                                          const QRect& DisplayVideoRect,
+                                                          const QRect& VideoRect)
 {
     auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
     auto * result = new MythVideoVulkan(m_render, colourspace,
