@@ -136,7 +136,6 @@ class MythVideoOutput
     virtual QStringList GetVisualiserList();
     void         DestroyVisualisation();
 
-    static int   CalcHueBase(const QString& AdaptorName);
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
     virtual bool StereoscopicModesAllowed() const { return false; }
     void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }

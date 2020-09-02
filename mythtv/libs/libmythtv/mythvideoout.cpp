@@ -1059,34 +1059,3 @@ void MythVideoOutput::InitDisplayMeasurements()
 
     m_window.SetDisplayAspect(static_cast<float>(displayaspect));
 }
-
-///\note Probably no longer required
-int MythVideoOutput::CalcHueBase(const QString& AdaptorName)
-{
-    int defaulthue = 50;
-
-    QString lower = AdaptorName.toLower();
-    // Hue base for different adaptors
-    // This can probably now be removed as it is only relevant to VAAPI
-    // which always uses 50
-    if (lower.contains("radeon") ||
-        lower.contains("g3d") ||
-        lower.contains("xvba") /* VAAPI */ ||
-        lower.startsWith("intel") ||
-        lower.contains("splitted"))
-    {
-        defaulthue = 50;
-    }
-    else if (lower.startsWith("nv17")) /* nVidia */
-    {
-        defaulthue = 0;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("CalcHueBase(%1): Unknown adaptor, hue may be wrong.")
-            .arg(AdaptorName));
-    }
-
-    return defaulthue;
-}

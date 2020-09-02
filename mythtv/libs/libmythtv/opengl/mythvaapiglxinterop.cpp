@@ -93,7 +93,6 @@ void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace *ColourSpac
         return;
 
     OpenGLLocker locker(m_context);
-    m_vaapiHueBase = MythVideoOutput::CalcHueBase(m_vaVendor);
 
     delete [] m_vaapiPictureAttributes;
     m_vaapiPictureAttributeCount = 0;
@@ -172,7 +171,7 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
             break;
         case kPictureAttribute_Hue:
             attrib = VADisplayAttribHue;
-            adjustment = m_vaapiHueBase;
+            adjustment = 50;
             break;
         case kPictureAttribute_Colour:
             attrib = VADisplayAttribSaturation;

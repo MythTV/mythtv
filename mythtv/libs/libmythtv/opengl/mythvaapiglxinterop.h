@@ -22,7 +22,6 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
   protected:
     VADisplayAttribute *m_vaapiPictureAttributes     { nullptr };
     int                 m_vaapiPictureAttributeCount { 0 };
-    int                 m_vaapiHueBase               { 0 };
     uint                m_vaapiColourSpace           { 0 };
     MythDeintType       m_basicDeinterlacer          { DEINT_NONE };
 };
