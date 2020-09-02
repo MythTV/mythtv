@@ -143,7 +143,6 @@ class MythVideoOutput
 
   protected:
     virtual void MoveResize();
-    void         InitDisplayMeasurements();
     virtual void ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers);
     virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
 

@@ -50,6 +50,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            RenderFrameGPU        (VideoFrame* Frame, FrameScanType Scan, OSD* Osd,
                                            const QRect& ViewPort);
     bool            ProcessInputChange    ();
+    void            InitDisplayMeasurements();
 
     MythRender*     m_render              { nullptr };
     MythVideoGPU*   m_video               { nullptr };
