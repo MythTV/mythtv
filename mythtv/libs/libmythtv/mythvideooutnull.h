@@ -27,10 +27,6 @@ class MythVideoOutputNull : public MythVideoOutput
     void ProcessFrame(VideoFrame* Frame, OSD* Osd,
                       const PIPMap& PiPPlayers,
                       FrameScanType Scan) override;
-    bool SetupVisualisation(AudioPlayer* /*Audio*/, MythRender* /*Render*/,
-                            const QString& /*Name*/) override { return false; }
-
-
     void CreatePauseFrame(void);
 
   private:

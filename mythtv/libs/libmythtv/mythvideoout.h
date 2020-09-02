@@ -74,8 +74,6 @@ class MythVideoOutput : public MythVideoBounds
     virtual int  SetPictureAttribute(PictureAttribute Attribute, int NewValue);
     int          GetPictureAttribute(PictureAttribute AttributeType);
     virtual void InitPictureAttributes() { }
-    virtual bool IsPIPSupported() const { return false; }
-    virtual bool IsPBPSupported() const { return false; }
     bool         HasSoftwareFrames() const { return codec_sw_copy(m_videoCodecID); }
     virtual void SetFramesPlayed(long long FramesPlayed);
     virtual long long GetFramesPlayed();
@@ -101,36 +99,32 @@ class MythVideoOutput : public MythVideoBounds
     virtual VideoFrame* GetLastShownFrame();
     QString      GetFrameStatus() const;
     virtual void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) = 0;
-    virtual void RemovePIP(MythPlayer* /*pipplayer*/) { }
-    virtual MythPainter* GetOSDPainter() { return nullptr; }
 
     QRect        GetImageRect(const QRect& Rect, QRect* DisplayRect = nullptr);
     QRect        GetSafeRect();
-
-    bool         EnableVisualisation(AudioPlayer* Audio, bool Enable,
-                                     const QString& Name = QString(""));
-    virtual bool CanVisualise(AudioPlayer* Audio, MythRender* Render);
-    virtual bool SetupVisualisation(AudioPlayer* Audio, MythRender* Render,
-                                    const QString& Name);
-    VideoVisual* GetVisualisation() { return m_visual; }
-    QString      GetVisualiserName();
-    virtual QStringList GetVisualiserList();
-    void         DestroyVisualisation();
-
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
-    virtual bool StereoscopicModesAllowed() const { return false; }
-    void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
-    StereoscopicMode GetStereoscopicMode() const { return m_stereo; }
+
+    virtual MythPainter* GetOSDPainter       () { return nullptr; }
+    virtual void         RemovePIP           (MythPlayer*) { }
+    virtual bool         IsPIPSupported      () const { return false; }
+    virtual bool         IsPBPSupported      () const { return false; }
+    virtual bool         EnableVisualisation (AudioPlayer*, bool, const QString& = QString("")) { return false; }
+    virtual bool         CanVisualise        (AudioPlayer*) { return false; }
+    virtual bool         SetupVisualisation  (AudioPlayer*, const QString&) { return false; }
+    virtual VideoVisual* GetVisualisation    () { return nullptr; }
+    virtual QString      GetVisualiserName   () { return QString {}; }
+    virtual QStringList  GetVisualiserList   () { return QStringList {}; }
+    virtual void         DestroyVisualisation() { }
+    virtual bool         StereoscopicModesAllowed() const { return false; }
+    virtual void         SetStereoscopicMode (StereoscopicMode) { }
+    virtual StereoscopicMode GetStereoscopicMode() const { return kStereoscopicModeNone; }
 
   protected:
-    virtual void ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers);
-    virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
+    virtual void ShowPIPs(VideoFrame*, const PIPMap&) { }
+    virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
 
-    QRect        GetVisibleOSDBounds(float& VisibleAspect,
-                                     float& FontScaling,
-                                     float ThemeAspect) const;
+    QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;
-
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
     MythDisplay*         m_display            { nullptr };
@@ -144,8 +138,6 @@ class MythVideoOutput : public MythVideoBounds
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState         { kError_None };
     long long            m_framesPlayed       { 0 };
-    VideoVisual*         m_visual             { nullptr };
-    StereoscopicMode     m_stereo             { kStereoscopicModeNone };
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
 };

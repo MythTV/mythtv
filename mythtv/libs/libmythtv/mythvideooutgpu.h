@@ -26,13 +26,19 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            Show                  (FrameScanType /*Scan*/) override;
     void            ClearAfterSeek        () override;
     bool            IsPIPSupported        () const override  { return true; }
-    bool            StereoscopicModesAllowed() const override { return true; }
-    bool            CanVisualise          (AudioPlayer* Audio, MythRender* Render) override;
-    bool            SetupVisualisation    (AudioPlayer* Audio, MythRender* Render, const QString& Name) override;
-    QStringList     GetVisualiserList     () override;
-    void            ShowPIP               (VideoFrame* Frame, MythPlayer* PiPPlayer,
-                                           PIPLocation Location) override;
+    void            ShowPIPs              (VideoFrame* Frame, const PIPMap& PiPPlayers) override;
+    void            ShowPIP               (VideoFrame* Frame, MythPlayer* PiPPlayer, PIPLocation Location) override;
     void            RemovePIP             (MythPlayer* PiPPlayer) override;
+    bool            EnableVisualisation   (AudioPlayer*, bool, const QString& = QString("")) override;
+    bool            CanVisualise          (AudioPlayer* Audio) override;
+    bool            SetupVisualisation    (AudioPlayer* Audio, const QString& Name) override;
+    VideoVisual*    GetVisualisation      () override;
+    QString         GetVisualiserName     () override;
+    QStringList     GetVisualiserList     () override;
+    void            DestroyVisualisation  () override;
+    virtual bool    StereoscopicModesAllowed() const override;
+    void            SetStereoscopicMode   (StereoscopicMode Mode) override;
+    StereoscopicMode GetStereoscopicMode  () const override;
 
   protected:
     virtual MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
@@ -62,6 +68,8 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_newFrameRate        { false };
     bool            m_buffersCreated      { false };
     QString         m_profile;
+    VideoVisual*    m_visual              { nullptr };
+    StereoscopicMode m_stereo             { kStereoscopicModeNone };
 
     QMap<MythPlayer*,MythVideoGPU*> m_pxpVideos;
     QMap<MythPlayer*,bool>          m_pxpVideosReady;

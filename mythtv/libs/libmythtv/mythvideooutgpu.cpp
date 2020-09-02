@@ -33,6 +33,8 @@ MythVideoOutputGPU::MythVideoOutputGPU(QString& Profile)
 
 MythVideoOutputGPU::~MythVideoOutputGPU()
 {
+    MythVideoOutputGPU::DestroyVisualisation();
+
     for (auto & pip : m_pxpVideos)
         delete pip;
 
@@ -565,6 +567,44 @@ void MythVideoOutputGPU::ClearAfterSeek()
     MythVideoOutput::ClearAfterSeek();
 }
 
+bool MythVideoOutputGPU::EnableVisualisation(AudioPlayer* Audio, bool Enable, const QString& Name)
+{
+    if (!Enable)
+    {
+        DestroyVisualisation();
+        return false;
+    }
+    return SetupVisualisation(Audio, Name);
+}
+
+QString MythVideoOutputGPU::GetVisualiserName()
+{
+    if (m_visual)
+        return m_visual->Name();
+    return MythVideoOutput::GetVisualiserName();
+}
+
+void MythVideoOutputGPU::DestroyVisualisation()
+{
+    delete m_visual;
+    m_visual = nullptr;
+}
+
+bool MythVideoOutputGPU::StereoscopicModesAllowed() const
+{
+    return true;
+}
+
+void MythVideoOutputGPU::SetStereoscopicMode(StereoscopicMode Mode)
+{
+    m_stereo = Mode;
+}
+
+StereoscopicMode MythVideoOutputGPU::GetStereoscopicMode() const
+{
+    return m_stereo;
+}
+
 QStringList MythVideoOutputGPU::GetVisualiserList()
 {
     if (m_render)
@@ -572,14 +612,27 @@ QStringList MythVideoOutputGPU::GetVisualiserList()
     return MythVideoOutput::GetVisualiserList();
 }
 
-bool MythVideoOutputGPU::CanVisualise(AudioPlayer* Audio, MythRender* /*Render*/)
+bool MythVideoOutputGPU::CanVisualise(AudioPlayer* Audio)
 {
-    return MythVideoOutput::CanVisualise(Audio, m_render);
+    return VideoVisual::CanVisualise(Audio, m_render);
 }
 
-bool MythVideoOutputGPU::SetupVisualisation(AudioPlayer* Audio, MythRender* /*Render*/, const QString& Name)
+bool MythVideoOutputGPU::SetupVisualisation(AudioPlayer* Audio, const QString& Name)
 {
-    return MythVideoOutput::SetupVisualisation(Audio, m_render, Name);
+    DestroyVisualisation();
+    m_visual = VideoVisual::Create(Name, Audio, m_render);
+    return m_visual != nullptr;
+}
+
+VideoVisual* MythVideoOutputGPU::GetVisualisation()
+{
+    return m_visual;
+}
+
+void MythVideoOutputGPU::ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers)
+{
+    for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
+        ShowPIP(Frame, it.key(), *it);
 }
 
 void MythVideoOutputGPU::ShowPIP(VideoFrame* /*Frame*/, MythPlayer* PiPPlayer, PIPLocation Location)

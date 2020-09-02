@@ -580,12 +580,6 @@ bool MythVideoOutput::EnoughDecodedFrames()
     return m_videoBuffers.EnoughDecodedFrames();
 }
 
-void MythVideoOutput::ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers)
-{
-    for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
-        ShowPIP(Frame, it.key(), *it);
-}
-
 /// \bug not implemented correctly. vpos is not updated.
 VideoFrame* MythVideoOutput::GetLastDecodedFrame()
 {
@@ -603,48 +597,6 @@ QString MythVideoOutput::GetFrameStatus() const
 VideoFrame* MythVideoOutput::GetLastShownFrame()
 {
     return m_videoBuffers.GetLastShownFrame();
-}
-
-bool MythVideoOutput::EnableVisualisation(AudioPlayer* Audio, bool Enable,
-                                      const QString& Name)
-{
-    if (!Enable)
-    {
-        DestroyVisualisation();
-        return false;
-    }
-    return SetupVisualisation(Audio, nullptr, Name);
-}
-
-bool MythVideoOutput::CanVisualise(AudioPlayer* Audio, MythRender* Render)
-{
-    return VideoVisual::CanVisualise(Audio, Render);
-}
-
-bool MythVideoOutput::SetupVisualisation(AudioPlayer* Audio, MythRender* Render,
-                                     const QString& Name)
-{
-    DestroyVisualisation();
-    m_visual = VideoVisual::Create(Name, Audio, Render);
-    return m_visual;
-}
-
-QString MythVideoOutput::GetVisualiserName()
-{
-    if (m_visual)
-        return m_visual->Name();
-    return QString("");
-}
-
-QStringList MythVideoOutput::GetVisualiserList()
-{
-    return QStringList();
-}
-
-void MythVideoOutput::DestroyVisualisation()
-{
-    delete m_visual;
-    m_visual = nullptr;
 }
 
 /**
