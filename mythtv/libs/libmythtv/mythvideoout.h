@@ -129,8 +129,6 @@ class MythVideoOutput : public MythVideoBounds
 
     MythDisplay*         m_display            { nullptr };
     MythVideoColourSpace m_videoColourSpace;
-    AspectOverrideMode   m_dbAspectOverride   { kAspect_Off };
-    AdjustFillMode       m_dbAdjustFill       { kAdjustFill_Off };
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
     MythCodecID          m_videoCodecID       { kCodec_NONE };
     int                  m_maxReferenceFrames { 16 };

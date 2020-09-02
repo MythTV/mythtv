@@ -59,6 +59,8 @@ MythVideoBounds::MythVideoBounds()
     m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
+    m_dbAspectOverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
+    m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
 }
 
 void MythVideoBounds::ScreenChanged(QScreen */*screen*/)
@@ -425,9 +427,7 @@ void MythVideoBounds::ApplyLetterboxing(void)
 }
 
 bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                                 float Aspect, const QRect &WindowRect,
-                                 AspectOverrideMode AspectOverride,
-                                 AdjustFillMode AdjustFill, MythDisplay *Display)
+                                 float Aspect, const QRect &WindowRect, MythDisplay *Display)
 {
     if (!m_displayPriv && Display)
     {
@@ -470,8 +470,8 @@ bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDi
     }
     else
     {
-        m_videoAspectOverrideMode = AspectOverride;
-        m_adjustFill = AdjustFill;
+        m_videoAspectOverrideMode = m_dbAspectOverride;
+        m_adjustFill = m_dbAdjustFill;
     }
     m_embedding = false;
     SetVideoAspectRatio(Aspect);

@@ -31,9 +31,7 @@ class MythVideoBounds : public QObject
    ~MythVideoBounds() override = default;
 
     bool InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                    float Aspect, const QRect &WindowRect,
-                    AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill,
-                    MythDisplay* Display);
+                    float Aspect, const QRect &WindowRect, MythDisplay* Display);
 
   signals:
     // Note These are emitted from MoveResize - which must be called after any call
@@ -116,6 +114,8 @@ class MythVideoBounds : public QObject
     int     m_dbPipSize        {26};    ///< percentage of full window to use for PiP
     bool    m_dbScalingAllowed {true};  ///< disable this to prevent overscan/underscan
     bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
+    AspectOverrideMode m_dbAspectOverride { kAspect_Off };
+    AdjustFillMode m_dbAdjustFill { kAdjustFill_Off };
     QRect   m_screenGeometry   {0,0,1024,768}; ///< Full screen geometry
     qreal   m_devicePixelRatio {1.0};
 

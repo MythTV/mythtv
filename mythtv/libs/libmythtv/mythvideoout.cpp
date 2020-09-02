@@ -303,8 +303,6 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
  */
 MythVideoOutput::MythVideoOutput()
 {
-    m_dbAspectOverride  = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
-    m_dbAdjustFill      = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
     m_dbLetterboxColour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
 }
 
@@ -338,8 +336,7 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         StopEmbedding();
     }
 
-    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect,
-                                  m_dbAspectOverride, m_dbAdjustFill, m_display);
+    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect,m_display);
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetInput(GetVideoDispDim());
