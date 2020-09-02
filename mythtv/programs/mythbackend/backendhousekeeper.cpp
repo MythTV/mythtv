@@ -216,7 +216,7 @@ void CleanupTask::CleanupRecordedTables(void)
         return;
     }
 
-    for (auto [table,column] : tables)
+    for (const auto & [table,column] : tables)
     {
         query.prepare(QString("TRUNCATE TABLE temprecordedcleanup;"));
         if (!query.exec() || !query.isActive())
