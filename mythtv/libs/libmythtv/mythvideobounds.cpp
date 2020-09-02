@@ -77,10 +77,10 @@ void MythVideoBounds::PhysicalDPIChanged(qreal /*DPI*/)
 
 void MythVideoBounds::PopulateGeometry(void)
 {
-    if (!m_display)
+    if (!m_displayPriv)
         return;
 
-    QScreen *screen = m_display->GetCurrentScreen();
+    QScreen *screen = m_displayPriv->GetCurrentScreen();
     if (!screen)
         return;
 
@@ -424,23 +424,24 @@ void MythVideoBounds::ApplyLetterboxing(void)
     }
 }
 
-bool MythVideoBounds::Init(const QSize &VideoDim, const QSize &VideoDispDim,
-                          float Aspect, const QRect &WindowRect,
-                          AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill, MythDisplay *Display)
+bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
+                                 float Aspect, const QRect &WindowRect,
+                                 AspectOverrideMode AspectOverride,
+                                 AdjustFillMode AdjustFill, MythDisplay *Display)
 {
-    if (!m_display && Display)
+    if (!m_displayPriv && Display)
     {
-        m_display = Display;
-        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
+        m_displayPriv = Display;
+        connect(m_displayPriv, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
 #ifdef Q_OS_MACOS
-        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
+        connect(m_displayPriv, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
 #endif
     }
 
-    if (m_display)
+    if (m_displayPriv)
     {
         QString dummy;
-        m_displayAspect = static_cast<float>(m_display->GetAspectRatio(dummy));
+        m_displayAspect = static_cast<float>(m_displayPriv->GetAspectRatio(dummy));
     }
 
     // Refresh the geometry in case the video mode has changed
@@ -527,7 +528,7 @@ void MythVideoBounds::VideoAspectRatioChanged(float Aspect)
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-void MythVideoBounds::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
+void MythVideoBounds::SourceChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
     if (Aspect < 0.0F)
         Aspect = m_videoAspect;

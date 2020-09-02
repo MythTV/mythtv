@@ -33,8 +33,10 @@ using PIPMap = QMap<MythPlayer*,PIPLocation>;
 
 class MythMultiLocker;
 
-class MythVideoOutput
+class MythVideoOutput : public MythVideoBounds
 {
+    Q_OBJECT
+
   public:
     static void GetRenderOptions(RenderOptions& Options);
     static MythVideoOutput* Create(const QString& Decoder,    MythCodecID CodecID,
@@ -63,24 +65,11 @@ class MythVideoOutput
                               float VideoAspect, MythCodecID  CodecID,
                               bool& AspectChanged, MythMultiLocker* Locks,
                               int   ReferenceFrames, bool ForceChange);
-    virtual void VideoAspectRatioChanged(float VideoAspect);
-    virtual void ResizeDisplayWindow(const QRect& Rect, bool SaveVisible);
-    virtual void EmbedInWidget(const QRect& EmbedRect);
-    bool         IsEmbedding();
-    virtual void StopEmbedding();
     virtual void ResizeForVideo(QSize Size = QSize());
-    virtual void Zoom(ZoomDirection Direction);
-    virtual void ToggleMoveBottomLine();
-    virtual void SaveBottomLine();
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
                               float& VisibleAspect, float& FontScaling,
                               float ThemeAspect) const;
     QRect        GetMHEGBounds();
-    AspectOverrideMode GetAspectOverride() const;
-    virtual void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
-    AdjustFillMode GetAdjustFill() const;
-    virtual void ToggleAdjustFill(AdjustFillMode FillMode = kAdjustFill_Toggle);
-    QString      GetZoomString() const;
     PictureAttributeSupported GetSupportedPictureAttributes();
     int          ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
     virtual int  SetPictureAttribute(PictureAttribute Attribute, int NewValue);
@@ -113,14 +102,7 @@ class MythVideoOutput
     virtual VideoFrame* GetLastShownFrame();
     QString      GetFrameStatus() const;
     virtual void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) = 0;
-
-    void         SetVideoResize(const QRect& VideoRect);
-    void         SetVideoScalingAllowed(bool Allow);
-    virtual QRect GetPIPRect(PIPLocation Location,
-                             MythPlayer* PiPPlayer = nullptr,
-                             bool DoPixelAdj = true) const;
     virtual void RemovePIP(MythPlayer* /*pipplayer*/) { }
-    virtual void SetPIPState(PIPState Setting);
     virtual MythPainter* GetOSDPainter() { return nullptr; }
 
     QRect        GetImageRect(const QRect& Rect, QRect* DisplayRect = nullptr);
@@ -142,7 +124,6 @@ class MythVideoOutput
     StereoscopicMode GetStereoscopicMode() const { return m_stereo; }
 
   protected:
-    virtual void MoveResize();
     virtual void ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers);
     virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
 
@@ -154,7 +135,6 @@ class MythVideoOutput
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
     MythDisplay*         m_display            { nullptr };
-    MythVideoBounds       m_window;
     MythVideoColourSpace m_videoColourSpace;
     AspectOverrideMode   m_dbAspectOverride   { kAspect_Off };
     AdjustFillMode       m_dbAdjustFill       { kAdjustFill_Off };

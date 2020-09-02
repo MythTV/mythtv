@@ -30,10 +30,10 @@ class MythVideoBounds : public QObject
     MythVideoBounds();
    ~MythVideoBounds() override = default;
 
-    bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
-              float Aspect, const QRect &WindowRect,
-              AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill,
-              MythDisplay* Display);
+    bool InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
+                    float Aspect, const QRect &WindowRect,
+                    AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill,
+                    MythDisplay* Display);
 
   signals:
     // Note These are emitted from MoveResize - which must be called after any call
@@ -48,10 +48,10 @@ class MythVideoBounds : public QObject
     void PhysicalDPIChanged     (qreal  /*DPI*/);
 
     // Sets
-    void InputChanged           (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
+    void SourceChanged          (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
-    void EmbedInWidget          (const QRect &Rect);
-    void StopEmbedding          (void);
+    virtual void EmbedInWidget  (const QRect &Rect);
+    virtual void StopEmbedding  (void);
     void ToggleAdjustFill       (AdjustFillMode AdjustFillMode = kAdjustFill_Toggle);
     void ToggleAspectOverride   (AspectOverrideMode AspectMode = kAspect_Toggle);
     void ResizeDisplayWindow    (const QRect &Rect, bool SaveVisibleRect);
@@ -107,7 +107,9 @@ class MythVideoBounds : public QObject
     void Rotate                  (void);
 
   private:
-    MythDisplay* m_display     {nullptr};
+    // TODO Priv avoids confusion with m_display in MythVideoOutput but look to
+    // use just the one instance
+    MythDisplay* m_displayPriv {nullptr};
     QPoint  m_dbMove           {0,0};   ///< Percentage move from database
     float   m_dbHorizScale     {0.0F};  ///< Horizontal Overscan/Underscan percentage
     float   m_dbVertScale      {0.0F};  ///< Vertical Overscan/Underscan percentage

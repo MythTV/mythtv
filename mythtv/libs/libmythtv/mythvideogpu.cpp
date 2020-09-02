@@ -3,25 +3,25 @@
 #include "mythvideogpu.h"
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
-                           const MythVideoBounds& Window,
+                           MythVideoBounds* Bounds,
                            bool ViewportControl, QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),
-    m_videoDispDim(Window.GetVideoDispDim()),
-    m_videoDim(Window.GetVideoDim()),
-    m_masterViewportSize(Window.GetDisplayVisibleRect().size()),
-    m_displayVideoRect(Window.GetDisplayVideoRect()),
-    m_videoRect(Window.GetVideoRect()),
+    m_videoDispDim(Bounds->GetVideoDispDim()),
+    m_videoDim(Bounds->GetVideoDim()),
+    m_masterViewportSize(Bounds->GetDisplayVisibleRect().size()),
+    m_displayVideoRect(Bounds->GetDisplayVideoRect()),
+    m_videoRect(Bounds->GetVideoRect()),
     m_videoColourSpace(ColourSpace),
-    m_inputTextureSize(Window.GetVideoDim()),
+    m_inputTextureSize(Bounds->GetVideoDim()),
     m_viewportControl(ViewportControl)
 {
     CommonInit();
 
-    connect(&Window, &MythVideoBounds::VideoSizeChanged,  this,   &MythVideoGPU::SetVideoDimensions);
-    connect(&Window, &MythVideoBounds::VideoRectsChanged, this,   &MythVideoGPU::SetVideoRects);
-    connect(&Window, &MythVideoBounds::WindowRectChanged, this,   &MythVideoGPU::SetViewportRect);
-    connect(this,    &MythVideoGPU::OutputChanged,      &Window, &MythVideoBounds::InputChanged);
+    connect(Bounds, &MythVideoBounds::VideoSizeChanged,  this,   &MythVideoGPU::SetVideoDimensions);
+    connect(Bounds, &MythVideoBounds::VideoRectsChanged, this,   &MythVideoGPU::SetVideoRects);
+    connect(Bounds, &MythVideoBounds::WindowRectChanged, this,   &MythVideoGPU::SetViewportRect);
+    connect(this,   &MythVideoGPU::OutputChanged,        Bounds, &MythVideoBounds::SourceChanged);
 }
 
 MythVideoGPU::MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,

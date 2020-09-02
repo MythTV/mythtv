@@ -136,9 +136,8 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
         LOG(VB_GENERAL, LOG_ERR, LOC + "This is not the painter you are looking for");
 
     // Create OpenGLVideo
-    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace,
-                                  m_window, true, m_profile);
-    m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRect());
+    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, true, m_profile);
+    m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRectAdj());
 }
 
 MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
@@ -176,9 +175,9 @@ bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDi
 }
 
 /// \brief Adjust the display rectangle for OpenGL coordinates in some cases.
-QRect MythVideoOutputOpenGL::GetDisplayVisibleRect()
+QRect MythVideoOutputOpenGL::GetDisplayVisibleRectAdj()
 {
-    QRect dvr = m_window.GetDisplayVisibleRect();
+    QRect dvr = GetDisplayVisibleRect();
 
     MythMainWindow* mainwin = GetMythMainWindow();
     if (!mainwin)
@@ -274,18 +273,18 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan, 
         m_openglRender->ClearFramebuffer();
     }
     // Avoid clearing the framebuffer if it will be entirely overwritten by video
-    else if (!m_window.VideoIsFullScreen())
+    else if (!VideoIsFullScreen())
     {
-        if (m_window.IsEmbedding())
+        if (IsEmbedding())
         {
             // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
-            m_openglRender->ClearRect(nullptr, m_window.GetWindowRect(), gray);
+            m_openglRender->ClearRect(nullptr, GetWindowRect(), gray);
         }
         else
         {
             // in the vast majority of cases it is significantly quicker to just
             // clear the unused portions of the screen
-            QRegion toclear = m_window.GetBoundingRegion();
+            QRegion toclear = GetBoundingRegion();
             for (auto rect : qAsConst(toclear))
                 m_openglRender->ClearRect(nullptr, rect, gray);
         }

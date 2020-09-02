@@ -5193,7 +5193,7 @@ void MythPlayer::SetVideoResize(const QRect &videoRect)
 {
     QMutexLocker locker(&m_osdLock);
     if (m_videoOutput)
-        m_videoOutput->SetVideoResize(videoRect);
+        m_videoOutput->SetITVResize(videoRect);
 }
 
 /** \fn MythPlayer::SetAudioByComponentTag(int tag)

@@ -34,7 +34,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     VideoFrameVec DirectRenderFormats() override;
 
   protected:
-    QRect         GetDisplayVisibleRect() override;
+    QRect         GetDisplayVisibleRectAdj() override;
 
   private:
     MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,

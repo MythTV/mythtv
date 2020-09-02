@@ -40,7 +40,7 @@ class MythVideoOutputGPU : public MythVideoOutput
                                                const QRect& DisplayVisibleRect,
                                                const QRect& DisplayVideoRect,
                                                const QRect& VideoRect) = 0;
-    virtual QRect   GetDisplayVisibleRect ();
+    virtual QRect   GetDisplayVisibleRectAdj();
 
     bool            InitGPU               (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
                                            MythDisplay* Display, const QRect& DisplayVisibleRect, MythCodecID CodecId);

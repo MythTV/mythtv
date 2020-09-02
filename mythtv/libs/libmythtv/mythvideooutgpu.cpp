@@ -49,9 +49,9 @@ MythPainter* MythVideoOutputGPU::GetOSDPainter()
     return m_painter;
 }
 
-QRect MythVideoOutputGPU::GetDisplayVisibleRect()
+QRect MythVideoOutputGPU::GetDisplayVisibleRectAdj()
 {
-    return m_window.GetDisplayVisibleRect();
+    return GetDisplayVisibleRect();
 }
 
 void MythVideoOutputGPU::InitPictureAttributes()
@@ -61,7 +61,7 @@ void MythVideoOutputGPU::InitPictureAttributes()
 
 void MythVideoOutputGPU::WindowResized(const QSize& Size)
 {
-    m_window.SetWindowSize(Size);
+    SetWindowSize(Size);
     InitDisplayMeasurements();
 }
 
@@ -86,7 +86,7 @@ bool MythVideoOutputGPU::InitGPU(const QSize& VideoDim, const QSize& VideoDispDi
 {
     // if we are the main video player then free up as much video memory
     // as possible at startup
-    PIPState pip = m_window.GetPIPState();
+    PIPState pip = GetPIPState();
     if ((kCodec_NONE == m_newCodecId) && ((kPIPOff == pip) || (kPBPLeft == pip)) && m_painter)
         m_painter->FreeResources();
 
@@ -102,26 +102,26 @@ bool MythVideoOutputGPU::InitGPU(const QSize& VideoDim, const QSize& VideoDispDi
     InitPictureAttributes();
 
     // Setup display
-    QSize size = m_window.GetVideoDim();
+    QSize size = GetVideoDim();
 
     // Set the display mode if required
-    if (m_display->UsingVideoModes() && !m_window.IsEmbedding())
+    if (m_display->UsingVideoModes() && !IsEmbedding())
         ResizeForVideo(size);
     InitDisplayMeasurements();
 
     // Create buffers
-    if (!CreateBuffers(CodecId, m_window.GetVideoDim()))
+    if (!CreateBuffers(CodecId, GetVideoDim()))
         return false;
 
     // Adjust visible rect for embedding
-    QRect dvr = GetDisplayVisibleRect();
+    QRect dvr = GetDisplayVisibleRectAdj();
     if (m_videoCodecID == kCodec_NONE)
     {
         m_render->SetViewPort(QRect(QPoint(), dvr.size()));
         return true;
     }
 
-    if (m_window.GetPIPState() >= kPIPStandAlone)
+    if (GetPIPState() >= kPIPStandAlone)
     {
         QRect tmprect = QRect(QPoint(0,0), dvr.size());
         ResizeDisplayWindow(tmprect, true);
@@ -235,10 +235,10 @@ bool MythVideoOutputGPU::InputChanged(const QSize& VideoDim, const QSize& VideoD
                                       MythMultiLocker* /*Locks*/, int ReferenceFrames,
                                       bool ForceChange)
 {
-    QSize currentvideodim     = m_window.GetVideoDim();
-    QSize currentvideodispdim = m_window.GetVideoDispDim();
+    QSize currentvideodim     = GetVideoDim();
+    QSize currentvideodispdim = GetVideoDispDim();
     MythCodecID currentcodec  = m_videoCodecID;
-    float currentaspect       = m_window.GetVideoAspect();
+    float currentaspect       = GetVideoAspect();
 
     if (m_newCodecId != kCodec_NONE)
     {
@@ -293,11 +293,11 @@ bool MythVideoOutputGPU::ProcessInputChange()
     if (m_newCodecId != kCodec_NONE)
     {
         // Ensure we don't lose embedding through program changes.
-        bool wasembedding = m_window.IsEmbedding();
+        bool wasembedding = IsEmbedding();
         QRect oldrect;
         if (wasembedding)
         {
-            oldrect = m_window.GetEmbeddingRect();
+            oldrect = GetEmbeddingRect();
             StopEmbedding();
         }
 
@@ -308,17 +308,17 @@ bool MythVideoOutputGPU::ProcessInputChange()
         // reset in Init.
         // All told needs a cleanup - not least because the use of codecName appears
         // to be inconsistent.
-        m_window.InputChanged(m_newVideoDim, m_newVideoDispDim, m_newAspect);
+        SourceChanged(m_newVideoDim, m_newVideoDispDim, m_newAspect);
         AVCodecID avCodecId = myth2av_codecid(m_newCodecId);
         AVCodec* codec = avcodec_find_decoder(avCodecId);
         QString codecName;
         if (codec)
             codecName = codec->name;
         if (m_dbDisplayProfile)
-            m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 , codecName);
+            m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 , codecName);
 
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       m_display, m_window.GetDisplayVisibleRect(), m_newCodecId);
+                       m_display, GetDisplayVisibleRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
@@ -365,7 +365,7 @@ void MythVideoOutputGPU::InitDisplayMeasurements()
         .arg(displayaspect).arg(source));
 
     // Get the window and screen resolutions
-    QSize window = m_window.GetRawWindowRect().size();
+    QSize window = GetRawWindowRect().size();
     QSize screen = m_display->GetResolution();
 
     // If not running fullscreen, adjust for window size and ignore any video
@@ -379,7 +379,7 @@ void MythVideoOutputGPU::InitDisplayMeasurements()
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window aspect ratio: %1").arg(displayaspect));
     }
 
-    m_window.SetDisplayAspect(static_cast<float>(displayaspect));
+    SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
 void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPlayers, FrameScanType Scan)
@@ -388,14 +388,14 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
     if (!ProcessInputChange())
         return;
 
-    if (!m_window.IsEmbedding())
+    if (!IsEmbedding())
     {
         m_pxpVideoActive = nullptr;
         ShowPIPs(Frame, PiPPlayers);
     }
 
     if (Frame)
-        m_window.SetRotation(Frame->rotation);
+        SetRotation(Frame->rotation);
 
     if ((Frame ? format_is_hw(Frame->codec) : true) || (Frame ? Frame->dummy : false))
         return;
@@ -443,7 +443,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     }
 
     // Main UI when embedded
-    if (m_window.IsEmbedding())
+    if (IsEmbedding())
     {
         MythMainWindow* win = GetMythMainWindow();
         if (win && win->GetPaintWindow() && m_painter)
@@ -467,10 +467,10 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     if (m_video && !dummy)
         m_video->RenderFrame(Frame, topfieldfirst, Scan, m_stereo);
     else if (dummy)
-        m_render->SetViewPort(m_window.GetWindowRect());
+        m_render->SetViewPort(GetWindowRect());
 
     // PiPs/PBPs
-    if (!m_pxpVideos.empty() && !m_window.IsEmbedding())
+    if (!m_pxpVideos.empty() && !IsEmbedding())
     {
         for (auto it = m_pxpVideos.begin(); it != m_pxpVideos.end(); ++it)
         {
@@ -493,7 +493,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     const QRect osdbounds = GetTotalOSDBounds();
 
     // Visualisation
-    if (m_visual && m_painter && !m_window.IsEmbedding())
+    if (m_visual && m_painter && !IsEmbedding())
     {
         if (stereo)
             m_render->SetViewPort(view1, true);
@@ -507,7 +507,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     }
 
     // OSD
-    if (Osd && m_painter && !m_window.IsEmbedding())
+    if (Osd && m_painter && !IsEmbedding())
     {
         if (stereo)
             m_render->SetViewPort(view1, true);
@@ -601,7 +601,7 @@ void MythVideoOutputGPU::ShowPIP(VideoFrame* /*Frame*/, MythPlayer* PiPPlayer, P
     }
 
     QRect position = GetPIPRect(Location, PiPPlayer);
-    QRect dvr = m_window.GetDisplayVisibleRect();
+    QRect dvr = GetDisplayVisibleRectAdj();
 
     m_pxpVideosReady[PiPPlayer] = false;
     MythVideoGPU* video = m_pxpVideos[PiPPlayer];

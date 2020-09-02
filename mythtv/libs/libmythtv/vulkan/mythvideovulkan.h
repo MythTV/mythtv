@@ -22,7 +22,7 @@ class MythVideoVulkan : public MythVideoGPU
     Q_OBJECT
 
   public:
-    MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace, const MythVideoBounds& Window,
+    MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace, MythVideoBounds* Bounds,
                     bool ViewportControl, const QString &Profile);
     MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,

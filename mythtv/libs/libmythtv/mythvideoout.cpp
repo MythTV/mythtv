@@ -330,21 +330,19 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
 {
     m_display = Display;
     m_videoCodecID = CodecID;
-    bool wasembedding = m_window.IsEmbedding();
+    bool wasembedding = IsEmbedding();
     QRect oldrect;
     if (wasembedding)
     {
-        oldrect = m_window.GetEmbeddingRect();
+        oldrect = GetEmbeddingRect();
         StopEmbedding();
     }
 
-    bool mainSuccess = m_window.Init(VideoDim, VideoDispDim,
-                                     VideoAspect, WindowRect,
-                                     m_dbAspectOverride, m_dbAdjustFill,
-                                     m_display);
+    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect,
+                                  m_dbAspectOverride, m_dbAdjustFill, m_display);
 
     if (m_dbDisplayProfile)
-        m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim());
+        m_dbDisplayProfile->SetInput(GetVideoDispDim());
 
     if (wasembedding)
         EmbedInWidget(oldrect);
@@ -419,17 +417,6 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
 }
 
 /**
- * \fn VideoOutput::VideoAspectRatioChanged(float VideoAspect)
- * \brief Calls SetVideoAspectRatio(float aspect),
- *        then calls MoveResize() to apply changes.
- * \param aspect video aspect ratio to use
- */
-void MythVideoOutput::VideoAspectRatioChanged(float VideoAspect)
-{
-    m_window.VideoAspectRatioChanged(VideoAspect);
-}
-
-/**
  * \brief Tells video output to discard decoded frames and wait for new ones.
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
@@ -439,7 +426,7 @@ bool MythVideoOutput::InputChanged(const QSize& VideoDim, const QSize& VideoDisp
                                    bool& /*AspectOnly*/, MythMultiLocker* /*Locks*/,
                                    int   ReferenceFrames, bool /*ForceChange*/)
 {
-    m_window.InputChanged(VideoDim, VideoDispDim, VideoAspect);
+    SourceChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;
     AVCodecID avCodecId = myth2av_codecid(CodecID);
     AVCodec* codec = avcodec_find_decoder(avCodecId);
@@ -447,36 +434,10 @@ bool MythVideoOutput::InputChanged(const QSize& VideoDim, const QSize& VideoDisp
     if (codec)
         codecName = codec->name;
     if (m_dbDisplayProfile)
-        m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 ,codecName);
+        m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 ,codecName);
     m_videoCodecID = CodecID;
     DiscardFrames(true, true);
     return true;
-}
-/**
-* \brief Resize Display Window
-*/
-void MythVideoOutput::ResizeDisplayWindow(const QRect& Rect, bool SaveVisible)
-{
-    m_window.ResizeDisplayWindow(Rect, SaveVisible);
-}
-
-/**
- * \brief Tells video output to embed video in an existing window.
- * \sa StopEmbedding()
- */
-void MythVideoOutput::EmbedInWidget(const QRect& EmbedRect)
-{
-    m_window.EmbedInWidget(EmbedRect);
-}
-
-/**
- * \fn VideoOutput::StopEmbedding()
- * \brief Tells video output to stop embedding video in an existing window.
- * \sa EmbedInWidget(const QRect&)
- */
-void MythVideoOutput::StopEmbedding()
-{
-    m_window.StopEmbedding();
 }
 
 void MythVideoOutput::GetOSDBounds(QRect& Total, QRect& Visible,
@@ -498,13 +459,13 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float& VisibleAspect,
                                            float& FontScaling,
                                            float ThemeAspect) const
 {
-    QRect dvr = m_window.GetDisplayVisibleRect();
+    QRect dvr = GetDisplayVisibleRect();
     float dispPixelAdj = 1.0F;
     if (dvr.height() && dvr.width())
-        dispPixelAdj = (m_window.GetDisplayAspect() * dvr.height()) / dvr.width();
+        dispPixelAdj = (GetDisplayAspect() * dvr.height()) / dvr.width();
 
-    float ova = m_window.GetOverridenVideoAspect();
-    QRect vr = m_window.GetVideoRect();
+    float ova = GetOverridenVideoAspect();
+    QRect vr = GetVideoRect();
     float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
     VisibleAspect = ThemeAspect * (ova > 0.0F ? vs / ova : 1.F) * dispPixelAdj;
 
@@ -518,86 +479,12 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float& VisibleAspect,
  */
 QRect MythVideoOutput::GetTotalOSDBounds() const
 {
-    return m_window.GetDisplayVisibleRect();
+    return GetDisplayVisibleRect();
 }
 
 QRect MythVideoOutput::GetMHEGBounds()
 {
-    return m_window.GetDisplayVideoRect();
-}
-
-/**
- * \fn VideoOutput::MoveResize()
- * \brief performs all the calculations for video framing and any resizing.
- *
- * First we apply playback over/underscanning and offsetting,
- * then we letterbox settings, and finally we apply manual
- * scale & move properties for "Zoom Mode".
- *
- * \sa Zoom(ZoomDirection), ToggleAdjustFill(int)
- */
-void MythVideoOutput::MoveResize()
-{
-    m_window.MoveResize();
-}
-
-/**
- * \fn VideoOutput::Zoom(ZoomDirection)
- * \brief Sets up zooming into to different parts of the video, the zoom
- *        is actually applied in MoveResize().
- * \sa ToggleAdjustFill(AdjustFillMode)
- */
-void MythVideoOutput::Zoom(ZoomDirection Direction)
-{
-    m_window.Zoom(Direction);
-}
-
-/**
- * \fn VideoOutput::ToogleMoveBottomLine()
- * \brief Toggle "zooming" the bottomline (sports tickers) off the screen.
- *        Applied in MoveResize().
- */
-void MythVideoOutput::ToggleMoveBottomLine()
-{
-    m_window.ToggleMoveBottomLine();
-}
-
-/**
- * \fn VideoOutput::SaveBottomLine()
- * \brief Save current Manual Zoom settings as BottomLine adjustment.
- */
-void MythVideoOutput::SaveBottomLine()
-{
-    m_window.SaveBottomLine();
-}
-
-/**
- * \fn VideoOutput::ToggleAspectOverride(AspectOverrideMode)
- * \brief Enforce different aspect ration than detected,
- *        then calls VideoAspectRatioChanged(float)
- *        to apply them.
- * \sa Zoom(ZoomDirection), ToggleAdjustFill(AdjustFillMode)
- */
-void MythVideoOutput::ToggleAspectOverride(AspectOverrideMode AspectMode)
-{
-    m_window.ToggleAspectOverride(AspectMode);
-}
-
-/**
- * \fn VideoOutput::ToggleAdjustFill(AdjustFillMode)
- * \brief Sets up letterboxing for various standard video frame and
- *        monitor dimensions, then calls MoveResize()
- *        to apply them.
- * \sa Zoom(ZoomDirection), ToggleAspectOverride(AspectOverrideMode)
- */
-void MythVideoOutput::ToggleAdjustFill(AdjustFillMode FillMode)
-{
-    m_window.ToggleAdjustFill(FillMode);
-}
-
-QString MythVideoOutput::GetZoomString() const
-{
-    return m_window.GetZoomString();
+    return GetDisplayVideoRect();
 }
 
 PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()
@@ -698,26 +585,10 @@ bool MythVideoOutput::EnoughDecodedFrames()
     return m_videoBuffers.EnoughDecodedFrames();
 }
 
-/// \brief returns QRect of PIP based on PIPLocation
-QRect MythVideoOutput::GetPIPRect(PIPLocation Location, MythPlayer* PiPPlayer, bool DoPixelAdj) const
-{
-    return m_window.GetPIPRect(Location, PiPPlayer, DoPixelAdj);
-}
-
 void MythVideoOutput::ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers)
 {
     for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
         ShowPIP(Frame, it.key(), *it);
-}
-
-AspectOverrideMode MythVideoOutput::GetAspectOverride() const
-{
-    return m_window.GetAspectOverride();
-}
-
-AdjustFillMode MythVideoOutput::GetAdjustFill() const
-{
-    return m_window.GetAdjustFill();
 }
 
 /// \bug not implemented correctly. vpos is not updated.
@@ -737,20 +608,6 @@ QString MythVideoOutput::GetFrameStatus() const
 VideoFrame* MythVideoOutput::GetLastShownFrame()
 {
     return m_videoBuffers.GetLastShownFrame();
-}
-
-/// \brief Tells the player to resize the video frame (used for ITV)
-void MythVideoOutput::SetVideoResize(const QRect& VideoRect)
-{
-    m_window.SetITVResize(VideoRect);
-}
-
-/**
- * \brief Disable or enable underscan/overscan
- */
-void MythVideoOutput::SetVideoScalingAllowed(bool Allow)
-{
-    m_window.SetVideoScalingAllowed(Allow);
 }
 
 bool MythVideoOutput::EnableVisualisation(AudioPlayer* Audio, bool Enable,
@@ -819,7 +676,7 @@ void MythVideoOutput::CopyFrame(VideoFrame* To, const VideoFrame* From)
 QRect MythVideoOutput::GetImageRect(const QRect& Rect, QRect* DisplayRect)
 {
     qreal hscale = 0.0;
-    QSize video_size   = m_window.GetVideoDispDim();
+    QSize video_size   = GetVideoDispDim();
     int image_height   = video_size.height();
     int image_width    = (image_height > 720) ? 1920 :
                          (image_height > 576) ? 1280 : 720;
@@ -837,8 +694,8 @@ QRect MythVideoOutput::GetImageRect(const QRect& Rect, QRect* DisplayRect)
     }
     QRect result = rect1;
 
-    QRect dvr_rec = m_window.GetDisplayVideoRect();
-    QRect vid_rec = m_window.GetVideoRect();
+    QRect dvr_rec = GetDisplayVideoRect();
+    QRect vid_rec = GetVideoRect();
 
     hscale = image_aspect / pixel_aspect;
     if (hscale < 0.99 || hscale > 1.01)
@@ -881,11 +738,6 @@ QRect MythVideoOutput::GetSafeRect()
              result.width() - (2 * safex), result.height() - (2 * safey) };
 }
 
-void MythVideoOutput::SetPIPState(PIPState Setting)
-{
-    m_window.SetPIPState(Setting);
-}
-
 VideoFrameVec MythVideoOutput::DirectRenderFormats()
 {
     static const VideoFrameVec s_defaultFormats { FMT_YV12, FMT_NONE };
@@ -911,12 +763,6 @@ void MythVideoOutput::ReleaseFrame(VideoFrame* Frame)
 void MythVideoOutput::DeLimboFrame(VideoFrame* Frame)
 {
     m_videoBuffers.DeLimboFrame(Frame);
-}
-
-/// \brief Returns if videooutput is embedding
-bool MythVideoOutput::IsEmbedding()
-{
-    return m_window.IsEmbedding();
 }
 
 /// \brief Tell GetLastShownFrame() to return the next frame from the head
@@ -967,7 +813,7 @@ void MythVideoOutput::ResizeForVideo(QSize Size)
 
     if (Size.isEmpty())
     {
-        Size = m_window.GetVideoDispDim();
+        Size = GetVideoDispDim();
         if (Size.isEmpty())
             return;
     }
@@ -987,10 +833,10 @@ void MythVideoOutput::ResizeForVideo(QSize Size)
         double aspect = m_display->GetAspectRatio(source);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Aspect ratio: %1 (%2)")
             .arg(aspect).arg(source));
-        m_window.SetDisplayAspect(static_cast<float>(aspect));
-        m_window.SetWindowSize(m_display->GetResolution());
+        SetDisplayAspect(static_cast<float>(aspect));
+        SetWindowSize(m_display->GetResolution());
 
-        bool fullscreen = !m_window.UsingGuiSize();
+        bool fullscreen = !UsingGuiSize();
 
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)

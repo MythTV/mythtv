@@ -24,9 +24,9 @@
  * state. Its role is to render video frames on screen.
 */
 MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                                 const MythVideoBounds& Window,
-                                 bool  ViewportControl, const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, Window, ViewportControl, Profile)
+                                 MythVideoBounds* Bounds, bool ViewportControl,
+                                 const QString& Profile)
+  : MythVideoGPU(Render, ColourSpace, Bounds, ViewportControl, Profile)
 {
     MythOpenGLVideo::Init();
 }

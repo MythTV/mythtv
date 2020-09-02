@@ -111,7 +111,7 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
 
     QMutexLocker locker(&m_globalLock);
 
-    if (VideoDispDim == m_window.GetVideoDim())
+    if (VideoDispDim == GetVideoDim())
     {
         m_videoBuffers.Clear();
         MoveResize();
@@ -125,7 +125,7 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
 
     MoveResize();
 
-    const QSize video_dim = m_window.GetVideoDim();
+    const QSize video_dim = GetVideoDim();
 
     bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
     if (!ok)
@@ -165,7 +165,7 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
                         kPrebufferFramesNormal, kPrebufferFramesSmall);
 
-    const QSize videodim = m_window.GetVideoDim();
+    const QSize videodim = GetVideoDim();
 
     if (!m_videoBuffers.CreateBuffers(FMT_YV12, videodim.width(), videodim.height()))
         return false;
@@ -182,16 +182,16 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
 
 void MythVideoOutputNull::EmbedInWidget(const QRect& EmbedRect)
 {
+    // TODO is this locking required (and associated override of EmbedInWidget)
     QMutexLocker locker(&m_globalLock);
-    if (!m_window.IsEmbedding())
-        MythVideoOutput::EmbedInWidget(EmbedRect);
+    MythVideoOutput::EmbedInWidget(EmbedRect);
 }
 
 void MythVideoOutputNull::StopEmbedding(void)
 {
+    // TODO is this locking required (and associated override of StopEmbedding)
     QMutexLocker locker(&m_globalLock);
-    if (m_window.IsEmbedding())
-        MythVideoOutput::StopEmbedding();
+    MythVideoOutput::StopEmbedding();
 }
 
 void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
