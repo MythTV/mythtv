@@ -663,7 +663,7 @@ using_frontend {
     DEFINES += USING_FRONTEND
 }
 
-using_v4l2:using_backend|using_frontend {
+if(using_backend|using_frontend):using_v4l2 {
     HEADERS += v4l2util.h
     SOURCES += v4l2util.cpp
     DEFINES += USING_V4L2
