@@ -14,11 +14,9 @@
 #include <cstdint>
 #include "compat.h"
 
-class NuppelVideoPlayer;
-
 class CommBreakMap
 {
-    Q_DECLARE_TR_FUNCTIONS(CommBreakMap);
+    Q_DECLARE_TR_FUNCTIONS(CommBreakMap)
 
   public:
     CommBreakMap(void);

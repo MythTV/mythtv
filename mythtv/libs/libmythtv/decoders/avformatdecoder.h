@@ -83,10 +83,7 @@ class AudioInfo
     }
 };
 
-/// A decoder for video files.
-
-/// The AvFormatDecoder is used to decode non-NuppleVideo files.
-/// It's used as a decoder of last resort after trying the NuppelDecoder
+/// A decoder for media files.
 class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void *data);

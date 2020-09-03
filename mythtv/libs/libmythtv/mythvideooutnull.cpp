@@ -18,7 +18,6 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
 {
     Options.renderers->append("null");
     (*Options.safe_renderers)["dummy"].append("null");
-    (*Options.safe_renderers)["nuppel"].append("null");
     if (Options.decoders->contains("ffmpeg"))
         (*Options.safe_renderers)["ffmpeg"].append("null");
 #ifdef USING_VTB

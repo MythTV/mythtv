@@ -31,8 +31,6 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcorecontext.h"
 #include "livetvchain.h"
-#include "decoderbase.h"
-#include "nuppeldecoder.h"
 #include "avformatdecoder.h"
 #include "dummydecoder.h"
 #include "tv_play.h"
@@ -770,13 +768,7 @@ void MythPlayer::OpenDummy(void)
 void MythPlayer::CreateDecoder(TestBufferVec & TestBuffer)
 {
     if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename()))
-    {
         SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
-        return;
-    }
-
-    if (NuppelDecoder::CanHandle(TestBuffer))
-        SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
 }
 
 int MythPlayer::OpenFile(int Retries)
@@ -4943,12 +4935,6 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 
     int playbackLen = 0;
     bool fixed_playbacklen = false;
-
-    if (m_decoder->GetCodecDecoderName() == "nuppel")
-    {
-        playbackLen = m_totalLength;
-        fixed_playbacklen = true;
-    }
 
     if (m_liveTV && m_playerCtx->m_tvchain)
     {

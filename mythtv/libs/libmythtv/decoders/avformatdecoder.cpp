@@ -309,7 +309,6 @@ static int get_canonical_lang(const char *lang_cstr)
 void AvFormatDecoder::GetDecoders(RenderOptions &opts)
 {
     opts.decoders->append("ffmpeg");
-    (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
 
     MythCodecContext::GetDecoders(opts);

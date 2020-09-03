@@ -47,7 +47,6 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 
     // all profiles can handle all software frames
     (*Options.safe_renderers)["dummy"].append(safe);
-    (*Options.safe_renderers)["nuppel"].append(safe);
     if (Options.decoders->contains("ffmpeg"))
         (*Options.safe_renderers)["ffmpeg"].append(safe);
     if (Options.decoders->contains("mediacodec-dec"))
@@ -76,7 +75,6 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 #if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME) || defined (USING_EGL)
     Options.renderers->append("opengl-hw");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
-    (*Options.safe_renderers)["nuppel"].append("opengl-hw");
     Options.priorities->insert("opengl-hw", 110);
 #endif
 #ifdef USING_VAAPI

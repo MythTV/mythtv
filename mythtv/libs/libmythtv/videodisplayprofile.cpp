@@ -1408,7 +1408,7 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
     options.decoders       = &s_safe_decoders;
     options.equiv_decoders = &s_safe_equiv_dec;
 
-    // N.B. assumes NuppelDecoder and DummyDecoder always present
+    // N.B. assumes DummyDecoder always present
     AvFormatDecoder::GetDecoders(options);
     MythVideoOutput::GetRenderOptions(options);
 

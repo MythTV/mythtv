@@ -24,7 +24,6 @@ void MythVideoOutputVulkan::GetRenderOptions(RenderOptions &Options)
     QStringList safe(VULKAN_RENDERER);
 
     (*Options.safe_renderers)["dummy"].append(safe);
-    (*Options.safe_renderers)["nuppel"].append(safe);
     (*Options.safe_renderers)["ffmpeg"].append(safe);
 
     for (auto & decoder : *Options.decoders)
