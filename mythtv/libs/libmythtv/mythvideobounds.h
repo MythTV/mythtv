@@ -64,6 +64,7 @@ class MythVideoBounds : public QObject
     void SetITVResize           (QRect Rect);
     void SetRotation            (int Rotation);
 
+  public:
     // Gets
     bool     IsEmbedding(void)             const { return m_embedding; }
     QSize    GetVideoDim(void)             const { return m_videoDim; }
