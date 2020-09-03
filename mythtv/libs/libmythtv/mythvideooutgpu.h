@@ -29,14 +29,14 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            ShowPIPs              (VideoFrame* Frame, const PIPMap& PiPPlayers) override;
     void            ShowPIP               (VideoFrame* Frame, MythPlayer* PiPPlayer, PIPLocation Location) override;
     void            RemovePIP             (MythPlayer* PiPPlayer) override;
-    bool            EnableVisualisation   (AudioPlayer*, bool, const QString& = QString("")) override;
+    bool            EnableVisualisation   (AudioPlayer* /*Audio*/, bool /*Enable*/, const QString& /*Name*/ = QString("")) override;
     bool            CanVisualise          (AudioPlayer* Audio) override;
     bool            SetupVisualisation    (AudioPlayer* Audio, const QString& Name) override;
     VideoVisual*    GetVisualisation      () override;
     QString         GetVisualiserName     () override;
     QStringList     GetVisualiserList     () override;
     void            DestroyVisualisation  () override;
-    virtual bool    StereoscopicModesAllowed() const override;
+    bool            StereoscopicModesAllowed() const override;
     void            SetStereoscopicMode   (StereoscopicMode Mode) override;
     StereoscopicMode GetStereoscopicMode  () const override;
 

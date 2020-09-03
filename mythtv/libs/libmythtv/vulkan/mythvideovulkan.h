@@ -31,8 +31,8 @@ class MythVideoVulkan : public MythVideoGPU
    ~MythVideoVulkan() override;
 
     void    StartFrame       () override;
-    void    PrepareFrame     (VideoFrame* Frame, FrameScanType = kScan_Progressive) override;
-    void    RenderFrame      (VideoFrame*, bool, FrameScanType, StereoscopicMode, bool = false) override;
+    void    PrepareFrame     (VideoFrame* Frame, FrameScanType /*Scan*/ = kScan_Progressive) override;
+    void    RenderFrame      (VideoFrame* /*Frame*/, bool /*TopFieldFirst*/, FrameScanType /*Scan*/, StereoscopicMode /*Stereo*/, bool /*DrawBorder*/ = false) override;
     void    EndFrame         () override;
     void    ResetFrameFormat () override;
     void    ResetTextures    () override {}

@@ -47,7 +47,7 @@ class MythVideoOutput : public MythVideoBounds
                                    QString& Codec,            int ReferenceFrames);
 
     MythVideoOutput();
-    virtual ~MythVideoOutput();
+    ~MythVideoOutput() override;
 
     virtual bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
                       float VideoAspect, MythDisplay* Display,
@@ -105,23 +105,23 @@ class MythVideoOutput : public MythVideoBounds
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     virtual MythPainter* GetOSDPainter       () { return nullptr; }
-    virtual void         RemovePIP           (MythPlayer*) { }
+    virtual void         RemovePIP           (MythPlayer* /*PiPPlayer*/) { }
     virtual bool         IsPIPSupported      () const { return false; }
     virtual bool         IsPBPSupported      () const { return false; }
-    virtual bool         EnableVisualisation (AudioPlayer*, bool, const QString& = QString("")) { return false; }
-    virtual bool         CanVisualise        (AudioPlayer*) { return false; }
-    virtual bool         SetupVisualisation  (AudioPlayer*, const QString&) { return false; }
+    virtual bool         EnableVisualisation (AudioPlayer*/*Audio*/, bool /*Enable*/, const QString& /*Name*/ = QString("")) { return false; }
+    virtual bool         CanVisualise        (AudioPlayer*/*Audio*/) { return false; }
+    virtual bool         SetupVisualisation  (AudioPlayer*/*Audio*/, const QString& /*Name*/) { return false; }
     virtual VideoVisual* GetVisualisation    () { return nullptr; }
     virtual QString      GetVisualiserName   () { return QString {}; }
     virtual QStringList  GetVisualiserList   () { return QStringList {}; }
     virtual void         DestroyVisualisation() { }
     virtual bool         StereoscopicModesAllowed() const { return false; }
-    virtual void         SetStereoscopicMode (StereoscopicMode) { }
+    virtual void         SetStereoscopicMode (StereoscopicMode /*Mode*/) { }
     virtual StereoscopicMode GetStereoscopicMode() const { return kStereoscopicModeNone; }
 
   protected:
-    virtual void ShowPIPs(VideoFrame*, const PIPMap&) { }
-    virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
+    virtual void ShowPIPs(VideoFrame* /*Frame*/, const PIPMap& /*PiPPlayers*/) { }
+    virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
 
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;
