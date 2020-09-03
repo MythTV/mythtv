@@ -178,20 +178,19 @@ void NetTree::LoadData(void)
         using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_currentNode->getAllChildren();
 
-        for (MGTreeChildList::const_iterator p = lchildren->begin();
-                p != lchildren->end(); ++p)
+        for (auto * child : qAsConst(*lchildren))
         {
-            if (*p != nullptr)
+            if (child != nullptr)
             {
                 auto *item =
                         new MythUIButtonListItem(m_siteButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
-                item->SetData(QVariant::fromValue(*p));
+                item->SetData(QVariant::fromValue(child));
 
                 UpdateItem(item);
 
-                if (*p == selectedNode)
+                if (child == selectedNode)
                     m_siteButtonList->SetItemCurrent(item);
             }
         }

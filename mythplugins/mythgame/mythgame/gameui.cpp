@@ -979,23 +979,14 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
 
     // Imagery
     ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);
-    for (ArtworkList::const_iterator p = coverartlist.begin();
-        p != coverartlist.end(); ++p)
-    {
-        coverart.prepend((*p).url);
-    }
+    for (const auto & art : qAsConst(coverartlist))
+        coverart.prepend(art.url);
     ArtworkList fanartlist = lookup->GetArtwork(kArtworkFanart);
-    for (ArtworkList::const_iterator p = fanartlist.begin();
-        p != fanartlist.end(); ++p)
-    {
-        fanart.prepend((*p).url);
-    }
+    for (const auto & art : qAsConst(fanartlist))
+        fanart.prepend(art.url);
     ArtworkList screenshotlist = lookup->GetArtwork(kArtworkScreenshot);
-    for (ArtworkList::const_iterator p = screenshotlist.begin();
-        p != screenshotlist.end(); ++p)
-    {
-        screenshot.prepend((*p).url);
-    }
+    for (const auto & art : qAsConst(screenshotlist))
+        screenshot.prepend(art.url);
 
     StartGameImageSet(node, coverart, fanart, screenshot);
 

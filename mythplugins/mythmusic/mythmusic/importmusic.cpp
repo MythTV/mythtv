@@ -1033,13 +1033,10 @@ void ImportCoverArtDialog::scanDirectory()
     if (list.isEmpty())
         return;
 
-    QFileInfoList::const_iterator it = list.begin();
-    while (it != list.end())
+    for (const auto & fi : qAsConst(list))
     {
-        const QFileInfo *fi = &(*it);
-        ++it;
-        QString filename = fi->absoluteFilePath();
-        if (!fi->isDir())
+        QString filename = fi.absoluteFilePath();
+        if (!fi.isDir())
         {
             m_filelist.append(filename);
         }

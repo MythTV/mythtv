@@ -480,16 +480,16 @@ bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
         return true;
 
     QFileInfoList list = QDir(GetDB()).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for (QFileInfoList::const_iterator it = list.begin(); it != list.end(); ++it)
+    for (const auto & fi1 : qAsConst(list))
     {
-        QString genre = it->baseName();
+        QString genre = fi1.baseName();
 
-        QFileInfoList ids = QDir(it->canonicalFilePath()).entryInfoList(QDir::Files);
-        for (QFileInfoList::const_iterator it2 = ids.begin(); it2 != ids.end(); ++it2)
+        QFileInfoList ids = QDir(fi1.canonicalFilePath()).entryInfoList(QDir::Files);
+        for (const auto & fi2 : qAsConst(ids))
         {
-            if (it2->baseName().toUInt(nullptr,16) == discID)
+            if (fi2.baseName().toUInt(nullptr,16) == discID)
             {
-                QFile file(it2->canonicalFilePath());
+                QFile file(fi2.canonicalFilePath());
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text))
                 {
                     Cddb::Album a(QTextStream(&file).readAll());

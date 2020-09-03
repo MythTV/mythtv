@@ -575,11 +575,8 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
 
     RomDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
-    for (QFileInfoList::const_iterator it = List.begin();
-         it != List.end(); ++it)
+    for (const auto & Info : qAsConst(List))
     {
-        QFileInfo Info = *it;
-
         if (Info.isDir())
         {
             filecount += buildFileCount(Info.filePath(), handler);
@@ -639,10 +636,8 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
     RomDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
-    for (QFileInfoList::const_iterator it = List.begin();
-         it != List.end(); ++it)
+    for (const auto & Info : qAsConst(List))
     {
-        QFileInfo Info = *it;
         QString RomName = Info.fileName();
         QString GameName = Info.completeBaseName();
 
