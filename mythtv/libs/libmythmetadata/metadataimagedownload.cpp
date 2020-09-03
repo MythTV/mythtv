@@ -495,8 +495,7 @@ void cleanThumbnailCacheDir()
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);
 
-    for (QStringList::const_iterator i = thumbs.end() - 1;
-            i != thumbs.begin() - 1; --i)
+    for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
     {
         QString filename = QString("%1/%2").arg(cache).arg(*i);
         QFileInfo fi(filename);
