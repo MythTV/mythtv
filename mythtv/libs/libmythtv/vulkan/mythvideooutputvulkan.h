@@ -17,6 +17,7 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU
   public:
     static void        GetRenderOptions    (RenderOptions& Options);
     static QStringList GetAllowedRenderers (MythCodecID CodecId);
+    static VideoFrameTypeVec s_vulkanFrameTypes;
 
     MythVideoOutputVulkan(QString& Profile);
    ~MythVideoOutputVulkan() override;
@@ -29,7 +30,6 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU
     void            PrepareFrame (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
     void            RenderFrame  (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     void            EndFrame     () override;
-    VideoFrameVec   DirectRenderFormats () override;
 
   private:
     MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,

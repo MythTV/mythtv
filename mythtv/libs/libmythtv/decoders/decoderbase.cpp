@@ -1447,10 +1447,10 @@ AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats)
 {
     if (m_parent)
     {
-        VideoFrameVec mythfmts = m_parent->DirectRenderFormats();
+        const VideoFrameTypeVec* mythfmts = m_parent->DirectRenderFormats();
         for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
         {
-            for (auto fmt : mythfmts)
+            for (auto fmt : *mythfmts)
                 if (FrameTypeToPixelFormat(fmt) == *format)
                     return *format;
         }

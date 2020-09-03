@@ -23,6 +23,8 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
 
     static void   GetRenderOptions (RenderOptions& Options);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize& VideoDim);
+    static VideoFrameTypeVec s_openglFrameTypes;
+    static VideoFrameTypeVec s_openglFrameTypesLegacy;
 
     bool          Init             (const QSize& VideoDim, const QSize& VideoDispDim,
                                     float Aspect, MythDisplay* Display,
@@ -30,7 +32,6 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     void          PrepareFrame     (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
     void          RenderFrame      (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     void          EndFrame         () override;
-    VideoFrameVec DirectRenderFormats() override;
 
   protected:
     QRect         GetDisplayVisibleRectAdj() override;
@@ -43,7 +44,6 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
                                        const QRect& VideoRect) override;
 
     MythRenderOpenGL* m_openglRender   { nullptr };
-    TextureFormats    m_textureFormats { AllFormats };
     MythOpenGLPerf*   m_openGLPerf     { nullptr };
 };
 

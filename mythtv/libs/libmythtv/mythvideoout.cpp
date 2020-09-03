@@ -32,6 +32,8 @@
 
 #define LOC QString("VideoOutput: ")
 
+VideoFrameTypeVec MythVideoOutput::s_defaultFrameTypes = { FMT_YV12 };
+
 void MythVideoOutput::GetRenderOptions(RenderOptions& Options)
 {
     MythVideoOutputNull::GetRenderOptions(Options);
@@ -668,10 +670,9 @@ QRect MythVideoOutput::GetSafeRect()
              result.width() - (2 * safex), result.height() - (2 * safey) };
 }
 
-VideoFrameVec MythVideoOutput::DirectRenderFormats()
+const VideoFrameTypeVec *MythVideoOutput::DirectRenderFormats() const
 {
-    static const VideoFrameVec s_defaultFormats { FMT_YV12, FMT_NONE };
-    return s_defaultFormats;
+    return m_renderFrameTypes;
 }
 
 /**

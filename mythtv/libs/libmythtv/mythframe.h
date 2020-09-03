@@ -175,7 +175,7 @@ struct VideoFrame
     bool          deinterlace_inuse2x;
 };
 
-using VideoFrameVec = std::vector<VideoFrameType>;
+using VideoFrameTypeVec = std::vector<VideoFrameType>;
 
 int MTV_PUBLIC ColorDepth(int Format);
 

@@ -945,12 +945,11 @@ int MythPlayer::GetFreeVideoFrames(void) const
 }
 
 /// \brief Return a list of frame types that can be rendered directly.
-VideoFrameVec MythPlayer::DirectRenderFormats(void)
+const VideoFrameTypeVec *MythPlayer::DirectRenderFormats(void)
 {
-    static const VideoFrameVec s_defaultFormats { FMT_YV12, FMT_NONE };
     if (m_videoOutput)
         return m_videoOutput->DirectRenderFormats();
-    return s_defaultFormats;
+    return &MythVideoOutput::s_defaultFrameTypes;
 }
 
 /**

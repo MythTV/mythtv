@@ -45,6 +45,7 @@ class MythVideoOutput : public MythVideoBounds
                                    QWidget* ParentWidget,     const QRect& EmbedRect,
                                    float FrameRate,           uint  PlayerFlags,
                                    QString& Codec,            int ReferenceFrames);
+    static VideoFrameTypeVec s_defaultFrameTypes;
 
     MythVideoOutput();
     ~MythVideoOutput() override;
@@ -86,7 +87,7 @@ class MythVideoOutput : public MythVideoBounds
     int          FreeVideoFrames();
     bool         EnoughFreeFrames();
     bool         EnoughDecodedFrames();
-    virtual VideoFrameVec DirectRenderFormats();
+    const VideoFrameTypeVec* DirectRenderFormats() const;
     virtual VideoFrame* GetNextFreeFrame();
     virtual void ReleaseFrame(VideoFrame* Frame);
     virtual void DeLimboFrame(VideoFrame* Frame);
@@ -138,6 +139,7 @@ class MythVideoOutput : public MythVideoBounds
     long long            m_framesPlayed       { 0 };
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
+    VideoFrameTypeVec*   m_renderFrameTypes   { &s_defaultFrameTypes };
 };
 
 #endif // MYTH_VIDEOOUT_H_
