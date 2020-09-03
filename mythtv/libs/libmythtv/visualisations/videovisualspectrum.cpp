@@ -1,82 +1,71 @@
+// QT
 #include <QPen>
 
+// MythTV
 #include "videovisualspectrum.h"
 
+// FFmpeg
 #define FFTW_N 512
 extern "C" {
 #include "libavutil/mem.h"
 }
 
-VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer *audio, MythRender *render)
-  : VideoVisual(audio, render)
-{
-    m_lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    m_rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    m_lout = (myth_fftw_complex*)
-        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    m_rout = (myth_fftw_complex*)
-        av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
+// Std
+#include <algorithm>
 
-    m_lplan = fftw_plan_dft_r2c_1d(FFTW_N, m_lin, (myth_fftw_complex_cast*)m_lout, FFTW_MEASURE);
-    m_rplan = fftw_plan_dft_r2c_1d(FFTW_N, m_rin, (myth_fftw_complex_cast*)m_rout, FFTW_MEASURE);
+VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
+  : VideoVisual(Audio, Render)
+{
+    m_lin  = static_cast<myth_fftw_float*>(av_malloc(sizeof(myth_fftw_float)*FFTW_N));
+    m_rin  = static_cast<myth_fftw_float*>(av_malloc(sizeof(myth_fftw_float)*FFTW_N));
+    m_lout = static_cast<myth_fftw_complex*>(av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1)));
+    m_rout = static_cast<myth_fftw_complex*>(av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1)));
+
+    m_lplan = fftw_plan_dft_r2c_1d(FFTW_N, m_lin, reinterpret_cast<myth_fftw_complex_cast*>(m_lout), FFTW_MEASURE);
+    m_rplan = fftw_plan_dft_r2c_1d(FFTW_N, m_rin, reinterpret_cast<myth_fftw_complex_cast*>(m_rout), FFTW_MEASURE);
 }
 
 VideoVisualSpectrum::~VideoVisualSpectrum()
 {
-    if (m_lin)
-        av_free(m_lin);
-    if (m_rin)
-        av_free(m_rin);
-    if (m_lout)
-        av_free(m_lout);
-    if (m_rout)
-        av_free(m_rout);
+    av_freep(&m_lin);
+    av_freep(&m_rin);
+    av_freep(&m_lout);
+    av_freep(&m_rout);
     fftw_destroy_plan(m_lplan);
     fftw_destroy_plan(m_rplan);
 }
 
 template<typename T> T sq(T a) { return a*a; };
 
-void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
-                               QPaintDevice* device)
+void VideoVisualSpectrum::Draw(const QRect& Area, MythPainter* Painter, QPaintDevice* Device)
 {
     if (m_disabled)
         return;
 
-    mutex()->lock();
-    VisualNode *node = GetNode();
-
-    if (area.isEmpty() || !painter)
-    {
-        mutex()->unlock();
-        return;
-    }
-
-    if (!Initialise(area))
-    {
-        mutex()->unlock();
-        return;
-    }
-
     uint i = 0;
-    if (node)
     {
-        i = node->m_length;
-        fast_real_set_from_short(m_lin, node->m_left, node->m_length);
-        if (node->m_right)
-            fast_real_set_from_short(m_rin, node->m_right, node->m_length);
+        QMutexLocker locker(mutex());
+        VisualNode* node = GetNode();
+        if (Area.isEmpty() || !Painter)
+            return;
+
+        if (!Initialise(Area))
+            return;
+
+        if (node)
+        {
+            i = static_cast<uint>(node->m_length);
+            fast_real_set_from_short(m_lin, node->m_left, node->m_length);
+            if (node->m_right)
+                fast_real_set_from_short(m_rin, node->m_right, node->m_length);
+        }
     }
-    mutex()->unlock();
 
     fast_reals_set(m_lin + i, m_rin + i, 0, FFTW_N - i);
     fftw_execute(m_lplan);
     fftw_execute(m_rplan);
 
-    double falloff = (((double)SetLastUpdate()) / 40.0) * m_falloff;
-    if (falloff < 0.0)
-        falloff = 0.0;
-    if (falloff > 2048.0)
-        falloff = 2048.0;
+    double falloff = std::clamp(((static_cast<double>(SetLastUpdate())) / 40.0) * m_falloff, 0.0, 2048.0);
     for (int l = 0, r = m_scale.range(); l < m_scale.range(); l++, r++)
     {
         int index = m_scale[l];
@@ -122,83 +111,78 @@ void VideoVisualSpectrum::Draw(const QRect &area, MythPainter *painter,
         m_magnitudes[r] = magR;
     }
 
-    DrawPriv(painter, device);
+    DrawPriv(Painter, Device);
 }
 
-void VideoVisualSpectrum::prepare(void)
+void VideoVisualSpectrum::prepare()
 {
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_magnitudes.size(); i++)
-        m_magnitudes[i] = 0.0;
+    std::fill(m_magnitudes.begin(), m_magnitudes.end(), 0.0);
     VideoVisual::prepare();
 }
 
-void VideoVisualSpectrum::DrawPriv(MythPainter *painter, QPaintDevice* device)
+void VideoVisualSpectrum::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
 {
     static const QBrush kBrush(QColor(0, 0, 200, 180));
     static const QPen   kPen(QColor(255, 255, 255, 255));
     double range = m_area.height() / 2.0;
     int count = m_scale.range();
-    painter->Begin(device);
+    Painter->Begin(Device);
     for (int i = 0; i < count; i++)
     {
-        m_rects[i].setTop(range - int(m_magnitudes[i]));
-        m_rects[i].setBottom(range + int(m_magnitudes[i + count]));
+        m_rects[i].setTop(static_cast<int>(range - static_cast<int>(m_magnitudes[i])));
+        m_rects[i].setBottom(static_cast<int>(range + static_cast<int>(m_magnitudes[i + count])));
         if (m_rects[i].height() > 4)
-            painter->DrawRect(m_rects[i], kBrush, kPen, 255);
+            Painter->DrawRect(m_rects[i], kBrush, kPen, 255);
     }
-    painter->End();
+    Painter->End();
 }
 
-bool VideoVisualSpectrum::Initialise(const QRect &area)
+bool VideoVisualSpectrum::Initialise(const QRect& Area)
 {
-    if (area == m_area)
+    if (Area == m_area)
         return true;
 
-    m_area = area;
+    m_area = Area;
     m_barWidth = m_area.width() / m_numSamples;
     if (m_barWidth < 6)
         m_barWidth = 6;
     m_scale.setMax(192, m_area.width() / m_barWidth);
 
     m_magnitudes.resize(m_scale.range() * 2);
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_magnitudes.size(); i++)
-        m_magnitudes[i] = 0.0;
+    std::fill(m_magnitudes.begin(), m_magnitudes.end(), 0.0);
     InitialisePriv();
     return true;
 }
 
-bool VideoVisualSpectrum::InitialisePriv(void)
+bool VideoVisualSpectrum::InitialisePriv()
 {
     m_range = m_area.height() / 2.0;
     m_rects.resize(m_scale.range());
     for (int i = 0, x = 0; i < m_rects.size(); i++, x+= m_barWidth)
         m_rects[i].setRect(x, m_area.height() / 2, m_barWidth - 1, 1);
 
-    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0)
-        / log((double)(FFTW_N));
-    m_falloff = (double)m_area.height() / 150.0;
+    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0) / log(static_cast<double>(FFTW_N));
+    m_falloff = static_cast<double>(m_area.height()) / 150.0;
 
-    LOG(VB_GENERAL, LOG_INFO, DESC +
-        QString("Initialised Spectrum with %1 bars") .arg(m_scale.range()));
+    LOG(VB_GENERAL, LOG_INFO, DESC + QString("Initialised Spectrum with %1 bars").arg(m_scale.range()));
     return true;
 }
 
 static class VideoVisualSpectrumFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const override // VideoVisualFactory
-    {
-        static QString s_name("Spectrum");
-        return s_name;
-    }
-
-    VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const override // VideoVisualFactory
-    {
-        return new VideoVisualSpectrum(audio, render);
-    }
-
-    bool SupportedRenderer(RenderType /*type*/) override { return true; } // VideoVisualFactory
+    const QString &name() const override;
+    VideoVisual *Create(AudioPlayer* Audio, MythRender* Render) const override;
+    bool SupportedRenderer(RenderType /*Type*/) override { return true; }
 } VideoVisualSpectrumFactory;
+
+const QString& VideoVisualSpectrumFactory::name() const
+{
+    static QString s_name(SPECTRUM_NAME);
+    return s_name;
+}
+
+VideoVisual* VideoVisualSpectrumFactory::Create(AudioPlayer* Audio, MythRender* Render) const
+{
+    return new VideoVisualSpectrum(Audio, Render);
+}

@@ -3,16 +3,17 @@
 
 #include "videovisualspectrum.h"
 
+#define CIRCLES_NAME QStringLiteral("Circles")
+
 class VideoVisualCircles : public VideoVisualSpectrum
 {
   public:
-    VideoVisualCircles(AudioPlayer *audio, MythRender *render);
-    QString Name(void) override // VideoVisualSpectrum
-        { return "Circles"; }
+    VideoVisualCircles(AudioPlayer* Audio, MythRender* Render);
+    QString Name() override { return CIRCLES_NAME; }
 
   protected:
-    bool InitialisePriv(void) override; // VideoVisualSpectrum
-    void DrawPriv(MythPainter *painter, QPaintDevice* device) override; // VideoVisualSpectrum
+    bool InitialisePriv() override;
+    void DrawPriv(MythPainter* Painter, QPaintDevice* Device) override;
 };
 
-#endif // VIDEOVISUALCIRCLES_H
+#endif

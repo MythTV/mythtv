@@ -4,20 +4,23 @@
 #include "videovisual.h"
 
 class MythGLTexture;
+
+#define GOOM_NAME QStringLiteral("Goom")
+#define GOOMHD_NAME QStringLiteral("Goom HD")
+
 class VideoVisualGoom : public VideoVisual
 {
   public:
-    VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd);
+    VideoVisualGoom(AudioPlayer* Audio, MythRender* Render, bool HD);
     ~VideoVisualGoom() override;
 
-    // VideoVisual
-    void Draw(const QRect &area, MythPainter *painter, QPaintDevice* device) override;
-    QString Name(void) override { return m_hd ? "Goom HD" : "Goom"; }
+    void Draw(const QRect& Area, MythPainter* Painter, QPaintDevice* Device) override;
+    QString Name(void) override { return m_hd ? GOOMHD_NAME : GOOM_NAME; }
 
   private:
-    unsigned int  *m_buffer;
-    MythGLTexture *m_glSurface;
+    unsigned int*  m_buffer;
+    MythGLTexture* m_glSurface;
     bool           m_hd;
 };
 
-#endif // VIDEOVISUALGOOM_H
+#endif

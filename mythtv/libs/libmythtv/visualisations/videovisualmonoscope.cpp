@@ -3,7 +3,7 @@
 #include "opengl/mythrenderopengl.h"
 #include "videovisualmonoscope.h"
 
-VideoVisualMonoScope::VideoVisualMonoScope(AudioPlayer *Audio, MythRender *Render, bool Fade)
+VideoVisualMonoScope::VideoVisualMonoScope(AudioPlayer* Audio, MythRender* Render, bool Fade)
   : VideoVisual(Audio, Render),
     m_fade(Fade)
 {
@@ -11,27 +11,27 @@ VideoVisualMonoScope::VideoVisualMonoScope(AudioPlayer *Audio, MythRender *Rende
 
 VideoVisualMonoScope::~VideoVisualMonoScope()
 {
-    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto * render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return;
 
     OpenGLLocker locker(render);
     render->DeleteShaderProgram(m_shader);
     delete m_vbo;
-    delete m_fbo[0];
-    delete m_fbo[1];
-    render->DeleteTexture(m_texture[0]);
-    render->DeleteTexture(m_texture[1]);
+    delete m_fbos[0];
+    delete m_fbos[1];
+    render->DeleteTexture(m_textures[0]);
+    render->DeleteTexture(m_textures[1]);
 }
 
-QString VideoVisualMonoScope::Name(void)
+QString VideoVisualMonoScope::Name()
 {
-    return m_fade ? "FadeScope" : "SimpleScope";
+    return m_fade ? FADE_NAME : SIMPLE_NAME;
 }
 
-MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
+MythRenderOpenGL* VideoVisualMonoScope::Initialise(const QRect& Area)
 {
-    auto *render = dynamic_cast<MythRenderOpenGL*>(m_render);
+    auto * render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)
         return nullptr;
 
@@ -39,7 +39,7 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     {
         if (!m_fade && m_shader && m_vbo)
             return render;
-        if (m_fade && m_shader && m_vbo && m_fbo[0] && m_fbo[1] && m_texture[0] && m_texture[1])
+        if (m_fade && m_shader && m_vbo && m_fbos[0] && m_fbos[1] && m_textures[0] && m_textures[1])
             return render;
     }
 
@@ -54,40 +54,40 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     m_area = Area;
     m_lastTime = QDateTime::currentMSecsSinceEpoch();
 
-    delete m_fbo[0];
-    delete m_fbo[1];
-    render->DeleteTexture(m_texture[0]);
-    render->DeleteTexture(m_texture[1]);
-    m_fbo.fill(nullptr);
-    m_texture.fill(nullptr);
+    delete m_fbos[0];
+    delete m_fbos[1];
+    render->DeleteTexture(m_textures[0]);
+    render->DeleteTexture(m_textures[1]);
+    m_fbos.fill(nullptr);
+    m_textures.fill(nullptr);
     m_currentFBO = false;
 
     if (m_fade)
     {
 
         QSize size(m_area.size());
-        m_fbo[0] = render->CreateFramebuffer(size);
-        m_fbo[1] = render->CreateFramebuffer(size);
+        m_fbos[0] = render->CreateFramebuffer(size);
+        m_fbos[1] = render->CreateFramebuffer(size);
         render->SetBackground(0, 0, 0, 255);
         render->SetViewPort(m_area);
-        if (m_fbo[0])
+        if (m_fbos[0])
         {
-            m_texture[0] = render->CreateFramebufferTexture(m_fbo[0]);
-            render->BindFramebuffer(m_fbo[0]);
+            m_textures[0] = render->CreateFramebufferTexture(m_fbos[0]);
+            render->BindFramebuffer(m_fbos[0]);
             render->ClearFramebuffer();
         }
-        if (m_fbo[1])
+        if (m_fbos[1])
         {
-            m_texture[1] = render->CreateFramebufferTexture(m_fbo[1]);
-            render->BindFramebuffer(m_fbo[1]);
+            m_textures[1] = render->CreateFramebufferTexture(m_fbos[1]);
+            render->BindFramebuffer(m_fbos[1]);
             render->ClearFramebuffer();
         }
-        if (m_texture[0])
-            render->SetTextureFilters(m_texture[0],  QOpenGLTexture::Linear);
-        if (m_texture[1])
-            render->SetTextureFilters(m_texture[1], QOpenGLTexture::Linear);
-        return (m_shader && m_vbo && m_fbo[0] && m_fbo[1] &&
-                m_texture[0] && m_texture[1]) ? render : nullptr;
+        if (m_textures[0])
+            render->SetTextureFilters(m_textures[0],  QOpenGLTexture::Linear);
+        if (m_textures[1])
+            render->SetTextureFilters(m_textures[1], QOpenGLTexture::Linear);
+        return (m_shader && m_vbo && m_fbos[0] && m_fbos[1] &&
+                m_textures[0] && m_textures[1]) ? render : nullptr;
     }
 
     if (m_shader && m_vbo)
@@ -95,13 +95,13 @@ MythRenderOpenGL *VideoVisualMonoScope::Initialise(const QRect &Area)
     return nullptr;
 }
 
-void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPaintDevice* /*device*/)
+void VideoVisualMonoScope::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
 {
     if (m_disabled)
         return;
 
-    VisualNode *node = nullptr;
-    MythRenderOpenGL *render = nullptr;
+    VisualNode* node = nullptr;
+    MythRenderOpenGL* render = nullptr;
 
     {
         QMutexLocker locker(mutex());
@@ -118,7 +118,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
 
         double index = 0;
         double const step = static_cast<double>(node->m_length) / NUM_SAMPLES;
-        for ( int i = 0; i < NUM_SAMPLES; i++)
+        for (size_t i = 0; i < NUM_SAMPLES; i++)
         {
             auto indexTo = static_cast<long>(index + step);
             if (indexTo == static_cast<long>(index))
@@ -147,13 +147,13 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
 
     render->makeCurrent();
 
-    int lastfbo = static_cast<int>(m_currentFBO);
-    int nextfbo = static_cast<int>(!m_currentFBO);
+    size_t lastfbo = static_cast<size_t>(m_currentFBO);
+    size_t nextfbo = static_cast<size_t>(!m_currentFBO);
 
     if (m_fade)
     {
         // bind the next framebuffer
-        render->BindFramebuffer(m_fbo[nextfbo]);
+        render->BindFramebuffer(m_fbos[nextfbo]);
         // Clear
         render->SetBackground(0, 0, 0, 255);
         render->SetViewPort(m_area);
@@ -167,7 +167,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
         // render last framebuffer into next with a little alpha fade
         // N.B. this alpha fade, in conjunction with the clear alpha above, causes
         // us to grey out the underlying video (if rendered over video).
-        render->DrawBitmap(m_texture[lastfbo], m_fbo[nextfbo], m_area, dest,
+        render->DrawBitmap(m_textures[lastfbo], m_fbos[nextfbo], m_area, dest,
                            nullptr, static_cast<int>(255.0 - rate / 2));
     }
 
@@ -178,7 +178,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
         m_hue -= 1.0;
     render->glEnableVertexAttribArray(0);
     m_vbo->bind();
-    m_vbo->write(0, m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
+    m_vbo->write(0, m_vertices.data(), static_cast<int>(m_vertices.size() * sizeof(GLfloat)));
     render->glVertexAttrib4f(1, static_cast<GLfloat>(color.redF()),
                                 static_cast<GLfloat>(color.greenF()),
                                 static_cast<GLfloat>(color.blueF()), 1.0F);
@@ -193,7 +193,7 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
     // Render and swap buffers
     if (m_fade)
     {
-        render->DrawBitmap(m_texture[nextfbo], nullptr, m_area, m_area, nullptr);
+        render->DrawBitmap(m_textures[nextfbo], nullptr, m_area, m_area, nullptr);
         m_currentFBO = !m_currentFBO;
     }
 
@@ -203,39 +203,43 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter* /*painter*/, QPa
 static class VideoVisualMonoScopeFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const override
+    const QString& name() const override
     {
-        static QString s_name("FadeScope");
+        static QString s_name(FADE_NAME);
         return s_name;
     }
 
-    VideoVisual *Create(AudioPlayer *Audio, MythRender *Render) const override
+    VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
         return new VideoVisualMonoScope(Audio, Render, true);
     }
 
-    bool SupportedRenderer(RenderType type) override
-    {
-        return (type == kRenderOpenGL);
-    }
+    bool SupportedRenderer(RenderType Type) override;
 } VideoVisualMonoScopeFactory;
+
+bool VideoVisualMonoScopeFactory::SupportedRenderer(RenderType Type)
+{
+    return (Type == kRenderOpenGL);
+}
 
 static class VideoVisualSimpleScopeFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const override
+    const QString& name() const override
     {
-        static QString s_name("SimpleScope");
+        static QString s_name(SIMPLE_NAME);
         return s_name;
     }
 
-    VideoVisual *Create(AudioPlayer *Audio, MythRender *Render) const override
+    VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
         return new VideoVisualMonoScope(Audio, Render, false);
     }
 
-    bool SupportedRenderer(RenderType type) override
-    {
-        return (type == kRenderOpenGL);
-    }
+    bool SupportedRenderer(RenderType Type) override;
 } VideoVisualSimpleScopeFactory;
+
+bool VideoVisualSimpleScopeFactory::SupportedRenderer(RenderType Type)
+{
+    return (Type == kRenderOpenGL);
+}
