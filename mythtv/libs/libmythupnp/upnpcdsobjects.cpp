@@ -381,7 +381,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
                 os << "<"  << sName;
 
-                for (const auto & attr : pProp->m_lstAttributes)
+                for (const auto & attr : qAsConst(pProp->m_lstAttributes))
                 {
                     QString filterName = QString("%1@%2").arg(sName)
                                                          .arg(attr.m_sName);
@@ -411,7 +411,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
             os << "<res protocolInfo=\"" << resource->m_sProtocolInfo << "\" ";
 
             QString filterName;
-            for (const auto & attr : resource->m_lstAttributes)
+            for (const auto & attr : qAsConst(resource->m_lstAttributes))
             {
                 filterName = QString("res@%1").arg(attr.m_sName);
                 if (attr.m_bRequired  || !filterAttributes ||

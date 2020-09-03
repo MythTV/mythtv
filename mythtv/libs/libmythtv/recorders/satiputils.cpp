@@ -70,7 +70,7 @@ QStringList SatIP::doUPNPsearch(void)
     EntryMap map;
     satipservers->GetEntryMap(map);
 
-    for (auto *BE : map)
+    for (auto *BE : qAsConst(map))
     {
         QString friendlyName = BE->GetFriendlyName();
         UPnpDeviceDesc *desc = BE->GetDeviceDesc();
