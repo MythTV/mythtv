@@ -576,7 +576,7 @@ bool FileServerHandler::HandleQueryCheckFile(SocketHandler *socket,
     if (recinfo.HasPathname())
     {
         pburl = GetPlaybackURL(&recinfo);
-        exists = QFileInfo(pburl).exists();
+        exists = QFileInfo::exists(pburl);
         if (!exists)
             pburl.clear();
     }
