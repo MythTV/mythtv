@@ -21,7 +21,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
-#include "compat.h" // for random()
+#include "mythmiscutil.h"
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")
@@ -473,7 +473,7 @@ QString PlaybackBoxHelper::GetPreviewImage(
         return QString();
 
     QString token = QString("%1:%2")
-        .arg(pginfo.MakeUniqueKey()).arg(random());
+        .arg(pginfo.MakeUniqueKey()).arg(MythRandom());
 
     QStringList extra(token);
     extra.push_back(check_availability?"1":"0");

@@ -23,6 +23,7 @@
 #include "upnptasksearch.h"
 #include "mythversion.h"
 #include "compat.h"
+#include "mythmiscutil.h"
 #include "mythdate.h"
 
 static QPair<QHostAddress, int> kLinkLocal6 =
@@ -133,7 +134,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                              m_nPeerPort );
-        std::this_thread::sleep_for( std::chrono::milliseconds( random() % 250 ));
+        std::this_thread::sleep_for( std::chrono::milliseconds( MythRandom() % 250 ));
         pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                              m_nPeerPort );
     }

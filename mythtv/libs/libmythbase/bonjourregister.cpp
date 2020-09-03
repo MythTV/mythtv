@@ -3,6 +3,7 @@
 #include <QSocketNotifier>
 #include <QtEndian>
 
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 #include "bonjourregister.h"
 
@@ -133,7 +134,7 @@ QByteArray BonjourRegister::RandomizeData(void)
 
     data.append(7);
     data.append("_rnd=");
-    rnd.append((random() % 80) + 33);
+    rnd.append((MythRandom() % 80) + 33);
     data.append(rnd.toHex());
 
     return data;

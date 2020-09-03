@@ -15,6 +15,21 @@
 class QStringList;
 class QFile;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#include <QtGlobal>
+#else
+#include <QRandomGenerator>
+#endif
+
+MBASE_PUBLIC inline uint32_t MythRandom()
+{
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+    return static_cast<uint32_t>(qrand());
+#else
+    return QRandomGenerator::global()->generate();
+#endif
+}
+
 MBASE_PUBLIC bool getUptime(time_t &uptime);
 MBASE_PUBLIC bool getMemStats(
     int &totalMB, int &freeMB, int &totalVM, int &freeVM);

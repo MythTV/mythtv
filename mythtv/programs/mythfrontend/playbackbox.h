@@ -252,7 +252,7 @@ class PlaybackBox : public ScheduleCommon
     void doPlaylistAllowRerecord();
     void togglePlayListTitle(void);
     void togglePlayListItem(void);
-    void playSelectedPlaylist(bool random);
+    void playSelectedPlaylist(bool Random);
     void doPlayList(void);
     void showViewChanger(void);
     void saveViewChanges(void);

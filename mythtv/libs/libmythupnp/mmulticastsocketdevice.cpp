@@ -31,6 +31,7 @@
 #include <QStringList>
 
 // MythTV headers
+#include "mythmiscutil.h"
 #include "mmulticastsocketdevice.h"
 #include "mythlogging.h"
 
@@ -116,7 +117,7 @@ qint64 MMulticastSocketDevice::writeBlock(
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
                     .arg((*it).toString()).arg((retx==(int)len)?"ok":"err"));
 #endif
-            std::this_thread::sleep_for(std::chrono::milliseconds(5 + (random() % 5)));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5 + (MythRandom() % 5)));
         }
         return retx;
     }

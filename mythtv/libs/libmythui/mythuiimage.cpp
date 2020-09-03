@@ -19,6 +19,7 @@
 
 // libmythbase
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 #include "mthreadpool.h"
 
 // Mythui
@@ -1660,7 +1661,7 @@ void MythUIImage::FindRandomImage(void)
         do
         {
             randFile = QString("%1%2").arg(m_imageDirectory)
-                                      .arg(imageList.takeAt(random() % imageList.size()));
+                                      .arg(imageList.takeAt(static_cast<int>(MythRandom()) % imageList.size()));
 
         } while (imageList.size() > 1 && randFile == m_origFilename);
     }

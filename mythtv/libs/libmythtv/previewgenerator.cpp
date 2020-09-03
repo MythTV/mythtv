@@ -361,7 +361,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     if (m_token.isEmpty())
     {
         m_token = QString("%1:%2")
-            .arg(m_programInfo.MakeUniqueKey()).arg(random());
+            .arg(m_programInfo.MakeUniqueKey()).arg(MythRandom());
     }
     strlist.push_back(m_token);
     m_programInfo.ToStringList(strlist);

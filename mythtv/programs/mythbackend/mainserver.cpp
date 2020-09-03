@@ -2376,7 +2376,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    std::this_thread::sleep_for(std::chrono::milliseconds(random()%2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom()%2));
 
     m_deletelock.lock();
 
@@ -7410,7 +7410,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (token.toLower() == "do_not_care")
     {
         token = QString("%1:%2")
-            .arg(pginfo.MakeUniqueKey()).arg(random());
+            .arg(pginfo.MakeUniqueKey()).arg(MythRandom());
     }
     if (it != slist.end())
         (time_fmt_sec = ((*it).toLower() == "s")), ++it;

@@ -9,7 +9,7 @@
 
 // MythTV headers
 #include "packetbuffer.h"
-#include "compat.h" // for random on windows
+#include "mythmiscutil.h"
 
 PacketBuffer::PacketBuffer(unsigned int bitrate) :
     m_bitrate(bitrate),
@@ -18,8 +18,8 @@ PacketBuffer::PacketBuffer(unsigned int bitrate) :
     while (!m_next_empty_packet_key)
     {
         m_next_empty_packet_key =
-            (random() << 24) ^ (random() << 16) ^
-            (random() << 8) ^ random();
+            (MythRandom() << 24) ^ (MythRandom() << 16) ^
+            (MythRandom() << 8) ^ MythRandom();
     }
 }
 

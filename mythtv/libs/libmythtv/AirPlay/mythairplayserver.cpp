@@ -127,7 +127,7 @@ QString AirPlayHardwareId()
     {
         QByteArray ba;
         for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
-            ba.append((random() % 80) + 33);
+            ba.append((MythRandom() % 80) + 33);
         id = ba.toHex();
     }
     id = id.toUpper();

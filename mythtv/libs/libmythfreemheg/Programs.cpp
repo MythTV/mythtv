@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "Logging.h"
 #include "freemheg.h"
+#include "mythmiscutil.h"
 
 #include <QDateTime>
 #include <QLocale>
@@ -318,7 +319,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 int nLimit = GetInt(args.GetAt(0), engine);
                 MHParameter *pResInt = args.GetAt(1);
-                int r = random() % (nLimit + 1);
+                int r = static_cast<int>(MythRandom()) % (nLimit + 1);
                 engine->FindObject(
                     *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);

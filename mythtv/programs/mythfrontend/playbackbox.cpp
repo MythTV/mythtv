@@ -2244,15 +2244,15 @@ bool PlaybackBox::UpdateUILists(void)
     return true;
 }
 
-void PlaybackBox::playSelectedPlaylist(bool _random)
+void PlaybackBox::playSelectedPlaylist(bool Random)
 {
-    if (_random)
+    if (Random)
     {
         m_playListPlay.clear();
         QList<uint> tmp = m_playList;
         while (!tmp.isEmpty())
         {
-            uint i = random() % tmp.size();
+            uint i = static_cast<int>(MythRandom()) % tmp.size();
             m_playListPlay.append(tmp[i]);
             tmp.removeAll(tmp[i]);
         }

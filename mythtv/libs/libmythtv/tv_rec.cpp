@@ -1255,7 +1255,7 @@ static int num_inputs(void)
 static int eit_start_rand(int eitTransportTimeout)
 {
     // randomize start time a bit
-    int timeout = random() % (eitTransportTimeout / 3);
+    int timeout = static_cast<int>(MythRandom()) % (eitTransportTimeout / 3);
     // get the number of inputs and the position of the current input
     // to distribute the the scan start evenly over eitTransportTimeout
     int no_inputs = num_inputs();

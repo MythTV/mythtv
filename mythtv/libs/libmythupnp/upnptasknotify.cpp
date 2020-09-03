@@ -25,7 +25,7 @@
 #include "mmulticastsocketdevice.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "compat.h"
+#include "mythmiscutil.h"
 #include "upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
-        std::this_thread::sleep_for(std::chrono::milliseconds(random() % 250));
+        std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
     }
