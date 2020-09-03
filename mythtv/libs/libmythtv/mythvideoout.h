@@ -54,10 +54,10 @@ class MythVideoOutput : public MythVideoBounds
                       const QRect& WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
-    virtual void ProcessFrame(VideoFrame* Frame, OSD* Osd, const PIPMap& PipPlayers,
-                              FrameScanType Scan = kScan_Ignore) = 0;
-    virtual void PrepareFrame(VideoFrame* Frame, FrameScanType, OSD* Osd) = 0;
-    virtual void Show(FrameScanType) = 0;
+    virtual void PrepareFrame (VideoFrame* Frame, OSD* Osd, const PIPMap& PipPlayers,
+                               FrameScanType Scan = kScan_Ignore) = 0;
+    virtual void RenderFrame  (VideoFrame* Frame, FrameScanType, OSD* Osd) = 0;
+    virtual void EndFrame     (FrameScanType) = 0;
     void         SetReferenceFrames(int ReferenceFrames);
     VideoDisplayProfile* GetProfile() { return m_dbDisplayProfile; }
     virtual void WindowResized(const QSize& /*size*/) {}

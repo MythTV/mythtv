@@ -142,18 +142,18 @@ class VideoPerformanceTest
             if (!m_decodeOnly)
             {
                 MythDeintType doubledeint = GetDoubleRateOption(frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
-                vo->ProcessFrame(frame, nullptr, dummy, scan);
-                vo->PrepareFrame(frame, scan, nullptr);
-                vo->Show(scan);
+                vo->PrepareFrame(frame, nullptr, dummy, scan);
+                vo->RenderFrame(frame, scan, nullptr);
+                vo->EndFrame(scan);
 
                 if (doubledeint && m_deinterlace)
                 {
                     doubledeint = GetDoubleRateOption(frame, DEINT_CPU);
                     MythDeintType other = GetDoubleRateOption(frame, DEINT_SHADER | DEINT_DRIVER);
                     if (doubledeint && !other)
-                        vo->ProcessFrame(frame, nullptr, dummy, kScan_Intr2ndField);
-                    vo->PrepareFrame(frame, kScan_Intr2ndField, nullptr);
-                    vo->Show(scan);
+                        vo->PrepareFrame(frame, nullptr, dummy, kScan_Intr2ndField);
+                    vo->RenderFrame(frame, kScan_Intr2ndField, nullptr);
+                    vo->EndFrame(scan);
                 }
             }
             if (!m_noDecode)

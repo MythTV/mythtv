@@ -23,7 +23,7 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
                                            MythMultiLocker* Locks, int ReferenceFrames,
                                            bool ForceChange) override;
-    void            Show                  (FrameScanType /*Scan*/) override;
+    void            EndFrame              (FrameScanType /*Scan*/) override;
     void            ClearAfterSeek        () override;
     bool            IsPIPSupported        () const override  { return true; }
     void            ShowPIPs              (VideoFrame* Frame, const PIPMap& PiPPlayers) override;

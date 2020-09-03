@@ -97,7 +97,13 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
     return true;
 }
 
-void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
+void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, OSD* /*Osd*/,
+                                         const PIPMap& PiPPlayers, FrameScanType Scan)
+{
+    ProcessFrameGPU(Frame, PiPPlayers, Scan);
+}
+
+void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
 {
     if (!(m_vulkanRender && m_vulkanWindow && m_video))
         return;
@@ -120,13 +126,7 @@ void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType Scan, 
         m_debugMarker->EndRegion(currentcmdbuffer);
 }
 
-void MythVideoOutputVulkan::ProcessFrame(VideoFrame* Frame, OSD* /*Osd*/,
-                                         const PIPMap& PiPPlayers, FrameScanType Scan)
-{
-    ProcessFrameGPU(Frame, PiPPlayers, Scan);
-}
-
-void MythVideoOutputVulkan::Show(FrameScanType /*Scan*/)
+void MythVideoOutputVulkan::EndFrame(FrameScanType /*Scan*/)
 {
     if (m_video)
         m_video->EndFrame();

@@ -551,7 +551,7 @@ void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTyp
         DoneDisplayingFrame(release);
 }
 
-void MythVideoOutputGPU::Show(FrameScanType /*Scan*/)
+void MythVideoOutputGPU::EndFrame(FrameScanType /*Scan*/)
 {
     m_video->EndFrame();
 }

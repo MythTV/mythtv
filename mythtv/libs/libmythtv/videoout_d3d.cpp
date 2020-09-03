@@ -305,7 +305,7 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     return true;
 }
 
-void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
+void VideoOutputD3D::RenderFrame(VideoFrame *buffer, FrameScanType t,
                                   OSD *osd)
 {
     (void)osd;
@@ -377,7 +377,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     }
 }
 
-void VideoOutputD3D::Show(FrameScanType )
+void VideoOutputD3D::EndFrame(FrameScanType )
 {
     if (IsErrored())
     {
@@ -460,7 +460,7 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     img->ReleaseBuffer();
 }
 
-void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
+void VideoOutputD3D::PrepareFrame(VideoFrame *frame, OSD *osd,
                                   const PIPMap &pipPlayers,
                                   FrameScanType scan)
 {

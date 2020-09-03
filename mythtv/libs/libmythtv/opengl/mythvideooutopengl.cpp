@@ -205,7 +205,7 @@ QRect MythVideoOutputOpenGL::GetDisplayVisibleRectAdj()
     return dvr;
 }
 
-void MythVideoOutputOpenGL::ProcessFrame(VideoFrame* Frame, OSD* /*osd*/,
+void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, OSD* /*osd*/,
                                          const PIPMap& PiPPlayers,
                                          FrameScanType Scan)
 {
@@ -233,7 +233,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame* Frame, OSD* /*osd*/,
         m_openglRender->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
 
-void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
+void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
 {
     if (!m_openglRender)
         return;
@@ -334,7 +334,7 @@ VideoFrameVec MythVideoOutputOpenGL::DirectRenderFormats()
     return s_formats[m_textureFormats];
 }
 
-void MythVideoOutputOpenGL::Show(FrameScanType /*scan*/)
+void MythVideoOutputOpenGL::EndFrame(FrameScanType /*scan*/)
 {
     if (!m_openglRender || IsErrored())
         return;
