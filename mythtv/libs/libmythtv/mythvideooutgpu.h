@@ -23,13 +23,13 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
                                            MythMultiLocker* Locks, int ReferenceFrames,
                                            bool ForceChange) override;
-    void            EndFrame              (FrameScanType /*Scan*/) override;
+    void            EndFrame              () override;
     void            ClearAfterSeek        () override;
     bool            IsPIPSupported        () const override  { return true; }
-    void            ShowPIPs              (VideoFrame* Frame, const PIPMap& PiPPlayers) override;
-    void            ShowPIP               (VideoFrame* Frame, MythPlayer* PiPPlayer, PIPLocation Location) override;
+    void            ShowPIPs              (const PIPMap& PiPPlayers) override;
+    void            ShowPIP               (MythPlayer* PiPPlayer, PIPLocation Location) override;
     void            RemovePIP             (MythPlayer* PiPPlayer) override;
-    bool            EnableVisualisation   (AudioPlayer* /*Audio*/, bool /*Enable*/, const QString& /*Name*/ = QString("")) override;
+    bool            EnableVisualisation   (AudioPlayer* Audio, bool Enable, const QString& Name = QString("")) override;
     bool            CanVisualise          (AudioPlayer* Audio) override;
     bool            SetupVisualisation    (AudioPlayer* Audio, const QString& Name) override;
     VideoVisual*    GetVisualisation      () override;

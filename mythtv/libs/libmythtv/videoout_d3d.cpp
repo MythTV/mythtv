@@ -305,14 +305,13 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     return true;
 }
 
-void VideoOutputD3D::RenderFrame(VideoFrame *buffer, FrameScanType t,
-                                  OSD *osd)
+void VideoOutputD3D::RenderFrame(VideoFrame *buffer, FrameScanType t, OSD *osd)
 {
     (void)osd;
     if (IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "PrepareFrame() called while IsErrored is true.");
+            "RenderFrame() called while IsErrored is true.");
         return;
     }
 
@@ -377,7 +376,7 @@ void VideoOutputD3D::RenderFrame(VideoFrame *buffer, FrameScanType t,
     }
 }
 
-void VideoOutputD3D::EndFrame(FrameScanType )
+void VideoOutputD3D::EndFrame()
 {
     if (IsErrored())
     {
@@ -460,8 +459,7 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     img->ReleaseBuffer();
 }
 
-void VideoOutputD3D::PrepareFrame(VideoFrame *frame, OSD *osd,
-                                  const PIPMap &pipPlayers,
+void VideoOutputD3D::PrepareFrame(VideoFrame *frame, const PIPMap &pipPlayers,
                                   FrameScanType scan)
 {
     if (!m_render || !m_video)
@@ -501,7 +499,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *frame, OSD *osd,
     bool safepauseframe = pauseframe && !gpu;
 
     if (!m_window.IsEmbedding())
-        ShowPIPs(frame, pipPlayers);
+        ShowPIPs(pipPlayers);
 
     // Test the device
     m_renderValid |= m_render->Test(m_renderReset);
@@ -530,9 +528,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *frame, OSD *osd,
     }
 }
 
-void VideoOutputD3D::ShowPIP(VideoFrame */*frame*/,
-                             MythPlayer *pipplayer,
-                             PIPLocation        loc)
+void VideoOutputD3D::ShowPIP(MythPlayer *pipplayer, PIPLocation loc)
 {
     if (!pipplayer)
         return;

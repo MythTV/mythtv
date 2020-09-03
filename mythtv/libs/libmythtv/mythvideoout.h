@@ -54,10 +54,10 @@ class MythVideoOutput : public MythVideoBounds
                       const QRect& WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
-    virtual void PrepareFrame (VideoFrame* Frame, OSD* Osd, const PIPMap& PipPlayers,
+    virtual void PrepareFrame (VideoFrame* Frame, const PIPMap& PipPlayers,
                                FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (VideoFrame* Frame, FrameScanType, OSD* Osd) = 0;
-    virtual void EndFrame     (FrameScanType) = 0;
+    virtual void EndFrame     () = 0;
     void         SetReferenceFrames(int ReferenceFrames);
     VideoDisplayProfile* GetProfile() { return m_dbDisplayProfile; }
     virtual void WindowResized(const QSize& /*size*/) {}
@@ -120,8 +120,8 @@ class MythVideoOutput : public MythVideoBounds
     virtual StereoscopicMode GetStereoscopicMode() const { return kStereoscopicModeNone; }
 
   protected:
-    virtual void ShowPIPs(VideoFrame* /*Frame*/, const PIPMap& /*PiPPlayers*/) { }
-    virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
+    virtual void ShowPIPs (const PIPMap& /*PiPPlayers*/) { }
+    virtual void ShowPIP  (MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
 
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;

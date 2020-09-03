@@ -27,9 +27,9 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     bool          Init             (const QSize& VideoDim, const QSize& VideoDispDim,
                                     float Aspect, MythDisplay* Display,
                                     const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
-    void          PrepareFrame     (VideoFrame* Frame, OSD* Osd, const PIPMap& PiPPlayers, FrameScanType Scan) override;
+    void          PrepareFrame     (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
     void          RenderFrame      (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
-    void          EndFrame         (FrameScanType Scan) override;
+    void          EndFrame         () override;
     VideoFrameVec DirectRenderFormats() override;
 
   protected:

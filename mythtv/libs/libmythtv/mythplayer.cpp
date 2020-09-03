@@ -1634,7 +1634,7 @@ bool MythPlayer::PipSync(void)
         if (!last)
             return false;
 
-        m_videoOutput->PrepareFrame(last, nullptr, m_pipPlayers, m_scan);
+        m_videoOutput->PrepareFrame(last, m_pipPlayers, m_scan);
 
         int64_t videotimecode = last->timecode & 0x0000ffffffffffff;
         if (videotimecode != last->timecode)
@@ -1815,7 +1815,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     if (buffer && !dropframe)
     {
         m_osdLock.lock();
-        m_videoOutput->PrepareFrame(buffer, m_osd, m_pipPlayers, ps);
+        m_videoOutput->PrepareFrame(buffer, m_pipPlayers, ps);
         m_osdLock.unlock();
     }
 
@@ -1853,7 +1853,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             WaitForTime(framedue);
         // get time codes for calculating difference next time
         m_priorAudioTimecode = m_audio.GetAudioTime();
-        m_videoOutput->EndFrame(ps);
+        m_videoOutput->EndFrame();
         if (m_videoOutput->IsErrored())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Error condition detected "
@@ -1872,7 +1872,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             {
                 // the first deinterlacing pass will have marked the frame as already deinterlaced
                 buffer->already_deinterlaced = false;
-                m_videoOutput->PrepareFrame(buffer, m_osd, m_pipPlayers, ps);
+                m_videoOutput->PrepareFrame(buffer, m_pipPlayers, ps);
             }
             m_videoOutput->RenderFrame(buffer, ps, m_osd);
             m_osdLock.unlock();
@@ -1882,7 +1882,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
                 int64_t due = framedue + m_frameInterval / 2;
                 WaitForTime(due);
             }
-            m_videoOutput->EndFrame(ps);
+            m_videoOutput->EndFrame();
         }
     }
     else if (!m_playerCtx->IsPiPOrSecondaryPBP())
@@ -1947,10 +1947,10 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     m_osdLock.lock();
-    m_videoOutput->PrepareFrame(nullptr, m_osd, m_pipPlayers, scan);
+    m_videoOutput->PrepareFrame(nullptr, m_pipPlayers, scan);
     m_videoOutput->RenderFrame(nullptr, scan, m_osd);
     m_osdLock.unlock();
-    m_videoOutput->EndFrame(scan);
+    m_videoOutput->EndFrame();
 }
 
 void MythPlayer::SetBuffering(bool new_buffering)

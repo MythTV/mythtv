@@ -391,7 +391,7 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
         return;
 
     if (!IsEmbedding())
-        ShowPIPs(Frame, PiPPlayers);
+        ShowPIPs(PiPPlayers);
 
     if (Frame)
     {
@@ -551,7 +551,7 @@ void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTyp
         DoneDisplayingFrame(release);
 }
 
-void MythVideoOutputGPU::EndFrame(FrameScanType /*Scan*/)
+void MythVideoOutputGPU::EndFrame()
 {
     m_video->EndFrame();
 }
@@ -627,14 +627,14 @@ VideoVisual* MythVideoOutputGPU::GetVisualisation()
     return m_visual;
 }
 
-void MythVideoOutputGPU::ShowPIPs(VideoFrame* Frame, const PIPMap& PiPPlayers)
+void MythVideoOutputGPU::ShowPIPs(const PIPMap& PiPPlayers)
 {
     m_pxpVideoActive = nullptr;
     for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
-        ShowPIP(Frame, it.key(), *it);
+        ShowPIP(it.key(), *it);
 }
 
-void MythVideoOutputGPU::ShowPIP(VideoFrame* /*Frame*/, MythPlayer* PiPPlayer, PIPLocation Location)
+void MythVideoOutputGPU::ShowPIP(MythPlayer* PiPPlayer, PIPLocation Location)
 {
     if (!PiPPlayer)
         return;

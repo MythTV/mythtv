@@ -214,7 +214,7 @@ void MythVideoOutputNull::RenderFrame(VideoFrame* Frame, FrameScanType /*Scan*/,
         LOG(VB_GENERAL, LOG_ERR, LOC + "No frame in PrepareFrame!");
 }
 
-void MythVideoOutputNull::EndFrame(FrameScanType /*Scan*/)
+void MythVideoOutputNull::EndFrame()
 {
 }
 
@@ -241,9 +241,7 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTy
     DisplayTimecode = m_avPauseFrame.disp_timecode;
 }
 
-void MythVideoOutputNull::PrepareFrame(VideoFrame* Frame, OSD* /*Osd*/,
-                                       const PIPMap& /*PiPPlayers*/,
-                                       FrameScanType Scan)
+void MythVideoOutputNull::PrepareFrame(VideoFrame* Frame, const PIPMap& /*PiPPlayers*/, FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
         m_deinterlacer.Filter(Frame, Scan, nullptr);

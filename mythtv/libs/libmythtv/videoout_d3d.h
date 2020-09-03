@@ -4,7 +4,7 @@
 #define VIDEOOUT_D3D_H_
 
 // MythTV headers
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "mythrender_d3d9.h"
 #include "mythpainter_d3d9.h"
 
@@ -19,15 +19,11 @@ class VideoOutputD3D : public MythVideoOutput
     VideoOutputD3D();
    ~VideoOutputD3D();
 
-    bool Init(const QSize &video_dim_buf,
-              const QSize &video_dim_disp,
-              float aspect,
+    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
-    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      const PIPMap &pipPlayers,
-                      FrameScanType scan) override; // VideoOutput
-    void Show(FrameScanType ) override; // VideoOutput
+    void RenderFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
+    void PrepareFrame(VideoFrame *frame, const PIPMap &pipPlayers, FrameScanType scan) override; // VideoOutput
+    void EndFrame() override;
     void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
@@ -46,9 +42,7 @@ class VideoOutputD3D : public MythVideoOutput
                                              bool no_acceleration,
                                              AVPixelFormat &pix_fmt);
 
-    void ShowPIP(VideoFrame  *frame,
-                 MythPlayer  *pipplayer,
-                 PIPLocation  loc) override; // VideoOutput
+    void ShowPIP(MythPlayer  *pipplayer, PIPLocation  loc) override; // VideoOutput
     void RemovePIP(MythPlayer *pipplayer) override; // VideoOutput
     bool IsPIPSupported(void) const override // VideoOutput
         { return true; }
