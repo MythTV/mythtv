@@ -247,8 +247,8 @@ bool PBHEventHandler::event(QEvent *e)
             const QString& token = me->ExtraData(0);
             bool check_avail = (bool) me->ExtraData(1).toInt();
             QStringList list = me->ExtraDataList();
-            QStringList::const_iterator it = list.begin()+2;
-            ProgramInfo evinfo(it, list.end());
+            QStringList::const_iterator it = list.cbegin()+2;
+            ProgramInfo evinfo(it, list.cend());
             if (!evinfo.HasPathname())
                 return true;
 
@@ -447,9 +447,9 @@ QString PlaybackBoxHelper::LocateArtwork(
     QMutexLocker locker(&m_lock);
 
     InfoMap::const_iterator it =
-        m_artworkCache.find(cacheKey);
+        m_artworkCache.constFind(cacheKey);
 
-    if (it != m_artworkCache.end())
+    if (it != m_artworkCache.constEnd())
         return *it;
 
     QStringList list(inetref);

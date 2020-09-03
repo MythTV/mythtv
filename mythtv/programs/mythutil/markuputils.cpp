@@ -33,7 +33,7 @@ static int GetMarkupList(const MythUtilCommandLineParser &cmdline,
         pginfo.QueryCommBreakList(cutlist);
 
     uint64_t lastStart = 0;
-    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
     {
         if ((*it == MARK_COMM_START) ||
             (*it == MARK_CUT_START))
@@ -153,7 +153,7 @@ static int CopySkipListToCutList(const MythUtilCommandLineParser &cmdline)
     frm_dir_map_t::const_iterator it;
 
     pginfo.QueryCommBreakList(cutlist);
-    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
     {
         if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;

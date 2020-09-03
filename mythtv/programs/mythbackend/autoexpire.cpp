@@ -158,8 +158,8 @@ void AutoExpire::CalcParams()
     // that every encoder writes only to one fs.
     // Copying the data minimizes the time the lock is held.
     m_instanceLock.lock();
-    QMap<int, int>::const_iterator ueit = m_usedEncoders.begin();
-    while (ueit != m_usedEncoders.end())
+    QMap<int, int>::const_iterator ueit = m_usedEncoders.cbegin();
+    while (ueit != m_usedEncoders.cend())
     {
         fsEncoderMap[*ueit].push_back(ueit.key());
         ++ueit;

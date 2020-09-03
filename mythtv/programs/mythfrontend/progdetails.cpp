@@ -82,7 +82,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, const QDateTime& sta
 
     QString ratings;
     QMap<QString,QString>::const_iterator it;
-    for (it = main_ratings.begin(); it != main_ratings.end(); ++it)
+    for (it = main_ratings.cbegin(); it != main_ratings.cend(); ++it)
     {
         ratings += it.key() + ": " + *it + ", ";
     }

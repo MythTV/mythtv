@@ -1657,7 +1657,7 @@ void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
     if (map.isEmpty())
         return;
 
-    for (DownloadMap::const_iterator i = map.begin(); i != map.end(); ++i)
+    for (DownloadMap::const_iterator i = map.cbegin(); i != map.cend(); ++i)
     {
         VideoArtworkType type = i.key();
         const ArtworkInfo& info = i.value();

@@ -332,8 +332,7 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
 {
     ArtworkMap map = GetArtwork(sInetref, nSeason);
 
-    for (ArtworkMap::const_iterator i = map.begin();
-         i != map.end(); ++i)
+    for (auto i = map.cbegin(); i != map.cend(); ++i)
     {
         DTC::ArtworkInfo *pArtInfo = pArtworkInfoList->AddNewArtworkInfo();
         pArtInfo->setFileName(i.value().url);
@@ -624,7 +623,7 @@ void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
     {
         rInfo->QueryCutList(markMap);
 
-        for (it = markMap.begin(); it != markMap.end(); ++it)
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
         {
             bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
@@ -670,7 +669,7 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
     {
         rInfo->QueryCommBreakList(markMap);
 
-        for (it = markMap.begin(); it != markMap.end(); ++it)
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
         {
             bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
             if (marktype == 0)
@@ -716,7 +715,7 @@ void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
     {
         rInfo->QueryPositionMap(markMap, marktype);
 
-        for (it = markMap.begin(); it != markMap.end(); ++it)
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
         {
             DTC::Cutting *pCutting = pCutList->AddNewCutting();
             pCutting->setMark(it.key());

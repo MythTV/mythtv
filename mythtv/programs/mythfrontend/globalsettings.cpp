@@ -904,11 +904,11 @@ void PlaybackProfileItemConfig::Load(void)
     QString     dech = VideoDisplayProfile::GetDecoderHelp();
     QStringList decr = VideoDisplayProfile::GetDecoders();
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
-    QStringList::const_iterator itr = decr.begin();
-    QStringList::const_iterator itn = decn.begin();
+    QStringList::const_iterator itr = decr.cbegin();
+    QStringList::const_iterator itn = decn.cbegin();
     m_decoder->clearSelections();
     m_decoder->setHelpText(dech);
-    for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
+    for (; (itr != decr.cend()) && (itn != decn.cend()); ++itr, ++itn)
     {
         m_decoder->addSelection(*itn, *itr, (*itr == pdecoder));
         found |= (*itr == pdecoder);

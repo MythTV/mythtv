@@ -478,7 +478,7 @@ bool Channel::UpdateVideoSource( uint          nSourceId,
                   .arg(settings));
     bindings[":SOURCEID"] = nSourceId;
 
-    for (it = bindings.begin(); it != bindings.end(); ++it)
+    for (it = bindings.cbegin(); it != bindings.cend(); ++it)
         query.bindValue(it.key(), it.value());
 
     if (!query.exec())

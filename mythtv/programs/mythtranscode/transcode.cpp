@@ -308,7 +308,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (deleteMap.empty())
             m_proginfo->QueryCutList(deleteMap);
 
-        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+        for (it = deleteMap.cbegin(); it != deleteMap.cend(); ++it)
         {
             if (*it)
             {

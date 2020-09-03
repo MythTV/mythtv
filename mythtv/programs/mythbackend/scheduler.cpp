@@ -1056,13 +1056,13 @@ bool Scheduler::IsSameProgram(
     const RecordingInfo *a, const RecordingInfo *b) const
 {
     IsSameKey X(a,b);
-    IsSameCacheType::const_iterator it = m_cacheIsSameProgram.find(X);
-    if (it != m_cacheIsSameProgram.end())
+    IsSameCacheType::const_iterator it = m_cacheIsSameProgram.constFind(X);
+    if (it != m_cacheIsSameProgram.constEnd())
         return *it;
 
     IsSameKey Y(b,a);
-    it = m_cacheIsSameProgram.find(Y);
-    if (it != m_cacheIsSameProgram.end())
+    it = m_cacheIsSameProgram.constFind(Y);
+    if (it != m_cacheIsSameProgram.constEnd())
         return *it;
 
     return m_cacheIsSameProgram[X] = a->IsDuplicateProgram(*b);
@@ -2268,7 +2268,7 @@ void Scheduler::ResetDuplicates(uint recordid, uint findid,
                   .arg(kDontRecord)
                   + filterClause);
     MSqlBindings::const_iterator it;
-    for (it = bindings.begin(); it != bindings.end(); ++it)
+    for (it = bindings.cbegin(); it != bindings.cend(); ++it)
         query.bindValue(it.key(), it.value());
     if (!query.exec())
         MythDB::DBError("ResetDuplicates1", query);
@@ -3993,7 +3993,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
                           "WHERE recordmatch.chanid = channel.chanid")
                   + deleteClause);
     MSqlBindings::const_iterator it;
-    for (it = bindings.begin(); it != bindings.end(); ++it)
+    for (it = bindings.cbegin(); it != bindings.cend(); ++it)
         query.bindValue(it.key(), it.value());
     if (!query.exec())
     {
@@ -4101,7 +4101,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         MSqlQuery result(m_dbConn);
         result.prepare(query2);
 
-        for (it = bindings.begin(); it != bindings.end(); ++it)
+        for (it = bindings.cbegin(); it != bindings.cend(); ++it)
         {
             if (query2.contains(it.key()))
                 result.bindValue(it.key(), it.value());

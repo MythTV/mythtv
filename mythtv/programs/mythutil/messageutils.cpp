@@ -121,7 +121,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     // cases
     QMap<QString,QString>::const_iterator i;
     QMap<QString,QString> extras = cmdline.GetExtra();
-    for (i = extras.begin(); i != extras.end(); ++i)
+    for (i = extras.cbegin(); i != extras.cend(); ++i)
     {
         QString kv_name = i.key();
         const QString& kv_value = i.value();

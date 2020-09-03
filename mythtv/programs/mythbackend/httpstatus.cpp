@@ -444,8 +444,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     // Make a temporary list to hold the per-filesystem elements so that the
     // total is always the first element.
     QList<QDomElement> fsXML;
-    QStringList::const_iterator sit = strlist.begin();
-    while (sit != strlist.end())
+    QStringList::const_iterator sit = strlist.cbegin();
+    while (sit != strlist.cend())
     {
         // cppcheck-suppress unreadVariable
         hostname   = *(sit++);

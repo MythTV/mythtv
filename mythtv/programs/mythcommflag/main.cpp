@@ -201,7 +201,7 @@ static int CopySkipListToCutList(uint chanid, const QDateTime& starttime)
     }
 
     pginfo.QueryCommBreakList(cutlist);
-    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
     {
         if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
@@ -298,7 +298,7 @@ static int GetMarkupList(const QString& list, uint chanid, const QDateTime& star
         pginfo.QueryCommBreakList(cutlist);
 
     uint64_t lastStart = 0;
-    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    for (it = cutlist.cbegin(); it != cutlist.cend(); ++it)
     {
         if ((*it == MARK_COMM_START) ||
             (*it == MARK_CUT_START))

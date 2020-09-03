@@ -354,13 +354,13 @@ bool PlaybackSock::IsBusy(int capturecardnum, InputInfo *busy_input,
 
     if (!strlist.isEmpty())
     {
-        QStringList::const_iterator it = strlist.begin();
+        QStringList::const_iterator it = strlist.cbegin();
         state = ((*it).toInt() != 0);
 
         if (busy_input)
         {
             ++it;
-            if (!busy_input->FromStringList(it, strlist.end()))
+            if (!busy_input->FromStringList(it, strlist.cend()))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "IsBusy: "
                     "Failed to parse response to " +
