@@ -993,20 +993,19 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 {
     QString     vrenderer = m_vidRend->getValue();
     QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
-    QStringList::const_iterator it;
 
     QString prenderer;
-    for (it = renderers.begin(); it != renderers.end(); ++it)
-        prenderer = (*it == vrenderer) ? vrenderer : prenderer;
+    for (const auto & rend : qAsConst(renderers))
+        prenderer = (rend == vrenderer) ? vrenderer : prenderer;
     if (prenderer.isEmpty())
         prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
 
     m_vidRend->clearSelections();
-    for (it = renderers.begin(); it != renderers.end(); ++it)
+    for (const auto & rend : qAsConst(renderers))
     {
-        if ((!(*it).contains("null")))
-            m_vidRend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
-                                    *it, (*it == prenderer));
+        if ((!rend.contains("null")))
+            m_vidRend->addSelection(VideoDisplayProfile::GetVideoRendererName(rend),
+                                    rend, (rend == prenderer));
     }
     QString vrenderer2 = m_vidRend->getValue();
     vrenderChanged(vrenderer2);
@@ -1328,12 +1327,11 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
         VideoDisplayProfile::SetDefaultProfileName(profile, host);
     }
 
-    QStringList::const_iterator it;
-    for (it = profiles.begin(); it != profiles.end(); ++it)
+    for (const auto & prof : qAsConst(profiles))
     {
-        grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
-        grouptrigger->addTargetedChild(*it,
-            new PlaybackProfileConfig(*it, grouptrigger));
+        grouptrigger->addSelection(ProgramInfo::i18n(prof), prof);
+        grouptrigger->addTargetedChild(prof,
+            new PlaybackProfileConfig(prof, grouptrigger));
     }
 
     return grouptrigger;

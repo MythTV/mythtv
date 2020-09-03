@@ -601,16 +601,15 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
     else
         frontends = gBackendContext->GetFrontends();
 
-    QMap<QString, Frontend*>::const_iterator it;
-    for (it = frontends.begin(); it != frontends.end(); ++it)
+    for (auto * fe : qAsConst(frontends))
     {
         DTC::Frontend *pFrontend = pList->AddNewFrontend();
-        pFrontend->setName((*it)->m_name);
-        pFrontend->setIP((*it)->m_ip.toString());
+        pFrontend->setName(fe->m_name);
+        pFrontend->setIP(fe->m_ip.toString());
         int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
-                                                        (*it)->m_name, 6547);
+                                                        fe->m_name, 6547);
         pFrontend->setPort(port);
-        pFrontend->setOnLine((*it)->m_connectionCount > 0);
+        pFrontend->setOnLine(fe->m_connectionCount > 0);
     }
 
     return pList;

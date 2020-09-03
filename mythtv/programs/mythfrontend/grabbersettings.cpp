@@ -77,40 +77,37 @@ void GrabberSettings::Load(void)
 
 void GrabberSettings::Init(void)
 {
-    for (GrabberList::const_iterator it = m_movieGrabberList.begin();
-         it != m_movieGrabberList.end(); ++it)
+    for (const auto & grabber : qAsConst(m_movieGrabberList))
     {
         InfoMap map;
-        it->toMap(map);
+        grabber.toMap(map);
         auto *item = new MythUIButtonListItem(m_movieGrabberButtonList,
-                                              it->GetName());
-        item->SetData(it->GetRelPath());
+                                              grabber.GetName());
+        item->SetData(grabber.GetRelPath());
         item->SetTextFromMap(map);
     }
 
     m_movieGrabberList.clear();
 
-    for (GrabberList::const_iterator it = m_tvGrabberList.begin();
-         it != m_tvGrabberList.end(); ++it)
+    for (const auto & grabber: qAsConst(m_tvGrabberList))
     {
         InfoMap map;
-        it->toMap(map);
+        grabber.toMap(map);
         auto *item = new MythUIButtonListItem(m_tvGrabberButtonList,
-                                              it->GetName());
-        item->SetData(it->GetRelPath());
+                                              grabber.GetName());
+        item->SetData(grabber.GetRelPath());
         item->SetTextFromMap(map);
     }
 
     m_tvGrabberList.clear();
 
-    for (GrabberList::const_iterator it = m_gameGrabberList.begin();
-         it != m_gameGrabberList.end(); ++it)
+    for (const auto & grabber : qAsConst(m_gameGrabberList))
     {
         InfoMap map;
-        it->toMap(map);
+        grabber.toMap(map);
         auto *item = new MythUIButtonListItem(m_gameGrabberButtonList,
-                                              it->GetName());
-        item->SetData(it->GetRelPath());
+                                              grabber.GetName());
+        item->SetData(grabber.GetRelPath());
         item->SetTextFromMap(map);
     }
 

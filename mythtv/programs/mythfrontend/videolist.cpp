@@ -243,9 +243,9 @@ static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
         path.clear();
     }
 
-    for (QStringList::const_iterator p = path.begin(); p != path.end(); ++p)
+    for (const auto & dir : qAsConst(path))
     {
-        smart_dir_node sdn = start->addSubDir(*p, "" , host, prefix);
+        smart_dir_node sdn = start->addSubDir(dir, "" , host, prefix);
         start = sdn.get();
     }
 
@@ -1003,12 +1003,10 @@ void VideoListImp::buildFsysList()
     QStringList dirs = GetVideoDirs();
     if (dirs.size() > 1)
     {
-        for (QStringList::const_iterator iter = dirs.begin();
-             iter != dirs.end(); ++iter)
+        for (const auto & dir : qAsConst(dirs))
         {
             node_paths.push_back(
-                node_to_path_list::value_type(path_to_node_name(*iter),
-                                              *iter));
+                node_to_path_list::value_type(path_to_node_name(dir), dir));
         }
     }
     else

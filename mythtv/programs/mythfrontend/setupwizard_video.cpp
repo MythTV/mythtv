@@ -92,11 +92,10 @@ void VideoSetupWizard::loadData(void)
 {
     QStringList profiles = VideoDisplayProfile::GetProfiles(gCoreContext->GetHostName());
 
-    for (QStringList::const_iterator i = profiles.begin();
-         i != profiles.end(); ++i)
+    for (const auto & prof : qAsConst(profiles))
     {
-        auto *item = new MythUIButtonListItem(m_playbackProfileButtonList, *i);
-        item->SetData(*i);
+        auto *item = new MythUIButtonListItem(m_playbackProfileButtonList, prof);
+        item->SetData(prof);
     }
 
     QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());

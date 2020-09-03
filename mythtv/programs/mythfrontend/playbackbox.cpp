@@ -3586,11 +3586,10 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
 {
     QString forceDeleteStr("0");
 
-    QList<uint>::const_iterator it;
     QStringList list;
-    for (it = m_playList.begin(); it != m_playList.end(); ++it)
+    for (int id : qAsConst(m_playList))
     {
-        ProgramInfo *tmpItem = FindProgramInUILists(*it);
+        ProgramInfo *tmpItem = FindProgramInUILists(id);
         if (tmpItem && tmpItem->QueryIsDeleteCandidate())
         {
             tmpItem->SetAvailableStatus(asPendingDelete, "PlaylistDelete");
@@ -5011,10 +5010,9 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     if (m_opOnPlaylist)
     {
-        QList<uint>::const_iterator it;
-        for (it = m_playList.begin(); it != m_playList.end(); ++it )
+        for (int id : qAsConst(m_playList))
         {
-            ProgramInfo *p = FindProgramInUILists(*it);
+            ProgramInfo *p = FindProgramInUILists(id);
             if (!p)
                 continue;
 

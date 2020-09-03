@@ -5731,20 +5731,20 @@ bool Scheduler::CreateConflictLists(void)
         while (checkset != fullset)
         {
             checkset = fullset;
-            for (sit = checkset.begin(); sit != checkset.end(); ++sit)
-                fullset += inputSets[*sit];
+            for (int item : qAsConst(checkset))
+                fullset += inputSets[item];
         }
 
         // Create a new conflict list for the resulting set of inputs
         // and point each inputs list at it.
         auto *conflictlist = new RecList();
         m_conflictLists.push_back(conflictlist);
-        for (sit = checkset.begin(); sit != checkset.end(); ++sit)
+        for (int item : qAsConst(checkset))
         {
             LOG(VB_SCHEDULE, LOG_INFO,
                 QString("Assigning input %1 to conflict set %2")
-                .arg(*sit).arg(m_conflictLists.size()));
-            m_sinputInfoMap[*sit].m_conflictList = conflictlist;
+                .arg(item).arg(m_conflictLists.size()));
+            m_sinputInfoMap[item].m_conflictList = conflictlist;
         }
     }
 

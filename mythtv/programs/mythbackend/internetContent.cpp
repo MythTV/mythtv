@@ -161,10 +161,9 @@ void InternetContent::GetInternetSources( HTTPRequest *pRequest )
     QDir GrabberPath(GrabberDir);
     QStringList Grabbers = GrabberPath.entryList(QDir::Files | QDir::Executable);
 
-    for (QStringList::const_iterator i = Grabbers.begin();
-            i != Grabbers.end(); ++i)
+    for (const auto & name : qAsConst(Grabbers))
     {
-        QString commandline = GrabberDir + (*i);
+        QString commandline = GrabberDir + name;
         MythSystemLegacy scriptcheck(commandline, QStringList("-v"),
                                kMSRunShell | kMSStdOut);
         scriptcheck.Run();

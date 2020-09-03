@@ -2078,13 +2078,13 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             QFileInfo fi(filename);
             QDir dir = fi.absoluteDir();
-            for (it = checkfiles.begin(); it != checkfiles.end(); ++it)
+            for (const auto & file : qAsConst(checkfiles))
             {
-                if (dir.exists(*it) &&
-                    ((*it).endsWith(".srt") ||
-                     QFileInfo(dir, *it).size() >= kReadTestSize))
+                if (dir.exists(file) &&
+                    ((file).endsWith(".srt") ||
+                     QFileInfo(dir, file).size() >= kReadTestSize))
                 {
-                    retlist<<*it;
+                    retlist<<file;
                 }
             }
         }
@@ -6938,14 +6938,10 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
     }
 
     QStringList scripts;
-    QFileInfoList::const_iterator it = list.begin();
-
-    while (it != list.end())
+    for (const auto & fi : qAsConst(list))
     {
-        const QFileInfo *fi = &(*it);
-        ++it;
-        LOG(VB_FILE, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi->filePath()));
-        scripts.append(fi->filePath());
+        LOG(VB_FILE, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi.filePath()));
+        scripts.append(fi.filePath());
     }
 
     QStringList grabbers;

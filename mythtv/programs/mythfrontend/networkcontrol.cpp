@@ -338,10 +338,8 @@ void NetworkControl::deleteClient(void)
 
     gCoreContext->SendSystemEvent("NET_CTRL_DISCONNECTED");
 
-    QList<NetworkControlClient *>::const_iterator it;
-    for (it = m_clients.begin(); it != m_clients.end(); ++it)
+    for (auto * ncc : qAsConst(m_clients))
     {
-        NetworkControlClient *ncc = *it;
         if (ncc->getSocket()->state() == QTcpSocket::UnconnectedState)
         {
             deleteClient(ncc);
@@ -1633,10 +1631,8 @@ void NetworkControl::customEvent(QEvent *e)
             }
             else //send to all clients
             {
-                QList<NetworkControlClient *>::const_iterator it;
-                for (it = m_clients.begin(); it != m_clients.end(); ++it)
+                for (auto * ncc2 : qAsConst(m_clients))
                 {
-                    NetworkControlClient *ncc2 = *it;
                     if (ncc2)
                         sendReplyToClient(ncc2, reply);
                 }

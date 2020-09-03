@@ -157,11 +157,8 @@ namespace
         if (sgroup == "Banners")
             suffix = "banner";
 
-        for (QList<QByteArray>::const_iterator it = image_types.begin();
-                it != image_types.end(); ++it)
-        {
-            image_exts.insert(QString(*it).toLower());
-        }
+        for (const auto & itype : qAsConst(image_types))
+            image_exts.insert(QString(itype).toLower());
 
         if (!host.isEmpty())
         {
@@ -198,12 +195,11 @@ namespace
                 sfn += hntm.arg(video_uid + "_%1").arg(suffix).arg(ext);
                 }
 
-                for (QStringList::const_iterator i = sfn.begin();
-                        i != sfn.end(); ++i)
+                for (const auto & str : qAsConst(sfn))
                 {
-                    if (hostFiles.contains(*i))
+                    if (hostFiles.contains(str))
                     {
-                        image = *i;
+                        image = str;
                         return true;
                     }
                 }
@@ -212,10 +208,9 @@ namespace
 
         const QString fntm("%1/%2.%3");
 
-        for (QStringList::const_iterator dir = search_dirs.begin();
-                dir != search_dirs.end(); ++dir)
+        for (const auto & dir : qAsConst(search_dirs))
         {
-            if (!(*dir).length()) continue;
+            if (!dir.length()) continue;
 
             for (const auto & ext : image_exts)
             {
@@ -224,7 +219,7 @@ namespace
                 {
                     if (isScreenshot)
                     {
-                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3_%4")
+                        sfn += fntm.arg(dir).arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
@@ -232,7 +227,7 @@ namespace
                     }
                     else if (!isScreenshot)
                     {
-                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3")
+                        sfn += fntm.arg(dir).arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(ext);
@@ -240,20 +235,19 @@ namespace
                 }
                 if (!isScreenshot)
                 {
-                sfn += fntm.arg(*dir)
+                sfn += fntm.arg(dir)
                     .arg(base_name + QString("_%1").arg(suffix))
                     .arg(ext);
-                sfn += fntm.arg(*dir)
+                sfn += fntm.arg(dir)
                     .arg(video_uid + QString("_%1").arg(suffix))
                     .arg(ext);
                 }
 
-                for (QStringList::const_iterator i = sfn.begin();
-                        i != sfn.end(); ++i)
+                for (const auto & file : qAsConst(sfn))
                 {
-                    if (QFile::exists(*i))
+                    if (QFile::exists(file))
                     {
-                        image = *i;
+                        image = file;
                         return true;
                     }
                 }
@@ -708,11 +702,10 @@ class VideoDialogPrivate
                         ratingstring.split(':', Qt::SkipEmptyParts);
 #endif
 
-                for (QStringList::const_iterator p = ratings.begin();
-                    p != ratings.end(); ++p)
+                for (const auto & rating : qAsConst(ratings))
                 {
                     m_ratingToPl.push_back(
-                        parental_level_map::value_type(*p, sl.GetLevel()));
+                        parental_level_map::value_type(rating, sl.GetLevel()));
                 }
             }
             m_ratingToPl.sort(std::binary_negate(rating_to_pl_less()));
@@ -1199,20 +1192,19 @@ void VideoDialog::loadData()
         using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_d->m_currentNode->getAllChildren();
 
-        for (MGTreeChildList::const_iterator p = lchildren->begin();
-                p != lchildren->end(); ++p)
+        for (auto * child : qAsConst(*lchildren))
         {
-            if (*p != nullptr)
+            if (child != nullptr)
             {
                 auto *item =
                         new MythUIButtonListItem(m_videoButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
-                item->SetData(QVariant::fromValue(*p));
+                item->SetData(QVariant::fromValue(child));
 
                 UpdateItem(item);
 
-                if (*p == selectedNode)
+                if (child == selectedNode)
                     m_videoButtonList->SetItemCurrent(item);
             }
         }
@@ -1368,10 +1360,9 @@ QString VideoDialog::RemoteImageCheck(const QString& host, const QString& filena
 
     if (!dirs.isEmpty())
     {
-        for (QStringList::const_iterator iter = dirs.begin();
-             iter != dirs.end(); ++iter)
+        for (const auto & dir : qAsConst(dirs))
         {
-            QUrl sgurl = *iter;
+            QUrl sgurl = dir;
             QString path = sgurl.path();
 
             QString fname = QString("%1/%2").arg(path).arg(filename);
@@ -1399,7 +1390,7 @@ QString VideoDialog::RemoteImageCheck(const QString& host, const QString& filena
 #if 0
                 LOG(VB_GENERAL, LOG_DEBUG,
                     QString("RemoteImageCheck(%1) res :%2: :%3:")
-                        .arg(fname).arg(result).arg(*iter));
+                        .arg(fname).arg(result).arg(dir));
 #endif
                 break;
             }
@@ -1430,10 +1421,8 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     test_files.append(filename + ".jpeg");
     test_files.append(filename + ".gif");
 
-    for (QStringList::const_iterator tfp = test_files.begin();
-            tfp != test_files.end(); ++tfp)
+    for (auto imagePath : qAsConst(test_files))
     {
-        QString imagePath = *tfp;
         bool foundCover = false;
         if (!host.isEmpty())
         {
@@ -1483,10 +1472,9 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 
             if (!dirs.isEmpty())
             {
-                for (QStringList::const_iterator iter = dirs.begin();
-                     iter != dirs.end(); ++iter)
+                for (const auto & dir : qAsConst(dirs))
                 {
-                    QUrl sgurl = *iter;
+                    QUrl sgurl = dir;
                     QString path = sgurl.path();
 
                     const QString& subdir = prefix;
@@ -1497,10 +1485,9 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 
                     if (ok)
                     {
-                        for (QStringList::const_iterator pattern = imageTypes.begin();
-                             pattern != imageTypes.end(); ++pattern)
+                        for (const auto & pattern : qAsConst(imageTypes))
                         {
-                            QRegExp rx(*pattern);
+                            QRegExp rx(pattern);
                             rx.setPatternSyntax(QRegExp::Wildcard);
                             rx.setCaseSensitivity(Qt::CaseInsensitive);
                             QStringList matches = tmpList.filter(rx);
@@ -1589,12 +1576,10 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         test_files.append(filename + ".jpeg");
         test_files.append(filename + ".gif");
 
-        for (QStringList::const_iterator tfp = test_files.begin();
-                tfp != test_files.end(); ++tfp)
+        for (auto imagePath : qAsConst(test_files))
         {
-            QString imagePath = *tfp;
 #if 0
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Cover check :%1 : ").arg(*tfp));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Cover check :%1 : ").arg(imagePath));
 #endif
 
             bool foundCover = false;
@@ -1641,10 +1626,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
                 if (!dirs.isEmpty())
                 {
-                    for (QStringList::const_iterator iter = dirs.begin();
-                         iter != dirs.end(); ++iter)
+                    for (const auto & dir : qAsConst(dirs))
                     {
-                        QUrl sgurl = *iter;
+                        QUrl sgurl = dir;
                         QString path = sgurl.path();
 
                         QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 1));
@@ -1656,10 +1640,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
                         if (ok)
                         {
-                            for (QStringList::const_iterator pattern = imageTypes.begin();
-                                 pattern != imageTypes.end(); ++pattern)
+                            for (const auto & pattern : qAsConst(imageTypes))
                             {
-                                QRegExp rx(*pattern);
+                                QRegExp rx(pattern);
                                 rx.setPatternSyntax(QRegExp::Wildcard);
                                 rx.setCaseSensitivity(Qt::CaseInsensitive);
                                 QStringList matches = tmpList.filter(rx);
@@ -3487,21 +3470,20 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("Fetching details in %1").arg(node->GetText()));
 
-    for (MGTreeChildList::const_iterator p = lchildren->begin();
-            p != lchildren->end(); ++p)
+    for (auto * child : qAsConst(*lchildren))
     {
-        if (((*p)->getInt() == kSubFolder) ||
-            ((*p)->getInt() == kUpFolder))
-            VideoAutoSearch((*p));
+        if ((child->getInt() == kSubFolder) ||
+            (child->getInt() == kUpFolder))
+            VideoAutoSearch(child);
         else
         {
-            VideoMetadata *metadata = GetMetadataPtrFromNode((*p));
+            VideoMetadata *metadata = GetMetadataPtrFromNode(child);
 
             if (!metadata)
                 continue;
 
             if (!metadata->GetProcessed())
-                VideoSearch((*p), true);
+                VideoSearch(child, true);
         }
     }
 }
@@ -3768,25 +3750,18 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
     QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
-    for (QList<PersonInfo>::const_iterator p = gueststars.begin();
-        p != gueststars.end(); ++p)
-    {
-        actors.append(*p);
-    }
+    for (const auto & name : qAsConst(gueststars))
+        actors.append(name);
 
     VideoMetadata::cast_list cast;
     QStringList cl;
 
-    for (QList<PersonInfo>::const_iterator p = actors.begin();
-        p != actors.end(); ++p)
-    {
-        cl.append((*p).name);
-    }
+    for (const auto & person : qAsConst(actors))
+        cl.append(person.name);
 
-    for (QStringList::const_iterator p = cl.begin();
-        p != cl.end(); ++p)
+    for (const auto & name : qAsConst(cl))
     {
-        QString cn = (*p).trimmed();
+        QString cn = name.trimmed();
         if (cn.length())
         {
             cast.push_back(VideoMetadata::cast_list::
@@ -3800,10 +3775,9 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     VideoMetadata::genre_list video_genres;
     QStringList genres = lookup->GetCategories();
 
-    for (QStringList::const_iterator p = genres.begin();
-        p != genres.end(); ++p)
+    for (const auto & name : qAsConst(genres))
     {
-        QString genre_name = (*p).trimmed();
+        QString genre_name = name.trimmed();
         if (genre_name.length())
         {
             video_genres.push_back(
@@ -3817,10 +3791,9 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     VideoMetadata::country_list video_countries;
     QStringList countries = lookup->GetCountries();
 
-    for (QStringList::const_iterator p = countries.begin();
-        p != countries.end(); ++p)
+    for (const auto & name : qAsConst(countries))
     {
-        QString country_name = (*p).trimmed();
+        QString country_name = name.trimmed();
         if (country_name.length())
         {
             video_countries.push_back(
