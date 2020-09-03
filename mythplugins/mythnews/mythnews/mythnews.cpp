@@ -552,9 +552,9 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
     QMutexLocker locker(&m_lock);
 
     QMap<MythUIButtonListItem*,NewsArticle>::const_iterator it =
-        m_articles.find(articlesListItem);
+        m_articles.constFind(articlesListItem);
 
-    if (it == m_articles.end())
+    if (it == m_articles.constEnd())
         return;
 
     const NewsArticle article = *it;

@@ -589,7 +589,7 @@ void Dbase::CachePut(const Cddb::Album& album)
 bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
 {
     bool ret = false;
-    for (cache_t::const_iterator it = s_cache.find(discID); it != s_cache.end(); ++it)
+    for (auto it = s_cache.constFind(discID); it != s_cache.constEnd(); ++it)
     {
         if (it->discID == discID)
         {

@@ -1893,7 +1893,7 @@ static int64_t getFrameCount(const QString &filename, float fps)
     if (posMap.empty())
         return 0; // no position map in recording
 
-    frm_pos_map_t::const_iterator it = posMap.end();
+    frm_pos_map_t::const_iterator it = posMap.cend();
     --it;
     uint64_t totframes = it.key() * keyframedist;
     return totframes;

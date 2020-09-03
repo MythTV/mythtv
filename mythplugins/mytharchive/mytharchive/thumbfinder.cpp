@@ -264,15 +264,15 @@ void ThumbFinder::loadCutList()
     }
 
     // if the first mark is a end mark then add the start mark at the beginning
-    frm_dir_map_t::const_iterator it = m_deleteMap.begin();
+    frm_dir_map_t::const_iterator it = m_deleteMap.constBegin();
     if (it.value() == MARK_CUT_END)
         m_deleteMap.insert(0, MARK_CUT_START);
 
 
     // if the last mark is a start mark then add the end mark at the end
-    it = m_deleteMap.end();
+    it = m_deleteMap.constEnd();
     --it;
-    if (it != m_deleteMap.end())
+    if (it != m_deleteMap.constEnd())
     {
         if (it.value() == MARK_CUT_START)
             m_deleteMap.insert(m_archiveItem->duration * m_fps, MARK_CUT_END);
@@ -628,14 +628,14 @@ int ThumbFinder::checkFramePosition(int frameNumber)
         return frameNumber;
 
     int diff = 0;
-    frm_dir_map_t::const_iterator it = m_deleteMap.find(frameNumber);
+    frm_dir_map_t::const_iterator it = m_deleteMap.constFind(frameNumber);
 
-    for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+    for (it = m_deleteMap.constBegin(); it != m_deleteMap.constEnd(); ++it)
     {
         int start = it.key();
 
         ++it;
-        if (it == m_deleteMap.end())
+        if (it == m_deleteMap.constEnd())
         {
             LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
             break;
@@ -689,7 +689,7 @@ bool ThumbFinder::seekForward()
     {
         int pos = 0;
         frm_dir_map_t::const_iterator it;
-        for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+        for (it = m_deleteMap.constBegin(); it != m_deleteMap.constEnd(); ++it)
         {
             if (it.key() > (uint64_t)currentFrame)
             {
@@ -726,7 +726,7 @@ bool ThumbFinder::seekBackward()
         // seek to previous cut point
         frm_dir_map_t::const_iterator it;
         int pos = 0;
-        for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+        for (it = m_deleteMap.constBegin(); it != m_deleteMap.constEnd(); ++it)
         {
             if (it.key() >= (uint64_t)currentFrame)
                 break;
@@ -883,14 +883,14 @@ void ThumbFinder::updatePositionBar(int64_t frame)
 
     brush.setColor(Qt::red);
 
-    for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+    for (it = m_deleteMap.constBegin(); it != m_deleteMap.constEnd(); ++it)
     {
         double startdelta = size.width();
         if (it.key() != 0)
             startdelta = (m_archiveItem->duration * m_fps) / it.key();
 
         ++it;
-        if (it == m_deleteMap.end())
+        if (it == m_deleteMap.constEnd())
         {
             LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
             break;
@@ -929,12 +929,12 @@ int ThumbFinder::calcFinalDuration()
 
             int cutLen = 0;
 
-            for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+            for (it = m_deleteMap.constBegin(); it != m_deleteMap.constEnd(); ++it)
             {
                 int start = it.key();
 
                 ++it;
-                if (it == m_deleteMap.end())
+                if (it == m_deleteMap.constEnd())
                 {
                     LOG(VB_GENERAL, LOG_ERR, "ThumbFinder: found a start cut but no cut end");
                     break;
