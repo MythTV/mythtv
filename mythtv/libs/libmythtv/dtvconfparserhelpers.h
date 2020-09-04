@@ -204,7 +204,7 @@ class DTVInversion : public DTVParamHelper
     QChar   toChar() const
         {
             if (toString().length() > 0)
-                return toString()[0];
+                return toString().at(0);
             return {0};
         }
 
@@ -267,7 +267,7 @@ class DTVBandwidth : public DTVParamHelper
     QChar   toChar() const
         {
             if (toString().length() > 0)
-                return toString()[0];
+                return toString().at(0);
             return {0};
         }
 
@@ -474,7 +474,7 @@ class DTVTransmitMode : public DTVParamHelper
     QChar   toChar() const
         {
             if (toString().length() > 0)
-                return toString()[0];
+                return toString().at(0);
             return {0};
         }
 
@@ -592,7 +592,7 @@ class DTVHierarchy : public DTVParamHelper
     QChar   toChar() const
         {
             if (toString().length() > 0)
-                return toString()[0];
+                return toString().at(0);
             return {0};
         }
 
@@ -631,7 +631,7 @@ class DTVPolarity : public DTVParamHelper
     QChar   toChar() const
         {
             if (toString().length() > 0)
-                return toString()[0];
+                return toString().at(0);
             return {0};
         }
 

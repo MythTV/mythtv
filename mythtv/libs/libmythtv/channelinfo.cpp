@@ -230,7 +230,7 @@ void ChannelInfo::ToMap(InfoMap& infoMap)
     infoMap["channelvisible"] = m_visible ? QObject::tr("Yes") : QObject::tr("No");
 
     if (!GetGroupIds().isEmpty())
-        infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(GetGroupIds().first());
+        infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(GetGroupIds().constFirst());
 }
 
 void ChannelInfo::LoadInputIds()

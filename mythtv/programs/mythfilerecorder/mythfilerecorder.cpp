@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
     if (!cmdline.toString("infile").isEmpty())
         filename = cmdline.toString("infile");
     else if (!cmdline.GetArgs().empty())
-        filename = cmdline.GetArgs()[0];
+        filename = cmdline.GetArgs().at(0);
 
     Commands recorder;
     recorder.Run(filename, data_rate, loopinput);

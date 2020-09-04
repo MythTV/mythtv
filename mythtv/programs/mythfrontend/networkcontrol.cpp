@@ -512,7 +512,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             QCoreApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
-                  (nc->getArg(curToken)[0].isLetterOrNumber())) ||
+                  (nc->getArg(curToken).at(0).isLetterOrNumber())) ||
                  ((tokenLen >= 1) &&
                   (nc->getArg(curToken).contains("+"))))
         {

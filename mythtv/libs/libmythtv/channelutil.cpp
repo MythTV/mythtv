@@ -303,11 +303,11 @@ static void handle_transport_desc(vector<uint> &muxes,
             freq,                  QString(),
             // DVB specific
             (int)tsid,            (int)netid,
-            -1,                   cd.BandwidthString()[0].toLatin1(),
+            -1,                   cd.BandwidthString().at(0).toLatin1(),
             -1,                   'a',
-            cd.TransmissionModeString()[0].toLatin1(),
+            cd.TransmissionModeString().at(0).toLatin1(),
             QString(),                         cd.ConstellationString(),
-            cd.HierarchyString()[0].toLatin1(), cd.CodeRateHPString(),
+            cd.HierarchyString().at(0).toLatin1(), cd.CodeRateHPString(),
             cd.CodeRateLPString(),             cd.GuardIntervalString(),
             QString(),                         QString());
 
@@ -332,7 +332,7 @@ static void handle_transport_desc(vector<uint> &muxes,
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,
-            cd.PolarizationString()[0].toLatin1(), 'a',
+            cd.PolarizationString().at(0).toLatin1(), 'a',
             -1,
             cd.FECInnerString(),  QString(),
             -1,                   QString(),

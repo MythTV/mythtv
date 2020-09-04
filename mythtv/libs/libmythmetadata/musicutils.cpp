@@ -94,17 +94,17 @@ QString filenameFromMetadata(MusicMetadata *track)
             i += rx.matchedLength();
             old_i = i;
 
-            if ((rx.capturedTexts()[1] == "GENRE") && (!track->Genre().isEmpty()))
+            if ((rx.capturedTexts().at(1) == "GENRE") && (!track->Genre().isEmpty()))
                 filename += fixFilename(track->Genre());
 
-            if ((rx.capturedTexts()[1] == "ARTIST")
+            if ((rx.capturedTexts().at(1) == "ARTIST")
                     && (!track->FormatArtist().isEmpty()))
                 filename += fixFilename(track->FormatArtist());
 
-            if ((rx.capturedTexts()[1] == "ALBUM") && (!track->Album().isEmpty()))
+            if ((rx.capturedTexts().at(1) == "ALBUM") && (!track->Album().isEmpty()))
                 filename += fixFilename(track->Album());
 
-            if ((rx.capturedTexts()[1] == "TRACK") && (track->Track() >= 0))
+            if ((rx.capturedTexts().at(1) == "TRACK") && (track->Track() >= 0))
             {
                 QString tempstr = QString::number(track->Track(), 10);
                 if (track->Track() < 10)
@@ -112,11 +112,11 @@ QString filenameFromMetadata(MusicMetadata *track)
                 filename += fixFilename(tempstr);
             }
 
-            if ((rx.capturedTexts()[1] == "TITLE")
+            if ((rx.capturedTexts().at(1) == "TITLE")
                     && (!track->FormatTitle().isEmpty()))
                 filename += fixFilename(track->FormatTitle());
 
-            if ((rx.capturedTexts()[1] == "YEAR") && (track->Year() >= 0))
+            if ((rx.capturedTexts().at(1) == "YEAR") && (track->Year() >= 0))
                 filename += fixFilename(QString::number(track->Year(), 10));
         }
     }

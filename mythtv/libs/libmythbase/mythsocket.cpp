@@ -396,7 +396,7 @@ bool MythSocket::ConnectToHost(const QString &host, quint16 port)
             QHostInfo info = QHostInfo::fromName(host);
             if (!info.addresses().isEmpty())
             {
-                hadr = info.addresses().first();
+                hadr = info.addresses().constFirst();
             }
             else
             {
