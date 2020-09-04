@@ -193,7 +193,6 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   signals:
     void RequestUpdate();
-    void RequestUpdate(const QRect &);
     void RequestRegionUpdate(const QRect &);
     void TakingFocus();
     void LosingFocus();
