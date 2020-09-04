@@ -635,13 +635,13 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
     do
     {
         uint pnum = 0;
-        QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.begin();
+        QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.cbegin();
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("%1/%2 checked")
             .arg(currentEncryptionStatusChecked.size())
             .arg(currentEncryptionStatus.size()));
 #endif
-        while (it != m_currentEncryptionStatus.end())
+        while (it != m_currentEncryptionStatus.cend())
         {
             if (!m_currentEncryptionStatusChecked[it.key()])
             {
@@ -998,8 +998,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (TestNextProgramEncryption())
             return false;
 
-        QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.begin();
-        for (; it != m_currentEncryptionStatus.end(); ++it)
+        QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.cbegin();
+        for (; it != m_currentEncryptionStatus.cend(); ++it)
         {
             m_currentInfo->m_programEncryptionStatus[it.key()] = *it;
 
@@ -1728,9 +1728,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (info.m_chanNum.isEmpty())
         {
             qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = scnChanNums.find(key);
+            QMap<qlonglong, uint>::const_iterator it = scnChanNums.constFind(key);
 
-            if (it != scnChanNums.end())
+            if (it != scnChanNums.constEnd())
             {
                 info.m_chanNum = QString::number(*it);
             }
@@ -1740,9 +1740,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (info.m_chanNum.isEmpty())
         {
             qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = ukChanNums.find(key);
+            QMap<qlonglong, uint>::const_iterator it = ukChanNums.constFind(key);
 
-            if (it != ukChanNums.end())
+            if (it != ukChanNums.constEnd())
             {
                 info.m_chanNum = QString::number(*it);
             }
@@ -1752,9 +1752,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (info.m_chanNum.isEmpty())
         {
             qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = sid_lcn.find(key);
+            QMap<qlonglong, uint>::const_iterator it = sid_lcn.constFind(key);
 
-            if (it != sid_lcn.end())
+            if (it != sid_lcn.constEnd())
             {
                 info.m_chanNum = QString::number(*it);
             }

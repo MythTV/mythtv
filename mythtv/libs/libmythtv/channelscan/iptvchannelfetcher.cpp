@@ -152,8 +152,8 @@ void IPTVChannelFetcher::run(void)
 
     if (!m_isMpts)
     {
-        fbox_chan_map_t::const_iterator it = m_channels.begin();
-        for (uint i = 1; it != m_channels.end(); ++it, ++i)
+        fbox_chan_map_t::const_iterator it = m_channels.cbegin();
+        for (uint i = 1; it != m_channels.cend(); ++it, ++i)
         {
             const QString& channum = it.key();
             QString name    = (*it).m_name;
@@ -439,8 +439,7 @@ static bool parse_chan_info(const QString   &rawdata,
         if (name.isEmpty())
             return false;
 
-        QMap<QString,QString>::const_iterator it = values.begin();
-        for (; it != values.end(); ++it)
+        for (auto it = values.cbegin(); it != values.cend(); ++it)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("parse_chan_info [%1]='%2'")

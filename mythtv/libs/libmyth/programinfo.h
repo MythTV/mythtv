@@ -895,10 +895,10 @@ bool LoadFromScheduler(
 
     hasConflicts = slist[0].toInt();
 
-    QStringList::const_iterator sit = slist.begin()+2;
-    while (sit != slist.end())
+    QStringList::const_iterator sit = slist.cbegin()+2;
+    while (sit != slist.cend())
     {
-        TYPE *p = new TYPE(sit, slist.end());
+        TYPE *p = new TYPE(sit, slist.cend());
         destination.push_back(p);
 
         if (!p->HasPathname() && !p->GetChanID())

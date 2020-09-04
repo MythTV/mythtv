@@ -7087,10 +7087,10 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     }
 
     // Source switching
-    QMap<uint,InputInfo>::const_iterator beg = sources.find(sourceid);
+    QMap<uint,InputInfo>::const_iterator beg = sources.constFind(sourceid);
     QMap<uint,InputInfo>::const_iterator sit = beg;
 
-    if (sit == sources.end())
+    if (sit == sources.constEnd())
     {
         return;
     }
@@ -7098,18 +7098,18 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     if (kNextSource == source_direction)
     {
         ++sit;
-        if (sit == sources.end())
-            sit = sources.begin();
+        if (sit == sources.constEnd())
+            sit = sources.constBegin();
     }
 
     if (kPreviousSource == source_direction)
     {
-        if (sit != sources.begin())
+        if (sit != sources.constBegin())
             --sit;
         else
         {
-            QMap<uint,InputInfo>::const_iterator tmp = sources.begin();
-            while (tmp != sources.end())
+            QMap<uint,InputInfo>::const_iterator tmp = sources.constBegin();
+            while (tmp != sources.constEnd())
             {
                 sit = tmp;
                 ++tmp;
@@ -12170,7 +12170,7 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
 
             ProgramInfo *lastprog = GetLastProgram();
             QMap<QString,ProgramList>::const_iterator Iprog;
-            for (Iprog = m_progLists.begin(); Iprog != m_progLists.end(); ++Iprog)
+            for (Iprog = m_progLists.cbegin(); Iprog != m_progLists.cend(); ++Iprog)
             {
                 const ProgramList &plist = *Iprog;
                 uint progIndex = (uint) plist.size();

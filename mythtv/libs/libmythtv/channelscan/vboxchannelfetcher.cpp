@@ -163,8 +163,8 @@ void VBoxChannelFetcher::run(void)
         .arg(m_channels->size()));
 
     // add the channels to the DB
-    vbox_chan_map_t::const_iterator it = m_channels->begin();
-    for (uint i = 1; it != m_channels->end(); ++it, ++i)
+    vbox_chan_map_t::const_iterator it = m_channels->cbegin();
+    for (uint i = 1; it != m_channels->cend(); ++it, ++i)
     {
         const QString& channum   = it.key();
         QString name      = (*it).m_name;

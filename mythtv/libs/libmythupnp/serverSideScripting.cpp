@@ -240,7 +240,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
                 array.insert(arrayKey, value);
 
-                if ((it + 1) != mapParams.end())
+                if ((it + 1) != mapParams.cend())
                     continue;
             }
 

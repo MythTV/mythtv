@@ -92,11 +92,11 @@ bool MessageHandler::HandleInbound(SocketHandler *sock, QStringList &slist)
  */
 bool MessageHandler::HandleOutbound(SocketHandler */*sock*/, QStringList &slist)
 {
-    QStringList::const_iterator iter = slist.begin();
+    QStringList::const_iterator iter = slist.cbegin();
     QString message = *(iter++);
     QStringList extra_data( *(iter++) );
     ++iter;
-    for (; iter != slist.end(); ++iter)
+    for (; iter != slist.cend(); ++iter)
         extra_data << *iter;
     MythEvent me(message, extra_data);
     gCoreContext->dispatch(me);

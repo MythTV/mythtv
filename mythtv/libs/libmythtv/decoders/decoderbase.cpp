@@ -174,8 +174,7 @@ bool DecoderBase::PosMapFromDb(void)
     m_frameToDurMap.clear();
     m_durToFrameMap.clear();
 
-    for (frm_pos_map_t::const_iterator it = posMap.begin();
-         it != posMap.end(); ++it)
+    for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
     {
         PosMapEntry e = {it.key(), it.key() * m_keyframeDist, *it};
         m_positionMap.push_back(e);
@@ -192,8 +191,7 @@ bool DecoderBase::PosMapFromDb(void)
     }
 
     uint64_t last = 0;
-    for (frm_pos_map_t::const_iterator it = durMap.begin();
-         it != durMap.end(); ++it)
+    for (auto it = durMap.cbegin(); it != durMap.cend(); ++it)
     {
         m_frameToDurMap[it.key()] = it.value();
         m_durToFrameMap[it.value()] = it.key();
@@ -242,8 +240,7 @@ bool DecoderBase::PosMapFromEnc(void)
     long long last_index = 0;
     if (!m_positionMap.empty())
         last_index = m_positionMap.back().index;
-    for (frm_pos_map_t::const_iterator it = posMap.begin();
-         it != posMap.end(); ++it)
+    for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
     {
         if (it.key() <= last_index)
             continue;
@@ -265,12 +262,12 @@ bool DecoderBase::PosMapFromEnc(void)
     bool isEmpty = m_frameToDurMap.empty();
     if (!isEmpty)
     {
-        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.cend();
         --it;
         last_index = it.key();
     }
-    for (frm_pos_map_t::const_iterator it = durMap.begin();
-         it != durMap.end(); ++it)
+    for (frm_pos_map_t::const_iterator it = durMap.cbegin();
+         it != durMap.cend(); ++it)
     {
         if (!isEmpty && it.key() <= last_index)
             continue; // we released the m_positionMapLock for a few ms...
@@ -280,7 +277,7 @@ bool DecoderBase::PosMapFromEnc(void)
 
     if (!m_frameToDurMap.empty())
     {
-        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.cend();
         --it;
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Duration map filled from Encoder to: %1").arg(it.key()));
@@ -523,8 +520,7 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
     }
 
     frm_pos_map_t durMap;
-    for (frm_pos_map_t::const_iterator it = m_frameToDurMap.begin();
-         it != m_frameToDurMap.end(); ++it)
+    for (auto it = m_frameToDurMap.cbegin(); it != m_frameToDurMap.cend(); ++it)
     {
         if (it.key() < first)
             continue;
@@ -1318,7 +1314,7 @@ uint64_t DecoderBase::TranslatePositionFrameToMs(long long position,
     // somewhat arbitrary value).
     if (!m_frameToDurMap.empty())
     {
-        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.cend();
         --it;
         if (position > it.key())
         {

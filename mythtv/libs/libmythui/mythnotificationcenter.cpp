@@ -1293,10 +1293,10 @@ bool NCPrivate::RemoveFirst(void)
     // The top screen is the only currently displayed first, if there's a
     // fullscreen notification displayed, it's the last one
     MythNotificationScreen *top = m_screens.front();
-    QList<MythNotificationScreen *>::const_iterator it = m_screens.end() - 1;
+    QList<MythNotificationScreen *>::const_iterator it = m_screens.cend() - 1;
 
     // loop from last to 2nd
-    for (; it != m_screens.begin(); --it)
+    for (; it != m_screens.cbegin(); --it)
     {
         MythNotificationScreen *s = *it;
 

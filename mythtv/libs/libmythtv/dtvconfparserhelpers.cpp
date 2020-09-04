@@ -65,8 +65,8 @@ void DTVTunerType::initStr(void)
 QString DTVTunerType::toString(int _value)
 {
     QMutexLocker locker(&dtv_tt_canonical_str_lock);
-    QMap<int,QString>::const_iterator it = dtv_tt_canonical_str.find(_value);
-    if (it != dtv_tt_canonical_str.end())
+    QMap<int,QString>::const_iterator it = dtv_tt_canonical_str.constFind(_value);
+    if (it != dtv_tt_canonical_str.constEnd())
         return *it;
     return dtv_tt_canonical_str[kTunerTypeUnknown];
 }

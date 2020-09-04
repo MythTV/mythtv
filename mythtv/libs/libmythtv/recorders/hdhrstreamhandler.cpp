@@ -258,7 +258,7 @@ bool HDHRStreamHandler::UpdateFilters(void)
         range_min.push_back(it.key());
         PIDInfoMap::const_iterator eit = it;
         for (++eit;
-             (eit != m_pidInfo.end()) && (it.key() + 1 == eit.key());
+             (eit != m_pidInfo.cend()) && (it.key() + 1 == eit.key());
              ++it, ++eit);
         range_max.push_back(it.key());
     }

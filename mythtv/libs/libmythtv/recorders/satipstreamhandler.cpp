@@ -130,11 +130,8 @@ bool SatIPStreamHandler::UpdateFilters(void)
     }
     else
     {
-        PIDInfoMap::const_iterator it = m_pidInfo.begin();
-        for (; it != m_pidInfo.end(); ++it)
-        {
+        for (auto it = m_pidInfo.cbegin(); it != m_pidInfo.cend(); ++it)
             pids.append(QString("%1").arg(it.key()));
-        }
     }
 #ifdef DEBUG_PID_FILTERS
     QString msg = QString("PIDS: '%1'").arg(pids.join(","));

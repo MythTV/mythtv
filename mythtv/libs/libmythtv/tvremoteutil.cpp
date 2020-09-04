@@ -146,11 +146,11 @@ vector<InputInfo> RemoteRequestFreeInputInfo(uint excluded_input)
     if (!gCoreContext->SendReceiveStringList(strlist))
         return inputs;
 
-    QStringList::const_iterator it = strlist.begin();
-    while (it != strlist.end())
+    QStringList::const_iterator it = strlist.cbegin();
+    while (it != strlist.cend())
     {
         InputInfo info;
-        if (!info.FromStringList(it, strlist.end()))
+        if (!info.FromStringList(it, strlist.cend()))
             break;
         inputs.push_back(info);
         LOG(VB_CHANNEL, LOG_INFO,
@@ -389,10 +389,10 @@ bool RemoteIsBusy(uint inputid, InputInfo &busy_input)
     if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return true;
 
-    QStringList::const_iterator it = strlist.begin();
+    QStringList::const_iterator it = strlist.cbegin();
     bool state = (*it).toInt() != 0;
     ++it;
-    if (!busy_input.FromStringList(it, strlist.end()))
+    if (!busy_input.FromStringList(it, strlist.cend()))
         state = true; // if there was an error pretend that the input is busy.
 
     return state;

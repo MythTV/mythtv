@@ -283,13 +283,13 @@ QString ContentDescriptor::GetDescription(uint i) const
     QMutexLocker locker(&s_categoryLock);
 
     // Try to get detailed description
-    QMap<uint,QString>::const_iterator it = s_categoryDesc.find(Nibble(i));
-    if (it != s_categoryDesc.end())
+    QMap<uint,QString>::const_iterator it = s_categoryDesc.constFind(Nibble(i));
+    if (it != s_categoryDesc.constEnd())
         return *it;
 
     // Fall back to category description
-    it = s_categoryDesc.find(Nibble1(i)<<4);
-    if (it != s_categoryDesc.end())
+    it = s_categoryDesc.constFind(Nibble1(i)<<4);
+    if (it != s_categoryDesc.constEnd())
         return *it;
 
     // Found nothing? Just return empty string.

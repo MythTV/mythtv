@@ -1095,7 +1095,7 @@ void CommandLineArg::PrintVerbose(void) const
 
       case QVariant::Map:
         tmpmap = m_stored.toMap();
-        for (it = tmpmap.begin(); it != tmpmap.end(); ++it)
+        for (it = tmpmap.cbegin(); it != tmpmap.cend(); ++it)
         {
             if (first)
                 first = false;
@@ -1921,8 +1921,7 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
         if (!smap.isEmpty())
         {
             QVariantMap vmap;
-            QMap<QString, QString>::const_iterator it;
-            for (it = smap.begin(); it != smap.end(); ++it)
+            for (auto it = smap.cbegin(); it != smap.cend(); ++it)
                 vmap[it.key()] = QVariant(it.value());
 
             m_namedArgs["overridesettings"]->Set(QVariant(vmap));
@@ -2174,8 +2173,7 @@ QMap<QString,QString> MythCommandLineParser::toMap(const QString& key) const
             tmp = arg->m_default.toMap();
     }
 
-    QMap<QString, QVariant>::const_iterator i;
-    for (i = tmp.begin(); i != tmp.end(); ++i)
+    for (auto i = tmp.cbegin(); i != tmp.cend(); ++i)
         val[i.key()] = i.value().toString();
 
     return val;

@@ -1183,8 +1183,8 @@ bool MPEGStreamData::HasCachedAllPAT(uint tsid) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    pat_cache_t::const_iterator it = m_cachedPats.find(tsid << 8);
-    if (it == m_cachedPats.end())
+    pat_cache_t::const_iterator it = m_cachedPats.constFind(tsid << 8);
+    if (it == m_cachedPats.constEnd())
         return false;
 
     uint last_section = (*it)->LastSection();
@@ -1192,7 +1192,7 @@ bool MPEGStreamData::HasCachedAllPAT(uint tsid) const
         return true;
 
     for (uint i = 1; i <= last_section; i++)
-        if (m_cachedPats.find((tsid << 8) | i) == m_cachedPats.end())
+        if (m_cachedPats.constFind((tsid << 8) | i) == m_cachedPats.constEnd())
             return false;
 
     return true;
@@ -1219,8 +1219,8 @@ bool MPEGStreamData::HasCachedAllCAT(uint tsid) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    cat_cache_t::const_iterator it = m_cachedCats.find(tsid << 8);
-    if (it == m_cachedCats.end())
+    cat_cache_t::const_iterator it = m_cachedCats.constFind(tsid << 8);
+    if (it == m_cachedCats.constEnd())
         return false;
 
     uint last_section = (*it)->LastSection();
@@ -1228,7 +1228,7 @@ bool MPEGStreamData::HasCachedAllCAT(uint tsid) const
         return true;
 
     for (uint i = 1; i <= last_section; i++)
-        if (m_cachedCats.find((tsid << 8) | i) == m_cachedCats.end())
+        if (m_cachedCats.constFind((tsid << 8) | i) == m_cachedCats.constEnd())
             return false;
 
     return true;
@@ -1255,8 +1255,8 @@ bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::const_iterator it = m_cachedPmts.find(pnum << 8);
-    if (it == m_cachedPmts.end())
+    pmt_cache_t::const_iterator it = m_cachedPmts.constFind(pnum << 8);
+    if (it == m_cachedPmts.constEnd())
         return false;
 
     uint last_section = (*it)->LastSection();
@@ -1264,7 +1264,7 @@ bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
         return true;
 
     for (uint i = 1; i <= last_section; i++)
-        if (m_cachedPmts.find((pnum << 8) | i) == m_cachedPmts.end())
+        if (m_cachedPmts.constFind((pnum << 8) | i) == m_cachedPmts.constEnd())
             return false;
 
     return true;
@@ -1316,8 +1316,8 @@ pat_const_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
     ProgramAssociationTable *pat = nullptr;
 
     uint key = (tsid << 8) | section_num;
-    pat_cache_t::const_iterator it = m_cachedPats.find(key);
-    if (it != m_cachedPats.end())
+    pat_cache_t::const_iterator it = m_cachedPats.constFind(key);
+    if (it != m_cachedPats.constEnd())
         IncrementRefCnt(pat = *it);
 
     return pat;
@@ -1358,8 +1358,8 @@ cat_const_ptr_t MPEGStreamData::GetCachedCAT(uint tsid, uint section_num) const
     ConditionalAccessTable *cat = nullptr;
 
     uint key = (tsid << 8) | section_num;
-    cat_cache_t::const_iterator it = m_cachedCats.find(key);
-    if (it != m_cachedCats.end())
+    cat_cache_t::const_iterator it = m_cachedCats.constFind(key);
+    if (it != m_cachedCats.constEnd())
         IncrementRefCnt(cat = *it);
 
     return cat;
@@ -1401,8 +1401,8 @@ pmt_const_ptr_t MPEGStreamData::GetCachedPMT(
     ProgramMapTable *pmt = nullptr;
 
     uint key = (program_num << 8) | section_num;
-    pmt_cache_t::const_iterator it = m_cachedPmts.find(key);
-    if (it != m_cachedPmts.end())
+    pmt_cache_t::const_iterator it = m_cachedPmts.constFind(key);
+    if (it != m_cachedPmts.constEnd())
         IncrementRefCnt(pmt = *it);
 
     return pmt;

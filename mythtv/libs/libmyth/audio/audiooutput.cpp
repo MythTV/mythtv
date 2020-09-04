@@ -427,8 +427,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 
     if (!alsadevs->empty())
     {
-        for (QMap<QString, QString>::const_iterator i = alsadevs->begin();
-             i != alsadevs->end(); ++i)
+        for (auto i = alsadevs->cbegin(); i != alsadevs->cend(); ++i)
         {
             const QString& key = i.key();
             QString desc = i.value();

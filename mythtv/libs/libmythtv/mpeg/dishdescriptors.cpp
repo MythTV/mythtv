@@ -191,8 +191,8 @@ QString DishEventMPAADescriptor::rating(void) const
 
     QMutexLocker locker(&s_mpaaRatingsLock);
 
-    QMap<uint,QString>::const_iterator it = s_mpaaRatingsDesc.find(rating_raw());
-    if (it != s_mpaaRatingsDesc.end())
+    QMap<uint,QString>::const_iterator it = s_mpaaRatingsDesc.constFind(rating_raw());
+    if (it != s_mpaaRatingsDesc.constEnd())
         return *it;
 
     // Found nothing? Just return empty string.
@@ -250,8 +250,8 @@ QString DishEventVCHIPDescriptor::rating(void) const
 
     QMutexLocker locker(&s_vchipRatingsLock);
 
-    QMap<uint,QString>::const_iterator it = s_vchipRatingsDesc.find(rating_raw());
-    if (it != s_vchipRatingsDesc.end())
+    QMap<uint,QString>::const_iterator it = s_vchipRatingsDesc.constFind(rating_raw());
+    if (it != s_vchipRatingsDesc.constEnd())
         return *it;
 
     // Found nothing? Just return empty string.
@@ -336,8 +336,8 @@ DishThemeType DishContentDescriptor::GetTheme(void) const
     if (Nibble1(0) == 0x00)
         return kThemeOffAir;
 
-    QMap<uint,QString>::const_iterator it = s_themeDesc.find(Nibble2(0));
-    if (it != s_themeDesc.end())
+    QMap<uint,QString>::const_iterator it = s_themeDesc.constFind(Nibble2(0));
+    if (it != s_themeDesc.constEnd())
         return string_to_dish_theme_type(*it);
 
     // Found nothing? Just return empty string.
@@ -353,8 +353,8 @@ QString DishContentDescriptor::GetCategory(void) const
 
     // Try to get detailed description
     QMap<uint,QString>::const_iterator it =
-        s_dishCategoryDesc.find(UserNibble(0));
-    if (it != s_dishCategoryDesc.end())
+        s_dishCategoryDesc.constFind(UserNibble(0));
+    if (it != s_dishCategoryDesc.constEnd())
         return *it;
 
     // Fallback to just the theme

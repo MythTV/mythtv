@@ -110,9 +110,8 @@ QString iso639_str_toName(const unsigned char *iso639)
 
 QString iso639_key_toName(int iso639_2)
 {
-    QMap<int, QString>::const_iterator it;
-    it = iso639_key_to_english_name.find(iso639_2);
-    if (it != iso639_key_to_english_name.end())
+    auto it = iso639_key_to_english_name.constFind(iso639_2);
+    if (it != iso639_key_to_english_name.constEnd())
         return *it;
 
     return "Unknown";
@@ -120,10 +119,8 @@ QString iso639_key_toName(int iso639_2)
 
 int iso639_key_to_canonical_key(int iso639_2)
 {
-    QMap<int, int>::const_iterator it;
-    it = s_iso639_key3_to_canonical_key3.find(iso639_2);
-
-    if (it != s_iso639_key3_to_canonical_key3.end())
+    auto it = s_iso639_key3_to_canonical_key3.constFind(iso639_2);
+    if (it != s_iso639_key3_to_canonical_key3.constEnd())
         return *it;
     return iso639_2;
 }

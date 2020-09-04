@@ -159,10 +159,10 @@ QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
     {
         int numdisks = strlist.size()/NUMDISKINFOLINES;
 
-        QStringList::const_iterator it = strlist.begin();
+        QStringList::const_iterator it = strlist.cbegin();
         for (int i = 0; i < numdisks; i++)
         {
-            fsInfo.FromStringList(it, strlist.end());
+            fsInfo.FromStringList(it, strlist.cend());
             fsInfos.append(fsInfo);
         }
     }

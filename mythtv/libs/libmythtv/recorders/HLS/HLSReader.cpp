@@ -706,9 +706,8 @@ void HLSReader::DecreaseBitrate(int progid)
     HLSRecStream *hls = nullptr;
     uint64_t bitrate = m_curstream->Bitrate();
     uint64_t candidate = 0;
-    StreamContainer::const_iterator Istream;
 
-    for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
+    for (auto Istream = m_streams.cbegin(); Istream != m_streams.cend(); ++Istream)
     {
         if ((*Istream)->Id() != progid)
             continue;
@@ -742,9 +741,8 @@ void HLSReader::IncreaseBitrate(int progid)
     HLSRecStream *hls = nullptr;
     uint64_t bitrate = m_curstream->Bitrate();
     uint64_t candidate = INT_MAX;
-    StreamContainer::const_iterator Istream;
 
-    for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
+    for (auto Istream = m_streams.cbegin(); Istream != m_streams.cend(); ++Istream)
     {
         if ((*Istream)->Id() != progid)
             continue;

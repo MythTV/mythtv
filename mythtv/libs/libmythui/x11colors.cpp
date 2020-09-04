@@ -784,8 +784,9 @@ QColor createColor(const QString &color)
         }
     }
 
-    QMap<QString, QColor>::const_iterator it = s_x11ColorMap.find(color.toLower());
-    if (it != s_x11ColorMap.end())
+    QMap<QString, QColor>::const_iterator it =
+        s_x11ColorMap.constFind(color.toLower());
+    if (it != s_x11ColorMap.constEnd())
         return it.value();
 
     return {color};

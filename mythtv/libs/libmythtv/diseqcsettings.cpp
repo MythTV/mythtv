@@ -521,9 +521,9 @@ void RotorPosMap::PopulateList(void)
     uint num_pos = 64;
     for (uint pos = 1; pos < num_pos; pos++)
     {
-        uint_to_dbl_t::const_iterator it = m_posmap.find(pos);
+        uint_to_dbl_t::const_iterator it = m_posmap.constFind(pos);
         QString posval;
-        if (it != m_posmap.end())
+        if (it != m_posmap.constEnd())
             posval = AngleToString(*it);
 
         auto *posEdit =

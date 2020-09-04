@@ -65,7 +65,7 @@ bool MythNotification::FromStringList(void)
         return false;
     }
 
-    QStringList::const_iterator Istr = m_extradata.begin();
+    QStringList::const_iterator Istr = m_extradata.cbegin();
 
     Type type     = static_cast<Type>((*Istr++).toInt());
     if (type != Type())

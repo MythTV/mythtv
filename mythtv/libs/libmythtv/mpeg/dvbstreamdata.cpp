@@ -670,8 +670,8 @@ bool DVBStreamData::HasCachedAllBAT(uint batid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    bat_cache_t::const_iterator it = m_cachedBats.find(batid << 8);
-    if (it == m_cachedBats.end())
+    bat_cache_t::const_iterator it = m_cachedBats.constFind(batid << 8);
+    if (it == m_cachedBats.constEnd())
         return false;
 
     uint last_section = (*it)->LastSection();
@@ -679,7 +679,7 @@ bool DVBStreamData::HasCachedAllBAT(uint batid, bool current) const
         return true;
 
     for (uint i = 1; i <= last_section; i++)
-        if (m_cachedBats.find((batid << 8) | i) == m_cachedBats.end())
+        if (m_cachedBats.constFind((batid << 8) | i) == m_cachedBats.constEnd())
             return false;
 
     return true;
@@ -715,8 +715,8 @@ bool DVBStreamData::HasCachedAllSDT(uint tsid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    sdt_cache_t::const_iterator it = m_cachedSdts.find(tsid << 8);
-    if (it == m_cachedSdts.end())
+    sdt_cache_t::const_iterator it = m_cachedSdts.constFind(tsid << 8);
+    if (it == m_cachedSdts.constEnd())
         return false;
 
     uint last_section = (*it)->LastSection();
@@ -724,7 +724,7 @@ bool DVBStreamData::HasCachedAllSDT(uint tsid, bool current) const
         return true;
 
     for (uint i = 1; i <= last_section; i++)
-        if (m_cachedSdts.find((tsid << 8) | i) == m_cachedSdts.end())
+        if (m_cachedSdts.constFind((tsid << 8) | i) == m_cachedSdts.constEnd())
             return false;
 
     return true;
@@ -801,8 +801,8 @@ nit_const_ptr_t DVBStreamData::GetCachedNIT(
 
     nit_ptr_t nit = nullptr;
 
-    nit_cache_t::const_iterator it = m_cachedNit.find(section_num);
-    if (it != m_cachedNit.end())
+    nit_cache_t::const_iterator it = m_cachedNit.constFind(section_num);
+    if (it != m_cachedNit.constEnd())
         IncrementRefCnt(nit = *it);
 
     return nit;
@@ -836,8 +836,8 @@ bat_const_ptr_t DVBStreamData::GetCachedBAT(
     bat_ptr_t bat = nullptr;
 
     uint key = (batid << 8) | section_num;
-    bat_cache_t::const_iterator it = m_cachedBats.find(key);
-    if (it != m_cachedBats.end())
+    bat_cache_t::const_iterator it = m_cachedBats.constFind(key);
+    if (it != m_cachedBats.constEnd())
         IncrementRefCnt(bat = *it);
 
     return bat;
@@ -874,8 +874,8 @@ sdt_const_ptr_t DVBStreamData::GetCachedSDT(
     sdt_ptr_t sdt = nullptr;
 
     uint key = (tsid << 8) | section_num;
-    sdt_cache_t::const_iterator it = m_cachedSdts.find(key);
-    if (it != m_cachedSdts.end())
+    sdt_cache_t::const_iterator it = m_cachedSdts.constFind(key);
+    if (it != m_cachedSdts.constEnd())
         IncrementRefCnt(sdt = *it);
 
     return sdt;

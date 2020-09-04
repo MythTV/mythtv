@@ -134,9 +134,9 @@ const unsigned char *MPEGDescriptor::FindBestMatch(
             if (!sed.IsValid())
                 continue;
             QMap<uint,uint>::const_iterator it =
-                langPrefs.find(sed.CanonicalLanguageKey());
+                langPrefs.constFind(sed.CanonicalLanguageKey());
 
-            if ((it != langPrefs.end()) && (*it < match_pri))
+            if ((it != langPrefs.constEnd()) && (*it < match_pri))
             {
                 match_idx = i;
                 match_pri = *it;
@@ -179,9 +179,9 @@ desc_list_t MPEGDescriptor::FindBestMatches(
             if (!eed.IsValid())
                 continue;
             QMap<uint,uint>::const_iterator it =
-                langPrefs.find(eed.CanonicalLanguageKey());
+                langPrefs.constFind(eed.CanonicalLanguageKey());
 
-            if ((it != langPrefs.end()) && (*it < match_pri))
+            if ((it != langPrefs.constEnd()) && (*it < match_pri))
             {
                 match_key = eed.LanguageKey();
                 match_pri = *it;
@@ -780,8 +780,8 @@ QString RegistrationDescriptor::GetDescription(const QString &fmt)
     QString ret;
     {
         QMutexLocker locker(&description_map_lock);
-        QMap<QString,QString>::const_iterator it = description_map.find(fmt);
-        if (it != description_map.end())
+        QMap<QString,QString>::const_iterator it = description_map.constFind(fmt);
+        if (it != description_map.constEnd())
             ret = *it;
     }
 

@@ -1483,7 +1483,7 @@ void ProgramData::HandlePrograms(
     MSqlQuery query(MSqlQuery::InitCon());
 
     QMap<QString, QList<ProgInfo> >::const_iterator mapiter;
-    for (mapiter = proglist.begin(); mapiter != proglist.end(); ++mapiter)
+    for (mapiter = proglist.cbegin(); mapiter != proglist.cend(); ++mapiter)
     {
         if (mapiter.key().isEmpty())
             continue;

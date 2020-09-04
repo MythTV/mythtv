@@ -790,8 +790,8 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
     key |= ((uint64_t) atsc_minor) << 16;
     key |= ((uint64_t) atsc_major) << 32;
 
-    ServiceToChanID::const_iterator it = m_srvToChanid.find(key);
-    if (it != m_srvToChanid.end())
+    ServiceToChanID::const_iterator it = m_srvToChanid.constFind(key);
+    if (it != m_srvToChanid.constEnd())
         return *it;
 
     uint chanid = get_chan_id_from_db_atsc(m_sourceid, atsc_major, atsc_minor);
@@ -807,8 +807,8 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
     key |= ((uint64_t) networkid) << 32;
     key |= ((uint64_t) tsid)      << 48;
 
-    ServiceToChanID::const_iterator it = m_srvToChanid.find(key);
-    if (it != m_srvToChanid.end())
+    ServiceToChanID::const_iterator it = m_srvToChanid.constFind(key);
+    if (it != m_srvToChanid.constEnd())
         return *it;
 
     uint chanid = get_chan_id_from_db_dvb(m_sourceid, serviceid, networkid, tsid);
@@ -823,8 +823,8 @@ uint EITHelper::GetChanID(uint program_number)
     key |= ((uint64_t) program_number) << 16;
     key |= ((uint64_t) m_channelid)    << 32;
 
-    ServiceToChanID::const_iterator it = m_srvToChanid.find(key);
-    if (it != m_srvToChanid.end())
+    ServiceToChanID::const_iterator it = m_srvToChanid.constFind(key);
+    if (it != m_srvToChanid.constEnd())
         return *it;
 
     uint chanid = get_chan_id_from_db_dtv(m_sourceid, program_number, m_channelid);

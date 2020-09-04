@@ -375,16 +375,16 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     d->m_settingsCacheLock.lockForRead();
     if (d->m_useSettingsCache)
     {
-        SettingsMap::const_iterator it = d->m_settingsCache.find(key);
-        if (it != d->m_settingsCache.end())
+        SettingsMap::const_iterator it = d->m_settingsCache.constFind(key);
+        if (it != d->m_settingsCache.constEnd())
         {
             value = *it;
             d->m_settingsCacheLock.unlock();
             return value;
         }
     }
-    SettingsMap::const_iterator it = d->m_overriddenSettings.find(key);
-    if (it != d->m_overriddenSettings.end())
+    SettingsMap::const_iterator it = d->m_overriddenSettings.constFind(key);
+    if (it != d->m_overriddenSettings.constEnd())
     {
         value = *it;
         d->m_settingsCacheLock.unlock();
@@ -457,8 +457,8 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         {
             for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
             {
-                SettingsMap::const_iterator it = d->m_settingsCache.find(dit.key());
-                if (it != d->m_settingsCache.end())
+                SettingsMap::const_iterator it = d->m_settingsCache.constFind(dit.key());
+                if (it != d->m_settingsCache.constEnd())
                 {
                     *kvit = *it;
                     *dit = true;
@@ -469,8 +469,8 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
         {
             SettingsMap::const_iterator it =
-                d->m_overriddenSettings.find(dit.key());
-            if (it != d->m_overriddenSettings.end())
+                d->m_overriddenSettings.constFind(dit.key());
+            if (it != d->m_overriddenSettings.constEnd())
             {
                 *kvit = *it;
                 *dit = true;
@@ -531,16 +531,15 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
     while (query.next())
     {
         QString key = query.value(0).toString().toLower();
-        QMap<QString,KVIt>::const_iterator it = keymap.find(key);
-        if (it != keymap.end())
+        QMap<QString,KVIt>::const_iterator it = keymap.constFind(key);
+        if (it != keymap.constEnd())
             **it = query.value(1).toString();
     }
 
     if (d->m_useSettingsCache)
     {
         d->m_settingsCacheLock.lockForWrite();
-        QMap<QString,KVIt>::const_iterator it = keymap.begin();
-        for (; it != keymap.end(); ++it)
+        for (auto it = keymap.cbegin(); it != keymap.cend(); ++it)
         {
             QString key = it.key();
             QString value = **it;
@@ -626,16 +625,16 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     d->m_settingsCacheLock.lockForRead();
     if (d->m_useSettingsCache)
     {
-        SettingsMap::const_iterator it = d->m_settingsCache.find(myKey);
-        if (it != d->m_settingsCache.end())
+        SettingsMap::const_iterator it = d->m_settingsCache.constFind(myKey);
+        if (it != d->m_settingsCache.constEnd())
         {
             value = *it;
             d->m_settingsCacheLock.unlock();
             return value;
         }
     }
-    SettingsMap::const_iterator it = d->m_overriddenSettings.find(myKey);
-    if (it != d->m_overriddenSettings.end())
+    SettingsMap::const_iterator it = d->m_overriddenSettings.constFind(myKey);
+    if (it != d->m_overriddenSettings.constEnd())
     {
         value = *it;
         d->m_settingsCacheLock.unlock();
@@ -850,8 +849,8 @@ static void clear(
     SettingsMap::iterator it = cache.find(myKey);
     if (it != cache.end())
     {
-        SettingsMap::const_iterator oit = overrides.find(myKey);
-        if (oit == overrides.end())
+        SettingsMap::const_iterator oit = overrides.constFind(myKey);
+        if (oit == overrides.constEnd())
         {
             LOG(VB_DATABASE, LOG_INFO,
                     QString("Clearing Settings Cache for '%1'.").arg(myKey));
@@ -876,8 +875,8 @@ void MythDB::ClearSettingsCache(const QString &_key)
         d->m_settingsCache.clear();
         d->m_settingsCache.reserve(settings_reserve);
 
-        SettingsMap::const_iterator it = d->m_overriddenSettings.begin();
-        for (; it != d->m_overriddenSettings.end(); ++it)
+        SettingsMap::const_iterator it = d->m_overriddenSettings.cbegin();
+        for (; it != d->m_overriddenSettings.cend(); ++it)
         {
             QString mk2 = d->m_localhostname + ' ' + it.key();
             mk2.squeeze();

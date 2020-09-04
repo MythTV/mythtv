@@ -281,7 +281,7 @@ void RemoteEncoder::FillPositionMap(int64_t start, int64_t end,
     {
         bool ok = false;
         uint64_t index = (*it).toLongLong(&ok);
-        if (++it == strlist.end() || !ok)
+        if (++it == strlist.cend() || !ok)
             break;
 
         uint64_t pos = (*it).toLongLong(&ok);
@@ -307,7 +307,7 @@ void RemoteEncoder::FillDurationMap(int64_t start, int64_t end,
     {
         bool ok = false;
         uint64_t index = (*it).toLongLong(&ok);
-        if (++it == strlist.end() || !ok)
+        if (++it == strlist.cend() || !ok)
             break;
 
         uint64_t pos = (*it).toLongLong(&ok);
@@ -508,8 +508,8 @@ uint RemoteEncoder::GetSignalLockTimeout(const QString& input)
 {
     QMutexLocker locker(&m_lock);
 
-    QMap<QString,uint>::const_iterator it = m_cachedTimeout.find(input);
-    if (it != m_cachedTimeout.end())
+    QMap<QString,uint>::const_iterator it = m_cachedTimeout.constFind(input);
+    if (it != m_cachedTimeout.constEnd())
         return *it;
 
     uint cardid  = m_recordernum;

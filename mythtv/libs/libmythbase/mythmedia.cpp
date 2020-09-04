@@ -228,11 +228,10 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
     QMap<uint, uint> media_cnts;
 
     // convert raw counts to composite mediatype counts
-    ext_cnt_t::const_iterator it = ext_cnt.begin();
-    for (; it != ext_cnt.end(); ++it)
+    for (auto it = ext_cnt.cbegin(); it != ext_cnt.cend(); ++it)
     {
-        ext_to_media_t::const_iterator found = s_ext_to_media.find(it.key());
-        if (found != s_ext_to_media.end())
+        ext_to_media_t::const_iterator found = s_ext_to_media.constFind(it.key());
+        if (found != s_ext_to_media.constEnd())
         {
             LOG(VB_MEDIA, LOG_INFO, QString("DetectMediaType %1 (%2)")
                 .arg(MediaTypeString(found.value())).arg(it.key()));
@@ -249,8 +248,7 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
     // break composite mediatypes into constituent components
     uint mediatype = 0;
 
-    QMap<uint, uint>::const_iterator cit = media_cnts.begin();
-    for (; cit != media_cnts.end(); ++cit)
+    for (auto cit = media_cnts.cbegin(); cit != media_cnts.cend(); ++cit)
     {
         for (uint key = 1; key != MEDIATYPE_END; key <<= 1)
         {

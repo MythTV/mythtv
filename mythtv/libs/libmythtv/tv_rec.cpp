@@ -4825,8 +4825,8 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
 
 TVRec* TVRec::GetTVRec(uint inputid)
 {
-    QMap<uint,TVRec*>::const_iterator it = s_inputs.find(inputid);
-    if (it == s_inputs.end())
+    QMap<uint,TVRec*>::const_iterator it = s_inputs.constFind(inputid);
+    if (it == s_inputs.constEnd())
         return nullptr;
     return *it;
 }

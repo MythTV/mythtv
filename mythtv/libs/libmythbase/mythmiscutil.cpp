@@ -1008,8 +1008,8 @@ QString xml_indent(uint level)
     static QMap<uint,QString> s_cache;
 
     s_rwLock.lockForRead();
-    QMap<uint,QString>::const_iterator it = s_cache.find(level);
-    if (it != s_cache.end())
+    QMap<uint,QString>::const_iterator it = s_cache.constFind(level);
+    if (it != s_cache.constEnd())
     {
         QString tmp = *it;
         s_rwLock.unlock();

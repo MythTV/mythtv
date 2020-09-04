@@ -668,8 +668,8 @@ bool ATSCStreamData::HasCachedTVCT(uint pid, bool current) const
             "Currently we ignore \'current\' param");
 
     m_cacheLock.lock();
-    tvct_cache_t::const_iterator it = m_cachedTvcts.find(pid);
-    bool exists = (it != m_cachedTvcts.end());
+    tvct_cache_t::const_iterator it = m_cachedTvcts.constFind(pid);
+    bool exists = (it != m_cachedTvcts.constEnd());
     m_cacheLock.unlock();
 
     return exists;
@@ -682,8 +682,8 @@ bool ATSCStreamData::HasCachedCVCT(uint pid, bool current) const
             "Currently we ignore \'current\' param");
 
     m_cacheLock.lock();
-    cvct_cache_t::const_iterator it = m_cachedCvcts.find(pid);
-    bool exists = (it != m_cachedCvcts.end());
+    cvct_cache_t::const_iterator it = m_cachedCvcts.constFind(pid);
+    bool exists = (it != m_cachedCvcts.constEnd());
     m_cacheLock.unlock();
 
     return exists;
@@ -794,8 +794,8 @@ tvct_const_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
     tvct_ptr_t tvct = nullptr;
 
     m_cacheLock.lock();
-    tvct_cache_t::const_iterator it = m_cachedTvcts.find(pid);
-    if (it != m_cachedTvcts.end())
+    tvct_cache_t::const_iterator it = m_cachedTvcts.constFind(pid);
+    if (it != m_cachedTvcts.constEnd())
         IncrementRefCnt(tvct = *it);
     m_cacheLock.unlock();
 
@@ -811,8 +811,8 @@ cvct_const_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
     cvct_ptr_t cvct = nullptr;
 
     m_cacheLock.lock();
-    cvct_cache_t::const_iterator it = m_cachedCvcts.find(pid);
-    if (it != m_cachedCvcts.end())
+    cvct_cache_t::const_iterator it = m_cachedCvcts.constFind(pid);
+    if (it != m_cachedCvcts.constEnd())
         IncrementRefCnt(cvct = *it);
     m_cacheLock.unlock();
 

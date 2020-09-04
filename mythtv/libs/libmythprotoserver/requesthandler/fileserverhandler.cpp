@@ -227,12 +227,12 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         hostname        = commands[2];
     }
 
-    QStringList::const_iterator it = slist.begin();
+    QStringList::const_iterator it = slist.cbegin();
     QString path        = *(++it);
     QString wantgroup   = *(++it);
 
     QStringList checkfiles;
-    while (++it != slist.end())
+    while (++it != slist.cend())
         checkfiles += *(it);
 
     slist.clear();
@@ -567,8 +567,8 @@ QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
 bool FileServerHandler::HandleQueryCheckFile(SocketHandler *socket,
                                              QStringList &slist)
 {
-    QStringList::const_iterator it = slist.begin() + 2;
-    RecordingInfo recinfo(it, slist.end());
+    QStringList::const_iterator it = slist.cbegin() + 2;
+    RecordingInfo recinfo(it, slist.cend());
 
     bool exists = false;
 

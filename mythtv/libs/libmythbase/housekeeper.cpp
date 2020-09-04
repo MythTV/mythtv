@@ -699,8 +699,7 @@ void HouseKeeper::Start(void)
 
     gCoreContext->addListener(this);
 
-    QMap<QString,HouseKeeperTask*>::const_iterator it;
-    for (it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
+    for (auto it = m_taskMap.cbegin(); it != m_taskMap.cend(); ++it)
     {
         if ((*it)->CheckImmediate())
         {

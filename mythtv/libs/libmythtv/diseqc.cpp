@@ -2017,9 +2017,10 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
                                   double angle)
 {
     // determine stored position from position map
-    dbl_to_uint_t::const_iterator it = m_posmap.lowerBound(angle - EPS);
+    dbl_to_uint_t::const_iterator it =
+        m_posmap.lowerBound(angle - EPS); // clazy:exclude=strict-iterators
     cmd_vec_t index { static_cast<uint8_t>(angle) };
-    if (it != m_posmap.end())
+    if (it != m_posmap.cend())
     {
         index[0] = *it;
         StartRotorPositionTracking(CalculateAzimuth(angle));

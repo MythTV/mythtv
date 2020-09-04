@@ -925,9 +925,9 @@ int MHIContext::GetChannelIndex(const QString &str)
             if (m_channelCache.isEmpty())
                 LoadChannelCache();
 
-            ChannelCache_t::const_iterator it = m_channelCache.find(
+            ChannelCache_t::const_iterator it = m_channelCache.constFind(
                 Key_t(netID,serviceID) );
-            if (it == m_channelCache.end())
+            if (it == m_channelCache.constEnd())
                 break;
             if (transportID < 0)
                 nResult = Cid(it);
@@ -941,7 +941,7 @@ int MHIContext::GetChannelIndex(const QString &str)
                         break;
                     }
                 }
-                while (++it != m_channelCache.end());
+                while (++it != m_channelCache.constEnd());
             }
         }
         else if (str.startsWith("rec://svc/lcn/"))
@@ -989,8 +989,7 @@ bool MHIContext::GetServiceInfo(int channelId, int &netId, int &origNetId,
     if (m_channelCache.isEmpty())
         LoadChannelCache();
 
-    for ( ChannelCache_t::const_iterator it = m_channelCache.begin();
-        it != m_channelCache.end(); ++it)
+    for (auto it = m_channelCache.cbegin(); it != m_channelCache.cend(); ++it)
     {
         if (Cid(it) == channelId)
         {
