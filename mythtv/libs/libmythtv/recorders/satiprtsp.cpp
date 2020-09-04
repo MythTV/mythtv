@@ -124,7 +124,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Setup completed, sessionID = %1, streamID = %2, timeout = %3s")
             .arg(m_sessionid).arg(m_streamid).arg(m_timeout / 1000));
-    emit(startKeepAlive(m_timeout));
+    emit startKeepAlive(m_timeout);
 
     // Reset tuner lock status
     QMutexLocker locker(&m_sigmonLock);
@@ -166,7 +166,7 @@ bool SatIPRTSP::Play(QStringList &pids)
 bool SatIPRTSP::Teardown(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC2 + "TEARDOWN");
-    emit(stopKeepAlive());
+    emit stopKeepAlive();
 
     QUrl url = QUrl(m_requestUrl);
     url.setQuery(QString());

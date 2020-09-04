@@ -43,7 +43,7 @@ class MythExternRecApp : public QObject
 
     QString Desc(void) const;
     void MythLog(const QString & msg)
-    { SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
+    { emit SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
     void SetErrorMsg(const QString & msg) { emit ErrorMessage(msg); }
 
   signals:

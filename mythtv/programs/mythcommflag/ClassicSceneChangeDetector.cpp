@@ -36,7 +36,7 @@ void ClassicSceneChangeDetector::processFrame(VideoFrame* frame)
 
     bool isSceneChange = (similar < .85F && !m_previousFrameWasSceneChange);
 
-    emit(haveNewInformation(m_frameNumber,isSceneChange,similar));
+    emit haveNewInformation(m_frameNumber,isSceneChange,similar);
     m_previousFrameWasSceneChange = isSceneChange;
 
     std::swap(m_histogram,m_previousHistogram);

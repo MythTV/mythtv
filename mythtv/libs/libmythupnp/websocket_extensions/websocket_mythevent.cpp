@@ -82,6 +82,6 @@ void WebSocketMythEvent::customEvent(QEvent* event)
         if (!m_filters.contains("ALL") && !m_filters.contains(tokens[0]))
             return;
 
-        SendTextMessage(message);
+        emit SendTextMessage(message);
     }
 }
