@@ -3,7 +3,7 @@
 
 #include "videovisualspectrum.h"
 
-#define CIRCLES_NAME QStringLiteral("Circles")
+#define CIRCLES_NAME QString("Circles")
 
 class VideoVisualCircles : public VideoVisualSpectrum
 {

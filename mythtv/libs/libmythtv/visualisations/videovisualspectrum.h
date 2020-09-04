@@ -4,7 +4,7 @@
 #include <QVector>
 #include "videovisual.h"
 
-#define SPECTRUM_NAME QStringLiteral("Spectrum")
+#define SPECTRUM_NAME QString("Spectrum")
 
 class VideoVisualSpectrum : public VideoVisual
 {

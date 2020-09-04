@@ -5,8 +5,8 @@
 
 class MythGLTexture;
 
-#define GOOM_NAME QStringLiteral("Goom")
-#define GOOMHD_NAME QStringLiteral("Goom HD")
+#define GOOM_NAME QString("Goom")
+#define GOOMHD_NAME QString("Goom HD")
 
 class VideoVisualGoom : public VideoVisual
 {

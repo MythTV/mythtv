@@ -6,8 +6,8 @@
 #include "videovisual.h"
 
 #define NUM_SAMPLES 256
-#define FADE_NAME   QStringLiteral("FadeScope")
-#define SIMPLE_NAME QStringLiteral("SimpleScope")
+#define FADE_NAME   QString("FadeScope")
+#define SIMPLE_NAME QString("SimpleScope")
 
 using Vertices = std::array<GLfloat, NUM_SAMPLES * 2>;
 using FrameBuffers = std::array<QOpenGLFramebufferObject*, 2>;

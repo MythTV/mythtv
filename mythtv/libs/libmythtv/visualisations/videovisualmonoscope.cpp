@@ -147,8 +147,8 @@ void VideoVisualMonoScope::Draw(const QRect& Area, MythPainter* /*Painter*/, QPa
 
     render->makeCurrent();
 
-    size_t lastfbo = static_cast<size_t>(m_currentFBO);
-    size_t nextfbo = static_cast<size_t>(!m_currentFBO);
+    auto lastfbo = static_cast<size_t>(m_currentFBO);
+    auto nextfbo = static_cast<size_t>(!m_currentFBO);
 
     if (m_fade)
     {
