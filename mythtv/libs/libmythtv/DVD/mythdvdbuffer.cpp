@@ -81,7 +81,7 @@ void MythDVDBuffer::CloseDVD(void)
 void MythDVDBuffer::ClearChapterCache(void)
 {
     m_rwLock.lockForWrite();
-    for (QList<uint64_t> chapters : m_chapterMap)
+    for (QList<uint64_t> chapters : qAsConst(m_chapterMap))
         chapters.clear();
     m_chapterMap.clear();
     m_rwLock.unlock();
