@@ -519,16 +519,13 @@ void MythUIFileBrowser::updateRemoteFileList()
             m_backButton->SetEnabled(false);
     }
 
-    QStringList::const_iterator it = slist.begin();
-
-    while (it != slist.end())
+    for (const auto & line : qAsConst(slist))
     {
-        QStringList tokens = (*it).split("::");
+        QStringList tokens = line.split("::");
 
         if (tokens.size() < 2)
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("failed to parse '%1'.").arg(*it));
-            ++it;
+            LOG(VB_GENERAL, LOG_ERR, QString("failed to parse '%1'.").arg(line));
             continue;
         }
 
@@ -579,7 +576,6 @@ void MythUIFileBrowser::updateRemoteFileList()
         else
         {
             // unknown type or filtered out
-            ++it;
             continue;
         }
 
@@ -594,8 +590,6 @@ void MythUIFileBrowser::updateRemoteFileList()
 
         item->SetText(dataName, "fullpath");
         item->DisplayState(type, "nodetype");
-
-        ++it;
     }
 }
 
@@ -628,18 +622,12 @@ void MythUIFileBrowser::updateLocalFileList()
     }
     else
     {
-        QFileInfoList::const_iterator it = list.begin();
-
-        while (it != list.end())
+        for (const auto & fi : qAsConst(list))
         {
-            const QFileInfo *fi = &(*it);
-            MFileInfo finfo(fi->filePath());
+            MFileInfo finfo(fi.filePath());
 
             if (finfo.fileName() == ".")
-            {
-                ++it;
                 continue;
-            }
 
             QString displayName = finfo.fileName();
             QString type;
@@ -647,10 +635,7 @@ void MythUIFileBrowser::updateLocalFileList()
             if (displayName == "..")
             {
                 if (m_subDirectory.endsWith("/"))
-                {
-                    ++it;
                     continue;
-                }
 
                 displayName = tr("Parent");
                 type = "upfolder";
@@ -681,8 +666,6 @@ void MythUIFileBrowser::updateLocalFileList()
             item->SetText(FormatSize(finfo.size()), "filesize");
             item->SetText(finfo.absoluteFilePath(), "fullpath");
             item->DisplayState(type, "nodetype");
-
-            ++it;
         }
     }
 

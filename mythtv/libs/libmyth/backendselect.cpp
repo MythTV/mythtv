@@ -254,11 +254,10 @@ void BackendSelection::Init(void)
         pEntries->GetEntryMap(ourMap);
         pEntries->DecrRef();
 
-        EntryMap::const_iterator it;
-        for (it = ourMap.begin(); it != ourMap.end(); ++it)
+        for (auto * devLoc : qAsConst(ourMap))
         {
-            AddItem(*it);
-            (*it)->DecrRef();
+            AddItem(devLoc);
+            devLoc->DecrRef();
         }
     }
 }

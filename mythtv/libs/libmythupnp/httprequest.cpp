@@ -2316,30 +2316,28 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
             "http://chromecast.mythtvcast.com"
             )).split(",");
 
-    for (QStringList::const_iterator it = allowedOriginsList.begin();
-                                     it != allowedOriginsList.end(); it++)
+    for (const auto & origin : qAsConst(allowedOriginsList))
     {
-         if ((*it).isEmpty())
+         if (origin.isEmpty())
             continue;
 
-        if (*it == "*" || (!(*it).startsWith("http://") &&
-            !(*it).startsWith("https://")))
+        if (origin == "*" || (!origin.startsWith("http://") &&
+            !origin.startsWith("https://")))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Illegal AllowedOriginsList"
                 " entry '%1'. Must start with http[s]:// and not be *")
-                .arg(*it));
+                .arg(origin));
         }
         else
         {
-            allowedOrigins << *it;
+            allowedOrigins << origin;
         }
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_DEBUG))
     {
-        for (QStringList::const_iterator it = allowedOrigins.begin();
-                                         it != allowedOrigins.end(); it++)
-            LOG(VB_HTTP, LOG_DEBUG, QString("Will allow Origin: %1").arg(*it));
+        for (const auto & origin : qAsConst(allowedOrigins))
+            LOG(VB_HTTP, LOG_DEBUG, QString("Will allow Origin: %1").arg(origin));
     }
 
     if (allowedOrigins.contains(sOrigin))

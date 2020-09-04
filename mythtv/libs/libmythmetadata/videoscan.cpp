@@ -172,11 +172,8 @@ void VideoScannerThread::run()
 
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
     QStringList imageExtensions;
-    for (QList<QByteArray>::const_iterator p = image_types.begin();
-         p != image_types.end(); ++p)
-    {
-        imageExtensions.push_back(QString(*p));
-    }
+    for (const auto & format : qAsConst(image_types))
+        imageExtensions.push_back(QString(format));
 
     LOG(VB_GENERAL, LOG_INFO, QString("Beginning Video Scan."));
 
@@ -186,20 +183,19 @@ void VideoScannerThread::run()
     if (m_hasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
                           tr("Searching for video files"));
-    for (QStringList::const_iterator iter = m_directories.begin();
-         iter != m_directories.end(); ++iter)
+    for (const auto & dir : qAsConst(m_directories))
     {
-        if (!buildFileList(*iter, imageExtensions, fs_files))
+        if (!buildFileList(dir, imageExtensions, fs_files))
         {
-            if (iter->startsWith("myth://"))
+            if (dir.startsWith("myth://"))
             {
-                QUrl sgurl = *iter;
+                QUrl sgurl = dir;
                 QString host = sgurl.host().toLower();
 
                 m_liveSGHosts.removeAll(host);
 
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("Failed to scan :%1:").arg(*iter));
+                    QString("Failed to scan :%1:").arg(dir));
             }
         }
         if (m_hasGUI)
@@ -219,12 +215,12 @@ void VideoScannerThread::run()
         QStringList slist;
 
         QList<int>::const_iterator i;
-        for (i = m_addList.begin(); i != m_addList.end(); ++i)
-            slist << QString("added::%1").arg(*i);
-        for (i = m_movList.begin(); i != m_movList.end(); ++i)
-            slist << QString("moved::%1").arg(*i);
-        for (i = m_delList.begin(); i != m_delList.end(); ++i)
-            slist << QString("deleted::%1").arg(*i);
+        for (int id : qAsConst(m_addList))
+            slist << QString("added::%1").arg(id);
+        for (int id : qAsConst(m_movList))
+            slist << QString("moved::%1").arg(id);
+        for (int id : qAsConst(m_delList))
+            slist << QString("deleted::%1").arg(id);
 
         MythEvent me("VIDEO_LIST_CHANGE", slist);
 

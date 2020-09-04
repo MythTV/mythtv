@@ -83,16 +83,12 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
     if (list.isEmpty())
         return;
 
-    QFileInfoList::const_iterator it = list.begin();
-
     // Recursively traverse directory
     int newparentid = 0;
-    while (it != list.end())
+    for (const auto& fi : qAsConst(list))
     {
-        const QFileInfo *fi = &(*it);
-        ++it;
-        QString filename = fi->absoluteFilePath();
-        if (fi->isDir())
+        QString filename = fi.absoluteFilePath();
+        if (fi.isDir())
         {
 
             QString dir(filename);

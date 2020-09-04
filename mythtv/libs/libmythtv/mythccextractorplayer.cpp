@@ -459,11 +459,8 @@ void MythCCExtractorPlayer::Ingest708Caption(
     }
 
     QStringList screenContent;
-    for (QMap<uint, QStringList>::const_iterator oit = orderedContent.begin();
-         oit != orderedContent.end(); ++oit)
-    {
-        screenContent += *oit;
-    }
+    for (const auto & ordered : qAsConst(orderedContent))
+        screenContent += ordered;
     IngestSubtitle(m_cc708Info[streamId].m_subs[serviceIdx], screenContent);
 }
 

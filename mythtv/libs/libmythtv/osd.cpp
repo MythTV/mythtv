@@ -631,21 +631,20 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
     QTime now = MythDate::current().time();
 
     CheckExpiry();
-    QMap<QString,MythScreenType*>::const_iterator it;
-    for (it = m_children.begin(); it != m_children.end(); ++it)
+    for (auto * screen : qAsConst(m_children))
     {
-        if ((*it)->IsVisible())
+        if (screen->IsVisible())
         {
             visible = true;
-            (*it)->Pulse();
-            if (m_expireTimes.contains((*it)))
+            screen->Pulse();
+            if (m_expireTimes.contains(screen))
             {
-                QTime expires = m_expireTimes.value((*it)).time();
+                QTime expires = m_expireTimes.value(screen).time();
                 int left = now.msecsTo(expires);
                 if (left < m_fadeTime)
-                    (*it)->SetAlpha((255 * left) / m_fadeTime);
+                    screen->SetAlpha((255 * left) / m_fadeTime);
             }
-            if ((*it)->NeedsRedraw())
+            if (screen->NeedsRedraw())
                 redraw = true;
         }
     }
@@ -703,22 +702,22 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
     {
         QRect cliprect = QRect(QPoint(0, 0), Size);
         Painter->Begin(nullptr);
-        for (it = m_children.begin(); it != m_children.end(); ++it)
+        for (auto * screen : qAsConst(m_children))
         {
-            if ((*it)->IsVisible())
+            if (screen->IsVisible())
             {
-                (*it)->Draw(Painter, 0, 0, 255, cliprect);
-                (*it)->SetAlpha(255);
-                (*it)->ResetNeedsRedraw();
+                screen->Draw(Painter, 0, 0, 255, cliprect);
+                screen->SetAlpha(255);
+                screen->ResetNeedsRedraw();
             }
         }
-        for (it2 = notifications.begin(); it2 != notifications.end(); ++it2)
+        for (auto * notif : qAsConst(notifications))
         {
-            if ((*it2)->IsVisible())
+            if (notif->IsVisible())
             {
-                (*it2)->Draw(Painter, 0, 0, 255, cliprect);
-                (*it2)->SetAlpha(255);
-                (*it2)->ResetNeedsRedraw();
+                notif->Draw(Painter, 0, 0, 255, cliprect);
+                notif->SetAlpha(255);
+                notif->ResetNeedsRedraw();
             }
         }
         Painter->End();

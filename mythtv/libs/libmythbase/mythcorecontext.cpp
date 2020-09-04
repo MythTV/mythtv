@@ -1312,22 +1312,20 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
-    QList<QNetworkInterface>::const_iterator qni;
-    for (qni = IFs.begin(); qni != IFs.end(); ++qni)
+    for (const auto & qni : qAsConst(IFs))
     {
-        if ((qni->flags() & QNetworkInterface::IsRunning) == 0)
+        if ((qni.flags() & QNetworkInterface::IsRunning) == 0)
             continue;
 
-        QList<QNetworkAddressEntry> IPs = qni->addressEntries();
-        QList<QNetworkAddressEntry>::iterator qnai;
-        for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
+        QList<QNetworkAddressEntry> IPs = qni.addressEntries();
+        for (const auto & qnai : qAsConst(IPs))
         {
-            int pfxlen = qnai->prefixLength();
+            int pfxlen = qnai.prefixLength();
             // Set this to test rejection without having an extra
             // network.
             if (GetBoolSetting("DebugSubnet"))
                 pfxlen += 4;
-            if (peer.isInSubnet(qnai->ip(),pfxlen))
+            if (peer.isInSubnet(qnai.ip(),pfxlen))
             {
                 d->m_approvedIps.append(peer);
                 return true;

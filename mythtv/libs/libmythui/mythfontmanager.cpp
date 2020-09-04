@@ -81,15 +81,14 @@ void MythFontManager::LoadFonts(const QString &directory,
     // Recurse through subdirectories
     QDir dir(directory);
     QFileInfoList files = dir.entryInfoList();
-    QFileInfo info;
-    for (QFileInfoList::const_iterator it = files.begin();
-         ((it != files.end()) && (*maxDirs > 0)); ++it)
+    for (const auto& info : qAsConst(files))
     {
-        info = *it;
         // Skip '.' and '..' and other files starting with "." by checking
         // baseName()
         if (!info.baseName().isEmpty() && info.isDir())
             LoadFonts(info.absoluteFilePath(), registeredFor, maxDirs);
+        if (*maxDirs <= 0)
+            break;
     }
 }
 
@@ -161,11 +160,8 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
     QDir dir(directory);
     QStringList nameFilters = QStringList() << "*.ttf" << "*.otf" << "*.ttc";
     QStringList fontFiles = dir.entryList(nameFilters);
-    for (QStringList::const_iterator it = fontFiles.begin();
-         it != fontFiles.end(); ++it)
-    {
-        LoadFontFile(dir.absoluteFilePath(*it), registeredFor);
-    }
+    for (const auto & path : qAsConst(fontFiles))
+        LoadFontFile(dir.absoluteFilePath(path), registeredFor);
 }
 
 /**

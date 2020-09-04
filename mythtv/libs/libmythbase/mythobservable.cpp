@@ -74,7 +74,6 @@ void MythObservable::dispatch(const MythEvent &event)
 {
     QMutexLocker locker(m_lock);
 
-    QSet<QObject*>::const_iterator it = m_listeners.begin();
-    for (; it != m_listeners.end() ; ++it)
-        QCoreApplication::postEvent(*it, event.clone());
+    for (auto *listener : qAsConst(m_listeners))
+        QCoreApplication::postEvent(listener, event.clone());
 }

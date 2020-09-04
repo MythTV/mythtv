@@ -439,11 +439,8 @@ QDomDocument CreateMetadataXML(MetadataLookupList list)
     QDomElement root = doc.createElement("metadata");
     doc.appendChild(root);
 
-    for (MetadataLookupList::const_iterator i = list.begin();
-            i != list.end(); ++i)
-    {
-        CreateMetadataXMLItem(*i, root, doc);
-    }
+    for (const auto & item : qAsConst(list))
+        CreateMetadataXMLItem(item, root, doc);
 
     return doc;
 }
@@ -848,13 +845,12 @@ void AddCategories(MetadataLookup *lookup,
     QDomElement categories = docroot.createElement("categories");
     placetoadd.appendChild(categories);
 
-    for (QStringList::const_iterator i = cats.begin();
-            i != cats.end(); ++i)
+    for (const auto & str : qAsConst(cats))
     {
         QDomElement cat = docroot.createElement("category");
         categories.appendChild(cat);
         cat.setAttribute("type", "genre");
-        cat.setAttribute("name", *i);
+        cat.setAttribute("name", str);
     }
 }
 
@@ -866,12 +862,11 @@ void AddStudios(MetadataLookup *lookup,
     QDomElement studios = docroot.createElement("studios");
     placetoadd.appendChild(studios);
 
-    for (QStringList::const_iterator i = studs.begin();
-            i != studs.end(); ++i)
+    for (const auto & str : qAsConst(studs))
     {
         QDomElement stud = docroot.createElement("studio");
         studios.appendChild(stud);
-        stud.setAttribute("name", *i);
+        stud.setAttribute("name", str);
     }
 }
 
@@ -883,12 +878,11 @@ void AddCountries(MetadataLookup *lookup,
     QDomElement countries = docroot.createElement("countries");
     placetoadd.appendChild(countries);
 
-    for (QStringList::const_iterator i = counts.begin();
-            i != counts.end(); ++i)
+    for (const auto & str : qAsConst(counts))
     {
         QDomElement count = docroot.createElement("country");
         countries.appendChild(count);
-        count.setAttribute("name", *i);
+        count.setAttribute("name", str);
     }
 }
 

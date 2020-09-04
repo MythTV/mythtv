@@ -3727,10 +3727,9 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
     QList<QKeyEvent> keyPressList;
     int i = 0;
     QStringList stringKeyList = keyList.split(',');
-    QStringList::const_iterator it;
-    for (it = stringKeyList.begin(); it != stringKeyList.end(); ++it)
+    for (const auto & str : qAsConst(stringKeyList))
     {
-        QKeySequence keySequence(*it);
+        QKeySequence keySequence(str);
         for(i = 0; i < keySequence.count(); i++)
         {
             unsigned int keynum = keySequence[i];

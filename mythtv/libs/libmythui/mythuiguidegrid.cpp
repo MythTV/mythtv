@@ -702,10 +702,9 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     QFile f;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
 
-    for (QStringList::const_iterator ii = searchpath.begin();
-         ii != searchpath.end(); ++ii)
+    for (const auto & path : qAsConst(searchpath))
     {
-        f.setFileName(*ii + "categories.xml");
+        f.setFileName(path + "categories.xml");
 
         if (f.open(QIODevice::ReadOnly))
             break;

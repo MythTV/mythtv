@@ -29,11 +29,10 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
     art_path_map_lock.lockForRead();
     ArtList ret(art_path_map.values(basename));
     art_path_map_lock.unlock();
-    for (ArtList::const_iterator i = ret.begin();
-            i != ret.end(); ++i)
+    for (const auto & [arttype, artpath] : qAsConst(ret))
     {
-        if ((*i).first == type)
-            return (*i).second;
+        if (arttype == type)
+            return artpath;
     }
 
     QString fn = basename;

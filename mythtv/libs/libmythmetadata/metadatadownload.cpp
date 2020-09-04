@@ -216,17 +216,16 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
     unsigned int exactMatches = 0;
     unsigned int exactMatchesWithArt = 0;
 
-    for (MetadataLookupList::const_iterator i = list.begin();
-            i != list.end(); ++i)
+    for (auto lkup : qAsConst(list))
     {
         // Consider exact title matches (ignoring case)
-        if ((QString::compare((*i)->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0))
+        if ((QString::compare(lkup->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0))
         {
             // In lookup by name, the television database tends to only include Banner artwork.
             // In lookup by name, the movie database tends to include only Fan and Cover artwork.
-            if ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
-                (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
-                (!((*i)->GetArtwork(kArtworkBanner)).empty()))
+            if ((!(lkup->GetArtwork(kArtworkFanart)).empty()) ||
+                (!(lkup->GetArtwork(kArtworkCoverart)).empty()) ||
+                (!(lkup->GetArtwork(kArtworkBanner)).empty()))
             {
                 exactMatchesWithArt++;
             }
@@ -251,25 +250,24 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     bool foundMatchWithArt = false;
 
     // Build a list of all the titles
-    for (MetadataLookupList::const_iterator i = list.begin();
-            i != list.end(); ++i)
+    for (auto lkup : qAsConst(list))
     {
-        QString title = (*i)->GetTitle();
+        QString title = lkup->GetTitle();
         LOG(VB_GENERAL, LOG_INFO, QString("Comparing metadata title '%1' [%2] to recording title '%3'")
                 .arg(title)
-                .arg((*i)->GetReleaseDate().toString())
+                .arg(lkup->GetReleaseDate().toString())
                 .arg(originaltitle));
         // Consider exact title matches (ignoring case), which have some artwork available.
         if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
         {
-            bool hasArtwork = ((!((*i)->GetArtwork(kArtworkFanart)).empty()) ||
-                               (!((*i)->GetArtwork(kArtworkCoverart)).empty()) ||
-                               (!((*i)->GetArtwork(kArtworkBanner)).empty()));
+            bool hasArtwork = ((!(lkup->GetArtwork(kArtworkFanart)).empty()) ||
+                               (!(lkup->GetArtwork(kArtworkCoverart)).empty()) ||
+                               (!(lkup->GetArtwork(kArtworkBanner)).empty()));
 
             LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3")
                     .arg(title)
-                    .arg((*i)->GetPopularity())
-                    .arg((*i)->GetReleaseDate().toString()));
+                    .arg(lkup->GetPopularity())
+                    .arg(lkup->GetReleaseDate().toString()));
 
             // After the first exact match, prefer any more popular one.
             // Most of the Movie database entries have Popularity fields.
@@ -280,12 +278,12 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             if ((ret == nullptr) ||
                 (hasArtwork &&
                  ((!foundMatchWithArt) ||
-                  (((*i)->GetPopularity() > exactTitlePopularity)) ||
-                  ((exactTitlePopularity == 0.0F) && ((*i)->GetReleaseDate() > exactTitleDate)))))
+                  ((lkup->GetPopularity() > exactTitlePopularity)) ||
+                  ((exactTitlePopularity == 0.0F) && (lkup->GetReleaseDate() > exactTitleDate)))))
             {
-                exactTitleDate = (*i)->GetReleaseDate();
-                exactTitlePopularity = (*i)->GetPopularity();
-                ret = (*i);
+                exactTitleDate = lkup->GetReleaseDate();
+                exactTitlePopularity = lkup->GetPopularity();
+                ret = lkup;
             }
             exactMatches++;
             if (hasArtwork)

@@ -1449,11 +1449,8 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     // ProbeVideoDevices returns "deviceid ip" pairs
     QStringList devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
 
-    QStringList::const_iterator it;
-
-    for (it = devs.begin(); it != devs.end(); ++it)
+    for (const auto & dev : qAsConst(devs))
     {
-        QString dev = *it;
         QStringList devinfo = dev.split(" ");
         const QString& devid = devinfo.at(0);
         const QString& devip = devinfo.at(1);
@@ -1990,11 +1987,8 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     // ProbeVideoDevices returns "deviceid ip tunerno tunertype"
     QStringList devs = CardUtil::ProbeVideoDevices("VBOX");
 
-    QStringList::const_iterator it;
-
-    for (it = devs.begin(); it != devs.end(); ++it)
+    for (const auto & dev : qAsConst(devs))
     {
-        QString dev = *it;
         QStringList devinfo = dev.split(" ");
         const QString& id = devinfo.at(0);
         const QString& ip = devinfo.at(1);
@@ -2018,10 +2012,10 @@ void VBoxConfigurationGroup::FillDeviceList(void)
     // returns "ip.ip.ip.ip-n-type" or deviceid-n-type values
     QStringList db = CardUtil::GetVideoDevices("VBOX");
 
-    for (it = db.begin(); it != db.end(); ++it)
+    for (const auto & dev : qAsConst(db))
     {
         QMap<QString, VBoxDevice>::iterator dit;
-        dit = m_deviceList.find(*it);
+        dit = m_deviceList.find(dev);
 
         if (dit != m_deviceList.end())
             (*dit).m_inUse = true;
@@ -4021,11 +4015,8 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     // Returns each devices as "deviceid friendlyname ip tunerno tunertype"
     QStringList devs = CardUtil::ProbeVideoDevices("SATIP");
 
-    QStringList::const_iterator it;
-
-    for (it = devs.begin(); it != devs.end(); ++it)
+    for (const auto & dev : qAsConst(devs))
     {
-        QString dev = *it;
         QStringList devparts = dev.split(" ");
         const QString& id = devparts.at(0);
         const QString& name = devparts.at(1);

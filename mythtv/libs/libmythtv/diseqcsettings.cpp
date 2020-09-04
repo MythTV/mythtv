@@ -1246,9 +1246,8 @@ class RotorSetting : public MythUIComboBoxSetting
     {
         clearSelections();
 
-        uint_to_dbl_t::const_iterator it;
-        for (it = m_posmap.begin(); it != m_posmap.end(); ++it)
-            addSelection(AngleToString(*it), QString::number(*it));
+        for (double d : qAsConst(m_posmap))
+            addSelection(AngleToString(d), QString::number(d));
 
         double angle = m_settings.GetValue(m_node.GetDeviceID());
         setValue(getValueIndex(QString::number(angle)));

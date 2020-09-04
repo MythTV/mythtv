@@ -828,10 +828,8 @@ tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
     vector<const TerrestrialVirtualChannelTable*> tvcts;
 
     m_cacheLock.lock();
-    tvct_cache_t::const_iterator it = m_cachedTvcts.begin();
-    for (; it != m_cachedTvcts.end(); ++it)
+    for (auto *tvct : qAsConst(m_cachedTvcts))
     {
-        TerrestrialVirtualChannelTable* tvct = *it;
         IncrementRefCnt(tvct);
         tvcts.push_back(tvct);
     }

@@ -239,14 +239,13 @@ void DVBCam::HandlePMT(void)
     uint length = m_pmtList.size();
     uint count  = 0;
 
-    pmt_list_t::const_iterator pmtit;
-    for (pmtit = m_pmtList.begin(); pmtit != m_pmtList.end(); ++pmtit)
+    for (auto *pmt : qAsConst(m_pmtList))
     {
         uint cplm = (count     == 0)      ? CPLM_FIRST : CPLM_MORE;
         cplm      = (count + 1 == length) ? CPLM_LAST  : cplm;
         cplm      = (length    == 1)      ? CPLM_ONLY  : cplm;
 
-        SendPMT(**pmtit, cplm);
+        SendPMT(*pmt, cplm);
 
         count++;
     }
