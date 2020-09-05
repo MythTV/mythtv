@@ -118,7 +118,7 @@ MythRenderVulkan::MythRenderVulkan()
 MythRenderVulkan::~MythRenderVulkan()
 {
 #ifdef USING_GLSLANG
-    MythShaderVulkan::InitGLSLang(false);
+    MythShaderVulkan::InitGLSLang(true);
 #endif
     LOG(VB_GENERAL, LOG_INFO, LOC + "Destroyed");
 }

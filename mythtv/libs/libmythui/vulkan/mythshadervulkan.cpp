@@ -199,7 +199,10 @@ bool MythShaderVulkan::InitGLSLang(bool Release /* = false */)
         }
 
         if (s_glslangRefcount < 1)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "GLSLang released");
             glslang::FinalizeProcess();
+        }
         return true;
     }
 
