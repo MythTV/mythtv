@@ -1355,7 +1355,7 @@ class ImageSize : public GroupSetting
             else
                 defaultsize = QSize(480, 576);
         }
-        else if (tvFormat.toLower().startsWith("ntsc"))
+        else if (tvFormat.startsWith("ntsc", Qt::CaseInsensitive))
         {
             maxsize     = QSize(720, 480);
             defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);

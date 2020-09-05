@@ -891,8 +891,8 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     if (html.size())
     {
         QString htmlstring = html.at(0).toElement().text();
-        if (htmlstring.toLower().contains("true") || htmlstring == "1" ||
-            htmlstring.toLower().contains("yes"))
+        if (htmlstring.contains("true", Qt::CaseInsensitive) || htmlstring == "1" ||
+            htmlstring.contains("yes", Qt::CaseInsensitive))
             customhtml = true;
     }
 

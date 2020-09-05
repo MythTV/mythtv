@@ -737,7 +737,7 @@ ChannelBase *ChannelBase::CreateChannel(
     else if ((genOpt.m_inputType == "IMPORT") ||
              (genOpt.m_inputType == "DEMO") ||
              (genOpt.m_inputType == "MPEG" &&
-              genOpt.m_videoDev.toLower().startsWith("file:")))
+              genOpt.m_videoDev.startsWith("file:", Qt::CaseInsensitive)))
     {
         channel = new DummyChannel(tvrec);
         rbFileExt = "mpg";

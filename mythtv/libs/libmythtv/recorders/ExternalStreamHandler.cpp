@@ -1138,7 +1138,7 @@ bool ExternalStreamHandler::StartStreaming(void)
         if (!ProcessCommand("StartStreaming", result, 15000))
         {
             LogLevel_t level = LOG_ERR;
-            if (result.toLower().startsWith("warn"))
+            if (result.startsWith("warn", Qt::CaseInsensitive))
                 level = LOG_WARNING;
             else
                 m_bError = true;
@@ -1205,7 +1205,7 @@ bool ExternalStreamHandler::StopStreaming(void)
     if (!ProcessCommand("StopStreaming", result, 10000))
     {
         LogLevel_t level = LOG_ERR;
-        if (result.toLower().startsWith("warn"))
+        if (result.startsWith("warn", Qt::CaseInsensitive))
             level = LOG_WARNING;
         else
             m_bError = true;

@@ -56,7 +56,7 @@ void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     QString testVideoDev = videodev;
 
-    if (videodev.toLower().startsWith("file:"))
+    if (videodev.startsWith("file:", Qt::CaseInsensitive))
         testVideoDev = videodev.mid(5);
 
     QFileInfo fi(testVideoDev);
@@ -190,7 +190,7 @@ bool ImportRecorder::Open(void)
             LOG(VB_RECORD, LOG_ERR, LOC + preRecorded.errorString());
     }
 
-    if (fn.toLower().startsWith("myth://"))
+    if (fn.startsWith("myth://", Qt::CaseInsensitive))
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Malformed recording ProgramInfo.");
         return false;

@@ -1916,7 +1916,7 @@ void ImportConfigurationGroup::probeCard(const QString &device)
     QFileInfo fileInfo(device);
 
     // For convenience, ImportRecorder allows both formats:
-    if (device.toLower().startsWith("file:"))
+    if (device.startsWith("file:", Qt::CaseInsensitive))
         fileInfo.setFile(device.mid(5));
 
     if (fileInfo.exists())
@@ -2292,7 +2292,7 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
 
 void ExternalConfigurationGroup::probeApp(const QString & path)
 {
-    int idx1 = path.toLower().startsWith("file:") ? 5 : 0;
+    int idx1 = path.startsWith("file:", Qt::CaseInsensitive) ? 5 : 0;
     int idx2 = path.indexOf(' ', idx1);
 
     QString   ci;

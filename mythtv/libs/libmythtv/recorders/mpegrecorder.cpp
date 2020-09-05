@@ -273,7 +273,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)audiodev;
     (void)vbidev;
 
-    if (videodev.toLower().startsWith("file:"))
+    if (videodev.startsWith("file:", Qt::CaseInsensitive))
     {
         m_deviceIsMpegFile = true;
         m_bufferSize = 64000;

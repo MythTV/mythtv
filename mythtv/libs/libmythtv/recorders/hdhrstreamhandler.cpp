@@ -299,7 +299,7 @@ bool HDHRStreamHandler::Open(void)
     {
         const char *model = hdhomerun_device_get_model_str(m_hdhomerunDevice);
         m_tunerTypes.clear();
-        if (QString(model).toLower().contains("cablecard"))
+        if (QString(model).contains("cablecard", Qt::CaseInsensitive))
         {
             QString status_channel = "none";
             hdhomerun_tuner_status_t t_status {};
@@ -329,15 +329,15 @@ bool HDHRStreamHandler::Open(void)
                 m_tunerTypes.emplace_back(DTVTunerType::kTunerTypeOCUR);
             }
         }
-        else if (QString(model).toLower().endsWith("dvbt"))
+        else if (QString(model).endsWith("dvbt", Qt::CaseInsensitive))
         {
             m_tunerTypes.emplace_back(DTVTunerType::kTunerTypeDVBT);
         }
-        else if (QString(model).toLower().endsWith("dvbc"))
+        else if (QString(model).endsWith("dvbc", Qt::CaseInsensitive))
         {
             m_tunerTypes.emplace_back(DTVTunerType::kTunerTypeDVBC);
         }
-        else if (QString(model).toLower().endsWith("dvbtc"))
+        else if (QString(model).endsWith("dvbtc", Qt::CaseInsensitive))
         {
             m_tunerTypes.emplace_back(DTVTunerType::kTunerTypeDVBT);
             m_tunerTypes.emplace_back(DTVTunerType::kTunerTypeDVBC);
