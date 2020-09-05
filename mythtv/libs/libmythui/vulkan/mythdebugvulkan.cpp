@@ -14,7 +14,7 @@ VulkanDebugColor const MythDebugVulkan::s_DebugBlack { 0.0, 0.0, 0.0, 1.0 };
 MythDebugVulkan* MythDebugVulkan::Create(MythRenderVulkan *Render, VkDevice Device,
                                          QVulkanDeviceFunctions *Functions, MythWindowVulkan *Window)
 {
-    auto* result = new MythDebugVulkan(Render, Device, Functions, Window);
+    auto * result = new MythDebugVulkan(Render, Device, Functions, Window);
     if (result && !result->IsValid())
     {
         delete result;
@@ -31,23 +31,24 @@ MythDebugVulkan::MythDebugVulkan(MythRenderVulkan *Render, VkDevice Device,
     if (!m_valid)
         return;
 
-    auto extensions = m_window->supportedDeviceExtensions();
-    if (!extensions.contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+    m_valid = false;
+    if (m_window->supportedDeviceExtensions().contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+    {
+        m_beginRegion = reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(
+                    m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerBeginEXT"));
+        m_endRegion = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(
+                    m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerEndEXT"));
+        m_nameObject = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(
+                    m_window->vulkanInstance()->getInstanceProcAddr("vkDebugMarkerSetObjectNameEXT"));
+        if (m_beginRegion && m_endRegion && m_nameObject)
+            m_valid = true;
+        else
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to load procs");
+    }
+    else
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Extension not found");
-        return;
     }
-
-    m_beginRegion = reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(
-                m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerBeginEXT"));
-    m_endRegion = reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(
-                m_window->vulkanInstance()->getInstanceProcAddr("vkCmdDebugMarkerEndEXT"));
-    m_nameObject = reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(
-                m_window->vulkanInstance()->getInstanceProcAddr("vkDebugMarkerSetObjectNameEXT"));
-
-    m_valid = m_beginRegion && m_endRegion && m_nameObject;
-    if (!m_valid)
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to load procs");
 }
 
 void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const VulkanDebugColor& Color)
