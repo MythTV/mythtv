@@ -123,11 +123,6 @@ MythRenderVulkan::~MythRenderVulkan()
     LOG(VB_GENERAL, LOG_INFO, LOC + "Destroyed");
 }
 
-bool MythRenderVulkan::Init(void)
-{
-    return true;
-}
-
 void MythRenderVulkan::SetVulkanWindow(MythWindowVulkan *VulkanWindow)
 {
     m_window = VulkanWindow;
