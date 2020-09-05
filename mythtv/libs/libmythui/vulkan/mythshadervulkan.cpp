@@ -254,9 +254,10 @@ MythShaderVulkan* MythShaderVulkan::Create(MythRenderVulkan *Render, VkDevice De
                                            const MythShaderMap *Sources,
                                            const MythBindingMap *Bindings)
 {
-    auto* result = new MythShaderVulkan(Render, Device, Functions, Stages, Sources, Bindings);
-    if (result && !result->m_valid)
+    auto * result = new MythShaderVulkan(Render, Device, Functions, Stages, Sources, Bindings);
+    if (result && !result->IsValid())
     {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create shader");
         delete result;
         result = nullptr;
     }
@@ -270,7 +271,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
                                    const MythBindingMap *Bindings)
   : MythVulkanObject(Render, Device, Functions)
 {
-    if (!Device || !Functions || Stages.empty())
+    if (!m_valid || Stages.empty())
         return;
 
     if (!Sources)

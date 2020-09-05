@@ -7,7 +7,7 @@ MythUniformBufferVulkan* MythUniformBufferVulkan::Create(MythRenderVulkan *Rende
                                                          VkDeviceSize Size)
 {
     auto* result = new MythUniformBufferVulkan(Render, Device, Functions, Size);
-    if (result && !result->m_valid)
+    if (result && !result->IsValid())
     {
         delete result;
         result = nullptr;
@@ -20,9 +20,9 @@ MythUniformBufferVulkan::MythUniformBufferVulkan(MythRenderVulkan* Render, VkDev
   : MythVulkanObject(Render, Device, Functions),
     m_bufferSize(Size)
 {
-    if (Render->CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                             m_buffer, m_bufferMemory))
+    if (m_valid && Render->CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                        m_buffer, m_bufferMemory))
     {
         m_valid = m_devFuncs->vkMapMemory(m_device, m_bufferMemory, 0, Size, 0, &m_mappedMemory) == VK_SUCCESS;
     }

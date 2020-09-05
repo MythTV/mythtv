@@ -18,11 +18,25 @@ class MythTextureVulkan;
 class MythVulkanObject
 {
   public:
+    static MythVulkanObject* Create(MythRenderVulkan* Render);
     MythVulkanObject(MythRenderVulkan* Render, VkDevice Device, QVulkanDeviceFunctions* Functions);
-    bool                    m_valid    { false   };
+    MythVulkanObject(MythRenderVulkan* Render, VkDevice Device, QVulkanDeviceFunctions* Functions, MythWindowVulkan* Window);
+
+    bool                    IsValid();
+    MythRenderVulkan*       Render ();
+    VkDevice                Device ();
+    QVulkanDeviceFunctions* Funcs  ();
+    MythWindowVulkan*       Window ();
+
+  protected:
+    bool                    m_valid    { true    };
     MythRenderVulkan*       m_render   { nullptr };
     VkDevice                m_device   { nullptr };
     QVulkanDeviceFunctions* m_devFuncs { nullptr };
+    MythWindowVulkan*       m_window   { nullptr };
+
+  private:
+    Q_DISABLE_COPY(MythVulkanObject)
 };
 
 class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer, public MythRender

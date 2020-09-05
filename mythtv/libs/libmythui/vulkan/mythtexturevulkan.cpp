@@ -12,7 +12,7 @@ MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice 
     if (Image)
         result = new MythTextureVulkan(Render, Device, Functions, Image, Sampler, CommandBuffer);
 
-    if (result && !result->m_valid)
+    if (result && !result->IsValid())
     {
         delete result;
         result = nullptr;
@@ -27,7 +27,7 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
   : MythVulkanObject(Render, Device, Functions),
     MythComboBufferVulkan(Image->width(), Image->height())
 {
-    if (!(Render && Device && Functions))
+    if (!m_valid)
         return;
 
     // retrieve and check Image data

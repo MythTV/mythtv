@@ -30,7 +30,6 @@ class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
                     MythWindowVulkan* Window);
 
   private:
-    MythWindowVulkan*                 m_window      { nullptr };
     PFN_vkCmdDebugMarkerBeginEXT      m_beginRegion { nullptr };
     PFN_vkCmdDebugMarkerEndEXT        m_endRegion   { nullptr };
     PFN_vkDebugMarkerSetObjectNameEXT m_nameObject  { nullptr };

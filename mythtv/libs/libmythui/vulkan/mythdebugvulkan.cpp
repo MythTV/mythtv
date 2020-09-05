@@ -15,7 +15,7 @@ MythDebugVulkan* MythDebugVulkan::Create(MythRenderVulkan *Render, VkDevice Devi
                                          QVulkanDeviceFunctions *Functions, MythWindowVulkan *Window)
 {
     auto* result = new MythDebugVulkan(Render, Device, Functions, Window);
-    if (result && !result->m_valid)
+    if (result && !result->IsValid())
     {
         delete result;
         result = nullptr;
@@ -26,9 +26,11 @@ MythDebugVulkan* MythDebugVulkan::Create(MythRenderVulkan *Render, VkDevice Devi
 MythDebugVulkan::MythDebugVulkan(MythRenderVulkan *Render, VkDevice Device,
                                  QVulkanDeviceFunctions *Functions,
                                  MythWindowVulkan* Window)
-  : MythVulkanObject(Render, Device, Functions),
-    m_window(Window)
+  : MythVulkanObject(Render, Device, Functions, Window)
 {
+    if (!m_valid)
+        return;
+
     auto extensions = m_window->supportedDeviceExtensions();
     if (!extensions.contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
     {
