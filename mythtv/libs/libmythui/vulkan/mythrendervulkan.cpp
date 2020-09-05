@@ -151,6 +151,11 @@ void MythRenderVulkan::initResources(void)
         s_debugged = true;
         DebugVulkan();
     }
+
+    // retrieve physical device features and limits
+    m_window->vulkanInstance()->functions()
+            ->vkGetPhysicalDeviceFeatures(m_window->physicalDevice(), &m_phyDevFeatures);
+    m_phyDevLimits = m_window->physicalDeviceProperties()->limits;
 }
 
 QStringList MythRenderVulkan::GetDescription(void)
@@ -502,6 +507,15 @@ VkSampler MythRenderVulkan::CreateSampler(VkFilter Min, VkFilter Mag)
     return result;
 }
 
+VkPhysicalDeviceFeatures MythRenderVulkan::GetPhysicalDeviceFeatures() const
+{
+    return m_phyDevFeatures;
+}
+
+VkPhysicalDeviceLimits MythRenderVulkan::GetPhysicalDeviceLimits() const
+{
+    return m_phyDevLimits;
+}
 
 bool MythRenderVulkan::CreateImage(QSize             Size,
                                    VkFormat          Format,

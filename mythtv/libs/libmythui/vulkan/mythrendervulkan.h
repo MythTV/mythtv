@@ -84,6 +84,8 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     VkCommandBuffer CreateSingleUseCommandBuffer(void);
     void            FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer);
     VkSampler       CreateSampler(VkFilter Min, VkFilter Mag);
+    VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures() const;
+    VkPhysicalDeviceLimits   GetPhysicalDeviceLimits  () const;
 
   signals:
     void DoFreeResources    (void);
@@ -102,6 +104,8 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     VkDevice           m_device        { nullptr };
     QVulkanFunctions*  m_funcs         { nullptr };
     QVulkanDeviceFunctions *m_devFuncs { nullptr };
+    VkPhysicalDeviceFeatures m_phyDevFeatures {  };
+    VkPhysicalDeviceLimits   m_phyDevLimits   {  };
     bool               m_frameExpected { false   };
     bool               m_frameStarted  { false   };
     QMap<QString,QString> m_debugInfo;
