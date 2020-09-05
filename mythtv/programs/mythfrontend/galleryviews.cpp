@@ -38,7 +38,7 @@ void MarkedFiles::Invert(const ImageIdList &all)
     QSet tmp;
     for (int tmpint : all)
         tmp.insert(tmpint);
-    for (int tmpint : *this)
+    for (int tmpint : qAsConst(*this))
         tmp.remove(tmpint);
     swap(tmp);
 }
@@ -605,7 +605,8 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
     ImagePtr userIm;
     if (parent.m_userThumbnail != 0)
     {
-        for (const ImagePtr & im : files + dirs)
+        ImageList images = files + dirs;
+        for (const ImagePtr & im : qAsConst(images))
         {
             if (im && im->m_id == parent.m_userThumbnail)
             {

@@ -124,10 +124,12 @@ void MythPowerDBus::Init(void)
     // populate power devices (i.e. batteries)
     if (m_upowerInterface)
     {
-        QDBusReply<QList<QDBusObjectPath> > devices = m_upowerInterface->call(QLatin1String("EnumerateDevices"));
-        if (devices.isValid())
+        QDBusReply<QList<QDBusObjectPath> > response =
+            m_upowerInterface->call(QLatin1String("EnumerateDevices"));
+        if (response.isValid())
         {
-            for (const auto& device : devices.value())
+            QList devices = response.value();
+            for (const auto& device : qAsConst(devices))
                 DeviceAdded(device);
         }
 

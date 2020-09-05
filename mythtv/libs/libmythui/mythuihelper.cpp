@@ -759,7 +759,8 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
     // use fi.filePath() method here and then add the directory if
     // needed.  Using dir.entryList() and adding the dirname each time
     // is also slower just using dir.entryInfoList().
-    for (const QFileInfo & fi : dir.entryInfoList())
+    QFileInfoList entries = dir.entryInfoList();
+    for (const QFileInfo & fi : qAsConst(entries))
     {
         struct stat buf {};
         QString fullname = fi.filePath();

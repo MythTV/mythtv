@@ -1753,7 +1753,8 @@ QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
 QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
                                        const QString& header)
 {
-    for (const auto& rh : cacheData.rawHeaders())
+    auto headers = cacheData.rawHeaders();
+    for (const auto& rh : qAsConst(headers))
         if (QString(rh.first) == header)
             return QString(rh.second);
     return QString();

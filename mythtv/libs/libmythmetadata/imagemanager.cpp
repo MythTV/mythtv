@@ -300,7 +300,8 @@ QStringList ImageAdapterBase::SupportedImages()
 {
     // Determine supported picture formats from Qt
     QStringList formats;
-    for (const auto& ext : QImageReader::supportedImageFormats())
+    QList<QByteArray> supported = QImageReader::supportedImageFormats();
+    for (const auto& ext : qAsConst(supported))
         formats << QString(ext);
     return formats;
 }
@@ -462,7 +463,8 @@ StringMap ImageAdapterSg::GetScanDirs() const
 {
     StringMap map;
     int i = 0;
-    for (const auto& path : m_sg.GetDirList())
+    QStringList paths = m_sg.GetDirList();
+    for (const auto& path : qAsConst(paths))
         map.insert(i++, path);
     return map;
 }
@@ -2420,7 +2422,8 @@ bool ImageManagerFe::DetectLocalDevices()
     if (DeviceCount() > 0)
     {
         // Close devices that are no longer present
-        for (int devId : GetAbsentees())
+        QList absentees = GetAbsentees();
+        for (int devId : qAsConst(absentees))
             CloseDevices(devId);
 
         // Start local scan

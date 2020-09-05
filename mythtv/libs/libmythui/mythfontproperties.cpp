@@ -448,18 +448,21 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
             QFontDatabase database;
 
-            for (const QString & family : database.families())
+            QStringList families = database.families();
+            for (const QString & family : qAsConst(families))
             {
                 QStringList family_styles;
 
                 family_styles << family + "::";
-                for (const QString & style : database.styles(family))
+                QStringList styles = database.styles(family);
+                for (const QString & style : qAsConst(styles))
                 {
                     family_styles << style + ":";
 
                     QString sizes;
                     bool    tic = false;
-                    for (int points : database.smoothSizes(family, style))
+                    QList<int> pointList = database.smoothSizes(family, style);
+                    for (int points : qAsConst(pointList))
                     {
                         if (tic)
                             sizes += ",";

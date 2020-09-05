@@ -1284,7 +1284,8 @@ void StatusBox::doMachineStatus()
                                                       .arg(QSysInfo::currentCpuArchitecture()));
     AddLogLine("   " + tr("Qt version") + QString(": %1").arg(qVersion()));
 
-    for (const QNetworkInterface & iface : QNetworkInterface::allInterfaces())
+    QList allInterfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface & iface : qAsConst(allInterfaces))
     {
         QNetworkInterface::InterfaceFlags f = iface.flags();
         if (!(f & QNetworkInterface::IsUp))
@@ -1302,7 +1303,8 @@ void StatusBox::doMachineStatus()
 #endif
         AddLogLine("   " + name + QString(" (%1): ").arg(iface.humanReadableName()));
         AddLogLine("        " + tr("MAC Address") + ": " + iface.hardwareAddress());
-        for (const QNetworkAddressEntry & addr : iface.addressEntries())
+        QList addresses = iface.addressEntries();
+        for (const QNetworkAddressEntry & addr : qAsConst(addresses))
         {
             if (addr.ip().protocol() == QAbstractSocket::IPv4Protocol ||
                 addr.ip().protocol() == QAbstractSocket::IPv6Protocol)

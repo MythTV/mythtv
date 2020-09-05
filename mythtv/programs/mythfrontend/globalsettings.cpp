@@ -4584,7 +4584,8 @@ void AppearanceSettings::applyChange()
 void AppearanceSettings::PopulateScreens(int Screens)
 {
     m_screen->clearSelections();
-    for (QScreen *qscreen : QGuiApplication::screens())
+    QList screens = QGuiApplication::screens();
+    for (QScreen *qscreen : qAsConst(screens))
     {
         QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
         m_screen->addSelection(qscreen->name() + extra, qscreen->name());

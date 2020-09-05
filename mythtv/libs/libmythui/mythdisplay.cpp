@@ -318,7 +318,8 @@ QScreen *MythDisplay::GetDesiredScreen(void)
         // When fullscreen, Qt appears to use the reverse - though this may be
         // the window manager rather than Qt. So could be wrong.
         QPoint point = windowed ? override.topLeft() : override.bottomRight();
-        for (QScreen *screen : QGuiApplication::screens())
+        QList screens = QGuiApplication::screens();
+        for (QScreen *screen : qAsConst(screens))
         {
             if (screen->geometry().contains(point))
             {
@@ -341,7 +342,8 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     // Lookup by name
     if (!newscreen)
     {
-        for (QScreen *screen : QGuiApplication::screens())
+        QList screens = QGuiApplication::screens();
+        for (QScreen *screen : qAsConst(screens))
         {
             if (!name.isEmpty() && name == screen->name())
             {

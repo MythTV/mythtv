@@ -564,7 +564,8 @@ static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
                                   const QDir& dir, bool absPath = true)
 
 {
-    for (const auto & fi : dir.entryInfoList())
+    QFileInfoList entries = dir.entryInfoList();
+    for (const auto & fi : qAsConst(entries))
     {
         if (absPath)
             comboBox->addSelection( fi.absoluteFilePath() );

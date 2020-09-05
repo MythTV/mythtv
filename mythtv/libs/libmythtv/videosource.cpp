@@ -804,7 +804,8 @@ class VideoDevice : public CaptureCardComboBoxSetting
         if (!driver.isEmpty())
             driverExp = new QRegExp(driver);
 
-        for (const auto & fi : dir.entryInfoList())
+        QFileInfoList entries = dir.entryInfoList();
+        for (const auto & fi : qAsConst(entries))
         {
             struct stat st {};
             QString filepath = fi.absoluteFilePath();
@@ -910,7 +911,8 @@ class VBIDevice : public CaptureCardComboBoxSetting
                                const QString &driver)
     {
         QStringList devices;
-        for (const auto & fi : dir.entryInfoList())
+        QFileInfoList entries = dir.entryInfoList();
+        for (const auto & fi : qAsConst(entries))
         {
             QString    device = fi.absoluteFilePath();
             QByteArray adevice = device.toLatin1();

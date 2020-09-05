@@ -207,7 +207,8 @@ void PList::ArrayToXML(const QVariant &data, QXmlStreamWriter &xml)
 {
     xml.writeStartElement("array");
 
-    for (const auto& item : data.toList())
+    QList list = data.toList();
+    for (const auto& item : qAsConst(list))
         ToXML(item, xml);
 
     xml.writeEndElement();

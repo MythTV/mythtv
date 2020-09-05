@@ -478,7 +478,8 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     if (rawtype.toUpper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
-        for (const auto & it : dir.entryInfoList())
+        QFileInfoList entries = dir.entryInfoList();
+        for (const auto & it : qAsConst(entries))
         {
             QDir subdir(it.filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
             const QFileInfoList subil = subdir.entryInfoList();
@@ -492,7 +493,8 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     else if (rawtype.toUpper() == "ASI")
     {
         QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
-        for (const auto & it : dir.entryInfoList())
+        QFileInfoList entries = dir.entryInfoList();
+        for (const auto & it : qAsConst(entries))
         {
             if (GetASIDeviceNumber(it.filePath()) >= 0)
             {
