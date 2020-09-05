@@ -696,7 +696,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
  */
 void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 {
-    QList<MHData>                    handlers;
+    QVector<MHData>                  handlers;
     QMap<QString, MHData>::Iterator  itr = m_handlerMap.begin();
 
     while (itr != m_handlerMap.end())

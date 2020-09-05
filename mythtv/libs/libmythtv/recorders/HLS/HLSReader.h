@@ -38,7 +38,7 @@ class MTV_PUBLIC  HLSReader
 
   public:
     using StreamContainer = QMap<QString, HLSRecStream* >;
-    using SegmentContainer = QList<HLSRecSegment>;
+    using SegmentContainer = QVector<HLSRecSegment>;
 
     HLSReader(void) = default;
     ~HLSReader(void);

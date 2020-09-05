@@ -156,7 +156,7 @@ private:
 
 // Convenience containers
 using ImagePtr  = QSharedPointer<ImageItem>;
-using ImageList = QList<ImagePtr>;
+using ImageList = QVector<ImagePtr>;
 using ImageHash = QHash<QString, ImagePtr>;
 
 // Read-only images alias

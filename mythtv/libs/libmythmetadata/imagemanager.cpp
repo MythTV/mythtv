@@ -1687,7 +1687,7 @@ QStringList ImageHandler<DBFS>::HandleCreateThumbnails
 template <class DBFS>
 void ImageHandler<DBFS>::RemoveFiles(ImageList &images) const
 {
-    QMutableListIterator<ImagePtr> it(images);
+    QMutableVectorIterator<ImagePtr> it(images);
     it.toBack();
     while (it.hasPrevious())
     {

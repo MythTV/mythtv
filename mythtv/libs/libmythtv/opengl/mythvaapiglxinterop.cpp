@@ -97,7 +97,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace *ColourSpac
     delete [] m_vaapiPictureAttributes;
     m_vaapiPictureAttributeCount = 0;
     int supported_controls = kPictureAttributeSupported_None;
-    QList<VADisplayAttribute> supported;
+    QVector<VADisplayAttribute> supported;
     int num = vaMaxNumDisplayAttributes(m_vaDisplay);
     auto* attribs = new VADisplayAttribute[static_cast<unsigned int>(num)];
 

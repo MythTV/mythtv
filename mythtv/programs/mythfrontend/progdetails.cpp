@@ -159,8 +159,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
         return;
 
     using string_pair = QPair<QString, QString>;
-    QList<string_pair > tests;
-    QList<string_pair >::iterator Itest;
+    QVector<string_pair> tests;
     QString  recmatch;
     QString  pwrpri;
     QString  desc;
@@ -277,7 +276,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                    .arg(recordid);
     }
 
-    for (Itest = tests.begin(); Itest != tests.end(); ++Itest)
+    for (auto Itest = tests.begin(); Itest != tests.end(); ++Itest)
     {
         query.prepare("SELECT " + (*Itest).second.replace("program.", "p.")
                       + QString

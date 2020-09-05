@@ -1015,7 +1015,7 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     // TODO: Once TMDB supports certification per-locale, come back and match
     // locale of myth to certification locale.
     QDomElement certifications = item.firstChildElement("certifications");
-    QList< QPair<QString,QString> > ratinglist;
+    QVector< QPair<QString,QString> > ratinglist;
     if (!certifications.isNull())
     {
         QDomElement cert = certifications.firstChildElement("certification");

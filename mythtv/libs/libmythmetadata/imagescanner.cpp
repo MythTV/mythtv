@@ -189,11 +189,11 @@ void ImageScanThread<DBFS>::run()
             // Adding or updating directories has been completed.
             // The maps now only contain old directories & files that are not
             // in the filesystem anymore. Remove them from the database
-            m_dbfs.RemoveFromDB(m_dbDirMap.values());
-            m_dbfs.RemoveFromDB(m_dbFileMap.values());
+            m_dbfs.RemoveFromDB(QVector<ImagePtr>::fromList(m_dbDirMap.values()));
+            m_dbfs.RemoveFromDB(QVector<ImagePtr>::fromList(m_dbFileMap.values()));
 
             // Cleanup thumbnails
-            QStringList mesg(m_thumb.DeleteThumbs(m_dbFileMap.values()));
+            QStringList mesg(m_thumb.DeleteThumbs(QVector<ImagePtr>::fromList(m_dbFileMap.values())));
             mesg << m_changedImages.join(",");
 
             // Cleanup dirs

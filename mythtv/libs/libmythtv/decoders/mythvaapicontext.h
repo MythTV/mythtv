@@ -18,7 +18,7 @@ extern "C" {
 }
 
 using VAAPIProfile = QPair<MythCodecContext::CodecProfile,QPair<QSize,QSize>>;
-using VAAPIProfiles = QList<VAAPIProfile>;
+using VAAPIProfiles = QVector<VAAPIProfile>;
 
 class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 {
