@@ -234,13 +234,10 @@ QString MythSystemEventHandler::EventNameToSetting(const QString &name)
     QStringList parts = name.toLower().split('_', Qt::SkipEmptyParts);
 #endif
 
-    QStringList::Iterator it = parts.begin();
-    while (it != parts.end())
+    for (const auto & part : qAsConst(parts))
     {
-        result += (*it).left(1).toUpper();
-        result += (*it).midRef(1);
-
-        ++it;
+        result += part.at(0).toUpper();
+        result += part.midRef(1);
     }
 
     return result;

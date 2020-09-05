@@ -7420,7 +7420,8 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
         return false;
 
     // Check for and remove duplicate separator characters
-    if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)))
+    size_t size = chan.size();
+    if ((size > 2) && (chan.at(size-1) == chan.at(size-2)))
     {
         bool ok = false;
         chan.rightRef(1).toUInt(&ok);

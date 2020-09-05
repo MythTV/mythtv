@@ -862,7 +862,8 @@ void MythUIText::FillCutMessage(void)
             templist = m_cutMessage.split(". ");
 
             for (it = templist.begin(); it != templist.end(); ++it)
-                (*it).replace(0, 1, (*it).left(1).toUpper());
+                if (!(*it).isEmpty())
+                    (*it).replace(0, 1, (*it).at(0).toUpper());
 
             m_cutMessage = templist.join(". ");
             break;
@@ -871,7 +872,8 @@ void MythUIText::FillCutMessage(void)
             templist = m_cutMessage.split(" ");
 
             for (it = templist.begin(); it != templist.end(); ++it)
-                (*it).replace(0, 1, (*it).left(1).toUpper());
+                if (!(*it).isEmpty())
+                    (*it).replace(0, 1, (*it).at(0).toUpper());
 
             m_cutMessage = templist.join(" ");
             break;
