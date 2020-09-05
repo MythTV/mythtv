@@ -1192,7 +1192,11 @@ uint Dvr::AddRecordSchedule   (
     rule.m_recProfile = sRecProfile;
     rule.m_recGroupID = RecordingInfo::GetRecgroupID(sRecGroup);
     if (rule.m_recGroupID == 0)
-        rule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    {
+        rule.m_recGroupID = CreateRecordingGroup(sRecGroup);
+        if (rule.m_recGroupID <= 0)
+            rule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    }
     rule.m_storageGroup = sStorageGroup;
     rule.m_playGroup = sPlayGroup;
 
@@ -1360,7 +1364,11 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
     pRule.m_recProfile = sRecProfile;
     pRule.m_recGroupID = RecordingInfo::GetRecgroupID(sRecGroup);
     if (pRule.m_recGroupID == 0)
-        pRule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    {
+        pRule.m_recGroupID = CreateRecordingGroup(sRecGroup);
+        if (pRule.m_recGroupID <= 0)
+            pRule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    }
     pRule.m_storageGroup = sStorageGroup;
     pRule.m_playGroup = sPlayGroup;
 

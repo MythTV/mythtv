@@ -724,3 +724,23 @@ void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
         }
     }
 }
+
+int CreateRecordingGroup(const QString& groupName)
+{
+    int groupID = -1;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recgroups SET recgroup = :NAME, "
+                  "displayname = :DISPLAYNAME");
+    query.bindValue(":NAME", groupName);
+    query.bindValue(":DISPLAYNAME", groupName);
+
+    if (query.exec())
+        groupID = query.lastInsertId().toInt();
+
+    if (groupID <= 0)
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not create recording group (%1). "
+                                         "Does it already exist?").arg(groupName));
+
+    return groupID;
+}
