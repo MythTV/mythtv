@@ -1801,8 +1801,14 @@ void MPEGStreamData::TestDecryption(const ProgramMapTable *pmt)
         if (!encrypted && !pmt->IsStreamEncrypted(i))
             continue;
 
-        bool is_vid = pmt->IsVideo(i, m_siStandard);
-        bool is_aud = pmt->IsAudio(i, m_siStandard);
+        const uint streamType = pmt->StreamType(i);
+        bool is_vid = StreamID::IsVideo(streamType);
+        bool is_aud = StreamID::IsAudio(streamType);
+#if 0
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("KdW program:%1  i:%2 pid:0x%3 IsVideo:%4 IsAudio:%5")
+                .arg(pmt->ProgramNumber()).arg(i).arg(pmt->StreamPID(i),0,16).arg(is_vid).arg(is_aud));
+#endif
         if (is_vid || is_aud)
         {
             AddEncryptionTestPID(
@@ -1846,8 +1852,9 @@ static QString toString(CryptStatus status)
  */
 void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 {
-    QMutexLocker locker(&m_encryptionLock);
+    QMutexLocker encryptionLock(&m_encryptionLock);
 
+    std::map<uint,bool> pnumEncrypted;
     const uint pid = tspacket.PID();
     CryptInfo &info = m_encryptionPidToInfo[pid];
 
@@ -1915,14 +1922,23 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         m_encryptionPnumToStatus[pnum] = status;
 
         bool encrypted = kEncUnknown == status || kEncEncrypted == status;
-        m_listenerLock.lock();
-        for (auto & listener : m_mpegListeners)
-            listener->HandleEncryptionStatus(pnum, encrypted);
-        m_listenerLock.unlock();
+        pnumEncrypted[pnum] = encrypted;
 
         if (kEncDecrypted == status)
             pnum_del_list.push_back(pnum);
     }
+
+    // Call HandleEncryptionStatus outside the m_encryptionLock
+    encryptionLock.unlock();
+    m_listenerLock.lock();
+    for (auto & pe : pnumEncrypted)
+    {
+        for (auto & listener : m_mpegListeners)
+        {
+            listener->HandleEncryptionStatus(pe.first, pe.second);
+        }
+    }
+    m_listenerLock.unlock();
 
     for (size_t i = 0; i < pnum_del_list.size(); i++)
         RemoveEncryptionTestPIDs(pnums[i]);

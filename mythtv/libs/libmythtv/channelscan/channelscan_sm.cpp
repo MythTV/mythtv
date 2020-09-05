@@ -676,8 +676,8 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             GetCurrentTransportInfo(cur_chan, cur_chan_tr);
 
             QString msg_tr =
-                QObject::tr("%1 -- Testing decryption of program %2")
-                .arg(cur_chan_tr).arg(pnum);
+                QObject::tr("Program %1 Testing Decryption")
+                .arg(pnum);
             QString msg =
                 QString("%1 -- Testing decryption of program %2")
                 .arg(cur_chan).arg(pnum);
@@ -690,6 +690,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
                 GetDVBChannel()->SetPMT(pmt);
 #endif // USING_DVB
 
+            GetDTVSignalMonitor()->GetStreamData()->ResetDecryptionMonitoringState();
             GetDTVSignalMonitor()->GetStreamData()->TestDecryption(pmt);
 
             m_currentTestingDecryption = true;
@@ -1010,7 +1011,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                     msg_tr2 = QObject::tr("Encrypted");
                 else if (kEncDecrypted == *it)
                     msg_tr2 = QObject::tr("Decrypted");
-                QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
+                QString msg_tr =QString("%1 %2").arg(msg_tr1).arg(msg_tr2);
                 m_scanMonitor->ScanAppendTextToLog(msg_tr);
             }
 
