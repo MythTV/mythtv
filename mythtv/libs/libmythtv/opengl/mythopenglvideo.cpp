@@ -694,7 +694,7 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
             {
                 if (inputtextures[0]->m_transform && m_shaders[Default])
                 {
-                    m_render->EnableShaderProgram(m_shaders[Default]);
+                    m_openglRender->EnableShaderProgram(m_shaders[Default]);
                     m_shaders[Default]->setUniformValue("u_transform", *inputtextures[0]->m_transform);
                 }
             }
