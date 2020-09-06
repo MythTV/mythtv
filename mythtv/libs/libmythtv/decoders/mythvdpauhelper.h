@@ -1,6 +1,8 @@
 #ifndef MYTHVDPAUHELPER_H
 #define MYTHVDPAUHELPER_H
 
+#include <vector>
+
 // Qt
 #include <QSize>
 #include <QMutex>
@@ -33,7 +35,7 @@ class VDPAUCodec
 };
 
 using VDPAUProfile = QPair<MythCodecContext::CodecProfile, VDPAUCodec>;
-using VDPAUProfiles = QList<VDPAUProfile>;
+using VDPAUProfiles = std::vector<VDPAUProfile>;
 
 class MythVDPAUHelper : public QObject
 {

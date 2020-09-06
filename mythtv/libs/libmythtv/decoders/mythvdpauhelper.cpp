@@ -188,7 +188,7 @@ const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
         if (helper.ProfileCheck(profile, level, macros, width, height))
         {
             MythCodecContext::CodecProfile prof = VDPAUToMythProfile(profile);
-            s_profiles.append(VDPAUProfile(prof,
+            s_profiles.push_back(VDPAUProfile(prof,
                 VDPAUCodec(prof, QSize(static_cast<int>(width), static_cast<int>(height)), macros, level)));
         }
     }
@@ -200,7 +200,7 @@ const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
             if (helper.ProfileCheck(profile, level, macros, width, height))
             {
                 MythCodecContext::CodecProfile prof = VDPAUToMythProfile(profile);
-                s_profiles.append(VDPAUProfile(prof,
+                s_profiles.push_back(VDPAUProfile(prof,
                     VDPAUCodec(prof, QSize(static_cast<int>(width), static_cast<int>(height)), macros, level)));
             }
         }
@@ -212,7 +212,7 @@ const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
 void MythVDPAUHelper::GetDecoderList(QStringList &Decoders)
 {
     const VDPAUProfiles& profiles = MythVDPAUHelper::GetProfiles();
-    if (profiles.isEmpty())
+    if (profiles.empty())
         return;
 
     Decoders.append("VDPAU:");
