@@ -1804,11 +1804,7 @@ void MPEGStreamData::TestDecryption(const ProgramMapTable *pmt)
         const uint streamType = pmt->StreamType(i);
         bool is_vid = StreamID::IsVideo(streamType);
         bool is_aud = StreamID::IsAudio(streamType);
-#if 0
-        LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("KdW program:%1  i:%2 pid:0x%3 IsVideo:%4 IsAudio:%5")
-                .arg(pmt->ProgramNumber()).arg(i).arg(pmt->StreamPID(i),0,16).arg(is_vid).arg(is_aud));
-#endif
+
         if (is_vid || is_aud)
         {
             AddEncryptionTestPID(
