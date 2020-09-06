@@ -276,9 +276,10 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                    .arg(recordid);
     }
 
-    for (auto Itest = tests.begin(); Itest != tests.end(); ++Itest)
+    for (const auto & [label, csqlStart] : qAsConst(tests))
     {
-        query.prepare("SELECT " + (*Itest).second.replace("program.", "p.")
+        QString sqlStart = csqlStart;
+        query.prepare("SELECT " + sqlStart.replace("program.", "p.")
                       + QString
                       (" FROM %1 as p "
                        "INNER JOIN channel "
@@ -294,7 +295,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
         query.bindValue(":CHANID",    m_progInfo.GetChanID());
         query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
-        adjustmsg = QString("%1 : ").arg((*Itest).first);
+        adjustmsg = QString("%1 : ").arg(label);
         if (query.exec() && query.next())
         {
             int adj = query.value(0).toInt();
