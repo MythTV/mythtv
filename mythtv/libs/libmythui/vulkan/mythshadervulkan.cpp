@@ -300,7 +300,8 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
     {
         bool isvertex = false;
         MythBindingDesc desc = Bindings->at(stage);
-        MythStageLayout binding = std::get<0>(desc);
+        m_topology = std::get<0>(desc);
+        MythStageLayout binding = std::get<1>(desc);
 
         for (auto & stagelayout : binding)
         {
@@ -321,13 +322,13 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
 
         if (isvertex && !foundvertices)
         {
-            m_vertexBindingDesc = std::get<1>(desc);
-            m_vertexAttributes  = std::get<2>(desc);
+            m_vertexBindingDesc = std::get<2>(desc);
+            m_vertexAttributes  = std::get<3>(desc);
         }
 
         if (!pushconstants)
         {
-            VkPushConstantRange range = std::get<3>(desc);
+            VkPushConstantRange range = std::get<4>(desc);
             if (range.stageFlags)
             {
                 pushconstants = true;
@@ -470,3 +471,7 @@ VkDescriptorSetLayout MythShaderVulkan::GetDescSetLayout(size_t Set) const
     return nullptr;
 }
 
+VkPrimitiveTopology MythShaderVulkan::GetTopology() const
+{
+    return m_topology;
+}

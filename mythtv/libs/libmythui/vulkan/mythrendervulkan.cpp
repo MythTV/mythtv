@@ -625,10 +625,10 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRec
     // shaders
     const auto & shaderstages = Shader->Stages();
 
-    // primitives - triangle strip as for OpenGL
+    // primitives
     VkPipelineInputAssemblyStateCreateInfo inputassembly { };
     inputassembly.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputassembly.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    inputassembly.topology               = Shader->GetTopology();
     inputassembly.primitiveRestartEnable = VK_FALSE;
 
     // viewport - N.B. static

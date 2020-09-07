@@ -20,19 +20,24 @@
 //  - run mythfrontend
 //  - cut and paste updated SPIR-V from the logs (if compilation worked!)
 
-#define DefaultVertex450   (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 8))
-#define DefaultFragment450 (VK_SHADER_STAGE_FRAGMENT_BIT | (1 << 9))
-
+#define DefaultVertex450   (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 6))
+#define DefaultFragment450 (VK_SHADER_STAGE_FRAGMENT_BIT | (1 << 7))
 
 static const MythBindingMap k450ShaderBindings = {
-    { DefaultVertex450,   { { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
-                            { },
-                            { },
-                            { VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE } } },
-    { DefaultFragment450, { { { 1, { 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr } } },
-                            { },
-                            { },
-                            { } } }
+    { DefaultVertex450,
+        { VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
+        { },
+        { },
+        { VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE } }
+    },
+    { DefaultFragment450,
+        { VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        { { 1, { 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr } } },
+        { },
+        { },
+        { } }
+    }
 };
 
 static const MythShaderMap k450DefaultShaders = {
