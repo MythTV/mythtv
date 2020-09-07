@@ -652,20 +652,24 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRec
     viewportstate.pScissors     = &scissor;
 
     // Vertex input - from the shader
-    //const auto & vertexattribs = Shader->GetVertexAttributes();
-    //VkPipelineVertexInputStateCreateInfo vertexinput { };
-    //vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    //vertexinput.vertexBindingDescriptionCount   = 1;
-    //vertexinput.pVertexBindingDescriptions      = &Shader->GetVertexBindingDesc();
-    //vertexinput.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexattribs.size());
-    //vertexinput.pVertexAttributeDescriptions    = vertexattribs.data();
-
     VkPipelineVertexInputStateCreateInfo vertexinput { };
-    vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexinput.vertexBindingDescriptionCount   = 0;
-    vertexinput.pVertexBindingDescriptions      = nullptr;
-    vertexinput.vertexAttributeDescriptionCount = 0;
-    vertexinput.pVertexAttributeDescriptions    = nullptr;
+    const auto & vertexattribs = Shader->GetVertexAttributes();
+    if (vertexattribs.empty())
+    {
+        vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexinput.vertexBindingDescriptionCount   = 0;
+        vertexinput.pVertexBindingDescriptions      = nullptr;
+        vertexinput.vertexAttributeDescriptionCount = 0;
+        vertexinput.pVertexAttributeDescriptions    = nullptr;
+    }
+    else
+    {
+        vertexinput.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexinput.vertexBindingDescriptionCount   = 1;
+        vertexinput.pVertexBindingDescriptions      = &Shader->GetVertexBindingDesc();
+        vertexinput.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexattribs.size());
+        vertexinput.pVertexAttributeDescriptions    = vertexattribs.data();
+    }
 
     // multisampling - no thanks
     VkPipelineMultisampleStateCreateInfo multisampling { };
