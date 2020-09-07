@@ -1858,7 +1858,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             if (kScan_Interlaced == ps)
                 ps = kScan_Intr2ndField;
             m_osdLock.lock();
-            // Only double rate CPU deinterlacers require an extra call to ProcessFrame
+            // Only double rate CPU deinterlacers require an extra call to PrepareFrame
             if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
             {
                 // the first deinterlacing pass will have marked the frame as already deinterlaced
