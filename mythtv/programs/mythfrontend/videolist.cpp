@@ -243,9 +243,9 @@ static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
         path.clear();
     }
 
-    for (const auto & dir : qAsConst(path))
+    for (const auto & part : qAsConst(path))
     {
-        smart_dir_node sdn = start->addSubDir(dir, "" , host, prefix);
+        smart_dir_node sdn = start->addSubDir(part, "" , host, prefix);
         start = sdn.get();
     }
 

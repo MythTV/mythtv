@@ -1410,8 +1410,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     QString icon_file;
     const QString& host = metadata->GetHost();
     QFileInfo fullpath(metadata->GetFilename());
-    QDir dir = fullpath.dir();
-    QString prefix = QDir::cleanPath(dir.path());
+    QString prefix = QDir::cleanPath(fullpath.dir().path());
 
     QString filename = QString("%1/folder").arg(prefix);
 
