@@ -54,7 +54,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            DestroyBuffers        ();
     void            ProcessFrameGPU       (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan);
     void            RenderFrameGPU        (VideoFrame* Frame, FrameScanType Scan, OSD* Osd,
-                                           const QRect& ViewPort);
+                                           const QRect& ViewPort, bool Prepare = false);
     bool            ProcessInputChange    ();
     void            InitDisplayMeasurements();
 

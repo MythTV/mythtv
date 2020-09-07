@@ -121,6 +121,13 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     if (m_newCodecId != kCodec_NONE)
         return;
 
+
+    // FIXME GetWindowRect() is a placeholder
+    QRect viewport = GetWindowRect();
+
+    // Render preparation
+    RenderFrameGPU(Frame, Scan, Osd, viewport, true);
+
     // Start the frame...
     m_video->StartFrame();
 
@@ -128,8 +135,8 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     if (m_debugMarker && currentcmdbuffer)
         m_debugMarker->BeginRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
 
-    // FIXME GetWindowRect() is a placeholder
-    RenderFrameGPU(Frame, Scan, Osd, GetWindowRect());
+    // Actual render
+    RenderFrameGPU(Frame, Scan, Osd, viewport);
 
     if (m_debugMarker && currentcmdbuffer)
         m_debugMarker->EndRegion(currentcmdbuffer);

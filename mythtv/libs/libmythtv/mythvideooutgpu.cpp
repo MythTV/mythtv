@@ -408,24 +408,9 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
     }
 }
 
-void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd, const QRect& ViewPort)
+void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
+                                        OSD *Osd, const QRect& ViewPort, bool Prepare)
 {
-    bool dummy = false;
-    bool topfieldfirst = false;
-    if (Frame)
-    {
-        m_framesPlayed = Frame->frameNumber + 1;
-        topfieldfirst = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
-        dummy = Frame->dummy;
-    }
-    else
-    {
-        // see DoneDisplayingFrame
-        // we only retain pause frames for hardware formats
-        if (m_videoBuffers.Size(kVideoBuffer_pause))
-            Frame = m_videoBuffers.Tail(kVideoBuffer_pause);
-    }
-
     // Stereoscopic views
     QRect view1 = ViewPort;
     QRect view2 = ViewPort;
@@ -440,6 +425,42 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, O
     {
         view1 = QRect(ViewPort.left(),  ViewPort.top() / 2, ViewPort.width(), ViewPort.height() / 2);
         view2 = view1.translated(0, ViewPort.height() / 2);
+    }
+
+    if (Prepare)
+    {
+        // Prepare visualisation
+        if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbedding())
+        {
+            const QRect osdbounds = GetTotalOSDBounds();
+            if (stereo)
+                m_render->SetViewPort(view1, true);
+            m_visual->Prepare(osdbounds);
+            if (stereo)
+            {
+                m_render->SetViewPort(view2, true);
+                m_visual->Prepare(osdbounds);
+                m_render->SetViewPort(ViewPort);
+            }
+        }
+
+        return;
+    }
+
+    bool dummy = false;
+    bool topfieldfirst = false;
+    if (Frame)
+    {
+        m_framesPlayed = Frame->frameNumber + 1;
+        topfieldfirst = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+        dummy = Frame->dummy;
+    }
+    else
+    {
+        // see DoneDisplayingFrame
+        // we only retain pause frames for hardware formats
+        if (m_videoBuffers.Size(kVideoBuffer_pause))
+            Frame = m_videoBuffers.Tail(kVideoBuffer_pause);
     }
 
     // Main UI when embedded
