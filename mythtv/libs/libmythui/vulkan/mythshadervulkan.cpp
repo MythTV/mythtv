@@ -276,6 +276,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
 {
     if (!m_valid || Stages.empty())
         return;
+    m_valid = false;
 
     if (!Sources)
         Sources = &k450DefaultShaders;
@@ -468,3 +469,4 @@ VkDescriptorSetLayout MythShaderVulkan::GetDescSetLayout(size_t Set) const
         return m_descriptorSetLayouts.at(Set);
     return nullptr;
 }
+

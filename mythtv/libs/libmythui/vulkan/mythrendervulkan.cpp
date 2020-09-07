@@ -617,9 +617,9 @@ void MythRenderVulkan::FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer)
     m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &Buffer);
 }
 
-VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipelineLayout Layout, const QRect &Viewport)
+VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRect &Viewport)
 {
-    if (!(Shader && Layout && Viewport.isValid()))
+    if (!(Shader && Viewport.isValid()))
         return nullptr;
 
     // shaders
@@ -738,7 +738,7 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, VkPipeline
     pipelinecreate.pDepthStencilState  = &depthstencil;
     pipelinecreate.pColorBlendState    = &colorBlending;
     pipelinecreate.pDynamicState       = nullptr;
-    pipelinecreate.layout              = Layout;
+    pipelinecreate.layout              = Shader->GetPipelineLayout();
     pipelinecreate.renderPass          = m_window->defaultRenderPass();
     pipelinecreate.subpass             = 0;
     pipelinecreate.basePipelineHandle  = nullptr;

@@ -61,7 +61,6 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
     MythUniformBufferVulkan* m_projectionUniform { nullptr };
     VkSampler         m_textureSampler   { nullptr };
     MythShaderVulkan* m_textureShader    { nullptr };
-    VkPipelineLayout  m_textureLayout    { nullptr };
     VkPipeline        m_texturePipeline  { nullptr };
     VkDescriptorPool  m_textureDescriptorPool { nullptr };
     bool              m_textureDescriptorsCreated { false };

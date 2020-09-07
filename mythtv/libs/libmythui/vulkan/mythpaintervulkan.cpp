@@ -69,7 +69,6 @@ void MythPainterVulkan::DoFreeResources()
     m_debugAvailable           = true;
     m_textureUploadCmd         = nullptr;
     m_textureSampler           = nullptr;
-    m_textureLayout            = nullptr; // N.B. owned by shader
     m_texturePipeline          = nullptr;
     m_textureDescriptorPool    = nullptr;
     m_textureDescriptorsCreated = false;
@@ -124,7 +123,7 @@ void MythPainterVulkan::PopTransformation()
 bool MythPainterVulkan::Ready()
 {
     if (m_window && m_render && m_device && m_devFuncs && m_textureShader &&
-        m_texturePipeline && m_textureDescriptorPool && m_textureLayout &&
+        m_texturePipeline && m_textureDescriptorPool &&
         m_projectionDescriptorPool && m_projectionDescriptor &&
         m_projectionUniform && m_textureSampler)
     {
@@ -157,17 +156,10 @@ bool MythPainterVulkan::Ready()
             return false;
     }
 
-    if (!m_textureLayout)
-    {
-        m_textureLayout = m_textureShader->GetPipelineLayout();
-        if (!m_textureLayout)
-            return false;
-    }
-
     if (!m_texturePipeline)
     {
         QRect viewport(QPoint{0, 0}, m_window->swapChainImageSize());
-        m_texturePipeline = m_render->CreatePipeline(m_textureShader, m_textureLayout, viewport);
+        m_texturePipeline = m_render->CreatePipeline(m_textureShader, viewport);
         if (!m_texturePipeline)
             return false;
     }
@@ -356,22 +348,23 @@ void MythPainterVulkan::End()
     if (m_debugMarker)
         m_debugMarker->BeginRegion(currentcmdbuf, "PAINTER_RENDER", MythDebugVulkan::s_DebugGreen);
 
-    // Bind our pipeline
+    // Bind our pipeline and retrieve layout once
     m_devFuncs->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_texturePipeline);
+    auto layout = m_textureShader->GetPipelineLayout();
 
     // Bind descriptor set 0 - which is the projection, which is 'constant' for all textures
     m_devFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                        m_textureLayout, 0, 1, &m_projectionDescriptor, 0, nullptr);
+                                        layout, 0, 1, &m_projectionDescriptor, 0, nullptr);
 
     for (auto * texture : m_queuedTextures)
     {
         // Bind descriptor set 1 for this texture - sampler
         m_devFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                            m_textureLayout, 1, 1, &texture->m_descriptor, 0, nullptr);
+                                            layout, 1, 1, &texture->m_descriptor, 0, nullptr);
 
         // Push constants - transform, vertex data and color (alpha)
-        m_devFuncs->vkCmdPushConstants(currentcmdbuf, m_textureLayout,
-                                       VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE, texture->Data());
+        m_devFuncs->vkCmdPushConstants(currentcmdbuf, layout, VK_SHADER_STAGE_VERTEX_BIT,
+                                       0, MYTH_PUSHBUFFER_SIZE, texture->Data());
         texture->PopData();
 
         // Draw

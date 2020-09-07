@@ -80,7 +80,7 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
                                  VkDeviceMemory& Memory);
     void            CopyBuffer(VkBuffer Src, VkBuffer Dst, VkDeviceSize Size,
                                VkCommandBuffer CommandBuffer = nullptr);
-    VkPipeline      CreatePipeline(MythShaderVulkan* Shader, VkPipelineLayout Layout, const QRect &Viewport);
+    VkPipeline      CreatePipeline(MythShaderVulkan* Shader, const QRect &Viewport);
     VkCommandBuffer CreateSingleUseCommandBuffer(void);
     void            FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer);
     VkSampler       CreateSampler(VkFilter Min, VkFilter Mag);
