@@ -617,7 +617,9 @@ void MythRenderVulkan::FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer)
     m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &Buffer);
 }
 
-VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRect &Viewport)
+VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
+                                            const QRect& Viewport,
+                                            std::vector<VkDynamicState> Dynamic)
 {
     if (!(Shader && Viewport.isValid()))
         return nullptr;
@@ -726,6 +728,12 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRec
     depthstencil.minDepthBounds        = 0.0F;
     depthstencil.maxDepthBounds        = 1.0F;
 
+    // setup dynamic state
+    VkPipelineDynamicStateCreateInfo dynamic { };
+    dynamic.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic.dynamicStateCount = Dynamic.empty() ? 0 : static_cast<uint32_t>(Dynamic.size());
+    dynamic.pDynamicStates    = Dynamic.empty() ? nullptr : Dynamic.data();
+
     // and breathe
     VkGraphicsPipelineCreateInfo pipelinecreate { };
     pipelinecreate.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -741,7 +749,7 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan *Shader, const QRec
     pipelinecreate.pMultisampleState   = &multisampling;
     pipelinecreate.pDepthStencilState  = &depthstencil;
     pipelinecreate.pColorBlendState    = &colorBlending;
-    pipelinecreate.pDynamicState       = nullptr;
+    pipelinecreate.pDynamicState       = &dynamic;
     pipelinecreate.layout              = Shader->GetPipelineLayout();
     pipelinecreate.renderPass          = m_window->defaultRenderPass();
     pipelinecreate.subpass             = 0;
