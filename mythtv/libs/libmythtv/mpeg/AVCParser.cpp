@@ -595,8 +595,6 @@ bool AVCParser::decode_Header(GetBitContext *gb)
         m_bottomFieldFlag = -1;
     }
 
-    m_scanType = m_fieldPicFlag ? SCAN_t::INTERLACED : SCAN_t::PROGRESSIVE;
-
     /*
       m_idrPicId identifies an IDR picture. The values of m_idrPicId
       in all the slices of an IDR picture shall remain unchanged. When
