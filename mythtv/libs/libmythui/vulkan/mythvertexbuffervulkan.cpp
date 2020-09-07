@@ -8,7 +8,7 @@ MythVertexBufferVulkan* MythVertexBufferVulkan::Create(MythRenderVulkan *Render,
                                                        QVulkanDeviceFunctions *Functions, VkDeviceSize Size)
 {
     MythVertexBufferVulkan* result = new MythVertexBufferVulkan(Render, Device, Functions, Size);
-    if (result && !result->m_valid)
+    if (result && !result->IsValid())
     {
         delete result;
         result = nullptr;
@@ -21,7 +21,7 @@ MythVertexBufferVulkan::MythVertexBufferVulkan(MythRenderVulkan *Render, VkDevic
   : MythVulkanObject(Render, Device, Functions),
     m_bufferSize(Size)
 {
-    if (!(Render && Device && Functions))
+    if (!m_valid)
         return;
 
     if (m_render->CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
