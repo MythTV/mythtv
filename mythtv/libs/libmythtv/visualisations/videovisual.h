@@ -48,6 +48,8 @@ class MTV_PUBLIC VideoVisual : public MythTV::Visual
     VideoVisual(AudioPlayer *audio, MythRender *render);
    ~VideoVisual() override;
 
+    bool NeedsPrepare() const { return m_needsPrepare; }
+    virtual void Prepare(const QRect& /*Area*/) { }
     virtual void Draw(const QRect &area, MythPainter *painter,
                       QPaintDevice* device) = 0;
     virtual QString Name(void) = 0;
@@ -60,10 +62,11 @@ class MTV_PUBLIC VideoVisual : public MythTV::Visual
     void DeleteNodes(void);
     int64_t SetLastUpdate(void);
 
-    AudioPlayer       *m_audio    {nullptr};
-    bool               m_disabled {false};
+    AudioPlayer       *m_audio        { nullptr };
+    bool               m_needsPrepare { false   };
+    bool               m_disabled     { false   };
     QRect              m_area;
-    MythRender        *m_render   {nullptr};
+    MythRender        *m_render       { nullptr };
     QList<VisualNode*> m_nodes;
     QDateTime          m_lastUpdate;
 };
