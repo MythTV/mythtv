@@ -5,6 +5,7 @@
 #include <QString>
 
 // MythTV
+#include "vulkan/mythcombobuffervulkan.h"
 #include "vulkan/mythshadervulkan.h"
 
 // GLSL 4.50 shaders for Vulkan.
@@ -19,14 +20,15 @@
 //  - run mythfrontend
 //  - cut and paste updated SPIR-V from the logs (if compilation worked!)
 
-#define DefaultVertex450   1
-#define DefaultFragment450 2
+#define DefaultVertex450   (VK_SHADER_STAGE_VERTEX_BIT   | (1 << 8))
+#define DefaultFragment450 (VK_SHADER_STAGE_FRAGMENT_BIT | (1 << 9))
+
 
 static const MythBindingMap k450ShaderBindings = {
     { DefaultVertex450,   { { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
                             { },
                             { },
-                            { VK_SHADER_STAGE_VERTEX_BIT, 0, 112 } } },
+                            { VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE } } },
     { DefaultFragment450, { { { 1, { 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr } } },
                             { },
                             { },

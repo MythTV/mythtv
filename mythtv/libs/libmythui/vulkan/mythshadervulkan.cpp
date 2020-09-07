@@ -383,7 +383,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
     {
         std::vector<MythGLSLStage> glslstages;
         for (const auto & stage : Stages)
-            glslstages.emplace_back(std::get<0>(Bindings->at(stage)).front().second.stageFlags, Sources->at(stage).first);
+            glslstages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).first);
         m_valid = MythShaderVulkan::CreateShaderFromGLSL(glslstages);
         return;
     }
@@ -391,7 +391,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
 
     std::vector<MythSPIRVStage> stages;
     for (const auto & stage : Stages)
-        stages.emplace_back(std::get<0>(Bindings->at(stage)).front().second.stageFlags, Sources->at(stage).second);
+        stages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).second);
     m_valid = MythShaderVulkan::CreateShaderFromSPIRV(stages);
 }
 
