@@ -66,19 +66,10 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
         m_render->IncrRef();
 
     if (IsValidVulkan())
-    {
-        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            m_debugMarker = MythDebugVulkan::Create(this);
         m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, true, QString {});
-    }
 
     if (!(IsValidVulkan() && m_painter && m_video))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise Vulkan video output");
-}
-
-MythVideoOutputVulkan::~MythVideoOutputVulkan()
-{
-    delete m_debugMarker;
 }
 
 bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDim,
@@ -125,14 +116,14 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     m_video->StartFrame();
 
     VkCommandBuffer currentcmdbuffer = m_vulkanWindow->currentCommandBuffer();
-    if (m_debugMarker && currentcmdbuffer)
-        m_debugMarker->BeginRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkanRender->BeginDebugRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
 
     // Actual render
     RenderFrameGPU(Frame, Scan, Osd, viewport);
 
-    if (m_debugMarker && currentcmdbuffer)
-        m_debugMarker->EndRegion(currentcmdbuffer);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkanRender->EndDebugRegion(currentcmdbuffer);
 }
 
 void MythVideoOutputVulkan::EndFrame()

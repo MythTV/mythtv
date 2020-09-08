@@ -76,9 +76,6 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
 
     QMatrix4x4         m_projection;
     QStack<QMatrix4x4> m_transforms;
-
-    MythDebugVulkan*   m_debugMarker     { nullptr };
-    bool               m_debugAvailable  { true    };
 };
 
 #endif

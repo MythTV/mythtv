@@ -5,6 +5,7 @@
 #include "mythlogging.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"
+#include "vulkan/mythdebugvulkan.h"
 #include "vulkan/mythwindowvulkan.h"
 #include "vulkan/mythshadervulkan.h"
 #include "vulkan/mythtexturevulkan.h"
@@ -150,6 +151,12 @@ void MythRenderVulkan::initResources(void)
     m_window->vulkanInstance()->functions()
             ->vkGetPhysicalDeviceFeatures(m_window->physicalDevice(), &m_phyDevFeatures);
     m_phyDevLimits = m_window->physicalDeviceProperties()->limits;
+
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+    {
+        MythVulkanObject temp(this);
+        m_debugMarker = MythDebugVulkan::Create(&temp);
+    }
 }
 
 QStringList MythRenderVulkan::GetDescription(void)
@@ -262,13 +269,18 @@ void MythRenderVulkan::releaseSwapChainResources(void)
 
 void MythRenderVulkan::releaseResources(void)
 {
+    delete m_debugMarker;
+
     LOG(VB_GENERAL, LOG_INFO, LOC + __FUNCTION__);
     emit DoFreeResources();
     m_devFuncs      = nullptr;
     m_funcs         = nullptr;
     m_device        = nullptr;
+    m_debugMarker   = nullptr;
     m_frameStarted  = false;
     m_frameExpected = false;
+    m_phyDevLimits  = { };
+    m_phyDevFeatures = { };
 }
 
 void MythRenderVulkan::physicalDeviceLost(void)
@@ -509,6 +521,19 @@ VkPhysicalDeviceFeatures MythRenderVulkan::GetPhysicalDeviceFeatures() const
 VkPhysicalDeviceLimits MythRenderVulkan::GetPhysicalDeviceLimits() const
 {
     return m_phyDevLimits;
+}
+
+void MythRenderVulkan::BeginDebugRegion(VkCommandBuffer CommandBuffer, const char *Name,
+                                        const MythVulkan4F &Color)
+{
+    if (m_debugMarker && CommandBuffer)
+        m_debugMarker->BeginRegion(CommandBuffer, Name, Color);
+}
+
+void MythRenderVulkan::EndDebugRegion(VkCommandBuffer CommandBuffer)
+{
+    if (m_debugMarker && CommandBuffer)
+        m_debugMarker->EndRegion(CommandBuffer);
 }
 
 bool MythRenderVulkan::CreateImage(QSize             Size,

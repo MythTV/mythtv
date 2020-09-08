@@ -35,7 +35,6 @@ MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace*
 MythVideoVulkan::~MythVideoVulkan()
 {
     MythVideoVulkan::ResetFrameFormat();
-    delete m_debugMarker;
 }
 
 void MythVideoVulkan::Init()
@@ -44,11 +43,7 @@ void MythVideoVulkan::Init()
         return;
 
     if (IsValidVulkan())
-    {
-        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            m_debugMarker = MythDebugVulkan::Create(this);
         m_valid = true;
-    }
 }
 
 void MythVideoVulkan::ResetFrameFormat()
@@ -148,11 +143,11 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
 
     //MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
 
-    if (m_debugMarker && cmdbuffer)
-        m_debugMarker->BeginRegion(cmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkanRender->BeginDebugRegion(cmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
 
-    if (m_debugMarker && cmdbuffer)
-        m_debugMarker->EndRegion(cmdbuffer);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkanRender->EndDebugRegion(cmdbuffer);
 
     m_vulkanRender->FinishSingleUseCommandBuffer(cmdbuffer);
 }

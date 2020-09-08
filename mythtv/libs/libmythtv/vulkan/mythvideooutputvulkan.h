@@ -7,7 +7,6 @@
 
 class MythPainterVulkan;
 class MythVideoVulkan;
-class MythDebugVulkan;
 
 #define VULKAN_RENDERER QString("vulkan")
 
@@ -19,7 +18,7 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
     static VideoFrameTypeVec s_vulkanFrameTypes;
 
     MythVideoOutputVulkan(QString& Profile);
-   ~MythVideoOutputVulkan() override;
+   ~MythVideoOutputVulkan() override = default;
 
     bool IsPIPSupported           () const override { return false; }
     bool StereoscopicModesAllowed () const override { return false; }
@@ -36,8 +35,6 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
                                        const QRect& DisplayVisibleRect,
                                        const QRect& DisplayVideoRect,
                                        const QRect& VideoRect) override;
-
-    MythDebugVulkan*   m_debugMarker   { nullptr };
 };
 
 #endif

@@ -13,7 +13,6 @@ using std::vector;
 
 class MythPainterVulkan;
 class MythVideoVulkan;
-class MythDebugVulkan;
 class MythVideoTextureVulkan;
 
 class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
@@ -44,7 +43,6 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
     bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType, QSize Size,
                               VkCommandBuffer CmdBuffer);
 
-    MythDebugVulkan*   m_debugMarker   { nullptr };
     vector<MythVideoTextureVulkan*> m_inputTextures;
 };
 

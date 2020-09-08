@@ -5,11 +5,11 @@
 
 #define LOC QString("VulkanMarker: ")
 
-VulkanDebugColor const MythDebugVulkan::s_DebugRed   { 1.0, 0.0, 0.0, 1.0 };
-VulkanDebugColor const MythDebugVulkan::s_DebugGreen { 0.0, 1.0, 0.0, 1.0 };
-VulkanDebugColor const MythDebugVulkan::s_DebugBlue  { 0.0, 0.0, 1.0, 1.0 };
-VulkanDebugColor const MythDebugVulkan::s_DebugGray  { 0.5, 0.5, 0.5, 1.0 };
-VulkanDebugColor const MythDebugVulkan::s_DebugBlack { 0.0, 0.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::s_DebugRed   { 1.0, 0.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::s_DebugGreen { 0.0, 1.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::s_DebugBlue  { 0.0, 0.0, 1.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::s_DebugGray  { 0.5, 0.5, 0.5, 1.0 };
+MythVulkan4F const MythDebugVulkan::s_DebugBlack { 0.0, 0.0, 0.0, 1.0 };
 
 MythDebugVulkan* MythDebugVulkan::Create(MythVulkanObject *Vulkan)
 {
@@ -48,7 +48,7 @@ MythDebugVulkan::MythDebugVulkan(MythVulkanObject* Vulkan)
     }
 }
 
-void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const VulkanDebugColor& Color)
+void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const MythVulkan4F& Color)
 {
     VkDebugMarkerMarkerInfoEXT begin =
         { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, nullptr, Name,

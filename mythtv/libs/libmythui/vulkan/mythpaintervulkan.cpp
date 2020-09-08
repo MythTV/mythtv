@@ -47,7 +47,6 @@ void MythPainterVulkan::DoFreeResources()
 
     delete m_projectionUniform;
     delete m_textureShader;
-    delete m_debugMarker;
 
     if (m_vulkan && m_vulkan->IsValidVulkan())
     {
@@ -69,8 +68,6 @@ void MythPainterVulkan::DoFreeResources()
     m_projectionDescriptor     = nullptr; // destroyed with pool
     m_projectionUniform        = nullptr;
     m_textureShader            = nullptr;
-    m_debugMarker              = nullptr;
-    m_debugAvailable           = true;
     m_textureUploadCmd         = nullptr;
     m_textureSampler           = nullptr;
     m_texturePipeline          = nullptr;
@@ -284,13 +281,6 @@ void MythPainterVulkan::Begin(QPaintDevice* /*Parent*/)
         SetMaximumCacheSizes(gpu, cpu);
     }
 
-    if (m_debugAvailable && !m_debugMarker && VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-    {
-        m_debugMarker = MythDebugVulkan::Create(m_vulkan);
-        if (!m_debugMarker)
-            m_debugAvailable = false;
-    }
-
     // Sometimes the UI engine will mark images as 'changed' when moving between
     // screens. These are then often released here whilst still in use for the
     // previous frame. To avoid validation errors, wait for the last frame to
@@ -337,8 +327,8 @@ void MythPainterVulkan::End()
 
     // Retrieve the command buffer
     VkCommandBuffer currentcmdbuf = m_vulkan->Window()->currentCommandBuffer();
-    if (m_debugMarker)
-        m_debugMarker->BeginRegion(currentcmdbuf, "PAINTER_RENDER", MythDebugVulkan::s_DebugGreen);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkan->Render()->BeginDebugRegion(currentcmdbuf, "PAINTER_RENDER", MythDebugVulkan::s_DebugGreen);
 
     // Bind our pipeline and retrieve layout once
     m_vulkan->Funcs()->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_texturePipeline);
@@ -363,8 +353,8 @@ void MythPainterVulkan::End()
         m_vulkan->Funcs()->vkCmdDraw(currentcmdbuf, 4, 1, 0, 0);
     }
 
-    if (m_debugMarker)
-        m_debugMarker->EndRegion(currentcmdbuf);
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_vulkan->Render()->EndDebugRegion(currentcmdbuf);
 
     m_queuedTextures.clear();
 

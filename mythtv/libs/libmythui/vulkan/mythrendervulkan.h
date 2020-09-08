@@ -10,10 +10,13 @@
 #include "mythrender_base.h"
 
 class MythImage;
+class MythDebugVulkan;
 class MythRenderVulkan;
 class MythWindowVulkan;
 class MythShaderVulkan;
 class MythTextureVulkan;
+
+using MythVulkan4F = std::array<float,4>;
 
 class MUI_PUBLIC MythVulkanObject
 {
@@ -68,6 +71,9 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     void physicalDeviceLost        (void) override;
     void logicalDeviceLost         (void) override;
 
+    void            BeginDebugRegion(VkCommandBuffer CommandBuffer, const char *Name,
+                                     const MythVulkan4F& Color);
+    void            EndDebugRegion(VkCommandBuffer CommandBuffer);
     bool            CreateImage(QSize Size, VkFormat Format, VkImageTiling Tiling,
                                 VkImageUsageFlags Usage, VkMemoryPropertyFlags Properties,
                                 VkImage& Image, VkDeviceMemory& ImageMemory);
@@ -111,6 +117,7 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     bool               m_frameExpected { false   };
     bool               m_frameStarted  { false   };
     QMap<QString,QString> m_debugInfo;
+    MythDebugVulkan*   m_debugMarker   { nullptr };
 };
 
 #endif
