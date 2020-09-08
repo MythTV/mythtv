@@ -21,7 +21,7 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
     Q_OBJECT
 
   public:
-    MythPainterVulkan(MythRenderVulkan *VulkanRender, MythWindowVulkan *VulkanWindow);
+    MythPainterVulkan(MythRenderVulkan *VulkanRender);
    ~MythPainterVulkan() override;
 
     QString GetName           () override;
@@ -51,10 +51,8 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
     void ClearCache();
     MythTextureVulkan* GetTextureFromCache(MythImage *Image);
 
-    MythWindowVulkan* m_window           { nullptr };
-    MythRenderVulkan* m_render           { nullptr };
-    VkDevice          m_device           { nullptr };
-    QVulkanDeviceFunctions* m_devFuncs   { nullptr };
+    bool              m_ready  { false   };
+    MythVulkanObject* m_vulkan { nullptr };
 
     VkDescriptorPool  m_projectionDescriptorPool { nullptr };
     VkDescriptorSet   m_projectionDescriptor { nullptr };

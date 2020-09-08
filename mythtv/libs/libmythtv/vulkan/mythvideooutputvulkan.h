@@ -7,12 +7,11 @@
 
 class MythPainterVulkan;
 class MythVideoVulkan;
-class MythWindowVulkan;
 class MythDebugVulkan;
 
 #define VULKAN_RENDERER QString("vulkan")
 
-class MythVideoOutputVulkan : public MythVideoOutputGPU
+class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
 {
   public:
     static void        GetRenderOptions    (RenderOptions& Options);
@@ -38,10 +37,6 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU
                                        const QRect& DisplayVideoRect,
                                        const QRect& VideoRect) override;
 
-    MythRenderVulkan*  m_vulkanRender  { nullptr };
-    MythWindowVulkan*  m_vulkanWindow  { nullptr };
-    VkDevice           m_device        { nullptr };
-    QVulkanDeviceFunctions* m_devFuncs { nullptr };
     MythDebugVulkan*   m_debugMarker   { nullptr };
 };
 

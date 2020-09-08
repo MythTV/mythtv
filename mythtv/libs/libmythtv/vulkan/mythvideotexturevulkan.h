@@ -17,16 +17,12 @@ using std::vector;
 class MythVideoTextureVulkan
 {
   public:
-    static vector<MythVideoTextureVulkan*> CreateTextures(MythRenderVulkan* Render,
-                                                          VkDevice          Device,
-                                                          QVulkanDeviceFunctions* Functions,
+    static vector<MythVideoTextureVulkan*> CreateTextures(MythVulkanObject* Vulkan,
                                                           VkCommandBuffer   CommandBuffer,
                                                           VideoFrameType    Type,
                                                           VideoFrameType    Format,
                                                           QSize             Size);
-    static void                            DeleteTextures(MythRenderVulkan* Render,
-                                                          VkDevice          Device,
-                                                          QVulkanDeviceFunctions* Functions,
+    static void                            DeleteTextures(MythVulkanObject* Vulkan,
                                                           VkCommandBuffer   CommandBuffer,
                                                           vector<MythVideoTextureVulkan*>& Textures);
   protected:
@@ -35,16 +31,12 @@ class MythVideoTextureVulkan
 
   private:
     Q_DISABLE_COPY(MythVideoTextureVulkan)
-    static vector<MythVideoTextureVulkan*> CreateSoftwareTextures(MythRenderVulkan* Render,
-                                                                  VkDevice          Device,
-                                                                  QVulkanDeviceFunctions* Functions,
+    static vector<MythVideoTextureVulkan*> CreateSoftwareTextures(MythVulkanObject* Vulkan,
                                                                   VkCommandBuffer   CommandBuffer,
                                                                   VideoFrameType    Type,
                                                                   VideoFrameType    Format,
                                                                   QSize             Size);
-    static void                            DeleteTexture (MythRenderVulkan* Render,
-                                                          VkDevice          Device,
-                                                          QVulkanDeviceFunctions* Functions,
+    static void                            DeleteTexture (MythVulkanObject* Vulkan,
                                                           VkCommandBuffer   CommandBuffer,
                                                           MythVideoTextureVulkan* Texture);
 

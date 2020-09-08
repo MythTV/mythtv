@@ -12,20 +12,22 @@
 
 #define LOC QString("VulkanVideo: ")
 
-MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
+MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
                                  MythVideoBounds* Bounds, bool ViewportControl,
                                  const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, Bounds, ViewportControl, Profile)
+  : MythVideoGPU(Vulkan->Render(), ColourSpace, Bounds, ViewportControl, Profile),
+    MythVulkanObject(Vulkan)
 {
     MythVideoVulkan::Init();
 }
 
-MythVideoVulkan::MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
+MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
                                  QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                                  QRect DisplayVideoRect, QRect VideoRect,
                                  bool ViewportControl, const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, ViewportControl, Profile)
+  : MythVideoGPU(Vulkan->Render(), ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
+                 DisplayVideoRect, VideoRect, ViewportControl, Profile),
+    MythVulkanObject(Vulkan)
 {
     MythVideoVulkan::Init();
 }
@@ -41,29 +43,17 @@ void MythVideoVulkan::Init()
     if (!m_videoColourSpace)
         return;
 
-    m_vulkanRender = MythRenderVulkan::GetVulkanRender();
-    if (m_vulkanRender)
+    if (IsValidVulkan())
     {
-        m_vulkanWindow = m_vulkanRender->GetVulkanWindow();
-        if (m_vulkanWindow)
-        {
-            m_device = m_vulkanWindow->device();
-            if (m_device)
-            {
-                m_devFuncs = m_vulkanWindow->vulkanInstance()->deviceFunctions(m_device);
-                m_valid = m_devFuncs != nullptr;
-            }
-        }
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            m_debugMarker = MythDebugVulkan::Create(this);
+        m_valid = true;
     }
-
-    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO) && m_vulkanRender && m_device && m_devFuncs && m_vulkanWindow)
-        m_debugMarker = MythDebugVulkan::Create(m_vulkanRender, m_device, m_devFuncs, m_vulkanWindow);
 }
 
 void MythVideoVulkan::ResetFrameFormat()
 {
-    MythVideoTextureVulkan::DeleteTextures(m_vulkanRender, m_device,
-                                           m_devFuncs, nullptr, m_inputTextures);
+    MythVideoTextureVulkan::DeleteTextures(this, nullptr, m_inputTextures);
     MythVideoGPU::ResetFrameFormat();
 }
 
@@ -83,8 +73,7 @@ bool MythVideoVulkan::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     m_videoDim   = Size;
 
     // Create textures
-    m_inputTextures = MythVideoTextureVulkan::CreateTextures(m_vulkanRender, m_device,
-                                                             m_devFuncs, CmdBuffer,
+    m_inputTextures = MythVideoTextureVulkan::CreateTextures(this, CmdBuffer,
                                                              m_inputType, m_outputType,
                                                              m_videoDim);
 
@@ -97,7 +86,7 @@ bool MythVideoVulkan::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
 
 void MythVideoVulkan::StartFrame()
 {
-    if (!m_valid)
+    if (!(m_valid && IsValidVulkan()))
         return;
 
     // Tell the renderer that we are requesting a frame start
@@ -111,7 +100,7 @@ void MythVideoVulkan::StartFrame()
 
 void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
 {
-    if (!m_valid || (Frame->codec == FMT_NONE))
+    if (!(m_valid && IsValidVulkan() && (Frame->codec == FMT_NONE)))
         return;
 
     // No hardware frame support yet
@@ -152,9 +141,7 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
     }
 
     m_videoColourSpace->UpdateColourSpace(Frame);
-
     m_discontinuityCounter = Frame->frameCounter;
-
 
     if (!cmdbuffer)
         cmdbuffer = m_vulkanRender->CreateSingleUseCommandBuffer();
@@ -174,11 +161,13 @@ void MythVideoVulkan::RenderFrame(VideoFrame* /*Frame*/, bool /*TopFieldFirst*/,
                                   FrameScanType /*Scan*/, StereoscopicMode /*Stereo*/,
                                   bool /*DrawBorder*/)
 {
+    if (!(m_valid && IsValidVulkan()))
+        return;
 }
 
 void MythVideoVulkan::EndFrame()
 {
-    if (m_valid)
+    if (m_valid && IsValidVulkan())
         m_vulkanRender->EndFrame();
 }
 

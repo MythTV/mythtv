@@ -14,9 +14,7 @@ class MythUniformBufferVulkan;
 class MUI_PUBLIC MythTextureVulkan : protected MythVulkanObject, public MythComboBufferVulkan
 {
   public:
-    static MythTextureVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                     QVulkanDeviceFunctions* Functions,
-                                     QImage *Image, VkSampler Sampler,
+    static MythTextureVulkan* Create(MythVulkanObject* Vulkan, QImage *Image, VkSampler Sampler,
                                      VkCommandBuffer CommandBuffer = nullptr);
    ~MythTextureVulkan();
 
@@ -29,9 +27,7 @@ class MUI_PUBLIC MythTextureVulkan : protected MythVulkanObject, public MythComb
     uint64_t         m_dataSize     { 0       };
 
   protected:
-    MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
-                      QVulkanDeviceFunctions* Functions,
-                      QImage *Image, VkSampler Sampler,
+    MythTextureVulkan(MythVulkanObject* Vulkan, QImage *Image, VkSampler Sampler,
                       VkCommandBuffer CommandBuffer = nullptr);
 
   private:

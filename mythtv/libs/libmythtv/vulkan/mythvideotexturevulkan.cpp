@@ -4,22 +4,19 @@
 
 #define LOC QString("VulkanVidTex: ")
 
-vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateTextures(MythRenderVulkan* Render,
-                                                                       VkDevice Device,
-                                                                       QVulkanDeviceFunctions* Functions,
+vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateTextures(MythVulkanObject* Vulkan,
                                                                        VkCommandBuffer CommandBuffer,
                                                                        VideoFrameType Type,
                                                                        VideoFrameType Format,
                                                                        QSize Size)
 {
-    if (!(Render && Device && Functions && CommandBuffer && !Size.isEmpty()))
+    if (!(Vulkan && Vulkan->IsValidVulkan() && !Size.isEmpty()))
         return vector<MythVideoTextureVulkan*>{};
 
     if (format_is_hw(Type))
         return vector<MythVideoTextureVulkan*>{};
 
-    return CreateSoftwareTextures(Render, Device, Functions, CommandBuffer,
-                                  Type, Format, Size);
+    return CreateSoftwareTextures(Vulkan, CommandBuffer, Type, Format, Size);
 }
 
 MythVideoTextureVulkan::MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format)
@@ -31,52 +28,46 @@ MythVideoTextureVulkan::MythVideoTextureVulkan(VideoFrameType Type, VideoFrameTy
     m_planeCount = planes(Format);
 }
 
-void MythVideoTextureVulkan::DeleteTextures(MythRenderVulkan* Render, VkDevice Device,
-                                            QVulkanDeviceFunctions* Functions,
+void MythVideoTextureVulkan::DeleteTextures(MythVulkanObject *Vulkan,
                                             VkCommandBuffer CommandBuffer,
                                             vector<MythVideoTextureVulkan*>& Textures)
 {
-    if (!(Render && Device && Functions))
+    if (!(Vulkan && Vulkan->IsValidVulkan()))
         return;
 
     VkCommandBuffer cmdbuffer = nullptr;
     if (!CommandBuffer)
     {
-        cmdbuffer = Render->CreateSingleUseCommandBuffer();
+        cmdbuffer = Vulkan->Render()->CreateSingleUseCommandBuffer();
         CommandBuffer = cmdbuffer;
     }
 
     for (auto * texture : Textures)
-        MythVideoTextureVulkan::DeleteTexture(Render, Device, Functions, CommandBuffer, texture);
+        MythVideoTextureVulkan::DeleteTexture(Vulkan, CommandBuffer, texture);
 
     if (cmdbuffer)
-        Render->FinishSingleUseCommandBuffer(cmdbuffer);
+        Vulkan->Render()->FinishSingleUseCommandBuffer(cmdbuffer);
 
     Textures.clear();
 }
 
-void MythVideoTextureVulkan::DeleteTexture(MythRenderVulkan* Render, VkDevice Device,
-                                           QVulkanDeviceFunctions* Functions,
+void MythVideoTextureVulkan::DeleteTexture(MythVulkanObject* Vulkan,
                                            VkCommandBuffer CommandBuffer,
                                            MythVideoTextureVulkan* Texture)
 {
-    if (!(Render && Device && Functions && CommandBuffer && Texture))
+    if (!(Vulkan && Vulkan->IsValidVulkan() && CommandBuffer && Texture))
         return;
 
     delete Texture;
 }
 
-vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateSoftwareTextures(MythRenderVulkan* Render,
-                                                                               VkDevice Device,
-                                                                               QVulkanDeviceFunctions* Functions,
+vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateSoftwareTextures(MythVulkanObject* Vulkan,
                                                                                VkCommandBuffer CommandBuffer,
                                                                                VideoFrameType Type,
                                                                                VideoFrameType Format,
                                                                                QSize Size)
 {
-    (void)Render;
-    (void)Device;
-    (void)Functions;
+    (void)Vulkan;
     (void)CommandBuffer;
     (void)Type;
 

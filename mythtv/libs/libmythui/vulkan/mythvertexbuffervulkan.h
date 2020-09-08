@@ -7,8 +7,7 @@
 class MUI_PUBLIC MythBufferVulkan  : protected MythVulkanObject
 {
   public:
-    static MythBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                    QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    static MythBufferVulkan* Create(MythVulkanObject* Vulkan, VkDeviceSize Size);
     virtual ~MythBufferVulkan();
 
     VkBuffer GetBuffer       () const;
@@ -16,8 +15,7 @@ class MUI_PUBLIC MythBufferVulkan  : protected MythVulkanObject
     void     Update          (VkCommandBuffer CommandBuffer = nullptr);
 
   protected:
-    MythBufferVulkan(MythRenderVulkan* Render, VkDevice Device,
-                     QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    MythBufferVulkan(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
     VkDeviceSize   m_bufferSize    { 0       };
     VkBuffer       m_buffer        { nullptr };
@@ -33,16 +31,14 @@ class MUI_PUBLIC MythBufferVulkan  : protected MythVulkanObject
 class MUI_PUBLIC MythVertexBufferVulkan : public MythBufferVulkan
 {
   public:
-    static MythVertexBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                          QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    static MythVertexBufferVulkan* Create(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
     bool     NeedsUpdate (const QRect& Source, const QRect& Dest, int Alpha, int Rotation);
     void     Update      (const QRect& Source, const QRect& Dest, int Alpha, int Rotation,
                           VkCommandBuffer CommandBuffer = nullptr);
 
   protected:
-    MythVertexBufferVulkan(MythRenderVulkan* Render, VkDevice Device,
-                           QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    MythVertexBufferVulkan(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
   private:
     QRect          m_source;

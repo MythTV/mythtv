@@ -218,7 +218,10 @@ bool MythShaderVulkan::InitGLSLang(bool Release /* = false */)
 
 bool MythShaderVulkan::CreateShaderFromGLSL(const std::vector<MythGLSLStage> &Stages)
 {
-    if (Stages.empty() || !MythShaderVulkan::InitGLSLang())
+    if (Stages.empty())
+        return false;
+
+    if (!MythShaderVulkan::InitGLSLang())
         return false;
 
     std::vector<MythSPIRVStage> spirvstages;
@@ -251,14 +254,13 @@ bool MythShaderVulkan::CreateShaderFromGLSL(const std::vector<MythGLSLStage> &St
  * be compiled from the GLSL source code. libglslang support is currently intended
  * for development use only - i.e. to test and compile shaders.
 */
-MythShaderVulkan* MythShaderVulkan::Create(MythRenderVulkan *Render, VkDevice Device,
-                                           QVulkanDeviceFunctions *Functions,
+MythShaderVulkan* MythShaderVulkan::Create(MythVulkanObject *Vulkan,
                                            const std::vector<int> &Stages,
                                            const MythShaderMap *Sources,
                                            const MythBindingMap *Bindings)
 {
-    auto * result = new MythShaderVulkan(Render, Device, Functions, Stages, Sources, Bindings);
-    if (result && !result->IsValid())
+    auto * result = new MythShaderVulkan(Vulkan, Stages, Sources, Bindings);
+    if (result && !result->IsValidVulkan())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create shader");
         delete result;
@@ -267,16 +269,15 @@ MythShaderVulkan* MythShaderVulkan::Create(MythRenderVulkan *Render, VkDevice De
     return result;
 }
 
-MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
-                                   QVulkanDeviceFunctions* Functions,
+MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
                                    const std::vector<int> &Stages,
                                    const MythShaderMap  *Sources,
                                    const MythBindingMap *Bindings)
-  : MythVulkanObject(Render, Device, Functions)
+  : MythVulkanObject(Vulkan)
 {
-    if (!m_valid || Stages.empty())
+    if (!m_vulkanValid || Stages.empty())
         return;
-    m_valid = false;
+    m_vulkanValid = false;
 
     if (!Sources)
         Sources = &k450DefaultShaders;
@@ -349,7 +350,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
         layoutinfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutinfo.bindingCount = static_cast<uint32_t>(layoutbinding.second.size());
         layoutinfo.pBindings    = layoutbinding.second.data();
-        if (m_devFuncs->vkCreateDescriptorSetLayout(m_device, &layoutinfo, nullptr, &layout) != VK_SUCCESS)
+        if (m_vulkanFuncs->vkCreateDescriptorSetLayout(m_vulkanDevice, &layoutinfo, nullptr, &layout) != VK_SUCCESS)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create DescriptorSetLayout");
         else
             m_descriptorSetLayouts.push_back(layout);
@@ -372,7 +373,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
         pipelinelayout.pPushConstantRanges    = &ranges;
     }
 
-    if (m_devFuncs->vkCreatePipelineLayout(m_device, &pipelinelayout, nullptr, &m_pipelineLayout) != VK_SUCCESS)
+    if (m_vulkanFuncs->vkCreatePipelineLayout(m_vulkanDevice, &pipelinelayout, nullptr, &m_pipelineLayout) != VK_SUCCESS)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create pipeline layout");
 
     if (!m_pipelineLayout)
@@ -385,7 +386,7 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
         std::vector<MythGLSLStage> glslstages;
         for (const auto & stage : Stages)
             glslstages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).first);
-        m_valid = MythShaderVulkan::CreateShaderFromGLSL(glslstages);
+        m_vulkanValid = MythShaderVulkan::CreateShaderFromGLSL(glslstages);
         return;
     }
 #endif
@@ -393,18 +394,18 @@ MythShaderVulkan::MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
     std::vector<MythSPIRVStage> stages;
     for (const auto & stage : Stages)
         stages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).second);
-    m_valid = MythShaderVulkan::CreateShaderFromSPIRV(stages);
+    m_vulkanValid = MythShaderVulkan::CreateShaderFromSPIRV(stages);
 }
 
 MythShaderVulkan::~MythShaderVulkan()
 {
-    if (m_device && m_devFuncs)
+    if (m_vulkanValid)
     {
-        m_devFuncs->vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+        m_vulkanFuncs->vkDestroyPipelineLayout(m_vulkanDevice, m_pipelineLayout, nullptr);
         for (auto & layout : m_descriptorSetLayouts)
-            m_devFuncs->vkDestroyDescriptorSetLayout(m_device, layout, nullptr);
+            m_vulkanFuncs->vkDestroyDescriptorSetLayout(m_vulkanDevice, layout, nullptr);
         for (auto & stage : m_stages)
-            m_devFuncs->vkDestroyShaderModule(m_device, stage.module, nullptr);
+            m_vulkanFuncs->vkDestroyShaderModule(m_vulkanDevice, stage.module, nullptr);
     }
     for (auto * spirv : m_spirv)
         delete [] spirv;
@@ -427,7 +428,7 @@ bool MythShaderVulkan::CreateShaderFromSPIRV(const std::vector<MythSPIRVStage> &
         memcpy(code, stage.second.data(), size);
         VkShaderModule module = nullptr;
         VkShaderModuleCreateInfo create { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, nullptr, 0, size, code };
-        success &= (m_devFuncs->vkCreateShaderModule(m_device, &create, nullptr, &module) == VK_SUCCESS);
+        success &= (m_vulkanFuncs->vkCreateShaderModule(m_vulkanDevice, &create, nullptr, &module) == VK_SUCCESS);
         m_stages.push_back( { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr,
                               0, static_cast<VkShaderStageFlagBits>(stage.first), module, "main", nullptr } );
         m_spirv.push_back(code);

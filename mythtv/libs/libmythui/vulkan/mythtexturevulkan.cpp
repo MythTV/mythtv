@@ -4,15 +4,14 @@
 
 #define LOC QString("VulkanTex: ")
 
-MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice Device,
-                                             QVulkanDeviceFunctions* Functions, QImage *Image,
+MythTextureVulkan* MythTextureVulkan::Create(MythVulkanObject* Vulkan, QImage *Image,
                                              VkSampler Sampler, VkCommandBuffer CommandBuffer)
 {
     MythTextureVulkan* result = nullptr;
     if (Image)
-        result = new MythTextureVulkan(Render, Device, Functions, Image, Sampler, CommandBuffer);
+        result = new MythTextureVulkan(Vulkan, Image, Sampler, CommandBuffer);
 
-    if (result && !result->IsValid())
+    if (result && !result->IsValidVulkan())
     {
         delete result;
         result = nullptr;
@@ -20,14 +19,13 @@ MythTextureVulkan* MythTextureVulkan::Create(MythRenderVulkan* Render, VkDevice 
     return result;
 }
 
-MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
-                                     QVulkanDeviceFunctions* Functions,
+MythTextureVulkan::MythTextureVulkan(MythVulkanObject *Vulkan,
                                      QImage *Image, VkSampler Sampler,
                                      VkCommandBuffer CommandBuffer)
-  : MythVulkanObject(Render, Device, Functions),
+  : MythVulkanObject(Vulkan),
     MythComboBufferVulkan(Image->width(), Image->height())
 {
-    if (!m_valid)
+    if (!m_vulkanValid)
         return;
 
     // retrieve and check Image data
@@ -44,9 +42,9 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
     const auto *data = Image->constBits();
 
     // Create staging buffer
-    if (!Render->CreateBuffer(datasize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                              m_stagingBuffer, m_stagingMemory))
+    if (!m_vulkanRender->CreateBuffer(datasize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                m_stagingBuffer, m_stagingMemory))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create staging buffer");
         return;
@@ -54,29 +52,29 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
 
     // Map memory and copy data
     void* memory = nullptr;
-    Functions->vkMapMemory(Device, m_stagingMemory, 0, datasize, 0, &memory);
+    m_vulkanFuncs->vkMapMemory(m_vulkanDevice, m_stagingMemory, 0, datasize, 0, &memory);
     memcpy(memory, data, static_cast<size_t>(datasize));
-    Functions->vkUnmapMemory(Device, m_stagingMemory);
+    m_vulkanFuncs->vkUnmapMemory(m_vulkanDevice, m_stagingMemory);
 
     // Create image
-    if (Render->CreateImage(Image->size(), VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
-                            VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_image, m_deviceMemory))
+    if (m_vulkanRender->CreateImage(Image->size(), VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
+                              VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_image, m_deviceMemory))
     {
-        VkCommandBuffer commandbuffer = CommandBuffer ? CommandBuffer : Render->CreateSingleUseCommandBuffer();
+        VkCommandBuffer commandbuffer = CommandBuffer ? CommandBuffer : m_vulkanRender->CreateSingleUseCommandBuffer();
 
         // Transition
-        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_UNDEFINED,
-                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, commandbuffer);
-        Render->CopyBufferToImage(m_stagingBuffer, m_image, static_cast<uint32_t>(Image->width()),
-                                  static_cast<uint32_t>(Image->height()), commandbuffer);
-        Render->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandbuffer);
+        m_vulkanRender->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_UNDEFINED,
+                                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, commandbuffer);
+        m_vulkanRender->CopyBufferToImage(m_stagingBuffer, m_image, static_cast<uint32_t>(Image->width()),
+                                    static_cast<uint32_t>(Image->height()), commandbuffer);
+        m_vulkanRender->TransitionImageLayout(m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandbuffer);
 
         // Create sampler if needed
         if (!Sampler)
         {
-            m_sampler = m_render->CreateSampler(VK_FILTER_LINEAR, VK_FILTER_LINEAR);
+            m_sampler = m_vulkanRender->CreateSampler(VK_FILTER_LINEAR, VK_FILTER_LINEAR);
             m_createdSampler = true;
         }
         else
@@ -95,14 +93,14 @@ MythTextureVulkan::MythTextureVulkan(MythRenderVulkan* Render, VkDevice Device,
         viewinfo.subresourceRange.levelCount = 1;
         viewinfo.subresourceRange.baseArrayLayer = 0;
         viewinfo.subresourceRange.layerCount = 1;
-        if (Functions->vkCreateImageView(Device, &viewinfo, nullptr, &m_view) != VK_SUCCESS)
+        if (m_vulkanFuncs->vkCreateImageView(m_vulkanDevice, &viewinfo, nullptr, &m_view) != VK_SUCCESS)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create image view");
 
         m_dataSize = datasize;
-        m_valid = m_sampler && m_view;
+        m_vulkanValid = m_sampler && m_view;
 
         if (!CommandBuffer)
-            Render->FinishSingleUseCommandBuffer(commandbuffer);
+            m_vulkanRender->FinishSingleUseCommandBuffer(commandbuffer);
     }
     else
     {
@@ -120,21 +118,21 @@ MythTextureVulkan::~MythTextureVulkan()
     if (m_descriptor)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Texture has not returned descriptor");
 
-    if (m_device && m_devFuncs)
+    if (m_vulkanValid)
     {
         StagingFinished();
         if (m_createdSampler)
-            m_devFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
-        m_devFuncs->vkDestroyImageView(m_device, m_view, nullptr);
-        m_devFuncs->vkDestroyImage(m_device, m_image, nullptr);
-        m_devFuncs->vkFreeMemory(m_device, m_deviceMemory, nullptr);
+            m_vulkanFuncs->vkDestroySampler(m_vulkanDevice, m_sampler, nullptr);
+        m_vulkanFuncs->vkDestroyImageView(m_vulkanDevice, m_view, nullptr);
+        m_vulkanFuncs->vkDestroyImage(m_vulkanDevice, m_image, nullptr);
+        m_vulkanFuncs->vkFreeMemory(m_vulkanDevice, m_deviceMemory, nullptr);
     }
 }
 
 void MythTextureVulkan::StagingFinished(void)
 {
-    m_devFuncs->vkDestroyBuffer(m_device, m_stagingBuffer, nullptr);
-    m_devFuncs->vkFreeMemory(m_device, m_stagingMemory, nullptr);
+    m_vulkanFuncs->vkDestroyBuffer(m_vulkanDevice, m_stagingBuffer, nullptr);
+    m_vulkanFuncs->vkFreeMemory(m_vulkanDevice, m_stagingMemory, nullptr);
     m_stagingBuffer = nullptr;
     m_stagingMemory = nullptr;
 }

@@ -19,21 +19,22 @@ class MUI_PUBLIC MythVulkanObject
 {
   public:
     static MythVulkanObject* Create(MythRenderVulkan* Render);
-    MythVulkanObject(MythRenderVulkan* Render, VkDevice Device, QVulkanDeviceFunctions* Functions);
-    MythVulkanObject(MythRenderVulkan* Render, VkDevice Device, QVulkanDeviceFunctions* Functions, MythWindowVulkan* Window);
+    MythVulkanObject(MythRenderVulkan* Render);
+    MythVulkanObject(MythVulkanObject* Other);
 
-    bool                    IsValid();
+    bool                    IsValidVulkan();
     MythRenderVulkan*       Render ();
     VkDevice                Device ();
     QVulkanDeviceFunctions* Funcs  ();
     MythWindowVulkan*       Window ();
 
   protected:
-    bool                    m_valid    { true    };
-    MythRenderVulkan*       m_render   { nullptr };
-    VkDevice                m_device   { nullptr };
-    QVulkanDeviceFunctions* m_devFuncs { nullptr };
-    MythWindowVulkan*       m_window   { nullptr };
+    void                    CheckValid();
+    bool                    m_vulkanValid  { true    };
+    MythRenderVulkan*       m_vulkanRender { nullptr };
+    VkDevice                m_vulkanDevice { nullptr };
+    QVulkanDeviceFunctions* m_vulkanFuncs  { nullptr };
+    MythWindowVulkan*       m_vulkanWindow { nullptr };
 
   private:
     Q_DISABLE_COPY(MythVulkanObject)

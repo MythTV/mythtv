@@ -15,23 +15,8 @@
 MythVulkanObject* MythVulkanObject::Create(MythRenderVulkan* Render)
 {
     MythVulkanObject* result = nullptr;
-    MythWindowVulkan* window = nullptr;
-    VkDevice          device = nullptr;
-    QVulkanDeviceFunctions* functions = nullptr;
-
-    if (Render)
-    {
-        window = Render->GetVulkanWindow();
-        if (window)
-        {
-            device = window->device();
-            if (device)
-                functions = window->vulkanInstance()->deviceFunctions(device);
-        }
-    }
-
-    result = new MythVulkanObject(Render, device, functions, window);
-    if (result && !result->IsValid())
+    result = new MythVulkanObject(Render);
+    if (result && !result->IsValidVulkan())
     {
         delete result;
         result = nullptr;
@@ -39,55 +24,64 @@ MythVulkanObject* MythVulkanObject::Create(MythRenderVulkan* Render)
     return result;
 }
 
-MythVulkanObject::MythVulkanObject(MythRenderVulkan *Render, VkDevice Device, QVulkanDeviceFunctions* Functions)
-  : m_render(Render),
-    m_device(Device),
-    m_devFuncs(Functions)
+MythVulkanObject::MythVulkanObject(MythRenderVulkan* Render)
+  : m_vulkanRender(Render)
 {
-    if (!(Render && Device && Functions))
+    if (m_vulkanRender)
     {
-        m_valid = false;
+        m_vulkanWindow = m_vulkanRender->GetVulkanWindow();
+        if (m_vulkanWindow)
+        {
+            m_vulkanDevice = m_vulkanWindow->device();
+            if (m_vulkanDevice)
+                m_vulkanFuncs = m_vulkanWindow->vulkanInstance()->deviceFunctions(m_vulkanDevice);
+        }
+    }
+
+    CheckValid();
+}
+
+MythVulkanObject::MythVulkanObject(MythVulkanObject* Other)
+  : m_vulkanRender(Other ? Other->Render() : nullptr),
+    m_vulkanDevice(Other ? Other->Device() : nullptr),
+    m_vulkanFuncs(Other  ? Other->Funcs()  : nullptr),
+    m_vulkanWindow(Other ? Other->Window() : nullptr)
+{
+    CheckValid();
+}
+
+void MythVulkanObject::CheckValid()
+{
+    if (!(m_vulkanRender && m_vulkanDevice && m_vulkanFuncs && m_vulkanWindow))
+    {
+        m_vulkanValid = false;
         LOG(VB_GENERAL, LOG_ERR, "VulkanBase: Invalid Myth vulkan object");
     }
 }
 
-MythVulkanObject::MythVulkanObject(MythRenderVulkan *Render, VkDevice Device,
-                                   QVulkanDeviceFunctions* Functions, MythWindowVulkan* Window)
-  : m_render(Render),
-    m_device(Device),
-    m_devFuncs(Functions),
-    m_window(Window)
+bool MythVulkanObject::IsValidVulkan()
 {
-    if (!(Render && Device && Functions && Window))
-    {
-        m_valid = false;
-        LOG(VB_GENERAL, LOG_ERR, "VulkanBase: Invalid Myth vulkan object");
-    }
-}
-
-bool MythVulkanObject::IsValid()
-{
-    return m_valid;
+    return m_vulkanValid;
 }
 
 MythRenderVulkan* MythVulkanObject::Render()
 {
-    return m_render;
+    return m_vulkanRender;
 }
 
 VkDevice MythVulkanObject::Device()
 {
-    return m_device;
+    return m_vulkanDevice;
 }
 
 QVulkanDeviceFunctions* MythVulkanObject::Funcs()
 {
-    return m_devFuncs;
+    return m_vulkanFuncs;
 }
 
 MythWindowVulkan* MythVulkanObject::Window()
 {
-    return m_window;
+    return m_vulkanWindow;
 }
 
 MythRenderVulkan* MythRenderVulkan::GetVulkanRender(void)

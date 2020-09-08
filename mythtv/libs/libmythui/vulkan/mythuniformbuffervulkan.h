@@ -7,8 +7,7 @@
 class MUI_PUBLIC MythUniformBufferVulkan : protected MythVulkanObject
 {
   public:
-    static MythUniformBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                           QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    static MythUniformBufferVulkan* Create(MythVulkanObject* Vulkan, VkDeviceSize Size);
    ~MythUniformBufferVulkan();
 
     VkDeviceSize           Size          (void) const;
@@ -16,8 +15,7 @@ class MUI_PUBLIC MythUniformBufferVulkan : protected MythVulkanObject
     void                   Update        (void *Source);
 
   protected:
-    MythUniformBufferVulkan(MythRenderVulkan* Render, VkDevice Device,
-                            QVulkanDeviceFunctions* Functions, VkDeviceSize Size);
+    MythUniformBufferVulkan(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
   private:
     VkDeviceSize   m_bufferSize    { 0       };

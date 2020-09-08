@@ -51,35 +51,28 @@ QStringList MythVideoOutputVulkan::GetAllowedRenderers(MythCodecID CodecId)
 }
 
 MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
-  : MythVideoOutputGPU(Profile)
+  : MythVideoOutputGPU(Profile),
+    MythVulkanObject(MythRenderVulkan::GetVulkanRender())
 {
     m_renderFrameTypes = &s_vulkanFrameTypes;
 
-    m_vulkanRender = MythRenderVulkan::GetVulkanRender();
-    if (m_vulkanRender)
+    m_render = MythVulkanObject::Render();
+    // Note - strictly we shouldn't be using reference counting for MythRenderVulkan
+    // as QVulkanWindow takes ownership. We need to ensure it is shared however,
+    // otherwise the painter window is hidden by the incredibly annoying disabling of
+    // drawing in MythMainWindow. There is no reason why QVulkanWindow should
+    // delete it while video is playing though.
+    if (m_render)
+        m_render->IncrRef();
+
+    if (IsValidVulkan())
     {
-        // Note - strictly we shouldn't be using reference counting for MythRenderVulkan
-        // as QVulkanWindow takes ownership. We need to ensure it is shared however,
-        // otherwise the painter window is hidden by the incredibly annoying disabling of
-        // drawing in MythMainWindow. There is no reason why QVulkanWindow should
-        // delete it while video is playing though.
-        m_vulkanRender->IncrRef();
-        m_render= m_vulkanRender;
-        m_vulkanWindow = m_vulkanRender->GetVulkanWindow();
-        if (m_vulkanWindow)
-        {
-            m_device = m_vulkanWindow->device();
-            if (m_device)
-                m_devFuncs = m_vulkanWindow->vulkanInstance()->deviceFunctions(m_device);
-        }
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            m_debugMarker = MythDebugVulkan::Create(this);
+        m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, true, QString {});
     }
 
-    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO) && m_vulkanRender && m_device && m_devFuncs && m_vulkanWindow)
-        m_debugMarker = MythDebugVulkan::Create(m_vulkanRender, m_device, m_devFuncs, m_vulkanWindow);
-
-    m_video = new MythVideoVulkan(m_vulkanRender, &m_videoColourSpace, this, true, QString {});
-
-    if (!(m_vulkanRender && m_painter && m_video && m_device && m_devFuncs && m_vulkanWindow))
+    if (!(IsValidVulkan() && m_painter && m_video))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise Vulkan video output");
 }
 
@@ -92,7 +85,7 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
                                  float Aspect, MythDisplay* Display,
                                  const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
-    if (!(m_vulkanRender && m_painter && m_video && m_device && m_devFuncs && m_vulkanWindow))
+    if (!(IsValidVulkan() && m_painter && m_video))
         return false;
 
     if (!gCoreContext->IsUIThread())
@@ -114,7 +107,7 @@ void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPla
 
 void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
 {
-    if (!(m_vulkanRender && m_vulkanWindow && m_video))
+    if (!(IsValidVulkan() && m_video))
         return;
 
     // input changes need to be handled in ProcessFrame
@@ -155,10 +148,15 @@ MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize& VideoDim,
                                                           const QRect& VideoRect)
 {
     auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
-    auto * result = new MythVideoVulkan(m_render, colourspace,
+    auto * result = new MythVideoVulkan(this, colourspace,
                                         VideoDim, VideoDispDim,
                                         DisplayVisibleRect, DisplayVideoRect,
                                         VideoRect, false, QString{});
     colourspace->DecrRef();
+    if (result && !(result->IsValidVulkan() && result->IsValid()))
+    {
+        delete result;
+        result = nullptr;
+    }
     return result;
 }

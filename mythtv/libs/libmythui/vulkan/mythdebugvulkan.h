@@ -16,18 +16,14 @@ class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
     static const VulkanDebugColor s_DebugGray;
     static const VulkanDebugColor s_DebugBlack;
 
-    static MythDebugVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                   QVulkanDeviceFunctions* Functions,
-                                   MythWindowVulkan* Window);
+    static MythDebugVulkan* Create(MythVulkanObject* Vulkan);
 
     void BeginRegion (VkCommandBuffer CmdBuffer, const char* Name, const VulkanDebugColor& Color);
     void EndRegion   (VkCommandBuffer CmdBuffer);
     void NameObject  (uint64_t Object, VkDebugReportObjectTypeEXT Type, const char *Name);
 
   protected:
-    MythDebugVulkan(MythRenderVulkan* Render, VkDevice Device,
-                    QVulkanDeviceFunctions* Functions,
-                    MythWindowVulkan* Window);
+    MythDebugVulkan(MythVulkanObject *Vulkan);
 
   private:
     PFN_vkCmdDebugMarkerBeginEXT      m_beginRegion { nullptr };

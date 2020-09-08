@@ -20,8 +20,7 @@ using MythBindingMap  = std::map<int, MythBindingDesc>;
 class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
 {
   public:
-    static MythShaderVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
-                                    QVulkanDeviceFunctions* Functions,
+    static MythShaderVulkan* Create(MythVulkanObject* Vulkan,
                                     const std::vector<int> &Stages,
                                     const MythShaderMap *Sources = nullptr,
                                     const MythBindingMap *Bindings = nullptr);
@@ -40,8 +39,7 @@ class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
 #endif
 
   protected:
-    MythShaderVulkan(MythRenderVulkan* Render, VkDevice Device,
-                     QVulkanDeviceFunctions* Functions,
+    MythShaderVulkan(MythVulkanObject* Vulkan,
                      const std::vector<int> &Stages,
                      const MythShaderMap *Sources = nullptr,
                      const MythBindingMap *Bindings = nullptr);

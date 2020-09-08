@@ -13,18 +13,17 @@ using std::vector;
 
 class MythPainterVulkan;
 class MythVideoVulkan;
-class MythWindowVulkan;
 class MythDebugVulkan;
 class MythVideoTextureVulkan;
 
-class MythVideoVulkan : public MythVideoGPU
+class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
 {
     Q_OBJECT
 
   public:
-    MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace, MythVideoBounds* Bounds,
+    MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace, MythVideoBounds* Bounds,
                     bool ViewportControl, const QString &Profile);
-    MythVideoVulkan(MythRender* Render, MythVideoColourSpace* ColourSpace,
+    MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                     QRect DisplayVideoRect, QRect VideoRect,
                     bool ViewportControl, const QString& Profile);
@@ -45,10 +44,6 @@ class MythVideoVulkan : public MythVideoGPU
     bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType, QSize Size,
                               VkCommandBuffer CmdBuffer);
 
-    MythRenderVulkan*  m_vulkanRender  { nullptr };
-    MythWindowVulkan*  m_vulkanWindow  { nullptr };
-    VkDevice           m_device        { nullptr };
-    QVulkanDeviceFunctions* m_devFuncs { nullptr };
     MythDebugVulkan*   m_debugMarker   { nullptr };
     vector<MythVideoTextureVulkan*> m_inputTextures;
 };

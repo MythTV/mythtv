@@ -1,13 +1,10 @@
 // MythTV
 #include "vulkan/mythuniformbuffervulkan.h"
 
-MythUniformBufferVulkan* MythUniformBufferVulkan::Create(MythRenderVulkan *Render,
-                                                         VkDevice Device,
-                                                         QVulkanDeviceFunctions *Functions,
-                                                         VkDeviceSize Size)
+MythUniformBufferVulkan* MythUniformBufferVulkan::Create(MythVulkanObject* Vulkan, VkDeviceSize Size)
 {
-    auto* result = new MythUniformBufferVulkan(Render, Device, Functions, Size);
-    if (result && !result->IsValid())
+    auto* result = new MythUniformBufferVulkan(Vulkan, Size);
+    if (result && !result->IsValidVulkan())
     {
         delete result;
         result = nullptr;
@@ -15,25 +12,24 @@ MythUniformBufferVulkan* MythUniformBufferVulkan::Create(MythRenderVulkan *Rende
     return result;
 }
 
-MythUniformBufferVulkan::MythUniformBufferVulkan(MythRenderVulkan* Render, VkDevice Device,
-                                                 QVulkanDeviceFunctions* Functions, VkDeviceSize Size)
-  : MythVulkanObject(Render, Device, Functions),
+MythUniformBufferVulkan::MythUniformBufferVulkan(MythVulkanObject* Vulkan, VkDeviceSize Size)
+  : MythVulkanObject(Vulkan),
     m_bufferSize(Size)
 {
-    if (m_valid && Render->CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                        m_buffer, m_bufferMemory))
+    if (m_vulkanValid && m_vulkanRender->CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                          m_buffer, m_bufferMemory))
     {
-        m_valid = m_devFuncs->vkMapMemory(m_device, m_bufferMemory, 0, Size, 0, &m_mappedMemory) == VK_SUCCESS;
+        m_vulkanValid = m_vulkanFuncs->vkMapMemory(m_vulkanDevice, m_bufferMemory, 0, Size, 0, &m_mappedMemory) == VK_SUCCESS;
     }
 }
 
 MythUniformBufferVulkan::~MythUniformBufferVulkan()
 {
-    if (m_device && m_devFuncs)
+    if (m_vulkanValid)
     {
-        m_devFuncs->vkDestroyBuffer(m_device, m_buffer, nullptr);
-        m_devFuncs->vkFreeMemory(m_device, m_bufferMemory, nullptr);
+        m_vulkanFuncs->vkDestroyBuffer(m_vulkanDevice, m_buffer, nullptr);
+        m_vulkanFuncs->vkFreeMemory(m_vulkanDevice, m_bufferMemory, nullptr);
     }
 }
 
