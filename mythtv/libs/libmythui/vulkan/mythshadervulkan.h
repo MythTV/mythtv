@@ -17,7 +17,7 @@ using MythBindingDesc = std::tuple<VkPrimitiveTopology,
                                    VkPushConstantRange>;
 using MythBindingMap  = std::map<int, MythBindingDesc>;
 
-class MythShaderVulkan : protected MythVulkanObject
+class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
 {
   public:
     static MythShaderVulkan* Create(MythRenderVulkan* Render, VkDevice Device,

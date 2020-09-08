@@ -15,7 +15,7 @@ class MythWindowVulkan;
 class MythShaderVulkan;
 class MythTextureVulkan;
 
-class MythVulkanObject
+class MUI_PUBLIC MythVulkanObject
 {
   public:
     static MythVulkanObject* Create(MythRenderVulkan* Render);

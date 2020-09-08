@@ -5,6 +5,9 @@
 #include <QRect>
 #include <QMatrix4x4>
 
+// MythTV
+#include "mythuiexp.h"
+
 #define MYTH_PUSHBUFFER_SIZE 112
 
 // Total Buffer size of 112bytes.
@@ -20,7 +23,7 @@ struct alignas(16) Buffer
 };
 }
 
-class MythComboBufferVulkan
+class MUI_PUBLIC MythComboBufferVulkan
 {
   public:
     MythComboBufferVulkan(float Width, float Height);

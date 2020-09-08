@@ -4,7 +4,7 @@
 // MythTV
 #include "vulkan/mythrendervulkan.h"
 
-class MythUniformBufferVulkan : protected MythVulkanObject
+class MUI_PUBLIC MythUniformBufferVulkan : protected MythVulkanObject
 {
   public:
     static MythUniformBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,

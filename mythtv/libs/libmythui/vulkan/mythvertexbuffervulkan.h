@@ -4,7 +4,7 @@
 // MythTV
 #include "vulkan/mythrendervulkan.h"
 
-class MythBufferVulkan  : protected MythVulkanObject
+class MUI_PUBLIC MythBufferVulkan  : protected MythVulkanObject
 {
   public:
     static MythBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
@@ -30,7 +30,7 @@ class MythBufferVulkan  : protected MythVulkanObject
     Q_DISABLE_COPY(MythBufferVulkan)
 };
 
-class MythVertexBufferVulkan : public MythBufferVulkan
+class MUI_PUBLIC MythVertexBufferVulkan : public MythBufferVulkan
 {
   public:
     static MythVertexBufferVulkan* Create(MythRenderVulkan* Render, VkDevice Device,

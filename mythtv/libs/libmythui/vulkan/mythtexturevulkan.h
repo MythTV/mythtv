@@ -11,7 +11,7 @@
 class MythVertexBufferVulkan;
 class MythUniformBufferVulkan;
 
-class MythTextureVulkan : protected MythVulkanObject, public MythComboBufferVulkan
+class MUI_PUBLIC MythTextureVulkan : protected MythVulkanObject, public MythComboBufferVulkan
 {
   public:
     static MythTextureVulkan* Create(MythRenderVulkan* Render, VkDevice Device,
