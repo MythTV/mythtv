@@ -495,7 +495,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
     {
         for (auto it = m_pxpVideos.begin(); it != m_pxpVideos.end(); ++it)
         {
-            if (m_pxpVideosReady[it.key()])
+            if (m_pxpVideosReady[it.key()] && (*it))
             {
                 bool active = m_pxpVideoActive == *it;
                 if (stereo)
@@ -693,14 +693,18 @@ void MythVideoOutputGPU::ShowPIP(MythPlayer* PiPPlayer, PIPLocation Location)
     }
 
     m_pxpVideos[PiPPlayer] = video;
-    if (!video->IsValid())
+
+    if (video)
     {
-        PiPPlayer->ReleaseCurrentFrame(pipimage);
-        return;
+        if (!video->IsValid())
+        {
+            PiPPlayer->ReleaseCurrentFrame(pipimage);
+            return;
+        }
+        video->SetMasterViewport(dvr.size());
+        video->SetVideoRects(position, pipvideorect);
+        video->PrepareFrame(pipimage);
     }
-    video->SetMasterViewport(dvr.size());
-    video->SetVideoRects(position, pipvideorect);
-    video->PrepareFrame(pipimage);
 
     m_pxpVideosReady[PiPPlayer] = true;
     if (PiPPlayer->IsPIPActive())

@@ -404,6 +404,11 @@ MythVideoGPU* MythVideoOutputOpenGL::CreateSecondaryVideo(const QSize& VideoDim,
                                         VideoDim, VideoDispDim,
                                         DisplayVisibleRect, DisplayVideoRect,
                                         VideoRect, false, m_profile);
+    if (result && !result->IsValid())
+    {
+        delete result;
+        result = nullptr;
+    }
     colourspace->DecrRef();
     return result;
 }
