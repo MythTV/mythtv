@@ -224,6 +224,10 @@ add_ldflags(){
 }
 
 add_cxxflags(){
+    append CXXFLAGS "$@"
+}
+
+add_ecxxflags(){
     append ECXXFLAGS "$@"
 }
 
@@ -556,6 +560,8 @@ CFLAGS=$(cat mythconfig.mak | grep -e "^CFLAGS=")
 CFLAGS=${CFLAGS#CFLAGS=}
 CPPFLAGS=$(cat mythconfig.mak | grep -e "^CPPFLAGS=")
 CPPFLAGS=${CPPFLAGS#CPPFLAGS=}
+CXXFLAGS=$(cat mythconfig.mak | grep -e "^CXXFLAGS=")
+CXXFLAGS=${CXXFLAGS#CXXFLAGS=}
 LDFLAGS=$(cat mythconfig.mak | grep -e "^LDFLAGS=")
 LDFLAGS="${LDFLAGS#LDFLAGS=} ${ELDFLAGS}"
 CXX=$(cat mythconfig.mak | grep -e "^QMAKE_CXX=")

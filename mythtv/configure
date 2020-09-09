@@ -575,6 +575,10 @@ add_cflags_headers(){
 }
 
 add_cxxflags(){
+    append CXXFLAGS "$@"
+}
+
+add_ecxxflags(){
     append ECXXFLAGS "$@"
 }
 
@@ -2988,7 +2992,7 @@ for opt do
         ;;
         --libdir-name=*) libdir_name=$optval
         ;;
-        --extra-cxxflags=*) add_cxxflags $optval
+        --extra-cxxflags=*) add_ecxxflags $optval
         ;;
         --firewire-sdk=*) firewiresdk_path="${optval}"
         ;;

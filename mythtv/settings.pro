@@ -267,10 +267,10 @@ macx:QMAKE_CFLAGS_STATIC_LIB += -fno-common
 # clang 3.0 on Linux does not like duplicate arguments.
 macx {
     QMAKE_CFLAGS   += $$CPPFLAGS   $$CFLAGS
-    QMAKE_CXXFLAGS += $$CXXPPFLAGS $$ECXXFLAGS
+    QMAKE_CXXFLAGS += $$CXXPPFLAGS $$CXXFLAGS $$ECXXFLAGS
 } else {
     QMAKE_CFLAGS   *= $$CPPFLAGS   $$CFLAGS
-    QMAKE_CXXFLAGS *= $$CXXPPFLAGS $$ECXXFLAGS
+    QMAKE_CXXFLAGS *= $$CXXPPFLAGS $$CXXFLAGS $$ECXXFLAGS
 }
 
 profile:!win32:!macx:CONFIG += debug
