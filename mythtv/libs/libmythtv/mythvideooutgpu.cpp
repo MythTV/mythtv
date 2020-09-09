@@ -430,7 +430,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
     if (Prepare)
     {
         // Prepare visualisation
-        if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbedding())
+        if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbeddingAndHidden())
         {
             const QRect osdbounds = GetTotalOSDBounds();
             if (stereo)
@@ -514,7 +514,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
     const QRect osdbounds = GetTotalOSDBounds();
 
     // Visualisation
-    if (m_visual && m_painter && !IsEmbedding())
+    if (m_visual && m_painter && !IsEmbeddingAndHidden())
     {
         if (stereo)
             m_render->SetViewPort(view1, true);
