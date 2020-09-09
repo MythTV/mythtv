@@ -5,8 +5,10 @@
 #include "opengl/mythrenderopengl.h"
 #include "visualisations/videovisualmonoscope.h"
 
-using FrameBuffers = std::array<QOpenGLFramebufferObject*, 2>;
-using Textures = std::array<MythGLTexture*, 2>;
+// Vertex buffer + Hue,Alpha,Zoom
+using VertexStateGL  = std::pair<QOpenGLBuffer*, std::array<float,3>>;
+using VertexStatesGL = QVector<VertexStateGL>;
+using Vertices = std::vector<float>;
 
 class MythVisualMonoScopeOpenGL : public VideoVisualMonoScope
 {
@@ -20,12 +22,10 @@ class MythVisualMonoScopeOpenGL : public VideoVisualMonoScope
     MythRenderOpenGL* Initialise (const QRect& Area);
     void              TearDown   ();
 
+    bool                  m_bufferMaps   { false };
     QOpenGLShaderProgram* m_openglShader { nullptr };
-    QOpenGLBuffer*        m_vbo          { nullptr };
-    bool                  m_currentFBO   { false };
-    FrameBuffers          m_fbos         { };
-    Textures              m_textures     { };
-    Vertices              m_vertices     { 0.0 };
+    VertexStatesGL        m_vbos;
+    Vertices              m_vertices;
 };
 
 #endif

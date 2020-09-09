@@ -8,8 +8,6 @@
 #define FADE_NAME   QString("FadeScope")
 #define SIMPLE_NAME QString("SimpleScope")
 
-using Vertices = std::array<float, NUM_SAMPLES * 2>;
-
 class VideoVisualMonoScope : public VideoVisual
 {
   public:
@@ -26,6 +24,7 @@ class VideoVisualMonoScope : public VideoVisual
     float                 m_hue           { 0.0   };
     float                 m_rate          { 1.0   };
     float                 m_lineWidth     { 1.0   };
+    float                 m_maxLineWidth  { 1.0   };
     bool                  m_fade          { false };
 };
 

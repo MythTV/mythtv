@@ -10,7 +10,7 @@
 
 static const MythBindingMap k450LineBindings = {
     { LineVertex450,
-        { VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+        { VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
         { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
         { 0, 2 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX },
         { { 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } },
@@ -226,9 +226,6 @@ void MythVisualMonoScopeVulkan::Draw(const QRect& Area, MythPainter* /*Painter*/
     // Retrieve current command buffer
     auto currentcmdbuf = m_vulkanWindow->currentCommandBuffer();
 
-    // Set line width
-    m_vulkanFuncs->vkCmdSetLineWidth(currentcmdbuf, m_lineWidth);
-
     // Bind our pipeline and retrieve layout
     m_vulkanFuncs->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
     auto layout = m_vulkanShader->GetPipelineLayout();
@@ -246,12 +243,16 @@ void MythVisualMonoScopeVulkan::Draw(const QRect& Area, MythPainter* /*Painter*/
         VkBuffer vbos { vertex.first->GetBuffer() };
         m_vulkanFuncs->vkCmdBindVertexBuffers(currentcmdbuf, 0, 1, &vbos, &offset);
 
+        // Set line width
+        m_vulkanFuncs->vkCmdSetLineWidth(currentcmdbuf,
+                std::clamp(m_lineWidth * vertex.second[2], 1.0F, m_maxLineWidth));
+
         // Push colour
         auto color = QColor::fromHsvF(static_cast<qreal>(vertex.second[0]), 1.0, 1.0);
         alignas(16) MythVulkan4F colorf { static_cast<float>(color.redF()),
                                           static_cast<float>(color.greenF()),
                                           static_cast<float>(color.blueF()),
-                                          static_cast<float>(vertex.second[1]) };
+                                          vertex.second[1] };
         m_vulkanFuncs->vkCmdPushConstants(currentcmdbuf, layout, VK_SHADER_STAGE_VERTEX_BIT,
                                               0, 4 * sizeof(float), colorf.data());
 
@@ -293,9 +294,14 @@ MythRenderVulkan* MythVisualMonoScopeVulkan::Initialise(const QRect& Area)
     // Check wideLines support
     // N.B. This still fails validation on Mesa for some reason
     if (m_vulkanRender->GetPhysicalDeviceFeatures().wideLines)
-        m_lineWidth = std::clamp(m_lineWidth, 1.0F, m_vulkanRender->GetPhysicalDeviceLimits().lineWidthRange[1]);
+    {
+        m_maxLineWidth = m_vulkanRender->GetPhysicalDeviceLimits().lineWidthRange[1];
+    }
     else
+    {
         m_lineWidth = 1.0;
+        m_maxLineWidth = 1.0;
+    }
 
     // Create line shader
     std::vector<int> stages = { LineVertex450, LineFragment450 };

@@ -20,11 +20,11 @@ void MythVisualMonoScopeOpenGL::TearDown()
 
     OpenGLLocker locker(render);
     render->DeleteShaderProgram(m_openglShader);
-    delete m_vbo;
-    delete m_fbos[0];
-    delete m_fbos[1];
-    render->DeleteTexture(m_textures[0]);
-    render->DeleteTexture(m_textures[1]);
+    for (auto & vbo : m_vbos)
+        delete vbo.first;
+    m_openglShader = nullptr;
+    m_vbos.clear();
+    m_vertices.clear();
 }
 
 void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
@@ -37,55 +37,76 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
 
     render->makeCurrent();
 
-    auto lastfbo = static_cast<size_t>(m_currentFBO);
-    auto nextfbo = static_cast<size_t>(!m_currentFBO);
-
+    // Rotate the vertex buffers and state
     if (m_fade)
     {
-        // bind the next framebuffer
-        render->BindFramebuffer(m_fbos[nextfbo]);
-        // Clear
-        render->SetBackground(0, 0, 0, 255);
-        render->SetViewPort(m_area);
-        render->ClearFramebuffer();
-        // Zoom out a little
+        // fade away...
+        float fade = 1.0F - (m_rate / 150.0F);
         float zoom = 1.0F - (m_rate / 4000.0F);
-        int width  = static_cast<int>(m_area.width() * zoom);
-        int height = static_cast<int>(m_area.height() * zoom);
-        auto dest = QRect((m_area.width() - width) / 2, (m_area.height() - height) / 2,
-                           width, height);
-        // render last framebuffer into next with a little alpha fade
-        // N.B. this alpha fade, in conjunction with the clear alpha above, causes
-        // us to grey out the underlying video (if rendered over video).
-        render->DrawBitmap(m_textures[lastfbo], m_fbos[nextfbo], m_area, dest,
-                           nullptr, static_cast<int>(255.0F - m_rate / 2));
+        for (auto & state : m_vbos)
+        {
+            state.second[1] *= fade;
+            state.second[2] *= zoom;
+        }
+
+        // drop oldest
+        auto vertex = m_vbos.front();
+        m_vbos.pop_front();
+        m_vbos.append(vertex);
     }
 
-    m_vbo->bind();
-    UpdateVertices(static_cast<float*>(m_vertices.data()));
-    m_vbo->write(0, m_vertices.data(), static_cast<int>(m_vertices.size() * sizeof(GLfloat)));
+    // Update the newest vertex buffer
+    auto & vbo = m_vbos.back();
+    vbo.second[0] = m_hue;
+    vbo.second[1] = 1.0;
+    vbo.second[2] = 1.0;
 
-    // Draw the scope - either to screen or to our framebuffer object
-    auto color = QColor::fromHsvF(m_hue, 1.0, 1.0);
+    vbo.first->bind();
+    if (m_bufferMaps)
+    {
+        void* buffer = vbo.first->map(QOpenGLBuffer::WriteOnly);
+        UpdateVertices(static_cast<float*>(buffer));
+        vbo.first->unmap();
+    }
+    else
+    {
+        UpdateVertices(m_vertices.data());
+        vbo.first->write(0, m_vertices.data(), static_cast<int>(m_vertices.size() * sizeof(GLfloat)));
+    }
 
+    // Common calls
     render->glEnableVertexAttribArray(0);
-    render->glVertexAttrib4f(1, static_cast<GLfloat>(color.redF()),
-                                static_cast<GLfloat>(color.greenF()),
-                                static_cast<GLfloat>(color.blueF()), 1.0F);
     render->SetShaderProjection(m_openglShader);
-    render->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    render->glLineWidth(static_cast<int>(m_lineWidth));
-    render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
+
+    // Draw lines
+    for (auto & vertex : m_vbos)
+    {
+        vertex.first->bind();
+        render->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        if (m_fade)
+        {
+            // Set viewport
+            int width  = static_cast<int>(m_area.width() * vertex.second[2]);
+            int height = static_cast<int>(m_area.height() * vertex.second[2]);
+            auto dest = QRect((m_area.width() - width) / 2, (m_area.height() - height) / 2,
+                               width, height);
+            render->SetViewPort(dest);
+        }
+
+        auto color = QColor::fromHsvF(static_cast<qreal>(vertex.second[0]), 1.0, 1.0);
+        render->glVertexAttrib4f(1, static_cast<GLfloat>(color.redF()),
+                                    static_cast<GLfloat>(color.greenF()),
+                                    static_cast<GLfloat>(color.blueF()),
+                                    vertex.second[1]);
+        render->glLineWidth(std::clamp(m_lineWidth * vertex.second[2], 1.0F, m_maxLineWidth));
+        render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
+    }
+
+    // Cleanup
     render->glLineWidth(1);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     render->glDisableVertexAttribArray(0);
-
-    // Render and swap buffers
-    if (m_fade)
-    {
-        render->DrawBitmap(m_textures[nextfbo], nullptr, m_area, m_area, nullptr);
-        m_currentFBO = !m_currentFBO;
-    }
 
     render->doneCurrent();
 }
@@ -96,60 +117,34 @@ MythRenderOpenGL* MythVisualMonoScopeOpenGL::Initialise(const QRect& Area)
     if (!render)
         return nullptr;
 
-    if (Area == m_area)
-    {
-        if (!m_fade && m_openglShader && m_vbo)
-            return render;
-        if (m_fade && m_openglShader && m_vbo && m_fbos[0] && m_fbos[1] && m_textures[0] && m_textures[1])
-            return render;
-    }
+    if ((Area == m_area) && m_openglShader && !m_vbos.empty())
+        return render;
 
+    TearDown();
     InitCommon(Area);
 
     OpenGLLocker locker(render);
 
+    // Check line width constraints
+    std::array<GLfloat,2> ranges;
+    render->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, ranges.data());
+    m_maxLineWidth = ranges[1];
+
+    // Use direct updates if available, otherwise create an intermediate buffer
+    m_bufferMaps = (render->GetExtraFeatures() & kGLBufferMap) == kGLBufferMap;
+    if (m_bufferMaps)
+        m_vertices.clear();
+    else
+        m_vertices.resize(NUM_SAMPLES * 2);
+
     if (!m_openglShader)
         m_openglShader = render->CreateShaderProgram(kSimpleVertexShader, kSimpleFragmentShader);
-    if (!m_vbo)
-        m_vbo = render->CreateVBO(NUM_SAMPLES * 2 * sizeof(GLfloat), false);
 
-    delete m_fbos[0];
-    delete m_fbos[1];
-    render->DeleteTexture(m_textures[0]);
-    render->DeleteTexture(m_textures[1]);
-    m_fbos.fill(nullptr);
-    m_textures.fill(nullptr);
-    m_currentFBO = false;
+    int size = m_fade ? 8 : 1;
+    while (m_vbos.size() < size)
+        m_vbos.push_back({render->CreateVBO(NUM_SAMPLES * 2 * sizeof(GLfloat), false), {}});
 
-    if (m_fade)
-    {
-
-        QSize size(m_area.size());
-        m_fbos[0] = render->CreateFramebuffer(size);
-        m_fbos[1] = render->CreateFramebuffer(size);
-        render->SetBackground(0, 0, 0, 255);
-        render->SetViewPort(m_area);
-        if (m_fbos[0])
-        {
-            m_textures[0] = render->CreateFramebufferTexture(m_fbos[0]);
-            render->BindFramebuffer(m_fbos[0]);
-            render->ClearFramebuffer();
-        }
-        if (m_fbos[1])
-        {
-            m_textures[1] = render->CreateFramebufferTexture(m_fbos[1]);
-            render->BindFramebuffer(m_fbos[1]);
-            render->ClearFramebuffer();
-        }
-        if (m_textures[0])
-            render->SetTextureFilters(m_textures[0],  QOpenGLTexture::Linear);
-        if (m_textures[1])
-            render->SetTextureFilters(m_textures[1], QOpenGLTexture::Linear);
-        return (m_openglShader && m_vbo && m_fbos[0] && m_fbos[1] &&
-                m_textures[0] && m_textures[1]) ? render : nullptr;
-    }
-
-    if (m_openglShader && m_vbo)
+    if (m_openglShader && m_vbos.size() == size)
         return render;
     return nullptr;
 }
