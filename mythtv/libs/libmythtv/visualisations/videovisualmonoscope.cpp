@@ -94,7 +94,7 @@ static class VideoVisualMonoScopeFactory : public VideoVisualFactory
         if (render1)
             return new MythVisualMonoScopeOpenGL(Audio, Render, true);
 #endif
-#ifdef USING_OPENGL
+#ifdef USING_VULKAN
         auto * render2 = dynamic_cast<MythRenderVulkan*>(Render);
         if (render2)
             return new MythVisualMonoScopeVulkan(Audio, Render, true);
@@ -126,7 +126,7 @@ static class VideoVisualSimpleScopeFactory : public VideoVisualFactory
         if (render1)
             return new MythVisualMonoScopeOpenGL(Audio, Render, false);
 #endif
-#ifdef USING_OPENGL
+#ifdef USING_VULKAN
         auto * render2 = dynamic_cast<MythRenderVulkan*>(Render);
         if (render2)
             return new MythVisualMonoScopeVulkan(Audio, Render, false);
