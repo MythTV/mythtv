@@ -708,6 +708,7 @@ void MythVideoBounds::EmbedInWidget(const QRect &Rect)
     m_embeddingRect = Rect;
     bool savevisiblerect = !m_embedding;
     m_embedding = true;
+    m_embeddingHidden = Rect.isEmpty();
     m_displayVideoRect = Rect;
     ResizeDisplayWindow(m_displayVideoRect, savevisiblerect);
 }
@@ -724,6 +725,7 @@ void MythVideoBounds::StopEmbedding(void)
     m_embeddingRect = QRect();
     m_displayVisibleRect = m_tmpDisplayVisibleRect;
     m_embedding = false;
+    m_embeddingHidden = false;
     MoveResize();
 }
 

@@ -67,6 +67,7 @@ class MythVideoBounds : public QObject
   public:
     // Gets
     bool     IsEmbedding(void)             const { return m_embedding; }
+    bool     IsEmbeddingAndHidden()        const { return m_embeddingHidden; }
     QSize    GetVideoDim(void)             const { return m_videoDim; }
     QSize    GetVideoDispDim(void)         const { return m_videoDispDim; }
     int      GetPIPSize(void)              const { return m_dbPipSize; }
@@ -165,6 +166,7 @@ class MythVideoBounds : public QObject
 
     /// State variables
     bool    m_embedding  {false};
+    bool    m_embeddingHidden { false };
     bool    m_bottomLine {false};
     PIPState m_pipState  {kPIPOff};
 
