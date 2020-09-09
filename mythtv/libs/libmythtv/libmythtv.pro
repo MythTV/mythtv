@@ -31,7 +31,8 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl ./io ./captions
+DEPENDPATH  += ./mpeg ./channelscan ./mheg ./decoders ./opengl ./io ./captions
+DEPENDPATH  += ./visualisations ./visualisations/opengl ./visualisations/vulkan
 DEPENDPATH  += ./vulkan
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
@@ -521,6 +522,23 @@ using_frontend {
         using_libglslang: DEFINES += USING_GLSLANG
     }
 
+    using_vulkan|using_opengl {
+        using_libfftw3 {
+            HEADERS += visualisations/videovisualmonoscope.h
+            SOURCES += visualisations/videovisualmonoscope.cpp
+
+            using_opengl {
+                HEADERS += visualisations/opengl/mythvisualmonoscopeopengl.h
+                SOURCES += visualisations/opengl/mythvisualmonoscopeopengl.cpp
+            }
+
+            using_vulkan {
+                HEADERS += visualisations/vulkan/mythvisualmonoscopevulkan.h
+                SOURCES += visualisations/vulkan/mythvisualmonoscopevulkan.cpp
+            }
+        }
+    }
+
     using_opengl {
         DEFINES += USING_OPENGL
         HEADERS += opengl/mythopenglvideo.h
@@ -583,9 +601,7 @@ using_frontend {
 
         using_libfftw3 {
             HEADERS += visualisations/videovisualcircles.h
-            HEADERS += visualisations/videovisualmonoscope.h
             SOURCES += visualisations/videovisualcircles.cpp
-            SOURCES += visualisations/videovisualmonoscope.cpp
         }
 
         !win32-msvc* {

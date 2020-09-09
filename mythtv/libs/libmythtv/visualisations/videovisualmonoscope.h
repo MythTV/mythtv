@@ -2,37 +2,31 @@
 #define VIDEOVISUALMONOSCOPE_H
 
 // MythTV
-#include "opengl/mythrenderopengl.h"
 #include "videovisual.h"
 
 #define NUM_SAMPLES 256
 #define FADE_NAME   QString("FadeScope")
 #define SIMPLE_NAME QString("SimpleScope")
 
-using Vertices = std::array<GLfloat, NUM_SAMPLES * 2>;
-using FrameBuffers = std::array<QOpenGLFramebufferObject*, 2>;
-using Textures = std::array<MythGLTexture*, 2>;
+using Vertices = std::array<float, NUM_SAMPLES * 2>;
 
 class VideoVisualMonoScope : public VideoVisual
 {
   public:
     VideoVisualMonoScope(AudioPlayer* Audio, MythRender* Render, bool Fade);
-    ~VideoVisualMonoScope() override;
-    void     Draw(const QRect& Area, MythPainter* Painter, QPaintDevice* /*Device*/) override;
     QString  Name() override;
 
-  private:
-    MythRenderOpenGL* Initialise(const QRect& Area);
+  protected:
+    Q_DISABLE_COPY(VideoVisualMonoScope)
+    void                  InitCommon      (const QRect& Area);
+    void                  UpdateVertices  (float* Buffer);
+    void                  UpdateTime      ();
 
-    bool                  m_fade       { false };
-    Vertices              m_vertices   { 0.0 };
-    QOpenGLShaderProgram* m_shader     { nullptr };
-    QOpenGLBuffer*        m_vbo        { nullptr };
-    bool                  m_currentFBO { false };
-    FrameBuffers          m_fbos       { };
-    Textures              m_textures   { };
-    int64_t               m_lastTime   { 0 };
-    qreal                 m_hue        { 0.0 };
+    int64_t               m_lastTime      { 0     };
+    float                 m_hue           { 0.0   };
+    float                 m_rate          { 1.0   };
+    float                 m_lineWidth     { 1.0   };
+    bool                  m_fade          { false };
 };
 
 #endif
