@@ -13,6 +13,14 @@ class MythBufferVulkan;
 using VertexState  = std::pair<MythBufferVulkan*, std::array<float,3>>;
 using VertexStates = QVector<VertexState>;
 
+extern "C" {
+struct alignas(16) PushBuffer
+{
+    float transform [16];
+    float color     [4];
+};
+}
+
 class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVulkanObject
 {
   public:
@@ -32,6 +40,7 @@ class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVulkan
     VkDescriptorSet          m_projectionDescriptor { nullptr };
     MythUniformBufferVulkan* m_projectionUniform    { nullptr };
     VertexStates             m_vertexBuffers;
+    PushBuffer               m_pushBuffer { };
 };
 
 #endif
