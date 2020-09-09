@@ -21,7 +21,7 @@ void MythComboBufferVulkan::PushData(const QMatrix4x4 &Transform, const QRect& S
                                      const QRect& Destination, int Alpha)
 {
     m_data.push_back({});
-    Buffer* data = &m_data.back();
+    VulkanComboBuffer* data = &m_data.back();
     data->color[0] = data->color[1] = data->color[2] = 1.0F;
 
     float width  = std::min(static_cast<float>(Source.width()), m_width);
