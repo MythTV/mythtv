@@ -107,7 +107,7 @@ static class VideoVisualMonoScopeFactory : public VideoVisualFactory
 
 bool VideoVisualMonoScopeFactory::SupportedRenderer(RenderType Type)
 {
-    return (Type == kRenderOpenGL);
+    return ((Type == kRenderOpenGL) || (Type == kRenderVulkan));
 }
 
 static class VideoVisualSimpleScopeFactory : public VideoVisualFactory
