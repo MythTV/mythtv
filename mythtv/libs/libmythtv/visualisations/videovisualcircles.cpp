@@ -33,7 +33,8 @@ void VideoVisualCircles::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
             pen.setWidth(static_cast<int>(mag));
             Painter->DrawRoundRect(circ, rad, kNobrush, pen, 200);
         }
-        circ.adjust(-rad, -rad, rad, rad);
+        circ.adjust(static_cast<int>(-m_range), static_cast<int>(-m_range),
+                    static_cast<int>(m_range),  static_cast<int>(m_range));
         pen.setColor(QColor(red, green, 0, 255));
     }
     Painter->End();

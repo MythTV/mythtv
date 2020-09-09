@@ -124,7 +124,7 @@ void VideoVisualSpectrum::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
 {
     static const QBrush kBrush(QColor(0, 0, 200, 180));
     static const QPen   kPen(QColor(255, 255, 255, 255));
-    double range = m_area.height() / 2.0;
+    double range = m_area.top() + m_area.height() / 2.0;
     int count = m_scale.range();
     Painter->Begin(Device);
     for (int i = 0; i < count; i++)
@@ -158,8 +158,9 @@ bool VideoVisualSpectrum::InitialisePriv()
 {
     m_range = m_area.height() / 2.0;
     m_rects.resize(m_scale.range());
-    for (int i = 0, x = 0; i < m_rects.size(); i++, x+= m_barWidth)
-        m_rects[i].setRect(x, m_area.height() / 2, m_barWidth - 1, 1);
+    int y = m_area.top() + static_cast<int>(m_range);
+    for (int i = 0, x = m_area.left(); i < m_rects.size(); i++, x+= m_barWidth)
+        m_rects[i].setRect(x, y, m_barWidth - 1, 1);
 
     m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0) / log(static_cast<double>(FFTW_N));
     m_falloff = static_cast<double>(m_area.height()) / 150.0;

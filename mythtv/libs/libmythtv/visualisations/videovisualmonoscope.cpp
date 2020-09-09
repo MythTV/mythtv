@@ -39,9 +39,9 @@ void VideoVisualMonoScope::UpdateVertices(float* Buffer)
     if (m_area.isEmpty() || !node)
         return;
 
-    int y = m_area.height() / 2;
-    int x = 0;
-    int xstep = m_area.width() / NUM_SAMPLES + 1;
+    float y = (m_area.height() / 2) + m_area.top();
+    float x = m_area.left();
+    float xstep = static_cast<float>(m_area.width()) / (NUM_SAMPLES - 1);
 
     double index = 0;
     double const step = static_cast<double>(node->m_length) / NUM_SAMPLES;
