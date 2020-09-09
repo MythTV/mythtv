@@ -76,7 +76,8 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
 
     // Common calls
     render->glEnableVertexAttribArray(0);
-    render->SetShaderProjection(m_openglShader);
+    QPointF center { m_area.left() + static_cast<qreal>(m_area.width()) / 2,
+                     m_area.top() + static_cast<qreal>(m_area.height()) / 2 };
 
     // Draw lines
     for (auto & vertex : m_vbos)
@@ -86,14 +87,13 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
 
         if (m_fade)
         {
-            // Set viewport
-            int width  = static_cast<int>(m_area.width() * vertex.second[2]);
-            int height = static_cast<int>(m_area.height() * vertex.second[2]);
-            auto dest = QRect((m_area.width() - width) / 2, (m_area.height() - height) / 2,
-                               width, height);
-            render->SetViewPort(dest);
+            UIEffects fx;
+            fx.m_vzoom = vertex.second[2];
+            fx.m_hzoom = vertex.second[2];
+            render->PushTransformation(fx, center);
         }
 
+        render->SetShaderProjection(m_openglShader);
         auto color = QColor::fromHsvF(static_cast<qreal>(vertex.second[0]), 1.0, 1.0);
         render->glVertexAttrib4f(1, static_cast<GLfloat>(color.redF()),
                                     static_cast<GLfloat>(color.greenF()),
@@ -101,13 +101,15 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
                                     vertex.second[1]);
         render->glLineWidth(std::clamp(m_lineWidth * vertex.second[2], 1.0F, m_maxLineWidth));
         render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
+
+        if (m_fade)
+            render->PopTransformation();
     }
 
     // Cleanup
     render->glLineWidth(1);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     render->glDisableVertexAttribArray(0);
-
     render->doneCurrent();
 }
 
