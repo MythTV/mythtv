@@ -128,7 +128,7 @@ MythRenderOpenGL* MythVisualMonoScopeOpenGL::Initialise(const QRect& Area)
     OpenGLLocker locker(render);
 
     // Check line width constraints
-    std::array<GLfloat,2> ranges;
+    std::array<GLfloat,2> ranges { 1.0 };
     render->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, ranges.data());
     m_maxLineWidth = ranges[1];
 
