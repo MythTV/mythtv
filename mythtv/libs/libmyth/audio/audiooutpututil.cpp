@@ -148,6 +148,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
             "jnz        1b                  \n\t"
             :"+r"(fptr)
             :"c"(loops),"m"(g)
+            :"xmm0","xmm1","xmm2","xmm3","xmm4"
         );
     }
 #endif //ARCH_X86
