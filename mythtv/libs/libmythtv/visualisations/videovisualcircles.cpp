@@ -4,6 +4,10 @@
 // MythTV
 #include "videovisualcircles.h"
 
+#ifdef USING_VULKAN
+#include "visualisations/vulkan/mythvisualcirclesvulkan.h"
+#endif
+
 VideoVisualCircles::VideoVisualCircles(AudioPlayer* Audio, MythRender* Render)
   : VideoVisualSpectrum(Audio, Render)
 {
@@ -63,6 +67,11 @@ static class VideoVisualCirclesFactory : public VideoVisualFactory
 
     VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
+#ifdef USING_VULKAN
+        auto * vulkan = dynamic_cast<MythRenderVulkan*>(Render);
+        if (vulkan)
+            return new MythVisualCirclesVulkan(Audio, vulkan);
+#endif
         return new VideoVisualCircles(Audio, Render);
     }
 
@@ -72,5 +81,5 @@ static class VideoVisualCirclesFactory : public VideoVisualFactory
 
 bool VideoVisualCirclesFactory::SupportedRenderer(RenderType Type)
 {
-    return (Type == kRenderOpenGL);
+    return ((Type == kRenderOpenGL) || (Type == kRenderVulkan));
 }

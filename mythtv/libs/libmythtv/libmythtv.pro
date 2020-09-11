@@ -533,7 +533,11 @@ using_frontend {
             }
 
             using_vulkan {
+                HEADERS += visualisations/vulkan/mythvisualvulkan.h
+                HEADERS += visualisations/vulkan/mythvisualcirclesvulkan.h
                 HEADERS += visualisations/vulkan/mythvisualmonoscopevulkan.h
+                SOURCES += visualisations/vulkan/mythvisualvulkan.cpp
+                SOURCES += visualisations/vulkan/mythvisualcirclesvulkan.cpp
                 SOURCES += visualisations/vulkan/mythvisualmonoscopevulkan.cpp
             }
         }
