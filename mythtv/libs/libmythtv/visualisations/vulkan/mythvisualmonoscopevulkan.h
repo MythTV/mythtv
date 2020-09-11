@@ -3,6 +3,7 @@
 
 // MythTV
 #include "vulkan/mythrendervulkan.h"
+#include "visualisations/vulkan/mythvisualvulkan.h"
 #include "visualisations/videovisualmonoscope.h"
 
 class MythShaderVulkan;
@@ -21,7 +22,7 @@ struct alignas(16) PushBuffer
 };
 }
 
-class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVulkanObject
+class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVisualVulkan
 {
   public:
     MythVisualMonoScopeVulkan(AudioPlayer* Audio, MythRender* Render, bool Fade);
@@ -31,16 +32,11 @@ class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVulkan
     void Draw    (const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/) override;
 
   private:
-    MythRenderVulkan* Initialise (const QRect& Area);
-    void              TearDown   ();
+    MythRenderVulkan* InitialiseVulkan (const QRect& Area) override;
+    void              TearDownVulkan   () override;
 
-    MythShaderVulkan*        m_vulkanShader         { nullptr };
-    VkPipeline               m_pipeline             { nullptr };
-    VkDescriptorPool         m_descriptorPool       { nullptr };
-    VkDescriptorSet          m_projectionDescriptor { nullptr };
-    MythUniformBufferVulkan* m_projectionUniform    { nullptr };
-    VertexStates             m_vertexBuffers;
-    PushBuffer               m_pushBuffer { };
+    VertexStates m_vertexBuffers;
+    PushBuffer   m_pushBuffer { };
 };
 
 #endif
