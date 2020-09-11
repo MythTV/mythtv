@@ -154,7 +154,7 @@ static auto GLSLangCompile(EShLanguage Stage, const QString &Code)
             for (uint32_t opcode : OpCodes)
             {
                 if (count++ == 0) string += "\n";
-                if (count > 3) count = 0;
+                if (count > 5) count = 0;
                 string += "0x" + QString("%1, ").arg(opcode, 8, 16, QLatin1Char('0')).toUpper();
             }
             return string;
