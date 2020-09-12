@@ -6,6 +6,7 @@
 
 class InteractiveScreen : public MythScreenType
 {
+    Q_OBJECT
   public:
     InteractiveScreen(MythPlayer *player, const QString &name);
     ~InteractiveScreen() override = default;

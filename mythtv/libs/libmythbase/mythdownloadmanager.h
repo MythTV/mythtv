@@ -2,15 +2,16 @@
 #define MYTHDOWNLOADMANAGER_H
 
 #include <QDateTime>
-#include <QTimer>
+#include <QHash>
 #include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkCookieJar>
 #include <QNetworkDiskCache>
-#include <QNetworkReply>
 #include <QNetworkProxy>
-#include <QWaitCondition>
+#include <QNetworkReply>
 #include <QString>
-#include <QHash>
+#include <QTimer>
+#include <QWaitCondition>
 
 #include "mythbaseexp.h"
 #include "mthread.h"
@@ -19,6 +20,20 @@ class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
 void ShutdownMythDownloadManager(void);
+
+/** \brief A subclassed QNetworkCookieJar that allows for reading and writing
+ *         cookie files that contain raw formatted cookies and copying the
+ *         cookie jar to share between threads.
+ */
+class MBASE_PUBLIC MythCookieJar : public QNetworkCookieJar
+{
+    Q_OBJECT
+  public:
+    MythCookieJar() = default;
+    void copyAllCookies(MythCookieJar &old);
+    void load(const QString &filename);
+    void save(const QString &filename);
+};
 
 // TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
 enum MRequestType {

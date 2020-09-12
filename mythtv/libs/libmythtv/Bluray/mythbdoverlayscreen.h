@@ -9,6 +9,7 @@ class MythBDOverlay;
 
 class MythBDOverlayScreen : public MythScreenType
 {
+    Q_OBJECT
   public:
     MythBDOverlayScreen(MythPlayer *Player, const QString &Name);
    ~MythBDOverlayScreen() override = default;

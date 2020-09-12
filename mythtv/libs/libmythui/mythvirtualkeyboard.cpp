@@ -107,7 +107,7 @@ bool MythUIVirtualKeyboard::Create()
 
     //FIXME this assumes the edit is a direct child of the parent screen
     MythUIType *parentScreen = nullptr;
-    parentScreen = dynamic_cast<MythUIType *>(m_parentEdit->parent());
+    parentScreen = qobject_cast<MythUIType *>(m_parentEdit->parent());
     if (parentScreen)
     {
         editArea.moveTopLeft(QPoint(editArea.x() + parentScreen->GetArea().x(),

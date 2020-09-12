@@ -896,7 +896,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
 
                     if (name.startsWith("channellist"))
                     {
-                        auto* channelList = dynamic_cast<MythUIButtonList*>(object);
+                        auto* channelList = qobject_cast<MythUIButtonList*>(object);
 
                         if (channelList)
                         {
@@ -906,7 +906,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                     }
                     else if (name.startsWith("guidegrid"))
                     {
-                        auto* guidegrid = dynamic_cast<MythUIGuideGrid*>(object);
+                        auto* guidegrid = qobject_cast<MythUIGuideGrid*>(object);
 
                         if (guidegrid)
                         {

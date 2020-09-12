@@ -353,7 +353,7 @@ static int runMenu(const QString& which_menu)
 
     while (parentObject)
     {
-        auto *menu = dynamic_cast<MythThemedMenu *>(parentObject);
+        auto *menu = qobject_cast<MythThemedMenu *>(parentObject);
 
         if (menu && menu->objectName() == "mainmenu")
         {

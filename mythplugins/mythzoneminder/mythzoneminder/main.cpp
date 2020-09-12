@@ -137,7 +137,7 @@ static int runMenu(const QString& which_menu)
 
     while (parentObject)
     {
-        mainMenu = dynamic_cast<MythThemedMenu *>(parentObject);
+        mainMenu = qobject_cast<MythThemedMenu *>(parentObject);
 
         if (mainMenu && mainMenu->objectName() == "mainmenu")
             break;

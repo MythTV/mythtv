@@ -49,7 +49,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 {
 
     PoolServerType type = kTCPServer;
-    auto *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    auto *server = qobject_cast<PrivTcpServer *>(QObject::sender());
     if (server)
         type = server->GetServerType();
 

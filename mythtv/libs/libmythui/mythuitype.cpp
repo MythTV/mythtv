@@ -46,7 +46,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     if (parent)
     {
-        m_parent = dynamic_cast<MythUIType *>(parent);
+        m_parent = qobject_cast<MythUIType *>(parent);
 
         if (m_parent)
             m_parent->AddChild(this);
@@ -112,7 +112,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                  && (!objName || obj->objectName() == oName))
             return obj;
 
-        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != nullptr)
+        if (recursiveSearch && (qobject_cast<MythUIGroup *>(obj) != nullptr)
             && (obj = qChildHelper(objName, inheritsClass,
                                    recursiveSearch,
                                    obj->children())))
@@ -133,7 +133,7 @@ MythUIType *MythUIType::GetChild(const QString &name) const
     QObject *ret = qChildHelper(name.toLatin1().constData(), nullptr, true, children());
 
     if (ret)
-        return dynamic_cast<MythUIType *>(ret);
+        return qobject_cast<MythUIType *>(ret);
 
     return nullptr;
 }
@@ -1078,7 +1078,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 
 void MythUIType::UpdateDependState(bool isDefault)
 {
-    auto *dependee = dynamic_cast<MythUIType*>(sender());
+    auto *dependee = qobject_cast<MythUIType*>(sender());
 
     UpdateDependState(dependee, isDefault);
 }

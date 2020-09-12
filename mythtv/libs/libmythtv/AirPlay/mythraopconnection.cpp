@@ -809,7 +809,7 @@ void MythRAOPConnection::audioRetry(void)
  */
 void MythRAOPConnection::readClient(void)
 {
-    auto *socket = dynamic_cast<QTcpSocket *>(sender());
+    auto *socket = qobject_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 
@@ -1099,7 +1099,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (tags.contains("Transport"))
         {
             // New client is trying to play audio, disconnect all the other clients
-            auto *dev = dynamic_cast<MythRAOPDevice*>(parent());
+            auto *dev = qobject_cast<MythRAOPDevice*>(parent());
             if (dev != nullptr)
                 dev->DeleteAllClients(this);
             gCoreContext->WantingPlayback(parent());
@@ -1752,7 +1752,7 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
 void MythRAOPConnection::deleteEventClient(void)
 {
-    auto *client = dynamic_cast<QTcpSocket *>(sender());
+    auto *client = qobject_cast<QTcpSocket *>(sender());
     QString label;
 
     if (client != nullptr)

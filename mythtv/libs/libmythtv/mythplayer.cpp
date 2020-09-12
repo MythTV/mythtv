@@ -2162,8 +2162,8 @@ void MythPlayer::PreProcessNormalFrame(void)
         m_itvLock.lock();
         if (m_osd && m_videoOutput->GetOSDPainter())
         {
-            InteractiveScreen *window =
-                dynamic_cast<InteractiveScreen *>(m_osd->GetWindow(OSD_WIN_INTERACT));
+            auto *window =
+                qobject_cast<InteractiveScreen *>(m_osd->GetWindow(OSD_WIN_INTERACT));
             if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
             {
                 m_interactiveTV->UpdateOSD(window, m_videoOutput->GetOSDPainter());

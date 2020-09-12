@@ -962,7 +962,7 @@ void MythUIWebBrowser::Init(void)
 
     while (parentObject)
     {
-        m_parentScreen = dynamic_cast<MythScreenType *>(parentObject);
+        m_parentScreen = qobject_cast<MythScreenType *>(parentObject);
 
         if (m_parentScreen)
             break;

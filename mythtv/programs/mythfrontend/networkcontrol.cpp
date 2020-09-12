@@ -437,7 +437,7 @@ void NetworkControl::receiveCommand(QString &command)
 {
     LOG(VB_NETWORK, LOG_INFO, LOC +
         QString("NetworkControl::receiveCommand(%1)").arg(command));
-    auto *ncc = dynamic_cast<NetworkControlClient *>(sender());
+    auto *ncc = qobject_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
 

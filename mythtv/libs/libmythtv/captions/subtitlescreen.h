@@ -171,6 +171,7 @@ private:
 
 class SubtitleScreen : public MythScreenType
 {
+    Q_OBJECT
 public:
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     ~SubtitleScreen() override;

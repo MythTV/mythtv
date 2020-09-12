@@ -527,7 +527,7 @@ void OSD::SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout)
 
     if (win == m_dialog)
     {
-        auto *edit = dynamic_cast<ChannelEditor*>(m_dialog);
+        auto *edit = qobject_cast<ChannelEditor*>(m_dialog);
         if (edit)
             edit->SetText(Map);
         else
@@ -750,7 +750,7 @@ void OSD::CheckExpiry(void)
             if (!m_pulsedDialogText.isEmpty() && now > m_nextPulseUpdate)
             {
                 QString newtext = m_pulsedDialogText;
-                auto *dialog = dynamic_cast<MythDialogBox*>(m_dialog);
+                auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
                 if (dialog)
                 {
                     // The disambiguation string must be an empty string
@@ -760,7 +760,7 @@ void OSD::CheckExpiry(void)
                                           static_cast<int>(now.secsTo(it.value())));
                     dialog->SetText(newtext.replace("%d", replace));
                 }
-                auto *cdialog = dynamic_cast<MythConfirmationDialog*>(m_dialog);
+                auto *cdialog = qobject_cast<MythConfirmationDialog*>(m_dialog);
                 if (cdialog)
                 {
                     QString replace = QString::number(now.secsTo(it.value()));
@@ -977,7 +977,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         }
         else
         {
-            auto *dialog = dynamic_cast<MythDialogBox*>(m_dialog);
+            auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
             if (dialog)
                 dialog->Reset();
 
@@ -1004,10 +1004,10 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         {
             PositionWindow(dialog);
             m_dialog = dialog;
-            auto *dbox = dynamic_cast<MythDialogBox*>(m_dialog);
+            auto *dbox = qobject_cast<MythDialogBox*>(m_dialog);
             if (dbox)
                 dbox->SetReturnEvent(m_parentObject, Window);
-            auto *cbox = dynamic_cast<MythConfirmationDialog*>(m_dialog);
+            auto *cbox = qobject_cast<MythConfirmationDialog*>(m_dialog);
             if (cbox)
             {
                 cbox->SetReturnEvent(m_parentObject, Window);
@@ -1039,14 +1039,14 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
 
 void OSD::DialogSetText(const QString &Text)
 {
-    auto *dialog = dynamic_cast<MythDialogBox*>(m_dialog);
+    auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
     if (dialog)
         dialog->SetText(Text);
 }
 
 void OSD::DialogBack(const QString& Text, const QVariant& Data, bool Exit)
 {
-    auto *dialog = dynamic_cast<MythDialogBox*>(m_dialog);
+    auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
     if (dialog)
     {
         dialog->SetBackAction(Text, Data);
@@ -1057,14 +1057,14 @@ void OSD::DialogBack(const QString& Text, const QVariant& Data, bool Exit)
 
 void OSD::DialogAddButton(const QString& Text, QVariant Data, bool Menu, bool Current)
 {
-    auto *dialog = dynamic_cast<MythDialogBox*>(m_dialog);
+    auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
     if (dialog)
         dialog->AddButton(Text, std::move(Data), Menu, Current);
 }
 
 void OSD::DialogGetText(InfoMap &Map)
 {
-    auto *edit = dynamic_cast<ChannelEditor*>(m_dialog);
+    auto *edit = qobject_cast<ChannelEditor*>(m_dialog);
     if (edit)
         edit->GetText(Map);
 }
@@ -1074,7 +1074,7 @@ TeletextScreen* OSD::InitTeletext(void)
     TeletextScreen *tt = nullptr;
     if (m_children.contains(OSD_WIN_TELETEXT))
     {
-        tt = dynamic_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
+        tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
     }
     else
     {
@@ -1129,7 +1129,7 @@ bool OSD::TeletextAction(const QString &Action)
     if (!HasWindow(OSD_WIN_TELETEXT))
         return false;
 
-    TeletextScreen* tt = dynamic_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
+    auto* tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
     if (tt)
         return tt->KeyPress(Action);
     return false;
@@ -1150,7 +1150,7 @@ void OSD::TeletextClear(void)
     if (!HasWindow(OSD_WIN_TELETEXT))
         return;
 
-    TeletextScreen* tt = dynamic_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
+    auto* tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
     if (tt)
         tt->ClearScreen();
 }
@@ -1160,7 +1160,7 @@ SubtitleScreen* OSD::InitSubtitles(void)
     SubtitleScreen *sub = nullptr;
     if (m_children.contains(OSD_WIN_SUBTITLE))
     {
-        sub = dynamic_cast<SubtitleScreen*>(m_children.value(OSD_WIN_SUBTITLE));
+        sub = qobject_cast<SubtitleScreen*>(m_children.value(OSD_WIN_SUBTITLE));
     }
     else
     {
@@ -1232,7 +1232,7 @@ void OSD::DisplayBDOverlay(MythBDOverlay* Overlay)
     if (!Overlay)
         return;
 
-    MythBDOverlayScreen* bd = dynamic_cast<MythBDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
+    auto* bd = qobject_cast<MythBDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
     if (bd)
         bd->DisplayBDOverlay(Overlay);
 }

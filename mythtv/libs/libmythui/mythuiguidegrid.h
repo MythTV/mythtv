@@ -40,6 +40,7 @@ class MythFontProperties;
  */
 class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 {
+    Q_OBJECT
   public:
     MythUIGuideGrid(MythUIType *parent, const QString &name);
     ~MythUIGuideGrid() override;

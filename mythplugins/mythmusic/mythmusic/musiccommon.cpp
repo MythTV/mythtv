@@ -466,7 +466,7 @@ void MusicCommon::switchView(MusicView view)
             // if we are switching playlist editor views save and restore
             // the current position in the tree
             bool restorePos = (m_currentView == MV_PLAYLISTEDITORGALLERY);
-            auto *oldView = dynamic_cast<PlaylistEditorView *>(this);
+            auto *oldView = qobject_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
 
@@ -496,7 +496,7 @@ void MusicCommon::switchView(MusicView view)
             // if we are switching playlist editor views save and restore
             // the current position in the tree
             bool restorePos = (m_currentView == MV_PLAYLISTEDITORTREE);
-            auto *oldView = dynamic_cast<PlaylistEditorView *>(this);
+            auto *oldView = qobject_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
 
@@ -2194,7 +2194,7 @@ MythMenu* MusicCommon::createMainMenu(void)
     while (screen)
     {
         screenList.append(screen->objectName());
-        screen = dynamic_cast<MusicCommon*>(screen)->m_parentScreen;
+        screen = qobject_cast<MusicCommon*>(screen)->m_parentScreen;
     }
 
     if (!screenList.contains("searchview") && !screenList.contains("streamview"))

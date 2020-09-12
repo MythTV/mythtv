@@ -30,6 +30,7 @@ struct ThemedButton
  */
 class MUI_PUBLIC MythThemedMenuState : public MythScreenType
 {
+    Q_OBJECT
   public:
     MythThemedMenuState(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {}

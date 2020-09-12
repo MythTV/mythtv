@@ -9,6 +9,8 @@
 
 class TeletextScreen: public MythScreenType
 {
+    Q_OBJECT
+
     static bool  InitialiseFont(void);
 
   public:

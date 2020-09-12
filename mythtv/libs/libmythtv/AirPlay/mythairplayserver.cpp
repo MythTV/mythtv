@@ -534,7 +534,7 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
 void MythAirplayServer::deleteConnection(void)
 {
     QMutexLocker locker(m_lock);
-    auto *socket = dynamic_cast<QTcpSocket *>(sender());
+    auto *socket = qobject_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 
@@ -598,7 +598,7 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
 void MythAirplayServer::read(void)
 {
     QMutexLocker locker(m_lock);
-    auto *socket = dynamic_cast<QTcpSocket *>(sender());
+    auto *socket = qobject_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 

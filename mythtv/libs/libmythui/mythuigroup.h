@@ -10,7 +10,7 @@
  */
 class MUI_PUBLIC MythUIGroup : public MythUIComposite
 {
-
+    Q_OBJECT
   public:
     MythUIGroup(MythUIType *parent, const QString &name)
         : MythUIComposite(parent, name) {}

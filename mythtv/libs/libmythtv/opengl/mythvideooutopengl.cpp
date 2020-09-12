@@ -148,7 +148,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
     else
         m_renderFrameTypes = &s_openglFrameTypes;
 
-    if (m_painter && !dynamic_cast<MythOpenGLPainter*>(m_painter))
+    if (m_painter && !qobject_cast<MythOpenGLPainter*>(m_painter))
         LOG(VB_GENERAL, LOG_ERR, LOC + "This is not the painter you are looking for");
 
     // Create OpenGLVideo
