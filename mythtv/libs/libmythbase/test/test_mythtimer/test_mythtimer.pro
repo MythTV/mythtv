@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += testlib
 
@@ -6,13 +7,6 @@ TEMPLATE = app
 TARGET = test_mythtimer
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
-
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage 
-  QMAKE_LFLAGS += -fprofile-arcs 
-}
-
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_mythtimer.h

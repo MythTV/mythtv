@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += testlib
 
@@ -6,11 +7,6 @@ TEMPLATE = app
 TARGET = test_avcinfo
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
-
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
-  QMAKE_LFLAGS += -fprofile-arcs
-}
 
 # Input
 HEADERS += test_avcinfo.h

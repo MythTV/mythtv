@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += network testlib
 
@@ -23,11 +24,6 @@ LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
 LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
-  QMAKE_LFLAGS += -fprofile-arcs
-}
-
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale
@@ -41,7 +37,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_mythiowrapper.h

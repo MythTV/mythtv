@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += testlib
 
@@ -8,13 +9,6 @@ DEPENDPATH += . ../.. ../../logging
 INCLUDEPATH += . ../.. ../../logging
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 LIBS += -Wl,$$_RPATH_$${PWD}/../..
-
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
-  QMAKE_LFLAGS += -fprofile-arcs
-}
-
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_mythmiscutil.h

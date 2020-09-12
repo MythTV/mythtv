@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += xml sql network testlib
 
@@ -27,11 +28,6 @@ LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
 LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
-  QMAKE_LFLAGS += -fprofile-arcs
-}
-
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavformat
@@ -46,7 +42,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 !using_libexiv_external {
     LIBS += -L../../../../external/libexiv2 -lmythexiv2-0.28

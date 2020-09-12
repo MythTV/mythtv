@@ -1,4 +1,5 @@
 include ( ../../../../settings.pro )
+include ( ../../../../test.pro )
 
 QT += xml sql network testlib
 
@@ -7,13 +8,6 @@ TARGET = test_template
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
 LIBS += -L../.. -lmythbase-$$LIBVERSION
-
-contains(QMAKE_CXX, "g++") {
-  QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
-  QMAKE_LFLAGS += -fprofile-arcs
-}
-
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_template.h
