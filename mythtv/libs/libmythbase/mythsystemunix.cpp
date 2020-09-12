@@ -166,9 +166,13 @@ void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
         fdLock.lock();
         FDType_t *fdType = fdMap.value(fd);
         fdLock.unlock();
+        if (fdType == nullptr)
+            return;
 
         // Emit the data ready signal (1 = stdout, 2 = stderr)
         MythSystemLegacyUnix *ms = fdType->m_ms;
+        if (ms == nullptr)
+            return;
         emit ms->readDataReady(fdType->m_type);
     }
 }

@@ -89,7 +89,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
         m_dvbCam = new DVBCam(m_device);
         m_hasCrcBug = CardUtil::HasDVBCRCBug(m_device);
     }
-    else
+    else if (master != nullptr)
     {
         m_dvbCam    = master->m_dvbCam;
         m_hasCrcBug = master->m_hasCrcBug;

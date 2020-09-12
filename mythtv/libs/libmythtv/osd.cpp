@@ -826,7 +826,9 @@ void OSD::ResetWindow(const QString &Window)
     if (!m_children.contains(Window))
         return;
 
-    m_children.value(Window)->Reset();
+    MythScreenType *screen = m_children.value(Window);
+    if (screen != nullptr)
+        screen->Reset();
 }
 
 void OSD::PositionWindow(MythScreenType *Window)
@@ -899,15 +901,20 @@ void OSD::HideWindow(const QString &Window)
 {
     if (!m_children.contains(Window))
         return;
-    m_children.value(Window)->SetVisible(false);
-    m_children.value(Window)->Close(); // for InteractiveScreen
+    MythScreenType *screen = m_children.value(Window);
+    if (screen != nullptr)
+    {
+        screen->SetVisible(false);
+        screen->Close(); // for InteractiveScreen
+    }
     SetExpiry(Window, kOSDTimeout_None);
     m_refresh = true;
 
     if (m_functionalType != kOSDFunctionalType_Default)
     {
         bool valid   = m_children.contains(m_functionalWindow);
-        bool visible = valid && m_children.value(m_functionalWindow)->IsVisible(false);
+        screen = m_children.value(m_functionalWindow);
+        bool visible = valid && screen && screen->IsVisible(false);
         if (!valid || !visible)
         {
             SendHideEvent();
@@ -1365,14 +1372,16 @@ void OsdNavigation::More(void)
 
     MythUIGroup *group = nullptr;
     UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
-    group->SetVisible (false);
+    if (group != nullptr)
+        group->SetVisible (false);
 
     // wrap around after last group displayed
     if (++m_visibleGroup > m_maxGroupNum)
         m_visibleGroup = 0;
 
     UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
-    group->SetVisible (true);
+    if (group != nullptr)
+        group->SetVisible (true);
 }
 
 void OsdNavigation::SetTextFromMap(const InfoMap &Map)

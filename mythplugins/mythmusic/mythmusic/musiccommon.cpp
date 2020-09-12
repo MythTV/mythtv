@@ -1117,10 +1117,11 @@ void MusicCommon::seek(int pos)
 {
     if (gPlayer->getOutput())
     {
-        if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning())
+        Decoder *decoder = gPlayer->getDecoder();
+        if (decoder && decoder->isRunning())
         {
-            gPlayer->getDecoder()->lock();
-            gPlayer->getDecoder()->seek(pos);
+            decoder->lock();
+            decoder->seek(pos);
 
             if (m_mainvisual)
             {
@@ -1129,7 +1130,7 @@ void MusicCommon::seek(int pos)
                 m_mainvisual->mutex()->unlock();
             }
 
-            gPlayer->getDecoder()->unlock();
+            decoder->unlock();
         }
 
         gPlayer->getOutput()->SetTimecode(pos*1000);

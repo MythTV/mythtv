@@ -183,6 +183,8 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
         return;
 
     auto *chanInfo = item->GetData().value<ChannelInfo *>();
+    if (chanInfo == nullptr)
+        return;
 
     // inc/dec recording priority
     int tempRecPriority = chanInfo->m_recPriority + howMuch;

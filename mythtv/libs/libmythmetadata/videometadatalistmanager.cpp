@@ -352,7 +352,7 @@ smart_dir_node meta_dir_node::getSubDir(const QString &subdir,
 {
     for (auto & entry : m_subdirs)
     {
-        if (subdir == entry->getPath())
+        if (entry && (subdir == entry->getPath()))
         {
             return entry;
         }

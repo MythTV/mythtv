@@ -83,7 +83,11 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (!m_running || m_exit)
         return;
 
-    if (!m_locked && GetIPTVChannel()->IsOpen())
+    IPTVChannel *channel = GetIPTVChannel();
+    if (channel == nullptr)
+        return;
+
+    if (!m_locked && channel->IsOpen())
     {
         QMutexLocker locker(&m_statusLock);
         m_signalLock.SetValue(1);
@@ -108,7 +112,7 @@ void IPTVSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues: start sigmon");
-        GetIPTVChannel()->SetStreamData(GetStreamData());
+        channel->SetStreamData(GetStreamData());
         m_streamHandlerStarted = true;
     }
 }

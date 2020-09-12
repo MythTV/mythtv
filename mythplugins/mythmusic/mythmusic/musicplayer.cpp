@@ -291,11 +291,12 @@ void MusicPlayer::pause(void)
         m_output->Pause(!m_isPlaying);
     }
     // wake up threads
-    if (getDecoder())
+    Decoder *decoder = getDecoder();
+    if (decoder)
     {
-        getDecoder()->lock();
-        getDecoder()->cond()->wakeAll();
-        getDecoder()->unlock();
+        decoder->lock();
+        decoder->cond()->wakeAll();
+        decoder->unlock();
     }
 
     GetMythMainWindow()->PauseIdleTimer(false);
@@ -1106,8 +1107,9 @@ void MusicPlayer::seek(int pos)
 {
     if (m_output)
     {
-        if (getDecoder() && getDecoder()->isRunning())
-            getDecoder()->seek(pos);
+        Decoder *decoder = getDecoder();
+        if (decoder && decoder->isRunning())
+            decoder->seek(pos);
 
         m_output->SetTimecode(pos*1000);
     }
@@ -1503,35 +1505,36 @@ void MusicPlayer::setupDecoderHandler(void)
 
 void MusicPlayer::decoderHandlerReady(void)
 {
-    if (!getDecoder())
+    Decoder *decoder = getDecoder();
+    if (!decoder)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString ("decoder handler is ready, decoding %1")
-            .arg(getDecoder()->getURL()));
+            .arg(decoder->getURL()));
 
 #ifdef HAVE_CDIO
-    auto *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
+    auto *cddecoder = dynamic_cast<CdDecoder*>(decoder);
     if (cddecoder)
         cddecoder->setDevice(gCDdevice);
 #endif
 
     // Decoder thread can't be running while being initialized
-    if (getDecoder()->isRunning())
+    if (decoder->isRunning())
     {
-        getDecoder()->stop();
-        getDecoder()->wait();
+        decoder->stop();
+        decoder->wait();
     }
 
-    getDecoder()->setOutput(m_output);
-    //getDecoder()-> setBlockSize(2 * 1024);
-    getDecoder()->addListener(this);
+    decoder->setOutput(m_output);
+    //decoder-> setBlockSize(2 * 1024);
+    decoder->addListener(this);
 
     // add any listeners to the decoder
     {
         QMutexLocker locker(m_lock);
         // NOLINTNEXTLINE(modernize-loop-convert)
         for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
-            getDecoder()->addListener(*it);
+            decoder->addListener(*it);
     }
 
     m_currentTime = 0;
@@ -1541,16 +1544,16 @@ void MusicPlayer::decoderHandlerReady(void)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
     {
         //m_output->addVisual((MythTV::Visual*)(*it));
-        //(*it)->setDecoder(getDecoder());
+        //(*it)->setDecoder(decoder);
         //m_visual->setOutput(m_output);
     }
 
-    if (getDecoder()->initialize())
+    if (decoder->initialize())
     {
         if (m_output)
              m_output->PauseUntilBuffered();
 
-        getDecoder()->start();
+        decoder->start();
 
         if (!m_oneshotMetadata && getResumeMode() == RESUME_EXACT &&
             gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
@@ -1565,7 +1568,7 @@ void MusicPlayer::decoderHandlerReady(void)
     else
     {
         LOG(VB_PLAYBACK, LOG_ERR, QString("Cannot initialise decoder for %1")
-                .arg(getDecoder()->getURL()));
+                .arg(decoder->getURL()));
         return;
     }
 

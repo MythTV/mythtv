@@ -1940,6 +1940,8 @@ bool MythCommandLineParser::toBool(const QString& key) const
         return false;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return false;
 
     if (arg->m_type == QVariant::Bool)
     {
@@ -1961,6 +1963,8 @@ int MythCommandLineParser::toInt(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -1986,6 +1990,8 @@ uint MythCommandLineParser::toUInt(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2011,6 +2017,8 @@ long long MythCommandLineParser::toLongLong(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2036,6 +2044,8 @@ double MythCommandLineParser::toDouble(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2061,6 +2071,8 @@ QSize MythCommandLineParser::toSize(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2086,6 +2098,8 @@ QString MythCommandLineParser::toString(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2116,6 +2130,8 @@ QStringList MythCommandLineParser::toStringList(const QString& key, const QStrin
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2146,6 +2162,8 @@ QMap<QString,QString> MythCommandLineParser::toMap(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {
@@ -2177,6 +2195,8 @@ QDateTime MythCommandLineParser::toDateTime(const QString& key) const
         return val;
 
     CommandLineArg *arg = m_namedArgs[key];
+    if (arg == nullptr)
+        return val;
 
     if (arg->m_given)
     {

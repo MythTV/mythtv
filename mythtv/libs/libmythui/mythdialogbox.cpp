@@ -216,7 +216,8 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     if (m_currentMenu)
     {
         auto *menuItem = item->GetData().value< MythMenuItem * >();
-
+        if (menuItem == nullptr)
+            return;
         if (menuItem->m_subMenu)
         {
             m_currentMenu->m_selectedItem = m_buttonList->GetCurrentPos();

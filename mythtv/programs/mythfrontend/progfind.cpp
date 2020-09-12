@@ -409,9 +409,12 @@ void ProgFinder::ShowGuide() const
         if (GetFocusWidget() == m_timesList)
         {
             ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
-            startchannel = pginfo->GetChanNum();
-            startchanid = pginfo->GetChanID();
-            starttime = pginfo->GetScheduledStartTime();
+            if (pginfo != nullptr)
+            {
+                startchannel = pginfo->GetChanNum();
+                startchanid = pginfo->GetChanID();
+                starttime = pginfo->GetScheduledStartTime();
+            }
         }
         GuideGrid::RunProgramGuide(startchanid, startchannel, starttime,
                                    m_player, m_embedVideo, false, -2);

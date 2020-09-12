@@ -107,7 +107,7 @@ class MHEngine: public MHEG {
     void SendToBack(const MHRoot *pVis);
     void PutBefore(const MHRoot *pVis, const MHRoot *pRef);
     void PutBehind(const MHRoot *pVis, const MHRoot *pRef);
-    void LockScreen() { CurrentApp()->m_nLockCount++; }
+    void LockScreen() { MHApplication *app = CurrentApp(); if (app) app->m_nLockCount++; }
     void UnlockScreen();
 
     // Run synchronous actions and process any asynchronous events until the queues are empty.
@@ -161,8 +161,8 @@ class MHEngine: public MHEG {
     MHInteractible *GetInteraction(void) { return m_interacting; }
     void SetInteraction(MHInteractible *p) { m_interacting = p; }
 
-    int GetTuneInfo() { return CurrentApp() ? CurrentApp()->m_tuneInfo : 0; }
-    void SetTuneInfo(int tuneinfo) { if (CurrentApp()) CurrentApp()->m_tuneInfo = tuneinfo; }
+    int GetTuneInfo() { MHApplication *app = CurrentApp(); return app ? app->m_tuneInfo : 0; }
+    void SetTuneInfo(int tuneinfo) { MHApplication *app = CurrentApp(); if (app) app->m_tuneInfo = tuneinfo; }
 
   protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);

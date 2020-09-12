@@ -385,10 +385,9 @@ void MHEngine::Quit()
 
     m_fInTransition = true; // Starting a transition
 
-    if (CurrentScene())
-    {
-        CurrentScene()->Destruction(this);
-    }
+    MHScene *scene = CurrentScene();
+    if (scene)
+        scene->Destruction(this);
 
     CurrentApp()->Destruction(this);
 

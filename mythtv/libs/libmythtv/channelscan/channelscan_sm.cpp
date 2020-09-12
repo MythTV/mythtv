@@ -2156,22 +2156,24 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     const TransportScanItem &item = *transport;
 
 #ifdef USING_DVB
-    if (GetDVBSignalMonitor())
+    DVBSignalMonitor *monitor = GetDVBSignalMonitor();
+    if (monitor)
     {
         // always wait for rotor to finish
-        GetDVBSignalMonitor()->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
-        GetDVBSignalMonitor()->SetRotorTarget(1.0F);
+        monitor->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
+        monitor->SetRotorTarget(1.0F);
     }
 #endif // USING_DVB
 
-    if (!GetDTVChannel())
+    DTVChannel *channel = GetDTVChannel();
+    if (!channel)
         return false;
 
     if (item.m_mplexid > 0 && transport.offset() == 0)
-        return GetDTVChannel()->TuneMultiplex(item.m_mplexid, m_inputName);
+        return channel->TuneMultiplex(item.m_mplexid, m_inputName);
 
     if (item.m_tuning.m_sistandard == "MPEG")
-        return GetDTVChannel()->Tune(item.m_iptvTuning, true);
+        return channel->Tune(item.m_iptvTuning, true);
 
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.m_tuning;
@@ -2189,7 +2191,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
             tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
     }
 
-    return GetDTVChannel()->Tune(tuning);
+    return channel->Tune(tuning);
 }
 
 void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)

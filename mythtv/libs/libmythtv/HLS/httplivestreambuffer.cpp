@@ -593,10 +593,11 @@ public:
     {
         QMutexLocker lock(&m_lock);
         HLSSegment *segment = GetSegment(segnum);
-        m_duration -= segment->Duration();
-        if (willdelete)
+        if (segment != nullptr)
         {
-            delete segment;
+            m_duration -= segment->Duration();
+            if (willdelete)
+                delete segment;
         }
         m_segments.removeAt(segnum);
     }
@@ -2409,6 +2410,8 @@ int HLSRingBuffer::ChooseSegment(int stream) const
     while(i >= 0)
     {
         HLSSegment *segment = hls->GetSegment(i);
+        if (segment == nullptr)
+            continue;
 
         if (segment->Duration() > hls->TargetDuration())
         {

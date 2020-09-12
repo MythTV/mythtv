@@ -51,7 +51,8 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
     else
         m_lockTimeout = GetLockTimeout() * 1000;
 
-    if (GetExternalChannel()->IsBackgroundTuning())
+    ExternalChannel *channel = GetExternalChannel();
+    if (channel && channel->IsBackgroundTuning())
         m_scriptStatus.SetValue(1);
 }
 
@@ -94,7 +95,11 @@ void ExternalSignalMonitor::UpdateValues(void)
     if (!m_running || m_exit)
         return;
 
-    if (GetExternalChannel()->IsExternalChannelChangeInUse())
+    ExternalChannel *channel = GetExternalChannel();
+    if (channel == nullptr)
+        return;
+
+    if (channel->IsExternalChannelChangeInUse())
     {
         SignalMonitor::UpdateValues();
 
@@ -103,11 +108,11 @@ void ExternalSignalMonitor::UpdateValues(void)
             return;
     }
 
-    if (GetExternalChannel()->IsBackgroundTuning())
+    if (channel->IsBackgroundTuning())
     {
         QMutexLocker locker(&m_statusLock);
         if (m_scriptStatus.GetValue() < 2)
-            m_scriptStatus.SetValue(GetExternalChannel()->GetTuneStatus());
+            m_scriptStatus.SetValue(channel->GetTuneStatus());
 
         if (!m_scriptStatus.IsGood())
             return;
