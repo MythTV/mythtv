@@ -188,7 +188,7 @@ void WebSocketWorker::SetupSocket()
         }
 
         if (pSslSocket)
-            m_socket = dynamic_cast<QTcpSocket *>(pSslSocket);
+            m_socket = pSslSocket;
         else
             return;
 #else

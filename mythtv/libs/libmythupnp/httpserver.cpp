@@ -508,7 +508,7 @@ void HttpWorker::run(void)
         }
 
         if (pSslSocket)
-            pSocket = qobject_cast<QTcpSocket *>(pSslSocket);
+            pSocket = pSslSocket;
         else
             return;
 #else

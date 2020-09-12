@@ -29,7 +29,7 @@ SatIPChannel::~SatIPChannel(void)
 bool SatIPChannel::IsMaster(void) const
 {
     DTVChannel *master = DTVChannel::GetMasterLock(m_device);
-    bool is_master = (master == static_cast<const DTVChannel*>(this));
+    bool is_master = (master == this);
     DTVChannel::ReturnMasterLock(master);
     return is_master;
 }

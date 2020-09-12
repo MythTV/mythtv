@@ -1348,7 +1348,7 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
 
 void DVBChannel::ReturnMasterLock(DVBChannel* &dvbm)
 {
-    auto *chan = static_cast<DTVChannel*>(dvbm);
+    DTVChannel *chan = dvbm;
     DTVChannel::ReturnMasterLock(chan);
     dvbm = nullptr;
 }

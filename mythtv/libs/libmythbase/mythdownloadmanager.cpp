@@ -1678,7 +1678,7 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
     auto *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
 
-    return static_cast<QNetworkCookieJar *>(outJar);
+    return outJar;
 }
 
 /** \brief Refresh the temporary cookie jar from another cookie jar
@@ -1695,7 +1695,7 @@ void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
 
     auto *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
-    m_inCookieJar = static_cast<QNetworkCookieJar *>(outJar);
+    m_inCookieJar = outJar;
 
     QMutexLocker locker2(&m_queueWaitLock);
     m_queueWaitCond.wakeAll();
@@ -1712,7 +1712,7 @@ void MythDownloadManager::updateCookieJar(void)
     {
         auto *outJar = new MythCookieJar;
         outJar->copyAllCookies(*inJar);
-        m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+        m_manager->setCookieJar(outJar);
     }
 
     delete m_inCookieJar;

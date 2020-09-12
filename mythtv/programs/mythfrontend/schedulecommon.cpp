@@ -223,7 +223,7 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
 
     auto *recrule = new RecordingRule();
 
-    if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
+    if (!recrule->LoadByProgram(recinfo))
         LOG(VB_GENERAL, LOG_ERR, "Failed to load by program info");
 
     if (!recrule->MakeOverride())

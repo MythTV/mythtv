@@ -1201,7 +1201,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        MythUIType *currType = topScreen;
         if (currType == nullptr)
             return QString("ERROR: cannot cast top screen!");
 
@@ -1246,7 +1246,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        MythUIType *currType = topScreen;
         if (currType == nullptr)
             return QString("ERROR: cannot cast top screen!");
 
@@ -1293,7 +1293,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
             topScreen = stack->GetTopScreen();
         }
 
-        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        MythUIType *currType = topScreen;
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 

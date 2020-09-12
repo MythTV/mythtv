@@ -48,7 +48,7 @@ HDHRChannel::~HDHRChannel(void)
 bool HDHRChannel::IsMaster(void) const
 {
     DTVChannel *master = DTVChannel::GetMasterLock(m_deviceId);
-    bool is_master = (master == static_cast<const DTVChannel*>(this));
+    bool is_master = (master == this);
     DTVChannel::ReturnMasterLock(master);
     return is_master;
 }
