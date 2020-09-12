@@ -78,29 +78,37 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
 
 void BackendContext::SetFrontendDisconnected(const QString& name)
 {
-    if (m_connectedFrontends.contains(name))
+    if (!m_connectedFrontends.contains(name))
     {
-        Frontend *frontend = m_connectedFrontends.value(name);
-        frontend->m_connectionCount--;
-        LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Decreasing "
-                                           "connection count for (%1) to %2 ")
-                                            .arg(frontend->m_name)
-                                            .arg(frontend->m_connectionCount));
-        if (frontend->m_connectionCount <= 0)
-        {
-            // Will still be referenced in knownFrontends, so no leak here
-            m_connectedFrontends.remove(name);
-
-            gCoreContext->SendSystemEvent(
-                    QString("CLIENT_DISCONNECTED HOSTNAME %1")
-                            .arg(frontend->m_name));
-            LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
-                                              "disconnected.").arg(frontend->m_name));
-        }
-
-        return;
-    }
-    LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Disconnect requested "
+        LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Disconnect requested "
                                            "for frontend (%1) which isn't "
                                            "registered. ").arg(name));
+        return;
+    }
+
+    Frontend *frontend = m_connectedFrontends.value(name);
+    if (frontend == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Disconnect requested "
+                                           "for frontend (%1) with null pointer.")
+                                           .arg(name));
+        return;
+    }
+
+    frontend->m_connectionCount--;
+    LOG(VB_GENERAL, LOG_DEBUG, QString("BackendContext: Decreasing "
+                                       "connection count for (%1) to %2 ")
+                                        .arg(frontend->m_name)
+                                        .arg(frontend->m_connectionCount));
+    if (frontend->m_connectionCount <= 0)
+    {
+        // Will still be referenced in knownFrontends, so no leak here
+        m_connectedFrontends.remove(name);
+
+        gCoreContext->SendSystemEvent(
+                QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                        .arg(frontend->m_name));
+        LOG(VB_GENERAL, LOG_INFO, QString("BackendContext: Frontend '%1' "
+                                          "disconnected.").arg(frontend->m_name));
+    }
 }
