@@ -1066,14 +1066,15 @@ static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
     copy_entries(dst, src, filter);
     for (auto dir = src.dirs_begin(); dir != src.dirs_end(); ++dir)
     {
-        if (*dir == nullptr)
+        simple_ref_ptr<meta_dir_node> node = *dir;
+        if (node == nullptr)
             continue;
 
-        smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
-                                           (*dir)->getName(),
-                                           (*dir)->GetHost(),
-                                           (*dir)->GetPrefix(),
-                                           (*dir)->GetData());
+        smart_dir_node sdn = dst.addSubDir(node->getPath(),
+                                           node->getName(),
+                                           node->GetHost(),
+                                           node->GetPrefix(),
+                                           node->GetData());
         copy_filtered_tree(*sdn, *(dir->get()), filter);
     }
 }
