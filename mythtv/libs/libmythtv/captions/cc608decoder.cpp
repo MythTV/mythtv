@@ -53,7 +53,7 @@ void CC608Decoder::FormatCC(int tc, int code1, int code2)
     FormatCCField(tc, 1, code2);
 }
 
-void CC608Decoder::GetServices(uint seconds, CC608Seen seen) const
+void CC608Decoder::GetServices(uint seconds, CC608Seen& seen) const
 {
     time_t now = time(nullptr);
     time_t then = now - seconds;

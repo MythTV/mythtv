@@ -68,7 +68,7 @@ class CC608Decoder
     QString GetXDS(const QString &key) const;
 
     /// \return Services seen in last few seconds as specified.
-    void GetServices(uint seconds, CC608Seen seen) const;
+    void GetServices(uint seconds, CC608Seen& seen) const;
 
     static QString ToASCII(const QString &cc608, bool suppress_unknown);
 
