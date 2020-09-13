@@ -259,6 +259,12 @@ void ImageScanThread<DBFS>::SyncSubTree(const QFileInfo &dirInfo, int parentId,
 
     // Create directory node
     int id = SyncDirectory(dirInfo, devId, base, parentId);
+    if (id == -1)
+    {
+        LOG(VB_FILE, LOG_INFO,
+            QString("Failed to sync dir %1").arg(dirInfo.absoluteFilePath()));
+        return;
+    }
 
     // Sync its contents
     QFileInfoList entries = dir.entryInfoList();
@@ -318,6 +324,8 @@ template <class DBFS>
     if (m_dbDirMap.contains(dir->m_filePath))
     {
         ImagePtr dbDir = m_dbDirMap.value(dir->m_filePath);
+        if (dbDir == nullptr)
+            return -1;
 
         // The directory already exists in the db. Retain its id
         dir->m_id = dbDir->m_id;
@@ -345,6 +353,8 @@ template <class DBFS>
     else if (m_seenDir.contains(dir->m_filePath))
     {
         ImagePtr cloneDir = m_seenDir.value(dir->m_filePath);
+        if (cloneDir == nullptr)
+            return -1;
 
         // All clones point to same Db dir. Use latest
         if (cloneDir->m_modTime >= dir->m_modTime )
