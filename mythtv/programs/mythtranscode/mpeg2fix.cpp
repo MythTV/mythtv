@@ -609,6 +609,9 @@ void MPEG2fixup::InitReplex()
         uint index = it.key();
         if (index > m_inputFC->nb_streams)
             continue;   // will never happen in practice
+        AVCodecContext  *avctx = getCodecContext(index);
+        if (avctx == nullptr)
+            continue;
         int i = m_audMap[index];
         AVDictionaryEntry *metatag =
             av_dict_get(m_inputFC->streams[index]->metadata,
@@ -617,7 +620,7 @@ void MPEG2fixup::InitReplex()
         ring_init(&m_rx.m_extrbuf[i], memsize / 5);
         ring_init(&m_rx.m_indexExtrbuf[i], INDEX_BUF);
         m_rx.m_extframe[i].set = 1;
-        m_rx.m_extframe[i].bit_rate = getCodecContext(index)->bit_rate;
+        m_rx.m_extframe[i].bit_rate = avctx->bit_rate;
         m_rx.m_extframe[i].framesize = (*it)->first()->m_pkt.size;
         strncpy(m_rx.m_extframe[i].language, lang, 4);
         switch(GetStreamType(index))
