@@ -268,7 +268,7 @@ class APHTTPRequest
 
     void Process(void)
     {
-        if (!m_data.size())
+        if (m_data.isEmpty())
             return;
 
         // request line
@@ -991,10 +991,10 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
     reply.append("DATE: ");
     reply.append(MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss"));
     reply.append(" GMT\r\n");
-    if (header.size())
+    if (!header.isEmpty())
         reply.append(header);
 
-    if (body.size())
+    if (!body.isEmpty())
     {
         reply.append("Content-Type: ");
         reply.append(content_type);
@@ -1007,7 +1007,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
     }
     reply.append("\r\n\r\n");
 
-    if (body.size())
+    if (!body.isEmpty())
         reply.append(body);
 
     response << reply;
@@ -1049,7 +1049,7 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
     reply.append("x-apple-session-id: ");
     reply.append(session);
     reply.append("\r\n\r\n");
-    if (body.size())
+    if (!body.isEmpty())
         reply.append(body);
 
     response << reply;

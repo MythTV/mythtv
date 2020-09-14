@@ -46,7 +46,7 @@ bool XmlConfiguration::Load( void )
 
     QFile  file( sName );
 
-    if (file.exists() && m_sFileName.length())  // Ignore empty filenames
+    if (file.exists() && !m_sFileName.isEmpty())  // Ignore empty filenames
     {
 
         if ( !file.open( QIODevice::ReadOnly ) )

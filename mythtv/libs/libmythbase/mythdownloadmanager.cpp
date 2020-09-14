@@ -1488,7 +1488,7 @@ bool MythDownloadManager::saveFile(const QString &outFile,
                                    const QByteArray &data,
                                    const bool append)
 {
-    if (outFile.isEmpty() || !data.size())
+    if (outFile.isEmpty() || data.isEmpty())
         return false;
 
     QFile file(outFile);

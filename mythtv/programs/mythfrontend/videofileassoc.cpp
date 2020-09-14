@@ -185,7 +185,7 @@ class FileAssocDialogPrivate
 
     bool AddExtension(const QString& newExtension, UIDToFAPair::UID_type &new_id)
     {
-        if (newExtension.length())
+        if (!newExtension.isEmpty())
         {
             new_id = ++m_nextFAID;
             m_fileAssociations.insert(FA_collection::value_type(new_id,

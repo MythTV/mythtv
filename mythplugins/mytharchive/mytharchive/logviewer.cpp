@@ -52,7 +52,7 @@ void showLogViewer(void)
             QDir d(logDir);
             logFiles = d.entryList(filters, QDir::Files | QDir::Readable, QDir::Time);
 
-            if (logFiles.count())
+            if (!logFiles.isEmpty())
             {
                 // the first log file should be the newest one available
                 progressLog = logDir + '/' + logFiles[0];

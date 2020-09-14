@@ -205,7 +205,7 @@ void RSSSite::process(void)
 
     m_articleList.clear();
 
-    if (!m_data.size())
+    if (m_data.isEmpty())
     {
         emit finished(this);
         return;

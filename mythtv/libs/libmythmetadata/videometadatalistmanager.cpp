@@ -198,7 +198,7 @@ const QString& meta_node::getPath() const
 
 const QString& meta_node::getFQPath()
 {
-    if (m_fqPath.length())
+    if (!m_fqPath.isEmpty())
         return m_fqPath;
 
     if (m_parent && !m_pathRoot)
@@ -209,7 +209,7 @@ const QString& meta_node::getFQPath()
         if (p.startsWith("myth://"))
             m_fqPath = p;
         else
-            m_fqPath = ((p.length() && p[0] != '/') ? "/" : "") + p;
+            m_fqPath = ((!p.isEmpty() && p[0] != '/') ? "/" : "") + p;
     }
 
     return m_fqPath;
@@ -254,7 +254,7 @@ meta_dir_node::meta_dir_node(const QString &path, const QString &name,
   : meta_node(parent, is_path_root), m_path(path), m_name(name),
     m_host(std::move(host)), m_prefix(std::move(prefix)), m_data(std::move(data))
 {
-    if (!name.length())
+    if (name.isEmpty())
         m_name = path;
     ensureSortFields();
 }

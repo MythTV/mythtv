@@ -297,7 +297,7 @@ void cleanup(void)
      delete gBackendContext;
      gBackendContext = nullptr;
 
-    if (pidfile.size())
+    if (!pidfile.isEmpty())
     {
         unlink(pidfile.toLatin1().constData());
         pidfile.clear();

@@ -7613,7 +7613,7 @@ void MainServer::HandlePixmapGetIfModified(
                 if (open_ok)
                     data = file.readAll();
 
-                if (data.size())
+                if (!data.isEmpty())
                 {
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Read preview file '%1'")

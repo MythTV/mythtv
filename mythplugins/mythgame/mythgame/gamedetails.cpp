@@ -26,7 +26,7 @@ void GameDetailsPopup::handleImage(const QString &name, const QString &filename)
     UIUtilW::Assign(this, image, name);
     if (image)
     {
-        if (filename.size())
+        if (!filename.isEmpty())
         {
             image->SetFilename(filename);
             image->Load();

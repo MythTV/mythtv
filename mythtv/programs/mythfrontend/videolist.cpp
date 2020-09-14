@@ -1188,7 +1188,7 @@ class dirhandler : public DirectoryHandler
         if (m_inferTitle)
         {
             QString tmptitle(VideoMetadata::FilenameToMeta(file_string, 1));
-            if (tmptitle.length())
+            if (!tmptitle.isEmpty())
                 title = tmptitle;
         }
         myData->SetTitle(title);

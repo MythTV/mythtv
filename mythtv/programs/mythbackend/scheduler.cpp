@@ -5646,7 +5646,7 @@ bool Scheduler::WasStartedAutomatically()
 
     QDateTime startupTime = QDateTime();
     QString s = gCoreContext->GetSetting("MythShutdownWakeupTime", "");
-    if (s.length())
+    if (!s.isEmpty())
         startupTime = MythDate::fromString(s);
 
     // if we don't have a valid startup time assume we were started manually

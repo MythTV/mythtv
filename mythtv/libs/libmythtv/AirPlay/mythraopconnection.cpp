@@ -1441,7 +1441,7 @@ void MythRAOPConnection::FinishResponse(RaopNetStream *stream, QTcpSocket *socke
         return;
     *stream << "Server: AirTunes/130.14\r\n";
     *stream << "CSeq: " << cseq << "\r\n";
-    if (responseData.length())
+    if (!responseData.isEmpty())
         *stream << "Content-Length: " << QString::number(responseData.length()) << "\r\n\r\n" << responseData;
     else
         *stream << "\r\n";

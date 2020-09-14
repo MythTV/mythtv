@@ -349,7 +349,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     // User can specify that some devices are not monitored
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
-    if (ignore.length())
+    if (!ignore.isEmpty())
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         m_ignoreList = ignore.split(',', QString::SkipEmptyParts);
@@ -668,7 +668,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         MHData  mhd = { callback, mediaType, destination, description };
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
-        if (extensions.length())
+        if (!extensions.isEmpty())
             msg += QString(", ext(%1)").arg(extensions, 0, 16);
 
         LOG(VB_MEDIA, LOG_INFO,
@@ -677,7 +677,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
 
         m_handlerMap[destination] = mhd;
 
-        if (extensions.length())
+        if (!extensions.isEmpty())
             MythMediaDevice::RegisterMediaExtensions(mediaType, extensions);
     }
     else
@@ -969,7 +969,7 @@ QString MediaMonitor::listDevices(void)
             devStr += path + "->";
         devStr += real;
 
-        if (!model.length())
+        if (model.isEmpty())
             model = "unknown";
         devStr += " (" + model + ")";
 

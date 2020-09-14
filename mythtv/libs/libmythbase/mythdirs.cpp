@@ -32,7 +32,7 @@ void InitializeMythDirs(void)
     installprefix = qgetenv( "MYTHTVDIR"   );
     confdir       = qgetenv( "MYTHCONFDIR" );
 
-    if (confdir.length())
+    if (!confdir.isEmpty())
     {
         LOG(VB_GENERAL, LOG_NOTICE, QString("Read conf dir = %1").arg(confdir));
         confdir.replace("$HOME", QDir::homePath());

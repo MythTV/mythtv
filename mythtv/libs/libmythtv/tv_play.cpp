@@ -8394,7 +8394,7 @@ static QString toCommaList(const QSet<uint> &list)
     for (uint i : qAsConst(list))
         ret += QString("%1,").arg(i);
 
-    if (ret.length())
+    if (!ret.isEmpty())
         return ret.left(ret.length()-1);
 
     return "";

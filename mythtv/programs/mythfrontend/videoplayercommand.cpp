@@ -216,7 +216,7 @@ class VideoPlayerCommandPrivate
                 filename = item->GetFilename();
             }
 
-            if (play_command.length())
+            if (!play_command.isEmpty())
             {
                 AddPlayer(play_command, filename, item->GetPlot(),
                         item->GetTitle(), item->GetSubtitle(),
@@ -249,7 +249,7 @@ class VideoPlayerCommandPrivate
                 filename = item->GetFilename();
             }
 
-            if (play_command.length())
+            if (!play_command.isEmpty())
             {
                 AddPlayer(play_command, filename, item->GetPlot(),
                         item->GetTitle(), item->GetSubtitle(),

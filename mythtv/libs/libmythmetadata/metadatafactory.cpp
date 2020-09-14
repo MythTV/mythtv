@@ -455,7 +455,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     for (const auto& name : qAsConst(cl))
     {
         QString cn = name.trimmed();
-        if (cn.length())
+        if (!cn.isEmpty())
         {
             cast.push_back(VideoMetadata::cast_list::
                         value_type(-1, cn));
@@ -471,7 +471,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     for (const auto& str : qAsConst(genres))
     {
         QString genre_name = str.trimmed();
-        if (genre_name.length())
+        if (!genre_name.isEmpty())
         {
             video_genres.push_back(
                     VideoMetadata::genre_list::value_type(-1, genre_name));
@@ -487,7 +487,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     for (const auto& str : qAsConst(countries))
     {
         QString country_name = str.trimmed();
-        if (country_name.length())
+        if (!country_name.isEmpty())
         {
             video_countries.push_back(
                     VideoMetadata::country_list::value_type(-1,

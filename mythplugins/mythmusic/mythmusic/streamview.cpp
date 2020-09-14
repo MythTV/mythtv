@@ -112,7 +112,7 @@ void StreamView::customEvent(QEvent *event)
             updateTrackInfo(gPlayer->getCurrentMetadata());
 
         // add the new track to the list
-        if (m_playedTracksList && gPlayer->getPlayedTracksList().count())
+        if (m_playedTracksList && !gPlayer->getPlayedTracksList().isEmpty())
         {
             MusicMetadata *mdata = gPlayer->getPlayedTracksList().last();
 

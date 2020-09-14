@@ -66,7 +66,7 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
         QString redir = m_reply->attribute(
             QNetworkRequest::RedirectionTargetAttribute).toUrl().toString();
 
-        if (redir.length())
+        if (!redir.isEmpty())
         {
             if (redirs <= 3)
             {

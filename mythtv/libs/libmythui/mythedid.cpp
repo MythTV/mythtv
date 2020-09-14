@@ -113,7 +113,7 @@ static QString ParseEdidString(const quint8 *data, bool Replace)
 void MythEDID::Parse(void)
 {
     // This is adapted from various sources including QEdidParser, edid-decode and xrandr
-    if (!m_data.constData() || !m_data.size())
+    if (!m_data.constData() || m_data.isEmpty())
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Invalid EDID");
         return;

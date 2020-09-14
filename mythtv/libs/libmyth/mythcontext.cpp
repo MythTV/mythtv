@@ -434,7 +434,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         if (DefaultUPnP(failure))                // Probably a valid backend,
             autoSelect = manualSelect = false;   // so disable any further UPnP
         else
-            if (failure.length())
+            if (!failure.isEmpty())
                 LOG(VB_GENERAL, LOG_ALERT, failure);
 
         failure = TestDBconnection(loaded);
@@ -720,7 +720,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         TempMainWindow();
 
         // Tell the user what went wrong:
-        if (error.length())
+        if (!error.isEmpty())
             ShowOkPopup(error);
 
         // ask user for database parameters
@@ -839,7 +839,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     {
         QElapsedTimer timer;
         timer.start();
-        if (m_dbParams.m_dbHostName.isNull() && m_dbHostCp.length())
+        if (m_dbParams.m_dbHostName.isNull() && !m_dbHostCp.isEmpty())
             host = m_dbHostCp;
         else
             host = m_dbParams.m_dbHostName;
@@ -1097,7 +1097,7 @@ void MythContextPrivate::SilenceDBerrors(void)
 
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
-    if (m_dbParams.m_dbHostName.length())
+    if (!m_dbParams.m_dbHostName.isEmpty())
         m_dbHostCp = m_dbParams.m_dbHostName;
 
     m_dbParams.m_dbHostName.clear();
@@ -1107,7 +1107,7 @@ void MythContextPrivate::SilenceDBerrors(void)
 void MythContextPrivate::EnableDBerrors(void)
 {
     // Restore (possibly) blanked hostname
-    if (m_dbParams.m_dbHostName.isNull() && m_dbHostCp.length())
+    if (m_dbParams.m_dbHostName.isNull() && !m_dbHostCp.isEmpty())
     {
         m_dbParams.m_dbHostName = m_dbHostCp;
         gCoreContext->GetDB()->SetDatabaseParams(m_dbParams);

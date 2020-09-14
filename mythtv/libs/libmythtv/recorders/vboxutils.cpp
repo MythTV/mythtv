@@ -36,7 +36,7 @@ QStringList VBox::probeDevices(void)
     // see if we have already found one or more vboxes
     QStringList result = VBox::doUPNPSearch();
 
-    if (result.count())
+    if (!result.isEmpty())
         return result;
 
     // non found so start a new search

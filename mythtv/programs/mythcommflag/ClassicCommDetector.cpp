@@ -61,7 +61,7 @@ static QString toStringFrameMaskValues(int mask, bool verbose)
         if (COMM_FRAME_RATING_SYMBOL & mask)
             msg += "rating,";
 
-        if (msg.length())
+        if (!msg.isEmpty())
             msg = msg.left(msg.length() - 1);
         else
             msg = "noflags";

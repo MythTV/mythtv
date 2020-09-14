@@ -457,7 +457,7 @@ QString getResponse(const QString &query, const QString &def)
     cout << tmp.constData();
 
     tmp = def.toLocal8Bit();
-    if (def.size())
+    if (!def.isEmpty())
         cout << " [" << tmp.constData() << "]  ";
     else
         cout << "  ";
@@ -855,7 +855,7 @@ void setHttpProxy(void)
     QString var(getenv("http_proxy"));
     if (var.isEmpty())
         var = getenv("HTTP_PROXY");  // Sadly, some OS envs are case sensitive
-    if (var.length())
+    if (!var.isEmpty())
     {
         if (!var.startsWith("http://"))   // i.e. just a host name
             var.prepend("http://");

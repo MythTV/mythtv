@@ -210,7 +210,7 @@ namespace
 
         for (const auto & dir : qAsConst(search_dirs))
         {
-            if (!dir.length()) continue;
+            if (dir.isEmpty()) continue;
 
             for (const auto & ext : image_exts)
             {
@@ -732,7 +732,7 @@ class VideoDialogPrivate
     {
         delete m_scanner;
 
-        if (m_rememberPosition && m_lastTreeNodePath.length())
+        if (m_rememberPosition && !m_lastTreeNodePath.isEmpty())
         {
             gCoreContext->SaveSetting("mythvideo.VideoTreeLastActive",
                     m_lastTreeNodePath);
@@ -3761,7 +3761,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     for (const auto & name : qAsConst(cl))
     {
         QString cn = name.trimmed();
-        if (cn.length())
+        if (!cn.isEmpty())
         {
             cast.push_back(VideoMetadata::cast_list::
                         value_type(-1, cn));
@@ -3777,7 +3777,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     for (const auto & name : qAsConst(genres))
     {
         QString genre_name = name.trimmed();
-        if (genre_name.length())
+        if (!genre_name.isEmpty())
         {
             video_genres.push_back(
                     VideoMetadata::genre_list::value_type(-1, genre_name));
@@ -3793,7 +3793,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     for (const auto & name : qAsConst(countries))
     {
         QString country_name = name.trimmed();
-        if (country_name.length())
+        if (!country_name.isEmpty())
         {
             video_countries.push_back(
                     VideoMetadata::country_list::value_type(-1,

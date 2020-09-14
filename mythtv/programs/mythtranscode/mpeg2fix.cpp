@@ -212,7 +212,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
 {
     int64_t delta = 0;
     QList<poq_idx_t> *dltaList = &m_orig[idx];
-    while (dltaList->count() && 
+    while (!dltaList->isEmpty() &&
            (pkt->pos     >= dltaList->first().pos_pts ||
             pkt->duration > dltaList->first().framenum))
     {
@@ -244,7 +244,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     m_maxFrames = maxf;
     m_rx.m_otype = otype;
 
-    if (deleteMap && deleteMap->count())
+    if (deleteMap && !deleteMap->isEmpty())
     {
         /* convert MythTV cutlist to mpeg2fix cutlist */
         frm_dir_map_t::iterator it = deleteMap->begin();
@@ -316,13 +316,13 @@ MPEG2fixup::~MPEG2fixup()
         avformat_close_input(&m_inputFC);
     av_frame_free(&m_picture);
 
-    while (m_vFrame.count())
+    while (!m_vFrame.isEmpty())
     {
         MPEG2frame *tmpFrame = m_vFrame.takeFirst();
         delete tmpFrame;
     }
 
-    while (m_vSecondary.count())
+    while (!m_vSecondary.isEmpty())
     {
         MPEG2frame *tmpFrame = m_vSecondary.takeFirst();
         delete tmpFrame;
@@ -330,7 +330,7 @@ MPEG2fixup::~MPEG2fixup()
 
     for (auto *af : qAsConst(m_aFrame))
     {
-        while (af->count())
+        while (!af->isEmpty())
         {
             MPEG2frame *tmpFrame = af->takeFirst();
             delete tmpFrame;
@@ -338,7 +338,7 @@ MPEG2fixup::~MPEG2fixup()
         delete af;
     }
 
-    while (m_framePool.count())
+    while (!m_framePool.isEmpty())
         delete m_framePool.dequeue();
 }
 
@@ -1347,10 +1347,10 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
     while (true)
     {
         bool done = false;
-        if (m_unreadFrames.count())
+        if (!m_unreadFrames.isEmpty())
         {
             m_vFrame.append(m_unreadFrames.dequeue());
-            if (m_realFileEnd && !m_unreadFrames.count())
+            if (m_realFileEnd && m_unreadFrames.isEmpty())
                 m_fileEnd = true;
             return static_cast<int>(m_fileEnd);
         }
@@ -1647,7 +1647,7 @@ void MPEG2fixup::RenumberFrames(int start_pos, int delta)
 
 void MPEG2fixup::StoreSecondary()
 {
-    while (m_vSecondary.count())
+    while (!m_vSecondary.isEmpty())
     {
         m_framePool.enqueue(m_vSecondary.takeFirst());
     }
@@ -1911,13 +1911,13 @@ void MPEG2fixup::AddRangeList(const QStringList& rangelist, int type)
         }
     }
 
-    if (rangelist.count())
+    if (!rangelist.isEmpty())
         m_useSecondary = true;
 }
 
 void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
 {
-    if (mapPtr->count())
+    if (!mapPtr->isEmpty())
     {
         int64_t start = 0;
         frm_dir_map_t::iterator it = mapPtr->begin();
@@ -2099,7 +2099,7 @@ int MPEG2fixup::Start()
         if (ret < 0)
             return ret;
 
-        if (m_vFrame.count() && (m_fileEnd || m_vFrame.last()->m_isSequence))
+        if (!m_vFrame.isEmpty() && (m_fileEnd || m_vFrame.last()->m_isSequence))
         {
             m_displayFrame = 0;
 
@@ -2214,7 +2214,7 @@ int MPEG2fixup::Start()
                 for (int curIndex = 0; curIndex < Lreorder.count(); curIndex++)
                 {
                     MPEG2frame *curFrame = Lreorder.at(curIndex);
-                    if (m_saveMap.count())
+                    if (!m_saveMap.isEmpty())
                     {
                         if (m_saveMap.begin().key() <= frame_count)
                            m_saveMap.remove(m_saveMap.begin().key());
@@ -2464,7 +2464,7 @@ int MPEG2fixup::Start()
             AVCodecParserContext *CPC = getCodecParserContext(it.key());
             bool backwardsPTS = false;
 
-            while (af->count())
+            while (!af->isEmpty())
             {
                 if (!CC || !CPC)
                 {

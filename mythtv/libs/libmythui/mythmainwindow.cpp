@@ -1501,7 +1501,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
         lhandler = "Internal";
 
     // Let's see if we have a plugin that matches the handler name...
-    if (d->m_mediaPluginMap.count(lhandler))
+    if (d->m_mediaPluginMap.count(lhandler)) // clazy:exclude=isempty-vs-count
     {
         d->m_mediaPluginMap[lhandler].second(mrl, plot, title, subtitle,
                                              director, season, episode,

@@ -57,7 +57,7 @@
  */
 static QString chooseCD(void)
 {
-    if (gCDdevice.length())
+    if (!gCDdevice.isEmpty())
         return gCDdevice;
 
 #ifdef Q_OS_MAC
@@ -755,7 +755,7 @@ static void handleCDMedia(MythMediaDevice *cd)
                 songList.append((mdata)->ID());
         }
 
-        if (songList.count())
+        if (!songList.isEmpty())
         {
             gMusicData->m_all_playlists->getActive()->fillSonglistFromList(
                     songList, true, PL_REPLACE, 0);

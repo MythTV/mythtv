@@ -229,12 +229,12 @@ void LyricsView::ShowMenu(void)
 
         if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
         {
-            if (m_lyricData->lyrics()->count())
+            if (!m_lyricData->lyrics()->isEmpty())
                 menu->AddItem(tr("Edit Lyrics"), nullptr, nullptr);
             else
                 menu->AddItem(tr("Add Lyrics"), nullptr, nullptr);
 
-            if (m_lyricData->lyrics()->count() && m_lyricData->changed())
+            if (!m_lyricData->lyrics()->isEmpty() && m_lyricData->changed())
                 menu->AddItem(tr("Save Lyrics"), nullptr, nullptr);
         }
 
@@ -363,7 +363,7 @@ void LyricsView::findLyrics(const QString &grabber)
 
     if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
     {
-        if (gPlayer->getPlayedTracksList().count())
+        if (!gPlayer->getPlayedTracksList().isEmpty())
             mdata = gPlayer->getPlayedTracksList().last();
     }
     else

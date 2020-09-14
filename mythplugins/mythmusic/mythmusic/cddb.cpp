@@ -402,7 +402,7 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
                     track.title += value;
                     track.artist += art;
 
-                    if (art.length())
+                    if (!art.isEmpty())
                         isCompilation = true;
                 }
             }
