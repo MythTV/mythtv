@@ -201,9 +201,9 @@ void Commands::Cleanup(void)
 bool Commands::SendStatus(const QString & command, const QString & status)
 {
     int len = write(2, status.toUtf8().constData(), status.size());
-    write(2, "\n", 1);
+    len += write(2, "\n", 1);
 
-    if (len != status.size())
+    if (len != status.size() + 1)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
@@ -224,9 +224,9 @@ bool Commands::SendStatus(const QString & command, const QString & serial,
     QString msg = QString("%1:%2").arg(serial).arg(status);
 
     int len = write(2, msg.toUtf8().constData(), msg.size());
-    write(2, "\n", 1);
+    len += write(2, "\n", 1);
 
-    if (len != msg.size())
+    if (len != msg.size() + 1)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
