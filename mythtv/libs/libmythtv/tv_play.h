@@ -330,6 +330,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void timerEvent(QTimerEvent *te) override; // QObject
     void StopPlayback(void);
 
+  signals:
+    void PlaybackExiting(TV* Player);
+
   protected:
     // Protected event handling
     void customEvent(QEvent *e) override; // QObject

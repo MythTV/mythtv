@@ -2602,6 +2602,9 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
         LOC + QString("For player ctx %1 -- begin")
             .arg(find_player_index(ctx)));
 
+    emit PlaybackExiting(this);
+    m_isEmbedded = false;
+
     SetActive(mctx, 0, false);
 
     if (ctx->m_buffer)

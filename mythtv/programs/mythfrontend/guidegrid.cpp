@@ -518,6 +518,19 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
     m_threadPool.setMaxThreadCount(1);
+
+    if (m_player)
+        connect(m_player, &TV::PlaybackExiting, this, &GuideGrid::PlayerExiting);
+}
+
+void GuideGrid::PlayerExiting(TV* Player)
+{
+    if (Player && (Player == m_player))
+    {
+        m_player->StopEmbedding();
+        HideTVWindow();
+        m_player = nullptr;
+    }
 }
 
 bool GuideGrid::Create()
