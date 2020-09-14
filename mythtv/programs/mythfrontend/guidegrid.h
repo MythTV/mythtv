@@ -134,6 +134,9 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     uint GetCurrentStartChannel(void) const { return m_currentStartChannel; }
     QDateTime GetCurrentStartTime(void) const { return m_currentStartTime; }
 
+  public slots:
+    void PlayerExiting(TV* Player);
+
   protected slots:
     void cursorLeft();
     void cursorRight();
