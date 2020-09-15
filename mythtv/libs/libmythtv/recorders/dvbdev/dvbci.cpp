@@ -828,7 +828,7 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
     return ERROR;
   }
 
-  if (!Data)
+  if ((Length > 0) && !Data)
   {
     esyslog("ERROR: CAM: Data pointer null");
     return ERROR;
