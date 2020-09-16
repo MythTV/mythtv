@@ -57,7 +57,15 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
     m_renderFrameTypes = &s_vulkanFrameTypes;
     m_render = MythVulkanObject::Render();
     if (IsValidVulkan())
+    {
         m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, true, QString {});
+        if (m_video && !m_video->IsValid())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create valid Vulkan video");
+            delete m_video;
+            m_video = nullptr;
+        }
+    }
 
     if (!(IsValidVulkan() && m_painter && m_video))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise Vulkan video output");
@@ -68,7 +76,10 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
                                  const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(IsValidVulkan() && m_painter && m_video))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
         return false;
+    }
 
     if (!gCoreContext->IsUIThread())
     {

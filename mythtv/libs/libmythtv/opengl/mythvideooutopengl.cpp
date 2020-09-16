@@ -149,7 +149,16 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
 
     // Create OpenGLVideo
     m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, true, m_profile);
-    m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRectAdj());
+    if (m_video)
+    {
+        m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRectAdj());
+        if (!m_video->IsValid())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create valid OpenGL video");
+            delete m_video;
+            m_video = nullptr;
+        }
+    }
 }
 
 MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
@@ -167,7 +176,10 @@ bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDi
                                  const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(m_openglRender && m_painter && m_video))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
         return false;
+    }
 
     if (!gCoreContext->IsUIThread())
     {
