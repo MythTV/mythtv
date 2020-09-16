@@ -112,20 +112,16 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 }
 
 MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
-  : MythVideoOutputGPU(Profile)
+  : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), Profile)
 {
     // Retrieve render context
-    m_openglRender = MythRenderOpenGL::GetOpenGLRender();
+    m_openglRender = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!m_openglRender)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve OpenGL context");
         return;
     }
 
-    // Retain and lock - released in MythVideoOutputGPU
-    // m_openglRender is just a convenience
-    m_openglRender->IncrRef();
-    m_render = m_openglRender;
     OpenGLLocker locker(m_openglRender);
 
     // Enable performance monitoring if requested
@@ -148,8 +144,8 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
     else
         m_renderFrameTypes = &s_openglFrameTypes;
 
-    if (m_painter && !qobject_cast<MythOpenGLPainter*>(m_painter))
-        LOG(VB_GENERAL, LOG_ERR, LOC + "This is not the painter you are looking for");
+    if (!qobject_cast<MythOpenGLPainter*>(m_painter))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL painter");
 
     // Create OpenGLVideo
     m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, true, m_profile);
@@ -170,7 +166,7 @@ bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDi
                                  float Aspect, MythDisplay* Display,
                                  const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
-    if (!m_openglRender || !m_painter || !m_video)
+    if (!(m_openglRender && m_painter && m_video))
         return false;
 
     if (!gCoreContext->IsUIThread())

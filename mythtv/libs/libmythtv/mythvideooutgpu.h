@@ -9,7 +9,7 @@ class MythVideoGPU;
 class MythVideoOutputGPU : public MythVideoOutput
 {
   public:
-    explicit MythVideoOutputGPU(QString &Profile);
+    MythVideoOutputGPU(MythRender* Render, QString &Profile);
    ~MythVideoOutputGPU() override;
 
     MythPainter*    GetOSDPainter         () override;

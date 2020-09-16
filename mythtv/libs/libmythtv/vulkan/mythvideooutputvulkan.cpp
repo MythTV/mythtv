@@ -51,20 +51,11 @@ QStringList MythVideoOutputVulkan::GetAllowedRenderers(MythCodecID CodecId)
 }
 
 MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
-  : MythVideoOutputGPU(Profile),
+  : MythVideoOutputGPU(MythRenderVulkan::GetVulkanRender(), Profile),
     MythVulkanObject(MythRenderVulkan::GetVulkanRender())
 {
     m_renderFrameTypes = &s_vulkanFrameTypes;
-
     m_render = MythVulkanObject::Render();
-    // Note - strictly we shouldn't be using reference counting for MythRenderVulkan
-    // as QVulkanWindow takes ownership. We need to ensure it is shared however,
-    // otherwise the painter window is hidden by the incredibly annoying disabling of
-    // drawing in MythMainWindow. There is no reason why QVulkanWindow should
-    // delete it while video is playing though.
-    if (m_render)
-        m_render->IncrRef();
-
     if (IsValidVulkan())
         m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, true, QString {});
 

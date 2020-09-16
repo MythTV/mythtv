@@ -19,9 +19,13 @@
  * \sa MythVideoOutputOpenGL
  * \sa MythVideoOutputVulkan
  */
-MythVideoOutputGPU::MythVideoOutputGPU(QString& Profile)
-  : m_profile(std::move(Profile))
+MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
+  : m_render(Render),
+    m_profile(std::move(Profile))
 {
+    if (m_render)
+        m_render->IncrRef();
+
     MythMainWindow* win = MythMainWindow::getMainWindow();
     if (win)
     {
