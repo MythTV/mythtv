@@ -258,6 +258,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     /// Scanner thread, runs ChannelScanSM::run()
     MThread             *m_scannerThread       {nullptr};
+
+    /// Protect UpdateChannelInfo
     QMutex               m_mutex;
 };
 

@@ -602,6 +602,11 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         str = descrDump("Video on Demand");
     }
+    else if (priv_dsid == PrivateDataSpecifierID::CASEMA &&
+             PrivateDescriptorID::ziggo_package_descriptor == DescriptorTag())
+    {
+        str = descrDump("Ziggo Package");
+    }
     else if ((priv_dsid == PrivateDataSpecifierID::EACEM  ||
               priv_dsid == PrivateDataSpecifierID::NORDIG ||
               priv_dsid == PrivateDataSpecifierID::ITC     ) &&
@@ -615,6 +620,16 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
              PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
     {
         SET_STRING(DVBLogicalChannelDescriptor);
+    }
+    else if (priv_dsid == PrivateDataSpecifierID::CIPLUS &&
+             PrivateDescriptorID::ci_protection_descriptor == DescriptorTag())
+    {
+        str = descrDump("CI Protection");
+    }
+    // All not otherwise specified private descriptors
+    else if (priv_dsid > 0 && DescriptorTag() > 0x80)
+    {
+        str = descrDump("User Defined");
     }
     //
     // POSSIBLY UNSAFE ! -- begin

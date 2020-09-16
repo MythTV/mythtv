@@ -209,6 +209,7 @@ class PrivateDescriptorID
 
         // Private -- NL Casema
         casema_video_on_demand         = 0x87,
+        ziggo_package_descriptor       = 0xd4,
 
         // Private -- Dish Network
         dish_event_rights              = 0x87,
@@ -252,6 +253,9 @@ class PrivateDescriptorID
         opentv_summaries_3             = 0xAA,
         opentv_summaries_4             = 0xAB,
         opentv_channel_list            = 0xB1, /* sky_lcn_table */
+
+        // Private -- CI Plus LPP
+        ci_protection_descriptor       = 0xce,
     };
 };
 
@@ -268,6 +272,7 @@ class PrivateDataSpecifierID
         CASEMA = 0x00000016,    // NL Casema
         EACEM  = 0x00000028,    // NL Ziggo
         NORDIG = 0x00000029,    // EU Nordig
+        CIPLUS = 0x00000040,    // CI Plus LPP
         ORS    = 0x000001B0,    // ORS comm GmbH & Co KG
         UPC1   = 0x00000600,    // UPC Cablecom
         ITC    = 0x0000233A,    // Independent Television Commission
