@@ -33,6 +33,9 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
         if (m_painter)
             m_painter->SetMaster(false);
     }
+
+    if (!(win && m_render && m_painter))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
 }
 
 MythVideoOutputGPU::~MythVideoOutputGPU()
