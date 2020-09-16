@@ -374,7 +374,8 @@ using_frontend {
     SOURCES += profilegroup.cpp
 
     # Video playback
-    HEADERS += tv_play.h                mythplayer.h
+    HEADERS += tv_play.h
+    HEADERS += mythplayer.h
     HEADERS += audioplayer.h
     HEADERS += mythccextractorplayer.h
     HEADERS += captions/teletextextractorreader.h
@@ -383,7 +384,8 @@ using_frontend {
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += tvbrowsehelper.h
     HEADERS += mheg/netstream.h
-    SOURCES += tv_play.cpp              mythplayer.cpp
+    SOURCES += tv_play.cpp
+    SOURCES += mythplayer.cpp
     SOURCES += audioplayer.cpp
     SOURCES += mythccextractorplayer.cpp
     SOURCES += captions/teletextextractorreader.cpp
@@ -410,10 +412,12 @@ using_frontend {
     HEADERS += decoders/avformatdecoder.h
     HEADERS += decoders/privatedecoder.h
     HEADERS += decoders/mythcodeccontext.h
+    HEADERS += decoders/mythdecoderthread.h
     SOURCES += decoders/decoderbase.cpp
     SOURCES += decoders/avformatdecoder.cpp
     SOURCES += decoders/privatedecoder.cpp
     SOURCES += decoders/mythcodeccontext.cpp
+    SOURCES += decoders/mythdecoderthread.cpp
 
     using_libass {
         DEFINES += USING_LIBASS

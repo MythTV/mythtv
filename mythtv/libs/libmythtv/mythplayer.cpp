@@ -47,6 +47,7 @@ using namespace std;
 #include "mythuiactions.h"
 #include "io/mythmediabuffer.h"
 #include "tv_actions.h"
+#include "decoders/mythdecoderthread.h"
 #include "mythcodeccontext.h"
 
 // MythUI headers
@@ -64,8 +65,7 @@ extern "C" {
 
 static unsigned dbg_ident(const MythPlayer* /*player*/);
 
-#define LOC      QString("Player(%1): ").arg(dbg_ident(this),0,36)
-#define LOC_DEC  QString("Player(%1): ").arg(dbg_ident(m_mp),0,36)
+#define LOC QString("Player(%1): ").arg(dbg_ident(this),0,36)
 
 const int MythPlayer::kNightModeBrightenssAdjustment = 10;
 const int MythPlayer::kNightModeContrastAdjustment = 10;
@@ -85,16 +85,6 @@ const double MythPlayer::kInaccuracyEditor = 0.5;
 // Any negative value means completely inexact, i.e. seek to the
 // keyframe that is closest to the target.
 const double MythPlayer::kInaccuracyFull = -1.0;
-
-void DecoderThread::run(void)
-{
-    RunProlog();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread starting.");
-    if (m_mp)
-        m_mp->DecoderLoop(m_startPaused);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC_DEC + "Decoder thread exiting.");
-    RunEpilog();
-}
 
 static int toCaptionType(int type)
 {
@@ -3170,7 +3160,7 @@ void MythPlayer::DecoderStart(bool start_paused)
 
     m_killDecoder = false;
     m_decoderPaused = start_paused;
-    m_decoderThread = new DecoderThread(this, start_paused);
+    m_decoderThread = new MythDecoderThread(this, start_paused);
     if (m_decoderThread)
         m_decoderThread->start();
 }

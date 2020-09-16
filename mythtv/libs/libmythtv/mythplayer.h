@@ -53,6 +53,7 @@ class Jitterometer;
 class QThread;
 class QWidget;
 class MythMediaBuffer;
+class MythDecoderThread;
 
 using StatusCallback = void (*)(int, void*);
 
@@ -103,21 +104,6 @@ enum PlayerFlags
 };
 
 #define FlagIsSet(arg) (m_playerFlags & (arg))
-
-class DecoderThread : public MThread
-{
-  public:
-    DecoderThread(MythPlayer *mp, bool start_paused)
-      : MThread("Decoder"), m_mp(mp), m_startPaused(start_paused) { }
-    ~DecoderThread() override { wait(); }
-
-  protected:
-    void run(void) override; // MThread
-
-  private:
-    MythPlayer *m_mp;
-    bool        m_startPaused;
-};
 
 class MythMultiLocker
 {
@@ -170,7 +156,7 @@ class MTV_PUBLIC MythPlayer
     friend class PlayerContext;
     friend class CC708Reader;
     friend class CC608Reader;
-    friend class DecoderThread;
+    friend class MythDecoderThread;
     friend class DetectLetterbox;
     friend class TeletextScreen;
     friend class SubtitleScreen;
@@ -671,7 +657,7 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
     MythVideoOutput *m_videoOutput        {nullptr};
     PlayerContext   *m_playerCtx          {nullptr};
-    DecoderThread   *m_decoderThread      {nullptr};
+    MythDecoderThread* m_decoderThread    {nullptr};
     QThread         *m_playerThread       {nullptr};
 #ifdef Q_OS_ANDROID
     int            m_playerThreadId       {0};
