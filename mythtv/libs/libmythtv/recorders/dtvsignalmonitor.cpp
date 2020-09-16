@@ -313,14 +313,6 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         // END HACK HACK HACK
 
-        // Discard PAT if we are still on the wrong transport
-        if (m_transportID > 0 && tsid != m_transportID)
-        {
-            DBG_SM("HandlePAT()", QString("Discard PAT for tsid %1 waiting for tsid %2")
-                .arg(tsid).arg(m_transportID));
-            return;
-        }
-
         if (insert_crc(m_seenTableCrc, *pat))
         {
             QString errStr = QString("Program #%1 not found in PAT!")
