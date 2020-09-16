@@ -1495,6 +1495,14 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
         m_videoRotation = 0;
 
+    // retrieve 3D type
+    uint8_t* stereo3d = av_stream_get_side_data(stream, AV_PKT_DATA_STEREO3D, nullptr);
+    if (stereo3d)
+    {
+        auto * avstereo = reinterpret_cast<AVStereo3D*>(stereo3d);
+        m_stereo3D = avstereo->type;
+    }
+
     delete m_mythCodecCtx;
     m_mythCodecCtx = MythCodecContext::CreateContext(this, m_videoCodecId);
     m_mythCodecCtx->InitVideoCodec(enc, selectedStream, m_directRendering);
@@ -3676,6 +3684,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
             oldframe->deinterlace_inuse2x = false;
             oldframe->already_deinterlaced = false;
             oldframe->rotation = m_videoRotation;
+            oldframe->stereo3D = m_stereo3D;
             m_parent->DiscardVideoFrame(oldframe);
         }
     }
@@ -3765,6 +3774,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         frame->deinterlace_inuse2x = false;
         frame->already_deinterlaced = false;
         frame->rotation         = m_videoRotation;
+        frame->stereo3D         = m_stereo3D;
         m_parent->ReleaseNextVideoFrame(frame, temppts);
         m_mythCodecCtx->PostProcessFrame(context, frame);
     }
@@ -5181,6 +5191,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->deinterlace_inuse2x = false;
         frame->already_deinterlaced = false;
         frame->rotation         = 0;
+        frame->stereo3D         = 0;
 
         m_decodedVideoFrame = frame;
         m_framesPlayed++;

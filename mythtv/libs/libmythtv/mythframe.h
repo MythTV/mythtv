@@ -168,6 +168,7 @@ struct VideoFrame
     bool colorshifted; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
     bool already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
     int rotation;
+    uint stereo3D;
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
     MythDeintType deinterlace_allowed;
@@ -257,6 +258,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->colorshifted     = false;
     vf->already_deinterlaced = false;
     vf->rotation         = 0;
+    vf->stereo3D         = 0;
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;
     vf->deinterlace_allowed = DEINT_NONE;

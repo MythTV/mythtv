@@ -345,6 +345,7 @@ class DecoderBase
     bool                 m_justAfterChange         {false};
     long long            m_readAdjust              {0};
     int                  m_videoRotation           {0};
+    uint                 m_stereo3D                {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     QMutex               m_trackLock                     { QMutex::Recursive };
