@@ -189,7 +189,7 @@ bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDi
 
     OpenGLLocker ctx_lock(m_openglRender);
 
-    if (!InitGPU(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
         return false;
 
     // This works around an issue with VDPAU direct rendering using legacy drivers

@@ -87,7 +87,7 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
         return false;
     }
 
-    if (!InitGPU(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
         return false;
 
     return true;

@@ -47,9 +47,8 @@ class MythVideoOutputGPU : public MythVideoOutput
                                                const QRect& DisplayVideoRect,
                                                const QRect& VideoRect) = 0;
     virtual QRect   GetDisplayVisibleRectAdj();
-
-    bool            InitGPU               (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
-                                           MythDisplay* Display, const QRect& DisplayVisibleRect, MythCodecID CodecId);
+    bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
+                                           MythDisplay* Display, const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
     void            ProcessFrameGPU       (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan);

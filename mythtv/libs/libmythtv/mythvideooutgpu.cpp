@@ -88,10 +88,10 @@ void MythVideoOutputGPU::SetVideoFrameRate(float NewRate)
     m_newFrameRate = true;
 }
 
-bool MythVideoOutputGPU::InitGPU(const QSize& VideoDim, const QSize& VideoDispDim,
-                                 float Aspect, MythDisplay* Display,
-                                 const QRect& DisplayVisibleRect,
-                                 MythCodecID CodecId)
+bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
+                              float Aspect, MythDisplay* Display,
+                              const QRect& DisplayVisibleRect,
+                              MythCodecID CodecId)
 {
     // if we are the main video player then free up as much video memory
     // as possible at startup
