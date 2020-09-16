@@ -515,7 +515,7 @@ void MythDVDBuffer::WaitForPlayer(void)
 
 int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 {
-    unsigned char  *blockBuf     = nullptr;
+    uint8_t*        blockBuf     = nullptr;
     uint            tot          = 0;
     int             needed       = static_cast<int>(Size);
     char           *dest         = static_cast<char*>(Buffer);
@@ -676,7 +676,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     // store the new clut
                     // m_clut = std::to_array(blockBuf); // C++20
                     std::copy(blockBuf, blockBuf + 16 * sizeof(uint32_t),
-                              m_clut.data());
+                              reinterpret_cast<uint8_t*>(m_clut.data()));
                     // release buffer
                     if (blockBuf != m_dvdBlockWriteBuf.data())
                         dvdnav_free_cache_block(m_dvdnav, blockBuf);
