@@ -1016,7 +1016,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                 return -1;
             }
 
-            m_avfRingBuffer->SetInInit(m_livetv);
+            m_avfRingBuffer->SetInInit(false);
             InitByteContext(m_livetv);
 
             err = avformat_open_input(&m_ic, filename, fmt, nullptr);
