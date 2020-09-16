@@ -338,7 +338,7 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         StopEmbedding();
     }
 
-    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect,m_display);
+    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect, m_display);
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetInput(GetVideoDispDim());
