@@ -1380,7 +1380,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
                     }
                     break;
                 case StreamID::H265Video:
-                  LOG(VB_GENERAL, LOG_WARNING, LOC + "HEVC detected");
+                  LOG(VB_GENERAL, LOG_INFO, LOC + "HEVC detected");
                     m_primaryVideoCodec = AV_CODEC_ID_H265;
                     if (dynamic_cast<HEVCParser *>(m_h2645Parser) == nullptr)
                     {
