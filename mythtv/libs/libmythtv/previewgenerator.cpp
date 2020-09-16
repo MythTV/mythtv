@@ -677,7 +677,10 @@ bool PreviewGenerator::LocalPreviewRun(void)
         }
         if (programDuration > 0)
         {
-            captime = startEarly + (programDuration / 3);
+            captime = programDuration / 3;
+            if (captime > 600)
+                captime = 600;
+            captime += startEarly;
         }
         if (captime < 0)
             captime = 600;
