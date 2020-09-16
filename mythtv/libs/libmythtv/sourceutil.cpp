@@ -532,11 +532,21 @@ bool SourceUtil::DeleteSource(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
+    // Delete the transports associated with the source
+    query.prepare("DELETE FROM dtv_multiplex "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Deleting transports", query);
+        return false;
+    }
+
     // Delete the channels associated with the source
     query.prepare("UPDATE channel "
-                  "SET deleted = NOW() "
-                  "WHERE deleted IS NULL AND "
-                  "      sourceid = :SOURCEID");
+                  "SET deleted = NOW(), mplexid = 0, sourceid = 0 "
+                  "WHERE deleted IS NULL AND sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())

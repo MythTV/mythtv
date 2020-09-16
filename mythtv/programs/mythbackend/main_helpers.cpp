@@ -127,7 +127,7 @@ bool setupTVs(bool ismaster, bool &error)
     }
 
     if (!query.exec(
-            "SELECT cardid, hostname "
+            "SELECT cardid, hostname, sourceid "
             "FROM capturecard "
             "ORDER BY cardid"))
     {
@@ -139,15 +139,24 @@ bool setupTVs(bool ismaster, bool &error)
     vector<QString> hosts;
     while (query.next())
     {
-        uint    cardid = query.value(0).toUInt();
-        QString host   = query.value(1).toString();
-        QString cidmsg = QString("Card %1").arg(cardid);
+        uint    cardid   = query.value(0).toUInt();
+        QString host     = query.value(1).toString();
+        uint    sourceid = query.value(2).toUInt();
+        QString cidmsg   = QString("Card %1").arg(cardid);
 
         if (host.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, cidmsg +
                 " does not have a hostname defined.\n"
                 "Please run setup and confirm all of the capture cards.\n");
+            continue;
+        }
+
+        // Skip all cards that do not have a video source
+        if (sourceid == 0)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, cidmsg +
+                " does not have a video source configured.");
             continue;
         }
 
