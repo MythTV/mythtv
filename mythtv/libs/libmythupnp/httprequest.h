@@ -127,7 +127,7 @@ class UPNP_PUBLIC HTTPRequest
         QString             m_sMethod;
 
         QStringMap          m_mapParams;
-        QStringMap          m_mapHeaders;
+        QStringMultiMap     m_mapHeaders;
         QStringMap          m_mapCookies;
 
         QString             m_sPayload;
@@ -242,6 +242,7 @@ class UPNP_PUBLIC HTTPRequest
         static QString         GetResponseProtocol () ;
 
         QString         GetRequestType () const;
+        QString         GetLastHeader( const QString &sType );
 
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QStringList GetSupportedMimeTypes ();

@@ -160,6 +160,18 @@ const char *HTTPRequest::s_szServerHeaders = "Accept-Ranges: bytes\r\n";
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::GetLastHeader( const QString &sType )
+{
+    QStringList values = m_mapHeaders.values( sType );
+    if (!values.isEmpty())
+        return values.last();
+    return QString();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 HttpRequestType HTTPRequest::SetRequestType( const QString &sType )
 {
     // HTTP
@@ -271,8 +283,9 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
             SetResponseHeader("contentFeatures.dlna.org", "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
     }
 
-    if (!m_mapHeaders[ "origin" ].isEmpty())
-        AddCORSHeaders(m_mapHeaders[ "origin" ]);
+    auto values = m_mapHeaders.values("origin");
+    for (const auto & value : values)
+        AddCORSHeaders(value);
 
     if (getenv("HTTPREQUEST_DEBUG"))
     {
@@ -401,7 +414,12 @@ qint64 HTTPRequest::SendResponse( void )
 
     QBuffer compBuffer;
 
-    if (( nContentLen > 0 ) && m_mapHeaders[ "accept-encoding" ].contains( "gzip" ))
+    auto values = m_mapHeaders.values("accept-encoding");
+    bool gzip_found = std::any_of(values.cbegin(), values.cend(),
+                                  [](const auto & value)
+                                      {return value.contains( "gzip" ); });
+
+    if (( nContentLen > 0 ) && gzip_found)
     {
         QByteArray compressed = gzipCompress( m_response.buffer() );
         compBuffer.setData( compressed );
@@ -1293,7 +1311,7 @@ bool HTTPRequest::ParseRequest()
 
                 if (!sName.isEmpty() && !sValue.isEmpty())
                 {
-                    m_mapHeaders.insertMulti(sName.toLower(), sValue.trimmed());
+                    m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
                 }
 
                 sLine = ReadLine( 2000 );
@@ -1372,9 +1390,9 @@ bool HTTPRequest::ParseRequest()
 
         bSuccess = true;
 
-        SetContentType( m_mapHeaders[ "content-type" ] );
+        SetContentType( GetLastHeader( "content-type" ) );
         // Lets load payload if any.
-        long nPayloadSize = m_mapHeaders[ "content-length" ].toLong();
+        long nPayloadSize = GetLastHeader( "content-length" ).toLong();
 
         if (nPayloadSize > 0)
         {
@@ -1897,7 +1915,7 @@ QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp) const
 bool HTTPRequest::BasicAuthentication()
 {
     LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Basic Authentication");
-    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+    QStringList oList = GetLastHeader( "authorization" ).split( ' ' );
 
     if (m_nMajor == 1 && m_nMinor == 0) // We only support Basic auth for http 1.0 clients
     {
@@ -1958,7 +1976,7 @@ bool HTTPRequest::DigestAuthentication()
     LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Digest Authentication");
     QString realm = "MythTV"; // TODO Check which realm applies for the request path
 
-    QString authMethod = m_mapHeaders[ "authorization" ].section(' ', 0, 0).toLower();
+    QString authMethod = GetLastHeader( "authorization" ).section(' ', 0, 0).toLower();
 
     if (authMethod != "digest")
     {
@@ -1966,7 +1984,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    QString parameterStr = m_mapHeaders[ "authorization" ].section(' ', 1);
+    QString parameterStr = GetLastHeader( "authorization" ).section(' ', 1);
 
     QMap<QString, QString> paramMap;
     QStringList paramList = parameterStr.split(',');
@@ -2120,7 +2138,7 @@ bool HTTPRequest::Authenticated()
     if (m_userSession.IsValid()) //m_userSession.CheckPermission())
         return true;
 
-    QStringList oList = m_mapHeaders[ "authorization" ].split( ' ' );
+    QStringList oList = GetLastHeader( "authorization" ).split( ' ' );
 
     if (oList.count() < 2)
         return false;
@@ -2198,7 +2216,7 @@ QString HTTPRequest::GetHostName()
 
     // RFC 3875 - The is the hostname or ip address in the client request, not
     //            the name or ip we might otherwise know for this server
-    QString hostname = m_mapHeaders["host"];
+    QString hostname = GetLastHeader("host");
     if (!hostname.isEmpty())
     {
         // Strip the port

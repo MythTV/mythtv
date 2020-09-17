@@ -188,8 +188,8 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
 
     pRequest->m_eResponseType = ResponseTypeHTML;
 
-    QString nt  = pRequest->m_mapHeaders["nt"];
-    QString nts = pRequest->m_mapHeaders["nts"];
+    QString nt  = pRequest->GetLastHeader("nt");
+    QString nts = pRequest->GetLastHeader("nts");
     bool    no  = (pRequest->m_eType == RequestTypeNotify);
 
     if (nt.isEmpty() || nts.isEmpty() || !no)
@@ -203,7 +203,7 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
         return true;
 
     QString usn = pRequest->m_mapParams["usn"];
-    QString sid = pRequest->m_mapHeaders["sid"];
+    QString sid = pRequest->GetLastHeader("sid");
     if (usn.isEmpty() || sid.isEmpty())
         return true;
 
@@ -213,7 +213,7 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
     // rapidly overload if a number of events arrive. Instead let the
     // subscribing objects validate the usn - the uuid should be superfluous.
 
-    QString seq = pRequest->m_mapHeaders["seq"];
+    QString seq = pRequest->GetLastHeader("seq");
 
     // mediatomb sends some extra character(s) at the end of the payload
     // which throw Qt, so try and trim them off

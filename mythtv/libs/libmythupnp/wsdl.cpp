@@ -238,7 +238,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 
     oNode = createElement( "soap:address" );
     oNode.setAttribute( "location", "http://" + 
-                                    pRequest->m_mapHeaders[ "host" ] + "/" +
+                                    pRequest->GetLastHeader( "host" ) + "/" +
                                     m_pServiceHost->GetServiceControlURL() );
 
     oPort.appendChild( oNode );
@@ -256,7 +256,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         //	<xs:import schemaLocation="<path to dependant schema" namespace="http://mythtv.org"/>
         // ------------------------------------------------------------------
 
-        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd";
+        QString sBaseUri = "http://" + pRequest->GetLastHeader( "host" ) + pRequest->m_sBaseUrl + "/xsd";
 
         QMap<QString, TypeInfo>::const_iterator it2 = m_typesToInclude.constBegin();
         while( it2 != m_typesToInclude.constEnd())

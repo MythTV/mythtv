@@ -477,7 +477,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
         //    <xs:include schemaLocation="<path to dependant schema"/>
         // ------------------------------------------------------------------
 
-        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + 
+        QString sBaseUri = "http://" + pRequest->GetLastHeader( "host" ) +
                                        pRequest->m_sResourceUrl;
 
         QMap<QString, TypeInfo >::const_iterator it = typesToInclude.constBegin();
@@ -602,7 +602,7 @@ bool Xsd::RenderArrayXSD( HTTPRequest   *pRequest,
     {
         QDomElement oIncNode = createElement( "xs:include" );
 
-        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + 
+        QString sBaseUri = "http://" + pRequest->GetLastHeader( "host" ) +
                                        pRequest->m_sResourceUrl + "?type=";
 
         oIncNode.setAttribute( "schemaLocation", sBaseUri + sClassName );
@@ -772,7 +772,7 @@ bool Xsd::RenderMapXSD( HTTPRequest   *pRequest,
     {
         QDomElement oIncNode = createElement( "xs:include" );
 
-        QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sResourceUrl + "?type=";
+        QString sBaseUri = "http://" + pRequest->GetLastHeader( "host" ) + pRequest->m_sResourceUrl + "?type=";
 
         oIncNode.setAttribute( "schemaLocation", sBaseUri + sClassName );
 

@@ -321,7 +321,7 @@ void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
     pRequest->m_nResponseStatus   = 301;
 
     QStringList sItems = pRequest->m_sRawRequest.split( ' ' );
-    QString sUrl = "http://" + pRequest->m_mapHeaders[ "host" ] + sItems[1];
+    QString sUrl = "http://" + pRequest->GetLastHeader( "host" ) + sItems[1];
     QUrl url( sUrl );
     url.setHost( hostName );
 

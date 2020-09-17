@@ -42,6 +42,7 @@ template <class T> inline const T& Max( const T &x, const T &y )
 
 using TaskTime   = struct timeval;
 using QStringMap = QMap< QString, QString >;
+using QStringMultiMap = QMultiMap< QString, QString >;
 
 
 /////////////////////////////////////////////////////////////////////////////
