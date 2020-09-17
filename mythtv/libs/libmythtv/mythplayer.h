@@ -1,19 +1,22 @@
 #ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
+// Std
 #include <cstdint>
 #include <utility>
 
+// Qt
 #include <QCoreApplication>
 #include <QList>
-#include <QMutex>                       // for QMutex
-#include <QTime>                        // for QTime
-#include <QString>                      // for QString
-#include <QRect>                        // for QRect
-#include <QSize>                        // for QSize
-#include <QStringList>                  // for QStringList
-#include <QWaitCondition>               // for QWaitCondition
+#include <QMutex>
+#include <QTime>
+#include <QString>
+#include <QRect>
+#include <QSize>
+#include <QStringList>
+#include <QWaitCondition>
 
+// MythTV
 #include "playercontext.h"
 #include "volumebase.h"
 #include "osd.h"
@@ -27,14 +30,13 @@
 #include "commbreakmap.h"
 #include "audioplayer.h"
 #include "audiooutputgraph.h"
-#include "mthread.h"                    // for MThread
-#include "mythavutil.h"                 // for VideoFrame
-#include "mythtypes.h"                  // for InfoMap
-#include "programtypes.h"               // for frm_dir_map_t, etc
-#include "tv.h"                         // for CommSkipMode
-#include "videoouttypes.h"              // for FrameScanType, PIPLocation, etc
+#include "mthread.h"
+#include "mythavutil.h"
+#include "mythtypes.h"
+#include "programtypes.h"
+#include "tv.h"
+#include "videoouttypes.h"
 #include "mythmiscutil.h"
-
 #include "mythtvexp.h"
 
 class MythVideoOutput;
@@ -148,9 +150,9 @@ class DecoderCallback
 // still higher than the default warning threshhold of 24 bytes.
 //
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-class MTV_PUBLIC MythPlayer
+class MTV_PUBLIC MythPlayer : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(MythPlayer)
+    Q_OBJECT
 
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
