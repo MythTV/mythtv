@@ -424,7 +424,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
             m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 , codecName);
 
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       m_display, m_window.GetDisplayVisibleRect(), m_newCodecId);
+                       m_display, m_window.GetRawWindowRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
