@@ -327,7 +327,7 @@ bool MythVideoOutputGPU::ProcessInputChange()
             m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 , codecName);
 
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       m_display, GetDisplayVisibleRect(), m_newCodecId);
+                       m_display, GetRawWindowRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
