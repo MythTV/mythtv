@@ -111,8 +111,12 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     // FIXME GetWindowRect() is a placeholder
     QRect viewport = GetWindowRect();
 
-    // Render preparation
-    RenderFrameGPU(Frame, Scan, Osd, viewport, true);
+    // Prepare visualisation
+    if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbeddingAndHidden())
+    {
+        const QRect osdbounds = GetTotalOSDBounds();
+        m_visual->Prepare(osdbounds);
+    }
 
     // Start the frame...
     m_video->StartFrame();

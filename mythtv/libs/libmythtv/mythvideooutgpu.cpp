@@ -416,7 +416,7 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
 }
 
 void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
-                                        OSD *Osd, const QRect& ViewPort, bool Prepare)
+                                        OSD *Osd, const QRect& ViewPort)
 {
     // Stereoscopic views
     QRect view1 = ViewPort;
@@ -432,26 +432,6 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
     {
         view1 = QRect(ViewPort.left(),  ViewPort.top() / 2, ViewPort.width(), ViewPort.height() / 2);
         view2 = view1.translated(0, ViewPort.height() / 2);
-    }
-
-    if (Prepare)
-    {
-        // Prepare visualisation
-        if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbeddingAndHidden())
-        {
-            const QRect osdbounds = GetTotalOSDBounds();
-            if (stereo)
-                m_render->SetViewPort(view1, true);
-            m_visual->Prepare(osdbounds);
-            if (stereo)
-            {
-                m_render->SetViewPort(view2, true);
-                m_visual->Prepare(osdbounds);
-                m_render->SetViewPort(ViewPort);
-            }
-        }
-
-        return;
     }
 
     bool dummy = false;
