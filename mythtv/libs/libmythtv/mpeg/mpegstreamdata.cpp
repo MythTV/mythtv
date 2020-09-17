@@ -140,6 +140,7 @@ void MPEGStreamData::Reset(int desiredProgram)
     m_pidsNotListening.clear();
     m_pidsWriting.clear();
     m_pidsAudio.clear();
+    m_pidsConditionalAccess.clear();
 
     m_pidVideoSingleProgram = m_pidPmtSingleProgram = 0xffffffff;
 
@@ -586,7 +587,10 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     {
         ConditionalAccessDescriptor cad(i);
         if (cad.IsValid())
+        {
             AddListeningPID(cad.PID());
+            AddConditionalAccessPID(cad.PID());
+        }
     }
 
     m_pidsAudio.clear();
@@ -795,7 +799,10 @@ void MPEGStreamData::ProcessCAT(const ConditionalAccessTable *cat)
     {
         ConditionalAccessDescriptor cad(i);
         if (cad.IsValid())
+        {
             AddListeningPID(cad.PID());
+            AddConditionalAccessPID(cad.PID());
+        }
     }
 }
 
@@ -1046,7 +1053,9 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             listener->ProcessTSPacket(tspacket);
     }
 
-    if (IsListeningPID(tspacket.PID()) && tspacket.HasPayload())
+    if (tspacket.HasPayload() &&
+        IsListeningPID(tspacket.PID()) &&
+        !IsConditionalAccessPID(tspacket.PID()))
     {
         HandleTSTables(&tspacket);
     }
@@ -1072,6 +1081,12 @@ int MPEGStreamData::ResyncStream(const unsigned char *buffer, int curr_pos,
     }
 
     return pos;
+}
+
+bool MPEGStreamData::IsConditionalAccessPID(uint pid) const
+{
+    pid_map_t::const_iterator it = m_pidsConditionalAccess.find(pid);
+    return it != m_pidsConditionalAccess.end();
 }
 
 bool MPEGStreamData::IsListeningPID(uint pid) const

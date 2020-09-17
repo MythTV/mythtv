@@ -128,6 +128,9 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual void AddAudioPID(
         uint pid, PIDPriority priority = kPIDPriorityHigh)
         { m_pidsAudio[pid] = priority; }
+    virtual void AddConditionalAccessPID(
+        uint pid, PIDPriority priority = kPIDPriorityNormal)
+        { m_pidsConditionalAccess[pid] = priority; }
 
     virtual void RemoveListeningPID(uint pid) { m_pidsListening.remove(pid);  }
     virtual void RemoveNotListeningPID(uint pid)
@@ -141,6 +144,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool IsVideoPID(uint pid) const
         { return m_pidVideoSingleProgram == pid; }
     virtual bool IsAudioPID(uint pid) const;
+    virtual bool IsConditionalAccessPID(uint pid) const;
 
     const pid_map_t& ListeningPIDs(void) const
         { return m_pidsListening; }
@@ -320,6 +324,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     pid_map_t                 m_pidsNotListening;
     pid_map_t                 m_pidsWriting;
     pid_map_t                 m_pidsAudio;
+    pid_map_t                 m_pidsConditionalAccess;
     bool                      m_listeningDisabled           {false};
 
     // Encryption monitoring
