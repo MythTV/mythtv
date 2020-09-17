@@ -256,11 +256,12 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
 {
     if (m_render)
     {
+        qreal pixelratio = (m_swapControl && m_usingHighDPI) ? m_pixelRatio : 1.0;
 #ifdef Q_OS_MACOS
-        QRect dest = QRect(static_cast<int>(Dest.left()   * m_pixelRatio),
-                           static_cast<int>(Dest.top()    * m_pixelRatio),
-                           static_cast<int>(Dest.width()  * m_pixelRatio),
-                           static_cast<int>(Dest.height() * m_pixelRatio));
+        QRect dest = QRect(static_cast<int>(Dest.left()   * pixelratio),
+                           static_cast<int>(Dest.top()    * pixelratio),
+                           static_cast<int>(Dest.width()  * pixelratio),
+                           static_cast<int>(Dest.height() * pixelratio));
 #endif
 
         // Drawing an image multiple times with the same VBO will stall most GPUs as
@@ -271,7 +272,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
             QOpenGLBuffer *vbo = texture->m_vbo;
             texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx];
             texture->m_destination = QRect();
-            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
+            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, pixelratio);
             texture->m_destination = QRect();
             texture->m_vbo = vbo;
             if (++m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
@@ -279,7 +280,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
         }
         else
         {
-            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, m_pixelRatio);
+            m_render->DrawBitmap(texture, m_target, Source, DEST, nullptr, Alpha, pixelratio);
             m_mappedTextures.append(texture);
         }
     }
