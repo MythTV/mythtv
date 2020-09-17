@@ -123,7 +123,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     //TODO We are currently dependant on the internal sorting of QMap for
     //     entries to be iterated in the correct order, this should probably
     //     be changed.
-    QMap<int, MythUIType *> m_focusWidgetList;
+    FocusInfoType m_focusWidgetList;
 
     MythScreenStack  *m_screenStack  {nullptr};
     MythUIBusyDialog *m_busyPopup    {nullptr};
