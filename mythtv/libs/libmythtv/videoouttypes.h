@@ -117,9 +117,10 @@ enum PictureAttributeSupported
 
 enum StereoscopicMode
 {
-    kStereoscopicModeNone,
+    kStereoscopicModeAuto,
+    kStereoscopicModeIgnore3D,
     kStereoscopicModeSideBySideDiscard,
-    kStereoscopicModeTopAndBottomDiscard,
+    kStereoscopicModeTopAndBottomDiscard
 };
 
 enum PrimariesMode
@@ -154,7 +155,8 @@ inline QString StereoscopictoString(StereoscopicMode Mode)
 {
     switch (Mode)
     {
-        case kStereoscopicModeNone:                return QObject::tr("No 3D");
+        case kStereoscopicModeAuto:                return QObject::tr("Auto 3D");
+        case kStereoscopicModeIgnore3D:            return QObject::tr("Ignore 3D");
         case kStereoscopicModeSideBySideDiscard:   return QObject::tr("Discard 3D Side by Side");
         case kStereoscopicModeTopAndBottomDiscard: return QObject::tr("Discard 3D Top and Bottom");
     }

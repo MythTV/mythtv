@@ -2147,6 +2147,17 @@ static HostComboBoxSetting *LetterboxingColour()
     return gc;
 }
 
+static HostCheckBoxSetting* StereoDiscard()
+{
+    auto * cb = new HostCheckBoxSetting("DiscardStereo3D");
+    cb->setValue(true);
+    cb->setLabel("Discard 3D stereoscopic fields");
+    cb->setHelpText(PlaybackSettings::tr(
+        "If 'Side by Side' or 'Top and Bottom' 3D material is detected, "
+        "enabling this setting will discard one field (enabled by default)."));
+    return cb;
+}
+
 static HostComboBoxSetting *AspectOverride()
 {
     auto *gc = new HostComboBoxSetting("AspectOverride");
@@ -4292,7 +4303,7 @@ void PlaybackSettings::Load(void)
 #endif
 
     general->addChild(new PlayBackScaling());
-
+    general->addChild(StereoDiscard());
     general->addChild(AspectOverride());
     general->addChild(AdjustFill());
 

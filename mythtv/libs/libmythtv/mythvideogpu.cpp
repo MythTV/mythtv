@@ -1,6 +1,9 @@
 // MythTV
+#include "mythcorecontext.h"
 #include "mythvideobounds.h"
 #include "mythvideogpu.h"
+
+#define LOC QString("VideoGPU: ")
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
                            MythVideoBounds* Bounds,
@@ -60,6 +63,11 @@ void MythVideoGPU::CommonInit()
         m_videoColourSpace->IncrRef();
         connect(m_videoColourSpace, &MythVideoColourSpace::Updated, this, &MythVideoGPU::UpdateColourSpace);
     }
+
+    m_stereoMode = gCoreContext->GetBoolSetting("DiscardStereo3D", true) ?
+                    kStereoscopicModeSideBySideDiscard : kStereoscopicModeIgnore3D;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Discard stereoscopic fields: %1")
+        .arg(m_stereoMode == kStereoscopicModeIgnore3D ? "No" : "Yes"));
 }
 
 /// \note QObject::connect with function pointers does not work when the slot

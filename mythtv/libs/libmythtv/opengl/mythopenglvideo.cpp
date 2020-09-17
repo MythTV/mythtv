@@ -10,6 +10,11 @@
 // std
 #include <utility>
 
+// FFmpeg
+extern "C" {
+#include "libavutil/stereo3d.h"
+}
+
 #define LOC QString("GLVid: ")
 #define MAX_VIDEO_TEXTURES 10 // YV12 Kernel deinterlacer + 1
 
@@ -641,7 +646,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 }
 
 void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
-                                  StereoscopicMode Stereo, bool DrawBorder)
+                                  StereoscopicMode StereoOverride, bool DrawBorder)
 {
     if (!m_openglRender)
         return;
@@ -918,9 +923,21 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
         m_openglRender->logDebugMarker(LOC + "RENDER_TO_SCREEN");
 
     // discard stereoscopic fields
-    if (kStereoscopicModeSideBySideDiscard == Stereo)
+    StereoscopicMode stereo = StereoOverride;
+    // N.B. kStereoscopicModeSideBySideDiscard is a proxy here for discard of all types
+    if ((stereo == kStereoscopicModeAuto) &&
+        (m_stereoMode == kStereoscopicModeSideBySideDiscard) &&
+        Frame && (Frame->stereo3D != AV_STEREO3D_2D))
+    {
+        if (Frame->stereo3D == AV_STEREO3D_SIDEBYSIDE)
+            stereo = kStereoscopicModeSideBySideDiscard;
+        else if (Frame->stereo3D == AV_STEREO3D_TOPBOTTOM)
+            stereo = kStereoscopicModeTopAndBottomDiscard;
+    }
+
+    if (kStereoscopicModeSideBySideDiscard == stereo)
         trect = QRect(trect.left() >> 1, trect.top(), trect.width() >> 1, trect.height());
-    else if (kStereoscopicModeTopAndBottomDiscard == Stereo)
+    else if (kStereoscopicModeTopAndBottomDiscard == stereo)
         trect = QRect(trect.left(), trect.top() >> 1, trect.width(), trect.height() >> 1);
 
     // bind default framebuffer

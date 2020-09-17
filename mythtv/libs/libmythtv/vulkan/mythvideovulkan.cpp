@@ -153,7 +153,7 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
 }
 
 void MythVideoVulkan::RenderFrame(VideoFrame* /*Frame*/, bool /*TopFieldFirst*/,
-                                  FrameScanType /*Scan*/, StereoscopicMode /*Stereo*/,
+                                  FrameScanType /*Scan*/, StereoscopicMode /*StereoOverride*/,
                                   bool /*DrawBorder*/)
 {
     if (!(m_valid && IsValidVulkan()))

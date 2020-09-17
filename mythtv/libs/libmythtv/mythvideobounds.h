@@ -144,7 +144,7 @@ class MythVideoBounds : public QObject
     /// Zoom mode
     AdjustFillMode m_adjustFill {kAdjustFill_Off};
     int     m_rotation {0};
-    StereoscopicMode m_stereo { kStereoscopicModeNone };
+    StereoscopicMode m_stereo { kStereoscopicModeAuto };
 
     /// Pixel rectangle in video frame to display
     QRect   m_videoRect {0,0,0,0};

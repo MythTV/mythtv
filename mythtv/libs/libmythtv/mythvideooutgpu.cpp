@@ -465,7 +465,7 @@ void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
             if (m_pxpVideosReady[it.key()] && (*it))
             {
                 bool active = m_pxpVideoActive == *it;
-                (*it)->RenderFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeNone, active);
+                (*it)->RenderFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeAuto, active);
             }
         }
     }

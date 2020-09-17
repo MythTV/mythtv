@@ -42,7 +42,7 @@ class MythVideoGPU : public QObject
     virtual void StartFrame        () = 0;
     virtual void PrepareFrame      (VideoFrame* Frame, FrameScanType Scan = kScan_Progressive) = 0;
     virtual void RenderFrame       (VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
-                                    StereoscopicMode Stereo, bool DrawBorder = false) = 0;
+                                    StereoscopicMode StereoOverride, bool DrawBorder = false) = 0;
     virtual void EndFrame          () = 0;
     virtual void ResetFrameFormat  ();
     virtual void ResetTextures     () = 0;
@@ -85,6 +85,7 @@ class MythVideoGPU : public QObject
     bool              m_deinterlacer2x       { false };
     bool              m_valid                { false };
     bool              m_viewportControl      { true };
+    StereoscopicMode  m_stereoMode           { kStereoscopicModeSideBySideDiscard };
 };
 
 #endif
