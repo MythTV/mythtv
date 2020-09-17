@@ -6,8 +6,7 @@
 #include <QQueue>
 
 // MythTV
-#include "mythdisplay.h"
-#include "mythpainter.h"
+#include "mythpaintergpu.h"
 #include "mythimage.h"
 
 // Std
@@ -21,17 +20,16 @@ class QOpenGLFramebufferObject;
 
 #define MAX_BUFFER_POOL 70
 
-class MUI_PUBLIC MythOpenGLPainter : public MythPainter
+class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
 {
     Q_OBJECT
 
   public:
-    explicit MythOpenGLPainter(MythRenderOpenGL *Render = nullptr, QWidget *Parent = nullptr);
+    explicit MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent);
    ~MythOpenGLPainter() override;
 
     void DeleteTextures(void);
 
-    // MythPainter
     QString GetName(void) override { return QString("OpenGL"); }
     bool SupportsAnimation(void) override { return true; }
     bool SupportsAlpha(void) override { return true; }
@@ -47,24 +45,15 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void PushTransformation(const UIEffects &Fx, QPointF Center = QPointF()) override;
     void PopTransformation(void) override;
 
-  public slots:
-    void CurrentDPIChanged(qreal DPI);
-
   protected:
     void  ClearCache(void);
     MythGLTexture* GetTextureFromCache(MythImage *Image);
 
-    // MythPainter
     MythImage* GetFormatImagePriv(void) override { return new MythImage(this); }
     void  DeleteFormatImagePriv(MythImage *Image) override;
 
   protected:
-    QWidget          *m_widget { nullptr };
     MythRenderOpenGL *m_render { nullptr };
-    QSize             m_lastSize { };
-    qreal             m_pixelRatio   { 1.0     };
-    MythDisplay*      m_display      { nullptr };
-    bool              m_usingHighDPI { false   };
 
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_imageExpireList;

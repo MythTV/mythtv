@@ -12,27 +12,17 @@
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
-  : m_widget(Parent),
+  : MythPainterGPU(Parent),
     m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
 
     if (!m_render)
         LOG(VB_GENERAL, LOG_ERR, "OpenGL painter has no render device");
-
-#ifdef Q_OS_MACOS
-     m_display = MythDisplay::AcquireRelease();
-     CurrentDPIChanged(m_widget->devicePixelRatioF());
-     connect(m_display, &MythDisplay::CurrentDPIChanged, this, &MythOpenGLPainter::CurrentDPIChanged);
-#endif
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
-#ifdef Q_OS_MACOS
-    MythDisplay::AcquireRelease(false);
-#endif
-
     if (!m_render)
         return;
     if (!m_render->IsReady())
@@ -61,7 +51,7 @@ void MythOpenGLPainter::FreeResources(void)
         m_mappedBufferPoolReady = false;
     }
 
-    MythPainter::FreeResources();
+    MythPainterGPU::FreeResources();
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
@@ -95,16 +85,9 @@ void MythOpenGLPainter::ClearCache(void)
     m_imageToTextureMap.clear();
 }
 
-void MythOpenGLPainter::CurrentDPIChanged(qreal DPI)
-{
-    m_pixelRatio = DPI;
-    m_usingHighDPI = !qFuzzyCompare(m_pixelRatio, 1.0);
-    LOG(VB_GENERAL, LOG_INFO, QString("High DPI scaling %1").arg(m_usingHighDPI ? "enabled" : "disabled"));
-}
-
 void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
-    MythPainter::Begin(Parent);
+    MythPainterGPU::Begin(Parent);
 
     if (!m_widget)
     {
@@ -181,7 +164,7 @@ void MythOpenGLPainter::End(void)
     m_render->doneCurrent();
 
     m_mappedTextures.clear();
-    MythPainter::End();
+    MythPainterGPU::End();
 }
 
 MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
@@ -306,7 +289,7 @@ void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
         m_render->DrawRect(nullptr, Area, FillBrush, LinePen, Alpha);
         return;
     }
-    MythPainter::DrawRect(Area, FillBrush, LinePen, Alpha);
+    MythPainterGPU::DrawRect(Area, FillBrush, LinePen, Alpha);
 }
 
 void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
@@ -320,7 +303,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
                                   LinePen, Alpha);
         return;
     }
-    MythPainter::DrawRoundRect(Area, CornerRadius, FillBrush, LinePen, Alpha);
+    MythPainterGPU::DrawRoundRect(Area, CornerRadius, FillBrush, LinePen, Alpha);
 }
 
 void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)

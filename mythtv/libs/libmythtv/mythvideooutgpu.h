@@ -5,6 +5,7 @@
 #include "mythvideoout.h"
 
 class MythVideoGPU;
+class MythPainterGPU;
 
 class MythVideoOutputGPU : public MythVideoOutput
 {
@@ -58,7 +59,7 @@ class MythVideoOutputGPU : public MythVideoOutput
 
     MythRender*     m_render              { nullptr };
     MythVideoGPU*   m_video               { nullptr };
-    MythPainter*    m_painter             { nullptr };
+    MythPainterGPU* m_painter             { nullptr };
     MythCodecID     m_newCodecId          { kCodec_NONE };
     QSize           m_newVideoDim         { 0, 0 };
     QSize           m_newVideoDispDim     { 0, 0 };

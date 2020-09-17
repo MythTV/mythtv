@@ -14,7 +14,8 @@
 
 #define LOC QString("VulkanPainter: ")
 
-MythPainterVulkan::MythPainterVulkan(MythRenderVulkan *VulkanRender)
+MythPainterVulkan::MythPainterVulkan(MythRenderVulkan *VulkanRender, QWidget *Parent)
+  : MythPainterGPU(Parent)
 {
     m_transforms.push(QMatrix4x4());
     connect(VulkanRender, &MythRenderVulkan::DoFreeResources, this, &MythPainterVulkan::DoFreeResources);
@@ -34,7 +35,7 @@ void MythPainterVulkan::FreeResources()
 {
     ClearCache();
     DeleteTextures();
-    MythPainter::FreeResources();
+    MythPainterGPU::FreeResources();
 }
 
 /// \brief Free resources before the render device is released.

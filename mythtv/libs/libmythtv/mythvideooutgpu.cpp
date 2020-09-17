@@ -2,6 +2,7 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
+#include "mythpaintergpu.h"
 #include "mythvideogpu.h"
 #include "mythvideooutgpu.h"
 
@@ -29,7 +30,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
     MythMainWindow* win = MythMainWindow::getMainWindow();
     if (win)
     {
-        m_painter = win->GetCurrentPainter();
+        m_painter = dynamic_cast<MythPainterGPU*>(win->GetCurrentPainter());
         if (m_painter)
             m_painter->SetMaster(false);
     }

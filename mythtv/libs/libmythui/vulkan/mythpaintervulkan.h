@@ -6,7 +6,7 @@
 
 // MythTV
 #include "mythuiexp.h"
-#include "mythpainter.h"
+#include "mythpaintergpu.h"
 #include "mythuianimation.h"
 #include "vulkan/mythrendervulkan.h"
 #include "vulkan/mythwindowvulkan.h"
@@ -16,12 +16,12 @@ class MythUniformBufferVulkan;
 
 #define MAX_TEXTURE_COUNT (1000)
 
-class MUI_PUBLIC MythPainterVulkan : public MythPainter
+class MUI_PUBLIC MythPainterVulkan : public MythPainterGPU
 {
     Q_OBJECT
 
   public:
-    MythPainterVulkan(MythRenderVulkan *VulkanRender);
+    MythPainterVulkan(MythRenderVulkan *VulkanRender, QWidget *Parent);
    ~MythPainterVulkan() override;
 
     QString GetName           () override;
@@ -64,9 +64,7 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainter
     bool              m_textureDescriptorsCreated { false };
     std::vector<VkDescriptorSet> m_availableTextureDescriptors;
     VkCommandBuffer   m_textureUploadCmd { nullptr };
-
     bool              m_frameStarted     { false   };
-    QSize             m_lastSize         { 0, 0    };
 
     std::vector<MythTextureVulkan*>      m_stagedTextures;
     std::vector<MythTextureVulkan*>      m_queuedTextures;
