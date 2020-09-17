@@ -92,7 +92,7 @@ class Property
         QString  m_sValue;
 };
 
-using Properties = QMap<QString,Property*>;
+using Properties = QMultiMap<QString,Property*>;
 using CDSObjects = QList<CDSObject*>;
 
 //////////////////////////////////////////////////////////////////////////////

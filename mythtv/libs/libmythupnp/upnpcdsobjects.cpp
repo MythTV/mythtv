@@ -84,17 +84,9 @@ Property *CDSObject::AddProperty( Property *pProp )
         // NOTE: This requires ALL instances of a property which can exist
         //       more than once to have m_bAllowMulti set to true.
         if (pProp->m_bMultiValue)
-            m_properties.insertMulti(pProp->m_sName, pProp);
+            m_properties.insert(pProp->m_sName, pProp);
         else
-        {
-            Properties::iterator it = m_properties.find(pProp->m_sName);
-            while (it != m_properties.end() && it.key() == pProp->m_sName)
-            {
-                delete *it;
-                it = m_properties.erase(it);
-            }
-            m_properties[pProp->m_sName] = pProp;
-        }
+            m_properties.replace(pProp->m_sName, pProp);
     }
 
     return pProp;
