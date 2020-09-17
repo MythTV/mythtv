@@ -207,7 +207,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
   public:
     uint32_t              m_chanid;
     FixupValue            m_fixup;
-    QMap<QString,QString> m_items;
+    QMultiMap<QString,QString> m_items;
 };
 
 class MTV_PUBLIC ProgInfo : public DBEvent

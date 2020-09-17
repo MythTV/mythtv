@@ -1550,7 +1550,7 @@ class MTV_PUBLIC ExtendedEventDescriptor : public MPEGDescriptor
     //   item_length            8   1.0+p2
     //   for (j=0;j<N;j++) { item_char 8 }
     // }
-    QMap<QString,QString> Items(void) const;
+    QMultiMap<QString,QString> Items(void) const;
     // text_length 8
     uint TextLength(void)       const { return m_data[7 + LengthOfItems()]; }
     // for (i=0; i<N; i++) { text_char 8 }

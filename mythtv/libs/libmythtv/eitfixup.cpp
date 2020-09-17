@@ -3149,7 +3149,7 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event)
 
     // handle cast and crew in items in the DVB Extended Event Descriptor
     // remove handled items from the map, so the left overs can be reported
-    QMap<QString,QString>::iterator i = event.m_items.begin();
+    auto i = event.m_items.begin();
     while (i != event.m_items.end())
     {
         if ((QString::compare (i.key(), "Role Player") == 0) ||

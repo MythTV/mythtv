@@ -697,11 +697,11 @@ void TestEITFixups::testUnitymedia()
                                          "Titel",
                                          "Beschreib",
                                          "Beschreibung ... IMDb Rating: 8.9 /10");
-    QMap<QString,QString> cast;
-    cast.insertMulti ("Role Player", "Great Actor");
-    cast.insertMulti ("Role Player", "Other Actor");
-    cast.insertMulti ("Director", "Great Director");
-    cast.insertMulti ("Unhandled", "lets fix it up");
+    QMultiMap<QString,QString> cast;
+    cast.insert ("Role Player", "Great Actor");
+    cast.insert ("Role Player", "Other Actor");
+    cast.insert ("Director", "Great Director");
+    cast.insert ("Unhandled", "lets fix it up");
     event->m_items = cast;
 
     QVERIFY(!event->HasCredits());

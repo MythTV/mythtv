@@ -1010,9 +1010,9 @@ QString AC3Descriptor::toString(void) const
     return ret;
 }
 
-QMap<QString,QString> ExtendedEventDescriptor::Items(void) const
+QMultiMap<QString,QString> ExtendedEventDescriptor::Items(void) const
 {
-    QMap<QString, QString> ret;
+    QMultiMap<QString, QString> ret;
 
     uint index = 0;
 
@@ -1025,7 +1025,7 @@ QMap<QString,QString> ExtendedEventDescriptor::Items(void) const
         index += 1 + m_data[7 + index];
         QString item = dvb_decode_text (&m_data[8 + index], m_data[7 + index]);
         index += 1 + m_data[7 + index];
-        ret.insertMulti (item_description, item);
+        ret.insert (item_description, item);
     }
 
     return ret;

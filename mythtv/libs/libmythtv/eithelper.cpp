@@ -206,7 +206,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
 static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
                                         QMap<uint,uint> languagePreferences,
                                         QString &title, QString &subtitle,
-                                        QString &description, QMap<QString,QString> &items)
+                                        QString &description, QMultiMap<QString,QString> &items)
 {
     const unsigned char *bestShortEvent =
         MPEGDescriptor::FindBestMatch(
@@ -362,7 +362,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         uint season = 0;
         uint episode = 0;
         uint totalepisodes = 0;
-        QMap<QString,QString> items;
+        QMultiMap<QString,QString> items;
 
         // Parse descriptors
         desc_list_t list = MPEGDescriptor::Parse(
@@ -636,7 +636,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     uint season = 0;
     uint episode = 0;
     uint totalepisodes = 0;
-    QMap<QString,QString> items;
+    QMultiMap<QString,QString> items;
 
     // Parse descriptors
     desc_list_t list = MPEGDescriptor::Parse(
