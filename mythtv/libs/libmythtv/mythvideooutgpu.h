@@ -38,8 +38,6 @@ class MythVideoOutputGPU : public MythVideoOutput
     QStringList     GetVisualiserList     () override;
     void            DestroyVisualisation  () override;
     bool            StereoscopicModesAllowed() const override;
-    void            SetStereoscopicMode   (StereoscopicMode Mode) override;
-    StereoscopicMode GetStereoscopicMode  () const override;
 
   protected:
     virtual MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
@@ -68,7 +66,6 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_buffersCreated      { false };
     QString         m_profile;
     VideoVisual*    m_visual              { nullptr };
-    StereoscopicMode m_stereo             { kStereoscopicModeNone };
 
     QMap<MythPlayer*,MythVideoGPU*> m_pxpVideos;
     QMap<MythPlayer*,bool>          m_pxpVideosReady;

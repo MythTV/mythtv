@@ -117,8 +117,6 @@ class MythVideoOutput : public MythVideoBounds
     virtual QStringList  GetVisualiserList   () { return QStringList {}; }
     virtual void         DestroyVisualisation() { }
     virtual bool         StereoscopicModesAllowed() const { return false; }
-    virtual void         SetStereoscopicMode (StereoscopicMode /*Mode*/) { }
-    virtual StereoscopicMode GetStereoscopicMode() const { return kStereoscopicModeNone; }
 
   protected:
     virtual void ShowPIPs (const PIPMap& /*PiPPlayers*/) { }

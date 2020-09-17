@@ -1065,3 +1065,13 @@ static float snap(float value, float snapto, float diff)
         return snapto;
     return value;
 }
+
+void MythVideoBounds::SetStereoscopicMode(StereoscopicMode Mode)
+{
+    m_stereo = Mode;
+}
+
+StereoscopicMode MythVideoBounds::GetStereoscopicMode() const
+{
+    return m_stereo;
+}

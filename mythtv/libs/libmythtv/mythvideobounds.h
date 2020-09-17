@@ -63,6 +63,7 @@ class MythVideoBounds : public QObject
     void SetWindowSize          (QSize Size);
     void SetITVResize           (QRect Rect);
     void SetRotation            (int Rotation);
+    void SetStereoscopicMode    (StereoscopicMode Mode);
 
   public:
     // Gets
@@ -95,6 +96,7 @@ class MythVideoBounds : public QObject
                         bool DoPixelAdjustment = true) const;
     bool     VideoIsFullScreen(void) const;
     QRegion  GetBoundingRegion(void) const;
+    StereoscopicMode GetStereoscopicMode() const;
 
   private:
     void PopulateGeometry        (void);
@@ -142,6 +144,7 @@ class MythVideoBounds : public QObject
     /// Zoom mode
     AdjustFillMode m_adjustFill {kAdjustFill_Off};
     int     m_rotation {0};
+    StereoscopicMode m_stereo { kStereoscopicModeNone };
 
     /// Pixel rectangle in video frame to display
     QRect   m_videoRect {0,0,0,0};

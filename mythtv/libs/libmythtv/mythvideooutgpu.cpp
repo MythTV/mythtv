@@ -453,7 +453,7 @@ void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // Video
     // N.B. dummy streams need the viewport updated in case we have resized the window (i.e. LiveTV)
     if (m_video && !dummy)
-        m_video->RenderFrame(Frame, topfieldfirst, Scan, m_stereo);
+        m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoscopicMode());
     else if (dummy)
         m_render->SetViewPort(GetWindowRect());
 
@@ -551,16 +551,6 @@ void MythVideoOutputGPU::DestroyVisualisation()
 bool MythVideoOutputGPU::StereoscopicModesAllowed() const
 {
     return true;
-}
-
-void MythVideoOutputGPU::SetStereoscopicMode(StereoscopicMode Mode)
-{
-    m_stereo = Mode;
-}
-
-StereoscopicMode MythVideoOutputGPU::GetStereoscopicMode() const
-{
-    return m_stereo;
 }
 
 QStringList MythVideoOutputGPU::GetVisualiserList()
