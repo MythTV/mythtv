@@ -225,7 +225,7 @@ class MHIContext : public MHContext, public QRunnable
     // Channel index database cache
     using Val_t = QPair< int, int >; // transportid, chanid
     using Key_t = QPair< int, int >; // networkid, serviceid
-    using ChannelCache_t = QMap< Key_t, Val_t >;
+    using ChannelCache_t = QMultiMap< Key_t, Val_t >;
     ChannelCache_t  m_channelCache;
     QMutex          m_channelMutex;
     static inline int Tid(ChannelCache_t::const_iterator it) { return it->first; }

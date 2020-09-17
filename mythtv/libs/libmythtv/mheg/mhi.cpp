@@ -886,7 +886,7 @@ bool MHIContext::LoadChannelCache()
         int sid = query.value(1).toInt();
         int tid = query.value(2).toInt();
         int cid = query.value(3).toInt();
-        m_channelCache.insertMulti( Key_t(nid, sid), Val_t(tid, cid) );
+        m_channelCache.insert( Key_t(nid, sid), Val_t(tid, cid) );
     }
     return true;
 }
