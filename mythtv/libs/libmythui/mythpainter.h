@@ -49,14 +49,12 @@ class MUI_PUBLIC MythPainter : public QObject
     virtual bool SupportsAlpha(void) = 0;
     virtual bool SupportsClipping(void) = 0;
     virtual void FreeResources(void) { }
-    virtual void Begin(QPaintDevice *parent) { m_parent = parent; }
-    virtual void End() { m_parent = nullptr; }
+    virtual void Begin(QPaintDevice* /*Parent*/) { }
+    virtual void End() { }
 
     virtual void SetClipRect(const QRect &clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);
     virtual void Clear(QPaintDevice *device, const QRegion &region);
-
-    QPaintDevice *GetParent(void) { return m_parent; }
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha) = 0;
@@ -127,7 +125,6 @@ class MUI_PUBLIC MythPainter : public QObject
 
     void CheckFormatImage(MythImage *im);
 
-    QPaintDevice* m_parent      { nullptr };
     int m_hardwareCacheSize     { 0 };
     int m_maxHardwareCacheSize  { 0 };
 
