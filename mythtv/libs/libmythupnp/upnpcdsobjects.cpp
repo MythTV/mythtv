@@ -17,6 +17,14 @@
 #include "upnpcds.h"
 #include "mythlogging.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+  #define QT_ENDL endl
+  #define QT_FLUSH flush
+#else
+  #define QT_ENDL Qt::endl
+  #define QT_FLUSH Qt::flush
+#endif
+
 inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -268,7 +276,7 @@ QString CDSObject::toXml( FilterMap &filter,
     QTextStream os( &sXML, QIODevice::WriteOnly );
     os.setCodec(QTextCodec::codecForName("UTF-8"));
     toXml(os, filter, ignoreChildren);
-    os << flush;
+    os << QT_FLUSH;
     return( sXML );
 }
 
@@ -330,7 +338,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
             if (!bFilter || filter.contains("@childContainerCount"))
                 os << "\" childContainerCount=\"" << GetChildContainerCount();
 
-               os << "\" >" << endl;
+            os << "\" >" << QT_ENDL;
 
             sEndTag = "</container>";
 
@@ -344,7 +352,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
             os << "<item id=\"" << m_sId
                << "\" parentID=\"" << m_sParentId
                << "\" restricted=\"" << GetBool( m_bRestricted )
-               << "\" >" << endl;
+               << "\" >" << QT_ENDL;
 
             sEndTag = "</item>";
 
@@ -353,8 +361,8 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
         default: break;
     }
 
-    os << "<dc:title>"   << m_sTitle << "</dc:title>" << endl;
-    os << "<upnp:class>" << m_sClass << "</upnp:class>" << endl;
+    os << "<dc:title>"   << m_sTitle << "</dc:title>" << QT_ENDL;
+    os << "<upnp:class>" << m_sClass << "</upnp:class>" << QT_ENDL;
 
     // ----------------------------------------------------------------------
     // Output all Properties
@@ -392,7 +400,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
                 os << ">";
                 os << pProp->GetEncodedValue();
-                os << "</" << sName << ">" << endl;
+                os << "</" << sName << ">" << QT_ENDL;
             }
         }
     }
@@ -420,7 +428,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
             }
 
             os << ">" << resource->m_sURI;
-            os << "</res>" << endl;
+            os << "</res>" << QT_ENDL;
         }
     }
 
@@ -438,8 +446,8 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
     // Close Element Tag
     // ----------------------------------------------------------------------
 
-    os << sEndTag << endl;
-    os << flush;
+    os << sEndTag << QT_ENDL;
+    os << QT_FLUSH;
 }
 
 

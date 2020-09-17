@@ -21,6 +21,14 @@
 #include "upnptaskevent.h"
 #include "mythlogging.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+  #define QT_ENDL endl
+  #define QT_FLUSH flush
+#else
+  #define QT_ENDL Qt::endl
+  #define QT_FLUSH Qt::flush
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -30,8 +38,8 @@ uint StateVariables::BuildNotifyBody(
 {
     uint nCount = 0;
 
-    ts << "<?xml version=\"1.0\"?>" << endl
-       << "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">" << endl;
+    ts << "<?xml version=\"1.0\"?>" << QT_ENDL
+       << "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">" << QT_ENDL;
 
     for (auto *prop : qAsConst(m_map))
     {
@@ -39,16 +47,16 @@ uint StateVariables::BuildNotifyBody(
         {
             nCount++;
 
-            ts << "<e:property>" << endl;
+            ts << "<e:property>" << QT_ENDL;
             ts <<   "<" << prop->m_sName << ">";
             ts <<     prop->ToString();
             ts <<   "</" << prop->m_sName << ">";
-            ts << "</e:property>" << endl;
+            ts << "</e:property>" << QT_ENDL;
         }
     }
 
-    ts << "</e:propertyset>" << endl;
-    ts << flush;
+    ts << "</e:propertyset>" << QT_ENDL;
+    ts << QT_FLUSH;
 
     return nCount;
 }
@@ -395,7 +403,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         tsMsg << "SEQ: " << QString::number( pInfo->m_nKey ) << "\r\n";
         tsMsg << "\r\n";
         tsMsg << aBody;
-        tsMsg << flush;
+        tsMsg << QT_FLUSH;
 
         // ------------------------------------------------------------------
         // Add new EventTask to the TaskQueue to do the actual sending.

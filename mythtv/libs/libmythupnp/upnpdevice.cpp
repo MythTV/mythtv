@@ -27,6 +27,12 @@
 #include <QHostAddress>
 #include <QHostInfo>
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+  #define QT_FLUSH flush
+#else
+  #define QT_FLUSH Qt::flush
+#endif
+
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
 /////////////////////////////////////////////////////////////////////////////
@@ -306,7 +312,7 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
     QTextStream os( &sXML, QIODevice::WriteOnly );
 
     GetValidXML( sBaseAddress, nPort, os );
-    os << flush;
+    os << QT_FLUSH;
     return( sXML );
 }
 
@@ -332,7 +338,7 @@ void UPnpDeviceDesc::GetValidXML(
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
     os << "</root>\n";
-    os << flush;
+    os << QT_FLUSH;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -491,7 +497,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         os << "</deviceList>";
     }
     os << "</device>\n";
-    os << flush;
+    os << QT_FLUSH;
 }
 
 /////////////////////////////////////////////////////////////////////////////

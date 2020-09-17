@@ -1798,8 +1798,13 @@ void MythCookieJar::save(const QString &filename)
     QList<QNetworkCookie> cookieList = allCookies();
     QTextStream stream(&f);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     for (const auto& cookie : qAsConst(cookieList))
         stream << cookie.toRawForm() << endl;
+#else
+    for (const auto& cookie : qAsConst(cookieList))
+        stream << cookie.toRawForm() << Qt::endl;
+#endif
 }
 
 

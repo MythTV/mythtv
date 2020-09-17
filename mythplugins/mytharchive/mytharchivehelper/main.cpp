@@ -78,6 +78,12 @@ extern "C" {
 #include "../mytharchive/archiveutil.h"
 #include "../mytharchive/remoteavformatcontext.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+  #define QT_ENDL endl
+#else
+  #define QT_ENDL Qt::endl
+#endif
+
 class NativeArchive
 {
   public:
@@ -2211,12 +2217,12 @@ static int getDBParamters(const QString& outFile)
     }
 
     QTextStream t(&f);
-    t << params.m_dbHostName << endl;
-    t << params.m_dbUserName << endl;
-    t << params.m_dbPassword << endl;
-    t << params.m_dbName << endl;
-    t << gCoreContext->GetHostName() << endl;
-    t << GetInstallPrefix() << endl;
+    t << params.m_dbHostName << QT_ENDL;
+    t << params.m_dbUserName << QT_ENDL;
+    t << params.m_dbPassword << QT_ENDL;
+    t << params.m_dbName << QT_ENDL;
+    t << gCoreContext->GetHostName() << QT_ENDL;
+    t << GetInstallPrefix() << QT_ENDL;
     f.close();
 
     return 0;
