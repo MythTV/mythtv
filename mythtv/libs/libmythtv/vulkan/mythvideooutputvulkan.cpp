@@ -126,7 +126,7 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
         m_vulkanRender->BeginDebugRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
 
     // Actual render
-    RenderFrameGPU(Frame, Scan, Osd, viewport);
+    RenderFrameGPU(Frame, Scan, Osd);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_vulkanRender->EndDebugRegion(currentcmdbuffer);

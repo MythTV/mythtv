@@ -320,7 +320,7 @@ void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
         m_openGLPerf->RecordSample();
 
     // Render
-    RenderFrameGPU(Frame, Scan, Osd, m_openglRender->GetViewPort());
+    RenderFrameGPU(Frame, Scan, Osd);
 
     // Time rendering
     if (m_openGLPerf)

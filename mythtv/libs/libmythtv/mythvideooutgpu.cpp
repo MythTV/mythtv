@@ -415,25 +415,8 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
     }
 }
 
-void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
-                                        OSD *Osd, const QRect& ViewPort)
+void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
 {
-    // Stereoscopic views
-    QRect view1 = ViewPort;
-    QRect view2 = ViewPort;
-    bool stereo = (m_stereo == kStereoscopicModeSideBySide) || (m_stereo == kStereoscopicModeTopAndBottom);
-
-    if (kStereoscopicModeSideBySide == m_stereo)
-    {
-        view1 = QRect(ViewPort.left() / 2,  ViewPort.top(), ViewPort.width() / 2, ViewPort.height());
-        view2 = view1.translated(ViewPort.width() / 2, 0);
-    }
-    else if (kStereoscopicModeTopAndBottom == m_stereo)
-    {
-        view1 = QRect(ViewPort.left(),  ViewPort.top() / 2, ViewPort.width(), ViewPort.height() / 2);
-        view2 = view1.translated(0, ViewPort.height() / 2);
-    }
-
     bool dummy = false;
     bool topfieldfirst = false;
     if (Frame)
@@ -451,22 +434,13 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
     }
 
     // Main UI when embedded
-    if (IsEmbedding())
+    if (m_painter && IsEmbedding())
     {
         MythMainWindow* win = GetMythMainWindow();
-        if (win && win->GetPaintWindow() && m_painter)
+        if (win && win->GetPaintWindow())
         {
-            if (stereo)
-                m_render->SetViewPort(view1, true);
             win->GetPaintWindow()->clearMask();
             win->Draw(m_painter);
-            if (stereo)
-            {
-                m_render->SetViewPort(view2, true);
-                win->GetPaintWindow()->clearMask();
-                win->Draw(m_painter);
-                m_render->SetViewPort(ViewPort, true);
-            }
         }
     }
 
@@ -485,15 +459,7 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
             if (m_pxpVideosReady[it.key()] && (*it))
             {
                 bool active = m_pxpVideoActive == *it;
-                if (stereo)
-                    m_render->SetViewPort(view1, true);
                 (*it)->RenderFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeNone, active);
-                if (stereo)
-                {
-                    m_render->SetViewPort(view2, true);
-                    (*it)->RenderFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeNone, active);
-                    m_render->SetViewPort(ViewPort);
-                }
             }
         }
     }
@@ -502,31 +468,11 @@ void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan,
 
     // Visualisation
     if (m_visual && m_painter && !IsEmbeddingAndHidden())
-    {
-        if (stereo)
-            m_render->SetViewPort(view1, true);
         m_visual->Draw(osdbounds, m_painter, nullptr);
-        if (stereo)
-        {
-            m_render->SetViewPort(view2, true);
-            m_visual->Draw(osdbounds, m_painter, nullptr);
-            m_render->SetViewPort(ViewPort);
-        }
-    }
 
     // OSD
     if (Osd && m_painter && !IsEmbedding())
-    {
-        if (stereo)
-            m_render->SetViewPort(view1, true);
         Osd->Draw(m_painter, osdbounds.size(), true);
-        if (stereo)
-        {
-            m_render->SetViewPort(view2, true);
-            Osd->Draw(m_painter, osdbounds.size(), true);
-            m_render->SetViewPort(ViewPort);
-        }
-    }
 }
 
 void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)

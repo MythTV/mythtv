@@ -941,12 +941,8 @@ void TV::InitKeys(void)
     /* 3D/Frame compatible/Stereoscopic TV */
     REG_KEY("TV Playback", ACTION_3DNONE,
             QT_TRANSLATE_NOOP("MythControls", "No 3D"), "");
-    REG_KEY("TV Playback", ACTION_3DSIDEBYSIDE,
-            QT_TRANSLATE_NOOP("MythControls", "3D Side by Side"), "");
     REG_KEY("TV Playback", ACTION_3DSIDEBYSIDEDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Side by Side"), "");
-    REG_KEY("TV Playback", ACTION_3DTOPANDBOTTOM,
-            QT_TRANSLATE_NOOP("MythControls", "3D Top and Bottom"), "");
     REG_KEY("TV Playback", ACTION_3DTOPANDBOTTOMDISCARD,
             QT_TRANSLATE_NOOP("MythControls", "Discard 3D Top and Bottom"), "");
 
@@ -4376,12 +4372,8 @@ bool TV::Handle3D(PlayerContext *ctx, const QString &action)
         ctx->m_player->GetVideoOutput()->StereoscopicModesAllowed())
     {
         StereoscopicMode mode = kStereoscopicModeNone;
-        if (ACTION_3DSIDEBYSIDE == action)
-            mode = kStereoscopicModeSideBySide;
-        else if (ACTION_3DSIDEBYSIDEDISCARD == action)
+        if (ACTION_3DSIDEBYSIDEDISCARD == action)
             mode = kStereoscopicModeSideBySideDiscard;
-        else if (ACTION_3DTOPANDBOTTOM == action)
-            mode = kStereoscopicModeTopAndBottom;
         else if (ACTION_3DTOPANDBOTTOMDISCARD == action)
             mode = kStereoscopicModeTopAndBottomDiscard;
         ctx->m_player->GetVideoOutput()->SetStereoscopicMode(mode);
@@ -11301,12 +11293,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             active = (m_tvmStereoMode == kStereoscopicModeNone);
             BUTTON(ACTION_3DNONE, tr("None"));
-            active = (m_tvmStereoMode == kStereoscopicModeSideBySide);
-            BUTTON(ACTION_3DSIDEBYSIDE, tr("Side by Side"));
             active = (m_tvmStereoMode == kStereoscopicModeSideBySideDiscard);
             BUTTON(ACTION_3DSIDEBYSIDEDISCARD, tr("Discard Side by Side"));
-            active = (m_tvmStereoMode == kStereoscopicModeTopAndBottom);
-            BUTTON(ACTION_3DTOPANDBOTTOM, tr("Top and Bottom"));
             active = (m_tvmStereoMode == kStereoscopicModeTopAndBottomDiscard);
             BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
         }
