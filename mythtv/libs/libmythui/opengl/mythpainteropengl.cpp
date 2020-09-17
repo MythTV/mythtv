@@ -150,10 +150,11 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     DeleteTextures();
     m_render->makeCurrent();
 
+    // If master (have complete swap control) then clear and set viewport
     if (m_master)
     {
-        // If we are master and using high DPI then scale the viewport
-        if (m_master && m_usingHighDPI)
+        // If using high DPI then scale the viewport
+        if (m_usingHighDPI)
             currentsize *= m_pixelRatio;
         m_render->BindFramebuffer(nullptr);
         m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
