@@ -391,7 +391,7 @@ void MythVideoOutputGPU::InitDisplayMeasurements()
     SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
-void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPlayers, FrameScanType Scan)
+void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, const PIPMap &PiPPlayers, FrameScanType Scan)
 {
     // Process input changes
     if (!ProcessInputChange())

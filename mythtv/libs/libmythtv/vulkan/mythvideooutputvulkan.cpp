@@ -95,7 +95,7 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
 
 void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan)
 {
-    ProcessFrameGPU(Frame, PiPPlayers, Scan);
+    MythVideoOutputGPU::PrepareFrame(Frame, PiPPlayers, Scan);
 }
 
 void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)

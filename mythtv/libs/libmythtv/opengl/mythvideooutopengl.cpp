@@ -245,7 +245,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPla
         m_openglRender->logDebugMarker(LOC + "PROCESS_FRAME_START");
 
     // Update software frames
-    ProcessFrameGPU(Frame, PiPPlayers, Scan);
+    MythVideoOutputGPU::PrepareFrame(Frame, PiPPlayers, Scan);
 
     // Time texture update
     if (m_openGLPerf)
