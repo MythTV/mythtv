@@ -32,7 +32,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
     {
         m_painter = dynamic_cast<MythPainterGPU*>(win->GetCurrentPainter());
         if (m_painter)
-            m_painter->SetMaster(false);
+            m_painter->SetViewControl(MythPainterGPU::None);
     }
 
     if (!(win && m_render && m_painter))
@@ -49,7 +49,7 @@ MythVideoOutputGPU::~MythVideoOutputGPU()
     MythVideoOutputGPU::DestroyBuffers();
     delete m_video;
     if (m_painter)
-        m_painter->SetMaster(true);
+        m_painter->SetViewControl(MythPainterGPU::Viewport | MythPainterGPU::Framebuffer);
     if (m_render)
         m_render->DecrRef();
 }
@@ -437,12 +437,17 @@ void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // Main UI when embedded
     if (m_painter && IsEmbedding())
     {
+        // If we are using high dpi, the painter needs to set the appropriate
+        // viewport and enable scaling of its images
+        m_painter->SetViewControl(MythPainterGPU::Viewport);
+
         MythMainWindow* win = GetMythMainWindow();
         if (win && win->GetPaintWindow())
         {
             win->GetPaintWindow()->clearMask();
             win->Draw(m_painter);
         }
+        m_painter->SetViewControl(MythPainterGPU::None);
     }
 
     // Video

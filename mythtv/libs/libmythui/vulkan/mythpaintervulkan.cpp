@@ -315,7 +315,7 @@ void MythPainterVulkan::End()
     if (m_queuedTextures.empty())
         return;
 
-    if (m_master)
+    if (m_viewControl.testFlag(Framebuffer))
     {
         // Tell the renderer that we are requesting a frame start
         m_vulkan->Render()->SetFrameExpected();
@@ -359,7 +359,7 @@ void MythPainterVulkan::End()
 
     m_queuedTextures.clear();
 
-    if (m_master)
+    if (m_viewControl.testFlag(Framebuffer))
         m_vulkan->Render()->EndFrame();
 }
 

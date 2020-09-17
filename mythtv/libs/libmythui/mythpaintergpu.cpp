@@ -24,9 +24,9 @@ MythPainterGPU::~MythPainterGPU()
 #endif
 }
 
-void MythPainterGPU::SetMaster(bool Master)
+void MythPainterGPU::SetViewControl(ViewControls Control)
 {
-    m_master = Master;
+    m_viewControl = Control;
 }
 
 void MythPainterGPU::CurrentDPIChanged(qreal DPI)
