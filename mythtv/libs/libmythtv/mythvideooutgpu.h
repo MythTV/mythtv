@@ -52,7 +52,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
     void            ProcessFrameGPU       (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan);
-    void            RenderFrameGPU        (VideoFrame* Frame, FrameScanType Scan, OSD* Osd);
+    void            RenderFrame           (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     bool            ProcessInputChange    ();
     void            InitDisplayMeasurements();
 

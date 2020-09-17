@@ -107,10 +107,6 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     if (m_newCodecId != kCodec_NONE)
         return;
 
-
-    // FIXME GetWindowRect() is a placeholder
-    QRect viewport = GetWindowRect();
-
     // Prepare visualisation
     if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbeddingAndHidden())
     {
@@ -126,7 +122,7 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
         m_vulkanRender->BeginDebugRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
 
     // Actual render
-    RenderFrameGPU(Frame, Scan, Osd);
+    MythVideoOutputGPU::RenderFrame(Frame, Scan, Osd);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_vulkanRender->EndDebugRegion(currentcmdbuffer);

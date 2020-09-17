@@ -415,7 +415,7 @@ void MythVideoOutputGPU::ProcessFrameGPU(VideoFrame* Frame, const PIPMap &PiPPla
     }
 }
 
-void MythVideoOutputGPU::RenderFrameGPU(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
+void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
 {
     bool dummy = false;
     bool topfieldfirst = false;
