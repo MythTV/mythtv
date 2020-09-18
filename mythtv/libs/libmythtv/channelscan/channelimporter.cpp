@@ -1096,8 +1096,6 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports)
 {
     QMap<uint64_t, bool> rs;
-    QElapsedTimer timer;
-    timer.start();
 
     // Search all channels to find relocated services
     for (auto & transport : transports)
@@ -1129,7 +1127,6 @@ void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports)
         }
         transport.m_channels = filtered;
     }
-    LOG(VB_CHANSCAN, LOG_DEBUG, QString("%1 processing %2 milliseconds").arg(__func__).arg(timer.elapsed()));
 }
 
 /** \fn ChannelImporter::GetDBTransports(uint,ScanDTVTransportList&) const

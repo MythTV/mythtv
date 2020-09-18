@@ -299,7 +299,7 @@ const std::array<const std::string,256> descriptor_tag_strings
     /* 0x82 */ "SCTE Frame Rate",       /* 0x83 */ "SCTE Extended Video",
     /* 0x84 */ "SCTE Component Name",   /* 0x85 */ "ATSC Program Identifier",
     /* 0x86 */ "Caption Service",       /* 0x87 */ "Content Advisory",
-    /* 0x88 */ "ATSC CA Descriptor",    /* 0x89 */ "ATSC Descriptor Tag",
+    /* 0x88 */ "ATSC CA",               /* 0x89 */ "ATSC Descriptor Tag",
     /* 0x8A */ "SCTE CUE Identifier",   /* 0x8B */ "",
     /* 0x8C */ "TimeStamp",             /* 0x8D */ "",
     /* 0x8E */ "",                      /* 0x8F */ "",

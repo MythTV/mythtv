@@ -2100,11 +2100,11 @@ class ServiceListDescriptor : public MPEGDescriptor
 
     QString toString(void) const override // MPEGDescriptor
     {
-        QString str = QString("ServiceListDescriptor: %1 Services\n")
+        QString str = QString("ServiceListDescriptor: %1 Services")
             .arg(ServiceCount());
         for (uint i=0; i<ServiceCount(); i++)
         {
-            if (i!=0) str.append("\n");
+            str.append("\n");
             str.append(QString("      Service (%1) Type%2 (0x%3)")
                 .arg(ServiceID(i))
                 .arg(ServiceDescriptorMapping(ServiceType(i)).toString())
