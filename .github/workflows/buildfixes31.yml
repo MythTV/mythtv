@@ -11,7 +11,7 @@ jobs:
     name: build
     strategy:
       matrix:
-        os: ['ubuntu-18.04', 'macos-10.15']
+        os: ['ubuntu-18.04']
         cc: ['gcc', 'clang']
         include:
           - cc: 'gcc'
@@ -78,7 +78,7 @@ jobs:
       
     - name: Configure plugins
       working-directory: ./mythplugins
-      run: ./configure $MYTHTV_CONFIG --disable-mythbrowser
+      run: ./configure $MYTHTV_CONFIG
     
     - name: Make plugins
       working-directory: ./mythplugins
