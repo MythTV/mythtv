@@ -3,6 +3,7 @@
 #define GUIDEGRID_H_
 
 // c++
+#include <list>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -219,7 +220,7 @@ public:
                           int progPast,
                           const QVector<ProgramList*> &proglists,
                           const ProgInfoGuideArray &programInfos,
-                          const QLinkedList<GuideUIElement> &elements);
+                          const std::list<GuideUIElement> &elements);
     void updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
                              QVector<bool> &unavailables);
     void updateChannelsUI(const QVector<ChannelInfo *> &chinfos,

@@ -319,8 +319,7 @@ private:
     QVector<ProgramList*> m_proglists;
     ProgInfoGuideArray m_programInfos {};
     int m_progPast {0};
-    //QVector<GuideUIElement> m_result;
-    QLinkedList<GuideUIElement> m_result;
+    std::list<GuideUIElement> m_result;
 };
 
 class GuideUpdateChannels : public GuideUpdaterBase
@@ -1842,10 +1841,10 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             QString title = (pginfo->GetTitle() == kUnknownTitle) ?
                 GuideGrid::tr("Unknown", "Unknown program title") :
                                 pginfo->GetTitle();
-            m_result.push_back(GuideUIElement(
+            m_result.emplace_back(
                 row, cnt, tempRect, title,
                 pginfo->GetCategory(), arrow, recFlag,
-                recStat, isCurrent));
+                recStat, isCurrent);
 
             cnt++;
         }
@@ -2042,7 +2041,7 @@ void GuideGrid::updateProgramsUI(unsigned int firstRow, unsigned int numRows,
                                  int progPast,
                                  const QVector<ProgramList*> &proglists,
                                  const ProgInfoGuideArray &programInfos,
-                                 const QLinkedList<GuideUIElement> &elements)
+                                 const std::list<GuideUIElement> &elements)
 {
     for (unsigned int i = 0; i < numRows; ++i)
     {
@@ -2055,7 +2054,7 @@ void GuideGrid::updateProgramsUI(unsigned int firstRow, unsigned int numRows,
         }
     }
     m_guideGrid->SetProgPast(progPast);
-    for (const auto & r : qAsConst(elements))
+    for (const auto & r : elements)
     {
         m_guideGrid->SetProgramInfo(r.m_row, r.m_col, r.m_area, r.m_title,
                                     r.m_category, r.m_arrow, r.m_recType,
