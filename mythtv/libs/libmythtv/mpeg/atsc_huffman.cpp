@@ -7,7 +7,7 @@
  *------------------------------------------------------------------------*/
 
 struct huffman_table {
-    uint16_t m_encodedSequence;
+    uint16_t m_encodedSequence; // cppcheck-suppress unusedStructMember
     uint8_t  m_character;
     uint8_t  m_numberOfBits;
 };
@@ -2183,8 +2183,8 @@ const huff2_lookup_vec Huff2Lookup256
 struct huff2_parts {
     const huff2_table_vec  table;
     const huff2_lookup_vec lookup;
-    uint                   min_size;
-    uint                   max_size;
+    uint                   min_size; // cppcheck-suppress unusedStructMember
+    uint                   max_size; // cppcheck-suppress unusedStructMember
 };
 
 const std::array<const huff2_parts,2> huff2_tables
