@@ -822,7 +822,7 @@ QString GalleryThumbView::CheckThumbnail(MythUIButtonListItem *item, const Image
         request << id;
 
     // Note this button is awaiting an update
-    m_pendingMap.insertMulti(id, qMakePair(item, index));
+    m_pendingMap.insert(id, qMakePair(item, index));
 
     return "";
 }

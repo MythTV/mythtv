@@ -146,7 +146,7 @@ private:
 
     using ThumbLocation = QPair<MythUIButtonListItem *, int>;
     //! Buttons waiting for thumbnails to be created
-    QHash<int, ThumbLocation> m_pendingMap;
+    QMultiHash<int, ThumbLocation> m_pendingMap;
 
     QSet<int> m_thumbExists;          //!< Images where thumbnails are known to exist
     bool      m_editsAllowed {false}; //!< Edit privileges
