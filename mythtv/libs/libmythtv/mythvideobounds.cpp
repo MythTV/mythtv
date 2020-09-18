@@ -26,10 +26,7 @@
 // MythtTV
 #include "mythconfig.h"
 #include "mythmiscutil.h"
-#include "osd.h"
 #include "mythplayer.h"
-#include "videodisplayprofile.h"
-#include "decoderbase.h"
 #include "mythcorecontext.h"
 #include "mythvideobounds.h"
 
@@ -510,7 +507,7 @@ void MythVideoBounds::SetVideoAspectRatio(float aspect)
 /**
  * \brief Calls SetVideoAspectRatio(float aspect),
  *        then calls MoveResize() to apply changes.
- * \param aspect video aspect ratio to use
+ * \param Aspect video aspect ratio to use
  */
 void MythVideoBounds::VideoAspectRatioChanged(float Aspect)
 {
@@ -523,11 +520,7 @@ void MythVideoBounds::VideoAspectRatioChanged(float Aspect)
     }
 }
 
-/**
- * \brief Tells video output to discard decoded frames and wait for new ones.
- * \bug We set the new width height and aspect ratio here, but we should
- *      do this based on the new video frames in Show().
- */
+/// \brief Update for new source video dimensions and aspect ratio
 void MythVideoBounds::SourceChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
     if (Aspect < 0.0F)
@@ -731,13 +724,13 @@ void MythVideoBounds::StopEmbedding(void)
 
 /**
  * \brief Returns visible portions of total OSD bounds
- * \param visible_aspect physical aspect ratio of bounds returned
- * \param font_scaling   scaling to apply to fonts
- * \param themeaspect    aspect ration of the theme
+ * \param VisibleAspect physical aspect ratio of bounds returned
+ * \param FontScaling   scaling to apply to fonts
+ * \param ThemeAspect    aspect ratio of the theme
  */
 QRect MythVideoBounds::GetVisibleOSDBounds(float &VisibleAspect,
-                                          float &FontScaling,
-                                          float ThemeAspect) const
+                                           float &FontScaling,
+                                           float ThemeAspect) const
 {
     float dv_w = ((static_cast<float>(m_videoDispDim.width())) / m_displayVideoRect.width());
     float dv_h = ((static_cast<float>(m_videoDispDim.height())) / m_displayVideoRect.height());
@@ -800,9 +793,9 @@ QRect MythVideoBounds::GetVisibleOSDBounds(float &VisibleAspect,
 }
 
 /**
- * \brief Enforce different aspect ration than detected,
- *        then calls VideoAspectRatioChanged(float)
- *        to apply them.
+ * \brief Enforce different aspect ratio than detected, then calls VideoAspectRatioChanged(float)
+ * to apply them.
+ *
  * \sa Zoom(ZoomDirection), ToggleAdjustFill(AdjustFillMode)
  */
 void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)

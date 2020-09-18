@@ -8,14 +8,11 @@
 #ifndef MYTHVIDEOBOUNDS_H_
 #define MYTHVIDEOBOUNDS_H_
 
-// Qt headers
-#include <QSize>
-#include <QRect>
-#include <QPoint>
+// Qt
 #include <QRegion>
 #include <QCoreApplication>
 
-// MythTV headers
+// MythTV
 #include "videoouttypes.h"
 
 class QScreen;
