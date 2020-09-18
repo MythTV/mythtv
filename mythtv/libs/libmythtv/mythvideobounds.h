@@ -68,27 +68,20 @@ class MythVideoBounds : public QObject
     bool     IsEmbeddingAndHidden()        const { return m_embeddingHidden; }
     QSize    GetVideoDim(void)             const { return m_videoDim; }
     QSize    GetVideoDispDim(void)         const { return m_videoDispDim; }
-    int      GetPIPSize(void)              const { return m_dbPipSize; }
     PIPState GetPIPState(void)             const { return m_pipState; }
     float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
     QRect    GetDisplayVisibleRect(void)   const { return m_displayVisibleRect; }
     QRect    GetWindowRect(void)           const { return m_windowRect; }
     QRect    GetRawWindowRect(void)        const { return m_rawWindowRect; }
-    QRect    GetScreenGeometry(void)       const { return m_screenGeometry; }
     QRect    GetVideoRect(void)            const { return m_videoRect; }
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
     QRect    GetEmbeddingRect(void)        const { return m_embeddingRect; }
     bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
-    bool     GetITVResizing(void)          const { return m_itvResizing; }
-    QRect    GetITVDisplayRect(void)       const { return m_itvDisplayVideoRect; }
     QString  GetZoomString(void)           const;
     AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
     float    GetVideoAspect(void)          const { return m_videoAspect; }
     float    GetDisplayAspect(void)        const { return m_displayAspect;  }
-    QRect    GetTmpDisplayVisibleRect(void) const { return m_tmpDisplayVisibleRect; }
-    QRect    GetVisibleOSDBounds(float &VisibleAspect, float &FontScaling, float ThemeAspect) const;
-    QRect    GetTotalOSDBounds(void) const;
     QRect    GetPIPRect(PIPLocation  Location, MythPlayer *PiPPlayer  = nullptr,
                         bool DoPixelAdjustment = true) const;
     bool     VideoIsFullScreen(void) const;
@@ -117,7 +110,6 @@ class MythVideoBounds : public QObject
     bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
     AspectOverrideMode m_dbAspectOverride { kAspect_Off };
     AdjustFillMode m_dbAdjustFill { kAdjustFill_Off };
-    QRect   m_screenGeometry   {0,0,1024,768}; ///< Full screen geometry
     qreal   m_devicePixelRatio {1.0};
 
     // Manual Zoom

@@ -89,15 +89,13 @@ void MythVideoBounds::PopulateGeometry(void)
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
-        m_screenGeometry = screen->virtualGeometry();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window using all screens %1x%2")
-            .arg(m_screenGeometry.width()).arg(m_screenGeometry.height()));
+            .arg(screen->virtualGeometry().width()).arg(screen->virtualGeometry().height()));
         return;
     }
 
-    m_screenGeometry = screen->geometry();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window using screen %1 %2x%3")
-        .arg(screen->name()).arg(m_screenGeometry.width()).arg(m_screenGeometry.height()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Window using screen '%1' %2x%3")
+        .arg(screen->name()).arg(screen->geometry().width()).arg(screen->geometry().height()));
 }
 
 /**
@@ -558,15 +556,6 @@ QSize MythVideoBounds::Fix1088(QSize Dimensions)
 }
 
 /**
- * \fn MythVideoBounds::GetTotalOSDBounds(void) const
- * \brief Returns total OSD bounds
- */
-QRect MythVideoBounds::GetTotalOSDBounds(void) const
-{
-    return { QPoint(0, 0), m_videoDispDim };
-}
-
-/**
  * \brief Sets up letterboxing for various standard video frame and
  *        monitor dimensions, then calls MoveResize()
  *        to apply them.
@@ -720,76 +709,6 @@ void MythVideoBounds::StopEmbedding(void)
     m_embedding = false;
     m_embeddingHidden = false;
     MoveResize();
-}
-
-/**
- * \brief Returns visible portions of total OSD bounds
- * \param VisibleAspect physical aspect ratio of bounds returned
- * \param FontScaling   scaling to apply to fonts
- * \param ThemeAspect    aspect ratio of the theme
- */
-QRect MythVideoBounds::GetVisibleOSDBounds(float &VisibleAspect,
-                                           float &FontScaling,
-                                           float ThemeAspect) const
-{
-    float dv_w = ((static_cast<float>(m_videoDispDim.width())) / m_displayVideoRect.width());
-    float dv_h = ((static_cast<float>(m_videoDispDim.height())) / m_displayVideoRect.height());
-
-    int right_overflow = max((m_displayVideoRect.width() + m_displayVideoRect.left()) - m_displayVisibleRect.width(), 0);
-    int lower_overflow = max((m_displayVideoRect.height() + m_displayVideoRect.top()) - m_displayVisibleRect.height(), 0);
-
-    bool isPBP = (kPBPLeft == m_pipState || kPBPRight == m_pipState);
-    if (isPBP)
-    {
-        right_overflow = 0;
-        lower_overflow = 0;
-    }
-
-    // top left and bottom right corners respecting letterboxing
-    QPoint tl = QPoint((static_cast<int>(max(-m_displayVideoRect.left(), 0) * dv_w)) & ~1,
-                       (static_cast<int>(max(-m_displayVideoRect.top(), 0) * dv_h)) & ~1);
-    QPoint br = QPoint(static_cast<int>(floor(m_videoDispDim.width()  - (right_overflow * dv_w))),
-                       static_cast<int>(floor(m_videoDispDim.height() - (lower_overflow * dv_h))));
-    // adjust for overscan
-    if ((m_dbVertScale > 0.0F) || (m_dbHorizScale > 0.0F))
-    {
-        QRect v(tl, br);
-        float xs = (m_dbHorizScale > 0.0F) ? m_dbHorizScale : 0.0F;
-        float ys = (m_dbVertScale > 0.0F) ? m_dbVertScale : 0.0F;
-        QPoint s(qRound((v.width() * xs)), qRound((v.height() * ys)));
-        tl += s;
-        br -= s;
-    }
-    // Work around Qt bug, QRect(QPoint(0,0), QPoint(0,0)) has area 1.
-    QRect vb(tl.x(), tl.y(), br.x() - tl.x(), br.y() - tl.y());
-
-    // The calculation is completely bogus if the video is not centered
-    // which happens in the EPG, where we don't actually care about the OSD.
-    // So we just make sure the width and height are positive numbers
-    vb = QRect(vb.x(), vb.y(), abs(vb.width()), abs(vb.height()));
-
-    // set the physical aspect ratio of the displayable area
-    const float dispPixelAdj = m_displayVisibleRect.width() ?
-        (GetDisplayAspect() * m_displayVisibleRect.height())
-                / m_displayVisibleRect.width() : 1.F;
-
-    float vs = m_videoRect.height() ? static_cast<float>(m_videoRect.width()) / m_videoRect.height() : 1.0F;
-    VisibleAspect = ThemeAspect / dispPixelAdj * (m_videoAspectOverride > 0.0F ? vs / m_videoAspectOverride : 1.F);
-
-    if (ThemeAspect > 0.0F)
-    {
-        // now adjust for scaling of the video on the size
-        float tmp = sqrtf(2.0F/(sq(VisibleAspect / ThemeAspect) + 1.0F));
-        if (tmp > 0.0F)
-            FontScaling = 1.0F / tmp;
-        // now adjust for aspect ratio effect on font size
-        // (should be in osd.cpp?)
-        FontScaling *= sqrtf(m_videoAspectOverride / ThemeAspect);
-    }
-
-    if (isPBP)
-        FontScaling *= 0.65F;
-    return vb;
 }
 
 /**
