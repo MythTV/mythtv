@@ -171,8 +171,7 @@ class MTV_PUBLIC MythPlayer : public QObject
 
   public:
     explicit MythPlayer(PlayerFlags flags = kNoFlags);
-    MythPlayer(const MythPlayer& rhs);
-    virtual ~MythPlayer();
+   ~MythPlayer() override;
 
     // Initialisation
     virtual int OpenFile(int Retries = 4);
@@ -867,10 +866,9 @@ class MTV_PUBLIC MythPlayer : public QObject
     Jitterometer *m_outputJmeter          {nullptr};
 
   private:
+    Q_DISABLE_COPY(MythPlayer)
     void syncWithAudioStretch();
     bool m_disablePassthrough             {false};
 };
 
 #endif
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
