@@ -105,8 +105,9 @@ int MythBDDecoder::GetAudioLanguage(uint /*AudioIndex*/, uint StreamIndex)
 
 int MythBDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& /*StorePacket*/)
 {
+    m_avCodecLock.lock();
     int result = av_read_frame(Ctx, Pkt);
-
+    m_avCodecLock.unlock();
     /* If we seem to have hit the end of the file, the ringbuffer may
      * just be blocked in order to drain the ffmpeg buffers, so try
      * unblocking it and reading again.
@@ -117,7 +118,9 @@ int MythBDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& /*Store
     {
         if (m_ringBuffer->BD()->IsReadingBlocked())
             m_ringBuffer->BD()->UnblockReading();
+        m_avCodecLock.lock();
         result = av_read_frame(Ctx, Pkt);
+        m_avCodecLock.unlock();
     }
 
     if (result >= 0)

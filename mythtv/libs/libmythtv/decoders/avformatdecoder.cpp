@@ -389,11 +389,13 @@ void AvFormatDecoder::CloseCodecs()
 {
     if (m_ic)
     {
+        m_avCodecLock.lock();
         for (uint i = 0; i < m_ic->nb_streams; i++)
         {
             AVStream *st = m_ic->streams[i];
             m_codecMap.freeCodecContext(st);
         }
+        m_avCodecLock.unlock();
     }
 }
 
@@ -691,6 +693,8 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
+    QMutexLocker locker(&m_avCodecLock);
+
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
@@ -916,7 +920,9 @@ extern "C" void HandleStreamChange(void *data)
 
 int AvFormatDecoder::FindStreamInfo(void)
 {
+    m_avCodecLock.lock();
     int retval = avformat_find_stream_info(m_ic, nullptr);
+    m_avCodecLock.unlock();
     silence_ffmpeg_logging = false;
     // ffmpeg 3.0 is returning -1 code when there is a channel
     // change or some encoding error just after the start
@@ -1935,6 +1941,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
+    QMutexLocker avlocker(&m_avCodecLock);
     QMutexLocker locker(&m_trackLock);
 
     bool unknownbitrate = false;
@@ -2517,11 +2524,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
 bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
+    m_avCodecLock.lock();
 #ifdef USING_MEDIACODEC
     if (QString("mediacodec") == codec->wrapper_name)
         av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
 #endif
     int ret = avcodec_open2(avctx, codec, nullptr);
+    m_avCodecLock.unlock();
     if (ret < 0)
     {
         std::string error;
@@ -2719,6 +2728,7 @@ void AvFormatDecoder::RemoveAudioStreams()
     if (!m_audio->HasAudioIn())
         return;
 
+    m_avCodecLock.lock();
     for (uint i = 0; i < m_ic->nb_streams;)
     {
         AVStream *st = m_ic->streams[i];
@@ -2732,6 +2742,7 @@ void AvFormatDecoder::RemoveAudioStreams()
         else
             i++;
     }
+    m_avCodecLock.unlock();
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
@@ -3409,6 +3420,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     }
     else
     {
+        m_avCodecLock.lock();
         if (!m_useFrameTiming)
             context->reordered_opaque = pkt->pts;
 
@@ -3444,6 +3456,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
                 sentPacket = true;
             }
         }
+        m_avCodecLock.unlock();
     }
 
     if (ret < 0 || ret2 < 0)
@@ -3942,11 +3955,11 @@ void AvFormatDecoder::ProcessDSMCCPacket(const AVStream *str, const AVPacket *pk
     int dataBroadcastId = 0;
     unsigned carouselId = 0;
     {
-        // TODO does this still need locking?
-        //QMutexLocker locker(avcodeclock);
+        m_avCodecLock.lock();
         componentTag    = str->component_tag;
         dataBroadcastId = str->data_id;
         carouselId  = (unsigned) str->carousel_id;
+        m_avCodecLock.unlock();
     }
     while (length > 3)
     {
@@ -4002,16 +4015,19 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         {
             if (pkt->stream_index == subIdx)
             {
+                m_avCodecLock.lock();
                 m_ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
                                                    pkt->data, pkt->size, pts);
+                m_avCodecLock.unlock();
             }
         }
     }
     else if (m_decodeAllSubtitles || pkt->stream_index == subIdx)
     {
+        m_avCodecLock.lock();
         AVCodecContext *ctx = m_codecMap.getCodecContext(curstream);
-        avcodec_decode_subtitle2(ctx, &subtitle, &gotSubtitles,
-            pkt);
+        avcodec_decode_subtitle2(ctx, &subtitle, &gotSubtitles, pkt);
+        m_avCodecLock.unlock();
 
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
@@ -4636,6 +4652,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         bool already_decoded = false;
         if (!ctx->channels)
         {
+            m_avCodecLock.lock();
             if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(ctx))
             {
                 // for passthru or codecs for which the decoder won't downmix
@@ -4655,6 +4672,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
+            m_avCodecLock.unlock();
         }
 
         if (reselectAudioTrack)
@@ -4695,6 +4713,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             }
         }
         m_firstVPtsInuse = false;
+        m_avCodecLock.lock();
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
@@ -4753,6 +4772,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 decoded_size = data_size;
             }
         }
+        m_avCodecLock.unlock();
 
         if (ret < 0)
         {
@@ -5130,7 +5150,10 @@ void AvFormatDecoder::StreamChangeCheck(void)
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
-    return av_read_frame(ctx, pkt);
+    m_avCodecLock.lock();
+    int result = av_read_frame(ctx, pkt);
+    m_avCodecLock.unlock();
+    return result;
 }
 
 bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)

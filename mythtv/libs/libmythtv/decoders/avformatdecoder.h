@@ -245,7 +245,7 @@ class AvFormatDecoder : public DecoderBase
     bool HasVideo(const AVFormatContext *ic);
     float GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise = false);
     static void av_update_stream_timings_video(AVFormatContext *ic);
-    static bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
+    bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
     void UpdateFramesPlayed(void) override; // DecoderBase
     bool DoRewindSeek(long long desiredFrame) override; // DecoderBase
@@ -371,6 +371,8 @@ class AvFormatDecoder : public DecoderBase
 
     // Value in milliseconds, from setting AudioReadAhead
     int                m_audioReadAhead               {100};
+
+    QMutex             m_avCodecLock                  { QMutex::Recursive };
 };
 
 #endif

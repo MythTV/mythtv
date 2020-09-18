@@ -158,7 +158,9 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                     m_ringBuffer->DVD()->UnblockReading();
                 }
 
+                m_avCodecLock.lock();
                 result = av_read_frame(Ctx, Pkt);
+                m_avCodecLock.unlock();
 
                 // Make sure we yield.  Otherwise other threads may not
                 // get chance to take the lock.  Shouldn't be necessary
