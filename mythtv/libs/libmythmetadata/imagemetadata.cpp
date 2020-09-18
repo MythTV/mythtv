@@ -730,7 +730,7 @@ ImageMetaData::TagMap ImageMetaData::ToMap(const QStringList &tagStrings)
             // Map tags by Family.Group to keep them together
             // Within each group they will preserve list ordering
             QString group = parts[0].section('.', 0, 1);
-            tags.insertMulti(group, parts);
+            tags.insert(group, parts);
 
 #ifdef DUMP_METADATA_TAGS
             LOG(VB_FILE, LOG_DEBUG, LOC + QString("%1 = %2").arg(group, token));

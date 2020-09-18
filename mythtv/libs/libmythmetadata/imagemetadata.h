@@ -116,7 +116,7 @@ public:
     static QStringList FromString(const QString &str)
     { return str.split(kSeparator); }
 
-    using TagMap = QMap<QString, QStringList>;
+    using TagMap = QMultiMap<QString, QStringList>;
     static TagMap ToMap(const QStringList &tags);
 
     virtual bool        IsValid()                                = 0;
