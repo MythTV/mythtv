@@ -21,7 +21,11 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     Q_DECLARE_FLAGS(ViewControls, ViewControl)
 
     MythPainterGPU(QWidget *Parent);
+#ifdef Q_OS_MACOS
    ~MythPainterGPU() override;
+#else
+   ~MythPainterGPU() override = default;
+#endif
 
     void SetViewControl    (ViewControls Control);
 

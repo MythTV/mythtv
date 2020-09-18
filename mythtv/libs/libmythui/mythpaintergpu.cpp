@@ -17,12 +17,12 @@ MythPainterGPU::MythPainterGPU(QWidget *Parent)
 #endif
 }
 
+#ifdef Q_OS_MACOS
 MythPainterGPU::~MythPainterGPU()
 {
-#ifdef Q_OS_MACOS
     MythDisplay::AcquireRelease(false);
-#endif
 }
+#endif
 
 void MythPainterGPU::SetViewControl(ViewControls Control)
 {
