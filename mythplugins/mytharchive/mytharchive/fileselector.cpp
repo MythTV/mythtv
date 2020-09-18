@@ -124,6 +124,8 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
         return;
 
     auto *fileData = item->GetData().value<FileData*>();
+    if (!fileData)
+        return;
 
     if (fileData->directory)
     {

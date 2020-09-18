@@ -395,23 +395,25 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
 void BookmarkManager::ShowEditDialog(bool edit)
 {
-    Bookmark *site = nullptr;
-
     if (edit)
     {
         MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
 
-        if (item && item->GetData().isValid())
-        {
-            site = item->GetData().value<Bookmark*>();
-            m_savedBookmark = *site;
-        }
-        else
+        if (!item || !item->GetData().isValid())
         {
             LOG(VB_GENERAL, LOG_ERR, "BookmarkManager: Something is wrong. "
                                      "Asked to edit a non existent bookmark!");
             return;
         }
+        auto *site = item->GetData().value<Bookmark*>();
+        if (!site)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "BookmarkManager: Something is wrong. "
+                                     "Existing bookmark is invalid!");
+            return;
+        }
+
+        m_savedBookmark = *site;
     }
 
 
@@ -590,7 +592,8 @@ void BookmarkManager::slotShowMarked(void)
     if (item && item->GetData().isValid())
     {
        auto *site = item->GetData().value<Bookmark*>();
-       m_savedBookmark = *site;
+       if (site)
+           m_savedBookmark = *site;
     }
 
     QString cmd = gCoreContext->GetSetting("WebBrowserCommand", "Internal");
