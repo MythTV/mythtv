@@ -47,12 +47,12 @@ private:
     static void CachePut(const Cddb::Album& album);
 
     // DiscID to album info cache
-    using cache_t = QMap< Cddb::discid_t, Cddb::Album >;
+    using cache_t = QMultiMap< Cddb::discid_t, Cddb::Album >;
     static cache_t s_cache;
 
     static const QString& GetDB();
 };
-QMap< Cddb::discid_t, Cddb::Album > Dbase::s_cache;
+QMultiMap< Cddb::discid_t, Cddb::Album > Dbase::s_cache;
 
 
 /*
@@ -582,7 +582,7 @@ void Dbase::CachePut(const Cddb::Album& album)
     LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CachePut %1 ")
         .arg(album.discID,0,16)
         + album.genre + " " + album.artist + " / " + album.title);
-    s_cache.insertMulti(album.discID, album);
+    s_cache.insert(album.discID, album);
 }
 
 // static
@@ -610,11 +610,14 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
 // static
 bool Dbase::CacheGet(Cddb::Album& album, const QString& genre, const Cddb::discid_t discID)
 {
-    const Cddb::Album& a = s_cache[ discID];
-    if (a.discID && a.discGenre == genre)
+    QList<Cddb::Album> albums = s_cache.values(discID);
+    for (const auto & a : qAsConst(albums))
     {
-        album = a;
-        return true;
+        if (a.discID && a.discGenre == genre)
+        {
+            album = a;
+            return true;
+        }
     }
     return false;
 }
