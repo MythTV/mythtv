@@ -149,15 +149,19 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     DeleteTextures();
     m_render->makeCurrent();
 
-    if (m_target || m_swapControl)
+    if (m_target || m_viewControl.testFlag(Framebuffer))
     {
-        // If we are master and using high DPI then scale the viewport
-        if (m_swapControl && m_usingHighDPI)
-            currentsize *= m_pixelRatio;
         m_render->BindFramebuffer(m_target);
-        m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
         m_render->SetBackground(0, 0, 0, 0);
         m_render->ClearFramebuffer();
+    }
+
+    if (m_target || m_viewControl.testFlag(Viewport))
+    {
+        // If using high DPI then scale the viewport
+        if (m_usingHighDPI)
+            currentsize *= m_pixelRatio;
+        m_render->SetViewPort(QRect(0, 0, currentsize.width(), currentsize.height()));
     }
 }
 
@@ -171,7 +175,7 @@ void MythOpenGLPainter::End(void)
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_END");
-    if (m_target == nullptr && m_swapControl)
+    if (m_target == nullptr && m_viewControl.testFlag(Framebuffer))
     {
         m_render->Flush();
         m_render->swapBuffers();
@@ -256,7 +260,9 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
 {
     if (m_render)
     {
-        qreal pixelratio = (m_swapControl && m_usingHighDPI) ? m_pixelRatio : 1.0;
+        qreal pixelratio = 1.0;
+        if (m_usingHighDPI && m_viewControl.testFlag(Viewport))
+            pixelratio = m_pixelRatio;
 #ifdef Q_OS_MACOS
         QRect dest = QRect(static_cast<int>(Dest.left()   * pixelratio),
                            static_cast<int>(Dest.top()    * pixelratio),
