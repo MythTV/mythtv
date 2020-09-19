@@ -284,7 +284,8 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
 {
     if (!Context || !Frame || Textures.empty())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Error");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Texture error: Context %1 Frame %2 Textures %3")
+            .arg(Context != nullptr).arg(Frame != nullptr).arg(Textures.size()));
         return;
     }
 

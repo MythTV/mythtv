@@ -61,7 +61,10 @@ void MythOpenGLVideo::Init()
 {
     m_openglRender = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!m_openglRender || !m_videoColourSpace)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
         return;
+    }
 
     OpenGLLocker ctx_lock(m_openglRender);
     if (m_openglRender->isOpenGLES())
