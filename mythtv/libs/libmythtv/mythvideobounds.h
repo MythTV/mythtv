@@ -75,7 +75,7 @@ class MythVideoBounds : public QObject
     QRect    GetRawWindowRect(void)        const { return m_rawWindowRect; }
     QRect    GetVideoRect(void)            const { return m_videoRect; }
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
-    QRect    GetEmbeddingRect(void)        const { return m_embeddingRect; }
+    QRect    GetEmbeddingRect(void)        const { return m_rawEmbeddingRect; }
     bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
     QString  GetZoomString(void)           const;
     AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
@@ -151,10 +151,12 @@ class MythVideoBounds : public QObject
     QRect   m_tmpDisplayVisibleRect {0,0,0,0};
     /// Embedded video rectangle
     QRect   m_embeddingRect;
+    QRect   m_rawEmbeddingRect;
 
     // Interactive TV (MHEG) video embedding
     bool    m_itvResizing {false};
     QRect   m_itvDisplayVideoRect;
+    QRect   m_rawItvDisplayVideoRect;
 
     /// State variables
     bool    m_embedding  {false};

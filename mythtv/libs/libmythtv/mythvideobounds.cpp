@@ -629,22 +629,25 @@ void MythVideoBounds::SetWindowSize(QSize Size)
 
 void MythVideoBounds::SetITVResize(QRect Rect)
 {
-    QRect oldrect = m_itvDisplayVideoRect;
+    QRect oldrect = m_rawItvDisplayVideoRect;
     if (Rect.isEmpty())
     {
         m_itvResizing = false;
         m_itvDisplayVideoRect = QRect();
+        m_rawItvDisplayVideoRect = QRect();
     }
     else
     {
         m_itvResizing = true;
-        m_itvDisplayVideoRect = Rect;
+        m_rawItvDisplayVideoRect = Rect;
+        m_itvDisplayVideoRect = SCALED_RECT(Rect, m_devicePixelRatio);
     }
-    if (m_itvDisplayVideoRect != oldrect)
+    if (m_rawItvDisplayVideoRect != oldrect)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New ITV display rect: %1x%2+%3+%4")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New ITV display rect: %1x%2+%3+%4 (Scale: %1)")
             .arg(m_itvDisplayVideoRect.width()).arg(m_itvDisplayVideoRect.height())
-            .arg(m_itvDisplayVideoRect.left()).arg(m_itvDisplayVideoRect.right()));
+            .arg(m_itvDisplayVideoRect.left()).arg(m_itvDisplayVideoRect.right())
+            .arg(m_devicePixelRatio));
         MoveResize();
     }
 }
@@ -683,15 +686,19 @@ void MythVideoBounds::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRec
  */
 void MythVideoBounds::EmbedInWidget(const QRect &Rect)
 {
-    if (m_embedding && (Rect == m_embeddingRect))
+    if (m_embedding && (Rect == m_rawEmbeddingRect))
         return;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4")
-        .arg(Rect.width()).arg(Rect.height()).arg(Rect.left()).arg(Rect.top()));
-    m_embeddingRect = Rect;
+
+    m_rawEmbeddingRect = Rect;
+    m_embeddingRect = SCALED_RECT(Rect, m_devicePixelRatio);
     bool savevisiblerect = !m_embedding;
     m_embedding = true;
     m_embeddingHidden = Rect.isEmpty();
-    m_displayVideoRect = Rect;
+    m_displayVideoRect = m_embeddingRect;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4 (Scale: %1)")
+        .arg(m_embeddingRect.width()).arg(m_embeddingRect.height())
+        .arg(m_embeddingRect.left()).arg(m_embeddingRect.top())
+        .arg(m_devicePixelRatio));
     ResizeDisplayWindow(m_displayVideoRect, savevisiblerect);
 }
 
@@ -704,6 +711,7 @@ void MythVideoBounds::StopEmbedding(void)
     if (!m_embedding)
         return;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stopped embedding");
+    m_rawEmbeddingRect = QRect();
     m_embeddingRect = QRect();
     m_displayVisibleRect = m_tmpDisplayVisibleRect;
     m_embedding = false;
