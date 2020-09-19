@@ -72,8 +72,7 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
 }
 
 bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                                 float Aspect, MythDisplay* Display,
-                                 const QRect& DisplayVisibleRect, MythCodecID CodecId)
+                                 float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(IsValidVulkan() && m_painter && m_video))
     {
@@ -87,7 +86,7 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
         return false;
     }
 
-    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId))
         return false;
 
     return true;

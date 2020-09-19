@@ -12,8 +12,7 @@ class MythVideoOutputNull : public MythVideoOutput
    ~MythVideoOutputNull() override;
 
     bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
-              float Aspect, MythDisplay* Display,
-              const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
+              float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
 
     void PrepareFrame (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;

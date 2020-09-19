@@ -27,8 +27,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     static VideoFrameTypeVec s_openglFrameTypesLegacy;
 
     bool          Init             (const QSize& VideoDim, const QSize& VideoDispDim,
-                                    float Aspect, MythDisplay* Display,
-                                    const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
+                                    float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
     void          PrepareFrame     (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
     void          RenderFrame      (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     void          EndFrame         () override;

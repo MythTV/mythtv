@@ -145,8 +145,7 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
 }
 
 bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                               float Aspect, MythDisplay* Display,
-                               const QRect& DisplayVisibleRect, MythCodecID CodecID)
+                               float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID)
 {
     if (VideoDispDim.isEmpty())
         return false;
@@ -160,7 +159,7 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
 
     QMutexLocker locker(&m_globalLock);
 
-    MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecID);
+    MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecID);
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
                         kPrebufferFramesNormal, kPrebufferFramesSmall);
 

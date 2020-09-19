@@ -24,11 +24,11 @@ class MythVideoBounds : public QObject
     Q_OBJECT
 
   public:
-    MythVideoBounds();
-   ~MythVideoBounds() override = default;
+    explicit MythVideoBounds(bool CreateDisplay);
+   ~MythVideoBounds() override;
 
     bool InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                    float Aspect, const QRect &WindowRect, MythDisplay* Display);
+                    float Aspect, const QRect &WindowRect);
 
   signals:
     // Note These are emitted from MoveResize - which must be called after any call
@@ -98,10 +98,10 @@ class MythVideoBounds : public QObject
     static QSize Fix1088         (QSize Dimensions);
     void Rotate                  (void);
 
+  protected:
+    MythDisplay* m_display     {nullptr};
+
   private:
-    // TODO Priv avoids confusion with m_display in MythVideoOutput but look to
-    // use just the one instance
-    MythDisplay* m_displayPriv {nullptr};
     QPoint  m_dbMove           {0,0};   ///< Percentage move from database
     float   m_dbHorizScale     {0.0F};  ///< Horizontal Overscan/Underscan percentage
     float   m_dbVertScale      {0.0F};  ///< Vertical Overscan/Underscan percentage

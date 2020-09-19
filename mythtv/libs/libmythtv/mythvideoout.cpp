@@ -57,11 +57,11 @@ void MythVideoOutput::GetRenderOptions(RenderOptions& Options)
  * \return instance of VideoOutput if successful, nullptr otherwise.
  */
 MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID CodecID,
-                                 PIPState PiPState,         const QSize& VideoDim,
-                                 const QSize& VideoDispDim, float VideoAspect,
-                                 QWidget *ParentWidget,     const QRect& EmbedRect,
-                                 float FrameRate,           uint  PlayerFlags,
-                                 QString& Codec,            int ReferenceFrames)
+                                         PIPState PiPState,         const QSize& VideoDim,
+                                         const QSize& VideoDispDim, float VideoAspect,
+                                         QWidget *ParentWidget,     const QRect& EmbedRect,
+                                         float FrameRate,           uint  PlayerFlags,
+                                         QString& Codec,            int ReferenceFrames)
 {
     QStringList renderers;
 
@@ -204,8 +204,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
             vo->SetPIPState(PiPState);
             vo->SetVideoFrameRate(FrameRate);
             vo->SetReferenceFrames(ReferenceFrames);
-            if (vo->Init(VideoDim, VideoDispDim, VideoAspect,
-                         MythDisplay::AcquireRelease(), display_rect, CodecID))
+            if (vo->Init(VideoDim, VideoDispDim, VideoAspect, display_rect, CodecID))
             {
                 vo->SetVideoScalingAllowed(true);
                 return vo;
@@ -217,7 +216,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
         }
         else if (vo && (PlayerFlags & kVideoIsNull))
         {
-            if (vo->Init(VideoDim, VideoDispDim, VideoAspect, nullptr, QRect(), CodecID))
+            if (vo->Init(VideoDim, VideoDispDim, VideoAspect, QRect(), CodecID))
                 return vo;
 
             vo->m_dbDisplayProfile = nullptr;
@@ -303,7 +302,8 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
  * \brief This constructor for VideoOutput must be followed by an
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
-MythVideoOutput::MythVideoOutput()
+MythVideoOutput::MythVideoOutput(bool CreateDisplay)
+  : MythVideoBounds(CreateDisplay)
 {
     m_dbLetterboxColour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
 }
@@ -315,8 +315,6 @@ MythVideoOutput::MythVideoOutput()
 MythVideoOutput::~MythVideoOutput()
 {
     delete m_dbDisplayProfile;
-    if (m_display)
-        MythDisplay::AcquireRelease(false);
 }
 
 /**
@@ -325,10 +323,8 @@ MythVideoOutput::~MythVideoOutput()
  * \return true if successful, false otherwise.
  */
 bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                           float VideoAspect, MythDisplay* Display,
-                           const QRect& WindowRect, MythCodecID CodecID)
+                           float VideoAspect, const QRect& WindowRect, MythCodecID CodecID)
 {
-    m_display = Display;
     m_videoCodecID = CodecID;
     bool wasembedding = IsEmbedding();
     QRect oldrect;
@@ -338,7 +334,7 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         StopEmbedding();
     }
 
-    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect, m_display);
+    bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect);
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetInput(GetVideoDispDim());
@@ -468,7 +464,7 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float& VisibleAspect,
     float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
     VisibleAspect = ThemeAspect * (ova > 0.0F ? vs / ova : 1.F) * dispPixelAdj;
 
-    FontScaling   = 1.0F;
+    FontScaling = 1.0F;
     return { QPoint(0,0), dvr.size() };
 }
 

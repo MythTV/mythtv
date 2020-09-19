@@ -172,8 +172,7 @@ MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
 }
 
 bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                                 float Aspect, MythDisplay* Display,
-                                 const QRect& DisplayVisibleRect, MythCodecID CodecId)
+                                 float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(m_openglRender && m_painter && m_video))
     {
@@ -189,7 +188,7 @@ bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDi
 
     OpenGLLocker ctx_lock(m_openglRender);
 
-    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId))
         return false;
 
     // This works around an issue with VDPAU direct rendering using legacy drivers

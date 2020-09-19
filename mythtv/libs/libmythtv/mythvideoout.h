@@ -47,12 +47,11 @@ class MythVideoOutput : public MythVideoBounds
                                    QString& Codec,            int ReferenceFrames);
     static VideoFrameTypeVec s_defaultFrameTypes;
 
-    MythVideoOutput();
+    MythVideoOutput(bool CreateDisplay = false);
     ~MythVideoOutput() override;
 
     virtual bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                      float VideoAspect, MythDisplay* Display,
-                      const QRect& WindowRect, MythCodecID CodecID);
+                      float VideoAspect, const QRect& WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (VideoFrame* Frame, const PIPMap& PipPlayers,
@@ -126,7 +125,6 @@ class MythVideoOutput : public MythVideoBounds
     QRect        GetTotalOSDBounds() const;
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
-    MythDisplay*         m_display            { nullptr };
     MythVideoColourSpace m_videoColourSpace;
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
     MythCodecID          m_videoCodecID       { kCodec_NONE };

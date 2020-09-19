@@ -49,7 +49,7 @@ const float MythVideoBounds::kManualZoomMinHorizontalZoom = 0.25F;
 const float MythVideoBounds::kManualZoomMinVerticalZoom   = 0.25F;
 const int   MythVideoBounds::kManualZoomMaxMove           = 50;
 
-MythVideoBounds::MythVideoBounds()
+MythVideoBounds::MythVideoBounds(bool CreateDisplay)
 {
     m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
 
@@ -58,6 +58,21 @@ MythVideoBounds::MythVideoBounds()
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
     m_dbAspectOverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
     m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
+
+    if (CreateDisplay)
+    {
+        m_display = MythDisplay::AcquireRelease();
+        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
+#ifdef Q_OS_MACOS
+        connect(m_displayPriv, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
+#endif
+    }
+}
+
+MythVideoBounds::~MythVideoBounds()
+{
+    if (m_display)
+        MythDisplay::AcquireRelease(false);
 }
 
 void MythVideoBounds::ScreenChanged(QScreen */*screen*/)
@@ -76,10 +91,10 @@ void MythVideoBounds::PhysicalDPIChanged(qreal /*DPI*/)
 
 void MythVideoBounds::PopulateGeometry(void)
 {
-    if (!m_displayPriv)
+    if (!m_display)
         return;
 
-    QScreen *screen = m_displayPriv->GetCurrentScreen();
+    QScreen *screen = m_display->GetCurrentScreen();
     if (!screen)
         return;
 
@@ -422,21 +437,12 @@ void MythVideoBounds::ApplyLetterboxing(void)
 }
 
 bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                                 float Aspect, const QRect &WindowRect, MythDisplay *Display)
+                                 float Aspect, const QRect &WindowRect)
 {
-    if (!m_displayPriv && Display)
-    {
-        m_displayPriv = Display;
-        connect(m_displayPriv, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
-#ifdef Q_OS_MACOS
-        connect(m_displayPriv, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
-#endif
-    }
-
-    if (m_displayPriv)
+    if (m_display)
     {
         QString dummy;
-        m_displayAspect = static_cast<float>(m_displayPriv->GetAspectRatio(dummy));
+        m_displayAspect = static_cast<float>(m_display->GetAspectRatio(dummy));
     }
 
     // Refresh the geometry in case the video mode has changed

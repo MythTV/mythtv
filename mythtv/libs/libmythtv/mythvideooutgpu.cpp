@@ -21,7 +21,8 @@
  * \sa MythVideoOutputVulkan
  */
 MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
-  : m_render(Render),
+  : MythVideoOutput(true),
+    m_render(Render),
     m_profile(std::move(Profile))
 {
     if (m_render)
@@ -90,9 +91,7 @@ void MythVideoOutputGPU::SetVideoFrameRate(float NewRate)
 }
 
 bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                              float Aspect, MythDisplay* Display,
-                              const QRect& DisplayVisibleRect,
-                              MythCodecID CodecId)
+                              float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
 {
     // if we are the main video player then free up as much video memory
     // as possible at startup
@@ -101,7 +100,7 @@ bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         m_painter->FreeResources();
 
     // Default initialisation - mainly MythVideoBounds
-    if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId))
         return false;
 
     // Ensure any new profile preferences are handled after a stream change
@@ -115,7 +114,7 @@ bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     QSize size = GetVideoDim();
 
     // Set the display mode if required
-    if (m_display->UsingVideoModes() && !IsEmbedding())
+    if (m_display && m_display->UsingVideoModes() && !IsEmbedding())
         ResizeForVideo(size);
     InitDisplayMeasurements();
 
@@ -327,8 +326,7 @@ bool MythVideoOutputGPU::ProcessInputChange()
         if (m_dbDisplayProfile)
             m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 , codecName);
 
-        bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       m_display, GetRawWindowRect(), m_newCodecId);
+        bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect, GetRawWindowRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
