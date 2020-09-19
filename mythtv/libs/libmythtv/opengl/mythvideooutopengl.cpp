@@ -115,7 +115,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
   : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), Profile)
 {
     // Retrieve render context
-    m_openglRender = dynamic_cast<MythRenderOpenGL*>(m_render);
+    m_openglRender = MythRenderOpenGL::GetOpenGLRender();
     if (!m_openglRender)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve OpenGL context");

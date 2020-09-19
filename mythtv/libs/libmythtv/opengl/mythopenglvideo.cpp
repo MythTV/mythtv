@@ -28,19 +28,21 @@ extern "C" {
  * \note MythOpenGLVideo has no knowledge of buffering, timing and other presentation
  * state. Its role is to render video frames on screen.
 */
-MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
+MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
                                  MythVideoBounds* Bounds,
                                  const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, Bounds, Profile)
+  : MythVideoGPU(Render, ColourSpace, Bounds, Profile),
+    m_openglRender(Render)
 {
     MythOpenGLVideo::Init();
 }
 
-MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
+MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, MythVideoColourSpace* ColourSpace,
                                  QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                                  QRect DisplayVideoRect, QRect VideoRect, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, Profile)
+                 DisplayVideoRect, VideoRect, Profile),
+    m_openglRender(Render)
 {
     MythOpenGLVideo::Init();
 }
@@ -58,7 +60,6 @@ MythOpenGLVideo::~MythOpenGLVideo()
 
 void MythOpenGLVideo::Init()
 {
-    m_openglRender = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!m_openglRender || !m_videoColourSpace)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
