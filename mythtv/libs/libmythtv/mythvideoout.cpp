@@ -61,7 +61,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
                                          const QSize& VideoDispDim, float VideoAspect,
                                          QWidget *ParentWidget,     const QRect& EmbedRect,
                                          float FrameRate,           uint  PlayerFlags,
-                                         QString& Codec,            int ReferenceFrames)
+                                         const QString& Codec,      int ReferenceFrames)
 {
     QStringList renderers;
 

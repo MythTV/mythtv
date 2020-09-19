@@ -31,7 +31,7 @@ class MediaServerItem
         m_name(std::move(name)), m_url(std::move(url)) { }
     QString NextUnbrowsed(void);
     MediaServerItem* Find(QString &id);
-    bool Add(MediaServerItem &item);
+    bool Add(const MediaServerItem &item);
     void Reset(void);
 
     QString m_id;

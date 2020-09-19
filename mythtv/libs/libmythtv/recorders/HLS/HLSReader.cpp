@@ -882,7 +882,7 @@ uint HLSReader::PercentBuffered(void) const
 
 int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
                                    HLSRecStream* hls,
-                                   HLSRecSegment& segment, int playlist_size)
+                                   const HLSRecSegment& segment, int playlist_size)
 {
     uint64_t bandwidth = hls->AverageBandwidth();
 

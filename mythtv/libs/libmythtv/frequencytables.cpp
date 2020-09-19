@@ -41,7 +41,7 @@ TransportScanItem::TransportScanItem(uint           sourceid,
 
 TransportScanItem::TransportScanItem(uint           _sourceid,
                                      QString        _name,
-                                     DTVMultiplex  &_tuning,
+                                     const  DTVMultiplex &_tuning,
                                      uint           _timeoutTune)
     : m_mplexid(0),
       m_friendlyName(std::move(_name)),

@@ -56,7 +56,7 @@ MediaServerItem* MediaServerItem::Find(QString &id)
     return nullptr;
 }
 
-bool MediaServerItem::Add(MediaServerItem &item)
+bool MediaServerItem::Add(const MediaServerItem &item)
 {
     if (m_id == item.m_parentid)
     {

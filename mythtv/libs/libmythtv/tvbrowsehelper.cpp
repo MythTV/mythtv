@@ -137,7 +137,7 @@ void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
     m_ctx = nullptr;
 }
 
-void TVBrowseHelper::BrowseDispInfo(PlayerContext *ctx, BrowseInfo &bi)
+void TVBrowseHelper::BrowseDispInfo(PlayerContext *ctx, const BrowseInfo &bi)
 {
     if (!gCoreContext->IsUIThread())
         return;

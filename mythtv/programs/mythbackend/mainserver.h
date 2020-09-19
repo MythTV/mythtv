@@ -131,7 +131,7 @@ class MainServer : public QObject, public MythSocketCBs
     void customEvent(QEvent *e) override; // QObject
 
     bool isClientConnected(bool onlyBlockingClients = false);
-    void ShutSlaveBackendsDown(QString &haltcmd);
+    void ShutSlaveBackendsDown(const QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
 
@@ -171,10 +171,10 @@ class MainServer : public QObject, public MythSocketCBs
 
     void GetActiveBackends(QStringList &hosts);
     void HandleActiveBackendsQuery(PlaybackSock *pbs);
-    void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
+    void HandleIsActiveBackendQuery(const QStringList &slist, PlaybackSock *pbs);
     void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
                         const QString &src, const QString &dst);
-    bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
+    bool HandleDeleteFile(const QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(const QString& filename, const QString& storagegroup,
                           PlaybackSock *pbs = nullptr);
     void HandleQueryRecordings(const QString& type, PlaybackSock *pbs);
@@ -223,12 +223,12 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
     void HandleGetRecorderFromNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
-    void HandleSetVerbose(QStringList &slist, PlaybackSock *pbs);
-    void HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs);
+    void HandleSetVerbose(const QStringList &slist, PlaybackSock *pbs);
+    void HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs);
     void HandlePixmapGetIfModified(const QStringList &slist, PlaybackSock *pbs);
-    void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
+    void HandleIsRecording(const QStringList &slist, PlaybackSock *pbs);
     void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
     void HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs);
@@ -245,8 +245,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleBookmarkQuery(const QString &chanid, const QString &starttime,
                              PlaybackSock *pbs);
     void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);
-    void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
-    void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
+    void HandleSettingQuery(const QStringList &tokens, PlaybackSock *pbs);
+    void HandleSetSetting(const QStringList &tokens, PlaybackSock *pbs);
     void HandleScanVideos(PlaybackSock *pbs);
     void HandleScanMusic(const QStringList &slist, PlaybackSock *pbs);
     void HandleMusicTagUpdateVolatile(const QStringList &slist, PlaybackSock *pbs);

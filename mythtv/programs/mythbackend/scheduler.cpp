@@ -587,7 +587,7 @@ void Scheduler::FillRecordListFromMaster(void)
         m_recList.push_back(it);
 }
 
-void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
+void Scheduler::PrintList(const RecList &list, bool onlyFutureRecordings)
 {
     if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_DEBUG))
         return;
@@ -822,7 +822,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     return rs == RecStatus::Recording;
 }
 
-void Scheduler::SlaveConnected(RecordingList &slavelist)
+void Scheduler::SlaveConnected(const RecordingList &slavelist)
 {
     QMutexLocker lockit(&m_schedLock);
     QReadLocker tvlocker(&TVRec::s_inputsLock);
@@ -1207,7 +1207,7 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
     }
 }
 
-void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
+void Scheduler::MarkShowingsList(const RecList &showinglist, RecordingInfo *p)
 {
     for (auto *q : showinglist)
     {
@@ -1916,7 +1916,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     // now check other inputs in the same input group as the recording.
     uint inputid = rcinfo->GetInputID();
-    vector<uint> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
+    const vector<uint> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
     vector<uint> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
     for (uint id : inputids)
     {
@@ -3047,7 +3047,7 @@ void Scheduler::DelayShutdown()
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
     int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
-    bool &statuschanged)
+    const bool &statuschanged)
 {
     // To ensure that one idle message is logged per 15 minutes
     uint logmask = VB_IDLE;

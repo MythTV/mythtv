@@ -350,7 +350,7 @@ MythSetting::DataType parse_data_type(const QString &str)
     return MythSetting::kInvalidDataType;
 }
 
-QMap<QString,QString> GetSettingsMap(MythSettingList &settings,
+QMap<QString,QString> GetSettingsMap(const MythSettingList &settings,
                                      const QString &hostname)
 {
     QMap<QString,QString> result;

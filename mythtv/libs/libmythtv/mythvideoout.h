@@ -44,7 +44,7 @@ class MythVideoOutput : public MythVideoBounds
                                    const QSize& VideoDispDim, float VideoAspect,
                                    QWidget* ParentWidget,     const QRect& EmbedRect,
                                    float FrameRate,           uint  PlayerFlags,
-                                   QString& Codec,            int ReferenceFrames);
+                                   const QString& Codec,      int ReferenceFrames);
     static VideoFrameTypeVec s_defaultFrameTypes;
 
     MythVideoOutput(bool CreateDisplay = false);

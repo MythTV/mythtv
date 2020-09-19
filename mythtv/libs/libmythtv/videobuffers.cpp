@@ -53,7 +53,7 @@ static inline void ReleaseDecoderResources(VideoFrame *Frame, vector<AVBufferRef
     }
 }
 
-static inline void DoDiscard(vector<AVBufferRef *> &Discards)
+static inline void DoDiscard(const vector<AVBufferRef *> &Discards)
 {
     for (auto * it : Discards)
         av_buffer_unref(&it);

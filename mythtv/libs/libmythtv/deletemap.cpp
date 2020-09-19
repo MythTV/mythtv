@@ -83,7 +83,7 @@ QString DeleteMap::GetRedoMessage(void) const
             tr("(Nothing to redo)"));
 }
 
-bool DeleteMap::HandleAction(QString &action, uint64_t frame)
+bool DeleteMap::HandleAction(const QString &action, uint64_t frame)
 {
     bool handled = true;
     if (action == ACTION_UP)

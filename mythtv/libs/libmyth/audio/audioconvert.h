@@ -49,9 +49,9 @@ public:
     AudioFormat Out(void) { return m_out; }
     AudioFormat In(void)  { return m_in;  }
 
-    bool operator==(AudioConvert& rhs) const
+    bool operator==(const AudioConvert& rhs) const
     { return m_in == rhs.m_in && m_out == rhs.m_out; }
-    bool operator!=(AudioConvert& rhs) const
+    bool operator!=(const AudioConvert& rhs) const
     { return m_in != rhs.m_in || m_out != rhs.m_out; }
 
     void DeinterleaveSamples(int channels,

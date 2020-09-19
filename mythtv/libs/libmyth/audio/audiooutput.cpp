@@ -302,7 +302,7 @@ void AudioOutput::ClearWarning(void)
 }
 
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
-    QString &name, QString &desc, bool willsuspendpa)
+    QString &name, const QString &desc, bool willsuspendpa)
 {
     AudioOutputSettings aosettings(true);
 
@@ -431,7 +431,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         for (auto i = alsadevs->cbegin(); i != alsadevs->cend(); ++i)
         {
             const QString& key = i.key();
-            QString desc = i.value();
+            const QString& desc = i.value();
             QString devname = QString("ALSA:%1").arg(key);
 
             auto *adc = GetAudioDeviceConfig(devname, desc);

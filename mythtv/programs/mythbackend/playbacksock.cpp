@@ -221,8 +221,8 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo &pginfo,
     return false;
 }
 
-QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
-                                        QString &directory, bool fileNamesOnly)
+QStringList PlaybackSock::GetSGFileList(const QString &host, const QString &groupname,
+                                        const QString &directory, bool fileNamesOnly)
 {
     QStringList strlist(QString("QUERY_SG_GETFILELIST"));
     strlist << host;
@@ -235,8 +235,8 @@ QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
     return strlist;
 }
 
-QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
-                                         QString &filename)
+QStringList PlaybackSock::GetSGFileQuery(const QString &host, const QString &groupname,
+                                         const QString &filename)
 {
     QStringList strlist(QString("QUERY_SG_FILEQUERY"));
     strlist << host;

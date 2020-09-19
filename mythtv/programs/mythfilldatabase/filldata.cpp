@@ -87,7 +87,7 @@ void FillData::SetRefresh(int day, bool set)
 }
 
 // XMLTV stuff
-bool FillData::GrabDataFromFile(int id, QString &filename)
+bool FillData::GrabDataFromFile(int id, const QString &filename)
 {
     ChannelInfoList chanlist;
     QMap<QString, QList<ProgInfo> > proglist;

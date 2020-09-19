@@ -3922,10 +3922,10 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     }
 
     QString host = gCoreContext->GetHostName();
-    QString wantHost = sList.at(1);
+    const QString& wantHost = sList.at(1);
     QHostAddress wantHostaddr(wantHost);
-    QString groupname = sList.at(2);
-    QString path = sList.at(3);
+    const QString& groupname = sList.at(2);
+    const QString& path = sList.at(3);
     bool fileNamesOnly = false;
 
     if (sList.size() >= 5)
@@ -4207,10 +4207,10 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     }
 
     QString host = gCoreContext->GetHostName();
-    QString wantHost = sList.at(1);
+    const QString& wantHost = sList.at(1);
     QHostAddress wantHostaddr(wantHost);
-    QString groupname = sList.at(2);
-    QString filename = sList.at(3);
+    const QString& groupname = sList.at(2);
+    const QString& filename = sList.at(3);
 
     bool allowFallback = true;
     if (sList.size() >= 5)
@@ -5081,7 +5081,7 @@ void MainServer::HandleActiveBackendsQuery(PlaybackSock *pbs)
     SendResponse(pbs->getSocket(), retlist);
 }
 
-void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
+void MainServer::HandleIsActiveBackendQuery(const QStringList &slist,
                                             PlaybackSock *pbs)
 {
     QStringList retlist;
@@ -5535,7 +5535,7 @@ void MainServer::DoTruncateThread(DeleteStruct *ds)
     }
 }
 
-bool MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
+bool MainServer::HandleDeleteFile(const QStringList &slist, PlaybackSock *pbs)
 {
     return HandleDeleteFile(slist[1], slist[2], pbs);
 }
@@ -5748,7 +5748,7 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
         SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
+void MainServer::HandleSettingQuery(const QStringList &tokens, PlaybackSock *pbs)
 {
 // Format: QUERY_SETTING <hostname> <setting>
 // Returns setting value as a string
@@ -5842,7 +5842,7 @@ void MainServer::HandleDownloadFile(const QStringList &command,
         SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleSetSetting(QStringList &tokens,
+void MainServer::HandleSetSetting(const QStringList &tokens,
                                   PlaybackSock *pbs)
 {
 // Format: SET_SETTING <hostname> <setting> <value>
@@ -7267,7 +7267,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleSetVerbose(const QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QStringList retlist;
@@ -7294,7 +7294,7 @@ void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleSetLogLevel(const QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QStringList retlist;
@@ -7327,7 +7327,7 @@ void MainServer::HandleSetLogLevel(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
+void MainServer::HandleIsRecording(const QStringList &slist, PlaybackSock *pbs)
 {
     (void)slist;
 
@@ -7958,10 +7958,10 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
 /// Warning you must hold a sockListLock lock before calling this
 PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 {
-    for (auto & pbs : m_playbackList)
-        if (sock == pbs->getSocket())
-            return pbs;
-    return nullptr;
+    auto it = std::find_if(m_playbackList.cbegin(), m_playbackList.cend(),
+                           [sock](auto & pbs)
+                               { return sock == pbs->getSocket(); });
+    return (it != m_playbackList.cend()) ? *it : nullptr;
 }
 
 /// Warning you must hold a sockListLock lock before calling this
@@ -8252,7 +8252,7 @@ bool MainServer::isClientConnected(bool onlyBlockingClients)
 }
 
 /// Sends the Slavebackends the request to shut down using haltcmd
-void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
+void MainServer::ShutSlaveBackendsDown(const QString &haltcmd)
 {
 // TODO FIXME We should issue a MythEvent and have customEvent
 // send this with the proper syncronisation and locking.

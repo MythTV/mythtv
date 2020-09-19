@@ -2746,7 +2746,7 @@ int main(int argc, char **argv)
 }
 #endif
 
-int MPEG2fixup::BuildKeyframeIndex(QString &file,
+int MPEG2fixup::BuildKeyframeIndex(const QString &file,
                                    frm_pos_map_t &posMap,
                                    frm_pos_map_t &durMap)
 {

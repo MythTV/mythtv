@@ -89,7 +89,7 @@ class MTV_PUBLIC  HLSReader
     // Downloading
     bool LoadSegments(HLSRecStream & hlsstream);
     int DownloadSegmentData(MythSingleDownload& downloader, HLSRecStream* hls,
-			    HLSRecSegment& segment, int playlist_size);
+			    const HLSRecSegment& segment, int playlist_size);
 
     // Debug
     void EnableDebugging(void);

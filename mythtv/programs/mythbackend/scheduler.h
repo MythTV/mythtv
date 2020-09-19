@@ -96,12 +96,12 @@ class Scheduler : public MThread, public MythScheduler
 
     void PrintList(bool onlyFutureRecordings = false)
         { PrintList(m_recList, onlyFutureRecordings); };
-    static void PrintList(RecList &list, bool onlyFutureRecordings = false);
+    static void PrintList(const RecList &list, bool onlyFutureRecordings = false);
     static void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
     void SetMainServer(MainServer *ms);
 
-    void SlaveConnected(RecordingList &slavelist);
+    void SlaveConnected(const RecordingList &slavelist);
     void SlaveDisconnected(uint cardid);
 
     void DisableScheduling(void) { m_schedulingEnabled = false; }
@@ -165,7 +165,7 @@ class Scheduler : public MThread, public MythScheduler
                                       bool checkAll = false)
         const;
     void MarkOtherShowings(RecordingInfo *p);
-    void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
+    void MarkShowingsList(const RecList &showinglist, RecordingInfo *p);
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
     bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
@@ -215,7 +215,7 @@ class Scheduler : public MThread, public MythScheduler
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
-        bool &statuschanged);
+        const bool &statuschanged);
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
                       const QDateTime &maxstarttime, const QString &why)

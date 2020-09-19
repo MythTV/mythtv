@@ -353,7 +353,7 @@ static int64_t extract_timestamp(
 }
 
 static QDateTime ts_to_qdatetime(
-    uint64_t pts, uint64_t pts_first, QDateTime &pts_first_dt)
+    uint64_t pts, uint64_t pts_first, const QDateTime &pts_first_dt)
 {
     if (pts < pts_first)
         pts += 0x1FFFFFFFFLL;

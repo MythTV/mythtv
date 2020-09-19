@@ -50,7 +50,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     static void Cleanup(void);
     static ADCVect* GetOutputList(void);
     static AudioDeviceConfig* GetAudioDeviceConfig(
-        QString &name, QString &desc, bool willsuspendpa = false);
+        QString &name, const QString &desc, bool willsuspendpa = false);
 
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(

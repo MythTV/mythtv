@@ -495,9 +495,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     static PSIPTable View(const TSPacket& tspacket)
         { return PSIPTable(tspacket, false); }
 
-    static PSIPTable View(TSPacket& tspacket)
-        { return PSIPTable(tspacket, false); }
-
     static PSIPTable ViewData(const unsigned char* pesdata)
         { return PSIPTable(pesdata); }
 

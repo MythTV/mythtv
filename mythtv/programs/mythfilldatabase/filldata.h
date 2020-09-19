@@ -48,7 +48,7 @@ class FillData
 
     void SetRefresh(int day, bool set);
 
-    bool GrabDataFromFile(int id, QString &filename);
+    bool GrabDataFromFile(int id, const QString &filename);
     bool GrabData(const Source& source, int offset);
     bool Run(SourceList &sourcelist);
 

@@ -69,7 +69,7 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, cons
     }
 }
 
-static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
+static int BuildKeyframeIndex(MPEG2fixup *m2f, const QString &infile,
                        frm_pos_map_t &posMap, frm_pos_map_t &durMap, int jobID)
 {
     if (!m2f)

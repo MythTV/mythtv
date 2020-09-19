@@ -18,7 +18,7 @@ extern "C" {
 class PrivateDecoder
 {
   public:
-    static void GetDecoders(RenderOptions &opts);
+    static void GetDecoders(const RenderOptions &opts);
     static PrivateDecoder* Create(const QString &decoder,
                                   PlayerFlags flags,
                                   AVCodecContext *avctx);

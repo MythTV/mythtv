@@ -925,7 +925,7 @@ struct Holder {
     int     m_holderPos;
 };
 
-void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
+void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
 {
     MSqlQuery result(MSqlQuery::InitCon());
 

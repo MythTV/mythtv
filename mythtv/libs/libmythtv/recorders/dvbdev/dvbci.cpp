@@ -1024,7 +1024,7 @@ public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   dvbca_vector GetCaSystemIds(void) { return m_caSystemIds; }
-  bool SendPMT(cCiCaPmt &CaPmt);
+  bool SendPMT(const cCiCaPmt &CaPmt);
   bool NeedCaPmt(void) const { return m_needCaPmt; }
   };
 
@@ -1076,7 +1076,7 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
   return true;
 }
 
-bool cCiConditionalAccessSupport::SendPMT(cCiCaPmt &CaPmt)
+bool cCiConditionalAccessSupport::SendPMT(const cCiCaPmt &CaPmt)
 {
   if (m_state == 2) {
      SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt);

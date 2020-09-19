@@ -129,7 +129,7 @@ class MPEG2fixup
     int Start();
     void AddRangeList(const QStringList& rangelist, int type);
     static void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
-    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
+    int BuildKeyframeIndex(const QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
     void SetAllAudio(bool keep) { m_allAudio = keep; }
 

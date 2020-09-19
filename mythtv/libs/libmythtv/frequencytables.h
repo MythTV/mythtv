@@ -134,7 +134,7 @@ class TransportScanItem
 
     TransportScanItem(uint           _sourceid,
                       QString        _name,
-                      DTVMultiplex  &_tuning,
+                      const DTVMultiplex &_tuning,
                       uint           _timeoutTune);
 
     TransportScanItem(uint                _sourceid,

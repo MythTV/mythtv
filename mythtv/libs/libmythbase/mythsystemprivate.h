@@ -56,13 +56,13 @@ class MythSystemLegacyPrivate : public QObject, public ReferenceCounter
 
     // FIXME: We should not return a reference here
     QString& GetCommand(void)        { return m_parent->GetCommand(); }
-    void SetCommand(QString &cmd)    { m_parent->SetCommand(cmd); }
+    void SetCommand(const QString &cmd) { m_parent->SetCommand(cmd); }
 
     // FIXME: We should not return a reference here
     // FIXME: Rename "GetArguments"
     QStringList &GetArgs(void)       { return m_parent->GetArgs(); }
     // FIXME: Rename "SetArguments"
-    void SetArgs(QStringList &args)  { m_parent->SetArgs(args); }
+    void SetArgs(const QStringList &args)  { m_parent->SetArgs(args); }
 
     // FIXME: This is likely a bad idea, but possibly manageable
     //        since this is a private class.

@@ -101,7 +101,7 @@ using MSqlBindings = QMap<QString, QVariant>;
  MBASE_PUBLIC  void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
 
 /// \brief Given a partial query string and a bindings object, escape the string
- MBASE_PUBLIC  void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
+ MBASE_PUBLIC  void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings);
 
 /** \brief QSqlQuery wrapper that fetches a DB connection from the connection pool.
  *

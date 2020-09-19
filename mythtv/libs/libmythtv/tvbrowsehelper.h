@@ -91,7 +91,7 @@ class TVBrowseHelper : public MThread
 
     bool BrowseStart(PlayerContext *ctx, bool skip_browse = false);
     void BrowseEnd(PlayerContext *ctx, bool change_channel);
-    void BrowseDispInfo(PlayerContext *ctx, BrowseInfo &bi);
+    void BrowseDispInfo(PlayerContext *ctx, const BrowseInfo &bi);
 
     void BrowseDispInfo(PlayerContext *ctx, BrowseDirection direction)
     {

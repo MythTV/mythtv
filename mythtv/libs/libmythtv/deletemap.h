@@ -29,7 +29,7 @@ class MTV_PUBLIC DeleteMap
     DeleteMap() = default;
 
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
-    bool HandleAction(QString &action, uint64_t frame);
+    bool HandleAction(const QString &action, uint64_t frame);
     float GetSeekAmount(void) const { return m_seekamount; }
     void UpdateSeekAmount(int change);
     void SetSeekAmount(float amount) { m_seekamount = amount; }
