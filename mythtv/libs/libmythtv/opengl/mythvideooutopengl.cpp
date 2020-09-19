@@ -148,7 +148,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
         LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL painter");
 
     // Create OpenGLVideo
-    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, true, m_profile);
+    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, m_profile);
     if (m_video)
     {
         m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRectAdj());
@@ -411,7 +411,7 @@ MythVideoGPU* MythVideoOutputOpenGL::CreateSecondaryVideo(const QSize& VideoDim,
     auto * result = new MythOpenGLVideo(m_openglRender, colourspace,
                                         VideoDim, VideoDispDim,
                                         DisplayVisibleRect, DisplayVideoRect,
-                                        VideoRect, false, m_profile);
+                                        VideoRect, m_profile);
     if (result && !result->IsValid())
     {
         delete result;

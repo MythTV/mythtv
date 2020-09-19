@@ -20,12 +20,11 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
     Q_OBJECT
 
   public:
-    MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace, MythVideoBounds* Bounds,
-                    bool ViewportControl, const QString &Profile);
+    MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
+                    MythVideoBounds* Bounds, const QString &Profile);
     MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                    QRect DisplayVideoRect, QRect VideoRect,
-                    bool ViewportControl, const QString& Profile);
+                    QRect DisplayVideoRect, QRect VideoRect, const QString& Profile);
    ~MythVideoVulkan() override;
 
     void    StartFrame       () override;

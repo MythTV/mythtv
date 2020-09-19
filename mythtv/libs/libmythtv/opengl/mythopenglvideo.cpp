@@ -29,19 +29,18 @@ extern "C" {
  * state. Its role is to render video frames on screen.
 */
 MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                                 MythVideoBounds* Bounds, bool ViewportControl,
+                                 MythVideoBounds* Bounds,
                                  const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, Bounds, ViewportControl, Profile)
+  : MythVideoGPU(Render, ColourSpace, Bounds, Profile)
 {
     MythOpenGLVideo::Init();
 }
 
 MythOpenGLVideo::MythOpenGLVideo(MythRender* Render, MythVideoColourSpace* ColourSpace,
                                  QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                                 QRect DisplayVideoRect, QRect VideoRect,
-                                 bool ViewportControl, const QString& Profile)
+                                 QRect DisplayVideoRect, QRect VideoRect, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, ViewportControl, Profile)
+                 DisplayVideoRect, VideoRect, Profile)
 {
     MythOpenGLVideo::Init();
 }

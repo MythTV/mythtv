@@ -6,8 +6,7 @@
 #define LOC QString("VideoGPU: ")
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
-                           MythVideoBounds* Bounds,
-                           bool ViewportControl, QString Profile)
+                           MythVideoBounds* Bounds, QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),
     m_videoDispDim(Bounds->GetVideoDispDim()),
@@ -17,7 +16,7 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
     m_videoRect(Bounds->GetVideoRect()),
     m_videoColourSpace(ColourSpace),
     m_inputTextureSize(Bounds->GetVideoDim()),
-    m_viewportControl(ViewportControl)
+    m_viewportControl(true)
 {
     CommonInit();
 
@@ -29,8 +28,7 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
 
 MythVideoGPU::MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
                            QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                           QRect DisplayVideoRect, QRect VideoRect,
-                           bool ViewportControl, QString Profile)
+                           QRect DisplayVideoRect, QRect VideoRect, QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),
     m_videoDispDim(VideoDispDim),
@@ -40,7 +38,7 @@ MythVideoGPU::MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace
     m_videoRect(VideoRect),
     m_videoColourSpace(ColourSpace),
     m_inputTextureSize(VideoDim),
-    m_viewportControl(ViewportControl)
+    m_viewportControl(false)
 {
     CommonInit();
 }

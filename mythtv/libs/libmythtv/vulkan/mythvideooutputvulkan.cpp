@@ -58,7 +58,7 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
     m_render = MythVulkanObject::Render();
     if (IsValidVulkan())
     {
-        m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, true, QString {});
+        m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, QString {});
         if (m_video && !m_video->IsValid())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create valid Vulkan video");
@@ -144,7 +144,7 @@ MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize& VideoDim,
     auto * result = new MythVideoVulkan(this, colourspace,
                                         VideoDim, VideoDispDim,
                                         DisplayVisibleRect, DisplayVideoRect,
-                                        VideoRect, false, QString{});
+                                        VideoRect, QString{});
     colourspace->DecrRef();
     if (result && !(result->IsValidVulkan() && result->IsValid()))
     {

@@ -13,9 +13,8 @@
 #define LOC QString("VulkanVideo: ")
 
 MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
-                                 MythVideoBounds* Bounds, bool ViewportControl,
-                                 const QString& Profile)
-  : MythVideoGPU(Vulkan->Render(), ColourSpace, Bounds, ViewportControl, Profile),
+                                 MythVideoBounds* Bounds, const QString& Profile)
+  : MythVideoGPU(Vulkan->Render(), ColourSpace, Bounds, Profile),
     MythVulkanObject(Vulkan)
 {
     MythVideoVulkan::Init();
@@ -23,10 +22,9 @@ MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace*
 
 MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
                                  QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                                 QRect DisplayVideoRect, QRect VideoRect,
-                                 bool ViewportControl, const QString& Profile)
+                                 QRect DisplayVideoRect, QRect VideoRect, const QString& Profile)
   : MythVideoGPU(Vulkan->Render(), ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, ViewportControl, Profile),
+                 DisplayVideoRect, VideoRect, Profile),
     MythVulkanObject(Vulkan)
 {
     MythVideoVulkan::Init();
