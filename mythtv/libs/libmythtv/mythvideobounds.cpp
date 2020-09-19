@@ -64,7 +64,7 @@ MythVideoBounds::MythVideoBounds(bool CreateDisplay)
         m_display = MythDisplay::AcquireRelease();
         connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
 #ifdef Q_OS_MACOS
-        connect(m_displayPriv, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
+        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
 #endif
     }
 }
