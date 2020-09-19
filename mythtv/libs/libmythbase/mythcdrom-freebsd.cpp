@@ -12,7 +12,7 @@
 class MythCDROMFreeBSD: public MythCDROM
 {
 public:
-    MythCDROMFreeBSD(QObject* par, const QString DevicePath, bool SuperMount,
+    MythCDROMFreeBSD(QObject* par, const QString& DevicePath, bool SuperMount,
                      bool AllowEject):
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
@@ -23,7 +23,7 @@ public:
     MythMediaError unlock(void) override; // MythMediaDevice
 };
 
-MythCDROM *GetMythCDROMFreeBSD(QObject* par, const QString devicePath,
+MythCDROM *GetMythCDROMFreeBSD(QObject* par, const QString& devicePath,
                                bool SuperMount, bool AllowEject)
 {
     return new MythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
