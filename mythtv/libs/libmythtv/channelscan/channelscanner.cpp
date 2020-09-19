@@ -304,7 +304,7 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     type = ((CardUtil::ATSC == cardtype) ||
             (CardUtil::HDHOMERUN == cardtype)) ? DTVConfParser::ATSC : type;
 
-    DTVConfParser::return_t ret = DTVConfParser::OK;
+    DTVConfParser::return_t ret { DTVConfParser::OK };
     if (type == DTVConfParser::UNKNOWN)
         ret = DTVConfParser::ERROR_CARDTYPE;
     else

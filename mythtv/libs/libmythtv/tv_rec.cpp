@@ -674,7 +674,7 @@ RecStatus::Type TVRec::GetRecordingStatus(void) const
 void TVRec::SetRecordingStatus(
     RecStatus::Type new_status, int line, bool have_lock)
 {
-    RecStatus::Type old_status = RecStatus::Unknown;
+    RecStatus::Type old_status { RecStatus::Unknown };
     if (have_lock)
     {
         old_status = m_recStatus;

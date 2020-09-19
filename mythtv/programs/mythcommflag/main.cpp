@@ -461,11 +461,10 @@ static void commDetectorGotNewCommercialBreakList(void)
     frm_dir_map_t newCommercialMap;
     commDetector->GetCommercialBreakList(newCommercialMap);
 
-    frm_dir_map_t::Iterator it = newCommercialMap.begin();
     QString message = "COMMFLAG_UPDATE ";
     message += global_program_info->MakeUniqueKey();
 
-    for (it = newCommercialMap.begin();
+    for (auto it = newCommercialMap.begin();
             it != newCommercialMap.end(); ++it)
     {
         if (it != newCommercialMap.begin())

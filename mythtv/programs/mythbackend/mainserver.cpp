@@ -2193,10 +2193,8 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
     int port = gCoreContext->GetBackendServerPort();
     QString host = gCoreContext->GetHostName();
 
-    auto it = destination.begin();
-    for (it = destination.begin(); it != destination.end(); ++it)
+    for (auto* proginfo : destination)
     {
-        ProgramInfo *proginfo = *it;
         PlaybackSock *slave = nullptr;
 
         if (proginfo->GetHostname() != gCoreContext->GetHostName())
