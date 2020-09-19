@@ -35,7 +35,6 @@ struct Source
     bool    xmltvgrabber_manualconfig {false};
     bool    xmltvgrabber_cache        {false};
     QString xmltvgrabber_prefmethod;
-    vector<int> dd_dups;
 };
 using SourceList = vector<Source>;
 
