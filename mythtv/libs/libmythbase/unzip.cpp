@@ -460,11 +460,10 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* dev, Ext
 UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString& dirname, ExtractionOptions options)
 {
 	QDir dir(dirname);
-	ErrorCode ec = Ok;
 
 	for (QStringList::ConstIterator itr = filenames.constBegin(); itr != filenames.constEnd(); ++itr)
 	{
-		ec = extractFile(*itr, dir, options);
+		ErrorCode ec = extractFile(*itr, dir, options);
 		if (ec == FileNotFound)
 			continue;
 		if (ec != Ok)
@@ -480,11 +479,10 @@ UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString
  */
 UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QDir& dir, ExtractionOptions options)
 {
-	ErrorCode ec = Ok;
 
 	for (QStringList::ConstIterator itr = filenames.constBegin(); itr != filenames.constEnd(); ++itr)
 	{
-		ec = extractFile(*itr, dir, options);
+		ErrorCode ec = extractFile(*itr, dir, options);
 		if (ec == FileNotFound)
 			continue;
 		if (ec != Ok)

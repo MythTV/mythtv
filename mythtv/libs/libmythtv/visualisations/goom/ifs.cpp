@@ -380,7 +380,6 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
 	int     i = 0;
-	int     j = 0;
 	SIMI   *Cur = nullptr;
 	SIMI   *Simi = nullptr;
 
@@ -404,6 +403,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	for (Cur = &F->m_components[0], i = F->m_nbSimi; i; --i, Cur++) {
 		F_PT xo = Cur->m_fCx;
 		F_PT yo = Cur->m_fCy;
+		int j = 0;
 		for (Simi = &F->m_components[0], j = F->m_nbSimi; j; --j, Simi++) {
 			F_PT x = NAN;
 			F_PT y = NAN;

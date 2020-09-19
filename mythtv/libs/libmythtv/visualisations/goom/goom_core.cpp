@@ -140,7 +140,6 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
 	static int s_aGoom = 0;			// un goom a eu lieu..
 	static int s_aBigGoom = 0;		// un big goom a eu lieu..
-	static int s_loopVar = 0;		// mouvement des points
 	static int s_speedVar = 0;		// vitesse des particules
 
 	// duree de la transition entre afficher les lignes ou pas
@@ -236,6 +235,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	
 	if (curGState->m_drawPoints) {
 		for (i = 1; i * 15 <= s_speedVar + 15; i++) {
+			static int s_loopVar = 0; // mouvement des points
 			s_loopVar += s_speedVar*2/3 + 1;
 
 			pointFilter (p1 + c_offset, YELLOW,

@@ -110,9 +110,11 @@ static int CheckJobQueue()
 static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
                             const QString& hostname, bool usecutlist)
 {
-    RecordingInfo recinfo(*pginfo);
     if (!profile.isEmpty())
+    {
+        RecordingInfo recinfo(*pginfo);
         recinfo.ApplyTranscoderProfileChange(profile);
+    }
 
     if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
                            pginfo->GetRecordingStartTime(),

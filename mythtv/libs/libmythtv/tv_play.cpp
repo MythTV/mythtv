@@ -12898,7 +12898,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, const QString& title,
     {
         LOG(VB_GENERAL, LOG_ERR,
             "This program cannot be deleted at this time.");
-        ProgramInfo pginfo(*ctx->m_playingInfo);
+        ProgramInfo pginfo(*ctx->m_playingInfo); // cppcheck-suppress variableScope
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         OSD *osd = GetOSDLock(ctx);

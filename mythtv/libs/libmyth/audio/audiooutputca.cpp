@@ -1719,7 +1719,6 @@ void CoreAudioData::ResetStream(AudioStreamID s)
         currentFormat.mFormatID == kAudioFormat60958AC3)
     {
         AudioStreamRangedVec        formats    = FormatsList(s);
-        bool                        streamReset = false;
 
 
         if (formats.empty())
@@ -1728,8 +1727,8 @@ void CoreAudioData::ResetStream(AudioStreamID s)
         for (auto format : formats) {
             if (format.mFormat.mFormatID == kAudioFormatLinearPCM)
             {
-	      err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
-					       sizeof(format), &(format.mFormat));
+                err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
+                                                 sizeof(format), &(format.mFormat));
                 if (err != noErr)
                 {
                     Warn(QString("ResetStream: could not set physical format: [%1]")
@@ -1737,7 +1736,6 @@ void CoreAudioData::ResetStream(AudioStreamID s)
                     continue;
                 }
                 
-		streamReset = true;
 		sleep(1);   // For the change to take effect
             }
 	}

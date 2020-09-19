@@ -48,8 +48,6 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
     int     y = 0;
     int     dx = 0;
     int     dy = 0;
-    int     yy = 0;
-    int     xx = 0;
     int    *p = nullptr;
 
 
@@ -113,7 +111,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			dx = ((dx << 16) / dy);
 			x = x1 << 16;
 			for (y = y1; y <= y2; y++) {
-				xx = x >> 16;
+				int xx = x >> 16;
 				p = &(data[(screenx * y) + xx]);
 				DRAWMETHOD;
 				if (xx < (screenx - 1)) {
@@ -127,7 +125,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                 dy = ((dy << 16) / dx);
                 y = y1 << 16;
                 for (x = x1; x <= x2; x++) {
-                    yy = y >> 16;
+                    int yy = y >> 16;
                     p = &(data[(screenx * yy) + x]);
                     DRAWMETHOD;
                     y += dy;
@@ -142,7 +140,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			dx = ((dx << 16) / -dy);
 			x = (x1 + 1) << 16;
 			for (y = y1; y >= y2; y--) {
-				xx = x >> 16;
+				int xx = x >> 16;
 				p = &(data[(screenx * y) + xx]);
 				DRAWMETHOD;
 				if (xx < (screenx - 1)) {
@@ -156,7 +154,7 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                 dy = ((dy << 16) / dx);
                 y = y1 << 16;
                 for (x = x1; x <= x2; x++) {
-                    yy = y >> 16;
+                    int yy = y >> 16;
                     p = &(data[(screenx * yy) + x]);
                     DRAWMETHOD;
                     y += dy;

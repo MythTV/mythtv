@@ -567,14 +567,14 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     pa_stream_connect_playback(m_pstream, nullptr, &m_bufferSettings,
                                (pa_stream_flags_t)flags, nullptr, nullptr);
 
-    pa_context_state_t cstate = PA_CONTEXT_UNCONNECTED;
     pa_stream_state_t sstate = PA_STREAM_UNCONNECTED;
     bool connected = false;
     bool failed = false;
 
     while (!(connected || failed))
     {
-        switch (cstate = pa_context_get_state(m_pcontext))
+        pa_context_state_t cstate = pa_context_get_state(m_pcontext);
+        switch (cstate)
         {
             case PA_CONTEXT_FAILED:
             case PA_CONTEXT_TERMINATED:

@@ -240,7 +240,6 @@ void AudioOutputAudioTrack::WriteAudio(unsigned char* aubuf, int size)
 
 int AudioOutputAudioTrack::GetBufferedOnSoundcard(void) const
 {
-    bool exception=false;
     QAndroidJniEnvironment env;
     int buffered (0);
     if (m_audioTrack)
@@ -249,6 +248,7 @@ int AudioOutputAudioTrack::GetBufferedOnSoundcard(void) const
         // is data already played that is still in the "Audio circular buffer"
         buffered
             = m_audioTrack->callMethod<jint>("getBufferedBytes");
+        bool exception=false;
         ANDROID_EXCEPTION_CHECK
         if (exception)
             buffered = 0;

@@ -90,7 +90,6 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	static float s_distT2 = 0.0F;
 	static float s_rot = 0.0F; // entre 0 et 2 * M_PI
 	static int s_happens = 0;
-        static int s_rotation = 0;
 	static int s_lock = 0;
 
 	if (s_happens)
@@ -115,6 +114,7 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 		tmp = M_PI_F*sinf(lcycle)/32+3*M_PI_F/2;
 	}
 	else {
+		static int s_rotation {0};
 		s_rotation = iRAND(500)?s_rotation:iRAND(2);
 		if (s_rotation)
 			lcycle *= 2.0F*M_PI_F;
@@ -145,8 +145,6 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
 		(0x48<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x6f<<(BLEU*8)),
 		(0x58<<(ROUGE*8))|(0x3c<<(VERT*8))|(0x0f<<(BLEU*8))};
 	
-	static int s_col = (0x28<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x5f<<(BLEU*8));
-	static int s_dstCol = 0;
 	static float s_lig = 1.15F;
 	static float s_ligs = 0.1F;
 
@@ -163,6 +161,9 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
 		if ((s_lig>10.0F) || (s_lig<1.1F))
                     s_ligs = -s_ligs;
 		
+		static int s_col = (0x28<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x5f<<(BLEU*8));
+		static int s_dstCol = 0;
+
 		if ((s_lig<6.3F)&&(iRAND(30)==0))
 			s_dstCol=iRAND(3);
 

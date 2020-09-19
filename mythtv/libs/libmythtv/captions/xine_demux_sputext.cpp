@@ -79,11 +79,10 @@ static inline void trail_space(std::string& str)
  *
  */
 static char *read_line_from_input(demux_sputext_t *demuxstr, std::string& line) {
-  off_t nread = 0;
 
   line.reserve(LINE_LEN);
   if ((line.capacity() - demuxstr->buf.size()) > 512) {
-    nread = line.capacity() - demuxstr->buf.size();
+    off_t nread = line.capacity() - demuxstr->buf.size();
     nread = std::min(nread, demuxstr->rbuffer_len - demuxstr->rbuffer_cur);
     if (nread < 0) {
       printf("read failed.\n");
@@ -653,7 +652,6 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                     int seconds = 0;
                     int delta = 0;
                     uint32_t units = s_jacoShift;
-                    int inverter = 1;
                     switch (toupper(line1[1])) {
                     case 'S':
                         if (isalpha(line1[2])) {
@@ -662,6 +660,7 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                             delta = 2;
                         }
                         if (sscanf(&line1[delta], "%d", &hours)) {
+                            int inverter = 1;
                             if (hours < 0) {
                                 hours *= -1;
                                 inverter = -1;

@@ -1310,10 +1310,9 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
 
     if (Texture->m_rotation != 0)
     {
-        GLfloat temp = NAN;
         if (Texture->m_rotation == 90)
         {
-            temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
+            GLfloat temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
             data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET];
             data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = temp;
             data[2 + TEX_OFFSET] = data[6 + TEX_OFFSET];
@@ -1321,7 +1320,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
         }
         else if (Texture->m_rotation == -90)
         {
-            temp = data[0 + TEX_OFFSET];
+            GLfloat temp = data[0 + TEX_OFFSET];
             data[0 + TEX_OFFSET] = data[6 + TEX_OFFSET];
             data[6 + TEX_OFFSET] = temp;
             data[3 + TEX_OFFSET] = data[1 + TEX_OFFSET];
@@ -1329,7 +1328,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
         }
         else if (abs(Texture->m_rotation) == 180)
         {
-            temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
+            GLfloat temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
             data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET];
             data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = temp;
             data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];

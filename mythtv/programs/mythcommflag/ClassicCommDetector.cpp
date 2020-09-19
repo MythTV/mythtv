@@ -405,7 +405,6 @@ bool ClassicCommDetector::go()
 
 
     float flagFPS = 0.0;
-    long long  currentFrameNumber = 0LL;
     float aspect = m_player->GetVideoAspect();
     int prevpercent = -1;
 
@@ -422,7 +421,7 @@ bool ClassicCommDetector::go()
             gettimeofday(&startTime, nullptr);
 
         VideoFrame* currentFrame = m_player->GetRawVideoFrame();
-        currentFrameNumber = currentFrame->frameNumber;
+        long long currentFrameNumber = currentFrame->frameNumber;
 
         //Lucas: maybe we should make the nuppelvideoplayer send out a signal
         //when the aspect ratio changes.

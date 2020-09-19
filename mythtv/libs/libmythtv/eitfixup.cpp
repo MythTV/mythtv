@@ -1112,10 +1112,9 @@ void EITFixUp::FixUK(DBEventEIT &event)
         !event.m_title.startsWith("The X-Files"))
     {
         int position1 = -1;
-        int position2 = -1;
         if ((position1=event.m_description.indexOf(kUKTime)) != -1)
         {
-            position2 = event.m_description.indexOf(kUKColonPeriod);
+            int position2 = event.m_description.indexOf(kUKColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
         }

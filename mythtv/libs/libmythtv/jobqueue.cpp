@@ -177,7 +177,6 @@ void JobQueue::ProcessQueue(void)
     QString message;
     QMap<int, JobQueueEntry> jobs;
     bool atMax = false;
-    bool inTimeWindow = true;
     QMap<int, RunningJobInfo>::Iterator rjiter;
 
     QMutexLocker locker(&m_queueThreadCondLock);
@@ -208,7 +207,7 @@ void JobQueue::ProcessQueue(void)
 
         if (!jobs.empty())
         {
-            inTimeWindow = InJobRunWindow();
+            bool inTimeWindow = InJobRunWindow();
             for (const auto & job : qAsConst(jobs))
             {
                 int status = job.status;

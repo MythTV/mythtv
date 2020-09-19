@@ -405,7 +405,6 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             .arg(rcinfo->toString(ProgramInfo::kTitleSubtitle)));
 
     QMutexLocker lock(&m_stateChangeLock);
-    QString msg("");
 
     if (m_recStatus != RecStatus::Failing)
         SetRecordingStatus(RecStatus::Aborted, __LINE__);
@@ -430,7 +429,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         m_recordEndTime = m_curRecording->GetRecordingEndTime()
             .addSecs(post_roll_seconds);
 
-        msg = QString("updating recording: %1 %2 %3 %4")
+        QString msg = QString("updating recording: %1 %2 %3 %4")
             .arg(m_curRecording->GetTitle()).arg(m_curRecording->GetChanID())
             .arg(m_curRecording->GetRecordingStartTime(MythDate::ISODate))
             .arg(m_curRecording->GetRecordingEndTime(MythDate::ISODate));
@@ -615,7 +614,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     }
     else if (!did_switch)
     {
-        msg = QString("Wanted to record: %1 %2 %3 %4\n\t\t\t")
+        QString msg = QString("Wanted to record: %1 %2 %3 %4\n\t\t\t")
             .arg(rcinfo->GetTitle()).arg(rcinfo->GetChanID())
             .arg(rcinfo->GetRecordingStartTime(MythDate::ISODate))
             .arg(rcinfo->GetRecordingEndTime(MythDate::ISODate));
