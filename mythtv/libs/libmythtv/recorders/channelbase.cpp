@@ -310,7 +310,8 @@ void ChannelBase::HandleScript(const QString &freqid)
     if (m_system)
         GetScriptStatus(true);
 
-    // If it's still running, try killing it
+    // If it's still running, try killing it. GetScriptStatus() may
+    // update m_system. (cppcheck-suppress duplicateCondition)
     if (m_system)
         ok = KillScript();
 
