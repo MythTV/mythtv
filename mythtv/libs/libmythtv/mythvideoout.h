@@ -66,7 +66,7 @@ class MythVideoOutput : public MythVideoBounds
                               float VideoAspect, MythCodecID  CodecID,
                               bool& AspectChanged, MythMultiLocker* Locks,
                               int   ReferenceFrames, bool ForceChange);
-    virtual void ResizeForVideo(QSize Size = QSize());
+    virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
                               float& VisibleAspect, float& FontScaling,
                               float ThemeAspect) const;

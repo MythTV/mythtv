@@ -650,3 +650,76 @@ void MythVideoOutputGPU::RemovePIP(MythPlayer* PiPPlayer)
         m_pxpVideos.remove(PiPPlayer);
     }
 }
+
+/**
+ * \fn VideoOutput::ResizeForVideo(uint width, uint height)
+ * Sets display parameters based on video resolution.
+ *
+ * If we are using DisplayRes support we use the video size to
+ * determine the desired screen size and refresh rate.
+ * If we are also not using "GuiSizeForTV" we also resize
+ * the video output window.
+ *
+ * \param width,height Resolution of the video we will be playing
+ */
+void MythVideoOutputGPU::ResizeForVideo(QSize Size)
+{
+    if (!m_display)
+        return;
+    if (!m_display->UsingVideoModes())
+        return;
+
+    if (Size.isEmpty())
+    {
+        Size = GetVideoDispDim();
+        if (Size.isEmpty())
+            return;
+    }
+
+    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
+
+    bool hide = m_display->NextModeIsLarger(Size);
+    MythMainWindow* window = GetMythMainWindow();
+    if (hide)
+        window->hide();
+
+    if (m_display->SwitchToVideo(Size, static_cast<double>(rate)))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        QString source;
+        double aspect = m_display->GetAspectRatio(source);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Aspect ratio: %1 (%2)")
+            .arg(aspect).arg(source));
+        SetDisplayAspect(static_cast<float>(aspect));
+        SetWindowSize(m_display->GetResolution());
+
+        bool fullscreen = !UsingGuiSize();
+
+        // if width && height are zero users expect fullscreen playback
+        if (!fullscreen)
+        {
+            int gui_width = 0;
+            int gui_height = 0;
+            gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
+            fullscreen |= (0 == gui_width && 0 == gui_height);
+        }
+
+        if (fullscreen)
+        {
+            QSize sz = m_display->GetResolution();
+            QRect display_visible_rect = QRect(GetMythMainWindow()->geometry().topLeft(), sz);
+            if (HasMythMainWindow())
+            {
+                if (hide)
+                {
+                    window->Show();
+                    hide = false;
+                }
+                GetMythMainWindow()->MoveResize(display_visible_rect);
+            }
+        }
+    }
+    if (hide)
+        window->Show();
+}

@@ -38,6 +38,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     QStringList     GetVisualiserList     () override;
     void            DestroyVisualisation  () override;
     bool            StereoscopicModesAllowed() const override;
+    void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
     virtual MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
