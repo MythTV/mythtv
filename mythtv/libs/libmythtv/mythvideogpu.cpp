@@ -15,8 +15,7 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
     m_displayVideoRect(Bounds->GetDisplayVideoRect()),
     m_videoRect(Bounds->GetVideoRect()),
     m_videoColourSpace(ColourSpace),
-    m_inputTextureSize(Bounds->GetVideoDim()),
-    m_viewportControl(true)
+    m_inputTextureSize(Bounds->GetVideoDim())
 {
     CommonInit();
 
