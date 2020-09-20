@@ -1344,7 +1344,8 @@ QString MythCommandLineParser::GetHelpString(void) const
                             .arg(toString("showhelp"));
         }
 
-        msg << m_optionedArgs[optstr]->GetLongHelpString(optstr);
+        if (m_optionedArgs[optstr] != nullptr)
+            msg << m_optionedArgs[optstr]->GetLongHelpString(optstr);
     }
 
     msg.flush();
