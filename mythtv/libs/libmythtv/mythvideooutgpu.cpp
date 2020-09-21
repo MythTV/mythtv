@@ -325,7 +325,6 @@ bool MythVideoOutputGPU::ProcessInputChange()
             codecName = codec->name;
         if (m_dbDisplayProfile)
             m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 , codecName);
-
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect, GetRawWindowRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
@@ -335,6 +334,9 @@ bool MythVideoOutputGPU::ProcessInputChange()
 
         if (wasembedding && ok)
             EmbedInWidget(oldrect);
+
+        // Update deinterlacers for any input change
+        SetDeinterlacing(m_deinterlacing, m_deinterlacing2X, m_forcedDeinterlacer);
 
         if (!ok)
             return false;
