@@ -631,7 +631,7 @@ void MythRenderVulkan::FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer)
     submitinfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitinfo.commandBufferCount = 1;
     submitinfo.pCommandBuffers = &Buffer;
-    m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, VK_NULL_HANDLE);
+    m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, static_cast<VkFence>(nullptr));
     m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
     m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &Buffer);
 }
