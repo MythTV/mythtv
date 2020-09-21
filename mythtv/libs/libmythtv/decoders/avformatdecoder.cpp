@@ -3146,7 +3146,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             float aspect = seq->aspect(context->codec_id == AV_CODEC_ID_MPEG1VIDEO);
             if (stream->sample_aspect_ratio.num)
                 aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) * width / height);
-            if (aspect_override >= 0.0F)
+            if (aspect_override > 0.0F)
                 aspect = aspect_override;
             float seqFPS = seq->fps();
 
