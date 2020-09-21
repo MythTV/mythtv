@@ -3145,8 +3145,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             int  height = static_cast<int>(seq->height()) >> context->lowres;
             float aspect = seq->aspect(context->codec_id == AV_CODEC_ID_MPEG1VIDEO);
             if (stream->sample_aspect_ratio.num)
-                aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) *
-                                                              width / height);
+                aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) * width / height);
+            if (aspect_override >= 0.0F)
+                aspect = aspect_override;
             float seqFPS = seq->fps();
 
             bool changed = (width  != m_currentWidth );
@@ -3158,12 +3159,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             // ratio changes
             bool forceaspectchange = !qFuzzyCompare(m_currentAspect + 10.0F, aspect + 10.0F) &&
                                       m_mythCodecCtx && m_mythCodecCtx->DecoderWillResetOnAspect();
-
             m_currentAspect = aspect;
-
-            // N.B. this will break aspect ratio change detection above
-            if (aspect_override > 0.0F)
-                m_currentAspect = aspect_override;
 
             if (changed || forceaspectchange)
             {
