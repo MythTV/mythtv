@@ -434,6 +434,9 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         if (wasembedding && ok)
             EmbedInWidget(oldrect);
 
+        // Update deinterlacers for any input change
+        SetDeinterlacing(m_deinterlacing, m_deinterlacing2X, m_forcedDeinterlacer);
+
         if (!ok)
             return;
     }

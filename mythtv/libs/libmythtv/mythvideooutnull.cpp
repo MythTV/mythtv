@@ -205,6 +205,10 @@ void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDei
         MythVideoOutput::SetDeinterlacing(Enable, DoubleRate, Force);
         return;
     }
+
+    m_deinterlacing   = false;
+    m_deinterlacing2X = false;
+    m_forcedDeinterlacer = DEINT_NONE;
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 

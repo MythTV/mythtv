@@ -171,6 +171,9 @@ class MythVideoOutput
     StereoscopicMode     m_stereo                {kStereoscopicModeNone};
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
+    bool                 m_deinterlacing      { false };
+    bool                 m_deinterlacing2X    { false };
+    MythDeintType        m_forcedDeinterlacer { DEINT_NONE };
 };
 
 #endif // MYTH_VIDEOOUT_H_

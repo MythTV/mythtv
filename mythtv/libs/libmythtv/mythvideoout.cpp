@@ -369,10 +369,17 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
 {
     if (!Enable)
     {
+        m_deinterlacing = false;
+        m_deinterlacing2X = false;
+        m_forcedDeinterlacer = DEINT_NONE;
         m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled all deinterlacing");
         return;
     }
+
+    m_deinterlacing   = Enable;
+    m_deinterlacing2X = DoubleRate;
+    m_forcedDeinterlacer = Force;
 
     MythDeintType singlerate = DEINT_NONE;
     MythDeintType doublerate = DEINT_NONE;
@@ -427,6 +434,9 @@ bool MythVideoOutput::InputChanged(const QSize &VideoDim, const QSize &VideoDisp
         m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 ,codecName);
     m_videoCodecID = CodecID;
     DiscardFrames(true, true);
+
+    // Update deinterlacers for any input change
+    SetDeinterlacing(m_deinterlacing, m_deinterlacing2X, m_forcedDeinterlacer);
     return true;
 }
 /**
