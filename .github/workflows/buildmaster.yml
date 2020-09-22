@@ -52,7 +52,7 @@ jobs:
       
     - name: Configure core
       working-directory: ./mythtv
-      run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava
+      run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
       
     - name: Make core
       working-directory: ./mythtv
