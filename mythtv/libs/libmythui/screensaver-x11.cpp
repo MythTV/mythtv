@@ -7,8 +7,8 @@
 
 // Mythdb headers
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 #include "mythdate.h"
-#include "mythdb.h"
 
 // Mythui headers
 #include "mythsystemlegacy.h"
@@ -117,10 +117,7 @@ class ScreenSaverX11Private
         StopTimer();
 
         if (m_timeoutInterval == -1)
-        {
-            m_timeoutInterval = GetMythDB()->GetNumSettingOnHost(
-                "xscreensaverInterval", GetMythDB()->GetHostName(), 50) * 1000;
-        }
+            m_timeoutInterval = gCoreContext->GetNumSetting("xscreensaverInterval", 50) * 1000;
 
         if (m_timeoutInterval > 0)
             StartTimer();
