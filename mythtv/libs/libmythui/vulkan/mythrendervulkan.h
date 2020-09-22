@@ -18,6 +18,13 @@ class MythTextureVulkan;
 
 using MythVulkan4F = std::array<float,4>;
 
+// workaround 32bit Vulkan defines
+#if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__) ) || defined(_M_X64) || defined(__ia64) || defined (_M_IA64) || defined(__aarch64__) || defined(__powerpc64__)
+#define MYTH_NULL_DISPATCH nullptr
+#else
+#define MYTH_NULL_DISPATCH 0
+#endif
+
 class MUI_PUBLIC MythVulkanObject
 {
   public:

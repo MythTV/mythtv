@@ -65,14 +65,14 @@ void MythPainterVulkan::DoFreeResources()
     m_ready = false;
     delete m_vulkan;
     m_vulkan                   = nullptr;
-    m_projectionDescriptorPool = nullptr;
-    m_projectionDescriptor     = nullptr; // destroyed with pool
+    m_projectionDescriptorPool = MYTH_NULL_DISPATCH;
+    m_projectionDescriptor     = MYTH_NULL_DISPATCH; // destroyed with pool
     m_projectionUniform        = nullptr;
     m_textureShader            = nullptr;
     m_textureUploadCmd         = nullptr;
-    m_textureSampler           = nullptr;
-    m_texturePipeline          = nullptr;
-    m_textureDescriptorPool    = nullptr;
+    m_textureSampler           = MYTH_NULL_DISPATCH;
+    m_texturePipeline          = MYTH_NULL_DISPATCH;
+    m_textureDescriptorPool    = MYTH_NULL_DISPATCH;
     m_textureDescriptorsCreated = false;
     m_availableTextureDescriptors.clear(); // destroyed with pool
     m_frameStarted             = false;

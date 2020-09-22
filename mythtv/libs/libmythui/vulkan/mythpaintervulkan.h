@@ -54,17 +54,17 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainterGPU
     bool              m_ready  { false   };
     MythVulkanObject* m_vulkan { nullptr };
 
-    VkDescriptorPool  m_projectionDescriptorPool { nullptr };
-    VkDescriptorSet   m_projectionDescriptor { nullptr };
-    MythUniformBufferVulkan* m_projectionUniform { nullptr };
-    VkSampler         m_textureSampler   { nullptr };
-    MythShaderVulkan* m_textureShader    { nullptr };
-    VkPipeline        m_texturePipeline  { nullptr };
-    VkDescriptorPool  m_textureDescriptorPool { nullptr };
+    VkDescriptorPool  m_projectionDescriptorPool  { MYTH_NULL_DISPATCH };
+    VkDescriptorSet   m_projectionDescriptor      { MYTH_NULL_DISPATCH };
+    MythUniformBufferVulkan* m_projectionUniform  { nullptr };
+    VkSampler         m_textureSampler            { MYTH_NULL_DISPATCH };
+    MythShaderVulkan* m_textureShader             { nullptr };
+    VkPipeline        m_texturePipeline           { MYTH_NULL_DISPATCH };
+    VkDescriptorPool  m_textureDescriptorPool     { MYTH_NULL_DISPATCH };
     bool              m_textureDescriptorsCreated { false };
     std::vector<VkDescriptorSet> m_availableTextureDescriptors;
-    VkCommandBuffer   m_textureUploadCmd { nullptr };
-    bool              m_frameStarted     { false   };
+    VkCommandBuffer   m_textureUploadCmd          { nullptr };
+    bool              m_frameStarted              { false   };
 
     std::vector<MythTextureVulkan*>      m_stagedTextures;
     std::vector<MythTextureVulkan*>      m_queuedTextures;
