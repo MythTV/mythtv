@@ -133,8 +133,8 @@ void MythTextureVulkan::StagingFinished(void)
 {
     m_vulkanFuncs->vkDestroyBuffer(m_vulkanDevice, m_stagingBuffer, nullptr);
     m_vulkanFuncs->vkFreeMemory(m_vulkanDevice, m_stagingMemory, nullptr);
-    m_stagingBuffer = nullptr;
-    m_stagingMemory = nullptr;
+    m_stagingBuffer = MYTH_NULL_DISPATCH;
+    m_stagingMemory = MYTH_NULL_DISPATCH;
 }
 
 VkDescriptorImageInfo MythTextureVulkan::GetDescriptorImage(void) const
@@ -150,6 +150,6 @@ void MythTextureVulkan::AddDescriptor(VkDescriptorSet Descriptor)
 VkDescriptorSet MythTextureVulkan::TakeDescriptor(void)
 {
     VkDescriptorSet result = m_descriptor;
-    m_descriptor = nullptr;
+    m_descriptor = MYTH_NULL_DISPATCH;
     return result;
 }

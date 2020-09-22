@@ -231,7 +231,7 @@ bool MythPainterVulkan::Ready()
         m_availableTextureDescriptors.clear();
         for (int i = 0; i < MAX_TEXTURE_COUNT; ++i)
         {
-            VkDescriptorSet descset = nullptr;
+            VkDescriptorSet descset = MYTH_NULL_DISPATCH;
             VkDescriptorSetAllocateInfo alloc { };
             alloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
             alloc.descriptorPool = m_textureDescriptorPool;

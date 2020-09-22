@@ -117,9 +117,9 @@ void MythVisualVulkan::TearDownVulkan()
     delete m_projectionUniform;
     delete m_vulkanShader;
 
-    m_pipeline = nullptr;
-    m_projectionDescriptor = nullptr; // destroyed with pool
-    m_descriptorPool = nullptr;
+    m_pipeline = MYTH_NULL_DISPATCH;
+    m_projectionDescriptor = MYTH_NULL_DISPATCH; // destroyed with pool
+    m_descriptorPool = MYTH_NULL_DISPATCH;
     m_projectionUniform = nullptr;
     m_vulkanShader = nullptr;
 }

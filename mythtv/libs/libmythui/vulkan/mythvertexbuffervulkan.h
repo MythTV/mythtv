@@ -18,10 +18,10 @@ class MUI_PUBLIC MythBufferVulkan  : protected MythVulkanObject
     MythBufferVulkan(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
     VkDeviceSize   m_bufferSize    { 0       };
-    VkBuffer       m_buffer        { nullptr };
-    VkDeviceMemory m_bufferMemory  { nullptr };
-    VkBuffer       m_stagingBuffer { nullptr };
-    VkDeviceMemory m_stagingMemory { nullptr };
+    VkBuffer       m_buffer        { MYTH_NULL_DISPATCH };
+    VkDeviceMemory m_bufferMemory  { MYTH_NULL_DISPATCH };
+    VkBuffer       m_stagingBuffer { MYTH_NULL_DISPATCH };
+    VkDeviceMemory m_stagingMemory { MYTH_NULL_DISPATCH };
     void*          m_mappedMemory  { nullptr };
 
   private:

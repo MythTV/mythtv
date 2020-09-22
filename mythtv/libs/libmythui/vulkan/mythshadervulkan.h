@@ -56,7 +56,7 @@ class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
     MythVertexAttrs                              m_vertexAttributes;
     std::vector<VkPipelineShaderStageCreateInfo> m_stages;
     std::vector<uint32_t*>                       m_spirv;
-    VkPipelineLayout                             m_pipelineLayout    { nullptr };
+    VkPipelineLayout                             m_pipelineLayout    { MYTH_NULL_DISPATCH };
 
     // these are per set
     std::vector<VkDescriptorSetLayout>           m_descriptorSetLayouts;

@@ -19,9 +19,9 @@ class MUI_PUBLIC MythUniformBufferVulkan : protected MythVulkanObject
 
   private:
     VkDeviceSize   m_bufferSize    { 0       };
-    VkBuffer       m_buffer        { nullptr };
-    VkDeviceMemory m_bufferMemory  { nullptr };
+    VkBuffer       m_buffer        { MYTH_NULL_DISPATCH };
+    VkDeviceMemory m_bufferMemory  { MYTH_NULL_DISPATCH };
     void*          m_mappedMemory  { nullptr };
 };
 
-#endif // MYTHUNIFORMBUFFERVULKAN_H
+#endif

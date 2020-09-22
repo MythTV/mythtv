@@ -21,9 +21,9 @@ class MythVisualVulkan : public MythVulkanObject
 
   protected:
     MythShaderVulkan*        m_vulkanShader         { nullptr };
-    VkPipeline               m_pipeline             { nullptr };
-    VkDescriptorPool         m_descriptorPool       { nullptr };
-    VkDescriptorSet          m_projectionDescriptor { nullptr };
+    VkPipeline               m_pipeline             { MYTH_NULL_DISPATCH };
+    VkDescriptorPool         m_descriptorPool       { MYTH_NULL_DISPATCH };
+    VkDescriptorSet          m_projectionDescriptor { MYTH_NULL_DISPATCH };
     MythUniformBufferVulkan* m_projectionUniform    { nullptr };
     std::vector<VkDynamicState> m_dynamicState      { };
     std::vector<int>         m_shaderStages         { };
