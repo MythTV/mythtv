@@ -23,19 +23,11 @@ enum RenderType
 class MUI_PUBLIC MythRender : public ReferenceCounter
 {
   public:
-    explicit MythRender(RenderType type) :
-        ReferenceCounter(QString("MythRender:%1").arg(type)),
-        m_type(type), m_size(QSize()), m_errored(false)
-    {
-    }
+    explicit MythRender(RenderType type);
 
     /// Warning: The reference count can be decremented between
     /// the call to this function and the use of it's value.
-    bool IsShared(void) const
-    {
-        return const_cast<QAtomicInt&>(m_referenceCount)
-            .fetchAndAddOrdered(0) > 1;
-    }
+    bool IsShared(void) const;
 
     RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
@@ -50,6 +42,9 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     RenderType  m_type;
     QSize       m_size;
     bool        m_errored;
+
+  private:
+    Q_DISABLE_COPY(MythRender)
 };
 
 #endif
