@@ -29,7 +29,7 @@
 #include <QRegExp>
 #include <QStringList>
 
-#ifdef ANDROID
+#ifdef Q_OS_ANDROID
 #include <sys/select.h>
 #endif
 

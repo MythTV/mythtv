@@ -389,7 +389,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
     }
 #endif
 
-#ifdef ANDROID
+#ifdef Q_OS_ANDROID
 #ifndef S_IREAD
 #define S_IREAD S_IRUSR
 #endif

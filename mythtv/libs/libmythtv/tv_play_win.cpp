@@ -1,6 +1,6 @@
 // Qt
 #include <QTimer>
-#ifdef ANDROID
+#ifdef Q_OS_ANDROID
 #include <QCoreApplication>
 #endif
 

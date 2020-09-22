@@ -32,7 +32,9 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     HostComboBoxSetting("AudioOutputDevice", true), m_parent(parent)
 {
     setLabel(tr("Audio output device"));
-#ifdef USING_ALSA
+#ifdef Q_OS_ANDROID
+    QString dflt = "OpenSLES:";
+#elif USING_ALSA
     QString dflt = "ALSA:default";
 #elif USING_PULSEOUTPUT
     QString dflt = "PulseAudio:default";
@@ -40,8 +42,6 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     QString dflt = "CoreAudio:";
 #elif _WIN32
     QString dflt = "Windows:";
-#elif ANDROID
-    QString dflt = "OpenSLES:";
 #else
     QString dflt = "NULL";
 #endif
@@ -1080,7 +1080,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
     gc->addSelection("DirectX:", "DirectX:");
     gc->addSelection("Windows:", "Windows:");
 #endif
-#ifdef ANDROID
+#ifdef Q_OS_ANDROID
     gc->addSelection("OpenSLES:", "OpenSLES:");
 #endif
 #if !defined(_WIN32)
