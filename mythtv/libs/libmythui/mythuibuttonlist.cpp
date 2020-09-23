@@ -2673,7 +2673,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 
         case MythGestureEvent::Up:
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                handled = MoveUp(MovePage);
+                handled = MoveUp(MoveRow);
             break;
 
         case MythGestureEvent::UpLeft:
@@ -2684,7 +2684,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 
         case MythGestureEvent::Down:
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                handled = MoveDown(MovePage);
+                handled = MoveDown(MoveRow);
             break;
 
         case MythGestureEvent::DownLeft:
