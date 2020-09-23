@@ -30,6 +30,8 @@
 #include <QList>
 #include <QString>
 #include <QEvent>
+#include <QMutex>
+#include <QMap>
 
 // MythTV
 #include "mythuiexp.h"
@@ -97,23 +99,22 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
     Button  m_button  { NoButton };
 };
 
-class MythGesturePrivate;
-
 class MythGesture
 {
   public:
     explicit MythGesture(size_t MaxPoints = 10000, size_t MinPoints = 50,
                          size_t MaxSequence = 20,  int ScaleRatio = 4,
                          float BinPercent = 0.07F);
-   ~MythGesture();
 
     void Start();
     void Stop();
-    bool Recording() const;
+    bool Recording();
     MythGestureEvent* GetGesture() const;
     bool Record(const QPoint& Point);
 
   private:
+    Q_DISABLE_COPY(MythGesture)
+
     bool    HasMinimumPoints() const;
     QString Translate();
     void    AdjustExtremes(int X, int Y);
@@ -130,8 +131,8 @@ class MythGesture
     float  m_binPercent   { 0.07F };
     MythGestureEvent::Gesture m_lastGesture { MythGestureEvent::Unknown };
     QList <QPoint> m_points;
-
-    MythGesturePrivate *p {nullptr}; // NOLINT(readability-identifier-naming)
+    QMutex m_lock;
+    QMap <QString, MythGestureEvent::Gesture> m_sequences;
 };
 
 #endif

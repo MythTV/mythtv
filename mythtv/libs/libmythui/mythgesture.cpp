@@ -26,15 +26,14 @@
  * the appropriate fixes.
  */
 
+// MythTV
 #include "mythgesture.h"
 
+// Std
 #include <array>
 #include <cmath>
 #include <algorithm>
 #include <complex>
-
-#include <QMutex>
-#include <QMap>
 
 QEvent::Type MythGestureEvent::kEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
 
@@ -52,17 +51,6 @@ MythGestureEvent::MythGestureEvent(Gesture gesture, Button button)
     m_button(button)
 {
 }
-
-/**
- * @class MythGesturePrivate
- * @brief Private information used only by a stroke class.
- */
-class MythGesturePrivate
-{
-  public:
-    QMutex m_m;
-    QMap <QString, MythGestureEvent::Gesture> m_sequences;
-};
 
 /*! \class MythGesture
  * \brief Contains the points in a stroke, and translates them into
@@ -92,44 +80,35 @@ MythGesture::MythGesture(size_t MaxPoints, size_t MinPoints,
     m_scaleRatio(ScaleRatio),
     m_binPercent(BinPercent)
 {
-    /* create new private information */
-    p = new MythGesturePrivate();
-
     /* Click */
-    p->m_sequences.insert("5", MythGestureEvent::Click);
+    m_sequences.insert("5", MythGestureEvent::Click);
 
     /* Lines */
-    p->m_sequences.insert("456", MythGestureEvent::Right);
-    p->m_sequences.insert("654", MythGestureEvent::Left);
-    p->m_sequences.insert("258", MythGestureEvent::Down);
-    p->m_sequences.insert("852", MythGestureEvent::Up);
+    m_sequences.insert("456", MythGestureEvent::Right);
+    m_sequences.insert("654", MythGestureEvent::Left);
+    m_sequences.insert("258", MythGestureEvent::Down);
+    m_sequences.insert("852", MythGestureEvent::Up);
 
     /* Diagonals */
-    p->m_sequences.insert("951", MythGestureEvent::UpLeft);
-    p->m_sequences.insert("753", MythGestureEvent::UpRight);
-    p->m_sequences.insert("159", MythGestureEvent::DownRight);
-    p->m_sequences.insert("357", MythGestureEvent::DownLeft);
+    m_sequences.insert("951", MythGestureEvent::UpLeft);
+    m_sequences.insert("753", MythGestureEvent::UpRight);
+    m_sequences.insert("159", MythGestureEvent::DownRight);
+    m_sequences.insert("357", MythGestureEvent::DownLeft);
 
     /* Double Lines*/
-    p->m_sequences.insert("96321",MythGestureEvent::UpThenLeft);
-    p->m_sequences.insert("74123",MythGestureEvent::UpThenRight);
-    p->m_sequences.insert("36987",MythGestureEvent::DownThenLeft);
-    p->m_sequences.insert("14789",MythGestureEvent::DownThenRight);
-    p->m_sequences.insert("32147",MythGestureEvent::LeftThenDown);
-    p->m_sequences.insert("98741",MythGestureEvent::LeftThenUp);
-    p->m_sequences.insert("12369",MythGestureEvent::RightThenDown);
-    p->m_sequences.insert("78963",MythGestureEvent::RightThenUp);
-    p->m_sequences.insert("45654",MythGestureEvent::RightThenLeft);
-    p->m_sequences.insert("65456",MythGestureEvent::LeftThenRight);
-    p->m_sequences.insert("85258",MythGestureEvent::UpThenDown);
-    p->m_sequences.insert("25852",MythGestureEvent::DownThenUp);
+    m_sequences.insert("96321",MythGestureEvent::UpThenLeft);
+    m_sequences.insert("74123",MythGestureEvent::UpThenRight);
+    m_sequences.insert("36987",MythGestureEvent::DownThenLeft);
+    m_sequences.insert("14789",MythGestureEvent::DownThenRight);
+    m_sequences.insert("32147",MythGestureEvent::LeftThenDown);
+    m_sequences.insert("98741",MythGestureEvent::LeftThenUp);
+    m_sequences.insert("12369",MythGestureEvent::RightThenDown);
+    m_sequences.insert("78963",MythGestureEvent::RightThenUp);
+    m_sequences.insert("45654",MythGestureEvent::RightThenLeft);
+    m_sequences.insert("65456",MythGestureEvent::LeftThenRight);
+    m_sequences.insert("85258",MythGestureEvent::UpThenDown);
+    m_sequences.insert("25852",MythGestureEvent::DownThenUp);
 }
-
-MythGesture::~MythGesture()
-{
-    delete p;
-}
-
 
 /*! \brief Adjust horizontal and vertical extremes.
  * \param x The new horizontal extreme.
@@ -146,20 +125,20 @@ void MythGesture::AdjustExtremes(int X, int Y)
 /*! \brief Determine if the stroke is being recorded.
  * \return True if recording is in progress, otherwise, false.
  */
-bool MythGesture::Recording(void) const
+bool MythGesture::Recording(void)
 {
-    p->m_m.lock();
+    m_lock.lock();
     bool temp = m_recording;
-    p->m_m.unlock();
+    m_lock.unlock();
     return temp;
 }
 
 /// \brief Start recording
 void MythGesture::Start(void)
 {
-    p->m_m.lock();
+    m_lock.lock();
     m_recording = true;
-    p->m_m.unlock();
+    m_lock.unlock();
 }
 
 
@@ -169,20 +148,20 @@ void MythGesture::Start(void)
  */
 void MythGesture::Stop(void)
 {
-    p->m_m.lock();
+    m_lock.lock();
 
     if (m_recording)
     {
         m_recording = false;
 
         /* translate before resetting maximums */
-        m_lastGesture = p->m_sequences[Translate()];
+        m_lastGesture = m_sequences[Translate()];
 
         m_minX = m_minY = 10000;
         m_maxX = m_maxY = -1;
     }
 
-    p->m_m.unlock();
+    m_lock.unlock();
 }
 
 
