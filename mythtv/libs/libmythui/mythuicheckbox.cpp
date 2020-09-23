@@ -147,7 +147,7 @@ void MythUICheckBox::Disable()
  */
 bool MythUICheckBox::gestureEvent(MythGestureEvent *event)
 {
-    if (event->gesture() == MythGestureEvent::Click)
+    if (event->GetGesture() == MythGestureEvent::Click)
     {
         if (IsEnabled())
         {

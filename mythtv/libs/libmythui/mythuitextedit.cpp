@@ -561,7 +561,7 @@ bool MythUITextEdit::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 
-    if (event->gesture() == MythGestureEvent::Click &&
+    if (event->GetGesture() == MythGestureEvent::Click &&
         event->GetButton() == MythGestureEvent::MiddleButton)
     {
         PasteTextFromClipboard(QClipboard::Selection);

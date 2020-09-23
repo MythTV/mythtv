@@ -456,7 +456,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
 bool MythScreenType::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
-    if (event->gesture() == MythGestureEvent::Click)
+    if (event->GetGesture() == MythGestureEvent::Click)
     {
         switch (event->GetButton())
         {

@@ -2625,7 +2625,7 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 
-    switch (event->gesture())
+    switch (event->GetGesture())
     {
         case MythGestureEvent::Click:
             {

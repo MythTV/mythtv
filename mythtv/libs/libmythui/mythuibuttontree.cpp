@@ -624,7 +624,7 @@ bool MythUIButtonTree::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 
-    if (event->gesture() == MythGestureEvent::Click)
+    if (event->GetGesture() == MythGestureEvent::Click)
     {
         // We want the relative position of the click
         QPoint position = event->GetPosition() -

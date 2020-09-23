@@ -88,7 +88,7 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
             break;
     }
 #else
-    if (event->gesture() == MythGestureEvent::Click)
+    if (event->GetGesture() == MythGestureEvent::Click)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window Click");
         handled = true;

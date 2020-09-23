@@ -869,8 +869,8 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture event %1")
-        .arg((QString)event->gesture()));
-    switch (event->gesture())
+        .arg((QString)event->GetGesture()));
+    switch (event->GetGesture())
     {
         case MythGestureEvent::Click:
             {

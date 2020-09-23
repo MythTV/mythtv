@@ -1524,15 +1524,13 @@ void MythMainWindow::AllowInput(bool allow)
 void MythMainWindow::mouseTimeout(void)
 {
     /* complete the stroke if its our first timeout */
-    if (d->m_gesture.recording())
-    {
-        d->m_gesture.stop();
-    }
+    if (d->m_gesture.Recording())
+        d->m_gesture.Stop();
 
     /* get the last gesture */
-    MythGestureEvent *e = d->m_gesture.gesture();
+    MythGestureEvent *e = d->m_gesture.GetGesture();
 
-    if (e->gesture() < MythGestureEvent::Click)
+    if (e->GetGesture() < MythGestureEvent::Click)
         QCoreApplication::postEvent(this, e);
 }
 
@@ -1710,13 +1708,13 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            if (!d->m_gesture.recording())
+            if (!d->m_gesture.Recording())
             {
-                d->m_gesture.start();
+                d->m_gesture.Start();
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
-                d->m_gesture.record(mouseEvent->pos());
+                d->m_gesture.Record(mouseEvent->pos());
 
                 /* start a single shot timer */
                 d->m_gestureTimer->start(GESTURE_TIMEOUT);
@@ -1732,15 +1730,15 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             if (d->m_gestureTimer->isActive())
                 d->m_gestureTimer->stop();
 
-            if (d->m_gesture.recording())
+            if (d->m_gesture.Recording())
             {
-                d->m_gesture.stop();
-                MythGestureEvent *ge = d->m_gesture.gesture();
+                d->m_gesture.Stop();
+                MythGestureEvent *ge = d->m_gesture.GetGesture();
 
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
 
                 /* handle clicks separately */
-                if (ge->gesture() == MythGestureEvent::Click)
+                if (ge->GetGesture() == MythGestureEvent::Click)
                 {
                     if (!mouseEvent)
                         return false;
@@ -1856,7 +1854,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            if (d->m_gesture.recording())
+            if (d->m_gesture.Recording())
             {
                 /* reset the timer */
                 d->m_gestureTimer->stop();
@@ -1865,7 +1863,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
-                d->m_gesture.record(mouseEvent->pos());
+                d->m_gesture.Record(mouseEvent->pos());
                 return true;
             }
             break;
