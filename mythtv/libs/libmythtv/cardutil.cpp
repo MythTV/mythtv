@@ -61,67 +61,51 @@
 
 QString CardUtil::GetScanableInputTypes(void)
 {
-    QString inputTypes = "";
+    QStringList inputTypes {};
 
 #ifdef USING_DVB
     inputTypes += "'DVB'";
 #endif // USING_DVB
 
 #ifdef USING_V4L2
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'V4L'";
 # ifdef USING_IVTV
-    inputTypes += ",'MPEG'";
+    inputTypes += "'MPEG'";
 # endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_IPTV
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'FREEBOX'";
 #endif // USING_IPTV
 
 #ifdef USING_VBOX
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'VBOX'";
 #endif // USING_VBOX
 
 #ifdef USING_HDHOMERUN
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'HDHOMERUN'";
 #endif // USING_HDHOMERUN
 
 #ifdef USING_SATIP
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'SATIP'";
 #endif // USING_SATIP
 
 #ifdef USING_ASI
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'ASI'";
 #endif
 
 #ifdef USING_CETON
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'CETON'";
 #endif // USING_CETON
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-    if (!inputTypes.isEmpty())
-        inputTypes += ",";
     inputTypes += "'EXTERNAL'";
 #endif
 
     if (inputTypes.isEmpty())
-        inputTypes = "'DUMMY'";
+        return "('DUMMY')";
 
-    return QString("(%1)").arg(inputTypes);
+    return QString("(%1)").arg(inputTypes.join(','));
 }
 
 bool CardUtil::IsCableCardPresent(uint inputid,
