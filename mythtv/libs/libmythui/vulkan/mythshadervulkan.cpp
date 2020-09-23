@@ -345,7 +345,7 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
     // create the desriptor layouts
     for (auto & layoutbinding : layoutbindings)
     {
-        VkDescriptorSetLayout layout = nullptr;
+        VkDescriptorSetLayout layout = MYTH_NULL_DISPATCH;
         VkDescriptorSetLayoutCreateInfo layoutinfo { };
         layoutinfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutinfo.bindingCount = static_cast<uint32_t>(layoutbinding.second.size());
@@ -426,7 +426,7 @@ bool MythShaderVulkan::CreateShaderFromSPIRV(const std::vector<MythSPIRVStage> &
         auto size = stage.second.size() * sizeof (uint32_t);
         auto *code = reinterpret_cast<uint32_t*>(new uint8_t [size]);
         memcpy(code, stage.second.data(), size);
-        VkShaderModule module = nullptr;
+        VkShaderModule module = MYTH_NULL_DISPATCH;
         VkShaderModuleCreateInfo create { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, nullptr, 0, size, code };
         success &= (m_vulkanFuncs->vkCreateShaderModule(m_vulkanDevice, &create, nullptr, &module) == VK_SUCCESS);
         m_stages.push_back( { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr,
@@ -469,7 +469,7 @@ VkDescriptorSetLayout MythShaderVulkan::GetDescSetLayout(size_t Set) const
 {
     if (Set < m_descriptorSetLayouts.size())
         return m_descriptorSetLayouts.at(Set);
-    return nullptr;
+    return MYTH_NULL_DISPATCH;
 }
 
 VkPrimitiveTopology MythShaderVulkan::GetTopology() const
