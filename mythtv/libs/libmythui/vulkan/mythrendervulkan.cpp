@@ -492,7 +492,7 @@ bool MythRenderVulkan::CreateBuffer(VkDeviceSize          Size,
 
 VkSampler MythRenderVulkan::CreateSampler(VkFilter Min, VkFilter Mag)
 {
-    VkSampler result = nullptr;
+    VkSampler result = MYTH_NULL_DISPATCH;
     VkSamplerCreateInfo samplerinfo { };
     memset(&samplerinfo, 0, sizeof(samplerinfo));
     samplerinfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -631,7 +631,7 @@ void MythRenderVulkan::FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer)
     submitinfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitinfo.commandBufferCount = 1;
     submitinfo.pCommandBuffers = &Buffer;
-    m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, static_cast<VkFence>(nullptr));
+    m_devFuncs->vkQueueSubmit(m_window->graphicsQueue(), 1, &submitinfo, MYTH_NULL_DISPATCH);
     m_devFuncs->vkQueueWaitIdle(m_window->graphicsQueue());
     m_devFuncs->vkFreeCommandBuffers(m_device, m_window->graphicsCommandPool(), 1, &Buffer);
 }
@@ -641,7 +641,7 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
                                             std::vector<VkDynamicState> Dynamic)
 {
     if (!(Shader && Viewport.isValid()))
-        return nullptr;
+        return MYTH_NULL_DISPATCH;
 
     // shaders
     const auto & shaderstages = Shader->Stages();
@@ -772,11 +772,11 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
     pipelinecreate.layout              = Shader->GetPipelineLayout();
     pipelinecreate.renderPass          = m_window->defaultRenderPass();
     pipelinecreate.subpass             = 0;
-    pipelinecreate.basePipelineHandle  = nullptr;
+    pipelinecreate.basePipelineHandle  = MYTH_NULL_DISPATCH;
     pipelinecreate.basePipelineIndex   = 0;
 
-    VkPipeline result = nullptr;
-    if (m_devFuncs->vkCreateGraphicsPipelines(m_device, nullptr, 1, &pipelinecreate, nullptr, &result) == VK_SUCCESS)
+    VkPipeline result = MYTH_NULL_DISPATCH;
+    if (m_devFuncs->vkCreateGraphicsPipelines(m_device, MYTH_NULL_DISPATCH, 1, &pipelinecreate, nullptr, &result) == VK_SUCCESS)
         return result;
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create graphics pipeline");
