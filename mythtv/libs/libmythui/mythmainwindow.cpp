@@ -1525,7 +1525,7 @@ void MythMainWindow::mouseTimeout(void)
 {
     /* complete the stroke if its our first timeout */
     if (d->m_gesture.Recording())
-        d->m_gesture.Stop();
+        d->m_gesture.Stop(true);
 
     /* get the last gesture */
     MythGestureEvent *e = d->m_gesture.GetGesture();

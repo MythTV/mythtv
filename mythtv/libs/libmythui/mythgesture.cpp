@@ -57,6 +57,7 @@ MythGestureEvent::MythGestureEvent(Gesture gesture, Button button)
 
 const std::map<QString, MythGestureEvent::Gesture>MythGesture::kSequences =
 {
+    { "1",     MythGestureEvent::LongClick },
     { "5",     MythGestureEvent::Click },
     { "456",   MythGestureEvent::Right },
     { "654",   MythGestureEvent::Left  },
@@ -159,7 +160,7 @@ void MythGesture::Start(void)
  *
  * This method stores the gesture, as it is, and resets all information.
  */
-void MythGesture::Stop(void)
+void MythGesture::Stop(bool Timeout)
 {
     m_lock.lock();
 
@@ -168,7 +169,7 @@ void MythGesture::Stop(void)
         m_recording = false;
 
         // translate before resetting maximums
-        const QString gesture = Translate();
+        const QString gesture = Translate(Timeout);
         auto found = kSequences.find(gesture);
         if (found != kSequences.cend())
             m_lastGesture = found->second;
@@ -213,7 +214,7 @@ static int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
  *
  * \note The points will be removed during this method.
  */
-QString MythGesture::Translate(void)
+QString MythGesture::Translate(bool Timeout)
 {
     size_t total_points = static_cast<size_t>(m_points.count());
 
@@ -228,6 +229,8 @@ QString MythGesture::Translate(void)
     if (total_points < m_minPoints)
     {
         m_points.clear();
+        if (Timeout)
+            return "1";
         return "5";
     }
 

@@ -72,6 +72,8 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
         DownThenUp,
 
         /* A click */
+        // NB LongClick before Click as MythMainWindow filters out otherwise
+        LongClick,
         Click
     };
     Q_ENUM(Gesture)
@@ -114,7 +116,7 @@ class MythGesture
                          float BinPercent = 0.07F);
 
     void Start();
-    void Stop();
+    void Stop(bool Timeout = false);
     bool Recording();
     MythGestureEvent* GetGesture() const;
     bool Record(const QPoint& Point);
@@ -123,7 +125,7 @@ class MythGesture
     Q_DISABLE_COPY(MythGesture)
 
     bool    HasMinimumPoints() const;
-    QString Translate();
+    QString Translate(bool Timeout);
     void    AdjustExtremes(int X, int Y);
 
     bool   m_recording    { false };
