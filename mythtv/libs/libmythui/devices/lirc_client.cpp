@@ -1775,7 +1775,6 @@ int lirc_nextcode(struct lirc_state *state, char **code)
 	static int s_packetSize=PACKET_SIZE;
 	static int s_endLen=0;
 	char *end = nullptr;
-	char c = '\0';
 
 	*code=nullptr;
 	if(state->lirc_buffer==nullptr)
@@ -1824,7 +1823,7 @@ int lirc_nextcode(struct lirc_state *state, char **code)
         // cppcheck-suppress nullPointerArithmeticRedundantCheck
 	end++;
 	s_endLen=strlen(end);
-	c=end[0];
+	char c=end[0];
 	end[0]=0;
 	*code=strdup(state->lirc_buffer);
 	end[0]=c;

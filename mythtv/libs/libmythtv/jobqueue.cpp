@@ -2190,7 +2190,6 @@ void JobQueue::DoMetadataLookupThread(int jobID)
         return;
     }
 
-    QString msg = tr("Metadata Lookup Starting");
     LOG(VB_GENERAL, LOG_INFO,
         LOC + "Metadata Lookup Starting for " + detailstr);
 
@@ -2246,7 +2245,7 @@ void JobQueue::DoMetadataLookupThread(int jobID)
         program_info->SendUpdateEvent();
     }
 
-    msg = tr("Metadata Lookup %1", "Job ID")
+    QString msg = tr("Metadata Lookup %1", "Job ID")
         .arg(StatusText(GetJobStatus(jobID)));
 
     if (!comment.isEmpty())
@@ -2315,7 +2314,6 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         return;
     }
 
-    QString msg = tr("Commercial Detection Starting");
     LOG(VB_GENERAL, LOG_INFO,
         LOC + "Commercial Detection Starting for " + detailstr);
 
@@ -2397,7 +2395,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         }
     }
 
-    msg = tr("Commercial Detection %1", "Job ID")
+    QString msg = tr("Commercial Detection %1", "Job ID")
         .arg(StatusText(GetJobStatus(jobID)));
 
     if (!comment.isEmpty())

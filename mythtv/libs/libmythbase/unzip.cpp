@@ -542,9 +542,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 		return UnZip::OpenFailed;
 	}
 
-	UnZip::ErrorCode ec = UnZip::Ok;
-
-	ec = seekToCentralDirectory();
+	UnZip::ErrorCode ec = seekToCentralDirectory();
 	if (ec != UnZip::Ok)
 	{
 		closeArchive();

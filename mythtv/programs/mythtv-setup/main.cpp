@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
         {
             ChannelScannerCLI scanner(doScanSaveOnly, scanInteractive);
 
-            int scantype = ScanTypeSetting::FullScan_ATSC;
+            int scantype { ScanTypeSetting::FullScan_ATSC };
             if (frequencyStandard == "atsc")
                 scantype = ScanTypeSetting::FullScan_ATSC; // NOLINT(bugprone-branch-clone)
             else if (frequencyStandard == "dvbt")
