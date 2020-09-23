@@ -36,8 +36,9 @@
  *  \brief Create a new KeyBindings instance.
  *  \param hostname The host for which to create the key bindings.
  */
-KeyBindings::KeyBindings(QString hostname)
-    : m_hostname(std::move(hostname))
+KeyBindings::KeyBindings(QString hostname, Filter Filters)
+    : m_hostname(std::move(hostname)),
+      m_filter(Filters)
 {
     LoadMandatoryBindings();
     LoadContexts();
@@ -348,6 +349,9 @@ void KeyBindings::CommitChanges(void)
  */
 void KeyBindings::LoadJumppoints(void)
 {
+    if (m_filter == JustModifiers)
+        return;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT destination, description, keylist "
@@ -401,11 +405,22 @@ void KeyBindings::LoadContexts(void)
         return;
     }
 
+    static QStringList kModifierContexts = { "Long Press" };
     while (query.next())
     {
-        ActionID id(query.value(0).toString(), query.value(1).toString());
-        m_actionSet.AddAction(id, query.value(2).toString(),
-                              query.value(3).toString());
+        QString context = query.value(0).toString();
+        bool modifier = kModifierContexts.contains(context);
+        bool allow = m_filter == AllBindings;
+        if (m_filter == JustModifiers)
+            allow = modifier;
+        else if (m_filter == NoModifiers)
+            allow = !modifier;
+        if (allow)
+        {
+            ActionID id(context, query.value(1).toString());
+            m_actionSet.AddAction(id, query.value(2).toString(),
+                                  query.value(3).toString());
+        }
     }
 }
 

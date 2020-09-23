@@ -495,7 +495,7 @@ QString MythControls::GetCurrentKey(void)
 void MythControls::LoadData(const QString &hostname)
 {
     /* create the key bindings and the tree */
-    m_bindings = new KeyBindings(hostname);
+    m_bindings = new KeyBindings(hostname, m_filters);
     m_sortedContexts = m_bindings->GetContexts();
 
     /* Alphabetic order, but jump and global at the top  */

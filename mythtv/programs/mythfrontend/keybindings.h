@@ -36,10 +36,17 @@
 class KeyBindings
 {
   public:
+    enum Filter
+    {
+        AllBindings,
+        NoModifiers,
+        JustModifiers
+    };
+
     /// \brief Levels of conflict
     enum ConflictLevels { kKeyBindingWarning, kKeyBindingError, };
 
-    explicit KeyBindings(QString hostname);
+    explicit KeyBindings(QString hostname, Filter Filters = AllBindings);
 
     // Commands
     bool        AddActionKey(const QString &context_name,
@@ -83,6 +90,7 @@ class KeyBindings
     ActionList  m_mandatoryBindings;
     QStringList m_defaultKeys;
     ActionSet   m_actionSet;
+    Filter      m_filter { AllBindings };
 };
 
 #endif /* KEYBINDINGS_H */
