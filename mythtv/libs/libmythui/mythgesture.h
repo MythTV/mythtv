@@ -78,34 +78,22 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
     };
     Q_ENUM(Gesture)
 
-    enum Button
-    {
-        NoButton,
-        LeftButton,
-        RightButton,
-        MiddleButton,
-        Aux1Button,
-        Aux2Button
-    };
-    Q_ENUM(Button)
-
-    explicit MythGestureEvent(Gesture gesture, Button button = LeftButton);
+    explicit MythGestureEvent(Gesture gesture, Qt::MouseButton Button);
     ~MythGestureEvent() override = default;
 
-    QString        GetName     () const;
-    inline Gesture GetGesture  () const { return m_gesture; }
-    void           SetPosition (QPoint Position) { m_position = Position; }
-    QPoint         GetPosition () const { return m_position; }
-    void           SetButton   (Button button) { m_button = button; }
-    Button         GetButton   () const { return m_button; }
-    QString        GetButtonName() const;
+    QString         GetName     () const;
+    inline Gesture  GetGesture  () const { return m_gesture; }
+    void            SetPosition (QPoint Position) { m_position = Position; }
+    QPoint          GetPosition () const { return m_position; }
+    Qt::MouseButton GetButton   () const { return m_button; }
+    QString         GetButtonName() const;
 
     static Type kEventType;
 
   private:
     Gesture m_gesture { Unknown  };
     QPoint  m_position;
-    Button  m_button  { NoButton };
+    Qt::MouseButton m_button { Qt::NoButton };
 };
 
 class MythGesture
@@ -119,7 +107,7 @@ class MythGesture
     void Stop(bool Timeout = false);
     bool Recording();
     MythGestureEvent* GetGesture() const;
-    bool Record(const QPoint& Point);
+    bool Record(const QPoint& Point, Qt::MouseButton Button);
 
   private:
     Q_DISABLE_COPY(MythGesture)
@@ -142,6 +130,7 @@ class MythGesture
     QList <QPoint> m_points;
     QMutex m_lock;
     static const std::map<QString, MythGestureEvent::Gesture> kSequences;
+    Qt::MouseButton m_lastButton { Qt::NoButton };
 };
 
 #endif

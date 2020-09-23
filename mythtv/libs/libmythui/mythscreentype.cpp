@@ -460,7 +460,7 @@ bool MythScreenType::gestureEvent(MythGestureEvent *event)
     {
         switch (event->GetButton())
         {
-            case MythGestureEvent::RightButton :
+            case Qt::RightButton:
                 ShowMenu();
                 handled = true;
                 break;

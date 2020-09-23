@@ -48,10 +48,10 @@ QEvent::Type MythGestureEvent::kEventType = static_cast<QEvent::Type>(QEvent::re
  * \param gesture What type of gesture was performed.
  * \param button The button (if any) that was pressed during the gesture.
  */
-MythGestureEvent::MythGestureEvent(Gesture gesture, Button button)
+MythGestureEvent::MythGestureEvent(Gesture gesture, Qt::MouseButton Button)
   : QEvent(kEventType),
     m_gesture(gesture),
-    m_button(button)
+    m_button(Button)
 {
 }
 
@@ -91,7 +91,7 @@ QString MythGestureEvent::GetName() const
 
 QString MythGestureEvent::GetButtonName() const
 {
-    return QMetaEnum::fromType<Button>().valueToKey(m_button);
+    return QMetaEnum::fromType<Qt::MouseButtons>().valueToKey(static_cast<int>(m_button));
 }
 
 /*! \class MythGesture
@@ -189,7 +189,7 @@ void MythGesture::Stop(bool Timeout)
  */
 MythGestureEvent *MythGesture::GetGesture(void) const
 {
-    return new MythGestureEvent(m_lastGesture);
+    return new MythGestureEvent(m_lastGesture, m_lastButton);
 }
 
 /* comments in header */
@@ -328,11 +328,13 @@ bool MythGesture::HasMinimumPoints() const
  * \param Point The point to record.
  * \return True if the point was recorded, otherwise, false.
  */
-bool MythGesture::Record(const QPoint& Point)
+bool MythGesture::Record(const QPoint& Point, Qt::MouseButton Button)
 {
     /* only record if we haven't exceeded the maximum points */
     if ((static_cast<size_t>(m_points.size()) >= m_maxPoints) || !Recording())
         return false;
+
+    m_lastButton = Button;
 
     if (m_points.empty())
     {

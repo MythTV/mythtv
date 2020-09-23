@@ -1714,7 +1714,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
-                d->m_gesture.Record(mouseEvent->pos());
+                d->m_gesture.Record(mouseEvent->pos(), mouseEvent->button());
 
                 /* start a single shot timer */
                 d->m_gestureTimer->start(GESTURE_TIMEOUT);
@@ -1735,7 +1735,13 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 d->m_gesture.Stop();
                 MythGestureEvent *ge = d->m_gesture.GetGesture();
 
+                QPoint point { -1, -1 };
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                if (mouseEvent)
+                {
+                    point = mouseEvent->pos();
+                    ge->SetPosition(point);
+                }
 
                 /* handle clicks separately */
                 if (ge->GetGesture() == MythGestureEvent::Click)
@@ -1743,41 +1749,11 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                     if (!mouseEvent)
                         return false;
 
-                    QPoint p = mouseEvent->pos();
-
-                    ge->SetPosition(p);
-
-                    MythGestureEvent::Button button = MythGestureEvent::NoButton;
-                    switch (mouseEvent->button())
-                    {
-                        case Qt::LeftButton :
-                            button = MythGestureEvent::LeftButton;
-                            break;
-                        case Qt::RightButton :
-                            button = MythGestureEvent::RightButton;
-                            break;
-                        case Qt::MidButton :
-                            button = MythGestureEvent::MiddleButton;
-                            break;
-                        case Qt::XButton1 :
-                            button = MythGestureEvent::Aux1Button;
-                            break;
-                        case Qt::XButton2 :
-                            button = MythGestureEvent::Aux2Button;
-                            break;
-                        default :
-                            button = MythGestureEvent::NoButton;
-                    }
-
-                    ge->SetButton(button);
-
-                    for (auto *it = d->m_stackList.end()-1;
-                         it != d->m_stackList.begin()-1;
-                         --it)
+                    for (auto *it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
 
-                        if (!screen || !screen->ContainsPoint(p))
+                        if (!screen || !screen->ContainsPoint(point))
                             continue;
 
                         if (screen->gestureEvent(ge))
@@ -1805,18 +1781,12 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                         QCoreApplication::postEvent(this, ge);
                         return true;
                     }
-
-                    QPoint p = mouseEvent->pos();
-
-                    ge->SetPosition(p);
                     
-                    for (auto *it = d->m_stackList.end()-1;
-                         it != d->m_stackList.begin()-1;
-                         --it)
+                    for (auto *it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
 
-                        if (!screen || !screen->ContainsPoint(p))
+                        if (!screen || !screen->ContainsPoint(point))
                             continue;
 
                         if (screen->gestureEvent(ge))
@@ -1837,13 +1807,9 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                     }
 
                     if (handled)
-                    {
                         delete ge;
-                    }
                     else
-                    {
                         QCoreApplication::postEvent(this, ge);
-                    }
                 }
 
                 return true;
@@ -1863,7 +1829,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
-                d->m_gesture.Record(mouseEvent->pos());
+                d->m_gesture.Record(mouseEvent->pos(), mouseEvent->button());
                 return true;
             }
             break;

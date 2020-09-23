@@ -3762,7 +3762,7 @@ bool TV::TranslateGesture(const QString &context, MythGestureEvent *e,
         // possibly with configurable hot zones of various sizes in a theme
         // TODO enhance gestures to support other non Click types too
         if ((e->GetGesture() == MythGestureEvent::Click) &&
-            (e->GetButton() == MythGestureEvent::LeftButton))
+            (e->GetButton() == Qt::LeftButton))
         {
             // divide screen into 12 regions
             QSize size = GetMythMainWindow()->size();

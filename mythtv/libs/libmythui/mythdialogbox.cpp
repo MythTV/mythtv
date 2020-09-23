@@ -394,7 +394,7 @@ bool MythDialogBox::gestureEvent(MythGestureEvent *event)
     {
         switch (event->GetButton())
         {
-            case MythGestureEvent::RightButton :
+            case Qt::RightButton:
                 SendEvent(-2);
                 Close();
                 handled = true;
