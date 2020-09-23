@@ -1660,8 +1660,8 @@ void MythUIImage::FindRandomImage(void)
         // try to find a different image
         do
         {
-            randFile = QString("%1%2").arg(m_imageDirectory)
-                                      .arg(imageList.takeAt(static_cast<int>(MythRandom()) % imageList.size()));
+            uint32_t rand = MythRandom() % static_cast<uint32_t>(imageList.size());
+            randFile = QString("%1%2").arg(m_imageDirectory).arg(imageList.takeAt(static_cast<int>(rand)));
 
         } while (imageList.size() > 1 && randFile == m_origFilename);
     }
