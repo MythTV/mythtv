@@ -26,6 +26,9 @@
  * the appropriate fixes.
  */
 
+// Qt
+#include <QMetaEnum>
+
 // MythTV
 #include "mythgesture.h"
 
@@ -50,6 +53,44 @@ MythGestureEvent::MythGestureEvent(Gesture gesture, Button button)
     m_gesture(gesture),
     m_button(button)
 {
+}
+
+const std::map<QString, MythGestureEvent::Gesture>MythGesture::kSequences =
+{
+    { "5",     MythGestureEvent::Click },
+    { "456",   MythGestureEvent::Right },
+    { "654",   MythGestureEvent::Left  },
+    { "258",   MythGestureEvent::Down  },
+    { "852",   MythGestureEvent::Up    },
+    { "951",   MythGestureEvent::UpLeft    },
+    { "753",   MythGestureEvent::UpRight   },
+    { "159",   MythGestureEvent::DownRight },
+    { "357",   MythGestureEvent::DownLeft  },
+    { "96321", MythGestureEvent::UpThenLeft    },
+    { "74123", MythGestureEvent::UpThenRight   },
+    { "36987", MythGestureEvent::DownThenLeft  },
+    { "14789", MythGestureEvent::DownThenRight },
+    { "32147", MythGestureEvent::LeftThenDown  },
+    { "98741", MythGestureEvent::LeftThenUp    },
+    { "12369", MythGestureEvent::RightThenDown },
+    { "78963", MythGestureEvent::RightThenUp   },
+    { "45654", MythGestureEvent::RightThenLeft },
+    { "65456", MythGestureEvent::LeftThenRight },
+    { "85258", MythGestureEvent::UpThenDown    },
+    { "25852", MythGestureEvent::DownThenUp    }
+};
+
+/*! \brief Get the symbolic name of the gesture.
+ * \return A string containing the symbolic name of the gesture.
+ */
+QString MythGestureEvent::GetName() const
+{
+    return QMetaEnum::fromType<Gesture>().valueToKey(m_gesture);
+}
+
+QString MythGestureEvent::GetButtonName() const
+{
+    return QMetaEnum::fromType<Button>().valueToKey(m_button);
 }
 
 /*! \class MythGesture
@@ -80,34 +121,6 @@ MythGesture::MythGesture(size_t MaxPoints, size_t MinPoints,
     m_scaleRatio(ScaleRatio),
     m_binPercent(BinPercent)
 {
-    /* Click */
-    m_sequences.insert("5", MythGestureEvent::Click);
-
-    /* Lines */
-    m_sequences.insert("456", MythGestureEvent::Right);
-    m_sequences.insert("654", MythGestureEvent::Left);
-    m_sequences.insert("258", MythGestureEvent::Down);
-    m_sequences.insert("852", MythGestureEvent::Up);
-
-    /* Diagonals */
-    m_sequences.insert("951", MythGestureEvent::UpLeft);
-    m_sequences.insert("753", MythGestureEvent::UpRight);
-    m_sequences.insert("159", MythGestureEvent::DownRight);
-    m_sequences.insert("357", MythGestureEvent::DownLeft);
-
-    /* Double Lines*/
-    m_sequences.insert("96321",MythGestureEvent::UpThenLeft);
-    m_sequences.insert("74123",MythGestureEvent::UpThenRight);
-    m_sequences.insert("36987",MythGestureEvent::DownThenLeft);
-    m_sequences.insert("14789",MythGestureEvent::DownThenRight);
-    m_sequences.insert("32147",MythGestureEvent::LeftThenDown);
-    m_sequences.insert("98741",MythGestureEvent::LeftThenUp);
-    m_sequences.insert("12369",MythGestureEvent::RightThenDown);
-    m_sequences.insert("78963",MythGestureEvent::RightThenUp);
-    m_sequences.insert("45654",MythGestureEvent::RightThenLeft);
-    m_sequences.insert("65456",MythGestureEvent::LeftThenRight);
-    m_sequences.insert("85258",MythGestureEvent::UpThenDown);
-    m_sequences.insert("25852",MythGestureEvent::DownThenUp);
 }
 
 /*! \brief Adjust horizontal and vertical extremes.
@@ -154,8 +167,13 @@ void MythGesture::Stop(void)
     {
         m_recording = false;
 
-        /* translate before resetting maximums */
-        m_lastGesture = m_sequences[Translate()];
+        // translate before resetting maximums
+        const QString gesture = Translate();
+        auto found = kSequences.find(gesture);
+        if (found != kSequences.cend())
+            m_lastGesture = found->second;
+        else
+            m_lastGesture = MythGestureEvent::Unknown;
 
         m_minX = m_minY = 10000;
         m_maxX = m_maxY = -1;
@@ -368,39 +386,4 @@ bool MythGesture::Record(const QPoint& Point)
     m_points.push_back(Point);
 
     return true;
-}
-
-
-static const std::array<const std::string,23> gesturename {
-    "Unknown",
-    "Up",
-    "Down",
-    "Left",
-    "Right",
-    "UpLeft",
-    "UpRight",
-    "DownLeft",
-    "DownRight",
-    "UpThenLeft",
-    "UpThenRight",
-    "DownThenLeft",
-    "DownThenRight",
-    "LeftThenUp",
-    "LeftThenDown",
-    "RightThenUp",
-    "RightThenDown",
-    "RightThenLeft",
-    "LeftThenRight",
-    "UpThenDown",
-    "DownThenUp",
-    "Click",
-    "MaxGesture"
-};
-
-/*! \brief Get the symbolic name of the gesture.
- * \return A string containing the symbolic name of the gesture.
- */
-MythGestureEvent::operator QString() const
-{
-    return QString::fromStdString(gesturename[m_gesture]);
 }

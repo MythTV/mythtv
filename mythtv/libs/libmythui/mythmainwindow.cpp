@@ -1921,7 +1921,8 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (screen)
                 screen->gestureEvent(ge);
         }
-        LOG(VB_GUI, LOG_DEBUG, QString("Gesture: %1") .arg(QString(*ge)));
+        LOG(VB_GUI, LOG_DEBUG, QString("Gesture: %1 (Button: %2)")
+            .arg(ge->GetName()).arg(ge->GetButtonName()));
     }
     else if (ce->type() == MythEvent::kExitToMainMenuEventType &&
              d->m_exitingtomain)

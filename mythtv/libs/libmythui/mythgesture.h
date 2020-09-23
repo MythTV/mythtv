@@ -31,15 +31,17 @@
 #include <QString>
 #include <QEvent>
 #include <QMutex>
-#include <QMap>
 
 // MythTV
 #include "mythuiexp.h"
 
 class MUI_PUBLIC MythGestureEvent : public QEvent
 {
+    Q_GADGET
+
   public:
-    enum Gesture {
+    enum Gesture
+    {
         Unknown,
 
         /* Horizontal and vertical lines */
@@ -71,8 +73,10 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
         /* A click */
         Click
     };
+    Q_ENUM(Gesture)
 
-    enum Button {
+    enum Button
+    {
         NoButton,
         LeftButton,
         RightButton,
@@ -80,16 +84,18 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
         Aux1Button,
         Aux2Button
     };
+    Q_ENUM(Button)
 
     explicit MythGestureEvent(Gesture gesture, Button button = LeftButton);
     ~MythGestureEvent() override = default;
 
-    explicit operator QString  () const;
+    QString        GetName     () const;
     inline Gesture GetGesture  () const { return m_gesture; }
     void           SetPosition (QPoint Position) { m_position = Position; }
     QPoint         GetPosition () const { return m_position; }
     void           SetButton   (Button button) { m_button = button; }
     Button         GetButton   () const { return m_button; }
+    QString        GetButtonName() const;
 
     static Type kEventType;
 
@@ -132,7 +138,7 @@ class MythGesture
     MythGestureEvent::Gesture m_lastGesture { MythGestureEvent::Unknown };
     QList <QPoint> m_points;
     QMutex m_lock;
-    QMap <QString, MythGestureEvent::Gesture> m_sequences;
+    static const std::map<QString, MythGestureEvent::Gesture> kSequences;
 };
 
 #endif
