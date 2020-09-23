@@ -22,9 +22,6 @@
 #ifndef MYTHGESTURE_H
 #define MYTHGESTURE_H
 
-// Std
-#include <sys/types.h>
-
 // Qt
 #include <QPoint>
 #include <QList>
@@ -34,6 +31,10 @@
 
 // MythTV
 #include "mythuiexp.h"
+
+// Std
+#include <sys/types.h>
+#include <map>
 
 class MUI_PUBLIC MythGestureEvent : public QEvent
 {
