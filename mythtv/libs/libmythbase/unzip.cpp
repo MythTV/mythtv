@@ -555,9 +555,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 		return UnZip::Ok;
 	}
 
-	bool continueParsing = true;
-
-	while (continueParsing)
+	while (true)
 	{
 		if (device->read(buffer1, 4) != 4)
 			UNZIP_CHECK_FOR_VALID_DATA
@@ -621,10 +619,7 @@ UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, ZipEn
 	*/
 	bool hasDataDescriptor = entry.hasDataDescriptor();
 
-	bool checkFailed = false;
-
-	if (!checkFailed)
-		checkFailed = entry.compMethod != getUShort(uBuffer, UNZIP_LH_OFF_CMETHOD);
+	bool checkFailed = entry.compMethod != getUShort(uBuffer, UNZIP_LH_OFF_CMETHOD);
 	if (!checkFailed)
 		checkFailed = entry.gpFlag[0] != uBuffer[UNZIP_LH_OFF_GPFLAG];
 	if (!checkFailed)
