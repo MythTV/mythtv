@@ -4572,42 +4572,6 @@ void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
     DoJumpToFrame(number, kInaccuracyNone);
 }
 
-/** \fn MythPlayer::GetRawVideoFrame(long long)
- *  \brief Returns a specific frame from the video.
- *
- *   NOTE: You must call DiscardVideoFrame(VideoFrame*) on
- *         the frame returned, as this marks the frame as
- *         being used and hence unavailable for decoding.
- */
-VideoFrame* MythPlayer::GetRawVideoFrame(long long frameNumber)
-{
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    if (m_playerCtx->m_playingInfo)
-        m_playerCtx->m_playingInfo->UpdateInUseMark();
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    if (!m_decoderThread)
-        DecoderStart(false);
-
-    if (frameNumber >= 0)
-    {
-        DoJumpToFrame(frameNumber, kInaccuracyNone);
-        ClearAfterSeek();
-    }
-
-    int tries = 0;
-    while (!m_videoOutput->ValidVideoFrames() && ((tries++) < 100))
-    {
-        m_decodeOneFrame = true;
-        usleep(10000);
-        if ((tries & 10) == 10)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
-    }
-
-    m_videoOutput->StartDisplayingFrame();
-    return m_videoOutput->GetLastShownFrame();
-}
-
 QString MythPlayer::GetEncodingType(void) const
 {
     if (m_decoder)

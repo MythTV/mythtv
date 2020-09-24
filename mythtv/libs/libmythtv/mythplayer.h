@@ -289,7 +289,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Decoder stuff..
     const VideoFrameTypeVec* DirectRenderFormats(void);
     VideoFrame *GetNextVideoFrame(void);
-    VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void DeLimboFrame(VideoFrame *frame);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
