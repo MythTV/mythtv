@@ -15,7 +15,6 @@
 
 // C++ headers
 #include <deque>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -51,7 +50,7 @@ class BufferedSocketDevice
         quint16                 m_nDestPort           {0};
 
         MMembuf                 m_bufRead;
-        deque<QByteArray*>      m_bufWrite;
+        std::deque<QByteArray*> m_bufWrite;
 
         int     ReadBytes      ( );
         bool    ConsumeWriteBuf( qulonglong nbytes );

@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-using namespace std;
 
 #include "upnp.h"
 #include "upnpcds.h"

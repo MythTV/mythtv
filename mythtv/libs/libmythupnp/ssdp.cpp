@@ -33,8 +33,6 @@
 #include <sys/select.h>
 #endif
 
-using namespace std;
-
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -267,7 +265,7 @@ void SSDP::run()
             if (socket != nullptr && socket->socket() >= 0)
             {
                 FD_SET( socket->socket(), &read_set );
-                nMaxSocket = max( socket->socket(), nMaxSocket );
+                nMaxSocket = std::max( socket->socket(), nMaxSocket );
 
 #if 0
                 if (socket->bytesAvailable() > 0)

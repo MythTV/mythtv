@@ -59,8 +59,6 @@
 #define O_LARGEFILE 0
 #endif
 
-using namespace std;
-
 static std::array<const MIMETypes,63> g_MIMETypes
 {{
     // Image Mime Types
@@ -403,7 +401,7 @@ qint64 HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
     // DEBUGGING
     if (getenv("HTTPREQUEST_DEBUG"))
-        cout << m_response.buffer().constData() << endl;
+        std::cout << m_response.buffer().constData() << std::endl;
     // ----------------------------------------------------------------------
 
     LOG(VB_HTTP, LOG_DEBUG, QString("Reponse Content Length: %1").arg(nContentLen));

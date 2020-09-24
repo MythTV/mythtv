@@ -43,9 +43,6 @@
 
 #include "serviceHosts/rttiServiceHost.h"
 
-using namespace std;
-
-
 /**
  * \brief Handle an OPTIONS request
  */
@@ -119,7 +116,7 @@ HttpServer::HttpServer() :
     m_privateToken(QUuid::createUuid().toString()) // Cryptographically random and sufficiently long enough to act as a secure token
 {
     // Number of connections processed concurrently
-    int maxHttpWorkers = max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
+    int maxHttpWorkers = std::max(QThread::idealThreadCount() * 2, 2); // idealThreadCount can return -1
     // Don't allow more connections than we can process, it causes browsers
     // to open lots of new connections instead of reusing existing ones
     setMaxPendingConnections(maxHttpWorkers);
