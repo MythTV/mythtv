@@ -9,8 +9,6 @@
 #include <algorithm>
 #include <vector>
 
-using namespace std;
-
 #include "audiooutputsettings.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -277,7 +275,7 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
         return;
     }
 
-    vector<int>::reverse_iterator it;
+    std::vector<int>::reverse_iterator it;
 
     for (it = m_channels.rbegin();
          it != m_channels.rend() && *it >= channels;

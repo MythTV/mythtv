@@ -1,8 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-using namespace std;
-
 // Qt utils: to parse audio list
 #include <QFile>
 #include <QDateTime>

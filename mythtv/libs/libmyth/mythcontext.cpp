@@ -19,8 +19,6 @@
 #include <thread>
 #include <vector>
 
-using namespace std;
-
 #include "config.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
@@ -750,7 +748,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         QString        response;
         std::this_thread::sleep_for(std::chrono::seconds(1));
         // give user chance to skip config
-        cout << endl << error.toLocal8Bit().constData() << endl << endl;
+        std::cout << std::endl << error.toLocal8Bit().constData() << std::endl << std::endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "no");

@@ -3,8 +3,6 @@
 #include <cmath>
 #include <limits>
 
-using namespace std;
-
 // POSIX headers
 #include <unistd.h>
 #include <sys/time.h>
@@ -134,7 +132,7 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
     m_outputSettings = GetOutputSettingsUsers(false);
     m_outputSettingsDigital = GetOutputSettingsUsers(true);
 
-    m_maxChannels = max(m_outputSettings->BestSupportedChannels(),
+    m_maxChannels = std::max(m_outputSettings->BestSupportedChannels(),
                        m_outputSettingsDigital->BestSupportedChannels());
     m_configuredChannels = m_maxChannels;
 
@@ -519,8 +517,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         // Make sure we never attempt to output more than what we can
         // the upmixer can only upmix to 6 channels when source < 6
         if (lsource_channels <= 6)
-            lconfigured_channels = min(lconfigured_channels, 6);
-        lconfigured_channels = min(lconfigured_channels, m_maxChannels);
+            lconfigured_channels = std::min(lconfigured_channels, 6);
+        lconfigured_channels = std::min(lconfigured_channels, m_maxChannels);
         /* Encode to AC-3 if we're allowed to passthru but aren't currently
            and we have more than 2 channels but multichannel PCM is not
            supported or if the device just doesn't support the number of

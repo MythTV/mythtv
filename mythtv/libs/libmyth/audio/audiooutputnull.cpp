@@ -15,8 +15,6 @@
 
 #include "config.h"
 
-using namespace std;
-
 #include "mythlogging.h"
 #include "audiooutputnull.h"
 

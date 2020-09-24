@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
-
 #include "mythlogging.h"
 #include "audiooutputdx.h"
 

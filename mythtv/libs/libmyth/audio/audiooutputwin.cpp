@@ -1,7 +1,5 @@
 #include <iostream>
 
-using namespace std;
-
 #include "mythlogging.h"
 #include "audiooutputwin.h"
 

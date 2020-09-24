@@ -13,8 +13,6 @@
 #include "rssparse.h"
 #include "mythsorthelper.h"
 
-using namespace std;
-
 #define LOC      QString("RSSSite: ")
 
 // ---------------------------------------------------

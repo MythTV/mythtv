@@ -11,8 +11,6 @@
 
 #include "config.h"
 
-using namespace std;
-
 #define LOC      QString("AOOSS: ")
 
 #include "mythcorecontext.h"

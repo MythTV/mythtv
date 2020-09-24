@@ -5,7 +5,6 @@
 // C++ headers
 #include <iostream>
 #include <typeinfo>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>

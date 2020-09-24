@@ -29,8 +29,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 #include "mythcorecontext.h"
 #include "audiooutputjack.h"
 #include "mythdate.h"

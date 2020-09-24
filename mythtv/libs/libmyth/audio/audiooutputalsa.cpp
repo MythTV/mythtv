@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-using namespace std;
-
 #include <QFile>
 #include "mythcorecontext.h"
 #include "audiooutputalsa.h"
@@ -852,8 +850,8 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
         retvol = (m_mixer.volrange != 0L) ? (mixervol - m_mixer.volmin) *
                                             100.0F / m_mixer.volrange + 0.5F
                                             : 0;
-        retvol = max(retvol, 0);
-        retvol = min(retvol, 100);
+        retvol = std::max(retvol, 0);
+        retvol = std::min(retvol, 100);
         VBAUDIO(QString("get volume channel %1: %2")
                 .arg(channel).arg(retvol));
     }
@@ -866,8 +864,8 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
         return;
 
     long mixervol = (int64_t(volume) * m_mixer.volrange) / 100 + m_mixer.volmin;
-    mixervol = max(mixervol, m_mixer.volmin);
-    mixervol = min(mixervol, m_mixer.volmax);
+    mixervol = std::max(mixervol, m_mixer.volmin);
+    mixervol = std::min(mixervol, m_mixer.volmax);
 
     auto chan = (snd_mixer_selem_channel_id_t) channel;
 

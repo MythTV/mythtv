@@ -2,7 +2,6 @@
 #include <cstdlib>
 
 #include <algorithm>
-using namespace std;
 
 #include <QString>
 #include <QMutex>
@@ -122,7 +121,7 @@ uint VolumeBase::GetCurrentVolume(void) const
 
 void VolumeBase::SetCurrentVolume(int value)
 {
-    m_volume = max(min(value, 100), 0);
+    m_volume = std::max(std::min(value, 100), 0);
     UpdateVolume();
     
     // Throttle Db writes

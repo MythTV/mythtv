@@ -15,8 +15,6 @@
 #include "programinfo.h" // for format_season_and_episode()
 #include "mythsorthelper.h"
 
-using namespace std;
-
 ResultItem::ResultItem(const QString& title, const QString& sortTitle,
               const QString& subtitle, const QString& sortSubtitle,
               const QString& desc, const QString& URL,

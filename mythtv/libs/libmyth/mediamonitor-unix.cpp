@@ -22,8 +22,6 @@
 // C++ headers
 #include <iostream>
 
-using namespace std;
-
 // Qt headers
 #if CONFIG_QTDBUS
 #include <QtDBus>

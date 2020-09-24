@@ -18,8 +18,6 @@
 
 #define LOC      QString("NetContent: ")
 
-using namespace std;
-
 // ---------------------------------------------------
 
 GrabberScript::GrabberScript(const QString& title, const QString& image,
