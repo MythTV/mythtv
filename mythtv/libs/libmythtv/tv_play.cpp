@@ -11309,13 +11309,13 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         FrameScanType scan = ctx->m_player->GetScanType();
         active = (scan == kScan_Detect);
-        BUTTON("SELECTSCAN_0", ScanTypeToString(kScan_Detect));
+        BUTTON("SELECTSCAN_0", ScanTypeToUserString(kScan_Detect));
         active = (scan == kScan_Progressive);
-        BUTTON("SELECTSCAN_3", ScanTypeToString(kScan_Progressive));
+        BUTTON("SELECTSCAN_3", ScanTypeToUserString(kScan_Progressive));
         active = (scan == kScan_Interlaced);
-        BUTTON("SELECTSCAN_1", ScanTypeToString(kScan_Interlaced));
+        BUTTON("SELECTSCAN_1", ScanTypeToUserString(kScan_Interlaced));
         active = (scan == kScan_Intr2ndField);
-        BUTTON("SELECTSCAN_2", ScanTypeToString(kScan_Intr2ndField));
+        BUTTON("SELECTSCAN_2", ScanTypeToUserString(kScan_Intr2ndField));
     }
     else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
              matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
@@ -12261,7 +12261,7 @@ void TV::OverrideScan(PlayerContext *Context, FrameScanType Scan)
     if (Context->m_player)
     {
         Context->m_player->SetScanOverride(Scan);
-        message = ScanTypeToString(Scan == kScan_Detect ? kScan_Detect :
+        message = ScanTypeToUserString(Scan == kScan_Detect ? kScan_Detect :
                     Context->m_player->GetScanType(), Scan > kScan_Detect);
     }
     Context->UnlockDeletePlayer(__FILE__, __LINE__);

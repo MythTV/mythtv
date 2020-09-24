@@ -179,7 +179,7 @@ inline bool is_progressive(FrameScanType Scan)
     return (kScan_Progressive == Scan);
 }
 
-inline QString ScanTypeToString(FrameScanType Scan, bool Forced = false)
+inline QString ScanTypeToUserString(FrameScanType Scan, bool Forced = false)
 {
     switch (Scan)
     {
@@ -190,6 +190,18 @@ inline QString ScanTypeToString(FrameScanType Scan, bool Forced = false)
         case kScan_Intr2ndField: return Forced ? QObject::tr("Interlaced (Reversed, Forced)") : QObject::tr("Interlaced (Reversed)");
     }
     return QObject::tr("Unknown");
+}
+
+inline QString ScanTypeToString(FrameScanType Scan)
+{
+    switch (Scan)
+    {
+        case kScan_Ignore:      return QString("Ignore Scan");
+        case kScan_Detect:      return QString("Detect Scan");
+        case kScan_Interlaced:  return QString("Interlaced Scan");
+        case kScan_Progressive: return QString("Progressive Scan");
+        default:                return QString("Unknown Scan");
+    }
 }
 
 inline QString toString(PIPState State)

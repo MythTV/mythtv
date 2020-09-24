@@ -445,22 +445,12 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
     AutoVisualise();
 }
 
-static inline QString toQString(FrameScanType scan) {
-    switch (scan) {
-        case kScan_Ignore: return QString("Ignore Scan");
-        case kScan_Detect: return QString("Detect Scan");
-        case kScan_Interlaced:  return QString("Interlaced Scan");
-        case kScan_Progressive: return QString("Progressive Scan");
-        default: return QString("Unknown Scan");
-    }
-}
-
 FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
                                           FrameScanType scan,
                                           float fps, int video_height) const
 {
-    QString dbg = QString("detectInterlace(") + toQString(newScan) +
-        QString(", ") + toQString(scan) + QString(", ") +
+    QString dbg = QString("detectInterlace(") + ScanTypeToString(newScan) +
+        QString(", ") + ScanTypeToString(scan) + QString(", ") +
         QString("%1").arg(static_cast<double>(fps)) + QString(", ") +
         QString("%1").arg(video_height) + QString(") ->");
 
@@ -478,8 +468,7 @@ FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
             scan = newScan;
     };
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg +toQString(scan));
-
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + ScanTypeToString(scan));
     return scan;
 }
 
@@ -516,7 +505,7 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
     if ((m_scanOverride > kScan_Detect) && (m_scan != m_scanOverride))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Locking scan override to '%1'")
-            .arg(ScanTypeToString(m_scanOverride, true)));
+            .arg(ScanTypeToUserString(m_scanOverride, true)));
         SetScanType(m_scanOverride);
     }
 
@@ -1529,7 +1518,7 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
     m_frameInterval = static_cast<int>(lround(1000000.0 * frame_period) / m_fpsMultiplier);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval Interval:%1 Speed:%2 Scan:%3 (Multiplier: %4)")
-        .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(toQString(scan)).arg(m_fpsMultiplier));
+        .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(ScanTypeToString(scan)).arg(m_fpsMultiplier));
 }
 
 void MythPlayer::ResetAVSync(void)
