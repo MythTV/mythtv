@@ -1,7 +1,6 @@
 // c/c++
 #include <unistd.h>
 #include <iostream>
-using namespace std;
 
 // qt
 #include <QKeyEvent>

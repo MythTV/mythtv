@@ -25,10 +25,6 @@
 // mythmusic
 #include "pls.h"
 
-
-using namespace std;
-
-
 PlayListFile::~PlayListFile(void)
 {
     clear();

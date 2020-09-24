@@ -17,8 +17,6 @@
 #include "webpage.h"
 #include "mythflashplayer.h"
 
-using namespace std;
-
 MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
                          QStringList &urlList)
     : MythScreenType (parent, "mythflashplayer"),

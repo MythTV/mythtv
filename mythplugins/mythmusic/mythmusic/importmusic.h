@@ -4,7 +4,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-using namespace std;
 
 #include <QStringList>
 
@@ -108,13 +107,13 @@ class ImportMusicDialog : public MythScreenType
 
   private:
     void fillWidgets();
-    void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);
+    void scanDirectory(QString &directory, std::vector<TrackInfo*> *tracks);
     void showImportCoverArtDialog();
     static bool copyFile(const QString &src, const QString &dst);
 
     QString              m_musicStorageDir;
     bool                 m_somethingWasImported {false};
-    vector<TrackInfo*>  *m_tracks               {nullptr};
+    std::vector<TrackInfo*> *m_tracks           {nullptr};
     QStringList          m_sourceFiles;
     int                  m_currentTrack         {0};
     MusicMetadata       *m_playingMetaData      {nullptr};

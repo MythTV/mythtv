@@ -8,7 +8,6 @@
 #define MAINVISUAL_H
 
 #include <vector>
-using namespace std;
 
 #include "constants.h"
 

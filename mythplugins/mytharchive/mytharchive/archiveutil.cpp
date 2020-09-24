@@ -4,7 +4,6 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <unistd.h>
-using namespace std;
 
 // qt
 #include <QDomDocument>

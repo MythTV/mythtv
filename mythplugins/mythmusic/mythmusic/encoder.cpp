@@ -6,8 +6,6 @@
 #include "encoder.h"
 
 
-using namespace std;
-
 Encoder::Encoder(QString outfile, int qualitylevel, MusicMetadata *metadata)
     : m_outfile(std::move(outfile)), m_quality(qualitylevel),
       m_metadata(metadata)

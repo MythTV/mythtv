@@ -33,8 +33,6 @@
 #include <decoderhandler.h>
 #include <mythavutil.h>
 
-using namespace std;
-
 // Mythmusic Headers
 #include "avfdecoder.h"
 #include "metaio.h"

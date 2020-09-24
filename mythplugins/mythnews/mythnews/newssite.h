@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // MythTV headers
 #include <QObject>
@@ -25,7 +24,7 @@ using namespace std;
 class NewsSiteItem
 {
   public:
-    using List = vector<NewsSiteItem>;
+    using List = std::vector<NewsSiteItem>;
 
     QString m_name;
     QString m_category;
@@ -39,7 +38,7 @@ Q_DECLARE_METATYPE(NewsSiteItem*)
 class NewsCategory
 {
   public:
-    using List = vector<NewsCategory>;
+    using List = std::vector<NewsCategory>;
 
     QString             m_name;
     NewsSiteItem::List  m_siteList;
@@ -62,7 +61,7 @@ class NewsSite : public QObject
         Success
     };
 
-    class List : public vector<NewsSite*>
+    class List : public std::vector<NewsSite*>
     {
       public:
         void clear(void)

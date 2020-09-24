@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <iostream>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>

@@ -14,7 +14,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
 // Qt
 #include <QCoreApplication>

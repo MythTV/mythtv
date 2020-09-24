@@ -1,9 +1,7 @@
 #include <unistd.h>
 
 #include <cstdlib>
-
 #include <iostream>
-using namespace std;
 
 #include <QString>
 

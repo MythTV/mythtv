@@ -29,8 +29,6 @@
 #include "rsseditor.h"
 #include "searcheditor.h"
 
-using namespace std;
-
 // ---------------------------------------------------
 
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)

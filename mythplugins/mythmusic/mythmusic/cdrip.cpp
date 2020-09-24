@@ -11,7 +11,6 @@
 // C++ includes
 #include <iostream>
 #include <memory>
-using namespace std;
 
 // Qt includes
 #include <QApplication>

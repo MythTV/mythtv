@@ -12,7 +12,6 @@
 #include <cstdlib>
 
 #include <iostream>
-using namespace std;
 
 #include <QCoreApplication>
 #include <QPainter>

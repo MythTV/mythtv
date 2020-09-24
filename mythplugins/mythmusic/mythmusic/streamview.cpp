@@ -29,9 +29,6 @@
 #include "streamview.h"
 #include "musicplayer.h"
 
-using namespace std;
-
-
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
     : MusicCommon(parent, parentScreen, "streamview")
 {

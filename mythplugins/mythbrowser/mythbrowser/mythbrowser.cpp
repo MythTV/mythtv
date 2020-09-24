@@ -15,9 +15,6 @@
 #include "bookmarkeditor.h"
 #include "mythbrowser.h"
 
-
-using namespace std;
-
 MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),
       m_urlList(urlList)

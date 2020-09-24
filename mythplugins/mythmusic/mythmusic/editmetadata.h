@@ -2,7 +2,6 @@
 #define EDITMETADATA_H_
 
 #include <iostream>
-using namespace std;
 
 #include <mythscreentype.h>
 #include <musicmetadata.h>

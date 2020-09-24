@@ -18,8 +18,6 @@
 #include "nettree.h"
 #include "treeeditor.h"
 
-using namespace std;
-
 GrabberManager *grabMan = nullptr;
 RSSManager *rssMan = nullptr;
 

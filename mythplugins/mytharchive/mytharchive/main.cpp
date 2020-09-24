@@ -9,8 +9,6 @@
 #include <cstdlib>
 #include <iostream>
 
-using namespace std;
-
 // Qt
 #include <QApplication>
 #include <QDir>

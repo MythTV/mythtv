@@ -57,7 +57,7 @@ void FileCopyThread::run()
 
 ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
     MythScreenType(parent, "musicimportfiles"),
-    m_tracks(new vector<TrackInfo*>)
+    m_tracks(new std::vector<TrackInfo*>)
 {
     QString lastHost = gCoreContext->GetSetting("MythMusicLastImportHost", gCoreContext->GetMasterHostName());
     QStringList dirs = StorageGroup::getGroupDirs("Music", lastHost);
@@ -543,7 +543,7 @@ void ImportMusicDialog::doScan()
     scanDirectory(location, m_tracks);
 }
 
-void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tracks)
+void ImportMusicDialog::scanDirectory(QString &directory, std::vector<TrackInfo*> *tracks)
 {
     QDir d(directory);
 

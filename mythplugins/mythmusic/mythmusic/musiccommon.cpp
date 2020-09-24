@@ -3,7 +3,6 @@
 
 // C++ includes
 #include <iostream>
-using namespace std;
 
 // Qt includes
 #include <QApplication>

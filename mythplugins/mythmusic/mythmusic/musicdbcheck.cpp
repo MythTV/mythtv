@@ -3,7 +3,6 @@
 #include <QSqlError>
 
 #include <iostream>
-using namespace std;
 
 #include <musicmetadata.h>
 #include <mythcontext.h>

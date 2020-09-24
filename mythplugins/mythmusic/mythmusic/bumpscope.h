@@ -5,7 +5,6 @@
 #include "config.h"
 
 #include <vector>
-using namespace std;
 
 #define MAX_PHONGRES 1024
 
@@ -53,7 +52,7 @@ private:
 
     int            m_bpl            {0};
 
-    vector<vector<unsigned char> > m_phongDat {};
+    std::vector<std::vector<unsigned char> > m_phongDat {};
     unsigned char *m_rgbBuf         {nullptr};
     std::array<double,256> m_intense1 {};
     std::array<double,256> m_intense2 {};

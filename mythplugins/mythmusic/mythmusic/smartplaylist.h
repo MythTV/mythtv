@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-class MythUIButton;using namespace std;
+class MythUIButton;
 
 // qt
 #include <QDateTime>

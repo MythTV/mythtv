@@ -38,9 +38,6 @@
 #include <sys/vfs.h>
 #endif
 
-using namespace std;
-
-
 // Qt headers
 #include <QApplication>
 #include <QFile>

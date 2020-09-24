@@ -22,8 +22,6 @@
 #include "videoselector.h"
 #include "archiveutil.h"
 
-using namespace std;
-
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
                m_archiveList(archiveList)
@@ -367,7 +365,7 @@ void VideoSelector::updateVideoList(void)
     }
 }
 
-vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
+std::vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 {
     // get a list of category's
     using CategoryMap = QMap<int, QString>;
@@ -391,7 +389,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 
     if (query.exec() && query.size())
     {
-        auto *videoList = new vector<VideoInfo*>;
+        auto *videoList = new std::vector<VideoInfo*>;
         QString episode;
         while (query.next())
         {

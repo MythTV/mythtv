@@ -1,6 +1,5 @@
 // C++ headers
 #include <vector>
-using namespace std;
 
 // MythTV headers
 #include <mythcontext.h>

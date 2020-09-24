@@ -13,8 +13,6 @@
 #include "mythbrowser.h"
 #include "webpage.h"
 
-using namespace std;
-
 WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
 {
     m_parent = parent;

@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // QT headers
 #include <QString>
@@ -11,7 +10,7 @@ using namespace std;
 class NewsArticle
 {
   public:
-    using List = vector<NewsArticle>;
+    using List = std::vector<NewsArticle>;
 
     NewsArticle(QString title, QString desc, QString articleURL,
                 QString thumbnail, QString mediaURL, QString enclosure);

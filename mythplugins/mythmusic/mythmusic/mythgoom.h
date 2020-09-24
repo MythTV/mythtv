@@ -4,8 +4,6 @@
 #include "mainvisual.h"
 #include "config.h"
 
-using namespace std;
-
 class Goom : public VisualBase
 {
 public:

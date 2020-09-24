@@ -14,7 +14,6 @@
 
 // C++
 #include <iostream>
-using namespace std;
 
 // Qt
 #include <QCoreApplication>

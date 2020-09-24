@@ -38,7 +38,6 @@
 
 // c++
 #include <iostream>
-using namespace std;
 
 static int write_buffer(char *buf, int bufsize, FILE *fp)
 {

@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <map>
 #include <unistd.h>
-using namespace std;
 
 // qt
 #include <QApplication>
@@ -326,7 +325,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         {
             // "intellegent/album" order
 
-            using AlbumMap = map<QString, uint32_t>;
+            using AlbumMap = std::map<QString, uint32_t>;
             AlbumMap                       album_map;
             AlbumMap::iterator             Ialbum;
             QString                        album;
@@ -396,7 +395,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         {
             // "intellegent/album" order
 
-            using ArtistMap = map<QString, uint32_t>;
+            using ArtistMap = std::map<QString, uint32_t>;
             ArtistMap                      artist_map;
             ArtistMap::iterator            Iartist;
             QString                        artist;

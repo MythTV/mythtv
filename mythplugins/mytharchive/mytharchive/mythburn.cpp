@@ -41,8 +41,6 @@
 #include "videoselector.h"
 #include "logviewer.h"
 
-using namespace std;
-
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
                    MythScreenType    *themeScreen,

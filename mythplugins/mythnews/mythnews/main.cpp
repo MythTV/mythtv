@@ -17,8 +17,6 @@
 #include "mythnews.h"
 #include "mythnewsconfig.h"
 
-using namespace std;
-
 static int RunNews(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

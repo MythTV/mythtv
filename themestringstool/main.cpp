@@ -13,8 +13,6 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
-
 QString getFirstText(QDomElement element);
 void parseElement(QDomElement &element);
 void parseDirectory(QString dir);
@@ -104,7 +102,7 @@ void parseDirectory(QString dir)
 {
     QDir themeDir(dir);
 
-    cout << "Searching directory: " << qPrintable(themeDir.path()) << endl;
+    std::cout << "Searching directory: " << qPrintable(themeDir.path()) << std::endl;
 
     themeDir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     themeDir.setSorting(QDir::DirsFirst);
@@ -123,13 +121,13 @@ void parseDirectory(QString dir)
         if ((*it).suffix() != "xml")
             continue;
 
-        cout << "  Found: " << qPrintable((*it).filePath()) << endl;
+        std::cout << "  Found: " << qPrintable((*it).filePath()) << std::endl;
 
         QFile fin((*it).absoluteFilePath());
 
         if (!fin.open(QIODevice::ReadOnly))
         {
-            cerr << "Can't open " << qPrintable((*it).absoluteFilePath()) << endl;
+            std::cerr << "Can't open " << qPrintable((*it).absoluteFilePath()) << std::endl;
             continue;
         }
 
@@ -139,10 +137,10 @@ void parseDirectory(QString dir)
 
         if (!doc.setContent(&fin, false, &errorMsg, &errorLine, &errorColumn))
         {
-            cerr << "Error parsing: " << qPrintable((*it).absoluteFilePath()) << endl;
-            cerr << "at line: " << errorLine << "  column: "
-                 << errorColumn << endl;
-            cerr << qPrintable(errorMsg) << endl;
+            std::cerr << "Error parsing: " << qPrintable((*it).absoluteFilePath()) << std::endl;
+            std::cerr << "at line: " << errorLine << "  column: "
+                      << errorColumn << std::endl;
+            std::cerr << qPrintable(errorMsg) << std::endl;
             fin.close();
             continue;
         }
@@ -163,7 +161,7 @@ void parseDirectory(QString dir)
             n = n.nextSibling();
         }
 
-        cout << "    Contains " << stringCount << " total strings" << endl;
+        std::cout << "    Contains " << stringCount << " total strings" << std::endl;
     }
 
 }
@@ -176,7 +174,7 @@ int main(int argc, char *argv[])
 
     if (args.count() < 2)
     {
-        cerr << "You must specify at least a starting directory." << endl;
+        std::cerr << "You must specify at least a starting directory." << std::endl;
         a.exit(-1);
     }
 
@@ -188,14 +186,14 @@ int main(int argc, char *argv[])
 
     if (indir.isEmpty() || outfilebase.isEmpty())
     {
-        cerr << "no filenames\n";
+        std::cerr << "no filenames\n";
         exit(-1);
     }
 
     QDir themeDir(indir);
     if (!themeDir.exists())
     {
-        cerr << "Starting directory does not exist\n";
+        std::cerr << "Starting directory does not exist\n";
         exit(-1);
     }
 
@@ -207,7 +205,7 @@ int main(int argc, char *argv[])
 
     if (!fstringout.open(QIODevice::WriteOnly))
     {
-        cerr << "can't open " << qPrintable(outfile) << " for writing\n";
+        std::cerr << "can't open " << qPrintable(outfile) << " for writing\n";
         exit(-1);
     }
 
@@ -283,10 +281,10 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    cout << endl;
-    cout << "---------------------------------------" << endl;
-    cout << "Found " << totalStringCount << " total strings" << endl;
-    cout << strings.count() << " unique" << endl;
+    std::cout << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "Found " << totalStringCount << " total strings" << std::endl;
+    std::cout << strings.count() << " unique" << std::endl;
 
     return 0;
 }
