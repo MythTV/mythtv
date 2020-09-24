@@ -21,8 +21,6 @@
 #include "programinfo.h" // for format_season_and_episode
 #include "mythsorthelper.h"
 
-using namespace std;
-
 class VideoMetadataImp
 {
   public:
@@ -559,7 +557,7 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_year = query.value(5).toInt();
     m_releasedate = query.value(6).toDate();
     m_userrating = (float)query.value(7).toDouble();
-    if (isnan(m_userrating) || m_userrating < 0)
+    if (std::isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
     if (m_userrating > 10.0F)
         m_userrating = 10.0F;
@@ -641,7 +639,7 @@ void VideoMetadataImp::saveToDatabase()
         m_trailer = VIDEO_TRAILER_DEFAULT;
     if (m_inetref.isEmpty())
         m_inetref = VIDEO_INETREF_DEFAULT;
-    if (isnan(m_userrating))
+    if (std::isnan(m_userrating))
         m_userrating = 0.0;
     if (m_userrating < -10.0F || m_userrating > 10.0F)
         m_userrating = 0.0;

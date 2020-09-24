@@ -42,8 +42,6 @@
 #include "musicutils.h"
 #include "lyricsdata.h"
 
-using namespace std;
-
 static QString thePrefix = "the ";
 
 bool operator==(MusicMetadata& a, MusicMetadata& b)
@@ -1591,10 +1589,10 @@ void AllMusic::resync()
                 int playCount = query.value(13).toInt();
                 qint64 lastPlay = query.value(14).toDateTime().toSecsSinceEpoch();
 
-                m_playCountMin = min(playCount, m_playCountMin);
-                m_playCountMax = max(playCount, m_playCountMax);
-                m_lastPlayMin  = min(lastPlay,  m_lastPlayMin);
-                m_lastPlayMax  = max(lastPlay,  m_lastPlayMax);
+                m_playCountMin = std::min(playCount, m_playCountMin);
+                m_playCountMax = std::max(playCount, m_playCountMax);
+                m_lastPlayMin  = std::min(lastPlay,  m_lastPlayMin);
+                m_lastPlayMax  = std::max(lastPlay,  m_lastPlayMax);
             }
             m_numLoaded++;
         }
