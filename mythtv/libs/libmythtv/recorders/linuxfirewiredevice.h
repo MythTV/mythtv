@@ -42,7 +42,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     void SignalReset(uint generation);
 
     // Statics
-    static vector<AVCInfo> GetSTBList(void);
+    static std::vector<AVCInfo> GetSTBList(void);
 
     // Constants
     static const uint kBroadcastChannel;
@@ -77,10 +77,10 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
 
     bool UpdateDeviceList(void);
     void UpdateDeviceListItem(uint64_t guid, void *pitem);
-    vector<AVCInfo> GetSTBListPrivate(void);
+    std::vector<AVCInfo> GetSTBListPrivate(void);
 
-    bool SendAVCCommand(const vector<uint8_t> &cmd,
-                        vector<uint8_t>       &result,
+    bool SendAVCCommand(const std::vector<uint8_t> &cmd,
+                        std::vector<uint8_t>       &result,
                         int                    retry_cnt) override; // FirewireDevice
 
     LinuxAVCInfo *GetInfoPtr(void);

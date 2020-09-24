@@ -228,7 +228,7 @@ void IPTVStreamHandler::run(void)
                 "Unable to create socket " + ENO);
             continue;
         }
-        int buf_size = 2 * 1024 * max(tuning.GetBitrate(i)/1000, 500U);
+        int buf_size = 2 * 1024 * std::max(tuning.GetBitrate(i)/1000, 500U);
         if (!tuning.GetBitrate(i))
             buf_size = 2 * 1024 * 1024;
         int err = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,

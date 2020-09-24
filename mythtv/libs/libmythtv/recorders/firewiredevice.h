@@ -9,7 +9,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -215,13 +214,13 @@ class FirewireDevice
     // Statics
     static bool IsSTBSupported(const QString &model);
     static QString GetModelName(uint vendor_id, uint model_id);
-    static vector<AVCInfo> GetSTBList(void);
+    static std::vector<AVCInfo> GetSTBList(void);
 
   protected:
     FirewireDevice(uint64_t guid, uint subunitid, uint speed);
 
-    virtual bool SendAVCCommand(const vector<uint8_t> &cmd,
-                                vector<uint8_t> &result,
+    virtual bool SendAVCCommand(const std::vector<uint8_t> &cmd,
+                                std::vector<uint8_t> &result,
                                 int retry_cnt) = 0;
     void SetLastChannel(uint channel);
     void ProcessPATPacket(const TSPacket &tspacket);
@@ -236,7 +235,7 @@ class FirewireDevice
     bool                     m_bufferCleared  {true};
 
     uint                     m_openPortCnt    {0};
-    vector<TSDataListener*>  m_listeners;
+    std::vector<TSDataListener*>  m_listeners;
     mutable QMutex           m_lock;
 
     /// Vendor ID + Model ID to FirewireDevice STB model string

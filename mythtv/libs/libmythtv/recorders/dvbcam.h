@@ -2,7 +2,6 @@
 #define DVBCAM_H
 
 #include <deque>
-using namespace std;
 
 #include <QWaitCondition>
 #include <QRunnable>

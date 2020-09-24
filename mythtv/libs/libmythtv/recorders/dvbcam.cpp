@@ -41,8 +41,6 @@
 #include <utility>
 #include <vector>
 
-using namespace std;
-
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>

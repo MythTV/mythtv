@@ -64,8 +64,8 @@ bool LinuxAVCInfo::ClosePort(void)
 }
 
 bool LinuxAVCInfo::SendAVCCommand(
-    const vector<uint8_t>  &_cmd,
-    vector<uint8_t>        &result,
+    const std::vector<uint8_t>  &_cmd,
+    std::vector<uint8_t>        &result,
     int                     retry_cnt)
 {
     retry_cnt = (retry_cnt < 0) ? 2 : retry_cnt;
@@ -75,7 +75,7 @@ bool LinuxAVCInfo::SendAVCCommand(
     if (!m_fwHandle || (m_node < 0))
         return false;
 
-    vector<uint8_t> cmd = _cmd;
+    std::vector<uint8_t> cmd = _cmd;
     while (cmd.size() & 0x3)
         cmd.push_back(0x00);
 

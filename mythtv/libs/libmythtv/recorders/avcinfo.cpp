@@ -45,8 +45,8 @@ bool AVCInfo::GetSubunitInfo(void)
 
     for (uint i = 0; i < 8; i++)
     {
-        vector<uint8_t> cmd;
-        vector<uint8_t> ret;
+        std::vector<uint8_t> cmd;
+        std::vector<uint8_t> ret;
 
         cmd.push_back(FirewireDevice::kAVCStatusInquiryCommand);
         cmd.push_back(FirewireDevice::kAVCSubunitTypeUnit |

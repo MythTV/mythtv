@@ -10,7 +10,6 @@
 // C++ headers
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QReadWriteLock>
@@ -117,7 +116,7 @@ class DTVChannel : public ChannelBase
     QString GetTuningMode(void) const;
 
     /// \brief Returns a vector of supported tuning types.
-    virtual vector<DTVTunerType> GetTunerTypes(void) const;
+    virtual std::vector<DTVTunerType> GetTunerTypes(void) const;
 
     void GetCachedPids(pid_cache_t &pid_cache) const;
 

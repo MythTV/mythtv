@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <utility>
 
-using namespace std;
-
 // MythTV includes
 #include "mythdbcon.h"
 #include "mythlogging.h"

@@ -11,8 +11,6 @@
 #include "tv_rec.h"
 #include "channelbase.h"
 
-using namespace std;
-
 class DummyChannel : public ChannelBase
 {
   public:

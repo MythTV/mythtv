@@ -34,7 +34,7 @@ class HDHRChannel : public DTVChannel
     bool IsOpen(void) const override; // ChannelBase
     QString GetDevice(void) const override // ChannelBase
         { return m_deviceId; }
-    vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
+    std::vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
         { return m_tunerTypes; }
     bool IsMaster(void) const override; // DTVChannel
 
@@ -51,7 +51,7 @@ class HDHRChannel : public DTVChannel
   private:
     QString               m_deviceId;
     HDHRStreamHandler    *m_streamHandler {nullptr};
-    vector<DTVTunerType>  m_tunerTypes;
+    std::vector<DTVTunerType>  m_tunerTypes;
 };
 
 #endif

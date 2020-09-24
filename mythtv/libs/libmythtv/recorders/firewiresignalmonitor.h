@@ -5,7 +5,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QMutex>
@@ -70,7 +69,7 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     MythTimer          m_stbWaitForPatTimer;
     MythTimer          m_stbWaitForPowerTimer;
 
-    vector<unsigned char> m_buffer;
+    std::vector<unsigned char> m_buffer;
 
     static QHash<void*,uint> s_patKeys;
     static QMutex            s_patKeysLock;

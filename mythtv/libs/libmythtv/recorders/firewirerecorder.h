@@ -60,7 +60,7 @@ class FirewireRecorder :
   private:
     FirewireChannel       *m_channel {nullptr};
     bool                   m_isopen  {false};
-    vector<unsigned char>  m_buffer;
+    std::vector<unsigned char>  m_buffer;
 };
 
 #endif // FIREWIRERECORDER_H

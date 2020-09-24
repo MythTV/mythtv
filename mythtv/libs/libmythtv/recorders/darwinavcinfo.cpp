@@ -6,7 +6,6 @@
 
 // Std C++ headers
 #include <vector>
-using namespace std;
 
 // MythTV headers
 #include "darwinfirewiredevice.h"
@@ -114,8 +113,8 @@ void DarwinAVCInfo::Update(uint64_t _guid, DarwinFirewireDevice *dev,
 }
 
 bool DarwinAVCInfo::SendAVCCommand(
-    const vector<uint8_t> &cmd,
-    vector<uint8_t>       &result,
+    const std::vector<uint8_t> &cmd,
+    std::vector<uint8_t>       &result,
     int                   /*retry_cnt*/)
 {
     result.clear();

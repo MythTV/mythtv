@@ -4,7 +4,6 @@
 #define IPTVSTREAMHANDLER_H
 
 #include <vector>
-using namespace std;
 
 #include <QHostAddress>
 #include <QUdpSocket>

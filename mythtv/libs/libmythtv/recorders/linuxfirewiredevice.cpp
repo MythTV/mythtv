@@ -26,7 +26,6 @@
 #include <chrono> // for milliseconds
 #include <map>
 #include <thread> // for sleep_for
-using namespace std;
 
 // Qt headers
 #include <QDateTime>
@@ -364,8 +363,8 @@ void LinuxFirewireDevice::RemoveListener(TSDataListener *listener)
 }
 
 bool LinuxFirewireDevice::SendAVCCommand(
-    const vector<uint8_t>  &cmd,
-    vector<uint8_t>        &result,
+    const std::vector<uint8_t>  &cmd,
+    std::vector<uint8_t>        &result,
     int                     retry_cnt)
 {
     return GetInfoPtr()->SendAVCCommand(cmd, result, retry_cnt);
@@ -712,8 +711,8 @@ bool LinuxFirewireDevice::SetAVStreamBufferSize(uint size_in_bytes)
         return false;
 
     // Set buffered packets size
-    uint   buffer_size      = max(size_in_bytes, 50 * TSPacket::kSize);
-    size_t buffered_packets = min(buffer_size / 4, kMaxBufferedPackets);
+    uint   buffer_size      = std::max(size_in_bytes, 50 * TSPacket::kSize);
+    size_t buffered_packets = std::min(buffer_size / 4, kMaxBufferedPackets);
 
     iec61883_mpeg2_set_buffers(m_priv->m_avstream, buffered_packets);
 
@@ -797,9 +796,9 @@ void LinuxFirewireDevice::PrintDropped(uint dropped_packets)
     }
 }
 
-vector<AVCInfo> LinuxFirewireDevice::GetSTBList(void)
+std::vector<AVCInfo> LinuxFirewireDevice::GetSTBList(void)
 {
-    vector<AVCInfo> list;
+    std::vector<AVCInfo> list;
 
     {
         LinuxFirewireDevice dev(0,0,0,false);
@@ -809,7 +808,7 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBList(void)
     return list;
 }
 
-vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
+std::vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- begin");
@@ -819,7 +818,7 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
     LOG(VB_GENERAL, LOG_DEBUG, "GetSTBListPrivate -- got lock");
 #endif
 
-    vector<AVCInfo> list;
+    std::vector<AVCInfo> list;
 
     for (const auto & device : qAsConst(m_priv->m_devices))
     {
@@ -864,7 +863,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
         return true;
     }
 
-    map<uint64_t,bool> guid_online;
+    std::map<uint64_t,bool> guid_online;
     for (int port = 0; port < numcards; port++)
     {
         if (raw1394_set_port(item.m_handle, port) < 0)

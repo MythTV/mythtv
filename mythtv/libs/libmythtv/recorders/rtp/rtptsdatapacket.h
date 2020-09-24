@@ -7,7 +7,6 @@
 #define RTP_TS_DATA_PACKET_H
 
 #include <algorithm>
-using namespace std;
 
 #include "rtpdatapacket.h"
 
@@ -29,7 +28,7 @@ class RTPTSDataPacket : public RTPDataPacket
 
     unsigned int GetTSDataSize(void) const
     {
-        return max(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize(), 0);
+        return std::max(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize(), 0);
     }
 
   private:

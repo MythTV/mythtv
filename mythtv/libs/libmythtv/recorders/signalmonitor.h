@@ -7,7 +7,6 @@
 // C++ headers
 #include <vector>
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
@@ -109,7 +108,7 @@ class SignalMonitor : protected MThread
      *  \param msec Milliseconds between signal monitoring events.
      */
     void SetUpdateRate(int msec)
-        { m_updateRate = max(msec, (int)m_minimumUpdateRate); }
+        { m_updateRate = std::max(msec, (int)m_minimumUpdateRate); }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Listeners   // // // // // // // // // // // // // // // // // // //
@@ -219,7 +218,7 @@ class SignalMonitor : protected MThread
     SignalMonitorValue m_signalStrength;
     SignalMonitorValue m_scriptStatus;
 
-    vector<SignalMonitorListener*> m_listeners;
+    std::vector<SignalMonitorListener*> m_listeners;
 
     QMutex             m_startStopLock;
     QWaitCondition     m_startStopWait;       // protected by startStopLock

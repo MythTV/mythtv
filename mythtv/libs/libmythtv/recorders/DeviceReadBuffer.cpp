@@ -1,5 +1,4 @@
 #include <algorithm>
-using namespace std;
 
 #include "DeviceReadBuffer.h"
 #include "mythcorecontext.h"
@@ -70,10 +69,10 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     m_used          = 0;
     m_devReadSize = m_readQuanta * (m_usingPoll ? 256 : 48);
     m_devReadSize = (deviceBufferSize) ?
-        min(m_devReadSize, (size_t)deviceBufferSize) : m_devReadSize;
+        std::min(m_devReadSize, (size_t)deviceBufferSize) : m_devReadSize;
     m_readThreshold = m_readQuanta * 128;
 
-    m_buffer        = new (nothrow) unsigned char[m_size + m_devReadSize];
+    m_buffer        = new (std::nothrow) unsigned char[m_size + m_devReadSize];
     m_readPtr       = m_buffer;
     m_writePtr      = m_buffer;
 
@@ -346,7 +345,7 @@ void DeviceReadBuffer::run(void)
         {
             // Limit read size for faster return from read
             auto unused = static_cast<size_t>(WaitForUnused(m_readQuanta));
-            size_t read_size = min(m_devReadSize, unused);
+            size_t read_size = std::min(m_devReadSize, unused);
 
             // if read_size > 0 do the read...
             if (read_size)
@@ -447,7 +446,7 @@ bool DeviceReadBuffer::Poll(void) const
             timeout = 10;
         else if (m_pollTimeoutIsError)
             // subtract a bit to allow processing time.
-            timeout = max((int)m_maxPollWait - timer.elapsed() - 15, 10);
+            timeout = std::max((int)m_maxPollWait - timer.elapsed() - 15, 10);
 
         int ret = poll(polls.data(), poll_cnt, timeout);
 
@@ -614,8 +613,8 @@ bool DeviceReadBuffer::CheckForErrors(
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(min(count, (uint)m_readThreshold), 20);
-    size_t cnt = min(count, avail);
+    uint avail = WaitForUsed(std::min(count, (uint)m_readThreshold), 20);
+    size_t cnt = std::min(count, avail);
 
     if (!cnt)
         return 0;

@@ -4,7 +4,6 @@
 #define DTVSIGNALMONITOR_H
 
 #include <vector>
-using namespace std;
 
 #include "signalmonitor.h"
 #include "signalmonitorvalue.h"
@@ -109,7 +108,7 @@ class DTVSignalMonitor : public SignalMonitor,
 
   protected:
     MPEGStreamData    *m_streamData         {nullptr};
-    vector<uint>       m_eitPids;
+    std::vector<uint>  m_eitPids;
     SignalMonitorValue m_seenPAT;
     SignalMonitorValue m_seenPMT;
     SignalMonitorValue m_seenMGT;

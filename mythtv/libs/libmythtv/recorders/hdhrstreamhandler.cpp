@@ -250,8 +250,8 @@ bool HDHRStreamHandler::UpdateFilters(void)
 
     QString filter = "";
 
-    vector<uint> range_min;
-    vector<uint> range_max;
+    std::vector<uint> range_min;
+    std::vector<uint> range_max;
 
     for (auto it = m_pidInfo.cbegin(); it != m_pidInfo.cend(); ++it)
     {

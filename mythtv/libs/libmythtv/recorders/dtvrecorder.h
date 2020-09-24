@@ -11,8 +11,6 @@
 
 #include <vector>
 
-using namespace std;
-
 #include <QAtomicInt>
 #include <QString>
 
@@ -164,7 +162,7 @@ class DTVRecorder :
 
     // keyframe finding buffer
     bool                     m_bufferPackets              {false};
-    vector<unsigned char>    m_payloadBuffer;
+    std::vector<unsigned char> m_payloadBuffer;
 
     // general recorder stuff
     mutable QMutex           m_pidLock                    {QMutex::Recursive};
@@ -181,7 +179,7 @@ class DTVRecorder :
     std::array<uint8_t,0x1fff + 1> m_streamId             {0};
     std::array<uint8_t,0x1fff + 1> m_pidStatus            {0};
     std::array<uint8_t,0x1fff + 1> m_continuityCounter    {0};
-    vector<TSPacket>         m_scratch;
+    std::vector<TSPacket>    m_scratch;
 
     // Statistics
     int                      m_minimumRecordingQuality    {95};

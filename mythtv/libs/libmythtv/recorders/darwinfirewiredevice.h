@@ -37,7 +37,7 @@ class DarwinFirewireDevice : public FirewireDevice
     bool IsPortOpen(void) const override; // FirewireDevice
 
     // Statics
-    static vector<AVCInfo> GetSTBList(void);
+    static std::vector<AVCInfo> GetSTBList(void);
 
   private:
     DarwinFirewireDevice(const DarwinFirewireDevice &) = delete;            // not copyable
@@ -54,8 +54,8 @@ class DarwinFirewireDevice : public FirewireDevice
     bool StopStreaming(void);
 
     bool SendAVCCommand(
-        const vector<uint8_t> &cmd,
-        vector<uint8_t>       &result,
+        const std::vector<uint8_t> &cmd,
+        std::vector<uint8_t>       &result,
         int                   /*retry_cnt*/) override; // FirewireDevice
 
     void HandleBusReset(void);
@@ -79,7 +79,7 @@ class DarwinFirewireDevice : public FirewireDevice
     int GetMaxSpeed(void);
     bool IsSTBStreaming(uint *fw_channel = nullptr);
 
-    vector<AVCInfo> GetSTBListPrivate(void);
+    std::vector<AVCInfo> GetSTBListPrivate(void);
 
   private:
     int      m_local_node  {-1};

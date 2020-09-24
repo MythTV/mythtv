@@ -5,7 +5,6 @@
 
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QAtomicInt>

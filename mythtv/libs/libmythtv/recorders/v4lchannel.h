@@ -13,8 +13,6 @@
 #include <linux/videodev2.h>
 #endif
 
-using namespace std;
-
 #define FAKE_VIDEO 0
 
 class TVRec;

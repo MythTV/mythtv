@@ -399,7 +399,7 @@ void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    vector<SignalMonitorListener*> new_listeners;
+    std::vector<SignalMonitorListener*> new_listeners;
     for (auto & entry : m_listeners)
     {
         if (entry != listener)

@@ -14,7 +14,6 @@
 // C++ headers
 #include <algorithm>
 #include <iostream>
-using namespace std;
 
 #include <linux/videodev2.h>
 
@@ -640,8 +639,8 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     int dfield = m_pictAttrDefault[db_col_name];
     int field  = (cfield + sfield + dfield) & 0xFFFF;
     int value0 = (int) ((scl_range * field) + qctrl.minimum);
-    int value1 = min(value0, qctrl.maximum);
-    ctrl.value = max(value1, qctrl.minimum);
+    int value1 = std::min(value0, qctrl.maximum);
+    ctrl.value = std::max(value1, qctrl.minimum);
 
 #if DEBUG_ATTRIB
     LOG(VB_CHANNEL, LOG_DEBUG, loc + QString(" %1\n\t\t\t"
@@ -716,7 +715,7 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
     }
 
     float mult = 65535.0 / (qctrl.maximum - qctrl.minimum);
-    return min(max((int)(mult * (ctrl.value - qctrl.minimum)), 0), 65525);
+    return std::min(std::max((int)(mult * (ctrl.value - qctrl.minimum)), 0), 65525);
 }
 
 static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
@@ -734,8 +733,8 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 
     float mult = (qctrl.maximum - qctrl.minimum) / 65535.0;
     ctrl.value = (int)(mult * newvalue + qctrl.minimum);
-    ctrl.value = min(ctrl.value, qctrl.maximum);
-    ctrl.value = max(ctrl.value, qctrl.minimum);
+    ctrl.value = std::min(ctrl.value, qctrl.maximum);
+    ctrl.value = std::max(ctrl.value, qctrl.minimum);
 
     if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
@@ -772,7 +771,7 @@ int V4LChannel::ChangePictureAttribute(
     // make sure we are within bounds (wrap around for hue)
     if (V4L2_CID_HUE == v4l2_attrib)
         new_value &= 0xffff;
-    new_value = min(max(new_value, 0), 65535);
+    new_value = std::min(std::max(new_value, 0), 65535);
 
 #if DEBUG_ATTRIB
     LOG(VB_CHANNEL, LOG_DEBUG,

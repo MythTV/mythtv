@@ -18,7 +18,6 @@
 #include <QStringList>
 
 #include <iostream>
-using namespace std;
 
 #include "mythmiscutil.h"
 #include "mythcontext.h"
@@ -86,7 +85,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     V4LRecorder(rec)
 {
     m_channelObj = channel;
-    m_seekTable = new vector<struct seektable_entry>;
+    m_seekTable = new std::vector<struct seektable_entry>;
     m_ccd = new CC608Decoder(this);
 
     SetPositionMapType(MARK_KEYFRAME);
@@ -2059,7 +2058,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 }
 
 void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
-    const vector<struct kfatable_entry> &kfa_table)
+    const std::vector<struct kfatable_entry> &kfa_table)
 {
     int numentries = kfa_table.size();
 
@@ -2248,7 +2247,7 @@ void NuppelVideoRecorder::doAudioThread(void)
            (like we used to.) Measure to see how much stuff is in there,
            and correct for it when calculating the timestamp */
         gettimeofday(&anow, &m_tzone);
-        int bytes_read = max(m_audioDevice->GetNumReadyBytes(), 0);
+        int bytes_read = std::max(m_audioDevice->GetNumReadyBytes(), 0);
 
         int act = m_actAudioBuffer;
 
@@ -2436,7 +2435,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                 break;
             memcpy(outpos, &st, sizeof(st));
             outpos += sizeof(st);
-            int count = max(st.len, static_cast<uint8_t>(41));
+            int count = std::max(st.len, static_cast<uint8_t>(41));
             std::copy(linebuf.cbegin(), linebuf.cbegin() + count, outpos);
             outpos += count;
             *outpos = 0;

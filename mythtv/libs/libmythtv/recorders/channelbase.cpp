@@ -11,7 +11,6 @@
 // C++ headers
 #include <iostream>
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
@@ -236,7 +235,7 @@ bool ChannelBase::IsInputAvailable(
     mplexid_restriction = 0;
     chanid_restriction = 0;
 
-    vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputId);
+    std::vector<uint> inputids = CardUtil::GetConflictingInputs(m_inputId);
     for (uint inputid : inputids)
     {
         if (RemoteIsBusy(inputid, info))

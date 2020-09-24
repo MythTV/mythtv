@@ -75,9 +75,9 @@ QString DTVChannel::GetTuningMode(void) const
     return m_tuningMode;
 }
 
-vector<DTVTunerType> DTVChannel::GetTunerTypes(void) const
+std::vector<DTVTunerType> DTVChannel::GetTunerTypes(void) const
 {
-    vector<DTVTunerType> tts;
+    std::vector<DTVTunerType> tts;
     if (m_tunerType != DTVTunerType::kTunerTypeUnknown)
         tts.push_back(m_tunerType);
     return tts;
@@ -340,13 +340,13 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         }
 
         // Now we construct the PAT & PMT
-        vector<uint> pnum; pnum.push_back(1);
-        vector<uint> pid;  pid.push_back(9999);
+        std::vector<uint> pnum; pnum.push_back(1);
+        std::vector<uint> pid;  pid.push_back(9999);
         m_genPAT = ProgramAssociationTable::Create(0,version,pnum,pid);
 
         int pcrpid = -1;
-        vector<uint> pids;
-        vector<uint> types;
+        std::vector<uint> pids;
+        std::vector<uint> types;
         for (auto & pit : pid_cache)
         {
             if (!pit.GetStreamID())

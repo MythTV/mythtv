@@ -4,7 +4,6 @@
 #define ASI_CHANNEL_H
 
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -34,13 +33,13 @@ class ASIChannel : public DTVChannel
         { return m_isOpen; }
     QString GetDevice(void) const override // ChannelBase
         { return m_device; }
-    vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
+    std::vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
         { return m_tunerTypes; }
     bool IsPIDTuningSupported(void) const override // DTVChannel
         { return true; }
 
   private:
-    vector<DTVTunerType>     m_tunerTypes;
+    std::vector<DTVTunerType> m_tunerTypes;
     QString                  m_device;
     bool                     m_isOpen {false};
 };

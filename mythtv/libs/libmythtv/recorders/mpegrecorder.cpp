@@ -9,7 +9,6 @@
 #include <thread> // for sleep_for
 #include <unistd.h>
 #include <vector>
-using namespace std;
 
 // System headers
 #include <sys/types.h>
@@ -556,7 +555,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
     int value = (int) ((range * m_audVolume * 0.01F) + qctrl.minimum);
-    int ctrl_volume = min(qctrl.maximum, max(qctrl.minimum, value));
+    int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
 
     // Set recording volume
     struct v4l2_control ctrl {V4L2_CID_AUDIO_VOLUME, ctrl_volume};
@@ -630,7 +629,7 @@ uint MpegRecorder::GetFilteredAudioLayer(void) const
 {
     uint layer = (uint) m_audType;
 
-    layer = max(min(layer, 3U), 1U);
+    layer = std::max(std::min(layer, 3U), 1U);
 
     layer = (m_driver == "ivtv") ? 2 : layer;
 
@@ -647,8 +646,8 @@ uint MpegRecorder::GetFilteredAudioLayer(void) const
 
 uint MpegRecorder::GetFilteredAudioBitRate(uint audio_layer) const
 {
-    return ((2 == audio_layer) ? max(m_audBitrateL2, 10) :
-            ((3 == audio_layer) ? m_audBitrateL3 : max(m_audBitrateL1, 6)));
+    return ((2 == audio_layer) ? std::max(m_audBitrateL2, 10) :
+            ((3 == audio_layer) ? m_audBitrateL3 : std::max(m_audBitrateL1, 6)));
 }
 
 static int streamtype_ivtv_to_v4l2(int st)
@@ -672,7 +671,7 @@ static int streamtype_ivtv_to_v4l2(int st)
     }
 }
 
-static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
+static void add_ext_ctrl(std::vector<struct v4l2_ext_control> &ctrl_list,
                          uint32_t id, int32_t value)
 {
     struct v4l2_ext_control tmp_ctrl {};
@@ -681,7 +680,7 @@ static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
     ctrl_list.push_back(tmp_ctrl);
 }
 
-static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
+static void set_ctrls(int fd, std::vector<struct v4l2_ext_control> &ext_ctrls)
 {
     static QMutex s_controlDescriptionLock;
     static QMap<uint32_t,QString> s_controlDescription;
@@ -731,7 +730,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
 
 bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 {
-    vector<struct v4l2_ext_control> ext_ctrls;
+    std::vector<struct v4l2_ext_control> ext_ctrls;
 
     // Set controls
     if (m_driver != "hdpvr")
@@ -809,7 +808,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
         if (!ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl))
         {
-            uint audio_enc = max(min(m_audType-1, qctrl.maximum), qctrl.minimum);
+            uint audio_enc = std::max(std::min(m_audType-1, qctrl.maximum), qctrl.minimum);
             add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING, audio_enc);
         }
         else
@@ -1458,7 +1457,7 @@ void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
                 .arg(reason).arg(bitrate).arg(maxbitrate));
     }
 
-    vector<struct v4l2_ext_control> ext_ctrls;
+    std::vector<struct v4l2_ext_control> ext_ctrls;
     add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
                  (maxbitrate == bitrate) ?
                  V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :

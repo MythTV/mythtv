@@ -69,8 +69,8 @@ bool FirewireDevice::SetPowerState(bool on)
 {
     QMutexLocker locker(&m_lock);
 
-    vector<uint8_t> cmd;
-    vector<uint8_t> ret;
+    std::vector<uint8_t> cmd;
+    std::vector<uint8_t> ret;
 
     cmd.push_back(kAVCControlCommand);
     cmd.push_back(kAVCSubunitTypeUnit | kAVCSubunitIdIgnore);
@@ -103,8 +103,8 @@ FirewireDevice::PowerState FirewireDevice::GetPowerState(void)
 {
     QMutexLocker locker(&m_lock);
 
-    vector<uint8_t> cmd;
-    vector<uint8_t> ret;
+    std::vector<uint8_t> cmd;
+    std::vector<uint8_t> ret;
 
     cmd.push_back(kAVCStatusInquiryCommand);
     cmd.push_back(kAVCSubunitTypeUnit | kAVCSubunitIdIgnore);
@@ -176,8 +176,8 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return false;
     }
 
-    vector<uint8_t> cmd;
-    vector<uint8_t> ret;
+    std::vector<uint8_t> cmd;
+    std::vector<uint8_t> ret;
 
     if ((panel_model.toUpper() == "SA GENERIC") ||
         (panel_model.toUpper() == "SA4200HD") ||
@@ -362,9 +362,9 @@ QString FirewireDevice::GetModelName(uint vendor_id, uint model_id)
     return ret;
 }
 
-vector<AVCInfo> FirewireDevice::GetSTBList(void)
+std::vector<AVCInfo> FirewireDevice::GetSTBList(void)
 {
-    vector<AVCInfo> list;
+    std::vector<AVCInfo> list;
 
 #ifdef USING_LINUX_FIREWIRE
     list = LinuxFirewireDevice::GetSTBList();

@@ -5,7 +5,6 @@
  */
 
 #include <algorithm>
-using namespace std;
 
 #include "rtppacketbuffer.h"
 #include "rtpdatapacket.h"
@@ -21,7 +20,7 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
     m_largeSequenceNumberSeenRecently = 
         (key > (1U<<15)) ? 500 : m_largeSequenceNumberSeenRecently - 1;
     m_largeSequenceNumberSeenRecently =
-        max(m_largeSequenceNumberSeenRecently, 0);
+        std::max(m_largeSequenceNumberSeenRecently, 0);
 
     if (m_largeSequenceNumberSeenRecently > 0)
     {

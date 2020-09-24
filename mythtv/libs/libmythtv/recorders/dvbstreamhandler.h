@@ -4,7 +4,6 @@
 #define DVBSTREAMHANDLER_H
 
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QMutex>

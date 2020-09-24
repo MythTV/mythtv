@@ -12,7 +12,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QMap>
@@ -32,8 +31,8 @@ class LinuxAVCInfo : public AVCInfo
     bool ClosePort(void);
 
     bool SendAVCCommand(
-        const vector<uint8_t> &cmd,
-        vector<uint8_t>       &result,
+        const std::vector<uint8_t> &cmd,
+        std::vector<uint8_t>       &result,
         int                    retry_cnt)  override; // AVCInfo
 
     bool IsPortOpen(void) const { return m_fwHandle; }

@@ -4,7 +4,6 @@
 #define HDHRSTREAMHANDLER_H
 
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QMutex>
@@ -60,7 +59,7 @@ class HDHRStreamHandler : public StreamHandler
 
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
-    vector<DTVTunerType> GetTunerTypes(void) const { return m_tunerTypes; }
+    std::vector<DTVTunerType> GetTunerTypes(void) const { return m_tunerTypes; }
 
     // Commands
     bool TuneChannel(const QString &chanid);
@@ -90,7 +89,7 @@ class HDHRStreamHandler : public StreamHandler
     hdhomerun_device_t          *m_hdhomerunDevice  {nullptr};
     hdhomerun_device_selector_t *m_deviceSelector   {nullptr};
     int                          m_tuner            {-1};
-    vector<DTVTunerType>         m_tunerTypes;
+    std::vector<DTVTunerType>    m_tunerTypes;
     HDHRTuneMode                 m_tuneMode         {hdhrTuneModeNone}; // debug self check
     int                          m_majorId;
 

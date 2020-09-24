@@ -5,7 +5,6 @@
 #include <array>
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -29,8 +28,8 @@ class AVCInfo
     virtual ~AVCInfo() = default;
 
     virtual bool SendAVCCommand(
-        const vector<uint8_t> &/*cmd*/,
-        vector<uint8_t>       &/*result*/,
+        const std::vector<uint8_t> &/*cmd*/,
+        std::vector<uint8_t>       &/*result*/,
         int                   /*retry_cnt*/)
     {
         return false;
