@@ -11,7 +11,6 @@
 #include <cinttypes>
 #include <climits>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -31,7 +30,7 @@ class DiSEqCDevSCR;
 using uint_to_dbl_t           = QMap<uint, double>;
 using dbl_to_uint_t           = QMap<double, uint>;
 using cardid_to_diseqc_tree_t = QMap<uint, DiSEqCDevTree*>;
-using dvbdev_vec_t            = vector<DiSEqCDevDevice*>;
+using dvbdev_vec_t            = std::vector<DiSEqCDevDevice*>;
 using cmd_vec_t               = std::vector<uint8_t>;
 
 class DiSEqCDevSettings
@@ -132,7 +131,7 @@ class DiSEqCDevTree
     DiSEqCDevDevice *m_root                   {nullptr};
     uint             m_lastVoltage            {UINT_MAX};
     uint             m_previousFakeDiseqcid   {kFirstFakeDiSEqCID};
-    vector<uint>     m_delete;
+    std::vector<uint> m_delete;
 
     static const uint kFirstFakeDiSEqCID;
 };

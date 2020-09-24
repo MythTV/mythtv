@@ -407,12 +407,12 @@ void TVBrowseHelper::run()
         BrowseInfo bi = m_browseList.front();
         m_browseList.pop_front();
 
-        vector<uint> chanids;
+        std::vector<uint> chanids;
         if (BROWSE_SAME == bi.m_dir)
         {
             if (!bi.m_chanId)
             {
-                vector<uint> chanids_extra;
+                std::vector<uint> chanids_extra;
                 uint sourceid = m_dbChanidToSourceid[m_browseChanId];
                 QMultiMap<QString,uint>::iterator it;
                 it = m_dbChannumToChanids.lowerBound(bi.m_chanNum);

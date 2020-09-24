@@ -11,8 +11,6 @@
 #include "mythsocket.h"
 #include "mythlogging.h"
 
-using namespace std;
-
 #define LOC QString("RemoteEncoder(%1): ").arg(m_recordernum)
 
 #define MAX_SIZE_CHECK 500  // in ms
@@ -526,7 +524,7 @@ uint RemoteEncoder::GetSignalLockTimeout(const QString& input)
         MythDB::DBError("Getting timeout", query);
     else if (query.next() &&
              SignalMonitor::IsRequired(query.value(1).toString()))
-        timeout = max(query.value(0).toInt(), 500);
+        timeout = std::max(query.value(0).toInt(), 500);
 
 #if 0
     LOG(VB_PLAYBACK, LOG_DEBUG, "RemoteEncoder: " +

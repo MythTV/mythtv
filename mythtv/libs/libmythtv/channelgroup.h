@@ -4,7 +4,6 @@
 // c/c++
 #include <utility>
 #include <vector>
-using namespace std;
 
 // qt
 #include <QString>
@@ -29,7 +28,7 @@ class MTV_PUBLIC ChannelGroupItem
     uint    m_grpId;
     QString m_name;
 };
-using ChannelGroupList = vector<ChannelGroupItem>;
+using ChannelGroupList = std::vector<ChannelGroupItem>;
 
 /** \class ChannelGroup
 */

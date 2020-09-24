@@ -12,7 +12,6 @@
 
 // C++ headers
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
@@ -1080,9 +1079,9 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 
         // Add current if needed
         if (!current.isEmpty() &&
-            (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
         {
-            stable_sort(sdevs.begin(), sdevs.end());
+            std::stable_sort(sdevs.begin(), sdevs.end());
         }
 
         QStringList db = CardUtil::GetVideoDevices("DVB");
@@ -1092,7 +1091,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         for (uint i = 0; i < (uint)sdevs.size(); i++)
         {
             const QString dev = sdevs[i];
-            in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
+            in_use[sdevs[i]] = std::find(db.begin(), db.end(), dev) != db.end();
             if (sel.isEmpty() && !in_use[sdevs[i]])
                 sel = dev;
         }
@@ -1222,7 +1221,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
     {
         setLabel(QObject::tr("GUID"));
 #ifdef USING_FIREWIRE
-        vector<AVCInfo> list = FirewireDevice::GetSTBList();
+        std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
         for (auto & i : list)
         {
             QString guid = i.GetGUIDString();
@@ -1276,7 +1275,7 @@ void FirewireModel::SetGUID(const QString &_guid)
 #ifdef USING_FIREWIRE
     AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
-    setValue(max(getValueIndex(model), 0));
+    setValue(std::max(getValueIndex(model), 0));
 #endif // USING_FIREWIRE
 }
 
@@ -1649,7 +1648,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 {
     clearSelections();
 
-    vector<QString> devs;
+    std::vector<QString> devs;
     QMap<QString, bool> in_use;
 
     const QString& current = cur;
@@ -1773,9 +1772,9 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
         // Add current if needed
         if (!current.isEmpty() &&
-            (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
         {
-            stable_sort(sdevs.begin(), sdevs.end());
+            std::stable_sort(sdevs.begin(), sdevs.end());
         }
 
         // Get devices from DB
@@ -1789,7 +1788,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         for (uint i = 0; i < (uint)sdevs.size(); ++i)
         {
             const QString dev = sdevs[i];
-            in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
+            in_use[sdevs[i]] = std::find(db.begin(), db.end(), dev) != db.end();
             if (sel.isEmpty() && !in_use[sdevs[i]])
                 sel = dev;
         }
@@ -2617,7 +2616,7 @@ void CaptureCard::Save(void)
     // Handle any cloning we may need to do
     if (CardUtil::IsTunerSharingCapable(type))
     {
-        vector<uint> clones = CardUtil::GetChildInputIDs(cardid);
+        std::vector<uint> clones = CardUtil::GetChildInputIDs(cardid);
         for (uint clone : clones)
             CardUtil::CloneCard(cardid, clone);
     }
@@ -2861,9 +2860,9 @@ void InputGroup::Load(void)
 
     uint             inputid = m_cardInput.getInputID();
     QMap<uint, uint> grpcnt;
-    vector<QString>  names;
-    vector<uint>     grpid;
-    vector<uint>     selected_groupids;
+    std::vector<QString>  names;
+    std::vector<uint>     grpid;
+    std::vector<uint>     selected_groupids;
 
     names.push_back(QObject::tr("Generic"));
     grpid.push_back(0);
@@ -3427,7 +3426,7 @@ void CardInput::Save(void)
     uint icount = 1;
     if (m_instanceCount)
         icount = m_instanceCount->getValue().toUInt();
-    vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
+    std::vector<uint> cardids = CardUtil::GetChildInputIDs(cardid);
 
     // Delete old clone cards as required.
     for (size_t i = cardids.size() + 1;
@@ -4100,8 +4099,8 @@ void SatIPDeviceIDList::fillSelections(const QString &cur)
 {
     clearSelections();
 
-    vector<QString> names;
-    vector<QString> devs;
+    std::vector<QString> names;
+    std::vector<QString> devs;
     QMap<QString, bool> in_use;
 
     const QString& current = cur;

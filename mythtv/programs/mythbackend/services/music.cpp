@@ -41,9 +41,9 @@ DTC::MusicMetadataInfoList* Music::GetTrackList(int nStartIndex,
 
     auto *pMusicMetadataInfos = new DTC::MusicMetadataInfoList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, musicList->count() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, musicList->count() ) : musicList->count();
-    int nEndIndex = min((nStartIndex + nCount), musicList->count() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, musicList->count() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, musicList->count() ) : musicList->count();
+    int nEndIndex = std::min((nStartIndex + nCount), musicList->count() );
 
     for( int n = nStartIndex; n < nEndIndex; n++ )
     {
@@ -60,13 +60,13 @@ DTC::MusicMetadataInfoList* Music::GetTrackList(int nStartIndex,
     if (nCount == 0)
         totalPages = 1;
     else
-        totalPages = (int)ceil((float)musicList->count() / nCount);
+        totalPages = (int)std::ceil((float)musicList->count() / nCount);
 
     if (totalPages == 1)
         curPage = 1;
     else
     {
-        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+        curPage = (int)std::ceil((float)nStartIndex / nCount) + 1;
     }
 
     pMusicMetadataInfos->setStartIndex    ( nStartIndex     );

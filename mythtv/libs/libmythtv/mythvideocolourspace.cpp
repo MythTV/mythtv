@@ -334,7 +334,7 @@ int MythVideoColourSpace::ChangePictureAttribute(PictureAttribute AttributeType,
         next = next % 100;
     if ((kPictureAttribute_Range == AttributeType) && next > 1)
         next = 1;
-    next = min(max(next, 0), 100);
+    next = std::min(std::max(next, 0), 100);
     return SetPictureAttribute(AttributeType, next);
 }
 

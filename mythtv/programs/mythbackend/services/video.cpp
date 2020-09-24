@@ -93,9 +93,9 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
 
     auto *pVideoMetadataInfos = new DTC::VideoMetadataInfoList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)videos.size() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, (int)videos.size() ) : videos.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)videos.size() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)videos.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)videos.size() ) : videos.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)videos.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++ )
     {

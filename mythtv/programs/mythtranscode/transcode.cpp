@@ -384,7 +384,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     bool halfFramerate = false;
     bool skippedLastFrame = false;
 
-    m_kfaTable = new vector<struct kfatable_entry>;
+    m_kfaTable = new std::vector<struct kfatable_entry>;
 
     if (m_avfMode)
     {

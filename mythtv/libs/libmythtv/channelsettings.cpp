@@ -379,7 +379,7 @@ class CommMethod : public MythUIComboBoxSetting
             "this channel or skips detection by marking the channel as "
             "Commercial Free."));
 
-        deque<int> tmp = GetPreferredSkipTypeCombinations();
+        std::deque<int> tmp = GetPreferredSkipTypeCombinations();
         tmp.push_front(COMM_DETECT_UNINIT);
         tmp.push_back(COMM_DETECT_COMMFREE);
 

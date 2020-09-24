@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <iostream>
 
-using namespace std;
 QMutex                   MythRebuildSaver::s_lock;
 QWaitCondition           MythRebuildSaver::s_wait;
 QHash<DecoderBase*,uint> MythRebuildSaver::s_count;
@@ -105,7 +104,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     m_decoder->TrackTotalDuration(true);
 
     if (ShowPercentage)
-        cout << "\r                         \r" << flush;
+        std::cout << "\r                         \r" << std::flush;
 
     int prevperc = -1;
     bool usingIframes = false;
@@ -154,7 +153,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
                 if (ShowPercentage)
                 {
                     QString str = QString("\r%1%/%2fps  \r").arg(percentage,3).arg(flagFPS,5);
-                    cout << qPrintable(str) << flush;
+                    std::cout << qPrintable(str) << std::flush;
                 }
                 else if (percentage % 10 == 0 && prevperc != percentage)
                 {
@@ -167,7 +166,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
                 if (ShowPercentage)
                 {
                     QString str = QString("\r%1  \r").arg(myFramesPlayed,6);
-                    cout << qPrintable(str) << flush;
+                    std::cout << qPrintable(str) << std::flush;
                 }
                 else if (myFramesPlayed % 1000 == 0)
                 {
@@ -192,7 +191,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
             (GetEof() != kEofStateNone || (frames > 1000 && frames < 1100)) &&
             !m_decoder->HasPositionMap())
         {
-            cout << "No I-frames found, rewinding..." << endl;
+            std::cout << "No I-frames found, rewinding..." << std::endl;
             m_decoder->DoRewind(0);
             m_decoder->Reset(true, true, true);
             pmap_first = pmap_last = myFramesPlayed = 0;
@@ -202,7 +201,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     }
 
     if (ShowPercentage)
-        cout << "\r                         \r" << flush;
+        std::cout << "\r                         \r" << std::flush;
 
     SaveTotalDuration();
     SaveTotalFrames();

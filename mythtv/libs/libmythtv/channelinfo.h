@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-using namespace std;
-
 // Qt headers
 #include <QString>
 #include <QImage>
@@ -130,7 +128,7 @@ class MTV_PUBLIC ChannelInfo
     QList<uint>  m_groupIdList;
     QList<uint>  m_inputIdList;
 };
-using ChannelInfoList = vector<ChannelInfo>;
+using ChannelInfoList = std::vector<ChannelInfo>;
 
 class MTV_PUBLIC ChannelInsertInfo
 {
@@ -258,7 +256,7 @@ class MTV_PUBLIC ChannelInsertInfo
     uint    m_oldTsId            {0};
     uint    m_oldServiceId       {0};
 };
-using ChannelInsertInfoList = vector<ChannelInsertInfo>;
+using ChannelInsertInfoList = std::vector<ChannelInsertInfo>;
 
 Q_DECLARE_METATYPE(ChannelInfo*)
 

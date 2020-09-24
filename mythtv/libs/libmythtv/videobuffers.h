@@ -15,11 +15,10 @@
 // Std
 #include <vector>
 #include <map>
-using namespace std;
 
 using frame_queue_t  = MythDeque<VideoFrame*> ;
-using frame_vector_t = vector<VideoFrame>;
-using vbuffer_map_t  = map<const VideoFrame*, uint>;
+using frame_vector_t = std::vector<VideoFrame>;
+using vbuffer_map_t  = std::map<const VideoFrame*, uint>;
 
 const QString& DebugString(const VideoFrame *Frame, bool Short = false);
 const QString& DebugString(uint  FrameNum, bool Short = false);

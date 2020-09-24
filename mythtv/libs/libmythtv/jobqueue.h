@@ -17,8 +17,6 @@ class MThread;
 class ProgramInfo;
 class RecordingInfo;
 
-using namespace std;
-
 // Strings are used by JobQueue::StatusText()
 #define JOBSTATUS_MAP(F) \
     F(JOB_UNKNOWN,      0x0000, JobQueue::tr("Unknown")) \

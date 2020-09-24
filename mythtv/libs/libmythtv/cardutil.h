@@ -5,7 +5,6 @@
 // C++ headers
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QList>
@@ -250,26 +249,26 @@ class MTV_PUBLIC CardUtil
 
     static bool         DeleteInput(uint inputid);
     static bool         DeleteAllInputs(void);
-    static vector<uint> GetInputList(void);
-    static vector<uint> GetSchedInputList(void);
-    static vector<uint> GetLiveTVInputList(void);
+    static std::vector<uint> GetInputList(void);
+    static std::vector<uint> GetSchedInputList(void);
+    static std::vector<uint> GetLiveTVInputList(void);
 
     /// Convenience function for GetInputIDs()
     static uint         GetFirstInputID(const QString &videodevice)
     {
-        vector<uint> list = GetInputIDs(videodevice);
+        std::vector<uint> list = GetInputIDs(videodevice);
         if (list.empty())
             return 0;
         return list[0];
     }
 
-    static vector<uint> GetInputIDs(const QString& videodevice = QString(),
+    static std::vector<uint> GetInputIDs(const QString& videodevice = QString(),
                                     const QString& rawtype     = QString(),
                                     const QString& inputname   = QString(),
                                     QString hostname    = QString());
 
     static uint         GetChildInputCount(uint inputid);
-    static vector<uint> GetChildInputIDs(uint inputid);
+    static std::vector<uint> GetChildInputIDs(uint inputid);
 
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString());
@@ -324,9 +323,9 @@ class MTV_PUBLIC CardUtil
 
     // Other input functions
 
-    static vector<uint> GetInputIDs(uint sourceid);
+    static std::vector<uint> GetInputIDs(uint sourceid);
     static bool         GetInputInfo(InputInfo &input,
-                                     vector<uint> *groupids = nullptr);
+                                     std::vector<uint> *groupids = nullptr);
     static QList<InputInfo> GetAllInputInfo();
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
@@ -344,9 +343,9 @@ class MTV_PUBLIC CardUtil
     static uint         GetDeviceInputGroup(uint inputid);
     static bool         LinkInputGroup(uint inputid, uint inputgroupid);
     static bool         UnlinkInputGroup(uint inputid, uint inputgroupid);
-    static vector<uint> GetInputGroups(uint inputid);
-    static vector<uint> GetGroupInputIDs(uint inputgroupid);
-    static vector<uint> GetConflictingInputs(uint inputid);
+    static std::vector<uint> GetInputGroups(uint inputid);
+    static std::vector<uint> GetGroupInputIDs(uint inputgroupid);
+    static std::vector<uint> GetConflictingInputs(uint inputid);
 
     static QString      GetDeviceLabel(const QString &inputtype,
                                        const QString &videodevice);

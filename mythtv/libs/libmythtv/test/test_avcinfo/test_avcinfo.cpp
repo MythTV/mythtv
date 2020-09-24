@@ -24,8 +24,6 @@
 #include "test_avcinfo.h"
 #include "recorders/avcinfo.h"
 
-using namespace std;
-
 void TestAvcInfo::initTestCase(void)
 {
 }

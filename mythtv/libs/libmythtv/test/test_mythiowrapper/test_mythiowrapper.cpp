@@ -24,8 +24,6 @@
 #include "io/mythiowrapper.h"
 #include "test_mythiowrapper.h"
 
-using namespace std;
-
 void TestMythIOWrapper::initTestCase(void)
 {
 }

@@ -235,7 +235,7 @@ class LCDProcClient : public QObject
     bool                m_isTimeVisible         {false};
     int                 m_lcdTunerNo            {0};
 
-    vector<TunerStatus> m_tunerList;
+    std::vector<TunerStatus> m_tunerList;
 };
 
 #endif

@@ -1272,12 +1272,12 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-vector<uint> CardUtil::GetInputIDs(const QString& videodevice,
+std::vector<uint> CardUtil::GetInputIDs(const QString& videodevice,
                                    const QString& rawtype,
                                    const QString& inputname,
                                    QString hostname)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     if (hostname.isEmpty())
         hostname = gCoreContext->GetHostName();
@@ -1340,9 +1340,9 @@ uint CardUtil::GetChildInputCount(uint inputid)
     return count;
 }
 
-vector<uint> CardUtil::GetChildInputIDs(uint inputid)
+std::vector<uint> CardUtil::GetChildInputIDs(uint inputid)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     if (!inputid)
         return list;
@@ -1502,8 +1502,8 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     }
 
     // copy input group linkages
-    vector<uint> src_grps = CardUtil::GetInputGroups(src_inputid);
-    vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
+    std::vector<uint> src_grps = CardUtil::GetInputGroups(src_inputid);
+    std::vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
     for (uint dst_grp : dst_grps)
         CardUtil::UnlinkInputGroup(dst_inputid, dst_grp);
     for (uint src_grp : src_grps)
@@ -1589,7 +1589,7 @@ QString CardUtil::GetFirewireChangerModel(uint inputid)
     return fwnode;
 }
 
-vector<uint> CardUtil::GetInputIDs(uint sourceid)
+std::vector<uint> CardUtil::GetInputIDs(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1599,7 +1599,7 @@ vector<uint> CardUtil::GetInputIDs(uint sourceid)
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
-    vector<uint> list;
+    std::vector<uint> list;
 
     if (!query.exec())
     {
@@ -1631,7 +1631,7 @@ bool CardUtil::SetStartChannel(uint inputid, const QString &channum)
     return true;
 }
 
-bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
+bool CardUtil::GetInputInfo(InputInfo &input, std::vector<uint> *groupids)
 {
     if (!input.m_inputId)
         return false;
@@ -1999,9 +1999,9 @@ bool CardUtil::UnlinkInputGroup(uint inputid, uint inputgroupid)
     return true;
 }
 
-vector<uint> CardUtil::GetInputGroups(uint inputid)
+std::vector<uint> CardUtil::GetInputGroups(uint inputid)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2025,9 +2025,9 @@ vector<uint> CardUtil::GetInputGroups(uint inputid)
     return list;
 }
 
-vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
+std::vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2052,12 +2052,12 @@ vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
     return list;
 }
 
-vector<uint> CardUtil::GetConflictingInputs(uint inputid)
+std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
     LOG(VB_RECORD, LOG_INFO,
         QString("CardUtil[%1]: GetConflictingInputs() input %1").arg(inputid));
 
-    vector<uint> inputids;
+    std::vector<uint> inputids;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2107,8 +2107,8 @@ bool CardUtil::GetTimeouts(uint inputid,
         MythDB::DBError("CardUtil::GetTimeouts()", query);
     else if (query.next())
     {
-        signal_timeout  = (uint) max(query.value(0).toInt(), 250);
-        channel_timeout = (uint) max(query.value(1).toInt(), 500);
+        signal_timeout  = (uint) std::max(query.value(0).toInt(), 250);
+        channel_timeout = (uint) std::max(query.value(1).toInt(), 500);
         return true;
     }
 
@@ -2563,7 +2563,7 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
 
 bool CardUtil::DeleteInput(uint inputid)
 {
-    vector<uint> childids = GetChildInputIDs(inputid);
+    std::vector<uint> childids = GetChildInputIDs(inputid);
     for (uint childid : childids)
     {
         if (!DeleteInput(childid))
@@ -2641,9 +2641,9 @@ bool CardUtil::DeleteAllInputs(void)
             query.exec("TRUNCATE TABLE iptv_channel"));
 }
 
-vector<uint> CardUtil::GetInputList(void)
+std::vector<uint> CardUtil::GetInputList(void)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -2662,9 +2662,9 @@ vector<uint> CardUtil::GetInputList(void)
     return list;
 }
 
-vector<uint> CardUtil::GetSchedInputList(void)
+std::vector<uint> CardUtil::GetSchedInputList(void)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -2684,9 +2684,9 @@ vector<uint> CardUtil::GetSchedInputList(void)
     return list;
 }
 
-vector<uint> CardUtil::GetLiveTVInputList(void)
+std::vector<uint> CardUtil::GetLiveTVInputList(void)
 {
-    vector<uint> list;
+    std::vector<uint> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(

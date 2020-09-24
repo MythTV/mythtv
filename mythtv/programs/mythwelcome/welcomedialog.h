@@ -84,8 +84,8 @@ class WelcomeDialog : public MythScreenType
     QStringList    m_statusList;
     bool           m_frontendIsRunning        { false };
 
-    vector<TunerStatus> m_tunerList;
-    vector<ProgramInfo> m_scheduledList;
+    std::vector<TunerStatus> m_tunerList;
+    std::vector<ProgramInfo> m_scheduledList;
 
     QMutex      m_recListUpdateMuxtex;
     bool        m_pendingRecListUpdate        { false };

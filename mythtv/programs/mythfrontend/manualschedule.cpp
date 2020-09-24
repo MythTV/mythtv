@@ -204,7 +204,7 @@ void ManualSchedule::dateChanged(void)
 void ManualSchedule::recordClicked(void)
 {
     QDateTime endts = m_startDateTime
-        .addSecs(max(m_durationSpin->GetIntValue() * 60, 60));
+        .addSecs(std::max(m_durationSpin->GetIntValue() * 60, 60));
 
     if (m_channelList->GetCurrentPos() >= m_chanids.size())
     {

@@ -6,7 +6,6 @@
 // Std
 #include <map>
 #include <iostream>
-using namespace std;
 
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 12;

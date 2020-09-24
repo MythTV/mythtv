@@ -3,7 +3,6 @@
 #include <map>
 #include <iostream>
 #include <algorithm>
-using namespace std;
 
 #include "mythcontext.h"
 #include "videoout_d3d.h"

@@ -10,8 +10,6 @@
 #include "mythtvexp.h"
 #include "mthread.h"
 
-using namespace std;
-
 class MythFIFOWriter;
 
 class MythFIFOThread : public MThread

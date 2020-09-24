@@ -34,7 +34,7 @@ int next_dbg_str = 0;
  * that can request the video buffer lock while the decoder thread is blocking.
  * So store the buffers and release once the master videobuffer lock is released.
 */
-static inline void ReleaseDecoderResources(VideoFrame *Frame, vector<AVBufferRef *> &Discards)
+static inline void ReleaseDecoderResources(VideoFrame *Frame, std::vector<AVBufferRef *> &Discards)
 {
     if (format_is_hw(Frame->codec))
     {
@@ -53,7 +53,7 @@ static inline void ReleaseDecoderResources(VideoFrame *Frame, vector<AVBufferRef
     }
 }
 
-static inline void DoDiscard(const vector<AVBufferRef *> &Discards)
+static inline void DoDiscard(const std::vector<AVBufferRef *> &Discards)
 {
     for (auto * it : Discards)
         av_buffer_unref(&it);
@@ -197,7 +197,7 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
 
     // make a big reservation, so that things that depend on
     // pointer to VideoFrames work even after a few push_backs
-    m_buffers.reserve(max(numcreate, (uint)128));
+    m_buffers.reserve(std::max(numcreate, (uint)128));
 
     m_buffers.resize(numcreate);
     for (uint i = 0; i < numcreate; i++)
@@ -403,7 +403,7 @@ void VideoBuffers::ReleaseFrame(VideoFrame *Frame)
  */
 void VideoBuffers::DeLimboFrame(VideoFrame *Frame)
 {
-    vector<AVBufferRef*> discards;
+    std::vector<AVBufferRef*> discards;
 
     m_globalLock.lock();
 
@@ -443,7 +443,7 @@ void VideoBuffers::StartDisplayingFrame(void)
  */
 void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
 {
-    vector<AVBufferRef*> discards;
+    std::vector<AVBufferRef*> discards;
 
     m_globalLock.lock();
 
@@ -476,7 +476,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
  */
 void VideoBuffers::DiscardFrame(VideoFrame *Frame)
 {
-    vector<AVBufferRef*> discards;
+    std::vector<AVBufferRef*> discards;
     m_globalLock.lock();
     ReleaseDecoderResources(Frame, discards);
     SafeEnqueue(kVideoBuffer_avail, Frame);
@@ -486,7 +486,7 @@ void VideoBuffers::DiscardFrame(VideoFrame *Frame)
 
 void VideoBuffers::DiscardPauseFrames(void)
 {
-    vector<AVBufferRef*> discards;
+    std::vector<AVBufferRef*> discards;
 
     m_globalLock.lock();
     while (Size(kVideoBuffer_pause))
@@ -509,7 +509,7 @@ void VideoBuffers::DiscardPauseFrames(void)
 bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int References)
 {
     bool result = false;
-    vector<AVBufferRef*> refs;
+    std::vector<AVBufferRef*> refs;
 
     m_globalLock.lock();
     LOG(VB_PLAYBACK, LOG_INFO, QString("DiscardAndRecreate: %1").arg(GetStatus()));
@@ -872,7 +872,7 @@ uint VideoBuffers::Size(void) const
  */
 void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
 {
-    vector<AVBufferRef*> refs;
+    std::vector<AVBufferRef*> refs;
     m_globalLock.lock();
     LOG(VB_PLAYBACK, LOG_INFO, QString("VideoBuffers::DiscardFrames(%1): %2")
             .arg(NextFrameIsKeyFrame).arg(GetStatus()));
@@ -959,7 +959,7 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
 */
 void VideoBuffers::ClearAfterSeek(void)
 {
-    vector<AVBufferRef*> discards;
+    std::vector<AVBufferRef*> discards;
     {
         QMutexLocker locker(&m_globalLock);
 
@@ -1192,7 +1192,7 @@ const std::array<const QString,DBG_STR_ARR_SIZE> dbg_str_arr_short
     "i","j","k","l","m","n","o","p", // 40
 };
 
-map<const VideoFrame *, int> dbg_str;
+std::map<const VideoFrame *, int> dbg_str;
 
 static int DebugNum(const VideoFrame *Frame)
 {

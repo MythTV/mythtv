@@ -1,8 +1,6 @@
 #include <algorithm>
 #include <utility>
 
-using namespace std;
-
 #include "signalmonitorvalue.h"
 #include "mythlogging.h"
 
@@ -214,8 +212,8 @@ int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
     int minWait = 0;
     for (const auto & smv : slist)
     {
-        wait = max(wait, smv.GetTimeout());
-        minWait = min(minWait, smv.GetTimeout());
+        wait = std::max(wait, smv.GetTimeout());
+        minWait = std::min(minWait, smv.GetTimeout());
     }
     return (minWait<0) ? -1 : wait;
 }

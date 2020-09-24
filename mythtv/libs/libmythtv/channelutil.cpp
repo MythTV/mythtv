@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <set>
-using namespace std;
 
 #include <QFile>
 #include <QHash>
@@ -274,7 +273,7 @@ static uint insert_dtv_multiplex(
     return mplex;
 }
 
-static void handle_transport_desc(vector<uint> &muxes,
+static void handle_transport_desc(std::vector<uint> &muxes,
                                   const MPEGDescriptor &desc,
                                   uint sourceid, uint tsid, uint netid)
 {
@@ -433,10 +432,10 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
 /** \fn ChannelUtil::CreateMultiplexes(int, const NetworkInformationTable*)
  *
  */
-vector<uint> ChannelUtil::CreateMultiplexes(
+std::vector<uint> ChannelUtil::CreateMultiplexes(
     int sourceid, const NetworkInformationTable *nit)
 {
-    vector<uint> muxes;
+    std::vector<uint> muxes;
 
     if (sourceid <= 0)
         return muxes;
@@ -1099,10 +1098,10 @@ QStringList ChannelUtil::GetValidRecorderList(
 }
 
 
-vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
+std::vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    vector<uint> conflicting;
+    std::vector<uint> conflicting;
 
     if (sourceid)
     {
@@ -1464,7 +1463,7 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
         return chanid;
 
     // try to at least base it on the sourceid for human readability
-    chanid = max(get_max_chanid(sourceid) + 1, sourceid * 10000);
+    chanid = std::max(get_max_chanid(sourceid) + 1, sourceid * 10000);
 
     if (chanid_available(chanid))
         return chanid;
@@ -2132,7 +2131,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
     return list;
 }
 
-vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
+std::vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2146,7 +2145,7 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
             select += "AND sourceid=" + QString::number(sourceid);
     }
 
-    vector<uint> list;
+    std::vector<uint> list;
     query.prepare(select);
     if (!query.exec())
     {

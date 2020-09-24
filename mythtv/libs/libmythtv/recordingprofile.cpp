@@ -140,7 +140,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         }
 
         int which = getValueIndex(val);
-        setValue(max(which,0));
+        setValue(std::max(which,0));
 
         if (m_allowedRate.size() <= 1)
             setEnabled(false);
@@ -164,7 +164,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         }
     }
 
-    vector<uint>    m_rates;
+    std::vector<uint> m_rates;
     QMap<uint,bool> m_allowedRate;
 };
 
@@ -350,7 +350,7 @@ class MPEG2AudioBitrateSettings : public GroupSetting
         addTargetedChild(layers[1], new MPEG2audBitrateL2(parent));
         addTargetedChild(layers[2], new MPEG2audBitrateL3(parent));
 
-        uint desired_layer = max(min(3U, default_layer), 1U) - 1;
+        uint desired_layer = std::max(std::min(3U, default_layer), 1U) - 1;
         int which = audType->getValueIndex(layers[desired_layer]);
         if (which >= 0)
             audType->setValue(which);

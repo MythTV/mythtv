@@ -135,7 +135,7 @@ class PendingInfo
     bool         m_canceled          {false};
     bool         m_ask               {false};
     bool         m_doNotAsk          {false};
-    vector<uint> m_possibleConflicts;
+    std::vector<uint> m_possibleConflicts;
 };
 using PendingMap = QMap<uint,PendingInfo>;
 

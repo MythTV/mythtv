@@ -9,7 +9,7 @@ class NuppelVideoRecorder;
 class MythPlayer;
 class MythMediaBuffer;
 
-using KFATable = vector<struct kfatable_entry>;
+using KFATable = std::vector<struct kfatable_entry>;
 
 class Transcode : public QObject
 {

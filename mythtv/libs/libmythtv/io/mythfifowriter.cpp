@@ -20,7 +20,6 @@
 #include <ctime>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 MythFIFOThread::MythFIFOThread()
   : MThread("FIFOThread")

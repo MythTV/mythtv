@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -61,7 +60,7 @@ class MTV_PUBLIC DBPerson
     Role    m_role;
     QString m_name;
 };
-using DBCredits = vector<DBPerson>;
+using DBCredits = std::vector<DBPerson>;
 
 class MTV_PUBLIC EventRating
 {
@@ -119,11 +118,11 @@ class MTV_PUBLIC DBEvent
 
   protected:
     uint GetOverlappingPrograms(
-        MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const;
+        MSqlQuery &query, uint chanid, std::vector<DBEvent> &programs) const;
     int  GetMatch(
-        const vector<DBEvent> &programs, int &bestmatch) const;
+        const std::vector<DBEvent> &programs, int &bestmatch) const;
     uint UpdateDB(
-        MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const;
+        MSqlQuery &q, uint chanid, const std::vector<DBEvent> &p, int match) const;
     uint UpdateDB(
         MSqlQuery &query, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(

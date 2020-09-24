@@ -37,7 +37,6 @@
 #include <unistd.h>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -58,7 +57,7 @@ class DTVChannelInfo
     uint    m_serviceid {0};
     int     m_lcn       {-1};
 };
-using DTVChannelInfoList = vector<DTVChannelInfo>;
+using DTVChannelInfoList = std::vector<DTVChannelInfo>;
 
 class DTVTransport : public DTVMultiplex
 {
@@ -68,7 +67,7 @@ class DTVTransport : public DTVMultiplex
   public:
     DTVChannelInfoList channels;
 };
-using DTVChannelList = vector<DTVTransport>;
+using DTVChannelList = std::vector<DTVTransport>;
 
 /** \class DTVConfParser
  *  \brief Parses dvb-utils channel scanner output files.

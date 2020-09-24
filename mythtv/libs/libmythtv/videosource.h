@@ -3,7 +3,6 @@
 
 #include <utility>
 #include <vector>
-using namespace std;
 
 // MythTV headers
 #include "mthread.h"
@@ -868,7 +867,7 @@ class MTV_PUBLIC CardInputEditor : public GroupSetting
     void Load(void) override; // StandardSetting
 
   private:
-    vector<CardInput*>  m_cardInputs;
+    std::vector<CardInput*>  m_cardInputs;
 };
 
 class StartingChannel : public MythUIComboBoxSetting

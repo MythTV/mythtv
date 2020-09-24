@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt
 #include <QReadWriteLock>
@@ -673,7 +672,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     bool              m_smartForward {false};
     float             m_ffRewRepos {1.0F};
     bool              m_ffRewReverse {false};
-    vector<int>       m_ffRewSpeeds;
+    std::vector<int>  m_ffRewSpeeds;
 
     uint              m_vbimode {VBIMode::None};
 
@@ -712,7 +711,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     InfoMap        m_chanEditMap;          ///< Channel Editing initial map
 
     class SleepTimerInfo;
-    static const vector<SleepTimerInfo> s_sleepTimes;
+    static const std::vector<SleepTimerInfo> s_sleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
     uint                   m_sleepTimerTimeout {0};   ///< Current sleep timeout in msec
     int                    m_sleepTimerId {0};        ///< Timer for turning off playback.

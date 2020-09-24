@@ -13,7 +13,6 @@
 
 // Std
 #include <vector>
-using namespace std;
 
 #define DEINT_QUALITY_NONE   QString("none")
 #define DEINT_QUALITY_LOW    QString("low")
@@ -113,12 +112,12 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool        IsFilterAllowed( const QString &VideoRenderer);
     static QStringList GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers);
     static QString     GetBestVideoRenderer(const QStringList &Renderers);
-    static vector<ProfileItem> LoadDB(uint GroupId);
-    static bool        DeleteDB(uint GroupId, const vector<ProfileItem>& Items);
-    static bool        SaveDB(uint GroupId, vector<ProfileItem>& Items);
+    static std::vector<ProfileItem> LoadDB(uint GroupId);
+    static bool        DeleteDB(uint GroupId, const std::vector<ProfileItem>& Items);
+    static bool        SaveDB(uint GroupId, std::vector<ProfileItem>& Items);
 
   private:
-    vector<ProfileItem>::const_iterator
+    std::vector<ProfileItem>::const_iterator
             FindMatch(const QSize &Size, float Framerate, const QString &CodecName,
                       const QStringList& DisallowedDecoders = QStringList());
     void    LoadBestPreferences(const QSize &Size, float Framerate, const QString &CodecName,
@@ -133,7 +132,7 @@ class MTV_PUBLIC VideoDisplayProfile
     QString               m_lastCodecName       { };
     QString               m_lastVideoRenderer   { };
     QMap<QString,QString> m_currentPreferences  { };
-    vector<ProfileItem>   m_allowedPreferences  { };
+    std::vector<ProfileItem>   m_allowedPreferences  { };
 
     static QMutex                    s_safe_lock;
     static bool                      s_safe_initialized;

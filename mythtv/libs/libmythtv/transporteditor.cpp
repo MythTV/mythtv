@@ -32,7 +32,6 @@
 
 // C++ includes
 #include <vector>
-using namespace std;
 
 // MythTV includes
 #include "transporteditor.h"
@@ -71,7 +70,7 @@ static QString pp_modulation(const QString& mod)
 
 static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 {
-    vector<uint> cardids;
+    std::vector<uint> cardids;
 
     // Work out what card we have.. (doesn't always work well)
     MSqlQuery query(MSqlQuery::InitCon());
@@ -101,7 +100,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         return CardUtil::ERROR_PROBE;
     }
 
-    vector<CardUtil::INPUT_TYPES> cardtypes;
+    std::vector<CardUtil::INPUT_TYPES> cardtypes;
 
     for (uint cardid : cardids)
     {

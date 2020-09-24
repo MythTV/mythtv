@@ -10,7 +10,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
@@ -318,7 +317,7 @@ bool MythPlayer::IsPlaying(uint wait_in_msec, bool wait_for) const
     while ((wait_for != m_playing) && ((uint)t.elapsed() < wait_in_msec))
     {
         m_playingWaitCond.wait(
-            &m_playingLock, max(0,(int)wait_in_msec - t.elapsed()));
+            &m_playingLock, std::max(0,(int)wait_in_msec - t.elapsed()));
     }
 
     return m_playing;
@@ -760,7 +759,7 @@ int MythPlayer::OpenFile(int Retries)
     // Test the incoming buffer and create a suitable decoder
     MythTimer bigTimer;
     bigTimer.start();
-    int timeout = max((Retries + 1) * 500, 30000);
+    int timeout = std::max((Retries + 1) * 500, 30000);
     while (testreadsize <= kDecoderProbeBufferSize)
     {
         testbuf.resize(testreadsize);
@@ -3396,7 +3395,7 @@ void MythPlayer::SetWatched(bool forceWatched)
         qint64 starttime = pi->GetRecordingStartTime().toSecsSinceEpoch();
         qint64 endactual = pi->GetRecordingEndTime().toSecsSinceEpoch();
         qint64 endsched = pi->GetScheduledEndTime().toSecsSinceEpoch();
-        qint64 endtime = min(endactual, endsched);
+        qint64 endtime = std::min(endactual, endsched);
         numFrames = (long long) ((endtime - starttime) * m_videoFrameRate);
     }
 
@@ -4715,7 +4714,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
                 length_ms =
                     TranslatePositionFrameToMs(framesWritten, use_cutlist);
             }
-            position_ms = min(position_ms, length_ms);
+            position_ms = std::min(position_ms, length_ms);
         }
     }
     return TranslatePositionMsToFrame(position_ms, use_cutlist);
@@ -4792,9 +4791,9 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         int secsplayed = GetSecondsPlayed(honorCutList);
 
         stillFrame = (secsplayed < 0);
-        playbackLen = max(playbackLen, 0);
-        secsplayed = min(playbackLen, max(secsplayed, 0));
-        int secsbehind = max((playbackLen - secsplayed), 0);
+        playbackLen = std::max(playbackLen, 0);
+        secsplayed = std::min(playbackLen, std::max(secsplayed, 0));
+        int secsbehind = std::max((playbackLen - secsplayed), 0);
 
         if (playbackLen > 0)
             pos = (int)(1000.0F * (secsplayed / (float)playbackLen));

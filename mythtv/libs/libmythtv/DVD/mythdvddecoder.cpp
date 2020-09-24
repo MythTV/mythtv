@@ -433,8 +433,8 @@ void MythDVDDecoder::PostProcessTracks(void)
 
     if (!m_tracks[kTrackTypeSubtitle].empty())
     {
-        map<int,uint> lang_sub_cnt;
-        map<int,int>  stream2idx;
+        std::map<int,uint> lang_sub_cnt;
+        std::map<int,int>  stream2idx;
 
         // First, create a map containing stream id -> track index
         // of the subtitle streams that have been found so far.

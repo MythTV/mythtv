@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <pthread.h>
-using namespace std;
 
 #include <QDateTime>
 #include <QFileInfo>
@@ -1879,7 +1878,7 @@ QString JobQueue::PrettyPrint(off_t bytes)
         unsigned int  m_max;
         int           m_precision;
     };
-    static constexpr array<const PpTab_t,9> kPpTab {{
+    static constexpr std::array<const PpTab_t,9> kPpTab {{
         { "bytes", 9999, 0 },
         { "kB", 999, 0 },
         { "MB", 999, 1 },

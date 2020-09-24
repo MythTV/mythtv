@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <deque>
-using namespace std;
 
 // Qt headers
 #include <QWidget>

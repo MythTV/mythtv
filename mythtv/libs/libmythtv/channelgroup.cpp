@@ -213,7 +213,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
     if (grpid == -1)
       return sorted[0].m_grpId;
 
-    auto it = find(sorted.cbegin(), sorted.cend(), grpid);
+    auto it = std::find(sorted.cbegin(), sorted.cend(), grpid);
 
     // If grpid is not in the list, return -1 for all channels
     if (it == sorted.end())

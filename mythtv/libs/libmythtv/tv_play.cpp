@@ -76,8 +76,6 @@
 #include <cstdlib>
 #include <thread>
 
-using namespace std;
-
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
@@ -1841,7 +1839,7 @@ void TV::ShowOSDAskAllow()
                 all_have_later &= (*it).m_hasLater;
                 int tmp = static_cast<int>(MythDate::current().secsTo((*it).m_expiry));
                 tmp *= 1000;
-                timeuntil = min(timeuntil, max(tmp, 0));
+                timeuntil = std::min(timeuntil, std::max(tmp, 0));
             }
         }
         timeuntil = (9999999 == timeuntil) ? 0 : timeuntil;
@@ -3194,7 +3192,7 @@ bool TV::HandleTrackAction(const QString &Action)
             if (m_vbimode == VBIMode::PAL_TT && valid)
                 m_playerContext.m_player->SetTeletextPage(static_cast<uint>(page));
             else if (m_vbimode == VBIMode::NTSC_CC)
-                m_playerContext.m_player->SetTrack(kTrackTypeCC608,max(min(page - 1, 1), 0));
+                m_playerContext.m_player->SetTrack(kTrackTypeCC608,std::max(std::min(page - 1, 1), 0));
 
             ClearInputQueues(true);
 
@@ -5347,7 +5345,7 @@ void TV::DoArbSeek(ArbSeekWhence Whence, bool HonorCutlist)
         uint64_t total_frames = m_playerContext.m_player->GetCurrentFrameCount();
         float dur = m_playerContext.m_player->ComputeSecs(total_frames, HonorCutlist);
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        DoSeek(max(0.0F, dur - static_cast<float>(time)), tr("Jump To"), /*timeIsOffset*/false, HonorCutlist);
+        DoSeek(std::max(0.0F, dur - static_cast<float>(time)), tr("Jump To"), /*timeIsOffset*/false, HonorCutlist);
     }
     else
     {
@@ -5747,7 +5745,7 @@ void TV::SwitchSource(uint Direction)
     m_playerContext.m_recorder->GetChannelInfo(info);
     uint sourceid = info["sourceid"].toUInt();
 
-    vector<InputInfo> inputs = RemoteRequestFreeInputInfo(cardid);
+    std::vector<InputInfo> inputs = RemoteRequestFreeInputInfo(cardid);
     for (auto & input : inputs)
     {
         // prefer the current card's input in sources list
@@ -6269,7 +6267,7 @@ static uint get_chanid(const PlayerContext *ctx,
     if (ctx && ctx->m_playingInfo && ctx->m_playingInfo->GetSourceID())
     {
         cur_sourceid = ctx->m_playingInfo->GetSourceID();
-        chanid = max(static_cast<uint>(ChannelUtil::GetChanID(cur_sourceid, channum)), 0U);
+        chanid = std::max(static_cast<uint>(ChannelUtil::GetChanID(cur_sourceid, channum)), 0U);
         if (chanid)
             return chanid;
     }
@@ -6277,7 +6275,7 @@ static uint get_chanid(const PlayerContext *ctx,
 
     uint sourceid = CardUtil::GetSourceID(cardid);
     if (cur_sourceid != sourceid && sourceid)
-        chanid = max(static_cast<uint>(ChannelUtil::GetChanID(sourceid, channum)), 0U);
+        chanid = std::max(static_cast<uint>(ChannelUtil::GetChanID(sourceid, channum)), 0U);
     return chanid;
 }
 
@@ -7044,7 +7042,7 @@ QSet<uint> TV::IsTunableOn(uint ChanId)
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(ChanId);
 
-    vector<InputInfo> inputs = RemoteRequestFreeInputInfo(excluded_input);
+    std::vector<InputInfo> inputs = RemoteRequestFreeInputInfo(excluded_input);
 
     for (auto & input : inputs)
     {
@@ -7427,8 +7425,8 @@ void TV::ChangeSubtitleZoom(int Dir)
     m_subtitleZoomAdjustment = true;
     bool showing = m_playerContext.m_player->GetCaptionsEnabled();
     int newval = (subs ? subs->GetZoom() : 100) + Dir;
-    newval = max(50, newval);
-    newval = min(200, newval);
+    newval = std::max(50, newval);
+    newval = std::min(200, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (showing && !IsBrowsing())
@@ -7463,8 +7461,8 @@ void TV::ChangeSubtitleDelay(int Dir)
     bool showing = m_playerContext.m_player->GetCaptionsEnabled() &&
                        (capmode == kDisplayRawTextSubtitle || capmode == kDisplayTextSubtitle);
     int newval = (subs ? subs->GetDelay() : 100) + Dir * 10;
-    newval = max(-5000, newval);
-    newval = min(5000, newval);
+    newval = std::max(-5000, newval);
+    newval = std::min(5000, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (showing && !IsBrowsing())
@@ -9804,7 +9802,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         if (m_playerContext.m_recorder)
         {
             uint inputid  = m_playerContext.GetCardID();
-            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            std::vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
             QSet <QString> addednames;
             addednames += CardUtil::GetDisplayName(inputid);
             for (auto & input : inputs)
@@ -9829,7 +9827,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             m_playerContext.m_recorder->GetChannelInfo(info);
             uint sourceid = info["sourceid"].toUInt();
             QMap<uint, bool> sourceids;
-            vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
+            std::vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
             for (auto & input : inputs)
             {
                 if (input.m_sourceId == sourceid ||
@@ -10382,7 +10380,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
 
         QMutexLocker locker(&m_progListsLock);
         m_progLists.clear();
-        vector<ProgramInfo*> *infoList = RemoteGetRecordedList(0);
+        std::vector<ProgramInfo*> *infoList = RemoteGetRecordedList(0);
         bool LiveTVInAllPrograms = gCoreContext->GetBoolSetting("LiveTVInAllPrograms",false);
         if (infoList)
         {

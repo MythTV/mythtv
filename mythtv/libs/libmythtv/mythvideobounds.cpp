@@ -216,7 +216,7 @@ void MythVideoBounds::ApplyDBScaleAndMove(void)
         {
             // To move the image down, move the start point up.
             // Don't offset the image more than we have overscanned.
-            yoff = min(m_videoRect.top(), yoff);
+            yoff = std::min(m_videoRect.top(), yoff);
             m_videoRect.moveTop(m_videoRect.top() - yoff);
         }
         else if (yoff < 0)
@@ -245,7 +245,7 @@ void MythVideoBounds::ApplyDBScaleAndMove(void)
         if (yoff > 0)
         {
             // Don't offset more than we have underscanned.
-            yoff = min(m_displayVideoRect.top(), yoff);
+            yoff = std::min(m_displayVideoRect.top(), yoff);
             m_displayVideoRect.moveTop(m_displayVideoRect.top() + yoff);
         }
         else if (yoff < 0)
@@ -267,7 +267,7 @@ void MythVideoBounds::ApplyDBScaleAndMove(void)
         int xoff = m_dbMove.x();
         if (xoff > 0)
         {
-            xoff = min(m_videoRect.left(), xoff);
+            xoff = std::min(m_videoRect.left(), xoff);
             m_videoRect.moveLeft(m_videoRect.left() - xoff);
         }
         else if (xoff < 0)
@@ -288,7 +288,7 @@ void MythVideoBounds::ApplyDBScaleAndMove(void)
         int xoff = m_dbMove.x();
         if (xoff > 0)
         {
-            xoff = min(m_displayVideoRect.left(), xoff);
+            xoff = std::min(m_displayVideoRect.left(), xoff);
             m_displayVideoRect.moveLeft(m_displayVideoRect.left() + xoff);
         }
         else if (xoff < 0)

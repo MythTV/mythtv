@@ -23,8 +23,6 @@
 #include <iostream>
 #include <utility>
 
-using namespace std;
-
 #include <QFileInfo>
 #include <QPainter>
 
@@ -160,7 +158,7 @@ bool MythCCExtractorPlayer::run(void)
         OnGotNewFrame();
 
     if (m_showProgress)
-        cout << "\r                                      \r" << flush;
+        std::cout << "\r                                      \r" << std::flush;
 
     while (!m_killDecoder && !IsErrored())
     {
@@ -178,7 +176,7 @@ bool MythCCExtractorPlayer::run(void)
             ui_timer.restart();
             QString str = progress_string(
                 flagTime, m_myFramesPlayed, m_totalFrames);
-            cout << qPrintable(str) << '\r' << flush;
+            std::cout << qPrintable(str) << '\r' << std::flush;
         }
 
         if (!DecoderGetFrame(kDecodeVideo))
@@ -195,7 +193,7 @@ bool MythCCExtractorPlayer::run(void)
             m_myFramesPlayed = m_totalFrames;
         }
         QString str = progress_string(flagTime, m_myFramesPlayed, m_totalFrames);
-        cout << qPrintable(str) << endl;
+        std::cout << qPrintable(str) << std::endl;
     }
 
     Process608Captions(kProcessFinalize);
@@ -326,7 +324,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 
             textlist->m_lock.lock();
 
-            const int ccIdx = kCcIndexTbl[min(streamRawIdx,6)];
+            const int ccIdx = kCcIndexTbl[std::min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
             {
@@ -686,10 +684,10 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
                     painter.drawImage(x, y, img);
 
-                    min_x = min(min_x, x);
-                    min_y = min(min_y, y);
-                    max_x = max(max_x, x + w);
-                    max_y = max(max_y, y + h);
+                    min_x = std::min(min_x, x);
+                    min_y = std::min(min_y, y);
+                    max_x = std::max(max_x, x + w);
+                    max_y = std::max(max_y, y + h);
                 }
             }
             painter.end();

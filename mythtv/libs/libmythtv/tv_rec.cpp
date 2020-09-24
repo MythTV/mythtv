@@ -155,7 +155,7 @@ bool TVRec::Init(void)
     m_earlyCommFlag     = gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
     m_runJobOnHostOnly  = gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false);
     m_eitTransportTimeout =
-        max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
+        std::max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
     m_eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);
     m_audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
     m_overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
@@ -1675,7 +1675,7 @@ bool TVRec::GetDevices(uint inputid,
     if (!test.isEmpty())
         gen_opts.m_audioDev = test;
 
-    gen_opts.m_audioSampleRate = max(testnum, query.value(3).toInt());
+    gen_opts.m_audioSampleRate = std::max(testnum, query.value(3).toInt());
 
     test = query.value(4).toString();
     if (!test.isEmpty())
@@ -1683,8 +1683,8 @@ bool TVRec::GetDevices(uint inputid,
 
     gen_opts.m_skipBtAudio = query.value(5).toBool();
 
-    gen_opts.m_signalTimeout  = (uint) max(query.value(6).toInt(), 0);
-    gen_opts.m_channelTimeout = (uint) max(query.value(7).toInt(), 0);
+    gen_opts.m_signalTimeout  = (uint) std::max(query.value(6).toInt(), 0);
+    gen_opts.m_channelTimeout = (uint) std::max(query.value(7).toInt(), 0);
 
     // We should have at least 100 ms to acquire tables...
     int table_timeout = ((int)gen_opts.m_channelTimeout -
@@ -3299,7 +3299,7 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
         return false;
 
     if (!chanid)
-        chanid = (uint) max(m_channel->GetChanID(), 0);
+        chanid = (uint) std::max(m_channel->GetChanID(), 0);
 
     if (!sourceid)
         sourceid = m_channel->GetSourceID();

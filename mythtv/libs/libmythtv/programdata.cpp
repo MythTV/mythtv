@@ -5,8 +5,6 @@
 #include <climits>
 #include <utility>
 
-using namespace std;
-
 // Qt includes
 #include <QtCore> // for qAbs
 
@@ -277,7 +275,7 @@ uint DBEvent::UpdateDB(
 
     // Get all programs already in the database that overlap
     // with our new program.
-    vector<DBEvent> programs;
+    std::vector<DBEvent> programs;
     uint count = GetOverlappingPrograms(query, chanid, programs);
     int  match = INT_MIN;
     int  i     = -1;
@@ -357,7 +355,7 @@ uint DBEvent::UpdateDB(
 //       This is the STIME3/ETIME3 comparison.
 //
 uint DBEvent::GetOverlappingPrograms(
-    MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const
+    MSqlQuery &query, uint chanid, std::vector<DBEvent> &programs) const
 {
     uint count = 0;
     query.prepare(
@@ -447,7 +445,7 @@ static int score_words(const QStringList &al, const QStringList &bl)
         {
             if (*ait == *bit)
             {
-                bscore = max(1000, 2000 - (dist * 500));
+                bscore = std::max(1000, 2000 - (dist * 500));
                 // lower score for short words
                 if (ait->length() < 5)
                     bscore /= 5 - ait->length();
@@ -497,10 +495,10 @@ static int score_match(const QString &a, const QString &b)
     // score words symmetrically
     int score = (score_words(al, bl) + score_words(bl, al)) / 2;
 
-    return min(900, score);
+    return std::min(900, score);
 }
 
-int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
+int DBEvent::GetMatch(const std::vector<DBEvent> &programs, int &bestmatch) const
 {
     bestmatch = -1;
     int match_val = INT_MIN;
@@ -541,8 +539,8 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
             /* crappy providers apparently have events without duration
              * ensure that the minimal duration is 2 second to avoid
              * multiplying and more importantly dividing by zero */
-            int min_dur = max(2, min(duration, duration_loop));
-            overlap = min(overlap, min_dur/2);
+            int min_dur = std::max(2, std::min(duration, duration_loop));
+            overlap = std::min(overlap, min_dur/2);
             mv *= overlap * 2;
             mv /= min_dur;
         }
@@ -575,7 +573,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 }
 
 uint DBEvent::UpdateDB(
-    MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const
+    MSqlQuery &q, uint chanid, const std::vector<DBEvent> &p, int match) const
 {
     // Adjust/delete overlaps;
     bool ok = true;
@@ -1381,7 +1379,7 @@ bool ProgramData::ClearDataBySource(
     uint sourceid, const QDateTime &from, const QDateTime &to,
     bool use_channel_time_offset)
 {
-    vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
+    std::vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
     bool ok = true;
     for (uint chanid : chanids)
@@ -1503,7 +1501,7 @@ void ProgramData::HandlePrograms(
             continue;
         }
 
-        vector<uint> chanids;
+        std::vector<uint> chanids;
         while (query.next())
             chanids.push_back(query.value(0).toUInt());
 

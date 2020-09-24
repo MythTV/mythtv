@@ -7,7 +7,6 @@
 #include <list>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt includes
 #include <QString>
@@ -23,7 +22,7 @@ class FrequencyTable;
 class TransportScanItem;
 
 using freq_table_map_t  = QMap<QString, const FrequencyTable*>;
-using freq_table_list_t = vector<const FrequencyTable*>;
+using freq_table_list_t = std::vector<const FrequencyTable*>;
 
 bool teardown_frequency_tables(void);
 
@@ -195,7 +194,7 @@ class transport_scan_items_it_t
 {
   public:
     transport_scan_items_it_t() = default;
-    transport_scan_items_it_t(const list<TransportScanItem>::iterator it)
+    transport_scan_items_it_t(const std::list<TransportScanItem>::iterator it)
         : m_it(it) {}
 
     transport_scan_items_it_t& operator++()
@@ -248,17 +247,17 @@ class transport_scan_items_it_t
     const TransportScanItem& operator*() const { return *m_it; }
     TransportScanItem&       operator*()       { return *m_it; }
 
-    list<TransportScanItem>::iterator iter() { return m_it; }
-    list<TransportScanItem>::const_iterator iter() const { return m_it; }
+    std::list<TransportScanItem>::iterator iter() { return m_it; }
+    std::list<TransportScanItem>::const_iterator iter() const { return m_it; }
     uint offset() const { return (uint) m_offset; }
     transport_scan_items_it_t nextTransport() const
     {
-        list<TransportScanItem>::iterator tmp = m_it;
+        std::list<TransportScanItem>::iterator tmp = m_it;
         return {++tmp};
     }
 
   private:
-    list<TransportScanItem>::iterator m_it;
+    std::list<TransportScanItem>::iterator m_it;
     int m_offset {0};
 
     friend bool operator==(const transport_scan_items_it_t&A,
@@ -267,7 +266,7 @@ class transport_scan_items_it_t
                            const transport_scan_items_it_t&B);
 
     friend bool operator==(const transport_scan_items_it_t&A,
-                           const list<TransportScanItem>::iterator&B);
+                           const std::list<TransportScanItem>::iterator&B);
 };
 
 inline bool operator==(const transport_scan_items_it_t& A,
@@ -283,11 +282,11 @@ inline bool operator!=(const transport_scan_items_it_t &A,
 }
 
 inline bool operator==(const transport_scan_items_it_t& A,
-                       const list<TransportScanItem>::iterator& B)
+                       const std::list<TransportScanItem>::iterator& B)
 {
     return (A.m_it == B) && (0 == A.offset());
 }
 
-using transport_scan_items_t = list<TransportScanItem>;
+using transport_scan_items_t = std::list<TransportScanItem>;
 
 #endif // FREQUENCY_TABLE_H

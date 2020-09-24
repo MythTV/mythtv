@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <deque>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -40,7 +39,7 @@ class pid_cache_item_t
     uint m_pid     {0};
     uint m_sidTid  {0};
 };
-using pid_cache_t = vector<pid_cache_item_t>;
+using pid_cache_t = std::vector<pid_cache_item_t>;
 
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use
@@ -73,7 +72,7 @@ class MTV_PUBLIC ChannelUtil
     static uint    CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
                                    int transport_id, int network_id);
 
-    static vector<uint> CreateMultiplexes(
+    static std::vector<uint> CreateMultiplexes(
         int sourceid, const NetworkInformationTable *nit);
 
     static uint    GetMplexID(uint sourceid, const QString &channum);
@@ -169,7 +168,7 @@ class MTV_PUBLIC ChannelUtil
     // Misc gets
     static QString GetDefaultAuthority(uint chanid);
     static QString GetIcon(uint chanid);
-    static vector<uint> GetInputIDs(uint chanid);
+    static std::vector<uint> GetInputIDs(uint chanid);
     static QString GetUnknownCallsign(void);
     static uint    FindChannel(uint sourceid, const QString &freqid);
     static int     GetChanID(uint sourceid, const QString &channum)
@@ -254,7 +253,7 @@ class MTV_PUBLIC ChannelUtil
     {
         return GetChannelsInternal(sourceid, false, true, QString(), 0);
     }
-    static vector<uint> GetChanIDs(int sourceid = -1, bool onlyVisible = false);
+    static std::vector<uint> GetChanIDs(int sourceid = -1, bool onlyVisible = false);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(ChannelInfoList &list, const QString &order,
                                 bool eliminate_duplicates = false);
@@ -287,12 +286,12 @@ class MTV_PUBLIC ChannelUtil
     static bool    IsConflicting(const QString &channum,
                                  uint sourceid = 0, uint excluded_chanid = 0)
     {
-        vector<uint> chanids = GetConflicting(channum, sourceid);
+        std::vector<uint> chanids = GetConflicting(channum, sourceid);
         return (chanids.size() > 1) ||
             ((1 == chanids.size()) && (chanids[0] != excluded_chanid));
     }
 
-    static vector<uint> GetConflicting(const QString &channum,
+    static std::vector<uint> GetConflicting(const QString &channum,
                                        uint sourceid = 0);
 
     /**

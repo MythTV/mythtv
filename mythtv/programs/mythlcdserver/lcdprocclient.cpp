@@ -1879,7 +1879,7 @@ void LCDProcClient::dostdclock()
     if ( m_lcdHeight < 3)
         y = m_lcdHeight;
     else
-        y = (int) rint( m_lcdHeight / 2) + 1;
+        y = (int) std::rint( m_lcdHeight / 2) + 1;
 
     QString time = QTime::currentTime().toString( m_timeFormat );
     x = ( m_lcdWidth - time.length()) / 2 + 1;
@@ -2139,7 +2139,7 @@ void LCDProcClient::outputMusic()
         aString += " ";
         aString += QString::number( m_lcdHeight );
         aString += " ";
-        aString += QString::number((int)rint( m_musicProgress *
+        aString += QString::number((int)std::rint( m_musicProgress *
                                         ( m_lcdWidth - info_width) * m_cellWidth ));
         sendToServer(aString);
     }
@@ -2153,7 +2153,7 @@ void LCDProcClient::outputChannel()
         aString = "widget_set Channel progressBar 1 ";
         aString += QString::number( m_lcdHeight );
         aString += " ";
-        aString += QString::number((int)rint( m_progress * m_lcdWidth * m_cellWidth ));
+        aString += QString::number((int)std::rint( m_progress * m_lcdWidth * m_cellWidth ));
         sendToServer(aString);
 
         if ( m_lcdHeight >= 4)
@@ -2173,7 +2173,7 @@ void LCDProcClient::outputGeneric()
     aString += " ";
     aString += QString::number( m_lcdHeight );
     aString += " ";
-    aString += QString::number((int)rint( m_genericProgress * m_lcdWidth *
+    aString += QString::number((int)std::rint( m_genericProgress * m_lcdWidth *
                                      m_cellWidth ));
     sendToServer(aString);
 }
@@ -2190,7 +2190,7 @@ void LCDProcClient::outputVolume()
         aString = "widget_set Volume progressBar 1 ";
         aString += QString::number( m_lcdHeight );
         aString += " ";
-        aString += QString::number((int)rint( m_volumeLevel * m_lcdWidth * m_cellWidth ));
+        aString += QString::number((int)std::rint( m_volumeLevel * m_lcdWidth * m_cellWidth ));
         sendToServer(aString);
     }
 

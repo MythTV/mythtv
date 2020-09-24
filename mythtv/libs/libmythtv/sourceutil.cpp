@@ -145,7 +145,7 @@ uint SourceUtil::GetChannelCount(uint sourceid)
     return 0;
 }
 
-vector<uint> SourceUtil::GetMplexIDs(uint sourceid)
+std::vector<uint> SourceUtil::GetMplexIDs(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -155,7 +155,7 @@ vector<uint> SourceUtil::GetMplexIDs(uint sourceid)
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
-    vector<uint> list;
+    std::vector<uint> list;
     if (!query.exec())
     {
         MythDB::DBError("SourceUtil::GetMplexIDs()", query);
@@ -353,7 +353,7 @@ bool SourceUtil::IsUnscanable(uint sourceid)
 bool SourceUtil::IsCableCardPresent(uint sourceid)
 {
     bool ccpresent = false;
-    vector<uint> inputs = CardUtil::GetInputIDs(sourceid);
+    std::vector<uint> inputs = CardUtil::GetInputIDs(sourceid);
     for (uint & input : inputs)
     {
         if (CardUtil::IsCableCardPresent(input, CardUtil::GetRawInputType(input))

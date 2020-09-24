@@ -4,7 +4,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -21,7 +20,7 @@ class MTV_PUBLIC SourceUtil
     static QString GetChannelSeparator(uint sourceid);
     static QString GetChannelFormat(uint sourceid);
     static uint    GetChannelCount(uint sourceid);
-    static vector<uint> GetMplexIDs(uint sourceid);
+    static std::vector<uint> GetMplexIDs(uint sourceid);
     static bool    GetListingsLoginData(uint sourceid,
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);

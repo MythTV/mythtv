@@ -140,6 +140,6 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
     uint                  m_transportID    {0};
     int                   m_signalStrength {0};
 };
-using ScanDTVTransportList = vector<ScanDTVTransport>;
+using ScanDTVTransportList = std::vector<ScanDTVTransport>;
 
 #endif // DTVMULTIPLEX_H

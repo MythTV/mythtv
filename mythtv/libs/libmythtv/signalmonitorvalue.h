@@ -3,7 +3,6 @@
 #define SIGNALMONITORVALUES_H
 
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QStringList>
@@ -15,7 +14,7 @@ class SignalMonitorValue
 {
     Q_DECLARE_TR_FUNCTIONS(SignalMonitorValue)
 
-    using SignalMonitorList = vector<SignalMonitorValue>;
+    using SignalMonitorList = std::vector<SignalMonitorValue>;
   public:
     SignalMonitorValue(QString _name, QString _noSpaceName,
                        int _threshold, bool _high_threshold,
@@ -65,7 +64,7 @@ class SignalMonitorValue
     {
         float rangeconv = ((float) (newmax - newmin)) / (GetMax() - GetMin());
         int newval = (int) (((GetValue() - GetMin()) * rangeconv) + newmin);
-        return max( min(newval, newmax), newmin );
+        return std::max( std::min(newval, newmax), newmin );
     }
 
 
@@ -75,7 +74,7 @@ class SignalMonitorValue
     void SetValue(int _value)
     {
         m_set = true;
-        m_value = min(max(_value,m_minVal),m_maxVal);
+        m_value = std::min(std::max(_value,m_minVal),m_maxVal);
     }
 
     void SetMin(int _min) { m_minVal = _min; }
@@ -146,6 +145,6 @@ class SignalMonitorValue
     bool    m_set           {false}; // false until value initially set
 };
 
-using SignalMonitorList = vector<SignalMonitorValue>;
+using SignalMonitorList = std::vector<SignalMonitorValue>;
 
 #endif // SIGNALMONITORVALUES_H

@@ -72,8 +72,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
     auto *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex = (nStartIndex > 0) ? min( nStartIndex, nTotalAvailable ) : 0;
-    nCount      = (nCount > 0) ? min(nCount, (nTotalAvailable - nStartIndex)) :
+    nStartIndex = (nStartIndex > 0) ? std::min( nStartIndex, nTotalAvailable ) : 0;
+    nCount      = (nCount > 0) ? std::min(nCount, (nTotalAvailable - nStartIndex)) :
                                              (nTotalAvailable - nStartIndex);
 
     ChannelInfoList::iterator chanIt;
@@ -99,13 +99,13 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
     if (nCount == 0)
         nTotalPages = 1;
     else
-        nTotalPages = (int)ceil((float)nTotalAvailable / nCount);
+        nTotalPages = (int)std::ceil((float)nTotalAvailable / nCount);
 
     if (nTotalPages == 1)
         nCurPage = 1;
     else
     {
-        nCurPage = (int)ceil((float)nStartIndex / nCount) + 1;
+        nCurPage = (int)std::ceil((float)nStartIndex / nCount) + 1;
     }
 
     pChannelInfos->setStartIndex    ( nStartIndex     );
@@ -605,9 +605,9 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( uint nSourceID,
 
     auto *pVideoMultiplexes = new DTC::VideoMultiplexList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, muxCount ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, muxCount ) : muxCount;
-    int nEndIndex = min((nStartIndex + nCount), muxCount );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, muxCount ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, muxCount ) : muxCount;
+    int nEndIndex = std::min((nStartIndex + nCount), muxCount );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
@@ -648,13 +648,13 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( uint nSourceID,
     if (nCount == 0)
         totalPages = 1;
     else
-        totalPages = (int)ceil((float)muxCount / nCount);
+        totalPages = (int)std::ceil((float)muxCount / nCount);
 
     if (totalPages == 1)
         curPage = 1;
     else
     {
-        curPage = (int)ceil((float)nStartIndex / nCount) + 1;
+        curPage = (int)std::ceil((float)nStartIndex / nCount) + 1;
     }
 
     pVideoMultiplexes->setStartIndex    ( nStartIndex     );

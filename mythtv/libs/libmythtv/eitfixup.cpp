@@ -1611,7 +1611,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     if (tmpExp1.indexIn(event.m_description) != -1)
     {
         uint tmpExp1Len = tmpExp1.cap(1).length();
-        uint evDescLen = max(event.m_description.length(), 1);
+        uint evDescLen = std::max(event.m_description.length(), 1);
 
         if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
             ((tmpExp1Len * 100 / evDescLen) < SUBTITLE_PCT))
@@ -1807,7 +1807,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         if (tmpExp1.indexIn(event.m_description) != -1)
         {
             uint tmpExp1Len = tmpExp1.cap(1).length();
-            uint evDescLen = max(event.m_description.length(), 1);
+            uint evDescLen = std::max(event.m_description.length(), 1);
 
             if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
                 (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))

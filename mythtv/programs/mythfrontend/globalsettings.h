@@ -163,7 +163,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
     virtual void ChangeResolution(StandardSetting *setting);
 
   private:
-    static vector<double> GetRefreshRates(const QString &resolution);
+    static std::vector<double> GetRefreshRates(const QString &resolution);
 };
 
 class MainGeneralSettings : public GroupSetting
@@ -272,15 +272,15 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void ReloadSettings(void);
-    vector<ProfileItem> m_items;
-    vector<ProfileItem> m_delItems;
+    std::vector<ProfileItem> m_items;
+    std::vector<ProfileItem> m_delItems;
     QString     m_profileName;
     uint        m_groupId {0};
 
     TransMythUICheckBoxSetting *m_markForDeletion {nullptr};
     ButtonStandardSetting      *m_addNewEntry     {nullptr};
-    vector<PlaybackProfileItemConfig*> m_profiles;
-    vector<TransMythUISpinBoxSetting*> m_priority;
+    std::vector<PlaybackProfileItemConfig*> m_profiles;
+    std::vector<TransMythUISpinBoxSetting*> m_priority;
 };
 
 class ChannelGroupSetting : public GroupSetting

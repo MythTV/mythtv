@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <iostream>
-using namespace std;
 
 #include <QString>
 #include <QSqlError>
@@ -1589,7 +1588,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             if (parts[1].contains("."))
                 continue; // already in new format, skip it..
 
-            int input = max(parts[1].toInt() - 1, 0);
+            int input = std::max(parts[1].toInt() - 1, 0);
             videodevice = parts[0] + QString("-0.%1").arg(input);
             update.bindValue(":CARDID", cardid);
             update.bindValue(":VIDDEV", videodevice);
@@ -3426,7 +3425,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         // convert old VideoDisplayProfile settings to new format
         ProfileItem temp;
-        vector<ProfileItem> profiles;
+        std::vector<ProfileItem> profiles;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT profileid, value, data FROM displayprofiles "
@@ -3616,7 +3615,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         // missed in 1357 - convert old vdpau and openglvaapi renderers to opengl
         // convert ancient quartz-blit to opengl as well
         ProfileItem temp;
-        vector<ProfileItem> profiles;
+        std::vector<ProfileItem> profiles;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT profileid, value, data FROM displayprofiles "

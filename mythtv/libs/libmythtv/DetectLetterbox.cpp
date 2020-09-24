@@ -13,7 +13,7 @@ DetectLetterbox::DetectLetterbox(MythPlayer* const Player)
     int dbAdjustFill = gCoreContext->GetNumSetting("AdjustFill", 0);
     m_isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
     m_detectLetterboxDefaultMode =
-            static_cast<AdjustFillMode>(max(static_cast<int>(kAdjustFill_Off),
+            static_cast<AdjustFillMode>(std::max(static_cast<int>(kAdjustFill_Off),
                                             dbAdjustFill - kAdjustFill_AutoDetect_DefaultOff));
     m_detectLetterboxDetectedMode = Player->GetAdjustFill();
     m_detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
@@ -249,7 +249,7 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
         if (m_detectLetterboxDetectedMode != m_detectLetterboxDefaultMode)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Non Letterbox detected on line: %1 (limit: %2)")
-                    .arg(min(maxTop, maxBottom)).arg(halfLimit));
+                    .arg(std::min(maxTop, maxBottom)).arg(halfLimit));
             m_detectLetterboxLock.lock();
             m_detectLetterboxConsecutiveCounter = 0;
             m_detectLetterboxDetectedMode = m_detectLetterboxDefaultMode;
