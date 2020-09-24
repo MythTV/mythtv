@@ -247,7 +247,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
                                                            VideoFrame *Frame,
                                                            FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -343,7 +343,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
                                                              VideoFrame *Frame,
                                                              FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
 
@@ -422,9 +422,9 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         // Create a texture
         // N.B. as for GLX Copy there is no obvious 10/12/16bit support here.
         // too many unknowns in this pipeline
-        vector<QSize> size;
+        std::vector<QSize> size;
         size.push_back(m_openglTextureSize);
-        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
+        std::vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
         if (textures.empty())
             return result;
         result.push_back(textures[0]);

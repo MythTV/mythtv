@@ -28,7 +28,7 @@ void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture
      delete Texture;
 }
 
-void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, vector<MythVideoTexture *> &Textures)
+void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, std::vector<MythVideoTexture *> &Textures)
 {
     if (!Context || Textures.empty())
         return;
@@ -38,7 +38,7 @@ void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, vector<MythVide
 }
 
 void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
-                                         const vector<MythVideoTexture *> &Textures,
+                                         const std::vector<MythVideoTexture *> &Textures,
                                          QOpenGLTexture::Filter Filter,
                                          QOpenGLTexture::WrapMode Wrap)
 {
@@ -54,13 +54,13 @@ void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
  * \param Type   Source video frame type.
  * \param Format Output frame type.
 */
-vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Context,
+std::vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Context,
                                                            VideoFrameType Type,
                                                            VideoFrameType Format,
-                                                           vector<QSize> Sizes,
+                                                           std::vector<QSize> Sizes,
                                                            GLenum Target)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
     if (!Context || Sizes.empty())
         return result;
     if (Sizes[0].isEmpty())
@@ -82,13 +82,13 @@ vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Con
  * specific handling.
  * \note Linear filtering is always set (except MediaCodec/MMAL which use OES)
 */
-vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpenGL *Context,
+std::vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpenGL *Context,
                                                                    VideoFrameType Type,
                                                                    VideoFrameType Format,
-                                                                   vector<QSize> Sizes,
+                                                                   std::vector<QSize> Sizes,
                                                                    GLenum Target)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
 
     uint count = planes(Format);
     if (count < 1)
@@ -130,13 +130,13 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
  *
  * \note All textures are created with CreateTexture which defaults to Linear filtering.
 */
-vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpenGL *Context,
+std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpenGL *Context,
                                                                    VideoFrameType Type,
                                                                    VideoFrameType Format,
-                                                                   vector<QSize> Sizes,
+                                                                   std::vector<QSize> Sizes,
                                                                    GLenum Target)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
 
     uint count = planes(Format);
     if (count < 1)
@@ -280,7 +280,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
 */
 void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                                       const VideoFrame *Frame,
-                                      const vector<MythVideoTexture*> &Textures)
+                                      const std::vector<MythVideoTexture*> &Textures)
 {
     if (!Context || !Frame || Textures.empty())
     {

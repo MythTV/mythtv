@@ -59,18 +59,18 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
  * \note This assumes one layer with multiple planes, typically where the layer
  * is a YUV format.
 */
-inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
+inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
                                                                VideoFrame *Frame, FrameScanType Scan) const
 {
     Frame->already_deinterlaced = true;
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
     for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
     {
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         int frameheight = Scan == kScan_Progressive ? Frame->height : Frame->height >> 1;
         sizes.emplace_back(QSize(Frame->width, frameheight));
-        vector<MythVideoTexture*> textures =
+        std::vector<MythVideoTexture*> textures =
                 MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
                                                  GL_TEXTURE_EXTERNAL_OES);
         if (textures.empty())
@@ -176,12 +176,12 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
  *
  * \note This assumes multiple layers each with one plane.
 */
-inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
+inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
                                                                VideoFrame *Frame) const
 {
     // N.B. this works for YV12/NV12/P010 etc but will probably break for YUV422 etc
-    vector<QSize> sizes;
+    std::vector<QSize> sizes;
     for (int plane = 0 ; plane < Desc->nb_layers; ++plane)
     {
         int width = Frame->width >> ((plane > 0) ? 1 : 0);
@@ -190,7 +190,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     }
 
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
-    vector<MythVideoTexture*> result =
+    std::vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
                                              QOpenGLTexture::Target2D);
     if (result.empty())
@@ -266,13 +266,13 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
  *
  * \todo Add support for simple onefield/bob with YUV textures.
 */
-inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
+inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
                                                                 MythRenderOpenGL *Context,
                                                                 VideoFrame *Frame) const
 {
     // As for CreateSeparate - may not work for some formats
     AVDRMLayerDescriptor* layer = &Desc->layers[0];
-    vector<QSize> sizes;
+    std::vector<QSize> sizes;
     for (int plane = 0 ; plane < layer->nb_planes; ++plane)
     {
         int width = Frame->width >> ((plane > 0) ? 1 : 0);
@@ -297,7 +297,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescri
         fourcc2 = DRM_FORMAT_GR32;
     }
 
-    vector<MythVideoTexture*> result =
+    std::vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
                                              QOpenGLTexture::Target2D);
     if (result.empty())
@@ -349,7 +349,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescri
 }
 
 void MythEGLDMABUF::ClearDMATextures(MythRenderOpenGL* Context,
-                                     vector<MythVideoTexture *> &Textures)
+                                     std::vector<MythVideoTexture *> &Textures)
 {
     for (auto & texture : Textures)
     {
@@ -363,13 +363,13 @@ void MythEGLDMABUF::ClearDMATextures(MythRenderOpenGL* Context,
     Textures.clear();
 }
 
-vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* Desc,
+std::vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* Desc,
                                                         MythRenderOpenGL *Context,
                                                         VideoFrame *Frame,
                                                         bool UseSeparate,
                                                         FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    std::vector<MythVideoTexture*> result;
     if (!Desc || !Context || !Frame)
         return result;
 

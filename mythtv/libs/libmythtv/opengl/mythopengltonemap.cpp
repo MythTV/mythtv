@@ -71,7 +71,7 @@ MythVideoTexture* MythOpenGLTonemap::GetTexture(void)
     return m_texture;
 }
 
-MythVideoTexture* MythOpenGLTonemap::Map(vector<MythVideoTexture *> &Inputs, QSize DisplaySize)
+MythVideoTexture* MythOpenGLTonemap::Map(std::vector<MythVideoTexture *> &Inputs, QSize DisplaySize)
 {
     size_t size = Inputs.size();
     if (!size || !m_render || !m_extra)

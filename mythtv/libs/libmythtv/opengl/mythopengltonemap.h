@@ -17,7 +17,7 @@ class MythOpenGLTonemap : public QObject
     MythOpenGLTonemap(MythRenderOpenGL *Render, MythVideoColourSpace *ColourSpace);
    ~MythOpenGLTonemap() override;
 
-    MythVideoTexture* Map(vector<MythVideoTexture*> &Inputs, QSize DisplaySize);
+    MythVideoTexture* Map(std::vector<MythVideoTexture*> &Inputs, QSize DisplaySize);
     MythVideoTexture* GetTexture(void);
 
   public slots:
