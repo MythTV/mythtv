@@ -49,8 +49,6 @@
 #define EXIT_SOCKET_ERROR            135
 #define EXIT_VERSION_ERROR           136
 
-using namespace std;
-
 int main(int argc, char **argv)
 {
     fd_set master;                  // master file descriptor list
@@ -67,9 +65,9 @@ int main(int argc, char **argv)
     bool debug = false;             // debug mode enabled
     bool daemon_mode = false;       // is daemon mode enabled
     int port = PORT;                // port we're listening on
-    string logfile;                 // log file
-    string zmconfig = ZM_CONFIG;    // location of zoneminders default config file
-    string zmoverideconfig = ZM_OVERRIDECONFIG;  // location of zoneminders override config file
+    std::string logfile;               // log file
+    std::string zmconfig = ZM_CONFIG;  // location of zoneminders default config file
+    std::string zmoverideconfig = ZM_OVERRIDECONFIG;  // location of zoneminders override config file
 
     //  Check command line arguments
     for (int argpos = 1; argpos < argc; ++argpos)
@@ -93,14 +91,14 @@ int main(int argc, char **argv)
 
                 if (port < 1 || port > 65534)
                 {
-                    cout << "Bad port number: " << port << endl;
+                    std::cout << "Bad port number: " << port << std::endl;
                     return EXIT_INVALID_CMDLINE;
                 }
                 ++argpos;
             }
             else
             {
-                cout << "Missing argument to -p/--port option\n";
+                std::cout << "Missing argument to -p/--port option\n";
                 return EXIT_INVALID_CMDLINE;
             }
         }
@@ -112,7 +110,7 @@ int main(int argc, char **argv)
                 logfile = argv[argpos+1];
                 if (logfile[0] == '-')
                 {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    std::cerr << "Invalid or missing argument to -l/--logfile option\n";
                     return EXIT_INVALID_CMDLINE;
                 }
 
@@ -120,7 +118,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                cerr << "Missing argument to -l/--logfile option\n";
+                std::cerr << "Missing argument to -l/--logfile option\n";
                 return EXIT_INVALID_CMDLINE;
             }
         }
@@ -132,7 +130,7 @@ int main(int argc, char **argv)
                 zmconfig = argv[argpos+1];
                 if (zmconfig[0] == '-')
                 {
-                    cerr << "Invalid or missing argument to -c/--zmconfig option\n";
+                    std::cerr << "Invalid or missing argument to -c/--zmconfig option\n";
                     return EXIT_INVALID_CMDLINE;
                 }
 
@@ -140,7 +138,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                cerr << "Missing argument to -c/--zmconfig option\n";
+                std::cerr << "Missing argument to -c/--zmconfig option\n";
                 return EXIT_INVALID_CMDLINE;
             }
         }
@@ -152,7 +150,7 @@ int main(int argc, char **argv)
                 zmconfig = argv[argpos+1];
                 if (zmconfig[0] == '-')
                 {
-                    cerr << "Invalid or missing argument to -o/--zmoverrideconfig option\n";
+                    std::cerr << "Invalid or missing argument to -o/--zmoverrideconfig option\n";
                     return EXIT_INVALID_CMDLINE;
                 }
 
@@ -160,7 +158,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                cerr << "Missing argument to -o/--zmoverrideconfig option\n";
+                std::cerr << "Missing argument to -o/--zmoverrideconfig option\n";
                 return EXIT_INVALID_CMDLINE;
             }
         }
@@ -171,15 +169,15 @@ int main(int argc, char **argv)
         }
         else
         {
-            cerr << "Invalid argument: " << argv[argpos] << endl <<
-                    "Valid options are: " << endl <<
-                    "-p or --port number        A port number to listen on (default is 6548) " << endl <<
-                    "-d or --daemon             Runs mythzmserver as a daemon " << endl <<
-                    "-n or --nodaemon           Does not run mythzmserver as a daemon (default)" << endl <<
-                    "-c or --zmconfig           Location of zoneminders default config file (default is " << ZM_CONFIG << ")" << endl <<
-                    "-o or --zmoverrideconfig   Location of zoneminders override config file (default is " << ZM_OVERRIDECONFIG << ")" << endl <<
-                    "-l or --logfile filename   Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-v or --verbose            Prints more debug output" << endl;
+            std::cerr << "Invalid argument: " << argv[argpos] << std::endl <<
+                    "Valid options are: " << std::endl <<
+                    "-p or --port number        A port number to listen on (default is 6548) " << std::endl <<
+                    "-d or --daemon             Runs mythzmserver as a daemon " << std::endl <<
+                    "-n or --nodaemon           Does not run mythzmserver as a daemon (default)" << std::endl <<
+                    "-c or --zmconfig           Location of zoneminders default config file (default is " << ZM_CONFIG << ")" << std::endl <<
+                    "-o or --zmoverrideconfig   Location of zoneminders override config file (default is " << ZM_OVERRIDECONFIG << ")" << std::endl <<
+                    "-l or --logfile filename   Writes STDERR and STDOUT messages to filename" << std::endl <<
+                    "-v or --verbose            Prints more debug output" << std::endl;
             return EXIT_INVALID_CMDLINE;
         }
     }
@@ -210,20 +208,20 @@ int main(int argc, char **argv)
     }
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        cout << "Unable to ignore SIGPIPE\n";
+        std::cout << "Unable to ignore SIGPIPE\n";
 
     //  Switch to daemon mode?
     if (daemon_mode)
     {
         if (daemon(0, 0) < 0)
         {
-            cout << "Failed to run as a daemon. Bailing out.\n";
+            std::cout << "Failed to run as a daemon. Bailing out.\n";
             return EXIT_DAEMONIZING_ERROR;
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
-    map<int, ZMServer*> serverList; // list of ZMServers
+    std::map<int, ZMServer*> serverList; // list of ZMServers
 
     // load the default config
     loadZMConfig(zmconfig);
@@ -234,7 +232,7 @@ int main(int argc, char **argv)
     // check we have a version (default to 1.34.16 if not found)
     if (g_zmversion.length() == 0)
     {
-        cout << "ZM version not found. Assuming at least v1.34.16 is installed" << endl;
+        std::cout << "ZM version not found. Assuming at least v1.34.16 is installed" << std::endl;
         g_majorVersion = 1;
         g_minorVersion = 34;
         g_revisionVersion = 16;
@@ -246,11 +244,11 @@ int main(int argc, char **argv)
         // we support version 1.24.0 or later
         if (checkVersion(1, 24, 0))
         {
-            cout << "ZM is version '" << g_zmversion << "'" << endl;
+            std::cout << "ZM is version '" << g_zmversion << "'" << std::endl;
         }
         else
         {
-            cout << "This version of ZM is to old you need 1.24.0 or later '" << g_zmversion << "'" << endl;
+            std::cout << "This version of ZM is to old you need 1.24.0 or later '" << g_zmversion << "'" << std::endl;
             return EXIT_VERSION_ERROR;
         }
     }
@@ -295,7 +293,7 @@ int main(int argc, char **argv)
         return EXIT_SOCKET_ERROR;
     }
 
-    cout << "Listening on port: " << port << endl;
+    std::cout << "Listening on port: " << port << std::endl;
 
     // add the listener to the master set
     FD_SET(listener, &master);

@@ -403,7 +403,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
         delete m_players;
     }
 
-    m_players = new vector<Player *>;
+    m_players = new std::vector<Player *>;
     m_monitorCount = 1;
 
     if (layout == 1)

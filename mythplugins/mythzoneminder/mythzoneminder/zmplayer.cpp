@@ -17,7 +17,6 @@
 
 // C++
 #include <iostream>
-using namespace std;
 
 // Qt
 #include <QKeyEvent>
@@ -35,10 +34,10 @@ using namespace std;
 #include "zmclient.h"
 
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
-                   vector<Event *> *eventList, size_t *currentEvent)
+                   std::vector<Event *> *eventList, size_t *currentEvent)
          :MythScreenType(parent, name),
           m_currentEvent(currentEvent),
-          m_eventList(eventList), m_frameList(new vector<Frame*>),
+          m_eventList(eventList), m_frameList(new std::vector<Frame*>),
           m_frameTimer(new QTimer(this))
 {
     connect(m_frameTimer, SIGNAL(timeout()), this,

@@ -398,7 +398,7 @@ bool ZMClient::updateAlarmStates(void)
 
 void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
                             const QString &date, bool includeContinuous,
-                            vector<Event*> *eventList)
+                            std::vector<Event*> *eventList)
 {
     QMutexLocker locker(&m_commandLock);
 
@@ -497,7 +497,7 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
     }
 }
 
-void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
+void ZMClient::getFrameList(int eventID, std::vector<Frame*> *frameList)
 {
     QMutexLocker locker(&m_commandLock);
 
@@ -552,14 +552,14 @@ void ZMClient::deleteEvent(int eventID)
     sendReceiveStringList(strList);
 }
 
-void ZMClient::deleteEventList(vector<Event*> *eventList)
+void ZMClient::deleteEventList(std::vector<Event*> *eventList)
 {
     QMutexLocker locker(&m_commandLock);
 
     // delete events in 100 event chunks
     QStringList strList("DELETE_EVENT_LIST");
     int count = 0;
-    vector<Event*>::iterator it;
+    std::vector<Event*>::iterator it;
     for (it = eventList->begin(); it != eventList->end(); ++it)
     {
         strList << QString::number((*it)->eventID());

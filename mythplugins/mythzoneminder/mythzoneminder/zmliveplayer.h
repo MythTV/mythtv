@@ -17,7 +17,6 @@
 
 // c++
 #include <vector>
-using namespace std;
 
 // qt
 //#include <QKeyEvent>
@@ -90,7 +89,7 @@ class ZMLivePlayer : public MythScreenType
     int                   m_monitorLayout {1};
     int                   m_monitorCount  {0};
 
-    vector<Player *>     *m_players       {nullptr};
+    std::vector<Player *> *m_players      {nullptr};
 
     bool                  m_isMiniPlayer  {false};
     int                   m_alarmMonitor  {-1};

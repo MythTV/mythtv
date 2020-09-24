@@ -312,7 +312,7 @@ void ZMEvents::deletePressed(void)
         MythUIButtonListItem *item = m_eventGrid->GetItemCurrent();
         delete item;
 
-        vector<Event*>::iterator it;
+        std::vector<Event*>::iterator it;
         for (it = m_eventList->begin(); it != m_eventList->end(); ++it)
         {
             if (*it == event)

@@ -33,8 +33,6 @@
 #include "zmminiplayer.h"
 #include "alarmnotifythread.h"
 
-using namespace std;
-
 static bool checkConnection(void)
 {
     if (!ZMClient::get()->connected())
