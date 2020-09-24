@@ -617,8 +617,8 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 
     // transport stream ID, program ID, count
     static ProgramAssociationTable* Create(uint tsid, uint version,
-                                           const vector<uint>& pnum,
-                                           const vector<uint>& pid);
+                                           const std::vector<uint>& pnum,
+                                           const std::vector<uint>& pid);
 
     uint TransportStreamID(void) const { return TableIDExtension(); }
 
@@ -702,14 +702,14 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
 
     static ProgramMapTable* Create(uint programNumber, uint basepid,
                                    uint pcrpid, uint version,
-                                   vector<uint> pids, vector<uint> types);
+                                   std::vector<uint> pids, std::vector<uint> types);
 
     static ProgramMapTable* Create(uint programNumber, uint basepid,
                                    uint pcrpid, uint version,
                                    const desc_list_t         &global_desc,
-                                   const vector<uint>        &pids,
-                                   const vector<uint>        &types,
-                                   const vector<desc_list_t> &prog_desc);
+                                   const std::vector<uint>        &pids,
+                                   const std::vector<uint>        &types,
+                                   const std::vector<desc_list_t> &prog_desc);
 
     /// stream that contains program clock reference.
     uint PCRPID(void) const
@@ -776,9 +776,9 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     /// Returns the audio type from the iso 639 descriptor
     uint GetAudioType(uint i) const;
 
-    uint FindPIDs(uint type, vector<uint> &pids,
+    uint FindPIDs(uint type, std::vector<uint> &pids,
                   const QString &sistandard) const;
-    uint FindPIDs(uint type, vector<uint> &pids, vector<uint> &types,
+    uint FindPIDs(uint type, std::vector<uint> &pids, std::vector<uint> &types,
                   const QString &sistandard, bool normalize) const;
 
     /// \brief Locates stream index of pid.
@@ -834,7 +834,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     static ProgramMapTable* CreateBlank(bool smallPacket = true);
 
     static const uint kPmtHeaderMinOffset = 4; // minimum PMT header offset
-    mutable vector<unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class ConditionalAccessTable
@@ -906,13 +906,13 @@ class MTV_PUBLIC SpliceTimeView
 class MTV_PUBLIC SpliceScheduleView
 {
   public:
-    SpliceScheduleView(vector<const unsigned char*> ptrs0,
-                       vector<const unsigned char*> ptrs1) :
+    SpliceScheduleView(std::vector<const unsigned char*> ptrs0,
+                       std::vector<const unsigned char*> ptrs1) :
         m_ptrs0(std::move(ptrs0)), m_ptrs1(std::move(ptrs1))
     {
     }
     //   splice_count           8  14.0
-    uint SpliceCount(void) const { return min(m_ptrs0.size(), m_ptrs1.size()); }
+    uint SpliceCount(void) const { return std::min(m_ptrs0.size(), m_ptrs1.size()); }
 
     //   splice_event_id       32  0.0 + m_ptrs0[i]
     uint SpliceEventID(uint i) const
@@ -947,15 +947,15 @@ class MTV_PUBLIC SpliceScheduleView
     //   }
 
   private:
-    vector<const unsigned char*> m_ptrs0;
-    vector<const unsigned char*> m_ptrs1;
+    std::vector<const unsigned char*> m_ptrs0;
+    std::vector<const unsigned char*> m_ptrs1;
 };
 
 class MTV_PUBLIC SpliceInsertView
 {
   public:
-    SpliceInsertView(vector<const unsigned char*> ptrs0,
-                     vector<const unsigned char*> ptrs1) :
+    SpliceInsertView(std::vector<const unsigned char*> ptrs0,
+                     std::vector<const unsigned char*> ptrs1) :
         m_ptrs0(std::move(ptrs0)), m_ptrs1(std::move(ptrs1))
     {
     }
@@ -1009,8 +1009,8 @@ class MTV_PUBLIC SpliceInsertView
         uint indent_level, int64_t first, int64_t last) const;
 
   private:
-    vector<const unsigned char*> m_ptrs0;
-    vector<const unsigned char*> m_ptrs1;
+    std::vector<const unsigned char*> m_ptrs0;
+    std::vector<const unsigned char*> m_ptrs1;
 };
 
 class MTV_PUBLIC SpliceInformationTable : public PSIPTable
@@ -1187,8 +1187,8 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     QString toStringXML(uint indent_level, int64_t first, int64_t last) const;
 
   private:
-    vector<const unsigned char*> m_ptrs0;
-    vector<const unsigned char*> m_ptrs1;
+    std::vector<const unsigned char*> m_ptrs0;
+    std::vector<const unsigned char*> m_ptrs1;
     const unsigned char *m_epilog {nullptr};
     int m_sctePid {0};
 };

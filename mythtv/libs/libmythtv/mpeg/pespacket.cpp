@@ -15,8 +15,6 @@ extern "C" {
 #include <vector>
 #include <map>
 
-using namespace std;
-
 // return true if complete or broken
 bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
 {
@@ -101,7 +99,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
 /** \fn PESPacket::GetAsTSPackets(vector<TSPacket>&,uint) const
  *  \brief Returns payload only PESPacket as series of TSPackets
  */
-void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
+void PESPacket::GetAsTSPackets(std::vector<TSPacket> &output, uint cc) const
 {
 #define INCR_CC(_CC_) do { (_CC_) = ((_CC_) + 1) & 0xf; } while (false)
     uint last_byte_of_pesdata = Length() + 4 - 1;
@@ -134,7 +132,7 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
         header.SetContinuityCounter(cc);
         output.resize(output.size()+1);
         output[output.size()-1].InitHeader(header.data());
-        uint write_size = min(size, TSPacket::kPayloadSize);
+        uint write_size = std::min(size, TSPacket::kPayloadSize);
         output[output.size()-1].InitPayload(data, write_size);
         data += write_size;
         size -= write_size;
@@ -213,13 +211,13 @@ float SequenceHeader::aspect(bool mpeg1) const
 /////////////////////////////////////////////////////////////////////////
 
 #ifndef USING_VALGRIND
-static vector<unsigned char*> mem188;
-static vector<unsigned char*> free188;
-static map<unsigned char*, bool> alloc188;
+static std::vector<unsigned char*> mem188;
+static std::vector<unsigned char*> free188;
+static std::map<unsigned char*, bool> alloc188;
 
-static vector<unsigned char*> mem4096;
-static vector<unsigned char*> free4096;
-static map<unsigned char*, bool> alloc4096;
+static std::vector<unsigned char*> mem4096;
+static std::vector<unsigned char*> free4096;
+static std::map<unsigned char*, bool> alloc4096;
 
 #define BLOCKS188 512
 static unsigned char* get_188_block()
@@ -252,7 +250,7 @@ static void return_188_block(unsigned char* ptr)
     // free the allocator only if more than 1 block was used
     if (alloc188.empty() && mem188.size() > 1)
     {
-        vector<unsigned char*>::iterator it;
+        std::vector<unsigned char*>::iterator it;
         for (it = mem188.begin(); it != mem188.end(); ++it)
             free(*it);
         mem188.clear();
@@ -313,7 +311,7 @@ static void return_4096_block(unsigned char* ptr)
     // free the allocator only if more than 1 block was used
     if (alloc4096.empty() && mem4096.size() > 1)
     {
-        vector<unsigned char*>::iterator it;
+        std::vector<unsigned char*>::iterator it;
         for (it = mem4096.begin(); it != mem4096.end(); ++it)
             free(*it);
         mem4096.clear();

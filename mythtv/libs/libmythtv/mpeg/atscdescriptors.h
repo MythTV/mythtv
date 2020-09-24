@@ -5,14 +5,11 @@
 
 #include <array>
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QMap>
 
 #include "mpegdescriptors.h"
-
-using namespace std;
 
 using IntToBuf = QMap<int, const unsigned char*>;
 

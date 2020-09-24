@@ -248,7 +248,7 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
-    vector<const unsigned char*> m_ptrs;
+    std::vector<const unsigned char*> m_ptrs;
 };
 
 class MTV_PUBLIC NetworkTextTable : public PSIPTable
@@ -351,7 +351,7 @@ class VirtualChannelMapSubtable
 {
   public:
     VirtualChannelMapSubtable(
-        const unsigned char *data, const vector<const unsigned char*> &ptrs) :
+        const unsigned char *data, const std::vector<const unsigned char*> &ptrs) :
         m_data(data), _ptrs(ptrs) {}
 
     //   zero                   2  7.0
@@ -462,7 +462,7 @@ class VirtualChannelMapSubtable
     uint Size(void) const { return _ptrs.back() - m_data; }
 
     const unsigned char *m_data;
-    const vector<const unsigned char*> &_ptrs;
+    const std::vector<const unsigned char*> &_ptrs;
 };
 
 class MTV_PUBLIC InverseChannelMapSubtable
@@ -555,7 +555,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
-    vector<const unsigned char*> m_ptrs;
+    std::vector<const unsigned char*> m_ptrs;
 };
 
 /** \class SCTESystemTimeTable

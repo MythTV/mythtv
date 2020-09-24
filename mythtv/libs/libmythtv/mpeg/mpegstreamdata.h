@@ -6,7 +6,6 @@
 // C++
 #include <cstdint>  // uint64_t
 #include <vector>
-using namespace std;
 
 // Qt
 #include <QMap>
@@ -21,36 +20,36 @@ using namespace std;
 class EITHelper;
 class PSIPTable;
 
-using uint_vec_t = vector<uint>;
+using uint_vec_t = std::vector<uint>;
 
 using pid_psip_map_t    = QMap<unsigned int, PSIPTable*>;
 using psip_refcnt_map_t = QMap<const PSIPTable*, int>;
 
 using pat_ptr_t         = ProgramAssociationTable *;
 using pat_const_ptr_t   = const ProgramAssociationTable *;
-using pat_vec_t         = vector<const ProgramAssociationTable *>;
+using pat_vec_t         = std::vector<const ProgramAssociationTable *>;
 using pat_map_t         = QMap<uint, pat_vec_t>;
 using pat_cache_t       = QMap<uint, ProgramAssociationTable*>;
 
 using cat_ptr_t         = ConditionalAccessTable *;
 using cat_const_ptr_t   = const ConditionalAccessTable *;
-using cat_vec_t         = vector<const ConditionalAccessTable *>;
+using cat_vec_t         = std::vector<const ConditionalAccessTable *>;
 using cat_map_t         = QMap<uint, cat_vec_t>;
 using cat_cache_t       = QMap<uint, ConditionalAccessTable*>;
 
 using pmt_ptr_t         = ProgramMapTable*;
 using pmt_const_ptr_t   = ProgramMapTable const*;
-using pmt_vec_t         = vector<const ProgramMapTable*>;
+using pmt_vec_t         = std::vector<const ProgramMapTable*>;
 using pmt_map_t         = QMap<uint, pmt_vec_t>;
 using pmt_cache_t       = QMap<uint, ProgramMapTable*>;
 
-using uchar_vec_t       = vector<unsigned char>;
+using uchar_vec_t       = std::vector<unsigned char>;
 
-using mpeg_listener_vec_t    = vector<MPEGStreamListener*>;
-using ts_listener_vec_t      = vector<TSPacketListener*>;
-using ts_av_listener_vec_t   = vector<TSPacketListenerAV*>;
-using mpeg_sp_listener_vec_t = vector<MPEGSingleProgramStreamListener*>;
-using ps_listener_vec_t      = vector<PSStreamListener*>;
+using mpeg_listener_vec_t    = std::vector<MPEGStreamListener*>;
+using ts_listener_vec_t      = std::vector<TSPacketListener*>;
+using ts_av_listener_vec_t   = std::vector<TSPacketListenerAV*>;
+using mpeg_sp_listener_vec_t = std::vector<MPEGSingleProgramStreamListener*>;
+using ps_listener_vec_t      = std::vector<PSStreamListener*>;
 
 enum CryptStatus
 {

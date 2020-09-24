@@ -2,7 +2,6 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
 #include <algorithm> // for find & max
-using namespace std;
 
 // POSIX headers
 #include <sys/time.h> // for gettimeofday
@@ -377,8 +376,8 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
     AddListeningPID(m_pidPmtSingleProgram);
 
-    vector<uint> pnums;
-    vector<uint> pids;
+    std::vector<uint> pnums;
+    std::vector<uint> pids;
 
     pnums.push_back(1);
     pids.push_back(m_pidPmtSingleProgram);
@@ -415,7 +414,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
 {
     desc_list_t desc;
 
-    vector<const VirtualChannelTable*> vct;
+    std::vector<const VirtualChannelTable*> vct;
 
     for (const auto *i : tvct)
         vct.push_back(i);
@@ -496,16 +495,16 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         }
     }
 
-    vector<uint> pids;
-    vector<uint> types;
-    vector<desc_list_t> pdesc;
+    std::vector<uint> pids;
+    std::vector<uint> types;
+    std::vector<desc_list_t> pdesc;
 
     uint video_cnt = 0;
     uint audio_cnt = 0;
 
-    vector<uint> videoPIDs;
-    vector<uint> audioPIDs;
-    vector<uint> dataPIDs;
+    std::vector<uint> videoPIDs;
+    std::vector<uint> audioPIDs;
+    std::vector<uint> dataPIDs;
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1123,13 +1122,13 @@ uint MPEGStreamData::GetPIDs(pid_map_t &pids) const
         pids[m_pidVideoSingleProgram] = kPIDPriorityHigh;
 
     for (auto it = m_pidsListening.cbegin(); it != m_pidsListening.cend(); ++it)
-        pids[it.key()] = max(pids[it.key()], *it);
+        pids[it.key()] = std::max(pids[it.key()], *it);
 
     for (auto it = m_pidsAudio.cbegin(); it != m_pidsAudio.cend(); ++it)
-        pids[it.key()] = max(pids[it.key()], *it);
+        pids[it.key()] = std::max(pids[it.key()], *it);
 
     for (auto it = m_pidsWriting.cbegin(); it != m_pidsWriting.cend(); ++it)
-        pids[it.key()] = max(pids[it.key()], *it);
+        pids[it.key()] = std::max(pids[it.key()], *it);
 
     return pids.size() - sz;
 }
@@ -1426,7 +1425,7 @@ pmt_const_ptr_t MPEGStreamData::GetCachedPMT(
 pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
 {
     QMutexLocker locker(&m_cacheLock);
-    vector<const ProgramMapTable*> pmts;
+    std::vector<const ProgramMapTable*> pmts;
 
     for (auto *pmt : qAsConst(m_cachedPmts))
     {
@@ -1920,7 +1919,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
             if (enc_cnt[kEncEncrypted])
                 status = kEncEncrypted;
-            else if (enc_cnt[kEncDecrypted] >= min((size_t) 2, pids.size()))
+            else if (enc_cnt[kEncDecrypted] >= std::min((size_t) 2, pids.size()))
                 status = kEncDecrypted;
         }
 

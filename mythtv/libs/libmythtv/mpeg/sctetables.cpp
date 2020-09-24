@@ -52,7 +52,7 @@ QString CarrierDefinitionSubtable::toStringXML(uint indent_level) const
         .arg(FirstCarrierFrequency())
         .arg(FirstCarrierFrequencyHz());
 
-    vector<const unsigned char*> desc =
+    std::vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (auto & d : desc)
     {
@@ -149,7 +149,7 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
         .arg(xml_bool_to_string(SplitBitstreamMode()));
     str += QString("symbol_rate=\"%1\"").arg(SymbolRate());
 
-    vector<const unsigned char*> desc =
+    std::vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
 
     if (desc.empty())
@@ -241,7 +241,7 @@ QString SCTENetworkInformationTable::toStringXML(uint indent_level) const
             str += ModulationMode(i).toStringXML(indent_level + 1) + "\n";
     }
 
-    vector<const unsigned char*> desc =
+    std::vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (auto & d : desc)
     {
@@ -463,7 +463,7 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
         str += QString("descriptors_count=\"%1\"").arg(DescriptorsCount(i));
         str += ">\n";
 
-        vector<const unsigned char*> desc =
+        std::vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
         for (auto & d : desc)
         {
@@ -533,7 +533,7 @@ QString ShortVirtualChannelTable::toStringXML(uint indent_level) const
     else if (kInverseChannelMap == TableSubtype())
         str += InverseChannelMap().toStringXML(indent_level + 1) + "\n";
 
-    vector<const unsigned char*> desc =
+    std::vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (auto & d : desc)
     {
@@ -571,7 +571,7 @@ QString SCTESystemTimeTable::toStringXML(uint indent_level) const
 
     str += ">\n";
 
-    vector<const unsigned char*> desc =
+    std::vector<const unsigned char*> desc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
     for (auto & d : desc)
     {

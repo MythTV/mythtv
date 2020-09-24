@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include <algorithm>
-using namespace std;
 
 #include "atscstreamdata.h"
 #include "atsctables.h"
@@ -493,8 +492,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 bool ATSCStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
 {
     QMutexLocker locker(&m_listenerLock);
-    uint eit_count = (uint) round(m_atscEitPids.size() * m_eitRate);
-    uint ett_count = (uint) round(m_atscEttPids.size() * m_eitRate);
+    uint eit_count = (uint) std::round(m_atscEitPids.size() * m_eitRate);
+    uint ett_count = (uint) std::round(m_atscEttPids.size() * m_eitRate);
     return (in_use_pids.size() != (eit_count + ett_count) || m_atscEitReset);
 }
 
@@ -506,8 +505,8 @@ bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
 
     m_atscEitReset = false;
 
-    uint eit_count = (uint) round(m_atscEitPids.size() * m_eitRate);
-    uint ett_count = (uint) round(m_atscEttPids.size() * m_eitRate);
+    uint eit_count = (uint) std::round(m_atscEitPids.size() * m_eitRate);
+    uint ett_count = (uint) std::round(m_atscEttPids.size() * m_eitRate);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("eit size: %1, rate: %2, cnt: %3")
@@ -825,7 +824,7 @@ tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    vector<const TerrestrialVirtualChannelTable*> tvcts;
+    std::vector<const TerrestrialVirtualChannelTable*> tvcts;
 
     m_cacheLock.lock();
     for (auto *tvct : qAsConst(m_cachedTvcts))
@@ -844,7 +843,7 @@ cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    vector<const CableVirtualChannelTable*> cvcts;
+    std::vector<const CableVirtualChannelTable*> cvcts;
 
     m_cacheLock.lock();
     for (auto *cvct : qAsConst(m_cachedCvcts))

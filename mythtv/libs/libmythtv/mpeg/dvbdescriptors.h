@@ -1213,8 +1213,8 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 
   private:
-    mutable vector<const unsigned char*> m_cellPtrs; // used to parse
-    mutable vector<const unsigned char*> m_subCellPtrs; // used to parse
+    mutable std::vector<const unsigned char*> m_cellPtrs; // used to parse
+    mutable std::vector<const unsigned char*> m_subCellPtrs; // used to parse
 };
 
 // DVB Bluebook A038 (Feb 2019) p 100       0x7f 0x05

@@ -39,7 +39,7 @@ class PremiereContentInformationTable : public PSIPTable
     static bool IsEIT(uint table_id);
 
   private:
-    mutable vector<const unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<const unsigned char*> m_ptrs; // used to parse
 };
 
 class PremiereContentPresentationTable : public PSIPTable

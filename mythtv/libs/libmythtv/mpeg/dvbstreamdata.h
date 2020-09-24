@@ -9,23 +9,23 @@
 
 using nit_ptr_t       = NetworkInformationTable*;
 using nit_const_ptr_t = NetworkInformationTable const*;
-using nit_vec_t       = vector<const NetworkInformationTable*>;
+using nit_vec_t       = std::vector<const NetworkInformationTable*>;
 using nit_cache_t     = QMap<uint, nit_ptr_t>; // section->sdts
 
 using sdt_ptr_t       = ServiceDescriptionTable*;
 using sdt_const_ptr_t = ServiceDescriptionTable const*;
-using sdt_vec_t       = vector<const ServiceDescriptionTable*>;
+using sdt_vec_t       = std::vector<const ServiceDescriptionTable*>;
 using sdt_cache_t     = QMap<uint, sdt_ptr_t>; // tsid+section->sdts
 using sdt_map_t       = QMap<uint, sdt_vec_t>;   // tsid->sdts
 
 using bat_ptr_t       = BouquetAssociationTable*;
 using bat_const_ptr_t = BouquetAssociationTable const*;
-using bat_vec_t       = vector<const BouquetAssociationTable*>;
+using bat_vec_t       = std::vector<const BouquetAssociationTable*>;
 using bat_cache_t     = QMap<uint, bat_ptr_t>;  // batid+section->bats
 
-using dvb_main_listener_vec_t  = vector<DVBMainStreamListener*>;
-using dvb_other_listener_vec_t = vector<DVBOtherStreamListener*>;
-using dvb_eit_listener_vec_t   = vector<DVBEITStreamListener*>;
+using dvb_main_listener_vec_t  = std::vector<DVBMainStreamListener*>;
+using dvb_other_listener_vec_t = std::vector<DVBOtherStreamListener*>;
+using dvb_eit_listener_vec_t   = std::vector<DVBEITStreamListener*>;
 
 using dvb_has_eit_t = QMap<uint, bool>;
 

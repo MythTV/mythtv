@@ -177,7 +177,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     QString toString(void) const override; // PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
   private:
-    mutable vector<unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class VirtualChannelTable
@@ -334,7 +334,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     virtual QString ChannelStringXML(uint indent_level, uint channel) const;
     virtual QString XMLChannelValues(uint indent_level, uint channel) const;
   protected:
-    mutable vector<unsigned char*> m_ptrs;
+    mutable std::vector<unsigned char*> m_ptrs;
 };
 
 /** \class TerrestrialVirtualChannelTable
@@ -609,7 +609,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     void Parse() const;
     QString toString() const override; // PSIPTable
   private:
-    mutable vector<unsigned char*> m_ptrs;
+    mutable std::vector<unsigned char*> m_ptrs;
 };
 
 /** \class ExtendedTextTable

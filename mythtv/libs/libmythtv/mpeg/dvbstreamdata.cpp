@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include <algorithm>
-using namespace std;
 
 #include <QSharedPointer>
 #include "dvbstreamdata.h"

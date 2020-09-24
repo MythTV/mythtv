@@ -12,18 +12,18 @@ using tvct_ptr_t         = TerrestrialVirtualChannelTable *;
 using tvct_const_ptr_t   = const TerrestrialVirtualChannelTable *;
 using cvct_ptr_t         = CableVirtualChannelTable *;
 using cvct_const_ptr_t   = const CableVirtualChannelTable *;
-using tvct_vec_t         = vector<const TerrestrialVirtualChannelTable *>;
-using cvct_vec_t         = vector<const CableVirtualChannelTable *>;
+using tvct_vec_t         = std::vector<const TerrestrialVirtualChannelTable *>;
+using cvct_vec_t         = std::vector<const CableVirtualChannelTable *>;
 using tvct_cache_t       = QMap<uint, tvct_ptr_t>;
 using cvct_cache_t       = QMap<uint, cvct_ptr_t>;
 using atsc_eit_pid_map_t = QMap<uint, uint>;
 using atsc_ett_pid_map_t = QMap<uint, uint>;
 
-using atsc_main_listener_vec_t  = vector<ATSCMainStreamListener *>;
-using scte_main_listener_vec_t  = vector<SCTEMainStreamListener *>;
-using atsc_aux_listener_vec_t   = vector<ATSCAuxStreamListener *>;
-using atsc_eit_listener_vec_t   = vector<ATSCEITStreamListener *>;
-using atsc81_eit_listener_vec_t = vector<ATSC81EITStreamListener *>;
+using atsc_main_listener_vec_t  = std::vector<ATSCMainStreamListener *>;
+using scte_main_listener_vec_t  = std::vector<SCTEMainStreamListener *>;
+using atsc_aux_listener_vec_t   = std::vector<ATSCAuxStreamListener *>;
+using atsc_eit_listener_vec_t   = std::vector<ATSCEITStreamListener *>;
+using atsc81_eit_listener_vec_t = std::vector<ATSC81EITStreamListener *>;
 
 class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 {

@@ -6,7 +6,6 @@
 // C++ headers
 #include <array>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QMutex>
@@ -16,7 +15,7 @@ using namespace std;
 #include "iso639.h"
 #include "mythtvexp.h"
 
-using desc_list_t = vector<const unsigned char *>;
+using desc_list_t = std::vector<const unsigned char *>;
 
 class DescriptorID
 {

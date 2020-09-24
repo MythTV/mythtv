@@ -100,7 +100,7 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
   private:
     mutable QString m_cachedNetworkName;
     mutable const unsigned char* m_tscPtr {nullptr};
-    mutable vector<const unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<const unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class ServiceDescriptionTable
@@ -176,7 +176,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
     QString toString(void) const override; // PSIPTable
 
   private:
-    mutable vector<const unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<const unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class BouquetAssociationTable
@@ -247,7 +247,7 @@ class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
 
   private:
     mutable const unsigned char* m_tscPtr {nullptr};
-    mutable vector<const unsigned char*> m_ptrs;
+    mutable std::vector<const unsigned char*> m_ptrs;
 };
 
 class MTV_PUBLIC DiscontinuityInformationTable : public PSIPTable
@@ -374,7 +374,7 @@ class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
     static bool IsEIT(uint table_id);
 
   private:
-    mutable vector<const unsigned char*> m_ptrs; // used to parse
+    mutable std::vector<const unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class TimeDateTable
