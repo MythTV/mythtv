@@ -2,8 +2,6 @@
 #include <iostream>
 #include <utility>
 
-using namespace std;
-
 #include <QApplication>
 #include <QDir>
 #include <QRegExp>

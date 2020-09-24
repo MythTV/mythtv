@@ -2,7 +2,6 @@
 #include "cutter.h"
 
 #include <algorithm>                    // for min
-using namespace std;
 
 #include <QMap>                         // for QMap
 
@@ -29,7 +28,7 @@ void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
                 break;
 
             case MARK_CUT_END:
-                leadinLength = min((int64_t)(it.key() - start),
+                leadinLength = std::min((int64_t)(it.key() - start),
                                    (int64_t)MAXLEADIN);
                 if (leadinLength >= MINCUT)
                 {

@@ -16,8 +16,6 @@
 #include "themeinfo.h"
 #include "mythrect.h"
 
-using namespace std;
-
 #define kMinWidth 160
 #define kMinHeight 160
 

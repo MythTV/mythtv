@@ -271,8 +271,6 @@ class MPEG2fixup
     #include <QDateTime>
     #include <iostream>
 
-    using namespace std;
-
     extern int verboseMask;
     #undef LOG
     #define LOG(mask,level,args...) \

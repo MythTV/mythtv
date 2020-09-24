@@ -2,7 +2,6 @@
 #include "audioreencodebuffer.h"
 
 #include <algorithm> // for min/max
-using namespace std;
 
 extern "C" {
 #include "libavutil/mem.h"
@@ -157,7 +156,7 @@ bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
             // Use as many of the remaining frames as will fit in the space
             // left in the buffer.
             int bufsize = m_saveBuffer->size();
-            int part = min(len - index, m_audioFrameSize - bufsize);
+            int part = std::min(len - index, m_audioFrameSize - bufsize);
             int out_frames = part / m_bytes_per_frame;
             timecode += out_frames * 1000 / m_eff_audiorate;
 

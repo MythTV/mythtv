@@ -36,8 +36,6 @@
 #define LOC_WARN QString("MythJobQueue, Warning: ")
 #define LOC_ERR  QString("MythJobQueue, Error: ")
 
-using namespace std;
-
 JobQueue *jobqueue = nullptr;
 QString   pidfile;
 QString   logfile;

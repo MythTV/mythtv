@@ -7,7 +7,6 @@
 
 // C++ headers
 #include <fstream>
-using namespace std;
 
 // Qt headers
 #include <QTextStream>
@@ -439,7 +438,7 @@ bool FillData::Run(SourceList &sourcelist)
             grabdays = (m_maxDays > 0)          ? m_maxDays : grabdays;
             grabdays = (m_onlyUpdateChannels)   ? 1         : grabdays;
 
-            vector<bool> refresh_request;
+            std::vector<bool> refresh_request;
             refresh_request.resize(grabdays, m_refreshAll);
             if (!m_refreshAll)
             {

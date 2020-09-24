@@ -43,8 +43,6 @@
 #define LOC_WARN QString("MythScreenWizard, Warning: ")
 #define LOC_ERR  QString("MythScreenWizard, Error: ")
 
-using namespace std;
-
 namespace
 {
     void cleanup()

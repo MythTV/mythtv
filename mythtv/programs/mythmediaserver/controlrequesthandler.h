@@ -1,8 +1,6 @@
 #ifndef CONTROLREQUESTHANDLER_H
 #define CONTROLREQUESTHANDLER_H
 
-using namespace std;
-
 #include <QString>
 #include <QStringList>
 

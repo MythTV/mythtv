@@ -1,7 +1,6 @@
 
 #include <iostream>
 #include <cstdlib>
-using namespace std;
 #include <unistd.h>
 
 #include <QCoreApplication>

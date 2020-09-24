@@ -2,7 +2,6 @@
 // C++ includes
 #include <algorithm> // for max
 #include <iostream> // for cout, endl
-using namespace std;
 #include <sys/stat.h>
 
 // Qt
@@ -58,7 +57,7 @@ static QString CreateProgramInfoString(const ProgramInfo &pginfo)
     if (!pginfo.GetSubtitle().isEmpty())
     {
         extra = QString(" ~ ") + pginfo.GetSubtitle();
-        int maxll = max(title.length(), 20);
+        int maxll = std::max(title.length(), 20);
         if (extra.length() > maxll)
             extra = extra.left(maxll - 3) + "...";
     }
@@ -68,7 +67,7 @@ static QString CreateProgramInfoString(const ProgramInfo &pginfo)
 
 static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 {
-    cout << "Checking Recordings" << endl;
+    std::cout << "Checking Recordings" << std::endl;
 
     std::vector<ProgramInfo *> *recordingList = RemoteGetRecordedList(-1);
     std::vector<ProgramInfo *>  missingRecordings;
@@ -77,13 +76,13 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 
     if (!recordingList)
     {
-        cout << "ERROR - failed to get recording list from backend" << endl;
+        std::cout << "ERROR - failed to get recording list from backend" << std::endl;
         return GENERIC_EXIT_NOT_OK;
     }
 
     bool fixSeektable = cmdline.toBool("fixseektable");
 
-    cout << "Fix seektable is: " << fixSeektable << endl;
+    std::cout << "Fix seektable is: " << fixSeektable << std::endl;
 
     if (!recordingList->empty())
     {
@@ -99,7 +98,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                 continue;
             }
 
-            cout << "Checking: " << qPrintable(CreateProgramInfoString(*p)) << endl;
+            std::cout << "Checking: " << qPrintable(CreateProgramInfoString(*p)) << std::endl;
             bool foundFile = true;
 
             QString url = p->GetPlaybackURL();
@@ -109,7 +108,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                 QFileInfo fi(url);
                 if (!fi.exists())
                 {
-                    cout << "File not found" << endl;
+                    std::cout << "File not found" << std::endl;
                     missingRecordings.push_back(p);
                     foundFile = false;
                 }
@@ -117,7 +116,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                 {
                     if (fi.size() == 0)
                     {
-                        cout << "File was found but has zero length" << endl;
+                        std::cout << "File was found but has zero length" << std::endl;
                         zeroByteRecordings.push_back(p);
                     }
                 }
@@ -126,7 +125,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
             {
                 if (!RemoteFile::Exists(url))
                 {
-                    cout << "File not found" << endl;
+                    std::cout << "File not found" << std::endl;
                     missingRecordings.push_back(p);
                     foundFile = false;
                 }
@@ -135,7 +134,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                     RemoteFile rf(url);
                     if (rf.GetFileSize() == 0)
                     {
-                        cout << "File was found but has zero length" << endl;
+                        std::cout << "File was found but has zero length" << std::endl;
                         zeroByteRecordings.push_back(p);
                     }
                 }
@@ -150,7 +149,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 
             if (posMap.isEmpty())
             {
-                cout << "No seektable found" << endl;
+                std::cout << "No seektable found" << std::endl;
 
                 noSeektableRecordings.push_back(p);
 
@@ -160,65 +159,65 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                                               QString("--rebuild --chanid %1 --starttime %2")
                                               .arg(p->GetChanID())
                                               .arg(p->GetRecordingStartTime(MythDate::ISODate));
-                    cout << "Running - " << qPrintable(command) << endl;
+                    std::cout << "Running - " << qPrintable(command) << std::endl;
                     QScopedPointer<MythSystem> cmd(MythSystem::Create(command));
                     cmd->Wait(0);
                     if (cmd.data()->GetExitCode() != GENERIC_EXIT_OK)
                     {
-                        cout << "ERROR - mythcommflag exited with result: " << cmd.data()->GetExitCode() << endl; 
+                        std::cout << "ERROR - mythcommflag exited with result: " << cmd.data()->GetExitCode() << std::endl;
                     }
                 }
             }
 
-            cout << "-------------------------------------------------------------------" << endl;
+            std::cout << "-------------------------------------------------------------------" << std::endl;
         }
     }
 
     if (!missingRecordings.empty())
     {
-        cout << endl << endl;
-        cout << "MISSING RECORDINGS" << endl;
-        cout << "------------------" << endl;
+        std::cout << std::endl << std::endl;
+        std::cout << "MISSING RECORDINGS" << std::endl;
+        std::cout << "------------------" << std::endl;
         for (auto *p : missingRecordings)
         {
-            cout << qPrintable(CreateProgramInfoString(*p)) << endl;
-            cout << qPrintable(p->GetPlaybackURL()) << endl;
-            cout << "-------------------------------------------------------------------" << endl;
+            std::cout << qPrintable(CreateProgramInfoString(*p)) << std::endl;
+            std::cout << qPrintable(p->GetPlaybackURL()) << std::endl;
+            std::cout << "-------------------------------------------------------------------" << std::endl;
         }
     }
 
     if (!zeroByteRecordings.empty())
     {
-        cout << endl << endl;
-        cout << "ZERO BYTE RECORDINGS" << endl;
-        cout << "--------------------" << endl;
+        std::cout << std::endl << std::endl;
+        std::cout << "ZERO BYTE RECORDINGS" << std::endl;
+        std::cout << "--------------------" << std::endl;
         for (auto *p : zeroByteRecordings)
         {
-            cout << qPrintable(CreateProgramInfoString(*p)) << endl;
-            cout << qPrintable(p->GetPlaybackURL()) << endl;
-            cout << "-------------------------------------------------------------------" << endl;
+            std::cout << qPrintable(CreateProgramInfoString(*p)) << std::endl;
+            std::cout << qPrintable(p->GetPlaybackURL()) << std::endl;
+            std::cout << "-------------------------------------------------------------------" << std::endl;
         }
     }
 
     if (!noSeektableRecordings.empty())
     {
-        cout << endl << endl;
-        cout << "NO SEEKTABLE RECORDINGS" << endl;
-        cout << "-----------------------" << endl;
+        std::cout << std::endl << std::endl;
+        std::cout << "NO SEEKTABLE RECORDINGS" << std::endl;
+        std::cout << "-----------------------" << std::endl;
         for (auto *p : noSeektableRecordings)
         {
-            cout << qPrintable(CreateProgramInfoString(*p)) << endl;
-            cout << qPrintable(p->GetPlaybackURL()) << endl;
-            cout << "File size is " << qPrintable(formatSize(p->GetFilesize(), 2)) << endl;
-            cout << "-------------------------------------------------------------------" << endl;
+            std::cout << qPrintable(CreateProgramInfoString(*p)) << std::endl;
+            std::cout << qPrintable(p->GetPlaybackURL()) << std::endl;
+            std::cout << "File size is " << qPrintable(formatSize(p->GetFilesize(), 2)) << std::endl;
+            std::cout << "-------------------------------------------------------------------" << std::endl;
         }
     }
 
-    cout << endl << endl << "SUMMARY" << endl;
-    cout << "Recordings           : " << recordingList->size() << endl;
-    cout << "Missing Recordings   : " << missingRecordings.size() << endl;
-    cout << "Zero byte Recordings : " << zeroByteRecordings.size() << endl;
-    cout << "Missing Seektables   : " << noSeektableRecordings.size() << endl;
+    std::cout << std::endl << std::endl << "SUMMARY" << std::endl;
+    std::cout << "Recordings           : " << recordingList->size() << std::endl;
+    std::cout << "Missing Recordings   : " << missingRecordings.size() << std::endl;
+    std::cout << "Zero byte Recordings : " << zeroByteRecordings.size() << std::endl;
+    std::cout << "Missing Seektables   : " << noSeektableRecordings.size() << std::endl;
 
     return GENERIC_EXIT_OK;
 }

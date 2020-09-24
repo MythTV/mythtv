@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -36,7 +35,7 @@ struct Source
     bool    xmltvgrabber_cache        {false};
     QString xmltvgrabber_prefmethod;
 };
-using SourceList = vector<Source>;
+using SourceList = std::vector<Source>;
 
 class FillData
 {

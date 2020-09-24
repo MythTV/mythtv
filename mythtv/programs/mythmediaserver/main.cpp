@@ -41,8 +41,6 @@
 #define LOC_WARN QString("MythMediaServer, Warning: ")
 #define LOC_ERR  QString("MythMediaServer, Error: ")
 
-using namespace std;
-
 QString   pidfile;
 QString   logfile  = "";
 
@@ -133,9 +131,9 @@ int main(int argc, char *argv[])
     int     port = gCoreContext->GetBackendServerPort();
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
-        cerr << "No setting found for this machine's BackendServerIP.\n"
-             << "Please run setup on this machine and modify the first page\n"
-             << "of the general settings.\n";
+        std::cerr << "No setting found for this machine's BackendServerIP.\n"
+                  << "Please run setup on this machine and modify the first page\n"
+                  << "of the general settings.\n";
         return GENERIC_EXIT_SETUP_ERROR;
     }
 

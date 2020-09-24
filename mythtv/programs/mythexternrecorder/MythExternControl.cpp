@@ -29,8 +29,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 const QString VERSION = "0.6";
 
 #define LOC Desc()

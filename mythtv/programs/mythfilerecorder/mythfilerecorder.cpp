@@ -6,8 +6,6 @@
 #include <iostream>
 #include <sys/poll.h>
 
-using namespace std;
-
 #include <QCoreApplication>
 #include <QDir>
 #include <QThread>
@@ -94,8 +92,8 @@ void Streamer::SendBytes(void)
         int delta = m_startTime.secsTo(MythDate::current()) + 1;
         int rate  = (delta * m_dataRate) - m_dataRead;
 
-        read_sz = min(rate, read_sz);
-        read_sz = min(m_bufferMax - m_buffer.size(), read_sz);
+        read_sz = std::min(rate, read_sz);
+        read_sz = std::min(m_bufferMax - m_buffer.size(), read_sz);
 
         if (read_sz > 0)
         {

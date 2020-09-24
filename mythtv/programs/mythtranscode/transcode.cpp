@@ -45,8 +45,6 @@ extern "C" {
 
 #include <unistd.h> // for unlink()
 
-using namespace std;
-
 #define LOC QString("Transcode: ")
 
 Transcode::Transcode(ProgramInfo *pginfo) :
