@@ -1,69 +1,62 @@
-
-#include "mythcommflagplayer.h"
-
+// Qt
 #include <QRunnable>
 
+// MythTV
 #include "mthreadpool.h"
 #include "mythlogging.h"
+#include "mythcommflagplayer.h"
 
-#include <unistd.h> // for usleep()
-#include <iostream> // for cout()
+// Std
+#include <unistd.h>
+#include <iostream>
 
 using namespace std;
+QMutex                   MythRebuildSaver::s_lock;
+QWaitCondition           MythRebuildSaver::s_wait;
+QHash<DecoderBase*,uint> MythRebuildSaver::s_count;
 
-class RebuildSaver : public QRunnable
+MythRebuildSaver::MythRebuildSaver(DecoderBase* Decoder, uint64_t First, uint64_t Last)
+  : m_decoder(Decoder),
+    m_first(First),
+    m_last(Last)
 {
-  public:
-    RebuildSaver(DecoderBase *d, uint64_t f, uint64_t l)
-        : m_decoder(d), m_first(f), m_last(l)
-    {
-        QMutexLocker locker(&s_lock);
-        s_cnt[d]++;
-    }
+    QMutexLocker locker(&s_lock);
+    s_count[Decoder]++;
+}
 
-    void run(void) override // QRunnable
-    {
-        m_decoder->SavePositionMapDelta(m_first, m_last);
+void MythRebuildSaver::run()
+{
+    m_decoder->SavePositionMapDelta(static_cast<long long>(m_first), static_cast<long long>(m_last));
 
-        QMutexLocker locker(&s_lock);
-        s_cnt[m_decoder]--;
-        if (!s_cnt[m_decoder])
-            s_wait.wakeAll();
-    }
+    QMutexLocker locker(&s_lock);
+    s_count[m_decoder]--;
+    if (!s_count[m_decoder])
+        s_wait.wakeAll();
+}
 
-    static uint GetCount(DecoderBase *d)
-    {
-        QMutexLocker locker(&s_lock);
-        return s_cnt[d];
-    }
+uint MythRebuildSaver::GetCount(DecoderBase* Decoder)
+{
+    QMutexLocker locker(&s_lock);
+    return s_count[Decoder];
+}
 
-    static void Wait(DecoderBase *d)
-    {
-        QMutexLocker locker(&s_lock);
-        if (!s_cnt[d])
+void MythRebuildSaver::Wait(DecoderBase*Decoder)
+{
+    QMutexLocker locker(&s_lock);
+    if (!s_count[Decoder])
+        return;
+
+    while (s_wait.wait(&s_lock))
+        if (!s_count[Decoder])
             return;
-        while (s_wait.wait(&s_lock))
-        {
-            if (!s_cnt[d])
-                return;
-        }
-    }
+}
 
-  private:
-    DecoderBase *m_decoder;
-    uint64_t     m_first;
-    uint64_t     m_last;
+MythCommFlagPlayer::MythCommFlagPlayer(PlayerFlags Flags)
+  : MythPlayer(Flags)
+{
+}
 
-    static QMutex                   s_lock;
-    static QWaitCondition           s_wait;
-    static QHash<DecoderBase*,uint> s_cnt;
-};
-QMutex                   RebuildSaver::s_lock;
-QWaitCondition           RebuildSaver::s_wait;
-QHash<DecoderBase*,uint> RebuildSaver::s_cnt;
-
-bool MythCommFlagPlayer::RebuildSeekTable(
-    bool showPercentage, StatusCallback cb, void* cbData)
+bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Callback, void* Opaque)
 {
     uint64_t myFramesPlayed = 0;
     uint64_t pmap_first = 0;
@@ -90,8 +83,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     if (!InitVideo())
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "RebuildSeekTable unable to initialize video");
+        LOG(VB_GENERAL, LOG_ERR, "RebuildSeekTable unable to initialize video");
         SetPlaying(false);
         return false;
     }
@@ -110,7 +102,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     m_decoder->TrackTotalDuration(true);
 
-    if (showPercentage)
+    if (ShowPercentage)
         cout << "\r                         \r" << flush;
 
     int prevperc = -1;
@@ -133,11 +125,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 usleep(200 * 1000);
 
             // If we're already saving, just save a larger block next time..
-            if (RebuildSaver::GetCount(m_decoder) < 1)
+            if (MythRebuildSaver::GetCount(m_decoder) < 1)
             {
                 pmap_last = myFramesPlayed;
                 MThreadPool::globalInstance()->start(
-                    new RebuildSaver(m_decoder, pmap_first, pmap_last),
+                    new MythRebuildSaver(m_decoder, pmap_first, pmap_last),
                     "RebuildSaver");
                 pmap_first = pmap_last + 1;
             }
@@ -152,43 +144,38 @@ bool MythCommFlagPlayer::RebuildSeekTable(
             if (m_totalFrames)
             {
                 float elapsed = flagTime.elapsed() * 0.001F;
-                int flagFPS = (elapsed > 0.0F) ?
-                    (int)(myFramesPlayed / elapsed) : 0;
+                auto flagFPS = (elapsed > 0.0F) ? static_cast<int>(myFramesPlayed / elapsed) : 0;
+                auto percentage = static_cast<int>(myFramesPlayed * 100 / m_totalFrames);
+                if (Callback)
+                    (*Callback)(percentage, Opaque);
 
-                int percentage = myFramesPlayed * 100 / m_totalFrames;
-                if (cb)
-                    (*cb)(percentage, cbData);
-
-                if (showPercentage)
+                if (ShowPercentage)
                 {
-                    QString str = QString("\r%1%/%2fps  \r")
-                        .arg(percentage,3).arg(flagFPS,5);
+                    QString str = QString("\r%1%/%2fps  \r").arg(percentage,3).arg(flagFPS,5);
                     cout << qPrintable(str) << flush;
                 }
                 else if (percentage % 10 == 0 && prevperc != percentage)
                 {
                     prevperc = percentage;
-                    LOG(VB_COMMFLAG, LOG_INFO, QString("Progress %1% @ %2fps")
-                        .arg(percentage,3).arg(flagFPS,5));
+                    LOG(VB_COMMFLAG, LOG_INFO, QString("Progress %1% @ %2fps").arg(percentage,3).arg(flagFPS,5));
                 }
             }
             else
             {
-                if (showPercentage)
+                if (ShowPercentage)
                 {
                     QString str = QString("\r%1  \r").arg(myFramesPlayed,6);
                     cout << qPrintable(str) << flush;
                 }
                 else if (myFramesPlayed % 1000 == 0)
                 {
-                    LOG(VB_COMMFLAG, LOG_INFO, QString("Frames processed %1")
-                        .arg(myFramesPlayed));
+                    LOG(VB_COMMFLAG, LOG_INFO, QString("Frames processed %1").arg(myFramesPlayed));
                 }
             }
         }
 
         if (DecoderGetFrame(kDecodeNothing,true))
-            myFramesPlayed = m_decoder->GetFramesRead();
+            myFramesPlayed = static_cast<uint64_t>(m_decoder->GetFramesRead());
 
         // H.264 recordings from an HD-PVR contain IDR keyframes,
         // which are the only valid cut points for lossless cuts.
@@ -198,7 +185,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         // seektable entries, we can assume it is because of the IDR
         // keyframe setting, and so we rewind and allow h.264 non-IDR
         // I-frames to be treated as keyframes.
-        uint64_t frames = m_decoder->GetFramesRead();
+        auto frames = static_cast<uint64_t>(m_decoder->GetFramesRead());
         if (!usingIframes &&
             (GetEof() != kEofStateNone || (frames > 1000 && frames < 1100)) &&
             !m_decoder->HasPositionMap())
@@ -212,7 +199,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         }
     }
 
-    if (showPercentage)
+    if (ShowPercentage)
         cout << "\r                         \r" << flush;
 
     SaveTotalDuration();
@@ -222,9 +209,9 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     m_killDecoder = true;
 
     MThreadPool::globalInstance()->start(
-        new RebuildSaver(m_decoder, pmap_first, myFramesPlayed),
+        new MythRebuildSaver(m_decoder, pmap_first, myFramesPlayed),
         "RebuildSaver");
-    RebuildSaver::Wait(m_decoder);
+    MythRebuildSaver::Wait(m_decoder);
 
     return true;
 }
