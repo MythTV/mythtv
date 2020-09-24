@@ -1,6 +1,5 @@
 
 #include <algorithm>
-using namespace std;
 
 #include "mythconfig.h"
 
@@ -471,8 +470,8 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
             upper++;
     }
     // keep in bounds
-    lower = max(lower, 0LL);
-    upper = min(upper, size - 1LL);
+    lower = std::max(lower, 0LL);
+    upper = std::min(upper, size - 1LL);
 
     upper_bound = upper;
     lower_bound = lower;
@@ -565,7 +564,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (uint64_t)(desiredFrame - (m_framesPlayed - 1)) > m_seekSnap
         ? desiredFrame - m_framesPlayed : 0;
-    normalframes = max(normalframes, 0);
+    normalframes = std::max(normalframes, 0);
     SeekReset(m_lastKey, normalframes, true, discardFrames);
 
     if (discardFrames || (m_ringBuffer && m_ringBuffer->IsDisc()))
@@ -728,7 +727,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     // that point the decoding is more than one frame ahead of display.
     if (desiredFrame+1 < m_framesPlayed)
         return DoRewind(desiredFrame, discardFrames);
-    desiredFrame = max(desiredFrame, m_framesPlayed);
+    desiredFrame = std::max(desiredFrame, m_framesPlayed);
 
     // Save rawframe state, for later restoration...
     bool oldrawstate = m_getRawFrames;
@@ -796,7 +795,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (uint64_t)(desiredFrame - (m_framesPlayed - 1)) > m_seekSnap
         ? desiredFrame - m_framesPlayed : 0;
-    normalframes = max(normalframes, 0);
+    normalframes = std::max(normalframes, 0);
     SeekReset(m_lastKey, normalframes, needflush, discardFrames);
 
     if (discardFrames || m_transcoding)
@@ -961,7 +960,7 @@ int DecoderBase::SetTrack(uint Type, int TrackNo)
     if (TrackNo >= static_cast<int>(m_tracks[Type].size()))
         return -1;
 
-    m_currentTrack[Type] = max(-1, TrackNo);
+    m_currentTrack[Type] = std::max(-1, TrackNo);
     if (m_currentTrack[Type] < 0)
     {
         m_selectedTrack[Type].m_av_stream_index = -1;
@@ -995,9 +994,9 @@ int DecoderBase::ChangeTrack(uint Type, int Dir)
     if (size)
     {
         if (Dir > 0)
-            next_track = (max(-1, m_currentTrack[Type]) + 1) % size;
+            next_track = (std::max(-1, m_currentTrack[Type]) + 1) % size;
         else
-            next_track = (max(+0, m_currentTrack[Type]) + size - 1) % size;
+            next_track = (std::max(+0, m_currentTrack[Type]) + size - 1) % size;
     }
     return SetTrack(Type, next_track);
 }
@@ -1009,7 +1008,7 @@ int DecoderBase::NextTrack(uint Type)
     int next_track = -1;
     int size = static_cast<int>(m_tracks[Type].size());
     if (size)
-        next_track = (max(0, m_currentTrack[Type]) + 1) % size;
+        next_track = (std::max(0, m_currentTrack[Type]) + 1) % size;
     return next_track;
 }
 

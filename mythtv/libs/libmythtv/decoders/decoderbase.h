@@ -4,7 +4,6 @@
 #include <array>
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 #include "io/mythmediabuffer.h"
 #include "remoteencoder.h"
@@ -109,7 +108,7 @@ class StreamInfo
         return (this->m_stream_id < b.m_stream_id);
     }
 };
-using sinfo_vec_t = vector<StreamInfo>;
+using sinfo_vec_t = std::vector<StreamInfo>;
 
 inline AVRational AVRationalInit(int num, int den = 1) {
     AVRational result;
@@ -323,7 +322,7 @@ class DecoderBase
     MarkTypes            m_positionMapType         {MARK_UNSET};
 
     mutable QMutex       m_positionMapLock         {QMutex::Recursive};
-    vector<PosMapEntry>  m_positionMap;
+    std::vector<PosMapEntry>  m_positionMap;
     frm_pos_map_t        m_frameToDurMap; // guarded by m_positionMapLock
     frm_pos_map_t        m_durToFrameMap; // guarded by m_positionMapLock
     mutable QDateTime    m_lastPositionMapUpdate; // guarded by m_positionMapLock
@@ -355,7 +354,7 @@ class DecoderBase
     std::array<StreamInfo, kTrackTypeCount> m_selectedTrack;
 
     /// language preferences for auto-selection of streams
-    vector<int>          m_languagePreference;
+    std::vector<int>     m_languagePreference;
     MythCodecContext    *m_mythCodecCtx         { nullptr };
     VideoDisplayProfile  m_videoDisplayProfile;
 

@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <iostream>
 #include <unistd.h>
-using namespace std;
 
 #include <QTextCodec>
 #include <QFileInfo>
@@ -654,7 +653,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         m_framesRead = m_lastKey;
 
         normalframes = (exactseeks) ? desiredFrame - m_framesPlayed : 0;
-        normalframes = max(normalframes, 0);
+        normalframes = std::max(normalframes, 0);
         m_noDtsHack = false;
     }
     else
@@ -1749,7 +1748,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
 
     uint pidx = 0;
     uint sidx = 0;
-    std::array<map<int,uint>,2> lang_cc_cnt;
+    std::array<std::map<int,uint>,2> lang_cc_cnt;
     while (true)
     {
         bool pofr = pidx >= (uint)m_pmtTracks.size();
@@ -1969,9 +1968,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         m_selectedTrack[kTrackTypeVideo].m_av_stream_index = -1;
         m_fps = 0;
     }
-    map<int,uint> lang_sub_cnt;
+    std::map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
-    map<int,uint> lang_aud_cnt;
+    std::map<int,uint> lang_aud_cnt;
     uint audioStreamCount = 0;
 
     if (m_ringBuffer && m_ringBuffer->IsDVD() &&
@@ -2341,8 +2340,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_avcParser->Reset();
 
             QSize dim = get_video_dim(*enc);
-            int width  = max(dim.width(),  16);
-            int height = max(dim.height(), 16);
+            int width  = std::max(dim.width(),  16);
+            int height = std::max(dim.height(), 16);
             QString dec = "ffmpeg";
             uint thread_count = 1;
             QString codecName;
@@ -3039,7 +3038,7 @@ void AvFormatDecoder::HandleGopStart(
         if (reset_kfd)
         {
             m_keyframeDist    = tempKeyFrameDist;
-            m_maxKeyframeDist = max(m_keyframeDist, m_maxKeyframeDist);
+            m_maxKeyframeDist = std::max(m_keyframeDist, m_maxKeyframeDist);
 
             m_parent->SetKeyframeDistance(m_keyframeDist);
 
@@ -3602,7 +3601,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     // frames, without an intervening ATSC frame, to cause a switch back to
     // considering SCTE frames.  The number 10 is somewhat arbitrarily chosen.
 
-    uint cc_len = static_cast<uint>(max(AvFrame->scte_cc_len,0));
+    uint cc_len = static_cast<uint>(std::max(AvFrame->scte_cc_len,0));
     uint8_t *cc_buf = AvFrame->scte_cc_buf;
     bool scte = true;
 
@@ -3613,7 +3612,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     // If both ATSC and SCTE caption data are available, prefer ATSC
     if ((AvFrame->atsc_cc_len > 0) || m_ignoreScte)
     {
-        cc_len = static_cast<uint>(max(AvFrame->atsc_cc_len, 0));
+        cc_len = static_cast<uint>(std::max(AvFrame->atsc_cc_len, 0));
         cc_buf = AvFrame->atsc_cc_buf;
         scte = false;
         // If we explicitly saw ATSC, then reset ignore_scte count.
