@@ -32,7 +32,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     uint cardid   = scan[0].m_cardid;
 
     // Delete saved scans when there are too many or when they are too old
-    const vector<ScanInfo> list = LoadScanList(sourceid);
+    const std::vector<ScanInfo> list = LoadScanList(sourceid);
     for (uint i = 0; i < list.size(); i++)
     {
         if (((i + 10) < (list.size())) ||
@@ -256,16 +256,16 @@ bool ScanInfo::DeleteScan(uint scanid)
 
 void ScanInfo::DeleteScansFromSource(uint sourceid)
 {
-    vector<ScanInfo> scans = LoadScanList(sourceid);
+    std::vector<ScanInfo> scans = LoadScanList(sourceid);
     for (auto &scan : scans)
     {
         DeleteScan(scan.m_scanid);
     }
 }
 
-vector<ScanInfo> LoadScanList(void)
+std::vector<ScanInfo> LoadScanList(void)
 {
-    vector<ScanInfo> list;
+    std::vector<ScanInfo> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -291,9 +291,9 @@ vector<ScanInfo> LoadScanList(void)
     return list;
 }
 
-vector<ScanInfo> LoadScanList(uint sourceid)
+std::vector<ScanInfo> LoadScanList(uint sourceid)
 {
-    vector<ScanInfo> list;
+    std::vector<ScanInfo> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(

@@ -34,8 +34,6 @@
 #include <algorithm>
 #include <utility>
 
-using namespace std;
-
 // Qt includes
 #include <QMutexLocker>
 #include <QObject>
@@ -327,7 +325,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
     m_scanTransports.clear();
     m_nextIt = m_scanTransports.end();
 
-    vector<uint> multiplexes = SourceUtil::GetMplexIDs(sourceid);
+    std::vector<uint> multiplexes = SourceUtil::GetMplexIDs(sourceid);
 
     if (multiplexes.empty())
     {
@@ -718,7 +716,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
     if (!chan)
         return type;
 
-    vector<DTVTunerType> tts = chan->GetTunerTypes();
+    std::vector<DTVTunerType> tts = chan->GetTunerTypes();
 
     for (auto & tt : tts)
     {

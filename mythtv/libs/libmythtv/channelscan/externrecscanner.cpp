@@ -109,8 +109,8 @@ void ExternRecChannelScanner::run(void)
         return;
     }
 
-    vector<uint> existing = ChannelUtil::GetChanIDs(m_sourceId);
-    vector<uint>::iterator Iold;
+    std::vector<uint> existing = ChannelUtil::GetChanIDs(m_sourceId);
+    std::vector<uint>::iterator Iold;
 
     // Step 3/4 : Process
     if (m_scanMonitor)

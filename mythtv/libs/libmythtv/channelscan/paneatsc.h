@@ -6,7 +6,6 @@
 #define PANE_ATSC_H
 
 #include <algorithm>
-using namespace std;
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
@@ -105,7 +104,7 @@ class PaneATSC : public GroupSetting
             b = a;
         }
 
-        int diff = max(b + 1 - a, 0);
+        int diff = std::max(b + 1 - a, 0);
         m_transportCount->setValue(QString::number(diff));
     }
 

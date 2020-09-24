@@ -60,7 +60,7 @@ class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
 
-using pmt_vec_t = vector<const ProgramMapTable*>;
+using pmt_vec_t = std::vector<const ProgramMapTable*>;
 using pmt_map_t = QMap<uint, pmt_vec_t>;
 class ScannedChannelInfo;
 using ChannelListItem = QPair<transport_scan_items_it_t, ScannedChannelInfo*>;

@@ -5,8 +5,6 @@
 #include <cstdint>
 using uint = unsigned;
 #include <vector>
-using namespace std;
-
 // Qt headers
 #include <QString>
 #include <QDateTime>
@@ -34,8 +32,8 @@ class ScanInfo
     QDateTime m_scandate;
 };
 
-MTV_PUBLIC vector<ScanInfo> LoadScanList(void);
-MTV_PUBLIC vector<ScanInfo> LoadScanList(uint sourceid);
+MTV_PUBLIC std::vector<ScanInfo> LoadScanList(void);
+MTV_PUBLIC std::vector<ScanInfo> LoadScanList(uint sourceid);
 uint SaveScan(const ScanDTVTransportList &scan);
 MTV_PUBLIC ScanDTVTransportList LoadScan(uint scanid);
 

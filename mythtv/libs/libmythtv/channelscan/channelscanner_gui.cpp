@@ -32,7 +32,6 @@
 
 // Std C++
 #include <algorithm>
-using namespace std;
 
 // MythTV headers
 #include "mythdialogbox.h"

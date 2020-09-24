@@ -57,7 +57,7 @@ class PaneExistingScanImport : public GroupSetting
         if (!m_sourceid)
             return;
 
-        vector<ScanInfo> scans = LoadScanList(m_sourceid);
+        std::vector<ScanInfo> scans = LoadScanList(m_sourceid);
         for (auto it = scans.rbegin(); it != scans.rend(); ++it)
         {
             ScanInfo &scan   = *it;
