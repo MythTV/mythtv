@@ -82,7 +82,7 @@ class MythDisplayMutter : public MythDisplay
     void UpdateCurrentMode   () override;
     bool VideoModesAvailable () override { return true; }
     bool UsingVideoModes     () override;
-    const vector<MythDisplayMode>& GetVideoModes(void) override;
+    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
     bool SwitchToVideoMode   (QSize Size, double DesiredRate) override;
 
   public slots:

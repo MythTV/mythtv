@@ -6,7 +6,6 @@
 
 // C++ headers
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QFile>
@@ -70,14 +69,14 @@ bool MythUIGuideGrid::ParseElement(
     else if (element.tagName() == "channels")
     {
         m_channelCount = getFirstText(element).toInt();
-        m_channelCount = max(m_channelCount, 1);
-        m_channelCount = min(m_channelCount, MAX_DISPLAY_CHANS);
+        m_channelCount = std::max(m_channelCount, 1);
+        m_channelCount = std::min(m_channelCount, MAX_DISPLAY_CHANS);
     }
     else if (element.tagName() == "timeslots")
     {
         m_timeCount = getFirstText(element).toInt();
-        m_timeCount = max(m_timeCount, 1);
-        m_timeCount = min(m_timeCount, MAX_DISPLAY_TIMES / 6);
+        m_timeCount = std::max(m_timeCount, 1);
+        m_timeCount = std::min(m_timeCount, MAX_DISPLAY_TIMES / 6);
     }
     else if (element.tagName() == "solidcolor")
     {
@@ -122,8 +121,8 @@ bool MythUIGuideGrid::ParseElement(
     else if (element.tagName() == "categoryalpha")
     {
         m_categoryAlpha = getFirstText(element).toInt();
-        m_categoryAlpha = max(m_categoryAlpha, 1);
-        m_categoryAlpha = min(m_categoryAlpha, 255);
+        m_categoryAlpha = std::max(m_categoryAlpha, 1);
+        m_categoryAlpha = std::min(m_categoryAlpha, 255);
     }
     else if (element.tagName() == "showcategories")
     {

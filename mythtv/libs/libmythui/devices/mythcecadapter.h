@@ -17,7 +17,6 @@
 #include <libcec/cec.h>
 #include <iostream>
 using namespace CEC;
-using namespace std;
 
 class MythCECAdapter
 {

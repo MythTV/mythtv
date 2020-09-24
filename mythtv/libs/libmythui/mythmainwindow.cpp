@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // QT
 #include <QWaitCondition>

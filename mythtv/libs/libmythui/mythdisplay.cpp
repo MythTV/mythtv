@@ -757,7 +757,7 @@ std::vector<double> MythDisplay::GetRefreshRates(QSize Size)
 {
     auto targetrate = static_cast<double>(NAN);
     const MythDisplayMode mode(Size, QSize(0, 0), -1.0, 0.0);
-    const vector<MythDisplayMode>& modes = GetVideoModes();
+    const std::vector<MythDisplayMode>& modes = GetVideoModes();
     int match = MythDisplayMode::FindBestMatch(modes, mode, targetrate);
     if (match < 0)
         return std::vector<double>();
@@ -769,7 +769,7 @@ bool MythDisplay::SwitchToVideoMode(QSize /*Size*/, double /*Framerate*/)
     return false;
 }
 
-const vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
+const std::vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
 {
     return m_videoModes;
 }

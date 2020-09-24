@@ -27,7 +27,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
     virtual bool  VideoModesAvailable(void) { return false; }
     virtual bool  UsingVideoModes(void) { return false; }
-    virtual const vector<MythDisplayMode>& GetVideoModes(void);
+    virtual const std::vector<MythDisplayMode>& GetVideoModes(void);
 
     static void  ConfigureQtGUI        (int SwapInterval = 1, const QString& Display = QString());
     static bool  SpanAllScreens        (void);
@@ -91,7 +91,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QWidget*        m_widget           { nullptr };
     QWindow*        m_window           { nullptr };
     QScreen*        m_screen           { nullptr };
-    vector<MythDisplayMode> m_videoModes { };
+    std::vector<MythDisplayMode> m_videoModes { };
 
   private:
     Q_DISABLE_COPY(MythDisplay)

@@ -9,8 +9,6 @@
 #include "mythrenderopengl.h"
 #include "mythpainteropengl.h"
 
-using namespace std;
-
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
   : MythPainterGPU(Parent),
     m_render(Render)

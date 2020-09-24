@@ -11,9 +11,7 @@
 #include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
-
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
@@ -366,7 +364,7 @@ void LIRC::Process(const QByteArray &data)
                     QString(), lirctext));
         }
 
-        vector<LircKeycodeEvent*> keyReleases;
+        std::vector<LircKeycodeEvent*> keyReleases;
 
         for (int i = 0; i < a.count(); i++)
         {

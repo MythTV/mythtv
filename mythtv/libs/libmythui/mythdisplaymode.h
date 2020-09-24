@@ -15,8 +15,7 @@
 #include <vector>
 
 class MythDisplayMode;
-using namespace std;
-using DisplayModeMap =  map<uint64_t, MythDisplayMode>;
+using DisplayModeMap =  std::map<uint64_t, MythDisplayMode>;
 
 class MUI_PUBLIC MythDisplayMode
 {
@@ -42,7 +41,7 @@ class MUI_PUBLIC MythDisplayMode
     void   ClearRefreshRates(void);
     void   SetRefreshRate(double Rate);
     const std::vector<double>& RefreshRates(void) const;
-    static int      FindBestMatch (const vector<MythDisplayMode>& Modes,
+    static int      FindBestMatch (const std::vector<MythDisplayMode>& Modes,
                                    const MythDisplayMode& Mode, double& TargetRate);
     static uint64_t CalcKey       (QSize Size, double Rate);
     static bool     CompareRates  (double First, double Second, double Precision = 0.01);
@@ -55,6 +54,6 @@ class MUI_PUBLIC MythDisplayMode
     int m_widthMM   { 0 };
     int m_heightMM  { 0 };
     double m_aspect { -1.0 };
-    vector<double> m_refreshRates { };
+    std::vector<double> m_refreshRates { };
 };
 #endif // MYTHDISPLAYMODE_H_

@@ -136,7 +136,7 @@ bool MythDisplayMode::CompareRates(double First, double Second, double Precision
     return qAbs(First - Second) < Precision;
 }
 
-int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode>& Modes,
+int MythDisplayMode::FindBestMatch(const std::vector<MythDisplayMode>& Modes,
                                    const MythDisplayMode& Mode, double &TargetRate)
 {
     double videorate = Mode.RefreshRate();
