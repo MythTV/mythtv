@@ -182,7 +182,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asin((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
+    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
     *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
