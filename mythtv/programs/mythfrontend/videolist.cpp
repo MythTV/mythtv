@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
-using namespace std;
 
 #include <QFileInfo>
 #include <QList>
@@ -333,7 +332,7 @@ static int AddFileNode(MythGenericTree *where_to_add, const QString& name,
 class VideoListImp
 {
   public:
-    using metadata_view_list = vector<VideoMetadata *>;
+    using metadata_view_list = std::vector<VideoMetadata *>;
 
   private:
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
@@ -791,14 +790,14 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     metadata_view_list mlist;
     mlist.reserve(m_metadata.getList().size());
 
-    back_insert_iterator<metadata_view_list> mli(mlist);
+    std::back_insert_iterator<metadata_view_list> mli(mlist);
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
     metadata_path_sort mps = metadata_path_sort();
-    sort(mlist.begin(), mlist.end(), mps);
+    std::sort(mlist.begin(), mlist.end(), mps);
 
-    using group_to_node_map = map<QString, meta_dir_node *>;
+    using group_to_node_map = std::map<QString, meta_dir_node *>;
     group_to_node_map gtnm;
 
     meta_dir_node *video_root = &m_metadataTree;
@@ -810,13 +809,13 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     {
         all_group_node->addEntry(smart_meta_node(new meta_data_node(data)));
 
-        vector<QString> groups;
+        std::vector<QString> groups;
 
         switch (whence)
         {
             case ltDBGenreGroup:
             {
-                vector<pair <int, QString> > genres =
+                std::vector<std::pair <int, QString> > genres =
                     data->GetGenres();
 
                 for (const auto& item : genres)
@@ -845,7 +844,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             }
             case ltDBCastGroup:
             {
-                vector<pair<int, QString> > cast = data->GetCast();
+                std::vector<std::pair<int, QString> > cast = data->GetCast();
 
                 for (const auto& item : cast)
                     groups.push_back(item.second);
@@ -911,7 +910,7 @@ void VideoListImp::buildTVList(void)
     metadata_view_list mlist;
     mlist.reserve(m_metadata.getList().size());
 
-    back_insert_iterator<metadata_view_list> mli(mlist);
+    std::back_insert_iterator<metadata_view_list> mli(mlist);
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
@@ -955,17 +954,17 @@ void VideoListImp::buildDbList()
     metadata_view_list mlist;
     mlist.reserve(m_metadata.getList().size());
 
-    back_insert_iterator<metadata_view_list> mli(mlist);
+    std::back_insert_iterator<metadata_view_list> mli(mlist);
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
 //    print_meta_list(mlist);
 
     metadata_path_sort mps = metadata_path_sort();
-    sort(mlist.begin(), mlist.end(), mps);
+    std::sort(mlist.begin(), mlist.end(), mps);
 
     // TODO: break out the prefix in the DB so this isn't needed
-    using prefix_to_node_map = map<QString, meta_dir_node *>;
+    using prefix_to_node_map = std::map<QString, meta_dir_node *>;
     prefix_to_node_map ptnm;
 
     QStringList dirs = GetVideoDirs();
@@ -996,7 +995,7 @@ void VideoListImp::buildFsysList()
     //  Fill metadata from directory structure
     //
 
-    using node_to_path_list = vector<pair<QString, QString> >;
+    using node_to_path_list = std::vector<std::pair<QString, QString> >;
 
     node_to_path_list node_paths;
 
@@ -1097,7 +1096,7 @@ struct call_tree_flat
 void tree_view_to_flat(meta_dir_node &tree,
                        VideoListImp::metadata_view_list &flat)
 {
-    back_insert_iterator<VideoListImp::metadata_view_list> bip(flat);
+    std::back_insert_iterator<VideoListImp::metadata_view_list> bip(flat);
     transform(tree.entries_begin(), tree.entries_end(), bip,
               to_metadata_ptr());
 
@@ -1142,7 +1141,7 @@ void VideoListImp::update_meta_view(bool flat_list)
 class dirhandler : public DirectoryHandler
 {
   public:
-    using free_list = list<simple_ref_ptr<DirectoryHandler> >;
+    using free_list = std::list<simple_ref_ptr<DirectoryHandler> >;
 
   public:
     dirhandler(smart_dir_node &directory, const QString &prefix,

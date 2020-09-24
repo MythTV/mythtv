@@ -1,8 +1,6 @@
 
 #include "statusbox.h"
 
-using namespace std;
-
 #include <QRegExp>
 #include <QHostAddress>
 #include <QNetworkInterface>

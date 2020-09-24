@@ -8,7 +8,6 @@
 #include <deque>
 #include <utility>
 #include <vector>
-using namespace std;
 
 #include <QStringList>
 #include <QDateTime>

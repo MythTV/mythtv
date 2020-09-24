@@ -6,7 +6,6 @@
 #include <functional>
 #include <deque>                        // for _Deque_iterator, operator-, etc
 #include <iterator>                     // for reverse_iterator
-using namespace std;
 
 // Qt
 #include <QCoreApplication>
@@ -992,7 +991,7 @@ void ProgLister::FillViewList(const QString &view)
         m_curView = m_viewList.size() - 1;
 }
 
-class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
+class plCompare : std::binary_function<const ProgramInfo*, const ProgramInfo*, bool>
 {
   public:
     virtual bool operator()(const ProgramInfo*, const ProgramInfo*) = 0;

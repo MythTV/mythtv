@@ -1721,7 +1721,7 @@ bool PlaybackBox::UpdateUILists(void)
         bool isDeletedGroup    = (m_recGroup == "Deleted");
         bool isLiveTvGroup     = (m_recGroup == "LiveTV");
 
-        vector<ProgramInfo*> list;
+        std::vector<ProgramInfo*> list;
         bool newest_first = (0==m_allOrder);
         m_programInfoCache.GetOrdered(list, newest_first);
         for (auto *p : list)
@@ -4284,7 +4284,7 @@ void PlaybackBox::customEvent(QEvent *event)
             ProgramInfo *pginfo = FindProgramInUILists(recordingID);
             if (pginfo)
             {
-                pginfo->SetFilesize(max(pginfo->GetFilesize(), fs));
+                pginfo->SetFilesize(std::max(pginfo->GetFilesize(), fs));
                 old_avail = pginfo->GetAvailableStatus();
                 pginfo->SetAvailableStatus(availableStatus, "AVAILABILITY");
             }

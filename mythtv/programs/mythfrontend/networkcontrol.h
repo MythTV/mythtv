@@ -2,7 +2,6 @@
 #define NETWORKCONTROL_H_
 
 #include <deque>
-using namespace std;
 
 #include <QWaitCondition>
 #include <QStringList>

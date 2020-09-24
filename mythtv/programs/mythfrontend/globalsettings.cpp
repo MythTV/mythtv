@@ -2307,7 +2307,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
                                           "watching a video."));
 
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<MythDisplayMode> scr = display->GetVideoModes();
+    std::vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
     for (auto & vmode : scr)
     {
@@ -2357,7 +2357,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
     gc->setHelpText(hstr);
 
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<MythDisplayMode> scr = display->GetVideoModes();
+    std::vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
     for (auto & vmode : scr)
     {
@@ -2377,7 +2377,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     QString resolution = setting->getValue();
     int hz50 = -1;
     int hz60 = -1;
-    const vector<double> list = GetRefreshRates(resolution);
+    const std::vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
     for (size_t i = 0; i < list.size(); ++i)
     {
@@ -2403,7 +2403,7 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     setEnabled(!list.empty());
 }
 
-vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(const QString &res)
+std::vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(const QString &res)
 {
     QStringList slist = res.split("x");
     int width = 0;
@@ -2416,7 +2416,7 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(const QString &re
         height = slist[1].toInt(&ok1);
     }
 
-    vector<double> result;
+    std::vector<double> result;
     if (ok0 && ok1)
     {
         QSize size(width, height);
@@ -4626,7 +4626,7 @@ AppearanceSettings::AppearanceSettings()
     MythDisplay* display = MythDisplay::AcquireRelease();
     if (display->VideoModesAvailable())
     {
-        vector<MythDisplayMode> scr = display->GetVideoModes();
+        std::vector<MythDisplayMode> scr = display->GetVideoModes();
         if (!scr.empty())
             addChild(UseVideoModes());
     }

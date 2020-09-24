@@ -1,5 +1,4 @@
 #include <algorithm>
-using namespace std;
 
 #include <QCoreApplication>
 #include <QStringList>

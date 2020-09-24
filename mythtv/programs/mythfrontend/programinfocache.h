@@ -6,7 +6,6 @@
 // C++ headers
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
@@ -37,7 +36,7 @@ class ProgramInfoCache
     bool Update(const ProgramInfo &pginfo);
     bool UpdateFileSize(uint recordingID, uint64_t filesize);
     QString GetRecGroup(uint recordingID) const;
-    void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
+    void GetOrdered(std::vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
     ProgramInfo *GetRecordingInfo(uint recordingID) const;
@@ -56,7 +55,7 @@ class ProgramInfoCache
 
     mutable QMutex          m_lock;
     Cache                   m_cache;
-    vector<ProgramInfo*>   *m_nextCache         {nullptr};
+    std::vector<ProgramInfo*> *m_nextCache      {nullptr};
     QObject                *m_listener          {nullptr};
     bool                    m_loadIsQueued      {false};
     uint                    m_loadsInProgress   {0};

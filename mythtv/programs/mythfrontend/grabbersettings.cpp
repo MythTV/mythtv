@@ -15,8 +15,6 @@
 #include "metadatacommon.h"
 #include "grabbersettings.h"
 
-using namespace std;
-
 // ---------------------------------------------------
 
 bool GrabberSettings::Create()

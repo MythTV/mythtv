@@ -11,7 +11,6 @@
 // Std
 #include <utility>
 #include <vector> // For std::vector
-using namespace std;
 
 class ProgramInfo;
 class MythUIText;
@@ -85,7 +84,7 @@ class StatusBox : public MythScreenType
 
     recprof2bps_t      m_recordingProfilesBps;
 
-    vector<ProgramInfo *> m_expList;
+    std::vector<ProgramInfo *> m_expList;
 
     MythScreenStack   *m_popupStack      {nullptr};
 

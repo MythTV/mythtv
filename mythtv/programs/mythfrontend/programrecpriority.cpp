@@ -4,7 +4,6 @@
 
 // C/C++ headers
 #include <vector> // For std::vector
-using namespace std;
 
 // QT headers
 #include <QDateTime>

@@ -11,8 +11,6 @@
 
 #include "videometadatasettings.h"
 
-using namespace std;
-
 // ---------------------------------------------------
 
 bool MetadataSettings::Create()

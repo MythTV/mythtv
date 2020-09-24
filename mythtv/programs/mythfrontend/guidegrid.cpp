@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstdint>                     // for uint64_t
 #include <deque>                        // for _Deque_iterator, operator!=, etc
-using namespace std;
 
 //qt
 #include <QCoreApplication>
@@ -576,9 +575,9 @@ void GuideGrid::Load(void)
     LoadFromScheduler(m_recList);
     fillChannelInfos();
 
-    int maxchannel = max((int)GetChannelCount() - 1, 0);
+    int maxchannel = std::max((int)GetChannelCount() - 1, 0);
     setStartChannel((int)(m_currentStartChannel) - (m_channelCount / 2));
-    m_channelCount = min(m_channelCount, maxchannel + 1);
+    m_channelCount = std::min(m_channelCount, maxchannel + 1);
 
     for (int y = 0; y < m_channelCount; ++y)
     {
@@ -1409,7 +1408,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     if (gotostartchannel)
     {
         int ch = FindChannel(m_startChanID, m_startChanNum, false);
-        m_currentStartChannel = (uint) max(0, ch);
+        m_currentStartChannel = (uint) std::max(0, ch);
     }
 
     if (m_channelInfos.empty())
@@ -1551,8 +1550,8 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
     {
         firstRow = 0;
         allRows = true;
-        numRows = min((unsigned int)m_channelInfos.size(),
-                      (unsigned int)m_guideGrid->getChannelCount());
+        numRows = std::min((unsigned int)m_channelInfos.size(),
+                           (unsigned int)m_guideGrid->getChannelCount());
     }
     QVector<int> chanNums;
     QVector<ProgramList*> proglists;
@@ -2230,8 +2229,8 @@ void GuideGrid::generateListings()
 
     int maxchannel = 0;
     fillChannelInfos();
-    maxchannel = max((int)GetChannelCount() - 1, 0);
-    m_channelCount = min(m_guideGrid->getChannelCount(), maxchannel + 1);
+    maxchannel = std::max((int)GetChannelCount() - 1, 0);
+    m_channelCount = std::min(m_guideGrid->getChannelCount(), maxchannel + 1);
 
     LoadFromScheduler(m_recList);
     fillProgramInfos();

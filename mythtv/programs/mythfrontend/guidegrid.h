@@ -6,7 +6,6 @@
 #include <list>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // qt
 #include <QString>
@@ -26,16 +25,14 @@ using namespace std;
 // mythfrontend
 #include "schedulecommon.h"
 
-using namespace std;
-
 class ProgramInfo;
 class QTimer;
 class MythUIButtonList;
 class MythUIGuideGrid;
 
-using db_chan_list_t = vector<ChannelInfo>  ;
-using db_chan_list_list_t = vector<db_chan_list_t>;
-using ProgInfoGuideArray = array<array<ProgramInfo *,MAX_DISPLAY_TIMES>,MAX_DISPLAY_CHANS>;
+using db_chan_list_t = std::vector<ChannelInfo>  ;
+using db_chan_list_list_t = std::vector<db_chan_list_t>;
+using ProgInfoGuideArray = std::array<std::array<ProgramInfo *,MAX_DISPLAY_TIMES>,MAX_DISPLAY_CHANS>;
 
 class JumpToChannel;
 class JumpToChannelListener
@@ -244,7 +241,7 @@ private:
     db_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
-    vector<ProgramList*> m_programs;
+    std::vector<ProgramList*> m_programs;
     ProgInfoGuideArray m_programInfos {};
     ProgramList  m_recList;
 

@@ -17,8 +17,6 @@
 //mythfrontend
 #include "viewschedulediff.h"
 
-using namespace std;
-
 bool ViewScheduleDiff::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "schedulediff", this))

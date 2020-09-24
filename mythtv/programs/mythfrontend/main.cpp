@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <iostream>
 #include <memory>
-using namespace std;
 
 #include <QFile>
 #include <QFileInfo>
@@ -1748,7 +1747,7 @@ static bool WasAutomaticStart(void)
                 // to record, to obtain guide data or or for a
                 // daily wakeup/shutdown period
                 if (abs(startupTime.secsTo(MythDate::current())) <
-                    max(startupSecs, 15 * 60))
+                    std::max(startupSecs, 15 * 60))
                 {
                     LOG(VB_GENERAL, LOG_INFO,
                         "Close to auto-start time, AUTO-Startup assumed");
@@ -1756,7 +1755,7 @@ static bool WasAutomaticStart(void)
                     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
                     QDateTime guideRunTime = MythDate::fromString(str);
                     if (guideRunTime.secsTo(MythDate::current()) <
-                        max(startupSecs, 15 * 60))
+                        std::max(startupSecs, 15 * 60))
                     {
                         LOG(VB_GENERAL, LOG_INFO,
                             "Close to MythFillDB suggested run time, AUTO-Startup to fetch guide data?");
@@ -1899,7 +1898,7 @@ int main(int argc, char **argv)
         bBypassAutoDiscovery = true;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        cerr << "Unable to ignore SIGPIPE\n";
+        std::cerr << "Unable to ignore SIGPIPE\n";
 
     if (!cmdline.toString("geometry").isEmpty())
         MythMainWindow::ParseGeometryOverride(cmdline.toString("geometry"));
@@ -2108,7 +2107,7 @@ int main(int argc, char **argv)
     fe_sd_notify("STATUS=Loading theme updates");
     std::unique_ptr<ThemeUpdateChecker> themeUpdateChecker;
     if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
-        themeUpdateChecker = make_unique<ThemeUpdateChecker>();
+        themeUpdateChecker = std::make_unique<ThemeUpdateChecker>();
 
     MythSystemEventHandler sysEventHandler {};
 

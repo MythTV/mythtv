@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <deque>                        // for _Deque_iterator, operator-, etc
 #include <iterator>                     // for reverse_iterator
-using namespace std;
 
 // QT
 #include <QDateTime>
