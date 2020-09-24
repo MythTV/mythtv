@@ -216,7 +216,7 @@ static int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
  */
 QString MythGesture::Translate(bool Timeout)
 {
-    size_t total_points = static_cast<size_t>(m_points.count());
+    auto total_points = static_cast<size_t>(m_points.count());
 
     if (total_points > m_maxPoints)
     {
