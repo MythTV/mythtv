@@ -7,13 +7,11 @@
 
 #include <QStringList>
 
-using namespace std;
-
 QMap<int, QString>    iso639_key_to_english_name;
 static QMap<int, int> s_iso639_key2_to_key3;
 static QMap<int, int> s_iso639_key3_to_canonical_key3;
 static QStringList    s_languages;
-static vector<int>    s_language_keys;
+static std::vector<int> s_language_keys;
 
 /* Note: this file takes a long time to compile. **/
 
@@ -55,7 +53,7 @@ QStringList iso639_get_language_list(void)
     return s_languages;
 }
 
-vector<int> iso639_get_language_key_list(void)
+std::vector<int> iso639_get_language_key_list(void)
 {
     if (s_language_keys.empty())
     {

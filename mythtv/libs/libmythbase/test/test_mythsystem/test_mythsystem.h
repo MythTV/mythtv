@@ -25,7 +25,6 @@
 #include <QDateTime>
 
 #include <iostream>
-using namespace std;
 
 //#define NEW_LOGGING
 #ifdef NEW_LOGGING
@@ -118,7 +117,7 @@ class TestMythSystem: public QObject
                                kMSStdIn | kMSRunShell));
         cmd->GetStandardInputStream()->write(in);
         cmd->GetStandardInputStream()->close();
-        std::cerr << "stdin_works -- Wait starting" << endl;
+        std::cerr << "stdin_works -- Wait starting" << std::endl;
         cmd->Wait(0);
         QVERIFY(cmd->GetExitCode() == 0);
         QByteArray out = tempfile.readAll();

@@ -1,5 +1,4 @@
 #include <iostream>
-using namespace std;
 
 #include <QFile>
 #include <QFileInfo>
@@ -780,7 +779,7 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         if (whence == SEEK_SET)
         {
             QFileInfo info(m_path);
-            offset = min(pos, info.size());
+            offset = std::min(pos, info.size());
         }
         else if (whence == SEEK_END)
         {

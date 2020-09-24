@@ -13,8 +13,6 @@
 #include <QSocketNotifier>
 #include <iostream>
 
-using namespace std;
-
 #include "mythlogging.h"
 #include "logging.h"
 #include "loggingserver.h"

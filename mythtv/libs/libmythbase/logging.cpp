@@ -12,8 +12,6 @@
 #include <QVariantMap>
 #include <iostream>
 
-using namespace std;
-
 #include "mythlogging.h"
 #include "logging.h"
 #include "loggingserver.h"
@@ -941,7 +939,7 @@ void verboseHelp(void)
 {
     QString m_verbose = userDefaultValueStr.simplified().replace(' ', ',');
 
-    cerr << "Verbose debug levels.\n"
+    std::cerr << "Verbose debug levels.\n"
             "Accepts any combination (separated by comma) of:\n\n";
 
     for (VerboseMap::Iterator vit = verboseMap.begin();
@@ -951,11 +949,11 @@ void verboseHelp(void)
         QString name = QString("  %1").arg(item->name, -15, ' ');
         if (item->helpText.isEmpty())
             continue;
-        cerr << name.toLocal8Bit().constData() << " - " <<
-                item->helpText.toLocal8Bit().constData() << endl;
+        std::cerr << name.toLocal8Bit().constData() << " - "
+                  << item->helpText.toLocal8Bit().constData() << std::endl;
     }
 
-    cerr << endl <<
+    std::cerr << std::endl <<
       "The default for this program appears to be: '-v " <<
       m_verbose.toLocal8Bit().constData() << "'\n\n"
       "Most options are additive except for 'none' and 'all'.\n"
@@ -967,13 +965,14 @@ void verboseHelp(void)
       "prefixing them with 'no', so you may use '-v all,nodatabase'\n"
       "to view all but database debug messages.\n\n";
 
-    cerr << "The 'global' loglevel is specified with --loglevel, but can be\n"
+    std::cerr
+         << "The 'global' loglevel is specified with --loglevel, but can be\n"
          << "overridden on a component by component basis by appending "
          << "':level'\n"
          << "to the component.\n"
          << "    For example: -v gui:debug,channel:notice,record\n\n";
 
-    cerr << "Some debug levels may not apply to this program.\n" << endl;
+    std::cerr << "Some debug levels may not apply to this program.\n" << std::endl;
 }
 
 /// \brief  Parse the --verbose commandline argument and set the verbose level
@@ -993,7 +992,7 @@ int verboseArgParse(const QString& arg)
 
     if (arg.startsWith('-'))
     {
-        cerr << "Invalid or missing argument to -v/--verbose option\n";
+        std::cerr << "Invalid or missing argument to -v/--verbose option\n";
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
@@ -1023,11 +1022,11 @@ int verboseArgParse(const QString& arg)
         }
         if (option == "important")
         {
-            cerr << "The \"important\" log mask is no longer valid.\n";
+            std::cerr << "The \"important\" log mask is no longer valid.\n";
         }
         else if (option == "extra")
         {
-            cerr << "The \"extra\" log mask is no longer valid.  Please try "
+            std::cerr << "The \"extra\" log mask is no longer valid.  Please try "
                     "--loglevel debug instead.\n";
         }
         else if (option == "default")
@@ -1088,8 +1087,8 @@ int verboseArgParse(const QString& arg)
             }
             else
             {
-                cerr << "Unknown argument for -v/--verbose: " <<
-                        option.toLocal8Bit().constData() << endl;;
+                std::cerr << "Unknown argument for -v/--verbose: " <<
+                        option.toLocal8Bit().constData() << std::endl;;
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }

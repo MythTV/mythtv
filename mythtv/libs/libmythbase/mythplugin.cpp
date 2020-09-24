@@ -18,8 +18,6 @@
 #include "mythversion.h"
 #include "mythlogging.h"
 
-using namespace std;
-
 int MythPlugin::init(const char *libversion)
 {
     using PluginInitFunc = int (*)(const char *);

@@ -31,8 +31,6 @@
 #include "mythlogging.h"
 #include "portchecker.h"
 
-using namespace std;
-
 #define LOC      QString("DownloadManager: ")
 #define CACHE_REDIRECTION_LIMIT     10
 

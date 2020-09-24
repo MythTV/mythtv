@@ -24,7 +24,6 @@
 #include <cstdarg>
 #include <queue>
 #include <unistd.h>       // for usleep()
-using namespace std;
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -219,7 +218,7 @@ bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Wake-On-LAN in progress, waiting...");
 
-        int max_wait = min(1000, timeout_remaining);
+        int max_wait = std::min(1000, timeout_remaining);
         m_wolInProgressWaitCondition.wait(
             &m_wolInProgressLock, max_wait);
         timeout_remaining -= max_wait;
@@ -458,15 +457,15 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         WOLcmd = GetSetting("WOLbackendCommand", "");
 
     if (maxConnTry < 1)
-        maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
+        maxConnTry = std::max(GetNumSetting("BackendConnectRetry", 1), 1);
 
     int WOLsleepTime = 0;
     int WOLmaxConnTry = 0;
     if (!WOLcmd.isEmpty())
     {
         WOLsleepTime  = GetNumSetting("WOLbackendReconnectWaitTime", 0);
-        WOLmaxConnTry = max(GetNumSetting("WOLbackendConnectRetry", 1), 1);
-        maxConnTry    = max(maxConnTry, WOLmaxConnTry);
+        WOLmaxConnTry = std::max(GetNumSetting("WOLbackendConnectRetry", 1), 1);
+        maxConnTry    = std::max(maxConnTry, WOLmaxConnTry);
     }
 
     bool we_attempted_wol = false;

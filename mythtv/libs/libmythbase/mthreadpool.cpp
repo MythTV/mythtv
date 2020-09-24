@@ -74,7 +74,6 @@
 
 // C++ headers
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
@@ -218,7 +217,7 @@ class MThreadPoolPrivate
 
     int GetRealMaxThread(void) const
     {
-        return max(m_maxThreadCount,1) + m_reserveThread;
+        return std::max(m_maxThreadCount,1) + m_reserveThread;
     }
 
     mutable QMutex m_lock;

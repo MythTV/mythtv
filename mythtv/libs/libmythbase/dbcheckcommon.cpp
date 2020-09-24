@@ -6,7 +6,6 @@
 
 #include <cstdio>
 #include <iostream>
-using namespace std;
 
 #include <QString>
 #include <QSqlError>

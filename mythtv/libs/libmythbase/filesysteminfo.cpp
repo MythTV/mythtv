@@ -16,8 +16,6 @@
 #include <sys/mount.h>  // for struct statfs
 #endif
 
-using namespace std;
-
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -190,7 +188,7 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
 
-            int bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize())
+            int bSize = std::max(32, std::max(it1->getBlockSize(), it2->getBlockSize())
                                         / 1024);
             int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
             int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();

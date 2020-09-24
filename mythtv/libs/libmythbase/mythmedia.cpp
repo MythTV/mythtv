@@ -20,8 +20,6 @@
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
-using namespace std;
-
 #ifdef _WIN32
 #   define O_NONBLOCK 0
 #endif

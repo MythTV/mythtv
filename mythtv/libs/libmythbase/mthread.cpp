@@ -20,7 +20,6 @@
  */
 
 #include <iostream>
-using namespace std;
 
 // Qt headers
 #include <QStringList>
@@ -159,13 +158,13 @@ void MThread::Cleanup(void)
         return;
 
     // logging has been stopped so we need to use iostream...
-    cerr<<"Error: Not all threads were shut down properly: "<<endl;
+    std::cerr<<"Error: Not all threads were shut down properly: "<<std::endl;
     for (auto *thread : qAsConst(badGuys))
     {
-        cerr<<"Thread "<<qPrintable(thread->objectName())
-            <<" is still running"<<endl;
+        std::cerr<<"Thread "<<qPrintable(thread->objectName())
+                 <<" is still running"<<std::endl;
     }
-    cerr<<endl;
+    std::cerr<<std::endl;
 
     static const int kTimeout = 5000;
     MythTimer t;

@@ -35,8 +35,6 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 
-using namespace std;
-
 class MythSystemLegacyWrapper : public MythSystem
 {
   public:

@@ -8,8 +8,6 @@
 #include <ctime>
 #include <iostream>
 
-using namespace std;
-
 // POSIX
 #include <unistd.h>
 #include <fcntl.h>
@@ -454,18 +452,18 @@ bool makeFileAccessible(const QString& filename)
 QString getResponse(const QString &query, const QString &def)
 {
     QByteArray tmp = query.toLocal8Bit();
-    cout << tmp.constData();
+    std::cout << tmp.constData();
 
     tmp = def.toLocal8Bit();
     if (!def.isEmpty())
-        cout << " [" << tmp.constData() << "]  ";
+        std::cout << " [" << tmp.constData() << "]  ";
     else
-        cout << "  ";
+        std::cout << "  ";
 
     if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
     {
-        cout << endl << "[console is not interactive, using default '"
-             << tmp.constData() << "']" << endl;
+        std::cout << std::endl << "[console is not interactive, using default '"
+             << tmp.constData() << "']" << std::endl;
         return def;
     }
 
@@ -960,7 +958,7 @@ void wrapList(QStringList &list, int width)
 {
     // if this is triggered, something has gone seriously wrong
     // the result won't really be usable, but at least it won't crash
-    width = max(width, 5);
+    width = std::max(width, 5);
 
     for (int i = 0; i < list.size(); i++)
     {

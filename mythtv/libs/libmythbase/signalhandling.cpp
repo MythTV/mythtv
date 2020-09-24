@@ -14,8 +14,6 @@
 #include <sys/socket.h>
 #endif
 
-using namespace std;
-
 #include "compat.h"
 #include "mythlogging.h"
 #include "exitcodes.h"
@@ -63,7 +61,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     // Carry on without the signal stack if it fails
     if (sigaltstack(&stack, nullptr) == -1)
     {
-        cerr << "Couldn't create signal stack!" << endl;
+        std::cerr << "Couldn't create signal stack!" << std::endl;
         delete [] m_sigStack;
         m_sigStack = nullptr;
     }
@@ -80,7 +78,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
 
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigFd.data()))
     {
-        cerr << "Couldn't create socketpair" << endl;
+        std::cerr << "Couldn't create socketpair" << std::endl;
         return;
     }
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
@@ -90,7 +88,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     {
         if (!s_defaultHandlerList.contains(signum))
         {
-            cerr << "No default handler for signal " << signum << endl;
+            std::cerr << "No default handler for signal " << signum << std::endl;
             continue;
         }
 
