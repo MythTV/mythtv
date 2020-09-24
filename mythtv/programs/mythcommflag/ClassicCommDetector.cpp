@@ -20,7 +20,7 @@ using namespace std;
 #include "mythmiscutil.h"
 #include "mythcontext.h"
 #include "programinfo.h"
-#include "mythplayer.h"
+#include "mythcommflagplayer.h"
 
 // Commercial Flagging headers
 #include "ClassicCommDetector.h"
@@ -127,7 +127,7 @@ QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const
 ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
-                                         MythPlayer* player_in,
+                                         MythCommFlagPlayer *player_in,
                                          QDateTime startedAt_in,
                                          QDateTime stopsAt_in,
                                          QDateTime recordingStartedAt_in,

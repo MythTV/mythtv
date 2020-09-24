@@ -9,11 +9,11 @@
 // MythTV headers
 #include "mythcorecontext.h"
 #include "programinfo.h"
-#include "mythplayer.h"
+#include "mythcommflagplayer.h"
 
 PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
-                            bool showProgress,bool fullSpeed,
-                            MythPlayer* player,
+                            bool showProgress, bool fullSpeed,
+                            MythCommFlagPlayer *player,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,
                             const QDateTime& recordingStartedAt_in,

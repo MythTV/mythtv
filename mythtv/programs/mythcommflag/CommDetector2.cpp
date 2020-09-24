@@ -18,7 +18,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
-#include "mythplayer.h"
+#include "mythcommflagplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"
 
@@ -282,7 +282,7 @@ CommDetector2::CommDetector2(
     SkipType           commDetectMethod_in,
     bool               showProgress_in,
     bool               fullSpeed_in,
-    MythPlayer        *player_in,
+    MythCommFlagPlayer *player_in,
     int                chanid,
     QDateTime          startts_in,
     QDateTime          endts_in,

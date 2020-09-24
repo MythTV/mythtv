@@ -16,7 +16,7 @@
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
 
-class MythPlayer;
+class MythCommFlagPlayer;
 class LogoDetectorBase;
 class SceneChangeDetectorBase;
 
@@ -49,7 +49,7 @@ class ClassicCommDetector : public CommDetectorBase
 
     public:
         ClassicCommDetector(SkipType commDetectMethod, bool showProgress,
-                            bool fullSpeed, MythPlayer* player,
+                            bool fullSpeed, MythCommFlagPlayer* player,
                             QDateTime startedAt_in,
                             QDateTime stopsAt_in,
                             QDateTime recordingStartedAt_in,
@@ -163,7 +163,7 @@ class ClassicCommDetector : public CommDetectorBase
         SceneChangeDetectorBase* m_sceneChangeDetector {nullptr};
 
 protected:
-        MythPlayer *m_player               {nullptr};
+        MythCommFlagPlayer *m_player       {nullptr};
         QDateTime m_startedAt;
         QDateTime m_stopsAt;
         QDateTime m_recordingStartedAt;

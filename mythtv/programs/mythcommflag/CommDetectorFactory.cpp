@@ -3,14 +3,14 @@
 #include "CommDetector2.h"
 #include "PrePostRollFlagger.h"
 
-class MythPlayer;
+class MythCommFlagPlayer;
 class RemoteEncoder;
 
 CommDetectorBase*
 CommDetectorFactory::makeCommDetector(
     SkipType commDetectMethod,
     bool showProgress, bool fullSpeed,
-    MythPlayer* player,
+    MythCommFlagPlayer* player,
     int chanid,
     const QDateTime& startedAt,
     const QDateTime& stopsAt,

@@ -5,7 +5,7 @@
 
 // MythTV headers
 #include "mythcorecontext.h"
-#include "mythplayer.h"
+#include "mythcommflagplayer.h"
 #include "libavutil/frame.h"
 
 // Commercial Flagging headers
@@ -72,7 +72,7 @@ void ClassicLogoDetector::deleteLater(void)
     LogoDetectorBase::deleteLater();
 }
 
-bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
+bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
 {
     int seekIncrement =
         (int)(m_commDetectLogoSampleSpacing * player->GetFrameRate());
