@@ -645,7 +645,7 @@ void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float asp
     enum { kNone, kHoriz, kBoth };
     int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
     auto const aspectd = static_cast<double>(aspect);
-    double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspectd)) : 1.;
+    double const vz = (mode == kBoth) ? std::min(1.15, 1. / sqrt(aspectd)) : 1.;
     double const hz = (mode > kNone) ? vz * aspectd : 1.;
 
     m_displayRect = QRect( int(dispRect.width() * (1 - hz) / 2),

@@ -68,7 +68,7 @@ ObjCarousel *Dsmcc::AddTap(unsigned short componentTag, unsigned carouselId)
     }
 
     // Add this only if it's not already there.
-    vector<unsigned short>::iterator it;
+    std::vector<unsigned short>::iterator it;
     for (it = car->m_Tags.begin(); it != car->m_Tags.end(); ++it)
     {
         if (*it == componentTag)
@@ -457,7 +457,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
     for (auto *car : m_carousels)
     {
         // Is the component tag one of the ones we know?
-        vector<unsigned short>::iterator it2;
+        std::vector<unsigned short>::iterator it2;
         for (it2 = car->m_Tags.begin(); it2 != car->m_Tags.end(); ++it2)
         {
             if (*it2 == componentTag)

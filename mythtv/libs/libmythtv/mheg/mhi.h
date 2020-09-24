@@ -8,7 +8,6 @@
 // STL headers
 #include <list>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
@@ -200,7 +199,7 @@ class MHIContext : public MHContext, public QRunnable
     QMutex           m_displayLock;
     bool             m_updated        {false};
 
-    list<MHIImageData*> m_display; // List of items to display
+    std::list<MHIImageData*> m_display; // List of items to display
 
     FT_Face          m_face           {nullptr};
     bool             m_faceLoaded     {false};
@@ -217,7 +216,7 @@ class MHIContext : public MHContext, public QRunnable
     QList<int>       m_tuneInfo;
 
     uint             m_lastNbiVersion {NBI_VERSION_UNSET};
-    vector<unsigned char> m_nbiData;
+    std::vector<unsigned char> m_nbiData;
 
     QRect            m_videoRect, m_videoDisplayRect;
     QRect            m_displayRect;
