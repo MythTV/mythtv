@@ -59,9 +59,8 @@ class VideoPerformanceTest
     void Test(void)
     {
         PIPMap dummy;
-        MythMediaBuffer *rb  = MythMediaBuffer::Create(m_file, false, true, 2000);
-        auto       *mp  = new MythPlayer(
-            (PlayerFlags)(kAudioMuted | (m_allowGpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
+        MythMediaBuffer *rb = MythMediaBuffer::Create(m_file, false, true, 2000);
+        auto *mp  = new MythPlayer(static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         m_ctx = new PlayerContext("VideoPerformanceTest");

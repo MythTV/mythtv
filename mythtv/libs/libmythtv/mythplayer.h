@@ -39,18 +39,9 @@
 #include "mythmiscutil.h"
 #include "mythtvexp.h"
 
-class MythVideoOutput;
-class RemoteEncoder;
-class MythSqlDatabase;
 class ProgramInfo;
-class DecoderBase;
-class LiveTVChain;
-class TV;
-struct SwsContext;
 class InteractiveTV;
-class NSAutoreleasePool;
 class DetectLetterbox;
-class MythPlayer;
 class Jitterometer;
 class QThread;
 class QWidget;
@@ -96,10 +87,8 @@ enum PlayerFlags
     kDecodeFewBlocks      = 0x000004,
     kDecodeNoLoopFilter   = 0x000008,
     kDecodeNoDecode       = 0x000010,
-    kDecodeDisallowCPU    = 0x000020, // NB CPU always available by default
-    kDecodeAllowGPU       = 0x000040, // VDPAU, VAAPI, DXVA2
-    kDecodeAllowEXT       = 0x000080, // VDA, CrystalHD
-    kVideoIsNull          = 0x000100,
+    kDecodeAllowGPU       = 0x000020,
+    kVideoIsNull          = 0x000040,
     kAudioMuted           = 0x010000,
     kNoITV                = 0x020000,
     kMusicChoice          = 0x040000,
