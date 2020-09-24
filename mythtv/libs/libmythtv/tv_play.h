@@ -1003,7 +1003,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};
     QStringList      m_tvmDeinterlacers       {};
     QString          m_tvmCurrentDeinterlacer {};
-    bool             m_tvmDoubleRate          {false};
 
     // Playback
     int          m_tvmSpeedX100         {100};

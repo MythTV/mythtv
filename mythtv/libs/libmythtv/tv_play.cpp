@@ -11899,7 +11899,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmSup               = kPictureAttributeSupported_None;
     m_tvmStereoAllowed     = false;
     m_tvmStereoMode        = kStereoscopicModeAuto;
-    m_tvmDoubleRate        = false;
 
     m_tvmSpeedX100         = (int)(round(ctx->m_tsNormal * 100));
     m_tvmState             = ctx->GetState();
@@ -11975,7 +11974,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         m_tvmCanUpmix         = ctx->m_player->GetAudio()->CanUpmix();
         m_tvmAspectOverride   = ctx->m_player->GetAspectOverride();
         m_tvmAdjustFill       = ctx->m_player->GetAdjustFill();
-        m_tvmDoubleRate       = ctx->m_player->CanSupportDoubleRate();
         m_tvmCurSkip          = ctx->m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = ctx->m_player->IsPaused();
         m_tvmSubsCapMode      = ctx->m_player->GetCaptionMode();
