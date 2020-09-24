@@ -240,8 +240,7 @@ void MythVideoOutputGPU::DestroyBuffers()
 }
 
 bool MythVideoOutputGPU::InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
-                                      float Aspect, MythCodecID CodecId, bool& AspectOnly,
-                                      MythMultiLocker* /*Locks*/, int ReferenceFrames,
+                                      float Aspect, MythCodecID CodecId, bool& AspectOnly, int ReferenceFrames,
                                       bool ForceChange)
 {
     QSize currentvideodim     = GetVideoDim();

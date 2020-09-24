@@ -107,21 +107,6 @@ enum PlayerFlags
 
 #define FlagIsSet(arg) (m_playerFlags & (arg))
 
-class MythMultiLocker
-{
-  public:
-    MythMultiLocker(std::initializer_list<QMutex*> Locks);
-    MythMultiLocker() = delete;
-   ~MythMultiLocker();
-
-    void Unlock(void);
-    void Relock(void);
-
-  private:
-    Q_DISABLE_COPY(MythMultiLocker)
-    QVector<QMutex*> m_locks;
-};
-
 class DecoderCallback
 {
   public:

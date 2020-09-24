@@ -93,7 +93,6 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
                                        float        Aspect,
                                        MythCodecID  CodecID,
                                        bool&        AspectOnly,
-                                       MythMultiLocker* Locks,
                                        int          ReferenceFrames,
                                        bool         ForceChange)
 {
@@ -118,7 +117,7 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
     }
 
     MythVideoOutput::InputChanged(VideoDim, VideoDispDim,
-                                  Aspect, CodecID, AspectOnly, Locks,
+                                  Aspect, CodecID, AspectOnly,
                                   ReferenceFrames, ForceChange);
     m_videoBuffers.DeleteBuffers();
 

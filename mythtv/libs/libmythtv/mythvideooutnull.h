@@ -20,7 +20,7 @@ class MythVideoOutputNull : public MythVideoOutput
     void EndFrame     () override;
     bool InputChanged(const QSize& VideoDim,   const QSize& VideoDispDim,
                       float        Aspect,     MythCodecID  CodecID,
-                      bool&        AspectOnly, MythMultiLocker* Locks,
+                      bool&        AspectOnly,
                       int          ReferenceFrames, bool ForceChange) override;
     void EmbedInWidget(const QRect& EmbedRect) override;
     void StopEmbedding(void) override;

@@ -31,8 +31,6 @@ class MythRender;
 
 using PIPMap = QHash<MythPlayer*,PIPLocation>;
 
-class MythMultiLocker;
-
 class MythVideoOutput : public MythVideoBounds
 {
     Q_OBJECT
@@ -63,8 +61,7 @@ class MythVideoOutput : public MythVideoBounds
     virtual void WindowResized(const QSize& /*size*/) {}
     virtual bool InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
                               float VideoAspect, MythCodecID  CodecID,
-                              bool& AspectChanged, MythMultiLocker* Locks,
-                              int   ReferenceFrames, bool ForceChange);
+                              bool& AspectChanged, int ReferenceFrames, bool ForceChange);
     virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
                               float& VisibleAspect, float& FontScaling,

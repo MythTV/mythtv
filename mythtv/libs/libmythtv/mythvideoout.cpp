@@ -427,8 +427,7 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
  */
 bool MythVideoOutput::InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
                                    float VideoAspect, MythCodecID  CodecID,
-                                   bool& /*AspectOnly*/, MythMultiLocker* /*Locks*/,
-                                   int   ReferenceFrames, bool /*ForceChange*/)
+                                   bool& /*AspectOnly*/, int ReferenceFrames, bool /*ForceChange*/)
 {
     SourceChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;

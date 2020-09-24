@@ -22,8 +22,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            UpdatePauseFrame      (int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     bool            InputChanged          (const QSize& VideoDim, const QSize& VideoDispDim,
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
-                                           MythMultiLocker* Locks, int ReferenceFrames,
-                                           bool ForceChange) override;
+                                           int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;
     bool            IsPIPSupported        () const override  { return true; }

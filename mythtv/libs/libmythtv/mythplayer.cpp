@@ -108,31 +108,6 @@ static int toTrackType(int type)
     return kTrackTypeUnknown;
 }
 
-MythMultiLocker::MythMultiLocker(std::initializer_list<QMutex*> Locks)
-  : m_locks(Locks)
-{
-    Relock();
-}
-
-MythMultiLocker::~MythMultiLocker()
-{
-    Unlock();
-}
-
-void MythMultiLocker::Unlock(void)
-{
-    for (QVector<QMutex*>::const_reverse_iterator it = m_locks.crbegin(); it != m_locks.crend(); ++it)
-        if (*it)
-            (*it)->unlock();
-}
-
-void MythMultiLocker::Relock(void)
-{
-    for (auto *lock : qAsConst(m_locks))
-        if (lock)
-            lock->lock();
-}
-
 MythPlayer::MythPlayer(PlayerFlags flags)
     : m_playerFlags(flags),
       m_display((flags & kVideoIsNull) ? nullptr : MythDisplay::AcquireRelease()),
@@ -176,7 +151,8 @@ MythPlayer::~MythPlayer(void)
         m_interactiveTV = nullptr;
     }
 
-    MythMultiLocker locker({&m_osdLock, &m_vidExitLock});
+    QMutexLocker lock1(&m_osdLock);
+    QMutexLocker lock2(&m_vidExitLock);
 
     delete m_osd;
     m_osd = nullptr;
@@ -440,13 +416,14 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
 
     bool aspect_only = false;
     {
-        MythMultiLocker locker({&m_osdLock, &m_vidExitLock});
+        QMutexLocker lock1(&m_osdLock);
+        QMutexLocker lock2(&m_vidExitLock);
 
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));
         float aspect = (m_forcedVideoAspect > 0) ? m_forcedVideoAspect : m_videoAspect;
         if (!m_videoOutput->InputChanged(m_videoDim, m_videoDispDim, aspect,
-                                       m_decoder->GetVideoCodecID(), aspect_only, &locker,
-                                       m_maxReferenceFrames, ForceUpdate))
+                                         m_decoder->GetVideoCodecID(), aspect_only,
+                                         m_maxReferenceFrames, ForceUpdate))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to Reinitialize Video. Exiting..");
@@ -5082,7 +5059,8 @@ InteractiveTV *MythPlayer::GetInteractiveTV(void)
 #ifdef USING_MHEG
     if (!m_interactiveTV && m_itvEnabled && !FlagIsSet(kNoITV))
     {
-        MythMultiLocker locker({&m_osdLock, &m_itvLock});
+        QMutexLocker lock1(&m_osdLock);
+        QMutexLocker lock2(&m_itvLock);
         if (!m_interactiveTV && m_osd)
             m_interactiveTV = new InteractiveTV(this);
     }
