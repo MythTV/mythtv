@@ -61,16 +61,16 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
 #ifdef Q_OS_ANDROID
-    switch (event->gesture())
+    switch (event->GetGesture())
     {
         case MythGestureEvent::Click:
             switch (event->GetButton())
             {
-                case MythGestureEvent::RightButton :
+                case Qt::RightButton :
                     LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window R Click");
                     handled = true;
                     break;
-                case MythGestureEvent::LeftButton :
+                case Qt::LeftButton :
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window L Click");
                         // send it on like the others to be handled by TV
