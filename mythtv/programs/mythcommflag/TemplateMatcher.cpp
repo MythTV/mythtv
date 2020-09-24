@@ -7,7 +7,6 @@
 
 // C++ headers
 #include <algorithm>
-using namespace std;
 
 // Qt headers
 #include <QFile>
@@ -72,11 +71,11 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
             if (!tmpl->data[0][rr * width + cc])
                 continue;
 
-            int r2min = max(0, rr - radius);
-            int r2max = min(height, rr + radius);
+            int r2min = std::max(0, rr - radius);
+            int r2max = std::min(height, rr + radius);
 
-            int c2min = max(0, cc - radius);
-            int c2max = min(width, cc + radius);
+            int c2min = std::max(0, cc - radius);
+            int c2max = std::min(width, cc + radius);
 
             for (int r2 = r2min; r2 <= r2max; r2++)
             {
@@ -741,10 +740,10 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         if (brkb > 0)
         {
             jj = frameMapSearchForwards(blankMap,
-                max(prevbrke,
-                    brkb - max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_LATE)),
-                min(brke,
-                    brkb + max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_EARLY)));
+                std::max(prevbrke,
+                    brkb - std::max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_LATE)),
+                std::min(brke,
+                    brkb + std::max(BLANK_NEARBY, TEMPLATE_DISAPPEARS_EARLY)));
         }
         long long newbrkb = brkb;
         if (jj != blankMap->constEnd())
@@ -762,10 +761,10 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
          */
         FrameAnalyzer::FrameMap::const_iterator kk = frameMapSearchBackwards(
             blankMap,
-            max(newbrkb,
-                brke - max(BLANK_NEARBY, TEMPLATE_REAPPEARS_LATE)),
-            min(iinext == m_breakMap.end() ? nframes : iinext.key(),
-                brke + max(BLANK_NEARBY, TEMPLATE_REAPPEARS_EARLY)));
+            std::max(newbrkb,
+                brke - std::max(BLANK_NEARBY, TEMPLATE_REAPPEARS_LATE)),
+            std::min(iinext == m_breakMap.end() ? nframes : iinext.key(),
+                brke + std::max(BLANK_NEARBY, TEMPLATE_REAPPEARS_EARLY)));
         long long newbrke = brke;
         if (kk != blankMap->constEnd())
         {

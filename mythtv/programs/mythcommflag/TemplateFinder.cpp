@@ -156,8 +156,8 @@ bounding_box(const AVFrame *img, int imgheight,
      * Higher values cut more, but avoid noise as part of the template..
      * Lower values cut less, but can include noise as part of the template.
      */
-    const int           VERTSLOP = max(4, imgheight * 1 / 15);
-    const int           HORIZSLOP = max(4, imgwidth * 1 / 20);
+    const int           VERTSLOP = std::max(4, imgheight * 1 / 15);
+    const int           HORIZSLOP = std::max(4, imgwidth * 1 / 20);
 
     int maxwidth = (maxcol1 - mincol) * kMaxWidthPct / 100;
     int maxheight = (maxrow1 - minrow) * kMaxHeightPct / 100;
@@ -270,8 +270,8 @@ bounding_box(const AVFrame *img, int imgheight,
                 QString("bounding_box too wide (%1 > %2); left=%3, right=%4")
                     .arg(width).arg(maxwidth)
                     .arg(left, 0, 'f', 3).arg(right, 0, 'f', 3));
-            float minscore = min(left, right);
-            float maxscore = max(left, right);
+            float minscore = std::min(left, right);
+            float maxscore = std::max(left, right);
             if (maxscore < 3 * minscore / 2)
             {
                 /*
@@ -302,8 +302,8 @@ bounding_box(const AVFrame *img, int imgheight,
                 QString("bounding_box too tall (%1 > %2); upper=%3, lower=%4")
                     .arg(height).arg(maxheight)
                     .arg(upper, 0, 'f', 3).arg(lower, 0, 'f', 3));
-            float minscore = min(upper, lower);
-            float maxscore = max(upper, lower);
+            float minscore = std::min(upper, lower);
+            float maxscore = std::max(upper, lower);
             if (maxscore < 3 * minscore / 2)
             {
                 /*
@@ -358,7 +358,7 @@ bounding_box(const AVFrame *img, int imgheight,
         }
         newrow--;
     }
-    newrow = max(minrow, newrow - 1);   /* Empty row on top. */
+    newrow = std::max(minrow, newrow - 1);   /* Empty row on top. */
 
     /* Expand leftwards. */
     newcol = col - 1;
@@ -381,7 +381,7 @@ bounding_box(const AVFrame *img, int imgheight,
         }
         newcol--;
     }
-    newcol = max(mincol, newcol - 1);   /* Empty column to left. */
+    newcol = std::max(mincol, newcol - 1);   /* Empty column to left. */
 
     /* Expand rightwards. */
     newright = col + width;
@@ -401,7 +401,7 @@ bounding_box(const AVFrame *img, int imgheight,
             break;
         newright++;
     }
-    newright = min(maxcol1, newright + 1);  /* Empty column to right. */
+    newright = std::min(maxcol1, newright + 1);  /* Empty column to right. */
 
     /* Expand downwards. */
     newbottom = row + height;
@@ -421,7 +421,7 @@ bounding_box(const AVFrame *img, int imgheight,
             break;
         newbottom++;
     }
-    newbottom = min(maxrow1, newbottom + 1);    /* Empty row on bottom. */
+    newbottom = std::min(maxrow1, newbottom + 1);    /* Empty row on bottom. */
 
     row = newrow;
     col = newcol;
@@ -728,7 +728,7 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
      *
      * Sample half of the program length or 20 minutes, whichever is less.
      */
-    m_sampleTime = min(proglen / 2, 20 * 60);
+    m_sampleTime = std::min(proglen / 2, 20 * 60);
 
     const float fps = player->GetFrameRate();
 
@@ -909,7 +909,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     }
 
     m_nextFrame = frameno + m_frameInterval;
-    *pNextFrame = min(m_endFrame, m_nextFrame);
+    *pNextFrame = std::min(m_endFrame, m_nextFrame);
 
     const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
     if (pgm == nullptr)

@@ -62,7 +62,7 @@ class ClassicCommDetector : public CommDetectorBase
         void requestCommBreakMapUpdate(void) override; // CommDetectorBase
 
         void PrintFullMap(
-            ostream &out, const frm_dir_map_t *comm_breaks,
+            std::ostream &out, const frm_dir_map_t *comm_breaks,
             bool verbose) const override; // CommDetectorBase
 
         void logoDetectorBreathe();

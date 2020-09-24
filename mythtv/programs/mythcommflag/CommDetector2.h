@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QDateTime>
@@ -31,8 +30,8 @@ QString strftimeval(const struct timeval *tv);
 
 };  /* namespace */
 
-using FrameAnalyzerItem = vector<FrameAnalyzer*>;
-using FrameAnalyzerList = vector<FrameAnalyzerItem>;
+using FrameAnalyzerItem = std::vector<FrameAnalyzer*>;
+using FrameAnalyzerList = std::vector<FrameAnalyzerItem>;
 
 class CommDetector2 : public CommDetectorBase
 {
@@ -46,7 +45,7 @@ class CommDetector2 : public CommDetectorBase
     void GetCommercialBreakList(frm_dir_map_t &marks) override; // CommDetectorBase
     void recordingFinished(long long totalFileSize) override; // CommDetectorBase
     void requestCommBreakMapUpdate(void) override; // CommDetectorBase
-    void PrintFullMap(ostream &out, const frm_dir_map_t *comm_breaks,
+    void PrintFullMap(std::ostream &out, const frm_dir_map_t *comm_breaks,
                       bool verbose) const override; // CommDetectorBase
 
   private:

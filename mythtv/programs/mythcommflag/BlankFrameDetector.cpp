@@ -102,11 +102,11 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     }
 
     qsort(blankmedian, nblanks, sizeof(*blankmedian), sort_ascending_uchar);
-    blankno = min(nblanks - 1, (long long)roundf(nblanks * MEDIANPCTILE));
+    blankno = std::min(nblanks - 1, (long long)roundf(nblanks * MEDIANPCTILE));
     uchar maxmedian = blankmedian[blankno];
 
     qsort(blankstddev, nblanks, sizeof(*blankstddev), sort_ascending_float);
-    long long stddevno = min(nblanks - 1, (long long)roundf(nblanks * STDDEVPCTILE));
+    long long stddevno = std::min(nblanks - 1, (long long)roundf(nblanks * STDDEVPCTILE));
     float maxstddev = blankstddev[stddevno];
 
     /* Determine effective percentile ranges (for debugging). */
@@ -597,7 +597,7 @@ BlankFrameDetector::computeForLogoSurplus(
                 /* End of logo break includes beginning of blank-frame break. */
                 overlap = true;
                 m_breakMap.erase(jj);
-                m_breakMap.insert(iibb, max(iiee, jjee) - iibb);
+                m_breakMap.insert(iibb, std::max(iiee, jjee) - iibb);
             }
             else if (jjbb < iibb && iibb < jjee)
             {

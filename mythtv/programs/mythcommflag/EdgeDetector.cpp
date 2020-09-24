@@ -3,7 +3,6 @@
 
 // C++ headers
 #include <algorithm>
-using namespace std;
 
 #include "mythconfig.h"
 
@@ -150,7 +149,7 @@ edge_mark(AVFrame *dst, int dstheight,
         if (sgmsorted[last] != thresholdval)
             last--;
 
-        uint newthresholdval = sgmsorted[min(last + 1, nn - 1)];
+        uint newthresholdval = sgmsorted[std::min(last + 1, nn - 1)];
         if (thresholdval == newthresholdval)
         {
             /* Degenerate case; no edges (e.g., blank frame). */

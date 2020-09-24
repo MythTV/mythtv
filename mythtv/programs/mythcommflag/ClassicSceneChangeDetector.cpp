@@ -1,5 +1,4 @@
 #include <algorithm>
-using namespace std;
 
 #include "ClassicSceneChangeDetector.h"
 #include "Histogram.h"

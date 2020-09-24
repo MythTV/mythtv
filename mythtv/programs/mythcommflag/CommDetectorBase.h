@@ -2,7 +2,6 @@
 #define COMMDETECTOR_BASE_H
 
 #include <iostream>
-using namespace std;
 
 #include <QObject>
 #include <QMap>
@@ -42,7 +41,7 @@ public:
     virtual void requestCommBreakMapUpdate(void) {};
 
     virtual void PrintFullMap(
-        ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const = 0;
+        std::ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const = 0;
 
 signals:
     void statusUpdate(const QString& a) ;

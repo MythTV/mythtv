@@ -10,8 +10,6 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-using namespace std;
-
 // Qt headers
 #include <QCoreApplication>
 #include <QString>
@@ -175,9 +173,9 @@ void ClassicCommDetector::Init()
     m_fps = m_player->GetFrameRate();
 
     m_preRoll  = (long long)(
-        max(int64_t(0), int64_t(m_recordingStartedAt.secsTo(m_startedAt))) * m_fps);
+        std::max(int64_t(0), int64_t(m_recordingStartedAt.secsTo(m_startedAt))) * m_fps);
     m_postRoll = (long long)(
-        max(int64_t(0), int64_t(m_stopsAt.secsTo(m_recordingStopsAt))) * m_fps);
+        std::max(int64_t(0), int64_t(m_stopsAt.secsTo(m_recordingStopsAt))) * m_fps);
 
     // CommDetectBorder's default value of 20 predates the change to use
     // ffmpeg's lowres decoding capability by 5 years.
@@ -326,7 +324,7 @@ bool ClassicCommDetector::go()
         m_logoDetector = new ClassicLogoDetector(this, m_width, m_height,
             logoDetectBorder);
 
-        requiredHeadStart += max(
+        requiredHeadStart += std::max(
             int64_t(0), int64_t(m_recordingStartedAt.secsTo(m_startedAt)));
         requiredHeadStart += m_logoDetector->getRequiredAvailableBufferForSearch();
 
@@ -366,8 +364,8 @@ bool ClassicCommDetector::go()
 
         if (m_showProgress)
         {
-            cerr << "Finding Logo";
-            cerr.flush();
+            std::cerr << "Finding Logo";
+            std::cerr.flush();
         }
         LOG(VB_GENERAL, LOG_INFO, "Finding Logo");
 
@@ -375,9 +373,9 @@ bool ClassicCommDetector::go()
 
         if (m_showProgress)
         {
-            cerr << "\b\b\b\b\b\b\b\b\b\b\b\b            "
-                    "\b\b\b\b\b\b\b\b\b\b\b\b";
-            cerr.flush();
+            std::cerr << "\b\b\b\b\b\b\b\b\b\b\b\b            "
+                         "\b\b\b\b\b\b\b\b\b\b\b\b";
+            std::cerr.flush();
         }
     }
 
@@ -398,9 +396,9 @@ bool ClassicCommDetector::go()
     if (m_showProgress)
     {
         if (myTotalFrames)
-            cerr << "\r  0%/          \r" << flush;
+            std::cerr << "\r  0%/          \r" << std::flush;
         else
-            cerr << "\r     0/        \r" << flush;
+            std::cerr << "\r     0/        \r" << std::flush;
     }
 
 
@@ -520,13 +518,13 @@ bool ClassicCommDetector::go()
                 {
                     QString tmp = QString("\r%1%/%2fps  \r")
                         .arg(percentage, 3).arg((int)flagFPS, 4);
-                    cerr << qPrintable(tmp) << flush;
+                    std::cerr << qPrintable(tmp) << std::flush;
                 }
                 else
                 {
                     QString tmp = QString("\r%1/%2fps  \r")
                         .arg(currentFrameNumber, 6).arg((int)flagFPS, 4);
-                    cerr << qPrintable(tmp) << flush;
+                    std::cerr << qPrintable(tmp) << std::flush;
                 }
             }
 
@@ -598,11 +596,11 @@ bool ClassicCommDetector::go()
 #endif
 
         if (myTotalFrames)
-            cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
+            std::cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
         else
-            cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
-                    "\b\b\b\b\b\b\b\b\b\b\b\b\b";
-        cerr.flush();
+            std::cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
+                         "\b\b\b\b\b\b\b\b\b\b\b\b\b";
+        std::cerr.flush();
     }
 
     return true;
@@ -2519,12 +2517,12 @@ void ClassicCommDetector::logoDetectorBreathe()
 }
 
 void ClassicCommDetector::PrintFullMap(
-    ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const
+    std::ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const
 {
     if (verbose)
     {
         QByteArray tmp = FrameInfoEntry::GetHeader().toLatin1();
-        out << tmp.constData() << " mark" << endl;
+        out << tmp.constData() << " mark" << std::endl;
     }
 
     for (long long i = 1; i < m_curFrameNumber; i++)
@@ -2550,7 +2548,7 @@ void ClassicCommDetector::PrintFullMap(
         out << "\n";
     }
 
-    out << flush;
+    out << std::flush;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

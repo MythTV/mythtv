@@ -318,44 +318,44 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
     if (!m_logoInfoAvailable)
         return;
 
-    cerr << "\nLogo Data ";
+    std::cerr << "\nLogo Data ";
     if (fromCurrentFrame)
-        cerr << "from current frame\n";
+        std::cerr << "from current frame\n";
 
-    cerr << "\n     ";
+    std::cerr << "\n     ";
 
     for(unsigned int x = m_logoMinX - 2; x <= (m_logoMaxX + 2); x++)
-        cerr << (x % 10);
-    cerr << "\n";
+        std::cerr << (x % 10);
+    std::cerr << "\n";
 
     for(unsigned int y = m_logoMinY - 2; y <= (m_logoMaxY + 2); y++)
     {
         QString tmp = QString("%1: ").arg(y, 3);
         QString ba = tmp.toLatin1();
-        cerr << ba.constData();
+        std::cerr << ba.constData();
         for(unsigned int x = m_logoMinX - 2; x <= (m_logoMaxX + 2); x++)
         {
             if (fromCurrentFrame)
             {
-                cerr << scrPixels[framePtr[y * m_width + x] / 50];
+                std::cerr << scrPixels[framePtr[y * m_width + x] / 50];
             }
             else
             {
                 switch (m_logoMask[y * m_width + x])
                 {
                         case 0:
-                        case 2: cerr << " ";
+                        case 2: std::cerr << " ";
                         break;
-                        case 1: cerr << "*";
+                        case 1: std::cerr << "*";
                         break;
-                        case 3: cerr << ".";
+                        case 3: std::cerr << ".";
                         break;
                 }
             }
         }
-        cerr << "\n";
+        std::cerr << "\n";
     }
-    cerr.flush();
+    std::cerr.flush();
 }
 
 

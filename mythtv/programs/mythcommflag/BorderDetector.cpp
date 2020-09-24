@@ -103,16 +103,16 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
      * TUNABLE: Margins to avoid noise at the extreme edges of the signal
      * (VBI?). (Really, just a special case of VERTSLOP and HORIZSLOP, below.)
      */
-    const int               VERTMARGIN = max(2, pgmheight * 1 / 60);
-    const int               HORIZMARGIN = max(2, pgmwidth * 1 / 80);
+    const int               VERTMARGIN = std::max(2, pgmheight * 1 / 60);
+    const int               HORIZMARGIN = std::max(2, pgmwidth * 1 / 80);
 
     /*
      * TUNABLE: Slop to accommodate any jagged letterboxing/pillarboxing edges,
      * or noise between edges and content. (Really, a more general case of
      * VERTMARGIN and HORIZMARGIN, above.)
      */
-    const int               VERTSLOP = max(kMaxLines, pgmheight * 1 / 120);
-    const int               HORIZSLOP = max(kMaxLines, pgmwidth * 1 / 160);
+    const int               VERTSLOP = std::max(kMaxLines, pgmheight * 1 / 120);
+    const int               HORIZSLOP = std::max(kMaxLines, pgmwidth * 1 / 160);
 
     struct timeval start {};
     struct timeval end {};
@@ -153,7 +153,7 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
                     continue;   /* Exclude logo area from analysis. */
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
-                int range = max(maxval, val) - min(minval, val) + 1;
+                int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -177,8 +177,8 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
 found_left:
         if (newcol != saved + 1 + HORIZSLOP)
         {
-            newcol = min(maxcol1, saved + 1 + HORIZSLOP);
-            newwidth = max(0, maxcol1 - newcol);
+            newcol = std::min(maxcol1, saved + 1 + HORIZSLOP);
+            newwidth = std::max(0, maxcol1 - newcol);
             left = true;
         }
 
@@ -205,7 +205,7 @@ found_left:
                     continue;   /* Exclude logo area from analysis. */
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
-                int range = max(maxval, val) - min(minval, val) + 1;
+                int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -229,7 +229,7 @@ found_left:
 found_right:
         if (newwidth != saved - mincol - HORIZSLOP)
         {
-            newwidth = max(0, saved - mincol - HORIZSLOP);
+            newwidth = std::max(0, saved - mincol - HORIZSLOP);
             right = true;
         }
 
@@ -258,7 +258,7 @@ found_right:
                     continue;   /* Exclude logo area from analysis. */
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
-                int range = max(maxval, val) - min(minval, val) + 1;
+                int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -282,8 +282,8 @@ found_right:
 found_top:
         if (newrow != saved + 1 + VERTSLOP)
         {
-            newrow = min(maxrow1, saved + 1 + VERTSLOP);
-            newheight = max(0, maxrow1 - newrow);
+            newrow = std::min(maxrow1, saved + 1 + VERTSLOP);
+            newheight = std::max(0, maxrow1 - newrow);
             top = true;
         }
 
@@ -307,7 +307,7 @@ found_top:
                     continue;   /* Exclude logo area from analysis. */
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
-                int range = max(maxval, val) - min(minval, val) + 1;
+                int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -331,7 +331,7 @@ found_top:
 found_bottom:
         if (newheight != saved - minrow - VERTSLOP)
         {
-            newheight = max(0, saved - minrow - VERTSLOP);
+            newheight = std::max(0, saved - minrow - VERTSLOP);
             bottom = true;
         }
 
