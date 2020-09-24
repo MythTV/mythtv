@@ -4,7 +4,6 @@
 // C++ headers
 #include <deque>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QWaitCondition>
@@ -284,7 +283,7 @@ class Scheduler : public MThread, public MythScheduler
     OpenEndType m_openEnd;
 
     // cache IsSameProgram()
-    using IsSameKey = pair<const RecordingInfo*,const RecordingInfo*>;
+    using IsSameKey = std::pair<const RecordingInfo*,const RecordingInfo*>;
     using IsSameCacheType = QMap<IsSameKey,bool>;
     mutable IsSameCacheType m_cacheIsSameProgram;
     int m_tmLastLog                    {0};

@@ -8,7 +8,6 @@
 #include <list>
 #include <memory>
 #include <thread> // for sleep_for
-using namespace std;
 
 #include "mythconfig.h"
 
@@ -2766,7 +2765,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     const size_t sleep_time = 500;
     const size_t min_tps    = 8 * 1024 * 1024;
     const auto calc_tps     = (size_t) (cards * 1.2 * (22200000LL / 8.0));
-    const size_t tps = max(min_tps, calc_tps);
+    const size_t tps        = std::max(min_tps, calc_tps);
     const auto increment    = (size_t) (tps * (sleep_time * 0.001F));
 
     LOG(VB_FILE, LOG_INFO, LOC +
@@ -5238,7 +5237,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     if (allHosts)
     {
         QMap <QString, bool> backendsCounted;
-        list<PlaybackSock *> localPlaybackList;
+        std::list<PlaybackSock *> localPlaybackList;
 
         m_sockListLock.lockForRead();
 
@@ -5288,7 +5287,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
     // Consolidate hosts sharing storage
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
 
     for (auto it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
@@ -5303,7 +5302,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
-            int bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
+            int bSize = std::max(32, std::max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
             int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
             int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)
@@ -5393,7 +5392,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos,
         "Determining unique filesystems");
     size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12  /*5 seconds*/;
     // safety for NFS mounted dirs
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec);
+    maxWriteFiveSec = std::max((size_t)2048, maxWriteFiveSec);
 
     FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 

@@ -659,9 +659,9 @@ DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
 
     auto *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)infoList.size() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)infoList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)infoList.size() ) : infoList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)infoList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
@@ -998,9 +998,9 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
 
     auto *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recordingList.size() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, (int)recordingList.size() ) : recordingList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)recordingList.size() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
@@ -1062,9 +1062,9 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
 
     auto *pPrograms = new DTC::ProgramList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recordingList.size() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, (int)recordingList.size() ) : recordingList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)recordingList.size() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
@@ -1479,9 +1479,9 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     auto *pRecRules = new DTC::RecRuleList();
 
-    nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)recList.size() ) : 0;
-    nCount        = (nCount > 0) ? min( nCount, (int)recList.size() ) : recList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)recList.size() );
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recList.size() ) : recList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {

@@ -2,7 +2,6 @@
 #define PLAYBACKSOCK_H_
 
 #include <vector>
-using namespace std;
 
 #include <QStringList>
 #include <QDateTime>

@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 #include <QWaitCondition>
 #include <QDateTime>
@@ -22,8 +21,8 @@ class EncoderLink;
 class FileSystemInfo;
 class MainServer;
 
-using pginfolist_t  = vector<ProgramInfo*>;
-using enclinklist_t = vector<EncoderLink*>;
+using pginfolist_t  = std::vector<ProgramInfo*>;
+using enclinklist_t = std::vector<EncoderLink*>;
 
 enum ExpireMethodType {
     emOldestFirst           = 1,

@@ -4,7 +4,6 @@
 // C++ headers
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 class MythBackendCommandLineParser;
 class QString;

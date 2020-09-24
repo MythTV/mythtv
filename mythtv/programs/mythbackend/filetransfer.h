@@ -4,7 +4,6 @@
 // C++ headers
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QMutex>
@@ -58,7 +57,7 @@ class FileTransfer : public ReferenceCounter
     MythSocket     *m_sock              {nullptr};
     bool            m_ateof             {false};
 
-    vector<char>    m_requestBuffer;
+    std::vector<char> m_requestBuffer;
 
     QMutex          m_lock              {QMutex::NonRecursive};
 

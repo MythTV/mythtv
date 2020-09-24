@@ -3,7 +3,6 @@
 
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QReadWriteLock>

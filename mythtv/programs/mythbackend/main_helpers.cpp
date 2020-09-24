@@ -393,14 +393,14 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
                 delete sched;
                 return GENERIC_EXIT_CONNECT_ERROR;
             }
-            cout << "Retrieving Schedule from Master backend.\n";
+            std::cout << "Retrieving Schedule from Master backend.\n";
             sched->FillRecordListFromMaster();
         }
         else
         {
-            cout << "Calculating Schedule from database.\n" <<
-                    "Inputs, Card IDs, and Conflict info may be invalid "
-                    "if you have multiple tuners.\n";
+            std::cout << "Calculating Schedule from database.\n" <<
+                         "Inputs, Card IDs, and Conflict info may be invalid "
+                         "if you have multiple tuners.\n";
             ProgramInfo::CheckProgramIDAuthorities();
             sched->FillRecordListFromDB();
         }
@@ -607,9 +607,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     int     port = gCoreContext->GetBackendServerPort();
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
-        cerr << "No setting found for this machine's BackendServerIP.\n"
-             << "Please run setup on this machine and modify the first page\n"
-             << "of the general settings.\n";
+        std::cerr << "No setting found for this machine's BackendServerIP.\n"
+                  << "Please run setup on this machine and modify the first page\n"
+                  << "of the general settings.\n";
         return GENERIC_EXIT_SETUP_ERROR;
     }
 

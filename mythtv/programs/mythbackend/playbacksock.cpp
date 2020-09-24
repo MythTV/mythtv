@@ -1,8 +1,6 @@
 #include <QStringList>
 #include <utility>
 
-using namespace std;
-
 #include "compat.h"
 #include "playbacksock.h"
 #include "programinfo.h"
