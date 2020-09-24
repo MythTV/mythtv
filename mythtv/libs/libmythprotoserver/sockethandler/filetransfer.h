@@ -4,8 +4,6 @@
 // C++ headers
 #include <cstdint>
 
-using namespace std;
-
 #include <QMutex>
 #include <QString>
 #include <QWaitCondition>
@@ -55,7 +53,7 @@ class FileTransfer : public SocketHandler
     MythMediaBuffer  *m_rbuffer {nullptr};
     bool m_ateof {false};
 
-    vector<char> m_requestBuffer;
+    std::vector<char> m_requestBuffer;
 
     QMutex m_lock {QMutex::NonRecursive};
 

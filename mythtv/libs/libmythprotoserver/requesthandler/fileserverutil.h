@@ -1,8 +1,6 @@
 #ifndef MEDIASERVERUTIL_H_
 #define MEDIASERVERUTIL_H_
 
-using namespace std;
-
 // c++
 #include <utility>
 

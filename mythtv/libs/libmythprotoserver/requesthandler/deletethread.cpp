@@ -2,8 +2,6 @@
 #include <iostream>
 #include <fcntl.h>
 
-using namespace std;
-
 #include <QList>
 #include <QTimer>
 #include <QString>
