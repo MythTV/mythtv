@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <cfloat>
 #include <cstdint>
-using namespace std;
 
 #include "captions/vbi608extractor.h"
 #include "mythlogging.h"
@@ -58,8 +57,8 @@ static float find_clock_diff(const QList<float> &list)
     for (uint i = 1; i < uint(list.size()); i++)
     {
         float diff = list[i] - list[i-1];
-        min_diff = min(diff, min_diff);
-        max_diff = max(diff, max_diff);
+        min_diff = std::min(diff, min_diff);
+        max_diff = std::max(diff, max_diff);
         avg_diff += diff;
     }
     if (list.size() >= 2)
@@ -88,10 +87,10 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // find our threshold
     uint minv = 255;
     for (uint j = width / 8; j < width / 4; j++)
-        minv = min(uint(buf[j]), minv);
+        minv = std::min(uint(buf[j]), minv);
     uint maxv = 0;
     for (uint j = width / 8; j < width / 4; j++)
-        maxv = max(uint(buf[j]), maxv);
+        maxv = std::max(uint(buf[j]), maxv);
     uint avgv = (maxv<minv) ? 0 : minv + ((maxv-minv) / 2);
     if (avgv <= 11)
     {
@@ -100,8 +99,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     }
 
     // get the raw minima and maxima list
-    uint noise_flr_sm = max(uint(0.003 * width), 2U);
-    uint noise_flr_lg = max(uint(0.007 * width), noise_flr_sm+1);
+    uint noise_flr_sm = std::max(uint(0.003 * width), 2U);
+    uint noise_flr_lg = std::max(uint(0.007 * width), noise_flr_sm+1);
     int last_max = -1;
     int last_min = -1;
     for (uint i = 0; i < (width/3); i++)
@@ -144,8 +143,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         for (uint i = 1; i < uint(m_maximas.size()); i++)
         {
             float diff = m_maximas[i] - m_maximas[i-1];
-            min_diff = min(diff, min_diff);
-            max_diff = max(diff, max_diff);
+            min_diff = std::min(diff, min_diff);
+            max_diff = std::max(diff, max_diff);
             avg_diff += diff;
         }
         avg_diff -= min_diff;
@@ -273,7 +272,7 @@ bool VBI608Extractor::ExtractCC(const VideoFrame *picframe, uint max_lines)
         {
             uint maxv = 0;
             for (uint j = 0; j < m_start + 8 * m_rate; j++)
-                maxv = max(uint((y+(i * ypitch))[j]), maxv);
+                maxv = std::max(uint((y+(i * ypitch))[j]), maxv);
             uint avgv = maxv / 2;
 
             if (y[uint(m_start + (0+7) * m_rate)] > avgv ||
@@ -325,7 +324,7 @@ bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
     {
         uint maxv = 0;
         for (uint j = 0; j < m_start + 8 * m_rate; j++)
-            maxv = max(uint(buf[j]), maxv);
+            maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 
         if (buf[uint(m_start + (0+7) * m_rate)] > avgv ||
@@ -355,7 +354,7 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
     {
         uint maxv = 0;
         for (uint j = 0; j < m_start + 8 * m_rate; j++)
-            maxv = max(uint(buf[j]), maxv);
+            maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 
         if (buf[uint(m_start + (0+7) * m_rate)] > avgv ||

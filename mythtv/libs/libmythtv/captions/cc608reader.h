@@ -48,7 +48,7 @@ class CC608Buffer
     }
 
     QMutex             m_lock;
-    vector<CC608Text*> m_buffers;
+    std::vector<CC608Text*> m_buffers;
 };
 
 class CC608StateTracker
@@ -95,7 +95,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
 
   private:
     int Update(unsigned char *inpos);
-    void Update608Text(vector<CC608Text*> *ccbuf,
+    void Update608Text(std::vector<CC608Text*> *ccbuf,
                          int replace = 0, int scroll = 0,
                          bool scroll_prsv = false,
                          int scroll_yoff = 0, int scroll_ymax = 15,

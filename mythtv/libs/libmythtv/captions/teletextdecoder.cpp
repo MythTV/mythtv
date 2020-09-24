@@ -25,8 +25,6 @@ extern "C" {
 #include "vbitext/vt.h"
 }
 
-using namespace std;
-
 #include "osd.h"
 #include "captions/teletextdecoder.h"
 #include "captions/teletextreader.h"

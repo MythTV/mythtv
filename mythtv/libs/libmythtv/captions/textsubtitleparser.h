@@ -10,7 +10,6 @@
 // C++ headers
 #include <cstdint>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QStringList>
@@ -30,7 +29,7 @@ class text_subtitle_t
     QStringList m_textLines;
 };
 
-using TextSubtitleList = vector<text_subtitle_t>;
+using TextSubtitleList = std::vector<text_subtitle_t>;
 
 class TextSubtitles
 {

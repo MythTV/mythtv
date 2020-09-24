@@ -760,7 +760,7 @@ QSize FormattedTextLine::CalcSize(float layoutSpacing) const
     {
         bool isLast = (it + 1 == chunks.constEnd());
         QSize tmp = (*it).CalcSize(layoutSpacing);
-        height = max(height, tmp.height());
+        height = std::max(height, tmp.height());
         width += tmp.width();
         (*it).CalcPadding(isFirst, isLast, leftPadding, rightPadding);
         if (it == chunks.constBegin())
@@ -789,7 +789,7 @@ void FormattedTextSubtitle::Layout(void)
     for (const auto & line : qAsConst(m_lines))
     {
         QSize sz = line.CalcSize(LINE_SPACING);
-        anchor_width = max(anchor_width, sz.width());
+        anchor_width = std::max(anchor_width, sz.width());
         anchor_height += sz.height();
     }
 
@@ -806,8 +806,8 @@ void FormattedTextSubtitle::Layout(void)
         anchor_y -= anchor_height;
 
     // Shift the anchor point back into the safe area if necessary/possible.
-    anchor_y = max(0, min(anchor_y, m_safeArea.height() - anchor_height));
-    anchor_x = max(0, min(anchor_x, m_safeArea.width() - anchor_width));
+    anchor_y = std::max(0, std::min(anchor_y, m_safeArea.height() - anchor_height));
+    anchor_x = std::max(0, std::min(anchor_x, m_safeArea.width() - anchor_width));
 
     m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
 
@@ -1184,7 +1184,7 @@ void FormattedTextSubtitle608::Layout(void)
     // Calculate totalHeight and totalSpace
     for (int i = 0; i < m_lines.size(); i++)
     {
-        m_lines[i].m_yIndent = max(m_lines[i].m_yIndent, prevY); // avoid overlap
+        m_lines[i].m_yIndent = std::max(m_lines[i].m_yIndent, prevY); // avoid overlap
         int y = m_lines[i].m_yIndent;
         if (i == 0)
             firstY = prevY = y;
@@ -1196,7 +1196,7 @@ void FormattedTextSubtitle608::Layout(void)
         totalHeight += height;
     }
     int safeHeight = m_safeArea.height();
-    int overage = min(totalHeight - safeHeight, totalSpace);
+    int overage = std::min(totalHeight - safeHeight, totalSpace);
 
     // Recalculate Y coordinates, applying the shrink factor to space
     // between each line.
@@ -1212,7 +1212,7 @@ void FormattedTextSubtitle608::Layout(void)
     }
 
     // Shift Y coordinates back up into the safe area.
-    int shift = min(firstY, max(0, prevY - safeHeight));
+    int shift = std::min(firstY, std::max(0, prevY - safeHeight));
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_lines.size(); i++)
         m_lines[i].m_yIndent -= shift;
@@ -1297,7 +1297,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
             QString captionText =
                 extract_cc608(text, color, isItalic, isUnderline);
             CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
-                                         kClr[min(max(0, color), 7)]);
+                                         kClr[std::min(std::max(0, color), 7)]);
             FormattedTextChunk chunk(captionText, attr, m_subScreen);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
@@ -1629,8 +1629,8 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
         shadowWidth = abs(shadowOffset.x());
         shadowHeight = abs(shadowOffset.y());
         // Shadow and outline overlap, so don't just add them.
-        shadowWidth = max(shadowWidth, outlineSize);
-        shadowHeight = max(shadowHeight, outlineSize);
+        shadowWidth = std::max(shadowWidth, outlineSize);
+        shadowHeight = std::max(shadowHeight, outlineSize);
     }
     return {shadowWidth + outlineSize, shadowHeight + outlineSize};
 }
@@ -1649,7 +1649,7 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
 #endif
     int height = fm.height() * (1 + PAD_HEIGHT);
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
-        height = max(height, (int)(font->pixelSize() * layoutSpacing));
+        height = std::max(height, (int)(font->pixelSize() * layoutSpacing));
     height += CalcShadowOffsetPadding(mythfont).height();
     return {width, height};
 }

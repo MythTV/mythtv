@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QStringList>
@@ -669,7 +668,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     {
         // calculate UTF-8 encoding length
         tmpbuf = m_ccBuf[mode].toUtf8();
-        len = min(tmpbuf.length(), 255);
+        len = std::min(tmpbuf.length(), 255);
     }
 
     unsigned char *bp = m_rbuf;
@@ -952,7 +951,7 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
     }
 }
 
-QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
+QString CC608Decoder::XDSDecodeString(const std::vector<unsigned char> &buf,
                                       uint start, uint end) const
 {
 #if DEBUG_XDS
@@ -1055,7 +1054,7 @@ QString CC608Decoder::GetProgramName(bool future) const
 QString CC608Decoder::GetProgramType(bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
-    const vector<uint> &program_type = m_xdsProgramType[(future) ? 1 : 0];
+    const std::vector<uint> &program_type = m_xdsProgramType[(future) ? 1 : 0];
     QString tmp = "";
 
     for (size_t i = 0; i < program_type.size(); i++)
@@ -1189,7 +1188,7 @@ bool CC608Decoder::XDSDecode(int field, int b1, int b2)
     return true;
 }
 
-void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
+void CC608Decoder::XDSPacketParse(const std::vector<unsigned char> &xds_buf)
 {
     QMutexLocker locker(&m_xdsLock);
 
@@ -1222,7 +1221,7 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
     }
 }
 
-bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
+bool CC608Decoder::XDSPacketCRC(const std::vector<unsigned char> &xds_buf)
 {
     /* Check the checksum for validity of the packet. */
     int sum = 0;
@@ -1244,7 +1243,7 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
 }
 
 bool CC608Decoder::XDSPacketParseProgram(
-    const vector<unsigned char> &xds_buf, bool future)
+    const std::vector<unsigned char> &xds_buf, bool future)
 {
     bool handled = true;
     int b2 = xds_buf[1];
@@ -1299,7 +1298,7 @@ bool CC608Decoder::XDSPacketParseProgram(
     }
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))
     {
-        vector<uint> program_type;
+        std::vector<uint> program_type;
         for (size_t i = 2; i < xds_buf.size() - 2; i++)
         {
             int cur = xds_buf[i] - 0x20;
@@ -1404,7 +1403,7 @@ bool CC608Decoder::XDSPacketParseProgram(
     return handled;
 }
 
-bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
+bool CC608Decoder::XDSPacketParseChannel(const std::vector<unsigned char> &xds_buf)
 {
     bool handled = true;
 

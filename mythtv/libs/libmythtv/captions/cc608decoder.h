@@ -8,7 +8,6 @@
 
 #include <array>
 #include <vector>
-using namespace std;
 
 #include <QString>
 #include <QMutex>
@@ -78,15 +77,15 @@ class CC608Decoder
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
 
-    QString XDSDecodeString(const vector<unsigned char>&buf,
+    QString XDSDecodeString(const std::vector<unsigned char>&buf,
                             uint start, uint end) const;
     bool XDSDecode(int field, int b1, int b2);
 
-    bool XDSPacketParseProgram(const vector<unsigned char> &xds_buf,
+    bool XDSPacketParseProgram(const std::vector<unsigned char> &xds_buf,
                                bool future);
-    bool XDSPacketParseChannel(const vector<unsigned char> &xds_buf);
-    void XDSPacketParse(const vector<unsigned char> &xds_buf);
-    bool XDSPacketCRC(const vector<unsigned char> &xds_buf);
+    bool XDSPacketParseChannel(const std::vector<unsigned char> &xds_buf);
+    void XDSPacketParse(const std::vector<unsigned char> &xds_buf);
+    bool XDSPacketCRC(const std::vector<unsigned char> &xds_buf);
 
     CC608Input     *m_reader                {nullptr};
 
@@ -136,7 +135,7 @@ class CC608Decoder
     bool            m_wssValid              {false};
 
     int             m_xdsCurService         {-1};
-    std::array<vector<unsigned char>,7> m_xdsBuf;
+    std::array<std::vector<unsigned char>,7> m_xdsBuf;
     uint            m_xdsCrcPassed          {0};
     uint            m_xdsCrcFailed          {0};
 
@@ -144,7 +143,7 @@ class CC608Decoder
     std::array<uint,2> m_xdsRatingSystems   {0};
     std::array<std::array<uint,4>,2> m_xdsRating       {{}};
     std::array<QString,2>            m_xdsProgramName;
-    std::array<vector<uint>,2>       m_xdsProgramType;
+    std::array<std::vector<uint>,2>  m_xdsProgramType;
 
     QString         m_xdsNetCall;
     QString         m_xdsNetName;

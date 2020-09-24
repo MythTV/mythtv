@@ -7,7 +7,6 @@
 #include <array>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // Qt headers
 #include <QString>
@@ -219,8 +218,8 @@ class MTV_PUBLIC CC708Window
                 (m_pen.m_column < m_true_column_count));
     }
     CC708Character &GetCCChar(void) const;
-    vector<CC708String*> GetStrings(void) const;
-    static void DisposeStrings(vector<CC708String*> &strings);
+    std::vector<CC708String*> GetStrings(void) const;
+    static void DisposeStrings(std::vector<CC708String*> &strings);
     QColor GetFillColor(void) const
     {
         QColor fill = CC708CharacterAttribute::ConvertToQColor(m_fill_color);

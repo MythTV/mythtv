@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <algorithm>
-using namespace std;
 
 #include "captions/cc708window.h"
 #include "mythlogging.h"
@@ -190,8 +189,8 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
 
     if (new_rows > m_true_row_count || new_columns > m_true_column_count)
     {
-        new_rows = max(new_rows, m_true_row_count);
-        new_columns = max(new_columns, m_true_column_count);
+        new_rows = std::max(new_rows, m_true_row_count);
+        new_columns = std::max(new_columns, m_true_column_count);
 
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
@@ -282,7 +281,7 @@ CC708Character &CC708Window::GetCCChar(void) const
     return m_text[m_pen.m_row * m_true_column_count + m_pen.m_column];
 }
 
-vector<CC708String*> CC708Window::GetStrings(void) const
+std::vector<CC708String*> CC708Window::GetStrings(void) const
 {
     // Note on implementation.  In many cases, one line will be
     // computed as the concatenation of 3 strings: a prefix of spaces
@@ -303,7 +302,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     // because the spaces are needed for coordinate calculations.)
     QMutexLocker locker(&m_lock);
 
-    vector<CC708String*> list;
+    std::vector<CC708String*> list;
 
     CC708String *cur = nullptr;
 
@@ -374,7 +373,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     return list;
 }
 
-void CC708Window::DisposeStrings(vector<CC708String*> &strings)
+void CC708Window::DisposeStrings(std::vector<CC708String*> &strings)
 {
     while (!strings.empty())
     {
@@ -531,8 +530,8 @@ void CC708Window::IncrPenLocation(void)
     }
     else
     {
-        m_pen.m_column = max(new_column, 0);
-        m_pen.m_row    = max(new_row,    0);
+        m_pen.m_column = std::max(new_column, 0);
+        m_pen.m_row    = std::max(new_row,    0);
     }
     // TODO implement other 2 scroll directions...
 
@@ -574,8 +573,8 @@ void CC708Window::DecrPenLocation(void)
     }
     else
     {
-        m_pen.m_column = max(new_column, 0);
-        m_pen.m_row    = max(new_row,    0);
+        m_pen.m_column = std::max(new_column, 0);
+        m_pen.m_row    = std::max(new_row,    0);
     }
     // TODO implement other 2 scroll directions...
 
@@ -605,10 +604,10 @@ void CC708Window::SetPenLocation(uint row, uint column)
 void CC708Window::LimitPenLocation(void)
 {
     // basic limiting
-    uint max_col   = max((int)m_true_column_count - 1, 0);
-    uint max_row   = max((int)m_true_row_count    - 1, 0);
-    m_pen.m_column = min(m_pen.m_column, max_col);
-    m_pen.m_row    = min(m_pen.m_row,    max_row);
+    uint max_col   = std::max((int)m_true_column_count - 1, 0);
+    uint max_row   = std::max((int)m_true_row_count    - 1, 0);
+    m_pen.m_column = std::min(m_pen.m_column, max_col);
+    m_pen.m_row    = std::min(m_pen.m_row,    max_row);
 }
 
 /***************************************************************************/
