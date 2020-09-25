@@ -205,23 +205,6 @@ int TV::ConfiguredTunerCards(void)
     return count;
 }
 
-static void multi_lock(std::vector<QMutex *> mutex)
-{
-    for (bool success = false; !success;)
-    {
-        success = true;
-        for (uint i = 0; success && (i < mutex.size()); i++)
-        {
-            if (!(success = mutex[i]->tryLock()))
-            {
-                for (uint j = 0; j < i; j++)
-                    mutex[j]->unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            }
-        }
-    }
-}
-
 QMutex* TV::gTVLock = new QMutex();
 TV*     TV::gTV     = nullptr;
 
@@ -989,11 +972,6 @@ TV::TV(void)
     m_sleepTimes.emplace_back(tr("1h30m", "Sleep timer"),  90*60);
     m_sleepTimes.emplace_back(tr("2h",    "Sleep timer"), 120*60);
 
-    m_playerLock.lockForWrite();
-    m_player.push_back(new PlayerContext(kPlayerInUseID));
-    m_playerActive = 0;
-    m_playerLock.unlock();
-
     InitFromDB();
 
 #ifdef Q_OS_ANDROID
@@ -1286,13 +1264,9 @@ TV::~TV(void)
         m_browseHelper = nullptr;
     }
 
-    PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-    while (!m_player.empty())
-    {
-        delete m_player.back();
-        m_player.pop_back();
-    }
-    ReturnPlayerLock(mctx);
+    m_playerLock.lockForWrite();
+    m_playerContext.TeardownPlayer();
+    m_playerLock.unlock();
 
     if (m_browseHelper)
     {
@@ -1324,30 +1298,17 @@ void TV::PlaybackLoop(void)
         if (kState_ChangingState == state)
             continue;
 
-        int count = m_player.size();
-        int errorCount = 0;
-        for (int i = 0; i < count; i++)
+        const PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+        if (m_playerContext.m_player && !m_playerContext.m_player->IsErrored())
         {
-            const PlayerContext *mctx = GetPlayerReadLock(i, __FILE__, __LINE__);
-            if (mctx)
-            {
-                mctx->LockDeletePlayer(__FILE__, __LINE__);
-                if (mctx->m_player && !mctx->m_player->IsErrored())
-                {
-                    mctx->m_player->EventLoop();
-                    mctx->m_player->VideoLoop();
-                }
-                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-                if (mctx->m_errored || !mctx->m_player)
-                    errorCount++;
-            }
-            ReturnPlayerLock(mctx);
+            m_playerContext.m_player->EventLoop();
+            m_playerContext.m_player->VideoLoop();
         }
+        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+        ReturnPlayerLock(mctx);
 
-        // break out of the loop if there are no valid players
-        // or all PlayerContexts are errored
-        if (errorCount == count)
+        if (m_playerContext.m_errored || !m_playerContext.m_player)
             return;
     }
 }
@@ -2083,16 +2044,9 @@ static QString tv_i18n(const QString &msg)
  */
 void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1) -- begin")
-            .arg(find_player_index(ctx)));
-
-    if (!ctx)   // can never happen, but keep coverity happy
-        return;
-
     if (ctx->IsErrored())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Called after fatal error detected.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Called after fatal error detected.");
         return;
     }
 
@@ -2240,18 +2194,12 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 m_lockTimerOn = true;
             }
         }
-
-        if (mctx != ctx)
-            SetActive(ctx, find_player_index(ctx), false);
     }
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
         SET_NEXT();
         RestoreScreenSaver(ctx);
         StopStuff(mctx, ctx, true, true, true);
-
-        if ((mctx != ctx) && (GetPlayer(ctx,-1) == ctx))
-            SetActive(mctx, 0, true);
     }
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingVideo) ||
@@ -2329,10 +2277,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                 ctx->m_player->ResetErrored();
             }
         }
-        else if (mctx != ctx)
-        {
-            SetActive(ctx, find_player_index(ctx), false);
-        }
     }
     else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
              TRANSITION(kState_WatchingVideo, kState_None)       ||
@@ -2344,9 +2288,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         RestoreScreenSaver(ctx);
         StopStuff(mctx, ctx, true, true, false);
-
-        if ((mctx != ctx) && (GetPlayer(ctx,-1) == ctx))
-            SetActive(mctx, 0, true);
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_None))
@@ -2454,10 +2395,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         LOG(VB_GENERAL, LOG_INFO, LOC + "Main UI disabled.");
     }
 
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("(%1) -- end")
-            .arg(find_player_index(ctx)));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + " -- end");
 }
+
 #undef TRANSITION
 #undef SET_NEXT
 #undef SET_LAST
@@ -2527,14 +2467,10 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
 void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
                    bool stopRingBuffer, bool stopPlayer, bool stopRecorder)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG,
-        LOC + QString("For player ctx %1 -- begin")
-            .arg(find_player_index(ctx)));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
 
     emit PlaybackExiting(this);
     m_isEmbedded = false;
-
-    SetActive(mctx, 0, false);
 
     if (ctx->m_buffer)
         ctx->m_buffer->IgnoreWaitStates(true);
@@ -2555,16 +2491,6 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
         }
     }
 
-    if (stopPlayer)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stopping player");
-        if (ctx == mctx)
-        {
-            for (uint i = 1; mctx && (i < m_player.size()); i++)
-                StopStuff(mctx, GetPlayer(mctx,i), true, true, true);
-        }
-    }
-
     if (stopRecorder)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "stopping recorder");
@@ -2573,35 +2499,6 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
-}
-
-void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
-{
-    int ctx_index = find_player_index(ctx);
-
-    QString loc = LOC + QString("player ctx %1")
-        .arg(ctx_index);
-
-    if (!mctx || !ctx || ctx_index < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, loc + "-- error");
-        return;
-    }
-
-    LOG(VB_PLAYBACK, LOG_INFO, loc);
-
-    if (mctx != ctx)
-    {
-        if (ctx->HasPlayer())
-            ctx->SetPlayer(nullptr);
-
-        m_player.erase(m_player.begin() + ctx_index);
-        delete ctx;
-        SetActive(mctx, m_playerActive, false);
-        return;
-    }
-
-    ctx->TeardownPlayer();
 }
 
 void TV::timerEvent(QTimerEvent *te)
@@ -2615,16 +2512,6 @@ void TV::timerEvent(QTimerEvent *te)
         return;
     }
     ReturnPlayerLock(mctx2);
-
-    bool ignore = false;
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        ignore =
-            (!m_stateChangeTimerId.empty() &&
-             m_stateChangeTimerId.find(timer_id) == m_stateChangeTimerId.end());
-    }
-    if (ignore)
-        return; // Always handle state changes first...
 
     bool handled = true;
     if (timer_id == m_lcdTimerId)
@@ -2660,74 +2547,41 @@ void TV::timerEvent(QTimerEvent *te)
         return;
 
     // Check if it matches a stateChangeTimerId
-    PlayerContext *ctx = nullptr;
+    if (timer_id == m_stateChangeTimerId)
     {
-        QMutexLocker locker(&m_timerIdLock);
-        TimerContextMap::iterator it = m_stateChangeTimerId.find(timer_id);
-        if (it != m_stateChangeTimerId.end())
+        KillTimer(m_stateChangeTimerId);
+        m_stateChangeTimerId = 0;
+        PlayerContext* mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        if (!mctx->m_nextState.empty())
         {
-            KillTimer(timer_id);
-            ctx = *it;
-            m_stateChangeTimerId.erase(it);
-        }
-    }
-
-    if (ctx)
-    {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool still_exists = find_player_index(ctx) >= 0;
-
-        while (still_exists && !ctx->m_nextState.empty())
-        {
-            HandleStateChange(mctx, ctx);
-            if ((kState_None  == ctx->GetState() ||
-                 kState_Error == ctx->GetState()) &&
-                ((mctx != ctx) || m_jumpToProgram))
+            HandleStateChange(mctx, mctx);
+            if ((kState_None  == mctx->GetState() || kState_Error == mctx->GetState()) && (m_jumpToProgram))
             {
                 ReturnPlayerLock(mctx);
                 mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-                TeardownPlayer(mctx, ctx);
-                still_exists = false;
+                m_playerContext.TeardownPlayer();
             }
         }
         ReturnPlayerLock(mctx);
-        handled = true;
-    }
-
-    if (handled)
         return;
+    }
 
     // Check if it matches a signalMonitorTimerId
-    ctx = nullptr;
+    if (timer_id == m_signalMonitorTimerId)
     {
-        QMutexLocker locker(&m_timerIdLock);
-        TimerContextMap::iterator it = m_signalMonitorTimerId.find(timer_id);
-        if (it != m_signalMonitorTimerId.end())
-        {
-            KillTimer(timer_id);
-            ctx = *it;
-            m_signalMonitorTimerId.erase(it);
-        }
-    }
-
-    if (ctx)
-    {
+        KillTimer(m_signalMonitorTimerId);
+        m_signalMonitorTimerId = 0;
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool still_exists = find_player_index(ctx) >= 0;
-
-        if (still_exists && !ctx->m_lastSignalMsg.empty())
-        {   // set last signal msg, so we get some feedback...
-            UpdateOSDSignal(ctx, ctx->m_lastSignalMsg);
-            ctx->m_lastSignalMsg.clear();
+        if (!mctx->m_lastSignalMsg.empty())
+        {
+            // set last signal msg, so we get some feedback...
+            UpdateOSDSignal(mctx, mctx->m_lastSignalMsg);
+            mctx->m_lastSignalMsg.clear();
         }
-        UpdateOSDTimeoutMessage(ctx);
-
+        UpdateOSDTimeoutMessage(mctx);
         ReturnPlayerLock(mctx);
-        handled = true;
-    }
-
-    if (handled)
         return;
+    }
 
     // Check if it matches networkControlTimerId
     QString netCmd;
@@ -2968,31 +2822,18 @@ void TV::timerEvent(QTimerEvent *te)
 
     if (timer_id == m_errorRecoveryTimerId)
     {
-        bool error = false;
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-        if (mctx->IsRecorderErrored() ||
-            mctx->IsPlayerErrored() ||
-            mctx->IsErrored())
+        if (mctx->IsRecorderErrored() || mctx->IsPlayerErrored() || mctx->IsErrored())
         {
             SetExitPlayer(true, false);
             ForceNextStateNone(mctx);
-            error = true;
-        }
-
-        for (size_t i = 0; i < m_player.size(); i++)
-        {
-            PlayerContext *ctx2 = GetPlayer(mctx, i);
-            if (error || ctx2->IsErrored())
-                ForceNextStateNone(ctx2);
         }
         ReturnPlayerLock(mctx);
 
         QMutexLocker locker(&m_timerIdLock);
         if (m_errorRecoveryTimerId)
             KillTimer(m_errorRecoveryTimerId);
-        m_errorRecoveryTimerId =
-            StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
+        m_errorRecoveryTimerId = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
     }
 }
 
@@ -3074,13 +2915,13 @@ void TV::KillTimer(int id)
 void TV::ForceNextStateNone(PlayerContext *ctx)
 {
     ctx->ForceNextStateNone();
-    ScheduleStateChange(ctx);
+    ScheduleStateChange();
 }
 
-void TV::ScheduleStateChange(PlayerContext *ctx)
+void TV::ScheduleStateChange()
 {
     QMutexLocker locker(&m_timerIdLock);
-    m_stateChangeTimerId[StartTimer(1, __LINE__)] = ctx;
+    m_stateChangeTimerId = StartTimer(1, __LINE__);
 }
 
 void TV::SetErrored(PlayerContext *ctx)
@@ -3200,27 +3041,17 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
 
     bool is_playing = false;
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    for (uint i = 0; mctx && (i < m_player.size()); i++)
+    if (StateIsPlaying(mctx->GetState()))
     {
-        PlayerContext *ctx = GetPlayer(mctx, i);
-        if (!StateIsPlaying(ctx->GetState()))
-            continue;
-
-        if (ctx->IsPlayerPlaying())
-        {
+        if (mctx->IsPlayerPlaying())
             is_playing = true;
-            continue;
-        }
 
         // If the end of playback is destined to pop up the end of
         // recording delete prompt, then don't exit the player here.
-        if (ctx->GetState() == kState_WatchingPreRecorded &&
-            m_dbEndOfRecExitPrompt && !m_inPlaylist && !m_underNetworkControl)
-            continue;
-
-        ForceNextStateNone(ctx);
-        if (mctx == ctx)
+        if (!(mctx->GetState() == kState_WatchingPreRecorded &&
+             m_dbEndOfRecExitPrompt && !m_inPlaylist && !m_underNetworkControl))
         {
+            ForceNextStateNone(mctx);
             m_endOfRecording = true;
             PrepareToExitPlayer(mctx, __LINE__);
             SetExitPlayer(true, true);
@@ -3231,8 +3062,7 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
     if (is_playing)
     {
         QMutexLocker locker(&m_timerIdLock);
-        m_endOfPlaybackTimerId =
-            StartTimer(kEndOfPlaybackCheckFrequency, __LINE__);
+        m_endOfPlaybackTimerId = StartTimer(kEndOfPlaybackCheckFrequency, __LINE__);
     }
 }
 
@@ -3322,29 +3152,25 @@ void TV::HandlePseudoLiveTVTimerEvent(void)
 
     bool restartTimer = false;
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    for (uint i = 0; mctx && (i < m_player.size()); i++)
+    if (mctx->m_pseudoLiveTVState)
     {
-        PlayerContext *ctx = GetPlayer(mctx, i);
-        if (kPseudoChangeChannel != ctx->m_pseudoLiveTVState)
-            continue;
-
-        if (ctx->InStateChange())
+        if (mctx->InStateChange())
         {
             restartTimer = true;
-            continue;
         }
+        else
+        {
+            LOG(VB_CHANNEL, LOG_INFO, "REC_PROGRAM -- channel change");
 
-        LOG(VB_CHANNEL, LOG_INFO,
-            QString("REC_PROGRAM -- channel change %1").arg(i));
+            uint        chanid  = mctx->m_pseudoLiveTVRec->GetChanID();
+            QString     channum = mctx->m_pseudoLiveTVRec->GetChanNum();
+            StringDeque tmp     = mctx->m_prevChan;
 
-        uint        chanid  = ctx->m_pseudoLiveTVRec->GetChanID();
-        QString     channum = ctx->m_pseudoLiveTVRec->GetChanNum();
-        StringDeque tmp     = ctx->m_prevChan;
-
-        ctx->m_prevChan.clear();
-        ChangeChannel(ctx, chanid, channum);
-        ctx->m_prevChan = tmp;
-        ctx->m_pseudoLiveTVState = kPseudoRecording;
+            mctx->m_prevChan.clear();
+            ChangeChannel(mctx, chanid, channum);
+            mctx->m_prevChan = tmp;
+            mctx->m_pseudoLiveTVState = kPseudoRecording;
+        }
     }
     ReturnPlayerLock(mctx);
 
@@ -3373,26 +3199,11 @@ void TV::HandleSpeedChangeTimerEvent(void)
         m_speedChangeTimerId = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
     }
 
-    bool update_msg = false;
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-    for (uint i = 0; actx && (i < m_player.size()); i++)
-    {
-        PlayerContext *ctx = GetPlayer(actx, i);
-        update_msg |= ctx->HandlePlayerSpeedChangeFFRew() && (ctx == actx);
-    }
-    ReturnPlayerLock(actx);
-
-    actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-    for (uint i = 0; actx && (i < m_player.size()); i++)
-    {
-        PlayerContext *ctx = GetPlayer(actx, i);
-        update_msg |= ctx->HandlePlayerSpeedChangeEOF() && (ctx == actx);
-    }
-
-    if (actx && update_msg)
-    {
+    bool update_msg = actx->HandlePlayerSpeedChangeFFRew();
+    update_msg     |= actx->HandlePlayerSpeedChangeEOF();
+    if (update_msg)
         UpdateOSDSeekMessage(actx, actx->GetPlayMessage(), kOSDTimeout_Med);
-    }
     ReturnPlayerLock(actx);
 }
 
@@ -4513,8 +4324,6 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
             SetExitPlayer(true, true);
         }
-
-        SetActive(ctx, 0, false);
     }
     else if (has_action(ACTION_ENABLEUPMIX, actions))
         EnableUpmix(ctx, true);
@@ -5373,26 +5182,16 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
 }
 
-int TV::find_player_index(const PlayerContext *ctx) const
-{
-    for (size_t i = 0; i < m_player.size(); i++)
-        if (GetPlayer(ctx, i) == ctx)
-            return i;
-    return -1;
-}
-
 bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
                      TVState desiredState)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1, %2) -- begin")
-            .arg(find_player_index(ctx)).arg(StateToString(desiredState)));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1) -- begin").arg(StateToString(desiredState)));
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Elapsed time since TV constructor was called: %1 ms")
-            .arg(m_ctorTime.elapsed()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Elapsed time since TV constructor was called: %1 ms")
+        .arg(m_ctorTime.elapsed()));
 
     bool ok = ctx->CreatePlayer(this, GetMythMainWindow(), desiredState, false);
-    ScheduleStateChange(ctx);
+    ScheduleStateChange();
 
     if (ok)
     {
@@ -5404,102 +5203,10 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Failed to create player."));
     }
 
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1, %2) -- end %4")
-        .arg(find_player_index(ctx)).arg(StateToString(desiredState)).arg((ok) ? "ok" : "error"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1) -- end %2")
+        .arg(StateToString(desiredState)).arg((ok) ? "ok" : "error"));
 
     return ok;
-}
-
-/** \brief Teardown all Player's in preparation for PxP Swap or
- *         change from PIP -> PBP or PBP -> PIP
- */
-vector<long long> TV::TeardownAllPlayers(PlayerContext *lctx)
-{
-    vector<long long> pos;
-    for (size_t i = 0; i < m_player.size(); i++)
-    {
-        const PlayerContext *ctx = GetPlayer(lctx, i);
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        pos.push_back((ctx->m_player) ? ctx->m_player->GetFramesPlayed() : 0);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
-
-    return pos;
-}
-
-/**
-* \brief Recreate Main and PIP windows. Could be either PIP or PBP views.
-*/
-void TV::RestartAllPlayers(PlayerContext *lctx,
-                        const vector<long long> &pos,
-                        MuteState mctx_mute)
-{
-    PlayerContext *mctx = GetPlayer(lctx, 0);
-
-    if (!mctx)
-        return;
-
-    if (mctx->m_buffer) {
-        mctx->m_buffer->Seek(0, SEEK_SET);
-        if (StateIsLiveTV(mctx->GetState()))
-            mctx->m_buffer->Unpause();
-    }
-
-    mctx->SetNoHardwareDecoders(false);
-    bool ok = StartPlayer(mctx, mctx, mctx->GetState());
-
-    if (ok)
-    {
-        mctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (mctx->m_player)
-            mctx->m_player->JumpToFrame(pos[0]);
-        mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Failed to restart new main context (was pip context)");
-        ForceNextStateNone(mctx);
-        return;
-    }
-
-    // If old main player had a kMuteAll | kMuteOff setting,
-    // apply old main player's mute setting to new main player.
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (mctx->m_player && ((kMuteAll == mctx_mute) || (kMuteOff == mctx_mute)))
-        mctx->m_player->SetMuteState(mctx_mute);
-    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
-void TV::RestartMainPlayer(PlayerContext *mctx)
-{
-    if (!mctx)
-        return;
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-    m_lockTimerOn = false;
-
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (!mctx->m_player)
-    {
-        mctx->m_deletePlayerLock.unlock();
-        return;
-    }
-
-//  MuteState mctx_mute = mctx->m_player->GetMuteState();
-    MuteState mctx_mute = kMuteOff; //FOR HACK
-
-    // HACK - FIXME
-    // workaround muted audio when Player is re-created
-    mctx_mute = kMuteOff;
-    // FIXME - end
-    mctx->m_deletePlayerLock.unlock();
-
-    vector<long long> pos = TeardownAllPlayers(mctx);
-    RestartAllPlayers(mctx, pos, mctx_mute);
-    SetActive(mctx, m_playerActive, false);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
 }
 
 void TV::DoPlay(PlayerContext *ctx)
@@ -5582,12 +5289,8 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
             ctx->m_buffer->WaitForPause();
 
         DoPlayerSeek(ctx, time);
-
-        if (showOSD && ctx == m_player[0])
+        if (showOSD)
             UpdateOSDSeekMessage(ctx, tr("Paused"), kOSDTimeout_None);
-        else if (showOSD)
-            UpdateOSDSeekMessage(ctx, tr("Aux Paused"), kOSDTimeout_None);
-
         RestoreScreenSaver(ctx);
     }
     else
@@ -6506,7 +6209,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
                     this, GetMythMainWindow(), ctx->GetState(),
                     false, dummy, muted))
             {
-                ScheduleStateChange(ctx);
+                ScheduleStateChange();
                 ok = true;
                 ctx->PushPreviousChannel();
                 SetSpeedChangeTimer(25, __LINE__);
@@ -7173,7 +6876,7 @@ void TV::ToggleOSD(PlayerContext *ctx, bool includeStatusOSD)
         osdInfo info;
         if (ctx->CalcPlayerSliderPosition(info))
         {
-            info.text["title"] = (paused ? tr("Paused") : tr("Position")) + GetLiveTVIndex(ctx);
+            info.text["title"] = (paused ? tr("Paused") : tr("Position"));
             UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
                             paused ? kOSDTimeout_None : kOSDTimeout_Med);
             SetUpdateOSDPosition(true);
@@ -7295,7 +6998,7 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
     {
         int osdtype = (m_doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
-        info.text["title"] = mesg + GetLiveTVIndex(ctx);
+        info.text["title"] = mesg;
         UpdateOSDStatus(ctx, info, osdtype, timeout);
         SetUpdateOSDPosition(true);
     }
@@ -7326,7 +7029,7 @@ void TV::UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist)
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&m_timerIdLock);
-        m_signalMonitorTimerId[StartTimer(1, __LINE__)] = ctx;
+        m_signalMonitorTimerId = StartTimer(1, __LINE__);
         return;
     }
     ReturnOSDLock(ctx, osd);
@@ -7737,28 +7440,15 @@ void TV::StopEmbedding(void)
     ReturnPlayerLock(ctx);
 }
 
-vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
+bool TV::DoSetPauseState(PlayerContext *lctx, const bool &Pause)
 {
-    vector<bool> was_paused;
-    vector<float> times;
-    for (uint i = 0; lctx && i < m_player.size() && i < pause.size(); i++)
-    {
-        PlayerContext *actx = GetPlayer(lctx, i);
-        if (actx)
-            was_paused.push_back(ContextIsPaused(actx, __FILE__, __LINE__));
-        float time = 0.0F;
-        if (pause[i] ^ was_paused.back())
-            time = DoTogglePauseStart(GetPlayer(lctx,i));
-        times.push_back(time);
-    }
-
-    for (uint i = 0; lctx && i < m_player.size() && i < pause.size(); i++)
-    {
-        if (pause[i] ^ was_paused[i])
-            DoTogglePauseFinish(GetPlayer(lctx,i), times[i], false);
-    }
-
-    return was_paused;
+    bool waspaused = ContextIsPaused(lctx, __FILE__, __LINE__);
+    float time = 0.0F;
+    if (Pause ^ waspaused)
+        time = DoTogglePauseStart(lctx);
+    if (Pause ^ waspaused)
+        DoTogglePauseFinish(lctx, time, false);
+    return waspaused;
 }
 
 void TV::DoEditSchedule(int editType)
@@ -7819,18 +7509,8 @@ void TV::DoEditSchedule(int editType)
     pause_active |= kScheduleProgramFinder == editType;
     pause_active |= !isLiveTV && (!m_dbContinueEmbedded || isNearEnd);
     pause_active |= paused;
-    vector<bool> do_pause;
-    do_pause.insert(do_pause.begin(), 1, !m_player.empty());
-    int actx_index = find_player_index(actx);
-    if (actx_index < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find player index by context");
-        return;
-    }
-    do_pause[static_cast<size_t>(actx_index)] = pause_active;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Pausing player: %1").arg(pause_active));
-
-    m_savedPause = DoSetPauseState(actx, do_pause);
+    m_savedPause = DoSetPauseState(actx, pause_active);
 
     // Resize window to the MythTV GUI size
     MythMainWindow *mwnd = GetMythMainWindow();
@@ -8512,18 +8192,10 @@ void TV::customEvent(QEvent *e)
 
         QString filename = mctx->m_buffer ? mctx->m_buffer->GetFilename() : "";
 
-        if (device && filename.endsWith(device->getDevicePath()) &&
-            (device->getStatus() == MEDIASTAT_OPEN))
+        if (device && filename.endsWith(device->getDevicePath()) && (device->getStatus() == MEDIASTAT_OPEN))
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "DVD has been ejected, exiting playback");
-
-            for (uint i = 0; mctx && (i < m_player.size()); i++)
-            {
-                PlayerContext *ctx = GetPlayer(mctx, i);
-                PrepareToExitPlayer(ctx, __LINE__, kBookmarkAuto);
-            }
-
+            LOG(VB_GENERAL, LOG_NOTICE, "DVD has been ejected, exiting playback");
+            PrepareToExitPlayer(mctx, __LINE__, kBookmarkAuto);
             SetExitPlayer(true, true);
         }
         ReturnPlayerLock(mctx);
@@ -8639,40 +8311,36 @@ void TV::customEvent(QEvent *e)
         }
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
+        if (mctx->GetState() == kState_WatchingRecording)
         {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            if (ctx->GetState() == kState_WatchingRecording)
+            if (mctx->m_recorder && (cardnum == mctx->GetCardID()))
             {
-                if (ctx->m_recorder && (cardnum == ctx->GetCardID()))
+                mctx->LockDeletePlayer(__FILE__, __LINE__);
+                if (mctx->m_player)
                 {
-                    ctx->LockDeletePlayer(__FILE__, __LINE__);
-                    if (ctx->m_player)
-                    {
-                        ctx->m_player->SetWatchingRecording(false);
-                        if (seconds > 0)
-                            ctx->m_player->SetLength(seconds);
-                    }
-                    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+                    mctx->m_player->SetWatchingRecording(false);
+                    if (seconds > 0)
+                        mctx->m_player->SetLength(seconds);
+                }
+                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
-                    ctx->ChangeState(kState_WatchingPreRecorded);
-                    ScheduleStateChange(ctx);
-                }
+                mctx->ChangeState(kState_WatchingPreRecorded);
+                ScheduleStateChange();
             }
-            else if (StateIsLiveTV(ctx->GetState()))
+        }
+        else if (StateIsLiveTV(mctx->GetState()))
+        {
+            if (mctx->m_recorder && cardnum == mctx->GetCardID() &&
+                mctx->m_tvchain && mctx->m_tvchain->HasNext())
             {
-                if (ctx->m_recorder && cardnum == ctx->GetCardID() &&
-                    ctx->m_tvchain && ctx->m_tvchain->HasNext())
+                mctx->LockDeletePlayer(__FILE__, __LINE__);
+                if (mctx->m_player)
                 {
-                    ctx->LockDeletePlayer(__FILE__, __LINE__);
-                    if (ctx->m_player)
-                    {
-                        ctx->m_player->SetWatchingRecording(false);
-                        if (seconds > 0)
-                            ctx->m_player->SetLength(seconds);
-                    }
-                    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+                    mctx->m_player->SetWatchingRecording(false);
+                    if (seconds > 0)
+                        mctx->m_player->SetLength(seconds);
                 }
+                mctx->UnlockDeletePlayer(__FILE__, __LINE__);
             }
         }
         ReturnPlayerLock(mctx);
@@ -8706,36 +8374,12 @@ void TV::customEvent(QEvent *e)
         cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
 
         PlayerContext *mctx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-        int match = -1;
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
+        bool match = mctx->GetCardID() == cardnum;
+        if (match && mctx->m_recorder)
         {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            match = (ctx->GetCardID() == cardnum) ? i : match;
-        }
-
-        if (match >= 0 && GetPlayer(mctx, match)->m_recorder)
-        {
-            if (0 == match)
-            {
-                for (uint i = 1; mctx && (i < m_player.size()); i++)
-                {
-                    PlayerContext *ctx = GetPlayer(mctx, i);
-                    if (ctx->m_recorder && (ctx->GetCardID() == cardnum))
-                    {
-                        LOG(VB_GENERAL, LOG_INFO, LOC +
-                            "Disabling PiP for QUIT_LIVETV");
-                        StopStuff(mctx, ctx, true, true, true);
-                    }
-                }
-                SetLastProgram(nullptr);
-                m_jumpToProgram = true;
-                SetExitPlayer(true, false);
-            }
-            else
-            {
-                PlayerContext *ctx = GetPlayer(mctx, match);
-                StopStuff(mctx, ctx, true, true, true);
-            }
+            SetLastProgram(nullptr);
+            m_jumpToProgram = true;
+            SetExitPlayer(true, false);
         }
         ReturnPlayerLock(mctx);
     }
@@ -8750,23 +8394,14 @@ void TV::customEvent(QEvent *e)
         }
 
         PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-        int match = -1;
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            match = (ctx->GetCardID() == cardnum) ? i : match;
-        }
-
-        if (match >= 0)
+        if (mctx->GetCardID() == cardnum)
         {
             if (watch)
             {
                 ProgramInfo pi(me->ExtraDataList());
                 if (pi.HasPathname() || pi.GetChanID())
                 {
-                    PlayerContext *ctx = GetPlayer(mctx, match);
-                    ctx->SetPseudoLiveTV(&pi, kPseudoChangeChannel);
-
+                    mctx->SetPseudoLiveTV(&pi, kPseudoChangeChannel);
                     QMutexLocker locker(&m_timerIdLock);
                     if (!m_pseudoChangeChanTimerId)
                         m_pseudoChangeChanTimerId = StartTimer(0, __LINE__);
@@ -8774,8 +8409,7 @@ void TV::customEvent(QEvent *e)
             }
             else
             {
-                PlayerContext *ctx = GetPlayer(mctx, match);
-                ctx->SetPseudoLiveTV(nullptr, kPseudoNormalLiveTV);
+                mctx->SetPseudoLiveTV(nullptr, kPseudoNormalLiveTV);
             }
         }
         ReturnPlayerLock(mctx);
@@ -8788,30 +8422,17 @@ void TV::customEvent(QEvent *e)
             id = tokens[2];
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            if (ctx->m_tvchain && ctx->m_tvchain->GetID() == id &&
-                find_player_index(ctx) >= 0)
-            {
-                ctx->UpdateTVChain(me->ExtraDataList());
-                break;
-            }
-        }
+        if (mctx->m_tvchain && mctx->m_tvchain->GetID() == id)
+            mctx->UpdateTVChain(me->ExtraDataList());
         ReturnPlayerLock(mctx);
     }
 
     if (message.startsWith("EXIT_TO_MENU"))
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            PrepareToExitPlayer(ctx, __LINE__);
-        }
-
+        PrepareToExitPlayer(mctx, __LINE__);
         SetExitPlayer(true, true);
-        if (mctx && mctx->m_player)
+        if (mctx->m_player)
             mctx->m_player->DisableEdit(-1);
         ReturnPlayerLock(mctx);
     }
@@ -8825,15 +8446,10 @@ void TV::customEvent(QEvent *e)
         OSD *osd = GetOSDLock(mctx);
         if (osd)
         {
-            for (uint i = 0; mctx && (i < m_player.size()); i++)
+            if (mctx->m_recorder && (mctx->GetCardID() == cardnum) && !signalList.empty())
             {
-                PlayerContext *ctx = GetPlayer(mctx, i);
-                bool tc = ctx->m_recorder && (ctx->GetCardID() == cardnum);
-                if (tc && !signalList.empty())
-                {
-                    UpdateOSDSignal(ctx, signalList);
-                    UpdateOSDTimeoutMessage(ctx);
-                }
+                UpdateOSDSignal(mctx, signalList);
+                UpdateOSDTimeoutMessage(mctx);
             }
         }
         ReturnOSDLock(mctx, osd);
@@ -8894,7 +8510,8 @@ void TV::customEvent(QEvent *e)
         if (!m_dbUseVideoModes)
             mwnd->MoveResize(m_playerBounds);
 
-        DoSetPauseState(actx, m_savedPause); // Restore pause states
+        // Restore pause
+        DoSetPauseState(actx, m_savedPause);
 
         if (!m_weDisabledGUI)
         {
@@ -8925,22 +8542,17 @@ void TV::customEvent(QEvent *e)
         ProgramInfo::ExtractKey(tokens[1], evchanid, evrecstartts);
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && (i < m_player.size()); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            ctx->LockPlayingInfo(__FILE__, __LINE__);
-            bool doit =
-                ((ctx->m_playingInfo) &&
-                 (ctx->m_playingInfo->GetChanID()             == evchanid) &&
-                 (ctx->m_playingInfo->GetRecordingStartTime() == evrecstartts));
-            ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        mctx->LockPlayingInfo(__FILE__, __LINE__);
+        bool doit = ((mctx->m_playingInfo) &&
+                     (mctx->m_playingInfo->GetChanID() == evchanid) &&
+                     (mctx->m_playingInfo->GetRecordingStartTime() == evrecstartts));
+        mctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-            if (doit)
-            {
-                QString msg = "COMMFLAG_REQUEST ";
-                msg += ProgramInfo::MakeUniqueKey(evchanid, evrecstartts);
-                gCoreContext->SendMessage(msg);
-            }
+        if (doit)
+        {
+            QString msg = "COMMFLAG_REQUEST ";
+            msg += ProgramInfo::MakeUniqueKey(evchanid, evrecstartts);
+            gCoreContext->SendMessage(msg);
         }
         ReturnPlayerLock(mctx);
     }
@@ -8952,44 +8564,39 @@ void TV::customEvent(QEvent *e)
         ProgramInfo::ExtractKey(tokens[1], evchanid, evrecstartts);
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        for (uint i = 0; mctx && evchanid && (i < m_player.size()); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            ctx->LockPlayingInfo(__FILE__, __LINE__);
-            bool doit =
-                ((ctx->m_playingInfo) &&
-                 (ctx->m_playingInfo->GetChanID()             == evchanid) &&
-                 (ctx->m_playingInfo->GetRecordingStartTime() == evrecstartts));
-            ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        mctx->LockPlayingInfo(__FILE__, __LINE__);
+        bool doit = ((mctx->m_playingInfo) &&
+                     (mctx->m_playingInfo->GetChanID() == evchanid) &&
+                     (mctx->m_playingInfo->GetRecordingStartTime() == evrecstartts));
+        mctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-            if (doit)
+        if (doit)
+        {
+            frm_dir_map_t newMap;
+            QStringList mark;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+            QStringList marks =
+                tokens[2].split(",", QString::SkipEmptyParts);
+#else
+            QStringList marks = tokens[2].split(",", Qt::SkipEmptyParts);
+#endif
+            for (uint j = 0; j < (uint)marks.size(); j++)
             {
-                frm_dir_map_t newMap;
-                QStringList mark;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList marks =
-                    tokens[2].split(",", QString::SkipEmptyParts);
+                mark = marks[j].split(":", QString::SkipEmptyParts);
 #else
-                QStringList marks = tokens[2].split(",", Qt::SkipEmptyParts);
+                mark = marks[j].split(":", Qt::SkipEmptyParts);
 #endif
-                for (uint j = 0; j < (uint)marks.size(); j++)
+                if (marks.size() >= 2)
                 {
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                    mark = marks[j].split(":", QString::SkipEmptyParts);
-#else
-                    mark = marks[j].split(":", Qt::SkipEmptyParts);
-#endif
-                    if (marks.size() >= 2)
-                    {
-                        newMap[mark[0].toLongLong()] =
-                            (MarkTypes) mark[1].toInt();
-                    }
+                    newMap[mark[0].toLongLong()] =
+                        (MarkTypes) mark[1].toInt();
                 }
-                ctx->LockDeletePlayer(__FILE__, __LINE__);
-                if (ctx->m_player)
-                    ctx->m_player->SetCommBreakMap(newMap);
-                ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             }
+            mctx->LockDeletePlayer(__FILE__, __LINE__);
+            if (mctx->m_player)
+                mctx->m_player->SetCommBreakMap(newMap);
+            mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
         ReturnPlayerLock(mctx);
     }
@@ -9255,28 +8862,6 @@ void TV::DoChangePictureAttribute(
                     kOSDFunctionalType_PictureAdjust, "%",
                     value * 10, kOSDTimeout_Med);
     SetUpdateOSDPosition(false);
-}
-
-void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
-{
-    if (!lctx)
-        return;
-
-    int new_index = (index < 0) ? (m_playerActive+1) % m_player.size() : index;
-    new_index = ((uint)new_index >= m_player.size()) ? 0 : new_index;
-
-    QString loc = LOC + QString("(%1,%2) %3 -> %4")
-        .arg(index).arg((osd_msg) ? "with OSD" : "w/o OSD")
-        .arg(m_playerActive).arg(new_index);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, loc + " -- begin");
-
-    for (size_t i = 0; i < m_player.size(); i++)
-        ClearOSD(GetPlayer(lctx,i));
-
-    m_playerActive = new_index;
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, loc + " -- end");
 }
 
 void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
@@ -11606,9 +11191,6 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
  */
 void TV::PauseLiveTV(PlayerContext *ctx)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("player ctx %1")
-            .arg(find_player_index(ctx)));
-
     m_lockTimerOn = false;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -11646,9 +11228,6 @@ void TV::PauseLiveTV(PlayerContext *ctx)
  */
 void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
 {
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("player ctx %1")
-            .arg(find_player_index(ctx)));
-
     if (ctx->HasPlayer() && ctx->m_tvchain)
     {
         ctx->ReloadTVChain();
@@ -12097,7 +11676,7 @@ void TV::HandleSaveLastPlayPosEvent(void)
     // before or while the background thread runs.
     class PositionSaver : public QRunnable
     {
-    public:
+      public:
         PositionSaver(const ProgramInfo &pginfo, uint64_t frame) :
             m_pginfo(pginfo), m_frame(frame) {}
         void run(void) override // QRunnable
@@ -12109,26 +11688,21 @@ void TV::HandleSaveLastPlayPosEvent(void)
             m_pginfo.ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
             m_pginfo.SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
         }
-    private:
+      private:
         const ProgramInfo m_pginfo;
         const uint64_t m_frame;
     };
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    for (uint i = 0; mctx && i < m_player.size(); ++i)
+    mctx->LockDeletePlayer(__FILE__, __LINE__);
+    bool playing = mctx->m_player && !mctx->m_player->IsPaused();
+    // Don't bother saving lastplaypos while paused
+    if (playing)
     {
-        PlayerContext *ctx = GetPlayer(mctx, i);
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        bool playing = ctx->m_player && !ctx->m_player->IsPaused();
-        if (playing) // Don't bother saving lastplaypos while paused
-        {
-            uint64_t framesPlayed = ctx->m_player->GetFramesPlayed();
-            MThreadPool::globalInstance()->
-                start(new PositionSaver(*ctx->m_playingInfo, framesPlayed),
-                      "PositionSaver");
-        }
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        uint64_t framesPlayed = mctx->m_player->GetFramesPlayed();
+        MThreadPool::globalInstance()->start(new PositionSaver(*mctx->m_playingInfo, framesPlayed), "PositionSaver");
     }
+    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock(mctx);
 
     QMutexLocker locker(&m_timerIdLock);
@@ -12257,104 +11831,40 @@ void TV::ReturnOSDLock(const PlayerContext *ctx, OSD *&osd)
 PlayerContext *TV::GetPlayerWriteLock(int which, const char *file, int location)
 {
     m_playerLock.lockForWrite();
-
-    if ((which >= (int)m_player.size()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("(%1,%2,%3) returning nullptr size(%4)")
-                .arg(which).arg(file).arg(location).arg(m_player.size()));
-        return nullptr;
-    }
-
-    return (which < 0) ? m_player[m_playerActive] : m_player[which];
+    return &m_playerContext;
 }
 
 PlayerContext *TV::GetPlayerReadLock(int which, const char *file, int location)
 {
     m_playerLock.lockForRead();
-
-    if ((which >= (int)m_player.size()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("(%1,%2,%3) returning nullptr size(%4)")
-                .arg(which).arg(file).arg(location).arg(m_player.size()));
-        return nullptr;
-    }
-
-    return (which < 0) ? m_player[m_playerActive] : m_player[which];
+    return &m_playerContext;
 }
 
-const PlayerContext *TV::GetPlayerReadLock(
-    int which, const char *file, int location) const
+const PlayerContext *TV::GetPlayerReadLock(int which, const char *file, int location) const
 {
     m_playerLock.lockForRead();
-
-    if ((which >= (int)m_player.size()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("(%1,%2,%3) returning nullptr size(%4)")
-                .arg(which).arg(file).arg(location).arg(m_player.size()));
-        return nullptr;
-    }
-
-    return (which < 0) ? m_player[m_playerActive] : m_player[which];
+    return &m_playerContext;
 }
 
-PlayerContext *TV::GetPlayerHaveLock(
-    PlayerContext *locked_context,
-    int which, const char *file, int location)
+PlayerContext *TV::GetPlayerHaveLock(PlayerContext *locked_context, int which, const char *file, int location)
 {
-    if (!locked_context || (which >= (int)m_player.size()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("(0x%1,%2,%3,%4) returning nullptr size(%5)")
-                .arg((uint64_t)locked_context, 0, 16)
-                .arg(which).arg(file).arg(location).arg(m_player.size()));
-        return nullptr;
-    }
-
-    return (which < 0) ? m_player[m_playerActive] : m_player[which];
+    return &m_playerContext;
 }
 
-const PlayerContext *TV::GetPlayerHaveLock(
-    const PlayerContext *locked_context,
-    int which, const char *file, int location) const
+const PlayerContext *TV::GetPlayerHaveLock(const PlayerContext *locked_context, int which, const char *file, int location) const
 {
-    if (!locked_context || (which >= (int)m_player.size()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("(0x%1,%2,%3,%4) returning nullptr size(%5)")
-                .arg((uint64_t)locked_context, 0, 16)
-                .arg(which).arg(file).arg(location).arg(m_player.size()));
-        return nullptr;
-    }
-
-    return (which < 0) ? m_player[m_playerActive] : m_player[which];
+    return &m_playerContext;
 }
 
-void TV::ReturnPlayerLock(PlayerContext *&ctx)
+void TV::ReturnPlayerLock(PlayerContext *ctx)
 {
     m_playerLock.unlock();
-    ctx = nullptr;
 }
 
-void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
+void TV::ReturnPlayerLock(const PlayerContext *ctx) const
 {
+    LOG(VB_GENERAL, LOG_INFO, "unlock");
     m_playerLock.unlock();
-    ctx = nullptr;
-}
-
-QString TV::GetLiveTVIndex(const PlayerContext *ctx)
-{
-#ifdef DEBUG_LIVETV_TRANSITION
-    return (ctx->m_tvchain ?
-            QString(" (%1/%2)")
-                .arg(ctx->m_tvchain->GetCurPos())
-                .arg(ctx->m_tvchain->TotalSize()) : QString());
-#else
-    (void)ctx;
-    return QString();
-#endif
 }
 
 void TV::onApplicationStateChange(Qt::ApplicationState state)
@@ -12371,5 +11881,3 @@ void TV::onApplicationStateChange(Qt::ApplicationState state)
             break;
     }
 }
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */

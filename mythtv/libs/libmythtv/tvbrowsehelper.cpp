@@ -504,45 +504,40 @@ void TVBrowseHelper::run()
         infoMap["chanid"]      = QString::number(m_chanId);
 
         m_tv->GetPlayerReadLock(0,__FILE__,__LINE__);
-        bool still_there = false;
-        for (uint i = 0; i < m_tv->m_player.size() && !still_there; i++)
-            still_there |= (ctx == m_tv->m_player[i]);
-        if (still_there)
+
+        if (!m_dbBrowseAllTuners)
         {
-            if (!m_dbBrowseAllTuners)
+            GetNextProgram(direction, infoMap);
+        }
+        else
+        {
+            if (!chanids.empty())
             {
-                GetNextProgram(direction, infoMap);
+                for (uint chanid : chanids)
+                {
+                    if (TV::IsTunable(ctx, chanid))
+                    {
+                        infoMap["chanid"] = QString::number(chanid);
+                        GetNextProgramDB(direction, infoMap);
+                        break;
+                    }
+                }
             }
             else
             {
-                if (!chanids.empty())
+                uint orig_chanid = infoMap["chanid"].toUInt();
+                GetNextProgramDB(direction, infoMap);
+                while (!TV::IsTunable(ctx, infoMap["chanid"].toUInt()) &&
+                       (infoMap["chanid"].toUInt() != orig_chanid))
                 {
-                    for (uint chanid : chanids)
-                    {
-                        if (TV::IsTunable(ctx, chanid))
-                        {
-                            infoMap["chanid"] = QString::number(chanid);
-                            GetNextProgramDB(direction, infoMap);
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    uint orig_chanid = infoMap["chanid"].toUInt();
                     GetNextProgramDB(direction, infoMap);
-                    while (!TV::IsTunable(ctx, infoMap["chanid"].toUInt()) &&
-                           (infoMap["chanid"].toUInt() != orig_chanid))
-                    {
-                        GetNextProgramDB(direction, infoMap);
-                    }
                 }
             }
         }
         m_tv->ReturnPlayerLock(ctx);
 
         m_lock.lock();
-        if (!m_ctx && !still_there)
+        if (!m_ctx)
             continue;
 
         m_chanNum = infoMap["channum"];
@@ -576,10 +571,7 @@ void TVBrowseHelper::run()
 
         m_lock.lock();
         if (m_ctx)
-        {
-            QCoreApplication::postEvent(
-                m_tv, new UpdateBrowseInfoEvent(infoMap));
-        }
+            QCoreApplication::postEvent(m_tv, new UpdateBrowseInfoEvent(infoMap));
     }
     RunEpilog();
 }

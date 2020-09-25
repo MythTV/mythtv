@@ -31,6 +31,7 @@ using namespace std;
 #include "channelgroup.h"
 #include "mythtimer.h"
 #include "osd.h"
+#include "playercontext.h"
 #include "decoders/decoderbase.h"
 #include "mythmiscutil.h"
 
@@ -46,7 +47,6 @@ class MythPlayer;
 class DetectLetterbox;
 class MythMediaBuffer;
 class ProgramInfo;
-class PlayerContext;
 class TvPlayWindow;
 class TV;
 class TVBrowseHelper;
@@ -441,8 +441,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     const PlayerContext *GetPlayerHaveLock(
         const PlayerContext *locked_context,
         int which, const char *file, int location) const;
-    void ReturnPlayerLock(PlayerContext *&ctx);
-    void ReturnPlayerLock(const PlayerContext *&ctx) const;
+    void ReturnPlayerLock(PlayerContext *ctx);
+    void ReturnPlayerLock(const PlayerContext *ctx) const;
 
     // Other toggles
     void ToggleAutoExpire(PlayerContext *ctx);
@@ -458,7 +458,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void HandleStateChange(PlayerContext *mctx, PlayerContext *ctx);
     void GetStatus(void);
     void ForceNextStateNone(PlayerContext *ctx);
-    void ScheduleStateChange(PlayerContext *ctx);
+    void ScheduleStateChange();
     void SetErrored(PlayerContext *ctx);
     void setInPlayList(bool setting) { m_inPlaylist = setting; }
     void setUnderNetworkControl(bool setting) { m_underNetworkControl = setting; }
@@ -480,17 +480,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool StartRecorder(PlayerContext *ctx, int maxWait=-1);
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
                    bool stopRingBuffer, bool stopPlayer, bool stopRecorder);
-    void TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx);
-
-
     bool StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
                      TVState desiredState);
-
-    vector<long long> TeardownAllPlayers(PlayerContext *lctx);
-    void RestartAllPlayers(PlayerContext *lctx,
-                           const vector<long long> &pos,
-                           MuteState mctx_mute);
-    void RestartMainPlayer(PlayerContext *mctx);
 
     /// Returns true if we are currently in the process of switching recorders.
     bool IsSwitchingCards(void)  const { return m_switchToRec; }
@@ -543,7 +534,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     float DoTogglePauseStart(PlayerContext *ctx);
     void DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD);
     void DoTogglePause(PlayerContext *ctx, bool showOSD);
-    vector<bool> DoSetPauseState(PlayerContext *lctx, const vector<bool>&pause);
+    bool DoSetPauseState(PlayerContext *lctx, const bool& Pause);
     static bool ContextIsPaused(PlayerContext *ctx, const char *file, int location);
 
     // Program jumping stuff
@@ -753,10 +744,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static TVState RemoveRecording(TVState state);
     void RestoreScreenSaver(const PlayerContext *ctx);
 
-    // for temp debugging only..
-    int find_player_index(const PlayerContext *ctx) const;
-    static QString GetLiveTVIndex(const PlayerContext *ctx);
-
   private:
     // Configuration variables from database
     QString           m_baseFilters;
@@ -886,9 +873,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool         m_jumpToProgram {false};
 
     // Video Players
-    vector<PlayerContext*>  m_player;
-    /// Video Player to which events are sent to
-    int                     m_playerActive {-1};
+    PlayerContext           m_playerContext { kPlayerInUseID };
     /// lock on player and playerActive changes
     mutable QReadWriteLock  m_playerLock;
 
@@ -918,7 +903,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // embedded and suspended status
     bool         m_isEmbedded {false};       ///< are we currently embedded
     bool         m_ignoreKeyPresses {false}; ///< should we ignore keypresses
-    vector<bool> m_savedPause;      ///< saved pause state before embedding
+    bool         m_savedPause;               ///< saved pause state before embedding
 
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.
@@ -932,8 +917,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     MythDeque<QString> m_networkControlCommands;
 
     // Timers
-    using TimerContextMap      = QMap<int,PlayerContext*>;
-    using TimerContextConstMap = QMap<int,const PlayerContext*>;
     mutable QMutex       m_timerIdLock;
     volatile int         m_lcdTimerId              {0};
     volatile int         m_lcdVolumeTimerId        {0};
@@ -955,8 +938,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_errorRecoveryTimerId    {0};
     mutable volatile int m_exitPlayerTimerId       {0};
     volatile int         m_saveLastPlayPosTimerId  {0};
-    TimerContextMap      m_stateChangeTimerId;
-    TimerContextMap      m_signalMonitorTimerId;
+    volatile int         m_stateChangeTimerId      {0};
+    volatile int         m_signalMonitorTimerId    {0};
 
     // Playback menu state caching
     PlayerContext *m_tvmCtx {nullptr};
