@@ -149,6 +149,7 @@
     static inline long int random(void)
         { return QRandomGenerator::global()->generate64(); }
 #else
+    // cppcheck-suppress qsrandCalled
     static inline void srandom(unsigned int seed) { qsrand(seed); }
     static inline long int random(void) { return qrand(); }
 #endif

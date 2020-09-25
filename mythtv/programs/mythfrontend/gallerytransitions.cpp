@@ -414,6 +414,7 @@ void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
     int rand = QRandomGenerator::global()->bounded(m_peers.size());
 #else
+    // cppcheck-suppress qrandCalled
     int rand = qrand() % m_peers.size();
 #endif
     m_current = m_peers[rand];

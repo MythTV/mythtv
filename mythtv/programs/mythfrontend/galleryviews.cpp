@@ -251,6 +251,7 @@ void FlatView::Populate(ImageList &files)
             rands.resize(files.size());
             QRandomGenerator::global()->fillRange(rands.data(), rands.size());
 #else
+            // cppcheck-suppress qsrandCalled
             qsrand(QTime::currentTime().msec());
 #endif
             // An image is not a valid candidate for its successor
@@ -261,6 +262,7 @@ void FlatView::Populate(ImageList &files)
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
                 int rand = rands[count] % range;
 #else
+                // cppcheck-suppress qrandCalled
                 int rand = qrand() % range;
 #endif
                 // Avoid consecutive repeats
@@ -276,6 +278,7 @@ void FlatView::Populate(ImageList &files)
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
             auto *randgen = QRandomGenerator::global();
 #else
+            // cppcheck-suppress qsrandCalled
             qsrand(QTime::currentTime().msec());
 #endif
             for (int count = 0; count < files.size(); ++count)
@@ -284,6 +287,7 @@ void FlatView::Populate(ImageList &files)
                 // generateDouble() returns in the range [0, 1)
                 double randWeight = randgen->generateDouble() * maxWeight;
 #else
+                // cppcheck-suppress qrandCalled
                 double randWeight = qrand() * maxWeight / RAND_MAX;
 #endif
                 WeightList::iterator it =
