@@ -30,7 +30,7 @@ class LogScale
         delete [] m_indices;
 
         auto domain = (long double) maxscale;
-        auto range  = (long double) maxrange;
+        auto drange  = (long double) maxrange;
         long double x  = 1.0;
         long double dx = 1.0;
         long double e4 = 1.0E-8;
@@ -43,7 +43,7 @@ class LogScale
         for (uint i = 0; i < 10000 && (std::abs(dx) > e4); i++)
         {
             long double t = std::log((domain + x) / x);
-            long double y = (x * t) - range;
+            long double y = (x * t) - drange;
             long double yy = t - (domain / (x + domain));
             dx = y / yy;
             x -= dx;

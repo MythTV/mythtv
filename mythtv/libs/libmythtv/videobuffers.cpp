@@ -1099,7 +1099,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
     init(Frame, Type, buf, Width, Height, static_cast<int>(size));
     // retain deinterlacer settings and update restrictions based on new frame type
     SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
-    clear(Frame);
+    clear_vf(Frame);
     return true;
 }
 
@@ -1156,7 +1156,7 @@ QString VideoBuffers::GetStatus(uint Num) const
 
 void VideoBuffers::Clear(uint FrameNum)
 {
-    clear(At(FrameNum));
+    clear_vf(At(FrameNum));
 }
 
 void VideoBuffers::Clear(void)

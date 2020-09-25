@@ -8364,7 +8364,7 @@ PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, MythPlayer *P
                kPictureAttributeSupported_Hue);
     }
 
-    return ::next(static_cast<PictureAttributeSupported>(sup), Attr);
+    return ::next_picattr(static_cast<PictureAttributeSupported>(sup), Attr);
 }
 
 void TV::DoToggleNightMode()

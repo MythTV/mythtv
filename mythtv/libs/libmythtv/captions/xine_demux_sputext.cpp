@@ -61,7 +61,7 @@
  * Demuxer code start
  */
 
-static bool eol(char p) {
+static bool isEol(char p) {
   return (p=='\r' || p=='\n' || p=='\0');
 }
 
@@ -204,7 +204,7 @@ static char *sub_readtext(char *source, std::string& dest) {
   int len=0;
   char *p=source;
 
-  while ( !eol(*p) && *p!= '|' ) {
+  while ( !isEol(*p) && *p!= '|' ) {
     p++,len++;
   }
 
@@ -558,14 +558,14 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     if (mark != std::string::npos)
         line.erase(0, mark);
 
-    if (eol(line[0]) && !current->text.empty())
+    if (isEol(line[0]) && !current->text.empty())
       return current;
 
-    if (eol(line[0]))
+    if (isEol(line[0]))
       return nullptr;
 
     char *q = nullptr;
-    for (q=line.data(); !eol(*q); q++);
+    for (q=line.data(); !isEol(*q); q++);
     *q='\0';
     line.resize(strlen(line.c_str()));
     if (!line.empty()) {
@@ -746,7 +746,7 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
             line2 = line1;
             p = line2.data();
         }
-        for (q = line1.data(); (!eol(*p)); ++p) {
+        for (q = line1.data(); (!isEol(*p)); ++p) {
             switch (*p) {
             case '{':
                 comment++;
@@ -801,7 +801,7 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                 if ((*(p + 1) == '\\') ||
                     (*(p + 1) == '~') || (*(p + 1) == '{')) {
                     ++p;
-                } else if (eol(*(p + 1))) {
+                } else if (isEol(*(p + 1))) {
                     std::string tmpstr {};
                     if (!read_line_from_input(demuxstr, tmpstr))
                         return nullptr;

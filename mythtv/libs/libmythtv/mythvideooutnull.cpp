@@ -84,7 +84,7 @@ void MythVideoOutputNull::CreatePauseFrame(void)
 
     m_avPauseFrame.frameNumber = m_videoBuffers.GetScratchFrame()->frameNumber;
     m_avPauseFrame.frameCounter = m_videoBuffers.GetScratchFrame()->frameCounter;
-    clear(&m_avPauseFrame);
+    clear_vf(&m_avPauseFrame);
 }
 
 bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,

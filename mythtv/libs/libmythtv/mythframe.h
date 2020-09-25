@@ -486,7 +486,7 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
     }
     return 0;
 }
-static inline void clear(VideoFrame *vf)
+static inline void clear_vf(VideoFrame *vf)
 {
     if (!vf || (vf && !vf->buf))
         return;
