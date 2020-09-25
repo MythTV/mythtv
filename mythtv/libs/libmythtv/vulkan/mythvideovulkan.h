@@ -22,9 +22,6 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
   public:
     MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
                     MythVideoBounds* Bounds, const QString &Profile);
-    MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
-                    QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                    QRect DisplayVideoRect, QRect VideoRect, const QString& Profile);
    ~MythVideoVulkan() override;
 
     void    StartFrame       () override;
@@ -39,7 +36,6 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
     void    ColourSpaceUpdate(bool /*PrimariesChanged*/) override;
 
   private:
-    void    Init             () override;
     bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType, QSize Size,
                               VkCommandBuffer CmdBuffer);
 

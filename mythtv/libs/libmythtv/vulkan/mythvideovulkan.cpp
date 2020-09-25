@@ -17,31 +17,16 @@ MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace*
   : MythVideoGPU(Vulkan->Render(), ColourSpace, Bounds, Profile),
     MythVulkanObject(Vulkan)
 {
-    MythVideoVulkan::Init();
-}
-
-MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
-                                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                                 QRect DisplayVideoRect, QRect VideoRect, const QString& Profile)
-  : MythVideoGPU(Vulkan->Render(), ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, Profile),
-    MythVulkanObject(Vulkan)
-{
-    MythVideoVulkan::Init();
-}
-
-MythVideoVulkan::~MythVideoVulkan()
-{
-    MythVideoVulkan::ResetFrameFormat();
-}
-
-void MythVideoVulkan::Init()
-{
     if (!m_videoColourSpace)
         return;
 
     if (IsValidVulkan())
         m_valid = true;
+}
+
+MythVideoVulkan::~MythVideoVulkan()
+{
+    MythVideoVulkan::ResetFrameFormat();
 }
 
 void MythVideoVulkan::ResetFrameFormat()

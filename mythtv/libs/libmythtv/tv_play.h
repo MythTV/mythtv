@@ -381,7 +381,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                             bool isDVD, bool isDVDStillFrame);
     bool BrowseHandleAction(PlayerContext *ctx, const QStringList &actions);
     void OSDDialogEvent(int result, const QString& text, QString action);
-    bool PxPHandleAction(PlayerContext *ctx,const QStringList &actions);
     bool ToggleHandleAction(PlayerContext *ctx,
                             const QStringList &actions, bool isDVD);
     bool FFRewHandleAction(PlayerContext *ctx, const QStringList &actions);
@@ -408,7 +407,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void HandleSpeedChangeTimerEvent(void);
     void ToggleSleepTimer(const PlayerContext *ctx);
     void ToggleSleepTimer(const PlayerContext *ctx, const QString &time);
-    bool HandlePxPTimerEvent(void);
     bool HandleLCDTimerEvent(void);
     void HandleLCDVolumeTimerEvent(void);
     void HandleSaveLastPlayPosEvent();
@@ -642,19 +640,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void ChangeSubtitleDelay(PlayerContext *ctx, int dir);
 
     // PxP handling
-    bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
-    bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
-    bool ResizePIPWindow(PlayerContext *ctx);
-    bool IsPBPSupported(const PlayerContext *ctx = nullptr) const;
-    bool IsPIPSupported(const PlayerContext *ctx = nullptr) const;
-    void PxPToggleView(  PlayerContext *actx, bool wantPBP);
-    void PxPCreateView(  PlayerContext *actx, bool wantPBP);
-    void PxPTeardownView(PlayerContext *actx);
-    void PxPToggleType(  PlayerContext *mctx, bool wantPBP);
-    void PxPSwap(        PlayerContext *mctx, PlayerContext *pipctx);
-    bool PIPAddPlayer(   PlayerContext *mctx, PlayerContext *ctx);
-    static bool PIPRemovePlayer(PlayerContext *mctx, PlayerContext *ctx);
-    void PBPRestartMainPlayer(PlayerContext *mctx);
     void SetActive(PlayerContext *lctx, int index, bool osd_msg);
 
     // Video controls
@@ -898,7 +883,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool            m_underNetworkControl {false}; ///< initial show started via by the network control interface
 
     // Program Jumping
-    PIPState     m_jumpToProgramPIPState {kPIPOff};
     bool         m_jumpToProgram {false};
 
     // Video Players
@@ -955,7 +939,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_lcdVolumeTimerId        {0};
     volatile int         m_networkControlTimerId   {0};
     volatile int         m_jumpMenuTimerId         {0};
-    volatile int         m_pipChangeTimerId        {0};
     volatile int         m_switchToInputTimerId    {0};
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
@@ -1012,10 +995,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool         m_tvmIsVideo           {false};
     CommSkipMode m_tvmCurSkip           {kCommSkipOff};
     bool         m_tvmIsPaused          {false};
-    bool         m_tvmAllowPIP          {false};
-    bool         m_tvmAllowPBP          {false};
-    bool         m_tvmHasPIP            {false};
-    bool         m_tvmHasPBP            {false};
     int          m_tvmFreeRecorderCount {-1};
     bool         m_tvmIsDvd             {false};
     bool         m_tvmIsBd              {false};
@@ -1055,8 +1034,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static const uint kInputKeysMax; ///< When to start discarding early keys
     static const uint kNextSource;
     static const uint kPreviousSource;
-    static const uint kMaxPIPCount;
-    static const uint kMaxPBPCount;
 
     ///< Timeout for entry modes in msec
     static const uint kInputModeTimeout;

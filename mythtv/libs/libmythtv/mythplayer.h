@@ -156,9 +156,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SetLength(int len)                   { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
-    void SetPIPActive(bool is_active)         { m_pipActive = is_active; }
-    void SetPIPVisible(bool is_visible)       { m_pipVisible = is_visible; }
-
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
@@ -180,8 +177,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     float   GetVideoAspect(void) const        { return m_videoAspect; }
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
     void    GetPlaybackData(InfoMap &infoMap);
-    bool    IsAudioNeeded(void)
-        { return ((FlagIsSet(kVideoIsNull)) == 0) && m_playerCtx->IsAudioNeeded(); }
+    bool    IsAudioNeeded(void) { return ((FlagIsSet(kVideoIsNull)) == 0); }
     uint    GetVolume(void) { return m_audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
@@ -212,7 +208,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     QString   GetEncodingType(void) const;
     void      GetCodecDescription(InfoMap &infoMap);
     QString   GetXDS(const QString &key) const;
-    PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
     bool    IsPaused(void) const              { return m_allPaused;      }
@@ -225,8 +220,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
     bool    HasAudioOut(void) const           { return m_audio.HasAudioOut(); }
-    bool    IsPIPActive(void) const           { return m_pipActive; }
-    bool    IsPIPVisible(void) const          { return m_pipVisible; }
     bool    IsMuted(void)                     { return m_audio.IsMuted(); }
     bool    PlayerControlsVolume(void) const  { return m_audio.ControlsVolume(); }
     bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
@@ -380,9 +373,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Non-public sets
     virtual void SetBookmark(bool clear = false);
-    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc);
-    bool RemovePIPPlayer(MythPlayer *pip);
-
     FrameScanType NextScanOverride(void);
     void          SetScanOverride(FrameScanType Scan);
     void          SetScanType(FrameScanType Scan);
@@ -775,12 +765,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Audio stuff
     AudioPlayer      m_audio;
     AudioOutputGraph m_audiograph;
-
-    // Picture-in-Picture
-    PIPMap         m_pipPlayers;
-    PIPLocation    m_pipDefaultLoc;
-    volatile bool  m_pipActive            {false};
-    volatile bool  m_pipVisible           {true};
 
     // Commercial filtering
     CommBreakMap   m_commBreakMap;

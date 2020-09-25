@@ -228,7 +228,7 @@ QRect MythVideoOutputOpenGL::GetDisplayVisibleRectAdj()
     return dvr;
 }
 
-void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan)
+void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 {
     if (!m_openglRender)
         return;
@@ -244,7 +244,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPla
         m_openglRender->logDebugMarker(LOC + "PROCESS_FRAME_START");
 
     // Update software frames
-    MythVideoOutputGPU::PrepareFrame(Frame, PiPPlayers, Scan);
+    MythVideoOutputGPU::PrepareFrame(Frame, Scan);
 
     // Time texture update
     if (m_openGLPerf)
@@ -398,24 +398,4 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
 
     allowed += MythOpenGLInterop::GetAllowedRenderers(format);
     return allowed;
-}
-
-MythVideoGPU* MythVideoOutputOpenGL::CreateSecondaryVideo(const QSize& VideoDim,
-                                                          const QSize& VideoDispDim,
-                                                          const QRect& DisplayVisibleRect,
-                                                          const QRect& DisplayVideoRect,
-                                                          const QRect& VideoRect)
-{
-    auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
-    auto * result = new MythOpenGLVideo(m_openglRender, colourspace,
-                                        VideoDim, VideoDispDim,
-                                        DisplayVisibleRect, DisplayVideoRect,
-                                        VideoRect, m_profile);
-    if (result && !result->IsValid())
-    {
-        delete result;
-        result = nullptr;
-    }
-    colourspace->DecrRef();
-    return result;
 }

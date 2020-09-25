@@ -130,7 +130,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     m_itvEnabled         = gCoreContext->GetBoolSetting("EnableMHEG", false);
     m_clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     m_endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
-    m_pipDefaultLoc      = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -330,8 +329,6 @@ bool MythPlayer::InitVideo(void)
     if (!m_playerCtx)
         return false;
 
-    PIPState pipState = m_playerCtx->GetPIPState();
-
     if (!m_decoder)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -342,9 +339,9 @@ bool MythPlayer::InitVideo(void)
     m_videoOutput = MythVideoOutput::Create(
                     m_decoder->GetCodecDecoderName(),
                     m_decoder->GetVideoCodecID(),
-                    pipState, m_videoDim, m_videoDispDim, m_videoAspect,
-                    m_parentWidget, m_embedRect,
-                    m_videoFrameRate, (uint)m_playerFlags, m_codecName, m_maxReferenceFrames);
+                    m_videoDim, m_videoDispDim, m_videoAspect,
+                    m_parentWidget, static_cast<float>(m_videoFrameRate),
+                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
     if (!m_videoOutput)
     {
@@ -354,7 +351,7 @@ bool MythPlayer::InitVideo(void)
         return false;
     }
 
-    if (m_embedding && pipState == kPIPOff)
+    if (m_embedding)
         m_videoOutput->EmbedInWidget(m_embedRect);
 
     return true;
@@ -611,10 +608,9 @@ void MythPlayer::SetScanType(FrameScanType Scan)
 
     if (is_interlaced(Scan))
     {
-        MythDeintType forced = m_playerCtx->IsPiPOrSecondaryPBP() ? (DEINT_CPU | DEINT_MEDIUM) : DEINT_NONE;
         bool normal = m_playSpeed > 0.99F && m_playSpeed < 1.01F && m_normalSpeed;
-        m_doubleFramerate = CanSupportDoubleRate() && normal && !forced;
-        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate, forced);
+        m_doubleFramerate = CanSupportDoubleRate() && normal;
+        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
     }
     else if (kScan_Progressive == Scan)
     {
@@ -733,15 +729,7 @@ int MythPlayer::OpenFile(int Retries)
     if (!m_playerCtx || (m_playerCtx && !m_playerCtx->m_buffer))
         return -1;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opening '%1'")
-        .arg(m_playerCtx->m_buffer->GetSafeFilename()));
-
-    // Disable hardware acceleration for second PBP
-    if (m_playerCtx && (m_playerCtx->IsPBP() && !m_playerCtx->IsPrimaryPBP()) &&
-        FlagIsSet(kDecodeAllowGPU))
-    {
-        m_playerFlags = static_cast<PlayerFlags>(m_playerFlags - kDecodeAllowGPU);
-    }
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opening '%1'").arg(m_playerCtx->m_buffer->GetSafeFilename()));
 
     m_isDummy = false;
     m_liveTV = m_playerCtx->m_tvchain && m_playerCtx->m_buffer->LiveMode();
@@ -1581,7 +1569,7 @@ bool MythPlayer::PipSync(void)
         if (!last)
             return false;
 
-        m_videoOutput->PrepareFrame(last, m_pipPlayers, m_scan);
+        m_videoOutput->PrepareFrame(last, m_scan);
 
         int64_t videotimecode = last->timecode & 0x0000ffffffffffff;
         if (videotimecode != last->timecode)
@@ -1762,7 +1750,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     if (buffer && !dropframe)
     {
         m_osdLock.lock();
-        m_videoOutput->PrepareFrame(buffer, m_pipPlayers, ps);
+        m_videoOutput->PrepareFrame(buffer, ps);
         m_osdLock.unlock();
     }
 
@@ -1794,10 +1782,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
         m_osdLock.lock();
         m_videoOutput->RenderFrame(buffer, ps, m_osd);
         m_osdLock.unlock();
-        // Don't wait for sync if this is a secondary PBP otherwise
-        // the primary PBP will become out of sync
-        if (!m_playerCtx->IsPBP() || m_playerCtx->IsPrimaryPBP())
-            WaitForTime(framedue);
+        WaitForTime(framedue);
         // get time codes for calculating difference next time
         m_priorAudioTimecode = m_audio.GetAudioTime();
         m_videoOutput->EndFrame();
@@ -1819,20 +1804,17 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             {
                 // the first deinterlacing pass will have marked the frame as already deinterlaced
                 buffer->already_deinterlaced = false;
-                m_videoOutput->PrepareFrame(buffer, m_pipPlayers, ps);
+                m_videoOutput->PrepareFrame(buffer, ps);
             }
             m_videoOutput->RenderFrame(buffer, ps, m_osd);
             m_osdLock.unlock();
             // Display the second field
-            if (!m_playerCtx->IsPBP() || m_playerCtx->IsPrimaryPBP())
-            {
-                int64_t due = framedue + m_frameInterval / 2;
-                WaitForTime(due);
-            }
+            int64_t due = framedue + m_frameInterval / 2;
+            WaitForTime(due);
             m_videoOutput->EndFrame();
         }
     }
-    else if (!m_playerCtx->IsPiPOrSecondaryPBP())
+    else
     {
         WaitForTime(framedue);
     }
@@ -1894,7 +1876,7 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
     m_osdLock.lock();
-    m_videoOutput->PrepareFrame(nullptr, m_pipPlayers, scan);
+    m_videoOutput->PrepareFrame(nullptr, scan);
     m_videoOutput->RenderFrame(nullptr, scan, m_osd);
     m_osdLock.unlock();
     m_videoOutput->EndFrame();
@@ -2057,24 +2039,11 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     if (m_allPaused)
         return;
 
-    bool ispip = m_playerCtx->IsPIP();
-    if (ispip)
-    {
-        if (!m_videoOutput->ValidVideoFrames())
-            return;
-    }
-    else if (check_prebuffer && !PrebufferEnoughFrames())
-    {
+    if (check_prebuffer && !PrebufferEnoughFrames())
         return;
-    }
 
     // clear the buffering state
     SetBuffering(false);
-
-    // If PiP then release the last shown frame to the decoding queue
-    if (ispip)
-        if (!PipSync())
-            return;
 
     // retrieve the next frame
     m_videoOutput->StartDisplayingFrame();
@@ -2093,8 +2062,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    if (!ispip)
-        AVSync(frame);
+    AVSync(frame);
 
     // Update details for debug OSD
     m_lastDeinterlacer = frame->deinterlace_inuse;
@@ -2102,10 +2070,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // We use the underlying pix_fmt as it retains the distinction between hardware
     // and software frames for decode only decoders.
     m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
-
-    // If PiP then keep this frame for MythPlayer::GetCurrentFrame
-    if (!ispip)
-        m_videoOutput->DoneDisplayingFrame(frame);
+    m_videoOutput->DoneDisplayingFrame(frame);
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
@@ -2165,7 +2130,7 @@ void MythPlayer::ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer)
 
 void MythPlayer::VideoStart(void)
 {
-    if (!FlagIsSet(kVideoIsNull) && !m_playerCtx->IsPIP())
+    if (!FlagIsSet(kVideoIsNull))
     {
         QRect visible;
         QRect total;
@@ -2250,20 +2215,7 @@ bool MythPlayer::VideoLoop(void)
     ProcessCallbacks();
 
     if (m_videoPaused || m_isDummy)
-    {
-        switch (m_playerCtx->GetPIPState())
-        {
-          case kPIPonTV:
-          case kPBPRight:
-            break;
-          case kPIPOff:
-          case kPIPStandAlone:
-          case kPBPLeft:  // PrimaryBPB
-            usleep(m_frameInterval);
-            break;
-        }
         DisplayPauseFrame();
-    }
     else
         DisplayNormalFrame();
 
@@ -2714,7 +2666,7 @@ void MythPlayer::InitialSeek(void)
     if (m_bookmarkSeek > 30)
     {
         DoJumpToFrame(m_bookmarkSeek, kInaccuracyNone);
-        if (m_clearSavedPosition && !m_playerCtx->IsPIP())
+        if (m_clearSavedPosition)
             SetBookmark(true);
     }
 }
@@ -3005,11 +2957,8 @@ void MythPlayer::EventLoop(void)
     {
         if (jumpto == m_totalFrames)
         {
-            if (!(m_endExitPrompt == 1 && !m_playerCtx->IsPIP() &&
-                  m_playerCtx->GetState() == kState_WatchingPreRecorded))
-            {
+            if (!(m_endExitPrompt == 1 && m_playerCtx->GetState() == kState_WatchingPreRecorded))
                 SetEof(kEofStateDelayed);
-            }
         }
         else
         {
@@ -3388,69 +3337,6 @@ void MythPlayer::SetTranscoding(bool value)
         m_decoder->SetTranscoding(value);
 }
 
-bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc)
-{
-    if (!is_current_thread(m_playerThread))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot add PiP from another thread");
-        return false;
-    }
-
-    if (m_pipPlayers.contains(pip))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "PiPMap already contains PiP.");
-        return false;
-    }
-
-    QList<PIPLocation> locs = m_pipPlayers.values();
-    if (locs.contains(loc))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +"Already have a PiP at that location.");
-        return false;
-    }
-
-    m_pipPlayers.insert(pip, loc);
-    return true;
-}
-
-bool MythPlayer::RemovePIPPlayer(MythPlayer *pip)
-{
-    if (!is_current_thread(m_playerThread))
-        return false;
-
-    if (!m_pipPlayers.contains(pip))
-        return false;
-
-    m_pipPlayers.remove(pip);
-    if (m_videoOutput)
-        m_videoOutput->RemovePIP(pip);
-    return true;
-}
-
-PIPLocation MythPlayer::GetNextPIPLocation(void) const
-{
-    if (!is_current_thread(m_playerThread))
-        return kPIP_END;
-
-    if (m_pipPlayers.isEmpty())
-        return m_pipDefaultLoc;
-
-    // order of preference, could be stored in db if we want it configurable
-    const std::array<const PIPLocation,4> ols
-        { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
-
-    for (const auto & ol : ols)
-    {
-        PIPMap::const_iterator it = m_pipPlayers.begin();
-        for (; it != m_pipPlayers.end() && (*it != ol); ++it);
-
-        if (it == m_pipPlayers.end())
-            return ol;
-    }
-
-    return kPIP_END;
-}
-
 int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
 {
     if ((newsync >= -1000) && (newsync <= 1000))
@@ -3802,8 +3688,7 @@ bool MythPlayer::IsNearEnd(void)
     uint64_t framesRead = m_framesPlayed;
     uint64_t framesLeft = 0;
 
-    if (!m_playerCtx->IsPIP() &&
-        m_playerCtx->GetState() == kState_WatchingPreRecorded)
+    if (m_playerCtx->GetState() == kState_WatchingPreRecorded)
     {
         if (framesRead >= m_deleteMap.GetLastFrame())
             return true;

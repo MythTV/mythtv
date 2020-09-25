@@ -28,7 +28,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
 
     bool          Init             (const QSize& VideoDim, const QSize& VideoDispDim,
                                     float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
-    void          PrepareFrame     (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
+    void          PrepareFrame     (VideoFrame* Frame, FrameScanType Scan) override;
     void          RenderFrame      (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     void          EndFrame         () override;
 
@@ -36,12 +36,6 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     QRect         GetDisplayVisibleRectAdj() override;
 
   private:
-    MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
-                                       const QSize& VideoDispDim,
-                                       const QRect& DisplayVisibleRect,
-                                       const QRect& DisplayVideoRect,
-                                       const QRect& VideoRect) override;
-
     MythRenderOpenGL* m_openglRender   { nullptr };
     MythOpenGLPerf*   m_openGLPerf     { nullptr };
 };

@@ -61,12 +61,6 @@ class MTV_PUBLIC PlayerContext
     void StopPlaying(void) const;
     void UpdateTVChain(const QStringList &data = QStringList());
     bool ReloadTVChain(void);
-    void CreatePIPWindow(const QRect &rect, int pos = -1,
-                        QWidget *widget = nullptr);
-    void ResizePIPWindow(const QRect &rect);
-    bool StartPIPPlayer(TV *tv, TVState desiredState);
-    void PIPTeardown(void);
-    void SetNullVideo(bool setting) { m_useNullVideo = setting; }
     bool StartEmbedding(const QRect &rect) const;
     void StopEmbedding(void) const;
     void    PushPreviousChannel(void);
@@ -102,14 +96,10 @@ class MTV_PUBLIC PlayerContext
     void SetPlayingInfo(const ProgramInfo *info);
     void SetPlayGroup(const QString &group);
     void SetPseudoLiveTV(const ProgramInfo *pi, PseudoState new_state);
-    void SetPIPLocation(int loc) { m_pipLocation = loc; }
-    void SetPIPState(PIPState change) { m_pipState = change; }
     void SetPlayerChangingBuffers(bool val) { m_playerUnsafe = val; }
     void SetNoHardwareDecoders(bool Disallow = true) { m_nohardwaredecoders = Disallow; }
 
     // Gets
-    QRect    GetStandAlonePIPRect(void);
-    PIPState GetPIPState(void) const { return m_pipState; }
     QString  GetPreviousChannel(void) const;
     bool     CalcPlayerSliderPosition(osdInfo &info,
                                    bool paddedFields = false) const;
@@ -120,19 +110,6 @@ class MTV_PUBLIC PlayerContext
     bool     GetPlayingInfoMap(InfoMap &infoMap) const;
 
     // Boolean Gets
-    bool IsPIPSupported(void) const;
-    bool IsPBPSupported(void) const;
-    bool IsPIP(void) const
-        { return (kPIPonTV == m_pipState) || (kPIPStandAlone == m_pipState); }
-    bool IsPBP(void) const
-        { return (kPBPLeft == m_pipState) || (kPBPRight      == m_pipState); }
-    bool IsPrimaryPBP(void) const
-        { return (kPBPLeft == m_pipState); }
-    bool IsAudioNeeded(void) const
-        { return (kPIPOff  == m_pipState) || (kPBPLeft       == m_pipState); }
-    bool IsPiPOrSecondaryPBP(void) const
-        { return IsPIP() || (IsPBP() && !IsPrimaryPBP()); }
-    bool IsNullVideoDesired(void)   const { return m_useNullVideo; }
     bool IsPlayerChangingBuffers(void) const { return m_playerUnsafe; }
     bool IsEmbedding(void) const;
     bool HasPlayer(void) const;
@@ -198,15 +175,6 @@ class MTV_PUBLIC PlayerContext
 
     // tv state related
     MythDeque<TVState>  m_nextState;
-
-    // Picture-in-Picture related
-    PIPState            m_pipState           {kPIPOff};
-    QRect               m_pipRect            {0,0,0,0};
-    QWidget            *m_parentWidget       {nullptr};
-    /// Position of PIP on TV screen
-    int                 m_pipLocation        {0};
-    /// True iff software scaled PIP should be used
-    bool                m_useNullVideo       {false};
 
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
     static const uint kSMExitTimeout;

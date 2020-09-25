@@ -43,10 +43,6 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
 MythVideoOutputGPU::~MythVideoOutputGPU()
 {
     MythVideoOutputGPU::DestroyVisualisation();
-
-    for (auto & pip : m_pxpVideos)
-        delete pip;
-
     MythVideoOutputGPU::DestroyBuffers();
     delete m_video;
     if (m_painter)
@@ -95,8 +91,7 @@ bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
 {
     // if we are the main video player then free up as much video memory
     // as possible at startup
-    PIPState pip = GetPIPState();
-    if ((kCodec_NONE == m_newCodecId) && ((kPIPOff == pip) || (kPBPLeft == pip)) && m_painter)
+    if ((kCodec_NONE == m_newCodecId) && m_painter)
         m_painter->FreeResources();
 
     // Default initialisation - mainly MythVideoBounds
@@ -128,12 +123,6 @@ bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     {
         m_render->SetViewPort(QRect(QPoint(), dvr.size()));
         return true;
-    }
-
-    if (GetPIPState() >= kPIPStandAlone)
-    {
-        QRect tmprect = QRect(QPoint(0,0), dvr.size());
-        ResizeDisplayWindow(tmprect, true);
     }
 
     // Reset OpenGLVideo
@@ -391,14 +380,11 @@ void MythVideoOutputGPU::InitDisplayMeasurements()
     SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
-void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, const PIPMap &PiPPlayers, FrameScanType Scan)
+void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 {
     // Process input changes
     if (!ProcessInputChange())
         return;
-
-    if (!IsEmbedding())
-        ShowPIPs(PiPPlayers);
 
     if (Frame)
     {
@@ -455,19 +441,6 @@ void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoscopicMode());
     else if (dummy)
         m_render->SetViewPort(GetWindowRect());
-
-    // PiPs/PBPs
-    if (!m_pxpVideos.empty() && !IsEmbedding())
-    {
-        for (auto it = m_pxpVideos.begin(); it != m_pxpVideos.end(); ++it)
-        {
-            if (m_pxpVideosReady[it.key()] && (*it))
-            {
-                bool active = m_pxpVideoActive == *it;
-                (*it)->RenderFrame(nullptr, topfieldfirst, Scan, kStereoscopicModeAuto, active);
-            }
-        }
-    }
 
     const QRect osdbounds = GetTotalOSDBounds();
 
@@ -574,80 +547,6 @@ bool MythVideoOutputGPU::SetupVisualisation(AudioPlayer* Audio, const QString& N
 VideoVisual* MythVideoOutputGPU::GetVisualisation()
 {
     return m_visual;
-}
-
-void MythVideoOutputGPU::ShowPIPs(const PIPMap& PiPPlayers)
-{
-    m_pxpVideoActive = nullptr;
-    for (auto it = PiPPlayers.cbegin(); it != PiPPlayers.cend(); ++it)
-        ShowPIP(it.key(), *it);
-}
-
-void MythVideoOutputGPU::ShowPIP(MythPlayer* PiPPlayer, PIPLocation Location)
-{
-    if (!PiPPlayer)
-        return;
-
-    int pipw = 0;
-    int piph = 0;
-    VideoFrame* pipimage     = PiPPlayer->GetCurrentFrame(pipw, piph);
-    const QSize pipvideodim  = PiPPlayer->GetVideoBufferSize();
-    QRect       pipvideorect = QRect(QPoint(0, 0), pipvideodim);
-
-    if ((PiPPlayer->GetVideoAspect() <= 0.0F) || !pipimage || !pipimage->buf ||
-        (pipimage->codec != FMT_YV12) || !PiPPlayer->IsPIPVisible())
-    {
-        PiPPlayer->ReleaseCurrentFrame(pipimage);
-        return;
-    }
-
-    QRect position = GetPIPRect(Location, PiPPlayer);
-    QRect dvr = GetDisplayVisibleRectAdj();
-
-    m_pxpVideosReady[PiPPlayer] = false;
-    MythVideoGPU* video = m_pxpVideos[PiPPlayer];
-
-    if (video && video->GetVideoDim() != pipvideodim)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
-        delete video;
-        video = nullptr;
-    }
-
-    if (!video)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP");
-        video = CreateSecondaryVideo(pipvideodim, pipvideodim, dvr, position, pipvideorect);
-    }
-
-    m_pxpVideos[PiPPlayer] = video;
-
-    if (video)
-    {
-        if (!video->IsValid())
-        {
-            PiPPlayer->ReleaseCurrentFrame(pipimage);
-            return;
-        }
-        video->SetMasterViewport(dvr.size());
-        video->SetVideoRects(position, pipvideorect);
-        video->PrepareFrame(pipimage);
-    }
-
-    m_pxpVideosReady[PiPPlayer] = true;
-    if (PiPPlayer->IsPIPActive())
-        m_pxpVideoActive = video;
-    PiPPlayer->ReleaseCurrentFrame(pipimage);
-}
-
-void MythVideoOutputGPU::RemovePIP(MythPlayer* PiPPlayer)
-{
-    if (m_pxpVideos.contains(PiPPlayer))
-    {
-        delete m_pxpVideos.take(PiPPlayer);
-        m_pxpVideosReady.remove(PiPPlayer);
-        m_pxpVideos.remove(PiPPlayer);
-    }
 }
 
 /**

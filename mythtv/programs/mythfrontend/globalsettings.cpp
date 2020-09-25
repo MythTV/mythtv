@@ -145,20 +145,6 @@ static HostCheckBoxSetting *FFmpegDemuxer()
 }
 #endif
 
-static HostComboBoxSetting *PIPLocationComboBox()
-{
-    auto *gc = new HostComboBoxSetting("PIPLocation");
-
-    gc->setLabel(PlaybackSettings::tr("PIP video location"));
-
-    for (uint loc = 0; loc < kPIP_END; ++loc)
-        gc->addSelection(toString((PIPLocation) loc), QString::number(loc));
-
-    gc->setHelpText(PlaybackSettings::tr("Location of PIP Video window."));
-
-    return gc;
-}
-
 static HostComboBoxSetting *DisplayRecGroup()
 {
     auto *gc = new HostComboBoxSetting("DisplayRecGroup");
@@ -4308,7 +4294,6 @@ void PlaybackSettings::Load(void)
     general->addChild(AdjustFill());
 
     general->addChild(LetterboxingColour());
-    general->addChild(PIPLocationComboBox());
     general->addChild(PlaybackExitPrompt());
     general->addChild(EndOfRecordingExitPrompt());
     general->addChild(MusicChoiceEnabled());

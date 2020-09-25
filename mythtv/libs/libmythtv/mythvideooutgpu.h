@@ -25,10 +25,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;
-    bool            IsPIPSupported        () const override  { return true; }
-    void            ShowPIPs              (const PIPMap& PiPPlayers) override;
-    void            ShowPIP               (MythPlayer* PiPPlayer, PIPLocation Location) override;
-    void            RemovePIP             (MythPlayer* PiPPlayer) override;
     bool            EnableVisualisation   (AudioPlayer* Audio, bool Enable, const QString& Name = QString("")) override;
     bool            CanVisualise          (AudioPlayer* Audio) override;
     bool            SetupVisualisation    (AudioPlayer* Audio, const QString& Name) override;
@@ -40,15 +36,10 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
-    virtual MythVideoGPU* CreateSecondaryVideo(const QSize& VideoDim,
-                                               const QSize& VideoDispDim,
-                                               const QRect& DisplayVisibleRect,
-                                               const QRect& DisplayVideoRect,
-                                               const QRect& VideoRect) = 0;
     virtual QRect   GetDisplayVisibleRectAdj();
     bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
                                            const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
-    void            PrepareFrame          (VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan) override;
+    void            PrepareFrame          (VideoFrame* Frame, FrameScanType Scan) override;
     void            RenderFrame           (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
@@ -66,10 +57,6 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_buffersCreated      { false };
     QString         m_profile;
     VideoVisual*    m_visual              { nullptr };
-
-    QMap<MythPlayer*,MythVideoGPU*> m_pxpVideos;
-    QMap<MythPlayer*,bool>          m_pxpVideosReady;
-    MythVideoGPU*                   m_pxpVideoActive { nullptr };
 
   private:
     Q_DISABLE_COPY(MythVideoOutputGPU)

@@ -56,7 +56,6 @@ class MythVideoBounds : public QObject
     void SaveBottomLine         (void);
     void SetVideoScalingAllowed (bool Change);
     void SetDisplayAspect       (float DisplayAspect);
-    void SetPIPState            (PIPState Setting);
     void SetWindowSize          (QSize Size);
     void SetITVResize           (QRect Rect);
     void SetRotation            (int Rotation);
@@ -68,7 +67,6 @@ class MythVideoBounds : public QObject
     bool     IsEmbeddingAndHidden()        const { return m_embeddingHidden; }
     QSize    GetVideoDim(void)             const { return m_videoDim; }
     QSize    GetVideoDispDim(void)         const { return m_videoDispDim; }
-    PIPState GetPIPState(void)             const { return m_pipState; }
     float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
     QRect    GetDisplayVisibleRect(void)   const { return m_displayVisibleRect; }
     QRect    GetWindowRect(void)           const { return m_windowRect; }
@@ -82,8 +80,6 @@ class MythVideoBounds : public QObject
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
     float    GetVideoAspect(void)          const { return m_videoAspect; }
     float    GetDisplayAspect(void)        const { return m_displayAspect;  }
-    QRect    GetPIPRect(PIPLocation  Location, MythPlayer *PiPPlayer  = nullptr,
-                        bool DoPixelAdjustment = true) const;
     bool     VideoIsFullScreen(void) const;
     QRegion  GetBoundingRegion(void) const;
     StereoscopicMode GetStereoscopicMode() const;
@@ -105,7 +101,6 @@ class MythVideoBounds : public QObject
     QPoint  m_dbMove           {0,0};   ///< Percentage move from database
     float   m_dbHorizScale     {0.0F};  ///< Horizontal Overscan/Underscan percentage
     float   m_dbVertScale      {0.0F};  ///< Vertical Overscan/Underscan percentage
-    int     m_dbPipSize        {26};    ///< percentage of full window to use for PiP
     bool    m_dbScalingAllowed {true};  ///< disable this to prevent overscan/underscan
     bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
     AspectOverrideMode m_dbAspectOverride { kAspect_Off };
@@ -162,7 +157,6 @@ class MythVideoBounds : public QObject
     bool    m_embedding  {false};
     bool    m_embeddingHidden { false };
     bool    m_bottomLine {false};
-    PIPState m_pipState  {kPIPOff};
 
     // Constants
     static const float kManualZoomMaxHorizontalZoom;

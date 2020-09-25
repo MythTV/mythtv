@@ -39,10 +39,6 @@ class MythOpenGLVideo : public MythVideoGPU
 
     MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
                     MythVideoBounds* Bounds, const QString &Profile);
-    MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
-                    QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                    QRect DisplayVideoRect, QRect VideoRect,
-                    const QString &Profile);
     ~MythOpenGLVideo() override;
 
     void    StartFrame       () override {}
@@ -61,7 +57,6 @@ class MythOpenGLVideo : public MythVideoGPU
     void    ColourSpaceUpdate(bool PrimariesChanged) override;
 
   private:
-    void    Init             () override;
     bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType,
                               QSize Size, GLenum TextureTarget);
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);

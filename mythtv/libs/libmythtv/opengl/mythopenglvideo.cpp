@@ -34,32 +34,6 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace*
   : MythVideoGPU(Render, ColourSpace, Bounds, Profile),
     m_openglRender(Render)
 {
-    MythOpenGLVideo::Init();
-}
-
-MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, MythVideoColourSpace* ColourSpace,
-                                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                                 QRect DisplayVideoRect, QRect VideoRect, const QString& Profile)
-  : MythVideoGPU(Render, ColourSpace, VideoDim, VideoDispDim, DisplayVisibleRect,
-                 DisplayVideoRect, VideoRect, Profile),
-    m_openglRender(Render)
-{
-    MythOpenGLVideo::Init();
-}
-
-MythOpenGLVideo::~MythOpenGLVideo()
-{
-    if (!m_openglRender)
-        return;
-
-    m_openglRender->makeCurrent();
-    MythOpenGLVideo::ResetFrameFormat();
-    delete m_toneMap;
-    m_openglRender->doneCurrent();
-}
-
-void MythOpenGLVideo::Init()
-{
     if (!m_openglRender || !m_videoColourSpace)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
@@ -78,6 +52,17 @@ void MythOpenGLVideo::Init()
     m_chromaUpsamplingFilter = gCoreContext->GetBoolSetting("ChromaUpsamplingFilter", true);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chroma upsampling filter %1")
         .arg(m_chromaUpsamplingFilter ? "enabled" : "disabled"));
+}
+
+MythOpenGLVideo::~MythOpenGLVideo()
+{
+    if (!m_openglRender)
+        return;
+
+    m_openglRender->makeCurrent();
+    MythOpenGLVideo::ResetFrameFormat();
+    delete m_toneMap;
+    m_openglRender->doneCurrent();
 }
 
 void MythOpenGLVideo::ColourSpaceUpdate(bool PrimariesChanged)

@@ -33,9 +33,6 @@ class MythVideoGPU : public QObject
 
     MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
                  MythVideoBounds* Bounds, QString Profile);
-    MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                 QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                 QRect DisplayVideoRect, QRect VideoRect, QString Profile);
    ~MythVideoGPU() override;
 
     virtual void StartFrame        () = 0;
@@ -63,8 +60,6 @@ class MythVideoGPU : public QObject
 
   protected:
     virtual void ColourSpaceUpdate (bool PrimariesChanged) = 0;
-    virtual void Init              () = 0;
-    void         CommonInit        ();
 
     MythRender*       m_render               { nullptr };
     long long         m_discontinuityCounter { 0 };

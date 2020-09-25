@@ -51,8 +51,6 @@ const int   MythVideoBounds::kManualZoomMaxMove           = 50;
 
 MythVideoBounds::MythVideoBounds(bool CreateDisplay)
 {
-    m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
-
     m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
@@ -452,28 +450,12 @@ bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDi
     // displayVisibleRect
     m_rawWindowRect = WindowRect;
     m_windowRect = m_displayVisibleRect = SCALED_RECT(WindowRect, m_devicePixelRatio);
-
-    int pbp_width = m_displayVisibleRect.width() / 2;
-    if (m_pipState == kPBPLeft || m_pipState == kPBPRight)
-        m_displayVisibleRect.setWidth(pbp_width);
-
-    if (m_pipState == kPBPRight)
-            m_displayVisibleRect.moveLeft(pbp_width);
-
     m_videoDispDim = Fix1088(VideoDispDim);
     m_videoDim = VideoDim;
     m_videoRect = QRect(m_displayVisibleRect.topLeft(), m_videoDispDim);
 
-    if (m_pipState > kPIPOff)
-    {
-        m_videoAspectOverrideMode = kAspect_Off;
-        m_adjustFill = kAdjustFill_Off;
-    }
-    else
-    {
-        m_videoAspectOverrideMode = m_dbAspectOverride;
-        m_adjustFill = m_dbAdjustFill;
-    }
+    m_videoAspectOverrideMode = m_dbAspectOverride;
+    m_adjustFill = m_dbAdjustFill;
     m_embedding = false;
     SetVideoAspectRatio(Aspect);
     MoveResize();
@@ -733,9 +715,6 @@ void MythVideoBounds::StopEmbedding(void)
  */
 void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)
 {
-    if (m_pipState > kPIPOff)
-        return;
-
     if (AspectMode == kAspect_Toggle)
         AspectMode = static_cast<AspectOverrideMode>(((m_videoAspectOverrideMode + 1) % kAspect_END));
 
@@ -770,47 +749,6 @@ QRegion MythVideoBounds::GetBoundingRegion(void) const
     QRegion visible(m_windowRect);
     QRegion video(m_displayVideoRect);
     return visible.subtracted(video);
-}
-
-/*
- * \brief Determines PIP Window size and Position.
- */
-QRect MythVideoBounds::GetPIPRect(
-    PIPLocation Location, MythPlayer *PiPPlayer, bool DoPixelAdjustment) const
-{
-    QRect position;
-
-    float pipVideoAspect = PiPPlayer ? PiPPlayer->GetVideoAspect() : (4.0F / 3.0F);
-    int tmph = (m_displayVisibleRect.height() * m_dbPipSize) / 100;
-    float pixel_adj = 1.0F;
-    if (DoPixelAdjustment)
-    {
-        pixel_adj = (static_cast<float>(m_displayVisibleRect.width()) /
-                     static_cast<float>(m_displayVisibleRect.height())) / m_displayAspect;
-    }
-    position.setHeight(tmph);
-    position.setWidth(qRound((tmph * pipVideoAspect * pixel_adj)));
-
-    int xoff = qRound(m_displayVisibleRect.width()  * 0.06);
-    int yoff = qRound(m_displayVisibleRect.height() * 0.06);
-    switch (Location)
-    {
-        case kPIP_END:
-        case kPIPTopLeft:
-            break;
-        case kPIPBottomLeft:
-            yoff = m_displayVisibleRect.height() - position.height() - yoff;
-            break;
-        case kPIPTopRight:
-            xoff = m_displayVisibleRect.width() - position.width() - xoff;
-            break;
-        case kPIPBottomRight:
-            xoff = m_displayVisibleRect.width() - position.width() - xoff;
-            yoff = m_displayVisibleRect.height() - position.height() - yoff;
-            break;
-    }
-    position.translate(xoff, yoff);
-    return position;
 }
 
 /**
@@ -974,15 +912,6 @@ static float fix_aspect(float raw)
         raw = 1.777777F;
 
     return raw;
-}
-
-void MythVideoBounds::SetPIPState(PIPState Setting)
-{
-    if (m_pipState != Setting)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetPIPState: %1").arg(toString(Setting)));
-        m_pipState = Setting;
-    }
 }
 
 static float snap(float value, float snapto, float diff)

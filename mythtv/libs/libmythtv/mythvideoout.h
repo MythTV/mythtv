@@ -29,8 +29,6 @@ class OSD;
 class AudioPlayer;
 class MythRender;
 
-using PIPMap = QHash<MythPlayer*,PIPLocation>;
-
 class MythVideoOutput : public MythVideoBounds
 {
     Q_OBJECT
@@ -38,9 +36,9 @@ class MythVideoOutput : public MythVideoBounds
   public:
     static void GetRenderOptions(RenderOptions& Options);
     static MythVideoOutput* Create(const QString& Decoder,    MythCodecID CodecID,
-                                   PIPState PiPState,         const QSize& VideoDim,
+                                   const QSize& VideoDim,
                                    const QSize& VideoDispDim, float VideoAspect,
-                                   QWidget* ParentWidget,     const QRect& EmbedRect,
+                                   QWidget* ParentWidget,
                                    float FrameRate,           uint  PlayerFlags,
                                    const QString& Codec,      int ReferenceFrames);
     static VideoFrameTypeVec s_defaultFrameTypes;
@@ -52,8 +50,7 @@ class MythVideoOutput : public MythVideoBounds
                       float VideoAspect, const QRect& WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
-    virtual void PrepareFrame (VideoFrame* Frame, const PIPMap& PipPlayers,
-                               FrameScanType Scan = kScan_Ignore) = 0;
+    virtual void PrepareFrame (VideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (VideoFrame* Frame, FrameScanType, OSD* Osd) = 0;
     virtual void EndFrame     () = 0;
     void         SetReferenceFrames(int ReferenceFrames);
@@ -102,9 +99,6 @@ class MythVideoOutput : public MythVideoBounds
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     virtual MythPainter* GetOSDPainter       () { return nullptr; }
-    virtual void         RemovePIP           (MythPlayer* /*PiPPlayer*/) { }
-    virtual bool         IsPIPSupported      () const { return false; }
-    virtual bool         IsPBPSupported      () const { return false; }
     virtual bool         EnableVisualisation (AudioPlayer*/*Audio*/, bool /*Enable*/, const QString& /*Name*/ = QString("")) { return false; }
     virtual bool         CanVisualise        (AudioPlayer*/*Audio*/) { return false; }
     virtual bool         SetupVisualisation  (AudioPlayer*/*Audio*/, const QString& /*Name*/) { return false; }
@@ -115,9 +109,6 @@ class MythVideoOutput : public MythVideoBounds
     virtual bool         StereoscopicModesAllowed() const { return false; }
 
   protected:
-    virtual void ShowPIPs (const PIPMap& /*PiPPlayers*/) { }
-    virtual void ShowPIP  (MythPlayer* /*PiPPlayer*/, PIPLocation /*Location*/) { }
-
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);

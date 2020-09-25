@@ -56,10 +56,9 @@ void MythVideoOutput::GetRenderOptions(RenderOptions& Options)
  *         renderer settings, create a relevant VideoOutput subclass.
  * \return instance of VideoOutput if successful, nullptr otherwise.
  */
-MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID CodecID,
-                                         PIPState PiPState,         const QSize& VideoDim,
+MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID CodecID, const QSize& VideoDim,
                                          const QSize& VideoDispDim, float VideoAspect,
-                                         QWidget *ParentWidget,     const QRect& EmbedRect,
+                                         QWidget *ParentWidget,
                                          float FrameRate,           uint  PlayerFlags,
                                          const QString& Codec,      int ReferenceFrames)
 {
@@ -198,10 +197,6 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
 
             // determine the display rectangle
             QRect display_rect = QRect(0, 0, widget->width(), widget->height());
-            if (PiPState == kPIPStandAlone)
-                display_rect = EmbedRect;
-
-            vo->SetPIPState(PiPState);
             vo->SetVideoFrameRate(FrameRate);
             vo->SetReferenceFrames(ReferenceFrames);
             if (vo->Init(VideoDim, VideoDispDim, VideoAspect, display_rect, CodecID))

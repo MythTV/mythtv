@@ -116,8 +116,6 @@ const int  TV::kInitFFRWSpeed                = 0;
 const uint TV::kInputKeysMax                 = 6;
 const uint TV::kNextSource                   = 1;
 const uint TV::kPreviousSource               = 2;
-const uint TV::kMaxPIPCount                  = 4;
-const uint TV::kMaxPBPCount                  = 2;
 
 
 const uint TV::kInputModeTimeout             = 5000;
@@ -649,20 +647,6 @@ void TV::InitKeys(void)
             "Cycle audio channels"), "");
     REG_KEY("TV Playback", ACTION_TOGGLEUPMIX, QT_TRANSLATE_NOOP("MythControls",
             "Toggle audio upmixer"), "Ctrl+U");
-    REG_KEY("TV Playback", "TOGGLEPIPMODE", QT_TRANSLATE_NOOP("MythControls",
-            "Toggle Picture-in-Picture view"), "V");
-    REG_KEY("TV Playback", "TOGGLEPBPMODE", QT_TRANSLATE_NOOP("MythControls",
-            "Toggle Picture-by-Picture view"), "Ctrl+V");
-    REG_KEY("TV Playback", "CREATEPIPVIEW", QT_TRANSLATE_NOOP("MythControls",
-            "Create Picture-in-Picture view"), "");
-    REG_KEY("TV Playback", "CREATEPBPVIEW", QT_TRANSLATE_NOOP("MythControls",
-            "Create Picture-by-Picture view"), "");
-    REG_KEY("TV Playback", "NEXTPIPWINDOW", QT_TRANSLATE_NOOP("MythControls",
-            "Toggle active PIP/PBP window"), "B");
-    REG_KEY("TV Playback", "SWAPPIP", QT_TRANSLATE_NOOP("MythControls",
-            "Swap PBP/PIP Windows"), "N");
-    REG_KEY("TV Playback", "TOGGLEPIPSTATE", QT_TRANSLATE_NOOP("MythControls",
-            "Change PxP view"), "");
     REG_KEY("TV Playback", ACTION_BOTTOMLINEMOVE,
             QT_TRANSLATE_NOOP("MythControls", "Move BottomLine off screen"),
             "L");
@@ -2247,7 +2231,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             SetErrored(ctx);
             SET_LAST();
         }
-        else if (!ctx->IsPIP())
+        else
         {
             if (!m_lastLockSeenTime.isValid() ||
                 (m_lastLockSeenTime < timerOffTime))
@@ -2452,8 +2436,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
              TRANSITION(kState_None, kState_WatchingRecording) ||
              TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        if (!ctx->IsPIP())
-            MythUIHelper::DisableScreensaver();
+        MythUIHelper::DisableScreensaver();
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
         if (!m_dbUseVideoModes)
@@ -2610,15 +2593,10 @@ void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
     if (mctx != ctx)
     {
         if (ctx->HasPlayer())
-        {
-            PIPRemovePlayer(mctx, ctx);
             ctx->SetPlayer(nullptr);
-        }
 
         m_player.erase(m_player.begin() + ctx_index);
         delete ctx;
-        if (mctx->IsPBP())
-            PBPRestartMainPlayer(mctx);
         SetActive(mctx, m_playerActive, false);
         return;
     }
@@ -2673,8 +2651,6 @@ void TV::timerEvent(QTimerEvent *te)
         HandlePseudoLiveTVTimerEvent();
     else if (timer_id == m_speedChangeTimerId)
         HandleSpeedChangeTimerEvent();
-    else if (timer_id == m_pipChangeTimerId)
-        HandlePxPTimerEvent();
     else if (timer_id == m_saveLastPlayPosTimerId)
         HandleSaveLastPlayPosEvent();
     else
@@ -3018,58 +2994,6 @@ void TV::timerEvent(QTimerEvent *te)
         m_errorRecoveryTimerId =
             StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
     }
-}
-
-bool TV::HandlePxPTimerEvent(void)
-{
-    QString cmd;
-
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        if (m_changePxP.empty())
-        {
-            if (m_pipChangeTimerId)
-                KillTimer(m_pipChangeTimerId);
-            m_pipChangeTimerId = 0;
-            return true;
-        }
-        cmd = m_changePxP.dequeue();
-    }
-
-    PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-    PlayerContext *actx = GetPlayer(mctx, -1);
-
-    if (cmd == "TOGGLEPIPMODE")
-        PxPToggleView(actx, false);
-    else if (cmd == "TOGGLEPBPMODE")
-        PxPToggleView(actx, true);
-    else if (cmd == "CREATEPIPVIEW")
-        PxPCreateView(actx, false);
-    else if (cmd == "CREATEPBPVIEW")
-        PxPCreateView(actx, true);
-    else if (cmd == "SWAPPIP")
-    {
-        if (mctx != actx)
-            PxPSwap(mctx, actx);
-        else if (mctx && m_player.size() == 2)
-            PxPSwap(mctx, GetPlayer(mctx,1));
-    }
-    else if (cmd == "TOGGLEPIPSTATE")
-        PxPToggleType(mctx, !mctx->IsPBP());
-
-    ReturnPlayerLock(mctx);
-
-    QMutexLocker locker(&m_timerIdLock);
-
-    if (m_pipChangeTimerId)
-        KillTimer(m_pipChangeTimerId);
-
-    if (m_changePxP.empty())
-        m_pipChangeTimerId = 0;
-    else
-        m_pipChangeTimerId = StartTimer(20, __LINE__);
-
-    return true;
 }
 
 bool TV::HandleLCDTimerEvent(void)
@@ -4035,7 +3959,6 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     handled = handled || ActiveHandleAction(
         actx, actions, isDVD, isMenuOrStill);
     handled = handled || ToggleHandleAction(actx, actions, isDVD);
-    handled = handled || PxPHandleAction(actx, actions);
     handled = handled || FFRewHandleAction(actx, actions);
     handled = handled || ActivePostQHandleAction(actx, actions);
 
@@ -4120,13 +4043,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
           has_action("CYCLEAUDIOCHAN",  actions) ||
           has_action("BOTTOMLINEMOVE",  actions) ||
           has_action("BOTTOMLINESAVE",  actions) ||
-          has_action("TOGGLEASPECT",    actions) ||
-          has_action("TOGGLEPIPMODE",   actions) ||
-          has_action("TOGGLEPIPSTATE",  actions) ||
-          has_action("NEXTPIPWINDOW",   actions) ||
-          has_action("CREATEPIPVIEW",   actions) ||
-          has_action("CREATEPBPVIEW",   actions) ||
-          has_action("SWAPPIP",         actions));
+          has_action("TOGGLEASPECT",    actions));
 }
 
 bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
@@ -4583,10 +4500,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         {
             PlayerContext *mctx = GetPlayer(ctx, 0);
             if (mctx != ctx)
-            { // A PIP is active, just tear it down..
-                PxPTeardownView(ctx);
                 return handled;
-            }
 
             // If it's a DVD, and we're not trying to execute a
             // jumppoint, try to back up.
@@ -4773,43 +4687,6 @@ void TV::EnableVisualisation(const PlayerContext *ctx, bool enable,
                                 tr("Visualisation Off"));
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
-bool TV::PxPHandleAction(PlayerContext *ctx, const QStringList &actions)
-{
-    if (!IsPIPSupported(ctx) && !IsPBPSupported(ctx))
-        return false;
-
-    bool handled = true;
-    {
-        QMutexLocker locker(&m_timerIdLock);
-
-        if (has_action("TOGGLEPIPMODE", actions))
-            m_changePxP.enqueue("TOGGLEPIPMODE");
-        else if (has_action("TOGGLEPBPMODE", actions))
-            m_changePxP.enqueue("TOGGLEPBPMODE");
-        else if (has_action("CREATEPIPVIEW", actions))
-            m_changePxP.enqueue("CREATEPIPVIEW");
-        else if (has_action("CREATEPBPVIEW", actions))
-            m_changePxP.enqueue("CREATEPBPVIEW");
-        else if (has_action("SWAPPIP", actions))
-            m_changePxP.enqueue("SWAPPIP");
-        else if (has_action("TOGGLEPIPSTATE", actions))
-            m_changePxP.enqueue("TOGGLEPIPSTATE");
-        else
-            handled = false;
-
-        if (!m_changePxP.empty() && !m_pipChangeTimerId)
-            m_pipChangeTimerId = StartTimer(1, __LINE__);
-    }
-
-    if (has_action("NEXTPIPWINDOW", actions))
-    {
-        SetActive(ctx, -1, true);
-        handled = true;
-    }
-
-    return handled;
 }
 
 void TV::SetBookmark(PlayerContext *ctx, bool clear)
@@ -5496,155 +5373,6 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
 }
 
-/**
- * \brief Setup Picture by Picture. right side will be the current video.
- * \param ctx  Current player context
- * \param info programinfo for PBP to use for left Picture. is nullptr for Live TV
- */
-bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
-{
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-
-    if (m_player.size() > 1)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Only allowed when player.size() == 1");
-        return false;
-    }
-
-    PlayerContext *mctx = GetPlayer(ctx, 0);
-    if (!IsPBPSupported(mctx))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "PBP not supported by video method.");
-        return false;
-    }
-
-    if (!mctx->m_player)
-        return false;
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    long long mctx_frame = mctx->m_player->GetFramesPlayed();
-    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    // This is safe because we are already holding lock for a ctx
-    m_player.push_back(new PlayerContext(kPBPPlayerInUseID));
-    PlayerContext *pbpctx = m_player.back();
-    // see comment in CreatePIP on disabling hardware acceleration for secondary players
-    //if (m_noHardwareDecoders)
-        pbpctx->SetNoHardwareDecoders();
-    pbpctx->SetPIPState(kPBPRight);
-
-    if (info)
-    {
-        pbpctx->SetPlayingInfo(info);
-        pbpctx->SetInitialTVState(false);
-        ScheduleStateChange(pbpctx);
-    }
-    else if (RequestNextRecorder(pbpctx, false))
-    {
-        pbpctx->SetInitialTVState(true);
-        ScheduleStateChange(pbpctx);
-    }
-    else
-    {
-        delete m_player.back();
-        m_player.pop_back();
-        return false;
-    }
-
-    mctx->PIPTeardown();
-    mctx->SetPIPState(kPBPLeft);
-    if (mctx->m_buffer)
-        mctx->m_buffer->Seek(0, SEEK_SET);
-
-    if (StateIsLiveTV(mctx->GetState()))
-        if (mctx->m_buffer)
-            mctx->m_buffer->Unpause();
-
-    bool ok = mctx->CreatePlayer(
-        this, GetMythMainWindow(), mctx->GetState(), false);
-
-    if (ok)
-    {
-        ScheduleStateChange(mctx);
-        mctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (mctx->m_player)
-            mctx->m_player->JumpToFrame(mctx_frame);
-        mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        SetSpeedChangeTimer(25, __LINE__);
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to restart new main context");
-        // Make putative PBP context the main context
-        swap(m_player[0],m_player[1]);
-        m_player[0]->SetPIPState(kPIPOff);
-        // End the old main context..
-        ForceNextStateNone(mctx);
-    }
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("-- end : %1").arg(ok));
-    return ok;
-}
-
-/**
- * \brief create PIP.
- * \param ctx  Current player context
- * \param info programinfo for PIP to create. is nullptr for LiveTV PIP
- */
-bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
-{
-    PlayerContext *mctx = GetPlayer(ctx, 0);
-    if (!mctx)
-        return false;
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-
-    if (mctx->IsPBP())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "CreatePIP called, but we're in PBP mode already, ignoring.");
-        return false;
-    }
-
-    if (!IsPIPSupported(mctx))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "PiP not supported by video method.");
-        return false;
-    }
-
-    auto *pipctx = new PlayerContext(kPIPPlayerInUseID);
-    // Hardware acceleration of PiP is currently disabled as the null video
-    // renderer cannot deal with hardware codecs which are returned by the display
-    // profile. The workaround would be to encourage the decoder, when using null
-    // video, to change the decoder to a decode only version - which will work
-    // with null video
-    //if (m_noHardwareDecoders)
-        pipctx->SetNoHardwareDecoders();
-    pipctx->SetNullVideo(true);
-    pipctx->SetPIPState(kPIPonTV);
-    if (info)
-    {
-        pipctx->SetPlayingInfo(info);
-        pipctx->SetInitialTVState(false);
-        ScheduleStateChange(pipctx);
-    }
-    else if (RequestNextRecorder(pipctx, false))
-    {
-        pipctx->SetInitialTVState(true);
-        ScheduleStateChange(pipctx);
-    }
-    else
-    {
-        delete pipctx;
-        return false;
-    }
-
-    // this is safe because we are already holding lock for ctx
-    m_player.push_back(pipctx);
-
-    return true;
-}
-
 int TV::find_player_index(const PlayerContext *ctx) const
 {
     for (size_t i = 0; i < m_player.size(); i++)
@@ -5656,44 +5384,15 @@ int TV::find_player_index(const PlayerContext *ctx) const
 bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
                      TVState desiredState)
 {
-    bool wantPiP = ctx->IsPIP();
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1, %2, %3) -- begin")
-            .arg(find_player_index(ctx)).arg(StateToString(desiredState))
-            .arg((wantPiP) ? "PiP" : "main"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1, %2) -- begin")
+            .arg(find_player_index(ctx)).arg(StateToString(desiredState)));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Elapsed time since TV constructor was called: %1 ms")
             .arg(m_ctorTime.elapsed()));
 
-    if (wantPiP)
-    {
-        if (mctx->HasPlayer() && ctx->StartPIPPlayer(this, desiredState) &&
-            ctx->HasPlayer() && PIPAddPlayer(mctx, ctx))
-        {
-            ScheduleStateChange(ctx);
-            LOG(VB_GENERAL, LOG_DEBUG, "PiP -- end : ok");
-            return true;
-        }
-
-        ForceNextStateNone(ctx);
-        LOG(VB_GENERAL, LOG_ERR, "PiP -- end : !ok");
-        return false;
-    }
-
-    bool ok = false;
-    if (ctx->IsNullVideoDesired())
-    {
-        ok = ctx->CreatePlayer(this, nullptr, desiredState, false);
-        ScheduleStateChange(ctx);
-        if (ok)
-            ok = PIPAddPlayer(mctx, ctx);
-    }
-    else
-    {
-        ok = ctx->CreatePlayer(this, GetMythMainWindow(), desiredState, false);
-        ScheduleStateChange(ctx);
-    }
+    bool ok = ctx->CreatePlayer(this, GetMythMainWindow(), desiredState, false);
+    ScheduleStateChange(ctx);
 
     if (ok)
     {
@@ -5701,329 +5400,14 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
         SetSpeedChangeTimer(25, __LINE__);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Failed to create player."));
+    }
 
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("(%1, %2, %3) -- end %4")
-            .arg(find_player_index(ctx)).arg(StateToString(desiredState))
-            .arg((wantPiP) ? "PiP" : "main").arg((ok) ? "ok" : "error"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1, %2) -- end %4")
+        .arg(find_player_index(ctx)).arg(StateToString(desiredState)).arg((ok) ? "ok" : "error"));
 
     return ok;
-}
-
-/// \brief Maps Player of software scaled PIP to the main player
-bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
-{
-    if (!mctx || !pipctx)
-        return false;
-
-    if (!mctx->IsPlayerPlaying())
-        return false;
-
-    bool ok = false;
-    bool addCondition = false;
-    bool is_using_null = false;
-    pipctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (pipctx->m_player)
-    {
-        is_using_null = pipctx->m_player->UsingNullVideo();
-        pipctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (is_using_null)
-        {
-            addCondition = true;
-            multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
-            if (mctx->m_player && pipctx->m_player)
-            {
-                PIPLocation loc = mctx->m_player->GetNextPIPLocation();
-                if (loc != kPIP_END)
-                    ok = mctx->m_player->AddPIPPlayer(pipctx->m_player, loc);
-            }
-            mctx->m_deletePlayerLock.unlock();
-            pipctx->m_deletePlayerLock.unlock();
-        }
-        else if (pipctx->IsPIP())
-        {
-            ok = ResizePIPWindow(pipctx);
-        }
-    }
-    else
-        pipctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    LOG(VB_GENERAL, LOG_ERR,
-        QString("AddPIPPlayer null: %1 IsPIP: %2 addCond: %3 ok: %4")
-            .arg(is_using_null)
-            .arg(pipctx->IsPIP()).arg(addCondition).arg(ok));
-
-    return ok;
-}
-
-/// \brief Unmaps Player of software scaled PIP from the main player
-bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
-{
-    if (!mctx || !pipctx)
-        return false;
-
-    bool ok = false;
-    multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
-    if (mctx->m_player && pipctx->m_player)
-        ok = mctx->m_player->RemovePIPPlayer(pipctx->m_player);
-    mctx->m_deletePlayerLock.unlock();
-    pipctx->m_deletePlayerLock.unlock();
-
-    LOG(VB_GENERAL, LOG_INFO, QString("PIPRemovePlayer ok: %1").arg(ok));
-
-    return ok;
-}
-
-/// \brief start/stop PIP/PBP
-void TV::PxPToggleView(PlayerContext *actx, bool wantPBP)
-{
-    if (wantPBP && !IsPBPSupported(actx))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "-- end: PBP not supported by video method.");
-        return;
-    }
-
-    if (m_player.size() <= 1)
-        PxPCreateView(actx, wantPBP);
-    else
-        PxPTeardownView(actx);
-}
-
-/// \brief start PIP/PBP
-void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
-{
-    if (!actx)
-        return;
-
-    QString err_msg;
-    if ((m_player.size() > kMaxPBPCount) && (wantPBP || actx->IsPBP()))
-    {
-        err_msg = tr("Sorry, PBP only supports %n video stream(s)", "",
-                     kMaxPBPCount);
-    }
-
-    if ((m_player.size() > kMaxPIPCount) &&
-        (!wantPBP || GetPlayer(actx,1)->IsPIP()))
-    {
-        err_msg = tr("Sorry, PIP only supports %n video stream(s)", "",
-                     kMaxPIPCount);
-    }
-
-    if ((m_player.size() > 1) && (wantPBP ^ actx->IsPBP()))
-        err_msg = tr("Sorry, cannot mix PBP and PIP views");
-
-    if (!err_msg.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + err_msg);
-        SetOSDMessage(actx, err_msg);
-        return;
-    }
-
-    bool ok = false;
-    if (wantPBP)
-        ok = CreatePBP(actx, nullptr);
-    else
-        ok = CreatePIP(actx, nullptr);
-    actx = GetPlayer(actx, -1); // CreatePBP/PIP mess with ctx's
-
-    QString msg = (ok) ?
-        ((wantPBP) ? tr("Creating PBP")      : tr("Creating PIP")) :
-        ((wantPBP) ? tr("Cannot create PBP") : tr("Cannot create PIP"));
-
-    SetOSDMessage(actx, msg);
-}
-
-/// \brief stop PIP/PBP
-void TV::PxPTeardownView(PlayerContext *actx)
-{
-    LOG(VB_GENERAL, LOG_INFO, "PxPTeardownView()");
-
-    QString msg;
-    PlayerContext *mctx = GetPlayer(actx, 0);
-    PlayerContext *dctx = nullptr;
-    dctx = (mctx != actx)       ? actx               : dctx;
-    dctx = (2 == m_player.size()) ? GetPlayer(actx, 1) : dctx;
-
-    SetActive(actx, 0, false);
-
-    PlayerContext *ctx1 = GetPlayer(actx, 1);
-    msg = (ctx1->IsPIP()) ? tr("Stopping PIP") : tr("Stopping PBP");
-    if (dctx)
-    {
-        ForceNextStateNone(dctx);
-    }
-    else
-    {
-        if (m_player.size() > 2)
-        {
-            msg = (ctx1->IsPIP()) ?
-                tr("Stopping all PIPs") : tr("Stopping all PBPs");
-        }
-
-        for (uint i = m_player.size() - 1; i > 0; i--)
-            ForceNextStateNone(GetPlayer(actx,i));
-    }
-
-    SetOSDMessage(mctx, msg);
-}
-
-/**
-* \brief Change PIP View from PIP to PBP and visa versa
-*/
-void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
-{
-    const QString before = (mctx->IsPBP()) ? "PBP" : "PIP";
-    const QString after  = (wantPBP)       ? "PBP" : "PIP";
-
-    // TODO renderer may change depending on display profile
-    //      check for support in new renderer
-    if (wantPBP && !IsPBPSupported(mctx))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "-- end: PBP not supported by video method.");
-        return;
-    }
-
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("converting from %1 to %2 -- begin")
-            .arg(before).arg(after));
-
-    if (mctx->IsPBP() == wantPBP)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "-- end: already in desired mode");
-        return;
-    }
-
-    uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
-    if (m_player.size() > max_cnt)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("-- end: # player contexts must be %1 or "
-                    "less, but it is currently %1")
-                .arg(max_cnt).arg(m_player.size()));
-
-        QString err_msg = tr("Too many views to switch");
-
-        PlayerContext *actx = GetPlayer(mctx, -1);
-        SetOSDMessage(actx, err_msg);
-        return;
-    }
-
-    for (size_t i = 0; i < m_player.size(); i++)
-    {
-        PlayerContext *ctx = GetPlayer(mctx, i);
-        if (!ctx->IsPlayerPlaying())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "-- end: " +
-                    QString("player #%1 is not active, exiting without "
-                            "doing anything to avoid danger").arg(i));
-            return;
-        }
-    }
-
-    MuteState mctx_mute = kMuteOff;
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (mctx->m_player)
-        mctx_mute = mctx->m_player->GetMuteState();
-    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    vector<long long> pos = TeardownAllPlayers(mctx);
-
-    if (wantPBP)
-    {
-        GetPlayer(mctx, 0)->SetPIPState(kPBPLeft);
-        if (m_player.size() > 1)
-            GetPlayer(mctx, 1)->SetPIPState(kPBPRight);
-    }
-    else
-    {
-        GetPlayer(mctx, 0)->SetPIPState(kPIPOff);
-        for (size_t i = 1; i < m_player.size(); i++)
-        {
-            GetPlayer(mctx, i)->SetPIPState(kPIPonTV);
-            GetPlayer(mctx, i)->SetNullVideo(true);
-        }
-    }
-
-    RestartAllPlayers(mctx, pos, mctx_mute);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("converting from %1 to %2 -- end")
-            .arg(before).arg(after));
-}
-
-/**
- * \brief resize PIP Window. done when changing channels or swapping PIP
- */
-bool TV::ResizePIPWindow(PlayerContext *ctx)
-{
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-    PlayerContext *mctx = GetPlayer(ctx, 0);
-    if (mctx->HasPlayer() && ctx->HasPlayer())
-    {
-        QRect rect;
-
-        multi_lock( {&mctx->m_deletePlayerLock, &ctx->m_deletePlayerLock} );
-        if (mctx->m_player && ctx->m_player)
-        {
-            PIPLocation loc = mctx->m_player->GetNextPIPLocation();
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("-- loc %1")
-                    .arg(loc));
-            if (loc != kPIP_END)
-            {
-                rect = mctx->m_player->GetVideoOutput()->GetPIPRect(
-                    loc, ctx->m_player, false);
-            }
-        }
-        mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (rect.isValid())
-        {
-            ctx->ResizePIPWindow(rect);
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end : ok");
-            return true;
-        }
-    }
-    LOG(VB_PLAYBACK, LOG_ERR, LOC + "-- end : !ok");
-    return false;
-}
-
-bool TV::IsPBPSupported(const PlayerContext *ctx) const
-{
-    const PlayerContext *mctx = nullptr;
-    if (ctx)
-        mctx = GetPlayer(ctx, 0);
-    else
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-    bool yes = mctx->IsPBPSupported();
-
-    if (!ctx)
-        ReturnPlayerLock(mctx);
-
-    return yes;
-}
-
-bool TV::IsPIPSupported(const PlayerContext *ctx) const
-{
-    const PlayerContext *mctx = nullptr;
-    if (ctx)
-        mctx = GetPlayer(ctx, 0);
-    else
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-    bool yes = mctx->IsPIPSupported();
-
-    if (!ctx)
-        ReturnPlayerLock(mctx);
-
-    return yes;
 }
 
 /** \brief Teardown all Player's in preparation for PxP Swap or
@@ -6040,54 +5424,7 @@ vector<long long> TV::TeardownAllPlayers(PlayerContext *lctx)
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
 
-    for (size_t i = 0; i < m_player.size(); i++)
-    {
-        PlayerContext *ctx = GetPlayer(lctx, i);
-        ctx->PIPTeardown();
-    }
-
     return pos;
-}
-
-/**
- * \brief tear down remaining PBP video and restore
- * fullscreen display
- */
-void TV::PBPRestartMainPlayer(PlayerContext *mctx)
-{
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC  + "-- begin");
-
-    if (!mctx->IsPlayerPlaying() ||
-        mctx->GetPIPState() != kPBPLeft || m_exitPlayerTimerId)
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            "-- end !ok !valid");
-        return;
-    }
-
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    long long mctx_frame = (mctx->m_player) ? mctx->m_player->GetFramesPlayed() : 0;
-    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-    mctx->PIPTeardown();
-    mctx->SetPIPState(kPIPOff);
-    if (mctx->m_buffer)
-        mctx->m_buffer->Seek(0, SEEK_SET);
-
-    if (mctx->CreatePlayer(this, GetMythMainWindow(), mctx->GetState(), false))
-    {
-        ScheduleStateChange(mctx);
-        mctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (mctx->m_player)
-            mctx->m_player->JumpToFrame(mctx_frame);
-        mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        SetSpeedChangeTimer(25, __LINE__);
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end ok");
-        return;
-    }
-
-    ForceNextStateNone(mctx);
-    LOG(VB_PLAYBACK, LOG_ERR, LOC + "-- end !ok Player did not restart");
 }
 
 /**
@@ -6108,7 +5445,6 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
             mctx->m_buffer->Unpause();
     }
 
-    mctx->SetNullVideo(false);
     mctx->SetNoHardwareDecoders(false);
     bool ok = StartPlayer(mctx, mctx, mctx->GetState());
 
@@ -6127,96 +5463,12 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
         return;
     }
 
-    for (size_t i = 1; i < m_player.size(); i++)
-    {
-        PlayerContext *pipctx = GetPlayer(lctx, i);
-
-        if (pipctx->m_buffer) {
-            pipctx->m_buffer->Seek(0, SEEK_SET);
-            if (StateIsLiveTV(pipctx->GetState()))
-                pipctx->m_buffer->Unpause();
-        }
-
-        pipctx->SetNullVideo(true);
-        pipctx->SetNoHardwareDecoders(true);
-
-        ok = StartPlayer(mctx, pipctx, pipctx->GetState());
-
-        if (ok)
-        {
-            pipctx->LockDeletePlayer(__FILE__, __LINE__);
-            if (pipctx->m_player)
-            {
-                pipctx->m_player->SetMuted(true);
-                pipctx->m_player->JumpToFrame(pos[i]);
-            }
-            pipctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        }
-        else
-        { // TODO print OSD informing user of Swap failure ?
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Failed to restart new pip context (was main context)");
-            ForceNextStateNone(pipctx);
-        }
-    }
-
     // If old main player had a kMuteAll | kMuteOff setting,
     // apply old main player's mute setting to new main player.
     mctx->LockDeletePlayer(__FILE__, __LINE__);
     if (mctx->m_player && ((kMuteAll == mctx_mute) || (kMuteOff == mctx_mute)))
         mctx->m_player->SetMuteState(mctx_mute);
     mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
-void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
-{
-    if (!mctx || !pipctx)
-        return;
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
-    if (mctx == pipctx)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "-- need two contexts");
-        return;
-    }
-
-    m_lockTimerOn = false;
-
-    multi_lock( {&mctx->m_deletePlayerLock, &pipctx->m_deletePlayerLock} );
-    if (!mctx->m_player   || !mctx->m_player->IsPlaying() ||
-        !pipctx->m_player || !pipctx->m_player->IsPlaying())
-    {
-        mctx->m_deletePlayerLock.unlock();
-        pipctx->m_deletePlayerLock.unlock();
-        LOG(VB_GENERAL, LOG_ERR, LOC + "-- a player is not playing");
-        return;
-    }
-
-    MuteState mctx_mute = mctx->m_player->GetMuteState();
-    mctx->m_deletePlayerLock.unlock();
-    pipctx->m_deletePlayerLock.unlock();
-
-    int ctx_index = find_player_index(pipctx);
-
-    if (ctx_index < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "-- failed to find player index by context");
-        return;
-    }
-
-    vector<long long> pos = TeardownAllPlayers(mctx);
-
-    swap(m_player[0],         m_player[ctx_index]);
-    swap(pos[0],              pos[ctx_index]);
-    swap(m_player[0]->m_pipState, m_player[ctx_index]->m_pipState);
-    m_playerActive = (ctx_index == m_playerActive) ?
-        0 : ((ctx_index == 0) ? ctx_index : m_playerActive);
-
-    RestartAllPlayers(mctx, pos, mctx_mute);
-
-    SetActive(mctx, m_playerActive, false);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
 }
 
 void TV::RestartMainPlayer(PlayerContext *mctx)
@@ -7185,9 +6437,6 @@ void TV::SwitchInputs(PlayerContext *ctx,
         ctx->SetPseudoLiveTV(nullptr, kPseudoNormalLiveTV);
 
         PlayerContext *mctx = GetPlayer(ctx, 0);
-        if (mctx != ctx)
-            PIPRemovePlayer(mctx, ctx);
-
         bool muted = false;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->m_player && ctx->m_player->IsMuted())
@@ -7260,9 +6509,6 @@ void TV::SwitchInputs(PlayerContext *ctx,
                 ScheduleStateChange(ctx);
                 ok = true;
                 ctx->PushPreviousChannel();
-                for (size_t i = 1; i < m_player.size(); i++)
-                    PIPAddPlayer(mctx2, GetPlayer(ctx, i));
-
                 SetSpeedChangeTimer(25, __LINE__);
             }
             else
@@ -8460,25 +7706,7 @@ bool TV::StartEmbedding(const QRect &embedRect)
     if (!ctx)
         return false;
 
-    if (!ctx->IsNullVideoDesired())
-        ctx->StartEmbedding(embedRect);
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Called with null video context #%1")
-                .arg(find_player_index(ctx)));
-        ctx->ResizePIPWindow(embedRect);
-    }
-
-    // Hide any PIP windows...
-    PlayerContext *mctx = GetPlayer(ctx, 0);
-    for (uint i = 1; (mctx == ctx) && (i < m_player.size()); i++)
-    {
-        GetPlayer(ctx,i)->LockDeletePlayer(__FILE__, __LINE__);
-        if (GetPlayer(ctx,i)->m_player)
-            GetPlayer(ctx,i)->m_player->SetPIPVisible(false);
-        GetPlayer(ctx,i)->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+    ctx->StartEmbedding(embedRect);
 
     // Start checking for end of file for embedded window..
     QMutexLocker locker(&m_timerIdLock);
@@ -8499,16 +7727,6 @@ void TV::StopEmbedding(void)
 
     if (ctx->IsEmbedding())
         ctx->StopEmbedding();
-
-    // Undo any PIP hiding
-    PlayerContext *mctx = GetPlayer(ctx, 0);
-    for (uint i = 1; (mctx == ctx) && (i < m_player.size()); i++)
-    {
-        GetPlayer(ctx,i)->LockDeletePlayer(__FILE__, __LINE__);
-        if (GetPlayer(ctx,i)->m_player)
-            GetPlayer(ctx,i)->m_player->SetPIPVisible(true);
-        GetPlayer(ctx,i)->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
 
     // Stop checking for end of file for embedded window..
     QMutexLocker locker(&m_timerIdLock);
@@ -9165,7 +8383,7 @@ void TV::ToggleAspectOverride(PlayerContext *ctx, AspectOverrideMode aspectMode)
 
 void TV::ToggleAdjustFill(PlayerContext *ctx, AdjustFillMode adjustfillMode)
 {
-    if (ctx != GetPlayer(ctx,0) || ctx->IsPBP())
+    if (ctx != GetPlayer(ctx,0))
         return;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -9478,24 +8696,8 @@ void TV::customEvent(QEvent *e)
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         if (mctx->m_recorder && cardnum == mctx->GetCardID())
-        {
-            AskAllowRecording(mctx, me->ExtraDataList(),
-                              timeuntil, hasrec, haslater);
-        }
+            AskAllowRecording(mctx, me->ExtraDataList(), timeuntil, hasrec, haslater);
 
-        for (size_t i = 1; i < m_player.size(); i++)
-        {
-            PlayerContext *ctx = GetPlayer(mctx, i);
-            if (ctx->m_recorder && ctx->GetCardID() == cardnum)
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling PxP for recording");
-                QString type = ctx->IsPIP() ?
-                    tr("PiP", "Picture-in-Picture") :
-                    tr("PbP", "Picture-by-Picture");
-                StopStuff(mctx, ctx, true, true, true);
-                SetOSDMessage(mctx, tr("Disabling %1 for recording").arg(type));
-            }
-        }
         ReturnPlayerLock(mctx);
     }
 
@@ -10074,21 +9276,6 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
 
     m_playerActive = new_index;
 
-    for (int i = 0; i < (int)m_player.size(); i++)
-    {
-        PlayerContext *ctx = GetPlayer(lctx, i);
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->m_player)
-            ctx->m_player->SetPIPActive(i == m_playerActive);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    }
-
-    if (osd_msg && !GetPlayer(lctx, -1)->IsPIP() && m_player.size() > 1)
-    {
-        PlayerContext *actx = GetPlayer(lctx, -1);
-        SetOSDMessage(actx, tr("Active Changed"));
-    }
-
     LOG(VB_PLAYBACK, LOG_DEBUG, loc + " -- end");
 }
 
@@ -10641,12 +9828,6 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         Handle3D(actx, action);
     else if (HandleJumpToProgramAction(actx, QStringList(action)))
     {
-    }
-    else if (PxPHandleAction(actx, QStringList(action)))
-    {
-        for (size_t i = 0; i < m_player.size(); i++)
-            ClearOSD(GetPlayer(actx,i));
-        actx = GetPlayer(actx,-1); // "NEXTPIPWINDOW" changes active context..
     }
     else if (StateIsLiveTV(GetState(actx)))
     {
@@ -11625,82 +10806,6 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             BUTTON(actionName, tr("Toggle"));
         }
-        else if (actionName == "CREATEPIPVIEW")
-        {
-            MenuLazyInit(&m_tvmFreeRecorderCount);
-            if (m_tvmFreeRecorderCount &&
-                m_player.size() <= kMaxPIPCount && !m_tvmHasPBP && m_tvmAllowPIP)
-            {
-                BUTTON(actionName, tr("Open Live TV PIP"));
-            }
-        }
-        else if (actionName == "CREATEPBPVIEW")
-        {
-            MenuLazyInit(&m_tvmFreeRecorderCount);
-            if (m_tvmFreeRecorderCount &&
-                m_player.size() < kMaxPBPCount && !m_tvmHasPIP && m_tvmAllowPBP)
-            {
-                BUTTON(actionName, tr("Open Live TV PBP"));
-            }
-        }
-        else if (actionName == "JUMPRECPIP")
-        {
-            if (m_player.size() <= kMaxPIPCount &&
-                !m_tvmHasPBP && m_tvmAllowPIP)
-            {
-                BUTTON(actionName, tr("Open Recording PIP"));
-            }
-        }
-        else if (actionName == "JUMPRECPBP")
-        {
-            if (m_player.size() < kMaxPBPCount &&
-                !m_tvmHasPIP && m_tvmAllowPBP)
-            {
-                BUTTON(actionName, tr("Open Recording PBP"));
-            }
-        }
-        else if (actionName == "NEXTPIPWINDOW")
-        {
-            if (m_player.size() > 1)
-                BUTTON(actionName, tr("Change Active Window"));
-        }
-        else if (actionName == "TOGGLEPIPMODE")
-        {
-            if (m_player.size() > 1)
-            {
-                const PlayerContext *mctx = GetPlayer(ctx, 0);
-                const PlayerContext *octx = GetPlayer(ctx, 1);
-                if (mctx == ctx && octx->IsPIP())
-                    BUTTON(actionName, tr("Close PIP(s)", nullptr, m_player.size() - 1));
-            }
-        }
-        else if (actionName == "TOGGLEPBPMODE")
-        {
-            if (m_player.size() > 1)
-            {
-                const PlayerContext *mctx = GetPlayer(ctx, 0);
-                const PlayerContext *octx = GetPlayer(ctx, 1);
-                if (mctx == ctx && octx->IsPBP())
-                    BUTTON(actionName, tr("Close PBP(s)", nullptr, m_player.size() - 1));
-            }
-        }
-        else if (actionName == "SWAPPIP")
-        {
-            const PlayerContext *mctx = GetPlayer(ctx, 0);
-            if (mctx != ctx || m_player.size() == 2)
-                BUTTON(actionName, tr("Swap Windows"));
-        }
-        else if (actionName == "TOGGLEPIPSTATE")
-        {
-            uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
-            if (m_player.size() <= max_cnt &&
-                ((m_tvmHasPIP && m_tvmAllowPBP) ||
-                    (m_tvmHasPBP && m_tvmAllowPIP)) )
-            {
-                active = !m_tvmHasPBP;
-                BUTTON2(actionName, tr("Switch to PBP"), tr("Switch to PIP"));
-            }
-        }
         else if (actionName == "TOGGLEBROWSE")
         {
             if (m_dbUseChannelGroups)
@@ -11907,10 +11012,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmIsVideo           = (m_tvmState == kState_WatchingVideo);
     m_tvmCurSkip           = kCommSkipOff;
     m_tvmIsPaused          = false;
-    m_tvmAllowPIP          = IsPIPSupported(ctx);
-    m_tvmAllowPBP          = IsPBPSupported(ctx);
-    m_tvmHasPBP            = (m_player.size() > 1) && GetPlayer(ctx,1)->IsPBP();
-    m_tvmHasPIP            = (m_player.size() > 1) && GetPlayer(ctx,1)->IsPIP();
     m_tvmFreeRecorderCount = -1;
     m_tvmIsDvd             = (m_tvmState == kState_WatchingDVD);
     m_tvmIsBd              = (ctx->m_buffer && ctx->m_buffer->IsBD() &&
@@ -12310,16 +11411,12 @@ void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
 
 void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, const QString& desc)
 {
-    if (ctx->GetPIPState() != kPIPOff)
-        return;
-
     m_zoomMode = zoomON;
     if (zoomON)
         ClearOSD(ctx);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc,
-                             zoomON ? kOSDTimeout_None : kOSDTimeout_Med);
+        UpdateOSDSeekMessage(ctx, desc, zoomON ? kOSDTimeout_None : kOSDTimeout_Med);
 }
 
 bool TV::HandleJumpToProgramAction(
@@ -12373,57 +11470,18 @@ bool TV::HandleJumpToProgramAction(
             return true;
         }
 
-        PIPState state = kPIPOff;
-        {
-            QMutexLocker locker(&m_timerIdLock);
-            state = m_jumpToProgramPIPState;
-        }
-
-        if (kPIPOff == state)
-        {
-            if (mctx == ctx)
-            {
-                PrepToSwitchToRecordedProgram(ctx, *p);
-            }
-            else
-            {
-                // TODO
-            }
-        }
-        else
-        {
-            QString type = (kPIPonTV == m_jumpToProgramPIPState) ? "PIP" : "PBP";
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Creating %1 with program: %2")
-                    .arg(type).arg(p->toString(ProgramInfo::kTitleSubtitle)));
-
-            if (m_jumpToProgramPIPState == kPIPonTV)
-                CreatePIP(ctx, p);
-            else if (m_jumpToProgramPIPState == kPBPLeft)
-                CreatePBP(ctx, p);
-        }
+        if (mctx == ctx)
+            PrepToSwitchToRecordedProgram(ctx, *p);
 
         delete p;
-
         return true;
     }
 
     bool wants_jump = has_action(ACTION_JUMPREC, actions);
-    bool wants_pip = !wants_jump && has_action("JUMPRECPIP", actions);
-    bool wants_pbp = !wants_jump && !wants_pip &&
-        has_action("JUMPRECPBP", actions);
-
-    if (!wants_jump && !wants_pip && !wants_pbp)
+    if (!wants_jump)
         return false;
 
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        m_jumpToProgramPIPState = wants_pip ? kPIPonTV :
-            (wants_pbp ? kPBPLeft : kPIPOff);
-    }
-
-    if ((wants_pbp || wants_pip || m_dbJumpPreferOsd) &&
-        (StateIsPlaying(s) || StateIsLiveTV(s)))
+    if (m_dbJumpPreferOsd && (StateIsPlaying(s) || StateIsLiveTV(s)))
     {
         QMutexLocker locker(&m_timerIdLock);
         if (m_jumpMenuTimerId)
@@ -12574,7 +11632,7 @@ void TV::PauseLiveTV(PlayerContext *ctx)
     QString input = ctx->m_recorder->GetInput();
     uint timeout  = ctx->m_recorder->GetSignalLockTimeout(input);
 
-    if (timeout < 0xffffffff && !ctx->IsPIP())
+    if (timeout < 0xffffffff)
     {
         m_lockTimer.start();
         m_lockTimerOn = true;
@@ -13168,7 +12226,7 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
     const PlayerContext *mctx = GetPlayer(ctx, 0);
 
     mctx->LockDeletePlayer(file, location);
-    if (mctx->m_player && ctx->IsPIP())
+    if (mctx->m_player)
     {
         mctx->LockOSD();
         OSD *osd = mctx->m_player->GetOSD();
@@ -13182,23 +12240,6 @@ OSD *TV::GetOSDL(const PlayerContext *ctx, const char *file, int location)
         return osd;
     }
     mctx->UnlockDeletePlayer(file, location);
-
-    ctx->LockDeletePlayer(file, location);
-    if (ctx->m_player && !ctx->IsPIP())
-    {
-        ctx->LockOSD();
-        OSD *osd = ctx->m_player->GetOSD();
-        if (!osd)
-        {
-            ctx->UnlockOSD();
-            ctx->UnlockDeletePlayer(file, location);
-        }
-        else
-            m_osdLctx[osd] = ctx;
-        return osd;
-    }
-    ctx->UnlockDeletePlayer(file, location);
-
     return nullptr;
 }
 

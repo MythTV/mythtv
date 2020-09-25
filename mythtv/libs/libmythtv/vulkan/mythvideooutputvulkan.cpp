@@ -92,9 +92,9 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
     return true;
 }
 
-void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, const PIPMap& PiPPlayers, FrameScanType Scan)
+void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 {
-    MythVideoOutputGPU::PrepareFrame(Frame, PiPPlayers, Scan);
+    MythVideoOutputGPU::PrepareFrame(Frame, Scan);
 }
 
 void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
@@ -131,24 +131,4 @@ void MythVideoOutputVulkan::EndFrame()
 {
     if (m_video)
         m_video->EndFrame();
-}
-
-MythVideoGPU* MythVideoOutputVulkan::CreateSecondaryVideo(const QSize& VideoDim,
-                                                          const QSize& VideoDispDim,
-                                                          const QRect& DisplayVisibleRect,
-                                                          const QRect& DisplayVideoRect,
-                                                          const QRect& VideoRect)
-{
-    auto * colourspace = new MythVideoColourSpace(&m_videoColourSpace);
-    auto * result = new MythVideoVulkan(this, colourspace,
-                                        VideoDim, VideoDispDim,
-                                        DisplayVisibleRect, DisplayVideoRect,
-                                        VideoRect, QString{});
-    colourspace->DecrRef();
-    if (result && !(result->IsValidVulkan() && result->IsValid()))
-    {
-        delete result;
-        result = nullptr;
-    }
-    return result;
 }

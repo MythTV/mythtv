@@ -58,7 +58,6 @@ class VideoPerformanceTest
 
     void Test(void)
     {
-        PIPMap dummy;
         MythMediaBuffer *rb = MythMediaBuffer::Create(m_file, false, true, 2000);
         auto *mp  = new MythPlayer(static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
@@ -141,7 +140,7 @@ class VideoPerformanceTest
             if (!m_decodeOnly)
             {
                 MythDeintType doubledeint = GetDoubleRateOption(frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
-                vo->PrepareFrame(frame, dummy, scan);
+                vo->PrepareFrame(frame, scan);
                 vo->RenderFrame(frame, scan, nullptr);
                 vo->EndFrame();
 
@@ -150,7 +149,7 @@ class VideoPerformanceTest
                     doubledeint = GetDoubleRateOption(frame, DEINT_CPU);
                     MythDeintType other = GetDoubleRateOption(frame, DEINT_SHADER | DEINT_DRIVER);
                     if (doubledeint && !other)
-                        vo->PrepareFrame(frame, dummy, kScan_Intr2ndField);
+                        vo->PrepareFrame(frame, kScan_Intr2ndField);
                     vo->RenderFrame(frame, kScan_Intr2ndField, nullptr);
                     vo->EndFrame();
                 }

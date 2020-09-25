@@ -5,24 +5,6 @@
 #include <QString>
 #include <QObject>
 
-enum PIPState
-{
-    kPIPOff = 0,
-    kPIPonTV,
-    kPIPStandAlone,
-    kPBPLeft,
-    kPBPRight,
-};
-
-enum PIPLocation
-{
-    kPIPTopLeft = 0,
-    kPIPBottomLeft,
-    kPIPTopRight,
-    kPIPBottomRight,
-    kPIP_END
-};
-
 enum ZoomDirection
 {
     kZoomHome = 0,
@@ -202,32 +184,6 @@ inline QString ScanTypeToString(FrameScanType Scan)
         case kScan_Progressive: return QString("Progressive Scan");
         default:                return QString("Unknown Scan");
     }
-}
-
-inline QString toString(PIPState State)
-{
-    switch (State)
-    {
-        case kPIPOff:        return QString("Pip Off");
-        case kPIPonTV:       return QString("Pip on TV");
-        case kPIPStandAlone: return QString("Pip Standalone");
-        case kPBPLeft:       return QString("PBP Left");
-        case kPBPRight:      return QString("PBP Right");
-    }
-    return QString("Unknown");
-}
-
-inline QString toString(PIPLocation Location)
-{
-    switch (Location)
-    {
-        case kPIPTopLeft:     return QObject::tr("Top Left");
-        case kPIPBottomLeft:  return QObject::tr("Bottom Left");
-        case kPIPTopRight:    return QObject::tr("Top Right");
-        case kPIPBottomRight: return QObject::tr("Bottom Right");
-        case kPIP_END:        break;
-    }
-    return "";
 }
 
 inline QString toString(AspectOverrideMode Aspectmode)
