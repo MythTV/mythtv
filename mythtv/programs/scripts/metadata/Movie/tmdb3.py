@@ -289,7 +289,7 @@ def main():
     opts, args = parser.parse_args()
 
     signal.signal(signal.SIGALRM, timeouthandler)
-    signal.alarm(30)
+    signal.alarm(180)
 
     if opts.version:
         buildVersion()
