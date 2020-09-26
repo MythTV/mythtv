@@ -445,7 +445,7 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
     }
 
     auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
+    if (!hwdevicecontext || !hwdevicecontext->hwctx)
     {
         interop->DecrRef();
         return -1;

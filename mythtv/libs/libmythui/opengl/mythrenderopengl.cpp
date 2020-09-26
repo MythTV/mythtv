@@ -663,7 +663,7 @@ int MythRenderOpenGL::GetTextureDataSize(MythGLTexture *Texture)
 
 void MythRenderOpenGL::SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap)
 {
-    if (!Texture || (Texture && !(Texture->m_texture || Texture->m_textureId)))
+    if (!Texture || !(Texture->m_texture || Texture->m_textureId))
         return;
 
     makeCurrent();
@@ -799,7 +799,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 {
     makeCurrent();
 
-    if (!Texture || (Texture && !((Texture->m_texture || Texture->m_textureId) && Texture->m_vbo)))
+    if (!Texture || !((Texture->m_texture || Texture->m_textureId) && Texture->m_vbo))
         return;
 
     if (Program == nullptr)
@@ -865,7 +865,7 @@ void MythRenderOpenGL::DrawBitmap(std::vector<MythGLTexture *> &Textures,
         Program = m_defaultPrograms[kShaderDefault];
 
     MythGLTexture* first = Textures[0];
-    if (!first || (first && !((first->m_texture || first->m_textureId) && first->m_vbo)))
+    if (!first || !((first->m_texture || first->m_textureId) && first->m_vbo))
         return;
 
     SetShaderProjection(Program);
@@ -1263,7 +1263,7 @@ QStringList MythRenderOpenGL::GetDescription(void)
 bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
                                              const QRect &Destination, int Rotation, qreal Scale)
 {
-    if (!Texture || (Texture && Texture->m_size.isEmpty()))
+    if (!Texture || Texture->m_size.isEmpty())
         return false;
 
     if ((Texture->m_source == Source) && (Texture->m_destination == Destination) &&

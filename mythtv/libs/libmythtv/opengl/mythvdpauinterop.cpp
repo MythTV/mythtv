@@ -257,10 +257,10 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         return result;
 
     auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-    if (!buffer || (buffer && !buffer->data))
+    if (!buffer || !buffer->data)
         return result;
     auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
-    if (!frames || (frames && !frames->device_ctx))
+    if (!frames || !frames->device_ctx)
         return result;
     auto *devicecontext = reinterpret_cast<AVVDPAUDeviceContext*>(frames->device_ctx->hwctx);
     if (!devicecontext)

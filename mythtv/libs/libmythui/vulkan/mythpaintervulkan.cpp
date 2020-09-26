@@ -129,7 +129,7 @@ bool MythPainterVulkan::Ready()
         // device setup can be delayed by a few frames on startup - check status
         // before continuing
         auto * window = MythRenderVulkan::GetVulkanRender()->GetVulkanWindow();
-        if (!window || (window && !window->device()))
+        if (!window || !window->device())
             return false;
 
         m_vulkan = MythVulkanObject::Create(MythRenderVulkan::GetVulkanRender());

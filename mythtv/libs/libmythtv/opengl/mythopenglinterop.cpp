@@ -187,19 +187,19 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     {
         // Unpick
         auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
-        if (!buffer || (buffer && !buffer->data))
+        if (!buffer || !buffer->data)
             return result;
         if (Frame->codec == FMT_NVDEC)
         {
             auto* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
-            if (!context || (context && !context->user_opaque))
+            if (!context || !context->user_opaque)
                 return result;
             interop = reinterpret_cast<MythOpenGLInterop*>(context->user_opaque);
         }
         else
         {
             auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
-            if (!frames || (frames && !frames->user_opaque))
+            if (!frames || !frames->user_opaque)
                 return result;
             interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
         }

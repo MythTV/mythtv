@@ -47,7 +47,7 @@ bool MythInteractiveBuffer::OpenFile(const QString &Url, uint /*Retry*/)
     }
 
     QScopedPointer<NetStream> stream(new NetStream(Url, NetStream::kNeverCache));
-    if (!stream || (stream && !stream->IsOpen()))
+    if (!stream || !stream->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'").arg(Url));
         return false;

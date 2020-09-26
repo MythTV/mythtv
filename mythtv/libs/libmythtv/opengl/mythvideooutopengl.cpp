@@ -288,7 +288,7 @@ void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
 
     uint8_t gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
 
-    if (!Frame || (Frame && Frame->dummy) || ((m_openglRender->GetExtraFeatures() & kGLTiled) != 0))
+    if (!Frame || Frame->dummy || ((m_openglRender->GetExtraFeatures() & kGLTiled) != 0))
     {
         m_openglRender->SetBackground(gray, gray, gray, 255);
         m_openglRender->ClearFramebuffer();

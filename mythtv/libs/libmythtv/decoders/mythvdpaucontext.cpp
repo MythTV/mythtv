@@ -64,7 +64,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
 
     auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
+    if (!hwdevicecontext || !hwdevicecontext->hwctx)
         return -1;
 
     // Initialise device context

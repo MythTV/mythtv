@@ -288,14 +288,14 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 
     // Create hardware device context
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
-    if (!hwdeviceref || (hwdeviceref && !hwdeviceref->data))
+    if (!hwdeviceref || !hwdeviceref->data)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware device context");
         return -1;
     }
 
     auto* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
+    if (!hwdevicecontext || !hwdevicecontext->hwctx)
         return -1;
     auto *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
     if (!vaapidevicectx)

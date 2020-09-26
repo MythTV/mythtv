@@ -171,7 +171,7 @@ void MythVideoOutputGPU::DoneDisplayingFrame(VideoFrame* Frame)
     while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
         VideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
-        if (!retain || (retain && (frame != Frame)))
+        if (!retain || (frame != Frame))
             release.append(frame);
     }
 

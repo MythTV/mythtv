@@ -1358,7 +1358,7 @@ MythBDOverlay* MythBDBuffer::GetOverlay(void)
 
 void MythBDBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
 {
-    if (!Overlay || (Overlay && (Overlay->plane > m_overlayPlanes.size())))
+    if (!Overlay || (Overlay->plane > m_overlayPlanes.size()))
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
@@ -1438,7 +1438,7 @@ void MythBDBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
 
 void MythBDBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
 {
-    if (!Overlay || (Overlay && (Overlay->plane > m_overlayPlanes.size())))
+    if (!Overlay || (Overlay->plane > m_overlayPlanes.size()))
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));

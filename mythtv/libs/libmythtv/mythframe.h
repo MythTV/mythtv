@@ -488,7 +488,7 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
 }
 static inline void clear_vf(VideoFrame *vf)
 {
-    if (!vf || (vf && !vf->buf))
+    if (!vf || !vf->buf)
         return;
 
     // luma (or RGBA)
