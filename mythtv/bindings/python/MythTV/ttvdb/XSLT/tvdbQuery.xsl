@@ -48,22 +48,22 @@
                         <xsl:if test=".//poster/text() != ''">
                             <xsl:element name="image">
                                 <xsl:attribute name="type">coverart</xsl:attribute>
-                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(poster))"/></xsl:attribute>
-                                <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(poster))"/></xsl:attribute>
+                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com', normalize-space(poster))"/></xsl:attribute>
+                                <xsl:attribute name="thumb"><xsl:value-of select="tvdbXpath:replace(concat('http://www.thetvdb.com', normalize-space(poster)), '/banners/', '/banners/_cache/')"/></xsl:attribute>
                             </xsl:element>
                         </xsl:if>
                         <xsl:if test=".//fanart/text() != ''">
                             <xsl:element name="image">
                                 <xsl:attribute name="type">fanart</xsl:attribute>
-                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(fanart))"/></xsl:attribute>
-                                <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(fanart))"/></xsl:attribute>
+                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com', normalize-space(fanart))"/></xsl:attribute>
+                                <xsl:attribute name="thumb"><xsl:value-of select="tvdbXpath:replace(concat('http://www.thetvdb.com', normalize-space(fanart)), '/banners/', '/banners/_cache/')"/></xsl:attribute>
                             </xsl:element>
                         </xsl:if>
                         <xsl:if test=".//banner/text() != ''">
                             <xsl:element name="image">
                                 <xsl:attribute name="type">banner</xsl:attribute>
-                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(banner))"/></xsl:attribute>
-                                <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(banner))"/></xsl:attribute>
+                                <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com', normalize-space(banner))"/></xsl:attribute>
+                                <xsl:attribute name="thumb"><xsl:value-of select="tvdbXpath:replace(concat('http://www.thetvdb.com', normalize-space(banner)), '/banners/', '/banners/_cache/')"/></xsl:attribute>
                             </xsl:element>
                         </xsl:if>
                     </images>
