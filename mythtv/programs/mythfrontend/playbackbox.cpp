@@ -271,7 +271,7 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
     if (((pginfo.GetRecordingStatus() != RecStatus::Recording) &&
          (pginfo.GetAvailableStatus() != asAvailable) &&
          (pginfo.GetAvailableStatus() != asNotYetAvailable)) ||
-        (player && player->IsSameProgram(0, &pginfo)))
+        (player && player->IsSameProgram(&pginfo)))
     {
         state = "disabled";
     }
@@ -449,7 +449,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
     if (player)
     {
         m_player = player;
-        QString tmp = m_player->GetRecordingGroup(0);
+        QString tmp = m_player->GetRecordingGroup();
         if (!tmp.isEmpty())
             m_recGroup = tmp;
     }
@@ -2350,12 +2350,11 @@ void PlaybackBox::PlayX(const ProgramInfo &pginfo,
 {
     if (!m_player)
     {
-        Play(pginfo, false, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
-             underNetworkControl);
+        Play(pginfo, false, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos, underNetworkControl);
         return;
     }
 
-    if (!m_player->IsSameProgram(0, &pginfo))
+    if (!m_player->IsSameProgram(&pginfo))
     {
         pginfo.ToStringList(m_playerSelectedNewShow);
         m_playerSelectedNewShow.push_back(ignoreBookmark ? "1" : "0");
@@ -3306,7 +3305,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     bool sameProgram = false;
 
     if (m_player)
-        sameProgram = m_player->IsSameProgram(0, &pginfo);
+        sameProgram = m_player->IsSameProgram(&pginfo);
 
     TVState tvstate = kState_None;
 

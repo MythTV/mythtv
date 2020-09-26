@@ -787,7 +787,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             int secsTillStart =
                 (pginfo) ? MythDate::current().secsTo(
                     pginfo->GetScheduledStartTime()) : 0;
-            if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+            if (m_player && (m_player->GetState() == kState_WatchingLiveTV))
             {
                 // See if this show is far enough into the future that it's
                 // probable that the user wanted to schedule it to record
@@ -923,7 +923,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                             {
                                 if ((rowCol.y() == m_currentRow) && (rowCol.x() == m_currentCol))
                                 {
-                                    if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+                                    if (m_player && (m_player->GetState() == kState_WatchingLiveTV))
                                     {
                                         // See if this show is far enough into the future that it's
                                         // probable that the user wanted to schedule it to record
@@ -1080,7 +1080,7 @@ void GuideGrid::ShowMenu(void)
     {
         menuPopup->SetReturnEvent(this, "guidemenu");
 
-        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+        if (m_player && (m_player->GetState() == kState_WatchingLiveTV))
             menuPopup->AddButton(tr("Change to Channel"));
         else if (!m_player && SelectionIsTunable(GetSelection()))
             menuPopup->AddButton(tr("Watch This Channel"));
@@ -1217,7 +1217,7 @@ uint GuideGrid::GetAlternateChannelIndex(
     uint si = m_channelInfoIdx[chan_idx];
     const ChannelInfo *chinfo = GetChannelInfo(chan_idx, si);
 
-    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+    PlayerContext *ctx = m_player->GetPlayerReadLock();
 
     const uint cnt = (ctx && chinfo) ? m_channelInfos[chan_idx].size() : 0;
     for (uint i = 0; i < cnt; ++i)
@@ -1234,7 +1234,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (with_same_channum != same_channum)
             continue;
 
-        if (!TV::IsTunable(ctx, ciinfo->m_chanId))
+        if (!TV::IsTunable(ciinfo->m_chanId))
             continue;
 
         if (with_same_channum)
@@ -1263,7 +1263,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         }
     }
 
-    m_player->ReturnPlayerLock(ctx);
+    m_player->ReturnPlayerLock();
 
     return si;
 }
@@ -2096,11 +2096,10 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
         if (m_player)
         {
-            const PlayerContext *ctx = m_player->GetPlayerReadLock(
-                -1, __FILE__, __LINE__);
+            const PlayerContext *ctx = m_player->GetPlayerReadLock();
             if (ctx && chinfo)
-                try_alt = !TV::IsTunable(ctx, chinfo->m_chanId);
-            m_player->ReturnPlayerLock(ctx);
+                try_alt = !TV::IsTunable(chinfo->m_chanId);
+            m_player->ReturnPlayerLock();
         }
 
         if (try_alt)
@@ -2588,9 +2587,9 @@ void GuideGrid::channelUpdate(void)
 
     if (!sel.empty())
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_player->ChangeChannel(ctx, sel);
-        m_player->ReturnPlayerLock(ctx);
+        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->ChangeChannel(sel);
+        m_player->ReturnPlayerLock();
     }
 }
 
@@ -2598,9 +2597,9 @@ void GuideGrid::volumeUpdate(bool up)
 {
     if (m_player)
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_player->ChangeVolume(ctx, up);
-        m_player->ReturnPlayerLock(ctx);
+        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->ChangeVolume(up);
+        m_player->ReturnPlayerLock();
     }
 }
 
@@ -2608,9 +2607,9 @@ void GuideGrid::toggleMute(const bool muteIndividualChannels)
 {
     if (m_player)
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_player->ToggleMute(ctx, muteIndividualChannels);
-        m_player->ReturnPlayerLock(ctx);
+        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->ToggleMute(muteIndividualChannels);
+        m_player->ReturnPlayerLock();
     }
 }
 

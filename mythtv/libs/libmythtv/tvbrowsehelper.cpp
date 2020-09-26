@@ -72,7 +72,7 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
     if (m_ctx)
         return m_ctx == ctx;
 
-    m_tv->ClearOSD(ctx);
+    m_tv->ClearOSD();
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (ctx->m_playingInfo)
@@ -126,13 +126,13 @@ void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
     m_list.clear();
     m_wait.wakeAll();
 
-    OSD *osd = m_tv->GetOSDLock(ctx);
+    OSD *osd = m_tv->GetOSDL();
     if (osd)
         osd->HideWindow("browse_info");
-    m_tv->ReturnOSDLock(ctx, osd);
+    m_tv->ReturnOSDLock();
 
     if (change_channel)
-        m_tv->ChangeChannel(ctx, 0, m_chanNum);
+        m_tv->ChangeChannel(0, m_chanNum);
 
     m_ctx = nullptr;
 }
@@ -421,8 +421,6 @@ void TVBrowseHelper::run()
         BrowseInfo bi = m_list.front();
         m_list.pop_front();
 
-        PlayerContext *ctx = m_ctx;
-
         vector<uint> chanids;
         if (BROWSE_SAME == bi.m_dir)
         {
@@ -503,7 +501,7 @@ void TVBrowseHelper::run()
         infoMap["channum"]     = m_chanNum;
         infoMap["chanid"]      = QString::number(m_chanId);
 
-        m_tv->GetPlayerReadLock(0,__FILE__,__LINE__);
+        m_tv->GetPlayerReadLock();
 
         if (!m_dbBrowseAllTuners)
         {
@@ -515,7 +513,7 @@ void TVBrowseHelper::run()
             {
                 for (uint chanid : chanids)
                 {
-                    if (TV::IsTunable(ctx, chanid))
+                    if (TV::IsTunable(chanid))
                     {
                         infoMap["chanid"] = QString::number(chanid);
                         GetNextProgramDB(direction, infoMap);
@@ -527,14 +525,14 @@ void TVBrowseHelper::run()
             {
                 uint orig_chanid = infoMap["chanid"].toUInt();
                 GetNextProgramDB(direction, infoMap);
-                while (!TV::IsTunable(ctx, infoMap["chanid"].toUInt()) &&
+                while (!TV::IsTunable(infoMap["chanid"].toUInt()) &&
                        (infoMap["chanid"].toUInt() != orig_chanid))
                 {
                     GetNextProgramDB(direction, infoMap);
                 }
             }
         }
-        m_tv->ReturnPlayerLock(ctx);
+        m_tv->ReturnPlayerLock();
 
         m_lock.lock();
         if (!m_ctx)
