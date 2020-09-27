@@ -211,7 +211,8 @@ public:
 
 class MenuItemDisplayer
 {
-public:
+  public:
+    virtual ~MenuItemDisplayer() = default;
     virtual bool MenuItemDisplay(const MenuItemContext &c) = 0;
 };
 
@@ -292,14 +293,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Check whether we already have a TV object
     static bool IsTVRunning();
     // Start media playback
-    static bool StartTV(ProgramInfo *tvrec,
-                        uint flags,
-                        const ChannelInfoList &selection = ChannelInfoList());
+    static bool StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection = ChannelInfoList());
     static bool IsPaused();
 
     // Public event handling
-    bool event(QEvent *e) override; // QObject
-    bool eventFilter(QObject *o, QEvent *e) override; // QObject
+    bool event(QEvent* Event) override;
+    bool eventFilter(QObject* Object, QEvent* Event) override;
 
     // Public PlaybackBox methods
     /// true iff program is the same as the one in the selected player
@@ -308,7 +307,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // static functions
     static void InitKeys();
     static void ReloadKeys();
-    static void SetFuncPtr(const char *string, void *lptr);
+    static void SetFuncPtr(const char* Name, void* Pointer);
     static int  ConfiguredTunerCards();
     static bool IsTunable(uint ChanId);
 
@@ -316,15 +315,16 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     class SleepTimerInfo
     {
       public:
-        SleepTimerInfo(QString  str, unsigned long secs)
-            : dispString(std::move(str)), seconds(secs) { ; }
+        SleepTimerInfo(QString String, unsigned long Seconds)
+          : dispString(std::move(String)),
+            seconds(Seconds) {}
         QString   dispString;
         unsigned long seconds;
     };
 
   public slots:
-    void HandleOSDClosed(int osdType);
-    void timerEvent(QTimerEvent *te) override;
+    void HandleOSDClosed(int OSDType);
+    void timerEvent(QTimerEvent* Event) override;
     void StopPlayback();
 
   signals:
@@ -332,7 +332,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
   protected:
     // Protected event handling
-    void customEvent(QEvent *e) override;
+    void customEvent(QEvent* Event) override;
 
     static QStringList lastProgramStringList;
     static EMBEDRETURNVOID RunPlaybackBoxPtr;
@@ -342,24 +342,24 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
   protected slots:
-    void onApplicationStateChange(Qt::ApplicationState state);
+    void onApplicationStateChange(Qt::ApplicationState State);
 
   private:
     TV();
    ~TV() override;
     static TV*      GetTV();
-    static void     ReleaseTV(TV* tv);
+    static void     ReleaseTV(TV* Tv);
     static QMutex  *gTVLock;
     static TV      *gTV;
 
     // Private initialisation
-    bool Init(bool createWindow = true);
+    bool Init();
     void InitFromDB();
-    static QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& keyList);
+    static QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& KeyList);
 
     // Top level playback methods
-    bool LiveTV(bool showDialogs, const ChannelInfoList &selection);
-    int  Playback(const ProgramInfo &rcinfo);
+    bool LiveTV(bool ShowDialogs, const ChannelInfoList &Selection);
+    int  Playback(const ProgramInfo &ProgInfo);
     void PlaybackLoop();
 
     // Private event handling
@@ -388,7 +388,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     int  StartTimer(int Interval, int Line);
     void KillTimer(int Id);
 
-    void SetSpeedChangeTimer(uint When, int Line);
+    void SetSpeedChangeTimer(int When, int Line);
     void HandleEndOfPlaybackTimerEvent();
     void HandleIsNearEndWhenEmbeddingTimerEvent();
     void HandleEndOfRecordingExitPromptTimerEvent();
@@ -495,7 +495,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Source and input
     void SwitchSource(uint Direction);
-    void SwitchInputs(uint chanid = 0, QString channum = "", uint inputid = 0);
+    void SwitchInputs(uint ChanID = 0, QString ChanNum = "", uint InputID = 0);
 
     // Pause/play
     void PauseLiveTV();
@@ -508,7 +508,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool ContextIsPaused(const char* File, int Location);
 
     // Program jumping stuff
-    void SetLastProgram(const ProgramInfo *rcinfo);
+    void SetLastProgram(const ProgramInfo* ProgInfo);
     ProgramInfo *GetLastProgram() const;
 
     // Seek, skip, jump, speed
@@ -578,7 +578,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void UpdateOSDInput();
     void UpdateOSDSignal(const QStringList &List);
     void UpdateOSDTimeoutMessage();
-    void SetUpdateOSDPosition(bool set_it);
+    void SetUpdateOSDPosition(bool Set);
 
     // Captions/subtitles
     bool SubtitleZoomHandleAction(const QStringList& Actions);
