@@ -1232,7 +1232,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             }
         }
 
-        if (iconState && !haveIcon)
+        if (!haveIcon)
             iconState->Reset();
     }
 
@@ -3722,18 +3722,15 @@ void PlaybackBox::toggleWatched(void)
     if (!pginfo)
         return;
 
-    if (pginfo)
-    {
-        bool on = !pginfo->IsWatched();
-        pginfo->SaveWatched(on);
-        item->DisplayState((on)?"yes":"on", "watched");
-        updateIcons(pginfo);
+    bool on = !pginfo->IsWatched();
+    pginfo->SaveWatched(on);
+    item->DisplayState((on)?"yes":"on", "watched");
+    updateIcons(pginfo);
 
-        // A refill affects the responsiveness of the UI and we only
-        // need to rebuild the list if the watch list is displayed
-        if (m_viewMask & VIEW_WATCHLIST)
-            UpdateUILists();
-    }
+    // A refill affects the responsiveness of the UI and we only
+    // need to rebuild the list if the watch list is displayed
+    if (m_viewMask & VIEW_WATCHLIST)
+        UpdateUILists();
 }
 
 void PlaybackBox::toggleAutoExpire()
@@ -3748,14 +3745,10 @@ void PlaybackBox::toggleAutoExpire()
     if (!pginfo)
         return;
 
-    if (pginfo)
-    {
-        bool on = !pginfo->IsAutoExpirable();
-        pginfo->SaveAutoExpire(
-            (on) ? kNormalAutoExpire : kDisableAutoExpire, true);
-        item->DisplayState((on)?"yes":"no", "autoexpire");
-        updateIcons(pginfo);
-    }
+    bool on = !pginfo->IsAutoExpirable();
+    pginfo->SaveAutoExpire((on) ? kNormalAutoExpire : kDisableAutoExpire, true);
+    item->DisplayState((on)?"yes":"no", "autoexpire");
+    updateIcons(pginfo);
 }
 
 void PlaybackBox::togglePreserveEpisode()
@@ -3770,13 +3763,10 @@ void PlaybackBox::togglePreserveEpisode()
     if (!pginfo)
         return;
 
-    if (pginfo)
-    {
-        bool on = !pginfo->IsPreserved();
-        pginfo->SavePreserve(on);
-        item->DisplayState(on?"yes":"no", "preserve");
-        updateIcons(pginfo);
-    }
+    bool on = !pginfo->IsPreserved();
+    pginfo->SavePreserve(on);
+    item->DisplayState(on?"yes":"no", "preserve");
+    updateIcons(pginfo);
 }
 
 void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
@@ -5076,7 +5066,7 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
         }
         doClearPlaylist();
     }
-    else if (tmpItem)
+    else
     {
         RecordingInfo ri(*tmpItem);
         ri.ApplyRecordPlayGroupChange(newPlayGroup);

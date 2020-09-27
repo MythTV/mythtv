@@ -182,7 +182,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
     tests.append(qMakePair(QString("capturecard.recpriority"),
                            QString("capturecard.recpriority")));
 
-    if (recordid && prefinputpri)
+    if (prefinputpri)
     {
         pwrpri = QString("(capturecard.cardid = record.prefinput) * %1")
               .arg(prefinputpri);
@@ -258,8 +258,6 @@ void ProgDetails::PowerPriorities(const QString & ptable)
             sclause.remove(';');
             pwrpri = QString("(%1) * %2").arg(sclause)
                                             .arg(query.value(0).toInt());
-            if (!recordid && pwrpri.indexOf("RECTABLE") != -1)
-                continue;
             pwrpri.replace("RECTABLE", "record");
 
             desc = pwrpri;
@@ -269,12 +267,9 @@ void ProgDetails::PowerPriorities(const QString & ptable)
         }
     }
 
-    if (recordid)
-    {
-        recmatch = QString("INNER JOIN record "
-                           "      ON ( record.recordid = %1 ) ")
-                   .arg(recordid);
-    }
+    recmatch = QString("INNER JOIN record "
+                       "      ON ( record.recordid = %1 ) ")
+        .arg(recordid);
 
     for (const auto & [label, csqlStart] : qAsConst(tests))
     {
