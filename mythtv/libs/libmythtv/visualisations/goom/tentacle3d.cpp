@@ -47,8 +47,6 @@ lighten (unsigned char value, float power)
 		val = (int) t; // (32.0F * log (t));
 		if (val > 255)
 			val = 255;
-		if (val < 0)
-			val = 0;
 		return val;
 	}
         return 0;
