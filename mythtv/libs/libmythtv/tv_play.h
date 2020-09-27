@@ -437,6 +437,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void GetStatus();
     void ForceNextStateNone();
     void ScheduleStateChange();
+    void ScheduleInputChange();
     void SetErrored();
     void SetInPlayList(bool InPlayList) { m_inPlaylist = InPlayList; }
     void setUnderNetworkControl(bool setting) { m_underNetworkControl = setting; }
@@ -842,7 +843,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_lcdTimerId              {0};
     volatile int         m_lcdVolumeTimerId        {0};
     volatile int         m_networkControlTimerId   {0};
-    volatile int         m_switchToInputTimerId    {0};
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
     volatile int         m_queueInputTimerId       {0};

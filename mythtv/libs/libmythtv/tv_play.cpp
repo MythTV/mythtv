@@ -2524,26 +2524,6 @@ void TV::timerEvent(QTimerEvent *Event)
     if (handled)
         return;
 
-    if (timer_id == m_switchToInputTimerId)
-    {
-        GetPlayerReadLock();
-        if (m_switchToInputId)
-        {
-            uint tmp = m_switchToInputId;
-            m_switchToInputId = 0;
-            SwitchInputs(0, QString(), tmp);
-        }
-        ReturnPlayerLock();
-
-        QMutexLocker locker(&m_timerIdLock);
-        KillTimer(m_switchToInputTimerId);
-        m_switchToInputTimerId = 0;
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
     if (timer_id == m_ccInputTimerId)
     {
         GetPlayerReadLock();
@@ -2791,6 +2771,23 @@ void TV::ScheduleStateChange()
     };
 
     QTimer::singleShot(0, StateChange);
+}
+
+void TV::ScheduleInputChange()
+{
+    auto InputChange = [&]()
+    {
+        GetPlayerReadLock();
+        if (m_switchToInputId)
+        {
+            uint tmp = m_switchToInputId;
+            m_switchToInputId = 0;
+            SwitchInputs(0, QString(), tmp);
+        }
+        ReturnPlayerLock();
+    };
+
+    QTimer::singleShot(0, InputChange);
 }
 
 void TV::SetErrored()
@@ -5815,10 +5812,7 @@ void TV::SwitchSource(uint Direction)
         return;
 
     m_switchToInputId = (*sit).m_inputId;
-
-    QMutexLocker locker(&m_timerIdLock);
-    if (!m_switchToInputTimerId)
-        m_switchToInputTimerId = StartTimer(1, __LINE__);
+    ScheduleInputChange();
 }
 
 void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
@@ -9085,9 +9079,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         else if (Action.startsWith("SWITCHTOINPUT_"))
         {
             m_switchToInputId = Action.midRef(14).toUInt();
-            QMutexLocker locker(&m_timerIdLock);
-            if (!m_switchToInputTimerId)
-                m_switchToInputTimerId = StartTimer(1, __LINE__);
+            ScheduleInputChange();
         }
         else if (Action == "EDIT")
         {
