@@ -259,7 +259,7 @@ QString LinkageDescriptor::LinkageTypeString(void) const
 {
     if (LinkageType() < linkage_types.size())
         return QString::fromStdString(linkage_types[LinkageType()]);
-    if ((LinkageType() <= 0x7f) || (LinkageType() == 0x7f))
+    if ((LinkageType() <= 0x7f) || (LinkageType() == 0xff))
         return QString("Reserved(0x%1)").arg(LinkageType(),2,16,QChar('0'));
     return QString("User Defined(0x%1)").arg(LinkageType(),2,16,QChar('0'));
 }
