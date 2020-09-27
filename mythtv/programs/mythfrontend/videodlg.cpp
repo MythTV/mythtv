@@ -225,7 +225,7 @@ namespace
                                  .arg(suffix))
                                  .arg(ext);
                     }
-                    else if (!isScreenshot)
+                    else
                     {
                         sfn += fntm.arg(dir).arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
@@ -1137,10 +1137,10 @@ void VideoDialog::loadData()
             return;
 
         if (!m_d->m_currentNode)
+        {
             SetCurrentNode(m_d->m_rootNode);
-
-        if (!m_d->m_currentNode)
             return;
+        }
 
         MythGenericTree *selectedNode = m_d->m_currentNode->getSelectedChild();
 
