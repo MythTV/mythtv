@@ -168,6 +168,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               int changrpid = -1);
    ~GuideGrid() override;
     ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
+        //cppcheck-suppress CastIntegerToAddressAtReturn
         { return m_programInfos[m_currentRow][m_currentCol]; };
 
   private slots:
