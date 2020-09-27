@@ -323,7 +323,9 @@ void UPnp::FormatRedirectResponse( HTTPRequest   *pRequest,
     QStringList sItems = pRequest->m_sRawRequest.split( ' ' );
     QString sUrl = "http://" + pRequest->GetLastHeader( "host" ) + sItems[1];
     QUrl url( sUrl );
-    url.setHost( hostName );
+    QString ipAddress = gCoreContext->GetSettingOnHost
+                            ("BackendServerAddr",hostName,hostName);
+    url.setHost( ipAddress );
 
     pRequest->m_mapRespHeaders[ "Location" ] = url.toString();
 

@@ -331,7 +331,6 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                           uint                  nSeason )
 {
     ArtworkMap map = GetArtwork(sInetref, nSeason);
-
     for (auto i = map.cbegin(); i != map.cend(); ++i)
     {
         DTC::ArtworkInfo *pArtInfo = pArtworkInfoList->AddNewArtworkInfo();
@@ -342,23 +341,29 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                 pArtInfo->setStorageGroup("Fanart");
                 pArtInfo->setType("fanart");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
-                              .arg(QUrl(i.value().url).path()));
+                    "&FileName=%2").arg("Fanart")
+                    .arg(QString(
+                        QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
                 break;
             case kArtworkBanner:
                 pArtInfo->setStorageGroup("Banners");
                 pArtInfo->setType("banner");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Banners")
-                              .arg(QUrl(i.value().url).path()));
+                    "&FileName=%2").arg("Banners")
+                    .arg(QString(
+                        QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
                 break;
             case kArtworkCoverart:
             default:
                 pArtInfo->setStorageGroup("Coverart");
                 pArtInfo->setType("coverart");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Coverart")
-                              .arg(QUrl(i.value().url).path()));
+                    "&FileName=%2").arg("Coverart")
+                    .arg(QString(
+                        QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
                 break;
         }
     }
@@ -448,8 +453,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Fanart");
             pArtInfo->setType("fanart");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
-                              .arg(pMetadata->GetFanart()));
+                      "&FileName=%2").arg("Fanart")
+                      .arg(QString(
+                           QUrl::toPercentEncoding(pMetadata->GetFanart()))));
         }
         if (!pMetadata->GetCoverFile().isEmpty())
         {
@@ -458,8 +464,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Coverart");
             pArtInfo->setType("coverart");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Coverart")
-                              .arg(pMetadata->GetCoverFile()));
+                      "&FileName=%2").arg("Coverart")
+                      .arg(QString(
+                           QUrl::toPercentEncoding(pMetadata->GetCoverFile()))));
         }
         if (!pMetadata->GetBanner().isEmpty())
         {
@@ -468,8 +475,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Banners");
             pArtInfo->setType("banner");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Banners")
-                              .arg(pMetadata->GetBanner()));
+                      "&FileName=%2").arg("Banners")
+                      .arg(QString(
+                           QUrl::toPercentEncoding(pMetadata->GetBanner()))));
         }
         if (!pMetadata->GetScreenshot().isEmpty())
         {
@@ -478,8 +486,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Screenshots");
             pArtInfo->setType("screenshot");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Screenshots")
-                              .arg(pMetadata->GetScreenshot()));
+                      "&FileName=%2").arg("Screenshots")
+                      .arg(QString(
+                           QUrl::toPercentEncoding(pMetadata->GetScreenshot()))));
         }
     }
 
