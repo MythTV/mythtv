@@ -1458,7 +1458,7 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
         return 0;
     }
 
-    // Hangel schedgroup and schedorder specially.  If schedgroup is
+    // Handle schedgroup and schedorder specially.  If schedgroup is
     // set, schedgroup and schedorder should be false and 0,
     // respectively, for all children.
     bool schedgroup = query.value(26).toBool();
