@@ -304,9 +304,6 @@ void ScheduleEditor::Load()
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kWeeklyRecord),
                                          ENUM_TO_QVARIANT(kWeeklyRecord));
-            }
-            if (!hasChannel || isManual)
-            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kDailyRecord),
                                          ENUM_TO_QVARIANT(kDailyRecord));
@@ -825,9 +822,10 @@ void ScheduleEditor::showMenu(void)
             m_view != kMetadataView)
             menuPopup->AddButton(tr("Metadata Options"));
         if (!m_recordingRule->m_isTemplate)
+        {
             menuPopup->AddButton(tr("Schedule Info"));
-        if (!m_recordingRule->m_isTemplate)
             menuPopup->AddButton(tr("Preview Changes"));
+        }
         menuPopup->AddButton(tr("Use Template"));
         popupStack->AddScreen(menuPopup);
     }
@@ -938,11 +936,11 @@ bool SchedEditChild::CreateEditChild(
     if (m_saveButton)
         connect(m_saveButton, SIGNAL(Clicked()), m_editor, SLOT(Save()));
     if (m_previewButton)
+    {
         connect(m_previewButton, SIGNAL(Clicked()),
                 m_editor, SLOT(ShowPreview()));
-
-    if (m_previewButton)
         m_previewButton->SetEnabled(!isTemplate);
+    }
 
     return true;
 }
