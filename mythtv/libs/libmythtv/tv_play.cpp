@@ -1065,7 +1065,7 @@ void TV::InitFromDB()
         if (m_channelGroupId > -1)
         {
             m_channelGroupChannelList = ChannelUtil::GetChannels(0, true, "channum, callsign",
-                                                                 static_cast<volatile uint>(m_channelGroupId));
+                                                                 static_cast<uint>(m_channelGroupId));
             ChannelUtil::SortChannels(m_channelGroupChannelList, "channum", true);
         }
     }
@@ -2528,21 +2528,6 @@ void TV::timerEvent(QTimerEvent *Event)
         QMutexLocker locker(&m_timerIdLock);
         KillTimer(m_exitPlayerTimerId);
         m_exitPlayerTimerId = 0;
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
-    if (timer_id == m_jumpMenuTimerId)
-    {
-        GetPlayerReadLock();
-        FillOSDMenuJumpRec();
-        ReturnPlayerLock();
-
-        QMutexLocker locker(&m_timerIdLock);
-        KillTimer(m_jumpMenuTimerId);
-        m_jumpMenuTimerId = 0;
         handled = true;
     }
 
@@ -10665,8 +10650,8 @@ void TV::SetManualZoom(bool ZoomON, const QString& Desc)
 
 bool TV::HandleJumpToProgramAction(const QStringList &Actions)
 {
-    TVState s = GetState();
-    if (has_action(ACTION_JUMPPREV, Actions) || (has_action("PREVCHAN", Actions) && !StateIsLiveTV(s)))
+    TVState state = GetState();
+    if (has_action(ACTION_JUMPPREV, Actions) || (has_action("PREVCHAN", Actions) && !StateIsLiveTV(state)))
     {
         PrepareToExitPlayer(__LINE__);
         m_jumpToProgram = true;
@@ -10680,33 +10665,32 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
             continue;
 
         bool ok = false;
-        QString progKey   = action.section(" ",1,-2);
-        uint    progIndex = action.section(" ",-1,-1).toUInt(&ok);
-        ProgramInfo *p = nullptr;
+        QString key   = action.section(" ",1,-2);
+        uint    index = action.section(" ",-1,-1).toUInt(&ok);
+        ProgramInfo* proginfo = nullptr;
 
         if (ok)
         {
             QMutexLocker locker(&m_progListsLock);
-            auto pit = m_progLists.find(progKey);
+            auto pit = m_progLists.find(key);
             if (pit != m_progLists.end())
             {
-                const ProgramInfo *tmp = (*pit)[progIndex];
+                const ProgramInfo* tmp = (*pit)[index];
                 if (tmp)
-                    p = new ProgramInfo(*tmp);
+                    proginfo = new ProgramInfo(*tmp);
             }
         }
 
-        if (!p)
+        if (!proginfo)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to locate jump to program '%1' @ %2")
-                    .arg(progKey).arg(action.section(" ",-1,-1)));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to locate jump to program '%1' @ %2")
+                .arg(key).arg(action.section(" ",-1,-1)));
             return true;
         }
 
-        PrepToSwitchToRecordedProgram(*p);
+        PrepToSwitchToRecordedProgram(*proginfo);
 
-        delete p;
+        delete proginfo;
         return true;
     }
 
@@ -10714,17 +10698,25 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
     if (!wants_jump)
         return false;
 
-    if (m_dbJumpPreferOsd && (StateIsPlaying(s) || StateIsLiveTV(s)))
+    if (m_dbJumpPreferOsd && (StateIsPlaying(state) || StateIsLiveTV(state)))
     {
-        QMutexLocker locker(&m_timerIdLock);
-        if (m_jumpMenuTimerId)
-            KillTimer(m_jumpMenuTimerId);
-        m_jumpMenuTimerId = StartTimer(1, __LINE__);
+        // TODO I'm not sure this really needs to be asyncronous
+        auto Jump = [&]()
+        {
+            GetPlayerReadLock();
+            FillOSDMenuJumpRec();
+            ReturnPlayerLock();
+        };
+        QTimer::singleShot(0, Jump);
     }
     else if (RunPlaybackBoxPtr)
+    {
         EditSchedule(kPlaybackBox);
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Failed to open jump to program GUI");
+    }
 
     return true;
 }

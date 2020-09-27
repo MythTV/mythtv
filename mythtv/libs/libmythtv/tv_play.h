@@ -842,7 +842,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_lcdTimerId              {0};
     volatile int         m_lcdVolumeTimerId        {0};
     volatile int         m_networkControlTimerId   {0};
-    volatile int         m_jumpMenuTimerId         {0};
     volatile int         m_switchToInputTimerId    {0};
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
