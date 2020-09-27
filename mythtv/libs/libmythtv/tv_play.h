@@ -285,7 +285,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     friend class ProgFinder;
     friend class ViewScheduled;
     friend class ScheduleEditor;
-    friend class TvPlayWindow;
     friend class TVBrowseHelper;
 
     Q_OBJECT
