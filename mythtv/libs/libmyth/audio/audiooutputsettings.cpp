@@ -275,14 +275,11 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
         return;
     }
 
-    std::vector<int>::reverse_iterator it;
-
-    for (it = m_channels.rbegin();
-         it != m_channels.rend() && *it >= channels;
-         ++it)
-    {
-        m_channels.pop_back();
-    }
+    std::vector<int>tmp;
+    std::copy_if(m_channels.cbegin(), m_channels.cend(),
+                 std::back_inserter(tmp),
+                 [channels](int value){ return channels > value; } );
+    m_channels = tmp;
     m_channels.push_back(channels);
 }
 
