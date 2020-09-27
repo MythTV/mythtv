@@ -1064,7 +1064,6 @@ static void init_fixup(FixupMap &fix)
 
     // Australia
     fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
-    fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
     fix[ 4112U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview; // ABC Brisbane
     fix[ 4114U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview | EITFixUp::kFixAUNine;; // Nine Brisbane
     fix[ 4115U  << 16] = EITFixUp::kFixAUDescription | EITFixUp::kFixAUSeven; //Seven
