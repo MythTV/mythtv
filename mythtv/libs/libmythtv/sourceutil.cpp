@@ -597,8 +597,18 @@ bool SourceUtil::DeleteAllSources(void)
         return false;
     }
 
-    return (query.exec("TRUNCATE TABLE channel") &&
-            query.exec("TRUNCATE TABLE program") &&
+    // Delete all channels
+    query.prepare("UPDATE channel "
+                  "SET deleted = NOW(), mplexid = 0, sourceid = 0 "
+                  "WHERE deleted IS NULL");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Deleting all Channels", query);
+        return false;
+    }
+
+    return (query.exec("TRUNCATE TABLE program") &&
             query.exec("TRUNCATE TABLE videosource") &&
             query.exec("TRUNCATE TABLE credits") &&
             query.exec("TRUNCATE TABLE programrating") &&
