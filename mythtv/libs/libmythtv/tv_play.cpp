@@ -10711,6 +10711,8 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
     }
     else if (RunPlaybackBoxPtr)
     {
+        // TODO This isn't working for some reason
+        // PlaybackBox::RunPlaybackBox is called but it never appears
         EditSchedule(kPlaybackBox);
     }
     else
