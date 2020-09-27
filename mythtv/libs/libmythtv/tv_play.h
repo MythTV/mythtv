@@ -350,6 +350,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static void     ReleaseTV(TV* Tv);
     static QMutex  *gTVLock;
     static TV      *gTV;
+    PlayerContext*  GetPlayerContext();
 
     // Private initialisation
     bool Init();
@@ -417,7 +418,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     OSD* GetOSDL();
     void ReturnOSDLock();
     void GetPlayerWriteLock();
-    PlayerContext* GetPlayerReadLock();
+    void GetPlayerReadLock();
     void GetPlayerReadLock() const;
     void ReturnPlayerLock();
     void ReturnPlayerLock() const;

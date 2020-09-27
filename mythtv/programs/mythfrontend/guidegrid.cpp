@@ -1217,7 +1217,8 @@ uint GuideGrid::GetAlternateChannelIndex(
     uint si = m_channelInfoIdx[chan_idx];
     const ChannelInfo *chinfo = GetChannelInfo(chan_idx, si);
 
-    PlayerContext *ctx = m_player->GetPlayerReadLock();
+    m_player->GetPlayerReadLock();
+    PlayerContext* ctx = m_player->GetPlayerContext();
 
     const uint cnt = (ctx && chinfo) ? m_channelInfos[chan_idx].size() : 0;
     for (uint i = 0; i < cnt; ++i)
@@ -2096,7 +2097,8 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
         if (m_player)
         {
-            const PlayerContext *ctx = m_player->GetPlayerReadLock();
+            m_player->GetPlayerReadLock();
+            const PlayerContext* ctx = m_player->GetPlayerContext();
             if (ctx && chinfo)
                 try_alt = !TV::IsTunable(chinfo->m_chanId);
             m_player->ReturnPlayerLock();
@@ -2587,7 +2589,7 @@ void GuideGrid::channelUpdate(void)
 
     if (!sel.empty())
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->GetPlayerReadLock();
         m_player->ChangeChannel(sel);
         m_player->ReturnPlayerLock();
     }
@@ -2597,7 +2599,7 @@ void GuideGrid::volumeUpdate(bool up)
 {
     if (m_player)
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->GetPlayerReadLock();
         m_player->ChangeVolume(up);
         m_player->ReturnPlayerLock();
     }
@@ -2607,7 +2609,7 @@ void GuideGrid::toggleMute(const bool muteIndividualChannels)
 {
     if (m_player)
     {
-        PlayerContext *ctx = m_player->GetPlayerReadLock();
+        m_player->GetPlayerReadLock();
         m_player->ToggleMute(muteIndividualChannels);
         m_player->ReturnPlayerLock();
     }
