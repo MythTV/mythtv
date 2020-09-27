@@ -859,7 +859,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_errorRecoveryTimerId    {0};
     mutable volatile int m_exitPlayerTimerId       {0};
     volatile int         m_saveLastPlayPosTimerId  {0};
-    volatile int         m_stateChangeTimerId      {0};
     volatile int         m_signalMonitorTimerId    {0};
 
     // Playback menu state caching

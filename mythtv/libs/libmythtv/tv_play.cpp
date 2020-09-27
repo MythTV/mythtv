@@ -2450,26 +2450,6 @@ void TV::timerEvent(QTimerEvent *Event)
     if (handled)
         return;
 
-    // Check if it matches a stateChangeTimerId
-    if (timer_id == m_stateChangeTimerId)
-    {
-        KillTimer(m_stateChangeTimerId);
-        m_stateChangeTimerId = 0;
-        PlayerContext* mctx = GetPlayerReadLock();
-        if (!mctx->m_nextState.empty())
-        {
-            HandleStateChange();
-            if ((kState_None  == mctx->GetState() || kState_Error == mctx->GetState()) && (m_jumpToProgram))
-            {
-                ReturnPlayerLock();
-                GetPlayerWriteLock();
-                m_playerContext.TeardownPlayer();
-            }
-        }
-        ReturnPlayerLock();
-        return;
-    }
-
     // Check if it matches a signalMonitorTimerId
     if (timer_id == m_signalMonitorTimerId)
     {
@@ -2819,8 +2799,24 @@ void TV::ForceNextStateNone()
 
 void TV::ScheduleStateChange()
 {
-    QMutexLocker locker(&m_timerIdLock);
-    m_stateChangeTimerId = StartTimer(1, __LINE__);
+    auto StateChange = [&]()
+    {
+        GetPlayerReadLock();
+        if (!m_playerContext.m_nextState.empty())
+        {
+            HandleStateChange();
+            if ((kState_None  == m_playerContext.GetState() ||
+                 kState_Error == m_playerContext.GetState()) && m_jumpToProgram)
+            {
+                ReturnPlayerLock();
+                GetPlayerWriteLock();
+                m_playerContext.TeardownPlayer();
+            }
+        }
+        ReturnPlayerLock();
+    };
+
+    QTimer::singleShot(0, StateChange);
 }
 
 void TV::SetErrored()
