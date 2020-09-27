@@ -1201,8 +1201,6 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
             return QString("ERROR: no top screen found!");
 
         MythUIType *currType = topScreen;
-        if (currType == nullptr)
-            return QString("ERROR: cannot cast top screen!");
 
         while (!path.isEmpty())
         {
