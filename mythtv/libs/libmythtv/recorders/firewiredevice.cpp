@@ -312,7 +312,7 @@ void FirewireDevice::BroadcastToListeners(
     if ((dataSize >= TSPacket::kSize) && (data[0] == SYNC_BYTE) &&
         ((data[1] & 0x1f) == 0) && (data[2] == 0))
     {
-        ProcessPATPacket(*((const TSPacket*)data));
+        ProcessPATPacket(*(reinterpret_cast<const TSPacket*>(data)));
     }
 
     for (auto & listener : m_listeners)

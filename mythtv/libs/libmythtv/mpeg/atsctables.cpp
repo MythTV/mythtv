@@ -447,7 +447,7 @@ QString EventInformationTable::toString(void) const
 {
     QString str;
     str.append(QString("Event Information Table\n"));
-    str.append(((PSIPTable*)(this))->toString());
+    str.append(static_cast<const PSIPTable*>(this)->toString());
     str.append(QString("      pid(0x%1) sourceID(%2) eventCount(%3)\n")
                .arg(tsheader()->PID()).arg(SourceID()).arg(EventCount()));
     for (uint i = 0; i < EventCount(); i++)

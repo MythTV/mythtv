@@ -4131,13 +4131,11 @@ void PlaybackBox::customEvent(QEvent *event)
                     Qt::KeypadModifier;
                 auto *keyevent = new QKeyEvent(QEvent::KeyPress,
                                                Qt::Key_LaunchMedia, modifiers);
-                QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
-                                            keyevent);
+                QCoreApplication::postEvent(GetMythMainWindow(), keyevent);
 
                 keyevent = new QKeyEvent(QEvent::KeyRelease,
                                          Qt::Key_LaunchMedia, modifiers);
-                QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
-                                            keyevent);
+                QCoreApplication::postEvent(GetMythMainWindow(), keyevent);
             }
         }
         else if (message.startsWith("UPDATE_FILE_SIZE"))

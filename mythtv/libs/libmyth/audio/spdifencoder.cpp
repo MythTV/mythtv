@@ -179,7 +179,7 @@ bool SPDIFEncoder::SetMaxHDRate(int rate)
  */
 int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
 {
-    auto *enc = (SPDIFEncoder *)opaque;
+    auto *enc = static_cast<SPDIFEncoder *>(opaque);
 
     if ((enc->m_oc == nullptr) || (enc->m_oc->pb == nullptr))
     {
