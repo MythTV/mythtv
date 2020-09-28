@@ -5813,6 +5813,8 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
     // state of the new player e.g. when switching inputs from the guide grid,
     // "EPG_EXITING" may not be received until after the player is re-created
     // and we inadvertantly disable drawing...
+    // TODO with recent changes, embedding should be ended synchronously and hence
+    // this extra call should no longer be needed
     QCoreApplication::processEvents();
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("(%1,'%2',%3)").arg(ChanID).arg(ChanNum).arg(InputID));
@@ -7109,18 +7111,58 @@ bool TV::StartEmbedding(const QRect &EmbedRect)
     return embedding;
 }
 
-void TV::StopEmbedding()
-{
+void TV::StopEmbedding(const QStringList &Data)
+{    
+    // Resize the window back to the MythTV Player size
     GetPlayerReadLock();
+    MythMainWindow *mwnd = GetMythMainWindow();
 
     if (m_playerContext.IsEmbedding())
         m_playerContext.StopEmbedding();
 
     // Stop checking for end of file for embedded window..
-    QMutexLocker locker(&m_timerIdLock);
-    if (m_embedCheckTimerId)
-        KillTimer(m_embedCheckTimerId);
-    m_embedCheckTimerId = 0;
+    {
+        QMutexLocker locker(&m_timerIdLock);
+        if (m_embedCheckTimerId)
+            KillTimer(m_embedCheckTimerId);
+        m_embedCheckTimerId = 0;
+    }
+
+    MythPainter *painter = GetMythPainter();
+    if (painter)
+        painter->FreeResources();
+
+    GetPlayerReadLock();
+    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+    if (m_playerContext.m_player && m_playerContext.m_player->GetVideoOutput())
+        m_playerContext.m_player->GetVideoOutput()->ResizeForVideo();
+    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    ReturnPlayerLock();
+
+    // m_playerBounds is not applicable when switching modes so
+    // skip this logic in that case.
+    if (!m_dbUseVideoModes)
+        mwnd->MoveResize(m_playerBounds);
+
+    // Restore pause
+    DoSetPauseState(m_savedPause);
+
+    if (!m_weDisabledGUI)
+    {
+        m_weDisabledGUI = true;
+        GetMythMainWindow()->PushDrawDisabled();
+    }
+
+    m_isEmbedded = false;
+    m_ignoreKeyPresses = false;
+
+    // additional data provided by PlaybackBox
+    if (!Data.isEmpty())
+    {
+        ProgramInfo pginfo(Data);
+        if (pginfo.HasPathname() || pginfo.GetChanID())
+            PrepToSwitchToRecordedProgram(pginfo);
+    }
 
     ReturnPlayerLock();
 }
@@ -8153,58 +8195,6 @@ void TV::customEvent(QEvent *Event)
     {
         int editType = tokens[1].toInt();
         DoEditSchedule(editType);
-    }
-
-    if (message.startsWith("EPG_EXITING") ||
-        message.startsWith("PROGFINDER_EXITING") ||
-        message.startsWith("VIEWSCHEDULED_EXITING") ||
-        message.startsWith("PLAYBACKBOX_EXITING") ||
-        message.startsWith("SCHEDULEEDITOR_EXITING"))
-    {
-        // Resize the window back to the MythTV Player size
-        GetPlayerReadLock();
-        MythMainWindow *mwnd = GetMythMainWindow();
-
-        StopEmbedding();
-        MythPainter *painter = GetMythPainter();
-        if (painter)
-            painter->FreeResources();
-
-        GetPlayerReadLock();
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_playerContext.m_player && m_playerContext.m_player->GetVideoOutput())
-            m_playerContext.m_player->GetVideoOutput()->ResizeForVideo();
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        ReturnPlayerLock();
-
-        // m_playerBounds is not applicable when switching modes so
-        // skip this logic in that case.
-        if (!m_dbUseVideoModes)
-            mwnd->MoveResize(m_playerBounds);
-
-        // Restore pause
-        DoSetPauseState(m_savedPause);
-
-        if (!m_weDisabledGUI)
-        {
-            m_weDisabledGUI = true;
-            GetMythMainWindow()->PushDrawDisabled();
-        }
-
-        QCoreApplication::processEvents();
-
-        m_isEmbedded = false;
-        m_ignoreKeyPresses = false;
-
-        if (message.startsWith("PLAYBACKBOX_EXITING"))
-        {
-            ProgramInfo pginfo(me->ExtraDataList());
-            if (pginfo.HasPathname() || pginfo.GetChanID())
-                PrepToSwitchToRecordedProgram(pginfo);
-        }
-
-        ReturnPlayerLock();
-
     }
 
     if (message.startsWith("COMMFLAG_START") && (tokens.size() >= 2))

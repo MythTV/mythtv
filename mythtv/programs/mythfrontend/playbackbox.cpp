@@ -482,11 +482,7 @@ PlaybackBox::~PlaybackBox(void)
     }
 
     if (m_player)
-    {
-        QString message = QString("PLAYBACKBOX_EXITING");
-        qApp->postEvent(m_player, new MythEvent(
-                            message, m_playerSelectedNewShow));
-    }
+        emit m_player->RequestStopEmbedding(m_playerSelectedNewShow);
 }
 
 bool PlaybackBox::Create()

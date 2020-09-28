@@ -57,10 +57,7 @@ ViewScheduled::~ViewScheduled()
 
     // if we have a player, we need to tell we are done
     if (m_player)
-    {
-        QString message = QString("VIEWSCHEDULED_EXITING");
-        QCoreApplication::postEvent(m_player, new MythEvent(message));
-    }
+        emit m_player->RequestStopEmbedding();
 }
 
 bool ViewScheduled::Create()

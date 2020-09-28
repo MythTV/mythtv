@@ -326,7 +326,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
   signals:
     void PlaybackExiting(TV* Player);
     void RequestStartEmbedding(const QRect& EmbedRect);
-    void RequestStopEmbedding();
+    void RequestStopEmbedding(const QStringList& Data = {});
 
   protected:
     // Protected event handling
@@ -342,7 +342,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
     bool StartEmbedding(const QRect& EmbedRect);
-    void StopEmbedding();
+    void StopEmbedding(const QStringList& Data = {});
 
   private:
     TV();

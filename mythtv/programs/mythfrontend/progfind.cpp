@@ -119,10 +119,7 @@ ProgFinder::~ProgFinder()
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
     if (m_player && m_allowEPG)
-    {
-        QString message = QString("PROGFINDER_EXITING");
-        QCoreApplication::postEvent(m_player, new MythEvent(message));
-    }
+        emit m_player->RequestStopEmbedding();
 }
 
 void ProgFinder::alphabetListItemSelected(MythUIButtonListItem *item)

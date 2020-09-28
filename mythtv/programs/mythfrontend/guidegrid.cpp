@@ -442,15 +442,8 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
         if (!player)
             ShowOkPopup(message);
-        else
-        {
-            if (player && allowFinder)
-            {
-                message = QString("EPG_EXITING");
-                QCoreApplication::postEvent(player, new MythEvent(message));
-            }
-        }
-
+        else if (player && allowFinder)
+            emit player->RequestStopEmbedding();
         return;
     }
 
@@ -645,10 +638,7 @@ GuideGrid::~GuideGrid()
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
     if (m_player && m_allowFinder)
-    {
-        QString message = QString("EPG_EXITING");
-        QCoreApplication::postEvent(m_player, new MythEvent(message));
-    }
+        emit m_player->RequestStopEmbedding();
 
     // maybe the user selected a different channel group,
     // tell the player to update its channel list just in case
