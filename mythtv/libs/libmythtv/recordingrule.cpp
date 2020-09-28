@@ -118,13 +118,12 @@ bool RecordingRule::Load(bool asTemplate)
     m_autoUserJob4 = query.value(22).toBool();
     m_autoMetadataLookup = query.value(23).toBool();
 
-    // Original rule id for override rule
-    if (!asTemplate)
-        m_parentRecID = query.value(24).toInt();
-
-    // Recording metadata
     if (!asTemplate)
     {
+        // Original rule id for override rule
+        m_parentRecID = query.value(24).toInt();
+
+        // Recording metadata
         m_title = query.value(25).toString();
         m_subtitle = query.value(26).toString();
         m_description = query.value(27).toString();
@@ -138,22 +137,16 @@ bool RecordingRule::Load(bool asTemplate)
         m_seriesid = query.value(35).toString();
         m_programid = query.value(36).toString();
         m_inetref = query.value(37).toString();
-    }
 
-    // Associated data for rule types
-    if (!asTemplate)
-    {
+        // Associated data for rule types
         m_channelid = query.value(38).toInt();
         m_station = query.value(39).toString();
         m_findday = query.value(40).toInt();
         m_findtime = query.value(41).toTime();
         m_findid = query.value(42).toInt();
-    }
 
-    // Statistic fields - Used to generate statistics about particular rules
-    // and influence watch list weighting
-    if (!asTemplate)
-    {
+        // Statistic fields - Used to generate statistics about particular rules
+        // and influence watch list weighting
         m_nextRecording = MythDate::as_utc(query.value(43).toDateTime());
         m_lastRecorded = MythDate::as_utc(query.value(44).toDateTime());
         m_lastDeleted = MythDate::as_utc(query.value(45).toDateTime());
