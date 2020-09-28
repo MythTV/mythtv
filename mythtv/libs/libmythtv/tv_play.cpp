@@ -972,6 +972,9 @@ TV::TV()
     m_sleepTimes.emplace_back(tr("1h30m", "Sleep timer"),  90*60);
     m_sleepTimes.emplace_back(tr("2h",    "Sleep timer"), 120*60);
 
+    connect(this, &TV::RequestStartEmbedding, this, &TV::StartEmbedding);
+    connect(this, &TV::RequestStopEmbedding,  this, &TV::StopEmbedding);
+
     InitFromDB();
 
 #ifdef Q_OS_ANDROID

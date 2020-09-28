@@ -568,7 +568,7 @@ void ViewScheduled::viewInputs()
 void ViewScheduled::EmbedTVWindow(void)
 {
     if (m_player)
-        m_player->StartEmbedding(QRect());
+        emit m_player->RequestStartEmbedding(QRect());
 }
 
 void ViewScheduled::customEvent(QEvent *event)

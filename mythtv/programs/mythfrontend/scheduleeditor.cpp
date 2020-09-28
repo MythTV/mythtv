@@ -217,7 +217,7 @@ bool ScheduleEditor::Create()
     }
 
     if (m_player)
-        m_player->StartEmbedding(QRect());
+        emit m_player->RequestStartEmbedding(QRect());
 
     return true;
 }

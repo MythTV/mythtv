@@ -282,9 +282,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
 {
     friend class PlaybackBox;
     friend class GuideGrid;
-    friend class ProgFinder;
-    friend class ViewScheduled;
-    friend class ScheduleEditor;
     friend class TVBrowseHelper;
 
     Q_OBJECT
@@ -328,6 +325,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
 
   signals:
     void PlaybackExiting(TV* Player);
+    void RequestStartEmbedding(const QRect& EmbedRect);
+    void RequestStopEmbedding();
 
   protected:
     // Protected event handling
@@ -342,6 +341,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
+    bool StartEmbedding(const QRect& EmbedRect);
+    void StopEmbedding();
 
   private:
     TV();
@@ -403,8 +404,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(int EditType = kScheduleProgramGuide);
-    bool StartEmbedding(const QRect& EmbedRect);
-    void StopEmbedding();
     bool IsTunablePriv(uint ChanId);
     QSet<uint> IsTunableOn(uint ChanId);
     void ChangeChannel(const ChannelInfoList& Options);

@@ -523,7 +523,7 @@ void GuideGrid::PlayerExiting(TV* Player)
 {
     if (Player && (Player == m_player))
     {
-        m_player->StopEmbedding();
+        emit m_player->RequestStopEmbedding();
         HideTVWindow();
         m_player = nullptr;
     }
@@ -2644,7 +2644,7 @@ void GuideGrid::HideTVWindow(void)
 
 void GuideGrid::EmbedTVWindow(void)
 {
-    m_player->StartEmbedding(m_videoRect);
+    emit m_player->RequestStartEmbedding(m_videoRect);
     QRegion r1 = QRegion(m_area);
     QRegion r2 = QRegion(m_videoRect);
     GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
