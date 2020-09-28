@@ -24,10 +24,10 @@ static void format_time(int seconds, QString& tMin, QString& tHrsMin)
     tHrsMin = QString("%1:%2").arg(hours).arg(min, 2, 10, QChar('0'));
 }
 
-TVBrowseHelper::TVBrowseHelper(TV* Tv, uint BrowseMaxForward, bool BrowseAllTuners,
+TVBrowseHelper::TVBrowseHelper(TV* Parent, uint BrowseMaxForward, bool BrowseAllTuners,
                                bool UseChannelGroups, const QString& DBChannelOrdering)
   : MThread("TVBrowseHelper"),
-    m_parent(Tv),
+    m_parent(Parent),
     m_dbBrowseMaxForward(BrowseMaxForward),
     m_dbBrowseAllTuners(BrowseAllTuners),
     m_dbUseChannelGroups(UseChannelGroups)
@@ -49,11 +49,11 @@ TVBrowseHelper::TVBrowseHelper(TV* Tv, uint BrowseMaxForward, bool BrowseAllTune
 
 TVBrowseHelper::~TVBrowseHelper()
 {
-    Stop();
-    Wait();
+    BrowseStop();
+    BrowseWait();
 }
 
-void TVBrowseHelper::Stop()
+void TVBrowseHelper::BrowseStop()
 {
     QMutexLocker locker(&m_browseLock);
     m_browseList.clear();
@@ -61,7 +61,7 @@ void TVBrowseHelper::Stop()
     m_browseWait.wakeAll();
 }
 
-void TVBrowseHelper::Wait()
+void TVBrowseHelper::BrowseWait()
 {
     MThread::wait();
 }
@@ -229,7 +229,7 @@ bool TVBrowseHelper::IsBrowsing() const
  *  is set then it will look to see if the chanid is available on any
  *  tuner.
  */
-uint TVBrowseHelper::GetChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const
+uint TVBrowseHelper::GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const
 {
     if (PrefSourceid)
         for (const auto & chan : m_dbAllChannels)

@@ -1206,7 +1206,7 @@ TV::~TV()
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
 
     if (m_browseHelper)
-        m_browseHelper->Stop();
+        m_browseHelper->BrowseStop();
 
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
@@ -6200,8 +6200,7 @@ bool TV::CommitQueuedInput()
             commited = true;
             if (channum.isEmpty())
                 channum = m_browseHelper->GetBrowsedInfo().m_chanNum;
-            uint chanid = m_browseHelper->GetChanId(
-                channum, m_playerContext.GetCardID(), sourceid);
+            uint chanid = m_browseHelper->GetBrowseChanId(channum, m_playerContext.GetCardID(), sourceid);
             if (chanid)
                 m_browseHelper->BrowseChannel(&m_playerContext, channum);
 

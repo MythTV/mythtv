@@ -45,11 +45,11 @@ class BrowseInfo
 class TVBrowseHelper : public MThread
 {
   public:
-    TVBrowseHelper(TV* Tv, uint BrowseMaxForward, bool BrowseAllTuners,
+    TVBrowseHelper(TV* Parent, uint BrowseMaxForward, bool BrowseAllTuners,
                    bool UseChannelGroups, const QString& DBChannelOrdering);
     ~TVBrowseHelper() override;
 
-    void Stop();
+    void BrowseStop();
     bool BrowseStart(PlayerContext* Ctx, bool SkipBrowse = false);
     void BrowseEnd(PlayerContext* Ctx, bool ChangeChannel);
     void BrowseDispInfo(PlayerContext* Ctx, const BrowseInfo& Browseinfo);
@@ -57,10 +57,11 @@ class TVBrowseHelper : public MThread
     void BrowseChannel(PlayerContext* Ctx, const QString& Channum);
     BrowseInfo GetBrowsedInfo() const;
     bool IsBrowsing() const;
-    uint GetChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const;
+    uint GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const;
 
   private:
-    void Wait();
+    Q_DISABLE_COPY(TVBrowseHelper)
+    void BrowseWait();
     void GetNextProgram(BrowseDirection Direction, InfoMap& Infomap) const;
     void GetNextProgramDB(BrowseDirection Direction, InfoMap& Infomap) const;
 
