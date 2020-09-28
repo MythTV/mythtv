@@ -441,7 +441,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
         if (!player)
             ShowOkPopup(message);
-        else if (player && allowFinder)
+        else if (allowFinder)
             emit player->RequestStopEmbedding();
         return;
     }
