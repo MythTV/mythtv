@@ -387,7 +387,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
 */
         i+=1;
     }
-    else if (code>=CLW && code<=DLY && ((i+1)<blk_size))
+    else if (code<=DLY && ((i+1)<blk_size))
     { // 1 byte of paramaters
         int param1 = blk_buf[i+1];
         SEND_STR;
