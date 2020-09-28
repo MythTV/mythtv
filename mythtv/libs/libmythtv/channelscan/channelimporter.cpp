@@ -1780,11 +1780,12 @@ ChannelImporter::QueryUserDelete(const QString &msg)
             }
         } while (ret < 0);
 
-        action = (0 == ret) ? kDeleteAll       : action;
-        action = (1 == ret) ? kDeleteInvisibleAll : action;
-        action = (2 == ret) ? kDeleteIgnoreAll   : action;
-//        action = (2 == m_deleteChannelResult) ? kDeleteManual    : action;
-//        action = (3 == m_deleteChannelResult) ? kDeleteIgnoreAll : action;
+        switch (ret)
+        {
+          case 0: action = kDeleteAll;          break;
+          case 1: action = kDeleteInvisibleAll; break;
+          case 2: action = kDeleteIgnoreAll;    break;
+        }
     }
     else if (m_isInteractive)
     {
@@ -1854,9 +1855,12 @@ ChannelImporter::QueryUserInsert(const QString &msg)
             }
         } while (ret < 0);
 
-        action = (0 == ret) ? kInsertAll       : action;
-        action = (1 == ret) ? kInsertManual    : action;
-        action = (2 == ret) ? kInsertIgnoreAll : action;
+        switch (ret)
+        {
+          case 0: action = kInsertAll;       break;
+          case 1: action = kInsertManual;    break;
+          case 2: action = kInsertIgnoreAll; break;
+        }
     }
     else if (m_isInteractive)
     {
@@ -1923,8 +1927,11 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
             }
         } while (ret < 0);
 
-        action = (0 == ret) ? kUpdateAll       : action;
-        action = (1 == ret) ? kUpdateIgnoreAll : action;
+        switch (ret)
+        {
+          case 0: action = kUpdateAll;       break;
+          case 1: action = kUpdateIgnoreAll; break;
+        }
     }
     else if (m_isInteractive)
     {
