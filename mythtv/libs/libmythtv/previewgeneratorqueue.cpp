@@ -674,7 +674,7 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
         PreviewGenState &state = m_previewMap[key];
         if (state.m_gen)
         {
-            if (g && state.m_gen != g)
+            if (state.m_gen != g)
             {
                 if (!g->GetToken().isEmpty())
                     state.m_tokens.insert(g->GetToken());
