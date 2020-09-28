@@ -33,7 +33,7 @@ class ExportNative : public MythScreenType
 
   public:
     ExportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                 ArchiveDestination archiveDestination, const QString& name)
+                 ArchiveDestination &archiveDestination, const QString& name)
         : MythScreenType(parent, name),
           m_previousScreen(previousScreen),
           m_archiveDestination(archiveDestination) {}
