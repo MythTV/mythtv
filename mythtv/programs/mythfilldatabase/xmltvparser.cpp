@@ -205,7 +205,7 @@ bool XMLTVParser::parseFile(
 
     QXmlStreamReader xml(&f);
     QUrl baseUrl;
-    QUrl sourceUrl;
+//  QUrl sourceUrl;
     QString aggregatedTitle;
     QString aggregatedDesc;
     bool haveReadTV = false;
@@ -215,7 +215,7 @@ bool XMLTVParser::parseFile(
         {
             if (xml.name() == "tv")
             {
-                sourceUrl = QUrl(xml.attributes().value("source-info-url").toString());
+//              sourceUrl = QUrl(xml.attributes().value("source-info-url").toString());
                 baseUrl = QUrl(xml.attributes().value("source-data-url").toString());
                 haveReadTV = true;
             }
