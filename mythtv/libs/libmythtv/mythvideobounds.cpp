@@ -683,7 +683,7 @@ void MythVideoBounds::EmbedInWidget(const QRect &Rect)
     m_embedding = true;
     m_embeddingHidden = Rect.isEmpty();
     m_displayVideoRect = m_embeddingRect;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4 (Scale: %1)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4 (Scale: %5)")
         .arg(m_embeddingRect.width()).arg(m_embeddingRect.height())
         .arg(m_embeddingRect.left()).arg(m_embeddingRect.top())
         .arg(m_devicePixelRatio));
