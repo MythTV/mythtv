@@ -50,7 +50,6 @@ class TVBrowseHelper : public MThread
     ~TVBrowseHelper() override;
 
     void Stop();
-    void Wait();
     bool BrowseStart(PlayerContext* Ctx, bool SkipBrowse = false);
     void BrowseEnd(PlayerContext* Ctx, bool ChangeChannel);
     void BrowseDispInfo(PlayerContext* Ctx, const BrowseInfo& Browseinfo);
@@ -60,13 +59,14 @@ class TVBrowseHelper : public MThread
     bool IsBrowsing() const;
     uint GetChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const;
 
-  protected:
+  private:
+    void Wait();
     void GetNextProgram(BrowseDirection Direction, InfoMap& Infomap) const;
     void GetNextProgramDB(BrowseDirection Direction, InfoMap& Infomap) const;
 
     void run() override;
 
-    TV*                     m_tv { nullptr };
+    TV*                     m_parent { nullptr };
     ChannelInfoList         m_dbAllChannels;
     ChannelInfoList         m_dbAllVisibleChannels;
     uint                    m_dbBrowseMaxForward;
@@ -76,14 +76,14 @@ class TVBrowseHelper : public MThread
     QHash<uint,uint>        m_dbChanidToSourceid;
     QMultiMap<QString,uint> m_dbChannumToChanids;
 
-    mutable QMutex          m_lock;
-    PlayerContext*          m_ctx       { nullptr };
-    QString                 m_chanNum;
-    uint                    m_chanId    { 0 };
-    QString                 m_startTime;
-    bool                    m_run       { true };
-    QWaitCondition          m_wait;
-    QList<BrowseInfo>       m_list;
+    mutable QMutex          m_browseLock;
+    PlayerContext*          m_playerContext   { nullptr };
+    QString                 m_browseChanNum;
+    uint                    m_browseChanId    { 0 };
+    QString                 m_browseStartTime;
+    bool                    m_browseRun       { true };
+    QWaitCondition          m_browseWait;
+    QList<BrowseInfo>       m_browseList;
 };
 
 #endif

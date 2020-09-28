@@ -27,7 +27,7 @@ static void format_time(int seconds, QString& tMin, QString& tHrsMin)
 TVBrowseHelper::TVBrowseHelper(TV* Tv, uint BrowseMaxForward, bool BrowseAllTuners,
                                bool UseChannelGroups, const QString& DBChannelOrdering)
   : MThread("TVBrowseHelper"),
-    m_tv(Tv),
+    m_parent(Tv),
     m_dbBrowseMaxForward(BrowseMaxForward),
     m_dbBrowseAllTuners(BrowseAllTuners),
     m_dbUseChannelGroups(UseChannelGroups)
@@ -55,10 +55,10 @@ TVBrowseHelper::~TVBrowseHelper()
 
 void TVBrowseHelper::Stop()
 {
-    QMutexLocker locker(&m_lock);
-    m_list.clear();
-    m_run = false;
-    m_wait.wakeAll();
+    QMutexLocker locker(&m_browseLock);
+    m_browseList.clear();
+    m_browseRun = false;
+    m_browseWait.wakeAll();
 }
 
 void TVBrowseHelper::Wait()
@@ -73,25 +73,25 @@ bool TVBrowseHelper::BrowseStart(PlayerContext* Ctx, bool SkipBrowse)
     if (!gCoreContext->IsUIThread())
         return false;
 
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_browseLock);
 
-    if (m_ctx)
-        return m_ctx == Ctx;
+    if (m_playerContext)
+        return m_playerContext == Ctx;
 
-    m_tv->ClearOSD();
+    m_parent->ClearOSD();
 
     Ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (Ctx->m_playingInfo)
     {
-        m_ctx       = Ctx;
-        m_chanNum   = Ctx->m_playingInfo->GetChanNum();
-        m_chanId    = Ctx->m_playingInfo->GetChanID();
-        m_startTime = Ctx->m_playingInfo->GetScheduledStartTime(MythDate::ISODate);
+        m_playerContext       = Ctx;
+        m_browseChanNum   = Ctx->m_playingInfo->GetChanNum();
+        m_browseChanId    = Ctx->m_playingInfo->GetChanID();
+        m_browseStartTime = Ctx->m_playingInfo->GetScheduledStartTime(MythDate::ISODate);
         Ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         if (!SkipBrowse)
         {
-            BrowseInfo bi(BROWSE_SAME, m_chanNum, m_chanId, m_startTime);
+            BrowseInfo bi(BROWSE_SAME, m_browseChanNum, m_browseChanId, m_browseStartTime);
             locker.unlock();
             BrowseDispInfo(Ctx, bi);
         }
@@ -112,35 +112,35 @@ void TVBrowseHelper::BrowseEnd(PlayerContext* Ctx, bool ChangeChannel)
     if (!gCoreContext->IsUIThread())
         return;
 
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_browseLock);
 
-    if (Ctx && m_ctx != Ctx)
+    if (Ctx && m_playerContext != Ctx)
         return;
 
-    if (!m_ctx)
+    if (!m_playerContext)
         return;
 
     {
-        QMutexLocker locker2(&m_tv->m_timerIdLock);
-        if (m_tv->m_browseTimerId)
+        QMutexLocker locker2(&m_parent->m_timerIdLock);
+        if (m_parent->m_browseTimerId)
         {
-            m_tv->KillTimer(m_tv->m_browseTimerId);
-            m_tv->m_browseTimerId = 0;
+            m_parent->KillTimer(m_parent->m_browseTimerId);
+            m_parent->m_browseTimerId = 0;
         }
     }
 
-    m_list.clear();
-    m_wait.wakeAll();
+    m_browseList.clear();
+    m_browseWait.wakeAll();
 
-    OSD* osd = m_tv->GetOSDL();
+    OSD* osd = m_parent->GetOSDL();
     if (osd)
         osd->HideWindow("browse_info");
-    m_tv->ReturnOSDLock();
+    m_parent->ReturnOSDLock();
 
     if (ChangeChannel)
-        m_tv->ChangeChannel(0, m_chanNum);
+        m_parent->ChangeChannel(0, m_browseChanNum);
 
-    m_ctx = nullptr;
+    m_playerContext = nullptr;
 }
 
 void TVBrowseHelper::BrowseDispInfo(PlayerContext* Ctx, const BrowseInfo& Browseinfo)
@@ -152,20 +152,19 @@ void TVBrowseHelper::BrowseDispInfo(PlayerContext* Ctx, const BrowseInfo& Browse
         return;
 
     {
-        QMutexLocker locker(&m_tv->m_timerIdLock);
-        if (m_tv->m_browseTimerId)
+        QMutexLocker locker(&m_parent->m_timerIdLock);
+        if (m_parent->m_browseTimerId)
         {
-            m_tv->KillTimer(m_tv->m_browseTimerId);
-            m_tv->m_browseTimerId =
-                m_tv->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
+            m_parent->KillTimer(m_parent->m_browseTimerId);
+            m_parent->m_browseTimerId = m_parent->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
         }
     }
 
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_browseLock);
     if (BROWSE_SAME == Browseinfo.m_dir)
-        m_list.clear();
-    m_list.push_back(Browseinfo);
-    m_wait.wakeAll();
+        m_browseList.clear();
+    m_browseList.push_back(Browseinfo);
+    m_browseWait.wakeAll();
 }
 
 void TVBrowseHelper::BrowseDispInfo(PlayerContext* Ctx, BrowseDirection Direction)
@@ -201,13 +200,13 @@ void TVBrowseHelper::BrowseChannel(PlayerContext* Ctx, const QString& Channum)
 
 BrowseInfo TVBrowseHelper::GetBrowsedInfo() const
 {
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_browseLock);
     BrowseInfo bi(BROWSE_SAME);
-    if (m_ctx != nullptr)
+    if (m_playerContext != nullptr)
     {
-        bi.m_chanNum   = m_chanNum;
-        bi.m_chanId    = m_chanId;
-        bi.m_startTime = m_startTime;
+        bi.m_chanNum   = m_browseChanNum;
+        bi.m_chanId    = m_browseChanId;
+        bi.m_startTime = m_browseStartTime;
     }
     return bi;
 }
@@ -220,7 +219,7 @@ bool TVBrowseHelper::IsBrowsing() const
     if (!gCoreContext->IsUIThread())
         return true;
 
-    return m_ctx != nullptr;
+    return m_playerContext != nullptr;
 }
 
 /** \brief Returns a chanid for the channum, or 0 if none is available.
@@ -259,7 +258,7 @@ uint TVBrowseHelper::GetChanId(const QString& Channum, uint PrefCardid, uint Pre
  */
 void TVBrowseHelper::GetNextProgram(BrowseDirection Direction, InfoMap& Infomap) const
 {
-    if (!m_ctx || !m_ctx->m_recorder)
+    if (!m_playerContext || !m_playerContext->m_recorder)
         return;
 
     QString title;
@@ -278,7 +277,7 @@ void TVBrowseHelper::GetNextProgram(BrowseDirection Direction, InfoMap& Infomap)
     QString seriesid  = Infomap["seriesid"];
     QString programid = Infomap["programid"];
 
-    m_ctx->m_recorder->GetNextProgram(Direction, title, subtitle, desc, category,
+    m_playerContext->m_recorder->GetNextProgram(Direction, title, subtitle, desc, category,
                                       starttime, endtime, callsign, iconpath,
                                       channum, chanid, seriesid, programid);
 
@@ -397,17 +396,17 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
 void TVBrowseHelper::run()
 {
     RunProlog();
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_browseLock);
     while (true)
     {
-        while (m_list.empty() && m_run)
-            m_wait.wait(&m_lock);
+        while (m_browseList.empty() && m_browseRun)
+            m_browseWait.wait(&m_browseLock);
 
-        if (!m_run)
+        if (!m_browseRun)
             break;
 
-        BrowseInfo bi = m_list.front();
-        m_list.pop_front();
+        BrowseInfo bi = m_browseList.front();
+        m_browseList.pop_front();
 
         vector<uint> chanids;
         if (BROWSE_SAME == bi.m_dir)
@@ -415,7 +414,7 @@ void TVBrowseHelper::run()
             if (!bi.m_chanId)
             {
                 vector<uint> chanids_extra;
-                uint sourceid = m_dbChanidToSourceid[m_chanId];
+                uint sourceid = m_dbChanidToSourceid[m_browseChanId];
                 QMultiMap<QString,uint>::iterator it;
                 it = m_dbChannumToChanids.lowerBound(bi.m_chanNum);
                 for ( ; (it != m_dbChannumToChanids.end()) &&
@@ -430,23 +429,23 @@ void TVBrowseHelper::run()
                                chanids_extra.begin(),
                                chanids_extra.end());
             }
-            m_chanNum   = bi.m_chanNum;
-            m_chanId    = (chanids.empty()) ? bi.m_chanId : chanids[0];
-            m_startTime = bi.m_startTime;
+            m_browseChanNum   = bi.m_chanNum;
+            m_browseChanId    = (chanids.empty()) ? bi.m_chanId : chanids[0];
+            m_browseStartTime = bi.m_startTime;
         }
 
         BrowseDirection direction = bi.m_dir;
 
-        QDateTime lasttime = MythDate::fromString(m_startTime);
+        QDateTime lasttime = MythDate::fromString(m_browseStartTime);
         QDateTime curtime  = MythDate::current();
         if (lasttime < curtime)
-            m_startTime = curtime.toString(Qt::ISODate);
+            m_browseStartTime = curtime.toString(Qt::ISODate);
 
         QDateTime maxtime  = curtime.addSecs(m_dbBrowseMaxForward);
         if ((lasttime > maxtime) && (direction == BROWSE_RIGHT))
             continue;
 
-        m_lock.unlock();
+        m_browseLock.unlock();
 
         // if browsing channel groups is enabled or
         // direction if BROWSE_FAVORITES
@@ -457,8 +456,8 @@ void TVBrowseHelper::run()
             (direction != BROWSE_RIGHT) && (direction != BROWSE_LEFT) &&
             (direction != BROWSE_SAME))
         {
-            m_tv->m_channelGroupLock.lock();
-            if (m_tv->m_channelGroupId > -1)
+            m_parent->m_channelGroupLock.lock();
+            if (m_parent->m_channelGroupId > -1)
             {
                 ChannelChangeDirection dir = CHANNEL_DIRECTION_SAME;
                 if ((direction == BROWSE_UP) || (direction == BROWSE_FAVORITE))
@@ -466,20 +465,19 @@ void TVBrowseHelper::run()
                 else if (direction == BROWSE_DOWN)
                     dir = CHANNEL_DIRECTION_DOWN;
 
-                uint chanid = ChannelUtil::GetNextChannel(
-                    m_tv->m_channelGroupChannelList, m_chanId, 0, 0, dir);
+                uint chanid = ChannelUtil::GetNextChannel(m_parent->m_channelGroupChannelList, m_browseChanId, 0, 0, dir);
                 direction = BROWSE_SAME;
 
-                m_tv->m_channelGroupLock.unlock();
+                m_parent->m_channelGroupLock.unlock();
 
-                m_lock.lock();
-                m_chanId  = chanid;
-                m_chanNum.clear();
-                m_lock.unlock();
+                m_browseLock.lock();
+                m_browseChanId  = chanid;
+                m_browseChanNum.clear();
+                m_browseLock.unlock();
             }
             else
             {
-                m_tv->m_channelGroupLock.unlock();
+                m_parent->m_channelGroupLock.unlock();
             }
         }
 
@@ -487,11 +485,11 @@ void TVBrowseHelper::run()
             direction = BROWSE_UP;
 
         InfoMap infoMap;
-        infoMap["dbstarttime"] = m_startTime;
-        infoMap["channum"]     = m_chanNum;
-        infoMap["chanid"]      = QString::number(m_chanId);
+        infoMap["dbstarttime"] = m_browseStartTime;
+        infoMap["channum"]     = m_browseChanNum;
+        infoMap["chanid"]      = QString::number(m_browseChanId);
 
-        m_tv->GetPlayerReadLock();
+        m_parent->GetPlayerReadLock();
 
         if (!m_dbBrowseAllTuners)
         {
@@ -522,43 +520,43 @@ void TVBrowseHelper::run()
                 }
             }
         }
-        m_tv->ReturnPlayerLock();
+        m_parent->ReturnPlayerLock();
 
-        m_lock.lock();
-        if (!m_ctx)
+        m_browseLock.lock();
+        if (!m_playerContext)
             continue;
 
-        m_chanNum = infoMap["channum"];
-        m_chanId  = infoMap["chanid"].toUInt();
+        m_browseChanNum = infoMap["channum"];
+        m_browseChanId  = infoMap["chanid"].toUInt();
 
         if (((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT)) &&
             !infoMap["dbstarttime"].isEmpty())
         {
-            m_startTime = infoMap["dbstarttime"];
+            m_browseStartTime = infoMap["dbstarttime"];
         }
 
-        if (!m_list.empty())
+        if (!m_browseList.empty())
         {
             // send partial info to UI for appearance of responsiveness
-            QCoreApplication::postEvent(m_tv, new UpdateBrowseInfoEvent(infoMap));
+            QCoreApplication::postEvent(m_parent, new UpdateBrowseInfoEvent(infoMap));
             continue;
         }
-        m_lock.unlock();
+        m_browseLock.unlock();
 
         // pull in additional data from the DB...
-        if (m_tv->m_channelGroupId > -1 && m_dbUseChannelGroups)
-            infoMap["channelgroup"] = ChannelGroup::GetChannelGroupName(m_tv->m_channelGroupId);
+        if (m_parent->m_channelGroupId > -1 && m_dbUseChannelGroups)
+            infoMap["channelgroup"] = ChannelGroup::GetChannelGroupName(m_parent->m_channelGroupId);
         else
             infoMap["channelgroup"] = QObject::tr("All channels");
 
-        QDateTime startts = MythDate::fromString(m_startTime);
-        RecordingInfo recinfo(m_chanId, startts, false);
+        QDateTime startts = MythDate::fromString(m_browseStartTime);
+        RecordingInfo recinfo(m_browseChanId, startts, false);
         recinfo.ToMap(infoMap);
         infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());
 
-        m_lock.lock();
-        if (m_ctx)
-            QCoreApplication::postEvent(m_tv, new UpdateBrowseInfoEvent(infoMap));
+        m_browseLock.lock();
+        if (m_playerContext)
+            QCoreApplication::postEvent(m_parent, new UpdateBrowseInfoEvent(infoMap));
     }
     RunEpilog();
 }
