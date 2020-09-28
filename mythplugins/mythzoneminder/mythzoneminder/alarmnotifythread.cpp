@@ -66,7 +66,8 @@ void AlarmNotifyThread::run()
             }
         }
 
-        usleep(999999);
+        const struct timespec onesec {1, 0};
+        nanosleep(&onesec, nullptr);
     }
 
     RunEpilog();

@@ -500,8 +500,9 @@ void MythDVDBuffer::WaitForPlayer(void)
         int count = 0;
         while (m_playerWait && count++ < 200)
         {
+            const struct timespec tenms {0, 10000000};
             m_rwLock.unlock();
-            usleep(10000);
+            nanosleep(&tenms, nullptr);
             m_rwLock.lockForWrite();
         }
 
@@ -522,6 +523,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
     int             offset       = 0;
     bool            reprocessing = false;
     bool            waiting      = false;
+    const struct timespec tenms {0, 10000000};
 
     if (m_gotStop)
     {
@@ -996,7 +998,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         // pause a little as the dvdnav VM will continue to return
                         // this event until it has been skipped
                         m_rwLock.unlock();
-                        usleep(10000);
+                        nanosleep(&tenms, nullptr);
                         m_rwLock.lockForWrite();
 
                         // when scanning the file or exiting playback, skip immediately
@@ -1052,7 +1054,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         {
                             m_dvdWaiting = true;
                             m_rwLock.unlock();
-                            usleep(10000);
+                            nanosleep(&tenms, nullptr);
                             m_rwLock.lockForWrite();
                         }
 

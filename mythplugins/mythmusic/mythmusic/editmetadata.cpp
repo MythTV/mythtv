@@ -1356,7 +1356,8 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
     while (copyThread->isRunning())
     {
         qApp->processEvents();
-        usleep(1000);
+        const struct timespec onems {0, 1000000};
+        nanosleep(&onems, nullptr);
     }
 
     strList = copyThread->getResult();

@@ -483,7 +483,8 @@ bool ImportMusicDialog::copyFile(const QString &src, const QString &dst)
 
     while (!copy->isFinished())
     {
-        usleep(500);
+        const struct timespec halfms {0, 500000};
+        nanosleep(&halfms, nullptr);
         QCoreApplication::processEvents();
     }
 
@@ -522,7 +523,8 @@ void ImportMusicDialog::startScan()
 
     while (!scanner->isFinished())
     {
-        usleep(500);
+        const struct timespec halfms {0, 500000};
+        nanosleep(&halfms, nullptr);
         QCoreApplication::processEvents();
     }
 
