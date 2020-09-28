@@ -465,7 +465,7 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
                      (TextureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
     QString texold = (m_textureTarget == QOpenGLTexture::TargetRectangle) ? "Rect" :
                      (m_textureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
-    LOG(VB_GENERAL, LOG_WARNING, LOC +
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New frame format: %1:%2 %3x%4 (Tex: %5) -> %6:%7 %8x%9 (Tex: %10)")
         .arg(format_description(m_inputType)).arg(format_description(m_outputType))
         .arg(m_videoDim.width()).arg(m_videoDim.height()).arg(texold)
