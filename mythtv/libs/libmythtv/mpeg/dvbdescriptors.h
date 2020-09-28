@@ -2797,7 +2797,7 @@ class SkyLCNDescriptor : public MPEGDescriptor
 class OpenTVChannelListDescriptor : public MPEGDescriptor
 {
   public:
-    OpenTVChannelListDescriptor(const unsigned char *data, int len = 300) :
+    explicit OpenTVChannelListDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::opentv_channel_list) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0xB1

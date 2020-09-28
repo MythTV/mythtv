@@ -22,7 +22,7 @@ class MythMediaCodecInterop : public MythOpenGLInterop
     void*   GetSurface(void);
 
   protected:
-    MythMediaCodecInterop(MythRenderOpenGL *Context);
+    explicit MythMediaCodecInterop(MythRenderOpenGL *Context);
    ~MythMediaCodecInterop() override;
     bool Initialise(QSize Size);
 
