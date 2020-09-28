@@ -59,7 +59,6 @@
 #include "recordingrule.h"
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
-#include "tvbrowsehelper.h"
 #include "playercontext.h"
 #include "programtypes.h"
 #include "io/mythmediabuffer.h"
@@ -959,11 +958,12 @@ void TV::ReloadKeys()
  *  \sa Init()
  */
 TV::TV()
+  : TVBrowseHelper(this)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
     m_ctorTime.start();
 
-    setObjectName("TV");
+    QObject::setObjectName("TV");
     m_keyRepeatTimer.start();
 
     m_sleepTimes.emplace_back(tr("Off",   "Sleep timer"),      0);
@@ -1084,10 +1084,7 @@ void TV::InitFromDB()
         m_ffRewSpeeds.push_back(kv[QString("FFRewSpeed%1").arg(i)].toInt());
 
     // process it..
-    m_browseHelper = new TVBrowseHelper(
-        this,
-        db_browse_max_forward,   m_dbBrowseAllTuners,
-        m_dbUseChannelGroups,    db_channel_ordering);
+    BrowseInit(db_browse_max_forward, m_dbBrowseAllTuners, m_dbUseChannelGroups, db_channel_ordering);
 
     m_vbimode = VBIMode::Parse(!feVBI.isEmpty() ? feVBI : beVBI);
 
@@ -1205,8 +1202,8 @@ TV::~TV()
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
 
-    if (m_browseHelper)
-        m_browseHelper->BrowseStop();
+    BrowseStop();
+    BrowseWait();
 
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
@@ -1254,21 +1251,9 @@ TV::~TV()
         lcd->switchToTime();
     }
 
-    if (m_browseHelper)
-    {
-        delete m_browseHelper;
-        m_browseHelper = nullptr;
-    }
-
     m_playerLock.lockForWrite();
     m_playerContext.TeardownPlayer();
     m_playerLock.unlock();
-
-    if (m_browseHelper)
-    {
-        delete m_browseHelper;
-        m_browseHelper = nullptr;
-    }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- end");
 }
@@ -1760,7 +1745,7 @@ void TV::ShowOSDAskAllow()
         OSD *osd = GetOSDL();
         if (osd)
         {
-            m_browseHelper->BrowseEnd(&m_playerContext, false);
+            BrowseEnd(false);
             timeuntil = static_cast<int>(MythDate::current().secsTo((*it).m_expiry) * 1000);
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0", false, !((*it).m_hasRec));
@@ -1832,7 +1817,7 @@ void TV::ShowOSDAskAllow()
         OSD *osd = GetOSDL();
         if (osd && conflict_count > 1)
         {
-            m_browseHelper->BrowseEnd(&m_playerContext, false);
+            BrowseEnd(false);
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(let_recordm, "DIALOG_ASKALLOW_EXIT_0",
                                  false, true);
@@ -1841,7 +1826,7 @@ void TV::ShowOSDAskAllow()
         }
         else if (osd)
         {
-            m_browseHelper->BrowseEnd(&m_playerContext, false);
+            BrowseEnd(false);
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0",
                                  false, !has_rec);
@@ -2598,7 +2583,7 @@ void TV::timerEvent(QTimerEvent *Event)
     if (timer_id == m_browseTimerId)
     {
         GetPlayerReadLock();
-        m_browseHelper->BrowseEnd(&m_playerContext, false);
+        BrowseEnd(false);
         ReturnPlayerLock();
         handled = true;
     }
@@ -3202,7 +3187,7 @@ bool TV::HandleTrackAction(const QString &Action)
         m_playerContext.m_player->SetCaptionsEnabled(true, true);
     else if (Action == ACTION_DISABLESUBS)
         m_playerContext.m_player->SetCaptionsEnabled(false, true);
-    else if (Action == ACTION_TOGGLESUBS && !m_browseHelper->IsBrowsing())
+    else if (Action == ACTION_TOGGLESUBS && !IsBrowsing())
     {
         if (m_ccInputMode)
         {
@@ -3459,7 +3444,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
         bool pause = has_action(ACTION_PAUSE, actions);
         bool play  = has_action(ACTION_PLAY,  actions);
 
-        if ((!esc || m_browseHelper->IsBrowsing()) && !pause && !play)
+        if ((!esc || IsBrowsing()) && !pause && !play)
             return false;
     }
 
@@ -3656,31 +3641,31 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
 bool TV::BrowseHandleAction(const QStringList &Actions)
 {
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
         return false;
 
     bool handled = true;
 
     if (has_action(ACTION_UP, Actions) || has_action(ACTION_CHANNELUP, Actions))
-        m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_UP);
+        BrowseDispInfo(BROWSE_UP);
     else if (has_action(ACTION_DOWN, Actions) || has_action(ACTION_CHANNELDOWN, Actions))
-        m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_DOWN);
+        BrowseDispInfo(BROWSE_DOWN);
     else if (has_action(ACTION_LEFT, Actions))
-        m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_LEFT);
+        BrowseDispInfo(BROWSE_LEFT);
     else if (has_action(ACTION_RIGHT, Actions))
-        m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_RIGHT);
+        BrowseDispInfo(BROWSE_RIGHT);
     else if (has_action("NEXTFAV", Actions))
-        m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_FAVORITE);
+        BrowseDispInfo(BROWSE_FAVORITE);
     else if (has_action(ACTION_SELECT, Actions))
     {
-        m_browseHelper->BrowseEnd(&m_playerContext, true);
+        BrowseEnd(true);
     }
     else if (has_action(ACTION_CLEAROSD, Actions) ||
              has_action("ESCAPE",       Actions) ||
              has_action("BACK",         Actions) ||
              has_action("TOGGLEBROWSE", Actions))
     {
-        m_browseHelper->BrowseEnd(&m_playerContext, false);
+        BrowseEnd(false);
     }
     else if (has_action(ACTION_TOGGLERECORD, Actions))
         QuickRecord();
@@ -4280,7 +4265,7 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (has_action("TOGGLEBROWSE", Actions))
     {
         if (islivetv)
-            m_browseHelper->BrowseStart(&m_playerContext);
+            BrowseStart();
         else if (!IsDVD)
             ShowOSDMenu();
         else
@@ -4391,7 +4376,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         if (islivetv)
         {
             if (m_dbBrowseAlways)
-                m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_UP);
+                BrowseDispInfo(BROWSE_UP);
             else
                 ChangeChannel(CHANNEL_DIRECTION_UP);
         }
@@ -4403,7 +4388,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         if (islivetv)
         {
             if (m_dbBrowseAlways)
-                m_browseHelper->BrowseDispInfo(&m_playerContext, BROWSE_DOWN);
+                BrowseDispInfo(BROWSE_DOWN);
             else
                 ChangeChannel(CHANNEL_DIRECTION_DOWN);
         }
@@ -4763,7 +4748,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
                 vol = static_cast<int>(m_playerContext.m_player->AdjustVolume(vol));
                 m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-                if (!m_browseHelper->IsBrowsing() && !m_editMode)
+                if (!IsBrowsing() && !m_editMode)
                 {
                     UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(vol),
                                     kOSDFunctionalType_PictureAdjust, "%", vol * 10, kOSDTimeout_Med);
@@ -6061,7 +6046,7 @@ void TV::AddKeyToInputQueue(char Key)
     // in browse mode because in browse mode space/enter exit browse
     // mode and change to the currently browsed channel.
     if (StateIsLiveTV(GetState()) && !m_ccInputMode && !m_asInputMode &&
-        m_browseHelper->IsBrowsing())
+        IsBrowsing())
     {
         commitSmart = ProcessSmartChannel(inputStr);
     }
@@ -6189,7 +6174,7 @@ bool TV::CommitQueuedInput()
     else if (StateIsLiveTV(GetState()))
     {
         QString channum = GetQueuedChanNum();
-        if (m_browseHelper->IsBrowsing())
+        if (IsBrowsing())
         {
             uint sourceid = 0;
             m_playerContext.LockPlayingInfo(__FILE__, __LINE__);
@@ -6199,10 +6184,10 @@ bool TV::CommitQueuedInput()
 
             commited = true;
             if (channum.isEmpty())
-                channum = m_browseHelper->GetBrowsedInfo().m_chanNum;
-            uint chanid = m_browseHelper->GetBrowseChanId(channum, m_playerContext.GetCardID(), sourceid);
+                channum = GetBrowsedInfo().m_chanNum;
+            uint chanid = GetBrowseChanId(channum, m_playerContext.GetCardID(), sourceid);
             if (chanid)
-                m_browseHelper->BrowseChannel(&m_playerContext, channum);
+                BrowseChannel(channum);
 
             HideOSDWindow("osd_input");
         }
@@ -6536,8 +6521,8 @@ bool TV::ClearOSD()
     }
     ReturnOSDLock();
 
-    if (m_browseHelper->IsBrowsing())
-        m_browseHelper->BrowseEnd(nullptr, false);
+    if (IsBrowsing())
+        BrowseEnd(false);
 
     return res;
 }
@@ -6733,7 +6718,7 @@ void TV::UpdateOSDInput()
 void TV::UpdateOSDSignal(const QStringList &List)
 {
     OSD *osd = GetOSDL();
-    if (!osd || m_browseHelper->IsBrowsing() || !m_queuedChanNum.isEmpty())
+    if (!osd || IsBrowsing() || !m_queuedChanNum.isEmpty())
     {
         if (&m_playerContext.m_lastSignalMsg != &List)
             m_playerContext.m_lastSignalMsg = List;
@@ -7306,7 +7291,7 @@ void TV::ChangeVolume(bool Up, int NewVolume)
 
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
     {
         UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(curvol),
                         kOSDFunctionalType_PictureAdjust, "%", static_cast<int>(curvol * 10),
@@ -7381,7 +7366,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
             m_playerContext.m_player->Play(m_playerContext.m_tsNormal, true);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
     {
         if (!AllowEdit)
         {
@@ -7417,7 +7402,7 @@ void TV::EnableUpmix(bool Enable, bool Toggle)
     m_playerContext.m_player->ForceSetupAudioStream();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
         SetOSDMessage(enabled ? tr("Upmixer On") : tr("Upmixer Off"));
 }
 
@@ -7442,7 +7427,7 @@ void TV::ChangeSubtitleZoom(int Dir)
     newval = min(200, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (showing && !m_browseHelper->IsBrowsing())
+    if (showing && !IsBrowsing())
     {
         UpdateOSDStatus(tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
                         QString::number(newval),
@@ -7478,7 +7463,7 @@ void TV::ChangeSubtitleDelay(int Dir)
     newval = min(5000, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (showing && !m_browseHelper->IsBrowsing())
+    if (showing && !IsBrowsing())
     {
         // range of -5000ms..+5000ms, scale to 0..1000
         UpdateOSDStatus(tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
@@ -7505,7 +7490,7 @@ void TV::ChangeAudioSync(int Dir, int NewSync)
     long long newval = m_playerContext.m_player->AdjustAudioTimecodeOffset(Dir * 10, NewSync);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
     {
         UpdateOSDStatus(tr("Adjust Audio Sync"), tr("Audio Sync"),
                         QString::number(newval), kOSDFunctionalType_AudioSyncAdjust,
@@ -7575,7 +7560,7 @@ void TV::ToggleSleepTimer()
 
     text = tr("Sleep ") + " " + m_sleepTimes[m_sleepIndex].dispString;
 
-    if (!m_browseHelper->IsBrowsing())
+    if (!IsBrowsing())
         SetOSDMessage(text);
 }
 
@@ -8293,7 +8278,7 @@ void TV::customEvent(QEvent *Event)
 
 void TV::QuickRecord()
 {
-    BrowseInfo bi = m_browseHelper->GetBrowsedInfo();
+    BrowseInfo bi = GetBrowsedInfo();
     if (bi.m_chanId)
     {
         InfoMap infoMap;
@@ -9072,7 +9057,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (StateIsLiveTV(GetState()))
     {
         if (Action == "TOGGLEBROWSE")
-            m_browseHelper->BrowseStart(&m_playerContext);
+            BrowseStart();
         else if (Action == "PREVCHAN")
             PopPreviousChannel(true);
         else if (Action.startsWith("SWITCHTOINPUT_"))

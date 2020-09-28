@@ -34,6 +34,7 @@ using namespace std;
 #include "playercontext.h"
 #include "decoders/decoderbase.h"
 #include "mythmiscutil.h"
+#include "tvbrowsehelper.h"
 
 class QEvent;
 class QKeyEvent;
@@ -49,7 +50,6 @@ class MythMediaBuffer;
 class ProgramInfo;
 class TvPlayWindow;
 class TV;
-class TVBrowseHelper;
 struct osdInfo;
 
 using EMBEDRETURNVOID        = void (*) (void *, bool);
@@ -278,7 +278,7 @@ private:
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
+class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrowseHelper
 {
     friend class PlaybackBox;
     friend class GuideGrid;
@@ -784,9 +784,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool      m_lockTimerOn {false};
     QDateTime m_lastLockSeenTime;
 
-    // Channel browsing state variables
-    TVBrowseHelper *m_browseHelper {nullptr};
-
     // Program Info for currently playing video
     // (or next video if InChangeState() is true)
     mutable QMutex  m_lastProgramLock;
@@ -846,7 +843,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
     volatile int         m_queueInputTimerId       {0};
-    volatile int         m_browseTimerId           {0};
     volatile int         m_updateOSDPosTimerId     {0};
     volatile int         m_updateOSDDebugTimerId   {0};
     volatile int         m_endOfPlaybackTimerId    {0};
