@@ -103,7 +103,7 @@ class EditPowerSearchPopup : public MythScreenType
 
   public:
     EditPowerSearchPopup(MythScreenStack *parentStack, ProgLister *parent,
-                         const QString &currentValue);
+                         QString &currentValue);
 
     bool Create() override; // MythScreenType
 

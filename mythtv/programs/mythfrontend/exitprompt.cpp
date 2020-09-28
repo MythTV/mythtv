@@ -13,11 +13,11 @@
 #include "exitcodes.h"
 
 ExitPrompter::ExitPrompter()
-  : m_power(MythPower::AcquireRelease(this, true))
+    : m_power(MythPower::AcquireRelease(this, true)),
+      m_haltCommand(gCoreContext->GetSetting("HaltCommand", "")),
+      m_rebootCommand(gCoreContext->GetSetting("RebootCommand", "")),
+      m_suspendCommand(gCoreContext->GetSetting("SuspendCommand", ""))
 {
-    m_haltCommand = gCoreContext->GetSetting("HaltCommand", "");
-    m_rebootCommand = gCoreContext->GetSetting("RebootCommand", "");
-    m_suspendCommand = gCoreContext->GetSetting("SuspendCommand", "");
 }
 
 ExitPrompter::~ExitPrompter()

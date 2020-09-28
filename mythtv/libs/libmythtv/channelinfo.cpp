@@ -1,8 +1,11 @@
 // -*- Mode: c++ -*-
 
+// C++ headers
+#include <utility>
+
 // Qt headers
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QImage>
 #include <QUrl>
@@ -20,63 +23,63 @@
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-ChannelInfo::ChannelInfo(const ChannelInfo &other)
-{
+ChannelInfo::ChannelInfo(const ChannelInfo &other) :
     // Channel table
-    m_chanId            = other.m_chanId;
-    m_chanNum           = other.m_chanNum;
-    m_freqId            = other.m_freqId;
-    m_sourceId          = other.m_sourceId;
-    m_callSign          = other.m_callSign;
-    m_name              = other.m_name;
-    m_icon              = other.m_icon;
-    m_fineTune          = other.m_fineTune;
-    m_videoFilters      = other.m_videoFilters;
-    m_xmltvId           = other.m_xmltvId;
-    m_recPriority       = other.m_recPriority;
-    m_contrast          = other.m_contrast;
-    m_brightness        = other.m_brightness;
-    m_colour            = other.m_colour;
-    m_hue               = other.m_hue;
-    m_tvFormat          = other.m_tvFormat;
-    m_visible           = other.m_visible;
-    m_outputFilters     = other.m_outputFilters;
-    m_useOnAirGuide     = other.m_useOnAirGuide;
-    m_mplexId           = (other.m_mplexId == 32767) ? 0 : other.m_mplexId;
-    m_serviceId         = other.m_serviceId;
-    m_serviceType       = other.m_serviceType;
-    m_atscMajorChan     = other.m_atscMajorChan;
-    m_atscMinorChan     = other.m_atscMinorChan;
-    m_lastRecord        = other.m_lastRecord;
-    m_defaultAuthority  = other.m_defaultAuthority;
-    m_commMethod        = other.m_commMethod;
-    m_tmOffset          = other.m_tmOffset;
-    m_iptvId            = other.m_iptvId;
+    m_chanId             (other.m_chanId),
+    m_chanNum            (other.m_chanNum),
+    m_freqId             (other.m_freqId),
+    m_sourceId           (other.m_sourceId),
+    m_callSign           (other.m_callSign),
+    m_name               (other.m_name),
+    m_icon               (other.m_icon),
+    m_fineTune           (other.m_fineTune),
+    m_videoFilters       (other.m_videoFilters),
+    m_xmltvId            (other.m_xmltvId),
+    m_recPriority        (other.m_recPriority),
+    m_contrast           (other.m_contrast),
+    m_brightness         (other.m_brightness),
+    m_colour             (other.m_colour),
+    m_hue                (other.m_hue),
+    m_tvFormat           (other.m_tvFormat),
+    m_visible            (other.m_visible),
+    m_outputFilters      (other.m_outputFilters),
+    m_useOnAirGuide      (other.m_useOnAirGuide),
+    m_mplexId            ((other.m_mplexId == 32767) ? 0 : other.m_mplexId),
+    m_serviceId          (other.m_serviceId),
+    m_serviceType        (other.m_serviceType),
+    m_atscMajorChan      (other.m_atscMajorChan),
+    m_atscMinorChan      (other.m_atscMinorChan),
+    m_lastRecord         (other.m_lastRecord),
+    m_defaultAuthority   (other.m_defaultAuthority),
+    m_commMethod         (other.m_commMethod),
+    m_tmOffset           (other.m_tmOffset),
+    m_iptvId             (other.m_iptvId),
 
     // Not in channel table
-    m_groupIdList       = other.m_groupIdList;
-    m_inputIdList       = other.m_inputIdList;
-    m_oldXmltvId        = other.m_oldXmltvId;
-    m_sourceName        = other.m_sourceName;
+    m_oldXmltvId         (other.m_oldXmltvId),
+    m_sourceName         (other.m_sourceName),
+    m_groupIdList        (other.m_groupIdList),
+    m_inputIdList        (other.m_inputIdList)
+{
 }
 
 ChannelInfo::ChannelInfo(
-    const QString &_channum, const QString &_callsign,
+    QString _channum, QString _callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _mplexid, ChannelVisibleType _visible,
-    const QString &_name, const QString &_icon,
-    uint _sourceid)
+    QString _name, QString _icon,
+    uint _sourceid) :
+    m_chanId(_chanid),
+    m_chanNum(std::move(_channum)),
+    m_sourceId(_sourceid),
+    m_callSign(std::move(_callsign)),
+    m_name(std::move(_name)),
+    m_icon(std::move(_icon)),
+    m_visible(_visible),
+    m_mplexId((_mplexid == 32767) ? 0 : _mplexid),
+    m_atscMajorChan(_major_chan),
+    m_atscMinorChan(_minor_chan)
 {
-    m_chanNum = _channum;
-    m_callSign = _callsign;
-    m_name = _name;
-    m_icon = _icon;
-    m_chanId = _chanid;
-    m_atscMajorChan = _major_chan;
-    m_atscMinorChan = _minor_chan;
-    m_mplexId = (_mplexid == 32767) ? 0 : _mplexid;
-    m_sourceId = _sourceid;
-    m_visible = _visible;
 }
 
 ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)

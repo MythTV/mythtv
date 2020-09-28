@@ -33,10 +33,10 @@ class MTV_PUBLIC ChannelInfo
  public:
     ChannelInfo() = default;
     ChannelInfo(const ChannelInfo &other);
-    ChannelInfo(const QString &_channum, const QString &_callsign,
+    ChannelInfo(QString _channum, QString _callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _mplexid, ChannelVisibleType _visible,
-              const QString &_name, const QString &_icon,
+              QString _name, QString _icon,
               uint _sourceid);
     
     ChannelInfo& operator=(const ChannelInfo &other);

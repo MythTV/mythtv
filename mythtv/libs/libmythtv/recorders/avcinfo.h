@@ -23,7 +23,7 @@ class AVCInfo
 {
   public:
     AVCInfo();
-    AVCInfo(const AVCInfo &o);
+    AVCInfo(const AVCInfo &o) = default;
     AVCInfo &operator=(const AVCInfo &o);
     virtual ~AVCInfo() = default;
 

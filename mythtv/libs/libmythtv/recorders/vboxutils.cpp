@@ -23,11 +23,6 @@
 #define SEARCH_TIME 3000
 #define VBOX_URI "urn:schemas-upnp-org:device:MediaServer:1"
 
-VBox::VBox(const QString &url)
-{
-    m_url = url;
-}
-
 // static method
 QStringList VBox::probeDevices(void)
 {

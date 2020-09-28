@@ -30,10 +30,10 @@
 #include "scheduleeditor.h"
 
 ManualSchedule::ManualSchedule(MythScreenStack *parent)
-               : MythScreenType(parent, "ManualSchedule")
+    : MythScreenType(parent, "ManualSchedule"),
+      m_nowDateTime(MythDate::current()),
+      m_startDateTime(m_nowDateTime)
 {
-    m_nowDateTime = MythDate::current();
-    m_startDateTime = m_nowDateTime;
 }
 
 bool ManualSchedule::Create(void)

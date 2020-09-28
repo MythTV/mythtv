@@ -13,15 +13,15 @@ class RomData
             QString lcountry = "", QString lgamename = "",
             QString ldescription = "", QString lpublisher = "",
             QString lplatform = "", QString lversion = ""  )
+        :       m_genre(std::move(lgenre)),
+                m_year(std::move(lyear)),
+                m_country(std::move(lcountry)),
+                m_gamename(std::move(lgamename)),
+                m_description(std::move(ldescription)),
+                m_publisher(std::move(lpublisher)),
+                m_platform(std::move(lplatform)),
+                m_version(std::move(lversion))
             {
-                m_genre = std::move(lgenre);
-                m_year = std::move(lyear);
-                m_country = std::move(lcountry);
-                m_gamename = std::move(lgamename);
-                m_description = std::move(ldescription);
-                m_publisher = std::move(lpublisher);
-                m_platform = std::move(lplatform);
-                m_version = std::move(lversion);
             }
 
     QString Genre() const { return m_genre; }

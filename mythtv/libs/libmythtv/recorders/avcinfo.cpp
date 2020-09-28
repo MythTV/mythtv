@@ -11,16 +11,6 @@ AVCInfo::AVCInfo()
     m_unit_table.fill(0xff);
 }
 
-AVCInfo::AVCInfo(const AVCInfo &o) :
-    m_port(o.m_port),         m_node(o.m_node),
-    m_guid(o.m_guid),         m_specid(o.m_specid),
-    m_vendorid(o.m_vendorid), m_modelid(o.m_modelid),
-    m_firmware_revision(o.m_firmware_revision),
-    m_product_name(o.m_product_name)
-{
-    m_unit_table = o.m_unit_table;
-}
-
 AVCInfo &AVCInfo::operator=(const AVCInfo &o)
 {
     if (this == &o)

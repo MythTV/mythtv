@@ -42,15 +42,13 @@
  */
 EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
                          QString lhostname)
-    : m_inputid(inputid), m_sock(lsock), m_hostname(std::move(lhostname))
+    : m_inputid(inputid), m_sock(lsock), m_hostname(std::move(lhostname)),
+      m_sleepStatusTime(MythDate::current()),
+      m_lastSleepTime(MythDate::current()),
+      m_lastWakeTime(MythDate::current()),
+      m_endRecordingTime(MythDate::current().addDays(-2)),
+      m_startRecordingTime(m_endRecordingTime)
 {
-    m_endRecordingTime = MythDate::current().addDays(-2);
-    m_startRecordingTime = m_endRecordingTime;
-
-    m_sleepStatusTime = MythDate::current();
-    m_lastSleepTime   = MythDate::current();
-    m_lastWakeTime    = MythDate::current();
-
     HasSockAndIncrRef();
 }
 
@@ -58,14 +56,13 @@ EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
  *  \brief This is the EncoderLink constructor for local recorders.
  */
 EncoderLink::EncoderLink(int inputid, TVRec *ltv)
-    : m_inputid(inputid), m_tv(ltv), m_local(true)
+    : m_inputid(inputid), m_tv(ltv), m_local(true),
+      m_sleepStatusTime(MythDate::current()),
+      m_lastSleepTime(MythDate::current()),
+      m_lastWakeTime(MythDate::current()),
+      m_endRecordingTime(MythDate::current().addDays(-2)),
+      m_startRecordingTime(m_endRecordingTime)
 {
-    m_endRecordingTime = MythDate::current().addDays(-2);
-    m_startRecordingTime = m_endRecordingTime;
-
-    m_sleepStatusTime = MythDate::current();
-    m_lastSleepTime   = MythDate::current();
-    m_lastWakeTime    = MythDate::current();
 }
 
 /** \fn EncoderLink::~EncoderLink()

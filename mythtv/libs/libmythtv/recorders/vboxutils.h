@@ -1,9 +1,12 @@
 #ifndef VBOX_UTILS_H
 #define VBOX_UTILS_H
 
+// C++ headers
+#include <utility>
+
 // Qt headers
-#include <QString>
 #include <QDomDocument>
+#include <QString>
 
 // MythTV headers
 #include "vboxchannelfetcher.h"
@@ -13,7 +16,9 @@
 class VBox
 {
   public:
-    explicit VBox(const QString &url);
+    explicit VBox(QString url) :
+        m_url(std::move(url)) {}
+
     ~VBox(void) = default;
 
     static QStringList probeDevices(void);

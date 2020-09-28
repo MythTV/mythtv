@@ -103,6 +103,12 @@ MythSortHelper::MythSortHelper(
  */
 MythSortHelper::MythSortHelper(MythSortHelper *other)
 {
+    if (other == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MythSortHelper created from null pointer."));
+        return;
+    }
     m_caseSensitive   = other->m_caseSensitive;
     m_prefixMode      = other->m_prefixMode;
     m_prefixes        = other->m_prefixes;

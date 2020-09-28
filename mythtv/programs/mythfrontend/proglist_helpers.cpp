@@ -394,13 +394,12 @@ void PowerSearchPopup::recordClicked(void)
 
 EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
                                            ProgLister *parent,
-                                           const QString &currentValue)
-    : MythScreenType(parentStack, "phrasepopup")
+                                           QString &currentValue)
+    : MythScreenType(parentStack, "phrasepopup"),
+      m_parent(parent),
+      m_currentValue(std::move(currentValue))
 {
-    m_parent = parent;
-
     //sanity check currentvalue
-    m_currentValue = currentValue;
     QStringList field = m_currentValue.split(':');
     if (field.count() != 6)
     {
