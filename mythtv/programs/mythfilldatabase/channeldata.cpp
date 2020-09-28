@@ -136,7 +136,9 @@ ChannelList ChannelData::channelList(int sourceId)
     ChannelInfoList channelList = ChannelUtil::LoadChannels(0, 0, avail, false,
                                                 ChannelUtil::kChanOrderByChanNum,
                                                 ChannelUtil::kChanGroupByChanid,
-                                                sourceId);
+                                                            sourceId, 0,
+                                                            false, "", "",
+                                                            false);
 
     for (auto & channel : channelList)
     {
