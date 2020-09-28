@@ -48,7 +48,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
     {
         QDomNodeList itemNodeList = doc.elementsByTagName("item");
         QString type;
-        QString dbVersion;
+//      QString dbVersion;
 
         if (itemNodeList.count() < 1)
         {
@@ -60,7 +60,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
         QDomNode n = itemNodeList.item(0);
         QDomElement e = n.toElement();
         type = e.attribute("type");
-        dbVersion = e.attribute("databaseversion");
+//      dbVersion = e.attribute("databaseversion");
         if (type == "recording")
         {
             QDomNodeList nodeList = e.elementsByTagName("recorded");
