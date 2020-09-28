@@ -202,6 +202,8 @@ public:
     void setUSWC(bool uswc);
 
 private:
+    // This function is needed on ARCH_X86
+    // cppcheck-suppress unusedPrivateFunction
     void allocateCache(int width);
 
     uint8_t*  m_cache {nullptr};
