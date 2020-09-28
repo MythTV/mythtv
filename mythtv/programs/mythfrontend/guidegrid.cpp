@@ -143,6 +143,7 @@ bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
 
     QString txt = e->text();
     bool isUInt = false;
+    // cppcheck-suppress ignoredReturnValue
     txt.toUInt(&isUInt);
     if (isUInt)
     {
