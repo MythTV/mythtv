@@ -494,15 +494,12 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
            m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
            m_player(player),
            m_embedVideo(embedVideo),
-           m_previewVideoRefreshTimer(new QTimer(this)),
            m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
            m_updateTimer(new QTimer(this)),
            m_threadPool("GuideGridHelperPool"),
            m_changrpid(changrpid),
            m_changrplist(ChannelGroup::GetChannelGroups(false))
 {
-    connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
-            this,                     SLOT(refreshVideo()));
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
@@ -642,12 +639,6 @@ GuideGrid::~GuideGrid()
     }
 
     m_channelInfos.clear();
-
-    if (m_previewVideoRefreshTimer)
-    {
-        m_previewVideoRefreshTimer->disconnect(this);
-        m_previewVideoRefreshTimer = nullptr;
-    }
 
     gCoreContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
 
@@ -1870,14 +1861,6 @@ void GuideGrid::customEvent(QEvent *event)
             LoadFromScheduler(m_recList);
             fillProgramInfos();
         }
-        else if (message == "STOP_VIDEO_REFRESH_TIMER")
-        {
-            m_previewVideoRefreshTimer->stop();
-        }
-        else if (message == "START_VIDEO_REFRESH_TIMER")
-        {
-            m_previewVideoRefreshTimer->start(66);
-        }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
@@ -2661,29 +2644,10 @@ void GuideGrid::HideTVWindow(void)
 
 void GuideGrid::EmbedTVWindow(void)
 {
-    auto *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
-    QCoreApplication::postEvent(this, me);
-
-    m_usingNullVideo = !m_player->StartEmbedding(m_videoRect);
-    if (!m_usingNullVideo)
-    {
-        QRegion r1 = QRegion(m_area);
-        QRegion r2 = QRegion(m_videoRect);
-        GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
-    }
-    else
-    {
-        me = new MythEvent("START_VIDEO_REFRESH_TIMER");
-        QCoreApplication::postEvent(this, me);
-    }
-}
-
-void GuideGrid::refreshVideo(void)
-{
-    if (m_player && m_usingNullVideo)
-    {
-        GetMythMainWindow()->GetPaintWindow()->update(m_videoRect);
-    }
+    m_player->StartEmbedding(m_videoRect);
+    QRegion r1 = QRegion(m_area);
+    QRegion r2 = QRegion(m_videoRect);
+    GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
 }
 
 void GuideGrid::aboutToHide(void)

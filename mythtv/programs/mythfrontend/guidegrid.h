@@ -175,7 +175,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
   private slots:
     void updateTimeout(void);
-    void refreshVideo(void);
     void updateInfo(void);
     void updateChannels(void);
     void updateJumpToChannel(void);
@@ -269,9 +268,7 @@ private:
     QDateTime m_lastTime;
 
     TV     *m_player                      {nullptr};
-    bool    m_usingNullVideo              {false};
     bool    m_embedVideo                  {false};
-    QTimer *m_previewVideoRefreshTimer    {nullptr}; // audited ref #5318
     void    EmbedTVWindow(void);
     static void    HideTVWindow(void);
     QRect   m_videoRect;
