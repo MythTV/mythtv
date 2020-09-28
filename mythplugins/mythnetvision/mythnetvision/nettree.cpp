@@ -168,10 +168,10 @@ void NetTree::LoadData(void)
         m_siteButtonList->Reset();
 
         if (!m_currentNode)
+        {
             SetCurrentNode(m_siteGeneric);
-
-        if (!m_currentNode)
             return;
+        }
 
         MythGenericTree *selectedNode = m_currentNode->getSelectedChild();
 
