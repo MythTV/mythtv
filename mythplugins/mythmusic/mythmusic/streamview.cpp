@@ -804,12 +804,13 @@ bool SearchStream::Create()
             this, SLOT(updateStreams()));
     connect(m_genreList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(updateStreams()));
-    connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(updateStreams()));
 
 
     if (m_countryList)
     {
+        connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                this, SLOT(updateStreams()));
+
         new MythUIButtonListItem(m_countryList, "");
         connect(m_languageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
                 this, SLOT(updateStreams()));
