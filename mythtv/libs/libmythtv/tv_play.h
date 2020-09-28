@@ -855,7 +855,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
     volatile int         m_signalMonitorTimerId    {0};
 
     // Playback menu state caching
-    PlayerContext *m_tvmCtx {nullptr};
     OSD           *m_tvmOsd {nullptr};
 
     // Various tracks
