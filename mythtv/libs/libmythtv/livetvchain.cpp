@@ -779,8 +779,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
     while (ok && itemIdx < numItems)
     {
         LiveTVChainEntry entry;
-        if (ok && itemIdx < numItems)
-            entry.chanid = items[itemIdx++].toUInt(&ok);
+        entry.chanid = items[itemIdx++].toUInt(&ok);
         if (ok && itemIdx < numItems)
         {
             entry.starttime =
