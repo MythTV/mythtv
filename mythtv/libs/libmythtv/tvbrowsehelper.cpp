@@ -120,13 +120,10 @@ void TVBrowseHelper::BrowseEnd(bool ChangeChannel)
 
     QMutexLocker locker(&m_browseLock);
 
+    if (m_browseTimerId)
     {
-        QMutexLocker locker2(&m_parent->m_timerIdLock);
-        if (m_browseTimerId)
-        {
-            m_parent->KillTimer(m_browseTimerId);
-            m_browseTimerId = 0;
-        }
+        m_parent->KillTimer(m_browseTimerId);
+        m_browseTimerId = 0;
     }
 
     m_browseList.clear();
@@ -149,11 +146,8 @@ void TVBrowseHelper::BrowseDispInfo(const BrowseInfo& Browseinfo)
     if (!BrowseStart(true))
         return;
 
-    {
-        QMutexLocker locker(&m_parent->m_timerIdLock);
-        m_parent->KillTimer(m_browseTimerId);
-        m_browseTimerId = m_parent->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
-    }
+    m_parent->KillTimer(m_browseTimerId);
+    m_browseTimerId = m_parent->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
 
     QMutexLocker locker(&m_browseLock);
     if (BROWSE_SAME == Browseinfo.m_dir)

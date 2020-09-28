@@ -835,7 +835,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
     MythDeque<QString> m_networkControlCommands;
 
     // Timers
-    mutable QMutex       m_timerIdLock;
     volatile int         m_lcdTimerId              {0};
     volatile int         m_lcdVolumeTimerId        {0};
     volatile int         m_networkControlTimerId   {0};

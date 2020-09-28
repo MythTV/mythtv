@@ -2243,14 +2243,11 @@ void TV::HandleStateChange()
     if (m_playerContext.m_recorder)
         m_playerContext.m_recorder->FrontendReady();
 
-    QMutexLocker locker(&m_timerIdLock);
     if (m_endOfRecPromptTimerId)
         KillTimer(m_endOfRecPromptTimerId);
     m_endOfRecPromptTimerId = 0;
     if (m_dbEndOfRecExitPrompt && !m_inPlaylist && !m_underNetworkControl)
-    {
         m_endOfRecPromptTimerId = StartTimer(kEndOfRecPromptCheckFrequency, __LINE__);
-    }
 
     if (m_endOfPlaybackTimerId)
         KillTimer(m_endOfPlaybackTimerId);
@@ -2447,17 +2444,14 @@ void TV::timerEvent(QTimerEvent *Event)
 
     // Check if it matches networkControlTimerId
     QString netCmd;
+    if (timer_id == m_networkControlTimerId)
     {
-        QMutexLocker locker(&m_timerIdLock);
-        if (timer_id == m_networkControlTimerId)
+        if (!m_networkControlCommands.empty())
+            netCmd = m_networkControlCommands.dequeue();
+        if (m_networkControlCommands.empty())
         {
-            if (!m_networkControlCommands.empty())
-                netCmd = m_networkControlCommands.dequeue();
-            if (m_networkControlCommands.empty())
-            {
-                KillTimer(m_networkControlTimerId);
-                m_networkControlTimerId = 0;
-            }
+            KillTimer(m_networkControlTimerId);
+            m_networkControlTimerId = 0;
         }
     }
 
@@ -2503,7 +2497,6 @@ void TV::timerEvent(QTimerEvent *Event)
 
         ReturnPlayerLock();
 
-        QMutexLocker locker(&m_timerIdLock);
         KillTimer(m_exitPlayerTimerId);
         m_exitPlayerTimerId = 0;
         handled = true;
@@ -2523,7 +2516,6 @@ void TV::timerEvent(QTimerEvent *Event)
         }
         ReturnPlayerLock();
 
-        QMutexLocker locker(&m_timerIdLock);
         KillTimer(m_ccInputTimerId);
         m_ccInputTimerId = 0;
         handled = true;
@@ -2543,7 +2535,6 @@ void TV::timerEvent(QTimerEvent *Event)
         }
         ReturnPlayerLock();
 
-        QMutexLocker locker(&m_timerIdLock);
         KillTimer(m_asInputTimerId);
         m_asInputTimerId = 0;
         handled = true;
@@ -2571,7 +2562,6 @@ void TV::timerEvent(QTimerEvent *Event)
         }
         ReturnPlayerLock();
 
-        QMutexLocker locker(&m_timerIdLock);
         if (!m_queuedChanID && m_queuedChanNum.isEmpty() && m_queueInputTimerId)
         {
             KillTimer(m_queueInputTimerId);
@@ -2606,7 +2596,6 @@ void TV::timerEvent(QTimerEvent *Event)
         }
         else
         {
-            QMutexLocker locker(&m_timerIdLock);
             KillTimer(m_updateOSDDebugTimerId);
             m_updateOSDDebugTimerId = 0;
             if (m_playerContext.m_buffer)
@@ -2655,11 +2644,13 @@ void TV::timerEvent(QTimerEvent *Event)
         }
         ReturnPlayerLock();
 
-        QMutexLocker locker(&m_timerIdLock);
         if (m_errorRecoveryTimerId)
             KillTimer(m_errorRecoveryTimerId);
         m_errorRecoveryTimerId = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
+        return;
     }
+
+    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Unknown timer: %1").arg(timer_id));
 }
 
 bool TV::HandleLCDTimerEvent()
@@ -2697,7 +2688,6 @@ bool TV::HandleLCDTimerEvent()
     }
     ReturnPlayerLock();
 
-    QMutexLocker locker(&m_timerIdLock);
     KillTimer(m_lcdTimerId);
     m_lcdTimerId = StartTimer(kLCDTimeout, __LINE__);
 
@@ -2715,7 +2705,6 @@ void TV::HandleLCDVolumeTimerEvent()
     }
     ReturnPlayerLock();
 
-    QMutexLocker locker(&m_timerIdLock);
     KillTimer(m_lcdVolumeTimerId);
     m_lcdVolumeTimerId = 0;
 }
@@ -2780,7 +2769,6 @@ void TV::ScheduleInputChange()
 
 void TV::SetErrored()
 {
-    QMutexLocker locker(&m_timerIdLock);
     m_playerContext.m_errored = true;
     KillTimer(m_errorRecoveryTimerId);
     m_errorRecoveryTimerId = StartTimer(1, __LINE__);
@@ -2849,7 +2837,6 @@ void TV::PrepareToExitPlayer(int Line, BookmarkAction Bookmark)
 
 void TV::SetExitPlayer(bool SetIt, bool WantsTo)
 {
-    QMutexLocker locker(&m_timerIdLock);
     if (SetIt)
     {
         m_wantsToQuit = WantsTo;
@@ -2867,7 +2854,6 @@ void TV::SetExitPlayer(bool SetIt, bool WantsTo)
 
 void TV::SetUpdateOSDPosition(bool Set)
 {
-    QMutexLocker locker(&m_timerIdLock);
     if (Set)
     {
         if (!m_updateOSDPosTimerId)
@@ -2883,12 +2869,10 @@ void TV::SetUpdateOSDPosition(bool Set)
 
 void TV::HandleEndOfPlaybackTimerEvent()
 {
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        if (m_endOfPlaybackTimerId)
-            KillTimer(m_endOfPlaybackTimerId);
-        m_endOfPlaybackTimerId = 0;
-    }
+
+    if (m_endOfPlaybackTimerId)
+        KillTimer(m_endOfPlaybackTimerId);
+    m_endOfPlaybackTimerId = 0;
 
     bool is_playing = false;
     GetPlayerReadLock();
@@ -2912,10 +2896,7 @@ void TV::HandleEndOfPlaybackTimerEvent()
     ReturnPlayerLock();
 
     if (is_playing)
-    {
-        QMutexLocker locker(&m_timerIdLock);
         m_endOfPlaybackTimerId = StartTimer(kEndOfPlaybackCheckFrequency, __LINE__);
-    }
 }
 
 void TV::HandleIsNearEndWhenEmbeddingTimerEvent()
@@ -2965,12 +2946,9 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent()
 
 void TV::HandleVideoExitDialogTimerEvent()
 {
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        if (m_videoExitDialogTimerId)
-            KillTimer(m_videoExitDialogTimerId);
-        m_videoExitDialogTimerId = 0;
-    }
+    if (m_videoExitDialogTimerId)
+        KillTimer(m_videoExitDialogTimerId);
+    m_videoExitDialogTimerId = 0;
 
     // disable dialog and exit playback after timeout
     GetPlayerReadLock();
@@ -2995,11 +2973,8 @@ void TV::HandleVideoExitDialogTimerEvent()
 
 void TV::HandlePseudoLiveTVTimerEvent()
 {
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        KillTimer(m_pseudoChangeChanTimerId);
-        m_pseudoChangeChanTimerId = 0;
-    }
+    KillTimer(m_pseudoChangeChanTimerId);
+    m_pseudoChangeChanTimerId = 0;
 
     bool restartTimer = false;
     GetPlayerReadLock();
@@ -3026,16 +3001,12 @@ void TV::HandlePseudoLiveTVTimerEvent()
     ReturnPlayerLock();
 
     if (restartTimer)
-    {
-        QMutexLocker locker(&m_timerIdLock);
         if (!m_pseudoChangeChanTimerId)
             m_pseudoChangeChanTimerId = StartTimer(25, __LINE__);
-    }
 }
 
 void TV::SetSpeedChangeTimer(int When, int Line)
 {
-    QMutexLocker locker(&m_timerIdLock);
     if (m_speedChangeTimerId)
         KillTimer(m_speedChangeTimerId);
     m_speedChangeTimerId = StartTimer(When, Line);
@@ -3043,12 +3014,9 @@ void TV::SetSpeedChangeTimer(int When, int Line)
 
 void TV::HandleSpeedChangeTimerEvent()
 {
-    {
-        QMutexLocker locker(&m_timerIdLock);
-        if (m_speedChangeTimerId)
-            KillTimer(m_speedChangeTimerId);
-        m_speedChangeTimerId = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
-    }
+    if (m_speedChangeTimerId)
+        KillTimer(m_speedChangeTimerId);
+    m_speedChangeTimerId = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
 
     GetPlayerReadLock();
     bool update_msg = m_playerContext.HandlePlayerSpeedChangeFFRew();
@@ -3203,7 +3171,6 @@ bool TV::HandleTrackAction(const QString &Action)
 
             ClearInputQueues(true);
 
-            QMutexLocker locker(&m_timerIdLock);
             m_ccInputMode = false;
             if (m_ccInputTimerId)
             {
@@ -3216,7 +3183,6 @@ bool TV::HandleTrackAction(const QString &Action)
             ClearInputQueues(false);
             AddKeyToInputQueue(0);
 
-            QMutexLocker locker(&m_timerIdLock);
             m_ccInputMode      = true;
             m_asInputMode      = false;
             m_ccInputTimerId = StartTimer(kInputModeTimeout, __LINE__);
@@ -3985,8 +3951,6 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         {
             ClearInputQueues(true);
             SetOSDText("osd_input", "osd_number_entry", tr("Seek:"), kOSDTimeout_Med);
-
-            QMutexLocker locker(&m_timerIdLock);
             m_asInputMode = false;
             if (m_asInputTimerId)
             {
@@ -3998,8 +3962,6 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         {
             ClearInputQueues(false);
             AddKeyToInputQueue(0);
-
-            QMutexLocker locker(&m_timerIdLock);
             m_asInputMode      = true;
             m_ccInputMode      = false;
             m_asInputTimerId = StartTimer(kInputModeTimeout, __LINE__);
@@ -5980,20 +5942,16 @@ void TV::ToggleChannelFavorite(const QString& ChangroupName)
 
 QString TV::GetQueuedInput() const
 {
-    QMutexLocker locker(&m_timerIdLock);
     return m_queuedInput;
 }
 
 int TV::GetQueuedInputAsInt(bool *OK, int Base) const
 {
-    QMutexLocker locker(&m_timerIdLock);
     return m_queuedInput.toInt(OK, Base);
 }
 
 QString TV::GetQueuedChanNum() const
 {
-    QMutexLocker locker(&m_timerIdLock);
-
     if (m_queuedChanNum.isEmpty())
         return "";
 
@@ -6022,7 +5980,6 @@ void TV::ClearInputQueues(bool Hideosd)
     if (Hideosd)
         HideOSDWindow("osd_input");
 
-    QMutexLocker locker(&m_timerIdLock);
     m_queuedInput   = "";
     m_queuedChanNum = "";
     m_queuedChanID  = 0;
@@ -6037,7 +5994,6 @@ void TV::AddKeyToInputQueue(char Key)
 {
     if (Key)
     {
-        QMutexLocker locker(&m_timerIdLock);
         m_queuedInput   = m_queuedInput.append(Key).right(kInputKeysMax);
         m_queuedChanNum = m_queuedChanNum.append(Key).right(kInputKeysMax);
         if (!m_queueInputTimerId)
@@ -6097,8 +6053,6 @@ bool TV::ProcessSmartChannel(QString &InputStr)
         if (!ok)
         {
             chan = chan.left(chan.length()-1);
-
-            QMutexLocker locker(&m_timerIdLock);
             m_queuedChanNum = chan;
             if (!m_queueInputTimerId)
                 m_queueInputTimerId = StartTimer(10, __LINE__);
@@ -6128,13 +6082,11 @@ bool TV::ProcessSmartChannel(QString &InputStr)
     if (!valid_prefix)
     {
         // not a valid prefix.. reset...
-        QMutexLocker locker(&m_timerIdLock);
         m_queuedChanNum = "";
     }
     else if (!needed_spacer.isEmpty())
     {
         // need a spacer..
-        QMutexLocker locker(&m_timerIdLock);
         m_queuedChanNum = add_spacer(chan, needed_spacer);
     }
 
@@ -6145,7 +6097,6 @@ bool TV::ProcessSmartChannel(QString &InputStr)
             .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
 #endif
 
-    QMutexLocker locker(&m_timerIdLock);
     InputStr = m_queuedChanNum;
     if (!m_queueInputTimerId)
         m_queueInputTimerId = StartTimer(10, __LINE__);
@@ -6454,8 +6405,6 @@ void TV::ChangeChannel(const ChannelInfoList &Options)
         {
             // hide the channel number, activated by certain signal monitors
             HideOSDWindow("osd_input");
-
-            QMutexLocker locker(&m_timerIdLock);
             m_queuedInput   = channum;
             m_queuedChanNum = channum;
             m_queuedChanID  = chanid;
@@ -6492,7 +6441,6 @@ void TV::PopPreviousChannel(bool ImmediateChange)
     // Only change channel if previous channel != current channel
     if (cur_channum != prev_channum && !prev_channum.isEmpty())
     {
-        QMutexLocker locker(&m_timerIdLock);
         m_queuedInput   = prev_channum;
         m_queuedChanNum = prev_channum;
         m_queuedChanID  = 0;
@@ -6622,7 +6570,6 @@ void TV::ToggleOSDDebug()
         if (m_playerContext.m_player)
             m_playerContext.m_player->EnableFrameRateMonitor(true);
         show = true;
-        QMutexLocker locker(&m_timerIdLock);
         if (!m_updateOSDDebugTimerId)
             m_updateOSDDebugTimerId = StartTimer(250, __LINE__);
     }
@@ -6728,8 +6675,6 @@ void TV::UpdateOSDSignal(const QStringList &List)
         if (&m_playerContext.m_lastSignalMsg != &List)
             m_playerContext.m_lastSignalMsg = List;
         ReturnOSDLock();
-
-        QMutexLocker locker(&m_timerIdLock);
         m_signalMonitorTimerId = StartTimer(1, __LINE__);
         return;
     }
@@ -6945,7 +6890,6 @@ void TV::UpdateOSDTimeoutMessage()
 void TV::UpdateLCD()
 {
     // Make sure the LCD information gets updated shortly
-    QMutexLocker locker(&m_timerIdLock);
     if (m_lcdTimerId)
         KillTimer(m_lcdTimerId);
     m_lcdTimerId = StartTimer(1, __LINE__);
@@ -7101,7 +7045,6 @@ bool TV::StartEmbedding(const QRect &EmbedRect)
     m_playerContext.StartEmbedding(EmbedRect);
 
     // Start checking for end of file for embedded window..
-    QMutexLocker locker(&m_timerIdLock);
     if (m_embedCheckTimerId)
         KillTimer(m_embedCheckTimerId);
     m_embedCheckTimerId = StartTimer(kEmbedCheckFrequency, __LINE__);
@@ -7122,7 +7065,6 @@ void TV::StopEmbedding(const QStringList &Data)
 
     // Stop checking for end of file for embedded window..
     {
-        QMutexLocker locker(&m_timerIdLock);
         if (m_embedCheckTimerId)
             KillTimer(m_embedCheckTimerId);
         m_embedCheckTimerId = 0;
@@ -7356,7 +7298,6 @@ void TV::ChangeVolume(bool Up, int NewVolume)
             lcd->switchToVolume(appName);
             lcd->setVolumeLevel(static_cast<float>(curvol) / 100);
 
-            QMutexLocker locker(&m_timerIdLock);
             if (m_lcdVolumeTimerId)
                 KillTimer(m_lcdVolumeTimerId);
 
@@ -8116,7 +8057,6 @@ void TV::customEvent(QEvent *Event)
                 if (pi.HasPathname() || pi.GetChanID())
                 {
                     m_playerContext.SetPseudoLiveTV(&pi, kPseudoChangeChannel);
-                    QMutexLocker locker(&m_timerIdLock);
                     if (!m_pseudoChangeChanTimerId)
                         m_pseudoChangeChanTimerId = StartTimer(0, __LINE__);
                 }
@@ -8183,7 +8123,6 @@ void TV::customEvent(QEvent *Event)
             if ((tokens2.size() >= 2) &&
                 (tokens2[1] != "ANSWER") && (tokens2[1] != "RESPONSE"))
             {
-                QMutexLocker locker(&m_timerIdLock);
                 m_networkControlCommands.enqueue(message);
                 if (!m_networkControlTimerId)
                     m_networkControlTimerId = StartTimer(1, __LINE__);
@@ -9020,7 +8959,6 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
                 // Only change channel if new channel != current channel
                 if (cur_channum != new_channum && !new_channum.isEmpty())
                 {
-                    QMutexLocker locker(&m_timerIdLock);
                     m_queuedInput   = new_channum;
                     m_queuedChanNum = new_channum;
                     m_queuedChanID  = 0;
@@ -11057,7 +10995,6 @@ void TV::ShowOSDStopWatchingRecording()
     }
     ReturnOSDLock();
 
-    QMutexLocker locker(&m_timerIdLock);
     if (m_videoExitDialogTimerId)
         KillTimer(m_videoExitDialogTimerId);
     m_videoExitDialogTimerId = StartTimer(kVideoExitDialogTimeout, __LINE__);
@@ -11160,7 +11097,6 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
                 osd->DialogBack("", "DIALOG_PLAY_0_0", true);
         }
 
-        QMutexLocker locker(&m_timerIdLock);
         if (m_videoExitDialogTimerId)
             KillTimer(m_videoExitDialogTimerId);
         m_videoExitDialogTimerId = StartTimer(kVideoExitDialogTimeout, __LINE__);
@@ -11249,7 +11185,6 @@ void TV::HandleSaveLastPlayPosEvent()
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();
 
-    QMutexLocker locker(&m_timerIdLock);
     KillTimer(m_saveLastPlayPosTimerId);
     m_saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
 }
