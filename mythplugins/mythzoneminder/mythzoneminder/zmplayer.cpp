@@ -329,7 +329,7 @@ void ZMPlayer::prevPressed()
     if (m_eventList->empty())
         return;
 
-    if (*m_currentEvent <= 0)
+    if (*m_currentEvent == 0)
         return;
 
     if (*m_currentEvent > m_eventList->size())
