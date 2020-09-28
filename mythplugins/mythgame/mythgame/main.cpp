@@ -20,7 +20,7 @@ struct GameData
 
 static void GameCallback(void *data, QString &selection)
 {
-    auto *ddata = (GameData *)data;
+    auto *ddata = static_cast<GameData *>(data);
     QString sel = selection.toLower();
 
     (void)ddata;
