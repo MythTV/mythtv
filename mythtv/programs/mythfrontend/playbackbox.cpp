@@ -449,6 +449,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
     if (player)
     {
         m_player = player;
+        m_player->IncrRef();
         QString tmp = m_player->GetRecordingGroup();
         if (!tmp.isEmpty())
             m_recGroup = tmp;
@@ -482,7 +483,10 @@ PlaybackBox::~PlaybackBox(void)
     }
 
     if (m_player)
+    {
         emit m_player->RequestStopEmbedding(m_playerSelectedNewShow);
+        m_player->DecrRef();
+    }
 }
 
 bool PlaybackBox::Create()

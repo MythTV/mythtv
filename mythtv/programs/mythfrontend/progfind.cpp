@@ -52,6 +52,17 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
         delete programFind;
 }
 
+ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG ,
+                       TV *player, bool embedVideo)
+  : ScheduleCommon(parentStack, "ProgFinder"),
+    m_player(player),
+    m_embedVideo(embedVideo),
+    m_allowEPG(allowEPG)
+{
+    if (m_player)
+        m_player->IncrRef();
+}
+
 bool ProgFinder::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "programfind", this))
@@ -118,8 +129,12 @@ ProgFinder::~ProgFinder()
 
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
-    if (m_player && m_allowEPG)
-        emit m_player->RequestStopEmbedding();
+    if (m_player)
+    {
+        if (m_allowEPG)
+            emit m_player->RequestStopEmbedding();
+        m_player->DecrRef();
+    }
 }
 
 void ProgFinder::alphabetListItemSelected(MythUIButtonListItem *item)

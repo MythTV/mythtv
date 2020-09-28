@@ -35,6 +35,7 @@ using namespace std;
 #include "decoders/decoderbase.h"
 #include "mythmiscutil.h"
 #include "tvbrowsehelper.h"
+#include "referencecounter.h"
 
 class QEvent;
 class QKeyEvent;
@@ -278,34 +279,25 @@ private:
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrowseHelper
+class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public ReferenceCounter, protected TVBrowseHelper
 {
     friend class PlaybackBox;
     friend class GuideGrid;
     friend class TVBrowseHelper;
 
     Q_OBJECT
+
   public:
-    // Check whether we already have a TV object
     static bool IsTVRunning();
-    // Start media playback
     static bool StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection = ChannelInfoList());
     static bool IsPaused();
-
-    // Public event handling
-    bool event(QEvent* Event) override;
-    bool eventFilter(QObject* Object, QEvent* Event) override;
-
-    // Public PlaybackBox methods
-    /// true iff program is the same as the one in the selected player
-    bool IsSameProgram(const ProgramInfo* ProgInfo) const;
-
-    // static functions
     static void InitKeys();
     static void ReloadKeys();
     static void SetFuncPtr(const char* Name, void* Pointer);
     static int  ConfiguredTunerCards();
     static bool IsTunable(uint ChanId);
+
+    bool IsSameProgram(const ProgramInfo* ProgInfo) const;
 
     /// \brief Helper class for Sleep Timer code.
     class SleepTimerInfo
@@ -319,7 +311,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
     };
 
   public slots:
-    void HandleOSDClosed(int OSDType);
+    bool event(QEvent* Event) override;
+    bool eventFilter(QObject* Object, QEvent* Event) override;
     void timerEvent(QTimerEvent* Event) override;
     void StopPlayback();
 
@@ -328,10 +321,16 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
     void RequestStartEmbedding(const QRect& EmbedRect);
     void RequestStopEmbedding(const QStringList& Data = {});
 
-  protected:
-    // Protected event handling
+  protected slots:
+    void onApplicationStateChange(Qt::ApplicationState State);
     void customEvent(QEvent* Event) override;
 
+  private slots:
+    bool StartEmbedding(const QRect& EmbedRect);
+    void StopEmbedding(const QStringList& Data = {});
+    void HandleOSDClosed(int OSDType);
+
+  private:
     static QStringList lastProgramStringList;
     static EMBEDRETURNVOID RunPlaybackBoxPtr;
     static EMBEDRETURNVOID RunViewScheduledPtr;
@@ -339,21 +338,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, protected TVBrow
     static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
-  protected slots:
-    void onApplicationStateChange(Qt::ApplicationState State);
-    bool StartEmbedding(const QRect& EmbedRect);
-    void StopEmbedding(const QStringList& Data = {});
-
-  private:
     TV();
    ~TV() override;
-    static TV*      GetTV();
-    static void     ReleaseTV(TV* Tv);
-    static QMutex  *gTVLock;
-    static TV      *gTV;
     PlayerContext*  GetPlayerContext();
 
     // Private initialisation
+    static TV* AcquireRelease(bool Acquire, bool Create);
     bool Init();
     void InitFromDB();
     static QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& KeyList);

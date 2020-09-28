@@ -198,25 +198,41 @@ int TV::ConfiguredTunerCards()
     return count;
 }
 
-QMutex* TV::gTVLock = new QMutex();
-TV*     TV::gTV     = nullptr;
+TV* TV::AcquireRelease(bool Acquire, bool Create)
+{
+    static QMutex s_lock;
+    static TV*    s_tv = nullptr;
+    QMutexLocker locker(&s_lock);
+
+    if (Acquire)
+    {
+        if (!s_tv && Create)
+            s_tv = new TV();
+        else if (s_tv)
+            s_tv->IncrRef();
+    }
+    else
+    {
+        if (!s_tv)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Ref count error");
+        else
+            if (s_tv->DecrRef() == 0)
+                s_tv = nullptr;
+    }
+
+    return s_tv;
+}
 
 bool TV::IsTVRunning()
 {
-    QMutexLocker locker(gTVLock);
-    return gTV;
-}
-
-TV* TV::GetTV()
-{
-    QMutexLocker locker(gTVLock);
-    if (gTV)
+    bool result = false;
+    TV* tv = AcquireRelease(true, false);
+    if (tv)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a TV object.");
-        return nullptr;
+        result = true;
+        AcquireRelease(false, false);
     }
-    gTV = new TV();
-    return gTV;
+    return result;
 }
 
 /*! \brief Return a pointer to TV::m_playerContext
@@ -231,31 +247,13 @@ PlayerContext* TV::GetPlayerContext()
     return &m_playerContext;
 }
 
-void TV::ReleaseTV(TV* Tv)
-{
-    QMutexLocker locker(gTVLock);
-    if (!Tv || !gTV || (gTV != Tv))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "- programmer error.");
-        return;
-    }
-
-    delete gTV;
-    gTV = nullptr;
-}
-
 void TV::StopPlayback()
 {
-    if (TV::IsTVRunning())
-    {
-        QMutexLocker lock(gTVLock);
-
-        (void)gTV->GetPlayerReadLock();
-        PrepareToExitPlayer(__LINE__);
-        SetExitPlayer(true, true);
-        ReturnPlayerLock();
-        gCoreContext->TVInWantingPlayback(true);
-    }
+    GetPlayerReadLock();
+    PrepareToExitPlayer(__LINE__);
+    SetExitPlayer(true, true);
+    ReturnPlayerLock();
+    gCoreContext->TVInWantingPlayback(true);
 }
 
 /**
@@ -263,9 +261,12 @@ void TV::StopPlayback()
  */
 bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection)
 {
-    TV *tv = GetTV();
-    if (!tv)
+    TV* tv = AcquireRelease(true, true);
+    // handle existing TV object atomically
+    if (tv->m_referenceCount > 1)
     {
+        AcquireRelease(false, false);
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a TV object.");
         gCoreContext->emitTVPlaybackAborted();
         return false;
     }
@@ -294,7 +295,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
-        ReleaseTV(tv);
+        AcquireRelease(false, false);
         GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
         gCoreContext->emitTVPlaybackAborted();
@@ -401,9 +402,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
 
     bool allowrerecord = tv->GetAllowRerecord();
     bool deleterecording = tv->m_requestDelete;
-
-    ReleaseTV(tv);
-
+    AcquireRelease(false, false);
     gCoreContext->emitTVPlaybackStopped();
     gCoreContext->TVInWantingPlayback(false);
 
@@ -958,7 +957,9 @@ void TV::ReloadKeys()
  *  \sa Init()
  */
 TV::TV()
-  : TVBrowseHelper(this)
+  : ReferenceCounter("TV"),
+    TVBrowseHelper(this)
+
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
     m_ctorTime.start();
@@ -5026,23 +5027,22 @@ void TV::DoTogglePauseFinish(float Time, bool ShowOSD)
  */
 bool TV::IsPaused()
 {
-    if (!IsTVRunning())
-        return false;
-
-    QMutexLocker lock(gTVLock);
-    gTV->GetPlayerReadLock();
-    PlayerContext* context = gTV->GetPlayerContext();
-    if (context->IsErrored())
-    {
-        gTV->ReturnPlayerLock();
-        return false;
-    }
-    context->LockDeletePlayer(__FILE__, __LINE__);
     bool paused = false;
-    if (context->m_player)
-        paused = context->m_player->IsPaused();
-    context->UnlockDeletePlayer(__FILE__, __LINE__);
-    gTV->ReturnPlayerLock();
+    TV* tv = AcquireRelease(true, false);
+    if (tv)
+    {
+        tv->GetPlayerReadLock();
+        PlayerContext* context = tv->GetPlayerContext();
+        if (!context->IsErrored())
+        {
+            context->LockDeletePlayer(__FILE__, __LINE__);
+            if (context->m_player)
+                paused = context->m_player->IsPaused();
+            context->UnlockDeletePlayer(__FILE__, __LINE__);
+        }
+        tv->ReturnPlayerLock();
+        AcquireRelease(false, false);
+    }
     return paused;
 }
 
@@ -6967,10 +6967,12 @@ void TV::ShowLCDDVDInfo()
 
 bool TV::IsTunable(uint ChanId)
 {
-    if (TV::IsTVRunning())
+    TV* tv = AcquireRelease(true, false);
+    if (tv)
     {
-        QMutexLocker lock(gTVLock);
-        return !gTV->IsTunableOn(ChanId).empty();
+        bool result = tv->IsTunableOn(ChanId).empty();
+        AcquireRelease(false, false);
+        return result;
     }
     return false;
 }

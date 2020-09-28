@@ -98,6 +98,9 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
     FilterOptMixin::SetRule(m_recordingRule);
     StoreOptMixin::SetRule(m_recordingRule);
     PostProcMixin::SetRule(m_recordingRule);
+
+    if (m_player)
+        m_player->IncrRef();
 }
 
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
@@ -110,6 +113,8 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             m_recordingRule(recRule),
             m_player(player)
 {
+    if (m_player)
+        m_player->IncrRef();
 }
 
 ScheduleEditor::~ScheduleEditor(void)
@@ -118,7 +123,10 @@ ScheduleEditor::~ScheduleEditor(void)
 
     // if we have a player, we need to tell we are done
     if (m_player)
+    {
         emit m_player->RequestStopEmbedding();
+        m_player->DecrRef();
+    }
 }
 
 bool ScheduleEditor::Create()

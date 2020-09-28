@@ -479,19 +479,19 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum, const QDateTime &startTime,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
-         : ScheduleCommon(parent, "guidegrid"),
-           m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
-           m_allowFinder(allowFinder),
-           m_startChanID(chanid),
-           m_startChanNum(std::move(channum)),
-           m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
-           m_player(player),
-           m_embedVideo(embedVideo),
-           m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-           m_updateTimer(new QTimer(this)),
-           m_threadPool("GuideGridHelperPool"),
-           m_changrpid(changrpid),
-           m_changrplist(ChannelGroup::GetChannelGroups(false))
+  : ScheduleCommon(parent, "guidegrid"),
+    m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
+    m_allowFinder(allowFinder),
+    m_startChanID(chanid),
+    m_startChanNum(std::move(channum)),
+    m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
+    m_player(player),
+    m_embedVideo(embedVideo),
+    m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
+    m_updateTimer(new QTimer(this)),
+    m_threadPool("GuideGridHelperPool"),
+    m_changrpid(changrpid),
+    m_changrplist(ChannelGroup::GetChannelGroups(false))
 {
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
 
@@ -509,7 +509,10 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_threadPool.setMaxThreadCount(1);
 
     if (m_player)
+    {
+        m_player->IncrRef();
         connect(m_player, &TV::PlaybackExiting, this, &GuideGrid::PlayerExiting);
+    }
 }
 
 void GuideGrid::PlayerExiting(TV* Player)
@@ -518,6 +521,7 @@ void GuideGrid::PlayerExiting(TV* Player)
     {
         emit m_player->RequestStopEmbedding();
         HideTVWindow();
+        m_player->DecrRef();
         m_player = nullptr;
     }
 }
@@ -635,15 +639,18 @@ GuideGrid::~GuideGrid()
 
     gCoreContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
 
-    // if we have a player and we are returning to it we need
-    // to tell it to stop embedding and return to fullscreen
-    if (m_player && m_allowFinder)
-        emit m_player->RequestStopEmbedding();
-
-    // maybe the user selected a different channel group,
-    // tell the player to update its channel list just in case
     if (m_player)
+    {
+        // if we have a player and we are returning to it we need
+        // to tell it to stop embedding and return to fullscreen
+        if (m_allowFinder)
+            emit m_player->RequestStopEmbedding();
+
+        // maybe the user selected a different channel group,
+        // tell the player to update its channel list just in case
         m_player->UpdateChannelList(m_changrpid);
+        m_player->DecrRef();
+    }
 
     if (gCoreContext->GetBoolSetting("ChannelGroupRememberLast", false))
         gCoreContext->SaveSetting("ChannelGroupDefault", m_changrpid);

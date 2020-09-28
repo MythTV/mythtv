@@ -25,11 +25,7 @@ class ProgFinder : public ScheduleCommon
     Q_OBJECT
   public:
     explicit ProgFinder(MythScreenStack *parentStack, bool allowEPG = true,
-               TV *player = nullptr, bool embedVideo = false)
-        : ScheduleCommon(parentStack, "ProgFinder"),
-          m_player(player),
-          m_embedVideo(embedVideo),
-          m_allowEPG(allowEPG) {}
+               TV *player = nullptr, bool embedVideo = false);
     ~ProgFinder() override;
 
     bool Create(void) override; // MythScreenType
