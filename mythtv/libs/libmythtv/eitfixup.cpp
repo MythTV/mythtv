@@ -2907,7 +2907,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
                 event.m_season = 11;
             else if (romanSeries == "XII")
                 event.m_season = 12;
-            else if (romanSeries == "XII")
+            else if (romanSeries == "XIII")
                 event.m_season = 13;
             else if (romanSeries == "XIV")
                 event.m_season = 14;
@@ -2917,7 +2917,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
                 event.m_season = 16;
             else if (romanSeries == "XVII")
                 event.m_season = 17;
-            else if (romanSeries == "XIII")
+            else if (romanSeries == "XVIII")
                 event.m_season = 18;
             else if (romanSeries == "XIX")
                 event.m_season = 19;
