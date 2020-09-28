@@ -953,6 +953,26 @@ void TV::ReloadKeys()
     InitKeys();
 }
 
+
+class TV::SleepTimerInfo
+{
+  public:
+    SleepTimerInfo(QString String, unsigned long Seconds)
+      : dispString(std::move(String)),
+        seconds(Seconds) {}
+    QString   dispString;
+    unsigned long seconds;
+};
+
+const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
+{
+    { tr("Off",   "Sleep timer"),      0 },
+    { tr("30m",   "Sleep timer"),  30*60 },
+    { tr("1h",    "Sleep timer"),  60*60 },
+    { tr("1h30m", "Sleep timer"),  90*60 },
+    { tr("2h",    "Sleep timer"), 120*60}
+};
+
 /** \fn TV::TV()
  *  \sa Init()
  */
@@ -966,12 +986,6 @@ TV::TV()
 
     QObject::setObjectName("TV");
     m_keyRepeatTimer.start();
-
-    m_sleepTimes.emplace_back(tr("Off",   "Sleep timer"),      0);
-    m_sleepTimes.emplace_back(tr("30m",   "Sleep timer"),  30*60);
-    m_sleepTimes.emplace_back(tr("1h",    "Sleep timer"),  60*60);
-    m_sleepTimes.emplace_back(tr("1h30m", "Sleep timer"),  90*60);
-    m_sleepTimes.emplace_back(tr("2h",    "Sleep timer"), 120*60);
 
     connect(this, &TV::RequestStartEmbedding, this, &TV::StartEmbedding);
     connect(this, &TV::RequestStopEmbedding,  this, &TV::StopEmbedding);
@@ -7529,7 +7543,7 @@ void TV::ToggleSleepTimer()
     QString text;
 
     // increment sleep index, cycle through
-    if (++m_sleepIndex == m_sleepTimes.size())
+    if (++m_sleepIndex == s_sleepTimes.size())
         m_sleepIndex = 0;
 
     // set sleep timer to next sleep_index timeout
@@ -7540,13 +7554,13 @@ void TV::ToggleSleepTimer()
         m_sleepTimerTimeout = 0;
     }
 
-    if (m_sleepTimes[m_sleepIndex].seconds != 0)
+    if (s_sleepTimes[m_sleepIndex].seconds != 0)
     {
-        m_sleepTimerTimeout = static_cast<uint>(m_sleepTimes[m_sleepIndex].seconds * 1000);
+        m_sleepTimerTimeout = static_cast<uint>(s_sleepTimes[m_sleepIndex].seconds * 1000);
         m_sleepTimerId = StartTimer(static_cast<int>(m_sleepTimerTimeout), __LINE__);
     }
 
-    text = tr("Sleep ") + " " + m_sleepTimes[m_sleepIndex].dispString;
+    text = tr("Sleep ") + " " + s_sleepTimes[m_sleepIndex].dispString;
 
     if (!IsBrowsing())
         SetOSDMessage(text);
@@ -10666,7 +10680,7 @@ void TV::ToggleSleepTimer(const QString& Time)
     if (mins != 0)
         out = tr("Sleep") + " " + QString::number(mins);
     else
-        out = tr("Sleep") + " " + m_sleepTimes[0].dispString;
+        out = tr("Sleep") + " " + s_sleepTimes[0].dispString;
     SetOSDMessage(out);
 }
 

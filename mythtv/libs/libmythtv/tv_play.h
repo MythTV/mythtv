@@ -299,17 +299,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
     bool IsSameProgram(const ProgramInfo* ProgInfo) const;
 
-    /// \brief Helper class for Sleep Timer code.
-    class SleepTimerInfo
-    {
-      public:
-        SleepTimerInfo(QString String, unsigned long Seconds)
-          : dispString(std::move(String)),
-            seconds(Seconds) {}
-        QString   dispString;
-        unsigned long seconds;
-    };
-
   public slots:
     bool event(QEvent* Event) override;
     bool eventFilter(QObject* Object, QEvent* Event) override;
@@ -727,9 +716,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     mutable QMutex m_chanEditMapLock {QMutex::Recursive}; ///< Lock for chanEditMap and ddMap
     InfoMap        m_chanEditMap;          ///< Channel Editing initial map
 
-    /// Vector or sleep timer sleep times in seconds,
-    /// with the appropriate UI message.
-    vector<SleepTimerInfo> m_sleepTimes;
+    class SleepTimerInfo;
+    static const vector<SleepTimerInfo> s_sleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
     uint                   m_sleepTimerTimeout {0};   ///< Current sleep timeout in msec
     int                    m_sleepTimerId {0};        ///< Timer for turning off playback.
