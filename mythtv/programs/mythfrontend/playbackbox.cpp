@@ -547,6 +547,8 @@ bool PlaybackBox::Create()
     m_programInfoCache.ScheduleLoad(false);
     LoadInBackground();
 
+    if (m_player)
+        emit m_player->RequestStartEmbedding({});
     return true;
 }
 
