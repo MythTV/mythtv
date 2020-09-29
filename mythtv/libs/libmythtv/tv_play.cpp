@@ -198,6 +198,13 @@ int TV::ConfiguredTunerCards()
     return count;
 }
 
+/*! \brief Statically create, destroy or check the existence of the TV instance
+ *
+ * \param RefCount Will be set to the reference count for the return object
+ * \param Acquire Increase refcount (or create) if true; reduce refcount (and possibly
+ * delete) for false
+ * \param Create If false (default) do not create TV if it does not exist and retun nullptr
+*/
 TV* TV::AcquireRelease(int& RefCount, bool Acquire, bool Create /*=false*/)
 {
     static QMutex s_lock;
@@ -227,6 +234,10 @@ TV* TV::AcquireRelease(int& RefCount, bool Acquire, bool Create /*=false*/)
     return s_tv;
 }
 
+/*! \brief Check whether media is currently playing
+ *
+ * This is currently used by the frontend service API and MythAirplayServer
+*/
 bool TV::IsTVRunning()
 {
     bool result = false;
@@ -261,8 +272,15 @@ void TV::StopPlayback()
     gCoreContext->TVInWantingPlayback(true);
 }
 
-/**
- * \brief returns true if the recording completed when exiting.
+/*! \brief Start playback of media
+ *
+ * This is the single global entry point for playing media.
+ *
+ * This is a 'blocking' call i.e. we do not actually return to the main event
+ * loop until this function returns. Playback is handled manually from this function
+ * with regular calls to QCoreApplication::processEvents from within PlaybackLoop.
+ *
+ * \returns true if the recording completed when exiting.
  */
 bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection)
 {
@@ -5023,9 +5041,11 @@ void TV::DoTogglePauseFinish(float Time, bool ShowOSD)
     SetSpeedChangeTimer(0, __LINE__);
 }
 
-/**
- * \fn bool TV::IsPaused() [static]
- * Returns true if a TV playback is currently going; otherwise returns false
+/*! \brief Check whether playback is paused
+ *
+ * This is currently used by MythAirplayServer.
+ *
+ * \returns true if a TV playback is currently going and is paused; otherwise returns false
  */
 bool TV::IsPaused()
 {
