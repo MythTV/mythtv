@@ -7171,30 +7171,19 @@ void TV::DoEditSchedule(int EditType)
     ClearOSD();
 
     // Pause playback as needed...
-    bool pause_active = true;
-    bool isNearEnd = false;
-    bool isLiveTV = StateIsLiveTV(GetState());
-    bool paused = false;
-
+    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+    bool pause = !m_playerContext.m_player || (!StateIsLiveTV(GetState()) && !m_dbContinueEmbedded);
+    if (m_playerContext.m_player)
     {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        pause_active = !m_playerContext.m_player || !m_playerContext.m_player->GetVideoOutput();
-        if (m_playerContext.m_player)
-        {
-            paused = m_playerContext.m_player->IsPaused();
-            if (!pause_active)
-                isNearEnd = m_playerContext.m_player->IsNearEnd();
-        }
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+        pause |= !m_playerContext.m_player->GetVideoOutput();
+        pause |= m_playerContext.m_player->IsPaused();
+        if (!pause)
+            pause |= m_playerContext.m_player->IsNearEnd();
     }
+    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    pause_active |= kScheduledRecording == EditType;
-    pause_active |= kViewSchedule == EditType;
-    pause_active |= kScheduleProgramFinder == EditType;
-    pause_active |= !isLiveTV && (!m_dbContinueEmbedded || isNearEnd);
-    pause_active |= paused;
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Pausing player: %1").arg(pause_active));
-    m_savedPause = DoSetPauseState(pause_active);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Pausing player: %1").arg(pause));
+    m_savedPause = DoSetPauseState(pause);
 
     // Resize window to the MythTV GUI size
     MythMainWindow *mwnd = GetMythMainWindow();
@@ -7225,7 +7214,7 @@ void TV::DoEditSchedule(int EditType)
     {
         case kScheduleProgramGuide:
         {
-            m_isEmbedded = (isLiveTV && !pause_active);
+            m_isEmbedded = !pause;
             RunProgramGuidePtr(chanid, channum, starttime, this,
                                m_isEmbedded, true, m_channelGroupId);
             m_ignoreKeyPresses = true;
@@ -7233,7 +7222,7 @@ void TV::DoEditSchedule(int EditType)
         }
         case kScheduleProgramFinder:
         {
-            m_isEmbedded = (isLiveTV && !pause_active);
+            m_isEmbedded = !pause;
             RunProgramFinderPtr(this, m_isEmbedded, true);
             m_ignoreKeyPresses = true;
             break;
@@ -7246,13 +7235,13 @@ void TV::DoEditSchedule(int EditType)
         }
         case kViewSchedule:
         {
-            RunViewScheduledPtr(reinterpret_cast<void*>(this), !pause_active);
+            RunViewScheduledPtr(reinterpret_cast<void*>(this), !pause);
             m_ignoreKeyPresses = true;
             break;
         }
         case kPlaybackBox:
         {
-            RunPlaybackBoxPtr(reinterpret_cast<void*>(this), !pause_active);
+            RunPlaybackBoxPtr(reinterpret_cast<void*>(this), !pause);
             m_ignoreKeyPresses = true;
             break;
         }
@@ -10605,8 +10594,6 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
     }
     else if (RunPlaybackBoxPtr)
     {
-        // TODO This isn't working for some reason
-        // PlaybackBox::RunPlaybackBox is called but it never appears
         EditSchedule(kPlaybackBox);
     }
     else
