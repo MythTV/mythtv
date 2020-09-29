@@ -681,10 +681,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     QElapsedTimer     m_ctorTime;
     uint              m_switchToInputId {0};
 
-    QMutex            m_initFromDBLock;
-    bool              m_initFromDBDone {false};
-    QWaitCondition    m_initFromDBWait;
-
     /// True if the user told MythTV to stop plaback. If this is false
     /// when we exit the player, we display an error screen.
     mutable bool      m_wantsToQuit {true};

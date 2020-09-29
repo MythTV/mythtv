@@ -1104,10 +1104,6 @@ void TV::InitFromDB()
 
     gCoreContext->addListener(this);
     gCoreContext->RegisterForPlayback(this, SLOT(StopPlayback()));
-
-    QMutexLocker lock(&m_initFromDBLock);
-    m_initFromDBDone = true;
-    m_initFromDBWait.wakeAll();
 }
 
 /** \fn TV::Init(bool)
@@ -1175,15 +1171,6 @@ bool TV::Init()
         mainwindow->GetPaintWindow()->update();
     mainwindow->installEventFilter(this);
     QCoreApplication::processEvents();
-
-    {
-        QMutexLocker locker(&m_initFromDBLock);
-        while (!m_initFromDBDone)
-        {
-            QCoreApplication::processEvents();
-            m_initFromDBWait.wait(&m_initFromDBLock, 50);
-        }
-    }
 
     GetPlayerReadLock();
     m_playerContext.m_ffRewState = 0;
