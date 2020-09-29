@@ -993,8 +993,16 @@ const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
     { tr("2h",    "Sleep timer"), 120*60}
 };
 
-/** \fn TV::TV()
+/*!
  *  \sa Init()
+ *
+ * This list is not complete:)
+ *
+ * \todo Remove m_playerLock. m_playerContext is always present and we should be
+ * using the lower level locks in PlayerContext (around player etc)
+ * \todo Move TV only state currently held in PlayerContext into TV
+ * \todo Try and remove friend class usage. This is a blunt tool and allows
+ * potentially unsafe calls into TV
  */
 TV::TV()
   : ReferenceCounter("TV"),
