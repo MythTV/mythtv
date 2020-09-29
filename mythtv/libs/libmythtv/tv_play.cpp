@@ -390,11 +390,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         quitAll |= !playerError.isEmpty();
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 begin");
-    do
-        QCoreApplication::processEvents();
-    while (tv->m_isEmbedded);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- process events 2 end");
+    QCoreApplication::processEvents();
 
     // check if the show has reached the end.
     if (TVRec && tv->GetEndOfRecording())
@@ -2366,7 +2362,6 @@ void TV::StopStuff(bool StopRingBuffer, bool StopPlayer, bool StopRecorder)
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
 
     emit PlaybackExiting(this);
-    m_isEmbedded = false;
 
     if (m_playerContext.m_buffer)
         m_playerContext.m_buffer->IgnoreWaitStates(true);
@@ -7111,7 +7106,6 @@ void TV::StopEmbedding(const QStringList &Data)
         GetMythMainWindow()->PushDrawDisabled();
     }
 
-    m_isEmbedded = false;
     m_ignoreKeyPresses = false;
 
     // additional data provided by PlaybackBox
@@ -7214,16 +7208,14 @@ void TV::DoEditSchedule(int EditType)
     {
         case kScheduleProgramGuide:
         {
-            m_isEmbedded = !pause;
             RunProgramGuidePtr(chanid, channum, starttime, this,
-                               m_isEmbedded, true, m_channelGroupId);
+                               !pause, true, m_channelGroupId);
             m_ignoreKeyPresses = true;
             break;
         }
         case kScheduleProgramFinder:
         {
-            m_isEmbedded = !pause;
-            RunProgramFinderPtr(this, m_isEmbedded, true);
+            RunProgramFinderPtr(this, !pause, true);
             m_ignoreKeyPresses = true;
             break;
         }

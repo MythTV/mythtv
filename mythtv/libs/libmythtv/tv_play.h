@@ -797,7 +797,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     bool          m_weDisabledGUI {false};
 
     // embedded and suspended status
-    bool         m_isEmbedded {false};       ///< are we currently embedded
     bool         m_ignoreKeyPresses {false}; ///< should we ignore keypresses
     bool         m_savedPause;               ///< saved pause state before embedding
 
