@@ -332,7 +332,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     PlayerContext*  GetPlayerContext();
 
     // Private initialisation
-    static TV* AcquireRelease(bool Acquire, bool Create);
+    static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
     bool Init();
     void InitFromDB();
     static QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& KeyList);

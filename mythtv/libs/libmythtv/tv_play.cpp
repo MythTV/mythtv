@@ -198,7 +198,7 @@ int TV::ConfiguredTunerCards()
     return count;
 }
 
-TV* TV::AcquireRelease(bool Acquire, bool Create)
+TV* TV::AcquireRelease(int& RefCount, bool Acquire, bool Create /*=false*/)
 {
     static QMutex s_lock;
     static TV*    s_tv = nullptr;
@@ -220,17 +220,22 @@ TV* TV::AcquireRelease(bool Acquire, bool Create)
                 s_tv = nullptr;
     }
 
+    if (s_tv)
+        RefCount = s_tv->m_referenceCount;
+    else
+        RefCount = 0;
     return s_tv;
 }
 
 bool TV::IsTVRunning()
 {
     bool result = false;
-    TV* tv = AcquireRelease(true, false);
+    int dummy = 0;
+    TV* tv = AcquireRelease(dummy, true);
     if (tv)
     {
         result = true;
-        AcquireRelease(false, false);
+        AcquireRelease(dummy, false);
     }
     return result;
 }
@@ -261,11 +266,12 @@ void TV::StopPlayback()
  */
 bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection)
 {
-    TV* tv = AcquireRelease(true, true);
+    int refs = 0;
+    TV* tv = AcquireRelease(refs, true, true);
     // handle existing TV object atomically
-    if (tv->m_referenceCount > 1)
+    if (refs > 1)
     {
-        AcquireRelease(false, false);
+        AcquireRelease(refs, false);
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a TV object.");
         gCoreContext->emitTVPlaybackAborted();
         return false;
@@ -295,7 +301,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
-        AcquireRelease(false, false);
+        AcquireRelease(refs, false);
         GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
         gCoreContext->emitTVPlaybackAborted();
@@ -398,7 +404,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
 
     bool allowrerecord = tv->GetAllowRerecord();
     bool deleterecording = tv->m_requestDelete;
-    AcquireRelease(false, false);
+    AcquireRelease(refs, false);
     gCoreContext->emitTVPlaybackStopped();
     gCoreContext->TVInWantingPlayback(false);
 
@@ -5024,7 +5030,8 @@ void TV::DoTogglePauseFinish(float Time, bool ShowOSD)
 bool TV::IsPaused()
 {
     bool paused = false;
-    TV* tv = AcquireRelease(true, false);
+    int dummy = 0;
+    TV* tv = AcquireRelease(dummy, true);
     if (tv)
     {
         tv->GetPlayerReadLock();
@@ -5037,7 +5044,7 @@ bool TV::IsPaused()
             context->UnlockDeletePlayer(__FILE__, __LINE__);
         }
         tv->ReturnPlayerLock();
-        AcquireRelease(false, false);
+        AcquireRelease(dummy, false);
     }
     return paused;
 }
@@ -6963,11 +6970,12 @@ void TV::ShowLCDDVDInfo()
 
 bool TV::IsTunable(uint ChanId)
 {
-    TV* tv = AcquireRelease(true, false);
+    int dummy = 0;
+    TV* tv = AcquireRelease(dummy, true);
     if (tv)
     {
         bool result = tv->IsTunableOn(ChanId).empty();
-        AcquireRelease(false, false);
+        AcquireRelease(dummy, false);
         return result;
     }
     return false;
