@@ -7,8 +7,8 @@
 #include "mythcorecontext.h"
 #include "mythdate.h"
 #include "mythsystemlegacy.h"
-#include "mythxdisplay.h"
-#include "screensaver-x11.h"
+#include "platforms/mythxdisplay.h"
+#include "platforms/mythscreensaverx11.h"
 
 // X11 headers
 #include <X11/Xlib.h>
@@ -20,10 +20,10 @@ extern "C" {
 
 class ScreenSaverX11Private
 {
-    friend class ScreenSaverX11;
+    friend class MythScreenSaverX11;
 
   public:
-    explicit ScreenSaverX11Private(ScreenSaverX11 *outer)
+    explicit ScreenSaverX11Private(MythScreenSaverX11 *outer)
     {
         const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
                            kMSProcessEvents;
@@ -214,21 +214,21 @@ class ScreenSaverX11Private
     MythXDisplay *m_display    {nullptr};
 };
 
-ScreenSaverX11::ScreenSaverX11() :
+MythScreenSaverX11::MythScreenSaverX11() :
     m_priv(new ScreenSaverX11Private(this))
 {
 }
 
-ScreenSaverX11::~ScreenSaverX11()
+MythScreenSaverX11::~MythScreenSaverX11()
 {
     // Ensure DPMS gets left as it was found.
     if (m_priv->DeactivatedDPMS())
-        ScreenSaverX11::Restore();
+        MythScreenSaverX11::Restore();
 
     delete m_priv;
 }
 
-void ScreenSaverX11::Disable()
+void MythScreenSaverX11::Disable()
 {
     m_priv->SaveScreenSaver();
 
@@ -245,7 +245,7 @@ void ScreenSaverX11::Disable()
         m_priv->ResetTimer();
 }
 
-void ScreenSaverX11::Restore()
+void MythScreenSaverX11::Restore()
 {
     m_priv->RestoreScreenSaver();
     m_priv->RestoreDPMS();
@@ -261,7 +261,7 @@ void ScreenSaverX11::Restore()
         m_priv->StopTimer();
 }
 
-void ScreenSaverX11::Reset()
+void MythScreenSaverX11::Reset()
 {
     bool need_xsync = false;
     Display *dsp = nullptr;
@@ -287,7 +287,7 @@ void ScreenSaverX11::Reset()
         m_priv->m_display->Sync();
 }
 
-bool ScreenSaverX11::Asleep()
+bool MythScreenSaverX11::Asleep()
 {
     if (!m_priv->IsDPMSEnabled())
         return false;
@@ -304,7 +304,7 @@ bool ScreenSaverX11::Asleep()
     return (power_level != DPMSModeOn);
 }
 
-void ScreenSaverX11::ResetSlot()
+void MythScreenSaverX11::ResetSlot()
 {
     m_priv->ResetScreenSaver();
 }

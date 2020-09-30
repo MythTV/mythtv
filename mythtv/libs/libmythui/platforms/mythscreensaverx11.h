@@ -7,13 +7,13 @@
 // MythTV
 #include "mythscreensaver.h"
 
-class ScreenSaverX11 : public QObject, public MythScreenSaver
+class MythScreenSaverX11 : public QObject, public MythScreenSaver
 {
     Q_OBJECT
 
   public:
-    ScreenSaverX11();
-    ~ScreenSaverX11() override;
+    MythScreenSaverX11();
+    ~MythScreenSaverX11() override;
 
     void Disable() override;
     void Restore() override;

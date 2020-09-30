@@ -1,5 +1,5 @@
 // MythTV
-#include "screensaver-null.h"
+#include "mythscreensavernull.h"
 
 void MythScreenSaverNull::Disable()
 {

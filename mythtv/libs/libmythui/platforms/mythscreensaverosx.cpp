@@ -1,5 +1,5 @@
 // MythTV
-#include "screensaver-osx.h"
+#include "platforms/mythscreensaverosx.h"
 
 void MythScreenSaverOSX::Disable()
 {

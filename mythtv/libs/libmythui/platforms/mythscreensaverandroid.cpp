@@ -1,4 +1,4 @@
-#include "screensaver-android.h"
+#include "platforms/mythscreensaverandroid.h"
 #include <QtAndroidExtras>
 #include <mythlogging.h>
 

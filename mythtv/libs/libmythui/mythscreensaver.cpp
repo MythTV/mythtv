@@ -1,23 +1,23 @@
 // MythTV
 #include "config.h"
 #include "mythscreensaver.h"
-#include "screensaver-null.h"
+#include "mythscreensavernull.h"
 
 #ifdef USING_DBUS
-#include "screensaver-dbus.h"
-#endif // USING_DBUS
+#include "platforms/mythscreensaverdbus.h"
+#endif
 
 #ifdef USING_X11
-#include "screensaver-x11.h"
-#include "mythxdisplay.h"
-#endif // USING_X11
+#include "platforms/mythscreensaverx11.h"
+#include "platforms/mythxdisplay.h"
+#endif
 
 #if CONFIG_DARWIN
-#include "screensaver-osx.h"
+#include "platforms/mythscreensaverosx.h"
 #endif
 
 #ifdef Q_OS_ANDROID
-#include "screensaver-android.h"
+#include "platforms/mythscreensaverandroid.h"
 #endif
 
 MythScreenSaverControl::MythScreenSaverControl()
@@ -29,17 +29,17 @@ MythScreenSaverControl::MythScreenSaverControl()
     MythXDisplay* display = MythXDisplay::OpenMythXDisplay(false);
     if (display)
     {
-        m_screenSavers.push_back(new ScreenSaverX11());
+        m_screenSavers.push_back(new MythScreenSaverX11());
         delete display;
     }
 #elif CONFIG_DARWIN
-    m_screenSavers.push_back(new ScreenSaverOSX());
+    m_screenSavers.push_back(new MythScreenSaverOSX());
 #endif
 #if defined(ANDROID)
-    m_screenSavers.push_back(new ScreenSaverAndroid());
+    m_screenSavers.push_back(new MythScreenSaverAndroid());
 #endif
 #if not (defined(USING_DBUS) || defined(USING_X11) || CONFIG_DARWIN || defined(ANDROID))
-    m_screenSavers.push_back(new ScreenSaverNull());
+    m_screenSavers.push_back(new MythScreenSaverNull());
 #endif
 }
 

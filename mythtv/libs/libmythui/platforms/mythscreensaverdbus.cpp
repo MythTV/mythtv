@@ -6,7 +6,7 @@
 
 // MythTV
 #include "mythlogging.h"
-#include "screensaver-dbus.h"
+#include "platforms/mythscreensaverdbus.h"
 
 // Std
 #include <cstdint>

@@ -34,7 +34,8 @@ HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += mythscreensaver.h
-HEADERS += screensaver-null.h x11colors.h
+HEADERS += mythscreensavernull.h
+HEADERS += x11colors.h
 HEADERS += themeinfo.h mythdisplaymode.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
@@ -61,7 +62,8 @@ SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += mythscreensaver.cpp
-SOURCES += screensaver-null.cpp x11colors.cpp
+SOURCES += mythscreensavernull.cpp
+SOURCES += x11colors.cpp
 SOURCES += themeinfo.cpp mythdisplaymode.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
@@ -108,10 +110,10 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
-    HEADERS += screensaver-x11.h
+    HEADERS += platforms/mythscreensaverx11.h
     SOURCES += platforms/mythxdisplay.cpp
     SOURCES += platforms/mythdisplayx11.cpp
-    SOURCES += screensaver-x11.cpp
+    SOURCES += platforms/mythscreensaverx11.cpp
     freebsd:LIBS += -lXext -lXxf86vm
 }
 
@@ -136,15 +138,17 @@ using_mmal {
 using_qtdbus {
     QT      += dbus
     DEFINES += USING_DBUS
-    HEADERS += screensaver-dbus.h
-    SOURCES += screensaver-dbus.cpp
+    HEADERS += platforms/mythscreensaverdbus.h
+    SOURCES += platforms/mythscreensaverdbus.cpp
     HEADERS += platforms/mythdisplaymutter.h
     SOURCES += platforms/mythdisplaymutter.cpp
 }
 
 macx {
-    HEADERS += screensaver-osx.h   platforms/mythosxutils.h
-    SOURCES += screensaver-osx.cpp platforms/mythosxutils.cpp
+    HEADERS += platforms/mythscreensaverosx.h
+    HEADERS += platforms/mythosxutils.h
+    SOURCES += platforms/mythscreensaverosx.cpp
+    SOURCES += platforms/mythosxutils.cpp
     HEADERS += platforms/mythdisplayosx.h
     SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
@@ -162,8 +166,10 @@ macx {
 }
 
 android {
-    HEADERS += screensaver-android.h   platforms/mythdisplayandroid.h
-    SOURCES += screensaver-android.cpp platforms/mythdisplayandroid.cpp
+    HEADERS += platforms/mythscreensaverandroid.h
+    HEADERS += platforms/mythdisplayandroid.h
+    SOURCES += platforms/mythscreensaverandroid.cpp
+    SOURCES += platforms/mythdisplayandroid.cpp
 }
 
 using_joystick_menu {
