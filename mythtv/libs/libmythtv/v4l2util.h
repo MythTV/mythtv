@@ -2,7 +2,7 @@
 #define V4L2_UTIL_H
 
 #ifdef USING_V4L2
-#include "videodev2.h" // our copy
+#include <linux/videodev2.h>
 #endif
 
 #include "tv.h"
