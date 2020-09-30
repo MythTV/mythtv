@@ -87,7 +87,7 @@ extern unsigned int useAltivec;
 extern const void ppc_zoom (unsigned int *frompixmap, unsigned int *topixmap,
                             unsigned int sizex, unsigned int sizey,
                             unsigned int *brutS, unsigned int *brutD,
-                            unsigned int buffratio, GoomCoefficients &precalCoef]);
+                            unsigned int buffratio, GoomCoefficients &precalCoef);
 
 #endif /* PowerPC */
 
