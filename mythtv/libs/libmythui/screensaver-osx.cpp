@@ -1,6 +1,7 @@
+// MythTV
 #include "screensaver-osx.h"
 
-void ScreenSaverOSX::Disable(void)
+void MythScreenSaverOSX::Disable()
 {
     IOPMAssertionCreateWithName(kIOPMAssertPreventUserIdleDisplaySleep,
 				kIOPMAssertionLevelOn,
@@ -8,16 +9,16 @@ void ScreenSaverOSX::Disable(void)
 				&iopm_id);
 }
 
-void ScreenSaverOSX::Restore(void)
+void MythScreenSaverOSX::Restore()
 {
     IOPMAssertionRelease(iopm_id);
 }
 
-void ScreenSaverOSX::Reset(void)
+void MythScreenSaverOSX::Reset()
 {
 }
 
-bool ScreenSaverOSX::Asleep(void)
+bool MythScreenSaverOSX::Asleep()
 {
     return false;
 }

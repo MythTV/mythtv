@@ -23,7 +23,7 @@ class MythMediaDevice;
 
 using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
-class ScreenSaverControl;
+class MythScreenSaverControl;
 class MythDisplay;
 class MythInputDeviceHandler;
 class MythMainWindowPrivate;
@@ -186,7 +186,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythPainterWindow* m_painterWin    { nullptr };
     MythPainterWindow* m_oldPainterWin { nullptr };
     MythInputDeviceHandler* m_deviceHandler { nullptr };
-    ScreenSaverControl *m_screensaver  { nullptr };
+    MythScreenSaverControl *m_screensaver { nullptr };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

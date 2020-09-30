@@ -1,11 +1,13 @@
 #ifndef MYTH_SCREENSAVER_X11_H
 #define MYTH_SCREENSAVER_X11_H
 
+// Qt
 #include <QObject>
 
-#include "screensaver.h"
+// MythTV
+#include "mythscreensaver.h"
 
-class ScreenSaverX11 : public QObject, public ScreenSaver
+class ScreenSaverX11 : public QObject, public MythScreenSaver
 {
     Q_OBJECT
 
@@ -13,18 +15,17 @@ class ScreenSaverX11 : public QObject, public ScreenSaver
     ScreenSaverX11();
     ~ScreenSaverX11() override;
 
-    void Disable(void) override; // ScreenSaver
-    void Restore(void) override; // ScreenSaver
-    void Reset(void) override; // ScreenSaver
-
-    bool Asleep(void) override; // ScreenSaver
+    void Disable() override;
+    void Restore() override;
+    void Reset() override;
+    bool Asleep() override;
 
   public slots:
-    void resetSlot();
+    void ResetSlot();
 
   protected:
-    class ScreenSaverX11Private *d {nullptr}; // NOLINT(readability-identifier-naming)
+    class ScreenSaverX11Private* m_priv { nullptr };
 };
 
-#endif // MYTH_SCREENSAVER_X11_H
+#endif
 

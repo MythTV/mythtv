@@ -35,7 +35,6 @@
 // mythui headers
 #include "mythprogressdialog.h"
 #include "mythimage.h"
-#include "screensaver.h"
 #include "mythmainwindow.h"
 #include "themeinfo.h"
 #include "x11colors.h"

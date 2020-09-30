@@ -1,18 +1,19 @@
+// MythTV
 #include "screensaver-null.h"
 
-void ScreenSaverNull::Disable(void)
+void MythScreenSaverNull::Disable()
 {
 }
 
-void ScreenSaverNull::Restore(void)
+void MythScreenSaverNull::Restore()
 {
 }
 
-void ScreenSaverNull::Reset(void)
+void MythScreenSaverNull::Reset()
 {
 }
 
-bool ScreenSaverNull::Asleep(void)
+bool MythScreenSaverNull::Asleep()
 {
     return false;
 }

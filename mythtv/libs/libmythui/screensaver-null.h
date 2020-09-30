@@ -1,20 +1,20 @@
 #ifndef MYTH_SCREENSAVER_NULL_H
 #define MYTH_SCREENSAVER_NULL_H
 
-#include "screensaver.h"
+// MythTV
+#include "mythscreensaver.h"
 
-class ScreenSaverNull : public ScreenSaver
+class MythScreenSaverNull : public MythScreenSaver
 {
-public:
-    ScreenSaverNull() = default;
-    ~ScreenSaverNull() override = default;
+  public:
+    MythScreenSaverNull() = default;
+   ~MythScreenSaverNull() override = default;
 
-    void Disable(void) override; // ScreenSaver
-    void Restore(void) override; // ScreenSaver
-    void Reset(void) override; // ScreenSaver
-
-    bool Asleep(void) override; // ScreenSaver
+    void Disable() override;
+    void Restore() override;
+    void Reset() override;
+    bool Asleep() override;
 };
 
-#endif // MYTH_SCREENSAVER_NULL_H
+#endif
 

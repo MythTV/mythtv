@@ -40,7 +40,6 @@ using namespace std;
 
 // libmythui headers
 #include "myththemebase.h"
-#include "screensaver.h"
 #include "mythudplistener.h"
 #include "mythrender_base.h"
 #include "mythuistatetracker.h"
@@ -53,7 +52,7 @@ using namespace std;
 #include "mythgesture.h"
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
-#include "screensaver.h"
+#include "mythscreensaver.h"
 #include "devices/mythinputdevicehandler.h"
 
 #ifdef _WIN32
@@ -205,12 +204,12 @@ MythMainWindow::MythMainWindow(const bool useDB)
     if (d->m_idleTime > 0)
         d->m_idleTimer->start();
 
-    m_screensaver = new ScreenSaverControl();
+    m_screensaver = new MythScreenSaverControl();
     if (m_screensaver)
     {
-        connect(this, &MythMainWindow::signalRestoreScreensaver, m_screensaver, &ScreenSaverControl::Restore);
-        connect(this, &MythMainWindow::signalDisableScreensaver, m_screensaver, &ScreenSaverControl::Disable);
-        connect(this, &MythMainWindow::signalResetScreensaver,   m_screensaver, &ScreenSaverControl::Reset);
+        connect(this, &MythMainWindow::signalRestoreScreensaver, m_screensaver, &MythScreenSaverControl::Restore);
+        connect(this, &MythMainWindow::signalDisableScreensaver, m_screensaver, &MythScreenSaverControl::Disable);
+        connect(this, &MythMainWindow::signalResetScreensaver,   m_screensaver, &MythScreenSaverControl::Reset);
     }
 }
 

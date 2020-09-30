@@ -1,25 +1,28 @@
 #ifndef MYTH_SCREENSAVER_DBUS_H
 #define MYTH_SCREENSAVER_DBUS_H
 
-#include "screensaver.h"
+// Qt
 #include "QDBusConnection"
 
-class ScreenSaverDBus : public ScreenSaver
+// MythTV
+#include "mythscreensaver.h"
+
+class MythScreenSaverDBus : public MythScreenSaver
 {
   public:
-    ScreenSaverDBus();
-    ~ScreenSaverDBus() override;
+    MythScreenSaverDBus();
+   ~MythScreenSaverDBus() override;
 
-    void Disable(void) override; // ScreenSaver
-    void Restore(void) override; // ScreenSaver
-    void Reset(void) override; // ScreenSaver
+    void Disable() override;
+    void Restore() override;
+    void Reset() override;
+    bool Asleep() override;
 
-    bool Asleep(void) override; // ScreenSaver
   protected:
     QDBusConnection m_bus;
-    class ScreenSaverDBusPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
-    QList<ScreenSaverDBusPrivate *> m_dbusPrivateInterfaces;
+    class ScreenSaverDBusPrivate* m_priv { nullptr };
+    QList<ScreenSaverDBusPrivate*> m_dbusPrivateInterfaces;
 };
 
-#endif // MYTH_SCREENSAVER_DBUS_H
+#endif
 

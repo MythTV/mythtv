@@ -1,25 +1,25 @@
 #ifndef MYTH_SCREENSAVER_ANDROID_H
 #define MYTH_SCREENSAVER_ANDROID_H
 
+// Qt
 #include <QObject>
 
-#include "screensaver.h"
+// MythTV
+#include "mythscreensaver.h"
 
-class ScreenSaverAndroid : public QObject, public ScreenSaver
+class MythScreenSaverAndroid : public QObject, public MythScreenSaver
 {
     Q_OBJECT
 
   public:
-    ScreenSaverAndroid();
-    ~ScreenSaverAndroid() override;
+    MythScreenSaverAndroid();
+   ~MythScreenSaverAndroid() override;
 
-    void Disable(void) override; // ScreenSaver
-    void Restore(void) override; // ScreenSaver
-    void Reset(void) override; // ScreenSaver
-
-    bool Asleep(void) override; // ScreenSaver
-
+    void Disable() override;
+    void Restore() override;
+    void Reset() override;
+    bool Asleep() override;
 };
 
-#endif // MYTH_SCREENSAVER_ANDROID_H
+#endif
 

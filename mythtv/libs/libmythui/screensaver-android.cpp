@@ -12,17 +12,17 @@
 #define LOC      QString("ScreenSaverAndroid: ")
 
 #define MODE 1
-ScreenSaverAndroid::ScreenSaverAndroid()
+MythScreenSaverAndroid::MythScreenSaverAndroid()
 {
     //jint keepScreenOn = QAndroidJniObject::getStaticObjectField<jint>("android/view/WindowManager/", "ACTION_CALL");
 }
 
-ScreenSaverAndroid::~ScreenSaverAndroid()
+MythScreenSaverAndroid::~MythScreenSaverAndroid()
 {
-    ScreenSaverAndroid::Restore();
+    MythScreenSaverAndroid::Restore();
 }
 
-void ScreenSaverAndroid::Disable(void)
+void MythScreenSaverAndroid::Disable()
 {
     QAndroidJniObject activity = QtAndroid::androidActivity();
     LOG(VB_GENERAL, LOG_INFO, LOC + "disable");
@@ -44,7 +44,7 @@ void ScreenSaverAndroid::Disable(void)
     }
 }
 
-void ScreenSaverAndroid::Restore(void)
+void MythScreenSaverAndroid::Restore()
 {
     QAndroidJniObject activity = QtAndroid::androidActivity();
     LOG(VB_GENERAL, LOG_INFO, LOC + "restore");
@@ -65,13 +65,13 @@ void ScreenSaverAndroid::Restore(void)
     }
 }
 
-void ScreenSaverAndroid::Reset(void)
+void MythScreenSaverAndroid::Reset()
 {
     // Wake up the screen saver now.
     LOG(VB_GENERAL, LOG_INFO, LOC + "reset");
 }
 
-bool ScreenSaverAndroid::Asleep(void)
+bool MythScreenSaverAndroid::Asleep()
 {
     return false;
 }

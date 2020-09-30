@@ -1,31 +1,26 @@
 #ifndef MYTH_SCREENSAVER_OSX_H
 #define MYTH_SCREENSAVER_OSX_H
 
-#include "screensaver.h"
+// MythTV
+#include "mythscreensaver.h"
 
+// macOS
 #include <IOKit/pwr_mgt/IOPMLib.h>
 
-class ScreenSaverOSX : public ScreenSaver
+class MythScreenSaverOSX : public MythScreenSaver
 {
-public:
-    ScreenSaverOSX() = default;
-    ~ScreenSaverOSX() override = default;
+  public:
+    MythScreenSaverOSX() = default;
+   ~MythScreenSaverOSX() override = default;
 
-    void Disable(void) override; // ScreenSaver
-    void Restore(void) override; // ScreenSaver
-    void Reset(void) override; // ScreenSaver
+    void Disable() override;
+    void Restore() override;
+    void Reset() override;
+    bool Asleep() override;
 
-    bool Asleep(void) override; // ScreenSaver
-
-protected:
-    class ScreenSaverOSXPrivate *d {nullptr};
-
-private:
-    ScreenSaverOSX(const ScreenSaverOSX &) = delete;            // not copyable
-    ScreenSaverOSX &operator=(const ScreenSaverOSX &) = delete; // not copyable
-
+  private:
+    Q_DISABLE_COPY(MythScreenSaverOSX)
     IOPMAssertionID iopm_id {kIOPMNullAssertionID};
 };
 
-#endif // MYTH_SCREENSAVER_OSX_H
-
+#endif

@@ -1,16 +1,18 @@
-#include "screensaver-dbus.h"
-
-#include <cstdint>
-#include <string>
-
+// Qt
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusReply>
 #include <QString>
 
+// MythTV
 #include "mythlogging.h"
+#include "screensaver-dbus.h"
 
-#define LOC                 QString("ScreenSaverDBus: ")
+// Std
+#include <cstdint>
+#include <string>
+
+#define LOC QString("ScreenSaverDBus: ")
 
 const std::string kApp         = "MythTV";
 const std::string kReason      = "Watching TV";
@@ -43,12 +45,12 @@ const std::array<const QString,NUM_DBUS_METHODS> kDbusUnInhibit {
 
 class ScreenSaverDBusPrivate
 {
-    friend class    ScreenSaverDBus;
+    friend class MythScreenSaverDBus;
 
   public:
     ScreenSaverDBusPrivate(const QString &dbusService, const QString& dbusPath,
-                           const QString &dbusInterface, QDBusConnection *bus) :
-        m_bus(bus),
+                           const QString &dbusInterface, QDBusConnection *bus)
+      : m_bus(bus),
         m_interface(new QDBusInterface(dbusService, dbusPath , dbusInterface, *m_bus)),
         m_serviceUsed(dbusService)
     {
@@ -66,7 +68,7 @@ class ScreenSaverDBusPrivate
     {
         delete m_interface;
     }
-    void Inhibit(void)
+    void Inhibit()
     {
         if (m_interface->isValid())
         {
@@ -91,7 +93,7 @@ class ScreenSaverDBusPrivate
             }
         }
     }
-    void UnInhibit(void)
+    void UnInhibit()
     {
         if (m_interface->isValid())
         {
@@ -120,55 +122,46 @@ class ScreenSaverDBusPrivate
     QString         m_serviceUsed;
 };
 
-ScreenSaverDBus::ScreenSaverDBus() :
+MythScreenSaverDBus::MythScreenSaverDBus() :
     m_bus(QDBusConnection::sessionBus())
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice
-    for (uint i=0; i < NUM_DBUS_METHODS; i++) {
-        auto *ssdbp =
-            new ScreenSaverDBusPrivate(kDbusService[i], kDbusPath[i], kDbusService[i], &m_bus);
+    for (uint i=0; i < NUM_DBUS_METHODS; i++)
+    {
+        auto *ssdbp = new ScreenSaverDBusPrivate(kDbusService[i], kDbusPath[i], kDbusService[i], &m_bus);
         ssdbp->SetUnInhibit(kDbusUnInhibit[i]);
         m_dbusPrivateInterfaces.push_back(ssdbp);
     }
 }
 
-ScreenSaverDBus::~ScreenSaverDBus()
+MythScreenSaverDBus::~MythScreenSaverDBus()
 {
-    ScreenSaverDBus::Restore();
-    while (!m_dbusPrivateInterfaces.isEmpty()) {
-        ScreenSaverDBusPrivate *ssdbp = m_dbusPrivateInterfaces.takeLast();
-        delete ssdbp;
-    }
+    MythScreenSaverDBus::Restore();
+    for (auto * interface : m_dbusPrivateInterfaces)
+        delete interface;
 }
 
-void ScreenSaverDBus::Disable(void)
+void MythScreenSaverDBus::Disable()
 {
-    QList<ScreenSaverDBusPrivate *>::iterator i;
-    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
-        (*i)->Inhibit();
-    }
+    for (auto * interface : m_dbusPrivateInterfaces)
+        interface->Inhibit();
 }
 
-void ScreenSaverDBus::Restore(void)
+void MythScreenSaverDBus::Restore()
 {
-    QList<ScreenSaverDBusPrivate *>::iterator i;
-    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
-        (*i)->UnInhibit();
-    }
+    for (auto * interface : m_dbusPrivateInterfaces)
+        interface->UnInhibit();
 }
 
-void ScreenSaverDBus::Reset(void)
+void MythScreenSaverDBus::Reset()
 {
     Restore();
 }
 
-bool ScreenSaverDBus::Asleep(void)
+bool MythScreenSaverDBus::Asleep()
 {
-    QList<ScreenSaverDBusPrivate *>::iterator i;
-    for (i = m_dbusPrivateInterfaces.begin(); i != m_dbusPrivateInterfaces.end(); ++i) {
-        if((*i)->m_inhibited) {
+    for (auto * interface : m_dbusPrivateInterfaces)
+        if (interface->m_inhibited)
             return true;
-        }
-    }
     return false;
 }
