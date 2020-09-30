@@ -204,7 +204,7 @@ void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
     signalInfo.m_code   = (info ? info->si_code : 0);
     signalInfo.m_pid    = (info ? (int)info->si_pid : 0);
     signalInfo.m_uid    = (info ? (int)info->si_uid : 0);
-    signalInfo.m_value  = (info ? *(uint64_t *)&info->si_value : 0);
+    signalInfo.m_value  = (info ? info->si_value.sival_int : 0);
 #endif
 
     // Keep trying if there's no room to write, but stop on error (-1)
