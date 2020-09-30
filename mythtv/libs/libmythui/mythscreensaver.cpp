@@ -1,7 +1,6 @@
 // MythTV
 #include "config.h"
 #include "mythscreensaver.h"
-#include "mythscreensavernull.h"
 
 #ifdef USING_DBUS
 #include "platforms/mythscreensaverdbus.h"
@@ -37,9 +36,6 @@ MythScreenSaverControl::MythScreenSaverControl()
 #endif
 #if defined(ANDROID)
     m_screenSavers.push_back(new MythScreenSaverAndroid());
-#endif
-#if not (defined(USING_DBUS) || defined(USING_X11) || CONFIG_DARWIN || defined(ANDROID))
-    m_screenSavers.push_back(new MythScreenSaverNull());
 #endif
 }
 
