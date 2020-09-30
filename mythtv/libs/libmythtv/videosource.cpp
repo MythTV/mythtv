@@ -396,10 +396,10 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
     }
 };
 
-class ScanFrequency : public MythUITextEditSetting
+class ScanFrequencyStart : public MythUITextEditSetting
 {
   public:
-    explicit ScanFrequency(const VideoSource &parent) :
+    explicit ScanFrequencyStart(const VideoSource &parent) :
         MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "scanfrequency"))
     {
        setLabel(QObject::tr("Scan Frequency"));
@@ -673,7 +673,7 @@ VideoSource::VideoSource()
     addChild(m_name = new Name(*this));
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
-    addChild(new ScanFrequency(*this));
+    addChild(new ScanFrequencyStart(*this));
     addChild(new DVBNetID(*this, -1, -1));
     addChild(new BouquetID(*this, 0, 0));
     addChild(new RegionID(*this, 0, 0));
