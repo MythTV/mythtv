@@ -2,6 +2,7 @@
 #define MYTH_SCREENSAVER_H
 
 // Qt
+#include <QObject>
 #include <QEvent>
 #include <QList>
 
