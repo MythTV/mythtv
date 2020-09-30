@@ -18,12 +18,14 @@ using namespace std;
 
 // Qt
 #include <QCoreApplication>
+#include <QApplication>
 #include <QPainter>
 #include <QImage>
 
 // MythTV
 #include <mythdbcon.h>
 #include <mythcontext.h>
+#include <mythmainwindow.h>
 #include <mythuihelper.h>
 #include <remotefile.h>
 #include <musicmetadata.h>
@@ -45,7 +47,7 @@ VisualBase::VisualBase(bool screensaverenable)
     : m_xscreensaverenable(screensaverenable)
 {
     if (!m_xscreensaverenable)
-        GetMythUI()->DoDisableScreensaver();
+        MythMainWindow::DisableScreensaver();
 }
 
 VisualBase::~VisualBase()
@@ -56,7 +58,7 @@ VisualBase::~VisualBase()
     //    can destruct properly
     //
     if (!m_xscreensaverenable)
-        GetMythUI()->DoRestoreScreensaver();
+        MythMainWindow::RestoreScreensaver();
 }
 
 
@@ -64,7 +66,12 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
-    QFont font = MythUIHelper::GetMediumFont();
+
+    // Taken from removed MythUIHelper::GetMediumFont
+    QFont font = QApplication::font();
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(16));
+    font.setWeight(QFont::Bold);
+
     font.setPointSizeF(fontSize * (size.width() / 800.0));
     p->setFont(font);
 
