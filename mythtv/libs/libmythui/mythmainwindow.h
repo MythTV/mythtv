@@ -110,6 +110,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     static void DisableScreensaver();
     static void ResetScreensaver();
     static bool IsScreensaverAsleep();
+    static bool IsTopScreenInitialized(void);
     void RemoteScreenShot(QString filename, int x, int y);
 
     void AllowInput(bool allow);

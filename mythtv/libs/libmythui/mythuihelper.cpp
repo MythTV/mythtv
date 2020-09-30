@@ -306,11 +306,6 @@ bool MythUIHelper::IsScreenSetup(void)
     return d->m_screenSetup;
 }
 
-bool MythUIHelper::IsTopScreenInitialized(void)
-{
-    return GetMythMainWindow()->GetMainStack()->GetTopScreen()->IsInitialized();
-}
-
 void MythUIHelper::LoadQtConfig(void)
 {
     gCoreContext->ResetLanguage();

@@ -631,8 +631,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             timer.start();
-            while (!timer.hasExpired(10000) &&
-                   (!MythUIHelper::IsTopScreenInitialized()))
+            while (!timer.hasExpired(10000) && (!MythMainWindow::IsTopScreenInitialized()))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 

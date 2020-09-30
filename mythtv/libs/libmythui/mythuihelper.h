@@ -64,7 +64,7 @@ class MUI_PUBLIC MythUIHelper
     void ExcludeFromCacheSize(MythImage *im);
 
     bool IsScreenSetup(void);
-    static bool IsTopScreenInitialized(void);
+
 
     void UpdateScreenSettings(void);
     // which the user may have set to be different from the raw screen size

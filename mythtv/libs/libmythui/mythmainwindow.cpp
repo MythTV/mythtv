@@ -609,6 +609,13 @@ bool MythMainWindow::IsScreensaverAsleep()
     return false;
 }
 
+bool MythMainWindow::IsTopScreenInitialized()
+{
+    if (HasMythMainWindow())
+        GetMythMainWindow()->GetMainStack()->GetTopScreen()->IsInitialized();
+    return false;
+}
+
 bool MythMainWindow::event(QEvent *e)
 {
     if (!updatesEnabled() && (e->type() == QEvent::UpdateRequest))
