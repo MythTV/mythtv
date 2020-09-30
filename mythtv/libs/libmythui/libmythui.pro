@@ -118,10 +118,19 @@ using_x11 {
 using_drm {
     DEFINES += USING_DRM
     HEADERS += platforms/mythdisplaydrm.h
+    HEADERS += platforms/mythscreensaverdrm.h
     HEADERS += platforms/mythdrmdevice.h
     SOURCES += platforms/mythdisplaydrm.cpp
+    SOURCES += platforms/mythscreensaverdrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+}
+
+# NOTE - there isn't a wayland define yet
+using_waylandextras {
+    DEFINES += USING_WAYLANDEXTRAS
+    HEADERS += platforms/mythscreensaverwayland.h
+    SOURCES += platforms/mythscreensaverwayland.cpp
 }
 
 # Use MMAL as a proxy for Raspberry Pi support

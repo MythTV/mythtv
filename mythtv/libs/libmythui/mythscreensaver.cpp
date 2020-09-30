@@ -19,6 +19,14 @@
 #include "platforms/mythscreensaverandroid.h"
 #endif
 
+#ifdef USING_DRM
+#include "platforms/mythscreensaverdrm.h"
+#endif
+
+#ifdef USING_WAYLANDEXTRAS
+#include "platforms/mythscreensaverwayland.h"
+#endif
+
 MythScreenSaverControl::MythScreenSaverControl()
 {
 #if defined(USING_DBUS)
@@ -36,6 +44,12 @@ MythScreenSaverControl::MythScreenSaverControl()
 #endif
 #if defined(ANDROID)
     m_screenSavers.push_back(new MythScreenSaverAndroid());
+#endif
+#ifdef USING_DRM
+    m_screenSavers.push_back(new MythScreenSaverDRM());
+#endif
+#ifdef USING_WAYLANDEXTRAS
+    m_screenSavers.push_back(new MythScreenSaverWayland());
 #endif
 }
 
