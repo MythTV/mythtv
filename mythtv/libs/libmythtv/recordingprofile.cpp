@@ -1221,10 +1221,10 @@ class TranscodeLossless : public MythUICheckBoxSetting, public CodecParamStorage
     };
 };
 
-class RecordingType : public MythUIComboBoxSetting, public CodecParamStorage
+class RecordingTypeStream : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
-    explicit RecordingType(const RecordingProfile &parent) :
+    explicit RecordingTypeStream(const RecordingProfile &parent) :
         MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "recordingtype")
     {
         setLabel(QObject::tr("Recording Type"));
@@ -1633,7 +1633,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
     }
     else if (type.toUpper() == "DVB")
     {
-        addChild(new RecordingType(*this));
+        addChild(new RecordingTypeStream(*this));
     }
 
     if (CardUtil::IsTunerSharingCapable(type))
