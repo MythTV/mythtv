@@ -393,8 +393,8 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
 
 void TVBrowseHelper::run()
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Helper thread starting");
     RunProlog();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Helper thread starting");
     QMutexLocker locker(&m_browseLock);
     while (true)
     {
@@ -554,6 +554,6 @@ void TVBrowseHelper::run()
         m_browseLock.lock();
         QCoreApplication::postEvent(m_parent, new UpdateBrowseInfoEvent(infoMap));
     }
-    RunEpilog();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Helper thread exiting");
+    RunEpilog();
 }
