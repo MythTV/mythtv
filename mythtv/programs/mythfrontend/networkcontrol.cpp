@@ -501,7 +501,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             if (m_keyTextMap.contains(keyCode))
                 keyText = m_keyTextMap[keyCode];
 
-            MythUIHelper::ResetScreensaver();
+            MythMainWindow::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
                                   keyText);
@@ -545,7 +545,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
                     modifiers = Qt::ShiftModifier;
             }
 
-            MythUIHelper::ResetScreensaver();
+            MythMainWindow::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
                                   nc->getArg(curToken));

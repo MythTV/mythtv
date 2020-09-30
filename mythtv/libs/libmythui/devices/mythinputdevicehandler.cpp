@@ -8,7 +8,6 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "mythinputdevicehandler.h"
 
@@ -267,8 +266,8 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
     }
     else if (target)
     {
-        MythUIHelper::ResetScreensaver();
-        if (GetMythUI()->GetScreenIsAsleep())
+        MythMainWindow::ResetScreensaver();
+        if (MythMainWindow::IsScreensaverAsleep())
             return;
         QCoreApplication::sendEvent(target, &key);
     }

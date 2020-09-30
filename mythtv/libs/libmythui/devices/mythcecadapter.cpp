@@ -7,7 +7,6 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythevent.h"
-#include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "mythdisplay.h"
 #include "mythcecadapter.h"
@@ -641,7 +640,7 @@ int MythCECAdapter::HandleKeyPress(const cec_keypress &Key) const
     if (0 == action)
         return 1;
 
-    MythUIHelper::ResetScreensaver();
+    MythMainWindow::ResetScreensaver();
     auto* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
     QCoreApplication::postEvent(GetMythMainWindow(), ke);
     return 1;
@@ -709,7 +708,7 @@ void MythCECAdapter::HandleSource(const cec_logical_address Address, const uint8
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Source %1 %2")
         .arg(Address).arg(Activated ? "Activated" : "Deactivated"));
     if (Activated)
-        MythUIHelper::ResetScreensaver();
+        MythMainWindow::ResetScreensaver();
 }
 
 void MythCECAdapter::HandleActions(MythCECActions Actions)

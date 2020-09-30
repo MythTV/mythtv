@@ -645,7 +645,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void UpdateLCD();
     void ShowLCDChannelInfo();
     void ShowLCDDVDInfo();
-    void RestoreScreenSaver();
 
   private:
     // Configuration variables from database

@@ -23,6 +23,7 @@ class MythMediaDevice;
 
 using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
 
+class ScreenSaverControl;
 class MythDisplay;
 class MythInputDeviceHandler;
 class MythMainWindowPrivate;
@@ -105,6 +106,10 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     static void GrabWindow(QImage &image);
     static bool SaveScreenShot(const QImage &image, QString filename = "");
     static bool ScreenShot(int w = 0, int h = 0, QString filename = "");
+    static void RestoreScreensaver();
+    static void DisableScreensaver();
+    static void ResetScreensaver();
+    static bool IsScreensaverAsleep();
     void RemoteScreenShot(QString filename, int x, int y);
 
     void AllowInput(bool allow);
@@ -149,6 +154,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void signalRemoteScreenShot(QString filename, int x, int y);
     void signalSetDrawEnabled(bool enable);
     void signalWindowReady(void);
+    void signalRestoreScreensaver();
+    void signalDisableScreensaver();
+    void signalResetScreensaver();
 
   protected:
     explicit MythMainWindow(bool useDB = true);
@@ -177,6 +185,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythPainterWindow* m_painterWin    { nullptr };
     MythPainterWindow* m_oldPainterWin { nullptr };
     MythInputDeviceHandler* m_deviceHandler { nullptr };
+    ScreenSaverControl *m_screensaver  { nullptr };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

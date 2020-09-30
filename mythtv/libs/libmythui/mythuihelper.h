@@ -97,22 +97,6 @@ class MUI_PUBLIC MythUIHelper
     static QFont GetMediumFont(void);
     static QFont GetSmallFont(void);
 
-    // event wrappers
-    static void DisableScreensaver(void);
-    static void RestoreScreensaver(void);
-    // Reset screensaver idle time, for input events that X doesn't see
-    // (e.g., lirc)
-    static void ResetScreensaver(void);
-
-    // actually do it
-    void DoDisableScreensaver(void);
-    void DoRestoreScreensaver(void);
-    void DoResetScreensaver(void);
-
-    // get the current status
-    bool GetScreensaverEnabled(void);
-    bool GetScreenIsAsleep(void);
-
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 

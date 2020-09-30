@@ -53,6 +53,7 @@ using namespace std;
 #include "mythgesture.h"
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
+#include "screensaver.h"
 #include "devices/mythinputdevicehandler.h"
 
 #ifdef _WIN32
@@ -203,10 +204,20 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(d->m_idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     if (d->m_idleTime > 0)
         d->m_idleTimer->start();
+
+    m_screensaver = new ScreenSaverControl();
+    if (m_screensaver)
+    {
+        connect(this, &MythMainWindow::signalRestoreScreensaver, m_screensaver, &ScreenSaverControl::Restore);
+        connect(this, &MythMainWindow::signalDisableScreensaver, m_screensaver, &ScreenSaverControl::Disable);
+        connect(this, &MythMainWindow::signalResetScreensaver,   m_screensaver, &ScreenSaverControl::Reset);
+    }
 }
 
 MythMainWindow::~MythMainWindow()
 {
+    delete m_screensaver;
+
     if (gCoreContext != nullptr)
         gCoreContext->removeListener(this);
 
@@ -567,6 +578,35 @@ bool MythMainWindow::ScreenShot(int w, int h, QString filename)
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     return SaveScreenShot(img, std::move(filename));
+}
+
+void MythMainWindow::RestoreScreensaver()
+{
+    if (HasMythMainWindow())
+        emit GetMythMainWindow()->signalRestoreScreensaver();
+}
+
+void MythMainWindow::DisableScreensaver()
+{
+    if (HasMythMainWindow())
+        emit GetMythMainWindow()->signalDisableScreensaver();
+}
+
+void MythMainWindow::ResetScreensaver()
+{
+    if (HasMythMainWindow())
+        emit GetMythMainWindow()->signalResetScreensaver();
+}
+
+bool MythMainWindow::IsScreensaverAsleep()
+{
+    if (HasMythMainWindow())
+    {
+        MythMainWindow* window = GetMythMainWindow();
+        if (window->m_screensaver)
+            return window->m_screensaver->Asleep();
+    }
+    return false;
 }
 
 bool MythMainWindow::event(QEvent *e)
@@ -1946,36 +1986,6 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("Media Event: %1 - %2")
                     .arg(device->getDevicePath()).arg(device->getStatus()));
-        }
-    }
-    else if (ce->type() == ScreenSaverEvent::kEventType)
-    {
-        auto *sse = dynamic_cast<ScreenSaverEvent *>(ce);
-        if (sse == nullptr)
-            return;
-        switch (sse->getSSEventType())
-        {
-            case ScreenSaverEvent::ssetDisable:
-            {
-                GetMythUI()->DoDisableScreensaver();
-                break;
-            }
-            case ScreenSaverEvent::ssetRestore:
-            {
-                GetMythUI()->DoRestoreScreensaver();
-                break;
-            }
-            case ScreenSaverEvent::ssetReset:
-            {
-                GetMythUI()->DoResetScreensaver();
-                break;
-            }
-            default:
-            {
-                LOG(VB_GENERAL, LOG_ERR,
-                        QString("Unknown ScreenSaverEvent type: %1")
-                        .arg(sse->getSSEventType()));
-            }
         }
     }
     else if (ce->type() == MythEvent::kPushDisableDrawingEventType)

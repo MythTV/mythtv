@@ -151,9 +151,6 @@ public:
     MythUIMenuCallbacks m_callbacks          {nullptr,nullptr,nullptr,nullptr,nullptr};
 
     QStringList m_searchPaths;
-
-    ScreenSaverControl *m_screensaver        {nullptr};
-    bool                m_screensaverEnabled {false};
     bool                m_screenSetup        {false};
 };
 
@@ -178,7 +175,6 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     delete m_cacheLock;
     delete m_imageThreadPool;
-    delete m_screensaver;
 
     if (m_display)
     {
@@ -193,7 +189,6 @@ void MythUIHelperPrivate::Init(void)
 {
     if (!m_display)
         m_display = MythDisplay::AcquireRelease();
-    m_screensaver = new ScreenSaverControl();
     StoreGUIsettings();
     m_screenSetup = true;
 
@@ -1349,76 +1344,6 @@ QFont MythUIHelper::GetSmallFont(void)
     font.setWeight(QFont::Bold);
 
     return font;
-}
-
-void MythUIHelper::DisableScreensaver(void)
-{
-    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
-    {
-        QCoreApplication::postEvent(
-            GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetDisable));
-    }
-}
-
-void MythUIHelper::RestoreScreensaver(void)
-{
-    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
-    {
-        QCoreApplication::postEvent(
-            GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetRestore));
-    }
-}
-
-void MythUIHelper::ResetScreensaver(void)
-{
-    if (qobject_cast<QApplication*>(QCoreApplication::instance()) != nullptr)
-    {
-        QCoreApplication::postEvent(
-            GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetReset));
-    }
-}
-
-void MythUIHelper::DoDisableScreensaver(void)
-{
-    if (d->m_screensaver)
-    {
-        d->m_screensaver->Disable();
-        d->m_screensaverEnabled = false;
-    }
-}
-
-void MythUIHelper::DoRestoreScreensaver(void)
-{
-    if (d->m_screensaver)
-    {
-        d->m_screensaver->Restore();
-        d->m_screensaverEnabled = true;
-    }
-}
-
-void MythUIHelper::DoResetScreensaver(void)
-{
-    if (d->m_screensaver)
-    {
-        d->m_screensaver->Reset();
-        d->m_screensaverEnabled = false;
-    }
-}
-
-bool MythUIHelper::GetScreensaverEnabled(void)
-{
-    return d->m_screensaverEnabled;
-}
-
-bool MythUIHelper::GetScreenIsAsleep(void)
-{
-    if (!d->m_screensaver)
-        return false;
-
-    return d->m_screensaver->Asleep();
 }
 
 void MythUIHelper::AddCurrentLocation(const QString& location)

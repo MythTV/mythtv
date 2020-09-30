@@ -16,12 +16,9 @@
 #include "screensaver-osx.h"
 #endif
 
-#if ANDROID
+#ifdef Q_OS_ANDROID
 #include "screensaver-android.h"
 #endif
-
-QEvent::Type ScreenSaverEvent::kEventType =
-    static_cast<QEvent::Type>(QEvent::registerEventType());
 
 ScreenSaverControl::ScreenSaverControl()
 {
@@ -52,28 +49,28 @@ ScreenSaverControl::~ScreenSaverControl()
         delete m_screenSavers.takeLast();
 }
 
-void ScreenSaverControl::Disable(void)
+void ScreenSaverControl::Disable()
 {
     QList<ScreenSaver *>::iterator i;
     for (i = m_screenSavers.begin(); i != m_screenSavers.end(); ++i)
         (*i)->Disable();
 }
 
-void ScreenSaverControl::Restore(void)
+void ScreenSaverControl::Restore()
 {
     QList<ScreenSaver *>::iterator i;
     for (i = m_screenSavers.begin(); i != m_screenSavers.end(); ++i)
         (*i)->Restore();
 }
 
-void ScreenSaverControl::Reset(void)
+void ScreenSaverControl::Reset()
 {
     QList<ScreenSaver *>::iterator i;
     for (i = m_screenSavers.begin(); i != m_screenSavers.end(); ++i)
         (*i)->Reset();
 }
 
-bool ScreenSaverControl::Asleep(void)
+bool ScreenSaverControl::Asleep()
 {
     QList<ScreenSaver *>::iterator i;
     for (i = m_screenSavers.begin(); i != m_screenSavers.end(); ++i)

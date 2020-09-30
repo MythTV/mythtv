@@ -9,7 +9,7 @@
 #include "mythdvdplayer.h"
 #include "compat.h"
 #include "mythlogging.h"
-#include "mythuihelper.h"
+#include "mythmainwindow.h"
 #include "mythuiactions.h"
 #include "tv_actions.h"
 #include "mythdvdbuffer.h"
@@ -814,11 +814,11 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                                 if (m_inMenu)
                                 {
                                     m_autoselectsubtitle = true;
-                                    MythUIHelper::RestoreScreensaver();
+                                    MythMainWindow::RestoreScreensaver();
                                 }
                                 else
                                 {
-                                    MythUIHelper::DisableScreensaver();
+                                    MythMainWindow::DisableScreensaver();
                                 }
                             }
 

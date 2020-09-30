@@ -2078,9 +2078,8 @@ void TV::HandleStateChange()
 
         if (!m_playerContext.ReloadTVChain())
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "LiveTV not successfully started");
-            RestoreScreenSaver();
+            LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully started");
+            MythMainWindow::RestoreScreensaver();
             m_playerContext.SetRecorder(nullptr);
             SetErrored();
             SET_LAST();
@@ -2114,7 +2113,7 @@ void TV::HandleStateChange()
         if (!ok)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully started");
-            RestoreScreenSaver();
+            MythMainWindow::RestoreScreensaver();
             m_playerContext.SetRecorder(nullptr);
             SetErrored();
             SET_LAST();
@@ -2132,7 +2131,7 @@ void TV::HandleStateChange()
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
         SET_NEXT();
-        RestoreScreenSaver();
+        MythMainWindow::RestoreScreensaver();
         StopStuff(true, true, true);
     }
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
@@ -2217,7 +2216,7 @@ void TV::HandleStateChange()
              TRANSITION(kState_WatchingRecording, kState_None))
     {
         SET_NEXT();
-        RestoreScreenSaver();
+        MythMainWindow::RestoreScreensaver();
         StopStuff(true, true, false);
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded) ||
@@ -2295,7 +2294,7 @@ void TV::HandleStateChange()
              TRANSITION(kState_None, kState_WatchingRecording) ||
              TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        MythUIHelper::DisableScreensaver();
+        MythMainWindow::DisableScreensaver();
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
         if (!m_dbUseVideoModes)
@@ -4984,7 +4983,7 @@ void TV::DoPlay()
     DoPlayerSeek(time);
     UpdateOSDSeekMessage(m_playerContext.GetPlayMessage(), kOSDTimeout_Med);
 
-    MythUIHelper::DisableScreensaver();
+    MythMainWindow::DisableScreensaver();
 
     SetSpeedChangeTimer(0, __LINE__);
     gCoreContext->emitTVPlaybackPlaying();
@@ -5036,14 +5035,14 @@ void TV::DoTogglePauseFinish(float Time, bool ShowOSD)
         DoPlayerSeek(Time);
         if (ShowOSD)
             UpdateOSDSeekMessage(tr("Paused"), kOSDTimeout_None);
-        RestoreScreenSaver();
+        MythMainWindow::RestoreScreensaver();
     }
     else
     {
         DoPlayerSeek(Time);
         if (ShowOSD)
             UpdateOSDSeekMessage(m_playerContext.GetPlayMessage(), kOSDTimeout_Short);
-        MythUIHelper::DisableScreensaver();
+        MythMainWindow::DisableScreensaver();
     }
 
     SetSpeedChangeTimer(0, __LINE__);
@@ -5895,7 +5894,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         if (!m_playerContext.ReloadTVChain())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully restarted");
-            RestoreScreenSaver();
+            MythMainWindow::RestoreScreensaver();
             m_playerContext.SetRecorder(nullptr);
             SetErrored();
             SetExitPlayer(true, false);
@@ -5935,7 +5934,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         if (!ok)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "LiveTV not successfully started");
-            RestoreScreenSaver();
+            MythMainWindow::RestoreScreensaver();
             m_playerContext.SetRecorder(nullptr);
             SetErrored();
             SetExitPlayer(true, false);
@@ -6232,7 +6231,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
     if (ContextIsPaused(__FILE__, __LINE__))
     {
         HideOSDWindow("osd_status");
-        MythUIHelper::DisableScreensaver();
+        MythMainWindow::DisableScreensaver();
     }
 
     // Save the current channel if this is the first time
@@ -6396,7 +6395,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
     if (ContextIsPaused(__FILE__, __LINE__))
     {
         HideOSDWindow("osd_status");
-        MythUIHelper::DisableScreensaver();
+        MythMainWindow::DisableScreensaver();
     }
 
     // Save the current channel if this is the first time
@@ -11253,11 +11252,6 @@ bool TV::IsSameProgram(const ProgramInfo* ProgInfo) const
     ret = m_playerContext.IsSameProgram(*ProgInfo);
     ReturnPlayerLock();
     return ret;
-}
-
-void TV::RestoreScreenSaver()
-{
-    MythUIHelper::RestoreScreensaver();
 }
 
 bool TV::ContextIsPaused(const char *File, int Location)
