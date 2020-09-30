@@ -9,7 +9,7 @@
 #include "dtvchannel.h"
 
 #ifdef USING_V4L2
-#include "videodev2.h" // needed for v4l2_std_id type
+#include <linux/videodev2.h>
 #endif
 
 using namespace std;
