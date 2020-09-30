@@ -1319,33 +1319,6 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, const QString& label,
     return ret;
 }
 
-QFont MythUIHelper::GetBigFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(25));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
-QFont MythUIHelper::GetMediumFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(16));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
-QFont MythUIHelper::GetSmallFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(12));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
 void MythUIHelper::AddCurrentLocation(const QString& location)
 {
     QMutexLocker locker(&m_locationLock);

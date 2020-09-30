@@ -93,10 +93,6 @@ class MUI_PUBLIC MythUIHelper
 
     bool FindThemeFile(QString &path);
 
-    static QFont GetBigFont(void);
-    static QFont GetMediumFont(void);
-    static QFont GetSmallFont(void);
-
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 
@@ -115,8 +111,6 @@ class MUI_PUBLIC MythUIHelper
    ~MythUIHelper();
 
   private:
-    void InitializeScreenSettings(void);
-
     void ClearOldImageCache(void);
     void RemoveCacheDir(const QString &dirname);
     static void PruneCacheDir(const QString& dirname);
