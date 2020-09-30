@@ -205,6 +205,10 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
     return true;
 }
 
+#ifndef V4L2_PIX_FMT_HEVC
+#define V4L2_PIX_FMT_HEVC v4l2_fourcc('H', 'E', 'V', 'C')
+#endif
+
 const V4L2Profiles& MythV4L2M2MContext::GetProfiles(void)
 {
     using V4L2Mapping = QPair<const uint32_t, const MythCodecContext::CodecProfile>;
