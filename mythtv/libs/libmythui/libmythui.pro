@@ -24,6 +24,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 HEADERS  = mythmainwindowprivate.h mythmainwindow.h mythpainter.h mythimage.h mythrect.h
 HEADERS += mythpainterwindow.h mythpainterwindowqt.h
+HEADERS += mythuithemecache.h
 HEADERS += myththemebase.h
 HEADERS += mythpainter_qt.h mythuihelper.h
 HEADERS += mythpaintergpu.h
@@ -49,6 +50,7 @@ HEADERS += devices/mythinputdevicehandler.h
 
 SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += mythpainterwindow.cpp mythpainterwindowqt.cpp
+SOURCES += mythuithemecache.cpp
 SOURCES += myththemebase.cpp
 SOURCES += mythrender.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
