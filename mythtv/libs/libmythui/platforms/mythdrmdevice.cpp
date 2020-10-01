@@ -359,6 +359,29 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
+bool MythDRMDevice::SetEnumProperty(const QString &Property, uint64_t Value)
+{
+    bool result = false;
+    if (m_connector && !Property.isEmpty())
+    {
+        for (int i = 0; i < m_connector->count_props; ++i)
+        {
+            drmModePropertyPtr prop = drmModeGetProperty(m_fd, m_connector->props[i]);
+            if ((prop->flags & DRM_MODE_PROP_ENUM) && prop->name == Property)
+            {
+                int ret = drmModeConnectorSetProperty(m_fd, m_connector->connector_id, prop->prop_id, Value);
+                result = ret == 0;
+                if (ret != 0)
+                    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("drmModeConnectorSetProperty error: %1").arg(strerror(-ret)));
+            }
+            drmModeFreeProperty(prop);
+        }
+    }
+    if (!result)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Failed to set property '%1'").arg(Property));
+    return result;
+}
+
 MythDRMDevice::DRMEnum MythDRMDevice::GetEnumProperty(const QString& Property)
 {
     DRMEnum result{0};

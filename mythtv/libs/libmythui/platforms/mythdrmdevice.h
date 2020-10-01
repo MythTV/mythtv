@@ -42,6 +42,7 @@ class MythDRMDevice
     bool     Authenticated  () const;
     MythEDID GetEDID        ();
     DRMEnum  GetEnumProperty(const QString& Property);
+    bool     SetEnumProperty(const QString& Property, uint64_t Value);
 
   protected:
     explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
