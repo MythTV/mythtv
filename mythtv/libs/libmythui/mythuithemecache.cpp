@@ -47,9 +47,9 @@ MythUIThemeCache::~MythUIThemeCache()
     delete m_imageThreadPool;
 }
 
-void MythUIThemeCache::SetScreenRect(const QRect &Rect)
+void MythUIThemeCache::SetScreenSize(const QSize &Size)
 {
-    m_screenRect = Rect;
+    m_cacheScreenSize = Size;
 }
 
 void MythUIThemeCache::ClearThemeCacheDir()
@@ -224,8 +224,8 @@ QString MythUIThemeCache::GetThemeCacheDir()
     static QString s_oldcachedir;
     QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) + "." +
-                          QString::number(m_screenRect.width()) + "." +
-                          QString::number(m_screenRect.height());
+                          QString::number(m_cacheScreenSize.width()) + "." +
+                          QString::number(m_cacheScreenSize.height());
 
     if (tmpcachedir != s_oldcachedir)
     {

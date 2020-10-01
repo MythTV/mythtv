@@ -191,8 +191,8 @@ void MythUIHelperPrivate::StoreGUIsettings()
     m_wmult = m_screenRect.width()  / static_cast<float>(m_baseSize.width());
     m_hmult = m_screenRect.height() / static_cast<float>(m_baseSize.height());
 
-    // For MythUICache
-    m_parent->SetScreenRect(m_screenRect);
+    // For MythUIThemeCache
+    m_parent->SetScreenSize(m_screenRect.size());
 
     // Default font, _ALL_ fonts inherit from this!
     // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
