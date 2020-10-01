@@ -2,13 +2,12 @@
 #include "config.h"
 #include "mythscreensaver.h"
 
-#ifdef USING_DBUS
-#include "platforms/mythscreensaverdbus.h"
+#ifdef USING_DRM
+#include "platforms/mythscreensaverdrm.h"
 #endif
 
-#ifdef USING_X11
-#include "platforms/mythscreensaverx11.h"
-#include "platforms/mythxdisplay.h"
+#ifdef USING_DBUS
+#include "platforms/mythscreensaverdbus.h"
 #endif
 
 #if CONFIG_DARWIN
@@ -19,12 +18,13 @@
 #include "platforms/mythscreensaverandroid.h"
 #endif
 
-#ifdef USING_DRM
-#include "platforms/mythscreensaverdrm.h"
-#endif
-
 #ifdef USING_WAYLANDEXTRAS
 #include "platforms/mythscreensaverwayland.h"
+#endif
+
+#ifdef USING_X11
+#include "platforms/mythscreensaverx11.h"
+#include "platforms/mythxdisplay.h"
 #endif
 
 MythScreenSaverControl::MythScreenSaverControl()
@@ -46,7 +46,9 @@ MythScreenSaverControl::MythScreenSaverControl()
     m_screenSavers.push_back(new MythScreenSaverAndroid());
 #endif
 #ifdef USING_DRM
-    m_screenSavers.push_back(new MythScreenSaverDRM());
+    MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create();
+    if (drmsaver)
+        m_screenSavers.push_back(drmsaver);
 #endif
 #ifdef USING_WAYLANDEXTRAS
     m_screenSavers.push_back(new MythScreenSaverWayland());
