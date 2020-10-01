@@ -196,7 +196,7 @@ void OSD::OverrideUIScale(bool Log)
 
     m_savedFontStretch = GetMythUI()->GetFontStretch();
     GetMythUI()->SetFontStretch(m_fontStretch);
-    GetMythUI()->GetScreenSettings(m_savedWMult, m_savedHMult);
+    GetMythUI()->GetThemeScales(m_savedWMult, m_savedHMult);
     QSize theme_size = GetMythUI()->GetBaseSize();
     m_savedUIRect = uirect;
     float tmp_wmult = static_cast<float>(m_rect.size().width()) / static_cast<float>(theme_size.width());

@@ -318,7 +318,7 @@ class ImageLoader
             {
                 float wmult = NAN; // Width multipler
                 float hmult = NAN; // Height multipler
-                GetMythUI()->GetScreenSettings(wmult, hmult);
+                GetMythUI()->GetThemeScales(wmult, hmult);
                 if (wmult != 1.0F || hmult != 1.0F)
                 {
                     w = image->size().width() * wmult;
@@ -337,7 +337,7 @@ class ImageLoader
                 {
                     float wmult = NAN; // Width multipler
                     float hmult = NAN; // Height multipler
-                    GetMythUI()->GetScreenSettings(wmult, hmult);
+                    GetMythUI()->GetThemeScales(wmult, hmult);
                     if (wmult != 1.0F || hmult != 1.0F)
                     {
                         int width = newMaskImage->size().width() * wmult;

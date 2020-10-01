@@ -35,10 +35,8 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
     void LoadQtConfig();
     bool IsScreenSetup();
     void UpdateScreenSettings();
-    // which the user may have set to be different from the raw screen size
-    QRect GetScreenSettings();
-    void GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor);
-    void GetScreenSettings(float &XFactor, float &YFactor);
+    QRect GetScreenRect();
+    void GetThemeScales(float &XFactor, float &YFactor);
 
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);

@@ -233,22 +233,15 @@ void MythUIHelper::UpdateScreenSettings()
     StoreGUIsettings();
 }
 
-QRect MythUIHelper::GetScreenSettings()
+QRect MythUIHelper::GetScreenRect()
 {
     return m_screenRect;
 }
 
-void MythUIHelper::GetScreenSettings(float &XFactor, float &YFactor)
+void MythUIHelper::GetThemeScales(float &XFactor, float &YFactor)
 {
     XFactor = m_wmult;
     YFactor = m_hmult;
-}
-
-void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor)
-{
-    XFactor = m_wmult;
-    YFactor = m_hmult;
-    Rect    = m_screenRect;
 }
 
 /**

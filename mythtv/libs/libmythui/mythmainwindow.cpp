@@ -709,7 +709,8 @@ void MythMainWindow::Init(bool mayReInit)
     // Ensure MythUIHelper has latest screen bounds if we have moved
     GetMythUI()->UpdateScreenSettings();
     // And use them
-    GetMythUI()->GetScreenSettings(d->m_screenRect, d->m_wmult, d->m_hmult);
+    d->m_screenRect = GetMythUI()->GetScreenRect();
+    GetMythUI()->GetThemeScales(d->m_wmult, d->m_hmult);
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
