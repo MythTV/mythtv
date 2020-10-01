@@ -6,7 +6,6 @@
 
 // MythTV
 #include "mythlogging.h"
-#include "referencecounter.h"
 #include "mythdisplay.h"
 
 // libdrm
@@ -15,7 +14,7 @@ extern "C" {
 #include <xf86drmMode.h>
 }
 
-class MythDRMDevice : public ReferenceCounter
+class MythDRMDevice
 {
   public:
     class DRMEnum
@@ -27,26 +26,26 @@ class MythDRMDevice : public ReferenceCounter
     };
 
     explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
-   ~MythDRMDevice() override;
+   ~MythDRMDevice();
 
-    bool     IsValid        (void) const;
-    QString  GetSerialNumber(void) const;
-    QScreen* GetScreen      (void) const;
-    QSize    GetResolution  (void) const;
-    QSize    GetPhysicalSize(void) const;
-    double   GetRefreshRate (void) const;
-    bool     Authenticated  (void) const;
-    MythEDID GetEDID        (void);
+    bool     IsValid        () const;
+    QString  GetSerialNumber() const;
+    QScreen* GetScreen      () const;
+    QSize    GetResolution  () const;
+    QSize    GetPhysicalSize() const;
+    double   GetRefreshRate () const;
+    bool     Authenticated  () const;
+    MythEDID GetEDID        ();
     DRMEnum  GetEnumProperty(const QString& Property);
 
   private:
     Q_DISABLE_COPY(MythDRMDevice)
-    bool     Open           (void);
-    void     Close          (void);
-    void     Authenticate   (void);
-    bool     Initialise     (void);
+    bool     Open           ();
+    void     Close          ();
+    void     Authenticate   ();
+    bool     Initialise     ();
 
-    QString  FindBestDevice (void);
+    QString  FindBestDevice ();
     static bool ConfirmDevice(const QString& Device);
 
     drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const;
@@ -69,4 +68,4 @@ class MythDRMDevice : public ReferenceCounter
     MythEDID           m_edid          { };
 };
 
-#endif // MYTHDRMDEVICE_H
+#endif

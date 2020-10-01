@@ -15,8 +15,7 @@
 #define LOC (QString("%1: ").arg(m_deviceName))
 
 MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
-  : ReferenceCounter("DRMDev"),
-    m_screen(qScreen),
+  : m_screen(qScreen),
     m_deviceName(Device),
     m_verbose(Device.isEmpty() ? LOG_INFO : LOG_DEBUG)
 {
@@ -39,7 +38,7 @@ MythDRMDevice::~MythDRMDevice()
     Close();
 }
 
-bool MythDRMDevice::Open(void)
+bool MythDRMDevice::Open()
 {
     if (m_deviceName.isEmpty())
         m_deviceName = FindBestDevice();
@@ -58,7 +57,7 @@ bool MythDRMDevice::Open(void)
     return true;
 }
 
-void MythDRMDevice::Close(void)
+void MythDRMDevice::Close()
 {
     if (m_fd)
     {
@@ -77,42 +76,42 @@ void MythDRMDevice::Close(void)
     m_fd = 0;
 }
 
-bool MythDRMDevice::IsValid(void) const
+bool MythDRMDevice::IsValid() const
 {
     return m_valid;
 }
 
-QString MythDRMDevice::GetSerialNumber(void) const
+QString MythDRMDevice::GetSerialNumber() const
 {
     return m_serialNumber;
 }
 
-QScreen* MythDRMDevice::GetScreen(void) const
+QScreen* MythDRMDevice::GetScreen() const
 {
     return m_screen;
 }
 
-QSize MythDRMDevice::GetResolution(void) const
+QSize MythDRMDevice::GetResolution() const
 {
     return m_resolution;
 }
 
-QSize MythDRMDevice::GetPhysicalSize(void) const
+QSize MythDRMDevice::GetPhysicalSize() const
 {
     return m_physicalSize;
 }
 
-double MythDRMDevice::GetRefreshRate(void) const
+double MythDRMDevice::GetRefreshRate() const
 {
     return m_refreshRate;
 }
 
-bool MythDRMDevice::Authenticated(void) const
+bool MythDRMDevice::Authenticated() const
 {
     return m_authenticated;
 }
 
-MythEDID MythDRMDevice::GetEDID(void)
+MythEDID MythDRMDevice::GetEDID()
 {
     return m_edid;
 }
@@ -129,7 +128,7 @@ static QString GetConnectorName(drmModeConnector *Connector)
     return QString("%1%2").arg(QString::fromStdString(connectorNames[type])).arg(Connector->connector_type_id);
 }
 
-void MythDRMDevice::Authenticate(void)
+void MythDRMDevice::Authenticate()
 {
     if (!m_fd || m_authenticated)
         return;
@@ -144,7 +143,7 @@ void MythDRMDevice::Authenticate(void)
     }
 }
 
-bool MythDRMDevice::Initialise(void)
+bool MythDRMDevice::Initialise()
 {
     if (!m_fd)
         return false;
@@ -274,8 +273,7 @@ bool MythDRMDevice::Initialise(void)
     }
 
     m_crtc = crtc;
-    m_resolution = QSize(static_cast<int>(m_crtc->width),
-                         static_cast<int>(m_crtc->height));
+    m_resolution = QSize(static_cast<int>(m_crtc->width), static_cast<int>(m_crtc->height));
     if (m_crtc->mode_valid)
     {
         drmModeModeInfo mode = m_crtc->mode;
@@ -288,7 +286,7 @@ bool MythDRMDevice::Initialise(void)
     return true;
 }
 
-QString MythDRMDevice::FindBestDevice(void)
+QString MythDRMDevice::FindBestDevice()
 {
     if (!m_screen)
         return QString();
@@ -367,7 +365,7 @@ MythDRMDevice::DRMEnum MythDRMDevice::GetEnumProperty(const QString& Property)
         if ((prop->flags & DRM_MODE_PROP_ENUM) && prop->name == Property)
         {
             result.m_value = m_connector->prop_values[prop->prop_id];
-            for (int i = 0; i < prop->count_enums; ++i)
+            for (int j = 0; j < prop->count_enums; ++j)
                 result.m_enums.insert({prop->enums[i].value, prop->enums[i].name});
         }
         drmModeFreeProperty(prop);
