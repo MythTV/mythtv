@@ -131,7 +131,7 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoSearchListSelection(const RefCountHandler<MetadataLookup>& lookup);
+    void OnVideoSearchListSelection(RefCountHandler<MetadataLookup> lookup);
 
     void doVideoScan();
 

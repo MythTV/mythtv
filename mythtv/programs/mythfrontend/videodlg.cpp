@@ -51,6 +51,8 @@
 // for ImageDLFailureEvent
 #include "metadataimagedownload.h"
 
+#define LOC_MML QString("Manual Metadata Lookup: ")
+
 static const QString _Location = "MythVideo";
 
 namespace
@@ -3506,12 +3508,33 @@ void VideoDialog::ToggleWatched()
     }
 }
 
-void VideoDialog::OnVideoSearchListSelection(const RefCountHandler<MetadataLookup>& lookup)
+void VideoDialog::OnVideoSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     if (!lookup)
         return;
 
-    OnVideoSearchDone(lookup);
+    if(!lookup->GetInetref().isEmpty() && lookup->GetInetref() != "00000000")
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC_MML +
+            QString("Selected Item: Type: %1%2 : Subtype: %3%4%5 : InetRef: %6")
+                .arg(lookup->GetType() == kMetadataVideo ? "Video" : "")
+                .arg(lookup->GetType() == kMetadataRecording ? "Recording" : "")
+                .arg(lookup->GetSubtype() == kProbableMovie ? "Movie" : "")
+                .arg(lookup->GetSubtype() == kProbableTelevision ? "Television" : "")
+                .arg(lookup->GetSubtype() == kUnknownVideo ? "Unknown" : "")
+                .arg(lookup->GetInetref()));
+
+        lookup->SetStep(kLookupData);
+        lookup->IncrRef();
+        m_metadataFactory->Lookup(lookup);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC_MML +
+            QString("Selected Item has no InetRef Number!"));
+
+        OnVideoSearchDone(lookup);
+    }
 }
 
 void VideoDialog::OnParentalChange(int amount)
