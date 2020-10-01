@@ -30,7 +30,7 @@ class MythScreenSaverControl : public QObject
 
   public:
     MythScreenSaverControl();
-    ~MythScreenSaverControl();
+    ~MythScreenSaverControl() override;
 
   public slots:
     void Disable();

@@ -158,7 +158,7 @@ const char *HTTPRequest::s_szServerHeaders = "Accept-Ranges: bytes\r\n";
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetLastHeader( const QString &sType )
+QString HTTPRequest::GetLastHeader( const QString &sType ) const
 {
     QStringList values = m_mapHeaders.values( sType );
     if (!values.isEmpty())

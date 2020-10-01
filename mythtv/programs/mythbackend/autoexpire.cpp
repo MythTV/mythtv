@@ -1110,15 +1110,10 @@ bool AutoExpire::IsInDontExpireSet(
 bool AutoExpire::IsInExpireList(
     const pginfolist_t &expireList, uint chanid, const QDateTime &recstartts)
 {
-    for (auto *info : expireList)
-    {
-        if ((info->GetChanID()             == chanid) &&
-            (info->GetRecordingStartTime() == recstartts))
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(expireList.cbegin(), expireList.cend(),
+                       [chanid,&recstartts](auto *info)
+                           { return ((info->GetChanID()             == chanid) &&
+                                     (info->GetRecordingStartTime() == recstartts)); } );
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

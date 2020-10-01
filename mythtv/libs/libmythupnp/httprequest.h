@@ -242,7 +242,7 @@ class UPNP_PUBLIC HTTPRequest
         static QString         GetResponseProtocol () ;
 
         QString         GetRequestType () const;
-        QString         GetLastHeader( const QString &sType );
+        QString         GetLastHeader( const QString &sType ) const;
 
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QStringList GetSupportedMimeTypes ();

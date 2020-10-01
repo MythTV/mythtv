@@ -1085,13 +1085,11 @@ bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)
     if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
         return true;
 
-    for (const QString & action : qAsConst(actions))
+    if (std::any_of(actions.cbegin(), actions.cend(),
+                    [](const QString & action) { return action == "DELETE"; } ))
     {
-        if (action == "DELETE")
-        {
-            ShowDeleteDialog();
-            return true;
-        }
+        ShowDeleteDialog();
+        return true;
     }
 
     return false;

@@ -65,16 +65,10 @@ bool AVCInfo::GetSubunitInfo(void)
 
 bool AVCInfo::IsSubunitType(int subunit_type) const
 {
-    for (int subunit : m_unit_table)
-    {
-        if ((subunit != 0xff) &&
-            (subunit & FirewireDevice::kAVCSubunitTypeUnit) == subunit_type)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return std::any_of(m_unit_table.cbegin(), m_unit_table.cend(),
+                       [subunit_type](int subunit)
+                           { return (subunit != 0xff) &&
+                                    (subunit & FirewireDevice::kAVCSubunitTypeUnit) == subunit_type; } );
 }
 
 QString AVCInfo::GetSubunitInfoString(void) const

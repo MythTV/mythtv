@@ -360,7 +360,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     bool HandleJumpToProgramAction(const QStringList& Actions);
     bool SeekHandleAction(const QStringList& Actions, bool IsDVD);
     bool TimeStretchHandleAction(const QStringList& Actions);
-    bool DiscMenuHandleAction(const QStringList& Actions);
+    bool DiscMenuHandleAction(const QStringList& Actions) const;
     bool Handle3D(const QString& Action);
 
     // Timers and timer events
@@ -448,7 +448,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
     // Channels
     static void ToggleChannelFavorite();
-    void ToggleChannelFavorite(const QString &ChangroupName);
+    void ToggleChannelFavorite(const QString &ChangroupName) const;
     void ChangeChannel(ChannelChangeDirection Direction);
     void ChangeChannel(uint Chanid, const QString& Channum);
 
@@ -792,7 +792,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
     // embedded and suspended status
     bool         m_ignoreKeyPresses {false}; ///< should we ignore keypresses
-    bool         m_savedPause;               ///< saved pause state before embedding
+    bool         m_savedPause       {false}; ///< saved pause state before embedding
 
     // Channel group stuff
     /// \brief Lock necessary when modifying channel group variables.

@@ -187,18 +187,13 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
             MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
     auto haveprofile = [=](MythCodecContext::CodecProfile Profile, QSize Size)
     {
-        for (auto vaprofile : qAsConst(profiles))
-        {
-            if (vaprofile.first == Profile &&
-                vaprofile.second.first.width() <= Size.width() &&
-                vaprofile.second.first.height() <= Size.height() &&
-                vaprofile.second.second.width() >= Size.width() &&
-                vaprofile.second.second.height() >= Size.height())
-            {
-                return true;
-            }
-        }
-        return false;
+        return std::any_of(profiles.cbegin(), profiles.cend(),
+                           [&Profile,Size](auto vaprofile)
+                               { return vaprofile.first == Profile &&
+                                        vaprofile.second.first.width() <= Size.width() &&
+                                        vaprofile.second.first.height() <= Size.height() &&
+                                        vaprofile.second.second.width() >= Size.width() &&
+                                        vaprofile.second.second.height() >= Size.height(); } );
     };
 
     ok = haveprofile(mythprofile, QSize((*Context)->width, (*Context)->height));

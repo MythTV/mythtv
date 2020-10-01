@@ -988,11 +988,8 @@ static bool is_better(const QString &newStr, const QString &oldStr)
             return true;
 
         // check if the string contains any bogus characters
-        for (auto ch : qAsConst(newStr))
-            if (ch.toLatin1() < 0x20)
-                return false;
-
-        return true;
+        return std::all_of(newStr.cbegin(), newStr.cend(),
+                           [](auto ch){ return ch.toLatin1() >= 0x20; } );
     }
     return false;
 }

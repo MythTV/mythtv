@@ -463,10 +463,10 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &Renderer)
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(Renderer).arg(m_lastVideoRenderer));
 
-    for (const auto& group : qAsConst(s_safe_renderer_group))
-        if (group.contains(m_lastVideoRenderer) && group.contains(Renderer))
-            return true;
-    return false;
+    return std::any_of(s_safe_renderer_group.cbegin(), s_safe_renderer_group.cend(),
+                       [this,Renderer](const auto& group)
+                           { return group.contains(m_lastVideoRenderer) &&
+                                    group.contains(Renderer); } );
 }
 
 bool VideoDisplayProfile::IsDecoderCompatible(const QString &Decoder) const

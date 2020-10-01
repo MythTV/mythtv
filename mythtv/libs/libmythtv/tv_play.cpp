@@ -3898,7 +3898,7 @@ bool TV::SubtitleDelayHandleAction(const QStringList &Actions)
     return handled;
 }
 
-bool TV::DiscMenuHandleAction(const QStringList& Actions)
+bool TV::DiscMenuHandleAction(const QStringList& Actions) const
 {
     int64_t pts = 0;
     MythVideoOutput *output = m_playerContext.m_player->GetVideoOutput();
@@ -5477,11 +5477,11 @@ void TV::SetFFRew(int Index)
     if (!m_playerContext.m_ffRewState)
         return;
 
-    size_t index = static_cast<size_t>(Index);
+    auto index = static_cast<size_t>(Index);
     if (!m_ffRewSpeeds[index])
         return;
 
-    size_t ffrewindex = static_cast<size_t>(m_playerContext.m_ffRewIndex);
+    auto ffrewindex = static_cast<size_t>(m_playerContext.m_ffRewIndex);
     int speed = 0;
     QString mesg;
     if (m_playerContext.m_ffRewState > 0)
@@ -5961,7 +5961,7 @@ void TV::ToggleChannelFavorite()
     LOG(VB_GENERAL, LOG_ERR, "TV::ToggleChannelFavorite() -- currently disabled");
 }
 
-void TV::ToggleChannelFavorite(const QString& ChangroupName)
+void TV::ToggleChannelFavorite(const QString& ChangroupName) const
 {
     if (m_playerContext.m_recorder)
         m_playerContext.m_recorder->ToggleChannelFavorite(ChangroupName);

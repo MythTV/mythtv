@@ -20,7 +20,7 @@ class MythScreenSaverDRM : public QObject, public MythScreenSaver
     static MythScreenSaverDRM* Create();
    ~MythScreenSaverDRM() override;
 
-    bool IsValid();
+    bool IsValid() const;
     void Disable() override;
     void Restore() override;
     void Reset() override;

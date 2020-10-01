@@ -223,15 +223,17 @@ bool TVBrowseHelper::IsBrowsing() const
  */
 uint TVBrowseHelper::GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const
 {
-    if (PrefSourceid)
+    if (PrefSourceid) {
         for (const auto & chan : m_dbAllChannels)
             if (chan.m_sourceId == PrefSourceid && chan.m_chanNum == Channum)
                 return chan.m_chanId;
+}
 
-    if (PrefCardid)
+    if (PrefCardid) {
         for (const auto & chan : m_dbAllChannels)
             if (chan.GetInputIds().contains(PrefCardid) && chan.m_chanNum == Channum)
                 return chan.m_chanId;
+}
 
     if (m_dbBrowseAllTuners)
     {

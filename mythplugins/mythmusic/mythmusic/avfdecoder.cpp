@@ -585,13 +585,9 @@ bool avfDecoderFactory::supports(const QString &source) const
 #else
     QStringList list = extension().split("|", Qt::SkipEmptyParts);
 #endif
-    for (const auto& str : qAsConst(list))
-    {
-        if (str == source.right(str.length()).toLower())
-            return true;
-    }
-
-    return false;
+    return std::any_of(list.cbegin(), list.cend(),
+                       [source](const auto& str)
+                           { return str == source.right(str.length()).toLower(); } );
 }
 
 const QString &avfDecoderFactory::extension() const

@@ -1049,12 +1049,8 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
 
 static bool SelectionIsTunable(const ChannelInfoList &selection)
 {
-    for (const auto & chan : selection)
-    {
-        if (TV::IsTunable(chan.m_chanId))
-            return true;
-    }
-    return false;
+    return std::any_of(selection.cbegin(), selection.cend(),
+                       [selection](const auto & chan){ return TV::IsTunable(chan.m_chanId); } );
 }
 
 void GuideGrid::ShowMenu(void)

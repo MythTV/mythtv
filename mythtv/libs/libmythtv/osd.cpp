@@ -261,17 +261,13 @@ bool OSD::IsVisible(void)
     if (GetNotificationCenter()->DisplayedNotifications() > 0)
         return true;
 
-    for (MythScreenType* child : qAsConst(m_children))
-    {
-        if (child->IsVisible() &&
-            child->objectName() != OSD_WIN_SUBTITLE &&
-            child->objectName() != OSD_WIN_TELETEXT &&
-            child->objectName() != OSD_WIN_BDOVERLAY &&
-            child->objectName() != OSD_WIN_INTERACT)
-            return true;
-    }
-
-    return false;
+    return std::any_of(m_children.cbegin(), m_children.cend(),
+                       [](MythScreenType* child)
+                           { return child->IsVisible() &&
+                                    child->objectName() != OSD_WIN_SUBTITLE &&
+                                    child->objectName() != OSD_WIN_TELETEXT &&
+                                    child->objectName() != OSD_WIN_BDOVERLAY &&
+                                    child->objectName() != OSD_WIN_INTERACT; } );
 }
 
 void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)

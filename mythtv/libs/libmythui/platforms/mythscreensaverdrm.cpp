@@ -9,7 +9,7 @@
 
 MythScreenSaverDRM* MythScreenSaverDRM::Create()
 {
-    auto result = new MythScreenSaverDRM();
+    auto* result = new MythScreenSaverDRM();
     if (result->IsValid())
         return result;
     delete result;
@@ -42,7 +42,7 @@ MythScreenSaverDRM* MythScreenSaverDRM::Create()
 MythScreenSaverDRM::MythScreenSaverDRM()
 {
     MythDisplay* display = MythDisplay::AcquireRelease(true);
-    MythDisplayDRM* drmdisplay = dynamic_cast<MythDisplayDRM*>(display);
+    auto* drmdisplay = dynamic_cast<MythDisplayDRM*>(display);
     if (drmdisplay)
     {
         m_display = drmdisplay;
@@ -89,7 +89,7 @@ void MythScreenSaverDRM::ScreenChanged()
     Init();
 }
 
-bool MythScreenSaverDRM::IsValid()
+bool MythScreenSaverDRM::IsValid() const
 {
     return m_valid;
 }
@@ -118,7 +118,7 @@ void MythScreenSaverDRM::UpdateDPMS()
 
     m_asleep = true;
     auto dpms = m_device->GetEnumProperty(DRM_DPMS);
-    for (auto & value : qAsConst(dpms.m_enums))
+    for (const auto & value : qAsConst(dpms.m_enums))
     {
         if ((value.first == dpms.m_value) && (value.second == DRM_ON))
         {

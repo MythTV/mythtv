@@ -739,40 +739,32 @@ QString MythWebView::getExtensionForMimetype(const QString &mimetype)
 
 bool MythWebView::isMusicFile(const QString &extension, const QString &mimetype)
 {
-    for (const auto &entry : SupportedMimeTypes)
-    {
-        if (entry.m_isVideo)
-            continue;
-
-        if (!mimetype.isEmpty() &&
-            mimetype == entry.m_mimeType)
-            return true;
-
-        if (!extension.isEmpty() &&
-            extension.toLower() == entry.m_extension)
-            return true;
-    }
-
-    return false;
+    return std::any_of(SupportedMimeTypes.cbegin(), SupportedMimeTypes.cend(),
+                       [extension, mimetype](const auto &entry){
+                           if (entry.m_isVideo)
+                               return false;
+                           if (!mimetype.isEmpty() &&
+                               mimetype == entry.m_mimeType)
+                               return true;
+                           if (!extension.isEmpty() &&
+                               extension.toLower() == entry.m_extension)
+                               return true;
+                           return false; } );
 }
 
 bool MythWebView::isVideoFile(const QString &extension, const QString &mimetype)
 {
-    for (const auto &entry : SupportedMimeTypes)
-    {
-        if (!entry.m_isVideo)
-            continue;
-
-        if (!mimetype.isEmpty() &&
-            mimetype == entry.m_mimeType)
-            return true;
-
-        if (!extension.isEmpty() &&
-            extension.toLower() == entry.m_extension)
-            return true;
-    }
-
-    return false;
+    return std::any_of(SupportedMimeTypes.cbegin(), SupportedMimeTypes.cend(),
+                       [extension, mimetype](const auto &entry) {
+                           if (!entry.m_isVideo)
+                               return false;
+                           if (!mimetype.isEmpty() &&
+                               mimetype == entry.m_mimeType)
+                               return true;
+                           if (!extension.isEmpty() &&
+                               extension.toLower() == entry.m_extension)
+                               return true;
+                           return false; } );
 }
 
 QString MythWebView::getReplyMimetype(void)

@@ -160,13 +160,10 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
 
 
     BaseFileName.truncate(dotLocation + 1);
-    for (const auto & format : qAsConst(graphic_formats))
-    {
-        *result = BaseFileName + format;
-        if (QFile::exists(*result))
-            return true;
-    }
-    return false;
+    return std::any_of(graphic_formats.cbegin(), graphic_formats.cend(),
+                       [BaseFileName,result](const auto & format)
+                           { *result = BaseFileName + format;
+                             return QFile::exists(*result); } );
 }
 
 void RomInfo::setField(const QString& field, const QString& data)
