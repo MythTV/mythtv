@@ -13,7 +13,7 @@
 #define DEFAULT_UI_THEME "MythCenter"
 #define FALLBACK_UI_THEME "Terra"
 
-class MythUIHelperPrivate;
+class MythDisplay;
 
 struct MUI_PUBLIC MythUIMenuCallbacks
 {
@@ -67,13 +67,41 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
     int GetFontStretch() const;
 
   protected:
-    MythUIHelper();
+    Q_DISABLE_COPY(MythUIHelper)
+    MythUIHelper() = default;
    ~MythUIHelper();
 
   private:
-    MythUIHelperPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+    void StoreGUIsettings();
     QMutex m_locationLock;
     QStringList m_currentLocation;
+
+    QString   m_menuthemepathname;
+    QString   m_themepathname;
+    QString   m_themename;
+
+    // The part of the screen(s) allocated for the GUI. Unless
+    // overridden by the user, defaults to the full drawable area.
+    QRect m_screenRect { 0, 0, 0, 0 };
+
+    // Command-line GUI size, which overrides both the above sets of sizes
+    static int x_override;
+    static int y_override;
+    static int w_override;
+    static int h_override;
+
+    float m_wmult     { 1.0F };
+    float m_hmult     { 1.0F };
+    int m_fontStretch { 100 };
+
+    // Dimensions of the theme
+    QSize m_baseSize  { 800, 600 };
+    bool m_isWide     { false };
+    QString m_userThemeDir;
+    MythDisplay *m_display { nullptr };
+    MythUIMenuCallbacks m_callbacks { nullptr,nullptr,nullptr,nullptr,nullptr };
+    QStringList m_searchPaths;
+    bool m_screenSetup { false };
 };
 
 MUI_PUBLIC MythUIHelper *GetMythUI();

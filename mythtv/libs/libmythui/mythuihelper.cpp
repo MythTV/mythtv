@@ -28,7 +28,7 @@
 #include "x11colors.h"
 #include "mythdisplay.h"
 
-#define LOC      QString("MythUIHelper: ")
+#define LOC QString("MythUIHelper: ")
 
 static MythUIHelper *mythui = nullptr;
 static QMutex uiLock;
@@ -73,76 +73,15 @@ void DestroyMythUI()
     MythUIHelper::destroyMythUI();
 }
 
-class MythUIHelperPrivate
-{
-public:
-    explicit MythUIHelperPrivate(MythUIHelper *p)
-        : m_parent(p) {}
-    ~MythUIHelperPrivate();
-
-    void Init();
-    void StoreGUIsettings();
-
-    MythUIHelper *m_parent { nullptr };
-    QString   m_menuthemepathname;
-    QString   m_themepathname;
-    QString   m_themename;
-
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to the full drawable area.
-    QRect m_screenRect { 0, 0, 0, 0 };
-
-    // Command-line GUI size, which overrides both the above sets of sizes
-    static int x_override;
-    static int y_override;
-    static int w_override;
-    static int h_override;
-
-    float m_wmult     { 1.0F };
-    float m_hmult     { 1.0F };
-    int m_fontStretch { 100 };
-
-    // Dimensions of the theme
-    QSize m_baseSize { 800, 600 };
-    bool m_isWide    { false };
-    QString m_userThemeDir;
-    MythDisplay *m_display { nullptr };
-    MythUIMenuCallbacks m_callbacks { nullptr,nullptr,nullptr,nullptr,nullptr };
-    QStringList m_searchPaths;
-    bool m_screenSetup  { false };
-};
-
-int MythUIHelperPrivate::x_override = -1;
-int MythUIHelperPrivate::y_override = -1;
-int MythUIHelperPrivate::w_override = -1;
-int MythUIHelperPrivate::h_override = -1;
-
-MythUIHelperPrivate::~MythUIHelperPrivate()
-{
-    if (m_display)
-    {
-        // N.B. we always call this to ensure the desktop mode is restored
-        // in case the setting was changed
-        m_display->SwitchToDesktop();
-        MythDisplay::AcquireRelease(false);
-    }
-}
-
-void MythUIHelperPrivate::Init()
-{
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
-    StoreGUIsettings();
-    m_screenSetup = true;
-
-    StorageGroup sgroup("Themes", gCoreContext->GetHostName());
-    m_userThemeDir = sgroup.GetFirstDir(true);
-}
+int MythUIHelper::x_override = -1;
+int MythUIHelper::y_override = -1;
+int MythUIHelper::w_override = -1;
+int MythUIHelper::h_override = -1;
 
 /**
  * Apply any user overrides to the screen geometry
  */
-void MythUIHelperPrivate::StoreGUIsettings()
+void MythUIHelper::StoreGUIsettings()
 {
     if (x_override >= 0 && y_override >= 0)
     {
@@ -191,8 +130,7 @@ void MythUIHelperPrivate::StoreGUIsettings()
     m_wmult = m_screenRect.width()  / static_cast<float>(m_baseSize.width());
     m_hmult = m_screenRect.height() / static_cast<float>(m_baseSize.height());
 
-    // For MythUIThemeCache
-    m_parent->SetScreenSize(m_screenRect.size());
+    MythUIThemeCache::SetScreenSize(m_screenRect.size());
 
     // Default font, _ALL_ fonts inherit from this!
     // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
@@ -209,20 +147,27 @@ void MythUIHelperPrivate::StoreGUIsettings()
     QApplication::setFont(font);
 }
 
-MythUIHelper::MythUIHelper()
-{
-    d = new MythUIHelperPrivate(this);
-}
-
 MythUIHelper::~MythUIHelper()
 {
-    delete d;
+    if (m_display)
+    {
+        // N.B. we always call this to ensure the desktop mode is restored
+        // in case the setting was changed
+        m_display->SwitchToDesktop();
+        MythDisplay::AcquireRelease(false);
+    }
 }
 
 void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 {
-    d->Init();
-    d->m_callbacks = cbs;
+    if (!m_display)
+        m_display = MythDisplay::AcquireRelease();
+    StoreGUIsettings();
+    m_screenSetup = true;
+    StorageGroup sgroup("Themes", gCoreContext->GetHostName());
+    m_userThemeDir = sgroup.GetFirstDir(true);
+
+    m_callbacks = cbs;
 }
 
 // This init is used for showing the startup UI that is shown
@@ -231,17 +176,22 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 // This class does not mind being Initialized twice.
 void MythUIHelper::Init()
 {
-    d->Init();
+    if (!m_display)
+        m_display = MythDisplay::AcquireRelease();
+    StoreGUIsettings();
+    m_screenSetup = true;
+    StorageGroup sgroup("Themes", gCoreContext->GetHostName());
+    m_userThemeDir = sgroup.GetFirstDir(true);
 }
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs()
 {
-    return &(d->m_callbacks);
+    return &m_callbacks;
 }
 
 bool MythUIHelper::IsScreenSetup()
 {
-    return d->m_screenSetup;
+    return m_screenSetup;
 }
 
 void MythUIHelper::LoadQtConfig()
@@ -249,12 +199,12 @@ void MythUIHelper::LoadQtConfig()
     gCoreContext->ResetLanguage();
     MythUIThemeCache::ClearThemeCacheDir();
 
-    if (!d->m_display)
-        d->m_display = MythDisplay::AcquireRelease();
+    if (!m_display)
+        m_display = MythDisplay::AcquireRelease();
 
     // Switch to desired GUI resolution
-    if (d->m_display->UsingVideoModes())
-        d->m_display->SwitchToGUI(true);
+    if (m_display->UsingVideoModes())
+        m_display->SwitchToGUI(true);
 
     QApplication::setStyle("Windows");
 
@@ -264,50 +214,49 @@ void MythUIHelper::LoadQtConfig()
     auto *themeinfo = new ThemeInfo(themedir);
     if (themeinfo)
     {
-        d->m_isWide = themeinfo->IsWide();
-        d->m_baseSize = themeinfo->GetBaseRes();
-        d->m_themename = themeinfo->GetName();
-        LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Using theme base resolution of %1x%2")
-            .arg(d->m_baseSize.width()).arg(d->m_baseSize.height()));
+        m_isWide    = themeinfo->IsWide();
+        m_baseSize  = themeinfo->GetBaseRes();
+        m_themename = themeinfo->GetName();
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Using theme base resolution of %1x%2")
+            .arg(m_baseSize.width()).arg(m_baseSize.height()));
         delete themeinfo;
     }
 
     // Recalculate GUI dimensions
-    d->StoreGUIsettings();
+    StoreGUIsettings();
 
-    d->m_themepathname = themedir + '/';
-    d->m_searchPaths.clear();
+    m_themepathname = themedir + '/';
+    m_searchPaths.clear();
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
 
     if (themename == "default")
         themename = "defaultmenu";
 
-    d->m_menuthemepathname = FindMenuThemeDir(themename);
+    m_menuthemepathname = FindMenuThemeDir(themename);
 }
 
 void MythUIHelper::UpdateScreenSettings()
 {
-    d->StoreGUIsettings();
+    StoreGUIsettings();
 }
 
 QRect MythUIHelper::GetScreenSettings()
 {
-    return d->m_screenRect;
+    return m_screenRect;
 }
 
 void MythUIHelper::GetScreenSettings(float &XFactor, float &YFactor)
 {
-    XFactor = d->m_wmult;
-    YFactor = d->m_hmult;
+    XFactor = m_wmult;
+    YFactor = m_hmult;
 }
 
 void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor)
 {
-    XFactor = d->m_wmult;
-    YFactor = d->m_hmult;
-    Rect    = d->m_screenRect;
+    XFactor = m_wmult;
+    YFactor = m_hmult;
+    Rect    = m_screenRect;
 }
 
 /**
@@ -366,8 +315,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (parsed)
     {
-        MythUIHelperPrivate::w_override = tmp_w;
-        MythUIHelperPrivate::h_override = tmp_h;
+        MythUIHelper::w_override = tmp_w;
+        MythUIHelper::h_override = tmp_h;
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Overriding GUI size: width=%1 height=%2")
             .arg(tmp_w).arg(tmp_h));
@@ -397,8 +346,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
             return;
         }
 
-        MythUIHelperPrivate::x_override = tmp_x;
-        MythUIHelperPrivate::y_override = tmp_y;
+        MythUIHelper::x_override = tmp_x;
+        MythUIHelper::y_override = tmp_y;
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Overriding GUI offset: x=%1 y=%2")
             .arg(tmp_x).arg(tmp_y));
@@ -407,10 +356,10 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
 bool MythUIHelper::IsGeometryOverridden()
 {
-    return (MythUIHelperPrivate::x_override >= 0 ||
-            MythUIHelperPrivate::y_override >= 0 ||
-            MythUIHelperPrivate::w_override >= 0 ||
-            MythUIHelperPrivate::h_override >= 0);
+    return (MythUIHelper::x_override >= 0 ||
+            MythUIHelper::y_override >= 0 ||
+            MythUIHelper::w_override >= 0 ||
+            MythUIHelper::h_override >= 0);
 }
 
 /*! \brief Return the raw geometry override rectangle.
@@ -421,8 +370,8 @@ bool MythUIHelper::IsGeometryOverridden()
 QRect MythUIHelper::GetGeometryOverride()
 {
     // NB Call IsGeometryOverridden first to ensure this is valid
-    return {MythUIHelperPrivate::x_override, MythUIHelperPrivate::y_override,
-            MythUIHelperPrivate::w_override, MythUIHelperPrivate::h_override};
+    return {MythUIHelper::x_override, MythUIHelper::y_override,
+            MythUIHelper::w_override, MythUIHelper::h_override};
 }
 
 /**
@@ -443,7 +392,7 @@ QString MythUIHelper::FindThemeDir(const QString &themename, bool doFallback)
 
     if (!themename.isEmpty())
     {
-        testdir = d->m_userThemeDir + themename;
+        testdir = m_userThemeDir + themename;
 
         dir.setPath(testdir);
 
@@ -509,7 +458,7 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
     QString testdir;
     QDir dir;
 
-    testdir = d->m_userThemeDir + menuname;
+    testdir = m_userThemeDir + menuname;
 
     dir.setPath(testdir);
 
@@ -544,28 +493,28 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
 
 QString MythUIHelper::GetMenuThemeDir()
 {
-    return d->m_menuthemepathname;
+    return m_menuthemepathname;
 }
 
 QString MythUIHelper::GetThemeDir()
 {
-    return d->m_themepathname;
+    return m_themepathname;
 }
 
 QString MythUIHelper::GetThemeName()
 {
-    return d->m_themename;
+    return m_themename;
 }
 
 QStringList MythUIHelper::GetThemeSearchPath()
 {
-    if (!d->m_searchPaths.isEmpty())
-        return d->m_searchPaths;
+    if (!m_searchPaths.isEmpty())
+        return m_searchPaths;
 
     // traverse up the theme inheritance list adding their location to the search path
     QList<ThemeInfo> themeList = GetThemes(THEME_UI);
     bool found = true;
-    QString themeName = d->m_themename;
+    QString themeName = m_themename;
     QString baseName;
     QString dirName;
 
@@ -594,7 +543,7 @@ QStringList MythUIHelper::GetThemeSearchPath()
             if (!themedir.isEmpty())
             {
                 LOG(VB_GUI, LOG_INFO, LOC + QString("Adding path '%1' to theme search paths").arg(themedir));
-                d->m_searchPaths.append(themedir + '/');
+                m_searchPaths.append(themedir + '/');
             }
             else
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find ui theme location: %1").arg(themedir));
@@ -607,12 +556,12 @@ QStringList MythUIHelper::GetThemeSearchPath()
         themeName = baseName;
     }
 
-    if (d->m_isWide)
-        d->m_searchPaths.append(GetThemesParentDir() + "default-wide/");
+    if (m_isWide)
+        m_searchPaths.append(GetThemesParentDir() + "default-wide/");
 
-    d->m_searchPaths.append(GetThemesParentDir() + "default/");
-    d->m_searchPaths.append("/tmp/");
-    return d->m_searchPaths;
+    m_searchPaths.append(GetThemesParentDir() + "default/");
+    m_searchPaths.append("/tmp/");
+    return m_searchPaths;
 }
 
 QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
@@ -625,7 +574,7 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
 
     fileList.append(themeDirs.entryInfoList());
 
-    themeDirs.setPath(d->m_userThemeDir);
+    themeDirs.setPath(m_userThemeDir);
 
     fileList.append(themeDirs.entryInfoList());
 
@@ -755,15 +704,15 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
 
 QSize MythUIHelper::GetBaseSize() const
 {
-    return d->m_baseSize;
+    return m_baseSize;
 }
 
 void MythUIHelper::SetFontStretch(int stretch)
 {
-    d->m_fontStretch = stretch;
+    m_fontStretch = stretch;
 }
 
 int MythUIHelper::GetFontStretch() const
 {
-    return d->m_fontStretch;
+    return m_fontStretch;
 }
