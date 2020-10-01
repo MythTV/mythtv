@@ -124,8 +124,6 @@ public:
     QSize m_baseSize                         { 800, 600 };
     bool m_isWide                            {false};
 
-    bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
-
     QMap<QString, MythImage *> m_imageCache;
     QMap<QString, qint64> m_cacheTrack;
     QMutex *m_cacheLock                      {nullptr};
@@ -339,8 +337,6 @@ void MythUIHelper::LoadQtConfig(void)
 
     d->m_themepathname = themedir + '/';
     d->m_searchPaths.clear();
-
-    d->m_themeloaded = false;
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
 
