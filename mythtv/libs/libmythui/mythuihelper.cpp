@@ -114,16 +114,8 @@ void MythUIHelper::StoreGUIsettings()
     if (m_screenRect.width() < 160 || m_screenRect.height() < 160)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Somehow, your screen size settings are bad.\n\t\t\t" +
-            QString("GuiResolution: %1\n\t\t\t")
-            .arg(GetMythDB()->GetSetting("GuiResolution")) +
-            QString("  old GuiWidth: %1\n\t\t\t")
-            .arg(GetMythDB()->GetNumSetting("GuiWidth")) +
-            QString("  old GuiHeight: %1\n\t\t\t")
-            .arg(GetMythDB()->GetNumSetting("GuiHeight")) +
-            QString("width: %1 ").arg(m_screenRect.width()) +
-            QString("height: %1\n\t\t\t").arg(m_screenRect.height()) +
-            "Falling back to 640x480");
+            QString("Strange screen size: %1x%2 - forcing 640x480")
+            .arg(m_screenRect.width()).arg(m_screenRect.height()));
         m_screenRect.setSize(QSize(640, 480));
     }
 
