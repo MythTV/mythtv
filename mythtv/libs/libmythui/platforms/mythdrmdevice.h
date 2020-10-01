@@ -18,6 +18,14 @@ extern "C" {
 class MythDRMDevice : public ReferenceCounter
 {
   public:
+    class DRMEnum
+    {
+      public:
+        DRMEnum(uint64_t Value) : m_value(Value) {}
+        uint64_t m_value { 0 };
+        std::map<uint64_t,QString> m_enums;
+    };
+
     explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
    ~MythDRMDevice() override;
 
@@ -29,6 +37,7 @@ class MythDRMDevice : public ReferenceCounter
     double   GetRefreshRate (void) const;
     bool     Authenticated  (void) const;
     MythEDID GetEDID        (void);
+    DRMEnum  GetEnumProperty(const QString& Property);
 
   private:
     Q_DISABLE_COPY(MythDRMDevice)

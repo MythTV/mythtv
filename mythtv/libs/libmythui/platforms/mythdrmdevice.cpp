@@ -355,11 +355,30 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
+MythDRMDevice::DRMEnum MythDRMDevice::GetEnumProperty(const QString& Property)
+{
+    DRMEnum result{0};
+    if (!m_connector || Property.isEmpty())
+        return result;
+
+    for (int i = 0; i < m_connector->count_props; ++i)
+    {
+        drmModePropertyPtr prop = drmModeGetProperty(m_fd, m_connector->props[i]);
+        if ((prop->flags & DRM_MODE_PROP_ENUM) && prop->name == Property)
+        {
+            result.m_value = m_connector->prop_values[prop->prop_id];
+            for (int i = 0; i < prop->count_enums; ++i)
+                result.m_enums.insert({prop->enums[i].value, prop->enums[i].name});
+        }
+        drmModeFreeProperty(prop);
+    }
+    return result;
+}
+
 drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const
 {
-    drmModePropertyBlobPtr result = nullptr;
     if (!Connector || Property.isEmpty())
-        return result;
+        return nullptr;
 
     for (int i = 0; i < Connector->count_props; ++i)
     {
@@ -367,11 +386,9 @@ drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connec
         if ((propid->flags & DRM_MODE_PROP_BLOB) && propid->name == Property)
         {
             auto blobid = static_cast<uint32_t>(Connector->prop_values[i]);
-            result = drmModeGetPropertyBlob(m_fd, blobid);
+            return drmModeGetPropertyBlob(m_fd, blobid);
         }
         drmModeFreeProperty(propid);
-        if (result)
-            break;
     }
-    return result;
+    return nullptr;
 }
