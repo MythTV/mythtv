@@ -14,6 +14,12 @@
 
 #define LOC (QString("%1: ").arg(m_deviceName))
 
+MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device)
+{
+    // note - cannot use make_shared with a protected constructor
+    return std::shared_ptr<MythDRMDevice>(new MythDRMDevice(qScreen, Device));
+}
+
 MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
   : m_screen(qScreen),
     m_deviceName(Device),

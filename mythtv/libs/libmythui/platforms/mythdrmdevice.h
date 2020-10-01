@@ -14,9 +14,17 @@ extern "C" {
 #include <xf86drmMode.h>
 }
 
+// Std
+#include <memory>
+
+using MythDRMPtr = std::shared_ptr<class MythDRMDevice>;
+
 class MythDRMDevice
 {
   public:
+    static MythDRMPtr Create(QScreen *qScreen, const QString& Device = QString());
+   ~MythDRMDevice();
+
     class DRMEnum
     {
       public:
@@ -24,9 +32,6 @@ class MythDRMDevice
         uint64_t m_value { 0 };
         std::map<uint64_t,QString> m_enums;
     };
-
-    explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
-   ~MythDRMDevice();
 
     bool     IsValid        () const;
     QString  GetSerialNumber() const;
@@ -38,16 +43,17 @@ class MythDRMDevice
     MythEDID GetEDID        ();
     DRMEnum  GetEnumProperty(const QString& Property);
 
+  protected:
+    explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
+
   private:
     Q_DISABLE_COPY(MythDRMDevice)
     bool     Open           ();
     void     Close          ();
     void     Authenticate   ();
     bool     Initialise     ();
-
     QString  FindBestDevice ();
     static bool ConfirmDevice(const QString& Device);
-
     drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const;
 
   private:

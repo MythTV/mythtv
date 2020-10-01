@@ -5,9 +5,8 @@
 #include <QObject>
 
 // MythTV
+#include "platforms/mythdrmdevice.h"
 #include "mythdisplay.h"
-
-class MythDRMDevice;
 
 class MythDisplayDRM : public MythDisplay
 {
@@ -17,13 +16,13 @@ class MythDisplayDRM : public MythDisplay
     MythDisplayDRM();
    ~MythDisplayDRM() override;
 
-    void UpdateCurrentMode(void) override;
+    void UpdateCurrentMode() override;
 
   public slots:
     void ScreenChanged(QScreen *qScreen) override;
 
   private:
-    MythDRMDevice* m_device;
+    MythDRMPtr m_device;
 };
 
-#endif // MYTHDISPLAYDRM_H
+#endif
