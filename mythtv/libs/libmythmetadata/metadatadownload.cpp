@@ -93,20 +93,24 @@ void MetadataDownload::run()
             if (lookup->GetSubtype() == kProbableTelevision)
             {
                 list = handleTelevision(lookup);
-                if (findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0)
+                if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
+                    (list.size() > 1 && !lookup->GetAutomatic()))
                 {
                     // There are no exact match prospects with artwork from TV search,
                     // so add in movies, where we might find a better match.
+                    // In case of manual mode and ambiguous result, add it as well.
                     list.append(handleMovie(lookup));
                 }
             }
             else if (lookup->GetSubtype() == kProbableMovie)
             {
                 list = handleMovie(lookup);
-                if (findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0)
+                if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
+                    (list.size() > 1 && !lookup->GetAutomatic()))
                 {
                     // There are no exact match prospects with artwork from Movie search
                     // so add in television, where we might find a better match.
+                    // In case of manual mode and ambiguous result, add it as well.
                     list.append(handleTelevision(lookup));
                 }
             }
@@ -114,19 +118,6 @@ void MetadataDownload::run()
             {
                 // will try both movie and TV
                 list = handleVideoUndetermined(lookup);
-            }
-
-            if ((list.isEmpty() ||
-                 (list.size() > 1 && !lookup->GetAutomatic())) &&
-                lookup->GetSubtype() == kProbableTelevision)
-            {
-                list.append(handleMovie(lookup));
-            }
-            else if ((list.isEmpty() ||
-                      (list.size() > 1 && !lookup->GetAutomatic())) &&
-                     lookup->GetSubtype() == kProbableMovie)
-            {
-                list.append(handleTelevision(lookup));
             }
         }
         else if (lookup->GetType() == kMetadataGame)
