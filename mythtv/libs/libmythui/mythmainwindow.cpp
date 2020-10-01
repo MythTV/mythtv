@@ -2155,55 +2155,6 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
     return key_target;
 }
 
-int MythMainWindow::NormalizeFontSize(int pointSize)
-{
-    float floatSize = pointSize;
-    float desired = 100.0;
-
-#ifdef _WIN32
-    // logicalDpiY not supported in Windows.
-    int logicalDpiY = 100;
-    HDC hdc = GetDC(nullptr);
-    if (hdc)
-    {
-        logicalDpiY = GetDeviceCaps(hdc, LOGPIXELSY);
-        ReleaseDC(nullptr, hdc);
-    }
-#else
-    int logicalDpiY = this->logicalDpiY();
-#endif
-
-    // adjust for screen resolution relative to 100 dpi
-    floatSize = floatSize * desired / logicalDpiY;
-    // adjust for myth GUI size relative to 800x600
-    floatSize = floatSize * d->m_hmult;
-    // round to the nearest point size
-    pointSize = lroundf(floatSize);
-
-    return pointSize;
-}
-
-MythRect MythMainWindow::NormRect(const MythRect &rect)
-{
-    MythRect ret;
-    ret.setWidth((int)(rect.width() * d->m_wmult));
-    ret.setHeight((int)(rect.height() * d->m_hmult));
-    ret.moveTopLeft(QPoint((int)(rect.x() * d->m_wmult),
-                           (int)(rect.y() * d->m_hmult)));
-    ret = ret.normalized();
-
-    return ret;
-}
-
-QPoint MythMainWindow::NormPoint(const QPoint &point)
-{
-    QPoint ret;
-    ret.setX((int)(point.x() * d->m_wmult));
-    ret.setY((int)(point.y() * d->m_hmult));
-
-    return ret;
-}
-
 QSize MythMainWindow::NormSize(const QSize &size)
 {
     QSize ret;

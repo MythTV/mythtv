@@ -119,12 +119,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void  SetUIScreenRect(QRect &rect);
 
     int GetDrawInterval() const;
-    int NormalizeFontSize(int pointSize);
-    MythRect NormRect(const MythRect &rect);
-    QPoint NormPoint(const QPoint &point);
     QSize NormSize(const QSize &size);
-    int NormX(int x);
-    int NormY(int y);
+    int  NormX(int x);
+    int  NormY(int y);
     void SetScalingFactors(float wmult, float hmult);
     void RestartInputHandlers(void);
     uint PushDrawDisabled(void);
