@@ -4,7 +4,9 @@
 #include "platforms/mythdisplaymutter.h"
 
 #ifdef USING_DRM
-#include "platforms/mythdrmdevice.h"
+extern "C" {
+#include <xf86drmMode.h>
+}
 #else
 #ifndef DRM_MODE_FLAG_INTERLACE
 #define DRM_MODE_FLAG_INTERLACE (1<<4)
