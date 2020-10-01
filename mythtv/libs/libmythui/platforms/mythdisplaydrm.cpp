@@ -17,6 +17,11 @@ MythDisplayDRM::~MythDisplayDRM()
     m_device = nullptr;
 }
 
+MythDRMPtr MythDisplayDRM::GetDevice()
+{
+    return m_device;
+}
+
 // FIXME - I doubt this slot is being called correctly
 void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
 {
@@ -31,6 +36,8 @@ void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
         if (!m_device->IsValid())
             m_device = nullptr;
     }
+
+    emit screenChanged();
 }
 
 void MythDisplayDRM::UpdateCurrentMode()

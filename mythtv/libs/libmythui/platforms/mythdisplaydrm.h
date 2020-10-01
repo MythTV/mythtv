@@ -17,6 +17,10 @@ class MythDisplayDRM : public MythDisplay
    ~MythDisplayDRM() override;
 
     void UpdateCurrentMode() override;
+    MythDRMPtr GetDevice();
+
+  signals:
+    void screenChanged();
 
   public slots:
     void ScreenChanged(QScreen *qScreen) override;
