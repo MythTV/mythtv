@@ -97,7 +97,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
     static MythMainWindow *getMainWindow(bool useDB = true);
     static void destroyMainWindow();
 
-    MythPainter *GetCurrentPainter();
+    MythPainter *GetPainter();
     QWidget     *GetPaintWindow();
     MythRender  *GetRenderDevice();
     MythNotificationCenter *GetCurrentNotificationCenter();

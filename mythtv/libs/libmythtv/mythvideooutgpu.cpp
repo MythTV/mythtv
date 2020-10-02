@@ -31,7 +31,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
     MythMainWindow* win = MythMainWindow::getMainWindow();
     if (win)
     {
-        m_painter = dynamic_cast<MythPainterGPU*>(win->GetCurrentPainter());
+        m_painter = dynamic_cast<MythPainterGPU*>(win->GetPainter());
         if (m_painter)
             m_painter->SetViewControl(MythPainterGPU::None);
     }

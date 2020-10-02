@@ -1508,20 +1508,20 @@ static void reloadTheme_void(void)
 
 static void setDebugShowBorders(void)
 {
-    MythPainter *p = GetMythPainter();
-    p->SetDebugMode(!p->ShowBorders(), p->ShowTypeNames());
-
-    if (GetMythMainWindow()->GetMainStack()->GetTopScreen())
-        GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
+    MythMainWindow* window = GetMythMainWindow();
+    MythPainter* painter = window->GetPainter();
+    painter->SetDebugMode(!painter->ShowBorders(), painter->ShowTypeNames());
+    if (window->GetMainStack()->GetTopScreen())
+        window->GetMainStack()->GetTopScreen()->SetRedraw();
 }
 
 static void setDebugShowNames(void)
 {
-    MythPainter *p = GetMythPainter();
-    p->SetDebugMode(p->ShowBorders(), !p->ShowTypeNames());
-
-    if (GetMythMainWindow()->GetMainStack()->GetTopScreen())
-        GetMythMainWindow()->GetMainStack()->GetTopScreen()->SetRedraw();
+    MythMainWindow* window = GetMythMainWindow();
+    MythPainter* painter = window->GetPainter();
+    painter->SetDebugMode(painter->ShowBorders(), !painter->ShowTypeNames());
+    if (window->GetMainStack()->GetTopScreen())
+        window->GetMainStack()->GetTopScreen()->SetRedraw();
 }
 
 static void InitJumpPoints(void)

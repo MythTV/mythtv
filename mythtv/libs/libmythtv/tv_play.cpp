@@ -7090,7 +7090,7 @@ void TV::StopEmbedding(const QStringList &Data)
 {    
     // Resize the window back to the MythTV Player size
     GetPlayerReadLock();
-    MythMainWindow *mwnd = GetMythMainWindow();
+    MythMainWindow* window = GetMythMainWindow();
 
     if (m_playerContext.IsEmbedding())
         m_playerContext.StopEmbedding();
@@ -7102,7 +7102,7 @@ void TV::StopEmbedding(const QStringList &Data)
         m_embedCheckTimerId = 0;
     }
 
-    MythPainter *painter = GetMythPainter();
+    MythPainter *painter = window->GetPainter();
     if (painter)
         painter->FreeResources();
 
@@ -7116,7 +7116,7 @@ void TV::StopEmbedding(const QStringList &Data)
     // m_playerBounds is not applicable when switching modes so
     // skip this logic in that case.
     if (!m_dbUseVideoModes)
-        mwnd->MoveResize(m_playerBounds);
+        window->MoveResize(m_playerBounds);
 
     // Restore pause
     DoSetPauseState(m_savedPause);

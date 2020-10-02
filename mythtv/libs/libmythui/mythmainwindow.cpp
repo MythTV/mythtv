@@ -120,7 +120,7 @@ void DestroyMythMainWindow(void)
 
 MythPainter *GetMythPainter(void)
 {
-    return MythMainWindow::getMainWindow()->GetCurrentPainter();
+    return MythMainWindow::getMainWindow()->GetPainter();
 }
 
 MythNotificationCenter *GetNotificationCenter(void)
@@ -246,7 +246,7 @@ MythMainWindow::~MythMainWindow()
     delete d;
 }
 
-MythPainter *MythMainWindow::GetCurrentPainter(void)
+MythPainter *MythMainWindow::GetPainter(void)
 {
     return m_painter;
 }
