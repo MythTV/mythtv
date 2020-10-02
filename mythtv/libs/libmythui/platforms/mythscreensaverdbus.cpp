@@ -160,8 +160,6 @@ void MythScreenSaverDBus::Reset()
 
 bool MythScreenSaverDBus::Asleep()
 {
-    for (auto * interface : m_dbusPrivateInterfaces)
-        if (interface->m_inhibited)
-            return true;
-    return false;
+    return std::any_of(m_dbusPrivateInterfaces.cbegin(), m_dbusPrivateInterfaces.cend(),
+                       [](auto * interface){ return interface->m_inhibited; } );
 }
