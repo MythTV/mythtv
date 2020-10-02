@@ -458,7 +458,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
 
     while ((m_cacheSize.fetchAndAddOrdered(0) +
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-       im->byteCount()
+       Image->byteCount()
 #else
        Image->sizeInBytes()
 #endif
@@ -491,7 +491,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("Cache too big (%1), removing :%2:")
                 .arg(m_cacheSize.fetchAndAddOrdered(0) +
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-             im->byteCount()
+             Image->byteCount()
 #else
              Image->sizeInBytes()
 #endif
@@ -521,7 +521,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("NOT IN RAM CACHE, Adding, and adding to size :%1: :%2:").arg(URL)
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-        .arg(im->byteCount())
+        .arg(Image->byteCount())
 #else
         .arg(Image->sizeInBytes())
 #endif
