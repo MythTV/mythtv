@@ -677,7 +677,7 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     }
 
     // get a MythImage
-    *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    *image = GetMythMainWindow()->GetPainter()->GetFormatImage();
 
     // extract the image data and create a MythImage from it
     if (!(*image)->loadFromData(data, imageSize, "JPEG"))

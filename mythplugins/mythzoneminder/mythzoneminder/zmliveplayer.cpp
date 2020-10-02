@@ -496,7 +496,7 @@ void Player::updateFrame(const unsigned char* buffer)
 {
     QImage image(buffer, m_monitor.width, m_monitor.height, QImage::Format_RGB888);
 
-    MythImage *img = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    MythImage *img = GetMythMainWindow()->GetPainter()->GetFormatImage();
     img->Assign(image);
     m_frameImage->SetImage(img);
     img->DecrRef();
