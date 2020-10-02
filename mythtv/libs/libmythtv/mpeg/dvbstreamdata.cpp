@@ -1020,9 +1020,9 @@ void DVBStreamData::AddDVBMainListener(DVBMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_dvbMainListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_dvbMainListeners.cbegin(), m_dvbMainListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_dvbMainListeners.push_back(val);
 }
@@ -1045,9 +1045,9 @@ void DVBStreamData::AddDVBOtherListener(DVBOtherStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_dvbOtherListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_dvbOtherListeners.cbegin(), m_dvbOtherListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_dvbOtherListeners.push_back(val);
 }
@@ -1070,9 +1070,9 @@ void DVBStreamData::AddDVBEITListener(DVBEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_dvbEitListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_dvbEitListeners.cbegin(), m_dvbEitListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_dvbEitListeners.push_back(val);
 }

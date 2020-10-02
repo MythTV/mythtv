@@ -78,35 +78,27 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
 const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
-    for (const auto *item : parsed)
-    {
-        if (item[0] == desc_tag)
-            return item;
-    }
-    return nullptr;
+    auto sametag = [desc_tag](const auto *item){ return item[0] == desc_tag; };
+    auto it = std::find_if(parsed.cbegin(), parsed.cend(), sametag);
+    return (it != parsed.cend()) ? *it : nullptr;
 }
 
 const unsigned char *MPEGDescriptor::FindExtension(const desc_list_t &parsed,
                                                     uint desc_tag)
 {
-    for (const auto *item : parsed)
-    {
-        if (item[0] == DescriptorID::extension &&
-            item[1] > 1 &&
-            item[2] == desc_tag)
-            return item;
-    }
-    return nullptr;
+    auto sametag = [desc_tag](const auto *item)
+        { return item[0] == DescriptorID::extension &&
+                 item[1] > 1 &&
+                 item[2] == desc_tag; };
+    auto it = std::find_if(parsed.cbegin(), parsed.cend(), sametag);
+    return (it != parsed.cend()) ? *it : nullptr;
 }
 
 desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;
-    for (const auto *item : parsed)
-    {
-        if (item[0] == desc_tag)
-            tmp.push_back(item);
-    }
+    auto sametag = [desc_tag](const auto *item){ return item[0] == desc_tag; };
+    std::copy_if(parsed.cbegin(), parsed.cend(), std::back_inserter(tmp), sametag);
     return tmp;
 }
 

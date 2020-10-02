@@ -939,10 +939,9 @@ void ATSCStreamData::AddATSCMainListener(ATSCMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_atscMainListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
-
+    if (std::any_of(m_atscMainListeners.cbegin(), m_atscMainListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
     m_atscMainListeners.push_back(val);
 }
 
@@ -964,9 +963,9 @@ void ATSCStreamData::AddSCTEMainListener(SCTEMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_scteMainlisteners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_scteMainlisteners.cbegin(), m_scteMainlisteners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_scteMainlisteners.push_back(val);
 }
@@ -989,9 +988,9 @@ void ATSCStreamData::AddATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_atscAuxListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_atscAuxListeners.cbegin(), m_atscAuxListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_atscAuxListeners.push_back(val);
 }
@@ -1014,9 +1013,9 @@ void ATSCStreamData::AddATSCEITListener(ATSCEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_atscEitListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_atscEitListeners.cbegin(), m_atscEitListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_atscEitListeners.push_back(val);
 }
@@ -1039,9 +1038,9 @@ void ATSCStreamData::AddATSC81EITListener(ATSC81EITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto & listener : m_atsc81EitListeners)
-        if (((void*)val) == ((void*)listener))
-            return;
+    if (std::any_of(m_atsc81EitListeners.cbegin(), m_atsc81EitListeners.cend(),
+                    [val](auto & listener){ return val == listener; } ))
+        return;
 
     m_atsc81EitListeners.push_back(val);
 }
