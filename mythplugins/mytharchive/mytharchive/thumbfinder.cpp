@@ -827,7 +827,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         if (m_updateFrame)
         {
             MythImage *mimage =
-                GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+                GetMythMainWindow()->GetPainter()->GetFormatImage();
             mimage->Assign(img);
             m_frameImage->SetImage(mimage);
             mimage->DecrRef();
@@ -911,7 +911,7 @@ void ThumbFinder::updatePositionBar(int64_t frame)
     int pos = (int) (size.width() / ((m_archiveItem->duration * m_fps) / frame));
     p.fillRect(pos, 0, 3, size.height(), brush);
 
-    MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    MythImage *image = GetMythMainWindow()->GetPainter()->GetFormatImage();
     image->Assign(*pixmap);
     m_positionImage->SetImage(image);
 
