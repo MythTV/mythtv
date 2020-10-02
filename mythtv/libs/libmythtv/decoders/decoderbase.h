@@ -122,7 +122,6 @@ class DecoderBase
 {
   public:
     DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
-    DecoderBase(const DecoderBase& rhs);
     virtual ~DecoderBase();
 
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
@@ -359,5 +358,8 @@ class DecoderBase
     vector<int>          m_languagePreference;
     MythCodecContext    *m_mythCodecCtx         { nullptr };
     VideoDisplayProfile  m_videoDisplayProfile;
+
+  private:
+    Q_DISABLE_COPY(DecoderBase)
 };
 #endif
