@@ -85,8 +85,6 @@ class MythMainWindowPrivate
     MythThemeBase   *m_themeBase         { nullptr };
     MythUDPListener *m_udpListener       { nullptr };
     MythNotificationCenter *m_nc         { nullptr };
-    QTimer          *m_idleTimer         { nullptr };
-    int              m_idleTime          { 0       };
     bool             m_standby           { false   };
     bool             m_enteringStandby   { false   };
     bool             m_disableIdle       { false   };

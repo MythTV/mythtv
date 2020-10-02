@@ -3,6 +3,7 @@
 
 // Qt
 #include <QWidget>
+#include <QTimer>
 
 // MythTV
 #include "mythscreenstack.h"
@@ -120,9 +121,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
     void SetEffectsEnabled(bool enable);
     void Draw(MythPainter *Painter = nullptr);
 
-    void ResetIdleTimer(void);
-    void PauseIdleTimer(bool pause);
-    void DisableIdleTimer(bool disableIdle = true);
+    void ResetIdleTimer();
+    void PauseIdleTimer(bool Pause);
+    void DisableIdleTimer(bool DisableIdle = true);
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
 
@@ -175,6 +176,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
     MythPainterWindow* m_oldPainterWin { nullptr };
     MythInputDeviceHandler* m_deviceHandler { nullptr };
     MythScreenSaverControl *m_screensaver { nullptr };
+    QTimer             m_idleTimer;
+    int                m_idleTime      { 0 };
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();

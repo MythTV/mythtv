@@ -10,10 +10,9 @@
 #include <vector>
 using namespace std;
 
-// QT headers
+// QT
 #include <QWaitCondition>
 #include <QApplication>
-#include <QTimer>
 #include <QHash>
 #include <QFile>
 #include <QDir>
@@ -191,18 +190,14 @@ MythMainWindow::MythMainWindow(const bool useDB)
     // We need to listen for playback start/end events
     gCoreContext->addListener(this);
 
-    d->m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                              STANDBY_TIMEOUT);
-
-    if (d->m_idleTime < 0)
-        d->m_idleTime = 0;
-
-    d->m_idleTimer = new QTimer(this);
-    d->m_idleTimer->setSingleShot(false);
-    d->m_idleTimer->setInterval(1000 * 60 * d->m_idleTime);
-    connect(d->m_idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
-    if (d->m_idleTime > 0)
-        d->m_idleTimer->start();
+    // Idle timer setup
+    m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout", STANDBY_TIMEOUT);
+    if (m_idleTime < 0)
+        m_idleTime = 0;
+    m_idleTimer.setInterval(1000 * 60 * m_idleTime);
+    connect(&m_idleTimer, &QTimer::timeout, this, &MythMainWindow::IdleTimeout);
+    if (m_idleTime > 0)
+        m_idleTimer.start();
 
     m_screensaver = new MythScreenSaverControl();
     if (m_screensaver)
@@ -2043,36 +2038,27 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             QVariantMap state;
             state.insert("state", "idle");
-            state.insert("menutheme",
-                 GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+            state.insert("menutheme", GetMythDB()->GetSetting("menutheme", "defaultmenu"));
             state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
         }
         else if (message == "CLEAR_SETTINGS_CACHE")
         {
             // update the idle time
-            d->m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                                      STANDBY_TIMEOUT);
-
-            if (d->m_idleTime < 0)
-                d->m_idleTime = 0;
-
-            bool isActive = d->m_idleTimer->isActive();
-
-            if (isActive)
-                d->m_idleTimer->stop();
-
-            if (d->m_idleTime > 0)
+            m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout", STANDBY_TIMEOUT);
+            if (m_idleTime < 0)
+                m_idleTime = 0;
+            m_idleTimer.stop();
+            if (m_idleTime > 0)
             {
-                d->m_idleTimer->setInterval(1000 * 60 * d->m_idleTime);
-
-                if (isActive)
-                    d->m_idleTimer->start();
-
-                LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(d->m_idleTime));
+                m_idleTimer.setInterval(1000 * 60 * m_idleTime);
+                m_idleTimer.start();
+                LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(m_idleTime));
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_INFO, "Frontend idle timeout is disabled");
+            }
         }
         else if (message == "NOTIFICATION")
         {
@@ -2152,62 +2138,76 @@ void MythMainWindow::ShowMouseCursor(bool show)
         d->m_hideMouseTimer->start();
 }
 
-void MythMainWindow::HideMouseTimeout(void)
+void MythMainWindow::HideMouseTimeout()
 {
     ShowMouseCursor(false);
 }
 
-void MythMainWindow::ResetIdleTimer(void)
+/*! \brief Disable the idle timeout timer
+ * \note This should only be called from the main thread.
+*/
+void MythMainWindow::DisableIdleTimer(bool DisableIdle)
+{
+    if ((d->m_disableIdle = DisableIdle))
+        m_idleTimer.stop();
+    else
+        m_idleTimer.start();
+}
+
+/*! \brief Reset the idle timeout timer
+ * \note This should only be called from the main thread.
+*/
+void MythMainWindow::ResetIdleTimer()
 {
     if (d->m_disableIdle)
         return;
 
-    if (d->m_idleTime == 0 ||
-        !d->m_idleTimer->isActive() ||
-        (d->m_standby && d->m_enteringStandby))
+    if (m_idleTime == 0 || !m_idleTimer.isActive() || (d->m_standby && d->m_enteringStandby))
         return;
 
     if (d->m_standby)
         ExitStandby(false);
 
-    QMetaObject::invokeMethod(d->m_idleTimer, "start");
+    m_idleTimer.start();
 }
 
-void MythMainWindow::PauseIdleTimer(bool pause)
+/*! \brief Pause the idle timeout timer
+ * \note This should only be called from the main thread.
+*/
+void MythMainWindow::PauseIdleTimer(bool Pause)
 {
     if (d->m_disableIdle)
         return;
 
     // don't do anything if the idle timer is disabled
-    if (d->m_idleTime == 0)
+    if (m_idleTime == 0)
         return;
 
-    if (pause)
+    if (Pause)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
-        QMetaObject::invokeMethod(d->m_idleTimer, "stop");
+        m_idleTimer.stop();
     }
     else
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Resuming idle timer");
-        QMetaObject::invokeMethod(d->m_idleTimer, "start");
+        m_idleTimer.start();
     }
 
     // ResetIdleTimer();
 }
 
-void MythMainWindow::IdleTimeout(void)
+void MythMainWindow::IdleTimeout()
 {
     if (d->m_disableIdle)
         return;
 
     d->m_enteringStandby = false;
 
-    if (d->m_idleTime > 0 && !d->m_standby)
+    if (m_idleTime > 0 && !d->m_standby)
     {
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
-                                        "%1 minutes of inactivity")
-                                        .arg(d->m_idleTime));
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("Entering standby mode after %1 minutes of inactivity").arg(m_idleTime));
         EnterStandby(false);
         if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) > 0)
         {
@@ -2283,14 +2283,6 @@ void MythMainWindow::ExitStandby(bool manual)
          GetMythDB()->GetSetting("menutheme", "defaultmenu"));
     state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
     MythUIStateTracker::SetState(state);
-}
-
-void MythMainWindow::DisableIdleTimer(bool disableIdle)
-{
-    if ((d->m_disableIdle = disableIdle))
-        QMetaObject::invokeMethod(d->m_idleTimer, "stop");
-    else
-        QMetaObject::invokeMethod(d->m_idleTimer, "start");
 }
 
 void MythMainWindow::onApplicationStateChange(Qt::ApplicationState state)
