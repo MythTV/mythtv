@@ -6,7 +6,6 @@
 #include "mythlogging.h"
 #include "mythuihelper.h"
 #include "mythdisplay.h"
-#include "mythmainwindow.h"
 #include "mythuiscreenbounds.h"
 
 int MythUIScreenBounds::s_XOverride = -1;
