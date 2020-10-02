@@ -465,8 +465,23 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
  */
 static bool doUpgradeTVDatabaseSchema(void)
 {
-    QString dbver = gCoreContext->GetSetting("DBSchemaVer");
+    QString order;
 
+    auto ss2ba = [](const auto & ss){ return QByteArray::fromStdString(ss); };
+    auto qs2ba = [](const auto & item){ return item.constData(); };
+    auto add_start_end = [order](const auto & field){
+        return QString("UPDATE %1 "
+                       "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
+                       "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
+                       "ORDER BY %2")
+            .arg(QString::fromStdString(field)).arg(order).toLocal8Bit(); };
+    auto add_start = [order](const auto & field){
+        return QString("UPDATE %1 "
+                       "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
+                       "ORDER BY %2")
+            .arg(QString::fromStdString(field)).arg(order).toLocal8Bit(); };
+
+    QString dbver = gCoreContext->GetSetting("DBSchemaVer");
     if (dbver == currentDatabaseVersion)
     {
         return true;
@@ -2007,8 +2022,8 @@ static bool doUpgradeTVDatabaseSchema(void)
             "       CONCAT(startdate, ' ', starttime), "
             "       CONCAT(enddate, ' ', endtime) FROM record",
         };
-        for (const auto & pre : pre_sql)
-            updates_ba.push_back(QByteArray::fromStdString(pre));
+        std::transform(pre_sql.cbegin(), pre_sql.cend(),
+                       std::back_inserter(updates_ba), ss2ba);
 
         // Convert various DATETIME fields from local time to UTC
         if (0 != utc_offset)
@@ -2020,31 +2035,11 @@ static bool doUpgradeTVDatabaseSchema(void)
                 "programgenres", "programrating", "credits",
                 "jobqueue",
             };
-            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
-
-            for (const auto & field : with_endtime)
-            {
-                updates_ba.push_back(
-                         QString("UPDATE %1 "
-                                 "SET starttime = "
-                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
-                                 "    endtime   = "
-                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
-                                 "ORDER BY %4")
-                         .arg(QString::fromStdString(field))
-                         .arg(order).toLocal8Bit());
-            }
-
-            for (const auto & field : without_endtime)
-            {
-                updates_ba.push_back(
-                          QString("UPDATE %1 "
-                                  "SET starttime = "
-                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
-                                  "ORDER BY %3")
-                          .arg(QString::fromStdString(field)).arg(order)
-                          .toLocal8Bit());
-            }
+            order = (utc_offset > 0) ? "-starttime" : "starttime";
+            std::transform(with_endtime.cbegin(), with_endtime.cend(),
+                           std::back_inserter(updates_ba), add_start_end);
+            std::transform(without_endtime.cbegin(), without_endtime.cend(),
+                           std::back_inserter(updates_ba), add_start);
 
             updates_ba.push_back(
                          QString("UPDATE oldprogram "
@@ -2078,13 +2073,13 @@ static bool doUpgradeTVDatabaseSchema(void)
             "DROP TABLE recordupdate",
         };
 
-        for (const auto & post : post_sql)
-            updates_ba.push_back(QByteArray::fromStdString(post));
+        std::transform(post_sql.cbegin(), post_sql.cend(),
+                       std::back_inserter(updates_ba), ss2ba);
 
         // Convert update ByteArrays to NULL terminated char**
         DBUpdates updates;
-        for (const auto & item : updates_ba)
-            updates.push_back(item.constData());
+        std::transform(updates_ba.cbegin(), updates_ba.cend(),
+                       std::back_inserter(updates), qs2ba);
 
         // do the actual update
         if (!performActualUpdate("MythTV", "DBSchemaVer",
@@ -2111,32 +2106,17 @@ static bool doUpgradeTVDatabaseSchema(void)
                 "recordedseek", "recordedmarkup", "recordedrating",
                 "recordedcredits",
             };
-            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
-
-            for (const auto & field : with_endtime)
-            {
-                updates_ba.push_back(
-                     QString("UPDATE %1 "
-                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
-                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
-                     "ORDER BY %4")
-                     .arg(QString::fromStdString(field)).arg(order).toLocal8Bit());
-            }
-
-            for (const auto & field : without_endtime)
-            {
-                updates_ba.push_back(
-                      QString("UPDATE %1 "
-                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
-                      "ORDER BY %3")
-                      .arg(QString::fromStdString(field)).arg(order).toLocal8Bit());
-            }
+            order = (utc_offset > 0) ? "-starttime" : "starttime";
+            std::transform(with_endtime.cbegin(), with_endtime.cend(),
+                           std::back_inserter(updates_ba), add_start_end);
+            std::transform(without_endtime.cbegin(), without_endtime.cend(),
+                           std::back_inserter(updates_ba), add_start);
         }
 
         // Convert update ByteArrays to NULL terminated char**
         DBUpdates updates;
-        for (const auto & item : updates_ba)
-            updates.push_back(item.constData());
+        std::transform(updates_ba.cbegin(), updates_ba.cend(),
+                       std::back_inserter(updates), qs2ba);
 
         // do the actual update
         if (!performActualUpdate("MythTV", "DBSchemaVer",
@@ -2168,8 +2148,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 
         // Convert update ByteArrays to NULL terminated char**
         DBUpdates updates;
-        for (const auto & item : updates_ba)
-            updates.push_back(item.constData());
+        std::transform(updates_ba.cbegin(), updates_ba.cend(),
+                       std::back_inserter(updates), qs2ba);
 
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1305", dbver))
@@ -2196,8 +2176,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 
         // Convert update ByteArrays to NULL terminated char**
         DBUpdates updates;
-        for (const auto & item : updates_ba)
-            updates.push_back(item.constData());
+        std::transform(updates_ba.cbegin(), updates_ba.cend(),
+                       std::back_inserter(updates), qs2ba);
 
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1306", dbver))
