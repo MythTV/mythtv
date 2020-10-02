@@ -1401,10 +1401,9 @@ bool MythUIText::ParseElement(
         if (fp)
         {
             MythFontProperties font = *fp;
-            int screenHeight = GetMythMainWindow()->GetUIScreenRect().height();
-            font.Rescale(screenHeight);
-            int fontStretch = GetMythUI()->GetFontStretch();
-            font.AdjustStretch(fontStretch);
+            MythMainWindow* window = GetMythMainWindow();
+            font.Rescale(window->GetUIScreenRect().height());
+            font.AdjustStretch(window->GetFontStretch());
             QString state = element.attribute("state", "");
 
             if (!state.isEmpty())

@@ -9,6 +9,7 @@
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
 #include "mythrect.h"
+#include "mythuiscreenbounds.h"
 
 class QEvent;
 
@@ -30,7 +31,7 @@ class MythMainWindowPrivate;
 class MythPainterWindow;
 class MythRender;
 
-class MUI_PUBLIC MythMainWindow : public QWidget
+class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
 {
     Q_OBJECT
     friend class MythPainterWindowOpenGL;
@@ -44,7 +45,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void ReinitDone(void);
     void Show(void);
     void MoveResize(QRect &Geometry);
-    static bool WindowIsAlwaysFullscreen(void);
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     void PopScreenStack();
@@ -112,17 +112,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     static bool IsScreensaverAsleep();
     static bool IsTopScreenInitialized(void);
     void RemoteScreenShot(QString filename, int x, int y);
-
     void AllowInput(bool allow);
-
-    QRect GetUIScreenRect();
-    void  SetUIScreenRect(QRect &rect);
-
-    int GetDrawInterval() const;
-    QSize NormSize(const QSize &size);
-    int  NormX(int x);
-    int  NormY(int y);
-    void SetScalingFactors(float wmult, float hmult);
+    int  GetDrawInterval() const;
     void RestartInputHandlers(void);
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);

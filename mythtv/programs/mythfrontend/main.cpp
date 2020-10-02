@@ -1902,7 +1902,7 @@ int main(int argc, char **argv)
         cerr << "Unable to ignore SIGPIPE\n";
 
     if (!cmdline.toString("geometry").isEmpty())
-        MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
+        MythMainWindow::ParseGeometryOverride(cmdline.toString("geometry"));
 
     fe_sd_notify("STATUS=Connecting to database.");
     gContext = new MythContext(MYTH_BINARY_VERSION, true);

@@ -386,13 +386,13 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
 
     if (!m_painter->SupportsClipping())
     {
-        m_repaintRegion = m_repaintRegion.united(d->m_uiScreenRect);
+        m_repaintRegion = m_repaintRegion.united(m_uiScreenRect);
     }
     else
     {
         // Ensure that the region is not larger than the screen which
         // can happen with bad themes
-        m_repaintRegion = m_repaintRegion.intersected(d->m_uiScreenRect);
+        m_repaintRegion = m_repaintRegion.intersected(m_uiScreenRect);
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
@@ -446,14 +446,14 @@ void MythMainWindow::Draw(MythPainter *Painter /* = nullptr */)
     Painter->Begin(m_painterWin);
 
     if (!Painter->SupportsClipping())
-        m_repaintRegion = QRegion(d->m_uiScreenRect);
+        m_repaintRegion = QRegion(m_uiScreenRect);
 
     for (const QRect& rect : m_repaintRegion)
     {
         if (rect.width() == 0 || rect.height() == 0)
             continue;
 
-        if (rect != d->m_uiScreenRect)
+        if (rect != m_uiScreenRect)
             Painter->SetClipRect(rect);
 
         // The call to GetDrawOrder can apparently alter m_stackList.
@@ -647,18 +647,12 @@ void MythMainWindow::Init(bool mayReInit)
     if (!(mayReInit || d->m_firstinit))
         return;
 
-    d->m_doesFillScreen =
-        (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
-         GetMythDB()->GetNumSetting("GuiWidth")   == 0 &&
-         GetMythDB()->GetNumSetting("GuiOffsetY") == 0 &&
-         GetMythDB()->GetNumSetting("GuiHeight")  == 0);
-
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
-    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
-                    !WindowIsAlwaysFullscreen();
-    bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
+    InitScreenBounds();
+    bool inwindow   = m_wantWindow && !m_QtFullScreen;
+    bool fullscreen = m_wantFullScreen && !GeometryIsOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
@@ -696,28 +690,22 @@ void MythMainWindow::Init(bool mayReInit)
         setWindowState(Qt::WindowNoState);
     }
 
-    if (gCoreContext->GetBoolSetting("AlwaysOnTop", false) &&
-        !WindowIsAlwaysFullscreen())
-    {
+    if (m_alwaysOnTop && !WindowIsAlwaysFullscreen())
         flags |= Qt::WindowStaysOnTopHint;
-    }
 
     setWindowFlags(flags);
 
     // SetWidget may move the widget into a new screen.
     m_display->SetWidget(this);
     // Ensure MythUIHelper has latest screen bounds if we have moved
-    GetMythUI()->UpdateScreenSettings();
-    // And use them
-    d->m_screenRect = GetMythUI()->GetScreenRect();
-    GetMythUI()->GetThemeScales(d->m_wmult, d->m_hmult);
+    UpdateScreenSettings();
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
-    d->m_uiScreenRect = QRect(QPoint(0, 0), d->m_screenRect.size());
+    m_uiScreenRect = QRect(QPoint(0, 0), m_screenRect.size());
     LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
-        .arg(d->m_screenRect.width()).arg(d->m_screenRect.height()));
-    MoveResize(d->m_screenRect);
+        .arg(m_screenRect.width()).arg(m_screenRect.height()));
+    MoveResize(m_screenRect);
     Show();
     // The window is sometimes not created until Show has been called - so try
     // MythDisplay::setWidget again to ensure we listen for QScreen changes
@@ -728,7 +716,7 @@ void MythMainWindow::Init(bool mayReInit)
     // Set cursor call must come after Show() to work on some systems.
     ShowMouseCursor(false);
 
-    move(d->m_screenRect.topLeft());
+    move(m_screenRect.topLeft());
 
     if (m_painterWin)
     {
@@ -759,7 +747,7 @@ void MythMainWindow::Init(bool mayReInit)
         setAutoFillBackground(false);
     }
 
-    MoveResize(d->m_screenRect);
+    MoveResize(m_screenRect);
     ShowPainterWindow();
 
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
@@ -795,7 +783,7 @@ void MythMainWindow::Init(bool mayReInit)
 
 void MythMainWindow::DelayedAction(void)
 {
-    MoveResize(d->m_screenRect);
+    MoveResize(m_screenRect);
     Show();
 
 #ifdef Q_OS_ANDROID
@@ -975,17 +963,15 @@ void MythMainWindow::ReloadKeys()
 void MythMainWindow::ReinitDone(void)
 {
     MythPainterWindow::DestroyPainters(m_oldPainterWin, m_oldPainter);
-
     ShowPainterWindow();
-    MoveResize(d->m_screenRect);
-
+    MoveResize(m_screenRect);
     d->m_drawTimer->start(1000 / drawRefresh);
 }
 
 void MythMainWindow::Show(void)
 {
-    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
+    bool inwindow = m_wantWindow && !m_QtFullScreen;
+    bool fullscreen = m_wantFullScreen && !GeometryIsOverridden();
     if (fullscreen && !inwindow && !d->m_firstinit)
         showFullScreen();
     else
@@ -1003,17 +989,6 @@ void MythMainWindow::MoveResize(QRect &Geometry)
         m_painterWin->setFixedSize(Geometry.size());
         m_painterWin->setGeometry(0, 0, Geometry.width(), Geometry.height());
     }
-}
-
-/// \brief Return true if the current platform only supports fullscreen windows
-bool MythMainWindow::WindowIsAlwaysFullscreen(void)
-{
-#ifdef Q_OS_ANDROID
-    return true;
-#else
-    // this may need to cover other platform plugins
-    return QGuiApplication::platformName().toLower().contains("eglfs");
-#endif
 }
 
 uint MythMainWindow::PushDrawDisabled(void)
@@ -1252,7 +1227,7 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
     if (!d->m_keyContexts.contains(context))
         d->m_keyContexts.insert(context, new KeyContext());
 
-    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
+    for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -1412,7 +1387,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
     QKeySequence keyseq(key);
 
-    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
+    for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -2153,41 +2128,6 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
         key_target = this;
 
     return key_target;
-}
-
-QSize MythMainWindow::NormSize(const QSize &size)
-{
-    QSize ret;
-    ret.setWidth((int)(size.width() * d->m_wmult));
-    ret.setHeight((int)(size.height() * d->m_hmult));
-
-    return ret;
-}
-
-int MythMainWindow::NormX(const int x)
-{
-    return qRound(x * d->m_wmult);
-}
-
-int MythMainWindow::NormY(const int y)
-{
-    return qRound(y * d->m_hmult);
-}
-
-void MythMainWindow::SetScalingFactors(float wmult, float hmult)
-{
-    d->m_wmult = wmult;
-    d->m_hmult = hmult;
-}
-
-QRect MythMainWindow::GetUIScreenRect(void)
-{
-    return d->m_uiScreenRect;
-}
-
-void MythMainWindow::SetUIScreenRect(QRect &rect)
-{
-    d->m_uiScreenRect = rect;
 }
 
 int MythMainWindow::GetDrawInterval() const

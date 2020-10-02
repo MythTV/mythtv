@@ -156,14 +156,15 @@ bool MythUIGuideGrid::ParseElement(
         if (font)
         {
             MythFontProperties fontcopy = *font;
-            int screenHeight = GetMythMainWindow()->GetUIScreenRect().height();
-            fontcopy.Rescale(screenHeight);
-            int fontStretch = GetMythUI()->GetFontStretch();
-            fontcopy.AdjustStretch(fontStretch);
+            MythMainWindow* window = GetMythMainWindow();
+            fontcopy.Rescale(window->GetUIScreenRect().height());
+            fontcopy.AdjustStretch(window->GetFontStretch());
             *m_font = fontcopy;
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown font: " + fontname);
+        }
     }
     else if (element.tagName() == "recordstatus")
     {

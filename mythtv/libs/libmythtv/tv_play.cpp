@@ -1156,11 +1156,10 @@ bool TV::Init()
     }
 
     bool fullscreen = !m_dbUseGuiSizeForTv;
-    m_savedGuiBounds = QRect(GetMythMainWindow()->geometry().topLeft(),
-                             GetMythMainWindow()->size());
+    m_savedGuiBounds = QRect(mainwindow->geometry().topLeft(), mainwindow->size());
 
     // adjust for window manager wierdness.
-    QRect screen = GetMythUI()->GetScreenRect();
+    QRect screen = mainwindow->GetScreenRect();
     if ((abs(m_savedGuiBounds.x() - screen.left()) < 3) &&
         (abs(m_savedGuiBounds.y() - screen.top()) < 3))
     {

@@ -34,14 +34,6 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
 
     void LoadQtConfig();
     bool IsScreenSetup();
-    void UpdateScreenSettings();
-    QRect GetScreenRect();
-    void GetThemeScales(float &XFactor, float &YFactor);
-
-    // Parse an X11 style command line (-geometry) string
-    static void ParseGeometryOverride(const QString &geometry);
-    static bool IsGeometryOverridden();
-    static QRect GetGeometryOverride();
 
     QString FindThemeDir(const QString &themename, bool doFallback = true);
     QString FindMenuThemeDir(const QString &menuname);
@@ -61,36 +53,18 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
     QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
     QSize GetBaseSize() const;
 
-    void SetFontStretch(int stretch);
-    int GetFontStretch() const;
-
   protected:
     Q_DISABLE_COPY(MythUIHelper)
     MythUIHelper() = default;
    ~MythUIHelper();
 
   private:
-    void StoreGUIsettings();
     QMutex m_locationLock;
     QStringList m_currentLocation;
 
     QString   m_menuthemepathname;
     QString   m_themepathname;
     QString   m_themename;
-
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to the full drawable area.
-    QRect m_screenRect { 0, 0, 0, 0 };
-
-    // Command-line GUI size, which overrides both the above sets of sizes
-    static int x_override;
-    static int y_override;
-    static int w_override;
-    static int h_override;
-
-    float m_wmult     { 1.0F };
-    float m_hmult     { 1.0F };
-    int m_fontStretch { 100 };
 
     // Dimensions of the theme
     QSize m_baseSize  { 800, 600 };

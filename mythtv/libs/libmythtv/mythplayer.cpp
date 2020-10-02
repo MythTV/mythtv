@@ -372,8 +372,7 @@ void MythPlayer::ReinitOSD(void)
         QRect total;
         float aspect = NAN;
         float scaling = NAN;
-        m_videoOutput->GetOSDBounds(total, visible, aspect,
-                                  scaling, 1.0F);
+        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         if (m_osd)
         {
             m_osd->SetPainter(m_videoOutput->GetOSDPainter());

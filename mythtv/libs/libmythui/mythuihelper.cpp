@@ -73,72 +73,6 @@ void DestroyMythUI()
     MythUIHelper::destroyMythUI();
 }
 
-int MythUIHelper::x_override = -1;
-int MythUIHelper::y_override = -1;
-int MythUIHelper::w_override = -1;
-int MythUIHelper::h_override = -1;
-
-/**
- * Apply any user overrides to the screen geometry
- */
-void MythUIHelper::StoreGUIsettings()
-{
-    if (x_override >= 0 && y_override >= 0)
-    {
-        GetMythDB()->OverrideSettingForSession("GuiOffsetX", QString::number(x_override));
-        GetMythDB()->OverrideSettingForSession("GuiOffsetY", QString::number(y_override));
-    }
-
-    if (w_override > 0 && h_override > 0)
-    {
-        GetMythDB()->OverrideSettingForSession("GuiWidth", QString::number(w_override));
-        GetMythDB()->OverrideSettingForSession("GuiHeight", QString::number(h_override));
-    }
-
-    int x = GetMythDB()->GetNumSetting("GuiOffsetX");
-    int y = GetMythDB()->GetNumSetting("GuiOffsetY");
-    int width = 0;
-    int height = 0;
-    GetMythDB()->GetResolutionSetting("Gui", width, height);
-
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
-    QRect screenbounds = m_display->GetScreenBounds();
-
-    // As per MythMainWindow::Init, fullscreen is indicated by all zero's in settings
-    if (x == 0 && y == 0 && width == 0 && height == 0)
-        m_screenRect = screenbounds;
-    else
-        m_screenRect = QRect(x, y, width, height);
-
-    if (m_screenRect.width() < 160 || m_screenRect.height() < 160)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Strange screen size: %1x%2 - forcing 640x480")
-            .arg(m_screenRect.width()).arg(m_screenRect.height()));
-        m_screenRect.setSize(QSize(640, 480));
-    }
-
-    m_wmult = m_screenRect.width()  / static_cast<float>(m_baseSize.width());
-    m_hmult = m_screenRect.height() / static_cast<float>(m_baseSize.height());
-
-    MythUIThemeCache::SetScreenSize(m_screenRect.size());
-
-    // Default font, _ALL_ fonts inherit from this!
-    // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
-    QFont font = QFont("Arial");
-    if (!font.exactMatch())
-        font = QFont();
-
-    font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPixelSize(static_cast<int>(lroundf(19.0F * m_hmult)));
-    int stretch = static_cast<int>(100 / m_display->GetPixelAspectRatio());
-    font.setStretch(stretch); // QT
-    m_fontStretch = stretch; // MythUI
-
-    QApplication::setFont(font);
-}
-
 MythUIHelper::~MythUIHelper()
 {
     if (m_display)
@@ -154,7 +88,6 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 {
     if (!m_display)
         m_display = MythDisplay::AcquireRelease();
-    StoreGUIsettings();
     m_screenSetup = true;
     StorageGroup sgroup("Themes", gCoreContext->GetHostName());
     m_userThemeDir = sgroup.GetFirstDir(true);
@@ -170,7 +103,6 @@ void MythUIHelper::Init()
 {
     if (!m_display)
         m_display = MythDisplay::AcquireRelease();
-    StoreGUIsettings();
     m_screenSetup = true;
     StorageGroup sgroup("Themes", gCoreContext->GetHostName());
     m_userThemeDir = sgroup.GetFirstDir(true);
@@ -214,149 +146,14 @@ void MythUIHelper::LoadQtConfig()
         delete themeinfo;
     }
 
-    // Recalculate GUI dimensions
-    StoreGUIsettings();
-
     m_themepathname = themedir + '/';
     m_searchPaths.clear();
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
-
     if (themename == "default")
         themename = "defaultmenu";
 
     m_menuthemepathname = FindMenuThemeDir(themename);
-}
-
-void MythUIHelper::UpdateScreenSettings()
-{
-    StoreGUIsettings();
-}
-
-QRect MythUIHelper::GetScreenRect()
-{
-    return m_screenRect;
-}
-
-void MythUIHelper::GetThemeScales(float &XFactor, float &YFactor)
-{
-    XFactor = m_wmult;
-    YFactor = m_hmult;
-}
-
-/**
- * \brief Parse an X11 style command line geometry string
- *
- * Accepts strings like
- *  -geometry 800x600
- * or
- *  -geometry 800x600+112+22
- * to override the fullscreen and user default screen dimensions
- */
-void MythUIHelper::ParseGeometryOverride(const QString &geometry)
-{
-    QRegExp     sre("^(\\d+)x(\\d+)$");
-    QRegExp     lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
-    QStringList geo;
-    bool        longForm = false;
-
-    if (sre.exactMatch(geometry))
-    {
-        geo = sre.capturedTexts();
-    }
-    else if (lre.exactMatch(geometry))
-    {
-        geo = lre.capturedTexts();
-        longForm = true;
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Geometry does not match either form -\n\t\t\t"
-            "WIDTHxHEIGHT or WIDTHxHEIGHT+XOFF+YOFF");
-        return;
-    }
-
-    bool parsed = false;
-    int tmp_h = 0;
-    int tmp_w = geo[1].toInt(&parsed);
-
-    if (!parsed)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Could not parse width of geometry override");
-    }
-
-    if (parsed)
-    {
-        tmp_h = geo[2].toInt(&parsed);
-
-        if (!parsed)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Could not parse height of geometry override");
-        }
-    }
-
-    if (parsed)
-    {
-        MythUIHelper::w_override = tmp_w;
-        MythUIHelper::h_override = tmp_h;
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Overriding GUI size: width=%1 height=%2")
-            .arg(tmp_w).arg(tmp_h));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI size.");
-    }
-
-    if (longForm)
-    {
-        int tmp_x = geo[3].toInt(&parsed);
-        if (!parsed)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Could not parse horizontal offset of geometry override");
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
-            return;
-        }
-
-        int tmp_y = geo[4].toInt(&parsed);
-        if (!parsed)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Could not parse vertical offset of geometry override");
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
-            return;
-        }
-
-        MythUIHelper::x_override = tmp_x;
-        MythUIHelper::y_override = tmp_y;
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Overriding GUI offset: x=%1 y=%2")
-            .arg(tmp_x).arg(tmp_y));
-    }
-}
-
-bool MythUIHelper::IsGeometryOverridden()
-{
-    return (MythUIHelper::x_override >= 0 ||
-            MythUIHelper::y_override >= 0 ||
-            MythUIHelper::w_override >= 0 ||
-            MythUIHelper::h_override >= 0);
-}
-
-/*! \brief Return the raw geometry override rectangle.
- *
- * Used before MythUIHelper has been otherwise initialised (and hence GetScreenSettings
- * does not return a valid result).
-*/
-QRect MythUIHelper::GetGeometryOverride()
-{
-    // NB Call IsGeometryOverridden first to ensure this is valid
-    return {MythUIHelper::x_override, MythUIHelper::y_override,
-            MythUIHelper::w_override, MythUIHelper::h_override};
 }
 
 /**
@@ -690,14 +487,4 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
 QSize MythUIHelper::GetBaseSize() const
 {
     return m_baseSize;
-}
-
-void MythUIHelper::SetFontStretch(int stretch)
-{
-    m_fontStretch = stretch;
-}
-
-int MythUIHelper::GetFontStretch() const
-{
-    return m_fontStretch;
 }

@@ -308,12 +308,12 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     // N.B. So many potential issues here e.g. should the geometry override be
     // ignored after first use? (as it will continue to override the screen
     // regardless of changes to screen preference).
-    if (MythUIHelper::IsGeometryOverridden())
+    if (MythMainWindow::GeometryIsOverridden())
     {
         // this matches the check in MythMainWindow
         bool windowed = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
                         !MythMainWindow::WindowIsAlwaysFullscreen();
-        QRect override = MythUIHelper::GetGeometryOverride();
+        QRect override = MythMainWindow::GetGeometryOverride();
         // When windowed, we use topleft as a best guess as to which screen we belong in.
         // When fullscreen, Qt appears to use the reverse - though this may be
         // the window manager rather than Qt. So could be wrong.

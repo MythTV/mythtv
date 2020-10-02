@@ -100,7 +100,7 @@ bool MythUIVirtualKeyboard::Create()
     loadKeyDefinitions(gCoreContext->GetLanguageAndVariant());
     updateKeys(true);
 
-    QSize screensize = GetMythUI()->GetScreenRect().size();
+    QSize screensize = GetMythMainWindow()->GetScreenRect().size();
     MythRect editArea = m_parentEdit->GetArea();
     MythRect area = GetArea();
     MythPoint newPos;

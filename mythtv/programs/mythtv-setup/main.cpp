@@ -381,9 +381,7 @@ int main(int argc, char *argv[])
         scanInputName = cmdline.toString("inputname");
 
     if (!geometry.isEmpty())
-    {
-        MythUIHelper::ParseGeometryOverride(geometry);
-    }
+        MythMainWindow::ParseGeometryOverride(geometry);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 

@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
         return retval;
 
     if (!cmdline.toString("geometry").isEmpty())
-        MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
+        MythMainWindow::ParseGeometryOverride(cmdline.toString("geometry"));
 
     QString filename = "";
     if (!cmdline.toString("infile").isEmpty())

@@ -56,11 +56,6 @@ class MythMainWindowPrivate
 
     static int TranslateKeyNum(QKeyEvent *Event);
 
-    float                m_wmult                { 1.0F    };
-    float                m_hmult                { 1.0F    };
-    QRect                m_screenRect;
-    QRect                m_uiScreenRect;
-    bool                 m_doesFillScreen       { false   };
     bool                 m_exitingtomain        { false   };
     bool                 m_popwindows           { false   };
     /// To allow or prevent database access

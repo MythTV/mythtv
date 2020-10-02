@@ -190,36 +190,46 @@ void OSD::SetPainter(MythPainter *Painter)
 
 void OSD::OverrideUIScale(bool Log)
 {
-    QRect uirect = GetMythMainWindow()->GetUIScreenRect();
+    // Avoid unnecessary switches
+    MythMainWindow* window = GetMythMainWindow();
+    QRect uirect = window->GetUIScreenRect();
     if (uirect == m_rect)
         return;
 
-    m_savedFontStretch = GetMythUI()->GetFontStretch();
-    GetMythUI()->SetFontStretch(m_fontStretch);
-    GetMythUI()->GetThemeScales(m_savedWMult, m_savedHMult);
-    QSize theme_size = GetMythUI()->GetBaseSize();
+    // Save current data
     m_savedUIRect = uirect;
-    float tmp_wmult = static_cast<float>(m_rect.size().width()) / static_cast<float>(theme_size.width());
-    float tmp_hmult = static_cast<float>(m_rect.size().height()) / static_cast<float>(theme_size.height());
+    m_savedFontStretch = window->GetFontStretch();
+    window->GetScalingFactors(m_savedWMult, m_savedHMult);
+
+    // Calculate new
+    QSize themesize = window->GetThemeSize();
+    float wmult = static_cast<float>(m_rect.size().width()) / static_cast<float>(themesize.width());
+    float mult = static_cast<float>(m_rect.size().height()) / static_cast<float>(themesize.height());
     if (Log)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Base theme size: %1x%2")
-            .arg(theme_size.width()).arg(theme_size.height()));
+            .arg(themesize.width()).arg(themesize.height()));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scaling factors: %1x%2")
-            .arg(static_cast<double>(tmp_wmult)).arg(static_cast<double>(tmp_hmult)));
+            .arg(static_cast<double>(wmult)).arg(static_cast<double>(mult)));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Font stretch: saved %1 new %2")
+            .arg(m_savedFontStretch).arg(m_fontStretch));
     }
     m_uiScaleOverride = true;
-    GetMythMainWindow()->SetScalingFactors(tmp_wmult, tmp_hmult);
-    GetMythMainWindow()->SetUIScreenRect(m_rect);
+
+    // Apply new
+    window->SetFontStretch(m_fontStretch);
+    window->SetScalingFactors(wmult, mult);
+    window->SetUIScreenRect(m_rect);
 }
 
 void OSD::RevertUIScale(void)
 {
     if (m_uiScaleOverride)
     {
-        GetMythUI()->SetFontStretch(m_savedFontStretch);
-        GetMythMainWindow()->SetScalingFactors(m_savedWMult, m_savedHMult);
-        GetMythMainWindow()->SetUIScreenRect(m_savedUIRect);
+        MythMainWindow* window = GetMythMainWindow();
+        window->SetFontStretch(m_savedFontStretch);
+        window->SetScalingFactors(m_savedWMult, m_savedHMult);
+        window->SetUIScreenRect(m_savedUIRect);
     }
     m_uiScaleOverride = false;
 }
