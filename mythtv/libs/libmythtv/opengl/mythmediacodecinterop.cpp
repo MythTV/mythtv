@@ -127,7 +127,7 @@ vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Conte
     }
 
     // Sanitise
-    if (!Context || !ColourSpace || !Frame || m_openglTextures.isEmpty())
+    if (!Context || !ColourSpace || m_openglTextures.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed");
         return result;
