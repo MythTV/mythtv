@@ -69,9 +69,30 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 
     // Taken from removed MythUIHelper::GetMediumFont
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(16));
-    font.setWeight(QFont::Bold);
 
+#ifdef _WIN32
+    // logicalDpiY not supported in Windows.
+    int logicalDpiY = 100;
+    HDC hdc = GetDC(nullptr);
+    if (hdc)
+    {
+        logicalDpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+        ReleaseDC(nullptr, hdc);
+    }
+#else
+    int logicalDpiY = GetMythMainWindow()->logicalDpiY();
+#endif
+
+    // adjust for screen resolution relative to 100 dpi
+    float floatSize = (16 * 100.0F) / logicalDpiY;
+    // adjust for myth GUI size relative to 800x600
+    float dummy = 0.0;
+    float hmult = 0.0;
+    GetMythMainWindow()->GetScalingFactors(hmult, dummy);
+    floatSize = floatSize * hmult;
+    // round and set
+    font.setPointSize(lroundf(floatSize));
+    font.setWeight(QFont::Bold);
     font.setPointSizeF(fontSize * (size.width() / 800.0));
     p->setFont(font);
 
