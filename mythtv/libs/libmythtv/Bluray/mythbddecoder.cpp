@@ -159,7 +159,7 @@ long long MythBDDecoder::BDFindPosition(long long DesiredFrame)
         if (desiredTimePos < 0)
             desiredTimePos = 0;
 #endif
-        return static_cast<long long>(DesiredFrame * 90000.0F / m_fps);
+        return static_cast<long long>(DesiredFrame * 90000.0 / m_fps);
     }
     return current_speed;
 }

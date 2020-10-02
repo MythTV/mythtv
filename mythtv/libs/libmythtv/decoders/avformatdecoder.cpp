@@ -1338,10 +1338,10 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         rates.emplace_back(estimated_fps);
 
     // last resort
-    rates.emplace_back(static_cast<float>(30000.0 / 1001.0));
+    rates.emplace_back(30000.0 / 1001.0);
 
     // debug
-    if (!qFuzzyCompare(static_cast<float>(rates.front()), m_fps))
+    if (!qFuzzyCompare(rates.front(), m_fps))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Selected FPS: %1 (Avg:%2 Mult:%3 Codec:%4 Container:%5 Estimated:%6)")
@@ -4702,7 +4702,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             // audio.
             if (m_skipAudio && m_selectedTrack[kTrackTypeVideo].m_av_stream_index > -1)
             {
-                if ((m_lastAPts < m_lastVPts - (10.0F / m_fps)) || m_lastVPts == 0)
+                if ((m_lastAPts < m_lastVPts - (10.0 / m_fps)) || m_lastVPts == 0)
                     break;
                 m_skipAudio = false;
             }

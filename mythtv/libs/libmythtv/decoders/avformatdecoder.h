@@ -363,7 +363,6 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo          m_audioIn;
     AudioInfo          m_audioOut;
 
-    float              m_fps                          {0.0F};
     bool               m_processFrames                {true};
 
     bool               m_streamsChanged               { false };
