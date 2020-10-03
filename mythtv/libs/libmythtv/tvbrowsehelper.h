@@ -47,7 +47,7 @@ class TVBrowseHelper : public MThread
     friend class TV;
 
   protected:
-    TVBrowseHelper(TV* Parent);
+    explicit TVBrowseHelper(TV* Parent);
     ~TVBrowseHelper() override;
 
     void BrowseInit(uint BrowseMaxForward, bool BrowseAllTuners,
