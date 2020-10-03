@@ -323,6 +323,7 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
 
         if (isvertex && !foundvertices)
         {
+            foundvertices = true;
             m_vertexBindingDesc = std::get<2>(desc);
             m_vertexAttributes  = std::get<3>(desc);
         }
