@@ -32,13 +32,11 @@ debug = False
 
 musicbrainzngs.set_useragent(
     "MythTV",
-    "0.28",
+    "32.0",
     "https://www.mythtv.org",
 )
 
-#musicbrainzngs.set_hostname("musicbrainz.org")
-#musicbrainzngs.set_hostname("music.peavers.com:5000")
-musicbrainzngs.set_hostname("musicbrainz-mirror.eu:5000")
+musicbrainzngs.set_hostname("musicbrainz.org")
 
 def log(debug, txt):
     if debug:
