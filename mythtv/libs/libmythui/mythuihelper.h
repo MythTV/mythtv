@@ -33,7 +33,7 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
     MythUIMenuCallbacks *GetMenuCBs();
 
     void LoadQtConfig();
-    bool IsScreenSetup();
+    bool IsScreenSetup() const;
 
     QString FindThemeDir(const QString &themename, bool doFallback = true);
     QString FindMenuThemeDir(const QString &menuname);

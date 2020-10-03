@@ -113,7 +113,7 @@ MythUIMenuCallbacks *MythUIHelper::GetMenuCBs()
     return &m_callbacks;
 }
 
-bool MythUIHelper::IsScreenSetup()
+bool MythUIHelper::IsScreenSetup() const
 {
     return m_screenSetup;
 }
