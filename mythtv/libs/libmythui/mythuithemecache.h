@@ -30,7 +30,7 @@ class MUI_PUBLIC MythUIThemeCache
     QString     GetThemeCacheDir();
     MythImage*  LoadCacheImage(QString File, const QString& Label,
                                MythPainter* Painter, ImageCacheMode cacheMode = kCacheNormal);
-    bool        FindThemeFile(QString& Path);
+    static bool FindThemeFile(QString& Path);
     MythImage*  CacheImage(const QString& URL, MythImage* Image, bool NoDisk = false);
     void        RemoveFromCacheByFile(const QString& File);
     bool        IsImageInCache(const QString& URL);
