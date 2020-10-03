@@ -55,7 +55,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
 
     ext_ctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
 
-    ext_ctrls.reserved[0] = ext_ctrls.reserved[1] = 0;
+    ext_ctrls.reserved[0] = 0;
     ext_ctrls.count = 1;
     ext_ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
     ext_ctrls.controls = &ext_ctrl;
