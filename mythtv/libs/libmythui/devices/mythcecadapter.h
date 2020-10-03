@@ -18,6 +18,8 @@
 #include <iostream>
 using namespace CEC;
 
+class MythMainWindow;
+
 class MythCECAdapter
 {
   public:
@@ -47,7 +49,7 @@ class MythCECAdapter
 
     MythCECAdapter() = default;
    ~MythCECAdapter();
-    void        Open          (void);
+    void        Open          (MythMainWindow* Window);
     void        Close         (void);
     void        Action        (const QString &Action);
     void        IgnoreKeys    (bool Ignore);

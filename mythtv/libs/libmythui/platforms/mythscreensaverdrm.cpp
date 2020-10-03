@@ -7,9 +7,9 @@
 
 #define LOC QString("ScreenSaverDRM: ")
 
-MythScreenSaverDRM* MythScreenSaverDRM::Create()
+MythScreenSaverDRM* MythScreenSaverDRM::Create(MythDisplay* mDisplay)
 {
-    auto* result = new MythScreenSaverDRM();
+    auto* result = new MythScreenSaverDRM(mDisplay);
     if (result->IsValid())
         return result;
     delete result;
@@ -39,10 +39,9 @@ MythScreenSaverDRM* MythScreenSaverDRM::Create()
  * Asleep is only called from MythInputDeviceHandler which will block input from
  * Joystick, lirc and appleremote devices ONLY).
 */
-MythScreenSaverDRM::MythScreenSaverDRM()
+MythScreenSaverDRM::MythScreenSaverDRM(MythDisplay *mDisplay)
 {
-    MythDisplay* display = MythDisplay::AcquireRelease(true);
-    auto* drmdisplay = dynamic_cast<MythDisplayDRM*>(display);
+    auto* drmdisplay = dynamic_cast<MythDisplayDRM*>(mDisplay);
     if (drmdisplay)
     {
         m_display = drmdisplay;
@@ -50,16 +49,10 @@ MythScreenSaverDRM::MythScreenSaverDRM()
         Init();
         connect(m_display, &MythDisplayDRM::screenChanged, this, &MythScreenSaverDRM::ScreenChanged);
     }
-    else
-    {
-        MythDisplay::AcquireRelease(false);
-    }
 }
 
 MythScreenSaverDRM::~MythScreenSaverDRM()
 {
-    if (m_display)
-        MythDisplay::AcquireRelease(false);
     m_device = nullptr;
 }
 

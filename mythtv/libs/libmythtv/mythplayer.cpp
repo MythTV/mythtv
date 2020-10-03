@@ -109,7 +109,6 @@ static int toTrackType(int type)
 
 MythPlayer::MythPlayer(PlayerFlags flags)
     : m_playerFlags(flags),
-      m_display((flags & kVideoIsNull) ? nullptr : MythDisplay::AcquireRelease()),
       // CC608/708
       m_cc608(this), m_cc708(this),
       // Audio
@@ -117,6 +116,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // Debugging variables
       m_outputJmeter(new Jitterometer(LOC))
 {
+    if (!(m_playerFlags & kVideoIsNull) && HasMythMainWindow())
+        m_display = GetMythMainWindow()->GetDisplay();
+
     m_playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
     m_playerThreadId = gettid();
@@ -168,9 +170,6 @@ MythPlayer::~MythPlayer(void)
 
     delete m_detectLetterBox;
     m_detectLetterBox = nullptr;
-
-    if (m_display)
-        MythDisplay::AcquireRelease(false);
 }
 
 void MythPlayer::SetWatchingRecording(bool mode)

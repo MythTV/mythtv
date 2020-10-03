@@ -1547,12 +1547,13 @@ void StatusBox::doDisplayStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(displayhelp);
 
-    QStringList desc = MythDisplay::GetDescription();
+    MythMainWindow* window = GetMythMainWindow();
+    QStringList desc = window->GetDisplay()->GetDescription();
     for (const auto & line : qAsConst(desc))
         AddLogLine(line);
     AddLogLine("");
 
-    MythRender* render = GetMythMainWindow()->GetRenderDevice();
+    MythRender* render = window->GetRenderDevice();
     if (render)
     {
         MythRenderOpenGL* gl = MythRenderOpenGL::GetOpenGLRender();

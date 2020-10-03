@@ -7,6 +7,8 @@
 // MythTV
 #include "mythuiexp.h"
 
+class MythDisplay;
+
 class MUI_PUBLIC MythUIScreenBounds
 {
   public:
@@ -15,7 +17,7 @@ class MUI_PUBLIC MythUIScreenBounds
     static QRect GetGeometryOverride();
     static bool  WindowIsAlwaysFullscreen();
 
-    void  UpdateScreenSettings();
+    void  UpdateScreenSettings(MythDisplay* mDisplay);
     QRect GetUIScreenRect();
     void  SetUIScreenRect(const QRect& Rect);
     QRect GetScreenRect();

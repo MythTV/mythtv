@@ -56,7 +56,7 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
   protected:
     Q_DISABLE_COPY(MythUIHelper)
     MythUIHelper() = default;
-   ~MythUIHelper();
+   ~MythUIHelper() = default;
 
   private:
     QMutex m_locationLock;
@@ -70,7 +70,6 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache
     QSize m_baseSize  { 800, 600 };
     bool m_isWide     { false };
     QString m_userThemeDir;
-    MythDisplay *m_display { nullptr };
     MythUIMenuCallbacks m_callbacks { nullptr,nullptr,nullptr,nullptr,nullptr };
     QStringList m_searchPaths;
     bool m_screenSetup { false };

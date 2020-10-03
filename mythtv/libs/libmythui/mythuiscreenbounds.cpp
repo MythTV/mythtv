@@ -135,7 +135,7 @@ void MythUIScreenBounds::InitScreenBounds()
     m_themeSize    = GetMythUI()->GetBaseSize();
 }
 
-void MythUIScreenBounds::UpdateScreenSettings()
+void MythUIScreenBounds::UpdateScreenSettings(MythDisplay *mDisplay)
 {
     if (s_XOverride >= 0 && s_YOverride >= 0)
     {
@@ -155,8 +155,7 @@ void MythUIScreenBounds::UpdateScreenSettings()
     int height = 0;
     gCoreContext->GetResolutionSetting("Gui", width, height);
 
-    MythDisplay* display = MythDisplay::AcquireRelease();
-    QRect screenbounds = display->GetScreenBounds();
+    QRect screenbounds = mDisplay->GetScreenBounds();
 
     // As per MythMainWindow::Init, fullscreen is indicated by all zero's in settings
     if (x == 0 && y == 0 && width == 0 && height == 0)
@@ -184,12 +183,10 @@ void MythUIScreenBounds::UpdateScreenSettings()
 
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
     font.setPixelSize(static_cast<int>(lroundf(19.0F * m_screenHorizScale)));
-    int stretch = static_cast<int>(lround(100.0 / display->GetPixelAspectRatio()));
+    int stretch = static_cast<int>(lround(100.0 / mDisplay->GetPixelAspectRatio()));
     font.setStretch(stretch); // QT
     m_fontStretch = stretch; // MythUI
     QApplication::setFont(font);
-
-    MythDisplay::AcquireRelease(false);
 }
 
 QRect MythUIScreenBounds::GetUIScreenRect()

@@ -7,6 +7,8 @@
 // Std
 #include <vector>
 
+class MythDisplay;
+
 /// Base Class for screensavers
 class MythScreenSaver
 {
@@ -29,7 +31,7 @@ class MythScreenSaverControl : public QObject
     Q_OBJECT
 
   public:
-    MythScreenSaverControl();
+    MythScreenSaverControl(MythDisplay* mDisplay);
     ~MythScreenSaverControl() override;
 
   public slots:

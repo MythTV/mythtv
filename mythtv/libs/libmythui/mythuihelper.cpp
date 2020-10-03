@@ -73,25 +73,11 @@ void DestroyMythUI()
     MythUIHelper::destroyMythUI();
 }
 
-MythUIHelper::~MythUIHelper()
-{
-    if (m_display)
-    {
-        // N.B. we always call this to ensure the desktop mode is restored
-        // in case the setting was changed
-        m_display->SwitchToDesktop();
-        MythDisplay::AcquireRelease(false);
-    }
-}
-
 void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 {
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
     m_screenSetup = true;
     StorageGroup sgroup("Themes", gCoreContext->GetHostName());
     m_userThemeDir = sgroup.GetFirstDir(true);
-
     m_callbacks = cbs;
 }
 
@@ -101,8 +87,6 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 // This class does not mind being Initialized twice.
 void MythUIHelper::Init()
 {
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
     m_screenSetup = true;
     StorageGroup sgroup("Themes", gCoreContext->GetHostName());
     m_userThemeDir = sgroup.GetFirstDir(true);
@@ -122,14 +106,6 @@ void MythUIHelper::LoadQtConfig()
 {
     gCoreContext->ResetLanguage();
     MythUIThemeCache::ClearThemeCacheDir();
-
-    if (!m_display)
-        m_display = MythDisplay::AcquireRelease();
-
-    // Switch to desired GUI resolution
-    if (m_display->UsingVideoModes())
-        m_display->SwitchToGUI(true);
-
     QApplication::setStyle("Windows");
 
     QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);

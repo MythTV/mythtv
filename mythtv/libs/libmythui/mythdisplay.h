@@ -22,9 +22,6 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     friend class MythMainWindow;
 
   public:
-    static MythDisplay* AcquireRelease(bool Acquire = true);
-    static QStringList  GetDescription(void);
-
     virtual bool  VideoModesAvailable(void) { return false; }
     virtual bool  UsingVideoModes(void) { return false; }
     virtual const std::vector<MythDisplayMode>& GetVideoModes(void);
@@ -32,7 +29,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static void  ConfigureQtGUI        (int SwapInterval = 1, const QString& Display = QString());
     static bool  SpanAllScreens        (void);
     static QString GetExtraScreenInfo  (QScreen *qScreen);
-
+    QStringList  GetDescription        (void);
     QRect        GetScreenBounds       (void);
     QScreen*     GetCurrentScreen      (void);
     static int   GetScreenCount        (void);
@@ -65,8 +62,9 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void         CurrentDPIChanged     (qreal    DPI);
 
   protected:
+    static MythDisplay* Create();
     MythDisplay();
-    ~MythDisplay() override;
+   ~MythDisplay() override;
 
     virtual void    UpdateCurrentMode  (void);
     virtual bool    SwitchToVideoMode  (QSize Size, double Framerate);
@@ -79,7 +77,6 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void            InitScreenBounds   (void);
     void            WaitForScreenChange(void);
     void            WaitForNewScreen   (void);
-
 
     bool            m_waitForModeChanges { true };
     bool            m_modeComplete     { false };
@@ -106,4 +103,4 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     DisplayModeMap  m_overrideVideoModes { };
 };
 
-#endif // MYTHDISPLAY_H
+#endif

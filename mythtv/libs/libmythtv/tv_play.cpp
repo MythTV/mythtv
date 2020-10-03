@@ -1175,10 +1175,7 @@ bool TV::Init()
 
     m_playerBounds = m_savedGuiBounds;
     if (fullscreen)
-    {
-        m_playerBounds = MythDisplay::AcquireRelease()->GetScreenBounds();
-        MythDisplay::AcquireRelease(false);
-    }
+        m_playerBounds = mainwindow->GetDisplay()->GetScreenBounds();
 
     // player window sizing
     MythScreenStack *mainStack = mainwindow->GetMainStack();
@@ -1253,17 +1250,18 @@ TV::~TV()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- lock");
 
     // restore window to gui size and position
-    MythDisplay* display = MythDisplay::AcquireRelease();
-    if (display->UsingVideoModes())
     {
-        bool hide = display->NextModeIsLarger(display->GetGUIResolution());
-        if (hide)
-            mwnd->hide();
-        display->SwitchToGUI(true);
-        if (hide)
-            mwnd->Show();
+        MythDisplay* display = mwnd->GetDisplay();
+        if (display->UsingVideoModes())
+        {
+            bool hide = display->NextModeIsLarger(display->GetGUIResolution());
+            if (hide)
+                mwnd->hide();
+            display->SwitchToGUI(true);
+            if (hide)
+                mwnd->Show();
+        }
     }
-    MythDisplay::AcquireRelease(false);
 
     mwnd->MoveResize(m_savedGuiBounds);
 #ifdef Q_OS_ANDROID
@@ -7200,17 +7198,18 @@ void TV::DoEditSchedule(int EditType)
 
     // Resize window to the MythTV GUI size
     MythMainWindow *mwnd = GetMythMainWindow();
-    MythDisplay* display = MythDisplay::AcquireRelease();
-    if (display->UsingVideoModes())
     {
-        bool hide = display->NextModeIsLarger(display->GetGUIResolution());
-        if (hide)
-            mwnd->hide();
-        display->SwitchToGUI(true);
-        if (hide)
-            mwnd->Show();
+        MythDisplay* display = mwnd->GetDisplay();
+        if (display->UsingVideoModes())
+        {
+            bool hide = display->NextModeIsLarger(display->GetGUIResolution());
+            if (hide)
+                mwnd->hide();
+            display->SwitchToGUI(true);
+            if (hide)
+                mwnd->Show();
+        }
     }
-    MythDisplay::AcquireRelease(false);
 
     if (!m_dbUseGuiSizeForTv)
         mwnd->MoveResize(m_savedGuiBounds);

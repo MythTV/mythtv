@@ -2304,9 +2304,8 @@ static HostComboBoxSetting *GuiVidModeResolution()
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
 
-    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythDisplay* display = GetMythMainWindow()->GetDisplay();
     std::vector<MythDisplayMode> scr = display->GetVideoModes();
-    MythDisplay::AcquireRelease(false);
     for (auto & vmode : scr)
     {
         int w = vmode.Width();
@@ -2354,9 +2353,8 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     gc->setHelpText(hstr);
 
-    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythDisplay* display = GetMythMainWindow()->GetDisplay();
     std::vector<MythDisplayMode> scr = display->GetVideoModes();
-    MythDisplay::AcquireRelease(false);
     for (auto & vmode : scr)
     {
         QString sel = QString("%1x%2").arg(vmode.Width()).arg(vmode.Height());
@@ -2418,9 +2416,8 @@ std::vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(const QStrin
     if (ok0 && ok1)
     {
         QSize size(width, height);
-        MythDisplay *display = MythDisplay::AcquireRelease();
+        MythDisplay* display = GetMythMainWindow()->GetDisplay();
         result = display->GetRefreshRates(size);
-        MythDisplay::AcquireRelease(false);
     }
     return result;
 }
@@ -4598,7 +4595,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(MenuTheme());
     screen->addChild(GUIRGBLevels());
 
-    m_display = MythDisplay::AcquireRelease();
+    m_display = GetMythMainWindow()->GetDisplay();
     m_screen = ScreenSelection();
     m_screenAspect = ScreenAspectRatio();
     screen->addChild(m_screen);
@@ -4621,14 +4618,13 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(AirPlayFullScreen());
 #endif
 
-    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythDisplay* display = GetMythMainWindow()->GetDisplay();
     if (display->VideoModesAvailable())
     {
         std::vector<MythDisplayMode> scr = display->GetVideoModes();
         if (!scr.empty())
             addChild(UseVideoModes());
     }
-    MythDisplay::AcquireRelease(false);
 
     auto *dates = new GroupSetting();
 
@@ -4644,11 +4640,6 @@ AppearanceSettings::AppearanceSettings()
     addChild(dates);
 
     addChild(LCDEnable());
-}
-
-AppearanceSettings::~AppearanceSettings()
-{
-    MythDisplay::AcquireRelease(false);
 }
 
 /*******************************************************************************

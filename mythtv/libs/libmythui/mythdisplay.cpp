@@ -40,13 +40,9 @@
 
 /*! \class MythDisplay
  *
- * MythDisplay is a reference counted, singleton class.
- *
- * Retrieve a reference to the MythDisplay object by calling AcquireRelease().
- *
- * A valid pointer is always returned.
- *
- * Release the reference by calling AcquireRelease(false).
+ * MythDisplay is a wrapper around platform dependant display functionality.
+ * It can only be created by MythMainWindow and the single instance is owned by
+ * the MythMainWindow object.
  *
  * \note There is no locking in MythDisplay. It should never be used from anywhere
  * other than the main/UI thread.
@@ -69,64 +65,50 @@
  * There are various complications here. Currently switching windows is triggered
  * from the settings screens - which initiate a teardown of painter/render/UI etc.
  * We cannot do that from random parts of the UI or during video playback.
+ *
+ * \sa MythMainWindow
 */
-MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
+
+/*! \brief Create a MythDisplay object appropriate for the current platform.
+ * \note This function always returns a valid MythDisplay object.
+*/
+MythDisplay* MythDisplay::Create()
 {
-    static QMutex s_lock(QMutex::Recursive);
-    static MythDisplay* s_display = nullptr;
-
-    QMutexLocker locker(&s_lock);
-
-    if (Acquire)
-    {
-        if (s_display)
-        {
-            s_display->IncrRef();
-        }
-        else
-        {
+    MythDisplay* result = nullptr;
 #ifdef USING_X11
-            if (MythDisplayX11::IsAvailable())
-                s_display = new MythDisplayX11();
+    if (MythDisplayX11::IsAvailable())
+        result = new MythDisplayX11();
 #endif
 #ifdef USING_DBUS
-            /* disabled until testing can be completed (add docs on subclass choice when done)
-            if (!s_display)
-                s_display = MythDisplayMutter::Create();
-            */
+    /* disabled until testing can be completed (add docs on subclass choice when done)
+    if (!result)
+        result = MythDisplayMutter::Create();
+    */
 #endif
 #ifdef USING_MMAL
-            if (!s_display)
-                s_display = new MythDisplayRPI();
+    if (!result)
+        result = new MythDisplayRPI();
 #endif
 #ifdef USING_DRM
-            // this will only work by validating the screen's serial number
-            if (!s_display)
-                s_display = new MythDisplayDRM();
+    // this will only work by validating the screen's serial number
+    if (!result)
+        result = new MythDisplayDRM();
 #endif
 #if defined(Q_OS_MAC)
-            if (!s_display)
-                s_display = new MythDisplayOSX();
+    if (!result)
+        result = new MythDisplayOSX();
 #endif
 #ifdef Q_OS_ANDROID
-            if (!s_display)
-                s_display = new MythDisplayAndroid();
+    if (!result)
+        result = new MythDisplayAndroid();
 #endif
 #if defined(Q_OS_WIN)
-            if (!s_display)
-                s_display = new MythDisplayWindows();
+    if (!result)
+        result = new MythDisplayWindows();
 #endif
-            if (!s_display)
-                s_display = new MythDisplay();
-        }
-    }
-    else
-    {
-        if (s_display)
-            if (s_display->DecrRef() == 0)
-                s_display = nullptr;
-    }
-    return s_display;
+    if (!result)
+        result = new MythDisplay();
+    return result;
 }
 
 QStringList MythDisplay::GetDescription(void)
@@ -134,7 +116,7 @@ QStringList MythDisplay::GetDescription(void)
     QStringList result;
     bool spanall = false;
     int screencount = MythDisplay::GetScreenCount();
-    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythDisplay* display = GetMythMainWindow()->GetDisplay();
 
     if (MythDisplay::SpanAllScreens() && screencount > 1)
     {
@@ -175,7 +157,6 @@ QStringList MythDisplay::GetDescription(void)
             }
         }
     }
-    MythDisplay::AcquireRelease(false);
     return result;
 }
 

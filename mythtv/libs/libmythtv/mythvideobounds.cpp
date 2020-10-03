@@ -28,6 +28,7 @@
 #include "mythmiscutil.h"
 #include "mythplayer.h"
 #include "mythcorecontext.h"
+#include "mythmainwindow.h"
 #include "mythvideobounds.h"
 
 // Std
@@ -59,7 +60,7 @@ MythVideoBounds::MythVideoBounds(bool CreateDisplay)
 
     if (CreateDisplay)
     {
-        m_display = MythDisplay::AcquireRelease();
+        m_display = GetMythMainWindow()->GetDisplay();
         connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
 #ifdef Q_OS_MACOS
         connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
@@ -69,8 +70,6 @@ MythVideoBounds::MythVideoBounds(bool CreateDisplay)
 
 MythVideoBounds::~MythVideoBounds()
 {
-    if (m_display)
-        MythDisplay::AcquireRelease(false);
 }
 
 void MythVideoBounds::ScreenChanged(QScreen */*screen*/)

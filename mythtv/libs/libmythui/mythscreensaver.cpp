@@ -27,7 +27,7 @@
 #include "platforms/mythxdisplay.h"
 #endif
 
-MythScreenSaverControl::MythScreenSaverControl()
+MythScreenSaverControl::MythScreenSaverControl(MythDisplay* mDisplay)
 {
 #if defined(USING_DBUS)
     m_screenSavers.push_back(new MythScreenSaverDBus());
@@ -46,9 +46,11 @@ MythScreenSaverControl::MythScreenSaverControl()
     m_screenSavers.push_back(new MythScreenSaverAndroid());
 #endif
 #ifdef USING_DRM
-    MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create();
+    MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create(mDisplay);
     if (drmsaver)
         m_screenSavers.push_back(drmsaver);
+#else
+    (void)mDisplay;
 #endif
 #ifdef USING_WAYLANDEXTRAS
     m_screenSavers.push_back(new MythScreenSaverWayland());

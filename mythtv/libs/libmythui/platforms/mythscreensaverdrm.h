@@ -17,7 +17,7 @@ class MythScreenSaverDRM : public QObject, public MythScreenSaver
     Q_OBJECT
 
   public:
-    static MythScreenSaverDRM* Create();
+    static MythScreenSaverDRM* Create(MythDisplay* mDisplay);
    ~MythScreenSaverDRM() override;
 
     bool IsValid() const;
@@ -31,7 +31,7 @@ class MythScreenSaverDRM : public QObject, public MythScreenSaver
     void timerEvent(QTimerEvent* Event) override;
 
   private:
-    MythScreenSaverDRM();
+    explicit MythScreenSaverDRM(MythDisplay* mDisplay);
     void Init();
     void UpdateDPMS();
     void TurnScreenOnOff(bool On);

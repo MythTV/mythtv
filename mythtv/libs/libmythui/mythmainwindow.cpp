@@ -133,7 +133,12 @@ MythNotificationCenter *GetNotificationCenter(void)
 MythMainWindow::MythMainWindow(const bool useDB)
   : QWidget(nullptr)
 {
-    m_display = MythDisplay::AcquireRelease();
+    m_display = MythDisplay::Create();
+
+    // Switch to desired GUI resolution
+    if (m_display->UsingVideoModes())
+        m_display->SwitchToGUI(true);
+
     m_deviceHandler = new MythInputDeviceHandler(this);
     connect(this, &MythMainWindow::signalWindowReady, m_deviceHandler, &MythInputDeviceHandler::MainWindowReady);
 
@@ -198,7 +203,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     if (m_idleTime > 0)
         m_idleTimer.start();
 
-    m_screensaver = new MythScreenSaverControl();
+    m_screensaver = new MythScreenSaverControl(m_display);
     if (m_screensaver)
     {
         connect(this, &MythMainWindow::signalRestoreScreensaver, m_screensaver, &MythScreenSaverControl::Restore);
@@ -240,9 +245,18 @@ MythMainWindow::~MythMainWindow()
     delete d->m_nc;
 
     MythPainterWindow::DestroyPainters(m_painterWin, m_painter);
-    MythDisplay::AcquireRelease(false);
+
+    // N.B. we always call this to ensure the desktop mode is restored
+    // in case the setting was changed
+    m_display->SwitchToDesktop();
+    delete m_display;
 
     delete d;
+}
+
+MythDisplay* MythMainWindow::GetDisplay()
+{
+    return m_display;
 }
 
 MythPainter *MythMainWindow::GetPainter(void)
@@ -499,8 +513,8 @@ void MythMainWindow::GrabWindow(QImage &image)
         winid = 0;
     }
 
-    QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
-    MythDisplay::AcquireRelease(false);
+    MythDisplay* display = GetMythMainWindow()->GetDisplay();
+    QScreen* screen = display->GetCurrentScreen();
     if (screen)
     {
         QPixmap p = screen->grabWindow(winid);
@@ -692,7 +706,7 @@ void MythMainWindow::Init(bool mayReInit)
     // SetWidget may move the widget into a new screen.
     m_display->SetWidget(this);
     // Ensure MythUIHelper has latest screen bounds if we have moved
-    UpdateScreenSettings();
+    UpdateScreenSettings(m_display);
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 

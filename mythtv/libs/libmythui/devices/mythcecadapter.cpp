@@ -92,7 +92,7 @@ MythCECAdapter::~MythCECAdapter()
     Close();
 }
 
-void MythCECAdapter::Open(void)
+void MythCECAdapter::Open(MythMainWindow *Window)
 {
     Close();
 
@@ -144,7 +144,7 @@ void MythCECAdapter::Open(void)
     // NOTE We could listen for display changes here but the adapter will be recreated
     // following a screen change and realistically any setup with more than 1 display
     // and/or CEC adapter is going to be very hit and miss.
-    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythDisplay* display = Window->GetDisplay();
     if (display->GetEDID().Valid())
     {
         uint16_t address = display->GetEDID().PhysicalAddress();
@@ -155,7 +155,6 @@ void MythCECAdapter::Open(void)
             configuration.iPhysicalAddress = address;
         }
     }
-    MythDisplay::AcquireRelease(false);
 
     // Set up the callbacks
 #if CEC_LIB_VERSION_MAJOR <= 3

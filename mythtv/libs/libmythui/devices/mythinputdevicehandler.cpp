@@ -203,7 +203,7 @@ void MythInputDeviceHandler::MainWindowReady(void)
     // Open any adapter after the window has been created to ensure we capture
     // the EDID if available - and hence get a more accurate Physical Address.
     // This will close any existing adapter in the event that the window has been re-init'ed.
-    m_cecAdapter.Open();
+    m_cecAdapter.Open(m_parent);
 #endif
 }
 

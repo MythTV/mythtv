@@ -138,7 +138,7 @@ class AppearanceSettings : public GroupSetting
 
   public:
     AppearanceSettings();
-   ~AppearanceSettings() override;
+   ~AppearanceSettings() override = default;
     void applyChange() override; // GroupSetting
 
   public slots:
