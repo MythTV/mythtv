@@ -207,7 +207,7 @@ QRect MythUIScreenBounds::GetScreenRect()
     return m_screenRect;
 }
 
-QSize MythUIScreenBounds::NormSize(const QSize& Size)
+QSize MythUIScreenBounds::NormSize(const QSize& Size) const
 {
     QSize result;
     result.setWidth(static_cast<int>(Size.width() * m_screenHorizScale));
@@ -215,17 +215,17 @@ QSize MythUIScreenBounds::NormSize(const QSize& Size)
     return result;
 }
 
-int MythUIScreenBounds::NormX(int X)
+int MythUIScreenBounds::NormX(int X) const
 {
     return qRound(X * m_screenHorizScale);
 }
 
-int MythUIScreenBounds::NormY(int Y)
+int MythUIScreenBounds::NormY(int Y) const
 {
     return qRound(Y * m_screenVertScale);
 }
 
-void MythUIScreenBounds::GetScalingFactors(float& Horizontal, float& Vertical)
+void MythUIScreenBounds::GetScalingFactors(float& Horizontal, float& Vertical) const
 {
     Horizontal = m_screenHorizScale;
     Vertical   = m_screenVertScale;
@@ -242,7 +242,7 @@ QSize MythUIScreenBounds::GetThemeSize()
     return m_themeSize;
 }
 
-int MythUIScreenBounds::GetFontStretch()
+int MythUIScreenBounds::GetFontStretch() const
 {
     return m_fontStretch;
 }

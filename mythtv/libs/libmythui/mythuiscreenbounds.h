@@ -19,13 +19,13 @@ class MUI_PUBLIC MythUIScreenBounds
     QRect GetUIScreenRect();
     void  SetUIScreenRect(const QRect& Rect);
     QRect GetScreenRect();
-    QSize NormSize(const QSize& Size);
-    int   NormX(int X);
-    int   NormY(int Y);
-    void  GetScalingFactors(float& Horizontal, float& Vertical);
+    QSize NormSize(const QSize& Size) const;
+    int   NormX(int X) const;
+    int   NormY(int Y) const;
+    void  GetScalingFactors(float& Horizontal, float& Vertical) const;
     void  SetScalingFactors(float  Horizontal, float  Vertical);
     QSize GetThemeSize();
-    int   GetFontStretch();
+    int   GetFontStretch() const;
     void  SetFontStretch(int Stretch);
 
   protected:
