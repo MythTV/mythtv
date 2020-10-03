@@ -130,7 +130,7 @@ void MythUIScreenBounds::InitScreenBounds()
                         gCoreContext->GetNumSetting("GuiOffsetY") == 0 &&
                         gCoreContext->GetNumSetting("GuiHeight")  == 0);
     m_wantWindow   = gCoreContext->GetBoolSetting("RunFrontendInWindow", false);
-    m_QtFullScreen = WindowIsAlwaysFullscreen();
+    m_qtFullScreen = WindowIsAlwaysFullscreen();
     m_alwaysOnTop  = gCoreContext->GetBoolSetting("AlwaysOnTop", false);
     m_themeSize    = GetMythUI()->GetBaseSize();
 }

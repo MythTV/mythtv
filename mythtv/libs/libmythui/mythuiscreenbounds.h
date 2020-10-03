@@ -39,7 +39,7 @@ class MUI_PUBLIC MythUIScreenBounds
     float m_screenVertScale  { 1.0   };
     bool  m_wantWindow       { false };
     bool  m_wantFullScreen   { true  };
-    bool  m_QtFullScreen     { false };
+    bool  m_qtFullScreen     { false };
     bool  m_alwaysOnTop      { false };
     int   m_fontStretch      { 100   };
 

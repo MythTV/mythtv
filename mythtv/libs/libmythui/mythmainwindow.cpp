@@ -645,7 +645,7 @@ void MythMainWindow::Init(bool mayReInit)
     Qt::WindowFlags flags = Qt::Window;
 
     InitScreenBounds();
-    bool inwindow   = m_wantWindow && !m_QtFullScreen;
+    bool inwindow   = m_wantWindow && !m_qtFullScreen;
     bool fullscreen = m_wantFullScreen && !GeometryIsOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
@@ -964,7 +964,7 @@ void MythMainWindow::ReinitDone(void)
 
 void MythMainWindow::Show(void)
 {
-    bool inwindow = m_wantWindow && !m_QtFullScreen;
+    bool inwindow = m_wantWindow && !m_qtFullScreen;
     bool fullscreen = m_wantFullScreen && !GeometryIsOverridden();
     if (fullscreen && !inwindow && !d->m_firstinit)
         showFullScreen();
