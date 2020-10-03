@@ -3,6 +3,9 @@
 #include "vulkan/mythshadersvulkan.h"
 #include "vulkan/mythshadervulkan.h"
 
+// Std
+#include <algorithm>
+
 #define LOC QString("VulkanShader: ")
 
 // libglslang
@@ -385,16 +388,16 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
     if (useglsl)
     {
         std::vector<MythGLSLStage> glslstages;
-        for (const auto & stage : Stages)
-            glslstages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).first);
+        std::transform(Stages.cbegin(), Stages.cend(), std::back_inserter(glslstages),
+                       [&](int Stage) { return MythGLSLStage{Stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(Stage).first }; });
         m_vulkanValid = MythShaderVulkan::CreateShaderFromGLSL(glslstages);
         return;
     }
 #endif
 
     std::vector<MythSPIRVStage> stages;
-    for (const auto & stage : Stages)
-        stages.emplace_back(stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(stage).second);
+    std::transform(Stages.cbegin(), Stages.cend(), std::back_inserter(stages),
+                   [&](int Stage) { return MythSPIRVStage{Stage & VK_SHADER_STAGE_ALL_GRAPHICS, Sources->at(Stage).second }; });
     m_vulkanValid = MythShaderVulkan::CreateShaderFromSPIRV(stages);
 }
 
@@ -417,9 +420,8 @@ bool MythShaderVulkan::CreateShaderFromSPIRV(const std::vector<MythSPIRVStage> &
     if (Stages.empty())
         return false;
 
-    for (const auto & stage : Stages)
-        if (stage.second.empty())
-            return false;
+    if (std::any_of(Stages.cbegin(), Stages.cend(), [](const MythSPIRVStage& Stage) { return Stage.second.empty(); }))
+        return false;
 
     bool success = true;
     for (const auto & stage : Stages)
