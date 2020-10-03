@@ -28,7 +28,6 @@ extern "C" {
 
 // MythMusic
 #include "constants.h"
-#include "cddb.h"
 
 #define CDEXT ".cda"
 const unsigned kSamplesPerSec = 44100;
@@ -494,44 +493,9 @@ MusicMetadata* CdDecoder::getMetadata(int track)
     return getMetadata();
 }
 
+
 // Create a TOC
 static lsn_t s_lastAudioLsn;
-static Cddb::Toc& GetToc(CdIo_t *cdio, Cddb::Toc& toc)
-{
-    // Get lead-in
-    const track_t firstTrack = cdio_get_first_track_num(cdio);
-    lsn_t lsn0 = 0;
-    msf_t msf;
-    if (cdio_get_track_msf(cdio, firstTrack, &msf))
-        lsn0 = (msf.m * 60 + msf.s) * CDIO_CD_FRAMES_PER_SEC + msf.f;
-
-    const track_t lastTrack = cdio_get_last_track_num(cdio);
-    for (track_t t = firstTrack; t <= lastTrack + 1; ++t)
-    {
-#if 0 // This would be better but the msf's returned are way off in libcdio 0.81
-        if (!cdio_get_track_msf(cdio, t, &msf))
-            break;
-#else
-        lsn_t lsn = cdio_get_track_lsn(cdio, t);
-        if (s_lastAudioLsn && lsn > s_lastAudioLsn)
-            lsn = s_lastAudioLsn;
-        lsn += lsn0; // lead-in
-
-        std::div_t d = std::div(lsn, CDIO_CD_FRAMES_PER_SEC);
-        msf.f = d.rem;
-        d = std::div(d.quot, 60);
-        msf.s = d.rem;
-        msf.m = d.quot;
-#endif
-        //LOG(VB_MEDIA, LOG_INFO, QString("Track %1 msf: %2:%3:%4").
-        //    arg(t,2).arg(msf.m,2).arg(msf.s,2).arg(msf.f,2) );
-        toc.push_back(Cddb::Msf(msf.m, msf.s, msf.f));
-
-        if (TRACK_FORMAT_AUDIO != cdio_get_track_format(cdio, t))
-            break;
-    }
-    return toc;
-}
 
 //virtual
 MusicMetadata *CdDecoder::getMetadata()
@@ -689,55 +653,7 @@ MusicMetadata *CdDecoder::getMetadata()
     if (title.isEmpty() || artist.isEmpty() || album.isEmpty())
 #endif // CDTEXT
     {
-        // CDDB lookup
-        Cddb::Toc toc;
-        Cddb::Matches r;
-        if (Cddb::Query(r, GetToc(cdio, toc)))
-        {
-            Cddb::Matches::match_t::const_iterator select = r.matches.cbegin();
-
-            if (r.matches.size() > 1)
-            {
-                // TODO prompt user to select one
-                // In the meantime, select the first non-generic genre
-                for (Cddb::Matches::match_t::const_iterator it = select;
-                    it != r.matches.cend(); ++it)
-                {
-                    QString g = it->discGenre.toLower();
-                    if (g != "misc" && g != "data")
-                    {
-                        select = it;
-                        break;
-                    }
-                }
-            }
-
-            Cddb::Album info;
-            if (Cddb::Read(info, select->discGenre, select->discID))
-            {
-                isCompilation = info.isCompilation;
-
-                if (info.genre.toLower() != "unknown")
-                    genre = info.genre[0].toTitleCase() + info.genre.mid(1);
-                else
-                    genre = info.discGenre[0].toTitleCase() + info.discGenre.mid(1);;
-
-                album = info.title;
-                compilation_artist = info.artist;
-                year = info.year;
-
-                if (info.tracks.size() >= tracknum)
-                {
-                    const Cddb::Track& track = info.tracks[tracknum - 1];
-                    title = track.title;
-                    artist = track.artist;
-                }
-
-                // Create a temporary local alias for future lookups
-                if (r.discID != info.discID)
-                    Cddb::Alias(info, r.discID);
-            }
-        }
+        //TODO: add MusicBrainz lookup
     }
 
     if (compilation_artist.toLower().left(7) == "various")

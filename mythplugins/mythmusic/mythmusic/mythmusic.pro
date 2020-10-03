@@ -66,8 +66,8 @@ SOURCES += lyricsview.cpp
 cdio {
     INCLUDEPATH -= $${SYSROOT}/usr/include/cdda
     INCLUDEPATH *= $${SYSROOT}/usr/include/cdio
-    HEADERS += cddecoder.h cdrip.h cddb.h
-    SOURCES += cddecoder.cpp cdrip.cpp cddb.cpp
+    HEADERS += cddecoder.h cdrip.h
+    SOURCES += cddecoder.cpp cdrip.cpp
     QT += network
     LIBS += -lcdio -lcdio_cdda -lcdio_paranoia
 }
