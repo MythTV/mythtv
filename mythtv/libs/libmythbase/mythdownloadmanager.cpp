@@ -813,7 +813,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     // the scope id.
 #ifndef _WIN32
     if (dlInfo->m_url.startsWith("http://[fe80::",Qt::CaseInsensitive))
-        return downloadNowLinkLocal(dlInfo,deleteInfo);
+        return downloadNowLinkLocal(dlInfo, deleteInfo);
 #endif
     m_infoLock->lock();
     m_downloadQueue.push_back(dlInfo);
@@ -885,37 +885,42 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
  */
 bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool deleteInfo)
 {
-    bool isOK = true;
+    bool ok = true;
+
+    // No buffer - no reply...
+    if (!dlInfo->m_data)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No data buffer provided for %1").arg(dlInfo->m_url));
+        ok = false;
+    }
 
     // Only certain features are supported here
     if (dlInfo->m_authCallback || dlInfo->m_authArg)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Unsupported authentication for %1").arg(dlInfo->m_url));
-        isOK = false;
-    }
-    if (!dlInfo->m_outFile.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Unsupported File output %1 for %2")
-              .arg(dlInfo->m_outFile).arg(dlInfo->m_url));
-        isOK = false;
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported authentication for %1").arg(dlInfo->m_url));
+        ok = false;
     }
 
-    if (!deleteInfo || dlInfo->m_requestType == kRequestHead)
+    if (ok && !dlInfo->m_outFile.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported File output %1 for %2")
+            .arg(dlInfo->m_outFile).arg(dlInfo->m_url));
+        ok = false;
+    }
+
+    if (ok && (!deleteInfo || dlInfo->m_requestType == kRequestHead))
     {
         // We do not have the ability to return a network reply in dlInfo
         // so if we are asked to do that, return an error.
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Unsupported link-local operation %1")
-              .arg(dlInfo->m_url));
-        isOK = false;
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported link-local operation %1")
+            .arg(dlInfo->m_url));
+        ok = false;
     }
 
     QUrl url(dlInfo->m_url);
     QString host(url.host());
     int port(url.port(80));
-    if (isOK && PortChecker::resolveLinkLocal(host, port))
+    if (ok && PortChecker::resolveLinkLocal(host, port))
     {
         QString reqType;
         switch (dlInfo->m_requestType)
@@ -928,20 +933,17 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
                 reqType = "GET";
                 break;
         }
-        QByteArray *aBuffer = dlInfo->m_data;
+        QByteArray* buffer = dlInfo->m_data;
         QHash<QByteArray, QByteArray> headers;
         if (dlInfo->m_headers)
             headers = *dlInfo->m_headers;
         if (!headers.contains("User-Agent"))
-            headers.insert("User-Agent",
-                             "MythDownloadManager v" MYTH_BINARY_VERSION);
+            headers.insert("User-Agent", "MythDownloadManager v" MYTH_BINARY_VERSION);
         headers.insert("Connection", "close");
         headers.insert("Accept-Encoding", "identity");
-        if (aBuffer && !aBuffer->isEmpty())
-            headers.insert("Content-Length",
-              (QString::number(aBuffer->size())).toUtf8());
-        headers.insert("Host",
-          (url.host()+":"+QString::number(port)).toUtf8());
+        if (!buffer->isEmpty())
+            headers.insert("Content-Length", QString::number(buffer->size()).toUtf8());
+        headers.insert("Host", (url.host() + ":" + QString::number(port)).toUtf8());
 
         QByteArray requestMessage;
         QString path (url.path());
@@ -958,48 +960,44 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
             requestMessage.append("\r\n");
         }
         requestMessage.append("\r\n");
-        if (aBuffer && !aBuffer->isEmpty())
-        {
-            requestMessage.append(*aBuffer);
-        }
+        if (!buffer->isEmpty())
+            requestMessage.append(*buffer);
+
         QTcpSocket socket;
-        socket.connectToHost(host, port);
+        socket.connectToHost(host, static_cast<uint16_t>(port));
         // QT Warning - this may not work on Windows
         if (!socket.waitForConnected(5000))
-            isOK = false;
-        if (isOK)
-            isOK = (socket.write(requestMessage) > 0);
-        if (isOK)
+            ok = false;
+        if (ok)
+            ok = socket.write(requestMessage) > 0;
+        if (ok)
             // QT Warning - this may not work on Windows
-            isOK = socket.waitForDisconnected(5000);
-        if (isOK)
+            ok = socket.waitForDisconnected(5000);
+        if (ok)
         {
-            *aBuffer = socket.readAll();
+            *buffer = socket.readAll();
             // Find the start of the content
             QByteArray delim("\r\n\r\n");
-            int delimLoc=aBuffer->indexOf(delim);
+            int delimLoc = buffer->indexOf(delim);
             if (delimLoc > -1)
-            {
-                *aBuffer = aBuffer->right
-                  (aBuffer->size()-delimLoc-4);
-            }
+                *buffer = buffer->right(buffer->size() - delimLoc - 4);
             else
-            {
-                isOK=false;
-            }
+                ok=false;
         }
         socket.close();
     }
     else
-        isOK = false;
+    {
+        ok = false;
+    }
 
     if (deleteInfo)
         delete dlInfo;
 
-    if (isOK)
+    if (ok)
         return true;
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1")
-        .arg(url.toString()));
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Link Local request failed: %1").arg(url.toString()));
     return false;
 }
 #endif
