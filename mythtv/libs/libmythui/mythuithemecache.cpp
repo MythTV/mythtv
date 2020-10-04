@@ -174,13 +174,6 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("Removing files not accessed since %1")
         .arg(cutoff.toLocalTime().toString(Qt::ISODate)));
 
-    int kept = 0;
-    int deleted = 0;
-    int errcnt = 0;
-    QDir dir(dirname);
-    dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-    dir.setSorting(QDir::NoSort);
-
     // Trying to save every cycle possible within this loop.  The
     // stat() call seems significantly faster than the fi.fileRead()
     // method.  The documentation for QFileInfo says that the
@@ -188,35 +181,45 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
     // use fi.filePath() method here and then add the directory if
     // needed.  Using dir.entryList() and adding the dirname each time
     // is also slower just using dir.entryInfoList().
+    QDir dir(dirname);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    dir.setSorting(QDir::NoSort);
     QFileInfoList entries = dir.entryInfoList();
+    int kept = 0;
+    int deleted = 0;
+    int errors = 0;
     for (const QFileInfo & fi : qAsConst(entries))
     {
         struct stat buf {};
         QString fullname = fi.filePath();
         if (not fullname.startsWith('/'))
             fullname = dirname + "/" + fullname;
-        QByteArray fullname8 = fullname.toLocal8Bit();
-        int rc = stat(fullname8, &buf);
-        if (rc == -1)
+        int rc = stat(fullname.toLocal8Bit(), &buf);
+        if (rc >= 0)
         {
-            errcnt += 1;
-            continue;
+            if (buf.st_atime < cutoffsecs)
+            {
+                deleted += 1;
+                LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Delete %2")
+                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
+                const char * fullname8 = fullname.toLocal8Bit().constData();
+                unlink(fullname8);
+            }
+            else
+            {
+                kept += 1;
+                LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Keep   %2")
+                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
+            }
         }
-        if (buf.st_atime >= cutoffsecs)
+        else
         {
-            kept += 1;
-            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Keep   %2")
-                .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
-            continue;
+            errors += 1;
         }
-        deleted += 1;
-        LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Delete %2")
-            .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
-        unlink(fullname8);
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Kept %1 files, deleted %2 files, stat error on %3 files")
-        .arg(kept).arg(deleted).arg(errcnt));
+        .arg(kept).arg(deleted).arg(errors));
 }
 
 QString MythUIThemeCache::GetThemeCacheDir()
