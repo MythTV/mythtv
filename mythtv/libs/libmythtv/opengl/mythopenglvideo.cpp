@@ -984,21 +984,15 @@ void MythOpenGLVideo::ResetTextures()
 void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>& Current,
                                    vector<MythGLTexture*>& Textures)
 {
-    bool usecurrent = true;
-    if (Deinterlacing)
+    if (Deinterlacing && !format_is_hw(m_inputType))
     {
-        if (format_is_hw(m_inputType))
-        {
-            usecurrent = true;
-        }
-        else if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
+        if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
         {
             // if we are using reference frames, we want the current frame in the middle
             // but next will be the first valid, followed by current...
-            usecurrent = false;
             size_t count = Current.size();
-            vector<MythVideoTexture*> &current = Current[0]->m_valid ? Current : m_nextTextures;
-            vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
+            vector<MythVideoTexture*>& current = Current[0]->m_valid ? Current : m_nextTextures;
+            vector<MythVideoTexture*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
             for (uint i = 0; i < count; ++i)
                 Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
@@ -1006,12 +1000,12 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>
                 Textures.push_back(reinterpret_cast<MythGLTexture*>(current[i]));
             for (uint i = 0; i < count; ++i)
                 Textures.push_back(reinterpret_cast<MythGLTexture*>(m_nextTextures[i]));
+            return;
         }
     }
 
-    if (usecurrent)
-        for (auto & texture : Current)
-            Textures.push_back(reinterpret_cast<MythGLTexture*>(texture));
+    std::transform(Current.cbegin(), Current.cend(), std::back_inserter(Textures),
+                   [](MythVideoTexture* Tex) { return reinterpret_cast<MythGLTexture*>(Tex); });
 }
 
 QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
