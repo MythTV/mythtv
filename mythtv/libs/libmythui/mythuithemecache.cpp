@@ -328,7 +328,7 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         }
         else
         {
-            if (!FindThemeFile(File))
+            if (!GetMythUI()->FindThemeFile(File))
                 return nullptr;
 
             QFileInfo original(File);
@@ -405,39 +405,6 @@ MythImage* MythUIThemeCache::GetImageFromCache(const QString& URL)
     */
 
     return nullptr;
-}
-
-bool MythUIThemeCache::FindThemeFile(QString &path)
-{
-    QFileInfo fi(path);
-
-    if (fi.isAbsolute() && fi.exists())
-        return true;
-#ifdef Q_OS_ANDROID
-    if (path.startsWith("assets:/") && fi.exists())
-        return true;
-#endif
-
-    QString file;
-    bool foundit = false;
-    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-
-    for (const auto & ii : qAsConst(searchpath))
-    {
-        if (fi.isRelative())
-            file = ii + fi.filePath();
-        else if (fi.isAbsolute() && !fi.isRoot())
-            file = ii + fi.fileName();
-
-        if (QFile::exists(file))
-        {
-            path = file;
-            foundit = true;
-            break;
-        }
-    }
-
-    return foundit;
 }
 
 MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bool NoDisk)
