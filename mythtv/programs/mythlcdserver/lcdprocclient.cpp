@@ -522,15 +522,9 @@ QString LCDProcClient::expandString(const QString &aString) const
     if ( m_pVersion != LCD_VERSION_5)
         return aString;
 
-    QString bString;
-
     // if version 5 then white space seperate the list of characters
-    for (auto x : qAsConst(aString))
-    {
-        bString += x + QString(" ");
-    }
-
-    return bString;
+    auto add_ws = [](QString str, auto x){ return str + x + QString(" "); };
+    return std::accumulate(aString.cbegin(), aString.cend(), QString(), add_ws);
 }
 
 void LCDProcClient::loadSettings()
@@ -953,14 +947,11 @@ void LCDProcClient::formatScrollingWidgets()
     if ( m_lcdTextItems->isEmpty())
         return; // Weird...
 
-    int max_len = 0;
-
     // Get the length of the longest item to scroll
-    for (const auto & item : qAsConst(*m_lcdTextItems))
-    {
-        if (item.getText().length() > max_len)
-            max_len = item.getText().length();
-    }
+    auto longest = [](int cur, const auto & item)
+        { return std::max(cur, item.getText().length()); };
+    int max_len = std::accumulate(m_lcdTextItems->cbegin(), m_lcdTextItems->cend(),
+                                  0, longest);
 
     // Make all scrollable items the same lenght and do the initial output
     auto it = m_lcdTextItems->begin();

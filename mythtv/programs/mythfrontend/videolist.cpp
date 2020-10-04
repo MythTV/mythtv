@@ -376,8 +376,8 @@ class VideoListImp
     int TryFilter(const VideoFilterSettings &filter) const
     {
         auto list = m_metadata.getList();
-        auto filtermatch = [filter](const auto & md)
-            { return filter.matches_filter(*md); };
+        auto filtermatch =
+            [filter](const auto & md){ return filter.matches_filter(*md); };
         return std::count_if(list.cbegin(), list.cend(), filtermatch);
     }
 
@@ -810,6 +810,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
         all_group_node->addEntry(smart_meta_node(new meta_data_node(data)));
 
         std::vector<QString> groups;
+        auto take_second = [](const auto& item){ return item.second; };
 
         switch (whence)
         {
@@ -819,8 +820,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                     data->GetGenres();
 
                 std::transform(genres.cbegin(), genres.cend(),
-                               std::back_inserter(groups),
-                               [](const auto& item){ return item.second; } );
+                               std::back_inserter(groups), take_second);
                 break;
             }
             case ltDBCategoryGroup:
@@ -848,8 +848,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 const std::vector<std::pair<int, QString> >& cast = data->GetCast();
 
                 std::transform(cast.cbegin(), cast.cend(),
-                               std::back_inserter(groups),
-                               [](const auto& item){ return item.second; } );
+                               std::back_inserter(groups), take_second);
                 break;
             }
             case ltDBUserRatingGroup:

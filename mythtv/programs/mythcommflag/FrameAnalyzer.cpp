@@ -86,10 +86,8 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
 long long
 frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap)
 {
-    long long sum = 0;
-    for (long long ii : qAsConst(*frameMap))
-        sum += ii;
-    return sum;
+    return std::accumulate(frameMap->cbegin(), frameMap->cend(),
+                           static_cast<long long>(0));
 }
 
 bool
