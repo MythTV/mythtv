@@ -213,8 +213,8 @@ bool MythPainterVulkan::Ready()
         const auto & sizes = m_textureShader->GetPoolSizes(1);
         // match total number of individual descriptors with pool size
         std::vector<VkDescriptorPoolSize> adjsizes;
-        for (const auto & size : sizes)
-            adjsizes.push_back( { size.type, MAX_TEXTURE_COUNT } );
+        std::transform(sizes.cbegin(), sizes.cend(), std::back_inserter(adjsizes),
+                       [](VkDescriptorPoolSize Size){ return VkDescriptorPoolSize { Size.type, MAX_TEXTURE_COUNT }; });
         VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
                                           0, MAX_TEXTURE_COUNT, static_cast<uint32_t>(adjsizes.size()), adjsizes.data() };
         if (m_vulkan->Funcs()->vkCreateDescriptorPool(m_vulkan->Device(), &pool, nullptr, &m_textureDescriptorPool) != VK_SUCCESS)
