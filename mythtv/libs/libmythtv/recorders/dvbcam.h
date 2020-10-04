@@ -1,15 +1,15 @@
 #ifndef DVBCAM_H
 #define DVBCAM_H
 
-#include <deque>
-
+// Qt
 #include <QWaitCondition>
 #include <QRunnable>
 #include <QString>
+#include <QMap>
 #include <QMutex>
 
+// MythTV
 #include "mpegtables.h"
-
 #include "dvbtypes.h"
 
 class ChannelBase;
@@ -40,7 +40,7 @@ class DVBCam : public QRunnable
     void run(void) override; // QRunnable
     void HandleUserIO(void);
     void HandlePMT(void);
-
+    void RemoveDuplicateServices(void);
     void SendPMT(const ProgramMapTable &pmt, uint cplm);
 
     QString         m_device;
