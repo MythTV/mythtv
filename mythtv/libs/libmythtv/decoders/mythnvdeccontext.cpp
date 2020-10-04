@@ -87,18 +87,10 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     }
 
     // iterate over known decoder capabilities
-    bool supported = false;
-    const std::vector<MythNVDECCaps>& profiles = MythNVDECContext::GetProfiles();
-    for (auto cap : profiles)
-    {
-        if (cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->height))
-        {
-            supported = true;
-            break;
-        }
-    }
-
-    if (!supported)
+    auto & profiles = MythNVDECContext::GetProfiles();
+    auto capcheck = [&](const MythNVDECCaps& Cap)
+        { return Cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->height); };
+    if (!std::any_of(profiles.cbegin(), profiles.cend(), capcheck))
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "No matching profile support");
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));
