@@ -85,19 +85,11 @@ static QWaitCondition               logMsgListNotEmpty;
 /// \brief LoggerBase class constructor.  Adds the new logger instance to the
 ///        loggerMap.
 /// \param string a C-string of the handle for this instance (NULL if unused)
-LoggerBase::LoggerBase(const char *string)
+LoggerBase::LoggerBase(const char *string) :
+    m_handle(string)
 {
     QMutexLocker locker(&loggerMapMutex);
-    if (string)
-    {
-        m_handle = strdup(string);
-        loggerMap.insert(QString(m_handle), this);
-    }
-    else
-    {
-        m_handle = nullptr;
-        loggerMap.insert(QString(""), this);
-    }
+    loggerMap.insert(m_handle, this);
 }
 
 
@@ -106,10 +98,7 @@ LoggerBase::LoggerBase(const char *string)
 LoggerBase::~LoggerBase()
 {
     QMutexLocker locker(&loggerMapMutex);
-    loggerMap.remove(QString(m_handle));
-
-    if (m_handle)
-        free(m_handle);
+    loggerMap.remove(m_handle);
 }
 
 
@@ -165,7 +154,7 @@ void FileLogger::reopen(void)
 {
     close(m_fd);
 
-    m_fd = open(m_handle, O_WRONLY|O_CREAT|O_APPEND, 0664);
+    m_fd = open(qPrintable(m_handle), O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
     LOG(VB_GENERAL, LOG_INFO, QString("Rolled logging on %1") .arg(m_handle));
 }

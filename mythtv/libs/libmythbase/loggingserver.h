@@ -41,7 +41,7 @@ class LoggerBase : public QObject
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
   protected:
-    char *m_handle {nullptr}; ///< semi-opaque handle for identifying instance
+    QString m_handle {}; ///< semi-opaque handle for identifying instance
 };
 
 /// \brief File-based logger - used for logfiles and console
