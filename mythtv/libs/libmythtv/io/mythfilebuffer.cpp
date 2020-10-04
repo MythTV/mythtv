@@ -535,7 +535,8 @@ int MythFileBuffer::SafeRead(RemoteFile *Remote, void *Buffer, uint Size)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "safe_read(RemoteFile* ...): read failed");
         m_posLock.lockForRead();
-        Remote->Seek(m_internalReadPos - m_readAdjust, SEEK_SET);
+        if (Remote->Seek(m_internalReadPos - m_readAdjust, SEEK_SET) < 0)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "safe_read() failed to seek reset");
         m_posLock.unlock();
         m_numFailures++;
     }
