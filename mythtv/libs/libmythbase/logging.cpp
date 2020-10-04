@@ -67,7 +67,7 @@ static QRegExp                 logRegExp = QRegExp("[%]{1,2}");
 
 static LoggerThread           *logThread = nullptr;
 static QMutex                  logThreadMutex;
-static QHash<uint64_t, char *> logThreadHash;
+static QHash<uint64_t, QString> logThreadHash;
 
 static QMutex                   logThreadTidMutex;
 static QHash<uint64_t, int64_t> logThreadTidHash;
@@ -149,20 +149,10 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         ReferenceCounter("LoggingItem", false),
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level),
-        m_file(strdup(_file)), m_function(strdup(_function))
+        m_file(_file), m_function(_function)
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
     setThreadTid();
-}
-
-LoggingItem::~LoggingItem()
-{
-    free(m_file);
-    free(m_function);
-    free(m_threadName);
-    free(m_appName);
-    free(m_table);
-    free(m_logFile);
 }
 
 QByteArray LoggingItem::toByteArray(void)
@@ -177,15 +167,15 @@ QByteArray LoggingItem::toByteArray(void)
 
 /// \brief Get the name of the thread that produced the LoggingItem
 /// \return C-string of the thread name
-char *LoggingItem::getThreadName(void)
+QString LoggingItem::getThreadName(void)
 {
     static constexpr char const *kSUnknown = "thread_unknown";
 
-    if( m_threadName )
+    if( !m_threadName.isEmpty() )
         return m_threadName;
 
     QMutexLocker locker(&logThreadMutex);
-    return logThreadHash.value(m_threadId, (char *)kSUnknown);
+    return logThreadHash.value(m_threadId, kSUnknown);
 }
 
 /// \brief Get the thread ID of the thread that produced the LoggingItem
@@ -362,12 +352,7 @@ void LoggerThread::handleItem(LoggingItem *item)
         item->m_tid = item->getThreadTid();
 
         QMutexLocker locker(&logThreadMutex);
-        if (logThreadHash.contains(item->m_threadId))
-        {
-            char *threadName = logThreadHash.take(item->m_threadId);
-            free(threadName);
-        }
-        logThreadHash[item->m_threadId] = strdup(item->m_threadName);
+        logThreadHash[item->m_threadId] = item->m_threadName;
 
         if (debugRegistration)
         {
@@ -400,8 +385,7 @@ void LoggerThread::handleItem(LoggingItem *item)
                          QString::number(tid),
                          logThreadHash[item->m_threadId]);
             }
-            char *threadName = logThreadHash.take(item->m_threadId);
-            free(threadName);
+            logThreadHash.remove(item->m_threadId);
         }
     }
 
@@ -452,7 +436,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
                 .arg(timestamp, QString(shortname),
                      QString::number(item->pid()),
                      QString::number(item->tid()),
-                     item->rawThreadName(),
+                     item->threadName(),
                      item->m_file,
                      QString::number(item->m_line),
                      item->m_function,
@@ -463,7 +447,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
             line = qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
                 .arg(timestamp, QString(shortname),
                      QString::number(item->pid()),
-                     item->rawThreadName(),
+                     item->threadName(),
                      item->m_file,
                      QString::number(item->m_line),
                      item->m_function,
@@ -507,8 +491,9 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         break;
     }
 #if CONFIG_DEBUGTYPE
-    __android_log_print(aprio, "mfe", "%s:%d:%s  %s", item->m_file,
-                        item->m_line, item->m_function, qPrintable(item->m_message));
+    __android_log_print(aprio, "mfe", "%s:%d:%s  %s", qPrintable(item->m_file),
+                        item->m_line, qPrintable(item->m_function),
+                        qPrintable(item->m_message));
 #else
     __android_log_print(aprio, "mfe", "%s", qPrintable(item->m_message));
 #endif

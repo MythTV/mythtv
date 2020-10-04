@@ -266,9 +266,9 @@ bool SyslogLogger::logmsg(LoggingItem *item)
 
     char shortname = item->getLevelChar();
     syslog(item->level() | item->facility(), "%s[%d]: %c %s %s:%d (%s) %s",
-           item->rawAppName(), item->pid(), shortname, item->rawThreadName(),
-           item->rawFile(), item->line(), item->rawFunction(),
-           qPrintable(item->message()));
+           qPrintable(item->appName()), item->pid(), shortname,
+           qPrintable(item->threadName()), qPrintable(item->file()), item->line(),
+           qPrintable(item->function()), qPrintable(item->message()));
 
     return true;
 }
@@ -312,12 +312,12 @@ bool JournalLogger::logmsg(LoggingItem *item)
     sd_journal_send(
         "MESSAGE=%s", qUtf8Printable(item->message()),
         "PRIORITY=%d", item->level(),
-        "CODE_FILE=%s", item->rawFile(),
+        "CODE_FILE=%s", qUtf8Printable(item->file()),
         "CODE_LINE=%d", item->line(),
-        "CODE_FUNC=%s", item->rawFunction(),
-        "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
+        "CODE_FUNC=%s", qUtf8Printable(item->function()),
+        "SYSLOG_IDENTIFIER=%s", qUtf8Printable(item->appName()),
         "SYSLOG_PID=%d", item->pid(),
-        "MYTH_THREAD=%s", item->rawThreadName(),
+        "MYTH_THREAD=%s", qUtf8Printable(item->threadName()),
         NULL
         );
     return true;
