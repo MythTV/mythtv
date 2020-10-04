@@ -237,14 +237,9 @@ void FileSelector::OKPressed()
         {
             f = m_selectedList.at(x);
 
-            for (const auto *a : qAsConst(*m_archiveList))
-            {
-                if (a->filename == f)
-                {
-                    tempSList.append(f);
-                    break;
-                }
-            }
+            auto namematch = [f](const auto *a){ return a->filename == f; };
+            if (std::any_of(m_archiveList->cbegin(), m_archiveList->cend(), namematch))
+                tempSList.append(f);
         }
 
         for (int x = 0; x < tempSList.size(); x++)
@@ -349,14 +344,13 @@ void FileSelector::updateSelectedList()
 
     for (const auto *a : qAsConst(*m_archiveList))
     {
-        for (const auto *f : qAsConst(m_fileData))
+        auto samename = [a](const auto *f)
+            { return f->filename == a->filename; };
+        auto f = std::find_if(m_fileData.cbegin(), m_fileData.cend(), samename);
+        if (f != m_fileData.cend())
         {
-            if (f->filename == a->filename)
-            {
-                if (m_selectedList.indexOf(f->filename) == -1)
-                    m_selectedList.append(f->filename);
-                break;
-            }
+            if (m_selectedList.indexOf((*f)->filename) == -1)
+                m_selectedList.append((*f)->filename);
         }
     }
 }

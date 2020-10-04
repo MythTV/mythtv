@@ -232,15 +232,8 @@ void BookmarkManager::UpdateURLList(void)
 
 uint BookmarkManager::GetMarkedCount(void)
 {
-    uint count = 0;
-
-    for (auto *site : qAsConst(m_siteList))
-    {
-        if (site && site->m_selected)
-            count++;
-    }
-
-    return count;
+    auto selected = [](auto *site){ return site && site->m_selected; };
+    return std::count_if(m_siteList.cbegin(), m_siteList.cend(), selected);
 }
 
 bool BookmarkManager::keyPressEvent(QKeyEvent *event)

@@ -29,31 +29,20 @@ const std::array<GameTypes,12> GameTypeList
 
 QString GetGameTypeName(const QString &GameType)
 {
-    QString result = "";
-
-    for (const auto & console : GameTypeList)
-    {
-        if (console.m_idStr == GameType) {
-            result = QCoreApplication::translate("(GameTypes)",
-                                                 console.m_nameStr.toUtf8());
-            break;
-        }
-    }
-    return result;
+    auto sametype = [GameType](const auto & console)
+        { return console.m_idStr == GameType; };
+    const auto *const con = std::find_if(GameTypeList.cbegin(), GameTypeList.cend(), sametype);
+    return (con != GameTypeList.cend())
+        ? QCoreApplication::translate("(GameTypes)", con->m_nameStr.toUtf8())
+        : "";
 }
 
 QString GetGameTypeExtensions(const QString &GameType)
 {
-    QString result = "";
-
-    for (const auto & console : GameTypeList)
-    {
-        if (console.m_idStr == GameType) {
-            result = console.m_extensions;
-            break;
-        }
-    }
-    return result;
+    auto sametype = [GameType](const auto & console)
+        { return console.m_idStr == GameType; };
+    const auto *const con = std::find_if(GameTypeList.cbegin(), GameTypeList.cend(), sametype);
+    return (con != GameTypeList.cend()) ? con->m_extensions : "";
 }
 
 // -----------------------------------------------------------------------

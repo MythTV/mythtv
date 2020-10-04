@@ -240,16 +240,15 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
     }
 
     // no matching source, make one
-    for (auto *si : qAsConst(m_scripts))
+    auto idmatch = [id](auto *si){ return si->id == id; };
+    auto it = std::find_if(m_scripts.cbegin(), m_scripts.cend(), idmatch);
+    if (it != m_scripts.cend())
     {
-        if (si->id == id)
-        {
-            auto *ws = new WeatherSource(si);
-            ws->setLocale(loc);
-            ws->setUnits(units);
-            m_sources.append(ws);
-            return ws;
-        }
+        auto *ws = new WeatherSource(*it);
+        ws->setLocale(loc);
+        ws->setUnits(units);
+        m_sources.append(ws);
+        return ws;
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC +

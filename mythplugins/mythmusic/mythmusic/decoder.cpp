@@ -101,11 +101,10 @@ Decoder *Decoder::create(const QString &source, AudioOutput *output, bool deleta
 {
     checkFactories();
 
-    for (const auto & factory : qAsConst(*factories))
-    {
-        if (factory->supports(source))
-            return factory->create(source, output, deletable);
-    }
-
-    return nullptr;
+    auto supported = [source](const auto & factory)
+        { return factory->supports(source); };
+    auto f = std::find_if(factories->cbegin(), factories->cend(), supported);
+    return (f != factories->cend())
+        ? (*f)->create(source, output, deletable)
+        : nullptr;
 }
