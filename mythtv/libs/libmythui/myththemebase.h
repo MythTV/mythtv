@@ -1,22 +1,25 @@
 #ifndef MYTHTHEMEBASE_H_
 #define MYTHTHEMEBASE_H_
 
+// MythTV
 #include "mythuiexp.h"
 
-class MythThemeBasePrivate;
+class MythScreenStack;
+class MythScreenType;
+class MythMainWindow;
 
 class MUI_PUBLIC MythThemeBase
 {
   public:
-    MythThemeBase();
+    explicit MythThemeBase(MythMainWindow* MainWindow);
    ~MythThemeBase();
 
-    void Reload(void);
+    void Reload();
 
   private:
-    void Init(void);
-
-    MythThemeBasePrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+    Q_DISABLE_COPY(MythThemeBase)
+    MythScreenStack *m_background       { nullptr };
+    MythScreenType  *m_backgroundscreen { nullptr };
 };
 
 #endif

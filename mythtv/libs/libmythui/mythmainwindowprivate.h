@@ -8,7 +8,6 @@
 
 class MythScreenStack;
 class MythSignalingTimer;
-class MythThemeBase;
 class MythUDPListener;
 class MythMediaDevice;
 
@@ -82,7 +81,6 @@ class MythMainWindowPrivate
     QMutex           m_drawDisableLock;
     uint             m_drawDisabledDepth { 0       };
     bool             m_drawEnabled       { true    };
-    MythThemeBase   *m_themeBase         { nullptr };
     MythUDPListener *m_udpListener       { nullptr };
     MythNotificationCenter *m_nc         { nullptr };
     bool             m_standby           { false   };

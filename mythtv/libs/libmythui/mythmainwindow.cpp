@@ -232,7 +232,7 @@ MythMainWindow::~MythMainWindow()
         delete stack;
     }
 
-    delete d->m_themeBase;
+    delete m_themeBase;
 
     while (!d->m_keyContexts.isEmpty())
     {
@@ -772,10 +772,10 @@ void MythMainWindow::Init(bool mayReInit)
         m_painterWin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
     GetMythUI()->UpdateImageCache();
-    if (d->m_themeBase)
-        d->m_themeBase->Reload();
+    if (m_themeBase)
+        m_themeBase->Reload();
     else
-        d->m_themeBase = new MythThemeBase();
+        m_themeBase = new MythThemeBase(this);
 
     if (!d->m_nc)
         d->m_nc = new MythNotificationCenter();

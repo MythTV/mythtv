@@ -13,7 +13,7 @@
 #include "mythuiscreenbounds.h"
 
 class QEvent;
-
+class MythThemeBase;
 class MythMediaDevice;
 
 #define REG_KEY(a, b, c, d) GetMythMainWindow()->RegisterKey(a, b, c, d)
@@ -171,6 +171,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
   private:
     MythDisplay*       m_display       { nullptr };
     QRegion            m_repaintRegion;
+
+    MythThemeBase*     m_themeBase     { nullptr };
     MythPainter*       m_painter       { nullptr };
     MythPainter*       m_oldPainter    { nullptr };
     MythPainterWindow* m_painterWin    { nullptr };
