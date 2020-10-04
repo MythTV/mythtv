@@ -645,9 +645,9 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             auto *si = dce->GetData().value<ScreenListInfo *>();
 
-            if (std::any_of(si->m_types.cbegin(), si->m_types.cend(),
-                            [](const auto & type)
-                            { return type.m_location.isEmpty(); } ))
+            auto emptyloc = [](const auto & type)
+                { return type.m_location.isEmpty(); };
+            if (std::any_of(si->m_types.cbegin(), si->m_types.cend(), emptyloc))
                 return;
 
             if (si->m_updating)

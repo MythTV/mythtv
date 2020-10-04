@@ -998,14 +998,10 @@ QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 
     while (*n != nullptr)
     {
-          char *name = snd_device_name_get_hint(*n, "NAME");
-          char *desc = snd_device_name_get_hint(*n, "DESC");
-          if (name && desc && (strcmp(name, "null") != 0))
+          QString name = snd_device_name_get_hint(*n, "NAME");
+          QString desc = snd_device_name_get_hint(*n, "DESC");
+          if (!name.isEmpty() && !desc.isEmpty() && (name != "null"))
               alsadevs->insert(name, desc);
-          if (name)
-              free(name);
-          if (desc)
-              free(desc);
           n++;
     }
     snd_device_name_free_hint(hints);
