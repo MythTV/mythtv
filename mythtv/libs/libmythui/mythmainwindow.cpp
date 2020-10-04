@@ -619,7 +619,7 @@ bool MythMainWindow::IsScreensaverAsleep()
 bool MythMainWindow::IsTopScreenInitialized()
 {
     if (HasMythMainWindow())
-        GetMythMainWindow()->GetMainStack()->GetTopScreen()->IsInitialized();
+        return GetMythMainWindow()->GetMainStack()->GetTopScreen()->IsInitialized();
     return false;
 }
 
