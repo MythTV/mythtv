@@ -111,7 +111,7 @@ MythDisplay* MythDisplay::Create()
     return result;
 }
 
-QStringList MythDisplay::GetDescription(void)
+QStringList MythDisplay::GetDescription()
 {
     QStringList result;
     bool spanall = false;
@@ -239,12 +239,12 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     }
 }
 
-int MythDisplay::GetScreenCount(void)
+int MythDisplay::GetScreenCount()
 {
     return QGuiApplication::screens().size();
 }
 
-double MythDisplay::GetPixelAspectRatio(void)
+double MythDisplay::GetPixelAspectRatio()
 {
     if (m_physicalSize.isEmpty() || m_resolution.isEmpty())
         return 1.0;
@@ -253,12 +253,12 @@ double MythDisplay::GetPixelAspectRatio(void)
            (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
 }
 
-QSize MythDisplay::GetGUIResolution(void)
+QSize MythDisplay::GetGUIResolution()
 {
     return m_guiMode.Resolution();
 }
 
-QRect MythDisplay::GetScreenBounds(void)
+QRect MythDisplay::GetScreenBounds()
 {
     return m_screenBounds;
 }
@@ -275,12 +275,12 @@ QRect MythDisplay::GetScreenBounds(void)
  * screen size/geometry accessed, and the proper physical/virtual
  * size/geometry retrieved.
 */
-QScreen* MythDisplay::GetCurrentScreen(void)
+QScreen* MythDisplay::GetCurrentScreen()
 {
     return m_screen;
 }
 
-QScreen *MythDisplay::GetDesiredScreen(void)
+QScreen *MythDisplay::GetDesiredScreen()
 {
     QScreen* newscreen = nullptr;
 
@@ -420,7 +420,7 @@ void MythDisplay::GeometryChanged(const QRect &Geo)
  * It is usually accurate apart from the refresh rate - which is often
  * rounded down.
 */
-void MythDisplay::UpdateCurrentMode(void)
+void MythDisplay::UpdateCurrentMode()
 {
     // Certain platform implementations do not have a window to access at startup
     // and hence use this implementation. Flag the status as incomplete to ensure
@@ -442,7 +442,7 @@ void MythDisplay::UpdateCurrentMode(void)
 }
 
 /// \brief Return true if the MythTV windows should span all screens.
-bool MythDisplay::SpanAllScreens(void)
+bool MythDisplay::SpanAllScreens()
 {
     return gCoreContext->GetSetting("XineramaScreen", nullptr) == "-1";
 }
@@ -482,7 +482,7 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
     }
 }
 
-void MythDisplay::Initialise(void)
+void MythDisplay::Initialise()
 {
     m_videoModes.clear();
     m_overrideVideoModes.clear();
@@ -555,7 +555,7 @@ void MythDisplay::Initialise(void)
  * Otherwise QScreen::size() or QScreen::availableSize() will provide
  * the size of an individual screen.
 */
-void MythDisplay::InitScreenBounds(void)
+void MythDisplay::InitScreenBounds()
 {
     QList<QScreen*> screens = QGuiApplication::screens();
     for (auto *screen : screens)
@@ -720,7 +720,7 @@ bool MythDisplay::SwitchToGUI(bool Wait)
     return true;
 }
 
-double MythDisplay::GetRefreshRate(void) const
+double MythDisplay::GetRefreshRate() const
 {
     return m_refreshRate;
 }
@@ -750,7 +750,7 @@ bool MythDisplay::SwitchToVideoMode(QSize /*Size*/, double /*Framerate*/)
     return false;
 }
 
-const std::vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
+const std::vector<MythDisplayMode> &MythDisplay::GetVideoModes()
 {
     return m_videoModes;
 }
@@ -836,7 +836,7 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
     return 16.0 / 9.0;
 }
 
-MythEDID& MythDisplay::GetEDID(void)
+MythEDID& MythDisplay::GetEDID()
 {
     return m_edid;
 }
@@ -850,7 +850,7 @@ MythEDID& MythDisplay::GetEDID(void)
  *
  * \note Untested with a grid layout - anyone have a card with 4 outputs?
 */
-double MythDisplay::EstimateVirtualAspectRatio(void)
+double MythDisplay::EstimateVirtualAspectRatio()
 {
     auto sortscreens = [](const QScreen* First, const QScreen* Second)
     {
@@ -948,17 +948,17 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
     return aspectratio;
 }
 
-QSize MythDisplay::GetResolution(void)
+QSize MythDisplay::GetResolution()
 {
     return m_resolution;
 }
 
-QSize MythDisplay::GetPhysicalSize(void)
+QSize MythDisplay::GetPhysicalSize()
 {
     return m_physicalSize;
 }
 
-void MythDisplay::WaitForScreenChange(void)
+void MythDisplay::WaitForScreenChange()
 {
     // Some implementations may have their own mechanism for ensuring the mode
     // is updated before continuing
@@ -977,7 +977,7 @@ void MythDisplay::WaitForScreenChange(void)
     loop.exec();
 }
 
-void MythDisplay::WaitForNewScreen(void)
+void MythDisplay::WaitForNewScreen()
 {
     // N.B. This isn't working as intended as it always times out rather than
     // exiting deliberately. It does however somehow filter out unwanted screenChanged
@@ -997,7 +997,7 @@ void MythDisplay::WaitForNewScreen(void)
     loop.exec();
 }
 
-void MythDisplay::PauseForModeSwitch(void)
+void MythDisplay::PauseForModeSwitch()
 {
     int pauselengthinms = gCoreContext->GetNumSetting("VideoModeChangePauseMS", 0);
     if (pauselengthinms)
@@ -1014,7 +1014,7 @@ void MythDisplay::PauseForModeSwitch(void)
     }
 }
 
-void MythDisplay::DebugModes(void) const
+void MythDisplay::DebugModes() const
 {
     // This is intentionally formatted to match the output of xrandr for comparison
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
