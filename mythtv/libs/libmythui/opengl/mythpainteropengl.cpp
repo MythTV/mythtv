@@ -6,10 +6,11 @@
 #include <QPainter>
 
 // MythTV
+#include "mythmainwindow.h"
 #include "mythrenderopengl.h"
 #include "mythpainteropengl.h"
 
-MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
+MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL* Render, MythMainWindow* Parent)
   : MythPainterGPU(Parent),
     m_render(Render)
 {
@@ -87,14 +88,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
     MythPainterGPU::Begin(Parent);
 
-    if (!m_widget)
-    {
-        m_widget = dynamic_cast<QWidget *>(Parent);
-        if (!m_widget)
-            return;
-    }
-
-    if (!m_render)
+    if (!(m_render && m_parent))
     {
         LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'Begin'");
         return;
@@ -108,7 +102,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
             [&]() { return m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize)); });
     }
 
-    QSize currentsize = m_widget->size();
+    QSize currentsize = m_parent->size();
 
     // check if we need to adjust cache sizes
     // NOTE - don't use the scaled size if using high DPI. Our images are at the lower

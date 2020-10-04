@@ -2,27 +2,18 @@
 #include "config.h"
 #include "mythlogging.h"
 #include "mythdisplay.h"
+#include "mythmainwindow.h"
 #include "mythpaintergpu.h"
 
-MythPainterGPU::MythPainterGPU(QWidget *Parent)
-  : m_widget(Parent)
+MythPainterGPU::MythPainterGPU(MythMainWindow* Parent)
+  : m_parent(Parent)
 {
 #ifdef Q_OS_MACOS
-    m_display = MythDisplay::AcquireRelease();
-    if (m_widget)
-    {
-        CurrentDPIChanged(m_widget->devicePixelRatioF());
-        connect(m_display, &MythDisplay::CurrentDPIChanged, this, &MythPainterGPU::CurrentDPIChanged);
-    }
+    MythDisplay* display = m_parent->GetDisplay();
+    CurrentDPIChanged(m_parent->devicePixelRatioF());
+    connect(display, &MythDisplay::CurrentDPIChanged, this, &MythPainterGPU::CurrentDPIChanged);
 #endif
 }
-
-#ifdef Q_OS_MACOS
-MythPainterGPU::~MythPainterGPU()
-{
-    MythDisplay::AcquireRelease(false);
-}
-#endif
 
 void MythPainterGPU::SetViewControl(ViewControls Control)
 {

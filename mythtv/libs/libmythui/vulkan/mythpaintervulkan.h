@@ -21,7 +21,7 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainterGPU
     Q_OBJECT
 
   public:
-    MythPainterVulkan(MythRenderVulkan *VulkanRender, QWidget *Parent);
+    MythPainterVulkan(MythRenderVulkan* VulkanRender, MythMainWindow* Parent);
    ~MythPainterVulkan() override;
 
     QString GetName           () override;

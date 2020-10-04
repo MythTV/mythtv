@@ -14,7 +14,7 @@
 
 #define LOC QString("VulkanPainter: ")
 
-MythPainterVulkan::MythPainterVulkan(MythRenderVulkan *VulkanRender, QWidget *Parent)
+MythPainterVulkan::MythPainterVulkan(MythRenderVulkan* VulkanRender, MythMainWindow* Parent)
   : MythPainterGPU(Parent)
 {
     m_transforms.push(QMatrix4x4());

@@ -12,7 +12,7 @@
 // Std
 #include <list>
 
-class QWidget;
+class MythMainWindow;
 class MythGLTexture;
 class MythRenderOpenGL;
 class QOpenGLBuffer;
@@ -25,7 +25,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
     Q_OBJECT
 
   public:
-    explicit MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent);
+    MythOpenGLPainter(MythRenderOpenGL* Render, MythMainWindow* Parent);
    ~MythOpenGLPainter() override;
 
     void DeleteTextures(void);

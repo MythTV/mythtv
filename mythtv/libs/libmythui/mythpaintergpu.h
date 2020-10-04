@@ -5,6 +5,7 @@
 #include "mythuiexp.h"
 #include "mythpainter.h"
 
+class MythMainWindow;
 class MythDisplay;
 
 class MUI_PUBLIC MythPainterGPU : public MythPainter
@@ -20,12 +21,8 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     };
     Q_DECLARE_FLAGS(ViewControls, ViewControl)
 
-    MythPainterGPU(QWidget *Parent);
-#ifdef Q_OS_MACOS
-   ~MythPainterGPU() override;
-#else
+    MythPainterGPU(MythMainWindow* Parent);
    ~MythPainterGPU() override = default;
-#endif
 
     void SetViewControl    (ViewControls Control);
 
@@ -33,10 +30,9 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     void CurrentDPIChanged (qreal DPI);
 
   protected:
-    QWidget*       m_widget       { nullptr };
+    MythMainWindow* m_parent      { nullptr };
     ViewControls   m_viewControl  { Viewport | Framebuffer };
     qreal          m_pixelRatio   { 1.0     };
-    MythDisplay*   m_display      { nullptr };
     bool           m_usingHighDPI { false   };
     QSize          m_lastSize;
 };
