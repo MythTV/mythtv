@@ -42,7 +42,7 @@ class AudioOutputPulseAudio : public AudioOutputBase
     int GetBufferedOnSoundcard(void) const override; // AudioOutputBase
 
   private:
-    char *ChooseHost(void);
+    QString ChooseHost(void);
     bool MapChannels(void);
     bool ContextConnect(void);
     bool ConnectPlaybackStream(void);

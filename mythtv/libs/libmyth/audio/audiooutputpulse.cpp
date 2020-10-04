@@ -421,11 +421,10 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     }
     pa_context_set_state_callback(m_pcontext, ContextStateCallback, this);
 
-    char *pulse_host = ChooseHost();
-    int chk = pa_context_connect(
-        m_pcontext, pulse_host, (pa_context_flags_t)0, nullptr);
-
-    delete[] pulse_host;
+    QString pulse_host = ChooseHost();
+    int chk = pa_context_connect(m_pcontext,
+                                 !pulse_host.isEmpty() ? qPrintable(pulse_host) : nullptr,
+                                 (pa_context_flags_t)0, nullptr);
 
     if (chk < 0)
     {
@@ -469,52 +468,29 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     return true;
 }
 
-char *AudioOutputPulseAudio::ChooseHost(void)
+QString AudioOutputPulseAudio::ChooseHost(void)
 {
     QString fn_log_tag = "ChooseHost, ";
-    char *pulse_host = nullptr;
-    char *device = strdup(m_mainDevice.toLatin1().constData());
-    const char *host = nullptr;
+    QStringList parts = m_mainDevice.split(':');
+    QString host = parts.size() > 1 ? parts[1] : QString();
+    QString pulse_host;
 
-    for (host=device; host && *host != ':' && *host != 0; host++);
+    if (host != "default")
+        pulse_host = host;
 
-    if (host && *host != 0)
-        host++;
-
-    if (host && *host != 0 && strcmp(host,"default") != 0)
+    if (pulse_host.isEmpty() && host != "default")
     {
-        if ((pulse_host = new char[strlen(host) + 1]))
-            strcpy(pulse_host, host);
-        else
-        {
-            VBERROR(fn_log_tag +
-                    QString("allocation of pulse host '%1' char[%2] failed")
-                    .arg(host).arg(strlen(host) + 1));
-        }
-    }
-
-    if (!pulse_host && host && strcmp(host,"default") != 0)
-    {
-        char *env_pulse_host = getenv("PULSE_SERVER");
-        if (env_pulse_host && (*env_pulse_host != '\0'))
-        {
-            int host_len = strlen(env_pulse_host) + 1;
-
-            if ((pulse_host = new char[host_len]))
-                strcpy(pulse_host, env_pulse_host);
-            else
-            {
-                VBERROR(fn_log_tag +
-                        QString("allocation of pulse host '%1' char[%2] failed")
-                        .arg(env_pulse_host).arg(host_len));
-            }
-        }
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+        QString env_pulse_host = qgetenv("PULSE_SERVER");
+#else
+        QString env_pulse_host = qEnvironmentVariable("PULSE_SERVER");
+#endif
+        if (!env_pulse_host.isEmpty())
+            pulse_host = env_pulse_host;
     }
 
     VBAUDIO(fn_log_tag + QString("chosen PulseAudio server: %1")
                          .arg((pulse_host != nullptr) ? pulse_host : "default"));
-
-    free(device);
 
     return pulse_host;
 }
