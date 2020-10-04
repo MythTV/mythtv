@@ -229,10 +229,9 @@ class APHTTPRequest
 
     QByteArray GetQueryValue(const QByteArray& key)
     {
-        for (const auto& query : qAsConst(m_queries))
-            if (query.first == key)
-                return query.second;
-        return "";
+        auto samekey = [key](const auto& query) { return query.first == key; };;
+        auto query = std::find_if(m_queries.cbegin(), m_queries.cend(), samekey);
+        return (query != m_queries.cend()) ? query->second : "";
     }
 
     QMap<QByteArray,QByteArray> GetHeadersFromBody(void)

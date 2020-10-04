@@ -314,18 +314,14 @@ bool DiseqcConfigBase::keyPressEvent(QKeyEvent *e)
     if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
         return true;
 
-    bool handled = false;
-    for (const QString & action : qAsConst(actions))
+    auto isdelete = [](const QString & action) { return action == "DELETE"; };
+    if (std::any_of(actions.cbegin(), actions.cend(), isdelete))
     {
-        if (action == "DELETE")
-        {
-            handled = true;
-            emit DeleteClicked();
-            break;
-        }
+        emit DeleteClicked();
+        return true;
     }
 
-    return handled;
+    return false;
 }
 
 //////////////////////////////////////// RotorTypeSetting

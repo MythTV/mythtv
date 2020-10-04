@@ -465,19 +465,13 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                     jfieldID id     = env->GetFieldID(objclass, "profile", "I");
                     int value       = static_cast<int>(env->GetIntField(profile, id));
                     QList<int>& mcprofiles = mimetype.second.second;
-                    bool found = false;
-                    for (auto mcprofile : qAsConst(mcprofiles))
+                    auto sameprof = [value](auto mcprofile) { return value == mcprofile; };
+                    if (std::any_of(mcprofiles.cbegin(), mcprofiles.cend(), sameprof))
                     {
-                        if (value == mcprofile)
-                        {
-                            found = true;
-                            MythCodecContext::CodecProfile p = MediaCodecToMythProfile(mimetype.second.first, value);
-                            s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(p, QSize(width, height)));
-                            break;
-                        }
+                        MythCodecContext::CodecProfile p = MediaCodecToMythProfile(mimetype.second.first, value);
+                        s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(p, QSize(width, height)));
                     }
-
-                    if (!found)
+                    else
                         s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(mimetype.second.first, QSize(width, height)));
                 }
             }

@@ -1382,9 +1382,9 @@ bool ProgramData::ClearDataBySource(
     std::vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
     bool ok = true;
-    for (uint chanid : chanids)
-        ok &= ClearDataByChannel(chanid, from, to, use_channel_time_offset);
-
+    auto cleardata = [&](uint chanid)
+        { ok &= ClearDataByChannel(chanid, from, to, use_channel_time_offset); };
+    std::for_each(chanids.cbegin(), chanids.cend(), cleardata);
     return ok;
 }
 

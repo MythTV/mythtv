@@ -507,14 +507,12 @@ void TVBrowseHelper::run()
         {
             if (!chanids.empty())
             {
-                for (uint chanid : chanids)
+                auto tunable = [](uint chanid) { return TV::IsTunable(chanid); };
+                auto it = std::find_if(chanids.cbegin(), chanids.cend(), tunable);
+                if (it != chanids.cend())
                 {
-                    if (TV::IsTunable(chanid))
-                    {
-                        infoMap["chanid"] = QString::number(chanid);
-                        GetNextProgramDB(direction, infoMap);
-                        break;
-                    }
+                    infoMap["chanid"] = QString::number(*it);
+                    GetNextProgramDB(direction, infoMap);
                 }
             }
             else

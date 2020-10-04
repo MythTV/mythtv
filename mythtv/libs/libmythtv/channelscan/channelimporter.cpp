@@ -168,8 +168,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     if (m_doDelete)
     {
         ScanDTVTransportList trans = transports;
-        for (const auto & tran : db_trans)
-            trans.push_back(tran);
+        std::copy(db_trans.cbegin(), db_trans.cend(), std::back_inserter(trans));
         uint deleted_count = DeleteChannels(trans);
         if (deleted_count)
             transports = trans;
@@ -1540,10 +1539,10 @@ QString ChannelImporter::FormatChannels(
 
     for (auto & transport : transports)
     {
-        for (auto & channel : transport.m_channels)
-        {
-            msg += FormatChannel(transport, channel, info) + "\n";
-        }
+        auto fmt_chan = [transport, info](const QString & m, const auto & chan)
+            { return m + FormatChannel(transport, chan, info) + "\n"; };
+        msg = std::accumulate(transport.m_channels.cbegin(), transport.m_channels.cend(),
+                              msg, fmt_chan);
     }
 
     return msg;
@@ -1575,12 +1574,10 @@ QString ChannelImporter::FormatTransports(
     ScanDTVTransportList transports(transports_in);
     std::sort(transports.begin(), transports.end(), less_than_key());
 
-    QString msg;
-
-    for (const auto & transport : transports)
-        msg += FormatTransport(transport) + "\n";
-
-    return msg;
+    auto fmt_trans = [](QString msg, const auto & transport)
+        { return msg + FormatTransport(transport) + "\n"; };
+    return std::accumulate(transports.cbegin(), transports.cend(),
+                           QString(), fmt_trans);
 }
 
 QString ChannelImporter::GetSummary(
@@ -1694,10 +1691,10 @@ void ChannelImporter::CountChannels(
 int ChannelImporter::SimpleCountChannels(
     const ScanDTVTransportList &transports)
 {
-    int count = 0;
-    for (const auto & transport : transports)
-        count += transport.m_channels.size();
-    return count;
+    auto add_count = [](int count, const auto & transport)
+        { return count + transport.m_channels.size(); };
+    return std::accumulate(transports.cbegin(), transports.cend(),
+                           0, add_count);
 }
 
 /**
