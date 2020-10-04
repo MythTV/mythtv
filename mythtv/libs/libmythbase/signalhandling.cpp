@@ -282,13 +282,13 @@ void SignalHandler::handleSignal(void)
 
     if (infoComplete)
     {
-        char *signame = strsignal(signum);
-        signame = strdup(signame ? signame : "Unknown Signal");
+        QString signame = strsignal(signum);
+        if (signame.isEmpty())
+            signame = "Unknown Signal";
         LOG(VB_GENERAL, LOG_CRIT,
             QString("Received %1: Code %2, PID %3, UID %4, Value 0x%5")
             .arg(signame) .arg(signalInfo.m_code) .arg(signalInfo.m_pid)
             .arg(signalInfo.m_uid) .arg(signalInfo.m_value,8,16,QChar('0')));
-        free(signame);
     }
 
     SigHandlerFunc handler = nullptr;
