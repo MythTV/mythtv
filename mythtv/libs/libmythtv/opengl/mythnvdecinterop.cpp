@@ -290,10 +290,8 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         }
 
         result = m_openglTextures[last];
-        for (MythVideoTexture* tex : qAsConst(m_openglTextures[current]))
-            result.push_back(tex);
-        for (MythVideoTexture* tex : qAsConst(m_openglTextures[next]))
-            result.push_back(tex);
+        std::copy(m_openglTextures[current].cbegin(), m_openglTextures[current].cend(), std::back_inserter(result));
+        std::copy(m_openglTextures[next].cbegin(), m_openglTextures[next].cend(), std::back_inserter(result));
         return result;
     }
     m_referenceFrames.clear();
