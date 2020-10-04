@@ -282,11 +282,9 @@ class FileAssocDialogPrivate
         tmp_fa_list tmp_fa;
         tmp_fa.reserve(fa_list.size());
 
-        for (const auto & fa : fa_list)
-        {
-            tmp_fa.push_back(UIDToFAPair(++m_nextFAID,
-                            new FileAssociationWrap(fa)));
-        }
+        auto newpair = [this](const auto & fa)
+            { return UIDToFAPair(++m_nextFAID, new FileAssociationWrap(fa)); };
+        std::transform(fa_list.cbegin(), fa_list.cend(), std::back_inserter(tmp_fa), newpair);
 
         std::shuffle(tmp_fa.begin(), tmp_fa.end(),
                      std::mt19937(std::random_device()()));

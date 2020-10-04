@@ -245,8 +245,7 @@ namespace {
 
 void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
 {
-    for (const auto & pi : qAsConst(m_cache))
-        list.push_back(pi);
+    std::copy(m_cache.cbegin(), m_cache.cend(), std::back_inserter(list));
 
     if (newest_first)
         std::sort(list.begin(), list.end(), reversePISort);

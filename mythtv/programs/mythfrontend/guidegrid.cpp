@@ -1190,8 +1190,9 @@ static ProgramList *CopyProglist(ProgramList *proglist)
     if (!proglist)
         return nullptr;
     auto *result = new ProgramList();
+    // AutoDeleteDeque doesn't work with std::back_inserter
     for (auto & pi : *proglist)
-        result->push_back(new ProgramInfo(*pi));
+        result->push_back(new ProgramInfo(*pi)); // cppcheck-suppress useStlAlgorithm
     return result;
 }
 
@@ -1689,8 +1690,9 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
         ts = ts.addSecs(5 * 60);
     }
 
+    // AutoDeleteDeque doesn't work with std::back_inserter
     for (auto & pi : unknownlist)
-        proglist->push_back(pi);
+        proglist->push_back(pi); // cppcheck-suppress useStlAlgorithm
 
     MythRect programRect = m_ggProgramRect;
 

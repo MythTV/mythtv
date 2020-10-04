@@ -71,9 +71,9 @@ public:
         QString action = m_move ? tr("Moving") : tr("Copying");
 
         // Sum file sizes
-        int total = 0;
-        for (const ImagePtrK & im : m_files.keys())
-            total += im->m_size;
+        auto keys = m_files.keys();
+        auto add_size = [](int t, const ImagePtrK & im){ return t + im->m_size; };
+        int total = std::accumulate(keys.cbegin(), keys.cend(), 0, add_size);
 
         int progressSize = 0;
         for (const ImagePtrK & im : m_files.keys())

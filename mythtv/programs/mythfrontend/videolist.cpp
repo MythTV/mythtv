@@ -375,10 +375,10 @@ class VideoListImp
 
     int TryFilter(const VideoFilterSettings &filter) const
     {
-        int ret = 0;
-        for (const auto & md : m_metadata.getList())
-            if (filter.matches_filter(*md)) ++ret;
-        return ret;
+        auto list = m_metadata.getList();
+        auto filtermatch = [filter](const auto & md)
+            { return filter.matches_filter(*md); };
+        return std::count_if(list.cbegin(), list.cend(), filtermatch);
     }
 
     const VideoMetadataListManager &getListCache(void) const
@@ -815,11 +815,12 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
         {
             case ltDBGenreGroup:
             {
-                std::vector<std::pair <int, QString> > genres =
+                const std::vector<std::pair <int, QString> >& genres =
                     data->GetGenres();
 
-                for (const auto& item : genres)
-                    groups.push_back(item.second);
+                std::transform(genres.cbegin(), genres.cend(),
+                               std::back_inserter(groups),
+                               [](const auto& item){ return item.second; } );
                 break;
             }
             case ltDBCategoryGroup:
@@ -844,10 +845,11 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             }
             case ltDBCastGroup:
             {
-                std::vector<std::pair<int, QString> > cast = data->GetCast();
+                const std::vector<std::pair<int, QString> >& cast = data->GetCast();
 
-                for (const auto& item : cast)
-                    groups.push_back(item.second);
+                std::transform(cast.cbegin(), cast.cend(),
+                               std::back_inserter(groups),
+                               [](const auto& item){ return item.second; } );
                 break;
             }
             case ltDBUserRatingGroup:
@@ -1002,11 +1004,9 @@ void VideoListImp::buildFsysList()
     QStringList dirs = GetVideoDirs();
     if (dirs.size() > 1)
     {
-        for (const auto & dir : qAsConst(dirs))
-        {
-            node_paths.push_back(
-                node_to_path_list::value_type(path_to_node_name(dir), dir));
-        }
+        auto new_pl = [](const auto& dir)
+            { return node_to_path_list::value_type(path_to_node_name(dir), dir); };
+        std::transform(dirs.cbegin(), dirs.cend(), std::back_inserter(node_paths), new_pl);
     }
     else
     {

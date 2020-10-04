@@ -185,10 +185,9 @@ class VideoPlayerCommandPrivate
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
-        for (auto *player : other.m_playerProcs)
-        {
-            m_playerProcs.push_back(player->Clone());
-        }
+        auto playerclone = [](auto *player) { return player->Clone(); };
+        std::transform(other.m_playerProcs.cbegin(), other.m_playerProcs.cend(),
+                       std::back_inserter(m_playerProcs), playerclone);
     }
 
     VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs) = delete;
@@ -279,15 +278,12 @@ class VideoPlayerCommandPrivate
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
-        for (const auto & fa : fa_list)
-        {
-            if (fa.extension.toLower() == extension.toLower() &&
-                    !fa.use_default)
-            {
-                play_command = fa.playcommand;
-                break;
-            }
-        }
+        auto sameext = [extension](const auto & fa)
+            { return fa.extension.toLower() == extension.toLower() &&
+                     !fa.use_default; };
+        auto fa = std::find_if(fa_list.cbegin(), fa_list.cend(), sameext);
+        if (fa != fa_list.cend())
+            play_command = fa->playcommand;
 
         if (play_command.trimmed().isEmpty())
             play_command = "Internal";
@@ -330,9 +326,8 @@ class VideoPlayerCommandPrivate
 
     void Play() const
     {
-        for (auto *player : m_playerProcs)
-            if (player->Play())
-                break;
+        std::any_of(m_playerProcs.cbegin(), m_playerProcs.cend(),
+                    [](auto *player){ return player->Play(); } );
     }
 
     QString GetCommandDisplayName() const

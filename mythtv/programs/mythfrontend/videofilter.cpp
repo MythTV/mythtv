@@ -212,30 +212,16 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     }
     if (matches && (m_genre != kGenreFilterAll))
     {
-        matches = false;
-
         const VideoMetadata::genre_list &gl = mdata.GetGenres();
-        for (const auto & g : gl)
-        {
-            if ((matches = (g.first == m_genre)))
-            {
-                break;
-            }
-        }
+        auto samegenre = [this](const auto & g) {return g.first == m_genre; };
+        matches = std::any_of(gl.cbegin(), gl.cend(), samegenre);
     }
 
     if (matches && m_country != kCountryFilterAll)
     {
-        matches = false;
-
         const VideoMetadata::country_list &cl = mdata.GetCountries();
-        for (const auto & c : cl)
-        {
-            if ((matches = (c.first == m_country)))
-            {
-                break;
-            }
-        }
+        auto samecountry = [this](const auto & c) {return c.first == m_country; };
+        matches = std::any_of(cl.cbegin(), cl.cend(), samecountry);
     }
 
     if (matches && m_cast != kCastFilterAll)
@@ -248,15 +234,8 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         }
         else
         {
-            matches = false;
-
-            for (const auto & c : cl)
-            {
-                if ((matches = (c.first == m_cast)))
-                {
-                    break;
-                }
-            }
+            auto samecast = [this](const auto & c){return c.first == m_cast; };
+            matches = std::any_of(cl.cbegin(), cl.cend(), samecast);
         }
     }
 

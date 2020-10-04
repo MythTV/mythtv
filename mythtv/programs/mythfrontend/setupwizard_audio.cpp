@@ -138,14 +138,8 @@ void AudioSetupWizard::Init(void)
 
     if (!current.isEmpty())
     {
-        for (const auto & ao : qAsConst(*m_outputlist))
-        {
-            if (ao.m_name == current)
-            {
-                found = true;
-                break;
-            }
-        }
+        auto samename = [current](const auto & ao){ return ao.m_name == current; };
+        found = std::any_of(m_outputlist->cbegin(), m_outputlist->cend(), samename);
         if (!found)
         {
             AudioOutput::AudioDeviceConfig *adc =
@@ -195,14 +189,10 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 
     AudioOutputSettings settings;
 
-    for (const auto & ao : qAsConst(*m_outputlist))
-    {
-        if (ao.m_name == out)
-        {
-            settings = ao.m_settings;
-            break;
-        }
-    }
+    auto samename = [out](const auto & ao){ return ao.m_name == out; };
+    const auto *ao = std::find_if(m_outputlist->cbegin(), m_outputlist->cend(), samename);
+    if (ao != m_outputlist->cend())
+        settings = ao->m_settings;
 
     realmax_speakers = max_speakers = settings.BestSupportedChannels();
 

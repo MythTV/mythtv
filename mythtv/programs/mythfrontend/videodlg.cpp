@@ -703,12 +703,10 @@ class VideoDialogPrivate
                 QStringList ratings =
                         ratingstring.split(':', Qt::SkipEmptyParts);
 #endif
-
-                for (const auto & rating : qAsConst(ratings))
-                {
-                    m_ratingToPl.push_back(
-                        parental_level_map::value_type(rating, sl.GetLevel()));
-                }
+                auto to_pl = [sl](const auto & rating)
+                    { return parental_level_map::value_type(rating, sl.GetLevel()); };
+                std::transform(ratings.cbegin(), ratings.cend(),
+                               std::back_inserter(m_ratingToPl), to_pl);
             }
             m_ratingToPl.sort(std::binary_negate(rating_to_pl_less()));
         }

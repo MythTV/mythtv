@@ -610,10 +610,11 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
     if (parent.m_userThumbnail != 0)
     {
         ImageList images = files + dirs;
+        // ImageItem has been explicitly marked Q_DISABLE_COPY
         for (const ImagePtr & im : qAsConst(images))
         {
             if (im && im->m_id == parent.m_userThumbnail)
-            {
+            { // cppcheck-suppress useStlAlgorithm
                 userIm = im;
                 break;
             }
