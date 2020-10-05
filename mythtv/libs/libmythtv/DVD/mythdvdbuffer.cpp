@@ -370,8 +370,9 @@ void MythDVDBuffer::GetChapterTimes(QList<long long> &Times)
         GetChapterTimes(m_title);
     if (!m_chapterMap.contains(m_title))
         return;
-    for (uint64_t chapter : m_chapterMap.value(m_title))
-        Times.push_back(static_cast<long long>(chapter));
+    const QList<uint64_t>& chapters = m_chapterMap.value(m_title);
+    std::transform(chapters.cbegin(), chapters.cend(), std::back_inserter(Times),
+                   [](uint64_t chap) { return static_cast<long long>(chap); });
 }
 
 uint64_t MythDVDBuffer::GetChapterTimes(int Title)
