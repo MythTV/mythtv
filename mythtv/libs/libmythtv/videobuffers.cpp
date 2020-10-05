@@ -197,13 +197,12 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
 
     // make a big reservation, so that things that depend on
     // pointer to VideoFrames work even after a few push_backs
-    m_buffers.reserve(std::max(numcreate, (uint)128));
+    m_buffers.reserve(std::max(numcreate, 128U));
 
     m_buffers.resize(numcreate);
     for (uint i = 0; i < numcreate; i++)
     {
-        memset(At(i), 0, sizeof(VideoFrame));
-        At(i)->codec            = FMT_NONE;
+        init(At(i), FMT_NONE, nullptr, 0, 0, 0);
         At(i)->interlaced_frame = -1;
         At(i)->top_field_first  = true;
         m_vbufferMap[At(i)]     = i;
