@@ -1643,10 +1643,12 @@ static void InitKeys(void)
 
 static void ReloadKeys(void)
 {
-    GetMythMainWindow()->ClearKeyContext("Video");
+    MythMainWindow* mainwindow = GetMythMainWindow();
+    if (mainwindow)
+        mainwindow->ClearKeyContext("Video");
     InitKeys();
-
-    TV::ReloadKeys();
+    if (mainwindow)
+        mainwindow->ReloadKeys();
 }
 
 static void SetFuncPtrs(void)

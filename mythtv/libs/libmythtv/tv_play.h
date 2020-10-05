@@ -292,10 +292,10 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     static bool StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection = ChannelInfoList());
     static bool IsPaused();
     static void InitKeys();
-    static void ReloadKeys();
     static void SetFuncPtr(const char* Name, void* Pointer);
     static int  ConfiguredTunerCards();
     static bool IsTunable(uint ChanId);
+    void        ReloadKeys();
 
     bool IsSameProgram(const ProgramInfo* ProgInfo) const;
 

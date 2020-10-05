@@ -958,11 +958,10 @@ void TV::InitKeys()
 
 void TV::ReloadKeys()
 {
-    MythMainWindow *mainWindow = GetMythMainWindow();
-    mainWindow->ClearKeyContext("TV Frontend");
-    mainWindow->ClearKeyContext("TV Playback");
-    mainWindow->ClearKeyContext("TV Editing");
-    mainWindow->ClearKeyContext("Teletext Menu");
+    m_mainWindow->ClearKeyContext("TV Frontend");
+    m_mainWindow->ClearKeyContext("TV Playback");
+    m_mainWindow->ClearKeyContext("TV Editing");
+    m_mainWindow->ClearKeyContext("Teletext Menu");
     InitKeys();
 }
 
