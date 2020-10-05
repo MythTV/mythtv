@@ -50,26 +50,28 @@ const float MythVideoBounds::kManualZoomMinHorizontalZoom = 0.25F;
 const float MythVideoBounds::kManualZoomMinVerticalZoom   = 0.25F;
 const int   MythVideoBounds::kManualZoomMaxMove           = 50;
 
-MythVideoBounds::MythVideoBounds(bool CreateDisplay)
+MythVideoBounds::MythVideoBounds()
 {
     m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
     m_dbAspectOverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
     m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
-
-    if (CreateDisplay)
-    {
-        m_display = GetMythMainWindow()->GetDisplay();
-        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
-#ifdef Q_OS_MACOS
-        connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
-#endif
-    }
 }
 
-MythVideoBounds::~MythVideoBounds()
+void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
 {
+    if (m_display)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Already have a display");
+        return;
+    }
+
+    m_display = mDisplay;
+    connect(m_display, &MythDisplay::CurrentScreenChanged, this, &MythVideoBounds::ScreenChanged);
+#ifdef Q_OS_MACOS
+    connect(m_display, &MythDisplay::PhysicalDPIChanged,   this, &MythVideoBounds::PhysicalDPIChanged);
+#endif
 }
 
 void MythVideoBounds::ScreenChanged(QScreen */*screen*/)

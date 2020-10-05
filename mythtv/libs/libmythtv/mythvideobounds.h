@@ -24,11 +24,12 @@ class MythVideoBounds : public QObject
     Q_OBJECT
 
   public:
-    explicit MythVideoBounds(bool CreateDisplay);
-   ~MythVideoBounds() override;
+    MythVideoBounds();
+   ~MythVideoBounds() override = default;
 
     bool InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
                     float Aspect, const QRect &WindowRect);
+    void SetDisplay(MythDisplay* mDisplay);
 
   signals:
     // Note These are emitted from MoveResize - which must be called after any call

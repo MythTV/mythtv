@@ -21,8 +21,7 @@
  * \sa MythVideoOutputVulkan
  */
 MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
-  : MythVideoOutput(true),
-    m_render(Render),
+  : m_render(Render),
     m_profile(std::move(Profile))
 {
     if (m_render)
@@ -31,6 +30,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
     MythMainWindow* win = MythMainWindow::getMainWindow();
     if (win)
     {
+        SetDisplay(win->GetDisplay());
         m_painter = dynamic_cast<MythPainterGPU*>(win->GetPainter());
         if (m_painter)
             m_painter->SetViewControl(MythPainterGPU::None);

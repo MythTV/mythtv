@@ -41,7 +41,7 @@ class MythVideoOutput : public MythVideoBounds
                                    const QString& Codec,      int ReferenceFrames);
     static VideoFrameTypeVec s_defaultFrameTypes;
 
-    MythVideoOutput(bool CreateDisplay = false);
+    MythVideoOutput();
     ~MythVideoOutput() override;
 
     virtual bool Init(const QSize& VideoDim, const QSize& VideoDispDim,

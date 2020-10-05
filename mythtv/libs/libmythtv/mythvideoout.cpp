@@ -297,8 +297,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString& Decoder,    MythCodecID 
  * \brief This constructor for VideoOutput must be followed by an
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
-MythVideoOutput::MythVideoOutput(bool CreateDisplay)
-  : MythVideoBounds(CreateDisplay)
+MythVideoOutput::MythVideoOutput()
 {
     m_dbLetterboxColour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
 }
