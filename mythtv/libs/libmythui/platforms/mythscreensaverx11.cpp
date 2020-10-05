@@ -27,10 +27,8 @@ class ScreenSaverX11Private
     {
         const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
                            kMSProcessEvents;
-        m_xscreensaverRunning =
-                myth_system("xscreensaver-command -version >&- 2>&-", flags) == 0;
-
-        if (IsScreenSaverRunning())
+        m_xscreensaverRunning = myth_system("xscreensaver-command -version >&- 2>&-", flags) == 0;
+        if (m_xscreensaverRunning)
         {
             m_resetTimer = new QTimer(outer);
             m_resetTimer->setSingleShot(false);
@@ -48,8 +46,7 @@ class ScreenSaverX11Private
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Failed to open connection to X11 server");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open connection to X11 server");
         }
 
         if (m_dpmsaware && m_display)
@@ -105,15 +102,12 @@ class ScreenSaverX11Private
     void ResetTimer()
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- begin");
-
         StopTimer();
-
+        // To be clear - this setting has no UI
         if (m_timeoutInterval == -1)
             m_timeoutInterval = gCoreContext->GetNumSetting("xscreensaverInterval", 50) * 1000;
-
         if (m_timeoutInterval > 0)
             StartTimer();
-
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- end");
     }
 
