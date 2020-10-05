@@ -311,14 +311,11 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         curProgram->SetAllowLastPlayPos((Flags & kStartTVAllowLastPlayPos) != 0U);
     }
 
-    GetMythMainWindow()->PauseIdleTimer(true);
-
     // Initialize TV
     if (!tv->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
         AcquireRelease(refs, false);
-        GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
         gCoreContext->emitTVPlaybackAborted();
         return false;
@@ -458,8 +455,6 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         else
             ss->AddScreen(dlg);
     }
-
-    GetMythMainWindow()->PauseIdleTimer(false);
 
     if (startLivetvEventSent)
         gCoreContext->SendSystemEvent("LIVETV_ENDED");
@@ -1024,6 +1019,9 @@ TV::TV(MythMainWindow* MainWindow)
             this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
 #endif
 
+    if (m_mainWindow)
+        m_mainWindow->PauseIdleTimer(true);
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Finished creating TV object");
 }
 
@@ -1269,6 +1267,7 @@ TV::~TV()
     #else
         m_mainWindow->show();
     #endif
+        m_mainWindow->PauseIdleTimer(false);
     }
 
 
