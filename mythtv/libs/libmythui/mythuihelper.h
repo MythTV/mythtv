@@ -9,6 +9,7 @@
 #include "mythuiexp.h"
 #include "mythuithemecache.h"
 #include "mythuithemehelper.h"
+#include "mythuilocation.h"
 
 struct MUI_PUBLIC MythUIMenuCallbacks
 {
@@ -19,7 +20,8 @@ struct MUI_PUBLIC MythUIMenuCallbacks
     void (*eject)();
 };
 
-class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelper
+class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelper,
+                                public MythUILocation
 {
   public:
     static MythUIHelper *getMythUI();
@@ -33,18 +35,12 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelpe
     void LoadQtConfig();
     bool IsScreenSetup() const;
 
-    void AddCurrentLocation(const QString& location);
-    QString RemoveCurrentLocation();
-    QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
-
   protected:
     Q_DISABLE_COPY(MythUIHelper)
     MythUIHelper() = default;
    ~MythUIHelper() = default;
 
   private:
-    QMutex m_locationLock;
-    QStringList m_currentLocation;
     MythUIMenuCallbacks m_callbacks { nullptr,nullptr,nullptr,nullptr,nullptr };
     bool m_screenSetup { false };
 };
