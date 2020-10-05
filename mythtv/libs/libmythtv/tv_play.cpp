@@ -1014,8 +1014,7 @@ TV::TV(MythMainWindow* MainWindow)
     InitFromDB();
 
 #ifdef Q_OS_ANDROID
-    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
-            this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
+    connect(qApp, &QApplication::applicationStateChanged, this, &TV::onApplicationStateChange);
 #endif
 
     if (m_mainWindow)
