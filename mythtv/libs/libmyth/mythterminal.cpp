@@ -38,8 +38,8 @@ MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
     connect(m_process, &QIODevice::readyRead,
             this,      &MythTerminal::ProcessHasText);
 
-    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this,      SLOT(  ProcessFinished(int, QProcess::ExitStatus)));
+    connect(m_process, qOverload<int,QProcess::ExitStatus>(&QProcess::finished),
+            this,      &MythTerminal::ProcessFinished);
 }
 
 void MythTerminal::TeardownAll(void)

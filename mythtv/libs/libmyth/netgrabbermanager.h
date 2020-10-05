@@ -181,8 +181,8 @@ class MPUBLIC Search : public QObject
     void searchTimedOut(Search *item);
 
   private slots:
-
-    void slotProcessSearchExit(uint exitcode = 0);
+    void slotProcessSearchExit(uint exitcode);
+    void slotProcessSearchExit(void);
 };
 
 #endif

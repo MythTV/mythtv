@@ -267,10 +267,10 @@ void Search::executeSearch(const QString &script, const QString &query,
     LOG(VB_GENERAL, LOG_DEBUG, "Search::executeSearch");
     m_searchProcess = new MythSystemLegacy();
 
-    connect(m_searchProcess, SIGNAL(finished()),
-            this, SLOT(slotProcessSearchExit()));
+    connect(m_searchProcess, &MythSystemLegacy::finished,
+            this, qOverload<>(&Search::slotProcessSearchExit));
     connect(m_searchProcess, &MythSystemLegacy::error,
-            this, &Search::slotProcessSearchExit);
+            this, qOverload<uint>(&Search::slotProcessSearchExit));
 
     const QString& cmd = script;
 
@@ -404,6 +404,11 @@ void Search::slotProcessSearchExit(uint exitcode)
     m_searchProcess->deleteLater();
     m_searchProcess = nullptr;
     emit finishedSearch(this);
+}
+
+void Search::slotProcessSearchExit(void)
+{
+    slotProcessSearchExit(GENERIC_EXIT_OK);
 }
 
 void Search::SetData(QByteArray data)

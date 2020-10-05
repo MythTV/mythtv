@@ -65,6 +65,7 @@ class PaneExistingScanImport;
 
 class ScanTypeSetting : public TransMythUIComboBoxSetting
 {
+    friend class ScanWizard;
     Q_OBJECT
   public:
     enum Type

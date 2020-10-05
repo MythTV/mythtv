@@ -525,8 +525,8 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
     {
         popupStack->AddScreen(menuPopup);
 
-        //connect(menuPopup, SIGNAL(haveResult(QString)),
-        //SLOT(setValue(QString)));
+        //connect(menuPopup, &MythDialogBox::haveResult,
+        //this, qOverload<const QString&>(&MythUIComboBoxSetting::setValue));
 
         menuPopup->SetReturnEvent(screen, "editsetting");
 
@@ -571,8 +571,8 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
 
             if (settingdialog->Create())
             {
-                connect(settingdialog, SIGNAL(haveResult(QString)),
-                        SLOT(setValue(const QString&)));
+                connect(settingdialog, &MythTextInputDialog::haveResult,
+                        this, qOverload<const QString&>(&MythUIComboBoxSetting::setValue));
                 popupStack->AddScreen(settingdialog);
             }
             else
@@ -861,7 +861,7 @@ void StandardSettingDialog::setCurrentGroupSetting(
     if (m_currentGroupSetting)
     {
         disconnect(m_currentGroupSetting,
-                   SIGNAL(settingsChanged(StandardSetting *)), nullptr, nullptr);
+                   &StandardSetting::settingsChanged, nullptr, nullptr);
         m_currentGroupSetting->Close();
     }
 

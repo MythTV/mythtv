@@ -120,8 +120,8 @@ void MythRAOPDevice::Start(void)
         return;
 
     // join the dots
-    connect(this, SIGNAL(newConnection(QTcpSocket *)),
-            this, SLOT(newConnection(QTcpSocket *)));
+    connect(this, &ServerPool::newConnection,
+            this, &MythRAOPDevice::newConnection);
 
     m_basePort = m_setupPort;
     m_setupPort = tryListeningPort(m_setupPort, RAOP_PORT_RANGE);

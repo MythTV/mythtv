@@ -573,8 +573,8 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
     // Devices on Mac OS X don't change status the way Linux ones do,
     // so we force a status change for mediaStatusChanged() to send an event
     pDevice->setStatus(MEDIASTAT_NODISK);
-    connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
-            this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
+    connect(pDevice, &MythMediaDevice::statusChanged,
+            this, &MediaMonitorDarwin::mediaStatusChanged);
     pDevice->setStatus(MEDIASTAT_USEABLE);
 
 

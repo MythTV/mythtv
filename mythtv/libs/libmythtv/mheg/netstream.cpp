@@ -803,7 +803,8 @@ void NAMThread::run()
     }
 
     // Quit when main app quits
-    connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(quit()) );
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
+            this, &NAMThread::quit);
 
     m_running.release();
 

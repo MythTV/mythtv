@@ -1457,8 +1457,8 @@ void MythUIType::ConnectDependants(bool recurse)
 
                 if (dependee)
                 {
-                    QObject::connect(dependee, SIGNAL(DependChanged(bool)),
-                                     dependant, SLOT(UpdateDependState(bool)));
+                    QObject::connect(dependee, &MythUIType::DependChanged,
+                                     dependant, qOverload<bool>(&MythUIType::UpdateDependState));
                     dependant->SetReverseDependence(dependee, reverse);
                     dependant->m_dependsValue.append(QPair<MythUIType *, bool>(dependee, false));
                     dependant->UpdateDependState(dependee, true);

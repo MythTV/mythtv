@@ -61,14 +61,12 @@ bool LanguageSelection::Create(void)
     }
 
 #if 0
-    connect(m_countryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(LocaleClicked(MythUIButtonListItem*)));
-    connect(m_languageList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(LanguageClicked(MythUIButtonListItem*)));
+    connect(m_countryList, &MythUIButton::Clicked, this, &LanguageSelection::LocaleClicked);
+    connect(m_languageList, &MythUIButton::Clicked, this, &LanguageSelection::LanguageClicked);
 #endif
 
     connect(m_saveButton, &MythUIButton::Clicked, this, &LanguageSelection::Save);
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &LanguageSelection::Close);
 
     m_languageList->SetLCDTitles(tr("Preferred language"), "");
     m_countryList->SetLCDTitles(tr("Your location"), "");

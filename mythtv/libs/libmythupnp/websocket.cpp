@@ -930,8 +930,8 @@ void WebSocketWorker::RegisterExtension(WebSocketExtension* extension)
     if (!extension)
         return;
 
-    connect(extension, SIGNAL(SendTextMessage(const QString &)),
-            this, SLOT(SendText(const QString &)));
+    connect(extension, &WebSocketExtension::SendTextMessage,
+            this, qOverload<const QString &>(&WebSocketWorker::SendText));
     connect(extension, &WebSocketExtension::SendBinaryMessage,
             this, &WebSocketWorker::SendBinary);
 

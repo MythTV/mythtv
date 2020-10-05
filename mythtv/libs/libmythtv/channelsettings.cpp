@@ -551,10 +551,10 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new CommMethod(id));
     addChild(new Icon(id));
 
-    connect(m_onAirGuide, SIGNAL(valueChanged(     bool)),
-            this,         SLOT(  onAirGuideChanged(bool)));
-    connect(source,       SIGNAL(valueChanged( const QString&)),
-            this,         SLOT(  sourceChanged(const QString&)));
+    connect(m_onAirGuide, &MythUICheckBoxSetting::valueChanged,
+            this,         &ChannelOptionsCommon::onAirGuideChanged);
+    connect(source,       qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,         &ChannelOptionsCommon::sourceChanged);
 
     // Transport stream ID and frequency from dtv_multiplex
     MSqlQuery query(MSqlQuery::InitCon());

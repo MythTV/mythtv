@@ -1623,12 +1623,12 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
 
         if (!m_profileName.isEmpty() && m_profileName.startsWith("Transcoders"))
         {
-            connect(m_trResize,   SIGNAL(valueChanged   (const QString &)),
-                    this,         SLOT(  ResizeTranscode(const QString &)));
-            connect(m_trLossless, SIGNAL(valueChanged        (const QString &)),
-                    this,         SLOT(  SetLosslessTranscode(const QString &)));
-            connect(m_trFilters,  SIGNAL(valueChanged(const QString&)),
-                    this,         SLOT(FiltersChanged(const QString&)));
+            connect(m_trResize,   qOverload<const QString&>(&StandardSetting::valueChanged),
+                    this,         &RecordingProfile::ResizeTranscode);
+            connect(m_trLossless, qOverload<const QString&>(&StandardSetting::valueChanged),
+                    this,         &RecordingProfile::SetLosslessTranscode);
+            connect(m_trFilters,  qOverload<const QString&>(&StandardSetting::valueChanged),
+                    this,         &RecordingProfile::FiltersChanged);
         }
     }
     else if (type.toUpper() == "DVB")

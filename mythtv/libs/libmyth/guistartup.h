@@ -64,7 +64,8 @@ class MPUBLIC GUIStartup : public MythScreenType
     void setTotal(int total);
 
   public slots:
-    bool updateProgress(bool finished = false);
+    bool updateProgress(bool finished);
+    void updateProgress(void);
 
   private slots:
     void Retry(void);

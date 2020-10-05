@@ -513,7 +513,7 @@ void MusicCommon::switchView(MusicView view)
 
             if (oldView)
             {
-                disconnect(this , &MythScreenType::Exiting, nullptr, nullptr);
+                disconnect(this, &MythScreenType::Exiting, nullptr, nullptr);
                 Close();
             }
 

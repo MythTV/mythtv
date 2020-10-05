@@ -31,10 +31,8 @@ void MythUDPListener::Enable(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling");
 
     m_socketPool = new ServerPool(this);
-    connect(m_socketPool, SIGNAL(newDatagram(QByteArray, QHostAddress,
-                                                quint16)),
-            this,         SLOT(Process(const QByteArray, QHostAddress,
-                                       quint16)));
+    connect(m_socketPool, &ServerPool::newDatagram,
+            this,         &MythUDPListener::Process);
 
     QList<QHostAddress> addrs = ServerPool::DefaultListen();
     addrs << ServerPool::DefaultBroadcast();

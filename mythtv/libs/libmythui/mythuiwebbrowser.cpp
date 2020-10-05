@@ -941,10 +941,8 @@ void MythUIWebBrowser::Init(void)
             this, &MythUIWebBrowser::slotIconChanged);
     connect(m_browser, &QWebView::statusBarMessage,
             this, &MythUIWebBrowser::slotStatusBarMessage);
-    connect(m_browser->page(), SIGNAL(linkHovered(const QString &,
-                                                  const QString &,
-                                                  const QString &)),
-            this, SLOT(slotStatusBarMessage(const QString &)));
+    connect(m_browser->page(), &QWebPage::linkHovered,
+            this, &MythUIWebBrowser::slotStatusBarMessage);
     connect(m_browser, &QWebView::linkClicked,
             this, &MythUIWebBrowser::slotLinkClicked);
 

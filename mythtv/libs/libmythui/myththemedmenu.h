@@ -83,7 +83,8 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
   private slots:
     void setButtonActive(MythUIButtonListItem* item);
-    void buttonAction(MythUIButtonListItem* item, bool skipPass = false);
+    void buttonAction(MythUIButtonListItem* item, bool skipPass);
+    void buttonAction(MythUIButtonListItem* item);
 
   private:
     void SetMenuTheme(const QString &menufile);

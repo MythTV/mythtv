@@ -1345,10 +1345,10 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 
     model->SetGUID(dev->getValue());
     desc->SetGUID(dev->getValue());
-    QObject::connect(dev,   SIGNAL(valueChanged(const QString&)),
-                     model, SLOT(  SetGUID(     const QString&)));
-    QObject::connect(dev,   SIGNAL(valueChanged(const QString&)),
-                     desc,  SLOT(  SetGUID(     const QString&)));
+    QObject::connect(dev,   qOverload<const QString&>(&StandardSetting::valueChanged),
+                     model, &FirewireModel::SetGUID);
+    QObject::connect(dev,   qOverload<const QString&>(&StandardSetting::valueChanged),
+                     desc,  &FirewireDesc::SetGUID);
 }
 #endif
 
@@ -1530,8 +1530,8 @@ VBoxIP::VBoxIP()
     setLabel(QObject::tr("IP Address"));
     setHelpText(QObject::tr("Device IP or ID of a VBox device. eg. '192.168.1.100' or 'vbox_3718'"));
     VBoxIP::setEnabled(false);
-    connect(this, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateDevices(const QString&)));
+    connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &VBoxIP::UpdateDevices);
 };
 
 void VBoxIP::setEnabled(bool e)
@@ -1560,8 +1560,8 @@ VBoxTunerIndex::VBoxTunerIndex()
     setLabel(QObject::tr("Tuner"));
     setHelpText(QObject::tr("Number and type of the tuner to use. eg '1-DVBT/T2'."));
     VBoxTunerIndex::setEnabled(false);
-    connect(this, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateDevices(const QString&)));
+    connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &VBoxTunerIndex::UpdateDevices);
 };
 
 void VBoxTunerIndex::setEnabled(bool e)
@@ -1639,8 +1639,8 @@ VBoxDeviceIDList::VBoxDeviceIDList(
         QObject::tr(
             "Device IP or ID, tuner number and tuner type of available VBox devices."));
 
-    connect(this, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateDevices(const QString&)));
+    connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &VBoxDeviceIDList::UpdateDevices);
 };
 
 /// \brief Adds all available device-tuner combinations to list
@@ -1844,8 +1844,8 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("ASI", new EmptyVBIDevice(m_parent));
     cardType.addTargetedChild("ASI", m_cardInfo);
 
-    connect(m_device, SIGNAL(valueChanged(const QString&)),
-            this,     SLOT(  probeCard(   const QString&)));
+    connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,     &ASIConfigurationGroup::probeCard);
 
     probeCard(m_device->getValue());
 };
@@ -1902,8 +1902,8 @@ ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
     m_size->setLabel(tr("File size"));
     a_cardtype.addTargetedChild("IMPORT", m_size);
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   &ImportConfigurationGroup::probeCard);
 
     probeCard(device->getValue());
 };
@@ -2031,8 +2031,8 @@ CetonSetting::CetonSetting(const char* label, const char* helptext)
 {
     setLabel(QObject::tr(label));
     setHelpText(tr(helptext));
-    connect(this, SIGNAL(valueChanged( const QString&)),
-            this, SLOT(  UpdateDevices(const QString&)));
+    connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &CetonSetting::UpdateDevices);
 }
 
 void CetonSetting::UpdateDevices(const QString &v)
@@ -2139,8 +2139,8 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
     a_cardtype.addTargetedChild("V4L", new AudioRateLimit(m_parent));
     a_cardtype.addTargetedChild("V4L", new SkipBtAudio(m_parent));
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   &V4LConfigurationGroup::probeCard);
 
     probeCard(device->getValue());
 };
@@ -2185,8 +2185,8 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("MPEG", m_cardInfo);
     a_cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12000, 2000));
 
-    connect(m_device, SIGNAL(valueChanged(const QString&)),
-            this,     SLOT(  probeCard(   const QString&)));
+    connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,     &MPEGConfigurationGroup::probeCard);
 
     probeCard(m_device->getValue());
 }
@@ -2233,8 +2233,8 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
     m_size->setLabel(tr("File size"));
     a_cardtype.addTargetedChild("DEMO", m_size);
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   &DemoConfigurationGroup::probeCard);
 
     probeCard(device->getValue());
 }
@@ -2283,8 +2283,8 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("EXTERNAL",
                                 new ChannelTimeout(m_parent, 20000, 1750));
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeApp(   const QString&)));
+    connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   &ExternalConfigurationGroup::probeApp);
 
     probeApp(device->getValue());
 }
@@ -2337,8 +2337,8 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("HDPVR", m_audioInput);
     a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(m_parent, 15000, 2000));
 
-    connect(device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   &HDPVRConfigurationGroup::probeCard);
 
     probeCard(device->getValue());
 }
@@ -2376,8 +2376,8 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
 
     setVisible(false);
 
-    connect(m_device, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  probeCard(   const QString&)));
+    connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,     &V4L2encGroup::probeCard);
 
     const QString &device_name = m_device->getValue();
     if (!device_name.isEmpty())
@@ -3191,10 +3191,10 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
 
     connect(m_scan,     &ButtonStandardSetting::clicked, this, &CardInput::channelScanner);
     connect(m_srcFetch, &ButtonStandardSetting::clicked, this, &CardInput::sourceFetch);
-    connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
-            m_startChan,SLOT(  SetSourceID (const QString&)));
-    connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
-            this,       SLOT(  SetSourceID (const QString&)));
+    connect(m_sourceId, qOverload<const QString&>(&StandardSetting::valueChanged),
+            m_startChan,&StartingChannel::SetSourceID);
+    connect(m_sourceId, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,       &CardInput::SetSourceID);
     connect(ingrpbtn,   &ButtonStandardSetting::clicked,
             this,       &CardInput::CreateNewInputGroup);
 }
@@ -3941,10 +3941,10 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("DVB", m_diseqcBtn);
     m_tuningDelay->setVisible(false);
 
-    connect(m_cardNum,    SIGNAL(valueChanged(const QString&)),
-            this,         SLOT(  probeCard   (const QString&)));
-    connect(m_cardNum,    SIGNAL(valueChanged(const QString&)),
-            this,         SLOT(  reloadDiseqcTree(const QString&)));
+    connect(m_cardNum,    qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,         &DVBConfigurationGroup::probeCard);
+    connect(m_cardNum,    qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,         &DVBConfigurationGroup::reloadDiseqcTree);
 }
 
 DVBConfigurationGroup::~DVBConfigurationGroup()
@@ -4072,8 +4072,8 @@ SatIPDeviceIDList::SatIPDeviceIDList(
     setLabel(tr("Available devices"));
     setHelpText(tr("Device IP or ID, tuner number and tuner type of available Sat>IP device"));
 
-    connect(this, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateDevices(const QString&)));
+    connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &SatIPDeviceIDList::UpdateDevices);
 };
 
 void SatIPDeviceIDList::Load(void)

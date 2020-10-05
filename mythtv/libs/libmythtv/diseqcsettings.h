@@ -39,6 +39,7 @@ class SwitchConfig : public DiseqcConfigBase
     void Load(void) override; // StandardSetting
 
   public slots:
+    void update(const QString &/*value*/);
     void update(void);
 
   private:
@@ -114,6 +115,7 @@ class LNBConfig : public DiseqcConfigBase
 
   public slots:
     void SetPreset(const QString &value);
+    void UpdateType(const QString &value);
     void UpdateType(void);
 
   private:

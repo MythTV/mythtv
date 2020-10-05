@@ -96,8 +96,8 @@ bool GUIStartup::Create(void)
     connect(m_retryButton, &MythUIButton::Clicked, this, &GUIStartup::Retry);
     connect(m_searchButton, &MythUIButton::Clicked, this, &GUIStartup::Search);
     connect(m_setupButton, &MythUIButton::Clicked, this, &GUIStartup::Setup);
-    connect(m_exitButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(&m_timer, SIGNAL(timeout()), SLOT(updateProgress()));
+    connect(m_exitButton, &MythUIButton::Clicked, this, &GUIStartup::Close);
+    connect(&m_timer, &QTimer::timeout, this, qOverload<>(&GUIStartup::updateProgress));
 
     BuildFocusList();
 
@@ -162,6 +162,11 @@ bool GUIStartup::updateProgress(bool finished)
     }
     m_timer.stop();
     return false;
+}
+
+void GUIStartup::updateProgress(void)
+{
+    updateProgress(false);
 }
 
 void GUIStartup::Close(void)

@@ -523,11 +523,11 @@ MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
     m_stdpipe[1] = nullptr;
     m_stdpipe[2] = nullptr;
 
-    connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
-    connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
-    connect(this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)));
-    connect(this, SIGNAL(readDataReady(int)),
-            m_parent, SIGNAL(readDataReady(int)));
+    connect(this, &MythSystemLegacyPrivate::started, m_parent, &MythSystemLegacy::started);
+    connect(this, &MythSystemLegacyPrivate::finished, m_parent, &MythSystemLegacy::finished);
+    connect(this, &MythSystemLegacyPrivate::error, m_parent,&MythSystemLegacy::error));
+    connect(this, &MythSystemLegacyPrivate::readDataReady,
+            m_parent, &MythSystemLegacy::readDataReady);
 
     // Start the threads if they haven't been started yet.
     if (manager == nullptr)

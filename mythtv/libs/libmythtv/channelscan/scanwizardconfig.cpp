@@ -59,20 +59,20 @@ void ScanWizard::SetupConfig(
     addChild(m_scanType);
     addChild(m_scanConfig);
 
-    connect(m_videoSource, SIGNAL(valueChanged(const QString&)),
-            m_scanConfig,  SLOT(  SetSourceID( const QString&)));
+    connect(m_videoSource, qOverload<const QString&>(&StandardSetting::valueChanged),
+            m_scanConfig,  &ScanOptionalConfig::SetSourceID);
 
-    connect(m_videoSource, SIGNAL(valueChanged(const QString&)),
-            m_input,       SLOT(  SetSourceID( const QString&)));
+    connect(m_videoSource, qOverload<const QString&>(&StandardSetting::valueChanged),
+            m_input,       &InputSelector::SetSourceID);
 
-    connect(m_input,       SIGNAL(valueChanged(const QString&)),
-            m_scanType,    SLOT(  SetInput(    const QString&)));
+    connect(m_input,       qOverload<const QString&>(&StandardSetting::valueChanged),
+            m_scanType,    &ScanTypeSetting::SetInput);
 
-    connect(m_input,       SIGNAL(valueChanged(const QString&)),
-            this,          SLOT(  SetInput(    const QString&)));
+    connect(m_input,       qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,          &ScanWizard::SetInput);
 
-    connect(m_input,       SIGNAL(valueChanged(const QString&)),
-            this,          SLOT(  SetPaneDefaults(const QString)));
+    connect(m_input,       qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,          &ScanWizard::SetPaneDefaults);
 
 }
 

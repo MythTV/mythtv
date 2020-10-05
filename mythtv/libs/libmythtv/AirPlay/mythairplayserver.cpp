@@ -452,8 +452,8 @@ void MythAirplayServer::Start(void)
         return;
 
     // join the dots
-    connect(this, SIGNAL(newConnection(QTcpSocket*)),
-            this, SLOT(newConnection(QTcpSocket*)));
+    connect(this, &ServerPool::newConnection,
+            this, &MythAirplayServer::newConnection);
 
     // start listening for connections
     // try a few ports in case the default is in use
@@ -526,7 +526,8 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
 
     gCoreContext->SendSystemEvent(QString("AIRPLAY_NEW_CONNECTION"));
     m_sockets.append(client);
-    connect(client, SIGNAL(disconnected()), this, SLOT(deleteConnection()));
+    connect(client, &QAbstractSocket::disconnected,
+            this, qOverload<>(&MythAirplayServer::deleteConnection));
     connect(client, &QIODevice::readyRead, this, &MythAirplayServer::read);
 }
 

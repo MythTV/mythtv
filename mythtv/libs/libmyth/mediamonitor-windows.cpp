@@ -122,8 +122,8 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     pDevice->setDeviceModel(path.toLocal8Bit().constData());
 
     QMutexLocker locker(&m_DevicesLock);
-    connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
-            this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
+    connect(pDevice, &MythMediaDevice::statusChanged,
+            this, &MediaMonitorWindows::mediaStatusChanged);
     m_Devices.push_back(pDevice);
     m_UseCount[pDevice] = 0;
 

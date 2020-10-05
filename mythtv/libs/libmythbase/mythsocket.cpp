@@ -111,8 +111,8 @@ MythSocket::MythSocket(
             this, &MythSocket::ConnectHandler,
             Qt::DirectConnection);
 #if QT_VERSION < QT_VERSION_CHECK(5,15,0)
-    connect(m_tcpSocket,  SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(ErrorHandler(QAbstractSocket::SocketError)),
+    connect(m_tcpSocket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
+            this, &MythSocket::ErrorHandler,
             Qt::DirectConnection);
 #else
     connect(m_tcpSocket,  &QAbstractSocket::errorOccurred,

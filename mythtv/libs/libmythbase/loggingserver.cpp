@@ -656,7 +656,8 @@ void LogForwardThread::run(void)
 {
     RunProlog();
 
-    connect(this, SIGNAL(incomingSigHup(void)), this, SLOT(handleSigHup(void)),
+    connect(this, &LogForwardThread::incomingSigHup,
+            this, &LogForwardThread::handleSigHup,
             Qt::QueuedConnection);
 
     qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");

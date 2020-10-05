@@ -218,8 +218,8 @@ void MythDownloadManager::run(void)
     // and set its parent to nullptr so it can be shared between managers
     m_manager->cookieJar()->setParent(nullptr);
 
-    QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
-                       SLOT(downloadFinished(QNetworkReply*)));
+    QObject::connect(m_manager, &QNetworkAccessManager::finished,
+                     this, qOverload<QNetworkReply*>(&MythDownloadManager::downloadFinished));
 
     m_isRunning = true;
     while (m_runThread)
@@ -762,13 +762,17 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
     if (dlInfo->m_authCallback)
     {
-        connect(m_manager, SIGNAL(authenticationRequired(QNetworkReply *,
-                                                         QAuthenticator *)),
-                this, SLOT(authCallback(QNetworkReply *, QAuthenticator *)));
+        connect(m_manager, &QNetworkAccessManager::authenticationRequired,
+                this, &MythDownloadManager::authCallback);
     }
 
-    connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
-            SLOT(downloadError(QNetworkReply::NetworkError)));
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
+    connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
+            this, &MythDownloadManager::downloadError);
+#else
+    connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
+            this, &MythDownloadManager::downloadError);
+#endif
     connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
             this, &MythDownloadManager::downloadProgress);
 }
@@ -1275,8 +1279,13 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
-        connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-                this, SLOT(downloadError(QNetworkReply::NetworkError)));
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
+        connect(dlInfo->m_reply, qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
+                this, &MythDownloadManager::downloadError);
+#else
+        connect(dlInfo->m_reply, &QNetworkReply::errorOccurred,
+                this, &MythDownloadManager::downloadError);
+#endif
         connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
                 this, &MythDownloadManager::downloadProgress);
 

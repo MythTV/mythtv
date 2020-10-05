@@ -266,10 +266,10 @@ SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev, StandardSetting *parent)
     m_ports = new SwitchPortsSetting(switch_dev);
     parent->addChild(m_ports);
 
-    connect(m_type, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  update(void)));
-    connect(m_deviceDescr, SIGNAL(valueChanged(const QString&)),
-            SLOT(setValue(const QString&)));
+    connect(m_type, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   qOverload<const QString&>(&SwitchConfig::update));
+    connect(m_deviceDescr, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,   qOverload<const QString&>(&StandardSetting::setValue));
 }
 
 void SwitchConfig::Load(void)
@@ -306,6 +306,11 @@ void SwitchConfig::update(void)
             m_ports->setEnabled(true);
             break;
     }
+}
+
+void SwitchConfig::update(const QString &/*value*/)
+{
+    update();
 }
 
 bool DiseqcConfigBase::keyPressEvent(QKeyEvent *e)
@@ -526,8 +531,8 @@ void RotorPosMap::PopulateList(void)
             new RotorPosTextEdit(DeviceTree::tr("Position #%1").arg(pos),
                                  pos,
                                  posval);
-        connect(posEdit, SIGNAL(valueChanged(StandardSetting*)),
-                SLOT(valueChanged(StandardSetting*)));
+        connect(posEdit, qOverload<StandardSetting*>(&StandardSetting::valueChanged),
+                this,    &RotorPosMap::valueChanged);
         addChild(posEdit);
     }
 }
@@ -545,8 +550,8 @@ RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
     parent->addChild(new DeviceRepeatSetting(rotor));
 
     auto *rtype = new RotorTypeSetting(rotor);
-    connect(rtype, SIGNAL(valueChanged(const QString&)),
-            this,  SLOT(  SetType(     const QString&)));
+    connect(rtype, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,  &RotorConfig::SetType);
     parent->addChild(rtype);
 
     m_pos = new RotorPosMap(rotor);
@@ -931,12 +936,12 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
     parent->addChild(m_lofHi);
     m_polInv = new LNBPolarityInvertedSetting(lnb);
     parent->addChild(m_polInv);
-    connect(m_type, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  UpdateType(  void)));
-    connect(m_preset, SIGNAL(valueChanged(const QString&)),
-            this,   SLOT(  SetPreset(   const QString&)));
-    connect(deviceDescr, SIGNAL(valueChanged(const QString&)),
-            SLOT(setValue(const QString&)));
+    connect(m_type,      qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,        qOverload<const QString&>(&LNBConfig::UpdateType));
+    connect(m_preset,    qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,        &LNBConfig::SetPreset);
+    connect(deviceDescr, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,        qOverload<const QString&>(&StandardSetting::setValue));
 }
 
 void LNBConfig::Load(void)
@@ -1002,6 +1007,10 @@ void LNBConfig::UpdateType(void)
     }
 }
 
+void LNBConfig::UpdateType(const QString &/*value*/)
+{
+    UpdateType();
+}
 //////////////////////////////////////// DeviceTree
 
 void DeviceTree::Load(void)

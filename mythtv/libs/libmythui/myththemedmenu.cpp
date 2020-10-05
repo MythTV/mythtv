@@ -126,8 +126,8 @@ void MythThemedMenu::SetMenuTheme(const QString &menufile)
 
     connect(m_buttonList, &MythUIButtonList::itemSelected,
             this, &MythThemedMenu::setButtonActive);
-    connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(buttonAction(MythUIButtonListItem*)));
+    connect(m_buttonList, &MythUIButtonList::itemClicked,
+            this, qOverload<MythUIButtonListItem*>(&MythThemedMenu::buttonAction));
 
     if (!parseMenu(menufile))
         m_foundtheme = false;
@@ -711,6 +711,11 @@ void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
         if (handleAction(act, password))
             break;
     }
+}
+
+void MythThemedMenu::buttonAction(MythUIButtonListItem *item)
+{
+    buttonAction(item, false);
 }
 
 /** \brief Locates the appropriate menu file from which to parse the menu

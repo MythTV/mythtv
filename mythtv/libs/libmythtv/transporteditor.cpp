@@ -223,8 +223,8 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
     addChild(newTransport);
 
-    connect(m_videosource, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(SetSourceID(const QString&)));
+    connect(m_videosource, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, qOverload<const QString&>(&TransportListEditor::SetSourceID));
 
     SetSourceID(sourceid);
 }
