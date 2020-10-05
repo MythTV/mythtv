@@ -127,6 +127,8 @@ class EITHelper
     static void WriteEITCache(void);
 
   private:
+    EITHelper &operator=(const EITHelper &) = delete;
+
     // only ATSC
     uint GetChanID(uint atsc_major, uint atsc_minor);
     // only DVB
