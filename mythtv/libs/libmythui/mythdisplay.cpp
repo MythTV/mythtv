@@ -116,19 +116,16 @@ QStringList MythDisplay::GetDescription()
     QStringList result;
     bool spanall = false;
     int screencount = MythDisplay::GetScreenCount();
-    MythDisplay* display = GetMythMainWindow()->GetDisplay();
-
     if (MythDisplay::SpanAllScreens() && screencount > 1)
     {
         spanall = true;
         result.append(tr("Spanning %1 screens").arg(screencount));
         result.append(tr("Total bounds") + QString("\t: %1x%2")
-                      .arg(display->GetScreenBounds().width())
-                      .arg(display->GetScreenBounds().height()));
+            .arg(GetScreenBounds().width()).arg(GetScreenBounds().height()));
         result.append("");
     }
 
-    QScreen *current = display->GetCurrentScreen();
+    QScreen *current = GetCurrentScreen();
     QList<QScreen*> screens = QGuiApplication::screens();
     bool first = true;
     for (auto *screen : qAsConst(screens))
@@ -146,14 +143,14 @@ QStringList MythDisplay::GetDescription()
         if (screen == current)
         {
             QString source;
-            double aspect = display->GetAspectRatio(source);
+            double aspect = GetAspectRatio(source);
             result.append(tr("Aspect ratio") + QString("\t: %1 (%2)")
                     .arg(aspect, 0, 'f', 3).arg(source));
             if (!spanall)
             {
                 result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
-                              .arg(display->GetResolution().width()).arg(display->GetResolution().height())
-                              .arg(display->GetRefreshRate(), 0, 'f', 2));
+                              .arg(GetResolution().width()).arg(GetResolution().height())
+                              .arg(GetRefreshRate(), 0, 'f', 2));
             }
         }
     }
