@@ -34,7 +34,7 @@ class ScreenSaverX11Private
         {
             m_resetTimer = new QTimer(outer);
             m_resetTimer->setSingleShot(false);
-            QObject::connect(m_resetTimer, SIGNAL(timeout()), outer, SLOT(resetSlot()));
+            QObject::connect(m_resetTimer, &QTimer::timeout, outer, &MythScreenSaverX11::ResetSlot);
             if (m_xscreensaverRunning)
                 LOG(VB_GENERAL, LOG_INFO, LOC + "XScreenSaver support enabled");
         }
