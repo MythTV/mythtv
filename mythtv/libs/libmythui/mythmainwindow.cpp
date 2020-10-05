@@ -647,8 +647,16 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
+void MythMainWindow::LoadQtConfig()
+{
+    gCoreContext->ResetLanguage();
+    GetMythUI()->ClearThemeCacheDir();
+    QApplication::setStyle("Windows");
+}
+
 void MythMainWindow::Init(bool mayReInit)
 {
+    LoadQtConfig();
     m_display->SetWidget(nullptr);
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 

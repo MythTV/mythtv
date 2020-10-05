@@ -283,8 +283,6 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 #endif
     GetMythUI()->Init();
-    GetMythUI()->LoadQtConfig();
-
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
 

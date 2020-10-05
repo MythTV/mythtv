@@ -99,10 +99,3 @@ bool MythUIHelper::IsScreenSetup() const
 {
     return m_screenSetup;
 }
-
-void MythUIHelper::LoadQtConfig()
-{
-    gCoreContext->ResetLanguage();
-    MythUIThemeCache::ClearThemeCacheDir();
-    QApplication::setStyle("Windows");
-}

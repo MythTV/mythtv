@@ -32,7 +32,6 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelpe
 
     MythUIMenuCallbacks *GetMenuCBs();
 
-    void LoadQtConfig();
     bool IsScreenSetup() const;
 
   protected:

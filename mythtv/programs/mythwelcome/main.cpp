@@ -113,8 +113,6 @@ int main(int argc, char **argv)
 
     MythTranslation::load("mythfrontend");
 
-    GetMythUI()->LoadQtConfig();
-
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     mainWindow->DisableIdleTimer();

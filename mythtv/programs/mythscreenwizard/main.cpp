@@ -169,8 +169,6 @@ int main(int argc, char **argv)
 
     cmdline.ApplySettingsOverride();
 
-    GetMythUI()->LoadQtConfig();
-
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())

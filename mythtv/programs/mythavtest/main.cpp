@@ -241,8 +241,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_THEME;
     }
 
-    GetMythUI()->LoadQtConfig();
-
 #if defined(Q_OS_MACX)
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else

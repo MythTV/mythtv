@@ -1403,7 +1403,6 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
     MythTranslation::reload();
     gCoreContext->ReInitLocale();
-    GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
     GetMythMainWindow()->ReinitDone();
 
@@ -1477,7 +1476,6 @@ static int reloadTheme(void)
     MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);
-    GetMythUI()->LoadQtConfig();
     if (g_menu)
         g_menu->Close();
     GetMythMainWindow()->Init();
@@ -2005,8 +2003,6 @@ int main(int argc, char **argv)
                 .arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
-
-    GetMythUI()->LoadQtConfig();
 
     themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     themedir = GetMythUI()->FindThemeDir(themename);

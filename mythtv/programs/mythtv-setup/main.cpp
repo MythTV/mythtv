@@ -202,7 +202,6 @@ static bool resetTheme(QString themedir, const QString &badtheme)
     themedir = GetMythUI()->FindThemeDir(themename);
 
     MythTranslation::reload();
-    GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
     GetMythMainWindow()->ReinitDone();
 
@@ -223,8 +222,6 @@ static int reloadTheme(void)
     MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);
-
-    GetMythUI()->LoadQtConfig();
 
     if (menu)
     {
@@ -402,10 +399,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        GetMythUI()->LoadQtConfig();
-
         QString fileprefix = GetConfDir();
-
         QDir dir(fileprefix);
         if (!dir.exists())
             dir.mkdir(fileprefix);
