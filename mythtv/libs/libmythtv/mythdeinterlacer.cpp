@@ -394,7 +394,7 @@ bool MythDeinterlacer::SetUpCache(VideoFrame *Frame)
         m_bobFrame = new VideoFrame;
         if (!m_bobFrame)
             return false;
-        memset(m_bobFrame, 0, sizeof(VideoFrame));
+        init(m_bobFrame, Frame->codec, nullptr, Frame->width, Frame->height, 0);
         LOG(VB_PLAYBACK, LOG_INFO, "Created new 'bob' cache frame");
     }
 
