@@ -16,7 +16,7 @@ extern "C" {
 #include <X11/extensions/dpms.h>
 }
 
-#define LOC QString("ScreenSaverX11Private: ")
+#define LOC QString("ScreenSaverX11: ")
 
 class ScreenSaverX11Private
 {
@@ -160,9 +160,16 @@ class ScreenSaverX11Private
     {
         if (m_state.m_saved && m_display)
         {
-            XSetScreenSaver(m_display->GetDisplay(), m_state.m_timeout,
-                            m_state.m_interval, m_state.m_preferblank,
-                            m_state.m_allowexposure);
+            if (XSetScreenSaver(m_display->GetDisplay(), m_state.m_timeout,
+                                m_state.m_interval, m_state.m_preferblank,
+                                m_state.m_allowexposure) == 1)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Uninhibited screensaver");
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to re-enable screensaver");
+            }
             m_display->Sync();
             m_state.m_saved = false;
         }
@@ -234,8 +241,14 @@ void MythScreenSaverX11::Disable()
 
     if (m_priv->m_display)
     {
-        XResetScreenSaver(m_priv->m_display->GetDisplay());
-        XSetScreenSaver(m_priv->m_display->GetDisplay(), 0, 0, 0, 0);
+        int reset = XResetScreenSaver(m_priv->m_display->GetDisplay());
+        int set   = XSetScreenSaver(m_priv->m_display->GetDisplay(), 0, 0, 0, 0);
+        if (reset != 1)
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to reset screensaver");
+        if (set != 1)
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to disable screensaver");
+        if (reset && set)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Inhibited X11 screensaver");
         m_priv->m_display->Sync();
     }
 
