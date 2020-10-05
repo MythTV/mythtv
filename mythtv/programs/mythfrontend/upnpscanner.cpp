@@ -87,7 +87,7 @@ class MediaServer : public MediaServerItem
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_url(std::move(URL)), m_eventSubPath(QString()),
+       m_serverURL(std::move(URL)), m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {
     }
@@ -104,7 +104,7 @@ class MediaServer : public MediaServerItem
         return result;
     }
 
-    QUrl    m_url;
+    QUrl    m_serverURL;
     int     m_connectionAttempts {0};
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
@@ -563,9 +563,8 @@ void UPNPScanner::CheckStatus(void)
         // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
         if (!SSDP::Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
         {
-            LOG(VB_UPNP, LOG_INFO, LOC +
-                QString("%1 no longer in SSDP cache. Removing")
-                    .arg(it.value()->m_url.toString()));
+            LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 no longer in SSDP cache. Removing")
+                .arg(it.value()->m_serverURL.toString()));
             MediaServer* last = it.value();
             it.remove();
             delete last;
@@ -772,8 +771,7 @@ void UPNPScanner::CheckFailure(const QUrl &url)
     while (it.hasNext())
     {
         it.next();
-        if (it.value()->m_url == url &&
-            it.value()->m_connectionAttempts == MAX_ATTEMPTS)
+        if (it.value()->m_serverURL == url && it.value()->m_connectionAttempts == MAX_ATTEMPTS)
         {
             Debug();
             break;
@@ -1298,7 +1296,7 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     while (it.hasNext())
     {
         it.next();
-        if (it.value()->m_url == url)
+        if (it.value()->m_serverURL == url)
         {
             usn = it.key();
             QUrl qcontrolurl(controlURL);
