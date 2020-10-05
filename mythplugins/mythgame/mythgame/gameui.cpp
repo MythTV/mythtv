@@ -578,8 +578,8 @@ void GameUI::customEvent(QEvent *event)
             auto *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, lul);
 
-            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
-                    SLOT(OnGameSearchListSelection(RefCountHandler<MetadataLookup>)),
+            connect(resultsdialog, &MetadataResultsDialog::haveResult,
+                    this, &GameUI::OnGameSearchListSelection,
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())

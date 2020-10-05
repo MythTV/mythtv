@@ -205,7 +205,7 @@ bool ArchiveFileSelector::Create(void)
         m_titleText->SetText(tr("Find File To Import"));
 
     connect(m_nextButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::nextPressed);
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::cancelPressed);
     connect(m_prevButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::prevPressed);
 
     connect(m_locationEdit, &MythUIType::LosingFocus,

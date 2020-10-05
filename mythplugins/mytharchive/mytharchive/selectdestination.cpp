@@ -272,8 +272,8 @@ void SelectDestination::handleFind(void)
     auto *selector = new
             FileSelector(mainStack, nullptr, FSTYPE_DIRECTORY, m_filenameEdit->GetText(), "*.*");
 
-    connect(selector, SIGNAL(haveResult(QString)),
-            this, SLOT(fileFinderClosed(QString)));
+    connect(selector, qOverload<QString>(&FileSelector::haveResult),
+            this, &SelectDestination::fileFinderClosed);
 
     if (selector->Create())
         mainStack->AddScreen(selector);

@@ -111,7 +111,7 @@ bool LogViewer::Create(void)
         return false;
     }
 
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelClicked()));
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &LogViewer::cancelClicked);
     connect(m_updateButton, &MythUIButton::Clicked, this, &LogViewer::updateClicked);
     connect(m_exitButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 

@@ -1242,6 +1242,11 @@ void Playlist::processExit(uint retval)
     m_procExitVal = retval;
 }
 
+void Playlist::processExit(void)
+{
+    m_procExitVal = GENERIC_EXIT_OK;
+}
+
 // FIXME: this needs updating to work with storage groups
 int Playlist::CreateCDMP3(void)
 {
@@ -1368,11 +1373,11 @@ int Playlist::CreateCDMP3(void)
 
     m_proc = new MythSystemLegacy(command, args, flags);
 
-    connect(m_proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)),
+    connect(m_proc, &MythSystemLegacy::readDataReady, this, &Playlist::mkisofsData,
             Qt::DirectConnection);
-    connect(m_proc, SIGNAL(finished()),         this, SLOT(processExit()),
+    connect(m_proc, &MythSystemLegacy::inished,       this, qOverload<>&Playlist::processExit,
             Qt::DirectConnection);
-    connect(m_proc, SIGNAL(error(uint)),        this, SLOT(processExit(uint)),
+    connect(m_proc, &MythSystemLegacy::error,         this, qOverload<uint>&Playlist::processExit),
             Qt::DirectConnection);
 
     m_procExitVal = GENERIC_EXIT_RUNNING;
@@ -1418,12 +1423,12 @@ int Playlist::CreateCDMP3(void)
                 kMSRunBackground;
 
         m_proc = new MythSystemLegacy(command, args, flags);
-        connect(m_proc, SIGNAL(readDataReady(int)),
-                this, SLOT(cdrecordData(int)), Qt::DirectConnection);
-        connect(m_proc, SIGNAL(finished()),
-                this, SLOT(processExit()), Qt::DirectConnection);
-        connect(m_proc, SIGNAL(error(uint)),
-                this, SLOT(processExit(uint)), Qt::DirectConnection);
+        connect(m_proc, &MythSystemLegacy::readDataReady,
+                this, &Playlist::cdrecordData, Qt::DirectConnection);
+        connect(m_proc, &MythSystemLegacy::SIGNAL(finished()),
+                this, qOverload<>&Playlist::processExit, Qt::DirectConnection);
+        connect(m_proc, &MythSystemLegacy::error,
+                this, qOverload<uint>&Playlist::processExit, Qt::DirectConnection);
         m_procExitVal = GENERIC_EXIT_RUNNING;
         m_proc->Run();
 

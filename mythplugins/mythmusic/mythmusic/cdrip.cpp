@@ -604,8 +604,8 @@ bool Ripper::Create(void)
         return false;
     }
 
-    connect(m_trackList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(toggleTrackActive(MythUIButtonListItem *)));
+    connect(m_trackList, &MythUIButtonList::itemClicked,
+            this, qOverload<MythUIButtonListItem *>(&Ripper::toggleTrackActive));
     connect(m_ripButton, &MythUIButton::Clicked, this, &Ripper::startRipper);
     connect(m_scanButton, &MythUIButton::Clicked, this, &Ripper::startScanCD);
     connect(m_switchTitleArtist, &MythUIButton::Clicked,

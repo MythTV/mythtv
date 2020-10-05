@@ -108,7 +108,10 @@ class SourceSetup : public MythScreenType
     bool loadData(void);
 
   protected slots:
-    void sourceListItemSelected(MythUIButtonListItem *item = nullptr);
+    void sourceListItemSelected(MythUIButtonListItem *item);
+#if 0
+    void sourceListItemSelected() { sourceListItemSelected(nullptr) };
+#endif
     void updateSpinboxUpdate(void);
     void retrieveSpinboxUpdate(void);
     void saveData(void);

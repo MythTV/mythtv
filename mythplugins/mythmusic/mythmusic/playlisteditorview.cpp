@@ -166,8 +166,8 @@ bool PlaylistEditorView::Create(void)
             this, &PlaylistEditorView::treeNodeChanged);
 
     if (m_currentView == MV_PLAYLISTEDITORGALLERY)
-        connect(m_playlistTree, SIGNAL(itemVisible(MythUIButtonListItem*)),
-                this, SLOT(treeItemVisible(MythUIButtonListItem*)));
+        connect(m_playlistTree, &MythUIButtonTree::itemVisible,
+                this, &PlaylistEditorView::treeItemVisible);
 
     BuildFocusList();
 

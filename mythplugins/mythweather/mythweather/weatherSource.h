@@ -81,7 +81,8 @@ class WeatherSource : public QObject
     void newData(QString, units_t,  DataMap);
 
   private slots:
-    void processExit(uint status = 0);
+    void processExit(uint status);
+    void processExit();
     void updateTimeout();
 
   private:

@@ -123,7 +123,8 @@ class Playlist : public QObject
   private slots:
     void mkisofsData(int fd);
     void cdrecordData(int fd);
-    void processExit(uint retval = 0);
+    void processExit(uint retval);
+    void processExit();
 #endif
 
   private:

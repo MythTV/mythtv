@@ -988,8 +988,8 @@ void MythBurn::handleAddFile()
     auto *selector = new FileSelector(mainStack, &m_archiveList,
                                       FSTYPE_FILELIST, "/", filter);
 
-    connect(selector, SIGNAL(haveResult(bool)),
-            this, SLOT(selectorClosed(bool)));
+    connect(selector, qOverload<bool>(&FileSelector::haveResult),
+            this, &MythBurn::selectorClosed);
 
     if (selector->Create())
         mainStack->AddScreen(selector);

@@ -115,8 +115,8 @@ bool MythNews::Create(void)
 
     connect(m_sitesList, &MythUIButtonList::itemSelected,
             this, &MythNews::slotSiteSelected);
-    connect(m_articlesList, SIGNAL(itemSelected( MythUIButtonListItem*)),
-            this, SLOT( updateInfoView(MythUIButtonListItem*)));
+    connect(m_articlesList, &MythUIButtonList::itemSelected,
+            this, qOverload<MythUIButtonListItem *>(&MythNews::updateInfoView));
     connect(m_articlesList, &MythUIButtonList::itemClicked,
             this, &MythNews::slotViewArticle);
 

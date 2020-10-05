@@ -263,6 +263,7 @@ class SmartPLOrderByDialog: public MythScreenType
     void descendingPressed(void);
     void okPressed(void);
     void orderByChanged(void);
+    void orderByChanged(MythUIButtonListItem */*item*/);
     void fieldListSelectionChanged(MythUIButtonListItem *item);
 
   private:

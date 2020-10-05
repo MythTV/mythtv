@@ -125,13 +125,13 @@ bool MusicCommon::CreateCommon(void)
     if (m_pauseButton)
     {
         m_pauseButton->SetLockable(true);
-        connect(m_pauseButton, SIGNAL(Clicked()), this, SLOT(pause()));
+        connect(m_pauseButton, &MythUIButton::Clicked, this, &MusicCommon::pause);
     }
 
     if (m_playButton)
     {
         m_playButton->SetLockable(true);
-        connect(m_playButton, SIGNAL(Clicked()), this, SLOT(play()));
+        connect(m_playButton, &MythUIButton::Clicked, this, &MusicCommon::play);
     }
 
     if (m_stopButton)
@@ -150,8 +150,8 @@ bool MusicCommon::CreateCommon(void)
     {
         connect(m_currentPlaylist, &MythUIButtonList::itemClicked,
                 this, &MusicCommon::playlistItemClicked);
-        connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
-                this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
+        connect(m_currentPlaylist, &MythUIButtonList::itemVisible,
+                this, &MusicCommon::playlistItemVisible);
 
         m_currentPlaylist->SetSearchFields("**search**");
     }
@@ -483,7 +483,7 @@ void MusicCommon::switchView(MusicView view)
 
             if (oldView)
             {
-                disconnect(this , SIGNAL(Exiting()));
+                disconnect(this, &MythScreenType::Exiting, nullptr, nullptr);
                 Close();
             }
 
@@ -513,7 +513,7 @@ void MusicCommon::switchView(MusicView view)
 
             if (oldView)
             {
-                disconnect(this , SIGNAL(Exiting()));
+                disconnect(this , &MythScreenType::Exiting, nullptr, nullptr);
                 Close();
             }
 

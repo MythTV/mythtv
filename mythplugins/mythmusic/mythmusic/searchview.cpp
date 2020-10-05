@@ -65,11 +65,11 @@ bool SearchView::Create(void)
     connect(m_fieldList, &MythUIButtonList::itemSelected,
             this, &SearchView::fieldSelected);
 
-    connect(m_tracksList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(trackClicked(MythUIButtonListItem*)));
+    connect(m_tracksList, &MythUIButtonList::itemClicked,
+            this, &SearchView::trackClicked);
 
-    connect(m_tracksList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            this, SLOT(trackVisible(MythUIButtonListItem*)));
+    connect(m_tracksList, &MythUIButtonList::itemVisible,
+            this, &SearchView::trackVisible);
 
     connect(m_criteriaEdit, &MythUITextEdit::valueChanged, this, &SearchView::criteriaChanged);
 

@@ -60,8 +60,8 @@ bool StreamView::Create(void)
 
     connect(m_streamList, &MythUIButtonList::itemClicked,
             this, &StreamView::streamItemClicked);
-    connect(m_streamList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            this, SLOT(streamItemVisible(MythUIButtonListItem*)));
+    connect(m_streamList, &MythUIButtonList::itemVisible,
+            this, &StreamView::streamItemVisible);
 
     gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
 
@@ -798,8 +798,8 @@ bool SearchStream::Create()
 
     connect(m_streamList, &MythUIButtonList::itemClicked,
             this, &SearchStream::streamClicked);
-    connect(m_streamList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            this, SLOT(streamVisible(MythUIButtonListItem*)));
+    connect(m_streamList, &MythUIButtonList::itemVisible,
+            this, &SearchStream::streamVisible);
     connect(m_broadcasterList, &MythUIButtonList::itemSelected,
             this, &SearchStream::updateStreams);
     connect(m_genreList, &MythUIButtonList::itemSelected,

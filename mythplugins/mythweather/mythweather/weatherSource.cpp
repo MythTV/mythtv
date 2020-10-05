@@ -485,8 +485,10 @@ void WeatherSource::startUpdate(bool forceUpdate)
     m_ms = new MythSystemLegacy(program, args, flags);
     m_ms->SetDirectory(m_info->path);
 
-    connect(m_ms, SIGNAL(finished()),  this, SLOT(processExit()));
-    connect(m_ms, &MythSystemLegacy::error, this, &WeatherSource::processExit);
+    connect(m_ms, &MythSystemLegacy::finished,
+            this, qOverload<>(&WeatherSource::processExit));
+    connect(m_ms, &MythSystemLegacy::error,
+            this, qOverload<uint>(&WeatherSource::processExit));
 
     m_ms->Run(m_info->scriptTimeout);
 }
@@ -557,6 +559,11 @@ void WeatherSource::processExit(uint status)
     {
         emit newData(m_locale, m_units, m_data);
     }
+}
+
+void WeatherSource::processExit(void)
+{
+    processExit(GENERIC_EXIT_OK);
 }
 
 void WeatherSource::processData()

@@ -1037,7 +1037,8 @@ void SmartPlaylistEditor::orderByClicked(void)
 
     orderByDialog->setFieldList(m_orderBySelector->GetValue());
 
-    connect(orderByDialog, SIGNAL(orderByChanged(QString)), SLOT(orderByChanged(QString)));
+    connect(orderByDialog, qOverload<QString>(&SmartPLOrderByDialog::orderByChanged),
+            this, &SmartPlaylistEditor::orderByChanged);
 
     popupStack->AddScreen(orderByDialog);
 }
@@ -1634,8 +1635,8 @@ bool SmartPLResultViewer::Create(void)
         return false;
     }
 
-    connect(m_trackList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            this, SLOT(trackVisible(MythUIButtonListItem*)));
+    connect(m_trackList, &MythUIButtonList::itemVisible,
+            this, &SmartPLResultViewer::trackVisible);
     connect(m_trackList, &MythUIButtonList::itemSelected,
             this, &SmartPLResultViewer::trackSelected);
 
@@ -1784,8 +1785,8 @@ bool SmartPLOrderByDialog::Create(void)
     connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
     connect(m_okButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::okPressed);
 
-    connect(m_orderSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(orderByChanged(void)));
+    connect(m_orderSelector,  &MythUIButtonList::itemSelected,
+            this, qOverload<MythUIButtonListItem *>(&SmartPLOrderByDialog::orderByChanged));
     connect(m_fieldList, &MythUIButtonList::itemSelected,
             this, &SmartPLOrderByDialog::fieldListSelectionChanged);
 
@@ -1950,6 +1951,11 @@ void SmartPLOrderByDialog::orderByChanged(void)
         m_ascendingButton->SetEnabled(false);
         m_descendingButton->SetEnabled(false);
     }
+}
+
+void SmartPLOrderByDialog::orderByChanged(MythUIButtonListItem */*item*/)
+{
+    orderByChanged();
 }
 
 void SmartPLOrderByDialog::getOrderByFields(void)

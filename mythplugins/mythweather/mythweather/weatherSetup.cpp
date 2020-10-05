@@ -714,10 +714,10 @@ bool SourceSetup::Create()
     SetFocusWidget(m_sourceList);
 
     connect(m_sourceList, &MythUIButtonList::itemSelected,
-            this, &SourceSetup::sourceListItemSelected);
+            this, qOverload<MythUIButtonListItem *>(&SourceSetup::sourceListItemSelected));
 #if 0
-    connect(m_sourceList, SIGNAL(TakingFocus()),
-            this, SLOT(sourceListItemSelected()));
+    connect(m_sourceList, &MythUIButtonList::TakingFocus,
+            this, qOverload<>(&SourceSetup::sourceListItemSelected));
 #endif
 
     // 12 Hour max interval

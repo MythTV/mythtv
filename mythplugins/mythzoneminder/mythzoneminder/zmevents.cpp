@@ -406,8 +406,8 @@ void ZMEvents::setGridLayout(int layout)
                 this, &ZMEvents::eventChanged);
         connect(m_eventGrid, &MythUIButtonList::itemClicked,
                 this, &ZMEvents::playPressed);
-        connect(m_eventGrid, SIGNAL(itemVisible(MythUIButtonListItem*)),
-             this, SLOT(eventVisible(MythUIButtonListItem*)));
+        connect(m_eventGrid, &MythUIButtonList::itemVisible,
+             this, &ZMEvents::eventVisible);
 
         updateUIList();
 
