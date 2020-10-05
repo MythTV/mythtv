@@ -410,12 +410,10 @@ using_frontend {
     # A/V decoders
     HEADERS += decoders/decoderbase.h
     HEADERS += decoders/avformatdecoder.h
-    HEADERS += decoders/privatedecoder.h
     HEADERS += decoders/mythcodeccontext.h
     HEADERS += decoders/mythdecoderthread.h
     SOURCES += decoders/decoderbase.cpp
     SOURCES += decoders/avformatdecoder.cpp
-    SOURCES += decoders/privatedecoder.cpp
     SOURCES += decoders/mythcodeccontext.cpp
     SOURCES += decoders/mythdecoderthread.cpp
 

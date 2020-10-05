@@ -11,7 +11,6 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
-#include "privatedecoder.h"
 #include "audiooutputsettings.h"
 #include "audiooutpututil.h"
 #include "spdifencoder.h"
@@ -258,8 +257,6 @@ class AvFormatDecoder : public DecoderBase
                     AVPacket *pkt);
 
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
-
-    PrivateDecoder    *m_privateDec                   {nullptr};
 
     bool               m_isDbIgnored;
 

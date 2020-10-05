@@ -13,7 +13,6 @@
 #include "mythtvexp.h"
 #include "mythconfig.h"
 #include "avformatdecoder.h"
-#include "privatedecoder.h"
 #include "audiooutput.h"
 #include "audiooutpututil.h"
 #include "io/mythmediabuffer.h"
@@ -309,9 +308,7 @@ void AvFormatDecoder::GetDecoders(RenderOptions &opts)
 {
     opts.decoders->append("ffmpeg");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
-
     MythCodecContext::GetDecoders(opts);
-    PrivateDecoder::GetDecoders(opts);
 }
 
 AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
@@ -359,7 +356,6 @@ AvFormatDecoder::~AvFormatDecoder()
     delete m_ccd608;
     delete m_ccd708;
     delete m_ttd;
-    delete m_privateDec;
     delete m_avcParser;
     delete m_mythCodecCtx;
 
@@ -413,9 +409,6 @@ void AvFormatDecoder::CloseContext()
         m_ic = nullptr;
         fmt->flags &= ~AVFMT_NOFILE;
     }
-
-    delete m_privateDec;
-    m_privateDec = nullptr;
     m_avcParser->Reset();
 }
 
@@ -736,8 +729,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             if (enc && enc->internal)
                 avcodec_flush_buffers(enc);
         }
-        if (m_privateDec)
-            m_privateDec->Reset();
 
         // Free up the stored up packets
         while (!m_storedPackets.isEmpty())
@@ -2335,8 +2326,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     .arg(get_decoder_name(m_videoCodecId)).arg(m_streamsChanged));
             }
 
-            delete m_privateDec;
-            m_privateDec = nullptr;
             m_avcParser->Reset();
 
             QSize dim = get_video_dim(*enc);
@@ -2424,12 +2413,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown video codec - defaulting to MPEG2");
                     m_videoCodecId = kCodec_MPEG2;
                 }
-
-                // Use a PrivateDecoder if allowed in playerFlags AND matched
-                // via the decoder name
-                //m_privateDec = PrivateDecoder::Create(dec, m_playerFlags, enc);
-                //if (m_privateDec)
-                //    thread_count = 1;
 
                 break;
             }
@@ -3170,9 +3153,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (changed || forceaspectchange)
             {
-                if (m_privateDec)
-                    m_privateDec->Reset();
-
                 // N.B. We now set the default scan to kScan_Ignore as interlaced detection based on frame
                 // size and rate is extremely error prone and FFmpeg gets it right far more often.
                 // As for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
@@ -3282,9 +3262,6 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (fps_changed || res_changed || forcechange)
         {
-            if (m_privateDec)
-                m_privateDec->Reset();
-
             // N.B. we now set the default scan to kScan_Ignore as interlaced detection based on frame
             // size and rate is extremely error prone and FFmpeg gets it right far more often.
             // N.B. if a decoder deinterlacer is in use - the stream must be progressive
@@ -3411,56 +3388,44 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 
     bool sentPacket = false;
     int ret2 = 0;
-    if (m_privateDec)
-    {
-        if (QString(m_ic->iformat->name).contains("avi") || !m_ptsDetected)
-            pkt->pts = pkt->dts;
-        // TODO disallow private decoders for dvd playback
-        // N.B. we do not reparse the frame as it breaks playback for
-        // everything but libmpeg2
-        ret = m_privateDec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
-        sentPacket = true;
-    }
+
+    m_avCodecLock.lock();
+    if (!m_useFrameTiming)
+        context->reordered_opaque = pkt->pts;
+
+    //  SUGGESTION
+    //  Now that avcodec_decode_video2 is deprecated and replaced
+    //  by 2 calls (receive frame and send packet), this could be optimized
+    //  into separate routines or separate threads.
+    //  Also now that it always consumes a whole buffer some code
+    //  in the caller may be able to be optimized.
+
+    // FilteredReceiveFrame will call avcodec_receive_frame and
+    // apply any codec-dependent filtering
+    ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
+
+    if (ret == 0)
+        gotpicture = 1;
     else
+        gotpicture = 0;
+    if (ret == AVERROR(EAGAIN))
+        ret = 0;
+    // If we got a picture do not send the packet until we have
+    // all available pictures
+    if (ret==0 && !gotpicture)
     {
-        m_avCodecLock.lock();
-        if (!m_useFrameTiming)
-            context->reordered_opaque = pkt->pts;
-
-        //  SUGGESTION
-        //  Now that avcodec_decode_video2 is deprecated and replaced
-        //  by 2 calls (receive frame and send packet), this could be optimized
-        //  into separate routines or separate threads.
-        //  Also now that it always consumes a whole buffer some code
-        //  in the caller may be able to be optimized.
-
-        // FilteredReceiveFrame will call avcodec_receive_frame and
-        // apply any codec-dependent filtering
-        ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
-
-        if (ret == 0)
-            gotpicture = 1;
-        else
-            gotpicture = 0;
-        if (ret == AVERROR(EAGAIN))
-            ret = 0;
-        // If we got a picture do not send the packet until we have
-        // all available pictures
-        if (ret==0 && !gotpicture)
+        ret2 = avcodec_send_packet(context, pkt);
+        if (ret2 == AVERROR(EAGAIN))
         {
-            ret2 = avcodec_send_packet(context, pkt);
-            if (ret2 == AVERROR(EAGAIN))
-            {
-                Retry = true;
-                ret2 = 0;
-            }
-            else
-            {
-                sentPacket = true;
-            }
+            Retry = true;
+            ret2 = 0;
         }
-        m_avCodecLock.unlock();
+        else
+        {
+            sentPacket = true;
+        }
     }
+    m_avCodecLock.unlock();
 
     if (ret < 0 || ret2 < 0)
     {
@@ -3545,12 +3510,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
                 if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
                 m_ptsSelected = false;
-            }
-            else if (m_privateDec && m_privateDec->NeedsReorderedPTS() &&
-                    mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
-            {
-                pts = mpa_pic->reordered_opaque;
-                m_ptsSelected = true;
             }
             else if (m_faultyPts <= m_faultyDts && m_reorderedPtsDetected)
             {
@@ -4860,21 +4819,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
     m_allowedQuit = m_audio->IsBufferAlmostFull();
 
-    if (m_privateDec && m_privateDec->HasBufferedFrames() &&
-       (m_selectedTrack[kTrackTypeVideo].m_av_stream_index > -1))
-    {
-        int got_picture  = 0;
-        AVStream *stream = m_ic->streams[m_selectedTrack[kTrackTypeVideo]
-                                 .m_av_stream_index];
-        MythAVFrame mpa_pic;
-        if (!mpa_pic)
-            return false;
-
-        m_privateDec->GetFrame(stream, mpa_pic, &got_picture, nullptr);
-        if (got_picture)
-            ProcessVideoFrame(stream, mpa_pic);
-    }
-
     while (!m_allowedQuit)
     {
         if (decodetype & kDecodeAudio)
@@ -5225,8 +5169,6 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
 
 QString AvFormatDecoder::GetCodecDecoderName(void) const
 {
-    if (m_privateDec)
-        return m_privateDec->GetName();
     return get_decoder_name(m_videoCodecId);
 }
 
