@@ -170,7 +170,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     bool  GetGPUMemory(int &Available, int &Total);
 
   public slots:
-    void  messageLogged  (const QOpenGLDebugMessage &Message);
+    void  MessageLogged  (const QOpenGLDebugMessage &Message);
     void  logDebugMarker (const QString &Message);
     void  contextToBeDestroyed(void);
 

@@ -143,7 +143,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
         MythRenderOpenGL::ReleaseResources();
 }
 
-void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
+void MythRenderOpenGL::MessageLogged(const QOpenGLDebugMessage &Message)
 {
     // filter unwanted messages
     if ((m_openGLDebuggerFilter & Message.type()) != 0U)
@@ -226,7 +226,7 @@ bool MythRenderOpenGL::Init(void)
         m_openglDebugger = new QOpenGLDebugLogger();
         if (m_openglDebugger->initialize())
         {
-            connect(m_openglDebugger, SIGNAL(messageLogged(QOpenGLDebugMessage)), this, SLOT(messageLogged(QOpenGLDebugMessage)));
+            connect(m_openglDebugger, &QOpenGLDebugLogger::messageLogged, this, &MythRenderOpenGL::MessageLogged);
             QOpenGLDebugLogger::LoggingMode mode = QOpenGLDebugLogger::AsynchronousLogging;
 
             // this will impact performance but can be very useful
