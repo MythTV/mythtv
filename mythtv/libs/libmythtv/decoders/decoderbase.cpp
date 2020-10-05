@@ -1143,8 +1143,7 @@ void DecoderBase::AutoSelectTracks(void)
 void DecoderBase::ResetTracks(void)
 {
     QMutexLocker locker(&m_trackLock);
-    for (int & i : m_currentTrack)
-        i = -1;
+    std::fill(m_currentTrack.begin(), m_currentTrack.end(), -1);
 }
 
 QString toString(TrackType type)
