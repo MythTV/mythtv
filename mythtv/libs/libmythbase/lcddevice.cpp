@@ -52,8 +52,8 @@ LCD::LCD()
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         "An LCD object now exists (LCD() was called)");
 
-    connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
-    connect(m_ledTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
+    connect(m_retryTimer, &QTimer::timeout,   this, &LCD::restartConnection);
+    connect(m_ledTimer,   &QTimer::timeout,   this, &LCD::outputLEDs);
     connect(this, &LCD::sendToServer, this, &LCD::sendToServerSlot, Qt::QueuedConnection);
 }
 
@@ -150,10 +150,10 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
             delete m_socket;
             m_socket = new QTcpSocket();
 
-            QObject::connect(m_socket, SIGNAL(readyRead()),
-                             this, SLOT(ReadyRead()));
-            QObject::connect(m_socket, SIGNAL(disconnected()),
-                             this, SLOT(Disconnected()));
+            QObject::connect(m_socket, &QIODevice::readyRead,
+                             this, &LCD::ReadyRead);
+            QObject::connect(m_socket, &QAbstractSocket::disconnected,
+                             this, &LCD::Disconnected);
 
             m_socket->connectToHost(m_hostname, m_port);
             if (m_socket->waitForConnected())

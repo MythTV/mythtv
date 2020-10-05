@@ -77,7 +77,7 @@ bool EditMetadataCommon::CreateCommon(void)
 
     UIUtilE::Assign(this, m_doneButton, "donebutton", &err);
 
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(showSaveMenu()));
+    connect(m_doneButton, &MythUIButton::Clicked, this, &EditMetadataCommon::showSaveMenu);
 
     return err;
 }
@@ -353,28 +353,28 @@ bool EditMetadataDialog::Create(void)
     if (m_ratingSpin)
     {
         m_ratingSpin->SetRange(0, 10, 1, 2);
-        connect(m_ratingSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-                SLOT(ratingSpinChanged(MythUIButtonListItem*)));
+        connect(m_ratingSpin, &MythUIButtonList::itemSelected,
+                this, &EditMetadataDialog::ratingSpinChanged);
     }
 
-    connect(m_artistEdit, SIGNAL(LosingFocus()), SLOT(artistLostFocus()));
-    connect(m_albumEdit, SIGNAL(LosingFocus()), SLOT(albumLostFocus()));
-    connect(m_genreEdit, SIGNAL(LosingFocus()), SLOT(genreLostFocus()));
+    connect(m_artistEdit, &MythUIType::LosingFocus, this, &EditMetadataDialog::artistLostFocus);
+    connect(m_albumEdit, &MythUIType::LosingFocus, this, &EditMetadataDialog::albumLostFocus);
+    connect(m_genreEdit, &MythUIType::LosingFocus, this, &EditMetadataDialog::genreLostFocus);
 
-    connect(m_searchArtistButton, SIGNAL(Clicked()), SLOT(searchArtist()));
-    connect(m_searchCompArtistButton, SIGNAL(Clicked()), SLOT(searchCompilationArtist()));
-    connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
-    connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
+    connect(m_searchArtistButton, &MythUIButton::Clicked, this, &EditMetadataDialog::searchArtist);
+    connect(m_searchCompArtistButton, &MythUIButton::Clicked, this, &EditMetadataDialog::searchCompilationArtist);
+    connect(m_searchAlbumButton, &MythUIButton::Clicked, this, &EditMetadataDialog::searchAlbum);
+    connect(m_searchGenreButton, &MythUIButton::Clicked, this, &EditMetadataDialog::searchGenre);
 
     if (m_incRatingButton && m_decRatingButton)
     {
-        connect(m_incRatingButton, SIGNAL(Clicked()), SLOT(incRating()));
-        connect(m_decRatingButton, SIGNAL(Clicked()), SLOT(decRating()));
+        connect(m_incRatingButton, &MythUIButton::Clicked, this, &EditMetadataDialog::incRating);
+        connect(m_decRatingButton, &MythUIButton::Clicked, this, &EditMetadataDialog::decRating);
     }
 
-    connect(m_compilationCheck, SIGNAL(toggled(bool)), SLOT(checkClicked(bool)));
+    connect(m_compilationCheck, &MythUICheckBox::toggled, this, &EditMetadataDialog::checkClicked);
 
-    connect(m_albumartButton, SIGNAL(Clicked()), SLOT(switchToAlbumArt()));
+    connect(m_albumartButton, &MythUIButton::Clicked, this, &EditMetadataDialog::switchToAlbumArt);
 
     fillWidgets();
 
@@ -544,7 +544,7 @@ void EditMetadataDialog::searchArtist()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setArtist(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &EditMetadataDialog::setArtist);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -589,7 +589,7 @@ void EditMetadataDialog::searchCompilationArtist()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setCompArtist(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &EditMetadataDialog::setCompArtist);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -614,7 +614,7 @@ void EditMetadataDialog::searchAlbum()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setAlbum(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &EditMetadataDialog::setAlbum);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -665,7 +665,7 @@ void EditMetadataDialog::searchGenre()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setGenre(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &EditMetadataDialog::setGenre);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -898,10 +898,10 @@ bool EditAlbumartDialog::Create(void)
 
     updateImageGrid();
 
-    connect(m_coverartList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(gridItemChanged(MythUIButtonListItem*)));
+    connect(m_coverartList, &MythUIButtonList::itemSelected,
+            this, &EditAlbumartDialog::gridItemChanged);
 
-    connect(m_metadataButton, SIGNAL(Clicked()), SLOT(switchToMetadata()));
+    connect(m_metadataButton, &MythUIButton::Clicked, this, &EditAlbumartDialog::switchToMetadata);
 
     BuildFocusList();
 

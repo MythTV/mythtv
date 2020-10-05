@@ -80,8 +80,8 @@ bool PlayerSettings::Create()
     m_cancelButton->SetHelpText(tr("Exit without saving settings"));
     m_saveButton->SetHelpText(tr("Save settings and Exit"));
 
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &PlayerSettings::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
 

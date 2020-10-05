@@ -493,7 +493,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_changrpid(changrpid),
     m_changrplist(ChannelGroup::GetChannelGroups(false))
 {
-    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
+    connect(m_updateTimer, &QTimer::timeout, this, &GuideGrid::updateTimeout);
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(nullptr);

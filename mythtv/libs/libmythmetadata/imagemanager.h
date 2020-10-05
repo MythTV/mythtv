@@ -384,7 +384,7 @@ protected:
     ImageManagerBe()
     {
         // Cleanup & terminate child threads before application exits
-        connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));
+        connect(qApp, &QCoreApplication::aboutToQuit, this, &QObject::deleteLater);
     }
 
     //! BE Gallery instance
@@ -504,7 +504,7 @@ protected:
           m_dateFormat(std::move(dateFormat))
     {
         // Cleanup & terminate child threads before application exits
-        connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));
+        connect(qApp, &QCoreApplication::aboutToQuit, this, &QObject::deleteLater);
     }
 
     //! FE Gallery instance

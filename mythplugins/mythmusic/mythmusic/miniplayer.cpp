@@ -18,7 +18,7 @@ MiniPlayer::MiniPlayer(MythScreenStack *parent)
     m_currentView = MV_MINIPLAYER;
     m_displayTimer = new QTimer(this);
     m_displayTimer->setSingleShot(true);
-    connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
+    connect(m_displayTimer, &QTimer::timeout, this, &MiniPlayer::timerTimeout);
 }
 
 MiniPlayer::~MiniPlayer(void)

@@ -30,8 +30,8 @@ bool EditMetadataDialog::Create(void)
         return false;
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &EditMetadataDialog::okPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &EditMetadataDialog::cancelPressed);
 
     m_titleEdit->SetText(m_sourceMetadata->title);
     m_subtitleEdit->SetText(m_sourceMetadata->subtitle);

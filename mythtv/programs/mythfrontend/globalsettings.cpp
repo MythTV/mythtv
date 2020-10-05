@@ -1103,8 +1103,8 @@ void PlaybackProfileItemConfig::ShowDeleteDialog()
 
     if (confirmDelete->Create())
     {
-        connect(confirmDelete, SIGNAL(haveResult(bool)),
-                SLOT(DoDeleteSlot(bool)));
+        connect(confirmDelete, &MythConfirmationDialog::haveResult,
+                this, &PlaybackProfileItemConfig::DoDeleteSlot);
         popupStack->AddScreen(confirmDelete);
     }
     else
@@ -1173,7 +1173,8 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
     parent->addTargetedChild(m_profileName, m_markForDeletion);
     parent->addTargetedChild(m_profileName, m_addNewEntry);
 
-    connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
+    connect(m_addNewEntry, &ButtonStandardSetting::clicked,
+            this, &PlaybackProfileConfig::AddNewEntry);
 
     for (size_t i = 0; i < m_items.size(); ++i)
         InitProfileItem(i, parent);
@@ -1332,8 +1333,8 @@ void PlaybackSettings::NewPlaybackProfileSlot()
 
     if (settingdialog->Create())
     {
-        connect(settingdialog, SIGNAL(haveResult(QString)),
-                SLOT(CreateNewPlaybackProfileSlot(const QString&)));
+        connect(settingdialog, &MythTextInputDialog::haveResult,
+                this, &PlaybackSettings::CreateNewPlaybackProfileSlot);
         popupStack->AddScreen(settingdialog);
     }
     else
@@ -4312,8 +4313,8 @@ void PlaybackSettings::Load(void)
     m_newPlaybackProfileButton =
         new ButtonStandardSetting(tr("Add a new playback profile"));
     addChild(m_newPlaybackProfileButton);
-    connect(m_newPlaybackProfileButton, SIGNAL(clicked()),
-            SLOT(NewPlaybackProfileSlot()));
+    connect(m_newPlaybackProfileButton, &ButtonStandardSetting::clicked,
+            this, &PlaybackSettings::NewPlaybackProfileSlot);
 
     auto *pbox = new GroupSetting();
     pbox->setLabel(tr("View Recordings"));
@@ -4833,7 +4834,8 @@ void ChannelGroupsSetting::Load()
 {
     clearSettings();
     auto *newGroup = new ButtonStandardSetting(tr("(Create New Channel Group)"));
-    connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
+    connect(newGroup, &ButtonStandardSetting::clicked,
+            this, &ChannelGroupsSetting::ShowNewGroupDialog);
     addChild(newGroup);
 
     addChild(new ChannelGroupSetting(tr("Favorites"), 1));
@@ -4872,8 +4874,8 @@ void ChannelGroupsSetting::ShowNewGroupDialog()
 
     if (settingdialog->Create())
     {
-        connect(settingdialog, SIGNAL(haveResult(QString)),
-                SLOT(CreateNewGroup(QString)));
+        connect(settingdialog, &MythTextInputDialog::haveResult,
+                this, &ChannelGroupsSetting::CreateNewGroup);
         popupStack->AddScreen(settingdialog);
     }
     else

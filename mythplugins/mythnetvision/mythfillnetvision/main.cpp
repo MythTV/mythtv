@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
             gdt->refreshAll();
         gdt->start();
 
-        QObject::connect(gdt, SIGNAL(finished(void)), &treeloop, SLOT(quit()));
+        QObject::connect(gdt, &GrabberDownloadThread::finished, &treeloop, &QEventLoop::quit);
         treeloop.exec();
     }
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
         rssMan = new RSSManager();
         rssMan->doUpdate();
 
-        QObject::connect(rssMan, SIGNAL(finished(void)), &rssloop, SLOT(quit()));
+        QObject::connect(rssMan, &RSSManager::finished, &rssloop, &QEventLoop::quit);
         rssloop.exec();
     }
 

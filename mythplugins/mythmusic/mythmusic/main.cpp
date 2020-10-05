@@ -210,8 +210,8 @@ static void startRipper(void)
     if (rip->Create())
     {
         mainStack->AddScreen(rip);
-        QObject::connect(rip, SIGNAL(ripFinished()),
-                     gMusicData, SLOT(reloadMusic()),
+        QObject::connect(rip, &Ripper::ripFinished,
+                     gMusicData, &MusicData::reloadMusic,
                      Qt::QueuedConnection);
     }
     else
@@ -248,8 +248,8 @@ static void startImport(void)
     if (import->Create())
     {
         mainStack->AddScreen(import);
-        QObject::connect(import, SIGNAL(importFinished()),
-                gMusicData, SLOT(reloadMusic()),
+        QObject::connect(import, &ImportMusicDialog::importFinished,
+                gMusicData, &MusicData::reloadMusic,
                 Qt::QueuedConnection);
     }
     else
@@ -428,8 +428,8 @@ static void runRipCD(void)
         return;
     }
 
-    QObject::connect(rip, SIGNAL(ripFinished()),
-                     gMusicData, SLOT(reloadMusic()),
+    QObject::connect(rip, &Ripper::ripFinished,
+                     gMusicData, &MusicData::reloadMusic,
                      Qt::QueuedConnection);
 #endif
 }
