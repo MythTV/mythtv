@@ -114,9 +114,8 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             LOG(VB_HTTP, LOG_DEBUG, "*** Threads are Different!!! ***");
 #endif
 
-        pService->qt_metacall( QMetaObject::InvokeMetaMethod, 
-                               m_nMethodIndex, 
-                               param.data() );
+        if (pService->qt_metacall(QMetaObject::InvokeMetaMethod, m_nMethodIndex, param.data()) >= 0)
+            LOG(VB_GENERAL, LOG_WARNING, "qt_metacall error");
 
         // --------------------------------------------------------------
         // Delete param array, skip return parameter since not dynamically
