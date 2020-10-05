@@ -212,7 +212,7 @@ TV* TV::AcquireRelease(int& RefCount, bool Acquire, bool Create /*=false*/)
     if (Acquire)
     {
         if (!s_tv && Create)
-            s_tv = new TV();
+            s_tv = new TV(GetMythMainWindow());
         else if (s_tv)
             s_tv->IncrRef();
     }
@@ -1002,9 +1002,10 @@ const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
  * \todo Try and remove friend class usage. This is a blunt tool and allows
  * potentially unsafe calls into TV
  */
-TV::TV()
+TV::TV(MythMainWindow* MainWindow)
   : ReferenceCounter("TV"),
-    TVBrowseHelper(this)
+    TVBrowseHelper(this),
+    m_mainWindow(MainWindow)
 
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
@@ -1146,22 +1147,21 @@ bool TV::Init()
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "-- begin");
 
-    MythMainWindow *mainwindow = GetMythMainWindow();
-    if (!mainwindow)
+    if (!m_mainWindow)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No MythMainWindow");
         return false;
     }
 
     bool fullscreen = !m_dbUseGuiSizeForTv;
-    m_savedGuiBounds = QRect(mainwindow->geometry().topLeft(), mainwindow->size());
+    m_savedGuiBounds = QRect(m_mainWindow->geometry().topLeft(), m_mainWindow->size());
 
     // adjust for window manager wierdness.
-    QRect screen = mainwindow->GetScreenRect();
+    QRect screen = m_mainWindow->GetScreenRect();
     if ((abs(m_savedGuiBounds.x() - screen.left()) < 3) &&
         (abs(m_savedGuiBounds.y() - screen.top()) < 3))
     {
-        m_savedGuiBounds = QRect(screen.topLeft(), mainwindow->size());
+        m_savedGuiBounds = QRect(screen.topLeft(), m_mainWindow->size());
     }
 
     // if width && height are zero users expect fullscreen playback
@@ -1175,10 +1175,10 @@ bool TV::Init()
 
     m_playerBounds = m_savedGuiBounds;
     if (fullscreen)
-        m_playerBounds = mainwindow->GetDisplay()->GetScreenBounds();
+        m_playerBounds = m_mainWindow->GetDisplay()->GetScreenBounds();
 
     // player window sizing
-    MythScreenStack *mainStack = mainwindow->GetMainStack();
+    MythScreenStack *mainStack = m_mainWindow->GetMainStack();
 
     m_myWindow = new TvPlayWindow(mainStack, "Playback");
 
@@ -1193,9 +1193,9 @@ bool TV::Init()
         m_myWindow = nullptr;
     }
 
-    if (mainwindow->GetPaintWindow())
-        mainwindow->GetPaintWindow()->update();
-    mainwindow->installEventFilter(this);
+    if (m_mainWindow->GetPaintWindow())
+        m_mainWindow->GetPaintWindow()->update();
+    m_mainWindow->installEventFilter(this);
     QCoreApplication::processEvents();
 
     GetPlayerReadLock();
@@ -1235,11 +1235,12 @@ TV::~TV()
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
 
-    MythMainWindow* mwnd = GetMythMainWindow();
-    mwnd->removeEventFilter(this);
-
-    if (m_weDisabledGUI)
-        mwnd->PopDrawDisabled();
+    if (m_mainWindow)
+    {
+        m_mainWindow->removeEventFilter(this);
+        if (m_weDisabledGUI)
+            m_mainWindow->PopDrawDisabled();
+    }
 
     if (m_myWindow)
     {
@@ -1250,25 +1251,26 @@ TV::~TV()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- lock");
 
     // restore window to gui size and position
+    if (m_mainWindow)
     {
-        MythDisplay* display = mwnd->GetDisplay();
+        MythDisplay* display = m_mainWindow->GetDisplay();
         if (display->UsingVideoModes())
         {
             bool hide = display->NextModeIsLarger(display->GetGUIResolution());
             if (hide)
-                mwnd->hide();
+                m_mainWindow->hide();
             display->SwitchToGUI(true);
             if (hide)
-                mwnd->Show();
+                m_mainWindow->Show();
         }
+        m_mainWindow->MoveResize(m_savedGuiBounds);
+    #ifdef Q_OS_ANDROID
+        m_mainWindow->Show();
+    #else
+        m_mainWindow->show();
+    #endif
     }
 
-    mwnd->MoveResize(m_savedGuiBounds);
-#ifdef Q_OS_ANDROID
-    mwnd->Show();
-#else
-    mwnd->show();
-#endif
 
     delete m_lastProgram;
 
@@ -2293,12 +2295,12 @@ void TV::HandleStateChange()
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
         if (!m_dbUseVideoModes)
-            GetMythMainWindow()->MoveResize(m_playerBounds);
+            m_mainWindow->MoveResize(m_playerBounds);
 
         if (!m_weDisabledGUI)
         {
             m_weDisabledGUI = true;
-            GetMythMainWindow()->PushDrawDisabled();
+            m_mainWindow->PushDrawDisabled();
         }
         // we no longer need the contents of myWindow
         if (m_myWindow)
@@ -3054,7 +3056,7 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
 {
     // We want to intercept all resize events sent to the main window
     if ((Event->type() == QEvent::Resize))
-        return (GetMythMainWindow() != Object) ? false : event(Event);
+        return (m_mainWindow != Object) ? false : event(Event);
 
     // Intercept keypress events unless they need to be handled by a main UI
     // screen (e.g. GuideGrid, ProgramFinder)
@@ -3064,7 +3066,7 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
         return false;
 
     QScopedPointer<QEvent> sNewEvent(nullptr);
-    if (GetMythMainWindow()->keyLongPressFilter(&Event, sNewEvent))
+    if (m_mainWindow->keyLongPressFilter(&Event, sNewEvent))
         return true;
 
     if (QEvent::KeyPress == Event->type())
@@ -3280,7 +3282,7 @@ static bool has_action(const QString& action, const QStringList &actions)
 //
 // As a result, some of the MythScreenType::keyPressEvent() string
 // compare logic is copied here.
-static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
+static bool SysEventHandleAction(MythMainWindow* MainWindow, QKeyEvent *e, const QStringList &actions)
 {
     QStringList::const_iterator it;
     for (it = actions.begin(); it != actions.end(); ++it)
@@ -3290,8 +3292,7 @@ static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
             *it == ACTION_TVPOWERON ||
             *it == ACTION_TVPOWEROFF)
         {
-            return GetMythMainWindow()->GetMainStack()->GetTopScreen()->
-                keyPressEvent(e);
+            return MainWindow->GetMainStack()->GetTopScreen()->keyPressEvent(e);
         }
     }
     return false;
@@ -3338,7 +3339,7 @@ bool TV::TranslateGesture(const QString &Context, MythGestureEvent *Event,
             (Event->GetButton() == Qt::LeftButton))
         {
             // divide screen into 12 regions
-            QSize size = GetMythMainWindow()->size();
+            QSize size = m_mainWindow->size();
             QPoint pos = Event->GetPosition();
             int region = 0;
             const int widthDivider = 4;
@@ -3348,12 +3349,8 @@ bool TV::TranslateGesture(const QString &Context, MythGestureEvent *Event,
             region += (pos.y() / h3) * widthDivider;
 
             if (IsLiveTV)
-            {
-                return GetMythMainWindow()->TranslateKeyPress(
-                        Context, &(m_screenPressKeyMapLiveTV[region]), Actions, true);
-            }
-            return GetMythMainWindow()->TranslateKeyPress(
-                Context, &(m_screenPressKeyMapPlayback[region]), Actions, true);
+                return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapLiveTV[region]), Actions, true);
+            return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapPlayback[region]), Actions, true);
         }
         return false;
     }
@@ -3366,7 +3363,7 @@ bool TV::TranslateKeyPressOrGesture(const QString &Context, QEvent *Event,
     if (Event)
     {
         if (QEvent::KeyPress == Event->type())
-            return GetMythMainWindow()->TranslateKeyPress(Context, dynamic_cast<QKeyEvent*>(Event), Actions, AllowJumps);
+            return m_mainWindow->TranslateKeyPress(Context, dynamic_cast<QKeyEvent*>(Event), Actions, AllowJumps);
         if (MythGestureEvent::kEventType == Event->type())
             return TranslateGesture(Context, dynamic_cast<MythGestureEvent*>(Event), Actions, IsLiveTV);
     }
@@ -3587,9 +3584,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     bool isMenuOrStill = m_playerContext.m_buffer && m_playerContext.m_buffer->IsInDiscMenuOrStillFrame();
 
     if (QEvent::KeyPress == Event->type())
-    {
-        handled = handled || SysEventHandleAction(dynamic_cast<QKeyEvent*>(Event), actions);
-    }
+        handled = handled || SysEventHandleAction(m_mainWindow, dynamic_cast<QKeyEvent*>(Event), actions);
     handled = handled || BrowseHandleAction(actions);
     handled = handled || ManualZoomHandleAction(actions);
     handled = handled || PictureAttributeHandleAction(actions);
@@ -4117,7 +4112,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         {
             // If it's a DVD, and we're not trying to execute a
             // jumppoint, try to back up.
-            if (IsDVD && !GetMythMainWindow()->IsExitingToMain() && has_action("BACK", Actions) &&
+            if (IsDVD && !m_mainWindow->IsExitingToMain() && has_action("BACK", Actions) &&
                 m_playerContext.m_buffer && m_playerContext.m_buffer->DVD()->GoBack())
             {
                 return handled;
@@ -4931,7 +4926,7 @@ bool TV::StartPlayer(TVState desiredState)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Elapsed time since TV constructor was called: %1 ms")
         .arg(m_ctorTime.elapsed()));
 
-    bool ok = m_playerContext.CreatePlayer(this, GetMythMainWindow(), desiredState, false);
+    bool ok = m_playerContext.CreatePlayer(this, m_mainWindow, desiredState, false);
     ScheduleStateChange();
 
     if (ok)
@@ -5914,7 +5909,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         if (m_playerContext.m_playingInfo && StartRecorder())
         {
             QRect dummy = QRect();
-            if (m_playerContext.CreatePlayer(this, GetMythMainWindow(), m_playerContext.GetState(),
+            if (m_playerContext.CreatePlayer(this, m_mainWindow, m_playerContext.GetState(),
                                              false, dummy, muted))
             {
                 ScheduleStateChange();
@@ -7086,7 +7081,6 @@ void TV::StopEmbedding(const QStringList &Data)
 {    
     // Resize the window back to the MythTV Player size
     GetPlayerReadLock();
-    MythMainWindow* window = GetMythMainWindow();
 
     if (m_playerContext.IsEmbedding())
         m_playerContext.StopEmbedding();
@@ -7098,7 +7092,7 @@ void TV::StopEmbedding(const QStringList &Data)
         m_embedCheckTimerId = 0;
     }
 
-    MythPainter *painter = window->GetPainter();
+    MythPainter *painter = m_mainWindow->GetPainter();
     if (painter)
         painter->FreeResources();
 
@@ -7112,7 +7106,7 @@ void TV::StopEmbedding(const QStringList &Data)
     // m_playerBounds is not applicable when switching modes so
     // skip this logic in that case.
     if (!m_dbUseVideoModes)
-        window->MoveResize(m_playerBounds);
+        m_mainWindow->MoveResize(m_playerBounds);
 
     // Restore pause
     DoSetPauseState(m_savedPause);
@@ -7120,7 +7114,7 @@ void TV::StopEmbedding(const QStringList &Data)
     if (!m_weDisabledGUI)
     {
         m_weDisabledGUI = true;
-        GetMythMainWindow()->PushDrawDisabled();
+        m_mainWindow->PushDrawDisabled();
     }
 
     m_ignoreKeyPresses = false;
@@ -7197,26 +7191,23 @@ void TV::DoEditSchedule(int EditType)
     m_savedPause = DoSetPauseState(pause);
 
     // Resize window to the MythTV GUI size
-    MythMainWindow *mwnd = GetMythMainWindow();
+    MythDisplay* display = m_mainWindow->GetDisplay();
+    if (display->UsingVideoModes())
     {
-        MythDisplay* display = mwnd->GetDisplay();
-        if (display->UsingVideoModes())
-        {
-            bool hide = display->NextModeIsLarger(display->GetGUIResolution());
-            if (hide)
-                mwnd->hide();
-            display->SwitchToGUI(true);
-            if (hide)
-                mwnd->Show();
-        }
+        bool hide = display->NextModeIsLarger(display->GetGUIResolution());
+        if (hide)
+            m_mainWindow->hide();
+        display->SwitchToGUI(true);
+        if (hide)
+            m_mainWindow->Show();
     }
 
     if (!m_dbUseGuiSizeForTv)
-        mwnd->MoveResize(m_savedGuiBounds);
+        m_mainWindow->MoveResize(m_savedGuiBounds);
 #ifdef Q_OS_ANDROID
-    mwnd->Show();
+    m_mainWindow->Show();
 #else
-    mwnd->show();
+    m_mainWindow->show();
 #endif
     ReturnPlayerLock();
 
@@ -7259,9 +7250,9 @@ void TV::DoEditSchedule(int EditType)
 
     // We are embedding in a mythui window so assuming no one
     // else has disabled painting show the MythUI window again.
-    if (GetMythMainWindow() && m_weDisabledGUI)
+    if (m_weDisabledGUI)
     {
-        GetMythMainWindow()->PopDrawDisabled();
+        m_mainWindow->PopDrawDisabled();
         m_weDisabledGUI = false;
     }
 }
@@ -9543,11 +9534,9 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &Context)
             // XXX This doesn't work well (yet) because a keybinding
             // action named "foo" is actually a menu action named
             // "DIALOG_CUTPOINT_foo_0".
-            QString text = GetMythMainWindow()->
-                GetActionText(Context.m_menu.GetKeyBindingContext(), actionName);
+            QString text = m_mainWindow->GetActionText(Context.m_menu.GetKeyBindingContext(), actionName);
             if (text.isEmpty())
-                text = GetMythMainWindow()->
-                    GetActionText("Global", actionName);
+                text = m_mainWindow->GetActionText("Global", actionName);
             if (!text.isEmpty())
                 BUTTON(actionName, text);
         }
@@ -10114,11 +10103,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             // description available to be used as the button text.
             // Look in the specified keybinding context as well as the
             // Global context.
-            QString text = GetMythMainWindow()->
-                GetActionText(Context.m_menu.GetKeyBindingContext(), actionName);
+            QString text = m_mainWindow->GetActionText(Context.m_menu.GetKeyBindingContext(), actionName);
             if (text.isEmpty())
-                text = GetMythMainWindow()->
-                    GetActionText("Global", actionName);
+                text = m_mainWindow->GetActionText("Global", actionName);
             if (!text.isEmpty())
                 BUTTON(actionName, text);
         }

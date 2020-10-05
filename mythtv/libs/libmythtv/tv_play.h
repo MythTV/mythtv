@@ -50,6 +50,7 @@ class MythMediaBuffer;
 class ProgramInfo;
 class TvPlayWindow;
 class TV;
+class MythMainWindow;
 struct osdInfo;
 
 using EMBEDRETURNVOID        = void (*) (void *, bool);
@@ -326,7 +327,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
-    TV();
+    explicit TV(MythMainWindow* MainWindow);
    ~TV() override;
     PlayerContext*  GetPlayerContext();
 
@@ -646,6 +647,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void ShowLCDDVDInfo();
 
   private:
+    MythMainWindow*   m_mainWindow { nullptr };
+
     // Configuration variables from database
     QString           m_baseFilters;
     QString           m_dbChannelFormat {"<num> <sign>"};
