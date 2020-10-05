@@ -168,27 +168,27 @@ MythMainWindow::MythMainWindow(const bool useDB)
     InitKeys();
 
     d->m_gestureTimer = new QTimer(this);
-    connect(d->m_gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
+    connect(d->m_gestureTimer, &QTimer::timeout, this, &MythMainWindow::mouseTimeout);
     d->m_hideMouseTimer = new QTimer(this);
     d->m_hideMouseTimer->setSingleShot(true);
     d->m_hideMouseTimer->setInterval(3000); // 3 seconds
-    connect(d->m_hideMouseTimer, SIGNAL(timeout()), SLOT(HideMouseTimeout()));
+    connect(d->m_hideMouseTimer, &QTimer::timeout, this, &MythMainWindow::HideMouseTimeout);
 
+    // this still uses an 'old' style SLOT connection - but MythSignalingTimer is
+    // scheduled for the scrap heap (it addresses a problem that no longer exists
+    // and we will move to the regular/builtin Qt timing)
     d->m_drawTimer = new MythSignalingTimer(this, SLOT(animate()));
     d->m_drawTimer->start(d->m_drawInterval);
 
     d->m_allowInput = true;
     d->m_drawEnabled = true;
 
-    connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
-            this, SLOT(doRemoteScreenShot(QString,int,int)),
+    connect(this, &MythMainWindow::signalRemoteScreenShot,this, &MythMainWindow::doRemoteScreenShot,
             Qt::BlockingQueuedConnection);
-    connect(this, SIGNAL(signalSetDrawEnabled(bool)),
-            this, SLOT(SetDrawEnabled(bool)),
+    connect(this, &MythMainWindow::signalSetDrawEnabled, this, &MythMainWindow::SetDrawEnabled,
             Qt::BlockingQueuedConnection);
 #ifdef Q_OS_ANDROID
-    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
-            this, SLOT(onApplicationStateChange(Qt::ApplicationState)));
+    connect(qApp, &QApplication::applicationStateChanged, this, &MythMainWindow::onApplicationStateChange);
 #endif
 
     // We need to listen for playback start/end events
