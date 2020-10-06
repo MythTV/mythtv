@@ -1535,7 +1535,8 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     m_outputJmeter && m_outputJmeter->RecordCycleTime();
     m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 
-    FrameScanType ps = GetScanForDisplay(buffer);
+    bool showsecondfield = false;
+    FrameScanType ps = GetScanForDisplay(buffer, showsecondfield);
 
     if (buffer && !dropframe)
     {
@@ -1583,7 +1584,11 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             SetErrored(tr("Serious error detected in Video Output"));
             return;
         }
-        if (GetDoubleFrameRate())
+
+        // Update scan settings now that deinterlacer has been set and we know
+        // whether we need a second field
+        ps = GetScanForDisplay(buffer, showsecondfield);
+        if (showsecondfield)
         {
             //second stage of deinterlacer processing
             if (kScan_Interlaced == ps)
@@ -1854,8 +1859,6 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     m_detectLetterBox->SwitchTo(frame);
 
     AVSync(frame);
-
-    UpdateLastDeint(frame);
     m_videoOutput->DoneDisplayingFrame(frame);
 }
 

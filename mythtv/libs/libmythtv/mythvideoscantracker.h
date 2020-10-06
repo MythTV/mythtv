@@ -22,13 +22,11 @@ class MTV_PUBLIC MythVideoScanTracker
     FrameScanType  NextScanOverride     ();
     void           SetScanOverride      (FrameScanType Scan);
     void           SetScanType          (FrameScanType Scan, MythVideoOutput* VideoOutput, int FrameInterval);
-    FrameScanType  GetScanForDisplay    (VideoFrame* Frame);
+    FrameScanType  GetScanForDisplay    (VideoFrame* Frame, bool& SecondField);
     FrameScanType  GetScanType          () const;
     FrameScanType  GetScanTypeWithOverride () const;
-    bool           GetDoubleFrameRate   () const;
     virtual void   AutoDeint            (VideoFrame* Frame, MythVideoOutput* VideoOutput,
                                          int FrameInterval, bool AllowLock = true);
-    void           UpdateLastDeint      (VideoFrame* Frame);
     void           CheckScanUpdate      (MythVideoOutput* VideoOutput, int FrameInterval);
     QString        GetDeinterlacerName  ();
 
@@ -40,7 +38,6 @@ class MTV_PUBLIC MythVideoScanTracker
     FrameScanType  m_scanOverride       { kScan_Detect     };
     bool           m_scanLocked         { false };
     bool           m_scanInitialized    { false };
-    bool           m_doubleFramerate    { false };
     int            m_lastFrameInterval  { 0     };
     bool           m_lastDeinterlacer2x { false };
     MythDeintType  m_lastDeinterlacer   { DEINT_NONE };

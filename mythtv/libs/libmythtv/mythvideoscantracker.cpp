@@ -25,12 +25,9 @@ void MythVideoScanTracker::InitialiseScan(MythVideoOutput* VideoOutput)
     // as e.g. 59.9 when it is actually 29.97 interlaced.
     m_scan             = kScan_Interlaced;
     m_scanLocked       = false;
-    m_doubleFramerate  = false;
     m_scanTracker      = -2;
-
-    m_doubleFramerate = m_parentPlayer->CanSupportDoubleRate();
     if (VideoOutput)
-        VideoOutput->SetDeinterlacing(true, m_doubleFramerate);
+        VideoOutput->SetDeinterlacing(true, m_parentPlayer->CanSupportDoubleRate());
 }
 
 void MythVideoScanTracker::UnlockScan()
@@ -43,19 +40,6 @@ void MythVideoScanTracker::ResetTracker()
 {
     m_scanLocked  = false;
     m_scanTracker = (m_scan == kScan_Interlaced) ? 2 : 0;
-}
-
-void MythVideoScanTracker::UpdateLastDeint(VideoFrame* Frame)
-{
-    if (Frame)
-    {
-        // Update details for debug OSD
-        m_lastDeinterlacer   = Frame->deinterlace_inuse;
-        m_lastDeinterlacer2x = Frame->deinterlace_inuse2x;
-        // We use the underlying pix_fmt as it retains the distinction between hardware
-        // and software frames for decode only decoders.
-        m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt));
-    }
 }
 
 FrameScanType MythVideoScanTracker::NextScanOverride()
@@ -80,22 +64,35 @@ void MythVideoScanTracker::SetScanOverride(FrameScanType Scan)
     }
 }
 
-FrameScanType MythVideoScanTracker::GetScanForDisplay(VideoFrame *Frame)
+FrameScanType MythVideoScanTracker::GetScanForDisplay(VideoFrame *Frame, bool &SecondField)
 {
-    bool decoderdeint = Frame && Frame->already_deinterlaced;
+    if (!Frame)
+        return kScan_Progressive;
+
+    // Update details for debug OSD
+    m_lastDeinterlacer   = Frame->deinterlace_inuse;
+    m_lastDeinterlacer2x = Frame->deinterlace_inuse2x;
+    // We use the underlying pix_fmt as it retains the distinction between hardware
+    // and software frames for decode only decoders.
+    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt));
+
+    // Decide on type and rate
     FrameScanType result = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
+    if ((kScan_Detect == m_scan) || (kScan_Ignore == m_scan) || Frame->already_deinterlaced)
     {
         result = kScan_Progressive;
     }
-    else if (Frame && is_interlaced(m_scan))
+    else if (is_interlaced(m_scan))
     {
         result = kScan_Interlaced;
         Frame->interlaced_reversed = (m_scan == kScan_Intr2ndField);
     }
 
-    // only display the second field if needed
-    m_doubleFramerate = is_interlaced(result) && m_lastDeinterlacer2x;
+    // Only display the second field if needed.
+    // This is somewhat circular - we check for double rate support when enabling
+    // deinterlacing, request that in the video buffers and the differing implementations
+    // then set m_lastDeinterlacer2x when they are actually using double rate
+    SecondField = is_interlaced(result) && m_lastDeinterlacer2x;
     return result;
 }
 
@@ -109,11 +106,6 @@ FrameScanType MythVideoScanTracker::GetScanTypeWithOverride() const
     if (m_scanOverride > kScan_Detect)
         return m_scanOverride;
     return m_scan;
-}
-
-bool MythVideoScanTracker::GetDoubleFrameRate() const
-{
-    return m_doubleFramerate;
 }
 
 void MythVideoScanTracker::CheckScanUpdate(MythVideoOutput* VideoOutput, int FrameInterval)
@@ -151,12 +143,10 @@ void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* Vide
     {
         float currentspeed = m_parentPlayer->GetPlaySpeed();
         bool normal = (currentspeed > 0.99F) && (currentspeed < 1.01F) && m_parentPlayer->AtNormalSpeed();
-        m_doubleFramerate = m_parentPlayer->CanSupportDoubleRate() && normal;
-        VideoOutput->SetDeinterlacing(true, m_doubleFramerate);
+        VideoOutput->SetDeinterlacing(true, m_parentPlayer->CanSupportDoubleRate() && normal);
     }
     else if (kScan_Progressive == Scan)
     {
-        m_doubleFramerate = false;
         VideoOutput->SetDeinterlacing(false, false);
     }
 
