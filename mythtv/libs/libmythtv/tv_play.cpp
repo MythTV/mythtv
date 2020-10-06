@@ -1562,7 +1562,7 @@ bool TV::RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection)
             QString channum = ci.m_chanNum;
             if (!chanid || channum.isEmpty())
                 continue;
-            QSet<uint> cards = IsTunableOn(chanid);
+            QSet<uint> cards = IsTunableOn(&m_playerContext, chanid);
 
             if (chanid && !channum.isEmpty() && !cards.isEmpty())
             {
@@ -6298,7 +6298,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
         }
         else if (Chanid)
         {
-            tunable_on = IsTunableOn(Chanid);
+            tunable_on = IsTunableOn(&m_playerContext, Chanid);
             getit = !tunable_on.contains(m_playerContext.GetCardID());
         }
         else
@@ -6326,7 +6326,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
             {
                 if (!Chanid)
                     Chanid = get_chanid(&m_playerContext, cardid, Channum);
-                tunable_on = IsTunableOn(Chanid);
+                tunable_on = IsTunableOn(&m_playerContext, Chanid);
                 getit = !tunable_on.contains(cardid);
             }
         }
@@ -6339,7 +6339,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
             {
                 if (!Chanid)
                     Chanid = get_chanid(&m_playerContext, m_playerContext.GetCardID(), Channum);
-                tunable_on = IsTunableOn(Chanid);
+                tunable_on = IsTunableOn(&m_playerContext, Chanid);
             }
             for (const auto& rec : qAsConst(tmp))
             {
@@ -6984,20 +6984,27 @@ void TV::ShowLCDDVDInfo()
 
 bool TV::IsTunable(uint ChanId)
 {
+    bool result = false;
     int dummy = 0;
     TV* tv = AcquireRelease(dummy, true);
     if (tv)
     {
-        bool result = tv->IsTunableOn(ChanId).empty();
+        tv->GetPlayerReadLock();
+        result = !tv->IsTunableOn(tv->GetPlayerContext(), ChanId).empty();
+        tv->ReturnPlayerLock();
         AcquireRelease(dummy, false);
         return result;
     }
-    return false;
+    else
+    {
+       result = !TV::IsTunableOn(nullptr, ChanId).empty();
+    }
+    return result;
 }
 
 bool TV::IsTunablePriv(uint ChanId)
 {
-    return !IsTunableOn(ChanId).empty();
+    return !IsTunableOn(&m_playerContext, ChanId).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -7012,7 +7019,7 @@ static QString toCommaList(const QSet<uint> &list)
     return "";
 }
 
-QSet<uint> TV::IsTunableOn(uint ChanId)
+QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
 {
     QSet<uint> tunable_cards;
 
@@ -7022,13 +7029,12 @@ QSet<uint> TV::IsTunableOn(uint ChanId)
         return tunable_cards;
     }
 
-    GetPlayerReadLock();
     uint mplexid = ChannelUtil::GetMplexID(ChanId);
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
     uint excluded_input = 0;
-    if (m_playerContext.m_recorder && m_playerContext.m_pseudoLiveTVState == kPseudoNormalLiveTV)
-        excluded_input = m_playerContext.GetCardID();
+    if (Context && Context->m_recorder && Context->m_pseudoLiveTVState == kPseudoNormalLiveTV)
+        excluded_input = Context->GetCardID();
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(ChanId);
 
@@ -7054,7 +7060,6 @@ QSet<uint> TV::IsTunableOn(uint ChanId)
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("ChanId (%1) - no").arg(ChanId));
     else
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("ChanId (%1) yes { %2 }").arg(ChanId).arg(toCommaList(tunable_cards)));
-    ReturnPlayerLock();
     return tunable_cards;
 }
 

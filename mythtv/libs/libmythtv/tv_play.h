@@ -384,7 +384,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(int EditType = kScheduleProgramGuide);
     bool IsTunablePriv(uint ChanId);
-    QSet<uint> IsTunableOn(uint ChanId);
+    static QSet<uint> IsTunableOn(PlayerContext* Context, uint ChanId);
     void ChangeChannel(const ChannelInfoList& Options);
     void DoEditSchedule(int EditType = kScheduleProgramGuide);
     QString GetRecordingGroup() const;
