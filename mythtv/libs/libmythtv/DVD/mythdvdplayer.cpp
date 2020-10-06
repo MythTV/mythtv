@@ -10,16 +10,16 @@
 
 #define LOC      QString("DVDPlayer: ")
 
-void MythDVDPlayer::AutoDeint(VideoFrame *Frame, bool AllowLock)
+void MythDVDPlayer::AutoDeint(VideoFrame *Frame, MythVideoOutput *VideoOutput, int FrameInterval, bool AllowLock)
 {
     bool dummy = false;
     if (m_decoder && m_decoder->GetMythCodecContext()->IsDeinterlacing(dummy))
     {
-        MythPlayer::AutoDeint(Frame, AllowLock);
+        MythPlayer::AutoDeint(Frame, VideoOutput, FrameInterval, AllowLock);
         return;
     }
 
-    SetScanType(kScan_Interlaced);
+    SetScanType(kScan_Interlaced, VideoOutput, m_frameInterval);
 }
 
 /** \fn MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
@@ -58,10 +58,8 @@ void MythDVDPlayer::EnableCaptions(uint Mode, bool OSDMsg)
         int track = GetTrack(kTrackTypeSubtitle);
         if (track >= 0 && track < static_cast<int>(m_decoder->GetTrackCount(kTrackTypeSubtitle)))
         {
-            StreamInfo stream = m_decoder->GetTrackInfo(kTrackTypeSubtitle,
-                                                      static_cast<uint>(track));
-            m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle,
-                                                stream.m_stream_id);
+            StreamInfo stream = m_decoder->GetTrackInfo(kTrackTypeSubtitle, static_cast<uint>(track));
+            m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle, stream.m_stream_id);
         }
     }
     MythPlayer::EnableCaptions(Mode, OSDMsg);
@@ -69,11 +67,8 @@ void MythDVDPlayer::EnableCaptions(uint Mode, bool OSDMsg)
 
 void MythDVDPlayer::DisplayPauseFrame(void)
 {
-    if (m_playerCtx->m_buffer->IsDVD() &&
-        m_playerCtx->m_buffer->DVD()->IsInStillFrame())
-    {
-        SetScanType(kScan_Progressive);
-    }
+    if (m_playerCtx->m_buffer->IsDVD() && m_playerCtx->m_buffer->DVD()->IsInStillFrame())
+        SetScanType(kScan_Progressive, m_videoOutput, m_frameInterval);
     DisplayDVDButton();
     MythPlayer::DisplayPauseFrame();
 }
@@ -234,7 +229,7 @@ void MythDVDPlayer::DisplayLastFrame(void)
     // clear the buffering state
     SetBuffering(false);
 
-    SetScanType(kScan_Progressive);
+    SetScanType(kScan_Progressive, m_videoOutput, m_frameInterval);
     DisplayDVDButton();
 
     AVSync(nullptr);

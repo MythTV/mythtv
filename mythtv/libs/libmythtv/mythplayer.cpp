@@ -108,13 +108,14 @@ static int toTrackType(int type)
 }
 
 MythPlayer::MythPlayer(PlayerFlags flags)
-    : m_playerFlags(flags),
-      // CC608/708
-      m_cc608(this), m_cc708(this),
-      // Audio
-      m_audio(this, (flags & kAudioMuted) != 0),
-      // Debugging variables
-      m_outputJmeter(new Jitterometer(LOC))
+  : MythVideoScanTracker(this),
+    m_playerFlags(flags),
+    // CC608/708
+    m_cc608(this), m_cc708(this),
+    // Audio
+    m_audio(this, (flags & kAudioMuted) != 0),
+    // Debugging variables
+    m_outputJmeter(new Jitterometer(LOC))
 {
     if (!(m_playerFlags & kVideoIsNull) && HasMythMainWindow())
         m_display = GetMythMainWindow()->GetDisplay();
@@ -471,153 +472,6 @@ void MythPlayer::SetKeyframeDistance(int keyframedistance)
     m_keyframeDist = (keyframedistance > 0) ? static_cast<uint>(keyframedistance) : m_keyframeDist;
 }
 
-/*! \brief Check whether deinterlacing should be enabled
- *
- * If the user has triggered an override, this will always be used (until 'detect'
- * is requested to turn it off again).
- *
- * For H264 material, the decoder will signal when the current frame is on a new
- * GOP boundary and if the frame's interlaced flag does not match the current
- * scan type, the scan type is unlocked. This works well for all test clips
- * with mixed progressive/interlaced sequences.
- *
- * For all other material, we lock the scan type to interlaced when interlaced
- * frames are seen - and do not unlock if we see progressive frames. This is
- * primarily targetted at MPEG2 material where there is a lot of content where
- * the scan type changes frequently - and for no obvious reason. This will result
- * in 'false positives' in some cases but there is no clear approach that works
- * for all cases. The previous behaviour is preserved (i.e. lock to interlaced
- * if interlaced frames are seen) which results in less erratic playback (as the
- * deinterlacers are not continually switched on and off) and correctly deinterlaces
- * material that is not otherwise flagged correctly.
-*/
-void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
-{
-    if (!frame)
-        return;
-
-    if ((m_scanOverride > kScan_Detect) && (m_scan != m_scanOverride))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Locking scan override to '%1'")
-            .arg(ScanTypeToUserString(m_scanOverride, true)));
-        SetScanType(m_scanOverride);
-    }
-
-    // This is currently only signalled for H264 content
-    if (frame->new_gop)
-    {
-        if (m_scanOverride < kScan_Interlaced &&
-            ((frame->interlaced_frame && !is_interlaced(m_scan)) ||
-            (!frame->interlaced_frame && is_interlaced(m_scan))))
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Unlocking frame scan");
-            m_scanLocked = false;
-        }
-    }
-
-    if (m_scanLocked)
-        return;
-
-    if (frame->interlaced_frame)
-    {
-        if (m_scanTracker < 0)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Interlaced frame seen after %1 progressive frames")
-                    .arg(abs(m_scanTracker)));
-            m_scanTracker = 2;
-            if (allow_lock)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Locking scan to Interlaced.");
-                SetScanType(kScan_Interlaced);
-                return;
-            }
-        }
-        m_scanTracker++;
-    }
-    else
-    {
-        if (m_scanTracker > 0)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Progressive frame seen after %1 interlaced frames")
-                    .arg(m_scanTracker));
-            m_scanTracker = 0;
-        }
-        m_scanTracker--;
-    }
-
-    int min_count = !allow_lock ? 0 : 2;
-    if (abs(m_scanTracker) <= min_count)
-        return;
-
-    SetScanType((m_scanTracker > min_count) ? kScan_Interlaced : kScan_Progressive);
-    m_scanLocked  = false;
-}
-
-FrameScanType MythPlayer::NextScanOverride(void)
-{
-    int next = m_scanOverride + 1;
-    if (next > kScan_Progressive)
-        next = kScan_Detect;
-    return static_cast<FrameScanType>(next);
-}
-
-void MythPlayer::SetScanOverride(FrameScanType Scan)
-{
-    if (m_scanOverride == Scan)
-        return;
-    m_scanOverride = Scan;
-    if (m_scanOverride == kScan_Detect)
-    {
-        m_scanLocked = false;
-        m_scanInitialized = false;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Reverting to auto detection of scan");
-    }
-}
-
-FrameScanType MythPlayer::GetScanType(void) const
-{
-    if (m_scanOverride > kScan_Detect)
-        return m_scanOverride;
-    return m_scan;
-}
-
-void MythPlayer::SetScanType(FrameScanType Scan)
-{
-    if (!is_current_thread(m_playerThread))
-    {
-        m_resetScan = Scan;
-        return;
-    }
-
-    if (!m_videoOutput)
-        return;
-
-    m_resetScan = kScan_Ignore;
-
-    if (m_scanInitialized && m_scan == Scan && m_frameIntervalPrev == m_frameInterval)
-        return;
-
-    m_scanLocked = (Scan != kScan_Detect);
-    m_scanInitialized = true;
-    m_frameIntervalPrev = m_frameInterval;
-
-    if (is_interlaced(Scan))
-    {
-        bool normal = m_playSpeed > 0.99F && m_playSpeed < 1.01F && m_normalSpeed;
-        m_doubleFramerate = CanSupportDoubleRate() && normal;
-        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
-    }
-    else if (kScan_Progressive == Scan)
-    {
-        m_doubleFramerate = false;
-        m_videoOutput->SetDeinterlacing(false, false);
-    }
-
-    m_scan = Scan;
-}
-
 void MythPlayer::SetVideoParams(int width, int height, double fps,
                                 float aspect, bool ForceUpdate,
                                 int ReferenceFrames, FrameScanType scan, const QString& codecName)
@@ -670,21 +524,18 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         return;
 
     // ensure deinterlacers are correctly reset after a change
-    m_scanInitialized = false;
-    SetScanType(detectInterlace(scan, m_scan, static_cast<float>(m_videoFrameRate),
-                                m_videoDispDim.height()));
-    m_scanLocked  = false;
-    m_scanTracker = (m_scan == kScan_Interlaced) ? 2 : 0;
+    UnlockScan();
+    SetScanType(detectInterlace(scan, GetScanType(), static_cast<float>(m_videoFrameRate), m_videoDispDim.height()),
+                m_videoOutput, m_frameInterval);
+    ResetTracker();
 }
 
 
 void MythPlayer::SetFrameRate(double fps)
 {
     m_videoFrameRate = fps;
-    float temp_speed = (m_playSpeed == 0.0F) ?
-        m_audio.GetStretchFactor() : m_playSpeed;
-    SetFrameInterval(kScan_Progressive,
-                     1.0 / (m_videoFrameRate * static_cast<double>(temp_speed)));
+    float temp_speed = (m_playSpeed == 0.0F) ? m_audio.GetStretchFactor() : m_playSpeed;
+    SetFrameInterval(kScan_Progressive, 1.0 / (m_videoFrameRate * static_cast<double>(temp_speed)));
 }
 
 void MythPlayer::SetFileLength(int total, int frames)
@@ -1530,7 +1381,7 @@ void MythPlayer::InitAVSync(void)
             .arg(1000000.0 / m_display->GetRefreshInterval(m_frameInterval), 0, 'f', 3)
             .arg(1000000.0 / m_frameInterval, 0, 'f', 3));
 
-        SetFrameInterval(m_scan, 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
+        SetFrameInterval(GetScanType(), 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
 
         // try to get preferential scheduling, but ignore if we fail to.
         myth_nice(-19);
@@ -1543,51 +1394,6 @@ void MythPlayer::WaitForTime(int64_t framedue)
     int64_t delay = framedue - unow;
     if (delay > 0)
         QThread::usleep(static_cast<unsigned long>(delay));
-}
-
-/*! \brief Keep PiP frame rate in sync with master framerate
- *
- * This is a simple frame rate tracker. If a frame is not due, then just keep
- * the last displayed frame. Otherwise discard frame(s) that are too old.
-*/
-bool MythPlayer::PipSync(void)
-{
-    int maxtries = 6;
-    int64_t timenow    = m_avTimer.nsecsElapsed() / 1000;
-    auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
-
-    while (maxtries--)
-    {
-        if (!m_videoOutput->ValidVideoFrames())
-            return false;
-
-        m_videoOutput->StartDisplayingFrame();
-        VideoFrame *last = m_videoOutput->GetLastShownFrame();
-        if (!last)
-            return false;
-
-        m_videoOutput->PrepareFrame(last, m_scan);
-
-        int64_t videotimecode = last->timecode & 0x0000ffffffffffff;
-        if (videotimecode != last->timecode)
-            videotimecode = m_maxTcVal;
-        if (videotimecode == 0)
-        {
-            m_videoOutput->DoneDisplayingFrame(last);
-            return true;
-        }
-        m_maxTcVal = videotimecode;
-
-        if (m_rtcBase == 0)
-            m_rtcBase = timenow - (videotimecode * playspeed1000);
-
-        int64_t framedue = m_rtcBase + (videotimecode * playspeed1000);
-        if (framedue > timenow)
-            return true;
-
-        m_videoOutput->DoneDisplayingFrame(last);
-    }
-    return true;
 }
 
 #define AVSYNC_MAX_LATE 10000000
@@ -1729,20 +1535,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     m_outputJmeter && m_outputJmeter->RecordCycleTime();
     m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 
-    bool decoderdeint = buffer && buffer->already_deinterlaced;
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
-    {
-        ps = kScan_Progressive;
-    }
-    else if (buffer && is_interlaced(ps))
-    {
-        ps = kScan_Interlaced;
-        buffer->interlaced_reversed = (m_scan == kScan_Intr2ndField);
-    }
-
-    // only display the second field if needed
-    m_doubleFramerate = is_interlaced(ps) && m_lastDeinterlacer2x;
+    FrameScanType ps = GetScanForDisplay(buffer);
 
     if (buffer && !dropframe)
     {
@@ -1790,7 +1583,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             SetErrored(tr("Serious error detected in Video Output"));
             return;
         }
-        if (m_doubleFramerate)
+        if (GetDoubleFrameRate())
         {
             //second stage of deinterlacer processing
             if (kScan_Interlaced == ps)
@@ -1836,7 +1629,7 @@ void MythPlayer::RefreshPauseFrame(void)
     {
         if (m_videoOutput->ValidVideoFrames())
         {
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode, m_scan);
+            m_videoOutput->UpdatePauseFrame(m_dispTimecode, GetScanType());
             m_needNewPauseFrame = false;
 
             if (m_deleteMap.IsEditing())
@@ -1871,7 +1664,8 @@ void MythPlayer::DisplayPauseFrame(void)
     RefreshPauseFrame();
     PreProcessNormalFrame(); // Allow interactiveTV to draw on pause frame
 
-    FrameScanType scan = (kScan_Detect == m_scan || kScan_Ignore == m_scan) ? kScan_Progressive : m_scan;
+    FrameScanType scan = GetScanType();
+    scan = (kScan_Detect == scan || kScan_Ignore == scan) ? kScan_Progressive : scan;
     m_osdLock.lock();
     m_videoOutput->PrepareFrame(nullptr, scan);
     m_videoOutput->RenderFrame(nullptr, scan, m_osd);
@@ -2056,17 +1850,12 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     PreProcessNormalFrame();
 
     // handle scan type changes
-    AutoDeint(frame);
+    AutoDeint(frame, m_videoOutput, m_frameInterval);
     m_detectLetterBox->SwitchTo(frame);
 
     AVSync(frame);
 
-    // Update details for debug OSD
-    m_lastDeinterlacer = frame->deinterlace_inuse;
-    m_lastDeinterlacer2x = frame->deinterlace_inuse2x;
-    // We use the underlying pix_fmt as it retains the distinction between hardware
-    // and software frames for decode only decoders.
-    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(frame->pix_fmt));
+    UpdateLastDeint(frame);
     m_videoOutput->DoneDisplayingFrame(frame);
 }
 
@@ -2184,24 +1973,7 @@ void MythPlayer::VideoStart(void)
 
     EnableFrameRateMonitor();
 
-    // Default to interlaced playback but set the tracker to progressive
-    // Enable autodetection of interlaced/progressive from video stream
-    // Previously we set to interlaced and the scan tracker to 2 but this
-    // mis-'detected' a number of streams as interlaced when they are progressive.
-    // This significantly reduces the number of errors and also ensures we do not
-    // needlessly setup deinterlacers - which may consume significant resources.
-    // We set to interlaced for those streams whose frame rate is initially detected
-    // as e.g. 59.9 when it is actually 29.97 interlaced.
-    m_scan             = kScan_Interlaced;
-    m_scanLocked       = false;
-    m_doubleFramerate  = false;
-    m_scanTracker      = -2;
-
-    if (!FlagIsSet(kVideoIsNull) && m_videoOutput)
-    {
-        m_doubleFramerate = CanSupportDoubleRate();
-        m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
-    }
+    InitialiseScan(m_videoOutput);
 
     InitAVSync();
     AutoVisualise();
@@ -2729,8 +2501,7 @@ void MythPlayer::EventLoop(void)
         DoDisableForcedSubtitles();
 
     // reset the scan (and hence deinterlacers) if triggered by the decoder
-    if (m_resetScan != kScan_Ignore)
-        SetScanType(m_resetScan);
+    CheckScanUpdate(m_videoOutput, m_frameInterval);
 
     // refresh the position map for an in-progress recording while editing
     if (m_hasFullPositionMap && IsWatchingInprogress() && m_deleteMap.IsEditing())
@@ -3513,8 +3284,7 @@ void MythPlayer::ChangeSpeed(void)
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));
 
     // ensure we re-check double rate support following a speed change
-    m_scanInitialized = false;
-    m_scanLocked = false;
+    UnlockScan();
 
     if (m_normalSpeed && m_audio.HasAudioOut())
     {
@@ -4440,13 +4210,12 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     infoMap["videowidth"]     = QString::number(width);
     infoMap["videoheight"]    = QString::number(height);
     infoMap["videoframerate"] = QString::number(m_videoFrameRate, 'f', 2);
-    infoMap["deinterlacer"]   = DeinterlacerName(m_lastDeinterlacer,
-                                                 m_lastDeinterlacer2x, m_lastFrameCodec);
+    infoMap["deinterlacer"]   = GetDeinterlacerName();
 
     if (width < 640)
         return;
 
-    bool interlaced = is_interlaced(m_scan);
+    bool interlaced = is_interlaced(GetScanType());
     if (height > 2100)
         infoMap["videodescrip"] = interlaced ? "UHD_4K_I" : "UHD_4K_P";
     else if (width == 1920 || height == 1080 || height == 1088)

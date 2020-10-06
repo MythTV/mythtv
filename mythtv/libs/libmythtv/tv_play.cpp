@@ -9625,7 +9625,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
     }
     else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix) && m_playerContext.m_player)
     {
-        FrameScanType scan = m_playerContext.m_player->GetScanType();
+        FrameScanType scan = m_playerContext.m_player->GetScanTypeWithOverride();
         active = (scan == kScan_Detect);
         BUTTON("SELECTSCAN_0", ScanTypeToUserString(kScan_Detect));
         active = (scan == kScan_Progressive);
@@ -10469,7 +10469,7 @@ void TV::OverrideScan(FrameScanType Scan)
     {
         m_playerContext.m_player->SetScanOverride(Scan);
         message = ScanTypeToUserString(Scan == kScan_Detect ? kScan_Detect :
-                    m_playerContext.m_player->GetScanType(), Scan > kScan_Detect);
+                    m_playerContext.m_player->GetScanTypeWithOverride(), Scan > kScan_Detect);
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 

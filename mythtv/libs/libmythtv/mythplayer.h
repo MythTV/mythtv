@@ -37,6 +37,7 @@
 #include "tv.h"
 #include "videoouttypes.h"
 #include "mythmiscutil.h"
+#include "mythvideoscantracker.h"
 #include "mythtvexp.h"
 
 class ProgramInfo;
@@ -124,7 +125,7 @@ class DecoderCallback
 // still higher than the default warning threshhold of 24 bytes.
 //
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-class MTV_PUBLIC MythPlayer : public QObject
+class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
 {
     Q_OBJECT
 
@@ -373,10 +374,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Non-public sets
     virtual void SetBookmark(bool clear = false);
-    FrameScanType NextScanOverride(void);
-    void          SetScanOverride(FrameScanType Scan);
-    void          SetScanType(FrameScanType Scan);
-    FrameScanType GetScanType(void) const;
 
     void Zoom(ZoomDirection direction);
     void ToggleMoveBottomLine(void);
@@ -549,7 +546,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Private initialization stuff
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height) const;
-    virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
 
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
@@ -601,7 +597,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     virtual void AVSync(VideoFrame *buffer);
-    bool  PipSync(void);
     void  ResetAVSync(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
     void  WaitForTime(int64_t framedue);
@@ -659,7 +654,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     mutable QMutex   m_errorLock;
     QString  m_errorMsg;   ///< Reason why NVP exited with a error
     int m_errorType                       {kError_None};
-    bool     m_doubleFramerate            {false};///< Output fps is double Video (input) rate
     bool     m_liveTV                     {false};
     bool     m_watchingRecording          {false};
     bool     m_transcoding                {false};
@@ -690,11 +684,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     int64_t   m_latestVideoTimecode       {-1};
     QElapsedTimer m_avTimer;
 
-    // Tracks deinterlacer for Debug OSD
-    MythDeintType m_lastDeinterlacer    { DEINT_NONE };
-    bool      m_lastDeinterlacer2x      { false };
-    VideoFrameType m_lastFrameCodec     { FMT_NONE };
-
     // -- end state stuff --
 
     // Input Video Attributes
@@ -706,13 +695,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     int      m_maxReferenceFrames        {0}; ///< Number of reference frames used in the video stream
     float    m_videoAspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
     float    m_forcedVideoAspect         {-1};
-
-    long long     m_scanTracker          { 0 };
-    FrameScanType m_resetScan            { kScan_Ignore     };
-    FrameScanType m_scan                 { kScan_Interlaced };
-    FrameScanType m_scanOverride         { kScan_Detect     };
-    bool          m_scanLocked           { false };
-    bool          m_scanInitialized      { false };
 
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     m_keyframeDist              {30};
@@ -781,7 +763,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     float      m_nextPlaySpeed            {1.0F};
     float      m_playSpeed                {1.0F};
     int        m_frameInterval            {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
-    int        m_frameIntervalPrev        {0}; ///< used to detect changes to frame_interval
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
     int        m_ffrewAdjust              {0};
