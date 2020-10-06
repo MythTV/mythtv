@@ -1535,45 +1535,43 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     m_outputJmeter && m_outputJmeter->RecordCycleTime();
     m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 
-    bool showsecondfield = false;
-    FrameScanType ps = GetScanForDisplay(buffer, showsecondfield);
-
-    if (buffer && !dropframe)
-    {
-        m_osdLock.lock();
-        m_videoOutput->PrepareFrame(buffer, ps);
-        m_osdLock.unlock();
-    }
-
     if (!pause_audio && m_avsyncAudioPaused)
     {
         m_avsyncAudioPaused = false;
         m_audio.Pause(false);
     }
-    if (pause_audio && !m_avsyncAudioPaused)
+    else if (pause_audio && !m_avsyncAudioPaused)
     {
         m_avsyncAudioPaused = true;
         m_audio.Pause(true);
     }
 
     if (dropframe)
-        m_numDroppedFrames++;
-    else
-        m_numDroppedFrames = 0;
-
-    if (dropframe)
     {
+        m_numDroppedFrames++;
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Dropping frame: Video is behind by %1ms").arg(lateness / 1000));
         m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
     }
     else if (!FlagIsSet(kVideoIsNull) && buffer)
     {
+        m_numDroppedFrames = 0;
+
+        // Check scan type
+        bool showsecondfield = false;
+        FrameScanType ps = GetScanForDisplay(buffer, showsecondfield);
+
+        // Prepare frame (software)
+        m_osdLock.lock();
+        m_videoOutput->PrepareFrame(buffer, ps);
+        m_osdLock.unlock();
+
         // if we get here, we're actually going to do video output
         m_osdLock.lock();
         m_videoOutput->RenderFrame(buffer, ps, m_osd);
         m_osdLock.unlock();
         WaitForTime(framedue);
+
         // get time codes for calculating difference next time
         m_priorAudioTimecode = m_audio.GetAudioTime();
         m_videoOutput->EndFrame();
