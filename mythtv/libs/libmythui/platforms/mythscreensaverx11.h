@@ -7,20 +7,19 @@
 // MythTV
 #include "mythscreensaver.h"
 
-class MythScreenSaverX11 : public QObject, public MythScreenSaver
+class MythScreenSaverX11 : public MythScreenSaver
 {
     Q_OBJECT
 
   public:
-    MythScreenSaverX11();
+    explicit MythScreenSaverX11(QObject* Parent);
     ~MythScreenSaverX11() override;
 
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;
     bool Asleep() override;
-
-  public slots:
     void ResetSlot();
 
   protected:

@@ -12,7 +12,8 @@
 #define LOC      QString("ScreenSaverAndroid: ")
 
 #define MODE 1
-MythScreenSaverAndroid::MythScreenSaverAndroid()
+MythScreenSaverAndroid::MythScreenSaverAndroid(QObject *Parent)
+  : MythScreenSaver(Parent)
 {
     //jint keepScreenOn = QAndroidJniObject::getStaticObjectField<jint>("android/view/WindowManager/", "ACTION_CALL");
 }

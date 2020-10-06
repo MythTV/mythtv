@@ -1,6 +1,11 @@
 // MythTV
 #include "platforms/mythscreensaverwayland.h"
 
+MythScreenSaverWayland::MythScreenSaverWayland(QObject* Parent)
+  : MythScreenSaver(Parent)
+{
+}
+
 void MythScreenSaverWayland::Disable()
 {
 }

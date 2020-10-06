@@ -1,6 +1,11 @@
 // MythTV
 #include "platforms/mythscreensaverosx.h"
 
+MythScreenSaverOSX::MythScreenSaverOSX(QObject* Parent)
+  : MythScreenSaver(Parent)
+{
+}
+
 void MythScreenSaverOSX::Disable()
 {
     IOPMAssertionCreateWithName(kIOPMAssertPreventUserIdleDisplaySleep,

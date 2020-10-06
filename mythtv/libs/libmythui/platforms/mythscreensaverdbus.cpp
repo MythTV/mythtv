@@ -122,7 +122,8 @@ class ScreenSaverDBusPrivate
     QString         m_serviceUsed;
 };
 
-MythScreenSaverDBus::MythScreenSaverDBus() :
+MythScreenSaverDBus::MythScreenSaverDBus(QObject *Parent)
+  : MythScreenSaver(Parent),
     m_bus(QDBusConnection::sessionBus())
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice

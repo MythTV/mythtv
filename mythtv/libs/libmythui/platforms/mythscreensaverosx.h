@@ -9,10 +9,13 @@
 
 class MythScreenSaverOSX : public MythScreenSaver
 {
+    Q_OBJECT
+
   public:
-    MythScreenSaverOSX() = default;
+    explicit MythScreenSaverOSX(QObject* Parent);
    ~MythScreenSaverOSX() override = default;
 
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;

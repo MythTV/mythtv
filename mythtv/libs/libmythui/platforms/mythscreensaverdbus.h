@@ -9,10 +9,13 @@
 
 class MythScreenSaverDBus : public MythScreenSaver
 {
+    Q_OBJECT
+
   public:
-    MythScreenSaverDBus();
+    MythScreenSaverDBus(QObject* Parent);
    ~MythScreenSaverDBus() override;
 
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;

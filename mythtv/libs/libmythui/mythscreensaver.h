@@ -10,12 +10,15 @@
 class MythDisplay;
 
 /// Base Class for screensavers
-class MythScreenSaver
+class MythScreenSaver : public QObject
 {
+    Q_OBJECT
+
   public:
-    MythScreenSaver() = default;
+    explicit MythScreenSaver(QObject* Parent) : QObject(Parent) {}
     virtual ~MythScreenSaver() = default;
 
+  public slots:
     virtual void Disable() = 0;
     virtual void Restore() = 0;
     virtual void Reset() = 0;
@@ -32,12 +35,14 @@ class MythScreenSaverControl : public QObject
 
   public:
     MythScreenSaverControl(MythDisplay* mDisplay);
-    ~MythScreenSaverControl() override;
+   ~MythScreenSaverControl() override = default;
 
-  public slots:
+  signals:
     void Disable();
     void Restore();
     void Reset();
+
+  public slots:
     bool Asleep();
 
   private:

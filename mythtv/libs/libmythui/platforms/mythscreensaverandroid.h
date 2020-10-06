@@ -7,14 +7,15 @@
 // MythTV
 #include "mythscreensaver.h"
 
-class MythScreenSaverAndroid : public QObject, public MythScreenSaver
+class MythScreenSaverAndroid : public MythScreenSaver
 {
     Q_OBJECT
 
   public:
-    MythScreenSaverAndroid();
+    explicit MythScreenSaverAndroid(QObject* Parent);
    ~MythScreenSaverAndroid() override;
 
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;

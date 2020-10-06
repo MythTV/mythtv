@@ -30,55 +30,38 @@
 MythScreenSaverControl::MythScreenSaverControl(MythDisplay* mDisplay)
 {
 #if defined(USING_DBUS)
-    m_screenSavers.push_back(new MythScreenSaverDBus());
+    m_screenSavers.push_back(new MythScreenSaverDBus(this));
 #endif
 #if defined(USING_X11)
     MythXDisplay* display = MythXDisplay::OpenMythXDisplay(false);
     if (display)
     {
-        m_screenSavers.push_back(new MythScreenSaverX11());
+        m_screenSavers.push_back(new MythScreenSaverX11(this));
         delete display;
     }
 #elif CONFIG_DARWIN
-    m_screenSavers.push_back(new MythScreenSaverOSX());
+    m_screenSavers.push_back(new MythScreenSaverOSX(this));
 #endif
 #if defined(ANDROID)
-    m_screenSavers.push_back(new MythScreenSaverAndroid());
+    m_screenSavers.push_back(new MythScreenSaverAndroid(this));
 #endif
 #ifdef USING_DRM
-    MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create(mDisplay);
+    MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create(this, mDisplay);
     if (drmsaver)
         m_screenSavers.push_back(drmsaver);
 #else
     (void)mDisplay;
 #endif
 #ifdef USING_WAYLANDEXTRAS
-    m_screenSavers.push_back(new MythScreenSaverWayland());
+    m_screenSavers.push_back(new MythScreenSaverWayland(this));
 #endif
-}
 
-MythScreenSaverControl::~MythScreenSaverControl()
-{
     for (auto * screensaver : m_screenSavers)
-        delete screensaver;
-}
-
-void MythScreenSaverControl::Disable()
-{
-    for (auto * screensaver : m_screenSavers)
-        screensaver->Disable();
-}
-
-void MythScreenSaverControl::Restore()
-{
-    for (auto * screensaver : m_screenSavers)
-        screensaver->Restore();
-}
-
-void MythScreenSaverControl::Reset()
-{
-    for (auto * screensaver : m_screenSavers)
-        screensaver->Reset();
+    {
+        connect(this, &MythScreenSaverControl::Disable, screensaver, &MythScreenSaver::Disable);
+        connect(this, &MythScreenSaverControl::Reset,   screensaver, &MythScreenSaver::Reset);
+        connect(this, &MythScreenSaverControl::Restore, screensaver, &MythScreenSaver::Restore);
+    }
 }
 
 bool MythScreenSaverControl::Asleep()

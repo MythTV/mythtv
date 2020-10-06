@@ -215,7 +215,8 @@ class ScreenSaverX11Private
     MythXDisplay *m_display    {nullptr};
 };
 
-MythScreenSaverX11::MythScreenSaverX11() :
+MythScreenSaverX11::MythScreenSaverX11(QObject* Parent)
+  : MythScreenSaver(Parent),
     m_priv(new ScreenSaverX11Private(this))
 {
 }

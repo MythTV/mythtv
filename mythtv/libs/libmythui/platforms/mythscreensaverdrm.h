@@ -12,26 +12,26 @@
 #define DRM_STANDBY QString("Standby")
 #define DRM_DPMS_POLL 5 // poll every 5 seconds
 
-class MythScreenSaverDRM : public QObject, public MythScreenSaver
+class MythScreenSaverDRM : public MythScreenSaver
 {
     Q_OBJECT
 
   public:
-    static MythScreenSaverDRM* Create(MythDisplay* mDisplay);
+    static MythScreenSaverDRM* Create(QObject* Parent, MythDisplay* mDisplay);
    ~MythScreenSaverDRM() override;
 
     bool IsValid() const;
+
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;
     bool Asleep() override;
-
-  public slots:
     void ScreenChanged();
     void timerEvent(QTimerEvent* Event) override;
 
   private:
-    explicit MythScreenSaverDRM(MythDisplay* mDisplay);
+    explicit MythScreenSaverDRM(QObject* Parent, MythDisplay* mDisplay);
     void Init();
     void UpdateDPMS();
     void TurnScreenOnOff(bool On);

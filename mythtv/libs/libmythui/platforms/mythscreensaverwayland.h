@@ -6,7 +6,12 @@
 
 class MythScreenSaverWayland : public MythScreenSaver
 {
+    Q_OBJECT
+
   public:
+    explicit MythScreenSaverWayland(QObject* Parent);
+
+  public slots:
     void Disable() override;
     void Restore() override;
     void Reset() override;
