@@ -29,7 +29,6 @@ class MTV_PUBLIC MythVideoScanTracker
     virtual void   AutoDeint            (VideoFrame* Frame, MythVideoOutput* VideoOutput,
                                          int FrameInterval, bool AllowLock = true);
     void           UpdateLastDeint      (VideoFrame* Frame);
-    QString        GetDeinterlacerString();
     void           CheckScanUpdate      (MythVideoOutput* VideoOutput, int FrameInterval);
     QString        GetDeinterlacerName  ();
 

@@ -58,11 +58,6 @@ void MythVideoScanTracker::UpdateLastDeint(VideoFrame* Frame)
     }
 }
 
-QString MythVideoScanTracker::GetDeinterlacerString()
-{
-    return DeinterlacerName(m_lastDeinterlacer, m_lastDeinterlacer2x, m_lastFrameCodec);
-}
-
 FrameScanType MythVideoScanTracker::NextScanOverride()
 {
     int next = m_scanOverride + 1;
