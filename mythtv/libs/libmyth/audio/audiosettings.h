@@ -29,6 +29,7 @@ class MPUBLIC AudioSettings
 {
   public:
     AudioSettings() = default;
+    AudioSettings &operator=(const AudioSettings &) = delete;
     AudioSettings(const AudioSettings &other);
     AudioSettings(
         QString                 main_device,
@@ -89,9 +90,6 @@ class MPUBLIC AudioSettings
      * manually override and immediately use them.
      */
     AudioOutputSettings *m_custom         {nullptr};
-
-  private:
-    AudioSettings &operator=(const AudioSettings &) = delete;
 };
 
 #endif // AUDIO_SETTINGS_H
