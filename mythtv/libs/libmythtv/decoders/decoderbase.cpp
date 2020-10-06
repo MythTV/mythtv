@@ -1016,9 +1016,11 @@ bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
 {
     QMutexLocker locker(&m_trackLock);
 
-    for (auto & i : m_tracks[Type])
-        if (Info.m_stream_id == i.m_stream_id)
-            return false;
+    if (std::any_of(m_tracks[Type].cbegin(), m_tracks[Type].cend(),
+                    [&](const StreamInfo& Si) { return Si.m_stream_id == Info.m_stream_id; } ))
+    {
+        return false;
+    }
 
     m_tracks[Type].push_back(Info);
 
