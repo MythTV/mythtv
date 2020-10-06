@@ -90,34 +90,51 @@ void MetadataDownload::run()
         if (lookup->GetType() == kMetadataVideo ||
             lookup->GetType() == kMetadataRecording)
         {
-            if (lookup->GetSubtype() == kProbableTelevision)
+            // First, look for mxml and nfo files in video storage groups
+            if (lookup->GetType() == kMetadataVideo &&
+                !lookup->GetFilename().isEmpty())
             {
-                list = handleTelevision(lookup);
-                if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
-                    (list.size() > 1 && !lookup->GetAutomatic()))
-                {
-                    // There are no exact match prospects with artwork from TV search,
-                    // so add in movies, where we might find a better match.
-                    // In case of manual mode and ambiguous result, add it as well.
-                    list.append(handleMovie(lookup));
-                }
+                QString mxml = getMXMLPath(lookup->GetFilename());
+                QString nfo = getNFOPath(lookup->GetFilename());
+
+                if (!mxml.isEmpty())
+                    list = readMXML(mxml, lookup);
+                else if (!nfo.isEmpty())
+                    list = readNFO(nfo, lookup);
             }
-            else if (lookup->GetSubtype() == kProbableMovie)
+
+            // If nothing found, create lookups based on filename
+            if (list.isEmpty())
             {
-                list = handleMovie(lookup);
-                if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
-                    (list.size() > 1 && !lookup->GetAutomatic()))
+                if (lookup->GetSubtype() == kProbableTelevision)
                 {
-                    // There are no exact match prospects with artwork from Movie search
-                    // so add in television, where we might find a better match.
-                    // In case of manual mode and ambiguous result, add it as well.
-                    list.append(handleTelevision(lookup));
+                    list = handleTelevision(lookup);
+                    if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
+                        (list.size() > 1 && !lookup->GetAutomatic()))
+                    {
+                        // There are no exact match prospects with artwork from TV search,
+                        // so add in movies, where we might find a better match.
+                        // In case of manual mode and ambiguous result, add it as well.
+                        list.append(handleMovie(lookup));
+                    }
                 }
-            }
-            else
-            {
-                // will try both movie and TV
-                list = handleVideoUndetermined(lookup);
+                else if (lookup->GetSubtype() == kProbableMovie)
+                {
+                    list = handleMovie(lookup);
+                    if ((findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0) ||
+                        (list.size() > 1 && !lookup->GetAutomatic()))
+                    {
+                        // There are no exact match prospects with artwork from Movie search
+                        // so add in television, where we might find a better match.
+                        // In case of manual mode and ambiguous result, add it as well.
+                        list.append(handleTelevision(lookup));
+                    }
+                }
+                else
+                {
+                    // will try both movie and TV
+                    list = handleVideoUndetermined(lookup);
+                }
             }
         }
         else if (lookup->GetType() == kMetadataGame)
@@ -560,31 +577,14 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup *lookup)
 /**
  * handleMovie:
  * attempt to find movie data via the following (in order)
- * 1- Local MXML
- * 2- Local NFO
+ * 1- Local MXML: already done before
+ * 2- Local NFO: already done
  * 3- By title
  * 4- By inetref (if present)
  */
 MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-
-    QString mxml;
-    QString nfo;
-
-    if (!lookup->GetFilename().isEmpty())
-    {
-        mxml = getMXMLPath(lookup->GetFilename());
-        nfo = getNFOPath(lookup->GetFilename());
-    }
-
-    if (!mxml.isEmpty())
-        list = readMXML(mxml, lookup);
-    else if (!nfo.isEmpty())
-        list = readNFO(nfo, lookup);
-
-    if (!list.isEmpty())
-        return list;
 
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberMovie, lookup);
@@ -614,8 +614,8 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 /**
  * handleTelevision
  * attempt to find television data via the following (in order)
- * 1- Local MXML
- * 2- Local NFO
+ * 1- Local MXML: already done before
+ * 2- Local NFO: already done
  * 3- By inetref with subtitle
  * 4- By inetref with season and episode
  * 5- By inetref
@@ -625,23 +625,6 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
 MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
 {
     MetadataLookupList list;
-
-    QString mxml;
-    QString nfo;
-
-    if (!lookup->GetFilename().isEmpty())
-    {
-        mxml = getMXMLPath(lookup->GetFilename());
-        nfo = getNFOPath(lookup->GetFilename());
-    }
-
-    if (!mxml.isEmpty())
-        list = readMXML(mxml, lookup);
-    else if (!nfo.isEmpty())
-        list = readNFO(nfo, lookup);
-
-    if (!list.isEmpty())
-        return list;
 
     MetaGrabberScript grabber =
         MetaGrabberScript::GetGrabber(kGrabberTelevision, lookup);
