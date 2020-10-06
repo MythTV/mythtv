@@ -1,3 +1,6 @@
+// C/C++
+#include <cstdlib>
+
 // qt
 #include <QCoreApplication>
 #include <QEvent>
@@ -186,10 +189,31 @@ void MetadataDownload::run()
                     continue;
                 }
 
-                // nothing more we can do in automatic mode
-                QCoreApplication::postEvent(m_parent,
-                    new MetadataLookupFailure(MetadataLookupList() << lookup));
-                continue;
+                // Experimental:
+                // If nothing matches, always return the first found item
+                if (getenv("EXPERIMENTAL_METADATA_GRAB"))
+                {
+                    MetadataLookup *newlookup = list.takeFirst();
+
+                    // pass through automatic type
+                    newlookup->SetAutomatic(true);   // ### XXX RER
+                    newlookup->SetStep(kLookupData);
+                    // Type may have changed
+                    LookupType ret = GuessLookupType(newlookup);
+                    if (ret != kUnknownVideo)
+                    {
+                        newlookup->SetSubtype(ret);
+                    }
+                    prependLookup(newlookup);
+                    continue;
+                }
+                else
+                {
+                    // nothing more we can do in automatic mode
+                    QCoreApplication::postEvent(m_parent,
+                        new MetadataLookupFailure(MetadataLookupList() << lookup));
+                    continue;
+                }
             }
 
             LOG(VB_GENERAL, LOG_INFO,
