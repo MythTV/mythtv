@@ -59,6 +59,7 @@ class PlaybackBox : public ScheduleCommon
 {
     Q_OBJECT
     friend class PlaybackBoxListItem;
+    friend class ChangeView;
 
   public:
     // ViewType values cannot change; they are stored in the database.
@@ -505,7 +506,7 @@ class ChangeView : public MythScreenType
     Q_OBJECT
 
   public:
-    ChangeView(MythScreenStack *lparent, MythScreenType *parentScreen,
+    ChangeView(MythScreenStack *lparent, PlaybackBox *parentScreen,
                int viewMask)
         : MythScreenType(lparent, "changeview"),
           m_parentScreen(parentScreen), m_viewMask(viewMask) {}
@@ -519,7 +520,7 @@ class ChangeView : public MythScreenType
     void SaveChanges(void);
 
   private:
-    MythScreenType *m_parentScreen;
+    PlaybackBox *m_parentScreen;
     int m_viewMask;
 };
 

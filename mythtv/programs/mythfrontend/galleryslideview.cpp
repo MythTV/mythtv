@@ -46,7 +46,8 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     // Initialise slideshow timer
     m_timer.setSingleShot(true);
     m_timer.setInterval(m_slideShowTime);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(ShowNextSlide()));
+    connect(&m_timer, &QTimer::timeout,
+            this, qOverload<>(&GallerySlideView::ShowNextSlide));
 
     // Initialise status delay timer
     m_delay.setSingleShot(true);
@@ -715,6 +716,10 @@ void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
         if (m_uiCaptionText)
             m_uiCaptionText->Reset();
     }
+}
+void GallerySlideView::ShowNextSlide(void)
+{
+    ShowNextSlide(1, true);
 }
 
 

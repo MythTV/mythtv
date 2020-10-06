@@ -811,22 +811,22 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_doubleShader);
     addChild(m_doubleDriver);
 
-    connect(m_widthRange, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(widthChanged(const QString&)));
-    connect(m_heightRange, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(heightChanged(const QString&)));
-    connect(m_codecs, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(InitLabel()));
-    connect(m_framerate, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(framerateChanged(const QString&)));
-    connect(m_decoder, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(decoderChanged(const QString&)));
-    connect(m_vidRend, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(vrenderChanged(const QString&)));
-    connect(m_singleDeint, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(SingleQualityChanged(const QString&)));
-    connect(m_doubleDeint, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(DoubleQualityChanged(const QString&)));
+    connect(m_widthRange, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::widthChanged);
+    connect(m_heightRange, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::heightChanged);
+    connect(m_codecs, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::InitLabel);
+    connect(m_framerate, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::framerateChanged);
+    connect(m_decoder, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::decoderChanged);
+    connect(m_vidRend, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::vrenderChanged);
+    connect(m_singleDeint, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::SingleQualityChanged);
+    connect(m_doubleDeint, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this,    &PlaybackProfileItemConfig::DoubleQualityChanged);
 }
 
 uint PlaybackProfileItemConfig::GetIndex(void) const
@@ -2510,8 +2510,8 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
     addChild(rate);
     addChild(TVVidModeForceAspect());
     addChild(pause);
-    connect(res, SIGNAL(valueChanged(StandardSetting *)),
-            rate, SLOT(ChangeResolution(StandardSetting *)));
+    connect(res, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            rate, &HostRefreshRateComboBoxSetting::ChangeResolution);
 
     auto *overrides = new GroupSetting();
 
@@ -2527,8 +2527,8 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
         overrides->addChild(rate = TVVidModeRefreshRate(idx));
         overrides->addChild(TVVidModeForceAspect(idx));
 
-        connect(res, SIGNAL(valueChanged(StandardSetting *)),
-                rate, SLOT(ChangeResolution(StandardSetting *)));
+        connect(res, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+                rate, &HostRefreshRateComboBoxSetting::ChangeResolution);
     }
 
     addChild(overrides);
@@ -3979,8 +3979,8 @@ ShutDownRebootSetting::ShutDownRebootSetting()
 #endif
     if (power)
         MythPower::AcquireRelease(this, false);
-    connect(m_overrideExitMenu,SIGNAL(valueChanged(StandardSetting *)),
-            SLOT(childChanged(StandardSetting *)));
+    connect(m_overrideExitMenu, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &ShutDownRebootSetting::childChanged);
 }
 
 void ShutDownRebootSetting::childChanged(StandardSetting* /*unused*/)
@@ -4075,10 +4075,10 @@ MainGeneralSettings::MainGeneralSettings()
     cec->addTargetedChild("1",m_cecPowerOffTVAllowed);
     cec->addTargetedChild("1",m_cecPowerOnTVOnStart);
     cec->addTargetedChild("1",m_cecPowerOffTVOnExit);
-    connect(m_cecPowerOnTVAllowed, SIGNAL(valueChanged(bool)),
-            this, SLOT(cecChanged(bool)));
-    connect(m_cecPowerOffTVAllowed, SIGNAL(valueChanged(bool)),
-            this, SLOT(cecChanged(bool)));
+    connect(m_cecPowerOnTVAllowed, &MythUICheckBoxSetting::valueChanged,
+            this, &MainGeneralSettings::cecChanged);
+    connect(m_cecPowerOffTVAllowed, &MythUICheckBoxSetting::valueChanged,
+            this, &MainGeneralSettings::cecChanged);
 #endif // USING_LIBCEC
     addChild(remotecontrol);
 
@@ -4148,14 +4148,14 @@ PlayBackScaling::PlayBackScaling()
     addChild(m_yScan = YScanDisplacement());
     addChild(m_horizScan = HorizScanPercentage());
     addChild(m_xScan = XScanDisplacement());
-    connect(m_vertScan, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(childChanged(StandardSetting *)));
-    connect(m_yScan, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(childChanged(StandardSetting *)));
-    connect(m_horizScan, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(childChanged(StandardSetting *)));
-    connect(m_xScan,SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(childChanged(StandardSetting *)));
+    connect(m_vertScan, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &PlayBackScaling::childChanged);
+    connect(m_yScan, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &PlayBackScaling::childChanged);
+    connect(m_horizScan, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &PlayBackScaling::childChanged);
+    connect(m_xScan, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &PlayBackScaling::childChanged);
 }
 
 
@@ -4532,14 +4532,14 @@ GuiDimension::GuiDimension()
     addChild(m_height  = GuiHeight());
     addChild(m_offsetX = GuiOffsetX());
     addChild(m_offsetY = GuiOffsetY());
-    connect(m_width, SIGNAL(valueChanged(StandardSetting *)),
-            SLOT(childChanged(StandardSetting *)));
-    connect(m_height, SIGNAL(valueChanged(StandardSetting *)),
-            SLOT(childChanged(StandardSetting *)));
-    connect(m_offsetX, SIGNAL(valueChanged(StandardSetting *)),
-            SLOT(childChanged(StandardSetting *)));
-    connect(m_offsetY, SIGNAL(valueChanged(StandardSetting *)),
-            SLOT(childChanged(StandardSetting *)));
+    connect(m_width, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &GuiDimension::childChanged);
+    connect(m_height, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &GuiDimension::childChanged);
+    connect(m_offsetX, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &GuiDimension::childChanged);
+    connect(m_offsetY, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &GuiDimension::childChanged);
 }
 
 void GuiDimension::updateButton(MythUIButtonListItem *item)

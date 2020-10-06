@@ -236,8 +236,8 @@ NetworkControl::NetworkControl() :
 
     gCoreContext->addListener(this);
 
-    connect(this, SIGNAL(newConnection(QTcpSocket*)),
-            this, SLOT(newConnection(QTcpSocket*)));
+    connect(this, &ServerPool::newConnection,
+            this, &NetworkControl::newConnection);
 }
 
 NetworkControl::~NetworkControl(void)
@@ -375,9 +375,10 @@ void NetworkControl::newConnection(QTcpSocket *client)
     QMutexLocker locker(&m_clientLock);
     m_clients.push_back(ncc);
 
-    connect(ncc, &NetworkControlClient::commandReceived, this,
-            &NetworkControl::receiveCommand);
-    connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
+    connect(ncc, &NetworkControlClient::commandReceived,
+            this, &NetworkControl::receiveCommand);
+    connect(client, &QAbstractSocket::disconnected,
+            this, qOverload<>(&NetworkControl::deleteClient));
 
     welcomeStr = "MythFrontend Network Control\r\n";
     welcomeStr += "Type 'help' for usage information\r\n"

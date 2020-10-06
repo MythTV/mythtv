@@ -241,7 +241,8 @@ signals:
     void SlideReady(int count);
 
 private slots:
-    void Flush(Slide *slide, const QString& reason = "Loaded");
+    void Flush(Slide *slide, const QString& reason);
+    void Flush(Slide *slide);
 
 protected:
     QString BufferState();

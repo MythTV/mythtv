@@ -128,8 +128,8 @@ bool ProgLister::Create()
     }
     else
     {
-        connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                this,       SLOT(  EditRecording()));
+        connect(m_progList, &MythUIButtonList::itemClicked,
+                this,       qOverload<MythUIButtonListItem*>(&ProgLister::EditRecording));
     }
 
     m_progList->SetLCDTitles(tr("Program List"), "title|channel|shortstarttimedate");
@@ -417,7 +417,6 @@ void ProgLister::ShowChooseViewMenu(void)
     MythScreenStack *popupStack =
         GetMythMainWindow()->GetStack("popup stack");
     MythScreenType *screen = nullptr;
-    bool connect_string = true;
 
     switch (m_type)
     {
@@ -444,31 +443,53 @@ void ProgLister::ShowChooseViewMenu(void)
                     break;
             }
 
-            screen = new MythUISearchDialog(
+            auto dialog = new MythUISearchDialog(
                 popupStack, msg, m_viewTextList, true, "");
-
+            if (!dialog)
+                return;
+            connect(dialog, &MythUISearchDialog::haveResult,
+                    this, &ProgLister::SetViewFromList);
+            screen = dialog;
             break;
         }
         case plTitleSearch:
         case plKeywordSearch:
         case plPeopleSearch:
-            screen = new PhrasePopup(
+        {
+            auto dialog = new PhrasePopup(
                 popupStack, this, m_searchType, m_viewTextList,
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
+            if (!dialog)
+                return;
+            connect(dialog, &PhrasePopup::haveResult,
+                    this, &ProgLister::SetViewFromList);
+            screen = dialog;
             break;
+        }
         case plPowerSearch:
-            screen = new PowerSearchPopup(
+        {
+            auto dialog = new PowerSearchPopup(
                 popupStack, this, m_searchType, m_viewTextList,
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
+            if (!dialog)
+                return;
+            connect(dialog, &PowerSearchPopup::haveResult,
+                    this, &ProgLister::SetViewFromList);
+            screen = dialog;
             break;
+        }
         case plTime:
         {
             QString message =  tr("Start search from date and time");
             int flags = (MythTimeInputDialog::kDay |
                          MythTimeInputDialog::kHours |
                          MythTimeInputDialog::kFutureDates);
-            screen = new MythTimeInputDialog(popupStack, message, flags);
-            connect_string = false;
+            auto dialog = new MythTimeInputDialog(popupStack, message, flags);
+            if (!dialog)
+                return;
+            connect(dialog, &MythTimeInputDialog::haveResult,
+                    this, &ProgLister::SetViewFromTime);
+            screen = dialog;
             break;
         }
         case plRecordid:
@@ -479,24 +500,10 @@ void ProgLister::ShowChooseViewMenu(void)
             break;
     }
 
-    if (!screen)
-        return;
-
     if (!screen->Create())
     {
         delete screen;
         return;
-    }
-
-    if (connect_string)
-    {
-        connect(screen, SIGNAL(haveResult(     QString)),
-                this,   SLOT(  SetViewFromList(QString)));
-    }
-    else
-    {
-        connect(screen, SIGNAL(haveResult(     QDateTime)),
-                this,   SLOT(  SetViewFromTime(QDateTime)));
     }
 
     popupStack->AddScreen(screen);

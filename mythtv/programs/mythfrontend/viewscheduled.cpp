@@ -81,8 +81,8 @@ bool ViewScheduled::Create()
 
     connect(m_schedulesList, &MythUIButtonList::itemSelected,
             this, &ViewScheduled::updateInfo);
-    connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(EditRecording()));
+    connect(m_schedulesList, &MythUIButtonList::itemClicked,
+            this, qOverload<MythUIButtonListItem*>(&ViewScheduled::EditRecording));
 
     m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"),
                               "shortstarttimedate|channel|titlesubtitle|card");

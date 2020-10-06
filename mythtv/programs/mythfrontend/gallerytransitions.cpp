@@ -419,7 +419,7 @@ void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 #endif
     m_current = m_peers[rand];
     // Invoke peer
-    connect(m_current, SIGNAL(finished()), this, SLOT(Finished()));
+    connect(m_current, &Transition::finished, this, &TransitionRandom::Finished);
     m_current->Start(from, to, forwards, speed);
 }
 

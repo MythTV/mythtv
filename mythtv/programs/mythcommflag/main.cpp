@@ -566,12 +566,12 @@ static int DoFlagCommercials(
     auto *a = new SlotRelayer(commDetectorBreathe);
     auto *b = new SlotRelayer(commDetectorStatusUpdate);
     auto *c = new SlotRelayer(commDetectorGotNewCommercialBreakList);
-    QObject::connect(commDetector, SIGNAL(breathe()),
-                     a,            SLOT(relay()));
-    QObject::connect(commDetector, SIGNAL(statusUpdate(const QString&)),
-                     b,            SLOT(relay(const QString&)));
-    QObject::connect(commDetector, SIGNAL(gotNewCommercialBreakList()),
-                     c,            SLOT(relay()));
+    QObject::connect(commDetector, &CommDetectorBase::breathe,
+                     a,            qOverload<>(&SlotRelayer::relay));
+    QObject::connect(commDetector, &CommDetectorBase::statusUpdate,
+                     b,            qOverload<const QString&>(&SlotRelayer::relay));
+    QObject::connect(commDetector, &CommDetectorBase::gotNewCommercialBreakList,
+                     c,            qOverload<>(&SlotRelayer::relay));
 
     if (useDB)
     {

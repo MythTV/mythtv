@@ -472,6 +472,11 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
     popupStack->AddScreen(menuPopup);
 }
 
+void ScheduleCommon::EditRecording(MythUIButtonListItem* /*item*/)
+{
+    EditRecording();
+}
+
 void ScheduleCommon::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)

@@ -77,7 +77,7 @@ JumpToChannel::JumpToChannel(
 {
     if (parent && m_timer)
     {
-        connect(m_timer, SIGNAL(timeout()), SLOT(deleteLater()));
+        connect(m_timer, &QTimer::timeout, this, &JumpToChannel::deleteLater);
         m_timer->setSingleShot(true);
     }
     Update();

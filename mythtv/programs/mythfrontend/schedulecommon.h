@@ -34,6 +34,7 @@ class ScheduleCommon : public MythScreenType
 
   protected slots:
     virtual void EditRecording(bool may_watch_now = false);
+    virtual void EditRecording(MythUIButtonListItem* /*item*/);
     virtual void QuickRecord(void);
     virtual void ShowPrevious(void) const;
     virtual void ShowPrevious(uint ruleid, const QString &title) const;

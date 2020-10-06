@@ -326,8 +326,8 @@ MainServer::MainServer(bool master, int port,
     m_metadatafactory = new MetadataFactory(this);
 
     m_autoexpireUpdateTimer = new QTimer(this);
-    connect(m_autoexpireUpdateTimer, SIGNAL(timeout()),
-            this, SLOT(autoexpireUpdate()));
+    connect(m_autoexpireUpdateTimer, &QTimer::timeout,
+            this, &MainServer::autoexpireUpdate);
     m_autoexpireUpdateTimer->setSingleShot(true);
 
     AutoExpire::Update(true);

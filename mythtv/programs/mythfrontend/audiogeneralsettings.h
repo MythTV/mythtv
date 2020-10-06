@@ -52,7 +52,9 @@ class AudioConfigSettings : public GroupSetting
     void UpdateVisibility(StandardSetting */*setting*/);
     AudioOutputSettings UpdateCapabilities(bool restore = true,
                                            bool AC3 = false);
+    void UpdateCapabilities(StandardSetting */*setting*/);
     AudioOutputSettings UpdateCapabilitiesAC3(void);
+    void UpdateCapabilitiesAC3(StandardSetting */*setting*/);
     void AudioRescan();
     void UpdateAudioTest();
 
@@ -202,7 +204,7 @@ class AudioTest : public GroupSetting
 
   private slots:
     void toggle();
-    void togglequality(void);
+    void togglequality(const QString &/*value*/);
     void cancelTest();
     void prepareTest();
 };

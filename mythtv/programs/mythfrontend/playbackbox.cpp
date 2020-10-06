@@ -4890,10 +4890,8 @@ void PlaybackBox::showMetadataEditor()
 
     if (editMetadata->Create())
     {
-        connect(editMetadata, SIGNAL(result(const QString &, const QString &,
-                const QString &, const QString &, uint, uint)), SLOT(
-                saveRecMetadata(const QString &, const QString &,
-                const QString &, const QString &, uint, uint)));
+        connect(editMetadata, &RecMetadataEdit::result,
+                this, &PlaybackBox::saveRecMetadata);
         mainStack->AddScreen(editMetadata);
     }
     else
@@ -5178,8 +5176,8 @@ bool ChangeView::Create()
     {
         if (m_viewMask & PlaybackBox::VIEW_TITLES)
             checkBox->SetCheckState(MythUIStateType::Full);
-        connect(checkBox, SIGNAL(toggled(bool)),
-                m_parentScreen, SLOT(toggleTitleView(bool)));
+        connect(checkBox, &MythUICheckBox::toggled,
+                m_parentScreen, &PlaybackBox::toggleTitleView);
     }
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("categories"));
@@ -5187,8 +5185,8 @@ bool ChangeView::Create()
     {
         if (m_viewMask & PlaybackBox::VIEW_CATEGORIES)
             checkBox->SetCheckState(MythUIStateType::Full);
-        connect(checkBox, SIGNAL(toggled(bool)),
-                m_parentScreen, SLOT(toggleCategoryView(bool)));
+        connect(checkBox, &MythUICheckBox::toggled,
+                m_parentScreen, &PlaybackBox::toggleCategoryView);
     }
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("recgroups"));
@@ -5196,8 +5194,8 @@ bool ChangeView::Create()
     {
         if (m_viewMask & PlaybackBox::VIEW_RECGROUPS)
             checkBox->SetCheckState(MythUIStateType::Full);
-        connect(checkBox, SIGNAL(toggled(bool)),
-                m_parentScreen, SLOT(toggleRecGroupView(bool)));
+        connect(checkBox, &MythUICheckBox::toggled,
+                m_parentScreen, &PlaybackBox::toggleRecGroupView);
     }
 
     // TODO Do we need two separate settings to determine whether the watchlist
@@ -5207,8 +5205,8 @@ bool ChangeView::Create()
         {
             if (m_viewMask & PlaybackBox::VIEW_WATCHLIST)
                 checkBox->SetCheckState(MythUIStateType::Full);
-            connect(checkBox, SIGNAL(toggled(bool)),
-                    m_parentScreen, SLOT(toggleWatchListView(bool)));
+            connect(checkBox, &MythUICheckBox::toggled,
+                    m_parentScreen, &PlaybackBox::toggleWatchListView);
         }
     //
 
@@ -5217,8 +5215,8 @@ bool ChangeView::Create()
     {
         if (m_viewMask & PlaybackBox::VIEW_SEARCHES)
             checkBox->SetCheckState(MythUIStateType::Full);
-        connect(checkBox, SIGNAL(toggled(bool)),
-                m_parentScreen, SLOT(toggleSearchView(bool)));
+        connect(checkBox, &MythUICheckBox::toggled,
+                m_parentScreen, &PlaybackBox::toggleSearchView);
     }
 
     // TODO Do we need two separate settings to determine whether livetv
@@ -5228,8 +5226,8 @@ bool ChangeView::Create()
         {
             if (m_viewMask & PlaybackBox::VIEW_LIVETVGRP)
                 checkBox->SetCheckState(MythUIStateType::Full);
-            connect(checkBox, SIGNAL(toggled(bool)),
-                    m_parentScreen, SLOT(toggleLiveTVView(bool)));
+            connect(checkBox, &MythUICheckBox::toggled,
+                    m_parentScreen, &PlaybackBox::toggleLiveTVView);
         }
     //
 
@@ -5238,8 +5236,8 @@ bool ChangeView::Create()
     {
         if (m_viewMask & PlaybackBox::VIEW_WATCHED)
             checkBox->SetCheckState(MythUIStateType::Full);
-        connect(checkBox, SIGNAL(toggled(bool)),
-                m_parentScreen, SLOT(toggleWatchedView(bool)));
+        connect(checkBox, &MythUICheckBox::toggled,
+                m_parentScreen, &PlaybackBox::toggleWatchedView);
     }
 
     MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
@@ -5485,8 +5483,8 @@ void RecMetadataEdit::customEvent(QEvent *levent)
 
         auto *resultsdialog = new MetadataResultsDialog(m_popupStack, list);
 
-        connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
-                SLOT(OnSearchListSelection(RefCountHandler<MetadataLookup>)),
+        connect(resultsdialog, &MetadataResultsDialog::haveResult,
+                this, &RecMetadataEdit::OnSearchListSelection,
                 Qt::QueuedConnection);
 
         if (resultsdialog->Create())

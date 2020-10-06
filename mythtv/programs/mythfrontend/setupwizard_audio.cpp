@@ -174,11 +174,10 @@ void AudioSetupWizard::Init(void)
     // Update list for default audio device
     UpdateCapabilities();
 
-    connect(m_ac3Check,
-            &MythUICheckBox::valueChanged, this, &AudioSetupWizard::UpdateCapabilitiesAC3);
-    connect(m_audioDeviceButtonList,
-            SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(UpdateCapabilities(MythUIButtonListItem*)));
+    connect(m_ac3Check, &MythUICheckBox::valueChanged,
+            this, &AudioSetupWizard::UpdateCapabilitiesAC3);
+    connect(m_audioDeviceButtonList, &MythUIButtonList::itemSelected,
+            this, qOverload<MythUIButtonListItem*>(&AudioSetupWizard::UpdateCapabilities));
 }
 
 AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)

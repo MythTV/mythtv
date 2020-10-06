@@ -162,10 +162,8 @@ namespace
         {
             if (check)
             {
-                connect(&m_plcc,
-                        SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
-                        SLOT(OnPasswordResultReady(bool,
-                                        ParentalLevel::Level)));
+                connect(&m_plcc, &ParentalLevelChangeChecker::SigResultReady,
+                        this, &RunSettingsCompletion::OnPasswordResultReady);
                 m_plcc.Check(ParentalLevel::plMedium, ParentalLevel::plHigh);
             }
             else
@@ -1193,9 +1191,8 @@ static void TVMenuCallback(void *data, QString &selection)
         if (g_settingsHelper)
         {
             QObject::connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
-                          SIGNAL(Exiting()),
-                          g_settingsHelper,
-                          SLOT(RunEpilog()));
+                             &MythScreenType::Exiting,
+                             g_settingsHelper, &SettingsHelper::RunEpilog);
         }
     }
 }

@@ -49,8 +49,8 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
                                                dflt);
     addSelection(current, current, true);
 
-    connect(this, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(AudioDescriptionHelp(StandardSetting *)));
+    connect(this, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &AudioDeviceComboBox::AudioDescriptionHelp);
 }
 
 void AudioDeviceComboBox::edit(MythScreenType * screen)
@@ -147,8 +147,8 @@ AudioConfigSettings::AudioConfigSettings()
     m_passThroughDeviceOverride = PassThroughOutputDevice();
     advancedSettings->addChild(m_passThroughDeviceOverride);
     m_passThroughDeviceOverride->setEnabled(m_passThroughOverride->boolValue());
-    connect(m_passThroughOverride, SIGNAL(valueChanged(bool)),
-            m_passThroughDeviceOverride, SLOT(setEnabled(bool)));
+    connect(m_passThroughOverride, &MythUICheckBoxSetting::valueChanged,
+            m_passThroughDeviceOverride, &StandardSetting::setEnabled);
 
     StandardSetting *srcqualityoverride = SRCQualityOverride();
     srcqualityoverride->addTargetedChild("1", SRCQuality());
@@ -166,26 +166,26 @@ AudioConfigSettings::AudioConfigSettings()
     addChild(m_audioTest = new AudioTest());
 
         // Set slots
-    connect(m_maxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateVisibility(StandardSetting *)));
-    connect(m_outputDevice, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilities()));
-    connect(m_ac3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilitiesAC3()));
+    connect(m_maxAudioChannels, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateVisibility));
+    connect(m_outputDevice, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilities));
+    connect(m_ac3PassThrough, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilitiesAC3));
 
-    connect(m_dtsPassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilities()));
-    connect(m_eac3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilities()));
-    connect(m_trueHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilities()));
-    connect(m_dtsHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateCapabilities()));
+    connect(m_dtsPassThrough, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilities));
+    connect(m_eac3PassThrough, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilities));
+    connect(m_trueHDPassThrough, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilities));
+    connect(m_dtsHDPassThrough, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, qOverload<StandardSetting *>(&AudioConfigSettings::UpdateCapabilities));
     //Slot for audio test
-    connect(m_outputDevice, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateAudioTest()));
-    connect(m_maxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
-            this, SLOT(UpdateAudioTest()));
+    connect(m_outputDevice, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &AudioConfigSettings::UpdateAudioTest);
+    connect(m_maxAudioChannels, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+            this, &AudioConfigSettings::UpdateAudioTest);
 }
 
 void AudioConfigSettings::CheckConfiguration(void)
@@ -415,11 +415,20 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     return settings;
 }
 
+void AudioConfigSettings::UpdateCapabilities(StandardSetting */*setting*/)
+{
+    UpdateCapabilities();
+}
+
 AudioOutputSettings AudioConfigSettings::UpdateCapabilitiesAC3(void)
 {
     return UpdateCapabilities(false, true);
 }
 
+void AudioConfigSettings::UpdateCapabilitiesAC3(StandardSetting */*setting*/)
+{
+    UpdateCapabilitiesAC3();
+}
 
 HostComboBoxSetting *AudioConfigSettings::MaxAudioChannels()
 {
@@ -841,7 +850,8 @@ AudioTest::AudioTest()
                          "a good place to start troubleshooting "
                          "potential errors"));
     addChild(m_hd);
-    connect(m_hd, SIGNAL(valueChanged(QString)), this, SLOT(togglequality()));
+    connect(m_hd, qOverload<const QString&>(&StandardSetting::valueChanged),
+            this, &AudioTest::togglequality);
 }
 
 AudioTest::~AudioTest()
@@ -920,7 +930,7 @@ void AudioTest::toggle()
     m_at->start();
 }
 
-void AudioTest::togglequality()
+void AudioTest::togglequality(const QString &/*value*/)
 {
     cancelTest();
     m_quality = m_hd->boolValue();

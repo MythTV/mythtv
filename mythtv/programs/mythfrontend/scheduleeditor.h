@@ -148,6 +148,7 @@ class ScheduleEditor : public ScheduleCommon,
     public SchedOptMixin, public FilterOptMixin,
     public StoreOptMixin, public PostProcMixin
 {
+    friend class SchedEditChild;
   Q_OBJECT
   public:
     ScheduleEditor(MythScreenStack *parent, RecordingInfo* recinfo,

@@ -612,8 +612,9 @@ void MythControls::GrabKey(void)
     if (keyGrabPopup->Create())
         popupStack->AddScreen(keyGrabPopup, false);
 
-    connect(keyGrabPopup, SIGNAL(HaveResult(QString)),
-            SLOT(AddKeyToAction(QString)), Qt::QueuedConnection);
+    connect(keyGrabPopup, &KeyGrabPopupBox::HaveResult,
+            this, qOverload<const QString&>(&MythControls::AddKeyToAction),
+            Qt::QueuedConnection);
 }
 
 /**
@@ -662,6 +663,11 @@ void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
     }
 
     RefreshKeyInformation();
+}
+
+void MythControls::AddKeyToAction(const QString& key)
+{
+    AddKeyToAction(key, false);
 }
 
 void MythControls::customEvent(QEvent *event)

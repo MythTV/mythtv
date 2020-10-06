@@ -120,8 +120,8 @@ bool ThemeChooser::Create(void)
         return false;
     }
 
-    connect(m_themes, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(saveAndReload(MythUIButtonListItem*)));
+    connect(m_themes, &MythUIButtonList::itemClicked,
+            this, qOverload<MythUIButtonListItem*>(&ThemeChooser::saveAndReload));
     connect(m_themes, &MythUIButtonList::itemSelected,
             this, &ThemeChooser::itemChanged);
 

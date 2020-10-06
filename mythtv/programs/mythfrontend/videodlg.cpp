@@ -3307,8 +3307,8 @@ void VideoDialog::customEvent(QEvent *levent)
             dismissFetchDialog(metadata, true);
             auto *resultsdialog = new MetadataResultsDialog(m_popupStack, list);
 
-            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
-                    SLOT(OnVideoSearchListSelection(RefCountHandler<MetadataLookup>)),
+            connect(resultsdialog, &MetadataResultsDialog::haveResult,
+                    this, &VideoDialog::OnVideoSearchListSelection,
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())

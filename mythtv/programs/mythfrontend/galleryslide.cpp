@@ -602,8 +602,8 @@ void SlideBuffer::Initialise(MythUIImage &image)
     auto *slide = new Slide(nullptr, "slide0", &image);
 
     // Buffer is notified when it has loaded image
-    connect(slide, SIGNAL(ImageLoaded(Slide *)),
-            this, SLOT(Flush(Slide *)));
+    connect(slide, &Slide::ImageLoaded,
+            this, qOverload<Slide*>(&SlideBuffer::Flush));
 
     m_queue.enqueue(slide);
 
@@ -616,8 +616,8 @@ void SlideBuffer::Initialise(MythUIImage &image)
         slide->SetVisible(false);
 
         // Buffer is notified when it has loaded image
-        connect(slide, SIGNAL(ImageLoaded(Slide *)),
-                this, SLOT(Flush(Slide *)));
+        connect(slide, &Slide::ImageLoaded,
+                this, qOverload<Slide*>(&SlideBuffer::Flush));
 
         m_queue.enqueue(slide);
     }
@@ -749,3 +749,8 @@ void SlideBuffer::Flush(Slide *slide, const QString& reason)
 
     emit SlideReady(--available);
 }
+
+void SlideBuffer::Flush(Slide *slide)
+{
+    Flush(slide, "Loaded");
+};
