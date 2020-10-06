@@ -55,8 +55,8 @@ bool ChannelEditor::Create(void)
     }
 
     BuildFocusList();
-    connect(okButton,    SIGNAL(Clicked()), SLOT(Confirm()));
-    connect(probeButton, SIGNAL(Clicked()), SLOT(Probe()));
+    connect(okButton,    &MythUIButton::Clicked, this, &ChannelEditor::Confirm);
+    connect(probeButton, &MythUIButton::Clicked, this, &ChannelEditor::Probe);
     SetFocusWidget(okButton);
 
     return true;
@@ -1251,7 +1251,7 @@ bool OsdNavigation::Create(void)
     MythUIButton *moreButton = nullptr;
     UIUtilW::Assign(this, moreButton, "more");
     if (moreButton)
-        connect(moreButton, SIGNAL(Clicked()), SLOT(More()));
+        connect(moreButton, &MythUIButton::Clicked, this, &OsdNavigation::More);
     UIUtilW::Assign(this, m_pauseButton, "PAUSE");
     UIUtilW::Assign(this, m_playButton, "PLAY");
     UIUtilW::Assign(this, m_muteButton, "MUTE");
@@ -1259,8 +1259,7 @@ bool OsdNavigation::Create(void)
 
     MythPlayer *player = m_osd->GetPlayer();
 
-    if (!player || !player->HasAudioOut() ||
-        !player->PlayerControlsVolume())
+    if (!player || !player->HasAudioOut() || !player->PlayerControlsVolume())
     {
         m_isVolumeControl = false;
         if (m_muteButton)
@@ -1274,23 +1273,22 @@ bool OsdNavigation::Create(void)
     for (int i = 0; i < 100 ; i++)
     {
         UIUtilW::Assign(this, group, QString("grp%1").arg(i));
-        if (group)
+        if (!group)
+            break;
+
+        m_maxGroupNum = i;
+        if (i != m_visibleGroup)
+            group->SetVisible(false);
+        QList<MythUIType *> * children = group->GetAllChildren();
+        for (auto * child : *children)
         {
-            m_maxGroupNum = i;
-            if (i != m_visibleGroup)
-                group->SetVisible (false);
-            QList<MythUIType *> * children = group->GetAllChildren();
-            QList<MythUIType *>::iterator it;
-            for (it = children->begin(); it != children->end(); ++it)
+            if (child != moreButton)
             {
-                MythUIType *child = *it;
-                if (child == moreButton)
-                    continue;
-                connect(child, SIGNAL(Clicked()), SLOT(GeneralAction()));
+                MythUIButton* button = dynamic_cast<MythUIButton*>(child);
+                if (button)
+                    connect(button, &MythUIButton::Clicked, this, &OsdNavigation::GeneralAction);
             }
         }
-        else
-            break;
     }
 
     BuildFocusList();
