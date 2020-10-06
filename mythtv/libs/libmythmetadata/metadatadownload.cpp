@@ -154,6 +154,8 @@ void MetadataDownload::run()
                 {
                     MetadataLookup *newlookup = bestLookup;
 
+                    // pass through automatic type
+                    newlookup->SetAutomatic(true);
                     // bestlookup is owned by list, we need an extra reference
                     newlookup->IncrRef();
                     newlookup->SetStep(kLookupData);
