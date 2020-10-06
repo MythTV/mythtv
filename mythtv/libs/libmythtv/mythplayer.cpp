@@ -1583,24 +1583,34 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             return;
         }
 
+        // Only double rate CPU deinterlacers require an extra call to PrepareFrame
+        bool secondprepare = GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER);
+        // and the first deinterlacing pass will have marked the frame as already deinterlaced
+        // which will break GetScanForDisplay below and subsequent deinterlacing
+        bool olddeinterlaced = buffer->already_deinterlaced;
+        if (secondprepare)
+            buffer->already_deinterlaced = false;
         // Update scan settings now that deinterlacer has been set and we know
         // whether we need a second field
         ps = GetScanForDisplay(buffer, showsecondfield);
-        if (showsecondfield)
+
+        // Reset olddeinterlaced if necessary (pause frame etc)
+        if (!showsecondfield && secondprepare)
         {
-            //second stage of deinterlacer processing
+            buffer->already_deinterlaced = olddeinterlaced;
+        }
+        else if (showsecondfield)
+        {
+            // Second field
             if (kScan_Interlaced == ps)
                 ps = kScan_Intr2ndField;
+
             m_osdLock.lock();
-            // Only double rate CPU deinterlacers require an extra call to PrepareFrame
-            if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
-            {
-                // the first deinterlacing pass will have marked the frame as already deinterlaced
-                buffer->already_deinterlaced = false;
+            if (secondprepare)
                 m_videoOutput->PrepareFrame(buffer, ps);
-            }
             m_videoOutput->RenderFrame(buffer, ps, m_osd);
             m_osdLock.unlock();
+
             // Display the second field
             int64_t due = framedue + m_frameInterval / 2;
             WaitForTime(due);
