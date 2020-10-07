@@ -16,7 +16,7 @@ class MythScreenSaver : public QObject
 
   public:
     explicit MythScreenSaver(QObject* Parent) : QObject(Parent) {}
-    virtual ~MythScreenSaver() = default;
+   ~MythScreenSaver() override = default;
 
   public slots:
     virtual void Disable() = 0;
