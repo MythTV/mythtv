@@ -26,7 +26,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Setup build environment
-      run: echo "::set-env name=MYTHTV_CONFIG::--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}"
+      run: echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
       
     - name: Check ccache
       uses: actions/cache@v2
@@ -47,7 +47,7 @@ jobs:
       run: |
         brew install pkg-config ccache qt5 nasm libsamplerate taglib lzo libcec libbluray fftw libass libhdhomerun dav1d x264 x265 libvpx openssl
         brew link qt5 --force
-        echo "::set-env name=MYTHTV_CONFIG::$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib"
+        echo "MYTHTV_CONFIG=$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib" >> $GITHUB_ENV
       if: runner.os == 'macOS'
       
     - name: Configure core
