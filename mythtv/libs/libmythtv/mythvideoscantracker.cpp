@@ -238,3 +238,27 @@ void MythVideoScanTracker::AutoDeint(VideoFrame* Frame, MythVideoOutput* VideoOu
                 VideoOutput, FrameInterval);
     m_scanLocked  = false;
 }
+
+FrameScanType MythVideoScanTracker::DetectInterlace(FrameScanType NewScan, float Rate, int VideoHeight)
+{
+    FrameScanType scan = m_scan;
+    QString dbg = QString("DetectInterlace(") + ScanTypeToString(NewScan) +
+        QString(", ") + ScanTypeToString(scan) + QString(", ") +
+        QString("%1").arg(static_cast<double>(Rate)) + QString(", ") +
+        QString("%1").arg(VideoHeight) + QString(") ->");
+
+    if (kScan_Ignore != NewScan || kScan_Detect == scan)
+    {
+        // The scanning mode should be decoded from the stream - otherwise guess
+        // default to interlaced
+        scan = kScan_Interlaced;
+        // 720P, outside interlaced frame rates or too large for interlaced
+        if ((720 == VideoHeight) || ((Rate < 25) && (Rate > 30)) || (VideoHeight > 1080))
+            scan = kScan_Progressive;
+        if (kScan_Detect != NewScan)
+            scan = NewScan;
+    };
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + ScanTypeToString(scan));
+    return scan;
+}

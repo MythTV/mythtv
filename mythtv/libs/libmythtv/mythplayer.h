@@ -538,10 +538,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
   protected:
     void RenderVideoFrame(VideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
 
-    // Private initialization stuff
-    FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
-                                  float fps, int video_height) const;
-
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPlaying(bool is_playing);

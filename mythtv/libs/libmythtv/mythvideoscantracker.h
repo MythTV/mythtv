@@ -29,6 +29,7 @@ class MTV_PUBLIC MythVideoScanTracker
                                          int FrameInterval, bool AllowLock = true);
     void           CheckScanUpdate      (MythVideoOutput* VideoOutput, int FrameInterval);
     QString        GetDeinterlacerName  ();
+    FrameScanType  DetectInterlace      (FrameScanType NewScan, float Rate, int VideoHeight);
 
   private:
     MythPlayer*    m_parentPlayer       { nullptr };

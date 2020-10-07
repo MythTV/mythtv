@@ -441,33 +441,6 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
     AutoVisualise(!m_videoDim.isEmpty());
 }
 
-FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
-                                          FrameScanType scan,
-                                          float fps, int video_height) const
-{
-    QString dbg = QString("detectInterlace(") + ScanTypeToString(newScan) +
-        QString(", ") + ScanTypeToString(scan) + QString(", ") +
-        QString("%1").arg(static_cast<double>(fps)) + QString(", ") +
-        QString("%1").arg(video_height) + QString(") ->");
-
-    if (kScan_Ignore != newScan || kScan_Detect == scan)
-    {
-        // The scanning mode should be decoded from the stream, but if it
-        // isn't, we have to guess.
-
-        scan = kScan_Interlaced; // default to interlaced
-        if ((720 == video_height) || // ATSC 720p
-            (fps > 45))              // software deinterlacing
-            scan = kScan_Progressive;
-
-        if (kScan_Detect != newScan)
-            scan = newScan;
-    };
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + ScanTypeToString(scan));
-    return scan;
-}
-
 void MythPlayer::SetKeyframeDistance(int keyframedistance)
 {
     m_keyframeDist = (keyframedistance > 0) ? static_cast<uint>(keyframedistance) : m_keyframeDist;
@@ -526,8 +499,8 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
 
     // ensure deinterlacers are correctly reset after a change
     UnlockScan();
-    SetScanType(detectInterlace(scan, GetScanType(), static_cast<float>(m_videoFrameRate), m_videoDispDim.height()),
-                m_videoOutput, m_frameInterval);
+    FrameScanType newscan = DetectInterlace(scan, static_cast<float>(m_videoFrameRate), m_videoDispDim.height());
+    SetScanType(newscan, m_videoOutput, m_frameInterval);
     ResetTracker();
 }
 
