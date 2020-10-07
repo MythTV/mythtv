@@ -6984,22 +6984,18 @@ void TV::ShowLCDDVDInfo()
 
 bool TV::IsTunable(uint ChanId)
 {
-    bool result = false;
     int dummy = 0;
     TV* tv = AcquireRelease(dummy, true);
     if (tv)
     {
         tv->GetPlayerReadLock();
-        result = !tv->IsTunableOn(tv->GetPlayerContext(), ChanId).empty();
+        bool result = !TV::IsTunableOn(tv->GetPlayerContext(), ChanId).empty();
         tv->ReturnPlayerLock();
         AcquireRelease(dummy, false);
         return result;
     }
-    else
-    {
-       result = !TV::IsTunableOn(nullptr, ChanId).empty();
-    }
-    return result;
+
+    return !TV::IsTunableOn(nullptr, ChanId).empty();
 }
 
 bool TV::IsTunablePriv(uint ChanId)
