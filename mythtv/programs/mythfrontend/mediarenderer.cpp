@@ -143,13 +143,10 @@ MediaRenderer::MediaRenderer()
 #endif
 
         UPNPSubscription *subscription = nullptr;
-        if (getenv("MYTHTV_UPNPSCANNER"))
+        if (qEnvironmentVariableIsSet("MYTHTV_UPNPSCANNER"))
         {
-            LOG(VB_UPNP, LOG_INFO,
-                "MediaRenderer: Registering UPnP Subscription Extension.");
-
-            subscription = new UPNPSubscription(
-                m_pHttpServer->GetSharePath(), nPort);
+            LOG(VB_UPNP, LOG_INFO, "MediaRenderer: Registering UPnP Subscription Extension.");
+            subscription = new UPNPSubscription(m_pHttpServer->GetSharePath(), nPort);
             m_pHttpServer->RegisterExtension(subscription);
         }
 

@@ -191,7 +191,7 @@ void MetadataDownload::run()
 
                 // Experimental:
                 // If nothing matches, always return the first found item
-                if (getenv("EXPERIMENTAL_METADATA_GRAB"))
+                if (qEnvironmentVariableIsSet("EXPERIMENTAL_METADATA_GRAB"))
                 {
                     MetadataLookup *newlookup = list.takeFirst();
 

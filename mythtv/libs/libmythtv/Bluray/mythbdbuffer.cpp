@@ -76,7 +76,7 @@ MythBDBuffer::MythBDBuffer(const QString &Filename)
   : MythOpticalBuffer(kMythBufferBD),
     m_overlayPlanes(2, nullptr)
 {
-    m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
+    m_tryHDMVNavigation = qEnvironmentVariableIsSet("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
     MythBDBuffer::OpenFile(Filename);
 }

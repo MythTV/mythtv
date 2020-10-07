@@ -47,6 +47,7 @@
 #endif
 
 // Qt headers
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
@@ -1161,11 +1162,10 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
 
 /** \brief Default constructor for MythCommandLineArg class
  */
-MythCommandLineParser::MythCommandLineParser(QString appname) :
-    m_appname(std::move(appname))
+MythCommandLineParser::MythCommandLineParser(QString appname)
+  : m_appname(std::move(appname))
 {
-    char *verbose = getenv("VERBOSE_PARSER");
-    if (verbose != nullptr)
+    if (qEnvironmentVariableIsSet("VERBOSE_PARSER"))
     {
         std::cerr << "MythCommandLineParser is now operating verbosely." << std::endl;
         m_verbose = true;

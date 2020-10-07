@@ -1246,7 +1246,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                 .arg(framenum)));
     }
 
-    if (getenv("FORCE_DTS_TIMESTAMPS"))
+    if (qEnvironmentVariableIsSet("FORCE_DTS_TIMESTAMPS"))
         m_forceDtsTimestamps = true;
 
     if (m_ringBuffer->IsDVD())
