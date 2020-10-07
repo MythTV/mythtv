@@ -4284,7 +4284,7 @@ void TV::EnableVisualisation(bool Enable, bool Toggle, const QString &Action)
         bool want = Enable || !visualiser.isEmpty();
         if (Toggle && visualiser.isEmpty())
             want = !m_playerContext.m_player->IsVisualising();
-        bool on = m_playerContext.m_player->EnableVisualisation(want, visualiser);
+        bool on = m_playerContext.m_player->EnableVisualiser(want, visualiser);
         SetOSDMessage(on ? m_playerContext.m_player->GetVisualiserName() : tr("Visualisation Off"));
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);

@@ -25,13 +25,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;
-    bool            EnableVisualisation   (AudioPlayer* Audio, bool Enable, const QString& Name = QString("")) override;
-    bool            CanVisualise          (AudioPlayer* Audio) override;
-    bool            SetupVisualisation    (AudioPlayer* Audio, const QString& Name) override;
-    VideoVisual*    GetVisualisation      () override;
-    QString         GetVisualiserName     () override;
-    QStringList     GetVisualiserList     () override;
-    void            DestroyVisualisation  () override;
     bool            StereoscopicModesAllowed() const override;
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
@@ -40,7 +33,8 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
                                            const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
     void            PrepareFrame          (VideoFrame* Frame, FrameScanType Scan) override;
-    void            RenderFrame           (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
+    void            RenderFrame           (VideoFrame* Frame, FrameScanType Scan) override;
+    void            RenderOverlays        (OSD* Osd) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
     bool            ProcessInputChange    ();
@@ -56,7 +50,6 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_newFrameRate        { false };
     bool            m_buffersCreated      { false };
     QString         m_profile;
-    VideoVisual*    m_visual              { nullptr };
 
   private:
     Q_DISABLE_COPY(MythVideoOutputGPU)

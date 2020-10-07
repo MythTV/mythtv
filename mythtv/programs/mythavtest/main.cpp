@@ -139,7 +139,7 @@ class VideoPerformanceTest
             {
                 MythDeintType doubledeint = GetDoubleRateOption(frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
                 vo->PrepareFrame(frame, scan);
-                vo->RenderFrame(frame, scan, nullptr);
+                vo->RenderFrame(frame, scan);
                 vo->EndFrame();
 
                 if (doubledeint && m_deinterlace)
@@ -148,7 +148,7 @@ class VideoPerformanceTest
                     MythDeintType other = GetDoubleRateOption(frame, DEINT_SHADER | DEINT_DRIVER);
                     if (doubledeint && !other)
                         vo->PrepareFrame(frame, kScan_Intr2ndField);
-                    vo->RenderFrame(frame, kScan_Intr2ndField, nullptr);
+                    vo->RenderFrame(frame, kScan_Intr2ndField);
                     vo->EndFrame();
                 }
             }

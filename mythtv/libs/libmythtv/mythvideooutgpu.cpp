@@ -42,7 +42,6 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
 
 MythVideoOutputGPU::~MythVideoOutputGPU()
 {
-    MythVideoOutputGPU::DestroyVisualisation();
     MythVideoOutputGPU::DestroyBuffers();
     delete m_video;
     if (m_painter)
@@ -401,7 +400,7 @@ void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
     }
 }
 
-void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
+void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan)
 {
     bool dummy = false;
     bool topfieldfirst = false;
@@ -441,16 +440,12 @@ void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoscopicMode());
     else if (dummy)
         m_render->SetViewPort(GetWindowRect());
+}
 
-    const QRect osdbounds = GetTotalOSDBounds();
-
-    // Visualisation
-    if (m_visual && m_painter && !IsEmbeddingAndHidden())
-        m_visual->Draw(osdbounds, m_painter, nullptr);
-
-    // OSD
+void MythVideoOutputGPU::RenderOverlays(OSD *Osd)
+{
     if (Osd && m_painter && !IsEmbedding())
-        Osd->Draw(m_painter, osdbounds.size(), true);
+        Osd->Draw(m_painter, GetTotalOSDBounds().size(), true);
 }
 
 void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)
@@ -497,56 +492,9 @@ void MythVideoOutputGPU::ClearAfterSeek()
     MythVideoOutput::ClearAfterSeek();
 }
 
-bool MythVideoOutputGPU::EnableVisualisation(AudioPlayer* Audio, bool Enable, const QString& Name)
-{
-    if (!Enable)
-    {
-        DestroyVisualisation();
-        return false;
-    }
-    return SetupVisualisation(Audio, Name);
-}
-
-QString MythVideoOutputGPU::GetVisualiserName()
-{
-    if (m_visual)
-        return m_visual->Name();
-    return MythVideoOutput::GetVisualiserName();
-}
-
-void MythVideoOutputGPU::DestroyVisualisation()
-{
-    delete m_visual;
-    m_visual = nullptr;
-}
-
 bool MythVideoOutputGPU::StereoscopicModesAllowed() const
 {
     return true;
-}
-
-QStringList MythVideoOutputGPU::GetVisualiserList()
-{
-    if (m_render)
-        return VideoVisual::GetVisualiserList(m_render->Type());
-    return MythVideoOutput::GetVisualiserList();
-}
-
-bool MythVideoOutputGPU::CanVisualise(AudioPlayer* Audio)
-{
-    return VideoVisual::CanVisualise(Audio, m_render);
-}
-
-bool MythVideoOutputGPU::SetupVisualisation(AudioPlayer* Audio, const QString& Name)
-{
-    DestroyVisualisation();
-    m_visual = VideoVisual::Create(Name, Audio, m_render);
-    return m_visual != nullptr;
-}
-
-VideoVisual* MythVideoOutputGPU::GetVisualisation()
-{
-    return m_visual;
 }
 
 /**

@@ -37,6 +37,7 @@
 #include "tv.h"
 #include "videoouttypes.h"
 #include "mythmiscutil.h"
+#include "mythplayervisualiser.h"
 #include "mythvideoscantracker.h"
 #include "mythtvexp.h"
 
@@ -125,7 +126,7 @@ class DecoderCallback
 // still higher than the default warning threshhold of 24 bytes.
 //
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
+class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, public MythPlayerVisualiser
 {
     Q_OBJECT
 
@@ -347,14 +348,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
     // Public picture controls
     void ToggleNightMode(void);
 
-    // Visualisations
-    bool CanVisualise(void);
-    bool IsVisualising(void);
-    QString GetVisualiserName(void);
-    QStringList GetVisualiserList(void);
-    bool EnableVisualisation(bool enable, const QString &name = QString(""));
-    void AutoVisualise(void);
-
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);
 
@@ -381,10 +374,10 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
     void FileChanged(void);
 
     // Windowing stuff
-    void EmbedInWidget(QRect rect);
+    void EmbedInWidget(QRect Rect);
     void StopEmbedding(void);
     bool IsEmbedding(void);
-    void WindowResized(const QSize &new_size);
+    void WindowResized(const QSize& Size);
 
     // Audio Sets
     uint AdjustVolume(int change)           { return m_audio.AdjustVolume(change); }
@@ -543,6 +536,8 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
     DetectLetterbox *m_detectLetterBox;
 
   protected:
+    void RenderVideoFrame(VideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
+
     // Private initialization stuff
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height) const;
@@ -623,8 +618,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker
     // Window stuff
     MythDisplay* m_display                {nullptr};
     QWidget *m_parentWidget               {nullptr};
-    QRect    m_embedRect                  {0,0,0,0};
-    bool     m_embedding                  {false};
 
     // State
     QWaitCondition m_decoderThreadPause;

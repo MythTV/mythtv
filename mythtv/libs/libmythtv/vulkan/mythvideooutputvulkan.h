@@ -25,7 +25,8 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
     bool Init(const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
               const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
     void PrepareFrame (VideoFrame* Frame, FrameScanType Scan) override;
-    void RenderFrame  (VideoFrame* Frame, FrameScanType Scan, OSD* Osd) override;
+    void RenderFrame  (VideoFrame* Frame, FrameScanType Scan) override;
+    void RenderEnd    () override;
     void EndFrame     () override;
 };
 

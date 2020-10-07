@@ -97,7 +97,7 @@ void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
     MythVideoOutputGPU::PrepareFrame(Frame, Scan);
 }
 
-void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
+void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan)
 {
     if (!(IsValidVulkan() && m_video))
         return;
@@ -106,25 +106,26 @@ void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     if (m_newCodecId != kCodec_NONE)
         return;
 
-    // Prepare visualisation
-    if (m_visual && m_painter && m_visual->NeedsPrepare() && !IsEmbeddingAndHidden())
-    {
-        const QRect osdbounds = GetTotalOSDBounds();
-        m_visual->Prepare(osdbounds);
-    }
-
     // Start the frame...
     m_video->StartFrame();
 
-    VkCommandBuffer currentcmdbuffer = m_vulkanWindow->currentCommandBuffer();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_vulkanRender->BeginDebugRegion(currentcmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
+    {
+        m_vulkanRender->BeginDebugRegion(m_vulkanWindow->currentCommandBuffer(),
+                                         "RENDER_FRAME", MythDebugVulkan::s_DebugBlue);
+    }
 
     // Actual render
-    MythVideoOutputGPU::RenderFrame(Frame, Scan, Osd);
+    MythVideoOutputGPU::RenderFrame(Frame, Scan);
+}
+
+void MythVideoOutputVulkan::RenderEnd()
+{
+    if (!(IsValidVulkan()))
+        return;
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_vulkanRender->EndDebugRegion(currentcmdbuffer);
+        m_vulkanRender->EndDebugRegion(m_vulkanWindow->currentCommandBuffer());
 }
 
 void MythVideoOutputVulkan::EndFrame()

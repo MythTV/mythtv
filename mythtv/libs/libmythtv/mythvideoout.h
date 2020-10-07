@@ -18,7 +18,6 @@
 #include "mythdisplay.h"
 #include "videodisplayprofile.h"
 #include "mythvideocolourspace.h"
-#include "visualisations/videovisual.h"
 #include "mythavutil.h"
 #include "mythdeinterlacer.h"
 
@@ -26,6 +25,7 @@ class MythPlayer;
 class OSD;
 class AudioPlayer;
 class MythRender;
+class MythPainter;
 
 class MythVideoOutput : public MythVideoBounds
 {
@@ -49,7 +49,9 @@ class MythVideoOutput : public MythVideoBounds
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (VideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
-    virtual void RenderFrame  (VideoFrame* Frame, FrameScanType, OSD* Osd) = 0;
+    virtual void RenderFrame  (VideoFrame* Frame, FrameScanType) = 0;
+    virtual void RenderOverlays (OSD* Osd) = 0;
+    virtual void RenderEnd    () = 0;
     virtual void EndFrame     () = 0;
     void         SetReferenceFrames(int ReferenceFrames);
     VideoDisplayProfile* GetProfile() { return m_dbDisplayProfile; }
@@ -97,13 +99,6 @@ class MythVideoOutput : public MythVideoBounds
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     virtual MythPainter* GetOSDPainter       () { return nullptr; }
-    virtual bool         EnableVisualisation (AudioPlayer*/*Audio*/, bool /*Enable*/, const QString& /*Name*/ = QString("")) { return false; }
-    virtual bool         CanVisualise        (AudioPlayer*/*Audio*/) { return false; }
-    virtual bool         SetupVisualisation  (AudioPlayer*/*Audio*/, const QString& /*Name*/) { return false; }
-    virtual VideoVisual* GetVisualisation    () { return nullptr; }
-    virtual QString      GetVisualiserName   () { return QString {}; }
-    virtual QStringList  GetVisualiserList   () { return QStringList {}; }
-    virtual void         DestroyVisualisation() { }
     virtual bool         StereoscopicModesAllowed() const { return false; }
 
   protected:

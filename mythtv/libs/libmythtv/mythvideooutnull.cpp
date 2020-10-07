@@ -204,7 +204,7 @@ void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDei
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 
-void MythVideoOutputNull::RenderFrame(VideoFrame* Frame, FrameScanType /*Scan*/, OSD* /*Osd*/)
+void MythVideoOutputNull::RenderFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
 {
     if (!Frame)
         Frame = m_videoBuffers.GetScratchFrame();
@@ -212,10 +212,6 @@ void MythVideoOutputNull::RenderFrame(VideoFrame* Frame, FrameScanType /*Scan*/,
         m_framesPlayed = Frame->frameNumber + 1;
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "No frame in PrepareFrame!");
-}
-
-void MythVideoOutputNull::EndFrame()
-{
 }
 
 void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType /*Scan*/)

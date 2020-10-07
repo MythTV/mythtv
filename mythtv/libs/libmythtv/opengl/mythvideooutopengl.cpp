@@ -254,7 +254,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
         m_openglRender->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
 
-void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, OSD* Osd)
+void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan)
 {
     if (!m_openglRender)
         return;
@@ -267,7 +267,7 @@ void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
     OpenGLLocker ctx_lock(m_openglRender);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_openglRender->logDebugMarker(LOC + "PREPARE_FRAME_START");
+        m_openglRender->logDebugMarker(LOC + "RENDER_FRAME_START");
 
     // If process frame has not been called (double rate hardware deint), then
     // we need to start the first 2 performance timers here
@@ -319,21 +319,22 @@ void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan, O
         m_openGLPerf->RecordSample();
 
     // Render
-    MythVideoOutputGPU::RenderFrame(Frame, Scan, Osd);
+    MythVideoOutputGPU::RenderFrame(Frame, Scan);
 
     // Time rendering
     if (m_openGLPerf)
         m_openGLPerf->RecordSample();
 
-    // Flish
-    m_openglRender->Flush();
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_openglRender->logDebugMarker(LOC + "RENDER_FRAME_END");
+}
 
-    // Time flush
+void MythVideoOutputOpenGL::RenderEnd()
+{
+    // Flush and time
+    m_openglRender->Flush();
     if (m_openGLPerf)
         m_openGLPerf->RecordSample();
-
-    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_openglRender->logDebugMarker(LOC + "PREPARE_FRAME_END");
 }
 
 void MythVideoOutputOpenGL::EndFrame()

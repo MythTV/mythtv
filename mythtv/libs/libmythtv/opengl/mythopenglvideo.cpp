@@ -1,3 +1,6 @@
+// Qt
+#include <QPen>
+
 // MythTV
 #include "mythcontext.h"
 #include "tv.h"

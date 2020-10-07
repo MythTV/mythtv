@@ -16,8 +16,10 @@ class MythVideoOutputNull : public MythVideoOutput
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
 
     void PrepareFrame (VideoFrame* Frame, FrameScanType Scan) override;
-    void RenderFrame  (VideoFrame* Frame, FrameScanType Scan, OSD* /*Osd*/) override;
-    void EndFrame     () override;
+    void RenderFrame  (VideoFrame* Frame, FrameScanType Scan) override;
+    void RenderOverlays (OSD* /*Osd*/) override { }
+    void RenderEnd    () override { }
+    void EndFrame     () override { }
     bool InputChanged(const QSize& VideoDim,   const QSize& VideoDispDim,
                       float        Aspect,     MythCodecID  CodecID,
                       bool&        AspectOnly,

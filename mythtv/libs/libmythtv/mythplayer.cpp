@@ -109,6 +109,7 @@ static int toTrackType(int type)
 
 MythPlayer::MythPlayer(PlayerFlags flags)
   : MythVideoScanTracker(this),
+    MythPlayerVisualiser(&m_audio),
     m_playerFlags(flags),
     // CC608/708
     m_cc608(this), m_cc708(this),
@@ -350,8 +351,8 @@ bool MythPlayer::InitVideo(void)
         return false;
     }
 
-    if (m_embedding)
-        m_videoOutput->EmbedInWidget(m_embedRect);
+    if (VisualiserIsEmbedding())
+        m_videoOutput->EmbedInWidget(GetEmbeddingRect());
 
     return true;
 }
@@ -437,7 +438,7 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
     if (m_textDisplayMode)
         EnableSubtitles(true);
 
-    AutoVisualise();
+    AutoVisualise(!m_videoDim.isEmpty());
 }
 
 FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
@@ -843,15 +844,11 @@ void MythPlayer::ReleaseCurrentFrame(VideoFrame *frame)
         m_vidExitLock.unlock();
 }
 
-void MythPlayer::EmbedInWidget(QRect rect)
+void MythPlayer::EmbedInWidget(QRect Rect)
 {
     if (m_videoOutput)
-        m_videoOutput->EmbedInWidget(rect);
-    else
-    {
-        m_embedRect = rect;
-        m_embedding = true;
-    }
+        m_videoOutput->EmbedInWidget(Rect);
+    EmbedVisualiser(true, Rect);
 }
 
 void MythPlayer::StopEmbedding(void)
@@ -861,17 +858,13 @@ void MythPlayer::StopEmbedding(void)
         m_videoOutput->StopEmbedding();
         ReinitOSD();
     }
-    else
-    {
-        m_embedRect = QRect();
-        m_embedding = false;
-    }
+    EmbedVisualiser(false);
 }
 
-void MythPlayer::WindowResized(const QSize &new_size)
+void MythPlayer::WindowResized(const QSize& Size)
 {
     if (m_videoOutput)
-        m_videoOutput->WindowResized(new_size);
+        m_videoOutput->WindowResized(Size);
     ReinitOSD();
 }
 
@@ -1561,20 +1554,11 @@ void MythPlayer::AVSync(VideoFrame *buffer)
         bool showsecondfield = false;
         FrameScanType ps = GetScanForDisplay(buffer, showsecondfield);
 
-        // Prepare frame (software)
-        m_osdLock.lock();
-        m_videoOutput->PrepareFrame(buffer, ps);
-        m_osdLock.unlock();
-
         // if we get here, we're actually going to do video output
-        m_osdLock.lock();
-        m_videoOutput->RenderFrame(buffer, ps, m_osd);
-        m_osdLock.unlock();
-        WaitForTime(framedue);
+        RenderVideoFrame(buffer, ps, true, framedue);
 
         // get time codes for calculating difference next time
         m_priorAudioTimecode = m_audio.GetAudioTime();
-        m_videoOutput->EndFrame();
         if (m_videoOutput->IsErrored())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Error condition detected "
@@ -1604,17 +1588,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             // Second field
             if (kScan_Interlaced == ps)
                 ps = kScan_Intr2ndField;
-
-            m_osdLock.lock();
-            if (secondprepare)
-                m_videoOutput->PrepareFrame(buffer, ps);
-            m_videoOutput->RenderFrame(buffer, ps, m_osd);
-            m_osdLock.unlock();
-
-            // Display the second field
-            int64_t due = framedue + m_frameInterval / 2;
-            WaitForTime(due);
-            m_videoOutput->EndFrame();
+            RenderVideoFrame(buffer, ps, secondprepare, framedue + m_frameInterval / 2);
         }
     }
     else
@@ -1634,6 +1608,27 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             .arg(framedue)
                 );
 
+}
+
+void MythPlayer::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
+{
+    if (!m_videoOutput)
+        return;
+
+    if (Prepare)
+        m_videoOutput->PrepareFrame(Frame, Scan);
+    PrepareVisualiser();
+    m_videoOutput->RenderFrame(Frame, Scan);
+    RenderVisualiser();
+    m_osdLock.lock();
+    m_videoOutput->RenderOverlays(m_osd);
+    m_osdLock.unlock();
+    m_videoOutput->RenderEnd();
+
+    if (Wait > 0)
+        WaitForTime(Wait);
+
+    m_videoOutput->EndFrame();
 }
 
 void MythPlayer::RefreshPauseFrame(void)
@@ -1679,11 +1674,7 @@ void MythPlayer::DisplayPauseFrame(void)
 
     FrameScanType scan = GetScanType();
     scan = (kScan_Detect == scan || kScan_Ignore == scan) ? kScan_Progressive : scan;
-    m_osdLock.lock();
-    m_videoOutput->PrepareFrame(nullptr, scan);
-    m_videoOutput->RenderFrame(nullptr, scan, m_osd);
-    m_osdLock.unlock();
-    m_videoOutput->EndFrame();
+    RenderVideoFrame(nullptr, scan, true, 0);
 }
 
 void MythPlayer::SetBuffering(bool new_buffering)
@@ -1987,7 +1978,7 @@ void MythPlayer::VideoStart(void)
     InitialiseScan(m_videoOutput);
 
     InitAVSync();
-    AutoVisualise();
+    AutoVisualise(!m_videoDim.isEmpty());
 }
 
 bool MythPlayer::VideoLoop(void)
@@ -5038,56 +5029,6 @@ void MythPlayer::ToggleNightMode(void)
         m_videoOutput->SetPictureAttribute(kPictureAttribute_Contrast, c);
 
     SetOSDMessage(msg, kOSDTimeout_Med);
-}
-
-bool MythPlayer::CanVisualise(void)
-{
-    if (m_videoOutput)
-        return m_videoOutput->CanVisualise(&m_audio);
-    return false;
-}
-
-bool MythPlayer::IsVisualising(void)
-{
-    if (m_videoOutput)
-        return m_videoOutput->GetVisualisation();
-    return false;
-}
-
-QString MythPlayer::GetVisualiserName(void)
-{
-    if (m_videoOutput)
-        return m_videoOutput->GetVisualiserName();
-    return QString("");
-}
-
-QStringList MythPlayer::GetVisualiserList(void)
-{
-    if (m_videoOutput)
-        return m_videoOutput->GetVisualiserList();
-    return QStringList();
-}
-
-bool MythPlayer::EnableVisualisation(bool enable, const QString &name)
-{
-    if (m_videoOutput)
-        return m_videoOutput->EnableVisualisation(&m_audio, enable, name);
-    return false;
-}
-
-/*! \brief Enable visualisation if possible, there is no video and user has requested.
-*/
-void MythPlayer::AutoVisualise(void)
-{
-    if (!m_videoOutput || !m_audio.HasAudioIn() || !m_videoDim.isEmpty())
-        return;
-
-    if (!CanVisualise() || IsVisualising())
-        return;
-
-    auto visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
-    if (!visualiser.isEmpty())
-        EnableVisualisation(true, visualiser);
 }
 
 void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
