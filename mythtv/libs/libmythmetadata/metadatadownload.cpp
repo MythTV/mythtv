@@ -207,13 +207,11 @@ void MetadataDownload::run()
                     prependLookup(newlookup);
                     continue;
                 }
-                else
-                {
-                    // nothing more we can do in automatic mode
-                    QCoreApplication::postEvent(m_parent,
-                        new MetadataLookupFailure(MetadataLookupList() << lookup));
-                    continue;
-                }
+
+                // nothing more we can do in automatic mode
+                QCoreApplication::postEvent(m_parent,
+                    new MetadataLookupFailure(MetadataLookupList() << lookup));
+                continue;
             }
 
             LOG(VB_GENERAL, LOG_INFO,
