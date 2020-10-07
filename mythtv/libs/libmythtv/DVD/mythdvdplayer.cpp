@@ -224,17 +224,6 @@ bool MythDVDPlayer::VideoLoop(void)
     return MythPlayer::VideoLoop();
 }
 
-void MythDVDPlayer::DisplayLastFrame(void)
-{
-    // clear the buffering state
-    SetBuffering(false);
-
-    SetScanType(kScan_Progressive, m_videoOutput, m_frameInterval);
-    DisplayDVDButton();
-
-    AVSync(nullptr);
-}
-
 bool MythDVDPlayer::FastForward(float Seconds)
 {
     if (m_decoder)
@@ -711,13 +700,6 @@ bool MythDVDPlayer::SwitchAngle(int Angle)
         Angle = 1;
 
     return m_playerCtx->m_buffer->DVD()->SwitchAngle(Angle);
-}
-
-void MythDVDPlayer::ResetStillFrameTimer(void)
-{
-    m_stillFrameTimerLock.lock();
-    m_stillFrameTimer.restart();
-    m_stillFrameTimerLock.unlock();
 }
 
 void MythDVDPlayer::SetStillFrameTimeout(int Length)

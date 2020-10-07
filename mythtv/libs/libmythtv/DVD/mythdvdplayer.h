@@ -32,7 +32,6 @@ class MythDVDPlayer : public MythPlayer
     int      GetCurrentChapter(void) override;
     void     GetChapterTimes(QList<long long> &Times) override;
 
-    void     ResetStillFrameTimer(void);
     void     SetStillFrameTimeout(int Length);
     void     StillFrameCheck(void);
 
@@ -66,9 +65,7 @@ class MythDVDPlayer : public MythPlayer
     bool     DoJumpChapter(int Chapter) override;
 
   private:
-    void     DoChangeDVDTrack(void);
     void     DisplayDVDButton(void);
-    void     DisplayLastFrame(void);
 
     int      m_buttonVersion          { 0 };
     bool     m_dvdStillFrameShowing   { false };
