@@ -223,23 +223,30 @@ bool TVBrowseHelper::IsBrowsing() const
  */
 uint TVBrowseHelper::GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const
 {
-    if (PrefSourceid) {
-        for (const auto & chan : m_dbAllChannels)
-            if (chan.m_sourceId == PrefSourceid && chan.m_chanNum == Channum)
-                return chan.m_chanId;
-}
+    if (PrefSourceid)
+    {
+        auto samesourceid = [&Channum, &PrefSourceid](const ChannelInfo& Chan)
+            { return Chan.m_sourceId == PrefSourceid && Chan.m_chanNum == Channum; };
+        auto chan = std::find_if(m_dbAllChannels.cbegin(), m_dbAllChannels.cend(), samesourceid);
+        if (chan != m_dbAllChannels.cend())
+            return chan->m_chanId;
+    }
 
-    if (PrefCardid) {
-        for (const auto & chan : m_dbAllChannels)
-            if (chan.GetInputIds().contains(PrefCardid) && chan.m_chanNum == Channum)
-                return chan.m_chanId;
-}
+    if (PrefCardid)
+    {
+        auto prefcardid = [&Channum, &PrefCardid](const ChannelInfo& Chan)
+            { return Chan.GetInputIds().contains(PrefCardid) && Chan.m_chanNum == Channum; };
+        auto chan = std::find_if(m_dbAllChannels.cbegin(), m_dbAllChannels.cend(), prefcardid);
+        if (chan != m_dbAllChannels.cend())
+            return chan->m_chanId;
+    }
 
     if (m_dbBrowseAllTuners)
     {
-        for (const auto & chan : m_dbAllChannels)
-            if (chan.m_chanNum == Channum)
-                return chan.m_chanId;
+        auto channelmatch = [&Channum](const ChannelInfo& Chan) { return Chan.m_chanNum == Channum; };
+        auto chan = std::find_if(m_dbAllChannels.cbegin(), m_dbAllChannels.cend(), channelmatch);
+        if (chan != m_dbAllChannels.cend())
+            return chan->m_chanId;
     }
 
     return 0;
