@@ -93,7 +93,7 @@ bool MythUIStateType::DisplayState(const QString &name)
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.value();
     else
-        m_currentState = nullptr;
+        m_CurrentState = nullptr;
 
     if (m_CurrentState != old)
     {
