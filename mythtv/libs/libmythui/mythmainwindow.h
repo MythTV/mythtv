@@ -153,7 +153,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
     explicit MythMainWindow(bool useDB = true);
     ~MythMainWindow() override;
 
-    void LoadQtConfig();
+    static void LoadQtConfig();
     void InitKeys(void);
 
     bool eventFilter(QObject *o, QEvent *e) override; // QWidget
