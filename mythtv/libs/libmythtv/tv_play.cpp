@@ -4279,11 +4279,11 @@ void TV::EnableVisualisation(bool Enable, bool Toggle, const QString &Action)
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_playerContext.m_player && m_playerContext.m_player->CanVisualise())
     {
-        if (visualiser.isEmpty())
-            visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
         bool want = Enable || !visualiser.isEmpty();
-        if (Toggle && visualiser.isEmpty())
+        if (Toggle)
             want = !m_playerContext.m_player->IsVisualising();
+        if (want && visualiser.isEmpty())
+            visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
         bool on = m_playerContext.m_player->EnableVisualiser(want, visualiser);
         SetOSDMessage(on ? m_playerContext.m_player->GetVisualiserName() : tr("Visualisation Off"));
     }
