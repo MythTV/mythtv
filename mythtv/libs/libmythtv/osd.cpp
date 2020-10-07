@@ -1284,7 +1284,7 @@ bool OsdNavigation::Create(void)
         {
             if (child != moreButton)
             {
-                MythUIButton* button = dynamic_cast<MythUIButton*>(child);
+                auto * button = dynamic_cast<MythUIButton*>(child);
                 if (button)
                     connect(button, &MythUIButton::Clicked, this, &OsdNavigation::GeneralAction);
             }
