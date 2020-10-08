@@ -234,7 +234,7 @@ std::vector<uint> RemoteRequestFreeRecorderList(uint excluded_input)
 
     std::vector<uint> inputids;
     std::transform(inputs.cbegin(), inputs.cend(), std::back_inserter(inputids),
-                   [](auto & input){ return input.m_inputId; } );
+                   [](const auto & input){ return input.m_inputId; } );
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestFreeRecorderList got inputs"));
@@ -252,7 +252,7 @@ std::vector<uint> RemoteRequestFreeInputList(uint excluded_input)
 
     std::vector<uint> inputids;
     std::transform(inputs.cbegin(), inputs.cend(), std::back_inserter(inputids),
-                   [](auto & input){ return input.m_inputId; } );
+                   [](const auto & input){ return input.m_inputId; } );
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestFreeInputList got inputs"));
@@ -272,7 +272,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
     for (const auto & recorder : qAsConst(qualifiedRecorders))
     {
         uint inputid = recorder.toUInt();
-        auto sameinput = [inputid](auto & input){ return input.m_inputId == inputid; };
+        auto sameinput = [inputid](const auto & input){ return input.m_inputId == inputid; };
         if (std::any_of(inputs.cbegin(), inputs.cend(), sameinput))
         {
             LOG(VB_CHANNEL, LOG_INFO,
