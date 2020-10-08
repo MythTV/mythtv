@@ -209,7 +209,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     moreTablePackets = true;
 
     PSIPTable* partial = GetPartialPSIP(tspacket->PID());
-    if (partial && partial->AddTSPacket(tspacket, broken) && !broken)
+    if (partial && partial->AddTSPacket(tspacket, m_cardId, broken) && !broken)
     {
         // check if it's safe to read pespacket's Length()
         if ((partial->PSIOffset() + 1 + 3) > partial->TSSizeInBuffer())

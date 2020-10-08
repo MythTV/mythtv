@@ -84,7 +84,7 @@ class MTV_PUBLIC PESPacket
     bool IsClone() const { return bool(m_allocSize); }
 
     // return true if complete or broken
-    bool AddTSPacket(const TSPacket* tspacket, bool &broken);
+    bool AddTSPacket(const TSPacket* tspacket, int cardid, bool &broken);
 
     bool IsGood() const { return !m_badPacket; }
 

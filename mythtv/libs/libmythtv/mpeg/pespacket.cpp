@@ -16,7 +16,7 @@ extern "C" {
 #include <map>
 
 // return true if complete or broken
-bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
+bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
 {
     broken = true;
     if (!tsheader()->PayloadStart())
@@ -72,9 +72,9 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     else
     {
         LOG(VB_RECORD, LOG_ERR,
-            "AddTSPacket: Out of sync!!! Need to wait for next payloadStart" +
-            QString(" PID: 0x%1, continuity counter: %2 (expected %3).")
-                .arg(packet->PID(),0,16).arg(cc).arg(ccExp));
+            QString("AddTSPacket[%1]: Out of sync!!! Need to wait for next payloadStart ").arg(cardid) +
+            QString("PID: 0x%1, continuity counter: %2 ").arg(packet->PID(),0,16).arg(cc) +
+            QString("(expected %1)").arg(ccExp));
         return true;
     }
 
