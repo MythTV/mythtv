@@ -1967,12 +1967,6 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
     a_cardtype.addTargetedChild("VBOX", m_cardTuner);
     a_cardtype.addTargetedChild("VBOX", new SignalTimeout(m_parent, 7000, 1000));
     a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(m_parent, 10000, 1750));
-//    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
-//    buttonRecOpt->setLabel(tr("Recording Options"));
-//    addChild(buttonRecOpt);
-
-//    connect(buttonRecOpt, SIGNAL(pressed()),
-//            this,         SLOT(  VBoxExtraPanel()));
 
     connect(m_cardIp,    &VBoxIP::NewIP,
             m_deviceId,  &VBoxDeviceID::SetIP);

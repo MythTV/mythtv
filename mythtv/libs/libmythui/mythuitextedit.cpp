@@ -527,7 +527,6 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
 
             if (kb->Create())
             {
-                //connect(kb, SIGNAL(keyPress(QString)), SLOT(keyPress(QString)));
                 popupStack->AddScreen(kb);
             }
             else

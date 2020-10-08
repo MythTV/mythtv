@@ -685,9 +685,6 @@ class DVBConfigurationGroup : public GroupSetting
     DVBCardType                  *m_cardType       {nullptr};
     SignalTimeout                *m_signalTimeout  {nullptr};
     ChannelTimeout               *m_channelTimeout {nullptr};
-#if 0
-    TransButtonSetting           *m_buttonAnalog   {nullptr};
-#endif
     DVBTuningDelay               *m_tuningDelay    {nullptr};
     DiSEqCDevTree                *m_diseqcTree     {nullptr};
     DeviceTree                   *m_diseqcBtn      {nullptr};

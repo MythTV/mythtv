@@ -81,7 +81,6 @@ class BackendSelection : public MythScreenType
     MythUIButton     *m_manualButton    {nullptr};
     MythUIButton     *m_saveButton      {nullptr};
     MythUIButton     *m_cancelButton    {nullptr};
-    //MythUIButton   *m_searchButton    {nullptr};
 
     QString           m_pinCode;
     QString           m_usn;

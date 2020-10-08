@@ -2000,7 +2000,6 @@ bool SmartPLDateDialog::Create(void)
 
     connect(m_fixedRadio, &MythUICheckBox::toggled, this, &SmartPLDateDialog::fixedCheckToggled);
     connect(m_nowRadio, &MythUICheckBox::toggled, this, &SmartPLDateDialog::nowCheckToggled);
-    //connect(addDaysCheck, SIGNAL(toggled(bool)), this, SLOT(addDaysCheckToggled(bool)));
     connect(m_addDaysSpin, &MythUIButtonList::itemSelected,
             this, &SmartPLDateDialog::valueChanged);
     connect(m_daySpin, &MythUIButtonList::itemSelected,

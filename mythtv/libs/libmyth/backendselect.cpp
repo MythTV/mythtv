@@ -77,12 +77,10 @@ bool BackendSelection::Create(void)
     m_saveButton = dynamic_cast<MythUIButton*>(GetChild("save"));
     m_cancelButton = dynamic_cast<MythUIButton*>(GetChild("cancel"));
     m_manualButton = dynamic_cast<MythUIButton*>(GetChild("manual"));
-    //m_searchButton = dynamic_cast<MythUIButton*>(GetChild("search"));
 
     connect(m_backendList, &MythUIButtonList::itemClicked,
             this, qOverload<MythUIButtonListItem *>(&BackendSelection::Accept));
 
-    // connect(m_searchButton, SIGNAL(clicked()), SLOT(Search()));
     connect(m_manualButton, &MythUIButton::Clicked, this, &BackendSelection::Manual);
     connect(m_cancelButton, &MythUIButton::Clicked, this, &BackendSelection::Cancel);
     connect(m_saveButton, &MythUIButton::Clicked,
