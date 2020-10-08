@@ -68,7 +68,6 @@ class MTV_PUBLIC PlayerContext
     void ForceNextStateNone(void);
     TVState DequeueNextState(void);
 
-    void ResizePIPWindow(void);
     bool HandlePlayerSpeedChangeFFRew(void);
     bool HandlePlayerSpeedChangeEOF(void);
 

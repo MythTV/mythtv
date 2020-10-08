@@ -632,17 +632,7 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
     m_tvchain = chain;
 
     if (m_tvchain)
-    {
-#if 0
-        QString seed = QString("");
-
-        if (IsPIP())
-            seed = "PIP";
-
-        seed += gCoreContext->GetHostName();
-#endif
         m_tvchain->InitializeNewChain(gCoreContext->GetHostName());
-    }
 }
 
 void PlayerContext::SetRingBuffer(MythMediaBuffer *Buffer)
