@@ -523,7 +523,7 @@ QString LCDProcClient::expandString(const QString &aString) const
         return aString;
 
     // if version 5 then white space seperate the list of characters
-    auto add_ws = [](QString str, auto x){ return str + x + QString(" "); };
+    auto add_ws = [](const QString& str, auto x){ return str + x + QString(" "); };
     return std::accumulate(aString.cbegin(), aString.cend(), QString(), add_ws);
 }
 

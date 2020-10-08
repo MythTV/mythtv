@@ -1574,7 +1574,7 @@ QString ChannelImporter::FormatTransports(
     ScanDTVTransportList transports(transports_in);
     std::sort(transports.begin(), transports.end(), less_than_key());
 
-    auto fmt_trans = [](QString msg, const auto & transport)
+    auto fmt_trans = [](const QString& msg, const auto & transport)
         { return msg + FormatTransport(transport) + "\n"; };
     return std::accumulate(transports.cbegin(), transports.cend(),
                            QString(), fmt_trans);
