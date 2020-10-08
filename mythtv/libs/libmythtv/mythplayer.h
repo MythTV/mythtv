@@ -29,7 +29,6 @@
 #include "deletemap.h"
 #include "commbreakmap.h"
 #include "audioplayer.h"
-#include "audiooutputgraph.h"
 #include "mthread.h"
 #include "mythavutil.h"
 #include "mythtypes.h"
@@ -40,6 +39,7 @@
 #include "mythplayervisualiser.h"
 #include "mythvideoscantracker.h"
 #include "mythplayeravsync.h"
+#include "mythplayeraudiointerface.h"
 #include "mythtvexp.h"
 
 class ProgramInfo;
@@ -127,7 +127,8 @@ class DecoderCallback
 // still higher than the default warning threshhold of 24 bytes.
 //
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, public MythPlayerVisualiser
+class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, public MythPlayerVisualiser,
+                              public MythPlayerAudioInterface
 {
     Q_OBJECT
 
@@ -181,17 +182,13 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
     void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void) { return ((FlagIsSet(kVideoIsNull)) == 0); }
-    uint    GetVolume(void) { return m_audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
-    MuteState          GetMuteState(void) { return m_audio.GetMuteState(); }
 
     int     GetFFRewSkip(void) const          { return m_ffrewSkip; }
     float   GetPlaySpeed(void) const          { return m_playSpeed; }
     AudioPlayer* GetAudio(void)               { return &m_audio; }
-    const AudioOutputGraph& GetAudioGraph() const { return m_audiograph; }
-    float   GetAudioStretchFactor(void)       { return m_audio.GetStretchFactor(); }
     float   GetNextPlaySpeed(void) const      { return m_nextPlaySpeed; }
     int     GetLength(void) const             { return m_totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return m_totalFrames; }
@@ -222,9 +219,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     bool    AtNormalSpeed(void) const         { return m_nextNormalSpeed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
-    bool    HasAudioOut(void) const           { return m_audio.HasAudioOut(); }
-    bool    IsMuted(void)                     { return m_audio.IsMuted(); }
-    bool    PlayerControlsVolume(void) const  { return m_audio.ControlsVolume(); }
     bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
@@ -379,13 +373,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void StopEmbedding(void);
     bool IsEmbedding(void);
     void WindowResized(const QSize& Size);
-
-    // Audio Sets
-    uint AdjustVolume(int change)           { return m_audio.AdjustVolume(change); }
-    uint SetVolume(int newvolume)           { return m_audio.SetVolume(newvolume); }
-    bool SetMuted(bool mute)                { return m_audio.SetMuted(mute);       }
-    MuteState SetMuteState(MuteState state) { return m_audio.SetMuteState(state);  }
-    MuteState IncrMuteState(void)           { return m_audio.IncrMuteState();      }
 
     // Non-const gets
     OSD         *GetOSD(void)               { return m_osd;       }
@@ -734,7 +721,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
 
     // Audio stuff
     AudioPlayer      m_audio;
-    AudioOutputGraph m_audiograph;
 
     // Commercial filtering
     CommBreakMap   m_commBreakMap;

@@ -1475,7 +1475,7 @@ void TV::GetStatus()
         status.insert("playspeed", m_playerContext.m_player->GetPlaySpeed());
         status.insert("audiosyncoffset", static_cast<long long>(m_playerContext.m_player->GetAudioTimecodeOffset()));
 
-        if (m_playerContext.m_player->GetAudio()->ControlsVolume())
+        if (m_playerContext.m_player->PlayerControlsVolume())
         {
             status.insert("volume", m_playerContext.m_player->GetVolume());
             status.insert("mute",   m_playerContext.m_player->GetMuteState());
@@ -6240,7 +6240,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
     ClearInputQueues(false);
 
     if (m_playerContext.m_player)
-        m_playerContext.m_player->GetAudio()->Reset();
+        m_playerContext.m_player->ResetAudio();
 
     UnpauseLiveTV();
 
@@ -6403,7 +6403,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
     m_playerContext.m_recorder->SetChannel(channum);
 
     if (m_playerContext.m_player)
-        m_playerContext.m_player->GetAudio()->Reset();
+        m_playerContext.m_player->ResetAudio();
 
     UnpauseLiveTV((Chanid != 0U) && (GetQueuedChanID() != 0U));
 
@@ -7385,9 +7385,9 @@ void TV::EnableUpmix(bool Enable, bool Toggle)
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (Toggle)
-        enabled = m_playerContext.m_player->GetAudio()->EnableUpmix(false, true);
+        enabled = m_playerContext.m_player->EnableUpmix(false, true);
     else
-        enabled = m_playerContext.m_player->GetAudio()->EnableUpmix(Enable);
+        enabled = m_playerContext.m_player->EnableUpmix(Enable);
     // May have to disable digital passthrough
     m_playerContext.m_player->ForceSetupAudioStream();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
@@ -7744,7 +7744,7 @@ void TV::PauseAudioUntilBuffered()
 {
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_playerContext.m_player)
-        m_playerContext.m_player->GetAudio()->PauseAudioUntilBuffered();
+        m_playerContext.m_player->PauseAudioUntilBuffered();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
@@ -10206,8 +10206,8 @@ void TV::PlaybackMenuInit(const MenuBase &Menu)
             !m_tvmTracks[kTrackTypeAudio].empty();
         m_tvmVisual           = m_playerContext.m_player->CanVisualise();
         m_tvmActive           = m_playerContext.m_player->GetVisualiserName();
-        m_tvmUpmixing         = m_playerContext.m_player->GetAudio()->IsUpmixing();
-        m_tvmCanUpmix         = m_playerContext.m_player->GetAudio()->CanUpmix();
+        m_tvmUpmixing         = m_playerContext.m_player->IsUpmixing();
+        m_tvmCanUpmix         = m_playerContext.m_player->CanUpmix();
         m_tvmAspectOverride   = m_playerContext.m_player->GetAspectOverride();
         m_tvmAdjustFill       = m_playerContext.m_player->GetAdjustFill();
         m_tvmCurSkip          = m_playerContext.m_player->GetAutoCommercialSkip();

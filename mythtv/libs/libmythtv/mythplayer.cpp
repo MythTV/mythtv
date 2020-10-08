@@ -110,6 +110,7 @@ static int toTrackType(int type)
 MythPlayer::MythPlayer(PlayerFlags flags)
   : MythVideoScanTracker(this),
     MythPlayerVisualiser(&m_audio),
+    MythPlayerAudioInterface(&m_audio),
     m_playerFlags(flags),
     // CC608/708
     m_cc608(this), m_cc708(this),
@@ -2792,8 +2793,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
 
     // Wait for frames to be available for decoding onto
     int tries = 0;
-    while (!unsafe &&
-           (!m_videoOutput->EnoughFreeFrames() || GetAudio()->IsBufferAlmostFull()) )
+    while (!unsafe && (!m_videoOutput->EnoughFreeFrames() || m_audio.IsBufferAlmostFull()))
     {
         if (m_killDecoder || m_pauseDecoder)
             return false;
@@ -3445,11 +3445,7 @@ bool MythPlayer::EnableEdit(void)
     if (!m_osd)
         return false;
 
-    m_audiograph.SetPainter(m_videoOutput->GetOSDPainter());
-    int sample_rate = GetAudio()->GetSampleRate();
-    m_audiograph.SetSampleRate(sample_rate);
-    m_audiograph.SetSampleCount((unsigned)(sample_rate / m_videoFrameRate));
-    GetAudio()->addVisual(&m_audiograph);
+    SetupAudioGraph(m_videoFrameRate);
 
     m_savedAudioTimecodeOffset = m_tcWrap[TC_AUDIO];
     m_tcWrap[TC_AUDIO] = 0;
@@ -3505,8 +3501,7 @@ void MythPlayer::DisableEdit(int howToSave)
     if (m_playerCtx->m_playingInfo)
         m_playerCtx->m_playingInfo->SaveEditing(false);
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-    GetAudio()->removeVisual(&m_audiograph);
-    m_audiograph.Reset();
+    ClearAudioGraph();
     m_tcWrap[TC_AUDIO] = m_savedAudioTimecodeOffset;
     m_savedAudioTimecodeOffset = 0;
 

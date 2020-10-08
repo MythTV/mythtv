@@ -379,6 +379,7 @@ using_frontend {
     HEADERS += mythvideoscantracker.h
     HEADERS += mythplayervisualiser.h
     HEADERS += mythplayeravsync.h
+    HEADERS += mythplayeraudiointerface.h
     HEADERS += audioplayer.h
     HEADERS += mythccextractorplayer.h
     HEADERS += captions/teletextextractorreader.h
@@ -392,6 +393,7 @@ using_frontend {
     SOURCES += mythvideoscantracker.cpp
     SOURCES += mythplayervisualiser.cpp
     SOURCES += mythplayeravsync.cpp
+    SOURCES += mythplayeraudiointerface.cpp
     SOURCES += audioplayer.cpp
     SOURCES += mythccextractorplayer.cpp
     SOURCES += captions/teletextextractorreader.cpp
