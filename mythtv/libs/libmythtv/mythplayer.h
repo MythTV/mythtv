@@ -39,6 +39,7 @@
 #include "mythmiscutil.h"
 #include "mythplayervisualiser.h"
 #include "mythvideoscantracker.h"
+#include "mythplayeravsync.h"
 #include "mythtvexp.h"
 
 class ProgramInfo;
@@ -457,6 +458,7 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void         CheckAspectRatio(VideoFrame* frame);
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool check_prebuffer = true);
+    void         DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due);
     virtual void PreProcessNormalFrame(void);
     virtual void VideoStart(void);
     virtual bool VideoLoop(void);
@@ -585,12 +587,9 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void HandleArbSeek(bool right);
 
     // Private A/V Sync Stuff
+    void  InitFrameInterval();
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
-    void  InitAVSync(void);
-    virtual void AVSync(VideoFrame *buffer);
-    void  ResetAVSync(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
-    void  WaitForTime(int64_t framedue);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);
@@ -671,7 +670,7 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     int64_t   m_totalDuration             {0};
     long long m_rewindTime                {0};
     int64_t   m_latestVideoTimecode       {-1};
-    QElapsedTimer m_avTimer;
+    MythPlayerAVSync m_avSync;
 
     // -- end state stuff --
 
@@ -759,24 +758,8 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     bool       m_nextNormalSpeed          {true};
     bool       m_normalSpeed              {true};
 
-    // Audio and video synchronization stuff
-    bool       m_avsyncAudioPaused        {false};
-    int        m_avsyncAvg                {0};
-    int64_t    m_dispTimecode             {0};
-    int64_t    m_rtcBase                  {0}; // real time clock base for presentation time (microsecs)
-    int64_t    m_maxTcVal                 {0}; // maximum to date video tc
-    int64_t    m_priorAudioTimecode       {0}; // time code from prior frame
-    int64_t    m_priorVideoTimecode       {0}; // time code from prior frame
-    int64_t    m_timeOffsetBase           {0};
-    int        m_maxTcFrames              {0}; // number of frames seen since max to date tc
-    int        m_numDroppedFrames         {0}; // number of consecutive dropped frames.
-    float      m_lastFix                  {0.0F}; //last sync adjustment to prior frame
-
     // Time Code stuff
-    int        m_prevTc                   {0}; ///< 32 bit timecode if last VideoFrame shown
-    int        m_prevRp                   {0}; ///< repeat_pict of last frame
     tctype_arr m_tcWrap                   {};
-    tctype_arr m_tcLastVal                {};
     int64_t    m_savedAudioTimecodeOffset {0};
 
     // LiveTV

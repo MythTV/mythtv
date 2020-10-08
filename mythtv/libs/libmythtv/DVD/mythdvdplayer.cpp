@@ -144,7 +144,7 @@ bool MythDVDPlayer::VideoLoop(void)
     if (release_all || release_one)
     {
         if (nbframes < 5 && m_videoOutput)
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
+            m_videoOutput->UpdatePauseFrame(m_avSync.DisplayTimecode());
 
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'

@@ -140,7 +140,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     uint tmp = mypage.toInt(&valid, 16);
     m_ttPageNum = (valid) ? tmp : m_ttPageNum;
     m_cc608.SetTTPageNum(m_ttPageNum);
-    m_avTimer.start();
 }
 
 MythPlayer::~MythPlayer(void)
@@ -253,10 +252,9 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
         m_pauseLock.unlock();
         return false;
     }
-    m_rtcBase = 0;
-    m_priorAudioTimecode = 0;
-    m_priorVideoTimecode = 0;
-    m_lastFix  = 0.0;
+
+    m_avSync.InitAVSync();
+
     SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
@@ -1323,24 +1321,8 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
         .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(ScanTypeToString(scan)).arg(m_fpsMultiplier));
 }
 
-void MythPlayer::ResetAVSync(void)
+void MythPlayer::InitFrameInterval()
 {
-    m_avsyncAvg = 0;
-    m_prevTc = 0;
-    m_rtcBase = 0;
-    m_priorAudioTimecode = 0;
-    m_priorVideoTimecode = 0;
-    m_lastFix = 0.0;
-    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "A/V sync reset");
-}
-
-void MythPlayer::InitAVSync(void)
-{
-    m_rtcBase = 0;
-    m_priorAudioTimecode = 0;
-    m_priorVideoTimecode = 0;
-    m_lastFix = 0.0;
-
     if (!FlagIsSet(kVideoIsNull))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display Refresh Rate: %1 Video Frame Rate: %2")
@@ -1352,235 +1334,6 @@ void MythPlayer::InitAVSync(void)
         // try to get preferential scheduling, but ignore if we fail to.
         myth_nice(-19);
     }
-}
-
-void MythPlayer::WaitForTime(int64_t framedue)
-{
-    int64_t unow = m_avTimer.nsecsElapsed() / 1000;
-    int64_t delay = framedue - unow;
-    if (delay > 0)
-        QThread::usleep(static_cast<unsigned long>(delay));
-}
-
-#define AVSYNC_MAX_LATE 10000000
-void MythPlayer::AVSync(VideoFrame *buffer)
-{
-    if (m_videoOutput->IsErrored())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "AVSync: Unknown error in videoOutput, aborting playback.");
-        SetErrored(tr("Failed to initialize A/V Sync"));
-        return;
-    }
-    int64_t videotimecode = 0;
-
-    bool dropframe = false;
-    bool pause_audio = false;
-    int64_t framedue = 0;
-    int64_t audio_adjustment = 0;
-    int64_t unow = 0;
-    int64_t lateness = 0;
-    auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
-    bool reset = false;
-    // controller gain
-    static float const s_av_control_gain = 0.4F;
-    // time weighted exponential filter coefficient
-    static float const s_sync_fc = 0.9F;
-
-    while (framedue == 0)
-    {
-        if (buffer)
-        {
-            videotimecode = buffer->timecode & 0x0000ffffffffffff;
-            // Detect bogus timecodes from DVD and ignore them.
-            if (videotimecode != buffer->timecode)
-                videotimecode = m_maxTcVal;
-        }
-
-        unow = m_avTimer.nsecsElapsed() / 1000;
-
-        if (!m_normalSpeed || FlagIsSet(kMusicChoice))
-        {
-            framedue = unow + m_frameInterval;
-            break;
-        }
-        // first time or after a seek - setup of m_rtcBase
-        if (m_rtcBase == 0)
-        {
-            // cater for DVB radio
-            if (videotimecode == 0)
-                videotimecode = m_audio.GetAudioTime();;
-
-            // cater for data only streams (i.e. MHEG)
-            bool dataonly = !m_audio.HasAudioIn() && m_videoDim.isEmpty();
-
-            // On first frame we get nothing, so exit out.
-            // FIXME - does this mean we skip the first frame? Should be avoidable.
-            if (videotimecode == 0 && !dataonly)
-                return;
-
-            m_rtcBase = unow - videotimecode * playspeed1000;
-            m_maxTcVal = 0;
-            m_maxTcFrames = 0;
-            m_numDroppedFrames = 0;
-            m_timeOffsetBase = static_cast<int64_t>(TranslatePositionFrameToMs(m_framesPlayed, false)) - videotimecode;
-        }
-
-        if (videotimecode == 0)
-            videotimecode = m_maxTcVal + m_frameInterval/1000;
-        int64_t tcincr = videotimecode - m_maxTcVal;
-        if (tcincr > 0 || tcincr < -100)
-        {
-            m_maxTcVal = videotimecode;
-            m_maxTcFrames = 0;
-        }
-        else
-        {
-            m_maxTcFrames++;
-            videotimecode = m_maxTcVal + m_maxTcFrames * m_frameInterval/1000;
-        }
-
-        if (m_playSpeed > 0.0F)
-            framedue = m_rtcBase + videotimecode * playspeed1000;
-        else
-            framedue = unow + m_frameInterval / 2;
-
-        // This code is disabled as it appears to cause multiple issues. It is
-        // retained for future reference...
-        // recalculate m_framesPlayed to conform to actual time code.
-        //m_framesPlayed = TranslatePositionMsToFrame(static_cast<uint64_t>(videotimecode + m_timeOffsetBase), false);
-        //m_decoder->SetFramesPlayed(static_cast<long long>(m_framesPlayed));
-
-        lateness = unow - framedue;
-        dropframe = false;
-        if (lateness > 30000)
-            dropframe = m_numDroppedFrames < 10;
-
-        if (lateness <= 30000 && m_priorAudioTimecode > 0
-            && m_priorVideoTimecode > 0)
-        {
-            // Get video in sync with audio
-            audio_adjustment = m_priorAudioTimecode - m_priorVideoTimecode;
-            // If there is excess audio - throw it away.
-            if (audio_adjustment < -200)
-            {
-                m_audio.Reset();
-                audio_adjustment = 0;
-            }
-            int sign = audio_adjustment < 0 ? -1 : 1;
-            float fix_amount = (m_lastFix * s_sync_fc + (1 - s_sync_fc) * audio_adjustment) * sign * s_av_control_gain;
-            m_lastFix = fix_amount * sign;
-            auto speedup1000 = static_cast<int64_t>(1000 * m_playSpeed);
-            m_rtcBase -= static_cast<int64_t>(1000000 * fix_amount * sign / speedup1000);
-            if (audio_adjustment * sign > 20)
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sync: Audio %1 by %2 ms")
-                    .arg(audio_adjustment > 0 ? "ahead" : "behind").arg(abs(audio_adjustment)));
-            if (audio_adjustment > 200)
-                pause_audio = true;
-        }
-        // sanity check - reset m_rtcBase if time codes have gone crazy.
-        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE))
-        {
-            framedue = 0;
-            m_rtcBase = 0;
-            if (reset)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Resetting AV Sync2 failed, lateness = %1").arg(lateness));
-                SetErrored(tr("Failed to initialize A/V Sync"));
-                return;
-            }
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Resetting AV Sync2, lateness = %1").arg(lateness));
-            reset = true;
-        }
-    }
-    m_priorVideoTimecode = videotimecode;
-    m_dispTimecode = videotimecode;
-
-    m_outputJmeter && m_outputJmeter->RecordCycleTime();
-    m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
-
-    if (!pause_audio && m_avsyncAudioPaused)
-    {
-        m_avsyncAudioPaused = false;
-        m_audio.Pause(false);
-    }
-    else if (pause_audio && !m_avsyncAudioPaused)
-    {
-        m_avsyncAudioPaused = true;
-        m_audio.Pause(true);
-    }
-
-    if (dropframe)
-    {
-        m_numDroppedFrames++;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Dropping frame: Video is behind by %1ms").arg(lateness / 1000));
-        m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
-    }
-    else if (!FlagIsSet(kVideoIsNull) && buffer)
-    {
-        m_numDroppedFrames = 0;
-
-        // Check scan type
-        bool showsecondfield = false;
-        FrameScanType ps = GetScanForDisplay(buffer, showsecondfield);
-
-        // if we get here, we're actually going to do video output
-        RenderVideoFrame(buffer, ps, true, framedue);
-
-        // get time codes for calculating difference next time
-        m_priorAudioTimecode = m_audio.GetAudioTime();
-        if (m_videoOutput->IsErrored())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Error condition detected "
-                    "in videoOutput after Show(), aborting playback.");
-            SetErrored(tr("Serious error detected in Video Output"));
-            return;
-        }
-
-        // Only double rate CPU deinterlacers require an extra call to PrepareFrame
-        bool secondprepare = GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER);
-        // and the first deinterlacing pass will have marked the frame as already deinterlaced
-        // which will break GetScanForDisplay below and subsequent deinterlacing
-        bool olddeinterlaced = buffer->already_deinterlaced;
-        if (secondprepare)
-            buffer->already_deinterlaced = false;
-        // Update scan settings now that deinterlacer has been set and we know
-        // whether we need a second field
-        ps = GetScanForDisplay(buffer, showsecondfield);
-
-        // Reset olddeinterlaced if necessary (pause frame etc)
-        if (!showsecondfield && secondprepare)
-        {
-            buffer->already_deinterlaced = olddeinterlaced;
-        }
-        else if (showsecondfield)
-        {
-            // Second field
-            if (kScan_Interlaced == ps)
-                ps = kScan_Intr2ndField;
-            RenderVideoFrame(buffer, ps, secondprepare, framedue + m_frameInterval / 2);
-        }
-    }
-    else
-    {
-        WaitForTime(framedue);
-    }
-
-    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-        QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
-                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7 ")
-            .arg(m_priorAudioTimecode)
-            .arg(m_priorVideoTimecode)
-            .arg(m_frameInterval)
-            .arg(audio_adjustment)
-            .arg(m_tcWrap[TC_AUDIO])
-            .arg(unow)
-            .arg(framedue)
-                );
-
 }
 
 void MythPlayer::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
@@ -1599,7 +1352,7 @@ void MythPlayer::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Pr
     m_videoOutput->RenderEnd();
 
     if (Wait > 0)
-        WaitForTime(Wait);
+        m_avSync.WaitForFrame(Wait);
 
     m_videoOutput->EndFrame();
 }
@@ -1610,7 +1363,7 @@ void MythPlayer::RefreshPauseFrame(void)
     {
         if (m_videoOutput->ValidVideoFrames())
         {
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode, GetScanType());
+            m_videoOutput->UpdatePauseFrame(m_avSync.DisplayTimecode(), GetScanType());
             m_needNewPauseFrame = false;
 
             if (m_deleteMap.IsEditing())
@@ -1694,18 +1447,16 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             auto margin = static_cast<uint64_t>(m_videoFrameRate * 3);
             if (framesLeft < margin)
             {
-                if (m_rtcBase)
+                if (m_avSync.ResetAVSyncForLiveTV(&m_audio))
                 {
                     LOG(VB_PLAYBACK, LOG_NOTICE, LOC + "Pause to allow live tv catch up");
                     LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Played: %1 Avail: %2 Buffered: %3 Margin: %4")
                         .arg(m_framesPlayed).arg(frameCount)
                         .arg(m_videoOutput->ValidVideoFrames()).arg(margin));
                 }
-                m_audio.Pause(true);
-                m_avsyncAudioPaused = true;
-                m_rtcBase = 0;
             }
         }
+
         usleep(static_cast<uint>(m_frameInterval >> 3));
         int waited_for = m_bufferingStart.msecsTo(QTime::currentTime());
         int last_msg = m_bufferingLastMsg.msecsTo(QTime::currentTime());
@@ -1731,10 +1482,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
             {
                 m_playerFlags = static_cast<PlayerFlags>(m_playerFlags | kMusicChoice);
-                LOG(VB_GENERAL, LOG_NOTICE, LOC +
-                    "Music Choice program detected - disabling AV Sync.");
-                m_avsyncAudioPaused = false;
-                m_audio.Pause(false);
+                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Music Choice program detected - disabling AV Sync.");
+                m_avSync.SetAVSyncMusicChoice(&m_audio);
             }
             if (waited_for > 7000 && m_audio.IsBufferAlmostFull()
                 && !FlagIsSet(kMusicChoice))
@@ -1746,11 +1495,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             }
             // Finish audio pause for sync after 1 second
             // in case of infrequent video frames (e.g. music choice)
-            if (m_avsyncAudioPaused && waited_for > 1000)
-            {
-                m_avsyncAudioPaused = false;
-                m_audio.Pause(false);
-            }
+            if (m_avSync.GetAVSyncAudioPause() && waited_for > 1000)
+                m_avSync.SetAVSyncMusicChoice(&m_audio);
         }
         int msecs = 500;
         if (preBufferDebug)
@@ -1777,7 +1523,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         return false;
     }
 
-    if (!m_avsyncAudioPaused)
+    if (!m_avSync.GetAVSyncAudioPause())
         m_audio.Pause(false);
     SetBuffering(false);
     return true;
@@ -1830,8 +1576,62 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame, m_videoOutput, m_frameInterval);
     m_detectLetterBox->SwitchTo(frame);
 
-    AVSync(frame);
+    // When is the next frame due
+    int64_t due = m_avSync.AVSync(&m_audio, frame, m_frameInterval, m_playSpeed, !m_videoDim.isEmpty(),
+                                  !m_normalSpeed || FlagIsSet(kMusicChoice));
+    // Display it
+    DoDisplayVideoFrame(frame, due);
+
     m_videoOutput->DoneDisplayingFrame(frame);
+
+    if (m_outputJmeter)
+        m_outputJmeter->RecordCycleTime();
+}
+
+void MythPlayer::DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due)
+{
+    if (Due < 0)
+    {
+        m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
+    }
+    else if (!FlagIsSet(kVideoIsNull) && Frame)
+    {
+
+        // Check scan type
+        bool showsecondfield = false;
+        FrameScanType ps = GetScanForDisplay(Frame, showsecondfield);
+
+        // if we get here, we're actually going to do video output
+        RenderVideoFrame(Frame, ps, true, Due);
+
+        // Only double rate CPU deinterlacers require an extra call to PrepareFrame
+        bool secondprepare = GetDoubleRateOption(Frame, DEINT_CPU) && !GetDoubleRateOption(Frame, DEINT_SHADER);
+        // and the first deinterlacing pass will have marked the frame as already deinterlaced
+        // which will break GetScanForDisplay below and subsequent deinterlacing
+        bool olddeinterlaced = Frame->already_deinterlaced;
+        if (secondprepare)
+            Frame->already_deinterlaced = false;
+        // Update scan settings now that deinterlacer has been set and we know
+        // whether we need a second field
+        ps = GetScanForDisplay(Frame, showsecondfield);
+
+        // Reset olddeinterlaced if necessary (pause frame etc)
+        if (!showsecondfield && secondprepare)
+        {
+            Frame->already_deinterlaced = olddeinterlaced;
+        }
+        else if (showsecondfield)
+        {
+            // Second field
+            if (kScan_Interlaced == ps)
+                ps = kScan_Intr2ndField;
+            RenderVideoFrame(Frame, ps, secondprepare, Due + m_frameInterval / 2);
+        }
+    }
+    else
+    {
+        m_avSync.WaitForFrame(Due);
+    }
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
@@ -1943,14 +1743,10 @@ void MythPlayer::VideoStart(void)
 
     SetPlaying(true);
     ClearAfterSeek(false);
-
-    m_avsyncAvg = 0;  // Frames till next sync check
-
     EnableFrameRateMonitor();
-
     InitialiseScan(m_videoOutput);
-
-    InitAVSync();
+    m_avSync.InitAVSync();
+    InitFrameInterval();
     AutoVisualise(!m_videoDim.isEmpty());
 }
 
@@ -3239,7 +3035,7 @@ void MythPlayer::ChangeSpeed(void)
     float last_speed = m_playSpeed;
     m_playSpeed   = m_nextPlaySpeed;
     m_normalSpeed = m_nextNormalSpeed;
-    m_rtcBase = 0;
+    m_avSync.ResetAVSyncClockBase();
 
     bool skip_changed = UpdateFFRewSkip();
 
@@ -3579,11 +3375,9 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     int64_t savedTC = m_tcWrap[TC_AUDIO];
 
     m_tcWrap.fill(0);
-    m_tcLastVal.fill(0);
-
     m_tcWrap[TC_AUDIO] = savedTC;
-
     m_audio.Reset();
+
     // Reenable (or re-disable) subtitles, which ultimately does
     // nothing except to call ResetCaptions() to erase any captions
     // currently on-screen.  The key is that the erasing is done in
@@ -3593,7 +3387,8 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     m_commBreakMap.SetTracker(m_framesPlayed);
     m_commBreakMap.ResetLastSkip();
     m_needNewPauseFrame = true;
-    ResetAVSync();
+
+    m_avSync.InitAVSync();
 }
 
 /*! \brief Discard video frames prior to seeking
@@ -4361,8 +4156,7 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     infoMap.insert("storagerate", m_playerCtx->m_buffer->GetStorageRate());
     infoMap.insert("bufferavail", m_playerCtx->m_buffer->GetAvailableBuffer());
     infoMap.insert("buffersize",  QString::number(m_playerCtx->m_buffer->GetBufferSize() >> 20));
-    int avsync = m_avsyncAvg / 1000;
-    infoMap.insert("avsync", tr("%1 ms").arg(avsync));
+    m_avSync.GetAVSyncData(infoMap);
 
     if (m_videoOutput)
     {

@@ -80,7 +80,7 @@ bool MythBDPlayer::VideoLoop(void)
     if (m_playerCtx->m_buffer->BD()->BDWaitingForPlayer() && (nbframes > 0))
     {
         if (nbframes < 2 && m_videoOutput)
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
+            m_videoOutput->UpdatePauseFrame(m_avSync.DisplayTimecode());
 
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
@@ -100,7 +100,7 @@ bool MythBDPlayer::VideoLoop(void)
     {
         if (nbframes > 1 && !m_stillFrameShowing)
         {
-            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
+            m_videoOutput->UpdatePauseFrame(m_avSync.DisplayTimecode());
             DisplayNormalFrame(false);
             return !IsErrored();
         }
