@@ -10,6 +10,11 @@
 
 #define LOC      QString("DVDPlayer: ")
 
+MythDVDPlayer::MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
+  : MythPlayer(MainWindow, Tv, Context, Flags)
+{
+}
+
 void MythDVDPlayer::AutoDeint(VideoFrame *Frame, MythVideoOutput *VideoOutput, int FrameInterval, bool AllowLock)
 {
     bool dummy = false;

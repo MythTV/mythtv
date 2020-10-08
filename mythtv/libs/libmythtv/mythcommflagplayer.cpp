@@ -52,8 +52,8 @@ void MythRebuildSaver::Wait(DecoderBase*Decoder)
             return;
 }
 
-MythCommFlagPlayer::MythCommFlagPlayer(PlayerFlags Flags)
-  : MythPlayer(Flags)
+MythCommFlagPlayer::MythCommFlagPlayer(PlayerContext* Context, PlayerFlags Flags)
+  : MythPlayer(nullptr, nullptr, Context, Flags)
 {
 }
 

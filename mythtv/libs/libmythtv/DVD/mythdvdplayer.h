@@ -12,8 +12,7 @@ class MythDVDPlayer : public MythPlayer
     Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer)
 
   public:
-    explicit MythDVDPlayer(PlayerFlags flags = kNoFlags)
-        : MythPlayer(flags) {}
+    MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,PlayerFlags Flags = kNoFlags);
 
     void     ReleaseNextVideoFrame(VideoFrame *Buffer, int64_t Timecode, bool Wrap = true) override;
     bool     HasReachedEof(void) const override;

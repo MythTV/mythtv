@@ -906,12 +906,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         flags = static_cast<PlayerFlags>(flags | kDecodeFewBlocks);
     }
 
-    auto *cfp = new MythCommFlagPlayer(flags);
     auto *ctx = new PlayerContext(kFlaggerInUseID);
+    auto *cfp = new MythCommFlagPlayer(ctx, flags);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (useDB)
     {
@@ -1052,13 +1051,13 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    auto *cfp = new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull |
-                                                     kDecodeNoDecode | kNoITV));
     auto *ctx = new PlayerContext(kFlaggerInUseID);
+    auto *cfp = new MythCommFlagPlayer(ctx, (PlayerFlags)(kAudioMuted | kVideoIsNull |
+                                                     kDecodeNoDecode | kNoITV));
+
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (progress)
     {

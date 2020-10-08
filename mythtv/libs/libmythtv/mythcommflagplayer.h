@@ -25,7 +25,7 @@ class MythRebuildSaver : public QRunnable
 class MTV_PUBLIC MythCommFlagPlayer : public MythPlayer
 {
   public:
-    explicit MythCommFlagPlayer(PlayerFlags Flags = kNoFlags);
+    explicit MythCommFlagPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     bool RebuildSeekTable(bool ShowPercentage = true, StatusCallback Callback = nullptr, void* Opaque = nullptr);
     VideoFrame* GetRawVideoFrame(long long FrameNumber = -1);
 };

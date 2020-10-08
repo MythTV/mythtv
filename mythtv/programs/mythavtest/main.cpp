@@ -57,16 +57,16 @@ class VideoPerformanceTest
     void Test(void)
     {
         MythMediaBuffer *rb = MythMediaBuffer::Create(m_file, false, true, 2000);
-        auto *mp  = new MythPlayer(static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
+        m_ctx = new PlayerContext("VideoPerformanceTest");
+        auto *mp  = new MythPlayer(GetMythMainWindow(), nullptr, m_ctx,
+                                   static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
-        m_ctx = new PlayerContext("VideoPerformanceTest");
         m_ctx->SetRingBuffer(rb);
         m_ctx->SetPlayer(mp);
         auto *pinfo = new ProgramInfo(m_file);
         m_ctx->SetPlayingInfo(pinfo); // makes a copy
         delete pinfo;
-        mp->SetPlayerInfo(nullptr, GetMythMainWindow(), m_ctx);
 
         FrameScanType scan = m_deinterlace ? kScan_Interlaced : kScan_Progressive;
         if (!mp->StartPlaying())

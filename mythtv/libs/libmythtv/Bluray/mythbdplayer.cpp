@@ -8,8 +8,8 @@
 
 #define LOC QString("BDPlayer: ")
 
-MythBDPlayer::MythBDPlayer(PlayerFlags Flags)
-  : MythPlayer(Flags)
+MythBDPlayer::MythBDPlayer(MythMainWindow *MainWindow, TV *Tv, PlayerContext *Context, PlayerFlags Flags)
+  : MythPlayer(MainWindow, Tv, Context, Flags)
 {
 }
 

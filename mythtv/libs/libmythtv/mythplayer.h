@@ -148,7 +148,8 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     friend class Transcode;
 
   public:
-    explicit MythPlayer(PlayerFlags flags = kNoFlags);
+    explicit MythPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,
+                        PlayerFlags Flags = kNoFlags);
    ~MythPlayer() override;
 
     // Initialisation
@@ -156,7 +157,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     bool InitVideo(void);
 
     // Public Sets
-    void SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx);
     void SetLength(int len)                   { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
@@ -597,9 +597,10 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
 #endif
     PlayerFlags      m_playerFlags;
 
-    // Window stuff
-    MythDisplay* m_display                {nullptr};
-    QWidget *m_parentWidget               {nullptr};
+    // Window/parent stuff
+    TV*             m_tv                  {nullptr};
+    MythDisplay*    m_display             { nullptr };
+    MythMainWindow* m_mainWindow          { nullptr };
 
     // State
     QWaitCondition m_decoderThreadPause;
@@ -749,7 +750,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     int64_t    m_savedAudioTimecodeOffset {0};
 
     // LiveTV
-    TV *m_tv                              {nullptr};
     bool m_isDummy                        {false};
 
     // Counter for buffering messages

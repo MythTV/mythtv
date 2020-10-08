@@ -12,7 +12,7 @@ class MythBDPlayer : public MythPlayer
     Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
 
   public:
-    explicit MythBDPlayer(PlayerFlags Flags = kNoFlags);
+    MythBDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     bool     HasReachedEof     (void) const override;
     bool     GoToMenu          (const QString& Menu) override;
     int      GetNumChapters    (void) override;

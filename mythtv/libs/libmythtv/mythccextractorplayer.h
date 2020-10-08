@@ -112,7 +112,7 @@ using SubtitleReaders = QHash<uint, SubtitleReader*>;
 class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
-    MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+    MythCCExtractorPlayer(PlayerContext* Context, PlayerFlags flags, bool showProgress,
                           QString fileName, const QString & destdir);
     MythCCExtractorPlayer(const MythCCExtractorPlayer& rhs);
     ~MythCCExtractorPlayer() override = default;

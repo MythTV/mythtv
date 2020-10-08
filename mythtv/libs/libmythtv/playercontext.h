@@ -28,6 +28,7 @@ class MythMediaBuffer;
 class ProgramInfo;
 class LiveTVChain;
 class QPainter;
+class MythMainWindow;
 
 struct osdInfo
 {
@@ -51,10 +52,8 @@ class MTV_PUBLIC PlayerContext
     ~PlayerContext();
 
     // Actions
-    bool CreatePlayer(TV *tv, QWidget *widget,
-                   TVState desiredState,
-                   bool embed, const QRect &embedBounds = QRect(),
-                   bool muted = false);
+    bool CreatePlayer(TV* Tv, MythMainWindow* MainWindow, TVState State,
+                      bool Embed, const QRect &EmbedBounds = QRect(), bool Muted = false);
     void TeardownPlayer(void);
     bool StartPlaying(int maxWait = -1);
     void StopPlaying(void) const;

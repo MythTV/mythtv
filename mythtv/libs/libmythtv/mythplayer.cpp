@@ -107,25 +107,32 @@ static int toTrackType(int type)
     return kTrackTypeUnknown;
 }
 
-MythPlayer::MythPlayer(PlayerFlags flags)
+MythPlayer::MythPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythVideoScanTracker(this),
     MythPlayerVisualiser(&m_audio),
     MythPlayerAudioInterface(&m_audio),
-    m_playerFlags(flags),
+    m_playerCtx(Context),
+    m_playerFlags(Flags),
+    m_tv(Tv),
+    m_mainWindow(MainWindow),
     // CC608/708
     m_cc608(this), m_cc708(this),
     // Audio
-    m_audio(this, (flags & kAudioMuted) != 0),
+    m_audio(this, (Flags & kAudioMuted) != 0),
+
     // Debugging variables
     m_outputJmeter(new Jitterometer(LOC))
 {
-    if (!(m_playerFlags & kVideoIsNull) && HasMythMainWindow())
-        m_display = GetMythMainWindow()->GetDisplay();
+    if (!(m_playerFlags & kVideoIsNull) && m_mainWindow)
+        m_display = m_mainWindow->GetDisplay();
 
     m_playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
     m_playerThreadId = gettid();
 #endif
+    m_deleteMap.SetPlayerContext(m_playerCtx);
+    m_liveTV = m_playerCtx->m_tvchain;
+
     // Playback (output) zoom control
     m_detectLetterBox = new DetectLetterbox(this);
 
@@ -339,7 +346,7 @@ bool MythPlayer::InitVideo(void)
                     m_decoder->GetCodecDecoderName(),
                     m_decoder->GetVideoCodecID(),
                     m_videoDim, m_videoDispDim, m_videoAspect,
-                    m_parentWidget, static_cast<float>(m_videoFrameRate),
+                    m_mainWindow, static_cast<float>(m_videoFrameRate),
                     static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
     if (!m_videoOutput)
@@ -3416,15 +3423,6 @@ void MythPlayer::ClearBeforeSeek(uint64_t Frames)
 #else
     Q_UNUSED(Frames);
 #endif
-}
-
-void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx)
-{
-    m_deleteMap.SetPlayerContext(ctx);
-    m_tv = tv;
-    m_parentWidget = widget;
-    m_playerCtx    = ctx;
-    m_liveTV       = ctx->m_tvchain;
 }
 
 bool MythPlayer::EnableEdit(void)

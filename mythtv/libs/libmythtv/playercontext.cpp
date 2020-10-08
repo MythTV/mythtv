@@ -188,35 +188,31 @@ bool PlayerContext::IsRecorderErrored(void) const
     return m_recorder && m_recorder->GetErrorStatus();
 }
 
-bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
-                                 TVState desiredState,
-                                 bool embed, const QRect &embedbounds,
-                                 bool muted)
+bool PlayerContext::CreatePlayer(TV *Tv, MythMainWindow* MainWindow, TVState State,
+                                 bool Embed, const QRect &EmbedBounds, bool Muted)
 {
     if (HasPlayer())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Attempting to setup a player, but it already exists.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Already have a player");
         return false;
     }
 
     uint playerflags = kNoFlags;
-    playerflags |= muted                ? kAudioMuted : kNoFlags;
+    playerflags |= Muted                ? kAudioMuted : kNoFlags;
     playerflags |= m_nohardwaredecoders ? kNoFlags : kDecodeAllowGPU;
 
     MythPlayer *player = nullptr;
-    if (kState_WatchingBD  == desiredState)
-        player = new MythBDPlayer(static_cast<PlayerFlags>(playerflags));
-    else if (kState_WatchingDVD == desiredState)
-        player = new MythDVDPlayer(static_cast<PlayerFlags>(playerflags));
+    if (kState_WatchingBD  == State)
+        player = new MythBDPlayer(MainWindow, Tv, this, static_cast<PlayerFlags>(playerflags));
+    else if (kState_WatchingDVD == State)
+        player = new MythDVDPlayer(MainWindow, Tv, this, static_cast<PlayerFlags>(playerflags));
     else
-        player = new MythPlayer(static_cast<PlayerFlags>(playerflags));
+        player = new MythPlayer(MainWindow, Tv, this, static_cast<PlayerFlags>(playerflags));
 
     QString passthru_device =
         gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString();
 
-    player->SetPlayerInfo(tv, widget, this);
     AudioPlayer *audio = player->GetAudio();
     audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
                         passthru_device,
@@ -227,17 +223,17 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     player->AdjustAudioTimecodeOffset(
                 0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
 
-    bool isWatchingRecording = (desiredState == kState_WatchingRecording);
+    bool isWatchingRecording = (State == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
 
     QString subfn = m_buffer->GetSubtitleFilename();
-    bool isInProgress = (desiredState == kState_WatchingRecording ||
-                         desiredState == kState_WatchingLiveTV);
+    bool isInProgress = (State == kState_WatchingRecording ||
+                         State == kState_WatchingLiveTV);
     if (!subfn.isEmpty() && player->GetSubReader())
         player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
 
-    if (embed && !embedbounds.isNull())
-        player->EmbedInWidget(embedbounds);
+    if (Embed && !EmbedBounds.isNull())
+        player->EmbedInWidget(EmbedBounds);
 
     SetPlayer(player);
     static_cast<void>(audio->ReinitAudio());

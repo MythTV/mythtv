@@ -48,10 +48,10 @@ CC708Stuff::~CC708Stuff() { delete m_reader; }
 TeletextStuff::~TeletextStuff() { delete m_reader; }
 DVBSubStuff::~DVBSubStuff() { delete m_reader; }
 
-MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerContext *Context, PlayerFlags flags, bool showProgress,
                                              QString fileName,
                                              const QString &destdir) :
-    MythPlayer(flags),
+    MythPlayer(nullptr, nullptr, Context, flags),
     m_curTime(0),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),

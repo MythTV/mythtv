@@ -69,13 +69,11 @@ static int RunCCExtract(ProgramInfo &program_info, const QString & destdir)
                                kDecodeNoLoopFilter | kDecodeFewBlocks |
                                kDecodeLowRes | kDecodeSingleThreaded |
                                kDecodeNoDecode);
-    auto *ccp = new MythCCExtractorPlayer(flags, true, filename, destdir);
     auto *ctx = new PlayerContext(kCCExtractorInUseID);
+    auto *ccp = new MythCCExtractorPlayer(ctx, flags, true, filename, destdir);
     ctx->SetPlayingInfo(&program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);
-
-    ccp->SetPlayerInfo(nullptr, nullptr, ctx);
     if (ccp->OpenFile() < 0)
     {
         std::cerr << "Failed to open " << qPrintable(filename) << std::endl;

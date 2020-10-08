@@ -259,7 +259,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         return REENCODE_ERROR;
     }
     player_ctx->SetRingBuffer(rb);
-    player_ctx->SetPlayer(new MythPlayer((PlayerFlags)(kVideoIsNull | kNoITV)));
+    player_ctx->SetPlayer(new MythPlayer(nullptr, nullptr, player_ctx, (PlayerFlags)(kVideoIsNull | kNoITV)));
     SetPlayerContext(player_ctx);
     MythPlayer *player = GetPlayer();
     if (player == nullptr)
@@ -268,7 +268,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             QString("Transcoding aborted, failed to retrieve MythPlayer object"));
         return REENCODE_ERROR;
     }
-    player->SetPlayerInfo(nullptr, nullptr, GetPlayerContext());
     if (m_proginfo->GetRecordingEndTime() > curtime)
     {
         player_ctx->SetRecorder(RemoteGetExistingRecorder(m_proginfo));
