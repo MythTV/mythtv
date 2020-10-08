@@ -82,7 +82,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
         return;
     }
     m_notifier = new QSocketNotifier(s_sigFd[1], QSocketNotifier::Read, this);
-    connect(m_notifier, SIGNAL(activated(int)), this, SLOT(handleSignal()));
+    connect(m_notifier, &QSocketNotifier::activated, this, &SignalHandler::handleSignal);
 
     for (int signum : qAsConst(signallist))
     {

@@ -769,8 +769,8 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
     connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
             SLOT(downloadError(QNetworkReply::NetworkError)));
-    connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-            this, SLOT(downloadProgress(qint64, qint64)));
+    connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
+            this, &MythDownloadManager::downloadProgress);
 }
 
 /** \brief Signal handler for authentication requests
@@ -1277,8 +1277,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
                 this, SLOT(downloadError(QNetworkReply::NetworkError)));
-        connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-                this, SLOT(downloadProgress(qint64, qint64)));
+        connect(dlInfo->m_reply, &QNetworkReply::downloadProgress,
+                this, &MythDownloadManager::downloadProgress);
 
         m_downloadReplies.remove(reply);
         reply->deleteLater();

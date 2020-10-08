@@ -99,7 +99,7 @@ bool ChannelScannerGUIScanPane::Create()
     MythUIButton *exitButton = nullptr;
     UIUtilW::Assign(this, exitButton, "exit");
     if (exitButton)
-        connect(exitButton, SIGNAL(Clicked()), SLOT(Close()));
+        connect(exitButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
 

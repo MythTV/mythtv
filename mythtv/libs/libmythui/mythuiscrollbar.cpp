@@ -168,7 +168,7 @@ void MythUIScrollBar::timerEvent(QTimerEvent * /*event*/)
         killTimer(m_timerId);
     m_timerId = 0;
     AdjustAlpha(1, -10, 0, 255);
-    connect(this, SIGNAL(FinishedFading()), this, SLOT(DoneFading()));
+    connect(this, &MythUIType::FinishedFading, this, &MythUIScrollBar::DoneFading);
 }
 
 void MythUIScrollBar::DoneFading(void)

@@ -86,8 +86,8 @@ bool ImageSearchResultsDialog::Create()
             button->SetData(QVariant::fromValue<ArtworkInfo>(info));
         }
 
-    connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(sendResult(MythUIButtonListItem *)));
+    connect(m_resultsList, &MythUIButtonList::itemClicked,
+            this, &ImageSearchResultsDialog::sendResult);
 
     BuildFocusList();
 

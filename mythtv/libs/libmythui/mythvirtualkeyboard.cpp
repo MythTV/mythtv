@@ -302,38 +302,38 @@ void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
                             m_shiftRButton = button;
 
                         button->SetLockable(true);
-                        connect(button, SIGNAL(Clicked()), SLOT(shiftClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::shiftClicked);
                     }
                     else if (key.type == "char")
-                        connect(button, SIGNAL(Clicked()), SLOT(charClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::charClicked);
                     else if (key.type == "done")
-                        connect(button, SIGNAL(Clicked()), SLOT(returnClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::returnClicked);
                     else if (key.type == "del")
-                        connect(button, SIGNAL(Clicked()), SLOT(delClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::delClicked);
                     else if (key.type == "lock")
                     {
                         m_lockButton = button;
                         m_lockButton->SetLockable(true);
-                        connect(m_lockButton, SIGNAL(Clicked()), SLOT(lockClicked()));
+                        connect(m_lockButton, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::lockClicked);
                     }
                     else if (key.type == "alt")
                     {
                         m_altButton = button;
                         m_altButton->SetLockable(true);
-                        connect(m_altButton, SIGNAL(Clicked()), SLOT(altClicked()));
+                        connect(m_altButton, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::altClicked);
                     }
                     else if (key.type == "comp")
                     {
                         m_compButton = button;
                         m_compButton->SetLockable(true);
-                        connect(m_compButton, SIGNAL(Clicked()), SLOT(compClicked()));
+                        connect(m_compButton, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::compClicked);
                     }
                     else if (key.type == "moveleft")
-                        connect(button, SIGNAL(Clicked()), SLOT(moveleftClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::moveleftClicked);
                     else if (key.type == "moveright")
-                        connect(button, SIGNAL(Clicked()), SLOT(moverightClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::moverightClicked);
                     else if (key.type == "back")
-                        connect(button, SIGNAL(Clicked()), SLOT(backClicked()));
+                        connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::backClicked);
                 }
             }
             else

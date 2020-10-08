@@ -28,8 +28,8 @@
 SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     : m_streamHandler(handler)
 {
-    connect(this, SIGNAL(startKeepAlive(int)), this, SLOT(startKeepAliveRequested(int)));
-    connect(this, SIGNAL(stopKeepAlive()), this, SLOT(stopKeepAliveRequested()));
+    connect(this, &SatIPRTSP::startKeepAlive, this, &SatIPRTSP::startKeepAliveRequested);
+    connect(this, &SatIPRTSP::stopKeepAlive, this, &SatIPRTSP::stopKeepAliveRequested);
 
     // Use RTPPacketBuffer if buffering and re-ordering needed
     m_buffer = new UDPPacketBuffer(0);
@@ -380,7 +380,7 @@ SatIPRTSPReadHelper::SatIPRTSPReadHelper(SatIPRTSP* p)
         QString("Starting read helper for UDP (RTP) socket on port %1")
             .arg(m_socket->localPort()));
 
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadPending()));
+    connect(m_socket, &QIODevice::readyRead, this, &SatIPRTSPReadHelper::ReadPending);
 }
 
 SatIPRTSPReadHelper::~SatIPRTSPReadHelper()
@@ -420,7 +420,7 @@ SatIPRTCPReadHelper::SatIPRTCPReadHelper(SatIPRTSP* p)
             .arg(m_socket->localPort()));
 
     // Call ReadPending when there is a message received on m_socket
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(ReadPending()));
+    connect(m_socket, &QIODevice::readyRead, this, &SatIPRTCPReadHelper::ReadPending);
 }
 
 SatIPRTCPReadHelper::~SatIPRTCPReadHelper()

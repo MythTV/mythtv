@@ -110,8 +110,8 @@ NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
             QNetworkRequest::PreferNetwork );
 
     // Receive requestStarted signals from NAMThread when it processes a NetStreamRequest
-    connect(&NAMThread::manager(), SIGNAL(requestStarted(int, QNetworkReply*)),
-        this, SLOT(slotRequestStarted(int, QNetworkReply*)), Qt::DirectConnection );
+    connect(&NAMThread::manager(), &NAMThread::requestStarted,
+        this, &NetStream::slotRequestStarted, Qt::DirectConnection );
 
     QMutexLocker locker(&m_mutex);
 
@@ -298,13 +298,13 @@ void NetStream::slotRequestStarted(int id, QNetworkReply *reply)
         // was connected Qt::DirectConnection so the current thread is NAMThread
 
         // QNetworkReply signals
-        connect(reply, SIGNAL(finished()), this, SLOT(slotFinished()), Qt::DirectConnection );
+        connect(reply, &QNetworkReply::finished, this, &NetStream::slotFinished, Qt::DirectConnection );
 #ifndef QT_NO_OPENSSL
-        connect(reply, SIGNAL(sslErrors(const QList<QSslError> &)), this,
-            SLOT(slotSslErrors(const QList<QSslError> &)), Qt::DirectConnection );
+        connect(reply, &QNetworkReply::sslErrors, this,
+            &NetStream::slotSslErrors, Qt::DirectConnection );
 #endif
         // QIODevice signals
-        connect(reply, SIGNAL(readyRead()), this, SLOT(slotReadyRead()), Qt::DirectConnection );
+        connect(reply, &QIODevice::readyRead, this, &NetStream::slotReadyRead, Qt::DirectConnection );
     }
     else
         LOG(VB_GENERAL, LOG_ERR, LOC +

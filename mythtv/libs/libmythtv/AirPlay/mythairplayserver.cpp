@@ -372,11 +372,11 @@ bool MythAirplayServer::Create(void)
     {
         gMythAirplayServer->moveToThread(gMythAirplayServerThread->qthread());
         QObject::connect(
-            gMythAirplayServerThread->qthread(), SIGNAL(started()),
-            gMythAirplayServer,                  SLOT(Start()));
+            gMythAirplayServerThread->qthread(), &QThread::started,
+            gMythAirplayServer,                  &MythAirplayServer::Start);
         QObject::connect(
-            gMythAirplayServerThread->qthread(), SIGNAL(finished()),
-            gMythAirplayServer,                  SLOT(Stop()));
+            gMythAirplayServerThread->qthread(), &QThread::finished,
+            gMythAirplayServer,                  &MythAirplayServer::Stop);
         gMythAirplayServerThread->start(QThread::LowestPriority);
     }
 
@@ -499,7 +499,7 @@ void MythAirplayServer::Start(void)
         if (!m_serviceRefresh)
         {
             m_serviceRefresh = new QTimer();
-            connect(m_serviceRefresh, SIGNAL(timeout()), this, SLOT(timeout()));
+            connect(m_serviceRefresh, &QTimer::timeout, this, &MythAirplayServer::timeout);
         }
         // Will force a Bonjour refresh in two seconds
         m_serviceRefresh->start(2000);
@@ -527,7 +527,7 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
     gCoreContext->SendSystemEvent(QString("AIRPLAY_NEW_CONNECTION"));
     m_sockets.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteConnection()));
-    connect(client, SIGNAL(readyRead()), this, SLOT(read()));
+    connect(client, &QIODevice::readyRead, this, &MythAirplayServer::read);
 }
 
 void MythAirplayServer::deleteConnection(void)

@@ -716,7 +716,7 @@ void MythMainWindow::Init(bool mayReInit)
     // Ensure MythUIHelper has latest screen bounds if we have moved
     UpdateScreenSettings(m_display);
 
-    QTimer::singleShot(1000, this, SLOT(DelayedAction()));
+    QTimer::singleShot(1000, this, &MythMainWindow::DelayedAction);
 
     m_uiScreenRect = QRect(QPoint(0, 0), m_screenRect.size());
     LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")

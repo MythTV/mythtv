@@ -98,8 +98,8 @@ void StorageGroupEditor::ShowDeleteDialog()
     auto *confirmDelete = new MythConfirmationDialog(popupStack, message, true);
     if (confirmDelete->Create())
     {
-        connect(confirmDelete, SIGNAL(haveResult(bool)),
-                SLOT(DoDeleteSlot(bool)));
+        connect(confirmDelete, &MythConfirmationDialog::haveResult,
+                this, &StorageGroupEditor::DoDeleteSlot);
         popupStack->AddScreen(confirmDelete);
     }
     else
@@ -205,8 +205,8 @@ void StorageGroupDirSetting::ShowDeleteDialog()
 
     if (confirmDelete->Create())
     {
-        connect(confirmDelete, SIGNAL(haveResult(bool)),
-                SLOT(DoDeleteSlot(bool)));
+        connect(confirmDelete, &MythConfirmationDialog::haveResult,
+                this, &StorageGroupDirSetting::DoDeleteSlot);
         popupStack->AddScreen(confirmDelete);
     }
     else
@@ -237,7 +237,7 @@ void StorageGroupEditor::Load(void)
     clearSettings();
 
     auto *button = new ButtonStandardSetting(tr("(Add New Directory)"));
-    connect(button, SIGNAL(clicked()), SLOT(ShowFileBrowser()));
+    connect(button, &ButtonStandardSetting::clicked, this, &StorageGroupEditor::ShowFileBrowser);
     addChild(button);
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -447,7 +447,7 @@ void StorageGroupListEditor::Load(void)
     if (isMaster)
     {
         auto *newGroup = new ButtonStandardSetting(tr("(Create new group)"));
-        connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
+        connect(newGroup, &ButtonStandardSetting::clicked, this, &StorageGroupListEditor::ShowNewGroupDialog);
         addChild(newGroup);
     }
     else
@@ -479,8 +479,8 @@ void StorageGroupListEditor::ShowNewGroupDialog()
 
     if (settingdialog->Create())
     {
-        connect(settingdialog, SIGNAL(haveResult(QString)),
-                SLOT(CreateNewGroup(QString)));
+        connect(settingdialog, &MythTextInputDialog::haveResult,
+                this, &StorageGroupListEditor::CreateNewGroup);
         popupStack->AddScreen(settingdialog);
     }
     else

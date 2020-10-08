@@ -12,10 +12,10 @@
 MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
-    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
-    connect(this, SIGNAL(Enabling()), this, SLOT(Enable()));
-    connect(this, SIGNAL(Disabling()), this, SLOT(Disable()));
+    connect(this, &MythUIType::TakingFocus, this, &MythUICheckBox::Select);
+    connect(this, &MythUIType::LosingFocus, this, &MythUICheckBox::Deselect);
+    connect(this, &MythUIType::Enabling, this, &MythUICheckBox::Enable);
+    connect(this, &MythUIType::Disabling, this, &MythUICheckBox::Disable);
 
     SetCanTakeFocus(true);
 }

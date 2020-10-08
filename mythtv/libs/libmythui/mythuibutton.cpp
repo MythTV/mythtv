@@ -22,12 +22,12 @@ MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     m_clickTimer = new QTimer();
     m_clickTimer->setSingleShot(true);
 
-    connect(m_clickTimer, SIGNAL(timeout()), SLOT(UnPush()));
+    connect(m_clickTimer, &QTimer::timeout, this, &MythUIButton::UnPush);
 
-    connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
-    connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
-    connect(this, SIGNAL(Enabling()), SLOT(Enable()));
-    connect(this, SIGNAL(Disabling()), SLOT(Disable()));
+    connect(this, &MythUIType::TakingFocus, this, &MythUIButton::Select);
+    connect(this, &MythUIType::LosingFocus, this, &MythUIButton::Deselect);
+    connect(this, &MythUIType::Enabling, this, &MythUIButton::Enable);
+    connect(this, &MythUIType::Disabling, this, &MythUIButton::Disable);
 
     SetCanTakeFocus(true);
 }

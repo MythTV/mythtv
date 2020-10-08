@@ -30,8 +30,8 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
     // Parent members
-    connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
-    connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
+    connect(this, &MythUIType::Enabling, this, &MythUIButtonList::ToggleEnabled);
+    connect(this, &MythUIType::Disabling, this, &MythUIButtonList::ToggleEnabled);
 
     Const();
 }
@@ -47,8 +47,8 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
     m_initiator = true;
     m_enableInitiator = true;
 
-    connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
-    connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
+    connect(this, &MythUIType::Enabling, this, &MythUIButtonList::ToggleEnabled);
+    connect(this, &MythUIType::Disabling, this, &MythUIButtonList::ToggleEnabled);
 
     Const();
 }
@@ -58,8 +58,8 @@ void MythUIButtonList::Const(void)
 
     SetCanTakeFocus(true);
 
-    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
-    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
+    connect(this, &MythUIType::TakingFocus, this, &MythUIButtonList::Select);
+    connect(this, &MythUIType::LosingFocus, this, &MythUIButtonList::Deselect);
 }
 
 MythUIButtonList::~MythUIButtonList()
@@ -3819,9 +3819,9 @@ bool SearchButtonListDialog::Create(void)
 
     m_searchEdit->SetText(m_searchText);
 
-    connect(m_searchEdit, SIGNAL(valueChanged()), SLOT(searchChanged()));
-    connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevClicked()));
-    connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextClicked()));
+    connect(m_searchEdit, &MythUITextEdit::valueChanged, this, &SearchButtonListDialog::searchChanged);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &SearchButtonListDialog::prevClicked);
+    connect(m_nextButton, &MythUIButton::Clicked, this, &SearchButtonListDialog::nextClicked);
 
     BuildFocusList();
 

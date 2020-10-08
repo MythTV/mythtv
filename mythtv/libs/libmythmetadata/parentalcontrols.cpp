@@ -313,9 +313,9 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         auto *pwd = new MythTextInputDialog(popupStack,
                         tr("Parental PIN:"), FilterNone, true);
 
-        connect(pwd, SIGNAL(haveResult(QString)),
-                SLOT(OnPasswordEntered(QString)));
-        connect(pwd, SIGNAL(Exiting()), SLOT(OnPasswordExit()));
+        connect(pwd, &MythTextInputDialog::haveResult,
+                this, &ParentalLevelChangeCheckerPrivate::OnPasswordEntered);
+        connect(pwd, &MythScreenType::Exiting, this, &ParentalLevelChangeCheckerPrivate::OnPasswordExit);
 
         if (pwd->Create())
             popupStack->AddScreen(pwd, false);
@@ -359,8 +359,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
 ParentalLevelChangeChecker::ParentalLevelChangeChecker()
 {
     m_private = new ParentalLevelChangeCheckerPrivate(this);
-    connect(m_private, SIGNAL(SigDone(bool, ParentalLevel::Level)),
-            SLOT(OnResultReady(bool, ParentalLevel::Level)));
+    connect(m_private, &ParentalLevelChangeCheckerPrivate::SigDone,
+            this, &ParentalLevelChangeChecker::OnResultReady);
 }
 
 void ParentalLevelChangeChecker::Check(ParentalLevel::Level fromLevel,

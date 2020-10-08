@@ -161,8 +161,8 @@ bool MythDialogBox::Create(void)
     if (m_menu)
         updateMenu();
 
-    connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(Select(MythUIButtonListItem*)));
+    connect(m_buttonList, &MythUIButtonList::itemClicked,
+            this, &MythDialogBox::Select);
 
     return true;
 }
@@ -458,12 +458,12 @@ bool MythConfirmationDialog::Create(void)
 
     if (m_showCancel)
     {
-        connect(cancelButton, SIGNAL(Clicked()), SLOT(Cancel()));
+        connect(cancelButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Cancel);
     }
     else
         cancelButton->SetVisible(false);
 
-    connect(okButton, SIGNAL(Clicked()), SLOT(Confirm()));
+    connect(okButton, &MythUIButton::Clicked, this, &MythConfirmationDialog::Confirm);
 
     m_messageText->SetText(m_message);
 
@@ -630,8 +630,8 @@ bool MythTextInputDialog::Create(void)
     }
 
     if (cancelButton)
-        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(okButton, SIGNAL(Clicked()), SLOT(sendResult()));
+        connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(okButton, &MythUIButton::Clicked, this, &MythTextInputDialog::sendResult);
 
     m_textEdit->SetFilter(m_filter);
     m_textEdit->SetText(m_defaultValue);
@@ -699,8 +699,8 @@ bool MythSpinBoxDialog::Create(void)
     }
 
     if (cancelButton)
-        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(okButton, SIGNAL(Clicked()), SLOT(sendResult()));
+        connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(okButton, &MythUIButton::Clicked, this, &MythSpinBoxDialog::sendResult);
 
     messageText->SetText(m_message);
     BuildFocusList();
@@ -824,15 +824,15 @@ bool MythUISearchDialog::Create(void)
     }
 
     if (cancelButton)
-        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+        connect(cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(okButton, SIGNAL(Clicked()), SLOT(slotSendResult()));
+    connect(okButton, &MythUIButton::Clicked, this, &MythUISearchDialog::slotSendResult);
 
-    connect(m_itemList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(slotSendResult()));
+    connect(m_itemList, &MythUIButtonList::itemClicked,
+            this, &MythUISearchDialog::slotSendResult);
 
     m_textEdit->SetText(m_defaultValue);
-    connect(m_textEdit, SIGNAL(valueChanged()), SLOT(slotUpdateList()));
+    connect(m_textEdit, &MythUITextEdit::valueChanged, this, &MythUISearchDialog::slotUpdateList);
 
     m_titleText->SetText(m_title);
     if (m_matchesText)
@@ -1039,7 +1039,7 @@ bool MythTimeInputDialog::Create()
     if (messageText && !m_message.isEmpty())
         messageText->SetText(m_message);
 
-    connect(okButton, SIGNAL(Clicked()), SLOT(okClicked()));
+    connect(okButton, &MythUIButton::Clicked, this, &MythTimeInputDialog::okClicked);
 
     BuildFocusList();
 

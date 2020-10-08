@@ -588,7 +588,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
 
     _setting->addTargetedChild(_grabber, config);
 
-    connect(config, SIGNAL(clicked()), SLOT(RunConfig()));
+    connect(config, &ButtonStandardSetting::clicked, this, &XMLTV_generic_config::RunConfig);
 }
 
 void XMLTV_generic_config::Save()
@@ -1974,10 +1974,10 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
 //    connect(buttonRecOpt, SIGNAL(pressed()),
 //            this,         SLOT(  VBoxExtraPanel()));
 
-    connect(m_cardIp,    SIGNAL(NewIP(const QString&)),
-            m_deviceId,  SLOT(  SetIP(const QString&)));
-    connect(m_cardTuner, SIGNAL(NewTuner(const QString&)),
-            m_deviceId,  SLOT(  SetTuner(const QString&)));
+    connect(m_cardIp,    &VBoxIP::NewIP,
+            m_deviceId,  &VBoxDeviceID::SetIP);
+    connect(m_cardTuner, &VBoxTunerIndex::NewTuner,
+            m_deviceId,  &VBoxDeviceID::SetTuner);
 };
 
 void VBoxConfigurationGroup::FillDeviceList(void)
@@ -2108,15 +2108,15 @@ static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     cardtype.addTargetedChild("CETON", new SignalTimeout(parent, 1000, 250));
     cardtype.addTargetedChild("CETON", new ChannelTimeout(parent, 3000, 1750));
 
-    QObject::connect(ip,       SIGNAL(NewValue(const QString&)),
-                     deviceid, SLOT(  SetIP(const QString&)));
-    QObject::connect(tuner,    SIGNAL(NewValue(const QString&)),
-                     deviceid, SLOT(  SetTuner(const QString&)));
+    QObject::connect(ip,       &CetonSetting::NewValue,
+                     deviceid, &CetonDeviceID::SetIP);
+    QObject::connect(tuner,    &CetonSetting::NewValue,
+                     deviceid, &CetonDeviceID::SetTuner);
 
-    QObject::connect(deviceid, SIGNAL(LoadedIP(const QString&)),
-                     ip,       SLOT(  LoadValue(const QString&)));
-    QObject::connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
-                     tuner,    SLOT(  LoadValue(const QString&)));
+    QObject::connect(deviceid, &CetonDeviceID::LoadedIP,
+                     ip,       &CetonSetting::LoadValue);
+    QObject::connect(deviceid, &CetonDeviceID::LoadedTuner,
+                     tuner,    &CetonSetting::LoadValue);
 }
 #endif
 
@@ -3189,14 +3189,14 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     setObjectName("CardInput");
     SetSourceID("-1");
 
-    connect(m_scan,     SIGNAL(clicked()), SLOT(channelScanner()));
-    connect(m_srcFetch, SIGNAL(clicked()), SLOT(sourceFetch()));
+    connect(m_scan,     &ButtonStandardSetting::clicked, this, &CardInput::channelScanner);
+    connect(m_srcFetch, &ButtonStandardSetting::clicked, this, &CardInput::sourceFetch);
     connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
             m_startChan,SLOT(  SetSourceID (const QString&)));
     connect(m_sourceId, SIGNAL(valueChanged(const QString&)),
             this,       SLOT(  SetSourceID (const QString&)));
-    connect(ingrpbtn,   SIGNAL(clicked()),
-            this,       SLOT(  CreateNewInputGroup()));
+    connect(ingrpbtn,   &ButtonStandardSetting::clicked,
+            this,       &CardInput::CreateNewInputGroup);
 }
 
 CardInput::~CardInput()
@@ -3234,8 +3234,8 @@ void CardInput::CreateNewInputGroup(void)
 
     if (settingdialog->Create())
     {
-        connect(settingdialog, SIGNAL(haveResult(QString)),
-                SLOT(CreateNewInputGroupSlot(const QString&)));
+        connect(settingdialog, &MythTextInputDialog::haveResult,
+                this, &CardInput::CreateNewInputGroupSlot);
         popupStack->AddScreen(settingdialog);
     }
     else
@@ -4004,8 +4004,8 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     a_cardtype.addTargetedChild("SATIP", new ChannelTimeout(m_parent, 10000, 2000));
     a_cardtype.addTargetedChild("SATIP", new DVBEITScan(m_parent));
 
-    connect(m_deviceIdList, SIGNAL(NewTuner(const QString&)),
-            m_deviceId,     SLOT(  SetTuner(const QString&)));
+    connect(m_deviceIdList, &SatIPDeviceIDList::NewTuner,
+            m_deviceId,     &SatIPDeviceID::SetTuner);
 };
 
 void SatIPConfigurationGroup::FillDeviceList(void)

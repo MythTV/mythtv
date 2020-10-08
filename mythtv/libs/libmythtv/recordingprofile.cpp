@@ -1664,7 +1664,7 @@ void RecordingProfileEditor::Load(void)
 {
     clearSettings();
     auto *newProfile = new ButtonStandardSetting(tr("(Create new profile)"));
-    connect(newProfile, SIGNAL(clicked()), SLOT(ShowNewProfileDialog()));
+    connect(newProfile, &ButtonStandardSetting::clicked, this, &RecordingProfileEditor::ShowNewProfileDialog);
     addChild(newProfile);
     RecordingProfile::fillSelections(this, m_group);
     StandardSetting::Load();
@@ -1678,8 +1678,8 @@ void RecordingProfileEditor::ShowNewProfileDialog()
 
     if (settingdialog->Create())
     {
-        connect(settingdialog, SIGNAL(haveResult(QString)),
-                SLOT(CreateNewProfile(QString)));
+        connect(settingdialog, &MythTextInputDialog::haveResult,
+                this, &RecordingProfileEditor::CreateNewProfile);
         popupStack->AddScreen(settingdialog);
     }
     else

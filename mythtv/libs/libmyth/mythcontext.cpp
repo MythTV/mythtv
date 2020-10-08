@@ -323,7 +323,7 @@ bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
-        QObject::connect(m_guiStartup,SIGNAL(cancelPortCheck()),&checker,SLOT(cancelPortCheck()));
+        QObject::connect(m_guiStartup,&GUIStartup::cancelPortCheck,&checker,&PortChecker::cancelPortCheck);
     return checker.checkPort(host, port, timeLimit*1000);
 }
 

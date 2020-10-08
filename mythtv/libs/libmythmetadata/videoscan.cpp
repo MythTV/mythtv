@@ -445,10 +445,10 @@ void VideoScanner::doScan(const QStringList &dirs)
         if (progressDlg->Create())
         {
             popupStack->AddScreen(progressDlg, false);
-            connect(m_scanThread->qthread(), SIGNAL(finished()),
-                    progressDlg, SLOT(Close()));
-            connect(m_scanThread->qthread(), SIGNAL(finished()),
-                    SLOT(finishedScan()));
+            connect(m_scanThread->qthread(), &QThread::finished,
+                    progressDlg, &MythScreenType::Close);
+            connect(m_scanThread->qthread(), &QThread::finished,
+                    this, &VideoScanner::finishedScan);
         }
         else
         {

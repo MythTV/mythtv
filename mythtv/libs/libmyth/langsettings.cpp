@@ -67,7 +67,7 @@ bool LanguageSelection::Create(void)
             SLOT(LanguageClicked(MythUIButtonListItem*)));
 #endif
 
-    connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &LanguageSelection::Save);
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
     m_languageList->SetLCDTitles(tr("Preferred language"), "");

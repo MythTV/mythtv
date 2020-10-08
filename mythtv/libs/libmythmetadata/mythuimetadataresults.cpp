@@ -95,8 +95,8 @@ bool MetadataResultsDialog::Create()
         button->SetData(QVariant::fromValue<uint>(i));
     }
 
-    connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(sendResult(MythUIButtonListItem *)));
+    connect(m_resultsList, &MythUIButtonList::itemClicked,
+            this, &MetadataResultsDialog::sendResult);
 
     BuildFocusList();
 

@@ -67,12 +67,12 @@ bool RawSettingsEditor::Create(void)
 
     m_settingValue = dynamic_cast<MythUITextEdit *> (GetChild("settingvalue"));
 
-    connect(m_settingsList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(selectionChanged(MythUIButtonListItem*)));
-    connect(m_settingValue, SIGNAL(LosingFocus()), SLOT(valueChanged()));
+    connect(m_settingsList, &MythUIButtonList::itemSelected,
+            this, &RawSettingsEditor::selectionChanged);
+    connect(m_settingValue, &MythUIType::LosingFocus, this, &RawSettingsEditor::valueChanged);
 
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &RawSettingsEditor::Save);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     LoadInBackground();
 

@@ -124,8 +124,8 @@ void MythThemedMenu::SetMenuTheme(const QString &menufile)
 
     CopyFrom(m_state);
 
-    connect(m_buttonList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setButtonActive(MythUIButtonListItem*)));
+    connect(m_buttonList, &MythUIButtonList::itemSelected,
+            this, &MythThemedMenu::setButtonActive);
     connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(buttonAction(MythUIButtonListItem*)));
 

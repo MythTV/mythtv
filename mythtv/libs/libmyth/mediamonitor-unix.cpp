@@ -615,8 +615,8 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 
     QMutexLocker locker(&m_devicesLock);
 
-    connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
-            this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
+    connect(pDevice, &MythMediaDevice::statusChanged,
+            this, &MediaMonitor::mediaStatusChanged);
     m_devices.push_back( pDevice );
     m_useCount[pDevice] = 0;
     LOG(VB_MEDIA, LOG_INFO, LOC + ":AddDevice() - Added " + path);

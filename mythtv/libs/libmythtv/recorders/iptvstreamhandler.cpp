@@ -336,8 +336,8 @@ IPTVStreamHandlerReadHelper::IPTVStreamHandlerReadHelper(
     m_parent(p), m_socket(s), m_sender(p->m_sender[stream]),
     m_stream(stream)
 {
-    connect(m_socket, SIGNAL(readyRead()),
-            this,     SLOT(ReadPending()));
+    connect(m_socket, &QIODevice::readyRead,
+            this,     &IPTVStreamHandlerReadHelper::ReadPending);
 }
 
 #define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->m_device)

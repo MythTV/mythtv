@@ -159,7 +159,7 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
+    connect(m_timer, &QTimer::timeout, this, &MythNotificationScreen::ProcessTimer);
 }
 
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
@@ -169,7 +169,7 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
       m_timer(new QTimer(this))
 {
     SetNotification(notification);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
+    connect(m_timer, &QTimer::timeout, this, &MythNotificationScreen::ProcessTimer);
 }
 
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
@@ -192,7 +192,7 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
       m_timer(new QTimer(this)),
       m_style(s.m_style)
 {
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
+    connect(m_timer, &QTimer::timeout, this, &MythNotificationScreen::ProcessTimer);
 }
 
 MythNotificationScreen::~MythNotificationScreen()
@@ -841,7 +841,7 @@ void NCPrivate::ScreenDeleted(void)
                 // re-create the screen
                 auto *newscreen =
                     new MythNotificationScreen(m_screenStack, *screen);
-                connect(newscreen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
+                connect(newscreen, &MythNotificationScreen::ScreenDeleted, this, &NCPrivate::ScreenDeleted);
                 m_registrations[screen->m_id] = newscreen;
                 // Screen was deleted, add it to suspended list
                 m_suspended.append(screen->m_id);
@@ -1006,7 +1006,7 @@ MythNotificationScreen *NCPrivate::CreateScreen(MythNotification *n, int id)
         delete screen;
         return nullptr;
     }
-    connect(screen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
+    connect(screen, &MythNotificationScreen::ScreenDeleted, this, &NCPrivate::ScreenDeleted);
     return screen;
 }
 

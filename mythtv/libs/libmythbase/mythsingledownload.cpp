@@ -31,9 +31,9 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
                      QNetworkRequest::AlwaysNetwork);
 
     // "quit()" the event-loop, when the network request "finished()"
-    connect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
-    connect(m_reply, SIGNAL(finished()), &event_loop, SLOT(quit()));
-    connect(m_reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(Progress(qint64,qint64)));
+    connect(&m_timer, &QTimer::timeout, &event_loop, &QEventLoop::quit);
+    connect(m_reply, &QNetworkReply::finished, &event_loop, &QEventLoop::quit);
+    connect(m_reply, &QNetworkReply::downloadProgress, this, &MythSingleDownload::Progress);
 
     // Configure timeout and size limit
     m_maxsize = maxsize;
@@ -42,9 +42,9 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
 
     bool ret = event_loop.exec() != 0; // blocks stack until quit() is called
 
-    disconnect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
-    disconnect(m_reply, SIGNAL(finished()), &event_loop, SLOT(quit()));
-    disconnect(m_reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(Progress(qint64,qint64)));
+    disconnect(&m_timer, &QTimer::timeout, &event_loop, &QEventLoop::quit);
+    disconnect(m_reply, &QNetworkReply::finished, &event_loop, &QEventLoop::quit);
+    disconnect(m_reply, &QNetworkReply::downloadProgress, this, &MythSingleDownload::Progress);
 
     if (ret)
     {

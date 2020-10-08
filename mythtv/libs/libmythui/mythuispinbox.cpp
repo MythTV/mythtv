@@ -328,10 +328,10 @@ bool SpinBoxEntryDialog::Create(void)
         m_rulesText->SetTextFromMap(infoMap);
     }
 
-    connect(m_entryEdit, SIGNAL(valueChanged()), SLOT(entryChanged()));
+    connect(m_entryEdit, &MythUITextEdit::valueChanged, this, &SpinBoxEntryDialog::entryChanged);
     if (m_cancelButton)
-        connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(m_okButton, SIGNAL(Clicked()), SLOT(okClicked()));
+        connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_okButton, &MythUIButton::Clicked, this, &SpinBoxEntryDialog::okClicked);
 
     BuildFocusList();
 

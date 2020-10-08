@@ -83,8 +83,8 @@ bool BackendSelection::Create(void)
             SLOT(Accept(MythUIButtonListItem *)));
 
     // connect(m_searchButton, SIGNAL(clicked()), SLOT(Search()));
-    connect(m_manualButton, SIGNAL(Clicked()), SLOT(Manual()));
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Cancel()));
+    connect(m_manualButton, &MythUIButton::Clicked, this, &BackendSelection::Manual);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &BackendSelection::Cancel);
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Accept()));
 
     BuildFocusList();

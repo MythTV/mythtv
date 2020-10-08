@@ -15,7 +15,7 @@
 OutboundRequestHandler::OutboundRequestHandler(void) 
 {
     m_timer.setSingleShot(true);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(ConnectToMaster()));
+    connect(&m_timer, &QTimer::timeout, this, &OutboundRequestHandler::ConnectToMaster);
 }
 
 void OutboundRequestHandler::ConnectToMaster(void)

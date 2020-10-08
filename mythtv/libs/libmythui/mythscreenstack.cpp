@@ -210,7 +210,7 @@ void MythScreenStack::ScheduleInitIfNeeded(void)
         !m_topScreen->IsLoading())
     {
         m_initTimerStarted = true;
-        QTimer::singleShot(100, this, SLOT(doInit()));
+        QTimer::singleShot(100, this, &MythScreenStack::doInit);
     }
 }
 

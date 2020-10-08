@@ -55,11 +55,11 @@ bool MythRAOPDevice::Create(void)
     {
         gMythRAOPDevice->moveToThread(gMythRAOPDeviceThread->qthread());
         QObject::connect(
-            gMythRAOPDeviceThread->qthread(), SIGNAL(started()),
-            gMythRAOPDevice,                  SLOT(Start()));
+            gMythRAOPDeviceThread->qthread(), &QThread::started,
+            gMythRAOPDevice,                  &MythRAOPDevice::Start);
         QObject::connect(
-            gMythRAOPDeviceThread->qthread(), SIGNAL(finished()),
-            gMythRAOPDevice,                  SLOT(Stop()));
+            gMythRAOPDeviceThread->qthread(), &QThread::finished,
+            gMythRAOPDevice,                  &MythRAOPDevice::Stop);
         gMythRAOPDeviceThread->start(QThread::LowestPriority);
     }
 
@@ -221,7 +221,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     if (obj->Init())
     {
         m_clients.append(obj);
-        connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
+        connect(client, &QAbstractSocket::disconnected, this, &MythRAOPDevice::deleteClient);
         gCoreContext->RegisterForPlayback(this, SLOT(TVPlaybackStarting()));
         return;
     }

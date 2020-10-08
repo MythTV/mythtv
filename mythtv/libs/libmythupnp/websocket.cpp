@@ -210,13 +210,13 @@ void WebSocketWorker::SetupSocket()
 
     m_socket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
-    connect(m_socket, SIGNAL(readyRead()), SLOT(doRead()));
-    connect(m_socket, SIGNAL(disconnected()), SLOT(CloseConnection()));
+    connect(m_socket, &QIODevice::readyRead, this, &WebSocketWorker::doRead);
+    connect(m_socket, &QAbstractSocket::disconnected, this, &WebSocketWorker::CloseConnection);
 
     // Setup heartbeat
     m_heartBeat->setInterval(20000); // 20 second
     m_heartBeat->setSingleShot(false);
-    connect(m_heartBeat, SIGNAL(timeout()), SLOT(SendHeartBeat()));
+    connect(m_heartBeat, &QTimer::timeout, this, &WebSocketWorker::SendHeartBeat);
 }
 
 void WebSocketWorker::CleanupSocket()
@@ -932,8 +932,8 @@ void WebSocketWorker::RegisterExtension(WebSocketExtension* extension)
 
     connect(extension, SIGNAL(SendTextMessage(const QString &)),
             this, SLOT(SendText(const QString &)));
-    connect(extension, SIGNAL(SendBinaryMessage(const QByteArray &)),
-            this, SLOT(SendBinary(const QByteArray &)));
+    connect(extension, &WebSocketExtension::SendBinaryMessage,
+            this, &WebSocketWorker::SendBinary);
 
     m_extensions.append(extension);
 }

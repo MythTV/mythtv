@@ -219,7 +219,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
     auto *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");
-    connect(newTransport, SIGNAL(clicked()), SLOT(NewTransport(void)));
+    connect(newTransport, &ButtonStandardSetting::clicked, this, &TransportListEditor::NewTransport);
 
     addChild(newTransport);
 

@@ -24,7 +24,7 @@ class SatIPRTSP;
 class SatIPStreamHandler;
 using Headers = QMap<QString, QString>;
 
-class SatIPRTSPReadHelper : QObject
+class SatIPRTSPReadHelper : public QObject
 {
     friend class SatIPRTSP;
     Q_OBJECT
@@ -43,7 +43,7 @@ class SatIPRTSPReadHelper : QObject
     SatIPRTSP *m_parent   {nullptr};
 };
 
-class SatIPRTCPReadHelper : QObject
+class SatIPRTCPReadHelper : public QObject
 {
     friend class SatIPRTSP;
     Q_OBJECT
@@ -62,7 +62,7 @@ class SatIPRTCPReadHelper : QObject
     SatIPRTSP *m_parent   {nullptr};
 };
 
-class SatIPRTSPWriteHelper : QObject
+class SatIPRTSPWriteHelper : public QObject
 {
     Q_OBJECT
 
@@ -83,7 +83,7 @@ class SatIPRTSPWriteHelper : QObject
     int                 m_lostInterval                {0};
 };
 
-class SatIPRTSP : QObject
+class SatIPRTSP : public QObject
 {
     friend class SatIPRTSPReadHelper;
     friend class SatIPRTCPReadHelper;

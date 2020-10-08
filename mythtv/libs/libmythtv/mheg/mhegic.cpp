@@ -92,7 +92,7 @@ bool MHInteractionChannel::CheckFile(const QString& csPath, const QByteArray &ce
         return false;
     }
 
-    connect(p.data(), SIGNAL(Finished(QObject*)), this, SLOT(slotFinished(QObject*)) );
+    connect(p.data(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
     m_pending.insert(url, p.take());
 
     return false; // It's now pending so unavailable
@@ -156,7 +156,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
         return kError;
     }
 
-    connect(p.data(), SIGNAL(Finished(QObject*)), this, SLOT(slotFinished(QObject*)) );
+    connect(p.data(), &NetStream::Finished, this, &MHInteractionChannel::slotFinished );
     m_pending.insert(url, p.take());
 
     return kPending;

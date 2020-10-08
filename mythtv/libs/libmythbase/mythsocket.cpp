@@ -107,29 +107,29 @@ MythSocket::MythSocket(
     // in the handlers safely since they will be running
     // in the same thread as all other m_tcpSocket users.
 
-    connect(m_tcpSocket,  SIGNAL(connected()),
-            this, SLOT(ConnectHandler()),
+    connect(m_tcpSocket,  &QAbstractSocket::connected,
+            this, &MythSocket::ConnectHandler,
             Qt::DirectConnection);
 #if QT_VERSION < QT_VERSION_CHECK(5,15,0)
     connect(m_tcpSocket,  SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(ErrorHandler(QAbstractSocket::SocketError)),
             Qt::DirectConnection);
 #else
-    connect(m_tcpSocket,  SIGNAL(errorOccurred(QAbstractSocket::SocketError)),
-            this, SLOT(ErrorHandler(QAbstractSocket::SocketError)),
+    connect(m_tcpSocket,  &QAbstractSocket::errorOccurred,
+            this, &MythSocket::ErrorHandler,
             Qt::DirectConnection);
 #endif
-    connect(m_tcpSocket,  SIGNAL(aboutToClose()),
-            this, SLOT(AboutToCloseHandler()));
-    connect(m_tcpSocket,  SIGNAL(disconnected()),
-            this, SLOT(DisconnectHandler()),
+    connect(m_tcpSocket,  &QIODevice::aboutToClose,
+            this, &MythSocket::AboutToCloseHandler);
+    connect(m_tcpSocket,  &QAbstractSocket::disconnected,
+            this, &MythSocket::DisconnectHandler,
             Qt::DirectConnection);
-    connect(m_tcpSocket,  SIGNAL(readyRead()),
-            this, SLOT(ReadyReadHandler()),
+    connect(m_tcpSocket,  &QIODevice::readyRead,
+            this, &MythSocket::ReadyReadHandler,
             Qt::DirectConnection);
 
-    connect(this, SIGNAL(CallReadyRead()),
-            this, SLOT(CallReadyReadHandler()),
+    connect(this, &MythSocket::CallReadyRead,
+            this, &MythSocket::CallReadyReadHandler,
             Qt::QueuedConnection);
 
     if (!use_shared_thread)

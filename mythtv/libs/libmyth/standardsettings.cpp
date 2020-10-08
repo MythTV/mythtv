@@ -38,8 +38,8 @@ MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
 {
     auto *item = new MythUIButtonListItemSetting(list, m_label);
     item->SetData(QVariant::fromValue(this));
-    connect(this, SIGNAL(ShouldRedraw(StandardSetting *)),
-            item, SLOT(ShouldUpdate(StandardSetting *)));
+    connect(this, &StandardSetting::ShouldRedraw,
+            item, &MythUIButtonListItemSetting::ShouldUpdate);
     updateButton(item);
     return item;
 }
@@ -760,10 +760,10 @@ bool StandardSettingDialog::Create(void)
         return false;
     }
 
-    connect(m_buttonList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(settingSelected(MythUIButtonListItem*)));
-    connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(settingClicked(MythUIButtonListItem*)));
+    connect(m_buttonList, &MythUIButtonList::itemSelected,
+            this, &StandardSettingDialog::settingSelected);
+    connect(m_buttonList, &MythUIButtonList::itemClicked,
+            this, &StandardSettingDialog::settingClicked);
 
     BuildFocusList();
 
@@ -875,8 +875,8 @@ void StandardSettingDialog::setCurrentGroupSetting(
     }
     updateSettings(selectedSetting);
     connect(m_currentGroupSetting,
-            SIGNAL(settingsChanged(StandardSetting *)),
-            SLOT(updateSettings(StandardSetting *)));
+            &StandardSetting::settingsChanged,
+            this, &StandardSettingDialog::updateSettings);
 }
 
 void StandardSettingDialog::updateSettings(StandardSetting * selectedSetting)

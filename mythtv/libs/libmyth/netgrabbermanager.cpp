@@ -149,8 +149,8 @@ GrabberManager::GrabberManager()
     m_updateFreq = (gCoreContext->GetNumSetting(
                        "netsite.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
-    connect( m_timer, SIGNAL(timeout()),
-                      this, SLOT(timeout()));
+    connect( m_timer, &QTimer::timeout,
+                      this, &GrabberManager::timeout);
 }
 
 GrabberManager::~GrabberManager()
@@ -269,8 +269,8 @@ void Search::executeSearch(const QString &script, const QString &query,
 
     connect(m_searchProcess, SIGNAL(finished()),
             this, SLOT(slotProcessSearchExit()));
-    connect(m_searchProcess, SIGNAL(error(uint)),
-            this, SLOT(slotProcessSearchExit(uint)));
+    connect(m_searchProcess, &MythSystemLegacy::error,
+            this, &Search::slotProcessSearchExit);
 
     const QString& cmd = script;
 

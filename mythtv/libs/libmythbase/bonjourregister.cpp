@@ -67,8 +67,8 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
         {
             m_socket = new QSocketNotifier(fd, QSocketNotifier::Read, this);
             m_socket->setEnabled(true);
-            connect(m_socket, SIGNAL(activated(int)),
-                    this, SLOT(socketReadyRead()));
+            connect(m_socket, &QSocketNotifier::activated,
+                    this, &BonjourRegister::socketReadyRead);
             delete m_lock; // would already have been deleted, but just in case
             m_lock = nullptr;
             return true;

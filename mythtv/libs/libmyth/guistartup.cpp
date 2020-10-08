@@ -93,9 +93,9 @@ bool GUIStartup::Create(void)
         return false;
     }
 
-    connect(m_retryButton, SIGNAL(Clicked()), SLOT(Retry()));
-    connect(m_searchButton, SIGNAL(Clicked()), SLOT(Search()));
-    connect(m_setupButton, SIGNAL(Clicked()), SLOT(Setup()));
+    connect(m_retryButton, &MythUIButton::Clicked, this, &GUIStartup::Retry);
+    connect(m_searchButton, &MythUIButton::Clicked, this, &GUIStartup::Search);
+    connect(m_setupButton, &MythUIButton::Clicked, this, &GUIStartup::Setup);
     connect(m_exitButton, SIGNAL(Clicked()), SLOT(Close()));
     connect(&m_timer, SIGNAL(timeout()), SLOT(updateProgress()));
 
@@ -181,8 +181,8 @@ void GUIStartup::Close(void)
     if (confirmdialog->Create())
         popupStack->AddScreen(confirmdialog);
 
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(OnClosePromptReturn(bool)));
+    connect(confirmdialog, &MythConfirmationDialog::haveResult,
+            this, &GUIStartup::OnClosePromptReturn);
 
     m_dlgLoop.exec();
 

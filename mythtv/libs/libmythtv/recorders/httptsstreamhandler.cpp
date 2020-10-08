@@ -150,9 +150,9 @@ bool HTTPReader::DownloadStream(const QUrl& url)
     m_reply = m_mgr.get(QNetworkRequest(url));
     m_replylock.unlock();
 
-    connect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
-    connect(m_reply, SIGNAL(finished()), &event_loop, SLOT(quit()));
-    connect(m_reply,SIGNAL(readyRead()), this,        SLOT(HttpRead()));
+    connect(&m_timer, &QTimer::timeout, &event_loop, &QEventLoop::quit);
+    connect(m_reply, &QNetworkReply::finished, &event_loop, &QEventLoop::quit);
+    connect(m_reply,&QIODevice::readyRead, this,        &HTTPReader::HttpRead);
 
     // Configure timeout and size limit
     m_timer.setSingleShot(true);
@@ -160,9 +160,9 @@ bool HTTPReader::DownloadStream(const QUrl& url)
 
     event_loop.exec(); // blocks stack until quit() is called
 
-    disconnect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
-    disconnect(m_reply, SIGNAL(finished()), &event_loop, SLOT(quit()));
-    disconnect(m_reply,SIGNAL(readyRead()), this,        SLOT(HttpRead()));
+    disconnect(&m_timer, &QTimer::timeout, &event_loop, &QEventLoop::quit);
+    disconnect(m_reply, &QNetworkReply::finished, &event_loop, &QEventLoop::quit);
+    disconnect(m_reply,&QIODevice::readyRead, this,        &HTTPReader::HttpRead);
 
     if (m_timer.isActive())
         m_timer.stop();

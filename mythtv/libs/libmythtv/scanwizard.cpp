@@ -49,7 +49,7 @@ ScanWizard::ScanWizard(uint           default_sourceid,
 {
     SetupConfig(default_sourceid, default_cardid, default_inputname);
     auto *scanButton = new ButtonStandardSetting(tr("Scan"));
-    connect(scanButton, SIGNAL(clicked()), SLOT(Scan()));
+    connect(scanButton, &ButtonStandardSetting::clicked, this, &ScanWizard::Scan);
     addChild(scanButton);
 }
 

@@ -553,11 +553,11 @@ MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
 {
     m_parent = parent;
 
-    connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
-    connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
-    connect(this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)));
-    connect(this, SIGNAL(readDataReady(int)),
-            m_parent, SIGNAL(readDataReady(int)));
+    connect(this, &MythSystemLegacyPrivate::started, m_parent.data(), &MythSystemLegacy::started);
+    connect(this, &MythSystemLegacyPrivate::finished, m_parent.data(), &MythSystemLegacy::finished);
+    connect(this, &MythSystemLegacyPrivate::error, m_parent.data(), &MythSystemLegacy::error);
+    connect(this, &MythSystemLegacyPrivate::readDataReady,
+            m_parent.data(), &MythSystemLegacy::readDataReady);
 
     // Start the threads if they haven't been started yet.
     if( manager == nullptr )

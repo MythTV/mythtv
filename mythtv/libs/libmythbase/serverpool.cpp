@@ -525,8 +525,8 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
             LOG(VB_GENERAL, LOG_INFO, QString("Binding to UDP %1:%2")
                     .arg(PRETTYIP_(qha)).arg(port));
             m_udpSockets.append(socket);
-            connect(socket, SIGNAL(readyRead()),
-                    this,   SLOT(newUdpDatagram()));
+            connect(socket, &QIODevice::readyRead,
+                    this,   &ServerPool::newUdpDatagram);
         }
         else
         {

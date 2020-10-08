@@ -35,8 +35,8 @@ MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
     m_arguments(std::move(_arguments))
 {
     m_process->setProcessChannelMode(QProcess::MergedChannels);
-    connect(m_process, SIGNAL(readyRead()),
-            this,      SLOT(ProcessHasText()));
+    connect(m_process, &QIODevice::readyRead,
+            this,      &MythTerminal::ProcessHasText);
 
     connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)),
             this,      SLOT(  ProcessFinished(int, QProcess::ExitStatus)));
@@ -162,7 +162,7 @@ bool MythTerminal::Create(void)
     MythUIButton *close = nullptr;
     UIUtilW::Assign(this, close, "close");
     if (close)
-        connect(close, SIGNAL(Clicked()), this, SLOT(Close()));
+        connect(close, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     connect(m_enterButton, &MythUIButton::Clicked,
             this,

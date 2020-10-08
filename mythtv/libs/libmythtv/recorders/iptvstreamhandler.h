@@ -26,7 +26,7 @@ class MPEGStreamData;
 class PacketBuffer;
 class IPTVChannel;
 
-class IPTVStreamHandlerReadHelper : QObject
+class IPTVStreamHandlerReadHelper : public QObject
 {
     Q_OBJECT
 
