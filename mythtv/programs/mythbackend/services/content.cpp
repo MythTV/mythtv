@@ -520,7 +520,8 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         return QFileInfo();
     }
 
-    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower()
+            &&  ! gCoreContext->GetBoolSetting("MasterBackendOverride", false))
     {
         QString sMsg =
             QString("GetPreviewImage: Wrong Host '%1' request from '%2'")
@@ -682,7 +683,8 @@ QFileInfo Content::GetRecording( int              nRecordedId,
         return QFileInfo();
     }
 
-    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower()
+            &&  ! gCoreContext->GetBoolSetting("MasterBackendOverride", false))
     {
         // We only handle requests for local resources
 
@@ -1022,7 +1024,10 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
         return nullptr;
     }
 
-    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    bool masterBackendOverride = gCoreContext->GetBoolSetting("MasterBackendOverride", false);
+
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower()
+            &&  ! masterBackendOverride)
     {
         // We only handle requests for local resources
 
@@ -1052,8 +1057,14 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
 
     QFileInfo fInfo( sFileName );
 
+    QString hostName;
+    if (masterBackendOverride)
+        hostName = gCoreContext->GetHostName();
+    else
+        hostName = pginfo.GetHostname();
+
     return AddLiveStream( pginfo.GetStorageGroup(), fInfo.fileName(),
-                          pginfo.GetHostname(), nMaxSegments, nWidth,
+                          hostName, nMaxSegments, nWidth,
                           nHeight, nBitrate, nAudioBitrate, nSampleRate );
 }
 
