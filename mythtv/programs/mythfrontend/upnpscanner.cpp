@@ -177,8 +177,8 @@ UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
     {
         gUPNPScanner->moveToThread(gUPNPScannerThread->qthread());
         QObject::connect(
-            gUPNPScannerThread->qthread(), SIGNAL(started()),
-            gUPNPScanner,                  SLOT(Start()));
+            gUPNPScannerThread->qthread(), &QThread::started,
+            gUPNPScanner,                  &UPNPScanner::Start);
         gUPNPScannerThread->start(QThread::LowestPriority);
     }
 
@@ -411,8 +411,8 @@ void UPNPScanner::Start()
 
     // create our network handler
     m_network = new QNetworkAccessManager();
-    connect(m_network, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(replyFinished(QNetworkReply*)));
+    connect(m_network, &QNetworkAccessManager::finished,
+            this, &UPNPScanner::replyFinished);
 
     // listen for SSDP updates
     SSDP::AddListener(this);
@@ -424,11 +424,11 @@ void UPNPScanner::Start()
     // create our update timer (driven by AddServer and ParseDescription)
     m_updateTimer = new QTimer(this);
     m_updateTimer->setSingleShot(true);
-    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(Update()));
+    connect(m_updateTimer, &QTimer::timeout, this, &UPNPScanner::Update);
 
     // create our watchdog timer (checks for stale servers)
     m_watchdogTimer = new QTimer(this);
-    connect(m_watchdogTimer, SIGNAL(timeout()), this, SLOT(CheckStatus()));
+    connect(m_watchdogTimer, &QTimer::timeout, this, &UPNPScanner::CheckStatus);
     m_watchdogTimer->start(1000 * 10); // every 10s
 
     // avoid connecting to the master backend

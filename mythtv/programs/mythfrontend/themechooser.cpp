@@ -122,8 +122,8 @@ bool ThemeChooser::Create(void)
 
     connect(m_themes, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(saveAndReload(MythUIButtonListItem*)));
-    connect(m_themes, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(itemChanged(MythUIButtonListItem*)));
+    connect(m_themes, &MythUIButtonList::itemSelected,
+            this, &ThemeChooser::itemChanged);
 
     BuildFocusList();
 
@@ -517,7 +517,7 @@ void ThemeChooser::showPopupMenu(void)
     m_popupMenu =
         new MythDialogBox(label, popupStack, "themechoosermenupopup");
 
-    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
+    connect(m_popupMenu, &MythDialogBox::Closed, this, &ThemeChooser::popupClosed);
 
     if (m_popupMenu->Create())
         popupStack->AddScreen(m_popupMenu);
@@ -1028,7 +1028,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
 
     gCoreContext->SaveSetting("ThemeUpdateStatus", "");
 
-    connect(m_updateTimer, SIGNAL(timeout()), SLOT(checkForUpdate()));
+    connect(m_updateTimer, &QTimer::timeout, this, &ThemeUpdateChecker::checkForUpdate);
 
     if (getenv("MYTHTV_DEBUGMDM"))
     {
@@ -1042,7 +1042,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
     }
 
     // Run once 15 seconds from now
-    QTimer::singleShot(15 * 1000, this, SLOT(checkForUpdate()));
+    QTimer::singleShot(15 * 1000, this, &ThemeUpdateChecker::checkForUpdate);
 }
 
 ThemeUpdateChecker::~ThemeUpdateChecker()

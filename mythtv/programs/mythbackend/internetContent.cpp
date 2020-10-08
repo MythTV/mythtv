@@ -127,10 +127,10 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
     auto *search = new Search();
     QEventLoop loop;
 
-    QObject::connect(search, SIGNAL(finishedSearch(Search *)),
-                     &loop, SLOT(quit(void)));
-    QObject::connect(search, SIGNAL(searchTimedOut(Search *)),
-                     &loop, SLOT(quit(void)));
+    QObject::connect(search, &Search::finishedSearch,
+                     &loop, &QEventLoop::quit);
+    QObject::connect(search, &Search::searchTimedOut,
+                     &loop, &QEventLoop::quit);
 
     search->executeSearch(command, query, page);
     loop.exec();

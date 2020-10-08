@@ -71,7 +71,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
 
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(veryBadThings(QAbstractSocket::SocketError)));
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
+    connect(m_socket, &QIODevice::readyRead, this, &LCDProcClient::serverSendingData);
 
     lcdStartCol = LCD_START_COL;
     if ( m_lcdWidth < 12)
@@ -82,37 +82,37 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
            lcdStartCol = 1;
     }
 
-    connect( m_timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));
+    connect( m_timeTimer, &QTimer::timeout, this, &LCDProcClient::outputTime);
 
-    connect( m_scrollWTimer, SIGNAL(timeout()), this, SLOT(scrollWidgets()));
+    connect( m_scrollWTimer, &QTimer::timeout, this, &LCDProcClient::scrollWidgets);
 
     m_preScrollWTimer->setSingleShot(true);
-    connect( m_preScrollWTimer, SIGNAL(timeout()), this,
-            SLOT(beginScrollingWidgets()));
+    connect( m_preScrollWTimer, &QTimer::timeout, this,
+            &LCDProcClient::beginScrollingWidgets);
 
     m_popMenuTimer->setSingleShot(true);
-    connect( m_popMenuTimer, SIGNAL(timeout()), this, SLOT(unPopMenu()));
+    connect( m_popMenuTimer, &QTimer::timeout, this, &LCDProcClient::unPopMenu);
 
-    connect( m_menuScrollTimer, SIGNAL(timeout()), this, SLOT(scrollMenuText()));
+    connect( m_menuScrollTimer, &QTimer::timeout, this, &LCDProcClient::scrollMenuText);
 
-    connect( m_menuPreScrollTimer, SIGNAL(timeout()), this,
-            SLOT(beginScrollingMenuText()));
+    connect( m_menuPreScrollTimer, &QTimer::timeout, this,
+            &LCDProcClient::beginScrollingMenuText);
 
-    connect( m_checkConnectionsTimer, SIGNAL(timeout()), this,
-            SLOT(checkConnections()));
+    connect( m_checkConnectionsTimer, &QTimer::timeout, this,
+            &LCDProcClient::checkConnections);
     m_checkConnectionsTimer->start(10000);
 
-    connect( m_recStatusTimer, SIGNAL(timeout()), this, SLOT(outputRecStatus()));
+    connect( m_recStatusTimer, &QTimer::timeout, this, &LCDProcClient::outputRecStatus);
 
-    connect( m_scrollListTimer, SIGNAL(timeout()), this, SLOT(scrollList()));
+    connect( m_scrollListTimer, &QTimer::timeout, this, &LCDProcClient::scrollList);
 
     m_showMessageTimer->setSingleShot(true);
-    connect( m_showMessageTimer, SIGNAL(timeout()), this,
-            SLOT(removeStartupMessage()));
+    connect( m_showMessageTimer, &QTimer::timeout, this,
+            &LCDProcClient::removeStartupMessage);
 
     m_updateRecInfoTimer->setSingleShot(true);
-    connect( m_updateRecInfoTimer, SIGNAL(timeout()), this,
-            SLOT(updateRecordingList()));
+    connect( m_updateRecInfoTimer, &QTimer::timeout, this,
+            &LCDProcClient::updateRecordingList);
 
     gCoreContext->addListener(this);
 }
@@ -2416,7 +2416,7 @@ void LCDProcClient::updateRecordingList(void)
                 "LCDProcClient: Cannot get recording status "
                 "- is the master server running?\n\t\t\t"
                 "Will retry in 30 seconds");
-            QTimer::singleShot(30 * 1000, this, SLOT(updateRecordingList()));
+            QTimer::singleShot(30 * 1000, this, &LCDProcClient::updateRecordingList);
 
             // If we can't get the recording status and we're showing
             // it, switch back to time. Maybe it would be even better

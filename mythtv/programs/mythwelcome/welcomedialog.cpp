@@ -44,12 +44,12 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
     m_idleTimeoutSecs = gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
 
-    connect(m_updateStatusTimer, SIGNAL(timeout()),
-            this, SLOT(updateStatus()));
+    connect(m_updateStatusTimer, &QTimer::timeout,
+            this, &WelcomeDialog::updateStatus);
     m_updateStatusTimer->start(UPDATE_STATUS_INTERVAL);
 
-    connect(m_updateScreenTimer, SIGNAL(timeout()),
-            this, SLOT(updateScreen()));
+    connect(m_updateScreenTimer, &QTimer::timeout,
+            this, &WelcomeDialog::updateScreen);
 }
 
 bool WelcomeDialog::Create(void)
@@ -75,8 +75,8 @@ bool WelcomeDialog::Create(void)
     m_warningText->SetVisible(false);
 
     m_startFrontendButton->SetText(tr("Start Frontend"));
-    connect(m_startFrontendButton, SIGNAL(Clicked()),
-            this, SLOT(startFrontendClick()));
+    connect(m_startFrontendButton, &MythUIButton::Clicked,
+            this, &WelcomeDialog::startFrontendClick);
 
     BuildFocusList();
 
@@ -106,7 +106,7 @@ void WelcomeDialog::startFrontendClick(void)
     m_frontendIsRunning = true;
 
     // this makes sure the button appears to click properly
-    QTimer::singleShot(500, this, SLOT(startFrontend()));
+    QTimer::singleShot(500, this, &WelcomeDialog::startFrontend);
 }
 
 void WelcomeDialog::checkAutoStart(void)
@@ -153,7 +153,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             else
             {
                 // we can't query the backend from inside a customEvent
-                QTimer::singleShot(500, this, SLOT(updateRecordingList()));
+                QTimer::singleShot(500, this, &WelcomeDialog::updateRecordingList);
                 setPendingRecListUpdate(true);
             }
         }
@@ -171,7 +171,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             }
             else
             {
-                QTimer::singleShot(500, this, SLOT(updateScheduledList()));
+                QTimer::singleShot(500, this, &WelcomeDialog::updateScheduledList);
                 setPendingSchedUpdate(true);
             }
         }

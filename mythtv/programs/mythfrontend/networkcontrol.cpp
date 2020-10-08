@@ -375,8 +375,8 @@ void NetworkControl::newConnection(QTcpSocket *client)
     QMutexLocker locker(&m_clientLock);
     m_clients.push_back(ncc);
 
-    connect(ncc, SIGNAL(commandReceived(QString&)), this,
-            SLOT(receiveCommand(QString&)));
+    connect(ncc, &NetworkControlClient::commandReceived, this,
+            &NetworkControl::receiveCommand);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
 
     welcomeStr = "MythFrontend Network Control\r\n";
@@ -394,7 +394,7 @@ NetworkControlClient::NetworkControlClient(QTcpSocket *s)
     m_socket = s;
     m_textStream = new QTextStream(s);
     m_textStream->setCodec("UTF-8");
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(m_socket, &QIODevice::readyRead, this, &NetworkControlClient::readClient);
 }
 
 NetworkControlClient::~NetworkControlClient()

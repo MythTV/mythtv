@@ -88,17 +88,17 @@ bool MythControls::Create(void)
         return false;
     }
 
-    connect(m_leftList,  SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(LeftSelected(MythUIButtonListItem*)));
-    connect(m_leftList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(LeftPressed(MythUIButtonListItem*)));
+    connect(m_leftList,  &MythUIButtonList::itemSelected,
+            this, &MythControls::LeftSelected);
+    connect(m_leftList,  &MythUIButtonList::itemClicked,
+            this, &MythControls::LeftPressed);
 
-    connect(m_rightList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(RightSelected(MythUIButtonListItem*)));
-    connect(m_rightList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(RightPressed(MythUIButtonListItem*)));
-    connect(m_rightList, SIGNAL(TakingFocus()),
-            SLOT(RefreshKeyInformation()));
+    connect(m_rightList, &MythUIButtonList::itemSelected,
+            this, &MythControls::RightSelected);
+    connect(m_rightList,  &MythUIButtonList::itemClicked,
+            this, &MythControls::RightPressed);
+    connect(m_rightList, &MythUIType::TakingFocus,
+            this, &MythControls::RefreshKeyInformation);
 
     for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
     {
@@ -113,7 +113,7 @@ bool MythControls::Create(void)
             return false;
         }
 
-        connect(button, SIGNAL(Clicked()), SLOT(ActionButtonPressed()));
+        connect(button, &MythUIButton::Clicked, this, &MythControls::ActionButtonPressed);
 
         m_actionButtons.append(button);
     }

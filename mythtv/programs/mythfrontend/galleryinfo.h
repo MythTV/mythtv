@@ -19,7 +19,7 @@ enum InfoVisibleState { kNoInfo,    //!< Details not displayed
                       };
 
 //! The image info/details buttonlist overlay that displays exif tags
-class InfoList : QObject
+class InfoList : public QObject
 {
     Q_OBJECT
 public:

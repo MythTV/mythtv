@@ -58,12 +58,12 @@ bool GeneralSetupWizard::Create()
                                   "next configuration step.") );
     m_cancelButton->SetHelpText( tr("Exit this wizard, save no changes.") );
 
-    connect(m_submitButton, SIGNAL(Clicked()), this, SLOT(slotSubmit()));
-    connect(m_viewButton, SIGNAL(Clicked()), this, SLOT(slotView()));
-    connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(slotDelete()));
+    connect(m_submitButton, &MythUIButton::Clicked, this, &GeneralSetupWizard::slotSubmit);
+    connect(m_viewButton, &MythUIButton::Clicked, this, &GeneralSetupWizard::slotView);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &GeneralSetupWizard::slotDelete);
 
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(slotNext()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_nextButton, &MythUIButton::Clicked, this, &GeneralSetupWizard::slotNext);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
     loadData();
@@ -128,8 +128,8 @@ void GeneralSetupWizard::slotSubmit(void)
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);
 
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(OnSubmitPromptReturn(bool)));
+    connect(confirmdialog, &MythConfirmationDialog::haveResult,
+            this, &GeneralSetupWizard::OnSubmitPromptReturn);
 }
 
 void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
@@ -226,8 +226,8 @@ void GeneralSetupWizard::slotDelete(void)
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);
 
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(OnDeletePromptReturn(bool)));
+    connect(confirmdialog, &MythConfirmationDialog::haveResult,
+            this, &GeneralSetupWizard::OnDeletePromptReturn);
 }
 
 void GeneralSetupWizard::OnDeletePromptReturn(bool submit)

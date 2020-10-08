@@ -55,8 +55,8 @@ bool GrabberSettings::Create()
                             "provide you with fresh, relevant artwork while "
                             "preserving the artwork assigned to old recordings."));
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &GrabberSettings::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
 

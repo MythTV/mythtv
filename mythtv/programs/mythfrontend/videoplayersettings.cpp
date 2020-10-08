@@ -64,10 +64,10 @@ bool PlayerSettings::Create()
     else
         m_altPlayerEdit->SetVisible(false);
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &PlayerSettings::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(m_altCheck, SIGNAL(valueChanged()), SLOT(toggleAlt()));
+    connect(m_altCheck, &MythUICheckBox::valueChanged, this, &PlayerSettings::toggleAlt);
 
     m_defaultPlayerEdit->SetHelpText(
                  tr("This is the command used for any file "

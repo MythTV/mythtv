@@ -1430,8 +1430,8 @@ void GalleryThumbView::StartSlideshow(ImageSlideShowType mode)
         mainStack->AddScreen(slide);
 
         // Update selected item when slideshow exits
-        connect(slide, SIGNAL(ImageSelected(int)),
-                this, SLOT(SelectImage(int)));
+        connect(slide, &GallerySlideView::ImageSelected,
+                this, &GalleryThumbView::SelectImage);
 
         if (selected->IsDirectory())
         {
@@ -1854,10 +1854,10 @@ void GalleryThumbView::SelectZoomWidget(int change)
     SetFocusWidget(m_imageList);
 
     // Monitor list actions (after focus events have been ignored)
-    connect(m_imageList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(ItemClicked(MythUIButtonListItem *)));
-    connect(m_imageList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(SetUiSelection(MythUIButtonListItem*)));
+    connect(m_imageList, &MythUIButtonList::itemClicked,
+            this, &GalleryThumbView::ItemClicked);
+    connect(m_imageList, &MythUIButtonList::itemSelected,
+            this, &GalleryThumbView::SetUiSelection);
 }
 
 

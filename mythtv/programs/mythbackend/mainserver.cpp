@@ -293,8 +293,8 @@ MainServer::MainServer(bool master, int port,
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-    connect(m_mythserver, SIGNAL(NewConnection(qt_socket_fd_t)),
-            this,       SLOT(NewConnection(qt_socket_fd_t)));
+    connect(m_mythserver, &MythServer::NewConnection,
+            this,       &MainServer::NewConnection);
 
     gCoreContext->addListener(this);
 
@@ -302,14 +302,14 @@ MainServer::MainServer(bool master, int port,
     {
         m_masterServerReconnect = new QTimer(this);
         m_masterServerReconnect->setSingleShot(true);
-        connect(m_masterServerReconnect, SIGNAL(timeout()),
-                this, SLOT(reconnectTimeout()));
+        connect(m_masterServerReconnect, &QTimer::timeout,
+                this, &MainServer::reconnectTimeout);
         m_masterServerReconnect->start(kMasterServerReconnectTimeout);
     }
 
     m_deferredDeleteTimer = new QTimer(this);
-    connect(m_deferredDeleteTimer, SIGNAL(timeout()),
-            this, SLOT(deferredDeleteSlot()));
+    connect(m_deferredDeleteTimer, &QTimer::timeout,
+            this, &MainServer::deferredDeleteSlot);
     m_deferredDeleteTimer->start(30 * 1000);
 
     if (sched)

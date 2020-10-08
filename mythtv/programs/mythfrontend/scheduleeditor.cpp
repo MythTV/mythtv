@@ -165,19 +165,19 @@ bool ScheduleEditor::Create()
                          SLOT(RuleChanged(MythUIButtonListItem *)));
 
     if (m_schedOptButton)
-        connect(m_schedOptButton, SIGNAL(Clicked()), SLOT(ShowSchedOpt()));
+        connect(m_schedOptButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowSchedOpt);
     if (m_filtersButton)
-        connect(m_filtersButton, SIGNAL(Clicked()), SLOT(ShowFilters()));
+        connect(m_filtersButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowFilters);
     if (m_storeOptButton)
-        connect(m_storeOptButton, SIGNAL(Clicked()), SLOT(ShowStoreOpt()));
+        connect(m_storeOptButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowStoreOpt);
     if (m_postProcButton)
-        connect(m_postProcButton, SIGNAL(Clicked()), SLOT(ShowPostProc()));
+        connect(m_postProcButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowPostProc);
     if (m_schedInfoButton)
-        connect(m_schedInfoButton, SIGNAL(Clicked()), SLOT(ShowSchedInfo()));
+        connect(m_schedInfoButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowSchedInfo);
     if (m_previewButton)
-        connect(m_previewButton, SIGNAL(Clicked()), SLOT(ShowPreview()));
+        connect(m_previewButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowPreview);
     if (m_metadataButton)
-        connect(m_metadataButton, SIGNAL(Clicked()), SLOT(ShowMetadataOptions()));
+        connect(m_metadataButton, &MythUIButton::Clicked, this, &ScheduleEditor::ShowMetadataOptions);
 
     if (m_cancelButton)
         connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
@@ -937,8 +937,8 @@ bool SchedEditChild::CreateEditChild(
         connect(m_saveButton, SIGNAL(Clicked()), m_editor, SLOT(Save()));
     if (m_previewButton)
     {
-        connect(m_previewButton, SIGNAL(Clicked()),
-                m_editor, SLOT(ShowPreview()));
+        connect(m_previewButton, &MythUIButton::Clicked,
+                m_editor, &ScheduleEditor::ShowPreview);
         m_previewButton->SetEnabled(!isTemplate);
     }
 
@@ -1007,8 +1007,8 @@ bool SchedOptEditor::Create()
                 SLOT(DupMethodChanged(MythUIButtonListItem *)));
 
     if (m_filtersButton)
-        connect(m_filtersButton, SIGNAL(Clicked()),
-                m_editor, SLOT(ShowFilters()));
+        connect(m_filtersButton, &MythUIButton::Clicked,
+                m_editor, &ScheduleEditor::ShowFilters);
 
     BuildFocusList();
 
@@ -1311,25 +1311,25 @@ bool MetadataOptions::Create()
         return false;
     }
 
-    connect(m_inetrefClear, SIGNAL(Clicked()),
-            SLOT(ClearInetref()));
-    connect(m_queryButton, SIGNAL(Clicked()),
-            SLOT(PerformQuery()));
-    connect(m_localFanartButton, SIGNAL(Clicked()),
-            SLOT(SelectLocalFanart()));
-    connect(m_localCoverartButton, SIGNAL(Clicked()),
-            SLOT(SelectLocalCoverart()));
-    connect(m_localBannerButton, SIGNAL(Clicked()),
-            SLOT(SelectLocalBanner()));
-    connect(m_onlineFanartButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineFanart()));
-    connect(m_onlineCoverartButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineCoverart()));
-    connect(m_onlineBannerButton, SIGNAL(Clicked()),
-            SLOT(SelectOnlineBanner()));
+    connect(m_inetrefClear, &MythUIButton::Clicked,
+            this, &MetadataOptions::ClearInetref);
+    connect(m_queryButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::PerformQuery);
+    connect(m_localFanartButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectLocalFanart);
+    connect(m_localCoverartButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectLocalCoverart);
+    connect(m_localBannerButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectLocalBanner);
+    connect(m_onlineFanartButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectOnlineFanart);
+    connect(m_onlineCoverartButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectOnlineCoverart);
+    connect(m_onlineBannerButton, &MythUIButton::Clicked,
+            this, &MetadataOptions::SelectOnlineBanner);
 
-    connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-                          SLOT(ValuesChanged()));
+    connect(m_seasonSpin, &MythUIButtonList::itemSelected,
+                          this, &MetadataOptions::ValuesChanged);
 
     // InetRef
     m_inetrefEdit->SetText(m_recordingRule->m_inetref);
@@ -1643,8 +1643,8 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
 
     auto *resultsdialog = new ImageSearchResultsDialog(m_popupStack, list, type);
 
-    connect(resultsdialog, SIGNAL(haveResult(ArtworkInfo, VideoArtworkType)),
-            SLOT(OnImageSearchListSelection(ArtworkInfo, VideoArtworkType)));
+    connect(resultsdialog, &ImageSearchResultsDialog::haveResult,
+            this, &MetadataOptions::OnImageSearchListSelection);
 
     if (resultsdialog->Create())
         m_popupStack->AddScreen(resultsdialog);

@@ -344,17 +344,17 @@ bool FileAssocDialog::Create()
         return false;
     }
 
-    connect(m_extensionList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(OnFASelected(MythUIButtonListItem *)));
-    connect(m_commandEdit, SIGNAL(valueChanged()),
-            SLOT(OnPlayerCommandChanged()));
-    connect(m_defaultCheck, SIGNAL(valueChanged()), SLOT(OnUseDefaltChanged()));
-    connect(m_ignoreCheck, SIGNAL(valueChanged()), SLOT(OnIgnoreChanged()));
+    connect(m_extensionList, &MythUIButtonList::itemSelected,
+            this, &FileAssocDialog::OnFASelected);
+    connect(m_commandEdit, &MythUITextEdit::valueChanged,
+            this, &FileAssocDialog::OnPlayerCommandChanged);
+    connect(m_defaultCheck, &MythUICheckBox::valueChanged, this, &FileAssocDialog::OnUseDefaltChanged);
+    connect(m_ignoreCheck, &MythUICheckBox::valueChanged, this, &FileAssocDialog::OnIgnoreChanged);
 
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(OnDonePressed()));
-    connect(m_newButton, SIGNAL(Clicked()),
-            SLOT(OnNewExtensionPressed()));
-    connect(m_deleteButton, SIGNAL(Clicked()), SLOT(OnDeletePressed()));
+    connect(m_doneButton, &MythUIButton::Clicked, this, &FileAssocDialog::OnDonePressed);
+    connect(m_newButton, &MythUIButton::Clicked,
+            this, &FileAssocDialog::OnNewExtensionPressed);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &FileAssocDialog::OnDeletePressed);
 
     m_extensionList->SetHelpText(tr("Select a file extension from this list "
                                     "to modify or delete its settings."));
@@ -434,8 +434,8 @@ void FileAssocDialog::OnNewExtensionPressed()
     if (newextdialog->Create())
         popupStack->AddScreen(newextdialog);
 
-    connect(newextdialog, SIGNAL(haveResult(QString)),
-            SLOT(OnNewExtensionComplete(QString)));
+    connect(newextdialog, &MythTextInputDialog::haveResult,
+            this, &FileAssocDialog::OnNewExtensionComplete);
 }
 
 void FileAssocDialog::OnNewExtensionComplete(const QString& newExtension)

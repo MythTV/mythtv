@@ -516,8 +516,8 @@ bool PlaybackBox::Create()
     {
         if (gCoreContext->GetBoolSetting("RecGroupsFocusable", false))
         {
-        connect(m_recgroupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(updateRecGroup(MythUIButtonListItem*)));
+        connect(m_recgroupList, &MythUIButtonList::itemSelected,
+            this, &PlaybackBox::updateRecGroup);
         }
         else
         {
@@ -525,23 +525,23 @@ bool PlaybackBox::Create()
         }
     }
 
-    connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(updateRecList(MythUIButtonListItem*)));
-    connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(SwitchList()));
-    connect(m_recordingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(ItemSelected(MythUIButtonListItem*)));
-    connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(PlayFromBookmarkOrProgStart(MythUIButtonListItem*)));
-    connect(m_recordingList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            SLOT(ItemVisible(MythUIButtonListItem*)));
-    connect(m_recordingList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
-            SLOT(ItemLoaded(MythUIButtonListItem*)));
+    connect(m_groupList, &MythUIButtonList::itemSelected,
+            this, &PlaybackBox::updateRecList);
+    connect(m_groupList, &MythUIButtonList::itemClicked,
+            this, &PlaybackBox::SwitchList);
+    connect(m_recordingList, &MythUIButtonList::itemSelected,
+            this, &PlaybackBox::ItemSelected);
+    connect(m_recordingList, &MythUIButtonList::itemClicked,
+            this, &PlaybackBox::PlayFromBookmarkOrProgStart);
+    connect(m_recordingList, &MythUIButtonList::itemVisible,
+            this, &PlaybackBox::ItemVisible);
+    connect(m_recordingList, &MythUIButtonList::itemLoaded,
+            this, &PlaybackBox::ItemLoaded);
 
     // connect up timers...
-    connect(m_artTimer[kArtworkFanart],   SIGNAL(timeout()), SLOT(fanartLoad()));
-    connect(m_artTimer[kArtworkBanner],   SIGNAL(timeout()), SLOT(bannerLoad()));
-    connect(m_artTimer[kArtworkCoverart], SIGNAL(timeout()), SLOT(coverartLoad()));
+    connect(m_artTimer[kArtworkFanart],   &QTimer::timeout, this, &PlaybackBox::fanartLoad);
+    connect(m_artTimer[kArtworkBanner],   &QTimer::timeout, this, &PlaybackBox::bannerLoad);
+    connect(m_artTimer[kArtworkCoverart], &QTimer::timeout, this, &PlaybackBox::coverartLoad);
 
     BuildFocusList();
     m_programInfoCache.ScheduleLoad(false);
@@ -609,10 +609,10 @@ void PlaybackBox::displayRecGroup(const QString &newRecGroup)
 
         auto *pwd = new MythTextInputDialog(popupStack, label, FilterNone, true);
 
-        connect(pwd, SIGNAL(haveResult(QString)),
-                SLOT(checkPassword(QString)));
-        connect(pwd, SIGNAL(Exiting(void)),
-                SLOT(passwordClosed(void)));
+        connect(pwd, &MythTextInputDialog::haveResult,
+                this, &PlaybackBox::checkPassword);
+        connect(pwd, &MythScreenType::Exiting,
+                this, &PlaybackBox::passwordClosed);
 
         m_passwordEntered = false;
 
@@ -3017,7 +3017,7 @@ void PlaybackBox::DisplayPopupMenu(void)
     if (m_menuDialog->Create())
     {
         m_popupStack->AddScreen(m_menuDialog);
-        connect(m_menuDialog, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+        connect(m_menuDialog, &MythDialogBox::Closed, this, &PlaybackBox::popupClosed);
     }
     else
         delete m_menuDialog;
@@ -4521,7 +4521,7 @@ void PlaybackBox::showViewChanger(void)
 
     if (viewPopup->Create())
     {
-        connect(viewPopup, SIGNAL(save()), SLOT(saveViewChanges()));
+        connect(viewPopup, &ChangeView::save, this, &PlaybackBox::saveViewChanges);
         m_popupStack->AddScreen(viewPopup);
     }
     else
@@ -4649,10 +4649,10 @@ void PlaybackBox::showGroupFilter(void)
     {
         m_usingGroupSelector = true;
         m_groupSelected = false;
-        connect(recGroupPopup, SIGNAL(result(QString)),
-                SLOT(displayRecGroup(QString)));
-        connect(recGroupPopup, SIGNAL(Exiting()),
-                SLOT(groupSelectorClosed()));
+        connect(recGroupPopup, &GroupSelector::result,
+                this, &PlaybackBox::displayRecGroup);
+        connect(recGroupPopup, &MythScreenType::Exiting,
+                this, &PlaybackBox::groupSelectorClosed);
         m_popupStack->AddScreen(recGroupPopup);
     }
     else
@@ -4796,7 +4796,7 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
 
     if (rgChanger->Create())
     {
-        connect(rgChanger, SIGNAL(result(QString)), SLOT(setRecGroup(QString)));
+        connect(rgChanger, &GroupSelector::result, this, &PlaybackBox::setRecGroup);
         m_popupStack->AddScreen(rgChanger);
     }
     else
@@ -4838,8 +4838,8 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
 
     if (pgChanger->Create())
     {
-        connect(pgChanger, SIGNAL(result(QString)),
-                SLOT(setPlayGroup(QString)));
+        connect(pgChanger, &GroupSelector::result,
+                this, &PlaybackBox::setPlayGroup);
         m_popupStack->AddScreen(pgChanger);
     }
     else
@@ -4982,8 +4982,8 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         auto *newgroup = new MythTextInputDialog(popupStack,
                                                  tr("New Recording Group"));
 
-        connect(newgroup, SIGNAL(haveResult(QString)),
-                SLOT(setRecGroup(QString)));
+        connect(newgroup, &MythTextInputDialog::haveResult,
+                this, &PlaybackBox::setRecGroup);
 
         if (newgroup->Create())
             popupStack->AddScreen(newgroup, false);
@@ -5087,8 +5087,8 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
 
     if (pwChanger->Create())
     {
-        connect(pwChanger, SIGNAL(result(const QString &)),
-                SLOT(SetRecGroupPassword(const QString &)));
+        connect(pwChanger, &PasswordChange::result,
+                this, &PlaybackBox::SetRecGroupPassword);
         m_popupStack->AddScreen(pwChanger);
     }
     else
@@ -5146,8 +5146,8 @@ bool GroupSelector::Create()
 
     BuildFocusList();
 
-    connect(groupList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(AcceptItem(MythUIButtonListItem *)));
+    connect(groupList, &MythUIButtonList::itemClicked,
+            this, &GroupSelector::AcceptItem);
 
     return true;
 }
@@ -5243,7 +5243,7 @@ bool ChangeView::Create()
     }
 
     MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
-    connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));
+    connect(savebutton, &MythUIButton::Clicked, this, &ChangeView::SaveChanges);
 
     BuildFocusList();
 
@@ -5283,9 +5283,9 @@ bool PasswordChange::Create()
 
     BuildFocusList();
 
-    connect(m_oldPasswordEdit, SIGNAL(valueChanged()),
-                               SLOT(OldPasswordChanged()));
-    connect(m_okButton, SIGNAL(Clicked()), SLOT(SendResult()));
+    connect(m_oldPasswordEdit, &MythUITextEdit::valueChanged,
+                               this, &PasswordChange::OldPasswordChanged);
+    connect(m_okButton, &MythUIButton::Clicked, this, &PasswordChange::SendResult);
 
     return true;
 }
@@ -5354,11 +5354,11 @@ bool RecMetadataEdit::Create()
     m_episodeSpin->SetRange(0,9999,1,10);
     m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
-    connect(inetrefClear, SIGNAL(Clicked()), SLOT(ClearInetref()));
-    connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
+    connect(inetrefClear, &MythUIButton::Clicked, this, &RecMetadataEdit::ClearInetref);
+    connect(okButton, &MythUIButton::Clicked, this, &RecMetadataEdit::SaveChanges);
     if (m_queryButton)
     {
-        connect(m_queryButton, SIGNAL(Clicked()), SLOT(PerformQuery()));
+        connect(m_queryButton, &MythUIButton::Clicked, this, &RecMetadataEdit::PerformQuery);
     }
 
     BuildFocusList();

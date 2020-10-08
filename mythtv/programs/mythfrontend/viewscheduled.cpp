@@ -79,8 +79,8 @@ bool ViewScheduled::Create()
         return false;
     }
 
-    connect(m_schedulesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(updateInfo(MythUIButtonListItem*)));
+    connect(m_schedulesList, &MythUIButtonList::itemSelected,
+            this, &ViewScheduled::updateInfo);
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(EditRecording()));
 
@@ -90,10 +90,10 @@ bool ViewScheduled::Create()
 
     if (m_groupList)
     {
-        connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-                SLOT(ChangeGroup(MythUIButtonListItem*)));
-        connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                SLOT(SwitchList()));
+        connect(m_groupList, &MythUIButtonList::itemSelected,
+                this, &ViewScheduled::ChangeGroup);
+        connect(m_groupList, &MythUIButtonList::itemClicked,
+                this, &ViewScheduled::SwitchList);
         m_groupList->SetLCDTitles(tr("Group List"), "");
     }
 

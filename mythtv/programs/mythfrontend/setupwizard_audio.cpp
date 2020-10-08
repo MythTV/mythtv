@@ -103,9 +103,9 @@ bool AudioSetupWizard::Create()
     // I hate to SetText but it's the only way to make it reliably bi-modal
     m_testSpeakerButton->SetText(tr("Test Speakers"));
 
-    connect(m_testSpeakerButton, SIGNAL(Clicked()), this, SLOT(toggleSpeakers()));
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(slotNext()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(slotPrevious()));
+    connect(m_testSpeakerButton, &MythUIButton::Clicked, this, &AudioSetupWizard::toggleSpeakers);
+    connect(m_nextButton, &MythUIButton::Clicked, this, &AudioSetupWizard::slotNext);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &AudioSetupWizard::slotPrevious);
 
     QString message = tr("Discovering audio devices...");
     LoadInBackground(message);
@@ -175,7 +175,7 @@ void AudioSetupWizard::Init(void)
     UpdateCapabilities();
 
     connect(m_ac3Check,
-            SIGNAL(valueChanged()), SLOT(UpdateCapabilitiesAC3()));
+            &MythUICheckBox::valueChanged, this, &AudioSetupWizard::UpdateCapabilitiesAC3);
     connect(m_audioDeviceButtonList,
             SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(UpdateCapabilities(MythUIButtonListItem*)));

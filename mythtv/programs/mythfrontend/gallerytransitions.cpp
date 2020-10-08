@@ -148,7 +148,7 @@ GroupTransition::GroupTransition(GroupAnimation *animation, const QString& name)
     : Transition(name), m_animation(animation)
 {
     // Complete transition when the group finishes
-    connect(m_animation, SIGNAL(finished()), this, SLOT(Finished()));
+    connect(m_animation, &AbstractAnimation::finished, this, &GroupTransition::Finished);
 }
 
 

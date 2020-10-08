@@ -30,7 +30,7 @@ bool CastDialog::Create()
     UIUtilW::Assign(this, okButton, "ok");
 
     if (okButton)
-        connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
+        connect(okButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     QStringList cast = GetDisplayCast(*m_metadata);
     QStringListIterator castIterator(cast);
@@ -68,7 +68,7 @@ bool PlotDialog::Create()
     plotText->SetText(m_metadata->GetPlot());
 
     if (okButton)
-        connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
+        connect(okButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
 

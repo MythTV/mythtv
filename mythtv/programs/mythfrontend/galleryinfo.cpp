@@ -50,7 +50,7 @@ InfoList::InfoList(MythScreenType &screen)
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(1000);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(Clear()));
+    connect(&m_timer, &QTimer::timeout, this, &InfoList::Clear);
 }
 
 

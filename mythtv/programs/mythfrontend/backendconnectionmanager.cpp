@@ -46,8 +46,8 @@ BackendConnectionManager::BackendConnectionManager()
     uint reconnect_timeout = 1;
     m_reconnectTimer = new QTimer(this);
     m_reconnectTimer->setSingleShot(true);
-    connect(m_reconnectTimer, SIGNAL(timeout()),
-            this,              SLOT(ReconnectToBackend()));
+    connect(m_reconnectTimer, &QTimer::timeout,
+            this,              &BackendConnectionManager::ReconnectToBackend);
     m_reconnectTimer->start(reconnect_timeout);
 }
 
@@ -111,8 +111,8 @@ void BackendConnectionManager::customEvent(QEvent *event)
         {
             m_reconnectTimer = new QTimer(this);
             m_reconnectTimer->setSingleShot(true);
-            connect(m_reconnectTimer, SIGNAL(timeout()),
-                    this,              SLOT(ReconnectToBackend()));
+            connect(m_reconnectTimer, &QTimer::timeout,
+                    this,              &BackendConnectionManager::ReconnectToBackend);
         }
         m_reconnectTimer->start(reconnect_timeout);
     }

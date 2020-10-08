@@ -138,8 +138,8 @@ void PrevRecordedList::Init(void)
             this, &PrevRecordedList::showListLoseFocus);
     connect(m_showList, &MythUIButtonList::TakingFocus,
             this, &PrevRecordedList::showListTakeFocus);
-    connect(m_showList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                this,  SLOT(ShowItemMenu()));
+    connect(m_showList, &MythUIButtonList::itemClicked,
+                this,  &PrevRecordedList::ShowItemMenu);
 
     UpdateTitleList();
     updateInfo();

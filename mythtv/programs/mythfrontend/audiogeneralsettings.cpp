@@ -119,7 +119,7 @@ AudioConfigSettings::AudioConfigSettings()
                            "Current entry will be checked and "
                            "capability entries populated."));
     addChild(rescan);
-    connect(rescan, SIGNAL(clicked()), SLOT(AudioRescan()));
+    connect(rescan, &ButtonStandardSetting::clicked, this, &AudioConfigSettings::AudioRescan);
 
     // digital settings
     m_triggerDigital = new GroupSetting();
@@ -775,28 +775,28 @@ AudioTest::AudioTest()
     m_frontleft->setHelpText(tr("Start front left channel test"));
     addChild(m_frontleft);
     connect(m_frontleft,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_frontright = new ButtonStandardSetting(m_channels == 2 ? "1" : "2");
     m_frontright->setLabel(tr("Front Right"));
     m_frontright->setHelpText(tr("Start front right channel test"));
     addChild(m_frontright);
     connect(m_frontright,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_rearleft = new ButtonStandardSetting("5");
     m_rearleft->setLabel(tr("Rear Left"));
     m_rearleft->setHelpText(tr("Start rear left channel test"));
     addChild(m_rearleft);
     connect(m_rearleft,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_rearright = new ButtonStandardSetting("4");
     m_rearright->setLabel(tr("Rear Right"));
     m_rearright->setHelpText(tr("Start rear right channel test"));
     addChild(m_rearright);
     connect(m_rearright,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_lfe = new ButtonStandardSetting(m_channels == 6 ? "5" :
                                       m_channels == 7 ? "6" : "7");
@@ -804,7 +804,7 @@ AudioTest::AudioTest()
     m_lfe->setHelpText(tr("Start LFE channel test"));
     addChild(m_lfe);
     connect(m_lfe,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_surroundleft = new ButtonStandardSetting(m_channels == 6 ? "4" :
                                                m_channels == 7 ? "5" : "6");
@@ -812,27 +812,27 @@ AudioTest::AudioTest()
     m_surroundleft->setHelpText(tr("Start surround left channel test"));
     addChild(m_surroundleft);
     connect(m_surroundleft,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_surroundright = new ButtonStandardSetting("3");
     m_surroundright->setLabel(tr("Surround Right"));
     m_surroundright->setHelpText(tr("Start surround right channel test"));
     addChild(m_surroundright);
     connect(m_surroundright,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_center = new ButtonStandardSetting("1");
     m_center->setLabel(tr("Center"));
     m_center->setHelpText(tr("Start center channel test"));
     addChild(m_center);
     connect(m_center,
-            SIGNAL(clicked()), this, SLOT(toggle()));
+            &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_startButton = new ButtonStandardSetting("start");
     m_startButton->setLabel(tr("Test All"));
     m_startButton->setHelpText(tr("Start all channels test"));
     addChild(m_startButton);
-    connect(m_startButton, SIGNAL(clicked()), this, SLOT(toggle()));
+    connect(m_startButton, &ButtonStandardSetting::clicked, this, &AudioTest::toggle);
 
     m_hd = new TransMythUICheckBoxSetting();
     m_hd->setLabel(tr("Use Highest Quality Mode"));

@@ -122,7 +122,7 @@ void GroupAnimation::Add(AbstractAnimation *child)
 {
     // Signal group when child completes
     m_group.append(child);
-    connect(child, SIGNAL(finished()), this, SLOT(Finished()));
+    connect(child, &AbstractAnimation::finished, this, &GroupAnimation::Finished);
 }
 
 
@@ -303,7 +303,7 @@ Slide::Slide(MythUIType *parent, const QString& name, MythUIImage *image)
         m_panAnimation  = new PanAnimation(this);
     }
 
-    connect(this, SIGNAL(LoadComplete()), this, SLOT(SlideLoaded()));
+    connect(this, &MythUIImage::LoadComplete, this, &Slide::SlideLoaded);
 }
 
 

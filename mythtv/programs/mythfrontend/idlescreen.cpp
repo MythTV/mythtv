@@ -24,8 +24,8 @@ IdleScreen::IdleScreen(MythScreenStack *parent)
     gCoreContext->addListener(this);
     GetMythMainWindow()->EnterStandby();
 
-    connect(m_updateScreenTimer, SIGNAL(timeout()),
-            this, SLOT(UpdateScreen()));
+    connect(m_updateScreenTimer, &QTimer::timeout,
+            this, &IdleScreen::UpdateScreen);
     m_updateScreenTimer->start(UPDATE_INTERVAL);
 }
 
@@ -284,7 +284,7 @@ void IdleScreen::customEvent(QEvent* event)
 
             if (!PendingSchedUpdate())
             {
-                QTimer::singleShot(50, this, SLOT(UpdateScheduledList()));
+                QTimer::singleShot(50, this, &IdleScreen::UpdateScheduledList);
                 SetPendingSchedUpdate(true);
             }
         }

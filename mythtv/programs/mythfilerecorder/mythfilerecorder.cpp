@@ -323,11 +323,11 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
     auto *streamThread = new QThread(this);
 
     m_streamer->moveToThread(streamThread);
-    connect(streamThread, SIGNAL(finished(void)),
-            m_streamer, SLOT(deleteLater(void)));
+    connect(streamThread, &QThread::finished,
+            m_streamer, &QObject::deleteLater);
 
-    connect(this, SIGNAL(SendBytes(void)),
-            m_streamer, SLOT(SendBytes(void)));
+    connect(this, &Commands::SendBytes,
+            m_streamer, &Streamer::SendBytes);
 
     streamThread->start();
 

@@ -72,25 +72,25 @@ bool CustomEdit::Create()
         return false;
     }
 
-    connect(m_ruleList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(ruleChanged(MythUIButtonListItem *)));
-    connect(m_titleEdit, SIGNAL(valueChanged(void)), this,
-                SLOT(textChanged(void)));
+    connect(m_ruleList, &MythUIButtonList::itemSelected,
+                this, &CustomEdit::ruleChanged);
+    connect(m_titleEdit, &MythUITextEdit::valueChanged, this,
+                &CustomEdit::textChanged);
     m_titleEdit->SetMaxLength(128);
     m_subtitleEdit->SetMaxLength(128);
-    connect(m_descriptionEdit, SIGNAL(valueChanged(void)), this,
-                SLOT(textChanged(void)));
+    connect(m_descriptionEdit, &MythUITextEdit::valueChanged, this,
+                &CustomEdit::textChanged);
     m_descriptionEdit->SetMaxLength(0);
 
-    connect(m_clauseList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(clauseChanged(MythUIButtonListItem *)));
-    connect(m_clauseList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(clauseClicked(MythUIButtonListItem *)));
+    connect(m_clauseList, &MythUIButtonList::itemSelected,
+                this, &CustomEdit::clauseChanged);
+    connect(m_clauseList, &MythUIButtonList::itemClicked,
+                this, &CustomEdit::clauseClicked);
 
-    connect(m_testButton, SIGNAL(Clicked()), SLOT(testClicked()));
-    connect(m_recordButton, SIGNAL(Clicked()), SLOT(recordClicked()));
-    connect(m_storeButton, SIGNAL(Clicked()), SLOT(storeClicked()));
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(m_testButton, &MythUIButton::Clicked, this, &CustomEdit::testClicked);
+    connect(m_recordButton, &MythUIButton::Clicked, this, &CustomEdit::recordClicked);
+    connect(m_storeButton, &MythUIButton::Clicked, this, &CustomEdit::storeClicked);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     loadData();
     BuildFocusList();
@@ -709,7 +709,7 @@ void CustomEdit::recordClicked(void)
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
-        connect(schededit, SIGNAL(ruleSaved(int)), SLOT(scheduleCreated(int)));
+        connect(schededit, &ScheduleEditor::ruleSaved, this, &CustomEdit::scheduleCreated);
     }
     else
         delete schededit;

@@ -83,8 +83,8 @@ bool ChannelRecPriority::Create()
         return false;
     }
 
-    connect(m_channelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(updateInfo(MythUIButtonListItem*)));
+    connect(m_channelList, &MythUIButtonList::itemSelected,
+            this, &ChannelRecPriority::updateInfo);
 
     FillList();
 

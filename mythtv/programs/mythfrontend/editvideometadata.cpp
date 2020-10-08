@@ -114,84 +114,84 @@ bool EditMetadataDialog::Create()
 
     BuildFocusList();
 
-    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
+    connect(m_titleEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetTitle);
     m_titleEdit->SetMaxLength(128);
-    connect(m_subtitleEdit, SIGNAL(valueChanged()), SLOT(SetSubtitle()));
+    connect(m_subtitleEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetSubtitle);
     m_subtitleEdit->SetMaxLength(0);
-    connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
+    connect(m_playerEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetPlayer);
     if (m_taglineEdit)
     {
-        connect(m_taglineEdit, SIGNAL(valueChanged()), SLOT(SetTagline()));
+        connect(m_taglineEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetTagline);
         m_taglineEdit->SetMaxLength(255);
     }
     if (m_ratingEdit)
     {
-        connect(m_ratingEdit, SIGNAL(valueChanged()), SLOT(SetRating()));
+        connect(m_ratingEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetRating);
         m_ratingEdit->SetMaxLength(128);
     }
     if (m_directorEdit)
     {
-        connect(m_directorEdit, SIGNAL(valueChanged()), SLOT(SetDirector()));
+        connect(m_directorEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetDirector);
         m_directorEdit->SetMaxLength(128);
     }
     if (m_inetrefEdit)
-        connect(m_inetrefEdit, SIGNAL(valueChanged()), SLOT(SetInetRef()));
+        connect(m_inetrefEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetInetRef);
     if (m_homepageEdit)
     {
-        connect(m_homepageEdit, SIGNAL(valueChanged()), SLOT(SetHomepage()));
+        connect(m_homepageEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetHomepage);
         m_homepageEdit->SetMaxLength(0);
     }
     if (m_plotEdit)
     {
-        connect(m_plotEdit, SIGNAL(valueChanged()), SLOT(SetPlot()));
+        connect(m_plotEdit, &MythUITextEdit::valueChanged, this, &EditMetadataDialog::SetPlot);
         m_plotEdit->SetMaxLength(0);
     }
 
-    connect(m_seasonSpin, SIGNAL(LosingFocus()), SLOT(SetSeason()));
-    connect(m_episodeSpin, SIGNAL(LosingFocus()), SLOT(SetEpisode()));
+    connect(m_seasonSpin, &MythUIType::LosingFocus, this, &EditMetadataDialog::SetSeason);
+    connect(m_episodeSpin, &MythUIType::LosingFocus, this, &EditMetadataDialog::SetEpisode);
     if (m_yearSpin)
-        connect(m_yearSpin, SIGNAL(LosingFocus()), SLOT(SetYear()));
+        connect(m_yearSpin, &MythUIType::LosingFocus, this, &EditMetadataDialog::SetYear);
     if (m_userRatingSpin)
-        connect(m_userRatingSpin, SIGNAL(LosingFocus()), SLOT(SetUserRating()));
+        connect(m_userRatingSpin, &MythUIType::LosingFocus, this, &EditMetadataDialog::SetUserRating);
     if (m_lengthSpin)
-        connect(m_lengthSpin, SIGNAL(LosingFocus()), SLOT(SetLength()));
+        connect(m_lengthSpin, &MythUIType::LosingFocus, this, &EditMetadataDialog::SetLength);
 
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
+    connect(m_doneButton, &MythUIButton::Clicked, this, &EditMetadataDialog::SaveAndExit);
 
     // Find Artwork locally
     if (m_coverartButton)
-        connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
+        connect(m_coverartButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindCoverArt);
     if (m_bannerButton)
-        connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
+        connect(m_bannerButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindBanner);
     if (m_fanartButton)
-        connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
+        connect(m_fanartButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindFanart);
     if (m_screenshotButton)
-        connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
+        connect(m_screenshotButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindScreenshot);
 
     // Find Artwork on the Internet
     if (m_netCoverartButton)
-        connect(m_netCoverartButton, SIGNAL(Clicked()), SLOT(FindNetCoverArt()));
+        connect(m_netCoverartButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindNetCoverArt);
     if (m_netBannerButton)
-        connect(m_netBannerButton, SIGNAL(Clicked()), SLOT(FindNetBanner()));
+        connect(m_netBannerButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindNetBanner);
     if (m_netFanartButton)
-        connect(m_netFanartButton, SIGNAL(Clicked()), SLOT(FindNetFanart()));
+        connect(m_netFanartButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindNetFanart);
     if (m_netScreenshotButton)
-        connect(m_netScreenshotButton, SIGNAL(Clicked()), SLOT(FindNetScreenshot()));
+        connect(m_netScreenshotButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindNetScreenshot);
 
     if (m_trailerButton)
-        connect(m_trailerButton, SIGNAL(Clicked()), SLOT(FindTrailer()));
+        connect(m_trailerButton, &MythUIButton::Clicked, this, &EditMetadataDialog::FindTrailer);
 
-    connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
-    connect(m_watchedCheck, SIGNAL(valueChanged()), SLOT(ToggleWatched()));
+    connect(m_browseCheck, &MythUICheckBox::valueChanged, this, &EditMetadataDialog::ToggleBrowse);
+    connect(m_watchedCheck, &MythUICheckBox::valueChanged, this, &EditMetadataDialog::ToggleWatched);
 
-    connect(m_childList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetChild(MythUIButtonListItem*)));
-    connect(m_levelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetLevel(MythUIButtonListItem*)));
-    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetCategory(MythUIButtonListItem*)));
-    connect(m_categoryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(NewCategoryPopup()));
+    connect(m_childList, &MythUIButtonList::itemSelected,
+            this, &EditMetadataDialog::SetChild);
+    connect(m_levelList, &MythUIButtonList::itemSelected,
+            this, &EditMetadataDialog::SetLevel);
+    connect(m_categoryList, &MythUIButtonList::itemSelected,
+            this, &EditMetadataDialog::SetCategory);
+    connect(m_categoryList, &MythUIButtonList::itemClicked,
+            this, &EditMetadataDialog::NewCategoryPopup);
 
     return true;
 }
@@ -655,8 +655,8 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
     }
     auto *resultsdialog = new ImageSearchResultsDialog(m_popupStack, list, type);
 
-    connect(resultsdialog, SIGNAL(haveResult(ArtworkInfo, VideoArtworkType)),
-            SLOT(OnSearchListSelection(ArtworkInfo, VideoArtworkType)));
+    connect(resultsdialog, &ImageSearchResultsDialog::haveResult,
+            this, &EditMetadataDialog::OnSearchListSelection);
 
     if (resultsdialog->Create())
         m_popupStack->AddScreen(resultsdialog);

@@ -87,8 +87,8 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
         m_lcd = nullptr;
     }
 
-    connect(m_serverPool, SIGNAL(newConnection(QTcpSocket*)),
-            this,         SLOT(newConnection(QTcpSocket*)));
+    connect(m_serverPool, &ServerPool::newConnection,
+            this,         &LCDServer::newConnection);
 
     if (!m_serverPool->listen(port))
     {
@@ -105,10 +105,10 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
 
 void LCDServer::newConnection(QTcpSocket *socket)
 {
-    connect(socket, SIGNAL(readyRead()),
-            this,   SLOT(  readSocket()));
-    connect(socket, SIGNAL(disconnected()),
-            this,   SLOT(  endConnection()));
+    connect(socket, &QIODevice::readyRead,
+            this,   &LCDServer::readSocket);
+    connect(socket, &QAbstractSocket::disconnected,
+            this,   &LCDServer::endConnection);
 
     if (debug_level > 0)
         LOG(VB_NETWORK, LOG_INFO, "LCDServer: new connection");

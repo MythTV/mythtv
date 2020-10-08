@@ -478,35 +478,35 @@ bool VideoFilterDialog::Create()
     fillWidgets();
     update_numvideo();
 
-    connect(m_yearList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetYear(MythUIButtonListItem*)));
-    connect(m_userRatingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetUserRating(MythUIButtonListItem*)));
-    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetCategory(MythUIButtonListItem*)));
-    connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setCountry(MythUIButtonListItem*)));
-    connect(m_genreList,SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setGenre(MythUIButtonListItem*)));
-    connect(m_castList,SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetCast(MythUIButtonListItem*)));
-    connect(m_runtimeList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setRunTime(MythUIButtonListItem*)));
-    connect(m_browseList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetBrowse(MythUIButtonListItem*)));
-    connect(m_watchedList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetWatched(MythUIButtonListItem*)));
-    connect(m_inetRefList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetInetRef(MythUIButtonListItem*)));
-    connect(m_coverFileList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(SetCoverFile(MythUIButtonListItem*)));
-    connect(m_orderByList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setOrderby(MythUIButtonListItem*)));
-    connect(m_textFilter, SIGNAL(valueChanged()),
-            SLOT(setTextFilter()));
+    connect(m_yearList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetYear);
+    connect(m_userRatingList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetUserRating);
+    connect(m_categoryList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetCategory);
+    connect(m_countryList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::setCountry);
+    connect(m_genreList,&MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::setGenre);
+    connect(m_castList,&MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetCast);
+    connect(m_runtimeList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::setRunTime);
+    connect(m_browseList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetBrowse);
+    connect(m_watchedList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetWatched);
+    connect(m_inetRefList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetInetRef);
+    connect(m_coverFileList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::SetCoverFile);
+    connect(m_orderByList, &MythUIButtonList::itemSelected,
+            this, &VideoFilterDialog::setOrderby);
+    connect(m_textFilter, &MythUITextEdit::valueChanged,
+            this, &VideoFilterDialog::setTextFilter);
 
-    connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveAsDefault()));
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &VideoFilterDialog::saveAsDefault);
+    connect(m_doneButton, &MythUIButton::Clicked, this, &VideoFilterDialog::saveAndExit);
 
     return true;
 }

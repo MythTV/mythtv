@@ -72,10 +72,10 @@ bool VideoSetupWizard::Create()
                                   "next configuration step.") );
     m_prevButton->SetHelpText(tr("Return to the previous configuration step."));
 
-    connect(m_testSDButton, SIGNAL(Clicked()), this, SLOT(testSDVideo()));
-    connect(m_testHDButton, SIGNAL(Clicked()), this, SLOT(testHDVideo()));
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(slotNext()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(slotPrevious()));
+    connect(m_testSDButton, &MythUIButton::Clicked, this, &VideoSetupWizard::testSDVideo);
+    connect(m_testHDButton, &MythUIButton::Clicked, this, &VideoSetupWizard::testHDVideo);
+    connect(m_nextButton, &MythUIButton::Clicked, this, &VideoSetupWizard::slotNext);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &VideoSetupWizard::slotPrevious);
 
     BuildFocusList();
     loadData();

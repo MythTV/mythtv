@@ -78,8 +78,8 @@ namespace
             QObject(lparent)
         {
             connect(&m_levelCheck,
-                    SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
-                    SLOT(OnResultReady(bool, ParentalLevel::Level)));
+                    &ParentalLevelChangeChecker::SigResultReady,
+                    this, &ParentalLevelNotifyContainer::OnResultReady);
         }
 
         const ParentalLevel &GetLevel() const { return m_level; }
@@ -305,7 +305,7 @@ namespace
         {
             if (!m_bConnected)
             {
-                connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+                connect(&m_fanartTimer, &QTimer::timeout, this, &FanartLoader::fanartLoad);
                 m_bConnected = true;
             }
 
@@ -587,10 +587,10 @@ class ItemDetailPopup : public MythScreenType
         UIUtilW::Assign(this, m_doneButton, "done_button");
 
         if (m_playButton)
-            connect(m_playButton, SIGNAL(Clicked()), SLOT(OnPlay()));
+            connect(m_playButton, &MythUIButton::Clicked, this, &ItemDetailPopup::OnPlay);
 
         if (m_doneButton)
-            connect(m_doneButton, SIGNAL(Clicked()), SLOT(OnDone()));
+            connect(m_doneButton, &MythUIButton::Clicked, this, &ItemDetailPopup::OnDone);
 
         BuildFocusList();
 
@@ -823,7 +823,7 @@ VideoListDeathDelay::VideoListDeathDelay(const VideoDialog::VideoListPtr& toSave
     QObject(QCoreApplication::instance())
 {
     m_d = new VideoListDeathDelayPrivate(toSave);
-    QTimer::singleShot(kDelayTimeMS, this, SLOT(OnTimeUp()));
+    QTimer::singleShot(kDelayTimeMS, this, &VideoListDeathDelay::OnTimeUp);
 }
 
 VideoListDeathDelay::~VideoListDeathDelay()
@@ -1019,21 +1019,21 @@ bool VideoDialog::Create()
     {
         SetFocusWidget(m_videoButtonTree);
 
-        connect(m_videoButtonTree, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(handleSelect(MythUIButtonListItem *)));
-        connect(m_videoButtonTree, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(UpdateText(MythUIButtonListItem *)));
-        connect(m_videoButtonTree, SIGNAL(nodeChanged(MythGenericTree *)),
-                SLOT(SetCurrentNode(MythGenericTree *)));
+        connect(m_videoButtonTree, &MythUIButtonTree::itemClicked,
+                this, &VideoDialog::handleSelect);
+        connect(m_videoButtonTree, &MythUIButtonTree::itemSelected,
+                this, &VideoDialog::UpdateText);
+        connect(m_videoButtonTree, &MythUIButtonTree::nodeChanged,
+                this, &VideoDialog::SetCurrentNode);
     }
     else
     {
         SetFocusWidget(m_videoButtonList);
 
-        connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                SLOT(handleSelect(MythUIButtonListItem *)));
-        connect(m_videoButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(UpdateText(MythUIButtonListItem *)));
+        connect(m_videoButtonList, &MythUIButtonList::itemClicked,
+                this, &VideoDialog::handleSelect);
+        connect(m_videoButtonList, &MythUIButtonList::itemSelected,
+                this, &VideoDialog::UpdateText);
     }
 
     return true;
@@ -1041,8 +1041,8 @@ bool VideoDialog::Create()
 
 void VideoDialog::Init()
 {
-    connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
-            SLOT(reloadData()));
+    connect(&m_d->m_parentalLevel, &ParentalLevelNotifyContainer::SigLevelChanged,
+            this, &VideoDialog::reloadData);
 }
 
 void VideoDialog::Load()
@@ -2263,8 +2263,8 @@ void VideoDialog::searchStart(void)
 
     if (searchDialog->Create())
     {
-        connect(searchDialog, SIGNAL(haveResult(QString)),
-                SLOT(searchComplete(QString)));
+        connect(searchDialog, &MythUISearchDialog::haveResult,
+                this, &VideoDialog::searchComplete);
 
         popupStack->AddScreen(searchDialog);
     }
@@ -2450,7 +2450,7 @@ void VideoDialog::VideoMenu()
     if (m_menuPopup->Create())
     {
         m_popupStack->AddScreen(m_menuPopup);
-        connect(m_menuPopup, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+        connect(m_menuPopup, &MythDialogBox::Closed, this, &VideoDialog::popupClosed);
     }
     else
         delete m_menuPopup;
@@ -2517,7 +2517,7 @@ void VideoDialog::DisplayMenu()
     if (m_menuPopup->Create())
     {
         m_popupStack->AddScreen(m_menuPopup);
-        connect(m_menuPopup, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+        connect(m_menuPopup, &MythDialogBox::Closed, this, &VideoDialog::popupClosed);
     }
     else
         delete m_menuPopup;
@@ -3264,7 +3264,7 @@ void VideoDialog::ChangeFilter()
     if (filterdialog->Create())
         mainStack->AddScreen(filterdialog);
 
-    connect(filterdialog, SIGNAL(filterChanged()), SLOT(reloadData()));
+    connect(filterdialog, &VideoFilterDialog::filterChanged, this, &VideoDialog::reloadData);
 }
 
 /** \fn VideoDialog::GetMetadata(MythUIButtonListItem *item)
@@ -3562,7 +3562,7 @@ void VideoDialog::EditMetadata()
             "mythvideoeditmetadata", metadata,
             m_d->m_videoList->getListCache());
 
-    connect(md_editor, SIGNAL(Finished()), SLOT(refreshData()));
+    connect(md_editor, &EditMetadataDialog::Finished, this, &VideoDialog::refreshData);
 
     if (md_editor->Create())
         screenStack->AddScreen(md_editor);
@@ -3583,8 +3583,8 @@ void VideoDialog::RemoveVideo()
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);
 
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(OnRemoveVideo(bool)));
+    connect(confirmdialog, &MythConfirmationDialog::haveResult,
+            this, &VideoDialog::OnRemoveVideo);
 }
 
 void VideoDialog::OnRemoveVideo(bool dodelete)
@@ -3838,7 +3838,7 @@ void VideoDialog::doVideoScan()
 {
     if (!m_d->m_scanner)
         m_d->m_scanner = new VideoScanner();
-    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(scanFinished(bool)));
+    connect(m_d->m_scanner, &VideoScanner::finished, this, &VideoDialog::scanFinished);
     m_d->m_scanner->doScan(GetVideoDirs());
 }
 

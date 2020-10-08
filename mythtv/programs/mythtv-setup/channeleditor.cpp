@@ -105,8 +105,8 @@ bool ChannelEditor::Create()
     new MythUIButtonListItem(sortList, tr("Channel Name"));
     new MythUIButtonListItem(sortList, tr("Channel Number"));
     new MythUIButtonListItem(sortList, tr("Multiplex Frequency"));
-    connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(setSourceID(MythUIButtonListItem *)));
+    connect(m_sourceList, &MythUIButtonList::itemSelected,
+            this, &ChannelEditor::setSourceID);
     sortList->SetValue(m_currentSortMode);
 
 
@@ -125,13 +125,13 @@ bool ChannelEditor::Create()
     }
     new MythUIButtonListItem(m_sourceList,tr("(Unassigned)"),
                              QVariant::fromValue((int)FILTER_UNASSIGNED));
-    connect(sortList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(setSortMode(MythUIButtonListItem *)));
+    connect(sortList, &MythUIButtonList::itemSelected,
+            this, &ChannelEditor::setSortMode);
 
     // Hide/Show channels without channum checkbox
     hideCheck->SetCheckState(m_currentHideMode);
-    connect(hideCheck, SIGNAL(toggled(bool)),
-            SLOT(setHideMode(bool)));
+    connect(hideCheck, &MythUICheckBox::toggled,
+            this, &ChannelEditor::setHideMode);
 
     // Scan Button
     scanButton->SetHelpText(tr("Starts the channel scanner."));
@@ -140,7 +140,7 @@ bool ChannelEditor::Create()
     // Import Icons Button
     importIconButton->SetHelpText(tr("Starts the icon downloader"));
     importIconButton->SetEnabled(true);
-    connect(importIconButton,  SIGNAL(Clicked()), SLOT(channelIconImport()));
+    connect(importIconButton,  &MythUIButton::Clicked, this, &ChannelEditor::channelIconImport);
 
     // Transport Editor Button
     transportEditorButton->SetHelpText(
@@ -148,15 +148,15 @@ bool ChannelEditor::Create()
             "This is rarely required unless you are using "
             "a satellite dish and must enter an initial "
             "frequency to for the channel scanner to try."));
-    connect(transportEditorButton, SIGNAL(Clicked()), SLOT(transportEditor()));
+    connect(transportEditorButton, &MythUIButton::Clicked, this, &ChannelEditor::transportEditor);
 
     // Other signals
-    connect(m_channelList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(edit(MythUIButtonListItem *)));
-    connect(m_channelList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(itemChanged(MythUIButtonListItem *)));
-    connect(scanButton, SIGNAL(Clicked()), SLOT(scan()));
-    connect(deleteButton,  SIGNAL(Clicked()), SLOT(deleteChannels()));
+    connect(m_channelList, &MythUIButtonList::itemClicked,
+            this, &ChannelEditor::edit);
+    connect(m_channelList, &MythUIButtonList::itemSelected,
+            this, &ChannelEditor::itemChanged);
+    connect(scanButton, &MythUIButton::Clicked, this, &ChannelEditor::scan);
+    connect(deleteButton,  &MythUIButton::Clicked, this, &ChannelEditor::deleteChannels);
 
     fillList();
 
@@ -460,7 +460,7 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
     auto *ssd = new StandardSettingDialog(mainStack, "channelwizard", cw);
     if (ssd->Create())
     {
-        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
         mainStack->AddScreen(ssd);
     }
     else
@@ -580,7 +580,7 @@ void ChannelEditor::scan(void)
                                           new ScanWizard(m_sourceFilter));
     if (ssd->Create())
     {
-        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
         mainStack->AddScreen(ssd);
     }
     else
@@ -599,7 +599,7 @@ void ChannelEditor::transportEditor(void)
                                   new TransportListEditor(m_sourceFilter));
     if (ssd->Create())
     {
-        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
         mainStack->AddScreen(ssd);
     }
     else
@@ -764,7 +764,7 @@ void ChannelEditor::customEvent(QEvent *event)
 
             if (iconwizard->Create())
             {
-                connect(iconwizard, SIGNAL(Exiting()), SLOT(fillList()));
+                connect(iconwizard, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
                 mainStack->AddScreen(iconwizard);
             }
             else

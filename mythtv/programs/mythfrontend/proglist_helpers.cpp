@@ -48,10 +48,10 @@ bool PhrasePopup::Create()
         new MythUIButtonListItem(m_phraseList, m_list.at(x), nullptr, false);
     }
 
-    connect(m_phraseList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(phraseClicked(MythUIButtonListItem*)));
-    connect(m_phraseList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(phraseSelected(MythUIButtonListItem*)));
+    connect(m_phraseList, &MythUIButtonList::itemClicked,
+            this, &PhrasePopup::phraseClicked);
+    connect(m_phraseList, &MythUIButtonList::itemSelected,
+            this, &PhrasePopup::phraseSelected);
 
 
     m_phraseList->MoveToNamedPosition(m_currentValue);
@@ -59,11 +59,11 @@ bool PhrasePopup::Create()
     m_deleteButton->SetText(tr("Delete"));
     m_recordButton->SetText(tr("Record"));
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
-    connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deleteClicked()));
-    connect(m_recordButton, SIGNAL(Clicked()), this, SLOT(recordClicked()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &PhrasePopup::okClicked);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &PhrasePopup::deleteClicked);
+    connect(m_recordButton, &MythUIButton::Clicked, this, &PhrasePopup::recordClicked);
 
-    connect(m_phraseEdit, SIGNAL(valueChanged()), this, SLOT(editChanged()));
+    connect(m_phraseEdit, &MythUITextEdit::valueChanged, this, &PhrasePopup::editChanged);
 
     BuildFocusList();
 
@@ -234,10 +234,10 @@ bool PowerSearchPopup::Create()
         new MythUIButtonListItem(m_phraseList, m_list.at(x), nullptr, false);
     }
 
-    connect(m_phraseList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(phraseClicked(MythUIButtonListItem*)));
-    connect(m_phraseList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(phraseSelected(MythUIButtonListItem*)));
+    connect(m_phraseList, &MythUIButtonList::itemClicked,
+            this, &PowerSearchPopup::phraseClicked);
+    connect(m_phraseList, &MythUIButtonList::itemSelected,
+            this, &PowerSearchPopup::phraseSelected);
 
 
     m_phraseList->MoveToNamedPosition(m_currentValue);
@@ -246,9 +246,9 @@ bool PowerSearchPopup::Create()
     m_deleteButton->SetText(tr("Delete"));
     m_recordButton->SetText(tr("Record"));
 
-    connect(m_editButton, SIGNAL(Clicked()), this, SLOT(editClicked()));
-    connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deleteClicked()));
-    connect(m_recordButton, SIGNAL(Clicked()), this, SLOT(recordClicked()));
+    connect(m_editButton, &MythUIButton::Clicked, this, &PowerSearchPopup::editClicked);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &PowerSearchPopup::deleteClicked);
+    connect(m_recordButton, &MythUIButton::Clicked, this, &PowerSearchPopup::recordClicked);
 
     BuildFocusList();
 
@@ -437,7 +437,7 @@ bool EditPowerSearchPopup::Create()
 
     initLists();
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &EditPowerSearchPopup::okClicked);
 
     BuildFocusList();
 

@@ -33,10 +33,10 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
 {
     // Detect when transitions finish. Queued signal to allow redraw/pulse to
     // complete before handling event.
-    connect(&m_transition, SIGNAL(finished()),
-            this, SLOT(TransitionComplete()), Qt::QueuedConnection);
-    connect(&m_updateTransition, SIGNAL(finished()),
-            this, SLOT(TransitionComplete()), Qt::QueuedConnection);
+    connect(&m_transition, &Transition::finished,
+            this, &GallerySlideView::TransitionComplete, Qt::QueuedConnection);
+    connect(&m_updateTransition, &Transition::finished,
+            this, &GallerySlideView::TransitionComplete, Qt::QueuedConnection);
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     // Seed random generator for random transitions
@@ -51,7 +51,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
     // Initialise status delay timer
     m_delay.setSingleShot(true);
     m_delay.setInterval(gCoreContext->GetNumSetting("GalleryStatusDelay", 0));
-    connect(&m_delay, SIGNAL(timeout()), this, SLOT(ShowStatus()));
+    connect(&m_delay, &QTimer::timeout, this, &GallerySlideView::ShowStatus);
 }
 
 
@@ -106,8 +106,8 @@ bool GallerySlideView::Create()
 
     // Detect when slides are available for display.
     // Queue so that keypress events always complete before transition starts
-    connect(&m_slides, SIGNAL(SlideReady(int)),
-            this, SLOT(SlideAvailable(int)), Qt::QueuedConnection);
+    connect(&m_slides, &SlideBuffer::SlideReady,
+            this, &GallerySlideView::SlideAvailable, Qt::QueuedConnection);
 
     return true;
 }

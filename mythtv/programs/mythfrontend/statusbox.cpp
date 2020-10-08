@@ -96,12 +96,12 @@ bool StatusBox::Create()
         return false;
     }
 
-    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(updateLogList(MythUIButtonListItem *)));
-    connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(setHelpText(MythUIButtonListItem *)));
-    connect(m_logList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(clicked(MythUIButtonListItem *)));
+    connect(m_categoryList, &MythUIButtonList::itemSelected,
+            this, &StatusBox::updateLogList);
+    connect(m_logList, &MythUIButtonList::itemSelected,
+            this, &StatusBox::setHelpText);
+    connect(m_logList, &MythUIButtonList::itemClicked,
+            this, &StatusBox::clicked);
 
     BuildFocusList();
     return true;

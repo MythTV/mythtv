@@ -90,12 +90,12 @@ bool ImportIconsWizard::Create()
     m_manualButton->SetHelpText(tr("Manually search for the text"));
     m_skipButton->SetHelpText(tr("Skip this icon"));
 
-    connect(m_manualButton, SIGNAL(Clicked()), SLOT(manualSearch()));
-    connect(m_skipButton, SIGNAL(Clicked()), SLOT(skip()));
-    connect(m_iconsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(menuSelection(MythUIButtonListItem *)));
-    connect(m_iconsList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(itemChanged(MythUIButtonListItem *)));
+    connect(m_manualButton, &MythUIButton::Clicked, this, &ImportIconsWizard::manualSearch);
+    connect(m_skipButton, &MythUIButton::Clicked, this, &ImportIconsWizard::skip);
+    connect(m_iconsList, &MythUIButtonList::itemClicked,
+            this, &ImportIconsWizard::menuSelection);
+    connect(m_iconsList, &MythUIButtonList::itemSelected,
+            this, &ImportIconsWizard::itemChanged);
 
     BuildFocusList();
 

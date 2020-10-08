@@ -112,19 +112,19 @@ bool ProgLister::Create()
         return false;
     }
 
-    connect(m_progList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this,       SLOT(  HandleSelected(  MythUIButtonListItem*)));
+    connect(m_progList, &MythUIButtonList::itemSelected,
+            this,       &ProgLister::HandleSelected);
 
-    connect(m_progList, SIGNAL(itemVisible(MythUIButtonListItem*)),
-            this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
+    connect(m_progList, &MythUIButtonList::itemVisible,
+            this,       &ProgLister::HandleVisible);
 
-    connect(m_progList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
-            this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
+    connect(m_progList, &MythUIButtonList::itemLoaded,
+            this,       &ProgLister::HandleVisible);
 
     if (m_type == plPreviouslyRecorded)
     {
-        connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                this,       SLOT(  ShowOldRecordedMenu()));
+        connect(m_progList, &MythUIButtonList::itemClicked,
+                this,       &ProgLister::ShowOldRecordedMenu);
     }
     else
     {

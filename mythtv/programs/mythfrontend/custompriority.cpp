@@ -72,19 +72,19 @@ bool CustomPriority::Create()
         return false;
     }
 
-    connect(m_ruleList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(ruleChanged(MythUIButtonListItem *)));
+    connect(m_ruleList, &MythUIButtonList::itemSelected,
+                this, &CustomPriority::ruleChanged);
 
-    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+    connect(m_titleEdit, &MythUITextEdit::valueChanged, this, &CustomPriority::textChanged);
     m_titleEdit->SetMaxLength(128);
-    connect(m_descriptionEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+    connect(m_descriptionEdit, &MythUITextEdit::valueChanged, this, &CustomPriority::textChanged);
     m_descriptionEdit->SetMaxLength(0);
 
-    connect(m_addButton, SIGNAL(Clicked()), SLOT(addClicked()));
-    connect(m_testButton, SIGNAL(Clicked()), SLOT(testClicked()));
-    connect(m_installButton, SIGNAL(Clicked()), SLOT(installClicked()));
-    connect(m_deleteButton, SIGNAL(Clicked()), SLOT(deleteClicked()));
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(m_addButton, &MythUIButton::Clicked, this, &CustomPriority::addClicked);
+    connect(m_testButton, &MythUIButton::Clicked, this, &CustomPriority::testClicked);
+    connect(m_installButton, &MythUIButton::Clicked, this, &CustomPriority::installClicked);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &CustomPriority::deleteClicked);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     loadData();
 

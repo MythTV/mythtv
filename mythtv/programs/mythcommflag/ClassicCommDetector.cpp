@@ -251,9 +251,9 @@ void ClassicCommDetector::Init()
         m_commDetectBorder, m_horizSpacing, m_vertSpacing);
     connect(
          m_sceneChangeDetector,
-         SIGNAL(haveNewInformation(unsigned int,bool,float)),
+         &SceneChangeDetectorBase::haveNewInformation,
          this,
-         SLOT(sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
+         &ClassicCommDetector::sceneChangeDetectorHasNewInformation
     );
 
     m_frameIsBlank = false;

@@ -72,11 +72,11 @@ bool MetadataSettings::Create()
     else
         m_trailerSpin->SetVisible(false);
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &MetadataSettings::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(m_randomTrailerCheck, SIGNAL(valueChanged()),
-            SLOT(toggleTrailers()));
+    connect(m_randomTrailerCheck, &MythUICheckBox::valueChanged,
+            this, &MetadataSettings::toggleTrailers);
 
     m_randomTrailerCheck->SetHelpText(
                                 tr("If set, this will enable a button "
