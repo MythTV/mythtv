@@ -326,8 +326,9 @@ class VideoPlayerCommandPrivate
 
     void Play() const
     {
-        std::any_of(m_playerProcs.cbegin(), m_playerProcs.cend(),
-                    [](auto *player){ return player->Play(); } );
+        // Do this until one of the players returns true
+        (void)std::any_of(m_playerProcs.cbegin(), m_playerProcs.cend(),
+                          [](auto *player){ return player->Play(); } );
     }
 
     QString GetCommandDisplayName() const
