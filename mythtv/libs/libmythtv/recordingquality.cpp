@@ -127,14 +127,15 @@ QString RecordingQuality::toStringXML(void) const
 
     str += ">\n";
 
-    for (const auto & gap : qAsConst(m_recordingGaps))
-    {
-        str += xml_indent(1) +
+    auto add_gap = [](const QString& s, const auto & gap) {
+        return s + xml_indent(1) +
             QString("<Gap start=\"%1\" end=\"%2\" duration=\"%3\" />\n")
             .arg(gap.GetStart().toString(Qt::ISODate))
             .arg(gap.GetEnd().toString(Qt::ISODate))
             .arg(gap.GetStart().secsTo(gap.GetEnd()));
-    }
+    };
+    str = std::accumulate(m_recordingGaps.cbegin(),m_recordingGaps.cend(),
+                          str, add_gap);
 
     return str + "</RecordingQuality>";
 }
