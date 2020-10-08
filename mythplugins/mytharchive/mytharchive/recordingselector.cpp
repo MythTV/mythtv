@@ -82,17 +82,17 @@ bool RecordingSelector::Create(void)
         return false;
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &RecordingSelector::OKPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &RecordingSelector::cancelPressed);
 
     new MythUIButtonListItem(m_categorySelector, tr("All Recordings"));
-    connect(m_categorySelector, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(setCategory(MythUIButtonListItem *)));
+    connect(m_categorySelector, &MythUIButtonList::itemSelected,
+            this, &RecordingSelector::setCategory);
 
-    connect(m_recordingButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(titleChanged(MythUIButtonListItem *)));
-    connect(m_recordingButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            this, SLOT(toggleSelected(MythUIButtonListItem *)));
+    connect(m_recordingButtonList, &MythUIButtonList::itemSelected,
+            this, &RecordingSelector::titleChanged);
+    connect(m_recordingButtonList, &MythUIButtonList::itemClicked,
+            this, &RecordingSelector::toggleSelected);
 
     if (m_cutlistImage)
         m_cutlistImage->Hide();

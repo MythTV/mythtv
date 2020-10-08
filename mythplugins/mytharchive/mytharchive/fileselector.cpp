@@ -68,18 +68,18 @@ bool FileSelector::Create(void)
         }
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &FileSelector::OKPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &FileSelector::cancelPressed);
 
-    connect(m_locationEdit, SIGNAL(LosingFocus()),
-            this, SLOT(locationEditLostFocus()));
+    connect(m_locationEdit, &MythUIType::LosingFocus,
+            this, &FileSelector::locationEditLostFocus);
     m_locationEdit->SetText(m_curDirectory);
 
-    connect(m_backButton, SIGNAL(Clicked()), this, SLOT(backPressed()));
-    connect(m_homeButton, SIGNAL(Clicked()), this, SLOT(homePressed()));
+    connect(m_backButton, &MythUIButton::Clicked, this, &FileSelector::backPressed);
+    connect(m_homeButton, &MythUIButton::Clicked, this, &FileSelector::homePressed);
 
-    connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            this, SLOT(itemClicked(MythUIButtonListItem *)));
+    connect(m_fileButtonList, &MythUIButtonList::itemClicked,
+            this, &FileSelector::itemClicked);
 
     BuildFocusList();
 

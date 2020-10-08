@@ -188,8 +188,8 @@ void NetBase::SlotDeleteVideo()
     if (confirmdialog->Create())
     {
         m_popupStack->AddScreen(confirmdialog);
-        connect(confirmdialog, SIGNAL(haveResult(bool)),
-                SLOT(DoDeleteVideo(bool)));
+        connect(confirmdialog, &MythConfirmationDialog::haveResult,
+                this, &NetBase::DoDeleteVideo);
     }
     else
         delete confirmdialog;

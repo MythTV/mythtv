@@ -391,7 +391,7 @@ bool SmartPlaylistEditor::Create(void)
 
     new MythUIButtonListItem(m_matchSelector, tr("All"));
     new MythUIButtonListItem(m_matchSelector, tr("Any"));
-    connect(m_matchSelector, SIGNAL(itemSelected(MythUIButtonListItem*)), SLOT(updateMatches()));
+    connect(m_matchSelector, &MythUIButtonList::itemSelected, this, &SmartPlaylistEditor::updateMatches);
 
     for (const auto & field : SmartPLFields)
     {
@@ -403,12 +403,12 @@ bool SmartPlaylistEditor::Create(void)
 
     m_limitSpin->SetRange(0, 9999, 10);
 
-    connect(m_orderByButton, SIGNAL(Clicked()), SLOT(orderByClicked()));
-    connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveClicked()));
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(m_categoryButton, SIGNAL(Clicked()), SLOT(showCategoryMenu()));
-    connect(m_showResultsButton, SIGNAL(Clicked()), SLOT(showResultsClicked()));
-    connect(m_criteriaList, SIGNAL(itemClicked(MythUIButtonListItem*)), SLOT(editCriteria()));
+    connect(m_orderByButton, &MythUIButton::Clicked, this, &SmartPlaylistEditor::orderByClicked);
+    connect(m_saveButton, &MythUIButton::Clicked, this, &SmartPlaylistEditor::saveClicked);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_categoryButton, &MythUIButton::Clicked, this, &SmartPlaylistEditor::showCategoryMenu);
+    connect(m_showResultsButton, &MythUIButton::Clicked, this, &SmartPlaylistEditor::showResultsClicked);
+    connect(m_criteriaList, &MythUIButtonList::itemClicked, this, &SmartPlaylistEditor::editCriteria);
 
     BuildFocusList();
 
@@ -469,8 +469,8 @@ void SmartPlaylistEditor::customEvent(QEvent *event)
 
                 auto *input = new MythTextInputDialog(popupStack, label);
 
-                connect(input, SIGNAL(haveResult(QString)),
-                        SLOT(newCategory(QString)));
+                connect(input, &MythTextInputDialog::haveResult,
+                        this, &SmartPlaylistEditor::newCategory);
 
                 if (input->Create())
                     popupStack->AddScreen(input);
@@ -486,8 +486,8 @@ void SmartPlaylistEditor::customEvent(QEvent *event)
 
                 auto *input = new MythTextInputDialog(popupStack, label);
 
-                connect(input, SIGNAL(haveResult(QString)),
-                        SLOT(renameCategory(QString)));
+                connect(input, &MythTextInputDialog::haveResult,
+                        this, &SmartPlaylistEditor::renameCategory);
 
                 if (input->Create())
                     popupStack->AddScreen(input);
@@ -526,7 +526,7 @@ void SmartPlaylistEditor::editCriteria(void)
         return;
     }
 
-    connect(editor, SIGNAL(criteriaChanged()), SLOT(criteriaChanged()));
+    connect(editor, &CriteriaRowEditor::criteriaChanged, this, &SmartPlaylistEditor::criteriaChanged);
 
     popupStack->AddScreen(editor);
 }
@@ -588,7 +588,7 @@ void SmartPlaylistEditor::addCriteria(void)
         return;
     }
 
-    connect(editor, SIGNAL(criteriaChanged()), SLOT(criteriaChanged()));
+    connect(editor, &CriteriaRowEditor::criteriaChanged, this, &SmartPlaylistEditor::criteriaChanged);
 
     popupStack->AddScreen(editor);
 }
@@ -1232,19 +1232,19 @@ bool CriteriaRowEditor::Create(void)
     updateOperators();
     updateValues();
 
-    connect(m_fieldSelector, SIGNAL(itemSelected(MythUIButtonListItem*)), SLOT(fieldChanged()));
-    connect(m_operatorSelector, SIGNAL(itemSelected(MythUIButtonListItem*)), SLOT(operatorChanged()));
+    connect(m_fieldSelector, &MythUIButtonList::itemSelected, this, &CriteriaRowEditor::fieldChanged);
+    connect(m_operatorSelector, &MythUIButtonList::itemSelected, this, &CriteriaRowEditor::operatorChanged);
 
-    connect(m_value1Edit, SIGNAL(valueChanged()), SLOT(valueEditChanged()));
-    connect(m_value2Edit, SIGNAL(valueChanged()), SLOT(valueEditChanged()));
-    connect(m_value1Selector, SIGNAL(itemSelected(MythUIButtonListItem*)), SLOT(valueEditChanged()));
-    connect(m_value2Selector, SIGNAL(itemSelected(MythUIButtonListItem*)), SLOT(valueEditChanged()));
+    connect(m_value1Edit, &MythUITextEdit::valueChanged, this, &CriteriaRowEditor::valueEditChanged);
+    connect(m_value2Edit, &MythUITextEdit::valueChanged, this, &CriteriaRowEditor::valueEditChanged);
+    connect(m_value1Selector, &MythUIButtonList::itemSelected, this, &CriteriaRowEditor::valueEditChanged);
+    connect(m_value2Selector, &MythUIButtonList::itemSelected, this, &CriteriaRowEditor::valueEditChanged);
 
-    connect(m_value1Button, SIGNAL(Clicked()), SLOT(valueButtonClicked()));
-    connect(m_value2Button, SIGNAL(Clicked()), SLOT(valueButtonClicked()));
+    connect(m_value1Button, &MythUIButton::Clicked, this, &CriteriaRowEditor::valueButtonClicked);
+    connect(m_value2Button, &MythUIButton::Clicked, this, &CriteriaRowEditor::valueButtonClicked);
 
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveClicked()));
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_saveButton, &MythUIButton::Clicked, this, &CriteriaRowEditor::saveClicked);
 
     BuildFocusList();
 
@@ -1559,7 +1559,7 @@ void CriteriaRowEditor::valueButtonClicked(void)
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setValue(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &CriteriaRowEditor::setValue);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -1586,7 +1586,7 @@ void CriteriaRowEditor::editDate(void)
 
     dateDlg->setDate(date);
 
-    connect(dateDlg, SIGNAL(dateChanged(QString)), SLOT(setDate(QString)));
+    connect(dateDlg, &SmartPLDateDialog::dateChanged, this, &CriteriaRowEditor::setDate);
 
     popupStack->AddScreen(dateDlg);
 }
@@ -1636,8 +1636,8 @@ bool SmartPLResultViewer::Create(void)
 
     connect(m_trackList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(trackVisible(MythUIButtonListItem*)));
-    connect(m_trackList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(trackSelected(MythUIButtonListItem*)));
+    connect(m_trackList, &MythUIButtonList::itemSelected,
+            this, &SmartPLResultViewer::trackSelected);
 
     BuildFocusList();
 
@@ -1775,19 +1775,19 @@ bool SmartPLOrderByDialog::Create(void)
         return false;
     }
 
-    connect(m_addButton, SIGNAL(Clicked()), this, SLOT(addPressed()));
-    connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deletePressed()));
-    connect(m_moveUpButton, SIGNAL(Clicked()), this, SLOT(moveUpPressed()));
-    connect(m_moveDownButton, SIGNAL(Clicked()), this, SLOT(moveDownPressed()));
-    connect(m_ascendingButton, SIGNAL(Clicked()), this, SLOT(ascendingPressed()));
-    connect(m_descendingButton, SIGNAL(Clicked()), this, SLOT(descendingPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okPressed()));
+    connect(m_addButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::addPressed);
+    connect(m_deleteButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::deletePressed);
+    connect(m_moveUpButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::moveUpPressed);
+    connect(m_moveDownButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::moveDownPressed);
+    connect(m_ascendingButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::ascendingPressed);
+    connect(m_descendingButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::descendingPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_okButton, &MythUIButton::Clicked, this, &SmartPLOrderByDialog::okPressed);
 
     connect(m_orderSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(orderByChanged(void)));
-    connect(m_fieldList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(fieldListSelectionChanged(MythUIButtonListItem*)));
+    connect(m_fieldList, &MythUIButtonList::itemSelected,
+            this, &SmartPLOrderByDialog::fieldListSelectionChanged);
 
     getOrderByFields();
 
@@ -1992,20 +1992,20 @@ bool SmartPLDateDialog::Create(void)
     m_addDaysSpin->SetRange(-9999, 9999, 1);
 
 
-    connect(m_fixedRadio, SIGNAL(toggled(bool)), this, SLOT(fixedCheckToggled(bool)));
-    connect(m_nowRadio, SIGNAL(toggled(bool)), this, SLOT(nowCheckToggled(bool)));
+    connect(m_fixedRadio, &MythUICheckBox::toggled, this, &SmartPLDateDialog::fixedCheckToggled);
+    connect(m_nowRadio, &MythUICheckBox::toggled, this, &SmartPLDateDialog::nowCheckToggled);
     //connect(addDaysCheck, SIGNAL(toggled(bool)), this, SLOT(addDaysCheckToggled(bool)));
-    connect(m_addDaysSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(valueChanged(void)));
-    connect(m_daySpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(valueChanged(void)));
-    connect(m_monthSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(valueChanged(void)));
-    connect(m_yearSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(valueChanged(void)));
+    connect(m_addDaysSpin, &MythUIButtonList::itemSelected,
+            this, &SmartPLDateDialog::valueChanged);
+    connect(m_daySpin, &MythUIButtonList::itemSelected,
+            this, &SmartPLDateDialog::valueChanged);
+    connect(m_monthSpin, &MythUIButtonList::itemSelected,
+            this, &SmartPLDateDialog::valueChanged);
+    connect(m_yearSpin, &MythUIButtonList::itemSelected,
+            this, &SmartPLDateDialog::valueChanged);
 
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okPressed()));
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_okButton, &MythUIButton::Clicked, this, &SmartPLDateDialog::okPressed);
 
     valueChanged();
 

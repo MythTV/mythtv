@@ -80,9 +80,9 @@ bool RSSEditPopup::Create(void)
         return false;
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(ParseAndSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_thumbButton, SIGNAL(Clicked()), this, SLOT(DoFileBrowser()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &RSSEditPopup::ParseAndSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_thumbButton, &MythUIButton::Clicked, this, &RSSEditPopup::DoFileBrowser);
 
     m_urlEdit->SetMaxLength(0);
     m_titleEdit->SetMaxLength(255);
@@ -156,8 +156,8 @@ void RSSEditPopup::ParseAndSave(void)
 
         m_reply = m_manager->get(QNetworkRequest(qurl));
 
-        connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
-                           SLOT(SlotCheckRedirect(QNetworkReply*)));
+        connect(m_manager, &QNetworkAccessManager::finished, this,
+                           &RSSEditPopup::SlotCheckRedirect);
     }
 }
 
@@ -336,18 +336,18 @@ bool RSSEditor::Create(void)
         return false;
     }
 
-    connect(m_sites, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(SlotEditSite(void)));
+    connect(m_sites, &MythUIButtonList::itemClicked,
+            this, &RSSEditor::SlotEditSite);
 
-    connect(m_delete, SIGNAL(Clicked(void)),
-            SLOT(SlotDeleteSite(void)));
-    connect(m_edit, SIGNAL(Clicked(void)),
-            SLOT(SlotEditSite(void)));
-    connect(m_new, SIGNAL(Clicked(void)),
-            SLOT(SlotNewSite(void)));
+    connect(m_delete, &MythUIButton::Clicked,
+            this, &RSSEditor::SlotDeleteSite);
+    connect(m_edit, &MythUIButton::Clicked,
+            this, &RSSEditor::SlotEditSite);
+    connect(m_new, &MythUIButton::Clicked,
+            this, &RSSEditor::SlotNewSite);
 
-    connect(m_sites, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(SlotItemChanged(void)));
+    connect(m_sites, &MythUIButtonList::itemSelected,
+            this, &RSSEditor::SlotItemChanged);
 
     BuildFocusList();
 
@@ -475,8 +475,8 @@ void RSSEditor::SlotDeleteSite()
     {
         m_popupStack->AddScreen(confirmdialog);
 
-        connect(confirmdialog, SIGNAL(haveResult(bool)),
-                SLOT(DoDeleteSite(bool)));
+        connect(confirmdialog, &MythConfirmationDialog::haveResult,
+                this, &RSSEditor::DoDeleteSite);
     }
     else
         delete confirmdialog;
@@ -496,7 +496,7 @@ void RSSEditor::SlotEditSite()
 
         if (rsseditpopup->Create())
         {
-            connect(rsseditpopup, SIGNAL(Saving()), this, SLOT(ListChanged()));
+            connect(rsseditpopup, &RSSEditPopup::Saving, this, &RSSEditor::ListChanged);
 
             mainStack->AddScreen(rsseditpopup);
         }
@@ -515,7 +515,7 @@ void RSSEditor::SlotNewSite()
 
     if (rsseditpopup->Create())
     {
-        connect(rsseditpopup, SIGNAL(Saving()), this, SLOT(ListChanged()));
+        connect(rsseditpopup, &RSSEditPopup::Saving, this, &RSSEditor::ListChanged);
 
         mainStack->AddScreen(rsseditpopup);
     }

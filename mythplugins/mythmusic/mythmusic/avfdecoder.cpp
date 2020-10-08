@@ -292,7 +292,7 @@ bool avfDecoder::initialize()
     {
         m_mdataTimer = new QTimer;
         m_mdataTimer->setSingleShot(false);
-        connect(m_mdataTimer, SIGNAL(timeout()), this, SLOT(checkMetatdata()));
+        connect(m_mdataTimer, &QTimer::timeout, this, &avfDecoder::checkMetatdata);
 
         m_mdataTimer->start(500);
 

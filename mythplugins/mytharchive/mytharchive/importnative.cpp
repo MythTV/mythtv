@@ -204,22 +204,22 @@ bool ArchiveFileSelector::Create(void)
     if (m_titleText)
         m_titleText->SetText(tr("Find File To Import"));
 
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
+    connect(m_nextButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::nextPressed);
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
+    connect(m_prevButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::prevPressed);
 
-    connect(m_locationEdit, SIGNAL(LosingFocus()),
-            this, SLOT(locationEditLostFocus()));
+    connect(m_locationEdit, &MythUIType::LosingFocus,
+            this, &ArchiveFileSelector::locationEditLostFocus);
     m_locationEdit->SetText(m_curDirectory);
 
-    connect(m_backButton, SIGNAL(Clicked()), this, SLOT(backPressed()));
-    connect(m_homeButton, SIGNAL(Clicked()), this, SLOT(homePressed()));
+    connect(m_backButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::backPressed);
+    connect(m_homeButton, &MythUIButton::Clicked, this, &ArchiveFileSelector::homePressed);
 
-    connect(m_fileButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(itemSelected(MythUIButtonListItem *)));
+    connect(m_fileButtonList, &MythUIButtonList::itemSelected,
+            this, &ArchiveFileSelector::itemSelected);
 
-    connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            this, SLOT(itemClicked(MythUIButtonListItem *)));
+    connect(m_fileButtonList, &MythUIButtonList::itemClicked,
+            this, &ArchiveFileSelector::itemClicked);
 
     BuildFocusList();
 
@@ -324,14 +324,14 @@ bool ImportNative::Create(void)
         return false;
     }
 
-    connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(finishedPressed()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_finishButton, &MythUIButton::Clicked, this, &ImportNative::finishedPressed);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &ImportNative::prevPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &ImportNative::cancelPressed);
 
-    connect(m_searchChanIDButton, SIGNAL(Clicked()), this, SLOT(searchChanID()));
-    connect(m_searchChanNoButton, SIGNAL(Clicked()), this, SLOT(searchChanNo()));
-    connect(m_searchChanNameButton, SIGNAL(Clicked()), this, SLOT(searchName()));
-    connect(m_searchCallsignButton, SIGNAL(Clicked()), this, SLOT(searchCallsign()));
+    connect(m_searchChanIDButton, &MythUIButton::Clicked, this, &ImportNative::searchChanID);
+    connect(m_searchChanNoButton, &MythUIButton::Clicked, this, &ImportNative::searchChanNo);
+    connect(m_searchChanNameButton, &MythUIButton::Clicked, this, &ImportNative::searchName);
+    connect(m_searchCallsignButton, &MythUIButton::Clicked, this, &ImportNative::searchCallsign);
 
     m_progTitleText->SetText(m_details.title);
 

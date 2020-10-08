@@ -61,8 +61,8 @@ bool ImportSettings::Create()
     if (loadMp3UseVBR == 1)
         m_mp3UseVBR->SetCheckState(MythUIStateType::Full);
 
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &ImportSettings::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     m_paranoiaLevel->SetHelpText(tr("Paranoia level of the CD ripper. Set to "
                  "faster if you're not concerned about "

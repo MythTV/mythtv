@@ -160,10 +160,10 @@ bool PlaylistEditorView::Create(void)
         restoreTreePosition(route);
     }
 
-    connect(m_playlistTree, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(treeItemClicked(MythUIButtonListItem*)));
-    connect(m_playlistTree, SIGNAL(nodeChanged(MythGenericTree*)),
-            this, SLOT(treeNodeChanged(MythGenericTree*)));
+    connect(m_playlistTree, &MythUIButtonTree::itemClicked,
+            this, &PlaylistEditorView::treeItemClicked);
+    connect(m_playlistTree, &MythUIButtonTree::nodeChanged,
+            this, &PlaylistEditorView::treeNodeChanged);
 
     if (m_currentView == MV_PLAYLISTEDITORGALLERY)
         connect(m_playlistTree, SIGNAL(itemVisible(MythUIButtonListItem*)),
@@ -260,8 +260,8 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
                 editor->newSmartPlaylist(category);
 
-                connect(editor, SIGNAL(smartPLChanged(const QString&, const QString&)),
-                        this, SLOT(smartPLChanged(QString, QString)));
+                connect(editor, &SmartPlaylistEditor::smartPLChanged,
+                        this, &PlaylistEditorView::smartPLChanged);
 
                 mainStack->AddScreen(editor);
             }
@@ -290,8 +290,8 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
                 editor->editSmartPlaylist(category, name);
 
-                connect(editor, SIGNAL(smartPLChanged(const QString&, const QString&)),
-                        this, SLOT(smartPLChanged(QString, QString)));
+                connect(editor, &SmartPlaylistEditor::smartPLChanged,
+                        this, &PlaylistEditorView::smartPLChanged);
 
                 mainStack->AddScreen(editor);
             }
@@ -391,8 +391,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                         }
 
                         editor->editSmartPlaylist(category, name);
-                        connect(editor, SIGNAL(smartPLChanged(const QString&, const QString&)),
-                                this, SLOT(smartPLChanged(QString, QString)));
+                        connect(editor, &SmartPlaylistEditor::smartPLChanged,
+                                this, &PlaylistEditorView::smartPLChanged);
 
                         mainStack->AddScreen(editor);
 
@@ -413,8 +413,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
 
                         editor->newSmartPlaylist(category);
 
-                        connect(editor, SIGNAL(smartPLChanged(const QString&, const QString&)),
-                                this, SLOT(smartPLChanged(QString, QString)));
+                        connect(editor, &SmartPlaylistEditor::smartPLChanged,
+                                this, &PlaylistEditorView::smartPLChanged);
 
                         mainStack->AddScreen(editor);
 

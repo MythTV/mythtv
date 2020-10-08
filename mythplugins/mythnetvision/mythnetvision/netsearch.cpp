@@ -74,14 +74,14 @@ bool NetSearch::Create()
     m_search->SetMaxLength(255);
 
     // UI Hookups
-    connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(SlotItemChanged()));
-    connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(DoSearch(void)));
-    connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(StreamWebVideo(void)));
-    connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(SlotItemChanged()));
+    connect(m_siteList, &MythUIButtonList::itemSelected,
+            this, &NetSearch::SlotItemChanged);
+    connect(m_siteList, &MythUIButtonList::itemClicked,
+            this, &NetSearch::DoSearch);
+    connect(m_searchResultList, &MythUIButtonList::itemClicked,
+            this, &NetSearch::StreamWebVideo);
+    connect(m_searchResultList, &MythUIButtonList::itemSelected,
+            this, &NetSearch::SlotItemChanged);
 
     BuildFocusList();
 
@@ -287,8 +287,8 @@ void NetSearch::DoSearch()
     if (!m_netSearch)
     {
         m_netSearch = new QNetworkAccessManager(this);
-        connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
-                SLOT(SearchFinished(void)));
+        connect(m_netSearch, &QNetworkAccessManager::finished,
+                this, &NetSearch::SearchFinished);
     }
 
     QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch, m_currentCmd, "");
@@ -462,8 +462,8 @@ void NetSearch::RunSearchEditor()
 
     if (searchedit->Create())
     {
-        connect(searchedit, SIGNAL(ItemsChanged()),
-                this, SLOT(DoListRefresh()));
+        connect(searchedit, &NetEditorBase::ItemsChanged,
+                this, &NetSearch::DoListRefresh);
 
         mainStack->AddScreen(searchedit);
     }

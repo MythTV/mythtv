@@ -58,8 +58,8 @@ bool MythBrowser::Create(void)
         return false;
     }
 
-    connect(m_pageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(slotTabSelected(MythUIButtonListItem*)));
+    connect(m_pageList, &MythUIButtonList::itemSelected,
+            this, &MythBrowser::slotTabSelected);
 
     // create the default favicon
     QString favIcon = "mb_default_favicon.png";
@@ -82,12 +82,12 @@ bool MythBrowser::Create(void)
 
     page->SetActive(true);
 
-    connect(page, SIGNAL(loadProgress(int)),
-            this, SLOT(slotLoadProgress(int)));
-    connect(page, SIGNAL(statusBarMessage(const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
-    connect(page, SIGNAL(loadFinished(bool)),
-            this, SLOT(slotLoadFinished(bool)));
+    connect(page, &WebPage::loadProgress,
+            this, &MythBrowser::slotLoadProgress);
+    connect(page, &WebPage::statusBarMessage,
+            this, &MythBrowser::slotStatusBarMessage);
+    connect(page, &WebPage::loadFinished,
+            this, &MythBrowser::slotLoadFinished);
 
     if (m_progressBar)
         m_progressBar->SetTotal(100);
@@ -96,19 +96,19 @@ bool MythBrowser::Create(void)
     {
         m_exitButton->SetEnabled(false);
         m_exitButton->SetEnabled(true);
-        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+        connect(m_exitButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
     }
 
     if (m_backButton)
     {
         m_backButton->SetEnabled(false);
-        connect(m_backButton, SIGNAL(Clicked()), this, SLOT(slotBack()));
+        connect(m_backButton, &MythUIButton::Clicked, this, &MythBrowser::slotBack);
     }
 
     if (m_forwardButton)
     {
         m_forwardButton->SetEnabled(false);
-        connect(m_forwardButton, SIGNAL(Clicked()), this, SLOT(slotForward()));
+        connect(m_forwardButton, &MythUIButton::Clicked, this, &MythBrowser::slotForward);
     }
 
     BuildFocusList();
@@ -144,8 +144,8 @@ void MythBrowser::slotEnterURL(void)
     if (dialog->Create())
        popupStack->AddScreen(dialog);
 
-     connect(dialog, SIGNAL(haveResult(QString)),
-            SLOT(slotOpenURL(QString)), Qt::QueuedConnection);
+     connect(dialog, &MythTextInputDialog::haveResult,
+            this, &MythBrowser::slotOpenURL, Qt::QueuedConnection);
 }
 
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
@@ -167,12 +167,12 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 
     page->SetActive(false);
 
-    connect(page, SIGNAL(loadProgress(int)),
-            this, SLOT(slotLoadProgress(int)));
-    connect(page, SIGNAL(statusBarMessage(const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
-    connect(page, SIGNAL(loadFinished(bool)),
-            this, SLOT(slotLoadFinished(bool)));
+    connect(page, &WebPage::loadProgress,
+            this, &MythBrowser::slotLoadProgress);
+    connect(page, &WebPage::statusBarMessage,
+            this, &MythBrowser::slotStatusBarMessage);
+    connect(page, &WebPage::loadFinished,
+            this, &MythBrowser::slotLoadFinished);
 
     if (doSwitch)
         m_pageList->SetItemCurrent(m_browserList.size() -1);

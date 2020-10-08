@@ -66,23 +66,23 @@ bool ZMEvents::Create(void)
     getCameraList();
     getDateList();
 
-    connect(m_cameraSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(cameraChanged()));
-    connect(m_dateSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(dateChanged()));
+    connect(m_cameraSelector, &MythUIButtonList::itemSelected,
+            this, &ZMEvents::cameraChanged);
+    connect(m_dateSelector, &MythUIButtonList::itemSelected,
+            this, &ZMEvents::dateChanged);
 
     // play button
     if (m_playButton)
     {
         m_playButton->SetText(tr("Play"));
-        connect(m_playButton, SIGNAL(Clicked()), this, SLOT(playPressed()));
+        connect(m_playButton, &MythUIButton::Clicked, this, &ZMEvents::playPressed);
     }
 
     // delete button
     if (m_deleteButton)
     {
         m_deleteButton->SetText(tr("Delete"));
-        connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deletePressed()));
+        connect(m_deleteButton, &MythUIButton::Clicked, this, &ZMEvents::deletePressed);
     }
 
     m_oldestFirst = (gCoreContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
@@ -279,7 +279,7 @@ void ZMEvents::playPressed(void)
         auto *player = new ZMPlayer(mainStack, "ZMPlayer",
                                     m_eventList, &m_savedPosition);
 
-        connect(player, SIGNAL(Exiting()), this, SLOT(playerExited()));
+        connect(player, &MythScreenType::Exiting, this, &ZMEvents::playerExited);
 
         if (player->Create())
             mainStack->AddScreen(player);
@@ -402,10 +402,10 @@ void ZMEvents::setGridLayout(int layout)
 
     if (m_eventGrid)
     {
-        connect(m_eventGrid, SIGNAL(itemSelected( MythUIButtonListItem*)),
-                this, SLOT(eventChanged(MythUIButtonListItem*)));
-        connect(m_eventGrid, SIGNAL(itemClicked( MythUIButtonListItem*)),
-                this, SLOT(playPressed()));
+        connect(m_eventGrid, &MythUIButtonList::itemSelected,
+                this, &ZMEvents::eventChanged);
+        connect(m_eventGrid, &MythUIButtonList::itemClicked,
+                this, &ZMEvents::playPressed);
         connect(m_eventGrid, SIGNAL(itemVisible(MythUIButtonListItem*)),
              this, SLOT(eventVisible(MythUIButtonListItem*)));
 
@@ -468,8 +468,8 @@ void ZMEvents::deleteAll(void)
     if (dialog->Create())
         popupStack->AddScreen(dialog);
 
-    connect(dialog, SIGNAL(haveResult(bool)),
-            SLOT(doDeleteAll(bool)), Qt::QueuedConnection);
+    connect(dialog, &MythConfirmationDialog::haveResult,
+            this, &ZMEvents::doDeleteAll, Qt::QueuedConnection);
 }
 
 void ZMEvents::doDeleteAll(bool doDelete)

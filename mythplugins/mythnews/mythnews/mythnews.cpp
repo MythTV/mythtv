@@ -58,8 +58,8 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    connect(m_retrieveTimer, SIGNAL(timeout()),
-            this, SLOT(slotRetrieveNews()));
+    connect(m_retrieveTimer, &QTimer::timeout,
+            this, &MythNews::slotRetrieveNews);
 
     m_retrieveTimer->stop();
     m_retrieveTimer->setSingleShot(false);
@@ -113,12 +113,12 @@ bool MythNews::Create(void)
     loadSites();
     updateInfoView(m_sitesList->GetItemFirst());
 
-    connect(m_sitesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT( slotSiteSelected(MythUIButtonListItem*)));
+    connect(m_sitesList, &MythUIButtonList::itemSelected,
+            this, &MythNews::slotSiteSelected);
     connect(m_articlesList, SIGNAL(itemSelected( MythUIButtonListItem*)),
             this, SLOT( updateInfoView(MythUIButtonListItem*)));
-    connect(m_articlesList, SIGNAL(itemClicked( MythUIButtonListItem*)),
-            this, SLOT( slotViewArticle(MythUIButtonListItem*)));
+    connect(m_articlesList, &MythUIButtonList::itemClicked,
+            this, &MythNews::slotViewArticle);
 
     return true;
 }
@@ -183,8 +183,8 @@ void MythNews::loadSites(void)
         auto *item = new MythUIButtonListItem(m_sitesList, site->name());
         item->SetData(QVariant::fromValue(site));
 
-        connect(site, SIGNAL(finished(NewsSite*)),
-                this, SLOT(slotNewsRetrieved(NewsSite*)));
+        connect(site, &NewsSite::finished,
+                this, &MythNews::slotNewsRetrieved);
     }
 
     slotRetrieveNews();
@@ -618,7 +618,7 @@ void MythNews::ShowEditDialog(bool edit)
 
     if (mythnewseditor->Create())
     {
-        connect(mythnewseditor, SIGNAL(Exiting()), SLOT(loadSites()));
+        connect(mythnewseditor, &MythScreenType::Exiting, this, &MythNews::loadSites);
         mainStack->AddScreen(mythnewseditor);
     }
     else
@@ -633,7 +633,7 @@ void MythNews::ShowFeedManager()
 
     if (mythnewsconfig->Create())
     {
-        connect(mythnewsconfig, SIGNAL(Exiting()), SLOT(loadSites()));
+        connect(mythnewsconfig, &MythScreenType::Exiting, this, &MythNews::loadSites);
         mainStack->AddScreen(mythnewsconfig);
     }
     else

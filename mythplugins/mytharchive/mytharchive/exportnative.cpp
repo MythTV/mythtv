@@ -74,17 +74,17 @@ bool ExportNative::Create(void)
         return false;
     }
 
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
+    connect(m_nextButton, &MythUIButton::Clicked, this, &ExportNative::handleNextPage);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &ExportNative::handlePrevPage);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &ExportNative::handleCancel);
 
 
     getArchiveList();
-    connect(m_archiveButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(titleChanged(MythUIButtonListItem *)));
+    connect(m_archiveButtonList, &MythUIButtonList::itemSelected,
+            this, &ExportNative::titleChanged);
 
-    connect(m_addrecordingButton, SIGNAL(Clicked()), this, SLOT(handleAddRecording()));
-    connect(m_addvideoButton, SIGNAL(Clicked()), this, SLOT(handleAddVideo()));
+    connect(m_addrecordingButton, &MythUIButton::Clicked, this, &ExportNative::handleAddRecording);
+    connect(m_addvideoButton, &MythUIButton::Clicked, this, &ExportNative::handleAddVideo);
 
     BuildFocusList();
 
@@ -452,8 +452,8 @@ void ExportNative::handleAddRecording()
 
     auto *selector = new RecordingSelector(mainStack, &m_archiveList);
 
-    connect(selector, SIGNAL(haveResult(bool)),
-            this, SLOT(selectorClosed(bool)));
+    connect(selector, &RecordingSelector::haveResult,
+            this, &ExportNative::selectorClosed);
 
     if (selector->Create())
         mainStack->AddScreen(selector);
@@ -482,8 +482,8 @@ void ExportNative::handleAddVideo()
 
     auto *selector = new VideoSelector(mainStack, &m_archiveList);
 
-    connect(selector, SIGNAL(haveResult(bool)),
-            this, SLOT(selectorClosed(bool)));
+    connect(selector, &VideoSelector::haveResult,
+            this, &ExportNative::selectorClosed);
 
     if (selector->Create())
         mainStack->AddScreen(selector);

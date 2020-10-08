@@ -62,20 +62,20 @@ bool EditRomInfoDialog::Create()
 
     BuildFocusList();
 
-    connect(m_gamenameEdit, SIGNAL(valueChanged()), SLOT(SetGamename()));
-    connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(SetGenre()));
-    connect(m_yearEdit, SIGNAL(valueChanged()), SLOT(SetYear()));
-    connect(m_countryEdit, SIGNAL(valueChanged()), SLOT(SetCountry()));
-    connect(m_plotEdit, SIGNAL(valueChanged()), SLOT(SetPlot()));
-    connect(m_publisherEdit, SIGNAL(valueChanged()), SLOT(SetPublisher()));
+    connect(m_gamenameEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetGamename);
+    connect(m_genreEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetGenre);
+    connect(m_yearEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetYear);
+    connect(m_countryEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetCountry);
+    connect(m_plotEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetPlot);
+    connect(m_publisherEdit, &MythUITextEdit::valueChanged, this, &EditRomInfoDialog::SetPublisher);
 
-    connect(m_favoriteCheck, SIGNAL(valueChanged()), SLOT(ToggleFavorite()));
+    connect(m_favoriteCheck, &MythUICheckBox::valueChanged, this, &EditRomInfoDialog::ToggleFavorite);
 
-    connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
-    connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
-    connect(m_boxartButton, SIGNAL(Clicked()), SLOT(FindBoxart()));
+    connect(m_screenshotButton, &MythUIButton::Clicked, this, &EditRomInfoDialog::FindScreenshot);
+    connect(m_fanartButton, &MythUIButton::Clicked, this, &EditRomInfoDialog::FindFanart);
+    connect(m_boxartButton, &MythUIButton::Clicked, this, &EditRomInfoDialog::FindBoxart);
 
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
+    connect(m_doneButton, &MythUIButton::Clicked, this, &EditRomInfoDialog::SaveAndExit);
 
     return true;
 }

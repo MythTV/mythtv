@@ -79,8 +79,8 @@ MusicPlayer::MusicPlayer(QObject *parent)
 
     gCoreContext->addListener(this);
     gCoreContext->RegisterForPlayback(this, SLOT(StopPlayback()));
-    connect(gCoreContext, SIGNAL(TVPlaybackStopped()), this, SLOT(StartPlayback()));
-    connect(gCoreContext, SIGNAL(TVPlaybackAborted()), this, SLOT(StartPlayback()));
+    connect(gCoreContext, &MythCoreContext::TVPlaybackStopped, this, &MusicPlayer::StartPlayback);
+    connect(gCoreContext, &MythCoreContext::TVPlaybackAborted, this, &MusicPlayer::StartPlayback);
 }
 
 MusicPlayer::~MusicPlayer()

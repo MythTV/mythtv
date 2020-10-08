@@ -339,7 +339,7 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     }
     m_dir = dir.absolutePath();
 
-    connect( m_updateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
+    connect( m_updateTimer, &QTimer::timeout, this, &WeatherSource::updateTimeout);
 }
 
 WeatherSource::~WeatherSource()
@@ -355,8 +355,8 @@ WeatherSource::~WeatherSource()
 
 void WeatherSource::connectScreen(WeatherScreen *ws)
 {
-    connect(this, SIGNAL(newData(QString, units_t, DataMap)),
-            ws, SLOT(newData(QString, units_t, DataMap)));
+    connect(this, &WeatherSource::newData,
+            ws, &WeatherScreen::newData);
     ++m_connectCnt;
 
     if (!m_data.empty())
@@ -486,7 +486,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
     m_ms->SetDirectory(m_info->path);
 
     connect(m_ms, SIGNAL(finished()),  this, SLOT(processExit()));
-    connect(m_ms, SIGNAL(error(uint)), this, SLOT(processExit(uint)));
+    connect(m_ms, &MythSystemLegacy::error, this, &WeatherSource::processExit);
 
     m_ms->Run(m_info->scriptTimeout);
 }

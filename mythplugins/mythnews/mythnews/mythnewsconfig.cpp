@@ -133,10 +133,10 @@ bool MythNewsConfig::Create(void)
         return false;
     }
 
-    connect(m_categoriesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(slotCategoryChanged(MythUIButtonListItem*)));
-    connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(toggleItem(MythUIButtonListItem*)));
+    connect(m_categoriesList, &MythUIButtonList::itemSelected,
+            this, &MythNewsConfig::slotCategoryChanged);
+    connect(m_siteList, &MythUIButtonList::itemClicked,
+            this, &MythNewsConfig::toggleItem);
 
     BuildFocusList();
 

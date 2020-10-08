@@ -269,15 +269,15 @@ bool ImportMusicDialog::Create()
         return false;
     }
 
-    connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevPressed()));
-    connect(m_locationButton, SIGNAL(Clicked()), SLOT(locationPressed()));
-    connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScan()));
-    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(coverArtPressed()));
-    connect(m_playButton, SIGNAL(Clicked()), SLOT(playPressed()));
-    connect(m_nextnewButton, SIGNAL(Clicked()), SLOT(nextNewPressed()));
-    connect(m_addButton, SIGNAL(Clicked()), SLOT(addPressed()));
-    connect(m_addallnewButton, SIGNAL(Clicked()), SLOT(addAllNewPressed()));
-    connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextPressed()));
+    connect(m_prevButton, &MythUIButton::Clicked, this, &ImportMusicDialog::prevPressed);
+    connect(m_locationButton, &MythUIButton::Clicked, this, &ImportMusicDialog::locationPressed);
+    connect(m_scanButton, &MythUIButton::Clicked, this, &ImportMusicDialog::startScan);
+    connect(m_coverartButton, &MythUIButton::Clicked, this, &ImportMusicDialog::coverArtPressed);
+    connect(m_playButton, &MythUIButton::Clicked, this, &ImportMusicDialog::playPressed);
+    connect(m_nextnewButton, &MythUIButton::Clicked, this, &ImportMusicDialog::nextNewPressed);
+    connect(m_addButton, &MythUIButton::Clicked, this, &ImportMusicDialog::addPressed);
+    connect(m_addallnewButton, &MythUIButton::Clicked, this, &ImportMusicDialog::addAllNewPressed);
+    connect(m_nextButton, &MythUIButton::Clicked, this, &ImportMusicDialog::nextPressed);
 
     fillWidgets();
 
@@ -607,7 +607,7 @@ void ImportMusicDialog::showEditMetadataDialog()
 
     editDialog->setSaveMetadataOnly();
 
-    connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
+    connect(editDialog, &EditMetadataCommon::metadataChanged, this, &ImportMusicDialog::metadataChanged);
 
     mainStack->AddScreen(editDialog);
 }
@@ -691,7 +691,7 @@ void ImportMusicDialog::chooseBackend(void)
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setSaveHost(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &ImportMusicDialog::setSaveHost);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -944,21 +944,21 @@ bool ImportCoverArtDialog::Create()
         new MythUIButtonListItem(m_typeList, tr("<Unknown>"),
                                  QVariant::fromValue((int)IT_UNKNOWN));
 
-        connect(m_typeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-                SLOT(selectorChanged()));
+        connect(m_typeList, &MythUIButtonList::itemSelected,
+                this, &ImportCoverArtDialog::selectorChanged);
     }
 
     if (m_copyButton)
-        connect(m_copyButton, SIGNAL(Clicked()), this, SLOT(copyPressed()));
+        connect(m_copyButton, &MythUIButton::Clicked, this, &ImportCoverArtDialog::copyPressed);
 
     if (m_exitButton)
-        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+        connect(m_exitButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     if (m_prevButton)
-        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
+        connect(m_prevButton, &MythUIButton::Clicked, this, &ImportCoverArtDialog::prevPressed);
 
     if (m_nextButton)
-        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
+        connect(m_nextButton, &MythUIButton::Clicked, this, &ImportCoverArtDialog::nextPressed);
 
     BuildFocusList();
 

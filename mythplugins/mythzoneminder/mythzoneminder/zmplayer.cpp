@@ -40,8 +40,8 @@ ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
           m_eventList(eventList), m_frameList(new std::vector<Frame*>),
           m_frameTimer(new QTimer(this))
 {
-    connect(m_frameTimer, SIGNAL(timeout()), this,
-            SLOT(updateFrame()));
+    connect(m_frameTimer, &QTimer::timeout, this,
+            &ZMPlayer::updateFrame);
 }
 
 ZMPlayer::~ZMPlayer()
@@ -89,25 +89,25 @@ bool ZMPlayer::Create(void)
     if (m_playButton)
     {
         m_playButton->SetText(tr("Pause"));
-        connect(m_playButton, SIGNAL(Clicked()), this, SLOT(playPressed()));
+        connect(m_playButton, &MythUIButton::Clicked, this, &ZMPlayer::playPressed);
     }
 
     if (m_deleteButton)
     {
         m_deleteButton->SetText(tr("Delete"));
-        connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deletePressed()));
+        connect(m_deleteButton, &MythUIButton::Clicked, this, &ZMPlayer::deletePressed);
     }
 
     if (m_prevButton)
     {
         m_prevButton->SetText(tr("Previous"));
-        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
+        connect(m_prevButton, &MythUIButton::Clicked, this, &ZMPlayer::prevPressed);
     }
 
     if (m_nextButton)
     {
         m_nextButton->SetText(tr("Next"));
-        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
+        connect(m_nextButton, &MythUIButton::Clicked, this, &ZMPlayer::nextPressed);
     }
 
     // hide the fullscreen image

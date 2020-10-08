@@ -24,16 +24,16 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
     m_browser->SetArea(MythRect(area));
     m_browser->Init();
 
-    connect(m_browser, SIGNAL(loadStarted()),
-            this, SLOT(slotLoadStarted()));
-    connect(m_browser, SIGNAL(loadFinished(bool)),
-            this, SLOT(slotLoadFinished(bool)));
-    connect(m_browser, SIGNAL(loadProgress(int)),
-            this, SLOT(slotLoadProgress(int)));
-    connect(m_browser, SIGNAL(statusBarMessage(const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
-    connect(m_browser, SIGNAL(titleChanged(const QString&)),
-            this, SLOT(slotTitleChanged(const QString&)));
+    connect(m_browser, &MythUIWebBrowser::loadStarted,
+            this, &WebPage::slotLoadStarted);
+    connect(m_browser, &MythUIWebBrowser::loadFinished,
+            this, &WebPage::slotLoadFinished);
+    connect(m_browser, &MythUIWebBrowser::loadProgress,
+            this, &WebPage::slotLoadProgress);
+    connect(m_browser, &MythUIWebBrowser::statusBarMessage,
+            this, &WebPage::slotStatusBarMessage);
+    connect(m_browser, &MythUIWebBrowser::titleChanged,
+            this, &WebPage::slotTitleChanged);
 }
 
 WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
@@ -44,16 +44,16 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
 
     m_browser = browser;
 
-    connect(m_browser, SIGNAL(loadStarted()),
-            this, SLOT(slotLoadStarted()));
-    connect(m_browser, SIGNAL(loadFinished(bool)),
-            this, SLOT(slotLoadFinished(bool)));
-    connect(m_browser, SIGNAL(titleChanged(const QString&)),
-            this, SLOT(slotTitleChanged(const QString&)));
-    connect(m_browser, SIGNAL(loadProgress(int)),
-            this, SLOT(slotLoadProgress(int)));
-    connect(m_browser, SIGNAL(statusBarMessage(const QString&)),
-            this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(m_browser, &MythUIWebBrowser::loadStarted,
+            this, &WebPage::slotLoadStarted);
+    connect(m_browser, &MythUIWebBrowser::loadFinished,
+            this, &WebPage::slotLoadFinished);
+    connect(m_browser, &MythUIWebBrowser::titleChanged,
+            this, &WebPage::slotTitleChanged);
+    connect(m_browser, &MythUIWebBrowser::loadProgress,
+            this, &WebPage::slotLoadProgress);
+    connect(m_browser, &MythUIWebBrowser::statusBarMessage,
+            this, &WebPage::slotStatusBarMessage);
 }
 
 WebPage::~WebPage()

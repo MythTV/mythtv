@@ -112,15 +112,15 @@ bool LogViewer::Create(void)
     }
 
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelClicked()));
-    connect(m_updateButton, SIGNAL(Clicked()), this, SLOT(updateClicked()));
-    connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_updateButton, &MythUIButton::Clicked, this, &LogViewer::updateClicked);
+    connect(m_exitButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(updateLogItem(MythUIButtonListItem*)));
+    connect(m_logList, &MythUIButtonList::itemSelected,
+            this, &LogViewer::updateLogItem);
 
     m_updateTimer = nullptr;
     m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimerTimeout()) );
+    connect(m_updateTimer, &QTimer::timeout, this, &LogViewer::updateTimerTimeout );
 
     BuildFocusList();
 

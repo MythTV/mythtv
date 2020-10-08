@@ -27,8 +27,8 @@ VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *arch
                m_archiveList(archiveList)
 {
     m_parentalLevelChecker = new ParentalLevelChangeChecker();
-    connect(m_parentalLevelChecker, SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
-            this, SLOT(parentalLevelChanged(bool, ParentalLevel::Level)));
+    connect(m_parentalLevelChecker, &ParentalLevelChangeChecker::SigResultReady,
+            this, &VideoSelector::parentalLevelChanged);
 }
 
 VideoSelector::~VideoSelector(void)
@@ -65,17 +65,17 @@ bool VideoSelector::Create(void)
         return false;
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), SLOT(OKPressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(cancelPressed()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &VideoSelector::OKPressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &VideoSelector::cancelPressed);
 
-    connect(m_categorySelector, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(setCategory(MythUIButtonListItem *)));
+    connect(m_categorySelector, &MythUIButtonList::itemSelected,
+            this, &VideoSelector::setCategory);
 
     getVideoList();
-    connect(m_videoButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            SLOT(titleChanged(MythUIButtonListItem *)));
-    connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(toggleSelected(MythUIButtonListItem *)));
+    connect(m_videoButtonList, &MythUIButtonList::itemSelected,
+            this, &VideoSelector::titleChanged);
+    connect(m_videoButtonList, &MythUIButtonList::itemClicked,
+            this, &VideoSelector::toggleSelected);
 
     BuildFocusList();
 
@@ -483,7 +483,7 @@ void VideoSelector::getVideoList(void)
     }
     else
     {
-        QTimer::singleShot(100, this, SLOT(cancelPressed()));
+        QTimer::singleShot(100, this, &VideoSelector::cancelPressed);
         return;
     }
 

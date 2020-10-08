@@ -170,7 +170,7 @@ bool TrackInfoPopup::Create(void)
     }
 
     m_displayTimer = new QTimer(this);
-    connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(Close()));
+    connect(m_displayTimer, &QTimer::timeout, this, &MythScreenType::Close);
     m_displayTimer->setSingleShot(true);
     m_displayTimer->start(MUSICINFOPOPUPTIME);
 

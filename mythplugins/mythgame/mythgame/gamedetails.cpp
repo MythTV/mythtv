@@ -45,10 +45,10 @@ bool GameDetailsPopup::Create(void)
     UIUtilW::Assign(this, m_doneButton, "done_button");
 
     if (m_playButton)
-        connect(m_playButton, SIGNAL(Clicked()), SLOT(Play()));
+        connect(m_playButton, &MythUIButton::Clicked, this, &GameDetailsPopup::Play);
 
     if (m_doneButton)
-        connect(m_doneButton, SIGNAL(Clicked()), SLOT(Close()));
+        connect(m_doneButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     BuildFocusList();
 

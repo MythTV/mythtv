@@ -57,12 +57,12 @@ bool SelectDestination::Create(void)
         return false;
     }
 
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
+    connect(m_nextButton, &MythUIButton::Clicked, this, &SelectDestination::handleNextPage);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &SelectDestination::handlePrevPage);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &SelectDestination::handleCancel);
 
-    connect(m_destinationSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(setDestination(MythUIButtonListItem*)));
+    connect(m_destinationSelector, &MythUIButtonList::itemSelected,
+            this, &SelectDestination::setDestination);
 
     for (const auto & dest : ArchiveDestinations)
     {
@@ -70,10 +70,10 @@ bool SelectDestination::Create(void)
             MythUIButtonListItem(m_destinationSelector, tr(dest.name));
         item->SetData(QVariant::fromValue(dest.type));
     }
-    connect(m_findButton, SIGNAL(Clicked()), this, SLOT(handleFind()));
+    connect(m_findButton, &MythUIButton::Clicked, this, &SelectDestination::handleFind);
 
-    connect(m_filenameEdit, SIGNAL(LosingFocus()), this,
-            SLOT(filenameEditLostFocus()));
+    connect(m_filenameEdit, &MythUIType::LosingFocus, this,
+            &SelectDestination::filenameEditLostFocus);
 
     BuildFocusList();
 

@@ -68,14 +68,14 @@ bool DVDThemeSelector::Create(void)
         return false;
     }
 
-    connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-    connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
+    connect(m_nextButton, &MythUIButton::Clicked, this, &DVDThemeSelector::handleNextPage);
+    connect(m_prevButton, &MythUIButton::Clicked, this, &DVDThemeSelector::handlePrevPage);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &DVDThemeSelector::handleCancel);
 
     getThemeList();
 
-    connect(m_themeSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(themeChanged(MythUIButtonListItem*)));
+    connect(m_themeSelector, &MythUIButtonList::itemSelected,
+            this, &DVDThemeSelector::themeChanged);
 
     BuildFocusList();
 

@@ -61,8 +61,8 @@ bool NetEditorBase::Create(void)
         return false;
     }
 
-    connect(m_grabbers, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(ToggleItem(MythUIButtonListItem*)));
+    connect(m_grabbers, &MythUIButtonList::itemClicked,
+            this, &NetEditorBase::ToggleItem);
 
     BuildFocusList();
 
@@ -78,8 +78,8 @@ void NetEditorBase::LoadData()
 
     m_manager = new QNetworkAccessManager();
 
-    connect(m_manager, SIGNAL(finished(QNetworkReply*)),
-                       SLOT(SlotLoadedData(void)));
+    connect(m_manager, &QNetworkAccessManager::finished,
+                       this, &NetEditorBase::SlotLoadedData);
 
     QUrl url(GetMythXMLURL() + "GetInternetSources");
     m_reply = m_manager->get(QNetworkRequest(url));

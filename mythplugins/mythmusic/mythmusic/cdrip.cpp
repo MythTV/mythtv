@@ -606,21 +606,21 @@ bool Ripper::Create(void)
 
     connect(m_trackList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(toggleTrackActive(MythUIButtonListItem *)));
-    connect(m_ripButton, SIGNAL(Clicked()), SLOT(startRipper()));
-    connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScanCD()));
-    connect(m_switchTitleArtist, SIGNAL(Clicked()),
-            SLOT(switchTitlesAndArtists()));
-    connect(m_compilationCheck, SIGNAL(toggled(bool)),
-            SLOT(compilationChanged(bool)));
-    connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
-    connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(genreChanged()));
+    connect(m_ripButton, &MythUIButton::Clicked, this, &Ripper::startRipper);
+    connect(m_scanButton, &MythUIButton::Clicked, this, &Ripper::startScanCD);
+    connect(m_switchTitleArtist, &MythUIButton::Clicked,
+            this, &Ripper::switchTitlesAndArtists);
+    connect(m_compilationCheck, &MythUICheckBox::toggled,
+            this, &Ripper::compilationChanged);
+    connect(m_searchGenreButton, &MythUIButton::Clicked, this, &Ripper::searchGenre);
+    connect(m_genreEdit, &MythUITextEdit::valueChanged, this, &Ripper::genreChanged);
     m_yearEdit->SetFilter((InputFilter)(FilterAlpha | FilterSymbols | FilterPunct));
     m_yearEdit->SetMaxLength(4);
-    connect(m_yearEdit, SIGNAL(valueChanged()), SLOT(yearChanged()));
-    connect(m_artistEdit, SIGNAL(valueChanged()), SLOT(artistChanged()));
-    connect(m_searchArtistButton, SIGNAL(Clicked()), SLOT(searchArtist()));
-    connect(m_albumEdit, SIGNAL(valueChanged()), SLOT(albumChanged()));
-    connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
+    connect(m_yearEdit, &MythUITextEdit::valueChanged, this, &Ripper::yearChanged);
+    connect(m_artistEdit, &MythUITextEdit::valueChanged, this, &Ripper::artistChanged);
+    connect(m_searchArtistButton, &MythUIButton::Clicked, this, &Ripper::searchArtist);
+    connect(m_albumEdit, &MythUITextEdit::valueChanged, this, &Ripper::albumChanged);
+    connect(m_searchAlbumButton, &MythUIButton::Clicked, this, &Ripper::searchAlbum);
 
     // Populate Quality List
     new MythUIButtonListItem(m_qualityList, tr("Low"), QVariant::fromValue(0));
@@ -630,7 +630,7 @@ bool Ripper::Create(void)
     m_qualityList->SetValueByData(QVariant::fromValue(
                         gCoreContext->GetNumSetting("DefaultRipQuality", 1)));
 
-    QTimer::singleShot(500, this, SLOT(startScanCD()));
+    QTimer::singleShot(500, this, &Ripper::startScanCD);
 
     return true;
 }
@@ -725,7 +725,7 @@ void Ripper::chooseBackend(void)
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setSaveHost(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &Ripper::setSaveHost);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -748,7 +748,7 @@ void Ripper::startScanCD(void)
     OpenBusyPopup(message);
 
     m_scanThread = new CDScannerThread(this);
-    connect(m_scanThread->qthread(), SIGNAL(finished()), SLOT(ScanFinished()));
+    connect(m_scanThread->qthread(), &QThread::finished, this, &Ripper::ScanFinished);
     m_scanThread->start();
 }
 
@@ -1110,7 +1110,7 @@ void Ripper::startRipper(void)
 
     if (statusDialog->Create())
     {
-        connect(statusDialog, SIGNAL(Result(bool)), SLOT(RipComplete(bool)));
+        connect(statusDialog, &RipStatus::Result, this, &Ripper::RipComplete);
         mainStack->AddScreen(statusDialog);
     }
     else
@@ -1146,7 +1146,7 @@ void Ripper::startEjectCD()
 
     m_ejectThread = new CDEjectorThread(this);
     connect(m_ejectThread->qthread(),
-            SIGNAL(finished()), SLOT(EjectFinished()));
+            &QThread::finished, this, &Ripper::EjectFinished);
     m_ejectThread->start();
 }
 
@@ -1248,7 +1248,7 @@ void Ripper::searchArtist()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setArtist(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &Ripper::setArtist);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -1272,7 +1272,7 @@ void Ripper::searchAlbum()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setAlbum(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &Ripper::setAlbum);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -1301,7 +1301,7 @@ void Ripper::searchGenre()
         return;
     }
 
-    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setGenre(QString)));
+    connect(searchDlg, &MythUISearchDialog::haveResult, this, &Ripper::setGenre);
 
     popupStack->AddScreen(searchDlg);
 }
@@ -1334,7 +1334,7 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
         return;
     }
 
-    connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
+    connect(editDialog, &EditMetadataCommon::metadataChanged, this, &Ripper::metadataChanged);
 
     mainStack->AddScreen(editDialog);
 }

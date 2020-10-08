@@ -62,7 +62,7 @@ bool FunctionDialog::Create()
 
     m_captionText->SetText(m_monitor->name);
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(setMonitorFunction()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &FunctionDialog::setMonitorFunction);
 
     if (m_monitor->enabled)
         m_enabledCheck->SetCheckState(MythUIStateType::Full);
@@ -122,11 +122,11 @@ ZMConsole::ZMConsole(MythScreenStack *parent)
 {
     m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
-    connect(m_timeTimer, SIGNAL(timeout()), this,
-            SLOT(updateTime()));
+    connect(m_timeTimer, &QTimer::timeout, this,
+            &ZMConsole::updateTime);
 
-    connect(m_updateTimer, SIGNAL(timeout()), this,
-            SLOT(updateStatus()));
+    connect(m_updateTimer, &QTimer::timeout, this,
+            &ZMConsole::updateStatus);
 }
 
 ZMConsole::~ZMConsole()
@@ -250,8 +250,8 @@ void ZMConsole::showEditFunctionPopup()
     if (m_functionDialog->Create())
     {
         m_popupStack->AddScreen(m_functionDialog, false);
-        connect(m_functionDialog, SIGNAL(haveResult(bool)),
-                this, SLOT(functionChanged(bool)));
+        connect(m_functionDialog, &FunctionDialog::haveResult,
+                this, &ZMConsole::functionChanged);
     }
 }
 

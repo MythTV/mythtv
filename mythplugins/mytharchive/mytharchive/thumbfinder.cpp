@@ -135,13 +135,13 @@ bool ThumbFinder::Create(void)
         return false;
     }
 
-    connect(m_imageGrid, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(gridItemChanged(MythUIButtonListItem *)));
+    connect(m_imageGrid, &MythUIButtonList::itemSelected,
+            this, &ThumbFinder::gridItemChanged);
 
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(savePressed()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_saveButton, &MythUIButton::Clicked, this, &ThumbFinder::savePressed);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &ThumbFinder::cancelPressed);
 
-    connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
+    connect(m_frameButton, &MythUIButton::Clicked, this, &ThumbFinder::updateThumb);
 
     m_seekAmountText->SetText(kSeekAmounts[m_currentSeek].name);
 

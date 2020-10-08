@@ -88,8 +88,8 @@ bool MythNewsEditor::Create(void)
     m_okButton->SetText(tr("OK"));
     m_cancelButton->SetText(tr("Cancel"));
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &MythNewsEditor::Save);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     if (m_editing)
     {

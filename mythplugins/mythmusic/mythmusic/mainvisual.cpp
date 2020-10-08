@@ -50,7 +50,7 @@ MainVisual::MainVisual(MythUIVideo *visualizer)
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(1000 / m_fps);
     m_updateTimer->setSingleShot(true);
-    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    connect(m_updateTimer, &QTimer::timeout, this, &MainVisual::timeout);
 }
 
 MainVisual::~MainVisual()

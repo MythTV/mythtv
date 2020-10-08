@@ -58,14 +58,14 @@ bool BrowserConfig::Create()
     if (setting == 1)
         m_enablePluginsCheck->SetCheckState(MythUIStateType::Full);
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &BrowserConfig::slotSave);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
-    connect(m_commandEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_zoomEdit   ,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_enablePluginsCheck,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_commandEdit,  &MythUIType::TakingFocus, this, &BrowserConfig::slotFocusChanged);
+    connect(m_zoomEdit   ,  &MythUIType::TakingFocus, this, &BrowserConfig::slotFocusChanged);
+    connect(m_enablePluginsCheck,  &MythUIType::TakingFocus, this, &BrowserConfig::slotFocusChanged);
+    connect(m_okButton,     &MythUIType::TakingFocus, this, &BrowserConfig::slotFocusChanged);
+    connect(m_cancelButton, &MythUIType::TakingFocus, this, &BrowserConfig::slotFocusChanged);
 
     BuildFocusList();
 
@@ -163,11 +163,11 @@ bool BookmarkManager::Create(void)
     UpdateGroupList();
     UpdateURLList();
 
-    connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(slotGroupSelected(MythUIButtonListItem*)));
+    connect(m_groupList, &MythUIButtonList::itemSelected,
+            this, &BookmarkManager::slotGroupSelected);
 
-    connect(m_bookmarkList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(slotBookmarkClicked(MythUIButtonListItem*)));
+    connect(m_bookmarkList, &MythUIButtonList::itemClicked,
+            this, &BookmarkManager::slotBookmarkClicked);
 
     BuildFocusList();
 
@@ -361,7 +361,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
         if (mythbrowser->Create())
         {
-            connect(mythbrowser, SIGNAL(Exiting()), SLOT(slotBrowserClosed()));
+            connect(mythbrowser, &MythScreenType::Exiting, this, &BookmarkManager::slotBrowserClosed);
             mainStack->AddScreen(mythbrowser);
         }
         else
@@ -414,7 +414,7 @@ void BookmarkManager::ShowEditDialog(bool edit)
     auto *editor = new BookmarkEditor(&m_savedBookmark, edit, mainStack,
                                       "bookmarkeditor");
 
-    connect(editor, SIGNAL(Exiting()), this, SLOT(slotEditDialogExited()));
+    connect(editor, &MythScreenType::Exiting, this, &BookmarkManager::slotEditDialogExited);
 
     if (editor->Create())
         mainStack->AddScreen(editor);
@@ -498,8 +498,8 @@ void BookmarkManager::slotDeleteCurrent(void)
     if (dialog->Create())
         popupStack->AddScreen(dialog);
 
-    connect(dialog, SIGNAL(haveResult(bool)),
-            this, SLOT(slotDoDeleteCurrent(bool)));
+    connect(dialog, &MythConfirmationDialog::haveResult,
+            this, &BookmarkManager::slotDoDeleteCurrent);
 }
 
 void BookmarkManager::slotDoDeleteCurrent(bool doDelete)
@@ -542,8 +542,8 @@ void BookmarkManager::slotDeleteMarked(void)
     if (dialog->Create())
         popupStack->AddScreen(dialog);
 
-    connect(dialog, SIGNAL(haveResult(bool)),
-            this, SLOT(slotDoDeleteMarked(bool)));
+    connect(dialog, &MythConfirmationDialog::haveResult,
+            this, &BookmarkManager::slotDoDeleteMarked);
 }
 
 void BookmarkManager::slotDoDeleteMarked(bool doDelete)
@@ -606,7 +606,7 @@ void BookmarkManager::slotShowMarked(void)
 
         if (mythbrowser->Create())
         {
-            connect(mythbrowser, SIGNAL(Exiting()), SLOT(slotBrowserClosed()));
+            connect(mythbrowser, &MythScreenType::Exiting, this, &BookmarkManager::slotBrowserClosed);
             mainStack->AddScreen(mythbrowser);
         }
         else

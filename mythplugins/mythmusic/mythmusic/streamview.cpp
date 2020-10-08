@@ -58,8 +58,8 @@ bool StreamView::Create(void)
         return false;
     }
 
-    connect(m_streamList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(streamItemClicked(MythUIButtonListItem*)));
+    connect(m_streamList, &MythUIButtonList::itemClicked,
+            this, &StreamView::streamItemClicked);
     connect(m_streamList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(streamItemVisible(MythUIButtonListItem*)));
 
@@ -695,9 +695,9 @@ bool EditStreamMetadata::Create()
     else
         m_formatEdit->SetText("%a - %t");
 
-    connect(m_searchButton, SIGNAL(Clicked()), this, SLOT(searchClicked()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
-    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(saveClicked()));
+    connect(m_searchButton, &MythUIButton::Clicked, this, &EditStreamMetadata::searchClicked);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
+    connect(m_saveButton, &MythUIButton::Clicked, this, &EditStreamMetadata::saveClicked);
 
     BuildFocusList();
 
@@ -796,34 +796,34 @@ bool SearchStream::Create()
     new MythUIButtonListItem(m_genreList, "");
     m_matchesText->SetText("");
 
-    connect(m_streamList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(streamClicked(MythUIButtonListItem*)));
+    connect(m_streamList, &MythUIButtonList::itemClicked,
+            this, &SearchStream::streamClicked);
     connect(m_streamList, SIGNAL(itemVisible(MythUIButtonListItem*)),
             this, SLOT(streamVisible(MythUIButtonListItem*)));
-    connect(m_broadcasterList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(updateStreams()));
-    connect(m_genreList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(updateStreams()));
+    connect(m_broadcasterList, &MythUIButtonList::itemSelected,
+            this, &SearchStream::updateStreams);
+    connect(m_genreList, &MythUIButtonList::itemSelected,
+            this, &SearchStream::updateStreams);
 
 
     if (m_countryList)
     {
-        connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-                this, SLOT(updateStreams()));
+        connect(m_countryList, &MythUIButtonList::itemSelected,
+                this, &SearchStream::updateStreams);
 
         new MythUIButtonListItem(m_countryList, "");
-        connect(m_languageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-                this, SLOT(updateStreams()));
+        connect(m_languageList, &MythUIButtonList::itemSelected,
+                this, &SearchStream::updateStreams);
     }
 
     if (m_languageList)
     {
         new MythUIButtonListItem(m_languageList, "");
-        connect(m_channelEdit, SIGNAL(valueChanged()),
-                this, SLOT(updateStreams()));
+        connect(m_channelEdit, &MythUITextEdit::valueChanged,
+                this, &SearchStream::updateStreams);
     }
 
-    connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(doUpdateStreams()));
+    connect(&m_updateTimer, &QTimer::timeout, this, &SearchStream::doUpdateStreams);
 
     LoadInBackground("Loading Streams...");
 
@@ -835,7 +835,7 @@ bool SearchStream::Create()
 void SearchStream::Load(void)
 {
     loadStreams();
-    QTimer::singleShot(0, this, SLOT(doneLoading(void)));
+    QTimer::singleShot(0, this, &SearchStream::doneLoading);
 }
 
 void SearchStream::doneLoading(void)

@@ -59,9 +59,9 @@ bool BookmarkEditor::Create()
           m_titleText->SetText(tr("Enter Bookmark Details"));
     }
 
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Exit()));
-    connect(m_findCategoryButton, SIGNAL(Clicked()), this, SLOT(slotFindCategory()));
+    connect(m_okButton, &MythUIButton::Clicked, this, &BookmarkEditor::Save);
+    connect(m_cancelButton, &MythUIButton::Clicked, this, &BookmarkEditor::Exit);
+    connect(m_findCategoryButton, &MythUIButton::Clicked, this, &BookmarkEditor::slotFindCategory);
 
     if (m_editing && m_site)
     {
@@ -140,7 +140,7 @@ void BookmarkEditor::slotFindCategory(void)
         return;
     }
 
-    connect(m_searchDialog, SIGNAL(haveResult(QString)), SLOT(slotCategoryFound(QString)));
+    connect(m_searchDialog, &MythUISearchDialog::haveResult, this, &BookmarkEditor::slotCategoryFound);
 
     popupStack->AddScreen(m_searchDialog);
 }

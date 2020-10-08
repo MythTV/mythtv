@@ -117,10 +117,10 @@ bool MusicCommon::CreateCommon(void)
     UIUtilW::Assign(this, m_visualizerVideo, "visualizer", &err);
 
     if (m_prevButton)
-        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(previous()));
+        connect(m_prevButton, &MythUIButton::Clicked, this, &MusicCommon::previous);
 
     if (m_rewButton)
-        connect(m_rewButton, SIGNAL(Clicked()), this, SLOT(seekback()));
+        connect(m_rewButton, &MythUIButton::Clicked, this, &MusicCommon::seekback);
 
     if (m_pauseButton)
     {
@@ -137,19 +137,19 @@ bool MusicCommon::CreateCommon(void)
     if (m_stopButton)
     {
         m_stopButton->SetLockable(true);
-        connect(m_stopButton, SIGNAL(Clicked()), this, SLOT(stop()));
+        connect(m_stopButton, &MythUIButton::Clicked, this, &MusicCommon::stop);
     }
 
     if (m_ffButton)
-        connect(m_ffButton, SIGNAL(Clicked()), this, SLOT(seekforward()));
+        connect(m_ffButton, &MythUIButton::Clicked, this, &MusicCommon::seekforward);
 
     if (m_nextButton)
-        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(next()));
+        connect(m_nextButton, &MythUIButton::Clicked, this, &MusicCommon::next);
 
     if (m_currentPlaylist)
     {
-        connect(m_currentPlaylist, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                this, SLOT(playlistItemClicked(MythUIButtonListItem*)));
+        connect(m_currentPlaylist, &MythUIButtonList::itemClicked,
+                this, &MusicCommon::playlistItemClicked);
         connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
                 this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
 
@@ -452,7 +452,7 @@ void MusicCommon::switchView(MusicView view)
             if (plview->Create())
             {
                 mainStack->AddScreen(plview);
-                connect(plview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(plview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete plview;
@@ -476,7 +476,7 @@ void MusicCommon::switchView(MusicView view)
             if (pleview->Create())
             {
                 mainStack->AddScreen(pleview);
-                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(pleview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete pleview;
@@ -506,7 +506,7 @@ void MusicCommon::switchView(MusicView view)
             if (pleview->Create())
             {
                 mainStack->AddScreen(pleview);
-                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(pleview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete pleview;
@@ -527,7 +527,7 @@ void MusicCommon::switchView(MusicView view)
             if (sview->Create())
             {
                 mainStack->AddScreen(sview);
-                connect(sview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(sview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete sview;
@@ -542,7 +542,7 @@ void MusicCommon::switchView(MusicView view)
             if (vview->Create())
             {
                 mainStack->AddScreen(vview);
-                connect(vview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(vview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete vview;
@@ -557,7 +557,7 @@ void MusicCommon::switchView(MusicView view)
             if (lview->Create())
             {
                 mainStack->AddScreen(lview);
-                connect(lview, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                connect(lview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
                 delete lview;
@@ -2675,7 +2675,7 @@ bool MythMusicVolumeDialog::Create(void)
     updateDisplay();
 
     m_displayTimer = new QTimer(this);
-    connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(Close()));
+    connect(m_displayTimer, &QTimer::timeout, this, &MythScreenType::Close);
     m_displayTimer->setSingleShot(true);
     m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
 

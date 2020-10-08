@@ -28,7 +28,7 @@ ZMClient::ZMClient()
       m_retryTimer(new QTimer(this))
 {
     setObjectName("ZMClient");
-    connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
+    connect(m_retryTimer, &QTimer::timeout,   this, &ZMClient::restartConnection);
 
     gCoreContext->addListener(this);
 }

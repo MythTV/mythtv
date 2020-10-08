@@ -42,8 +42,8 @@ ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer)
     MythMainWindow::DisableScreensaver();
     GetMythMainWindow()->PauseIdleTimer(true);
 
-    connect(m_frameTimer, SIGNAL(timeout()), this,
-            SLOT(updateFrame()));
+    connect(m_frameTimer, &QTimer::timeout, this,
+            &ZMLivePlayer::updateFrame);
 }
 
 bool ZMLivePlayer::Create(void)
