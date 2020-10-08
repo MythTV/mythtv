@@ -52,7 +52,7 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
 
 MythVideoOutputNull::MythVideoOutputNull()
 {
-    memset(&m_avPauseFrame, 0, sizeof(m_avPauseFrame));
+    init(&m_avPauseFrame, FMT_NONE, nullptr, 0, 0, 0);
 }
 
 MythVideoOutputNull::~MythVideoOutputNull()
@@ -62,7 +62,7 @@ MythVideoOutputNull::~MythVideoOutputNull()
     if (m_avPauseFrame.buf)
     {
         delete [] m_avPauseFrame.buf;
-        memset(&m_avPauseFrame, 0, sizeof(m_avPauseFrame));
+        init(&m_avPauseFrame, FMT_NONE, nullptr, 0, 0, 0);
     }
 
     m_videoBuffers.DeleteBuffers();
