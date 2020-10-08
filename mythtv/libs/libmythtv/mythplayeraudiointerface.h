@@ -13,6 +13,7 @@ class MythPlayerAudioInterface
     MythPlayerAudioInterface(AudioPlayer* Audio);
 
     void      ResetAudio();
+    void      ReinitAudio();
     const AudioOutputGraph& GetAudioGraph() const;
     void      SetupAudioGraph (double VideoFrameRate);
     void      ClearAudioGraph ();
@@ -30,6 +31,7 @@ class MythPlayerAudioInterface
     bool      IsUpmixing();
     bool      EnableUpmix(bool Enable, bool Toggle = false);
     void      PauseAudioUntilBuffered();
+    void      SetupAudioOutput(float TimeStretch);
 
   private:
     Q_DISABLE_COPY(MythPlayerAudioInterface)

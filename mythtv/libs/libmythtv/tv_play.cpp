@@ -4923,7 +4923,7 @@ bool TV::StartPlayer(TVState desiredState)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Elapsed time since TV constructor was called: %1 ms")
         .arg(m_ctorTime.elapsed()));
 
-    bool ok = m_playerContext.CreatePlayer(this, m_mainWindow, desiredState, false);
+    bool ok = m_playerContext.CreatePlayer(this, m_mainWindow, desiredState);
     ScheduleStateChange();
 
     if (ok)
@@ -5905,9 +5905,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         bool ok = false;
         if (m_playerContext.m_playingInfo && StartRecorder())
         {
-            QRect dummy = QRect();
-            if (m_playerContext.CreatePlayer(this, m_mainWindow, m_playerContext.GetState(),
-                                             false, dummy, muted))
+            if (m_playerContext.CreatePlayer(this, m_mainWindow, m_playerContext.GetState(), muted))
             {
                 ScheduleStateChange();
                 ok = true;
@@ -5915,7 +5913,9 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
                 SetSpeedChangeTimer(25, __LINE__);
             }
             else
+            {
                 StopStuff(true, true, true);
+            }
         }
 
         if (!ok)

@@ -1,4 +1,5 @@
 // MythTV
+#include "mythcorecontext.h"
 #include "audioplayer.h"
 #include "mythmainwindow.h"
 #include "mythplayeraudiointerface.h"
@@ -14,6 +15,11 @@ MythPlayerAudioInterface::MythPlayerAudioInterface(AudioPlayer* Audio)
 void MythPlayerAudioInterface::ResetAudio()
 {
     m_audio->Reset();
+}
+
+void MythPlayerAudioInterface::ReinitAudio()
+{
+    (void)m_audio->ReinitAudio();
 }
 
 const AudioOutputGraph& MythPlayerAudioInterface::GetAudioGraph() const
@@ -103,5 +109,14 @@ bool MythPlayerAudioInterface::EnableUpmix(bool Enable, bool Toggle)
 void MythPlayerAudioInterface::PauseAudioUntilBuffered()
 {
     m_audio->PauseAudioUntilBuffered();
+}
+
+void MythPlayerAudioInterface::SetupAudioOutput(float TimeStretch)
+{
+    QString passthru = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
+                       gCoreContext->GetSetting("PassThruOutputDevice") : QString();
+    m_audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"), passthru,
+                          static_cast<uint>(gCoreContext->GetNumSetting("AudioSampleRate", 44100)));
+    m_audio->SetStretchFactor(TimeStretch);
 }
 
