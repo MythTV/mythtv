@@ -1,3 +1,6 @@
+// Qt
+#include <QThread>
+
 // MythTV
 #include "mythlogging.h"
 #include "audioplayer.h"
