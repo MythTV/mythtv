@@ -205,7 +205,7 @@ bool PlayerContext::CreatePlayer(TV *Tv, MythMainWindow* MainWindow, TVState Sta
     uint playerflags = kNoFlags;
     playerflags |= Muted                ? kAudioMuted : kNoFlags;
     playerflags |= m_nohardwaredecoders ? kNoFlags : kDecodeAllowGPU;
-    PlayerFlags flags = static_cast<PlayerFlags>(playerflags);
+    auto flags = static_cast<PlayerFlags>(playerflags);
 
     MythPlayer *player = nullptr;
     if (kState_WatchingBD  == State)
