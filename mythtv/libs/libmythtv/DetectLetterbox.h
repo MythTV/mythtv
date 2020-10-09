@@ -1,3 +1,6 @@
+#ifndef MYTHDETECTLETTERBOX_H
+#define MYTHDETECTLETTERBOX_H
+
 // MythTV
 #include "mythplayer.h"
 
@@ -26,4 +29,4 @@ class MTV_PUBLIC DetectLetterbox
     QMutex         m_detectLetterboxLock;
 };
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#endif
