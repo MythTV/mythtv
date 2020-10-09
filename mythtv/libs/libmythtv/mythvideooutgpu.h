@@ -4,13 +4,18 @@
 // MythTV
 #include "mythvideoout.h"
 
+class MythMainWindow;
 class MythVideoGPU;
 class MythPainterGPU;
 
 class MythVideoOutputGPU : public MythVideoOutput
 {
   public:
-    MythVideoOutputGPU(MythRender* Render, QString &Profile);
+    static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, const QString& Decoder,
+                                      MythCodecID CodecID, const QSize& VideoDim,
+                                      const QSize& VideoDispDim, float VideoAspect,
+                                      float FrameRate,           uint  PlayerFlags,
+                                      const QString& Codec,      int ReferenceFrames);
    ~MythVideoOutputGPU() override;
 
     MythPainter*    GetOSDPainter         () override;
@@ -29,6 +34,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
+    MythVideoOutputGPU(MythRender* Render, QString &Profile);
     virtual QRect   GetDisplayVisibleRectAdj();
     bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
                                            const QRect& DisplayVisibleRect, MythCodecID CodecId) override;

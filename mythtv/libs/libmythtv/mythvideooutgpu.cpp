@@ -6,7 +6,149 @@
 #include "mythvideogpu.h"
 #include "mythvideooutgpu.h"
 
+#ifdef USING_OPENGL
+#include "opengl/mythvideooutopengl.h"
+#endif
+#ifdef USING_VULKAN
+#include "vulkan/mythvideooutputvulkan.h"
+#endif
+
 #define LOC QString("VidOutGPU: ")
+
+MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const QString& Decoder,
+                                               MythCodecID CodecID, const QSize& VideoDim,
+                                               const QSize& VideoDispDim, float VideoAspect,
+                                               float FrameRate,           uint  PlayerFlags,
+                                               const QString& Codec,      int ReferenceFrames)
+{
+    if (!MainWindow)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No main window");
+        return nullptr;
+    }
+
+    if (PlayerFlags & kVideoIsNull)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot create null video output here");
+        return nullptr;
+    }
+
+    MythRender* render = MainWindow->GetRenderDevice();
+    if (!render)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve render device");
+        return nullptr;
+    }
+
+    QStringList renderers;
+
+#ifdef _WIN32
+    if (render->Type() == kRenderDirect3D9)
+        renderers += VideoOutputD3D::GetAllowedRenderers(CodecID, VideoDispDim);
+#endif
+
+#ifdef USING_OPENGL
+    if (render->Type() == kRenderOpenGL)
+        renderers += MythVideoOutputOpenGL::GetAllowedRenderers(CodecID, VideoDispDim);
+#endif
+
+#ifdef USING_VULKAN
+    if (render->Type() == kRenderVulkan)
+        renderers += MythVideoOutputVulkan::GetAllowedRenderers(CodecID);
+#endif
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers for %1 %2 (Decoder: %3): '%4'")
+        .arg(get_encoding_type(CodecID)).arg(get_decoder_name(CodecID))
+        .arg(Decoder).arg(renderers.join(",")));
+    renderers = VideoDisplayProfile::GetFilteredRenderers(Decoder, renderers);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers (filt: %1): %2")
+        .arg(Decoder).arg(renderers.join(",")));
+
+    QString renderer;
+
+    auto * vprof = new VideoDisplayProfile();
+
+    if (!renderers.empty())
+    {
+        vprof->SetInput(VideoDispDim, FrameRate, Codec);
+        QString tmp = vprof->GetVideoRenderer();
+        if (vprof->IsDecoderCompatible(Decoder) && renderers.contains(tmp))
+        {
+            renderer = tmp;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preferred renderer: " + renderer);
+        }
+        else
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("No preferred renderer for decoder '%1' - profile renderer: '%2'")
+                .arg(Decoder).arg(tmp));
+        }
+    }
+
+    if (renderer.isEmpty())
+        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+
+    if (renderer.isEmpty())
+    {
+        QString fallback;
+#ifdef USING_OPENGL
+        if (render->Type() == kRenderOpenGL)
+            fallback = "opengl";
+#endif
+#ifdef USING_VULKAN
+        if (render->Type() == kRenderVulkan)
+            fallback = VULKAN_RENDERER;
+#endif
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "No renderer found. This should not happen!.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'").arg(fallback));
+        renderer = fallback;
+    }
+
+    while (!renderers.empty())
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Trying video renderer: '%1'").arg(renderer));
+        int index = renderers.indexOf(renderer);
+        if (index >= 0)
+            renderers.removeAt(index);
+        else
+            break;
+
+        MythVideoOutputGPU* video = nullptr;
+
+#ifdef _WIN32
+        if (renderer == "direct3d")
+            video = new VideoOutputD3D();
+#endif
+#ifdef USING_OPENGL
+        if (renderer.contains("opengl"))
+            video = new MythVideoOutputOpenGL(renderer);
+#endif
+#ifdef USING_VULKAN
+        if (renderer.contains(VULKAN_RENDERER))
+            video = new MythVideoOutputVulkan(renderer);
+#endif
+
+        if (video)
+        {
+            video->m_dbDisplayProfile = vprof;
+            video->SetVideoFrameRate(FrameRate);
+            video->SetReferenceFrames(ReferenceFrames);
+            if (video->Init(VideoDim, VideoDispDim, VideoAspect, MainWindow->GetUIScreenRect(), CodecID))
+            {
+                video->SetVideoScalingAllowed(true);
+                return video;
+            }
+
+            video->m_dbDisplayProfile = nullptr;
+            delete video;
+            video = nullptr;
+        }
+        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Not compiled with any useable video output method.");
+    delete vprof;
+    return nullptr;
+}
 
 /*! \class MythVideoOutputGPU
  * \brief Common code shared between GPU accelerated sub-classes (e.g. OpenGL)

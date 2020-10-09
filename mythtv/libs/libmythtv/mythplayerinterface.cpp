@@ -5,6 +5,7 @@
 #include "osd.h"
 #include "tv_play.h"
 #include "livetvchain.h"
+#include "mythvideooutgpu.h"
 #include "mythplayerinterface.h"
 
 #define LOC QString("PlayerUI: ")
@@ -292,10 +293,10 @@ bool MythPlayerInterface::InitVideo()
     if (!(m_playerCtx && m_decoder))
         return false;
 
-    m_videoOutput = MythVideoOutput::Create(
+    m_videoOutput = MythVideoOutputGPU::Create(m_mainWindow,
                     m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
                     m_videoDim, m_videoDispDim, m_videoAspect,
-                    m_mainWindow, static_cast<float>(m_videoFrameRate),
+                    static_cast<float>(m_videoFrameRate),
                     static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
     if (m_videoOutput)

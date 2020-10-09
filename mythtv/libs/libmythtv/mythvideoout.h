@@ -33,15 +33,8 @@ class MythVideoOutput : public MythVideoBounds
 
   public:
     static void GetRenderOptions(RenderOptions& Options);
-    static MythVideoOutput* Create(const QString& Decoder,    MythCodecID CodecID,
-                                   const QSize& VideoDim,
-                                   const QSize& VideoDispDim, float VideoAspect,
-                                   QWidget* ParentWidget,
-                                   float FrameRate,           uint  PlayerFlags,
-                                   const QString& Codec,      int ReferenceFrames);
     static VideoFrameTypeVec s_defaultFrameTypes;
 
-    MythVideoOutput();
     ~MythVideoOutput() override;
 
     virtual bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
@@ -102,6 +95,7 @@ class MythVideoOutput : public MythVideoBounds
     virtual bool         StereoscopicModesAllowed() const { return false; }
 
   protected:
+    MythVideoOutput();
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
@@ -120,6 +114,9 @@ class MythVideoOutput : public MythVideoBounds
     bool                 m_deinterlacing      { false };
     bool                 m_deinterlacing2X    { false };
     MythDeintType        m_forcedDeinterlacer { DEINT_NONE };
+
+  private:
+    Q_DISABLE_COPY(MythVideoOutput)
 };
 
-#endif // MYTH_VIDEOOUT_H_
+#endif

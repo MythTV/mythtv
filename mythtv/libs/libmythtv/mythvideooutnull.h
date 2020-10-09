@@ -9,7 +9,6 @@ class MythVideoOutputNull : public MythVideoOutput
   public:
     static MythVideoOutputNull* Create(QSize VideoDim, QSize VideoDispDim, float VideoAspect, MythCodecID CodecID);
     static void GetRenderOptions(RenderOptions& Options);
-    MythVideoOutputNull();
    ~MythVideoOutputNull() override;
 
     bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
@@ -30,7 +29,11 @@ class MythVideoOutputNull : public MythVideoOutput
     void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     void CreatePauseFrame(void);
 
+  protected:
+    MythVideoOutputNull();
+
   private:
+    Q_DISABLE_COPY(MythVideoOutputNull)
     QMutex     m_globalLock   { QMutex::Recursive };
     VideoFrame m_avPauseFrame { };
 };
