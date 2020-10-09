@@ -1,8 +1,14 @@
 #ifndef MYTHDETECTLETTERBOX_H
 #define MYTHDETECTLETTERBOX_H
 
+// Qt
+#include <QMutex>
+
 // MythTV
-#include "mythplayer.h"
+#include "mythframe.h"
+#include "videoouttypes.h"
+
+class MythPlayer;
 
 class MTV_PUBLIC DetectLetterbox
 {

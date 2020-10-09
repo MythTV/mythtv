@@ -1,5 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
+#include "mythplayer.h"
 #include "DetectLetterbox.h"
 
 #define LOC QString("DetectLetterbox: ")
