@@ -27,7 +27,7 @@
 #if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
 #endif
-#include "mythplayer.h"
+#include "mythtranscodeplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
 #include "io/mythavformatwriter.h"
@@ -259,9 +259,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         return REENCODE_ERROR;
     }
     player_ctx->SetRingBuffer(rb);
-    player_ctx->SetPlayer(new MythPlayer(player_ctx, (PlayerFlags)(kVideoIsNull | kNoITV)));
+    player_ctx->SetPlayer(new MythTranscodePlayer(player_ctx, static_cast<PlayerFlags>(kVideoIsNull | kNoITV)));
     SetPlayerContext(player_ctx);
-    MythPlayer *player = GetPlayer();
+    auto * player = dynamic_cast<MythTranscodePlayer*>(GetPlayer());
     if (player == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,

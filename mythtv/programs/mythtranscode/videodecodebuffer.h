@@ -1,28 +1,28 @@
 #ifndef VIDEODECODEBUFFER_H
 #define VIDEODECODEBUFFER_H
 
+// Qt
 #include <QList>
 #include <QWaitCondition>
 #include <QMutex>
 #include <QRunnable>
 
+// MythTV
 #include "mythvideoout.h"
 
-class MythPlayer;
+class MythTranscodePlayer;
 class MythVideoOutput;
 
 class VideoDecodeBuffer : public QRunnable
 {
   public:
-    VideoDecodeBuffer(MythPlayer *player, MythVideoOutput *videoout,
-        bool cutlist, int size = 5)
-        : m_player(player),        m_videoOutput(videoout),
-          m_honorCutlist(cutlist), m_maxFrames(size) {}
+    VideoDecodeBuffer(MythTranscodePlayer* Player, MythVideoOutput* Videoout,
+                      bool Cutlist, int Size = 5);
     ~VideoDecodeBuffer() override;
 
-    void          stop(void);
-    void run() override; // QRunnable
-    VideoFrame *GetFrame(int &didFF, bool &isKey);
+    void       stop     ();
+    void       run      () override;
+    VideoFrame *GetFrame(int &DidFF, bool &Key);
 
   private:
     struct DecodedFrameInfo
@@ -32,18 +32,17 @@ class VideoDecodeBuffer : public QRunnable
         bool        isKey;
     };
 
-    MythPlayer * const      m_player      {nullptr};
-    MythVideoOutput * const m_videoOutput {nullptr};
+    MythTranscodePlayer* const m_player   { nullptr };
+    MythVideoOutput* const m_videoOutput  { nullptr };
     bool const              m_honorCutlist;
     int const               m_maxFrames;
-    bool volatile           m_runThread   {true};
-    bool volatile           m_isRunning   {false};
+    bool volatile           m_runThread   { true  };
+    bool volatile           m_isRunning   { false };
     QMutex mutable          m_queueLock; // Guards the following...
-    bool                    m_eof         {false};
+    bool                    m_eof         { false };
     QList<DecodedFrameInfo> m_frameList;
     QWaitCondition          m_frameWaitCond;
 };
 
 #endif
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
 

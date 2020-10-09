@@ -608,6 +608,7 @@ int MythPlayer::OpenFile(int Retries)
     m_decoder->SetSeekSnap(0);
     m_decoder->SetLiveTVMode(m_liveTV);
     m_decoder->SetWatchingRecording(m_watchingRecording);
+    // TODO (re)move this into MythTranscode player
     m_decoder->SetTranscoding(m_transcoding);
 
     // Open the decoder
@@ -2293,14 +2294,6 @@ bool MythPlayer::DoGetFrame(DecodeType Type)
     return ret;
 }
 
-void MythPlayer::SetTranscoding(bool value)
-{
-    m_transcoding = value;
-
-    if (m_decoder)
-        m_decoder->SetTranscoding(value);
-}
-
 int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
 {
     if ((newsync >= -1000) && (newsync <= 1000))
@@ -2935,119 +2928,6 @@ QString MythPlayer::GetXDS(const QString &key) const
     if (!m_decoder)
         return QString();
     return m_decoder->GetXDS(key);
-}
-
-void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
-{
-    // Are these really needed?
-    SetPlaying(true);
-    m_keyframeDist = 30;
-
-    if (!InitVideo())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Unable to initialize video for transcode.");
-        SetPlaying(false);
-        return;
-    }
-
-    m_framesPlayed = 0;
-    ClearAfterSeek();
-
-    if (copyvideo && m_decoder)
-        m_decoder->SetRawVideoState(true);
-    if (copyaudio && m_decoder)
-        m_decoder->SetRawAudioState(true);
-
-    if (m_decoder)
-    {
-        m_decoder->SetSeekSnap(0);
-    }
-}
-
-bool MythPlayer::TranscodeGetNextFrame(
-    int &did_ff, bool &is_key, bool honorCutList)
-{
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    if (m_playerCtx->m_playingInfo)
-        m_playerCtx->m_playingInfo->UpdateInUseMark();
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    int64_t lastDecodedFrameNumber =
-        m_videoOutput->GetLastDecodedFrame()->frameNumber;
-
-    if ((lastDecodedFrameNumber == 0) && honorCutList)
-        m_deleteMap.TrackerReset(0);
-
-    if (!m_decoderThread)
-        DecoderStart(true/*start paused*/);
-
-    if (!m_decoder)
-        return false;
-
-    {
-        QMutexLocker decoderlocker(&m_decoderChangeLock);
-        if (!DoGetFrame(kDecodeAV))
-            return false;
-    }
-
-    if (GetEof() != kEofStateNone)
-        return false;
-
-    if (honorCutList && !m_deleteMap.IsEmpty())
-    {
-        if (m_totalFrames && lastDecodedFrameNumber >= (int64_t)m_totalFrames)
-            return false;
-
-        uint64_t jumpto = 0;
-        if (m_deleteMap.TrackerWantsToJump(lastDecodedFrameNumber, jumpto))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Fast-Forwarding from %1 to %2")
-                    .arg(lastDecodedFrameNumber).arg(jumpto));
-            if (jumpto >= m_totalFrames)
-            {
-                SetEof(kEofStateDelayed);
-                return false;
-            }
-
-            // For 0.25, move this to DoJumpToFrame(jumpto)
-            WaitForSeek(jumpto, 0);
-            m_decoder->ClearStoredData();
-            ClearAfterSeek();
-            m_decoderChangeLock.lock();
-            DoGetFrame(kDecodeAV);
-            m_decoderChangeLock.unlock();
-            did_ff = 1;
-        }
-    }
-    if (GetEof() != kEofStateNone)
-      return false;
-    is_key = m_decoder->IsLastFrameKey();
-    return true;
-}
-
-long MythPlayer::UpdateStoredFrameNum(long curFrameNum)
-{
-    if (m_decoder)
-        return m_decoder->UpdateStoredFrameNum(curFrameNum);
-    return 0;
-}
-
-void MythPlayer::SetCutList(const frm_dir_map_t &newCutList)
-{
-    m_deleteMap.SetMap(newCutList);
-}
-
-bool MythPlayer::WriteStoredData(MythMediaBuffer *OutBuffer,
-                                 bool Writevideo, long TimecodeOffset)
-{
-    if (!m_decoder)
-        return false;
-    if (Writevideo && !m_decoder->GetRawVideoState())
-        Writevideo = false;
-    m_decoder->WriteStoredData(OutBuffer, Writevideo, TimecodeOffset);
-    return Writevideo;
 }
 
 void MythPlayer::SetCommBreakMap(frm_dir_map_t &newMap)

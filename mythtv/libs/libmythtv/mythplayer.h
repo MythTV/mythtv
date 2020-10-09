@@ -159,7 +159,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SetLength(int len)                   { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
-    void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
@@ -232,13 +231,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool SwitchAngle(int /*title*/) { return false; }
     virtual bool NextAngle(void) { return false; }
     virtual bool PrevAngle(void) { return false; }
-
-    // Transcode stuff
-    void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(int &did_ff, bool &is_key, bool honorCutList);
-    bool WriteStoredData(MythMediaBuffer *OutBuffer, bool WriteVideo, long TimecodeOffset);
-    long UpdateStoredFrameNum(long curFrameNum);
-    void SetCutList(const frm_dir_map_t &newCutList);
 
     // Decoder stuff..
     const VideoFrameTypeVec* DirectRenderFormats(void);

@@ -1,24 +1,30 @@
+// MythTV
 #include "videodecodebuffer.h"
+#include "mythtranscodeplayer.h"
 
-#include "mythplayer.h"
+// Std
+#include <chrono>
+#include <thread>
 
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
+VideoDecodeBuffer::VideoDecodeBuffer(MythTranscodePlayer* Player, MythVideoOutput* Videoout,
+                                     bool Cutlist, int Size)
+  : m_player(Player),        m_videoOutput(Videoout),
+    m_honorCutlist(Cutlist), m_maxFrames(Size)
+{
+}
 
 VideoDecodeBuffer::~VideoDecodeBuffer()
 {
     m_runThread = false;
     m_frameWaitCond.wakeAll();
-
     while (m_isRunning)
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-void VideoDecodeBuffer::stop(void)
+void VideoDecodeBuffer::stop()
 {
     m_runThread = false;
     m_frameWaitCond.wakeAll();
-
     while (m_isRunning)
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
@@ -34,18 +40,16 @@ void VideoDecodeBuffer::run()
         {
             locker.unlock();
 
-            DecodedFrameInfo tfInfo {};
-            tfInfo.frame = nullptr;
-            tfInfo.didFF = 0;
-            tfInfo.isKey = false;
+            DecodedFrameInfo frameinfo {};
+            frameinfo.frame = nullptr;
+            frameinfo.didFF = 0;
+            frameinfo.isKey = false;
 
-            if (m_player->TranscodeGetNextFrame(tfInfo.didFF,
-                tfInfo.isKey, m_honorCutlist))
+            if (m_player->TranscodeGetNextFrame(frameinfo.didFF, frameinfo.isKey, m_honorCutlist))
             {
-                tfInfo.frame = m_videoOutput->GetLastDecodedFrame();
-
+                frameinfo.frame = m_videoOutput->GetLastDecodedFrame();
                 locker.relock();
-                m_frameList.append(tfInfo);
+                m_frameList.append(frameinfo);
             }
             else if (m_player->GetEof() != kEofStateNone)
             {
@@ -53,8 +57,9 @@ void VideoDecodeBuffer::run()
                 m_eof = true;
             }
             else
+            {
                 continue;
-
+            }
             m_frameWaitCond.wakeAll();
         }
         else
@@ -65,7 +70,7 @@ void VideoDecodeBuffer::run()
     m_isRunning = false;
 }
 
-VideoFrame *VideoDecodeBuffer::GetFrame(int &didFF, bool &isKey)
+VideoFrame *VideoDecodeBuffer::GetFrame(int &DidFF, bool &Key)
 {
     QMutexLocker locker(&m_queueLock);
 
@@ -75,7 +80,6 @@ VideoFrame *VideoDecodeBuffer::GetFrame(int &didFF, bool &isKey)
             return nullptr;
 
         m_frameWaitCond.wait(locker.mutex());
-
         if (m_frameList.isEmpty())
             return nullptr;
     }
@@ -83,10 +87,8 @@ VideoFrame *VideoDecodeBuffer::GetFrame(int &didFF, bool &isKey)
     DecodedFrameInfo tfInfo = m_frameList.takeFirst();
     locker.unlock();
     m_frameWaitCond.wakeAll();
-
-    didFF = tfInfo.didFF;
-    isKey = tfInfo.isKey;
-
+    DidFF = tfInfo.didFF;
+    Key = tfInfo.isKey;
     return tfInfo.frame;
 }
 
