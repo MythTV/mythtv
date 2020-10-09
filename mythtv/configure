@@ -5916,6 +5916,10 @@ if enabled libexiv2_external ; then
     fi
 fi
 
+if [ $target_os = "linux" ] ; then
+    . /etc/os-release
+fi
+
 # libmythbluray!
 if enabled libbluray_external; then
     if $(pkg-config --atleast-version="0.9.3" libbluray); then
@@ -5928,7 +5932,6 @@ if enabled libbluray_external; then
                 # only those systems to reach the bottom of the
                 # following case statement.  This list should only
                 # shrink over time.
-                . /etc/os-release
                 case $ID in
                     centos)
                         if test $VERSION_ID -gt 8; then
@@ -6571,7 +6574,12 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                   }
                 }
 
-enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang -lMachineIndependent -lGenericCodeGen -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
+case $ID in
+    fedora)
+        EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
+esac
+
+enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
 
 enable enforce_wshadow
 case $target_os in
