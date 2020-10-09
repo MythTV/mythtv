@@ -5906,6 +5906,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         m_playerContext.StopPlaying();
         m_playerContext.m_recorder->StopLiveTV();
         m_playerContext.SetPlayer(nullptr);
+        m_player = nullptr;
 
         // now restart stuff
         m_playerContext.m_lastSignalUIInfo.clear();
