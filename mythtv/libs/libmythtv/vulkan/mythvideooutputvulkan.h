@@ -12,6 +12,8 @@ class MythVideoVulkan;
 
 class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
 {
+    Q_OBJECT
+
   public:
     static void        GetRenderOptions    (RenderOptions& Options);
     static QStringList GetAllowedRenderers (MythCodecID CodecId);

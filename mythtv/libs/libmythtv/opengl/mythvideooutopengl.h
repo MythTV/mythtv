@@ -11,6 +11,8 @@ class MythOpenGLPerf;
 
 class MythVideoOutputOpenGL : public MythVideoOutputGPU
 {
+    Q_OBJECT
+
   public:
     enum TextureFormats
     {

@@ -10,6 +10,8 @@ class MythPainterGPU;
 
 class MythVideoOutputGPU : public MythVideoOutput
 {
+    Q_OBJECT
+
   public:
     static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, const QString& Decoder,
                                       MythCodecID CodecID, const QSize& VideoDim,
