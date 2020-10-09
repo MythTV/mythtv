@@ -186,20 +186,6 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     return true;
 }
 
-void MythVideoOutputNull::EmbedInWidget(const QRect& EmbedRect)
-{
-    // TODO is this locking required (and associated override of EmbedInWidget)
-    QMutexLocker locker(&m_globalLock);
-    MythVideoOutput::EmbedInWidget(EmbedRect);
-}
-
-void MythVideoOutputNull::StopEmbedding(void)
-{
-    // TODO is this locking required (and associated override of StopEmbedding)
-    QMutexLocker locker(&m_globalLock);
-    MythVideoOutput::StopEmbedding();
-}
-
 void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
 {
     if (DEINT_NONE != Force)

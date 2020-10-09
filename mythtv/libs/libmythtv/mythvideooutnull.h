@@ -24,8 +24,6 @@ class MythVideoOutputNull : public MythVideoOutput
                       float        Aspect,     MythCodecID  CodecID,
                       bool&        AspectOnly,
                       int          ReferenceFrames, bool ForceChange) override;
-    void EmbedInWidget(const QRect& EmbedRect) override;
-    void StopEmbedding(void) override;
     void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     void CreatePauseFrame(void);
 
