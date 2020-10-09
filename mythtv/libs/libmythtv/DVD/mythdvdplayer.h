@@ -49,8 +49,6 @@ class MythDVDPlayer : public MythPlayerInterface
     void     EventStart(void) override;
     virtual void EventEnd(void);
     void     InitialSeek(void) override;
-    void     SeekForScreenGrab(uint64_t &Number, uint64_t FrameNum,
-                               bool Absolute) override;
     void     AutoDeint(VideoFrame* Frame, MythVideoOutput* VideoOutput,
                        int FrameInterval, bool AllowLock = true) override;
     long long CalcMaxFFTime(long long FastFwd, bool Setjump = true) const override;

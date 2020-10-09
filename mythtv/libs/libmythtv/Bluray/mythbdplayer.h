@@ -35,14 +35,6 @@ class MythBDPlayer : public MythPlayerInterface
     void     SetBookmark       (bool Clear) override;
     uint64_t GetBookmark       (void) override;
 
-    // Disable screen grabs for Bluray
-    char *GetScreenGrabAtFrame(uint64_t /*FrameNum*/, bool /*Absolute*/, int &/*BufferSize*/,
-                               int &/*FrameWidth*/, int &/*FrameHeight*/, float &/*AspectRatio*/) override
-        { return nullptr; }
-    char *GetScreenGrab(int /*SecondsIn*/, int &/*BufferSize*/, int &/*FrameWidth*/,
-                        int &/*FrameHeight*/, float &/*AspectRatio*/) override
-        { return nullptr; }
-
   protected:
     void     VideoStart        (void) override;
     bool     VideoLoop         (void) override;
@@ -51,8 +43,6 @@ class MythBDPlayer : public MythPlayerInterface
     void     PreProcessNormalFrame(void) override;
     bool     JumpToFrame       (uint64_t Frame) override;
     void     CreateDecoder     (TestBufferVec & TestBuffer) override;
-    void     SeekForScreenGrab (uint64_t &/*Number*/, uint64_t /*FrameNumber*/,
-                                bool /*Absolute*/) override {}
 
   private:
     Q_DISABLE_COPY(MythBDPlayer)

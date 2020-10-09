@@ -219,11 +219,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    HasTVChainNext(void) const;
     bool    IsWatchingInprogress(void) const;
 
-    // Non-const gets
-    virtual char *GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int &BufferSize,
-                                       int &FrameWidth, int &FrameHeight, float &AspectRatio);
-    virtual char *GetScreenGrab(int SecondsIn, int &BufferSize, int &FrameWidth,
-                                int &FrameHeight, float &AspectRatio);
     InteractiveTV *GetInteractiveTV(void);
     MythVideoOutput *GetVideoOutput(void)       { return m_videoOutput; }
     MythCodecContext *GetMythCodecContext(void) { return m_decoder->GetMythCodecContext(); }
@@ -360,8 +355,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Non-const gets
     OSD         *GetOSD(void)               { return m_osd;       }
-    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                   bool absolute);
 
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;

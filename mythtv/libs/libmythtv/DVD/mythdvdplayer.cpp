@@ -486,28 +486,6 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*HonorCutList*/, int Divisor) const
     return total * 1000 / Divisor;
 }
 
-void MythDVDPlayer::SeekForScreenGrab(uint64_t &Number, uint64_t FrameNum,
-                                      bool /*Absolute*/)
-{
-    if (!m_playerCtx->m_buffer->IsDVD())
-        return;
-    if (GoToMenu("menu"))
-    {
-        if (m_playerCtx->m_buffer->DVD()->IsInMenu() &&
-            !m_playerCtx->m_buffer->DVD()->IsInStillFrame())
-        {
-            GoToDVDProgram(true);
-        }
-    }
-    else if (m_playerCtx->m_buffer->DVD()->GetTotalTimeOfTitle() < 60)
-    {
-        GoToDVDProgram(true);
-        Number = FrameNum;
-        if (Number >= m_totalFrames)
-            Number = m_totalFrames / 2;
-    }
-}
-
 int MythDVDPlayer::SetTrack(uint Type, int TrackNo)
 {
     if (kTrackTypeAudio == Type)
