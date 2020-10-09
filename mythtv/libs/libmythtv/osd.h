@@ -37,7 +37,7 @@
 
 #define kOSDFadeTime 1000
 
-class MythPlayer;
+class MythPlayerInterface;
 class TeletextScreen;
 class SubtitleScreen;
 struct AVSubtitle;
@@ -133,7 +133,7 @@ class OSD
     Q_DECLARE_TR_FUNCTIONS(OSD)
 
   public:
-    OSD(MythPlayer *Player, QObject *Parent, MythPainter *Painter)
+    OSD(MythPlayerInterface *Player, QObject *Parent, MythPainter *Painter)
         : m_parent(Player), m_parentObject(Parent), m_currentPainter(Painter) {}
    ~OSD();
 
@@ -187,7 +187,7 @@ class OSD
     void DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos);
 
     void DisplayBDOverlay(MythBDOverlay *Overlay);
-    MythPlayer *GetPlayer(void) { return m_parent; }
+    MythPlayerInterface *GetPlayer(void) { return m_parent; }
 
   private:
     void TearDown(void);
@@ -198,7 +198,7 @@ class OSD
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
 
   private:
-    MythPlayer     *m_parent            { nullptr };
+    MythPlayerInterface *m_parent       { nullptr };
     QObject        *m_parentObject      { nullptr };
     MythPainter    *m_currentPainter    { nullptr };
     QRect           m_rect              { };

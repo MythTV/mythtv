@@ -45,6 +45,7 @@ class QDomNode;
 class OSD;
 class RemoteEncoder;
 class MythPlayer;
+class MythPlayerInterface;
 class DetectLetterbox;
 class MythMediaBuffer;
 class ProgramInfo;
@@ -330,6 +331,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     explicit TV(MythMainWindow* MainWindow);
    ~TV() override;
     PlayerContext*  GetPlayerContext();
+    bool CreatePlayer(TVState State, bool Muted = false);
 
     // Private initialisation
     static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
@@ -574,7 +576,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void DoTogglePictureAttribute(PictureAdjustType Type);
     void DoChangePictureAttribute(PictureAdjustType Type, PictureAttribute Attr, bool Up, int NewValue = -1);
     bool PictureAttributeHandleAction(const QStringList &Actions);
-    static PictureAttribute NextPictureAdjustType(PictureAdjustType Type, MythPlayer *Player, PictureAttribute Attr);
+    PictureAttribute NextPictureAdjustType(PictureAdjustType Type, PictureAttribute Attr);
     void OverrideScan(FrameScanType Scan);
 
     // Sundry on screen
@@ -770,6 +772,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
     // Video Player
     PlayerContext           m_playerContext { kPlayerInUseID };
+    // Ugly temporary workaround. We need a full MythPlayerInterface object but
+    // avoid endless casts
+    MythPlayerInterface*    m_player        { nullptr };
     /// lock on player and playerActive changes
     mutable QReadWriteLock  m_playerLock;
 

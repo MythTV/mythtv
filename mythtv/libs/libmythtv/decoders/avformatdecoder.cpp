@@ -1518,7 +1518,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         // will avoid the issue (video player deinterlacing) and maybe disable
         // decoder VAAPI deinterlacing. If we get it wrong and the display cannot
         // keep up, the player should just drop frames.
-        bool doublerate = m_parent->CanSupportDoubleRate();
+
+        // FIXME - need a better way to handle this
+        bool doublerate = true;//m_parent->CanSupportDoubleRate();
         m_mythCodecCtx->SetDeinterlacing(enc, &m_videoDisplayProfile, doublerate);
     }
 

@@ -58,8 +58,7 @@ class VideoPerformanceTest
     {
         MythMediaBuffer *rb = MythMediaBuffer::Create(m_file, false, true, 2000);
         m_ctx = new PlayerContext("VideoPerformanceTest");
-        auto *mp  = new MythPlayer(GetMythMainWindow(), nullptr, m_ctx,
-                                   static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
+        auto *mp  = new MythPlayer(m_ctx, static_cast<PlayerFlags>(kAudioMuted | (m_allowGpu ? kDecodeAllowGPU: kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         m_ctx->SetRingBuffer(rb);

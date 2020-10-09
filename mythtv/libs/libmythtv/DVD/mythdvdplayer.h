@@ -2,14 +2,14 @@
 #define MYTHDVDPLAYER_H
 
 // MythTV
-#include "mythplayer.h"
+#include "mythplayerinterface.h"
 
 // Std
 #include <cstdint>
 
-class MythDVDPlayer : public MythPlayer
+class MythDVDPlayer : public MythPlayerInterface
 {
-    Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer)
+    Q_OBJECT
 
   public:
     MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,PlayerFlags Flags = kNoFlags);

@@ -7,6 +7,7 @@
 class MythVideoOutputNull : public MythVideoOutput
 {
   public:
+    static MythVideoOutputNull* Create(QSize VideoDim, QSize VideoDispDim, float VideoAspect, MythCodecID CodecID);
     static void GetRenderOptions(RenderOptions& Options);
     MythVideoOutputNull();
    ~MythVideoOutputNull() override;

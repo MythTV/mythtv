@@ -5,11 +5,11 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "mythplayer.h"
+#include "mythplayerinterface.h"
 
-class MythBDPlayer : public MythPlayer
+class MythBDPlayer : public MythPlayerInterface
 {
-    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
+    Q_OBJECT
 
   public:
     MythBDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags = kNoFlags);

@@ -52,14 +52,11 @@ class MTV_PUBLIC PlayerContext
     ~PlayerContext();
 
     // Actions
-    bool CreatePlayer(TV* Tv, MythMainWindow* MainWindow, TVState State, bool Muted = false);
     void TeardownPlayer(void);
     bool StartPlaying(int maxWait = -1);
     void StopPlaying(void) const;
     void UpdateTVChain(const QStringList &data = QStringList());
     bool ReloadTVChain(void);
-    bool StartEmbedding(const QRect &rect) const;
-    void StopEmbedding(void) const;
     void    PushPreviousChannel(void);
     QString PopPreviousChannel(void);
 
@@ -93,7 +90,6 @@ class MTV_PUBLIC PlayerContext
     void SetPlayGroup(const QString &group);
     void SetPseudoLiveTV(const ProgramInfo *pi, PseudoState new_state);
     void SetPlayerChangingBuffers(bool val) { m_playerUnsafe = val; }
-    void SetNoHardwareDecoders(bool Disallow = true) { m_nohardwaredecoders = Disallow; }
 
     // Gets
     QString  GetPreviousChannel(void) const;
@@ -107,7 +103,6 @@ class MTV_PUBLIC PlayerContext
 
     // Boolean Gets
     bool IsPlayerChangingBuffers(void) const { return m_playerUnsafe; }
-    bool IsEmbedding(void) const;
     bool HasPlayer(void) const;
     bool IsPlayerErrored(void) const;
     bool IsPlayerPlaying(void) const;
@@ -128,7 +123,6 @@ class MTV_PUBLIC PlayerContext
     MythMediaBuffer    *m_buffer             {nullptr};
     ProgramInfo        *m_playingInfo        {nullptr}; ///< Currently playing info
     long long           m_playingLen         {0};  ///< Initial CalculateLength()
-    bool                m_nohardwaredecoders {false}; // < Disable use of VDPAU decoding
     int                 m_lastCardid         {-1}; ///< CardID of current/last recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind
     int                 m_ffRewState         {0};

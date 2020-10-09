@@ -4,22 +4,20 @@
 #include "mythmainwindow.h"
 #include "mythplayeraudiointerface.h"
 
-MythPlayerAudioInterface::MythPlayerAudioInterface(AudioPlayer* Audio)
-  : m_audio(Audio)
+MythPlayerAudioInterface::MythPlayerAudioInterface(MythMainWindow* MainWindow, AudioPlayer* Audio)
+  : m_audioOut(Audio)
 {
-    // TODO pass this in via constructor
-    if (HasMythMainWindow())
-        m_audioGraph.SetPainter(GetMythMainWindow()->GetPainter());
+    m_audioGraph.SetPainter(MainWindow->GetPainter());
 }
 
 void MythPlayerAudioInterface::ResetAudio()
 {
-    m_audio->Reset();
+    m_audioOut->Reset();
 }
 
 void MythPlayerAudioInterface::ReinitAudio()
 {
-    (void)m_audio->ReinitAudio();
+    (void)m_audioOut->ReinitAudio();
 }
 
 const AudioOutputGraph& MythPlayerAudioInterface::GetAudioGraph() const
@@ -29,94 +27,94 @@ const AudioOutputGraph& MythPlayerAudioInterface::GetAudioGraph() const
 
 void MythPlayerAudioInterface::SetupAudioGraph(double VideoFrameRate)
 {
-    uint samplerate = static_cast<uint>(m_audio->GetSampleRate());
+    uint samplerate = static_cast<uint>(m_audioOut->GetSampleRate());
     m_audioGraph.SetSampleRate(samplerate);
     m_audioGraph.SetSampleCount(static_cast<unsigned>(samplerate / VideoFrameRate));
-    m_audio->addVisual(&m_audioGraph);
+    m_audioOut->addVisual(&m_audioGraph);
 }
 
 void MythPlayerAudioInterface::ClearAudioGraph()
 {
-    m_audio->removeVisual(&m_audioGraph);
+    m_audioOut->removeVisual(&m_audioGraph);
     m_audioGraph.Reset();
 }
 
 uint MythPlayerAudioInterface::GetVolume()
 {
-    return m_audio->GetVolume();
+    return m_audioOut->GetVolume();
 }
 
 uint MythPlayerAudioInterface::AdjustVolume(int Change)
 {
-    return m_audio->AdjustVolume(Change);
+    return m_audioOut->AdjustVolume(Change);
 }
 
 uint MythPlayerAudioInterface::SetVolume(int Volume)
 {
-    return m_audio->SetVolume(Volume);
+    return m_audioOut->SetVolume(Volume);
 }
 
 bool MythPlayerAudioInterface::SetMuted(bool Mute)
 {
-    return m_audio->SetMuted(Mute);
+    return m_audioOut->SetMuted(Mute);
 }
 
 MuteState MythPlayerAudioInterface::GetMuteState()
 {
-    return m_audio->GetMuteState();
+    return m_audioOut->GetMuteState();
 }
 
 MuteState MythPlayerAudioInterface::SetMuteState(MuteState State)
 {
-    return m_audio->SetMuteState(State);
+    return m_audioOut->SetMuteState(State);
 }
 
 MuteState MythPlayerAudioInterface::IncrMuteState()
 {
-    return m_audio->IncrMuteState();
+    return m_audioOut->IncrMuteState();
 }
 
 bool MythPlayerAudioInterface::HasAudioOut() const
 {
-    return m_audio->HasAudioOut();
+    return m_audioOut->HasAudioOut();
 }
 
 bool MythPlayerAudioInterface::IsMuted()
 {
-    return m_audio->IsMuted();
+    return m_audioOut->IsMuted();
 }
 
 bool MythPlayerAudioInterface::CanUpmix()
 {
-    return m_audio->CanUpmix();
+    return m_audioOut->CanUpmix();
 }
 
 bool MythPlayerAudioInterface::IsUpmixing()
 {
-    return m_audio->IsUpmixing();
+    return m_audioOut->IsUpmixing();
 }
 
 bool MythPlayerAudioInterface::PlayerControlsVolume() const
 {
-    return m_audio->ControlsVolume();
+    return m_audioOut->ControlsVolume();
 }
 
 bool MythPlayerAudioInterface::EnableUpmix(bool Enable, bool Toggle)
 {
-    return m_audio->EnableUpmix(Enable, Toggle);
+    return m_audioOut->EnableUpmix(Enable, Toggle);
 }
 
 void MythPlayerAudioInterface::PauseAudioUntilBuffered()
 {
-    m_audio->PauseAudioUntilBuffered();
+    m_audioOut->PauseAudioUntilBuffered();
 }
 
 void MythPlayerAudioInterface::SetupAudioOutput(float TimeStretch)
 {
     QString passthru = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
                        gCoreContext->GetSetting("PassThruOutputDevice") : QString();
-    m_audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"), passthru,
-                          static_cast<uint>(gCoreContext->GetNumSetting("AudioSampleRate", 44100)));
-    m_audio->SetStretchFactor(TimeStretch);
+    m_audioOut->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"), passthru,
+                             static_cast<uint>(gCoreContext->GetNumSetting("AudioSampleRate", 44100)));
+    m_audioOut->SetStretchFactor(TimeStretch);
 }
 

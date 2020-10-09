@@ -6,11 +6,12 @@
 #include "audiooutputgraph.h"
 
 class AudioPlayer;
+class MythMainWindow;
 
 class MythPlayerAudioInterface
 {
   public:
-    MythPlayerAudioInterface(AudioPlayer* Audio);
+    MythPlayerAudioInterface(MythMainWindow* MainWindow, AudioPlayer* Audio);
 
     void      ResetAudio();
     void      ReinitAudio();
@@ -35,7 +36,7 @@ class MythPlayerAudioInterface
 
   private:
     Q_DISABLE_COPY(MythPlayerAudioInterface)
-    AudioPlayer*     m_audio { nullptr };
+    AudioPlayer*     m_audioOut { nullptr };
     AudioOutputGraph m_audioGraph;
 };
 

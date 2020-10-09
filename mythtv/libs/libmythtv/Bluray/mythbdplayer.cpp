@@ -9,7 +9,7 @@
 #define LOC QString("BDPlayer: ")
 
 MythBDPlayer::MythBDPlayer(MythMainWindow *MainWindow, TV *Tv, PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayer(MainWindow, Tv, Context, Flags)
+  : MythPlayerInterface(MainWindow, Tv, Context, Flags)
 {
 }
 
@@ -55,7 +55,7 @@ void MythBDPlayer::DisplayPauseFrame(void)
     if (m_playerCtx->m_buffer->IsBD() && m_playerCtx->m_buffer->BD()->IsInStillFrame())
         SetScanType(kScan_Progressive, m_videoOutput, m_frameInterval);
     DisplayMenu();
-    MythPlayer::DisplayPauseFrame();
+    MythPlayerInterface::DisplayPauseFrame();
 }
 
 void MythBDPlayer::VideoStart(void)
@@ -63,7 +63,7 @@ void MythBDPlayer::VideoStart(void)
     if (!m_initialBDState.isEmpty())
         m_playerCtx->m_buffer->BD()->RestoreBDStateSnapshot(m_initialBDState);
 
-    MythPlayer::VideoStart();
+    MythPlayerInterface::VideoStart();
 }
 
 bool MythBDPlayer::VideoLoop(void)
@@ -137,14 +137,14 @@ bool MythBDPlayer::VideoLoop(void)
         m_stillFrameShowing = false;
     }
 
-    return MythPlayer::VideoLoop();
+    return MythPlayerInterface::VideoLoop();
 }
 
 bool MythBDPlayer::JumpToFrame(uint64_t Frame)
 {
     if (Frame == ~0x0ULL)
         return false;
-    return MythPlayer::JumpToFrame(Frame);
+    return MythPlayerInterface::JumpToFrame(Frame);
 }
 
 void MythBDPlayer::EventStart(void)
@@ -162,7 +162,7 @@ void MythBDPlayer::EventStart(void)
     }
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    MythPlayer::EventStart();
+    MythPlayerInterface::EventStart();
 }
 
 int MythBDPlayer::GetNumChapters(void)

@@ -78,8 +78,7 @@ enum
     kDisplayRawTextSubtitle     = 0x080,
     kDisplayAllCaptions         = 0x0FF,
     kDisplayTeletextMenu        = 0x100,
-    kDisplayAllTextCaptions     = ~kDisplayDVDButton &
-                                   kDisplayAllCaptions,
+    kDisplayAllTextCaptions     = ~kDisplayDVDButton & kDisplayAllCaptions
 };
 
 enum PlayerFlags
@@ -127,8 +126,7 @@ class DecoderCallback
 // still higher than the default warning threshhold of 24 bytes.
 //
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, public MythPlayerVisualiser,
-                              public MythPlayerAudioInterface
+class MTV_PUBLIC MythPlayer : public QObject
 {
     Q_OBJECT
 
@@ -148,13 +146,14 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     friend class Transcode;
 
   public:
-    explicit MythPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,
-                        PlayerFlags Flags = kNoFlags);
+    explicit MythPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
    ~MythPlayer() override;
 
     // Initialisation
-    virtual int OpenFile(int Retries = 4);
-    bool InitVideo(void);
+    virtual int  OpenFile(int Retries = 4);
+    virtual bool InitVideo(void);
+    virtual void ReinitVideo(bool ForceUpdate);
+    virtual void InitFrameInterval();
 
     // Public Sets
     void SetLength(int len)                   { m_totalLength = len; }
@@ -164,14 +163,13 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
-    void SetVideoParams(int w, int h, double fps, float aspect,
+    virtual void SetVideoParams(int w, int h, double fps, float aspect,
                         bool ForceUpdate, int ReferenceFrames,
-                        FrameScanType scan = kScan_Ignore,
+                        FrameScanType /*scan*/ = kScan_Ignore,
                         const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
-    void EnableFrameRateMonitor(bool enable = false);
     void ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer);
     void SetFrameRate(double fps);
 
@@ -180,7 +178,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     QSize   GetVideoSize(void) const          { return m_videoDispDim; }
     float   GetVideoAspect(void) const        { return m_videoAspect; }
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
-    void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void) { return ((FlagIsSet(kVideoIsNull)) == 0); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
@@ -206,7 +203,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     QString   GetEncodingType(void) const;
-    void      GetCodecDescription(InfoMap &infoMap);
     QString   GetXDS(const QString &key) const;
 
     // Bool Gets
@@ -221,7 +217,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     bool    IsNearEnd(void);
     bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
-    bool    CanSupportDoubleRate(void);
     bool    IsWatchingInprogress(void) const;
 
     // Non-const gets
@@ -268,9 +263,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void HandleDecoderCallback(const QString &Debug, DecoderCallback::Callback Function,
                                void *Opaque1, void *Opaque2);
     void ProcessCallbacks(void);
-
-    // Reinit
-    void ReinitVideo(bool ForceUpdate);
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);
@@ -331,9 +323,7 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     virtual bool IsInStillFrame() const         { return false;     }
 
     // Position Map Stuff
-    bool PosMapFromEnc(uint64_t start,
-                       frm_pos_map_t &posMap,
-                       frm_pos_map_t &durMap);
+    bool PosMapFromEnc(uint64_t start, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
     // OSD locking for TV class
     bool TryLockOSD(void) { return m_osdLock.tryLock(50); }
@@ -367,12 +357,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void ToggleMoveBottomLine(void);
     void SaveBottomLine(void);
     void FileChanged(void);
-
-    // Windowing stuff
-    void EmbedInWidget(QRect Rect);
-    void StopEmbedding(void);
-    bool IsEmbedding(void);
-    void WindowResized(const QSize& Size);
 
     // Non-const gets
     OSD         *GetOSD(void)               { return m_osd;       }
@@ -416,7 +400,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
 
     // Toggle Sets
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
-    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
 
     // Start/Reset/Stop playing
     virtual bool StartPlaying(void);
@@ -441,14 +424,10 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     // Playback
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
-    void         RefreshPauseFrame(void);
     void         CheckAspectRatio(VideoFrame* frame);
-    virtual void DisplayPauseFrame(void);
-    virtual void DisplayNormalFrame(bool check_prebuffer = true);
-    void         DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due);
+    virtual void DisplayPauseFrame(void) { } // FIXME
     virtual void PreProcessNormalFrame(void);
     virtual void VideoStart(void);
-    virtual bool VideoLoop(void);
     virtual void VideoEnd(void);
     virtual void DecoderStart(bool start_paused);
     virtual void DecoderLoop(bool pause);
@@ -456,7 +435,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     virtual void DecoderPauseCheck(void);
     virtual void AudioEnd(void);
     virtual void EventStart(void);
-    virtual void EventLoop(void);
     virtual void InitialSeek(void);
 
     // Protected MHEG/MHI stuff
@@ -464,19 +442,8 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void ITVRestart(uint chanid, uint cardid, bool isLiveTV);
 
     // Edit mode stuff
-    bool EnableEdit(void);
-    bool HandleProgramEditorActions(QStringList &actions);
     bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
-    void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
-    uint64_t GetNearestMark(uint64_t frame, bool right);
-    bool IsTemporaryMark(uint64_t frame);
-    bool HasTemporaryMark(void);
-    bool IsCutListSaved(void) { return m_deleteMap.IsSaved(); }
-    bool DeleteMapHasUndo(void) { return m_deleteMap.HasUndo(); }
-    bool DeleteMapHasRedo(void) { return m_deleteMap.HasRedo(); }
-    QString DeleteMapGetUndoMessage(void) { return m_deleteMap.GetUndoMessage(); }
-    QString DeleteMapGetRedoMessage(void) { return m_deleteMap.GetRedoMessage(); }
 
     // Reinit
     void ReinitOSD(void);
@@ -521,12 +488,7 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     int64_t GetAudioTimecodeOffset(void) const
         { return m_tcWrap[TC_AUDIO]; }
 
-    // Playback (output) zoom automation
-    DetectLetterbox *m_detectLetterBox;
-
   protected:
-    void RenderVideoFrame(VideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
-
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPlaying(bool is_playing);
@@ -574,7 +536,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     void HandleArbSeek(bool right);
 
     // Private A/V Sync Stuff
-    void  InitFrameInterval();
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
 
@@ -596,11 +557,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     int            m_playerThreadId       {0};
 #endif
     PlayerFlags      m_playerFlags;
-
-    // Window/parent stuff
-    TV*             m_tv                  {nullptr};
-    MythDisplay*    m_display             { nullptr };
-    MythMainWindow* m_mainWindow          { nullptr };
 
     // State
     QWaitCondition m_decoderThreadPause;
@@ -728,9 +684,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
     bool       m_forcePositionMapSync     {false};
     // Manual editing
     DeleteMap  m_deleteMap;
-    QElapsedTimer m_editUpdateTimer;
-    float      m_speedBeforeEdit          {1.0F};
-    bool       m_pausedBeforeEdit         {false};
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
@@ -754,9 +707,6 @@ class MTV_PUBLIC MythPlayer : public QObject, public MythVideoScanTracker, publi
 
     // Counter for buffering messages
     int  m_bufferingCounter               {0};
-
-    // Debugging variables
-    Jitterometer *m_outputJmeter          {nullptr};
 
   private:
     Q_DISABLE_COPY(MythPlayer)

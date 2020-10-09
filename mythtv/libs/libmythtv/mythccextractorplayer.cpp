@@ -51,7 +51,7 @@ DVBSubStuff::~DVBSubStuff() { delete m_reader; }
 MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerContext *Context, PlayerFlags flags, bool showProgress,
                                              QString fileName,
                                              const QString &destdir) :
-    MythPlayer(nullptr, nullptr, Context, flags),
+    MythPlayer(Context, flags),
     m_curTime(0),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),

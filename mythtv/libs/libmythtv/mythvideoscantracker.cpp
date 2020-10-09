@@ -2,13 +2,13 @@
 #include "mythlogging.h"
 #include "mythframe.h"
 #include "mythavutil.h"
-#include "mythplayer.h"
+#include "mythplayerinterface.h"
 #include "mythvideoout.h"
 #include "mythvideoscantracker.h"
 
 #define LOC QString("ScanTracker: ")
 
-MythVideoScanTracker::MythVideoScanTracker(MythPlayer* Parent)
+MythVideoScanTracker::MythVideoScanTracker(MythPlayerInterface *Parent)
   : m_parentPlayer(Parent)
 {
 }

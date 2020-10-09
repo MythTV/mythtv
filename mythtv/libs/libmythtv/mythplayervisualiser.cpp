@@ -4,17 +4,12 @@
 #include "mythmainwindow.h"
 #include "mythplayervisualiser.h"
 
-MythPlayerVisualiser::MythPlayerVisualiser(AudioPlayer *Audio)
-  : m_audio(Audio)
+MythPlayerVisualiser::MythPlayerVisualiser(MythMainWindow *MainWindow, AudioPlayer *Audio)
+  : m_visualAudio(Audio)
 {
-    // TODO pass these in via constructor
-    // TODO remove various checks when this is used in UI player class
-    if (HasMythMainWindow())
-    {
-        m_mainWindow = GetMythMainWindow();
-        m_render     = m_mainWindow->GetRenderDevice();
-        m_painter    = m_mainWindow->GetPainter();
-    }
+    m_mainWindow = MainWindow;
+    m_render     = m_mainWindow->GetRenderDevice();
+    m_painter    = m_mainWindow->GetPainter();
 }
 
 MythPlayerVisualiser::~MythPlayerVisualiser()
@@ -45,7 +40,7 @@ void MythPlayerVisualiser::DestroyVisualiser()
 
 bool MythPlayerVisualiser::CanVisualise()
 {
-    return VideoVisual::CanVisualise(m_audio, m_render);
+    return VideoVisual::CanVisualise(m_visualAudio, m_render);
 }
 
 bool MythPlayerVisualiser::IsVisualising()
@@ -67,17 +62,13 @@ QStringList MythPlayerVisualiser::GetVisualiserList()
 
 bool MythPlayerVisualiser::EnableVisualiser(bool Enable, const QString &Name)
 {
-    // Remove
-    if (!m_mainWindow || !m_render)
-        return false;
-
     if (!Enable)
     {
         DestroyVisualiser();
         return false;
     }
     DestroyVisualiser();
-    m_visual = VideoVisual::Create(Name, m_audio, m_render);
+    m_visual = VideoVisual::Create(Name, m_visualAudio, m_render);
     return m_visual != nullptr;
 }
 
@@ -85,11 +76,7 @@ bool MythPlayerVisualiser::EnableVisualiser(bool Enable, const QString &Name)
 */
 void MythPlayerVisualiser::AutoVisualise(bool HaveVideo)
 {
-    // Remove
-    if (!m_mainWindow || !m_render)
-        return;
-
-    if (!m_audio->HasAudioIn() || HaveVideo)
+    if (!m_visualAudio->HasAudioIn() || HaveVideo)
         return;
 
     if (!CanVisualise() || IsVisualising())

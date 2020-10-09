@@ -50,6 +50,16 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
     Options.priorities->insert("null", 10);
 }
 
+MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDispDim,
+                                                 float VideoAspect, MythCodecID CodecID)
+{
+    MythVideoOutputNull* result = new MythVideoOutputNull();
+    if (result->Init(VideoDim, VideoDispDim, VideoAspect, QRect(), CodecID))
+        return result;
+    delete result;
+    return nullptr;
+}
+
 MythVideoOutputNull::MythVideoOutputNull()
 {
     init(&m_avPauseFrame, FMT_NONE, nullptr, 0, 0, 0);

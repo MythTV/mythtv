@@ -9,7 +9,7 @@ class MythMainWindow;
 class MythPlayerVisualiser
 {
   public:
-    explicit MythPlayerVisualiser(AudioPlayer* Audio);
+    explicit MythPlayerVisualiser(MythMainWindow* MainWindow, AudioPlayer* Audio);
    ~MythPlayerVisualiser();
 
     void        PrepareVisualiser();
@@ -27,13 +27,13 @@ class MythPlayerVisualiser
   private:
     void        DestroyVisualiser();
 
-    MythMainWindow* m_mainWindow { nullptr };
-    MythRender*     m_render     { nullptr };
-    MythPainter*    m_painter    { nullptr };
-    AudioPlayer*    m_audio      { nullptr };
-    VideoVisual*    m_visual     { nullptr };
-    QRect           m_embedRect  { 0, 0, 0, 0};
-    bool            m_embedding  { false   };
+    MythMainWindow* m_mainWindow  { nullptr };
+    MythRender*     m_render      { nullptr };
+    MythPainter*    m_painter     { nullptr };
+    AudioPlayer*    m_visualAudio { nullptr };
+    VideoVisual*    m_visual      { nullptr };
+    QRect           m_embedRect   { 0, 0, 0, 0};
+    bool            m_embedding   { false   };
 };
 
 #endif

@@ -96,37 +96,6 @@ void PlayerContext::SetInitialTVState(bool islivetv)
     SetPlayGroup(newPlaygroup);
 }
 
-bool PlayerContext::StartEmbedding(const QRect &embedRect) const
-{
-    bool ret = false;
-    LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-    {
-        ret = true;
-        m_player->EmbedInWidget(embedRect);
-    }
-    UnlockDeletePlayer(__FILE__, __LINE__);
-    return ret;
-}
-
-bool PlayerContext::IsEmbedding(void) const
-{
-    bool ret = false;
-    LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-        ret = m_player->IsEmbedding();
-    UnlockDeletePlayer(__FILE__, __LINE__);
-    return ret;
-}
-
-void PlayerContext::StopEmbedding(void) const
-{
-    LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-        m_player->StopEmbedding();
-    UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
 bool PlayerContext::HasPlayer(void) const
 {
     QMutexLocker locker(&m_deletePlayerLock);
@@ -186,50 +155,6 @@ bool PlayerContext::CalcPlayerSliderPosition(osdInfo &info,
 bool PlayerContext::IsRecorderErrored(void) const
 {
     return m_recorder && m_recorder->GetErrorStatus();
-}
-
-bool PlayerContext::CreatePlayer(TV *Tv, MythMainWindow* MainWindow, TVState State, bool Muted)
-{
-    if (HasPlayer())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Already have a player");
-        return false;
-    }
-
-    if (!(Tv && MainWindow))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No window and/or TV");
-        return false;
-    }
-
-    uint playerflags = kNoFlags;
-    playerflags |= Muted                ? kAudioMuted : kNoFlags;
-    playerflags |= m_nohardwaredecoders ? kNoFlags : kDecodeAllowGPU;
-    auto flags = static_cast<PlayerFlags>(playerflags);
-
-    MythPlayer *player = nullptr;
-    if (kState_WatchingBD  == State)
-        player = new MythBDPlayer(MainWindow, Tv, this, flags);
-    else if (kState_WatchingDVD == State)
-        player = new MythDVDPlayer(MainWindow, Tv, this, flags);
-    else
-        player = new MythPlayer(MainWindow, Tv, this, flags);
-
-    player->SetupAudioOutput(m_tsNormal);
-    player->SetLength(static_cast<int>(m_playingLen));
-    player->AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
-
-    bool isWatchingRecording = (State == kState_WatchingRecording);
-    player->SetWatchingRecording(isWatchingRecording);
-
-    QString subfn = m_buffer->GetSubtitleFilename();
-    bool isInProgress = (State == kState_WatchingRecording || State == kState_WatchingLiveTV);
-    if (!subfn.isEmpty() && player->GetSubReader())
-        player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
-
-    SetPlayer(player);
-    player->ReinitAudio();
-    return StartPlaying(-1);
 }
 
 /** \fn PlayerContext::StartPlaying(int)
@@ -510,9 +435,6 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
             infoMap["screenshotpath"] =
                 artmap.value(kArtworkScreenshot).url;
         }
-        if (m_player)
-            m_player->GetCodecDescription(infoMap);
-
         loaded = true;
     }
     UnlockPlayingInfo(__FILE__, __LINE__);
