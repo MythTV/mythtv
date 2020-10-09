@@ -2,6 +2,9 @@
 #define MYTHPLAYERINTERFACE_H
 
 // MythTV
+#include "mythplayervisualiser.h"
+#include "mythvideoscantracker.h"
+#include "mythplayeraudiointerface.h"
 #include "DetectLetterbox.h"
 #include "jitterometer.h"
 #include "mythplayer.h"

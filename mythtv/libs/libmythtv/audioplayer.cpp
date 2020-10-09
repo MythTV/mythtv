@@ -1,6 +1,6 @@
 
 #include "audioplayer.h"
-
+#include "visualisations/videovisual.h"
 #include "mythplayer.h"
 #include "audiooutput.h"
 #include "mythnotificationcenter.h"

@@ -36,10 +36,7 @@
 #include "tv.h"
 #include "videoouttypes.h"
 #include "mythmiscutil.h"
-#include "mythplayervisualiser.h"
-#include "mythvideoscantracker.h"
 #include "mythplayeravsync.h"
-#include "mythplayeraudiointerface.h"
 #include "mythtvexp.h"
 
 class ProgramInfo;
