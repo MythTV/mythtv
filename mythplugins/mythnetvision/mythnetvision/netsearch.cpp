@@ -454,7 +454,7 @@ ResultItem* NetSearch::GetStreamItem()
     return m_searchResultList->GetDataValue().value<ResultItem*>();
 }
 
-void NetSearch::RunSearchEditor()
+void NetSearch::RunSearchEditor() const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

@@ -93,7 +93,7 @@ void MythPlayerVisualiser::EmbedVisualiser(bool Embed, const QRect &Rect)
     m_embedding = Embed;
 }
 
-bool MythPlayerVisualiser::VisualiserIsEmbedding()
+bool MythPlayerVisualiser::VisualiserIsEmbedding() const
 {
     return m_embedding;
 }

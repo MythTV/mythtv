@@ -101,8 +101,8 @@ class NetTree : public NetBase
     void ShowMenu(void) override; // MythScreenType
     MythMenu* CreateShowViewMenu(void);
     MythMenu* CreateShowManageMenu(void);
-    void RunTreeEditor(void);
-    void RunRSSEditor(void);
+    void RunTreeEditor(void) const;
+    void RunRSSEditor(void) const;
     void LoadData(void) override; // NetBase
     void HandleSelect(MythUIButtonListItem *item);
 

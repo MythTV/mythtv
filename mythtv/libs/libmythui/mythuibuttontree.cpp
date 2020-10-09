@@ -146,7 +146,7 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
  *
  * \return True if successful, False if the node had no children or was invalid
  */
-bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
+bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node) const
 {
     disconnect(list, nullptr, nullptr, nullptr);
 

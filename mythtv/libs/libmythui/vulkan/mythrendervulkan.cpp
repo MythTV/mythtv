@@ -60,7 +60,7 @@ void MythVulkanObject::CheckValid()
     }
 }
 
-bool MythVulkanObject::IsValidVulkan()
+bool MythVulkanObject::IsValidVulkan() const
 {
     return m_vulkanValid;
 }

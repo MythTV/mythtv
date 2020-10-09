@@ -99,7 +99,7 @@ class ImportMusicDialog : public MythScreenType
     void setTitleWordCaps(void);
     void setTitleInitialCap(void);
     void metadataChanged(void);
-    void chooseBackend(void);
+    void chooseBackend(void) const;
     void setSaveHost(const QString& host);
 
   signals:

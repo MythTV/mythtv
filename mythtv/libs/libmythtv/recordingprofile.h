@@ -161,7 +161,7 @@ class RecordingProfileEditor :
     void Load(void) override; // StandardSetting
 
   public slots:
-    void ShowNewProfileDialog();
+    void ShowNewProfileDialog() const;
     void CreateNewProfile(const QString &profName);
 
   protected:

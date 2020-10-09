@@ -29,7 +29,7 @@ class FileAssocDialog : public MythScreenType
 
     void OnDonePressed();
     void OnDeletePressed();
-    void OnNewExtensionPressed();
+    void OnNewExtensionPressed() const;
 
     void OnNewExtensionComplete(const QString& newExtension);
 

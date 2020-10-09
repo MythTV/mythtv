@@ -655,7 +655,7 @@ void ImportMusicDialog::ShowMenu()
     }
 }
 
-void ImportMusicDialog::chooseBackend(void)
+void ImportMusicDialog::chooseBackend(void) const
 {
     QStringList hostList;
 

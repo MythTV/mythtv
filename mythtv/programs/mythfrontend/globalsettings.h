@@ -38,7 +38,7 @@ class PlaybackSettings : public GroupSetting
     void Load(void) override; // StandardSetting
 
   private slots:
-    void NewPlaybackProfileSlot(void);
+    void NewPlaybackProfileSlot(void) const;
     void CreateNewPlaybackProfileSlot(const QString &name);
 
   private:
@@ -207,7 +207,7 @@ class PlaybackProfileItemConfig : public GroupSetting
 
     bool keyPressEvent(QKeyEvent *e) override; // StandardSetting
     uint GetIndex(void) const;
-    void ShowDeleteDialog(void);
+    void ShowDeleteDialog(void) const;
     void DecreasePriority(void);
     void IncreasePriority(void);
 
@@ -308,7 +308,7 @@ class ChannelGroupsSetting : public GroupSetting
     void Load() override; // StandardSetting
 
   public slots:
-    void ShowNewGroupDialog(void);
+    void ShowNewGroupDialog(void) const;
     void CreateNewGroup(const QString& name);
 
   private:

@@ -275,7 +275,7 @@ PlayGroupEditor::PlayGroupEditor()
             this, &PlayGroupEditor::CreateNewPlayBackGroup);
 }
 
-void PlayGroupEditor::CreateNewPlayBackGroup()
+void PlayGroupEditor::CreateNewPlayBackGroup() const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *settingdialog = new MythTextInputDialog(popupStack,

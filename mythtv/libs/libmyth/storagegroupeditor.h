@@ -36,7 +36,7 @@ class MPUBLIC StorageGroupListEditor :
     void AddSelection(const QString &label, const QString &value);
 
 public slots:
-    void ShowNewGroupDialog(void);
+    void ShowNewGroupDialog(void) const;
     void CreateNewGroup(const QString& name);
 };
 

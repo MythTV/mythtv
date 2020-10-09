@@ -1670,7 +1670,7 @@ void RecordingProfileEditor::Load(void)
     StandardSetting::Load();
 }
 
-void RecordingProfileEditor::ShowNewProfileDialog()
+void RecordingProfileEditor::ShowNewProfileDialog() const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *settingdialog = new MythTextInputDialog(popupStack,

@@ -529,7 +529,7 @@ void EditMetadataDialog::checkClicked(bool state)
     }
 }
 
-void EditMetadataDialog::searchArtist()
+void EditMetadataDialog::searchArtist() const
 {
     QString msg = tr("Select an Artist");
     QStringList searchList = MusicMetadata::fillFieldList("artist");
@@ -574,7 +574,7 @@ void EditMetadataDialog::updateArtistImage(void)
     }
 }
 
-void EditMetadataDialog::searchCompilationArtist()
+void EditMetadataDialog::searchCompilationArtist() const
 {
     QString msg = tr("Select a Compilation Artist");
     QStringList searchList = MusicMetadata::fillFieldList("compilation_artist");
@@ -599,7 +599,7 @@ void EditMetadataDialog::setCompArtist(const QString& compArtist)
     m_compArtistEdit->SetText(compArtist);
 }
 
-void EditMetadataDialog::searchAlbum()
+void EditMetadataDialog::searchAlbum() const
 {
     QString msg = tr("Select an Album");
     QStringList searchList = MusicMetadata::fillFieldList("album");
@@ -642,7 +642,7 @@ void EditMetadataDialog::updateAlbumImage(void)
     }
 }
 
-void EditMetadataDialog::searchGenre()
+void EditMetadataDialog::searchGenre() const
 {
     QString msg = tr("Select a Genre");
     QStringList searchList = MusicMetadata::fillFieldList("genre");

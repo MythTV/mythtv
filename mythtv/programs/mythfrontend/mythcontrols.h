@@ -91,7 +91,7 @@ class MythControls : public MythScreenType
                             bool arrows = false);
     void    UpdateRightList(void);
 
-    void GrabKey(void);
+    void GrabKey(void) const;
     void DeleteKey(void);
     void Save(void) { m_bindings->CommitChanges(); }
 

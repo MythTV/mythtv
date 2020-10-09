@@ -42,7 +42,7 @@ void MythPlayerAVSync::ResetAVSyncClockBase()
     m_rtcBase = 0;
 }
 
-bool MythPlayerAVSync::GetAVSyncAudioPause()
+bool MythPlayerAVSync::GetAVSyncAudioPause() const
 {
     return m_avsyncAudioPaused;
 }
@@ -67,7 +67,7 @@ void MythPlayerAVSync::SetAVSyncMusicChoice(AudioPlayer* Audio)
     Audio->Pause(false);
 }
 
-void MythPlayerAVSync::GetAVSyncData(InfoMap& Map)
+void MythPlayerAVSync::GetAVSyncData(InfoMap& Map) const
 {
     Map.insert("avsync", QObject::tr("%1 ms").arg(m_avsyncAvg / 1000));
 }

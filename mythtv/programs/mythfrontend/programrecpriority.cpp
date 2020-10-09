@@ -821,7 +821,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
     }
 }
 
-void ProgramRecPriority::edit(MythUIButtonListItem *item)
+void ProgramRecPriority::edit(MythUIButtonListItem *item) const
 {
     if (!item)
         return;

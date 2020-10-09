@@ -837,7 +837,7 @@ void NetTree::SlotItemChanged()
         UpdateCurrentItem();
 }
 
-void NetTree::RunTreeEditor()
+void NetTree::RunTreeEditor() const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -853,7 +853,7 @@ void NetTree::RunTreeEditor()
         delete treeedit;
 }
 
-void NetTree::RunRSSEditor()
+void NetTree::RunRSSEditor() const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

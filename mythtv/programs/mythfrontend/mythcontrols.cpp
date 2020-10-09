@@ -601,7 +601,7 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     delete conflict;
 }
 
-void MythControls::GrabKey(void)
+void MythControls::GrabKey(void) const
 {
     /* grab a key from the user */
     MythScreenStack *popupStack =

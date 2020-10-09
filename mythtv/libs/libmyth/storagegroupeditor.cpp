@@ -471,7 +471,7 @@ void StorageGroupListEditor::Load(void)
 }
 
 
-void StorageGroupListEditor::ShowNewGroupDialog()
+void StorageGroupListEditor::ShowNewGroupDialog() const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *settingdialog = new MythTextInputDialog(popupStack,

@@ -263,11 +263,11 @@ void MythVisualCirclesVulkan::DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /
         return;
 
     // Retrieve current command buffer
-    auto currentcmdbuf = m_vulkanWindow->currentCommandBuffer();
+    auto *currentcmdbuf = m_vulkanWindow->currentCommandBuffer();
 
     // Bind our pipeline and retrieve layout
     m_vulkanFuncs->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-    auto layout = m_vulkanShader->GetPipelineLayout();
+    auto *layout = m_vulkanShader->GetPipelineLayout();
 
     // Bind projection descriptor set
     m_vulkanFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,

@@ -1095,7 +1095,7 @@ bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)
     return false;
 }
 
-void PlaybackProfileItemConfig::ShowDeleteDialog()
+void PlaybackProfileItemConfig::ShowDeleteDialog() const
 {
     QString message = tr("Remove this profile item?");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -1322,7 +1322,7 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
     return grouptrigger;
 }
 
-void PlaybackSettings::NewPlaybackProfileSlot()
+void PlaybackSettings::NewPlaybackProfileSlot() const
 {
     QString msg = tr("Enter Playback Profile Name");
 
@@ -4866,7 +4866,7 @@ void ChannelGroupsSetting::Load()
 }
 
 
-void ChannelGroupsSetting::ShowNewGroupDialog()
+void ChannelGroupsSetting::ShowNewGroupDialog() const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *settingdialog = new MythTextInputDialog(popupStack,

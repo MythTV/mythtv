@@ -32,7 +32,7 @@ class MUI_PUBLIC MythVulkanObject
     MythVulkanObject(MythRenderVulkan* Render);
     MythVulkanObject(MythVulkanObject* Other);
 
-    bool                    IsValidVulkan();
+    bool                    IsValidVulkan() const;
     MythRenderVulkan*       Render ();
     VkDevice                Device ();
     QVulkanDeviceFunctions* Funcs  ();

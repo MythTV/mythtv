@@ -27,7 +27,7 @@ class MTV_PUBLIC PlayGroupEditor : public GroupSetting
     void Load(void) override; // StandardSetting
 
   public slots:
-    void CreateNewPlayBackGroup();
+    void CreateNewPlayBackGroup() const;
     void CreateNewPlayBackGroupSlot(const QString &name);
 
   private:

@@ -132,7 +132,7 @@ MythUIWebBrowser* MythBrowser::activeBrowser(void)
     return m_browserList[0]->getBrowser();
 }
 
-void MythBrowser::slotEnterURL(void)
+void MythBrowser::slotEnterURL(void) const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

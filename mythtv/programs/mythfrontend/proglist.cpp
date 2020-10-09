@@ -443,7 +443,7 @@ void ProgLister::ShowChooseViewMenu(void)
                     break;
             }
 
-            auto dialog = new MythUISearchDialog(
+            auto *dialog = new MythUISearchDialog(
                 popupStack, msg, m_viewTextList, true, "");
             if (!dialog)
                 return;
@@ -456,7 +456,7 @@ void ProgLister::ShowChooseViewMenu(void)
         case plKeywordSearch:
         case plPeopleSearch:
         {
-            auto dialog = new PhrasePopup(
+            auto *dialog = new PhrasePopup(
                 popupStack, this, m_searchType, m_viewTextList,
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             if (!dialog)
@@ -468,7 +468,7 @@ void ProgLister::ShowChooseViewMenu(void)
         }
         case plPowerSearch:
         {
-            auto dialog = new PowerSearchPopup(
+            auto *dialog = new PowerSearchPopup(
                 popupStack, this, m_searchType, m_viewTextList,
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             if (!dialog)
@@ -484,7 +484,7 @@ void ProgLister::ShowChooseViewMenu(void)
             int flags = (MythTimeInputDialog::kDay |
                          MythTimeInputDialog::kHours |
                          MythTimeInputDialog::kFutureDates);
-            auto dialog = new MythTimeInputDialog(popupStack, message, flags);
+            auto *dialog = new MythTimeInputDialog(popupStack, message, flags);
             if (!dialog)
                 return;
             connect(dialog, &MythTimeInputDialog::haveResult,

@@ -67,7 +67,7 @@ class NetSearch : public NetBase
     void GetLastResults();
     void SkipPagesBack();
     void SkipPagesForward();
-    void RunSearchEditor();
+    void RunSearchEditor() const;
     void DoListRefresh();
 
     void DoSearch(void);

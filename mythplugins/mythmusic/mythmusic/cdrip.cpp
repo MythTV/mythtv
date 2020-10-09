@@ -689,7 +689,7 @@ void Ripper::showEditMetadataDialog(void)
     showEditMetadataDialog(m_trackList->GetItemCurrent());
 }
 
-void Ripper::chooseBackend(void)
+void Ripper::chooseBackend(void) const
 {
     QStringList hostList;
 
@@ -1234,7 +1234,7 @@ void Ripper::updateTrackList(void)
     }
 }
 
-void Ripper::searchArtist()
+void Ripper::searchArtist() const
 {
     QString msg = tr("Select an Artist");
     QStringList searchList = MusicMetadata::fillFieldList("artist");
@@ -1258,7 +1258,7 @@ void Ripper::setArtist(const QString& artist)
     m_artistEdit->SetText(artist);
 }
 
-void Ripper::searchAlbum()
+void Ripper::searchAlbum() const
 {
     QString msg = tr("Select an Album");
     QStringList searchList = MusicMetadata::fillFieldList("album");

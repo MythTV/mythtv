@@ -43,7 +43,7 @@ class MythNews : public MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void deleteNewsSite(void);
     void ShowEditDialog(bool edit);
-    void ShowFeedManager();
+    void ShowFeedManager() const;
 
     mutable QMutex m_lock            {QMutex::Recursive};
     NewsSite::List m_newsSites;

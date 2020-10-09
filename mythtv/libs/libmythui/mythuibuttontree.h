@@ -60,7 +60,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
   private:
     void Init(void);
     void SetTreeState(bool refreshAll = false);
-    bool UpdateList(MythUIButtonList *list, MythGenericTree *node);
+    bool UpdateList(MythUIButtonList *list, MythGenericTree *node) const;
     bool DoSetCurrentNode(MythGenericTree *node);
 
     void SwitchList(bool right);

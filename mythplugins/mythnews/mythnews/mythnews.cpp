@@ -625,7 +625,7 @@ void MythNews::ShowEditDialog(bool edit)
         delete mythnewseditor;
 }
 
-void MythNews::ShowFeedManager()
+void MythNews::ShowFeedManager() const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 

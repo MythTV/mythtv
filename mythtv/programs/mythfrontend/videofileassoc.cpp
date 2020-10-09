@@ -423,7 +423,7 @@ void FileAssocDialog::OnDeletePressed()
     UpdateScreen();
 }
 
-void FileAssocDialog::OnNewExtensionPressed()
+void FileAssocDialog::OnNewExtensionPressed() const
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

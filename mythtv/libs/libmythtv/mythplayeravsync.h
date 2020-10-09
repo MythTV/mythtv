@@ -22,8 +22,8 @@ class MythPlayerAVSync
     void     WaitForFrame        (int64_t FrameDue);
     int64_t& DisplayTimecode     ();
     void     ResetAVSyncClockBase();
-    void     GetAVSyncData       (InfoMap& Map);
-    bool     GetAVSyncAudioPause ();
+    void     GetAVSyncData       (InfoMap& Map) const;
+    bool     GetAVSyncAudioPause () const;
     void     SetAVSyncAudioPause (bool Pause);
     bool     ResetAVSyncForLiveTV(AudioPlayer* Audio);
     void     SetAVSyncMusicChoice(AudioPlayer* Audio); // remove
