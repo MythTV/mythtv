@@ -9,16 +9,16 @@
 #define THRESHOLD 5                 // Y component has to not vary more than this in the bars
 #define HORIZONTAL_THRESHOLD 4      // How tolerant are we that the image has horizontal edges
 
-DetectLetterbox::DetectLetterbox(MythPlayer* const Player)
+DetectLetterbox::DetectLetterbox(MythPlayer* Player)
+  : m_player(Player)
 {
     int dbAdjustFill = gCoreContext->GetNumSetting("AdjustFill", 0);
     m_isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
     m_detectLetterboxDefaultMode =
             static_cast<AdjustFillMode>(std::max(static_cast<int>(kAdjustFill_Off),
                                             dbAdjustFill - kAdjustFill_AutoDetect_DefaultOff));
-    m_detectLetterboxDetectedMode = Player->GetAdjustFill();
+    m_detectLetterboxDetectedMode = m_player->GetAdjustFill();
     m_detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
-    m_player = Player;
 }
 
 /** \fn DetectLetterbox::Detect(VideoFrame*)

@@ -30,7 +30,7 @@ class MTV_PUBLIC DetectLetterbox
     long long      m_detectLetterboxPossibleHalfFrame  { -1 };
     long long      m_detectLetterboxPossibleFullFrame  { -1 };
     int            m_detectLetterboxConsecutiveCounter { 0 };
-    MythPlayer    *m_player                            { nullptr };
+    MythPlayer*    m_player                            { nullptr };
     int            m_detectLetterboxLimit              { 75 };
     QMutex         m_detectLetterboxLock;
 };
