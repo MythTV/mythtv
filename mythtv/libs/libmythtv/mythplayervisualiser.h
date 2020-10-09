@@ -21,7 +21,7 @@ class MythPlayerVisualiser
     bool        EnableVisualiser(bool Enable, const QString& Name = QString(""));
     void        AutoVisualise(bool HaveVideo);
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
-    bool        VisualiserIsEmbedding() const;
+    bool        IsEmbedding();
     QRect       GetEmbeddingRect();
 
   private:

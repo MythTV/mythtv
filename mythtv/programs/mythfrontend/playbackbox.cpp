@@ -484,7 +484,7 @@ PlaybackBox::~PlaybackBox(void)
 
     if (m_player)
     {
-        emit m_player->RequestStopEmbedding(m_playerSelectedNewShow);
+        emit m_player->RequestEmbedding(false, {}, m_playerSelectedNewShow);
         m_player->DecrRef();
     }
 }
@@ -548,7 +548,7 @@ bool PlaybackBox::Create()
     LoadInBackground();
 
     if (m_player)
-        emit m_player->RequestStartEmbedding({});
+        emit m_player->RequestEmbedding(true);
     return true;
 }
 

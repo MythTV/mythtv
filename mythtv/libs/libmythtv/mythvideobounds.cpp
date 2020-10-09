@@ -668,35 +668,27 @@ void MythVideoBounds::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRec
     MoveResize();
 }
 
-/**
- * \brief Tells video output to embed video in an existing window.
- * \param Rect new display_video_rect
- * \sa StopEmbedding()
- */
-void MythVideoBounds::EmbedInWidget(const QRect &Rect)
+void MythVideoBounds::EmbedPlayback(bool Embed, const QRect& Rect)
 {
-    if (m_embedding && (Rect == m_rawEmbeddingRect))
+    if (Embed)
+    {
+        if (m_embedding && (Rect == m_rawEmbeddingRect))
+            return;
+
+        m_rawEmbeddingRect = Rect;
+        m_embeddingRect = SCALED_RECT(Rect, m_devicePixelRatio);
+        bool savevisiblerect = !m_embedding;
+        m_embedding = true;
+        m_embeddingHidden = Rect.isEmpty();
+        m_displayVideoRect = m_embeddingRect;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4 (Scale: %5)")
+            .arg(m_embeddingRect.width()).arg(m_embeddingRect.height())
+            .arg(m_embeddingRect.left()).arg(m_embeddingRect.top())
+            .arg(m_devicePixelRatio));
+        ResizeDisplayWindow(m_displayVideoRect, savevisiblerect);
         return;
+    }
 
-    m_rawEmbeddingRect = Rect;
-    m_embeddingRect = SCALED_RECT(Rect, m_devicePixelRatio);
-    bool savevisiblerect = !m_embedding;
-    m_embedding = true;
-    m_embeddingHidden = Rect.isEmpty();
-    m_displayVideoRect = m_embeddingRect;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New embedding rect: %1x%2+%3+%4 (Scale: %5)")
-        .arg(m_embeddingRect.width()).arg(m_embeddingRect.height())
-        .arg(m_embeddingRect.left()).arg(m_embeddingRect.top())
-        .arg(m_devicePixelRatio));
-    ResizeDisplayWindow(m_displayVideoRect, savevisiblerect);
-}
-
-/**
- * \brief Tells video output to stop embedding video in an existing window.
- * \sa EmbedInWidget(WId, int, int, int, int)
- */
-void MythVideoBounds::StopEmbedding(void)
-{
     if (!m_embedding)
         return;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stopped embedding");

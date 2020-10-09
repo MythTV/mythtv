@@ -124,7 +124,7 @@ ScheduleEditor::~ScheduleEditor(void)
     // if we have a player, we need to tell we are done
     if (m_player)
     {
-        emit m_player->RequestStopEmbedding();
+        emit m_player->RequestEmbedding(false);
         m_player->DecrRef();
     }
 }
@@ -222,7 +222,7 @@ bool ScheduleEditor::Create()
     }
 
     if (m_player)
-        emit m_player->RequestStartEmbedding(QRect());
+        emit m_player->RequestEmbedding(true);
 
     return true;
 }

@@ -91,7 +91,7 @@ bool ProgFinder::Create()
     LoadInBackground();
 
     if (m_player)
-        emit m_player->RequestStartEmbedding(QRect());
+        emit m_player->RequestEmbedding(true);
 
     return true;
 }
@@ -132,7 +132,7 @@ ProgFinder::~ProgFinder()
     if (m_player)
     {
         if (m_allowEPG)
-            emit m_player->RequestStopEmbedding();
+            emit m_player->RequestEmbedding(false);
         m_player->DecrRef();
     }
 }

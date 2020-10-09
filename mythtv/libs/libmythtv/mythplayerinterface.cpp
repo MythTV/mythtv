@@ -19,6 +19,7 @@ MythPlayerInterface::MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv,
     m_mainWindow(MainWindow),
     m_tv(Tv)
 {
+    connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerInterface::EmbedPlayback);
     m_display = m_mainWindow->GetDisplay();
 }
 
@@ -300,11 +301,20 @@ bool MythPlayerInterface::InitVideo()
                     static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
     if (m_videoOutput)
+    {
+        connect(m_tv, &TV::EmbedPlayback, m_videoOutput, &MythVideoBounds::EmbedPlayback);
         return true;
+    }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
     SetErrored(tr("Failed to initialize video output"));
     return false;
+}
+
+void MythPlayerInterface::EmbedPlayback(bool Embed, const QRect& Rect)
+{
+    // We cannot have multiple inheritance from QObject so we need to call directly
+    EmbedVisualiser(Embed, Rect);
 }
 
 void MythPlayerInterface::ReinitVideo(bool ForceUpdate)
@@ -563,30 +573,6 @@ void MythPlayerInterface::SetVideoParams(int Width, int Height, double FrameRate
     FrameScanType newscan = DetectInterlace(Scan, static_cast<float>(m_videoFrameRate), m_videoDispDim.height());
     SetScanType(newscan, m_videoOutput, m_frameInterval);
     ResetTracker();
-}
-
-void MythPlayerInterface::EmbedInWidget(QRect Rect)
-{
-    if (m_videoOutput)
-        m_videoOutput->EmbedInWidget(Rect);
-    EmbedVisualiser(true, Rect);
-}
-
-void MythPlayerInterface::StopEmbedding()
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->StopEmbedding();
-        ReinitOSD();
-    }
-    EmbedVisualiser(false);
-}
-
-bool MythPlayerInterface::IsEmbedding()
-{
-    if (m_videoOutput)
-        return m_videoOutput->IsEmbedding();
-    return false;
 }
 
 void MythPlayerInterface::WindowResized(const QSize& Size)

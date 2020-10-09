@@ -443,7 +443,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
         if (!player)
             ShowOkPopup(message);
         else if (allowFinder)
-            emit player->RequestStopEmbedding();
+            emit player->RequestEmbedding(false);
         return;
     }
 
@@ -519,7 +519,7 @@ void GuideGrid::PlayerExiting(TV* Player)
 {
     if (Player && (Player == m_player))
     {
-        emit m_player->RequestStopEmbedding();
+        emit m_player->RequestEmbedding(false);
         HideTVWindow();
         m_player->DecrRef();
         m_player = nullptr;
@@ -644,7 +644,7 @@ GuideGrid::~GuideGrid()
         // if we have a player and we are returning to it we need
         // to tell it to stop embedding and return to fullscreen
         if (m_allowFinder)
-            emit m_player->RequestStopEmbedding();
+            emit m_player->RequestEmbedding(false);
 
         // maybe the user selected a different channel group,
         // tell the player to update its channel list just in case
@@ -2639,7 +2639,7 @@ void GuideGrid::HideTVWindow(void)
 
 void GuideGrid::EmbedTVWindow(void)
 {
-    emit m_player->RequestStartEmbedding(m_videoRect);
+    emit m_player->RequestEmbedding(true, m_videoRect);
     QRegion r1 = QRegion(m_area);
     QRegion r2 = QRegion(m_videoRect);
     GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));

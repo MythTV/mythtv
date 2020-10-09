@@ -148,7 +148,7 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     if (wasembedding)
     {
         oldrect = GetEmbeddingRect();
-        StopEmbedding();
+        EmbedPlayback(false, {});
     }
 
     bool mainSuccess = InitBounds(VideoDim, VideoDispDim, VideoAspect, WindowRect);
@@ -157,7 +157,7 @@ bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         m_dbDisplayProfile->SetInput(GetVideoDispDim());
 
     if (wasembedding)
-        EmbedInWidget(oldrect);
+        EmbedPlayback(true, oldrect);
 
     VideoAspectRatioChanged(VideoAspect); // apply aspect ratio and letterbox mode
 

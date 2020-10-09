@@ -46,8 +46,7 @@ class MythVideoBounds : public QObject
     // Sets
     void SourceChanged          (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
-    virtual void EmbedInWidget  (const QRect &Rect);
-    virtual void StopEmbedding  (void);
+    virtual void EmbedPlayback  (bool Embed, const QRect& Rect);
     void ToggleAdjustFill       (AdjustFillMode AdjustFillMode = kAdjustFill_Toggle);
     void ToggleAspectOverride   (AspectOverrideMode AspectMode = kAspect_Toggle);
     void ResizeDisplayWindow    (const QRect &Rect, bool SaveVisibleRect);

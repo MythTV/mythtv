@@ -1047,10 +1047,7 @@ TV::TV(MythMainWindow* MainWindow)
 
     QObject::setObjectName("TV");
     m_keyRepeatTimer.start();
-
-    connect(this, &TV::RequestStartEmbedding, this, &TV::StartEmbedding);
-    connect(this, &TV::RequestStopEmbedding,  this, &TV::StopEmbedding);
-
+    connect(this, &TV::RequestEmbedding, this, &TV::Embed);
     InitFromDB();
 
 #ifdef Q_OS_ANDROID
@@ -7089,20 +7086,11 @@ QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
     return tunable_cards;
 }
 
-void TV::StartEmbedding(const QRect &EmbedRect)
+void TV::Embed(bool Embed, const QRect& Rect, const QStringList& Data)
 {
-    GetPlayerReadLock();
-    m_player->EmbedInWidget(EmbedRect);
-    ReturnPlayerLock();
-}
-
-void TV::StopEmbedding(const QStringList &Data)
-{    
-    // Resize the window back to the MythTV Player size
-    GetPlayerReadLock();
-
-    if (m_player->IsEmbedding())
-        m_player->StopEmbedding();
+    emit EmbedPlayback(Embed, Rect);
+    if (Embed)
+        return;
 
     GetPlayerReadLock();
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
@@ -7127,15 +7115,13 @@ void TV::StopEmbedding(const QStringList &Data)
 
     m_ignoreKeyPresses = false;
 
-    // additional data provided by PlaybackBox
+    // additional data returned by PlaybackBox
     if (!Data.isEmpty())
     {
         ProgramInfo pginfo(Data);
         if (pginfo.HasPathname() || pginfo.GetChanID())
             PrepToSwitchToRecordedProgram(pginfo);
     }
-
-    ReturnPlayerLock();
 }
 
 bool TV::DoSetPauseState(const bool& Pause)
@@ -7158,7 +7144,8 @@ void TV::DoEditSchedule(int EditType)
     if ((EditType == kScheduleProgramGuide  && !RunProgramGuidePtr) ||
         (EditType == kScheduleProgramFinder && !RunProgramFinderPtr) ||
         (EditType == kScheduledRecording    && !RunScheduleEditorPtr) ||
-        (EditType == kViewSchedule          && !RunViewScheduledPtr))
+        (EditType == kViewSchedule          && !RunViewScheduledPtr) ||
+        (EditType == kPlaybackBox           && !RunPlaybackBoxPtr))
     {
         return;
     }

@@ -436,7 +436,7 @@ bool MythVideoOutputGPU::ProcessInputChange()
         if (wasembedding)
         {
             oldrect = GetEmbeddingRect();
-            StopEmbedding();
+            EmbedPlayback(false, {});
         }
 
         // Note - we don't call the default VideoOutput::InputChanged method as
@@ -462,7 +462,7 @@ bool MythVideoOutputGPU::ProcessInputChange()
         m_newFrameRate = false;
 
         if (wasembedding && ok)
-            EmbedInWidget(oldrect);
+            EmbedPlayback(true, oldrect);
 
         // Update deinterlacers for any input change
         SetDeinterlacing(m_deinterlacing, m_deinterlacing2X, m_forcedDeinterlacer);

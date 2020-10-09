@@ -308,16 +308,15 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
   signals:
     void PlaybackExiting(TV* Player);
-    void RequestStartEmbedding(const QRect& EmbedRect);
-    void RequestStopEmbedding(const QStringList& Data = {});
+    void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
+    void EmbedPlayback(bool Embed, const QRect& Rect = {});
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
     void customEvent(QEvent* Event) override;
 
   private slots:
-    void StartEmbedding(const QRect& EmbedRect);
-    void StopEmbedding(const QStringList& Data = {});
+    void Embed(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void HandleOSDClosed(int OSDType);
 
   private:

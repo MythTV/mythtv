@@ -1,4 +1,4 @@
-#ifndef MYTHPLAYERINTERFACE_H
+﻿#ifndef MYTHPLAYERINTERFACE_H
 #define MYTHPLAYERINTERFACE_H
 
 // MythTV
@@ -12,6 +12,9 @@ class MythPlayerInterface : public MythPlayer,
                             public MythPlayerAudioInterface
 {
     Q_OBJECT
+
+  public slots:
+    void EmbedPlayback(bool Embed, const QRect& Rect = {});
 
   public:
     MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
@@ -27,10 +30,6 @@ class MythPlayerInterface : public MythPlayer,
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
                         const QString& CodecName = QString()) override;
-
-    void EmbedInWidget(QRect Rect);
-    void StopEmbedding();
-    bool IsEmbedding();
     void WindowResized(const QSize& Size);
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
