@@ -7104,10 +7104,6 @@ void TV::StopEmbedding(const QStringList &Data)
     if (m_player->IsEmbedding())
         m_player->StopEmbedding();
 
-    MythPainter *painter = m_mainWindow->GetPainter();
-    if (painter)
-        painter->FreeResources();
-
     GetPlayerReadLock();
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player && m_player->GetVideoOutput())
