@@ -316,7 +316,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void customEvent(QEvent* Event) override;
 
   private slots:
-    bool StartEmbedding(const QRect& EmbedRect);
+    void StartEmbedding(const QRect& EmbedRect);
     void StopEmbedding(const QStringList& Data = {});
     void HandleOSDClosed(int OSDType);
 
@@ -372,7 +372,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
     void SetSpeedChangeTimer(int When, int Line);
     void HandleEndOfPlaybackTimerEvent();
-    void HandleIsNearEndWhenEmbeddingTimerEvent();
     void HandleEndOfRecordingExitPromptTimerEvent();
     void HandleVideoExitDialogTimerEvent();
     void HandlePseudoLiveTVTimerEvent();
@@ -823,7 +822,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     volatile int         m_updateOSDPosTimerId     {0};
     volatile int         m_updateOSDDebugTimerId   {0};
     volatile int         m_endOfPlaybackTimerId    {0};
-    volatile int         m_embedCheckTimerId       {0};
     volatile int         m_endOfRecPromptTimerId   {0};
     volatile int         m_videoExitDialogTimerId  {0};
     volatile int         m_pseudoChangeChanTimerId {0};

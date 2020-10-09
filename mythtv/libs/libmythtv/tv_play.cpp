@@ -2470,8 +2470,6 @@ void TV::timerEvent(QTimerEvent *Event)
         IdleDialogTimeout();
     else if (timer_id == m_endOfPlaybackTimerId)
         HandleEndOfPlaybackTimerEvent();
-    else if (timer_id == m_embedCheckTimerId)
-        HandleIsNearEndWhenEmbeddingTimerEvent();
     else if (timer_id == m_endOfRecPromptTimerId)
         HandleEndOfRecordingExitPromptTimerEvent();
     else if (timer_id == m_videoExitDialogTimerId)
@@ -2961,21 +2959,6 @@ void TV::HandleEndOfPlaybackTimerEvent()
 
     if (is_playing)
         m_endOfPlaybackTimerId = StartTimer(kEndOfPlaybackCheckFrequency, __LINE__);
-}
-
-void TV::HandleIsNearEndWhenEmbeddingTimerEvent()
-{
-    GetPlayerReadLock();
-    if (!StateIsLiveTV(GetState()))
-    {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        bool toggle = m_player && m_player->IsEmbedding() &&
-                      m_player->IsNearEnd() && !m_player->IsPaused();
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        if (toggle)
-            DoTogglePause(true);
-    }
-    ReturnPlayerLock();
 }
 
 void TV::HandleEndOfRecordingExitPromptTimerEvent()
@@ -7106,19 +7089,11 @@ QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
     return tunable_cards;
 }
 
-bool TV::StartEmbedding(const QRect &EmbedRect)
+void TV::StartEmbedding(const QRect &EmbedRect)
 {
     GetPlayerReadLock();
     m_player->EmbedInWidget(EmbedRect);
-
-    // Start checking for end of file for embedded window..
-    if (m_embedCheckTimerId)
-        KillTimer(m_embedCheckTimerId);
-    m_embedCheckTimerId = StartTimer(kEmbedCheckFrequency, __LINE__);
-
-    bool embedding = m_player->IsEmbedding();
     ReturnPlayerLock();
-    return embedding;
 }
 
 void TV::StopEmbedding(const QStringList &Data)
@@ -7128,13 +7103,6 @@ void TV::StopEmbedding(const QStringList &Data)
 
     if (m_player->IsEmbedding())
         m_player->StopEmbedding();
-
-    // Stop checking for end of file for embedded window..
-    {
-        if (m_embedCheckTimerId)
-            KillTimer(m_embedCheckTimerId);
-        m_embedCheckTimerId = 0;
-    }
 
     MythPainter *painter = m_mainWindow->GetPainter();
     if (painter)
