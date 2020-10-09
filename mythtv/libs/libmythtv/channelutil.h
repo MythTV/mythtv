@@ -202,6 +202,7 @@ class MTV_PUBLIC ChannelUtil
     enum GroupBy
     {
         kChanGroupByCallsign,
+        kChanGroupByCallsignAndChannum,
         kChanGroupByChanid // Because of the nature of the query we always need to group
     };
 

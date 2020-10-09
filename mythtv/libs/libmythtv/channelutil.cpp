@@ -2451,6 +2451,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     if (groupBy == kChanGroupByCallsign)
         sql += "GROUP BY channel.callsign ";
+    else if (groupBy == kChanGroupByCallsignAndChannum)
+        sql += "GROUP BY channel.callsign, channel.channum ";
     else
         sql += "GROUP BY channel.chanid "; // We must always group for this query
 

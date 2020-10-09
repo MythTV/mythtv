@@ -80,7 +80,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime,
                                                          nTotalAvailable,
                                                          !bWithInvisible,
                                                          ChannelUtil::kChanOrderByChanNum,
-                                                         ChannelUtil::kChanGroupByCallsign,
+                                                         ChannelUtil::kChanGroupByCallsignAndChannum,
                                                          0,
                                                          nChannelGroupId);
 
