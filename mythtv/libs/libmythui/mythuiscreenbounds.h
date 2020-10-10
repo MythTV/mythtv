@@ -13,6 +13,9 @@ class MUI_PUBLIC MythUIScreenBounds : public QWidget
 {
     Q_OBJECT
 
+  signals:
+    void  UIScreenRectChanged(const QRect& Rect);
+
   public:
     static bool  GeometryIsOverridden();
     static void  ParseGeometryOverride(const QString& Geometry);

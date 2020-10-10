@@ -9,6 +9,8 @@ MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *T
                                            PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerUIBase(MainWindow, Tv, Context, Flags)
 {
+    m_uiScreenRect = m_mainWindow->GetUIScreenRect();
+    connect(m_mainWindow, &MythMainWindow::UIScreenRectChanged, this, &MythPlayerVisualiserUI::UIScreenRectChanged);
     connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerVisualiserUI::EmbedVisualiser);
 }
 
@@ -17,19 +19,24 @@ MythPlayerVisualiserUI::~MythPlayerVisualiserUI()
     MythPlayerVisualiserUI::DestroyVisualiser();
 }
 
+void MythPlayerVisualiserUI::UIScreenRectChanged(const QRect& Rect)
+{
+    m_uiScreenRect = Rect;
+}
+
 void MythPlayerVisualiserUI::PrepareVisualiser()
 {
     if (!(m_visual && m_painter) || (m_embedding && m_embedRect.isEmpty()))
         return;
     if (m_visual->NeedsPrepare())
-        m_visual->Prepare(m_embedding ? m_embedRect : m_mainWindow->GetUIScreenRect());
+        m_visual->Prepare(m_embedding ? m_embedRect : m_uiScreenRect);
 }
 
 void MythPlayerVisualiserUI::RenderVisualiser()
 {
     if (!(m_visual && m_painter) || (m_embedding && m_embedRect.isEmpty()))
         return;
-    m_visual->Draw(m_embedding ? m_embedRect : m_mainWindow->GetUIScreenRect(), m_painter, nullptr);
+    m_visual->Draw(m_embedding ? m_embedRect : m_uiScreenRect, m_painter, nullptr);
 }
 
 void MythPlayerVisualiserUI::DestroyVisualiser()

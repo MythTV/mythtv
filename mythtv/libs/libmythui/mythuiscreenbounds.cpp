@@ -196,7 +196,13 @@ QRect MythUIScreenBounds::GetUIScreenRect()
 
 void MythUIScreenBounds::SetUIScreenRect(const QRect& Rect)
 {
+    if (Rect == m_uiScreenRect)
+        return;
     m_uiScreenRect = Rect;
+    LOG(VB_GENERAL, LOG_INFO, LOC +  QString("New UI bounds: %1x%2+%3+%4")
+        .arg(m_uiScreenRect.width()).arg(m_uiScreenRect.height())
+        .arg(m_uiScreenRect.left()).arg(m_uiScreenRect.top()));
+    emit UIScreenRectChanged(m_uiScreenRect);
 }
 
 QRect MythUIScreenBounds::GetScreenRect()

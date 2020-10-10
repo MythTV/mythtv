@@ -712,16 +712,14 @@ void MythMainWindow::Init(bool mayReInit)
 
     // SetWidget may move the widget into a new screen.
     m_display->SetWidget(this);
-    // Ensure MythUIHelper has latest screen bounds if we have moved
-    UpdateScreenSettings(m_display);
-
     QTimer::singleShot(1000, this, &MythMainWindow::DelayedAction);
 
-    m_uiScreenRect = QRect(QPoint(0, 0), m_screenRect.size());
-    LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
-        .arg(m_screenRect.width()).arg(m_screenRect.height()));
+    // Ensure we have latest screen bounds if we have moved
+    UpdateScreenSettings(m_display);
+    SetUIScreenRect({{0, 0}, m_screenRect.size()});
     MoveResize(m_screenRect);
     Show();
+
     // The window is sometimes not created until Show has been called - so try
     // MythDisplay::setWidget again to ensure we listen for QScreen changes
     m_display->SetWidget(this);

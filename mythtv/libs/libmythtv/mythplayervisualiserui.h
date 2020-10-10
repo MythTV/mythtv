@@ -10,6 +10,7 @@ class MythPlayerVisualiserUI : public MythPlayerUIBase
     Q_OBJECT
 
   public slots:
+    void        UIScreenRectChanged(const QRect& Rect);
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
 
   public:
@@ -29,9 +30,10 @@ class MythPlayerVisualiserUI : public MythPlayerUIBase
   private:
     void        DestroyVisualiser();
 
-    VideoVisual* m_visual    { nullptr };
-    QRect        m_embedRect { 0, 0, 0, 0};
-    bool         m_embedding { false   };
+    VideoVisual* m_visual      { nullptr };
+    QRect        m_uiScreenRect{ };
+    QRect        m_embedRect   { };
+    bool         m_embedding   { false   };
 };
 
 #endif
