@@ -113,8 +113,8 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     {
         m_decodeOneFrame = true;
         QThread::usleep(10000);
-        if ((tries & 10) == 10)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "ScreenGrab: Waited 100ms for video frame");
+        if ((tries % 10) == 0)
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
     }
 
     VideoFrame *frame = nullptr;
