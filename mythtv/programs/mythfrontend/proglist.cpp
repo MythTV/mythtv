@@ -414,8 +414,7 @@ void ProgLister::UpdateKeywordInDB(const QString &text, const QString &oldValue)
 
 void ProgLister::ShowChooseViewMenu(void)
 {
-    MythScreenStack *popupStack =
-        GetMythMainWindow()->GetStack("popup stack");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythScreenType *screen = nullptr;
 
     switch (m_type)
@@ -498,6 +497,12 @@ void ProgLister::ShowChooseViewMenu(void)
         case plTitle:
         case plSQLSearch:
             break;
+    }
+
+    if (!screen)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "No menu");
+        return;
     }
 
     if (!screen->Create())
