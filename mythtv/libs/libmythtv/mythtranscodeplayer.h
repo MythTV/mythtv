@@ -7,7 +7,7 @@
 class MTV_PUBLIC MythTranscodePlayer : public MythPlayer
 {
   public:
-    MythTranscodePlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
+    explicit MythTranscodePlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
 
     void SetTranscoding        (bool Transcoding);
     void InitForTranscode      (bool CopyAudio, bool CopyVideo);
