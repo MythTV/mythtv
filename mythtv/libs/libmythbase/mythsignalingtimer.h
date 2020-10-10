@@ -17,12 +17,18 @@
  *  timer firing. This lost millisecond is not a huge issue for infrequent
  *  timers, but causes 7% lost CPU in the MythUI animate() handling.
  */
-class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
+class MBASE_PUBLIC MythSignalingTimer : public QObject, private MThread
 {
     Q_OBJECT
 
   public:
-    MythSignalingTimer(QObject *parent, const char *slot);
+    template <class OBJ, typename FUNC>
+    MythSignalingTimer(OBJ *parent, FUNC func) :
+        QObject(parent), MThread("SignalingTimer")
+    {
+        connect(this, &MythSignalingTimer::timeout, parent, func,
+                Qt::QueuedConnection);
+    }
     ~MythSignalingTimer() override;
 
     virtual void stop(void);

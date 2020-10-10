@@ -173,10 +173,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_hideMouseTimer->setInterval(3000); // 3 seconds
     connect(d->m_hideMouseTimer, &QTimer::timeout, this, &MythMainWindow::HideMouseTimeout);
 
-    // this still uses an 'old' style SLOT connection - but MythSignalingTimer is
-    // scheduled for the scrap heap (it addresses a problem that no longer exists
-    // and we will move to the regular/builtin Qt timing)
-    d->m_drawTimer = new MythSignalingTimer(this, SLOT(animate()));
+    // MythSignalingTimer is scheduled for the scrap heap (it
+    // addresses a problem that no longer exists and we will move to
+    // the regular/builtin Qt timing)
+    d->m_drawTimer = new MythSignalingTimer(this, &MythMainWindow::animate);
     d->m_drawTimer->start(d->m_drawInterval);
 
     d->m_allowInput = true;

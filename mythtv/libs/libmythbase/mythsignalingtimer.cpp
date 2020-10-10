@@ -20,14 +20,6 @@
 #include "mythsignalingtimer.h"
 #include "mythlogging.h"
 
-MythSignalingTimer::MythSignalingTimer(
-    QObject *parent, const char *slot) :
-    QObject(parent), MThread("SignalingTimer")
-{
-    connect(this, SIGNAL(timeout()), parent, slot,
-            Qt::QueuedConnection);
-}
-
 MythSignalingTimer::~MythSignalingTimer()
 {
     MythSignalingTimer::stop();
