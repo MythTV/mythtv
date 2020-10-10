@@ -1425,7 +1425,7 @@ int Playlist::CreateCDMP3(void)
         m_proc = new MythSystemLegacy(command, args, flags);
         connect(m_proc, &MythSystemLegacy::readDataReady,
                 this, &Playlist::cdrecordData, Qt::DirectConnection);
-        connect(m_proc, &MythSystemLegacy::SIGNAL(finished()),
+        connect(m_proc, &MythSystemLegacy::finished,
                 this, qOverload<>&Playlist::processExit, Qt::DirectConnection);
         connect(m_proc, &MythSystemLegacy::error,
                 this, qOverload<uint>&Playlist::processExit, Qt::DirectConnection);
