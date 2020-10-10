@@ -1270,7 +1270,7 @@ void EditAlbumartDialog::removeSelectedImageFromTag(void)
         if (image)
         {
             QString msg = tr("Are you sure you want to permanently remove this image from the tag?");
-            ShowOkPopup(msg, this, SLOT(doRemoveImageFromTag(bool)), true);
+            ShowOkPopup(msg, this, &EditAlbumartDialog::doRemoveImageFromTag, true);
         }
     }
 }

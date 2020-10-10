@@ -13,6 +13,7 @@ class MythContextPrivate;
 
 class MythContextSlotHandler : public QObject
 {
+    friend class MythContextPrivate;
     Q_OBJECT
 
   public:

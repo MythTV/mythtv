@@ -97,10 +97,10 @@ bool GeneralSettings::Create()
     return true;
 }
 
-void GeneralSettings::slotResetDB(void)
+void GeneralSettings::slotResetDB(void) const
 {
     ShowOkPopup(tr("Are you sure you want to reset the music database?"),
-                this, SLOT(slotDoResetDB(bool)), true);
+                this, &GeneralSettings::slotDoResetDB, true);
 }
 
 void GeneralSettings::slotDoResetDB(bool ok)

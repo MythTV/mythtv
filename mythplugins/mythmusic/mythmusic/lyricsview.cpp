@@ -657,7 +657,7 @@ void EditLyricsDialog::cancelPressed(void )
 {
     if (somethingChanged())
     {
-        ShowOkPopup(tr("Save changes?"), this, SLOT(saveEdits(bool)), true);
+        ShowOkPopup(tr("Save changes?"), this, &EditLyricsDialog::saveEdits, true);
         return;
     }
 

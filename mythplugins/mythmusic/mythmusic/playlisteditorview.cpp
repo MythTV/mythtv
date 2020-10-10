@@ -272,7 +272,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
                 ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
                                "Category: %1 - Name: %2").arg(category).arg(name),
-                            this, SLOT(deleteSmartPlaylist(bool)), true);
+                            this, &PlaylistEditorView::deleteSmartPlaylist, true);
             }
             else if (resulttext == tr("Edit Smart Playlist"))
             {
@@ -327,7 +327,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
 
                 ShowOkPopup(tr("Are you sure you want to delete this Playlist?\n"
                                "Name: %1").arg(name),
-                            this, SLOT(deletePlaylist(bool)), true);
+                            this, &PlaylistEditorView::deletePlaylist, true);
             }
             else if (resulttext == tr("Replace Tracks"))
             {
@@ -453,7 +453,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
 
                         ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
                                        "Category: %1 - Name: %2").arg(category).arg(name),
-                                    this, SLOT(deleteSmartPlaylist(bool)), true);
+                                    this, &PlaylistEditorView::deleteSmartPlaylist, true);
                         handled = true;
                     }
                     else if (mnode->getAction() == "playlist")
@@ -462,7 +462,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
 
                         ShowOkPopup(tr("Are you sure you want to delete this Playlist?\n"
                                        "Name: %1").arg(name),
-                                    this, SLOT(deletePlaylist(bool)), true);
+                                    this, &PlaylistEditorView::deletePlaylist, true);
                         handled = true;
                     }
                 }

@@ -1514,8 +1514,7 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
             m_ripperThread && m_ripperThread->isRunning())
         {
             MythConfirmationDialog *dialog =
-                ShowOkPopup(tr("Cancel ripping the CD?"), this,
-                            static_cast<const char*>(nullptr), true);
+                ShowOkPopup(tr("Cancel ripping the CD?"), true);
             if (dialog)
                 dialog->SetReturnEvent(this, "stop_ripping");
         }

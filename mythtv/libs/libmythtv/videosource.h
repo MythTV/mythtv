@@ -828,8 +828,8 @@ class MTV_PUBLIC CaptureCardEditor : public GroupSetting
     void AddSelection(const QString &label, const char *slot);
 
   public slots:
-    void ShowDeleteAllCaptureCardsDialog(void);
-    void ShowDeleteAllCaptureCardsDialogOnHost(void);
+    void ShowDeleteAllCaptureCardsDialog(void) const;
+    void ShowDeleteAllCaptureCardsDialogOnHost(void) const;
     void DeleteAllCaptureCards(bool doDelete);
     void DeleteAllCaptureCardsOnHost(bool doDelete);
     void AddNewCard(void);
@@ -850,7 +850,7 @@ class MTV_PUBLIC VideoSourceEditor : public GroupSetting
 
   public slots:
     void NewSource(void);
-    void ShowDeleteAllSourcesDialog(void);
+    void ShowDeleteAllSourcesDialog(void) const;
     void DeleteAllSources(bool doDelete);
 };
 

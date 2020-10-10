@@ -1440,7 +1440,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
         m_mbeVersionPopup = ShowOkPopup(
-            message, m_sh, SLOT(VersionMismatchPopupClosed()));
+            message, m_sh, &MythContextSlotHandler::VersionMismatchPopupClosed);
     }
     else
     {

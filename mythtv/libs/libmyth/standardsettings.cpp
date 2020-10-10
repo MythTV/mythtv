@@ -1068,7 +1068,7 @@ void StandardSettingDialog::deleteEntry()
     {
         QString message = tr("Do you want to delete the '%1' entry?")
             .arg(source->getLabel());
-        ShowOkPopup(message, this, SLOT(deleteEntryConfirmed(bool)), true);
+        ShowOkPopup(message, this, &StandardSettingDialog::deleteEntryConfirmed, true);
     }
 }
 

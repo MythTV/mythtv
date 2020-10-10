@@ -730,7 +730,7 @@ void PrevRecordedList::ShowDeleteOldEpisodeMenu(void)
 
     QString message = tr("Delete this episode of '%1' from the previously recorded history?").arg(pi->GetTitle());
 
-    ShowOkPopup(message, this, SLOT(DeleteOldEpisode(bool)), true);
+    ShowOkPopup(message, this, &PrevRecordedList::DeleteOldEpisode, true);
 }
 
 void PrevRecordedList::DeleteOldEpisode(bool ok)
@@ -768,7 +768,7 @@ void PrevRecordedList::ShowDeleteOldSeriesMenu(void)
 
     QString message = tr("Delete all episodes of '%1' from the previously recorded history?").arg(pi->GetTitle());
 
-    ShowOkPopup(message, this, SLOT(DeleteOldSeries(bool)), true);
+    ShowOkPopup(message, this, &PrevRecordedList::DeleteOldSeries, true);
 }
 
 void PrevRecordedList::DeleteOldSeries(bool ok)

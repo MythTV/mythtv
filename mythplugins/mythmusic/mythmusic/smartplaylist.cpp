@@ -539,7 +539,7 @@ void SmartPlaylistEditor::deleteCriteria(void)
     if (!item)
         return;
 
-    ShowOkPopup(tr("Delete Criteria?"), this, SLOT(doDeleteCriteria(bool)), true);
+    ShowOkPopup(tr("Delete Criteria?"), this, &SmartPlaylistEditor::doDeleteCriteria, true);
 }
 
 void SmartPlaylistEditor::doDeleteCriteria(bool doit)

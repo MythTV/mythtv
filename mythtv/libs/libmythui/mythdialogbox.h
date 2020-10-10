@@ -442,11 +442,10 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     QString           m_id;
 };
 
-MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = nullptr,
-                                             const char *slot = nullptr, bool showCancel = false);
-template <typename Func>
-MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
-                                             Func slot, bool showCancel = false)
+MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, bool showCancel = false);
+template <class OBJ, typename FUNC>
+MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, const OBJ *parent,
+                                                FUNC slot, bool showCancel = false)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythScreenStack         *stk = nullptr;

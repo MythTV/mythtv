@@ -179,7 +179,7 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
                 if (found)
                 {
                     QString msg = tr("You might have unsaved changes.\nAre you sure you want to exit this screen?");
-                    ShowOkPopup(msg, this, SLOT(doExit(bool)), true);
+                    ShowOkPopup(msg, this, &ImportMusicDialog::doExit, true);
                 }
             }
 

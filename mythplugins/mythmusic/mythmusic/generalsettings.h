@@ -34,7 +34,7 @@ class GeneralSettings : public MythScreenType
   private slots:
     void slotSave(void);
 
-    void slotResetDB(void);
+    void slotResetDB(void) const;
     static void slotDoResetDB(bool ok);
 };
 

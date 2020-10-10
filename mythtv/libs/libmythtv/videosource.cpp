@@ -3466,23 +3466,21 @@ void CaptureCardEditor::AddSelection(const QString &label, const char *slot)
     addChild(button);
 }
 
-void CaptureCardEditor::ShowDeleteAllCaptureCardsDialogOnHost()
+void CaptureCardEditor::ShowDeleteAllCaptureCardsDialogOnHost() const
 {
     ShowOkPopup(
         tr("Are you sure you want to delete "
            "ALL capture cards on %1?").arg(gCoreContext->GetHostName()),
-        this,
-        SLOT(DeleteAllCaptureCardsOnHost(bool)),
+        this, &CaptureCardEditor::DeleteAllCaptureCardsOnHost,
         true);
 }
 
-void CaptureCardEditor::ShowDeleteAllCaptureCardsDialog()
+void CaptureCardEditor::ShowDeleteAllCaptureCardsDialog() const
 {
     ShowOkPopup(
         tr("Are you sure you want to delete "
            "ALL capture cards?"),
-        this,
-        SLOT(DeleteAllCaptureCards(bool)),
+        this, &CaptureCardEditor::DeleteAllCaptureCards,
         true);
 }
 
@@ -3575,13 +3573,12 @@ void VideoSourceEditor::AddSelection(const QString &label, const char* slot)
     addChild(button);
 }
 
-void VideoSourceEditor::ShowDeleteAllSourcesDialog(void)
+void VideoSourceEditor::ShowDeleteAllSourcesDialog(void) const
 {
     ShowOkPopup(
        tr("Are you sure you want to delete "
           "ALL video sources?"),
-       this,
-       SLOT(DeleteAllSources(bool)),
+       this, &VideoSourceEditor::DeleteAllSources,
        true);
 }
 

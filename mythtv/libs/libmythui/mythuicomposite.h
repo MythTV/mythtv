@@ -6,6 +6,7 @@
 
 class MUI_PUBLIC MythUIComposite : public MythUIType
 {
+    Q_OBJECT
 public:
     MythUIComposite(QObject *parent, const QString &name);
     ~MythUIComposite() override = default;

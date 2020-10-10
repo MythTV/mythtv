@@ -641,7 +641,7 @@ void ProgLister::ShowDeleteOldEpisodeMenu(void)
 
     QString message = tr("Delete this episode of '%1'?").arg(pi->GetTitle());
 
-    ShowOkPopup(message, this, SLOT(DeleteOldEpisode(bool)), true);
+    ShowOkPopup(message, this, &ProgLister::DeleteOldEpisode, true);
 }
 
 void ProgLister::DeleteOldEpisode(bool ok)
@@ -674,7 +674,7 @@ void ProgLister::ShowDeleteOldSeriesMenu(void)
 
     QString message = tr("Delete all episodes of '%1'?").arg(pi->GetTitle());
 
-    ShowOkPopup(message, this, SLOT(DeleteOldSeries(bool)), true);
+    ShowOkPopup(message, this, &ProgLister::DeleteOldSeries, true);
 }
 
 void ProgLister::DeleteOldSeries(bool ok)
