@@ -61,17 +61,26 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
     vbo.second[1] = 1.0;
     vbo.second[2] = 1.0;
 
+    bool updated = false;
     vbo.first->bind();
     if (m_bufferMaps)
     {
         void* buffer = vbo.first->map(QOpenGLBuffer::WriteOnly);
-        UpdateVertices(static_cast<float*>(buffer));
+        updated = UpdateVertices(static_cast<float*>(buffer));
         vbo.first->unmap();
     }
     else
     {
-        UpdateVertices(m_vertices.data());
+        updated = UpdateVertices(m_vertices.data());
         vbo.first->write(0, m_vertices.data(), static_cast<int>(m_vertices.size() * sizeof(GLfloat)));
+    }
+
+    if (!updated)
+    {
+        // this is generally when the visualiser is embedding and hidden. We must
+        // still drain the buffers but don't actually draw
+        render->doneCurrent();
+        return;
     }
 
     // Common calls

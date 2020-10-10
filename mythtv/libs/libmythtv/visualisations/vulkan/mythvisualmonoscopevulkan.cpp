@@ -229,13 +229,17 @@ void MythVisualMonoScopeVulkan::Prepare(const QRect &Area)
     vertex.second[1] = 1.0;
     vertex.second[2] = 1.0;
     auto * buffer = vertex.first->GetMappedMemory();
-    UpdateVertices(static_cast<float*>(buffer));
+    if (!UpdateVertices(static_cast<float*>(buffer)))
+        return;
     vertex.first->Update(nullptr);
 }
 
 void MythVisualMonoScopeVulkan::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
 {
     if (!InitialiseVulkan(Area))
+        return;
+
+    if (Area.isEmpty())
         return;
 
     // Retrieve current command buffer

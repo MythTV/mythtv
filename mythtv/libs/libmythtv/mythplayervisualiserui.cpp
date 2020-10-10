@@ -26,7 +26,10 @@ void MythPlayerVisualiserUI::UIScreenRectChanged(const QRect& Rect)
 
 void MythPlayerVisualiserUI::PrepareVisualiser()
 {
-    if (!(m_visual && m_painter) || (m_embedding && m_embedRect.isEmpty()))
+    // Note - we must call the visualiser to drain its buffers even if it is not
+    // to be displayed (otherwise it fails). So do not check for output rect
+    // size (embedding) etc
+    if (!m_visual)
         return;
     if (m_visual->NeedsPrepare())
         m_visual->Prepare(m_embedding ? m_embedRect : m_uiScreenRect);
@@ -34,7 +37,8 @@ void MythPlayerVisualiserUI::PrepareVisualiser()
 
 void MythPlayerVisualiserUI::RenderVisualiser()
 {
-    if (!(m_visual && m_painter) || (m_embedding && m_embedRect.isEmpty()))
+    // As for PrepareVisualiser - always call the visualiser if it is present
+    if (!m_visual)
         return;
     m_visual->Draw(m_embedding ? m_embedRect : m_uiScreenRect, m_painter, nullptr);
 }

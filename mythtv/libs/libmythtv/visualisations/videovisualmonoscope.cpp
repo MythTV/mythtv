@@ -28,16 +28,16 @@ void VideoVisualMonoScope::InitCommon(const QRect& Area)
     m_lineWidth = qMax(1.0F, m_area.height() * 0.004F);
 }
 
-void VideoVisualMonoScope::UpdateVertices(float* Buffer)
+bool VideoVisualMonoScope::UpdateVertices(float* Buffer)
 {
     if (!Buffer)
-        return;
+        return false;
 
     QMutexLocker locker(mutex());
     auto * node = GetNode();
 
     if (m_area.isEmpty() || !node)
-        return;
+        return false;
 
     float y = (static_cast<float>(m_area.height()) / 2.0F) + m_area.top();
     float x = m_area.left();
@@ -65,6 +65,7 @@ void VideoVisualMonoScope::UpdateVertices(float* Buffer)
         Buffer[i * 2 + 1] = y + static_cast<float>(value);
         x += xstep;
     }
+    return true;
 }
 
 void VideoVisualMonoScope::UpdateTime()
