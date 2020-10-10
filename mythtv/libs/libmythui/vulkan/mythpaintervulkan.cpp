@@ -333,7 +333,7 @@ void MythPainterVulkan::End()
 
     // Bind our pipeline and retrieve layout once
     m_vulkan->Funcs()->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_texturePipeline);
-    VkPipelineLayout layout = m_textureShader->GetPipelineLayout();
+    auto *layout = m_textureShader->GetPipelineLayout();
 
     // Bind descriptor set 0 - which is the projection, which is 'constant' for all textures
     m_vulkan->Funcs()->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
