@@ -390,9 +390,10 @@ class Grabber( System ):
         return sorted(self.search(phrase, subtitle, tolerance), \
                         key=lambda r: r.levenshtein)
 
-    def grabInetref(self, inetref, season=None, episode=None):
+    def grabInetref(self, inetref, season=None, episode=None, search_collection=False):
         """
-        obj.grabInetref(inetref, season=None, episode=None) -> metadata object
+        obj.grabInetref(inetref, season=None, episode=None, search_collection=False)
+                -> metadata object
 
             Returns a direct search for a specific movie or episode.
             'inetref' can be an existing VideoMetadata object, and
@@ -411,7 +412,10 @@ class Grabber( System ):
         # inetref may expand to "my_grabber_script.xyz_1234" or "9876"
         args = list(args)
         args[0] = args[0].split("_")[-1]
-        return next(self.command('-D', *args))
+        if search_collection:
+            return next(self.command('-C', *args))
+        else:
+            return next(self.command('-D', *args))
 
 class SystemEvent( System ):
     """
