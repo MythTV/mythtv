@@ -2,15 +2,17 @@
 #define MYTHUISCREENBOUNDS_H
 
 // Qt
-#include <QRect>
+#include <QWidget>
 
 // MythTV
 #include "mythuiexp.h"
 
 class MythDisplay;
 
-class MUI_PUBLIC MythUIScreenBounds
+class MUI_PUBLIC MythUIScreenBounds : public QWidget
 {
+    Q_OBJECT
+
   public:
     static bool  GeometryIsOverridden();
     static void  ParseGeometryOverride(const QString& Geometry);

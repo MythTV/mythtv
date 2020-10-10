@@ -2,7 +2,6 @@
 #define MYTHMAINWINDOW_H_
 
 // Qt
-#include <QWidget>
 #include <QTimer>
 
 // MythTV
@@ -32,9 +31,10 @@ class MythMainWindowPrivate;
 class MythPainterWindow;
 class MythRender;
 
-class MUI_PUBLIC MythMainWindow : public QWidget, public MythUIScreenBounds
+class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
 {
     Q_OBJECT
+
     friend class MythPainterWindowOpenGL;
     friend class MythPainterWindowVulkan;
     friend class MythPainterWindowQt;

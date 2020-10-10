@@ -131,7 +131,6 @@ MythNotificationCenter *GetNotificationCenter(void)
 }
 
 MythMainWindow::MythMainWindow(const bool useDB)
-  : QWidget(nullptr)
 {
     m_display = MythDisplay::Create();
 
