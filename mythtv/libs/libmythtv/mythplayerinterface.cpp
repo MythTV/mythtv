@@ -12,15 +12,9 @@
 
 MythPlayerInterface::MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv,
                                          PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayer(Context, Flags),
-    MythPlayerVisualiser(MainWindow, &m_audio),
-    MythVideoScanTracker(this),
-    MythPlayerAudioInterface(MainWindow, &m_audio),
-    m_mainWindow(MainWindow),
-    m_tv(Tv)
+  : MythPlayerAudioInterface(MainWindow, Tv, Context, Flags),
+    MythVideoScanTracker(this)
 {
-    connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerInterface::EmbedPlayback);
-    m_display = m_mainWindow->GetDisplay();
 }
 
 void MythPlayerInterface::EventLoop()
@@ -311,12 +305,6 @@ bool MythPlayerInterface::InitVideo()
     return false;
 }
 
-void MythPlayerInterface::EmbedPlayback(bool Embed, const QRect& Rect)
-{
-    // We cannot have multiple inheritance from QObject so we need to call directly
-    EmbedVisualiser(Embed, Rect);
-}
-
 void MythPlayerInterface::ReinitVideo(bool ForceUpdate)
 {
     MythPlayer::ReinitVideo(ForceUpdate);
@@ -518,12 +506,12 @@ void MythPlayerInterface::DisplayPauseFrame()
     RenderVideoFrame(nullptr, scan, true, 0);
 }
 
-void MythPlayerInterface::DisplayNormalFrame(bool check_prebuffer)
+void MythPlayerInterface::DisplayNormalFrame(bool CheckPrebuffer)
 {
     if (m_allPaused)
         return;
 
-    if (check_prebuffer && !PrebufferEnoughFrames())
+    if (CheckPrebuffer && !PrebufferEnoughFrames())
         return;
 
     // clear the buffering state

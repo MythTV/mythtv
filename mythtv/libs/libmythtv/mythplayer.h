@@ -41,10 +41,7 @@
 
 class ProgramInfo;
 class InteractiveTV;
-class DetectLetterbox;
-class Jitterometer;
 class QThread;
-class QWidget;
 class MythMediaBuffer;
 class MythDecoderThread;
 

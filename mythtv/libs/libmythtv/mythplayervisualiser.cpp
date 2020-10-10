@@ -2,14 +2,14 @@
 #include "mythcorecontext.h"
 #include "audioplayer.h"
 #include "mythmainwindow.h"
+#include "tv_play.h"
 #include "mythplayervisualiser.h"
 
-MythPlayerVisualiser::MythPlayerVisualiser(MythMainWindow *MainWindow, AudioPlayer *Audio)
-  : m_visualAudio(Audio)
+MythPlayerVisualiser::MythPlayerVisualiser(MythMainWindow *MainWindow, TV *Tv,
+                                           PlayerContext *Context, PlayerFlags Flags)
+  : MythPlayerUIBase(MainWindow, Tv, Context, Flags)
 {
-    m_mainWindow = MainWindow;
-    m_render     = m_mainWindow->GetRenderDevice();
-    m_painter    = m_mainWindow->GetPainter();
+    connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerVisualiser::EmbedVisualiser);
 }
 
 MythPlayerVisualiser::~MythPlayerVisualiser()
@@ -40,7 +40,7 @@ void MythPlayerVisualiser::DestroyVisualiser()
 
 bool MythPlayerVisualiser::CanVisualise()
 {
-    return VideoVisual::CanVisualise(m_visualAudio, m_render);
+    return VideoVisual::CanVisualise(&m_audio, m_render);
 }
 
 bool MythPlayerVisualiser::IsVisualising()
@@ -68,7 +68,7 @@ bool MythPlayerVisualiser::EnableVisualiser(bool Enable, const QString &Name)
         return false;
     }
     DestroyVisualiser();
-    m_visual = VideoVisual::Create(Name, m_visualAudio, m_render);
+    m_visual = VideoVisual::Create(Name, &m_audio, m_render);
     return m_visual != nullptr;
 }
 
@@ -76,7 +76,7 @@ bool MythPlayerVisualiser::EnableVisualiser(bool Enable, const QString &Name)
 */
 void MythPlayerVisualiser::AutoVisualise(bool HaveVideo)
 {
-    if (!m_visualAudio->HasAudioIn() || HaveVideo)
+    if (!m_audio.HasAudioIn() || HaveVideo)
         return;
 
     if (!CanVisualise() || IsVisualising())
@@ -96,9 +96,4 @@ void MythPlayerVisualiser::EmbedVisualiser(bool Embed, const QRect &Rect)
 bool MythPlayerVisualiser::IsEmbedding()
 {
     return m_embedding;
-}
-
-QRect MythPlayerVisualiser::GetEmbeddingRect()
-{
-    return m_embedRect;
 }

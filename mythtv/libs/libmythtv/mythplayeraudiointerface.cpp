@@ -4,20 +4,21 @@
 #include "mythmainwindow.h"
 #include "mythplayeraudiointerface.h"
 
-MythPlayerAudioInterface::MythPlayerAudioInterface(MythMainWindow* MainWindow, AudioPlayer* Audio)
-  : m_audioOut(Audio)
+MythPlayerAudioInterface::MythPlayerAudioInterface(MythMainWindow* MainWindow, TV *Tv,
+                                                   PlayerContext *Context, PlayerFlags Flags)
+  : MythPlayerVisualiser(MainWindow, Tv, Context, Flags)
 {
-    m_audioGraph.SetPainter(MainWindow->GetPainter());
+    m_audioGraph.SetPainter(m_painter);
 }
 
 void MythPlayerAudioInterface::ResetAudio()
 {
-    m_audioOut->Reset();
+    m_audio.Reset();
 }
 
 void MythPlayerAudioInterface::ReinitAudio()
 {
-    (void)m_audioOut->ReinitAudio();
+    (void)m_audio.ReinitAudio();
 }
 
 const AudioOutputGraph& MythPlayerAudioInterface::GetAudioGraph() const
@@ -27,94 +28,94 @@ const AudioOutputGraph& MythPlayerAudioInterface::GetAudioGraph() const
 
 void MythPlayerAudioInterface::SetupAudioGraph(double VideoFrameRate)
 {
-    uint samplerate = static_cast<uint>(m_audioOut->GetSampleRate());
+    uint samplerate = static_cast<uint>(m_audio.GetSampleRate());
     m_audioGraph.SetSampleRate(samplerate);
     m_audioGraph.SetSampleCount(static_cast<unsigned>(samplerate / VideoFrameRate));
-    m_audioOut->addVisual(&m_audioGraph);
+    m_audio.addVisual(&m_audioGraph);
 }
 
 void MythPlayerAudioInterface::ClearAudioGraph()
 {
-    m_audioOut->removeVisual(&m_audioGraph);
+    m_audio.removeVisual(&m_audioGraph);
     m_audioGraph.Reset();
 }
 
 uint MythPlayerAudioInterface::GetVolume()
 {
-    return m_audioOut->GetVolume();
+    return m_audio.GetVolume();
 }
 
 uint MythPlayerAudioInterface::AdjustVolume(int Change)
 {
-    return m_audioOut->AdjustVolume(Change);
+    return m_audio.AdjustVolume(Change);
 }
 
 uint MythPlayerAudioInterface::SetVolume(int Volume)
 {
-    return m_audioOut->SetVolume(Volume);
+    return m_audio.SetVolume(Volume);
 }
 
 bool MythPlayerAudioInterface::SetMuted(bool Mute)
 {
-    return m_audioOut->SetMuted(Mute);
+    return m_audio.SetMuted(Mute);
 }
 
 MuteState MythPlayerAudioInterface::GetMuteState()
 {
-    return m_audioOut->GetMuteState();
+    return m_audio.GetMuteState();
 }
 
 MuteState MythPlayerAudioInterface::SetMuteState(MuteState State)
 {
-    return m_audioOut->SetMuteState(State);
+    return m_audio.SetMuteState(State);
 }
 
 MuteState MythPlayerAudioInterface::IncrMuteState()
 {
-    return m_audioOut->IncrMuteState();
+    return m_audio.IncrMuteState();
 }
 
 bool MythPlayerAudioInterface::HasAudioOut() const
 {
-    return m_audioOut->HasAudioOut();
+    return m_audio.HasAudioOut();
 }
 
 bool MythPlayerAudioInterface::IsMuted()
 {
-    return m_audioOut->IsMuted();
+    return m_audio.IsMuted();
 }
 
 bool MythPlayerAudioInterface::CanUpmix()
 {
-    return m_audioOut->CanUpmix();
+    return m_audio.CanUpmix();
 }
 
 bool MythPlayerAudioInterface::IsUpmixing()
 {
-    return m_audioOut->IsUpmixing();
+    return m_audio.IsUpmixing();
 }
 
 bool MythPlayerAudioInterface::PlayerControlsVolume() const
 {
-    return m_audioOut->ControlsVolume();
+    return m_audio.ControlsVolume();
 }
 
 bool MythPlayerAudioInterface::EnableUpmix(bool Enable, bool Toggle)
 {
-    return m_audioOut->EnableUpmix(Enable, Toggle);
+    return m_audio.EnableUpmix(Enable, Toggle);
 }
 
 void MythPlayerAudioInterface::PauseAudioUntilBuffered()
 {
-    m_audioOut->PauseAudioUntilBuffered();
+    m_audio.PauseAudioUntilBuffered();
 }
 
 void MythPlayerAudioInterface::SetupAudioOutput(float TimeStretch)
 {
     QString passthru = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
                        gCoreContext->GetSetting("PassThruOutputDevice") : QString();
-    m_audioOut->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"), passthru,
+    m_audio.SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"), passthru,
                              static_cast<uint>(gCoreContext->GetNumSetting("AudioSampleRate", 44100)));
-    m_audioOut->SetStretchFactor(TimeStretch);
+    m_audio.SetStretchFactor(TimeStretch);
 }
 

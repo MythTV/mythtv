@@ -9,15 +9,9 @@
 #include "jitterometer.h"
 #include "mythplayer.h"
 
-class MythPlayerInterface : public MythPlayer,
-                            public MythPlayerVisualiser,
-                            public MythVideoScanTracker,
-                            public MythPlayerAudioInterface
+class MythPlayerInterface : public MythPlayerAudioInterface, public MythVideoScanTracker
 {
     Q_OBJECT
-
-  public slots:
-    void EmbedPlayback(bool Embed, const QRect& Rect = {});
 
   public:
     MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
@@ -66,15 +60,12 @@ class MythPlayerInterface : public MythPlayer,
     void RenderVideoFrame(VideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
     void DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due);
 
-    MythMainWindow* m_mainWindow   { nullptr };
-    TV*             m_tv           { nullptr };
-    MythDisplay*    m_display      { nullptr };
     Jitterometer    m_outputJmeter { "Player" };
 
     // N.B. Editor - keep ringfenced and move into subclass
+    QElapsedTimer   m_editUpdateTimer;
     float           m_speedBeforeEdit  { 1.0   };
     bool            m_pausedBeforeEdit { false };
-    QElapsedTimer   m_editUpdateTimer;
 };
 
 #endif

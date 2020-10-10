@@ -3,13 +3,17 @@
 
 // MythTV
 #include "visualisations/videovisual.h"
+#include "mythplayeruibase.h"
 
-class MythMainWindow;
-
-class MythPlayerVisualiser
+class MythPlayerVisualiser : public MythPlayerUIBase
 {
+    Q_OBJECT
+
+  public slots:
+    void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
+
   public:
-    explicit MythPlayerVisualiser(MythMainWindow* MainWindow, AudioPlayer* Audio);
+    explicit MythPlayerVisualiser(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVisualiser();
 
     void        PrepareVisualiser();
@@ -20,20 +24,14 @@ class MythPlayerVisualiser
     QStringList GetVisualiserList();
     bool        EnableVisualiser(bool Enable, const QString& Name = QString(""));
     void        AutoVisualise(bool HaveVideo);
-    void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
     bool        IsEmbedding();
-    QRect       GetEmbeddingRect();
 
   private:
     void        DestroyVisualiser();
 
-    MythMainWindow* m_mainWindow  { nullptr };
-    MythRender*     m_render      { nullptr };
-    MythPainter*    m_painter     { nullptr };
-    AudioPlayer*    m_visualAudio { nullptr };
-    VideoVisual*    m_visual      { nullptr };
-    QRect           m_embedRect   { 0, 0, 0, 0};
-    bool            m_embedding   { false   };
+    VideoVisual* m_visual    { nullptr };
+    QRect        m_embedRect { 0, 0, 0, 0};
+    bool         m_embedding { false   };
 };
 
 #endif

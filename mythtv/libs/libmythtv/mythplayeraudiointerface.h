@@ -4,14 +4,12 @@
 // MythTV
 #include "volumebase.h"
 #include "audiooutputgraph.h"
+#include "mythplayervisualiser.h"
 
-class AudioPlayer;
-class MythMainWindow;
-
-class MythPlayerAudioInterface
+class MythPlayerAudioInterface : public MythPlayerVisualiser
 {
   public:
-    MythPlayerAudioInterface(MythMainWindow* MainWindow, AudioPlayer* Audio);
+    MythPlayerAudioInterface(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
     void      ResetAudio();
     void      ReinitAudio();
@@ -36,7 +34,6 @@ class MythPlayerAudioInterface
 
   private:
     Q_DISABLE_COPY(MythPlayerAudioInterface)
-    AudioPlayer*     m_audioOut { nullptr };
     AudioOutputGraph m_audioGraph;
 };
 
