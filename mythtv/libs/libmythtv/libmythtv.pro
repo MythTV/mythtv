@@ -389,7 +389,6 @@ using_frontend {
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += mythpreviewplayer.h
-    HEADERS += mythtranscodeplayer.h
     HEADERS += tvbrowsehelper.h
     HEADERS += mheg/netstream.h
     SOURCES += tv_play.cpp
@@ -407,7 +406,6 @@ using_frontend {
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
     SOURCES += mythpreviewplayer.cpp
-    SOURCES += mythtranscodeplayer.cpp
     SOURCES += tvbrowsehelper.cpp
     SOURCES += mheg/netstream.cpp
 

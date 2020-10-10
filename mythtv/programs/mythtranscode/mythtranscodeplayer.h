@@ -4,7 +4,7 @@
 // MythTV
 #include "mythplayer.h"
 
-class MTV_PUBLIC MythTranscodePlayer : public MythPlayer
+class MythTranscodePlayer : public MythPlayer
 {
   public:
     explicit MythTranscodePlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);

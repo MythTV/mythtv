@@ -22,12 +22,14 @@ SOURCES += commandlineparser.cpp
 SOURCES += external/replex/element.cpp external/replex/mpg_common.cpp
 SOURCES += external/replex/multiplex.cpp external/replex/pes.cpp
 SOURCES += external/replex/ringbuffer.cpp external/replex/ts.cpp
+SOURCES += mythtranscodeplayer.cpp
 
 HEADERS += mpeg2fix.h transcodedefs.h commandlineparser.h
 HEADERS += audioreencodebuffer.h cutter.h videodecodebuffer.h
 HEADERS += external/replex/element.h external/replex/mpg_common.h
 HEADERS += external/replex/multiplex.h external/replex/pes.h
 HEADERS += external/replex/ringbuffer.h external/replex/ts.h
+HEADERS += mythtranscodeplayer.h
 
 DEPENDPATH += external/replex
 DEPENDPATH += ../../libs/libswresample
