@@ -140,9 +140,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     FrameHeight = m_videoDispDim.height();
     AspectRatio = frame->aspect;
 
-    if (frame)
-        DiscardVideoFrame(frame);
-
+    DiscardVideoFrame(frame);
     return reinterpret_cast<char*>(result);
 }
 
