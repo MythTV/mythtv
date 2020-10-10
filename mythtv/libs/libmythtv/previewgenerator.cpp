@@ -824,7 +824,7 @@ char *PreviewGenerator::GetScreenGrab(
     }
 
     auto *ctx = new PlayerContext(kPreviewGeneratorInUseID);
-    MythPreviewPlayer* player = new MythPreviewPlayer(ctx, static_cast<PlayerFlags>(kAudioMuted | kVideoIsNull | kNoITV));
+    auto * player = new MythPreviewPlayer(ctx, static_cast<PlayerFlags>(kAudioMuted | kVideoIsNull | kNoITV));
     ctx->SetRingBuffer(buffer);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(player);
