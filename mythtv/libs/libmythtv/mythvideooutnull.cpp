@@ -53,7 +53,7 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
 MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDispDim,
                                                  float VideoAspect, MythCodecID CodecID)
 {
-    MythVideoOutputNull* result = new MythVideoOutputNull();
+    auto * result = new MythVideoOutputNull();
     if (result->Init(VideoDim, VideoDispDim, VideoAspect, QRect(), CodecID))
         return result;
     delete result;
