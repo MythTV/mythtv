@@ -2,12 +2,12 @@
 #define MYTHDVDPLAYER_H
 
 // MythTV
-#include "mythplayerinterface.h"
+#include "mythplayerui.h"
 
 // Std
 #include <cstdint>
 
-class MythDVDPlayer : public MythPlayerInterface
+class MythDVDPlayer : public MythPlayerUI
 {
     Q_OBJECT
 

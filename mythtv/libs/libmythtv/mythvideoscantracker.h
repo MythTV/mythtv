@@ -6,13 +6,13 @@
 #include "mythframe.h"
 #include "videoouttypes.h"
 
-class MythPlayerInterface;
+class MythPlayerUI;
 class MythVideoOutput;
 
 class MTV_PUBLIC MythVideoScanTracker
 {
   public:
-    MythVideoScanTracker(MythPlayerInterface* Parent);
+    MythVideoScanTracker(MythPlayerUI* Parent);
     virtual ~MythVideoScanTracker() = default;
 
     FrameScanType  NextScanOverride     ();
@@ -34,7 +34,7 @@ class MTV_PUBLIC MythVideoScanTracker
     FrameScanType  DetectInterlace      (FrameScanType NewScan, float Rate, int VideoHeight);
 
   private:
-    MythPlayerInterface* m_parentPlayer { nullptr };
+    MythPlayerUI*  m_parentPlayer       { nullptr };
     long long      m_scanTracker        { 0 };
     FrameScanType  m_resetScan          { kScan_Ignore     };
     FrameScanType  m_scan               { kScan_Interlaced };

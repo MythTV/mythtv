@@ -45,7 +45,7 @@ class QDomNode;
 class OSD;
 class RemoteEncoder;
 class MythPlayer;
-class MythPlayerInterface;
+class MythPlayerUI;
 class DetectLetterbox;
 class MythMediaBuffer;
 class ProgramInfo;
@@ -772,7 +772,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     PlayerContext           m_playerContext { kPlayerInUseID };
     // Ugly temporary workaround. We need a full MythPlayerInterface object but
     // avoid endless casts
-    MythPlayerInterface*    m_player        { nullptr };
+    MythPlayerUI*    m_player        { nullptr };
     /// lock on player and playerActive changes
     mutable QReadWriteLock  m_playerLock;
 

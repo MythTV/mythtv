@@ -1,11 +1,11 @@
-#ifndef MYTHPLAYERVISUALISER_H
-#define MYTHPLAYERVISUALISER_H
+#ifndef MYTHPLAYERVISUALISERUI_H
+#define MYTHPLAYERVISUALISERUI_H
 
 // MythTV
 #include "visualisations/videovisual.h"
 #include "mythplayeruibase.h"
 
-class MythPlayerVisualiser : public MythPlayerUIBase
+class MythPlayerVisualiserUI : public MythPlayerUIBase
 {
     Q_OBJECT
 
@@ -13,8 +13,8 @@ class MythPlayerVisualiser : public MythPlayerUIBase
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
 
   public:
-    explicit MythPlayerVisualiser(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
-   ~MythPlayerVisualiser();
+    explicit MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
+   ~MythPlayerVisualiserUI();
 
     void        PrepareVisualiser();
     void        RenderVisualiser();

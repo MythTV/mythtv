@@ -1,15 +1,15 @@
-#ifndef MYTHPLAYERAUDIOINTERFACE_H
-#define MYTHPLAYERAUDIOINTERFACE_H
+#ifndef MYTHPLAYERAUDIOUI_H
+#define MYTHPLAYERAUDIOUI_H
 
 // MythTV
 #include "volumebase.h"
 #include "audiooutputgraph.h"
-#include "mythplayervisualiser.h"
+#include "mythplayervisualiserui.h"
 
-class MythPlayerAudioInterface : public MythPlayerVisualiser
+class MythPlayerAudioUI : public MythPlayerVisualiserUI
 {
   public:
-    MythPlayerAudioInterface(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
+    MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
     void      ResetAudio();
     void      ReinitAudio();
@@ -33,7 +33,7 @@ class MythPlayerAudioInterface : public MythPlayerVisualiser
     void      SetupAudioOutput(float TimeStretch);
 
   private:
-    Q_DISABLE_COPY(MythPlayerAudioInterface)
+    Q_DISABLE_COPY(MythPlayerAudioUI)
     AudioOutputGraph m_audioGraph;
 };
 

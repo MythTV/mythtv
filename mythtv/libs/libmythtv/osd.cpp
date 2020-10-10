@@ -27,7 +27,7 @@
 #include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbdoverlayscreen.h"
 #include "tv_actions.h"
-#include "mythplayerinterface.h"
+#include "mythplayerui.h"
 
 #define LOC     QString("OSD: ")
 
@@ -1258,7 +1258,7 @@ bool OsdNavigation::Create(void)
     UIUtilW::Assign(this, m_muteButton, "MUTE");
     UIUtilW::Assign(this, m_unMuteButton, "unmute");
 
-    MythPlayerInterface *player = m_osd->GetPlayer();
+    MythPlayerUI *player = m_osd->GetPlayer();
 
     if (!player || !player->HasAudioOut() || !player->PlayerControlsVolume())
     {

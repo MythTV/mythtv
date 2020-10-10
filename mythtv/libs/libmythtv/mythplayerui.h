@@ -1,20 +1,20 @@
-﻿#ifndef MYTHPLAYERINTERFACE_H
-#define MYTHPLAYERINTERFACE_H
+﻿#ifndef MYTHPLAYERUI_H
+#define MYTHPLAYERUI_H
 
 // MythTV
-#include "mythplayervisualiser.h"
+#include "mythplayervisualiserui.h"
 #include "mythvideoscantracker.h"
-#include "mythplayeraudiointerface.h"
+#include "mythplayeraudioui.h"
 #include "DetectLetterbox.h"
 #include "jitterometer.h"
 #include "mythplayer.h"
 
-class MythPlayerInterface : public MythPlayerAudioInterface, public MythVideoScanTracker
+class MythPlayerUI : public MythPlayerAudioUI, public MythVideoScanTracker
 {
     Q_OBJECT
 
   public:
-    MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
+    MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
     virtual void EventLoop();
     bool InitVideo() override;

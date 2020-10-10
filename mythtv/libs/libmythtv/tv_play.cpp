@@ -46,7 +46,7 @@
 #include "Bluray/mythbdbuffer.h"
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
-#include "mythplayerinterface.h"
+#include "mythplayerui.h"
 #include "captions/subtitlescreen.h"
 #include "DetectLetterbox.h"
 #include "jobqueue.h"
@@ -275,13 +275,13 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     playerflags |= Muted ? kAudioMuted : kNoFlags;
     auto flags = static_cast<PlayerFlags>(playerflags);
 
-    MythPlayerInterface *player = nullptr;
+    MythPlayerUI *player = nullptr;
     if (kState_WatchingBD  == State)
         player = new MythBDPlayer(m_mainWindow, this, &m_playerContext, flags);
     else if (kState_WatchingDVD == State)
         player = new MythDVDPlayer(m_mainWindow, this, &m_playerContext, flags);
     else
-        player = new MythPlayerInterface(m_mainWindow, this, &m_playerContext, flags);
+        player = new MythPlayerUI(m_mainWindow, this, &m_playerContext, flags);
 
     player->SetupAudioOutput(m_playerContext.m_tsNormal);
     player->SetLength(static_cast<int>(m_playerContext.m_playingLen));

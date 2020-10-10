@@ -6,18 +6,18 @@
 #include "tv_play.h"
 #include "livetvchain.h"
 #include "mythvideooutgpu.h"
-#include "mythplayerinterface.h"
+#include "mythplayerui.h"
 
 #define LOC QString("PlayerUI: ")
 
-MythPlayerInterface::MythPlayerInterface(MythMainWindow* MainWindow, TV* Tv,
+MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
                                          PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayerAudioInterface(MainWindow, Tv, Context, Flags),
+  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
 }
 
-void MythPlayerInterface::EventLoop()
+void MythPlayerUI::EventLoop()
 {
     // Handle decoder callbacks
     ProcessCallbacks();
@@ -276,14 +276,14 @@ void MythPlayerInterface::EventLoop()
     }
 }
 
-void MythPlayerInterface::ChangeSpeed()
+void MythPlayerUI::ChangeSpeed()
 {
     MythPlayer::ChangeSpeed();
     // ensure we re-check double rate support following a speed change
     UnlockScan();
 }
 
-bool MythPlayerInterface::InitVideo()
+bool MythPlayerUI::InitVideo()
 {
     if (!(m_playerCtx && m_decoder))
         return false;
@@ -305,13 +305,13 @@ bool MythPlayerInterface::InitVideo()
     return false;
 }
 
-void MythPlayerInterface::ReinitVideo(bool ForceUpdate)
+void MythPlayerUI::ReinitVideo(bool ForceUpdate)
 {
     MythPlayer::ReinitVideo(ForceUpdate);
     AutoVisualise(!m_videoDim.isEmpty());
 }
 
-void MythPlayerInterface::VideoStart()
+void MythPlayerUI::VideoStart()
 {
     QRect visible;
     QRect total;
@@ -366,7 +366,7 @@ void MythPlayerInterface::VideoStart()
     AutoVisualise(!m_videoDim.isEmpty());
 }
 
-bool MythPlayerInterface::VideoLoop()
+bool MythPlayerUI::VideoLoop()
 {
     ProcessCallbacks();
 
@@ -384,7 +384,7 @@ bool MythPlayerInterface::VideoLoop()
     return !IsErrored();
 }
 
-void MythPlayerInterface::InitFrameInterval()
+void MythPlayerUI::InitFrameInterval()
 {
     SetFrameInterval(GetScanType(), 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
     MythPlayer::InitFrameInterval();
@@ -393,7 +393,7 @@ void MythPlayerInterface::InitFrameInterval()
         .arg(1000000.0 / m_frameInterval, 0, 'f', 3));
 }
 
-void MythPlayerInterface::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
+void MythPlayerUI::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
 {
     if (!m_videoOutput)
         return;
@@ -414,7 +414,7 @@ void MythPlayerInterface::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan
     m_videoOutput->EndFrame();
 }
 
-void MythPlayerInterface::RefreshPauseFrame()
+void MythPlayerUI::RefreshPauseFrame()
 {
     if (m_needNewPauseFrame)
     {
@@ -438,7 +438,7 @@ void MythPlayerInterface::RefreshPauseFrame()
     }
 }
 
-void MythPlayerInterface::DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due)
+void MythPlayerUI::DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due)
 {
     if (Due < 0)
     {
@@ -484,7 +484,7 @@ void MythPlayerInterface::DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due)
     }
 }
 
-void MythPlayerInterface::DisplayPauseFrame()
+void MythPlayerUI::DisplayPauseFrame()
 {
     if (!m_videoOutput)
         return;
@@ -506,7 +506,7 @@ void MythPlayerInterface::DisplayPauseFrame()
     RenderVideoFrame(nullptr, scan, true, 0);
 }
 
-void MythPlayerInterface::DisplayNormalFrame(bool CheckPrebuffer)
+void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
 {
     if (m_allPaused)
         return;
@@ -543,13 +543,13 @@ void MythPlayerInterface::DisplayNormalFrame(bool CheckPrebuffer)
     m_outputJmeter.RecordCycleTime();
 }
 
-void MythPlayerInterface::ReleaseNextVideoFrame(VideoFrame* Frame, int64_t Timecode, bool Wrap)
+void MythPlayerUI::ReleaseNextVideoFrame(VideoFrame* Frame, int64_t Timecode, bool Wrap)
 {
     MythPlayer::ReleaseNextVideoFrame(Frame, Timecode, Wrap);
     m_detectLetterBox.Detect(Frame);
 }
 
-void MythPlayerInterface::SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
+void MythPlayerUI::SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
                                          bool ForceUpdate, int ReferenceFrames,
                                          FrameScanType Scan, const QString &CodecName)
 {
@@ -563,14 +563,14 @@ void MythPlayerInterface::SetVideoParams(int Width, int Height, double FrameRate
     ResetTracker();
 }
 
-void MythPlayerInterface::WindowResized(const QSize& Size)
+void MythPlayerUI::WindowResized(const QSize& Size)
 {
     if (m_videoOutput)
         m_videoOutput->WindowResized(Size);
     ReinitOSD();
 }
 
-bool MythPlayerInterface::CanSupportDoubleRate()
+bool MythPlayerUI::CanSupportDoubleRate()
 {
     int refreshinterval = 1;
     if (m_display)
@@ -586,7 +586,7 @@ bool MythPlayerInterface::CanSupportDoubleRate()
     return ((realfi / 2.0) > (refreshinterval * 0.995));
 }
 
-void MythPlayerInterface::GetPlaybackData(InfoMap& Map)
+void MythPlayerUI::GetPlaybackData(InfoMap& Map)
 {
     QString samplerate = MythMediaBuffer::BitrateToString(static_cast<uint64_t>(m_audio.GetSampleRate()), true);
     Map.insert("samplerate",  samplerate);
@@ -614,7 +614,7 @@ void MythPlayerInterface::GetPlaybackData(InfoMap& Map)
     GetCodecDescription(Map);
 }
 
-void MythPlayerInterface::GetCodecDescription(InfoMap& Map)
+void MythPlayerUI::GetCodecDescription(InfoMap& Map)
 {
     Map["audiocodec"]    = ff_codec_id_string(m_audio.GetCodec());
     Map["audiochannels"] = QString::number(m_audio.GetOrigChannels());
@@ -645,14 +645,14 @@ void MythPlayerInterface::GetCodecDescription(InfoMap& Map)
         Map["videodescrip"] = "SD";
 }
 
-void MythPlayerInterface::EnableFrameRateMonitor(bool Enable)
+void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
 {
     bool verbose = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY);
     double rate = Enable ? m_videoFrameRate : verbose ? (m_videoFrameRate * 4) : 0.0;
     m_outputJmeter.SetNumCycles(static_cast<int>(rate));
 }
 
-void MythPlayerInterface::ToggleAdjustFill(AdjustFillMode Mode)
+void MythPlayerUI::ToggleAdjustFill(AdjustFillMode Mode)
 {
     if (m_videoOutput)
     {
@@ -665,47 +665,47 @@ void MythPlayerInterface::ToggleAdjustFill(AdjustFillMode Mode)
 // Only edit stuff below here - to be moved
 #include "tv_actions.h"
 
-uint64_t MythPlayerInterface::GetNearestMark(uint64_t Frame, bool Right)
+uint64_t MythPlayerUI::GetNearestMark(uint64_t Frame, bool Right)
 {
     return m_deleteMap.GetNearestMark(Frame, Right);
 }
 
-bool MythPlayerInterface::IsTemporaryMark(uint64_t Frame)
+bool MythPlayerUI::IsTemporaryMark(uint64_t Frame)
 {
     return m_deleteMap.IsTemporaryMark(Frame);
 }
 
-bool MythPlayerInterface::HasTemporaryMark()
+bool MythPlayerUI::HasTemporaryMark()
 {
     return m_deleteMap.HasTemporaryMark();
 }
 
-bool MythPlayerInterface::IsCutListSaved()
+bool MythPlayerUI::IsCutListSaved()
 {
     return m_deleteMap.IsSaved();
 }
 
-bool MythPlayerInterface::DeleteMapHasUndo()
+bool MythPlayerUI::DeleteMapHasUndo()
 {
     return m_deleteMap.HasUndo();
 }
 
-bool MythPlayerInterface::DeleteMapHasRedo()
+bool MythPlayerUI::DeleteMapHasRedo()
 {
     return m_deleteMap.HasRedo();
 }
 
-QString MythPlayerInterface::DeleteMapGetUndoMessage()
+QString MythPlayerUI::DeleteMapGetUndoMessage()
 {
     return m_deleteMap.GetUndoMessage();
 }
 
-QString MythPlayerInterface::DeleteMapGetRedoMessage()
+QString MythPlayerUI::DeleteMapGetRedoMessage()
 {
     return m_deleteMap.GetRedoMessage();
 }
 
-bool MythPlayerInterface::EnableEdit()
+bool MythPlayerUI::EnableEdit()
 {
     m_deleteMap.SetEditing(false);
 
@@ -757,7 +757,7 @@ bool MythPlayerInterface::EnableEdit()
  *  changes.  If -1, do not explicitly save changes but leave
  *  auto-save information intact in the database.
  */
-void MythPlayerInterface::DisableEdit(int HowToSave)
+void MythPlayerUI::DisableEdit(int HowToSave)
 {
     QMutexLocker locker(&m_osdLock);
     if (!m_osd)
@@ -785,7 +785,7 @@ void MythPlayerInterface::DisableEdit(int HowToSave)
         SetOSDStatus(tr("Paused"), kOSDTimeout_None);
 }
 
-bool MythPlayerInterface::HandleProgramEditorActions(QStringList& Actions)
+bool MythPlayerUI::HandleProgramEditorActions(QStringList& Actions)
 {
     bool handled = false;
     bool refresh = true;
