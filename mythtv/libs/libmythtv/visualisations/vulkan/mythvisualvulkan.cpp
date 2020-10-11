@@ -75,7 +75,7 @@ MythRenderVulkan* MythVisualVulkan::InitialiseVulkan(const QRect& /*Area*/)
     }
 
     // Create descriptor
-    auto *layout = m_vulkanShader->GetDescSetLayout(0);
+    VkDescriptorSetLayout layout = m_vulkanShader->GetDescSetLayout(0);
     VkDescriptorSetAllocateInfo alloc { };
     alloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc.descriptorPool = m_descriptorPool;
