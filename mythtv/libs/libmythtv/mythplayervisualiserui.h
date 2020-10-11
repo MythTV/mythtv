@@ -15,7 +15,7 @@ class MythPlayerVisualiserUI : public MythPlayerUIBase
 
   public:
     explicit MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
-   ~MythPlayerVisualiserUI();
+   ~MythPlayerVisualiserUI() override;
 
     void        PrepareVisualiser();
     void        RenderVisualiser();
@@ -25,7 +25,7 @@ class MythPlayerVisualiserUI : public MythPlayerUIBase
     QStringList GetVisualiserList();
     bool        EnableVisualiser(bool Enable, const QString& Name = QString(""));
     void        AutoVisualise(bool HaveVideo);
-    bool        IsEmbedding();
+    bool        IsEmbedding() const;
 
   private:
     void        DestroyVisualiser();

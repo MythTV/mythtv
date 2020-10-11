@@ -7,8 +7,7 @@
 class MythPreviewPlayer : public MythPlayer
 {
   public:
-    MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
-
+    explicit MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     char* GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int& BufferSize,
                                int& FrameWidth, int& FrameHeight, float& AspectRatio);
     char* GetScreenGrab       (int SecondsIn, int& BufferSize, int& FrameWidth,
