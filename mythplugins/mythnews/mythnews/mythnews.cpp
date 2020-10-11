@@ -227,47 +227,14 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
         {
 
             if (m_titleText)
-                m_titleText->SetText(article.title());
+            {
+                QString title = cleanText(article.title());
+                m_titleText->SetText(title);
+            }
 
             if (m_descText)
             {
-                QString artText = article.description();
-                // replace a few HTML characters
-                artText.replace("&#8232;", "");   // LSEP
-                artText.replace("&#8233;", "");   // PSEP
-                artText.replace("&#163;",  u8"\u00A3");  // POUND
-                artText.replace("&#173;",  "");   // ?
-                artText.replace("&#8211;", "-");  // EN-DASH
-                artText.replace("&#8220;", """"); // LEFT-DOUBLE-QUOTE
-                artText.replace("&#8221;", """"); // RIGHT-DOUBLE-QUOTE
-                artText.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
-                artText.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
-                // Replace paragraph and break HTML with newlines
-                if( artText.contains(QRegExp("</(p|P)>")) )
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "");
-                    artText.replace( QRegExp("</(p|P)>"), "\n\n");
-                }
-                else
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "\n\n");
-                    artText.replace( QRegExp("</(p|P)>"), "");
-                }
-                artText.replace( QRegExp("<(br|BR|)/>"), "\n");
-                artText.replace( QRegExp("<(br|BR|)>"), "\n");
-                // These are done instead of simplifyWhitespace
-                // because that function also strips out newlines
-                // Replace tab characters with nothing
-                artText.replace( QRegExp("\t"), "");
-                // Replace double space with single
-                artText.replace( QRegExp("  "), "");
-                // Replace whitespace at beginning of lines with newline
-                artText.replace( QRegExp("\n "), "\n");
-                // Remove any remaining HTML tags
-                QRegExp removeHTML(QRegExp("</?.+>"));
-                removeHTML.setMinimal(true);
-                artText.remove((const QRegExp&) removeHTML);
-                artText = artText.trimmed();
+                QString artText = cleanText(article.description());
                 m_descText->SetText(artText);
             }
 
@@ -515,7 +482,7 @@ void MythNews::processAndShowNews(NewsSite *site)
     for (auto & article : articles)
     {
         auto *item =
-            new MythUIButtonListItem(m_articlesList, article.title());
+            new MythUIButtonListItem(m_articlesList, cleanText(article.title()));
         m_articles[item] = article;
     }
 
@@ -540,7 +507,7 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     NewsArticle::List articles = site->GetArticleList();
     for (auto & article : articles)
     {
-        auto *blitem = new MythUIButtonListItem(m_articlesList, article.title());
+        auto *blitem = new MythUIButtonListItem(m_articlesList, cleanText(article.title()));
         m_articles[blitem] = article;
     }
 
@@ -722,4 +689,50 @@ void MythNews::customEvent(QEvent *event)
 
         m_menuPopup = nullptr;
     }
+}
+
+QString MythNews::cleanText(const QString &text)
+{
+    QString result = text;
+
+    // replace a few HTML characters
+    result.replace("&#8232;", "");   // LSEP
+    result.replace("&#8233;", "");   // PSEP
+    result.replace("&#163;",  u8"\u00A3");  // POUND
+    result.replace("&#173;",  "");   // ?
+    result.replace("&#8211;", "-");  // EN-DASH
+    result.replace("&#8220;", """"); // LEFT-DOUBLE-QUOTE
+    result.replace("&#8221;", """"); // RIGHT-DOUBLE-QUOTE
+    result.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
+    result.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
+    result.replace("&#39;", "'");    // Apostrophe
+
+    // Replace paragraph and break HTML with newlines
+    if( result.contains(QRegExp("</(p|P)>")) )
+    {
+        result.replace( QRegExp("<(p|P)>"), "");
+        result.replace( QRegExp("</(p|P)>"), "\n\n");
+    }
+    else
+    {
+        result.replace( QRegExp("<(p|P)>"), "\n\n");
+        result.replace( QRegExp("</(p|P)>"), "");
+    }
+    result.replace( QRegExp("<(br|BR|)/>"), "\n");
+    result.replace( QRegExp("<(br|BR|)>"), "\n");
+    // These are done instead of simplifyWhitespace
+    // because that function also strips out newlines
+    // Replace tab characters with nothing
+    result.replace( QRegExp("\t"), "");
+    // Replace double space with single
+    result.replace( QRegExp("  "), "");
+    // Replace whitespace at beginning of lines with newline
+    result.replace( QRegExp("\n "), "\n");
+    // Remove any remaining HTML tags
+    QRegExp removeHTML(QRegExp("</?.+>"));
+    removeHTML.setMinimal(true);
+    result.remove((const QRegExp&) removeHTML);
+    result = result.trimmed();
+
+    return result;
 }
