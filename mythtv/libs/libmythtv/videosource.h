@@ -816,6 +816,7 @@ class CaptureCardButton : public ButtonStandardSetting
     QString m_value;
 };
 
+
 class MTV_PUBLIC CaptureCardEditor : public GroupSetting
 {
     Q_OBJECT
@@ -825,7 +826,10 @@ class MTV_PUBLIC CaptureCardEditor : public GroupSetting
 
     void Load(void) override; // StandardSetting
 
-    void AddSelection(const QString &label, const char *slot);
+    using CCESlot = void (CaptureCardEditor::*)(void);
+    using CCESlotConst = void (CaptureCardEditor::*)(void) const;
+    void AddSelection(const QString &label, CCESlot slot);
+    void AddSelection(const QString &label, CCESlotConst slot);
 
   public slots:
     void ShowDeleteAllCaptureCardsDialog(void) const;
@@ -846,7 +850,10 @@ class MTV_PUBLIC VideoSourceEditor : public GroupSetting
                                  const QString& thecardtype);
 
     void Load(void) override; // StandardSetting
-    void AddSelection(const QString &label, const char *slot);
+    using VSESlot = void (VideoSourceEditor::*)(void);
+    using VSESlotConst = void (VideoSourceEditor::*)(void) const;
+    void AddSelection(const QString &label, VSESlot slot);
+    void AddSelection(const QString &label, VSESlotConst slot);
 
   public slots:
     void NewSource(void);

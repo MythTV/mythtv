@@ -3459,10 +3459,17 @@ void CaptureCardButton::edit(MythScreenType * /*screen*/)
     emit Clicked(m_value);
 }
 
-void CaptureCardEditor::AddSelection(const QString &label, const char *slot)
+void CaptureCardEditor::AddSelection(const QString &label, const CCESlot slot)
 {
     auto *button = new ButtonStandardSetting(label);
-    connect(button, SIGNAL(clicked()), slot);
+    connect(button, &ButtonStandardSetting::clicked, this, slot);
+    addChild(button);
+}
+
+void CaptureCardEditor::AddSelection(const QString &label, const CCESlotConst slot)
+{
+    auto *button = new ButtonStandardSetting(label);
+    connect(button, &ButtonStandardSetting::clicked, this, slot);
     addChild(button);
 }
 
@@ -3542,12 +3549,12 @@ CaptureCardEditor::CaptureCardEditor()
 void CaptureCardEditor::Load(void)
 {
     clearSettings();
-    AddSelection(QObject::tr("(New capture card)"), SLOT(AddNewCard()));
+    AddSelection(QObject::tr("(New capture card)"), &CaptureCardEditor::AddNewCard);
     AddSelection(QObject::tr("(Delete all capture cards on %1)")
                  .arg(gCoreContext->GetHostName()),
-                 SLOT(ShowDeleteAllCaptureCardsDialogOnHost()));
+                 &CaptureCardEditor::ShowDeleteAllCaptureCardsDialogOnHost);
     AddSelection(QObject::tr("(Delete all capture cards)"),
-                 SLOT(ShowDeleteAllCaptureCardsDialog()));
+                 &CaptureCardEditor::ShowDeleteAllCaptureCardsDialog);
     CaptureCard::fillSelections(this);
 }
 
@@ -3559,17 +3566,24 @@ VideoSourceEditor::VideoSourceEditor()
 void VideoSourceEditor::Load(void)
 {
     clearSettings();
-    AddSelection(QObject::tr("(New video source)"), SLOT(NewSource()));
+    AddSelection(QObject::tr("(New video source)"), &VideoSourceEditor::NewSource);
     AddSelection(QObject::tr("(Delete all video sources)"),
-                 SLOT(ShowDeleteAllSourcesDialog()));
+                 &VideoSourceEditor::ShowDeleteAllSourcesDialog);
     VideoSource::fillSelections(this);
     GroupSetting::Load();
 }
 
-void VideoSourceEditor::AddSelection(const QString &label, const char* slot)
+void VideoSourceEditor::AddSelection(const QString &label, const VSESlot slot)
 {
     auto *button = new ButtonStandardSetting(label);
-    connect(button, SIGNAL(clicked()), slot);
+    connect(button, &ButtonStandardSetting::clicked, this, slot);
+    addChild(button);
+}
+
+void VideoSourceEditor::AddSelection(const QString &label, const VSESlotConst slot)
+{
+    auto *button = new ButtonStandardSetting(label);
+    connect(button, &ButtonStandardSetting::clicked, this, slot);
     addChild(button);
 }
 
