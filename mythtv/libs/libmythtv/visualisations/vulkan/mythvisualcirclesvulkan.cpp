@@ -267,7 +267,7 @@ void MythVisualCirclesVulkan::DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /
 
     // Bind our pipeline and retrieve layout
     m_vulkanFuncs->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-    auto *layout = m_vulkanShader->GetPipelineLayout();
+    VkPipelineLayout layout = m_vulkanShader->GetPipelineLayout();
 
     // Bind projection descriptor set
     m_vulkanFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
