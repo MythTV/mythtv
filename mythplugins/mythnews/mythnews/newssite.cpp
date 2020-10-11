@@ -65,7 +65,7 @@ void NewsSite::retrieve(void)
     m_updateErrorString.clear();
     m_articleList.clear();
     QString destFile = QString("%1/%2").arg(m_destDir).arg(m_name);
-    GetMythDownloadManager()->queueDownload(m_url, destFile, this);
+    GetMythDownloadManager()->queueDownload(m_url, destFile, this, true);
 }
 
 void NewsSite::stop(void)
@@ -178,6 +178,7 @@ void NewsSite::customEvent(QEvent *event)
             }
             else if (tokens[1] == "FINISHED")
             {
+                QString url = args[0];
                 QString filename = args[1];
                 int fileSize  = args[2].toInt();
                 QString errorStr = args[3];
@@ -185,9 +186,9 @@ void NewsSite::customEvent(QEvent *event)
 
                 if ((errorCode != 0) || (fileSize == 0))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Connection Error" +
-                        QString("\n\t\t\tExplanation: %1: %2")
-                                .arg(errorCode).arg(errorStr));
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Connection Error - " +
+                        QString("%1\n\t\t\tExplanation: %2: %3, filesize: %4, filename: %5")
+                                .arg(url).arg(errorCode).arg(errorStr).arg(fileSize).arg(filename));
 
                     m_state = NewsSite::RetrieveFailed;
                     m_updateErrorString = QString("%1: %2").arg(errorCode).arg(errorStr);
