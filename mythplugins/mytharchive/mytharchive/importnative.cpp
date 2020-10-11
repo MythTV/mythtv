@@ -502,7 +502,7 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
 }
 
 void ImportNative::showList(const QString &caption, QString &value,
-                            const char *slot)
+                            const INSlot slot)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -516,7 +516,7 @@ void ImportNative::showList(const QString &caption, QString &value,
         return;
     }
 
-    connect(searchDialog, SIGNAL(haveResult(QString)), this, slot);
+    connect(searchDialog, &MythUISearchDialog::haveResult, this, slot);
 
     popupStack->AddScreen(searchDialog);
 }
@@ -547,7 +547,7 @@ void ImportNative::searchChanID()
     fillSearchList("chanid");
 
     s = m_chanIDText->GetText();
-    showList(tr("Select a channel id"), s, SLOT(gotChanID(QString)));
+    showList(tr("Select a channel id"), s, &ImportNative::gotChanID);
 }
 
 void ImportNative::gotChanID(const QString& value)
@@ -573,7 +573,7 @@ void ImportNative::searchChanNo()
     fillSearchList("channum");
 
     s = m_chanNoText->GetText();
-    showList(tr("Select a channel number"), s, SLOT(gotChanNo(QString)));
+    showList(tr("Select a channel number"), s, &ImportNative::gotChanNo);
 }
 
 void ImportNative::gotChanNo(const QString& value)
@@ -599,7 +599,7 @@ void ImportNative::searchName()
     fillSearchList("name");
 
     s = m_chanNameText->GetText();
-    showList(tr("Select a channel name"), s, SLOT(gotName(QString)));
+    showList(tr("Select a channel name"), s, &ImportNative::gotName);
 }
 
 void ImportNative::gotName(const QString& value)
@@ -625,7 +625,7 @@ void ImportNative::searchCallsign()
     fillSearchList("callsign");
 
     s = m_callsignText->GetText();
-    showList(tr("Select a Callsign"), s, SLOT(gotCallsign(QString)));
+    showList(tr("Select a Callsign"), s, &ImportNative::gotCallsign);
 }
 
 void ImportNative::gotCallsign(const QString& value)

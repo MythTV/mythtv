@@ -104,7 +104,8 @@ class ImportNative : public MythScreenType
     void findChannelMatch(const QString &chanid, const QString &chanNo,
                           const QString &name, const QString &callsign);
     void fillSearchList(const QString &field);
-    void showList(const QString &caption, QString &value, const char *slot);
+    using INSlot = void (ImportNative::*)(const QString&);
+    void showList(const QString &caption, QString &value, INSlot slot);
 
     QString         m_xmlFile;
     FileDetails     m_details;
