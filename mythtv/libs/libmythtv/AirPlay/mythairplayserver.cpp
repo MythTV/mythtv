@@ -1209,8 +1209,9 @@ void MythAirplayServer::StartPlayback(const QString &pathname)
     auto* me = new MythEvent(ACTION_HANDLEMEDIA, QStringList(pathname));
     qApp->postEvent(GetMythMainWindow(), me);
     // Wait until we receive that the play has started
-    std::vector<const char*> sigs { SIGNAL(TVPlaybackStarted()),
-                                    SIGNAL(TVPlaybackAborted()) };
+    std::vector<CoreWaitInfo> sigs {
+        { "TVPlaybackStarted", &MythCoreContext::TVPlaybackStarted },
+        { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
     gCoreContext->WaitUntilSignals(sigs);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("ACTION_HANDLEMEDIA completed"));
@@ -1228,8 +1229,9 @@ void MythAirplayServer::StopPlayback(void)
                                  Qt::NoModifier, ACTION_STOP);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        std::vector<const char*> sigs { SIGNAL(TVPlaybackStopped()),
-                                        SIGNAL(TVPlaybackAborted()) };
+        std::vector<CoreWaitInfo> sigs {
+            { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_STOP completed"));
@@ -1254,9 +1256,10 @@ void MythAirplayServer::SeekPosition(uint64_t position)
                                  QStringList(QString::number(position)));
         qApp->postEvent(GetMythMainWindow(), me);
         // Wait until we receive that the seek has completed
-        std::vector<const char*> sigs { SIGNAL(TVPlaybackSought(qint64)),
-                                        SIGNAL(TVPlaybackStopped()),
-                                        SIGNAL(TVPlaybackAborted()) };
+        std::vector<CoreWaitInfo> sigs {
+            { "TVPlaybackSought", qOverload<>(&MythCoreContext::TVPlaybackSought) },
+            { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_SEEKABSOLUTE completed"));
@@ -1280,9 +1283,10 @@ void MythAirplayServer::PausePlayback(void)
                                  Qt::NoModifier, ACTION_PAUSE);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        std::vector<const char*> sigs { SIGNAL(TVPlaybackPaused()),
-                                        SIGNAL(TVPlaybackStopped()),
-                                        SIGNAL(TVPlaybackAborted()) };
+        std::vector<CoreWaitInfo> sigs {
+            { "TVPlaybackPaused", &MythCoreContext::TVPlaybackPaused },
+            { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PAUSE completed"));
@@ -1306,9 +1310,10 @@ void MythAirplayServer::UnpausePlayback(void)
                                  Qt::NoModifier, ACTION_PLAY);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        std::vector<const char*> sigs { SIGNAL(TVPlaybackPlaying()),
-                                        SIGNAL(TVPlaybackStopped()),
-                                        SIGNAL(TVPlaybackAborted()) };
+        std::vector<CoreWaitInfo> sigs {
+            { "TVPlaybackPlaying", &MythCoreContext::TVPlaybackPlaying },
+            { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PLAY completed"));

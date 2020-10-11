@@ -3,9 +3,10 @@
 
 #include <vector>
 
+#include <QHostAddress>
+#include <QMetaMethod>
 #include <QObject>
 #include <QString>
-#include <QHostAddress>
 
 #include "mythdb.h"
 #include "mythbaseexp.h"
@@ -40,6 +41,13 @@ class MythCoreContextPrivate;
 class MythSocket;
 class MythScheduler;
 class MythPluginManager;
+
+class MythCoreContext;
+using CoreWaitSigFn = void (MythCoreContext::*)(void);
+struct CoreWaitInfo {
+    const char *name;
+    CoreWaitSigFn fn;
+};
 
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.
@@ -248,10 +256,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void setTestStringSettings(QMap<QString,QString>& overrides);
 
     // signal related methods
-    void WaitUntilSignals(std::vector<const char *> & sigs);
+    void WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const;
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
     void emitTVPlaybackStopped(void)            { emit TVPlaybackStopped(); }
-    void emitTVPlaybackSought(qint64 position)  { emit TVPlaybackSought(position); }
+    void emitTVPlaybackSought(qint64 position)  { emit TVPlaybackSought(position);
+                                                  emit TVPlaybackSought();}
     void emitTVPlaybackPaused(void)             { emit TVPlaybackPaused(); }
     void emitTVPlaybackUnpaused(void)           { emit TVPlaybackUnpaused(); }
     void emitTVPlaybackAborted(void)            { emit TVPlaybackAborted(); }
@@ -264,6 +273,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     //// InWantingPlayback() and treat it accordingly
     void TVPlaybackStopped(void);
     void TVPlaybackSought(qint64 position);
+    void TVPlaybackSought(void);
     void TVPlaybackPaused(void);
     void TVPlaybackUnpaused(void);
     void TVPlaybackAborted(void);
