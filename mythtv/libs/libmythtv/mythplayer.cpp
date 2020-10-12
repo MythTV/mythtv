@@ -674,7 +674,7 @@ int MythPlayer::GetFreeVideoFrames(void) const
 }
 
 /// \brief Return a list of frame types that can be rendered directly.
-const VideoFrameTypeVec *MythPlayer::DirectRenderFormats(void)
+const VideoFrameTypes *MythPlayer::DirectRenderFormats(void)
 {
     if (m_videoOutput)
         return m_videoOutput->DirectRenderFormats();

@@ -36,14 +36,14 @@ int next_dbg_str = 0;
 */
 static inline void ReleaseDecoderResources(VideoFrame *Frame, std::vector<AVBufferRef *> &Discards)
 {
-    if (format_is_hw(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->codec))
     {
         auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref != nullptr)
             Discards.push_back(ref);
         Frame->buf = Frame->priv[0] = nullptr;
 
-        if (format_is_hwframes(Frame->codec))
+        if (MythVideoFrame::HardwareFramesFormat(Frame->codec))
         {
             ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (ref != nullptr)
@@ -1015,7 +1015,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     bool success = true;
 
     // Hardware buffers with no allocated memory
-    if (format_is_hw(Type))
+    if (MythVideoFrame::HardwareFormat(Type))
     {
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
@@ -1062,7 +1062,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
 {
     if (!Frame)
         return false;
-    if (format_is_hw(Type) || format_is_hw(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Type) || MythVideoFrame::HardwareFormat(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot re-initialise a hardware buffer");
         return false;
@@ -1098,7 +1098,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
     init(Frame, Type, buf, Width, Height, static_cast<int>(size));
     // retain deinterlacer settings and update restrictions based on new frame type
     SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
-    clear_vf(Frame);
+    MythVideoFrame::Clear(Frame);
     return true;
 }
 
@@ -1155,7 +1155,7 @@ QString VideoBuffers::GetStatus(uint Num) const
 
 void VideoBuffers::Clear(uint FrameNum)
 {
-    clear_vf(At(FrameNum));
+    MythVideoFrame::Clear(At(FrameNum));
 }
 
 void VideoBuffers::Clear(void)

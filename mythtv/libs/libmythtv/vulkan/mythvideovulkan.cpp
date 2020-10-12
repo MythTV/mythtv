@@ -84,7 +84,7 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
         return;
 
     // No hardware frame support yet
-    if (format_is_hw(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid hardware video frame");
         return;
@@ -98,7 +98,7 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
     }
 
     // Can we render this frame format
-    if (!format_is_yuv(Frame->codec))
+    if (!MythVideoFrame::YUVFormat(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;

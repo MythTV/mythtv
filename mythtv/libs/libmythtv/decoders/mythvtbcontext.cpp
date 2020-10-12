@@ -306,7 +306,7 @@ void MythVTBContext::InitFramesContext(AVCodecContext *Context)
         return;
 
     AVPixelFormat format = AV_PIX_FMT_NV12;
-    if (ColorDepth(PixelFormatToFrameType(Context->sw_pix_fmt)) > 8)
+    if (MythVideoFrame::ColorDepth(PixelFormatToFrameType(Context->sw_pix_fmt)) > 8)
         format = AV_PIX_FMT_P010;
 
     if (m_framesContext)

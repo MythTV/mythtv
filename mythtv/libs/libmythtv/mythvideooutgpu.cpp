@@ -305,7 +305,7 @@ void MythVideoOutputGPU::DoneDisplayingFrame(VideoFrame* Frame)
     if (!Frame)
         return;
 
-    bool retain = format_is_hw(Frame->codec);
+    bool retain = MythVideoFrame::HardwareFormat(Frame->codec);
     QVector<VideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
@@ -530,7 +530,7 @@ void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
     if (Frame)
     {
         SetRotation(Frame->rotation);
-        if (format_is_hw(Frame->codec) || Frame->dummy)
+        if (MythVideoFrame::HardwareFormat(Frame->codec) || Frame->dummy)
             return;
 
         // software deinterlacing
@@ -597,7 +597,7 @@ void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTyp
     VideoFrame* used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
-        if (format_is_hw(used->codec))
+        if (MythVideoFrame::HardwareFormat(used->codec))
         {
             release = m_videoBuffers.Dequeue(kVideoBuffer_used);
         }

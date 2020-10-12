@@ -122,7 +122,7 @@ void MythOpenGLVideo::UpdateShaderParameters()
 
 QString MythOpenGLVideo::GetProfile() const
 {
-    if (format_is_hw(m_inputType))
+    if (MythVideoFrame::HardwareFormat(m_inputType))
         return TypeToProfile(m_inputType);
     return TypeToProfile(m_outputType);
 }
@@ -132,7 +132,7 @@ void MythOpenGLVideo::CleanupDeinterlacers()
     // If switching off/from basic deinterlacing, then we need to delete and
     // recreate the input textures and sometimes the shaders as well - so start
     // from scratch
-    if (m_deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+    if (m_deinterlacer == DEINT_BASIC && MythVideoFrame::YUVFormat(m_inputType))
     {
         // Note. Textures will be created with linear filtering - which matches
         // no resizing - which should be the case for the basic deinterlacer - and
@@ -216,7 +216,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Sca
     //
     // YUYV formats are currently not supported as it does not work correctly - force YV12 instead.
 
-    if (deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+    if (deinterlacer == DEINT_BASIC && MythVideoFrame::YUVFormat(m_inputType))
     {
         if (m_outputType == FMT_YUY2)
         {
@@ -308,7 +308,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
         defines << "EXTOES";
 
-    if ((Default == Type) || (!format_is_yuv(m_outputType)))
+    if ((Default == Type) || (!MythVideoFrame::YUVFormat(m_outputType)))
     {
         QString glsldefines;
         for (const QString& define : qAsConst(defines))
@@ -329,7 +329,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 
         // Any software frames that are not 8bit need to use unsigned integer
         // samplers with GLES3.x - which need more modern shaders
-        if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
+        if ((m_gles > 2) && (MythVideoFrame::ColorDepth(m_inputType) > 8))
         {
             static const QString glsl300("#version 300 es\n");
             fragment   = GLSL300YUVFragmentShader;
@@ -341,12 +341,12 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         bool kernel = false;
         bool topfield = InterlacedTop == Type;
         bool progressive = (Progressive == Type) || (Deint == DEINT_NONE);
-        if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
+        if (MythVideoFrame::FormatIs420(m_outputType) || MythVideoFrame::FormatIs422(m_outputType) || MythVideoFrame::FormatIs444(m_outputType))
         {
             defines << "YV12";
             cost = 3;
         }
-        else if (format_is_nv12(m_outputType))
+        else if (MythVideoFrame::FormatIsNV12(m_outputType))
         {
             defines << "NV12";
             cost = 2;
@@ -366,9 +366,9 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 #endif
         if (!progressive)
         {
-            bool basic = Deint == DEINT_BASIC && format_is_yuv(m_inputType);
+            bool basic = Deint == DEINT_BASIC && MythVideoFrame::YUVFormat(m_inputType);
             // Chroma upsampling filter
-            if ((format_is_420(m_outputType) || format_is_nv12(m_outputType)) &&
+            if ((MythVideoFrame::FormatIs420(m_outputType) || MythVideoFrame::FormatIsNV12(m_outputType)) &&
                 m_chromaUpsamplingFilter && !basic)
             {
                 defines << "CUE";
@@ -490,7 +490,7 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     if (m_inputType == FMT_DRMPRIME && m_outputType == FMT_RGBA32)
         emit OutputChanged(m_videoDim, m_videoDim, -1.0F);
 
-    if (!format_is_hw(InputType))
+    if (!MythVideoFrame::HardwareFormat(InputType))
     {
         vector<QSize> sizes;
         sizes.push_back(Size);
@@ -547,9 +547,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
 
     // Hardware frames are retrieved/updated in PrepareFrame but we need to
     // reset software frames now if necessary
-    if (format_is_hw(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->codec))
     {
-        if ((!format_is_hw(m_inputType)) && (m_inputType != FMT_NONE))
+        if ((!MythVideoFrame::HardwareFormat(m_inputType)) && (m_inputType != FMT_NONE))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Resetting input format");
             ResetFrameFormat();
@@ -565,7 +565,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
     }
 
     // Can we render this frame format
-    if (!format_is_yuv(Frame->codec))
+    if (!MythVideoFrame::YUVFormat(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;
@@ -666,8 +666,8 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
     // nothing to display, then fallback to this framebuffer.
     // N.B. this is now strictly necessary with v4l2 and DRM PRIME direct rendering
     // but ignore now for performance reasons
-    VideoResizing resize = Frame ? (format_is_hwframes(Frame->codec) ? Framebuffer : None) :
-                                   (format_is_hwframes(m_inputType)  ? Framebuffer : None);
+    VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->codec) ? Framebuffer : None) :
+                                   (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
     vector<MythVideoTexture*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
@@ -723,7 +723,7 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
     bool basicdeinterlacing = false;
-    VideoShaderType program = format_is_yuv(m_outputType) ? Progressive :  Default;
+    VideoShaderType program = MythVideoFrame::YUVFormat(m_outputType) ? Progressive :  Default;
     if (m_deinterlacer != DEINT_NONE)
     {
         if (Scan == kScan_Interlaced)
@@ -738,7 +738,7 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
         }
 
         // select the correct field for the basic deinterlacer
-        if (deinterlacing && m_deinterlacer == DEINT_BASIC && format_is_yuv(m_inputType))
+        if (deinterlacing && m_deinterlacer == DEINT_BASIC && MythVideoFrame::YUVFormat(m_inputType))
         {
             basicdeinterlacing = true;
             if (program == InterlacedBot)
@@ -758,7 +758,7 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
         resize |= ToneMap;
 
     // Decide whether to use render to texture - for performance or quality
-    if (format_is_yuv(m_outputType) && !resize)
+    if (MythVideoFrame::YUVFormat(m_outputType) && !resize)
     {
         // ensure deinterlacing works correctly when down scaling in height
         // N.B. not needed for the basic deinterlacer
@@ -773,7 +773,7 @@ void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameSc
         if (FMT_YUY2 == m_outputType)
             resize |= Sampling;
         // unsigned integer texture formats need GL_NEAREST sampling
-        if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
+        if ((m_gles > 2) && (MythVideoFrame::ColorDepth(m_inputType) > 8))
             resize |= Sampling;
 
         // don't enable resizing if the cost of a framebuffer switch may be
@@ -990,7 +990,7 @@ void MythOpenGLVideo::ResetTextures()
 void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>& Current,
                                    vector<MythGLTexture*>& Textures)
 {
-    if (Deinterlacing && !format_is_hw(m_inputType))
+    if (Deinterlacing && !MythVideoFrame::HardwareFormat(m_inputType))
     {
         if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
         {
@@ -1016,7 +1016,7 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>
 
 QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 {
-    if (format_is_hw(Type))
+    if (MythVideoFrame::HardwareFormat(Type))
         return "opengl-hw";
 
     switch (Type)
@@ -1038,7 +1038,7 @@ QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType
     // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
     // will be preserved.
     bool sixteenbitfb  = m_extraFeatures & kGL16BitFBO;
-    bool sixteenbitvid = ColorDepth(OutputType) > 8;
+    bool sixteenbitvid = MythVideoFrame::ColorDepth(OutputType) > 8;
     if (sixteenbitfb && sixteenbitvid)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Requesting 16bit framebuffer texture");
     return m_openglRender->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);

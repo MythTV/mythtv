@@ -129,7 +129,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
             textures = m_openglTextures[id];
         }
 
-        if (textures.empty() ? false : format_is_yuv(textures[0]->m_frameFormat))
+        if (textures.empty() ? false : MythVideoFrame::YUVFormat(textures[0]->m_frameFormat))
         {
             // Enable colour controls for YUV frame
             if (firstpass)

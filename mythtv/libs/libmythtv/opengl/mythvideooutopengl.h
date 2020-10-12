@@ -25,8 +25,8 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
 
     static void   GetRenderOptions (RenderOptions& Options);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize& VideoDim);
-    static VideoFrameTypeVec s_openglFrameTypes;
-    static VideoFrameTypeVec s_openglFrameTypesLegacy;
+    static VideoFrameTypes s_openglFrameTypes;
+    static VideoFrameTypes s_openglFrameTypesLegacy;
 
     bool          Init             (const QSize& VideoDim, const QSize& VideoDispDim,
                                     float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId) override;

@@ -362,7 +362,7 @@ bool MythVideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     // to equate to RGB. In testing, NVDEC reports the same colourspace as FFmpeg
     // software decode for MPEG2, MPEG4, H.264, HEVC and VP8. VP9 seems to go wrong (with limited samples)
     bool forced = false;
-    if (csp == AVCOL_SPC_RGB && (format_is_yuv(frametype) || frametype == FMT_NVDEC))
+    if (csp == AVCOL_SPC_RGB && (MythVideoFrame::YUVFormat(frametype) || frametype == FMT_NVDEC))
     {
         forced = true;
         csp = AVCOL_SPC_UNSPECIFIED;
@@ -370,7 +370,7 @@ bool MythVideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     int range = Frame->colorrange;
     if (range ==  AVCOL_RANGE_UNSPECIFIED)
         range = AVCOL_RANGE_MPEG;
-    int depth = ColorDepth(format_is_hw(frametype) ? softwaretype : frametype);
+    int depth = MythVideoFrame::ColorDepth(MythVideoFrame::HardwareFormat(frametype) ? softwaretype : frametype);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
     if (primary == AVCOL_PRI_UNSPECIFIED)

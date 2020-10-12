@@ -10,7 +10,7 @@
 
 #define LOC QString("VidOutVulkan: ")
 
-VideoFrameTypeVec MythVideoOutputVulkan::s_vulkanFrameTypes =
+VideoFrameTypes MythVideoOutputVulkan::s_vulkanFrameTypes =
 {
     FMT_YV12,     FMT_NV12,      FMT_YUV422P,   FMT_YUV444P,
     FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,

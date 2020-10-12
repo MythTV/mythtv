@@ -170,7 +170,7 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if (!(Context && Frame))
         return result;
 
-    if (!(Frame->priv[1] && format_is_hw(Frame->codec) &&
+    if (!(Frame->priv[1] && MythVideoFrame::HardwareFormat(Frame->codec) &&
          (Frame->codec == PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt)))))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");

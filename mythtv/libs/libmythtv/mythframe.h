@@ -6,7 +6,7 @@
 #include <cstring>
 #include <vector>
 
-#include "mythtvexp.h" // for MTV_PUBLIC
+#include "mythtvexp.h"
 #include "mythaverror.h"
 
 extern "C" {
@@ -62,6 +62,10 @@ enum VideoFrameType
     FMT_DRMPRIME
 };
 
+using VideoFrameTypes = std::vector<VideoFrameType>;
+using FramePitches = std::array<int,3>;
+using FrameOffsets = std::array<int,3>;
+
 class VideoFrame;
 class MTV_PUBLIC MythVideoFrame
 {
@@ -75,6 +79,7 @@ class MTV_PUBLIC MythVideoFrame
     static uint8_t*   GetAlignedBufferZero(size_t Size);
     static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
     static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
+    static void       Clear(VideoFrame *Frame);
     static inline int BitsPerPixel(VideoFrameType Type)
     {
         switch (Type)
@@ -304,55 +309,83 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
+    static inline int ColorDepth(int Format)
+    {
+        switch (Format)
+        {
+            case FMT_YUV420P9:
+            case FMT_YUV422P9:
+            case FMT_YUV444P9:  return 9;
+            case FMT_P010:
+            case FMT_YUV420P10:
+            case FMT_YUV422P10:
+            case FMT_YUV444P10: return 10;
+            case FMT_YUV420P12:
+            case FMT_YUV422P12:
+            case FMT_YUV444P12: return 12;
+            case FMT_YUV420P14:
+            case FMT_YUV422P14:
+            case FMT_YUV444P14: return 14;
+            case FMT_P016:
+            case FMT_YUV420P16:
+            case FMT_YUV422P16:
+            case FMT_YUV444P16: return 16;
+            default: break;
+        }
+        return 8;
+    }
+
+    static inline bool HardwareFormat(VideoFrameType Type)
+    {
+        return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
+               (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
+               (Type == FMT_MEDIACODEC) || (Type == FMT_VTB) ||
+               (Type == FMT_NVDEC) || (Type == FMT_DRMPRIME);
+    }
+
+    static inline bool HardwareFramesFormat(VideoFrameType Type)
+    {
+        return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) || (Type == FMT_NVDEC);
+    }
+
+    static inline bool FormatIs420(VideoFrameType Type)
+    {
+        return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||
+               (Type == FMT_YUV420P12) || (Type == FMT_YUV420P14) || (Type == FMT_YUV420P16);
+    }
+
+    static inline bool FormatIs422(VideoFrameType Type)
+    {
+        return (Type == FMT_YUV422P)   || (Type == FMT_YUV422P9) || (Type == FMT_YUV422P10) ||
+               (Type == FMT_YUV422P12) || (Type == FMT_YUV422P14) || (Type == FMT_YUV422P16);
+    }
+
+    static inline bool FormatIs444(VideoFrameType Type)
+    {
+        return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
+               (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
+
+    }
+
+    static inline bool FormatIsNV12(VideoFrameType Type)
+    {
+        return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
+    }
+
+    static inline bool PackedFormat(VideoFrameType Type)
+    {
+        return Type == FMT_YUY2;
+    }
+
+    static inline bool YUVFormat(VideoFrameType Type)
+    {
+        return FormatIs420(Type)  || FormatIs422(Type) || FormatIs444(Type) ||
+               FormatIsNV12(Type) || PackedFormat(Type);
+    }
+
+  private:
+    Q_DISABLE_COPY(MythVideoFrame)
 };
-
-static inline bool format_is_hw(VideoFrameType Type)
-{
-    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
-           (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
-           (Type == FMT_MEDIACODEC) || (Type == FMT_VTB) ||
-           (Type == FMT_NVDEC) || (Type == FMT_DRMPRIME);
-}
-
-static inline bool format_is_hwframes(VideoFrameType Type)
-{
-    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) || (Type == FMT_NVDEC);
-}
-
-static inline bool format_is_420(VideoFrameType Type)
-{
-    return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||
-           (Type == FMT_YUV420P12) || (Type == FMT_YUV420P14) || (Type == FMT_YUV420P16);
-}
-
-static inline bool format_is_422(VideoFrameType Type)
-{
-    return (Type == FMT_YUV422P)   || (Type == FMT_YUV422P9) || (Type == FMT_YUV422P10) ||
-           (Type == FMT_YUV422P12) || (Type == FMT_YUV422P14) || (Type == FMT_YUV422P16);
-}
-
-static inline bool format_is_444(VideoFrameType Type)
-{
-    return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
-           (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
-
-}
-
-static inline bool format_is_nv12(VideoFrameType Type)
-{
-    return (Type == FMT_NV12) || (Type == FMT_P010) || (Type == FMT_P016);
-}
-
-static inline bool format_is_packed(VideoFrameType Type)
-{
-    return Type == FMT_YUY2;
-}
-
-static inline bool format_is_yuv(VideoFrameType Type)
-{
-    return format_is_420(Type)  || format_is_422(Type) || format_is_444(Type) ||
-           format_is_nv12(Type) || format_is_packed(Type);
-}
 
 enum MythDeintType
 {
@@ -369,9 +402,6 @@ enum MythDeintType
 inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
 inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
-
-using FramePitches = std::array<int,3>;
-using FrameOffsets = std::array<int,3>;
 
 struct VideoFrame
 {
@@ -417,10 +447,6 @@ struct VideoFrame
     MythDeintType deinterlace_inuse;
     bool          deinterlace_inuse2x;
 };
-
-using VideoFrameTypeVec = std::vector<VideoFrameType>;
-
-int MTV_PUBLIC ColorDepth(int Format);
 
 MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
@@ -505,7 +531,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * height_aligned;
             vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((height_aligned+1) >> 1);
         }
-        else if (format_is_420(_codec))
+        else if (MythVideoFrame::FormatIs420(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * height_aligned;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * (height_aligned >> 1));
@@ -515,7 +541,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * height_aligned;
             vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * height_aligned;
         }
-        else if (format_is_422(_codec))
+        else if (MythVideoFrame::FormatIs422(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * height_aligned;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
@@ -525,7 +551,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * height_aligned;
             vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
         }
-        else if (format_is_444(_codec))
+        else if (MythVideoFrame::FormatIs444(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * height_aligned;
             vf->offsets[2] = vf->offsets[1] + ((width_aligned << 1) * height_aligned);
@@ -535,7 +561,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
             vf->offsets[1] = width_aligned * height_aligned;
             vf->offsets[2] = 0;
         }
-        else if (format_is_nv12(_codec))
+        else if (MythVideoFrame::FormatIsNV12(_codec))
         {
             vf->offsets[1] = (width_aligned << 1) * height_aligned;
             vf->offsets[2] = 0;
@@ -554,61 +580,6 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
 {
     init(vf, _codec, _buf, _width, _height, _size, {}, {}, false,
          _aspect, _rate, _aligned);
-}
-
-static inline void clear_vf(VideoFrame *vf)
-{
-    if (!vf || !vf->buf)
-        return;
-
-    // luma (or RGBA)
-    int uv_height = MythVideoFrame::GetHeightForPlane(vf->codec, vf->height, 1);
-    int uv = (1 << (ColorDepth(vf->codec) - 1)) - 1;
-    if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec)
-    {
-        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
-        memset(vf->buf + vf->offsets[1], uv & 0xff, static_cast<size_t>(vf->pitches[1] * uv_height));
-        memset(vf->buf + vf->offsets[2], uv & 0xff, static_cast<size_t>(vf->pitches[2] * uv_height));
-    }
-    else if ((format_is_420(vf->codec) || format_is_422(vf->codec) || format_is_444(vf->codec)) && (vf->pitches[1] == vf->pitches[2]))
-    {
-        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
-        unsigned char uv1 = (uv & 0xff00) >> 8;
-        unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf1 = vf->buf + vf->offsets[1];
-        unsigned char* buf2 = vf->buf + vf->offsets[2];
-        for (int row = 0; row < uv_height; ++row)
-        {
-            for (int col = 0; col < vf->pitches[1]; col += 2)
-            {
-                buf1[col]     = buf2[col]     = uv1;
-                buf1[col + 1] = buf2[col + 1] = uv2;
-            }
-            buf1 += vf->pitches[1];
-            buf2 += vf->pitches[2];
-        }
-    }
-    else if (FMT_NV12 == vf->codec)
-    {
-        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
-        memset(vf->buf + vf->offsets[1], uv & 0xff, vf->pitches[1] * uv_height);
-    }
-    else if (format_is_nv12(vf->codec))
-    {
-        memset(vf->buf + vf->offsets[0], 0, static_cast<size_t>(vf->pitches[0] * vf->height));
-        unsigned char uv1 = (uv & 0xff00) >> 8;
-        unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf = vf->buf + vf->offsets[1];
-        for (int row = 0; row < uv_height; ++row)
-        {
-            for (int col = 0; col < vf->pitches[1]; col += 4)
-            {
-                buf[col]     = buf[col + 2] = uv1;
-                buf[col + 1] = buf[col + 3] = uv2;
-            }
-            buf += vf->pitches[1];
-        }
-    }
 }
 
 #endif

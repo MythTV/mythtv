@@ -19,7 +19,7 @@
 #define LOC QString("VidOutGL: ")
 
 // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
-VideoFrameTypeVec MythVideoOutputOpenGL::s_openglFrameTypes =
+VideoFrameTypes MythVideoOutputOpenGL::s_openglFrameTypes =
 {
     FMT_YV12,     FMT_NV12,      FMT_YUV422P,   FMT_YUV444P,
     FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
@@ -29,7 +29,7 @@ VideoFrameTypeVec MythVideoOutputOpenGL::s_openglFrameTypes =
 };
 
 // OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
-VideoFrameTypeVec MythVideoOutputOpenGL::s_openglFrameTypesLegacy =
+VideoFrameTypes MythVideoOutputOpenGL::s_openglFrameTypesLegacy =
 {
     FMT_YV12, FMT_YUV422P, FMT_YUV444P
 };

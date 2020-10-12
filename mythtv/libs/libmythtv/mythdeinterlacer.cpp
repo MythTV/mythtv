@@ -81,7 +81,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
         return;
 
     // Sanity check frame format
-    if (!format_is_yuv(Frame->codec))
+    if (!MythVideoFrame::YUVFormat(Frame->codec))
     {
         Cleanup();
         return;
@@ -113,7 +113,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
 
     // libavfilter will not deinterlace NV12 frames. Allow shaders in this case.
     // libswscale (for bob/onefield) is fine, as is our linearblend.
-    if ((deinterlacer == DEINT_HIGH) && format_is_nv12(Frame->codec))
+    if ((deinterlacer == DEINT_HIGH) && MythVideoFrame::FormatIsNV12(Frame->codec))
     {
         Cleanup();
         Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
@@ -657,7 +657,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
         src = m_bobFrame;
     }
 
-    bool hidepth = ColorDepth(src->codec) > 8;
+    bool hidepth = MythVideoFrame::ColorDepth(src->codec) > 8;
     bool top = second ? !m_topFirst : m_topFirst;
     uint count = MythVideoFrame::GetNumPlanes(src->codec);
     for (uint plane = 0; plane < count; plane++)

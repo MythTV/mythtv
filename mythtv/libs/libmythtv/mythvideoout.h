@@ -33,7 +33,7 @@ class MythVideoOutput : public MythVideoBounds
 
   public:
     static void GetRenderOptions(RenderOptions& Options);
-    static VideoFrameTypeVec s_defaultFrameTypes;
+    static VideoFrameTypes s_defaultFrameTypes;
 
     ~MythVideoOutput() override;
 
@@ -73,7 +73,7 @@ class MythVideoOutput : public MythVideoBounds
     int          FreeVideoFrames();
     bool         EnoughFreeFrames();
     bool         EnoughDecodedFrames();
-    const VideoFrameTypeVec* DirectRenderFormats() const;
+    const VideoFrameTypes* DirectRenderFormats() const;
     virtual VideoFrame* GetNextFreeFrame();
     virtual void ReleaseFrame(VideoFrame* Frame);
     virtual void DeLimboFrame(VideoFrame* Frame);
@@ -109,7 +109,7 @@ class MythVideoOutput : public MythVideoBounds
     long long            m_framesPlayed       { 0 };
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
-    VideoFrameTypeVec*   m_renderFrameTypes   { &s_defaultFrameTypes };
+    VideoFrameTypes*   m_renderFrameTypes   { &s_defaultFrameTypes };
     bool                 m_deinterlacing      { false };
     bool                 m_deinterlacing2X    { false };
     MythDeintType        m_forcedDeinterlacer { DEINT_NONE };

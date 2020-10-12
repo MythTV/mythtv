@@ -13,7 +13,7 @@ vector<MythVideoTextureVulkan*> MythVideoTextureVulkan::CreateTextures(MythVulka
     if (!(Vulkan && Vulkan->IsValidVulkan() && !Size.isEmpty()))
         return vector<MythVideoTextureVulkan*>{};
 
-    if (format_is_hw(Type))
+    if (MythVideoFrame::HardwareFormat(Type))
         return vector<MythVideoTextureVulkan*>{};
 
     return CreateSoftwareTextures(Vulkan, CommandBuffer, Type, Format, Size);

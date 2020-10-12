@@ -65,18 +65,18 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
 
     cudaVideoChromaFormat cudaformat = cudaVideoChromaFormat_Monochrome;
     VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
-    uint depth = static_cast<uint>(ColorDepth(type) - 8);
+    uint depth = static_cast<uint>(MythVideoFrame::ColorDepth(type) - 8);
     QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
             .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
             .arg((*Context)->width).arg((*Context)->height);
 
     // N.B. on stream changes format is set to CUDA/NVDEC. This may break if the new
     // stream has an unsupported chroma but the decoder should fail gracefully - just later.
-    if ((FMT_NVDEC == type) || (format_is_420(type)))
+    if ((FMT_NVDEC == type) || (MythVideoFrame::FormatIs420(type)))
         cudaformat = cudaVideoChromaFormat_420;
-    else if (format_is_422(type))
+    else if (MythVideoFrame::FormatIs422(type))
         cudaformat = cudaVideoChromaFormat_422;
-    else if (format_is_444(type))
+    else if (MythVideoFrame::FormatIs444(type))
         cudaformat = cudaVideoChromaFormat_444;
 
     if ((cudacodec == cudaVideoCodec_NumCodecs) || (cudaformat == cudaVideoChromaFormat_Monochrome))

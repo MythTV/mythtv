@@ -154,7 +154,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // create and map textures for a new buffer
     VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
                 PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
-    bool p010 = ColorDepth(type) > 8;
+    bool p010 = MythVideoFrame::ColorDepth(type) > 8;
     if (!m_openglTextures.contains(cudabuffer))
     {
         vector<QSize> sizes;

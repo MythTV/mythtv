@@ -128,8 +128,8 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
         averageY = 0;
 
     // Note - for 10/12 bit etc we only sample the most significant byte
-    bool triplanar = format_is_420(m_frameType);
-    int depth = ColorDepth(m_frameType);
+    bool triplanar = MythVideoFrame::FormatIs420(m_frameType);
+    int depth = MythVideoFrame::ColorDepth(m_frameType);
     int leftshift = depth > 8 ? 1 : 0;
     int rightshift = depth > 8 ? 0 : 1;
 

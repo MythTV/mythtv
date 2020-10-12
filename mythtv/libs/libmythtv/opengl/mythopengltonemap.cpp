@@ -133,9 +133,9 @@ bool MythOpenGLTonemap::CreateShader(size_t InputSize, VideoFrameType Type, QSiz
     m_inputSize = Size;
 
     QString source = (m_render->isOpenGLES() ? "#version 310 es\n" : "#version 430\n");
-    if (format_is_420(Type) || format_is_422(Type) || format_is_444(Type))
+    if (MythVideoFrame::FormatIs420(Type) || MythVideoFrame::FormatIs422(Type) || MythVideoFrame::FormatIs444(Type))
         source.append("#define YV12\n");
-    if (m_render->isOpenGLES() && ColorDepth(Type) > 8)
+    if (m_render->isOpenGLES() && MythVideoFrame::ColorDepth(Type) > 8)
         source.append("#define UNSIGNED\n");
     source.append(GLSL430Tonemap);
 

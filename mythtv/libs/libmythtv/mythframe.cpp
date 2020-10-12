@@ -30,33 +30,6 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
-/// \brief Return the color depth for the given MythTV frame format
-int ColorDepth(int Format)
-{
-    switch (Format)
-    {
-        case FMT_YUV420P9:
-        case FMT_YUV422P9:
-        case FMT_YUV444P9:  return 9;
-        case FMT_P010:
-        case FMT_YUV420P10:
-        case FMT_YUV422P10:
-        case FMT_YUV444P10: return 10;
-        case FMT_YUV420P12:
-        case FMT_YUV422P12:
-        case FMT_YUV444P12: return 12;
-        case FMT_YUV420P14:
-        case FMT_YUV422P14:
-        case FMT_YUV444P14: return 14;
-        case FMT_P016:
-        case FMT_YUV420P16:
-        case FMT_YUV422P16:
-        case FMT_YUV444P16: return 16;
-        default: break;
-    }
-    return 8;
-}
-
 MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type,
                                   MythDeintType Override)
 {
@@ -105,6 +78,62 @@ void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, in
     }
 }
 
+void MythVideoFrame::Clear(VideoFrame *Frame)
+{
+    if (!Frame || !Frame->buf)
+        return;
+
+    // luma (or RGBA)
+    int uv_height = GetHeightForPlane(Frame->codec, Frame->height, 1);
+    int uv = (1 << (ColorDepth(Frame->codec) - 1)) - 1;
+    if (FMT_YV12 == Frame->codec || FMT_YUV422P == Frame->codec || FMT_YUV444P == Frame->codec)
+    {
+        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        memset(Frame->buf + Frame->offsets[1], uv & 0xff, static_cast<size_t>(Frame->pitches[1] * uv_height));
+        memset(Frame->buf + Frame->offsets[2], uv & 0xff, static_cast<size_t>(Frame->pitches[2] * uv_height));
+    }
+    else if ((FormatIs420(Frame->codec) || FormatIs422(Frame->codec) || FormatIs444(Frame->codec)) &&
+             (Frame->pitches[1] == Frame->pitches[2]))
+    {
+        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        unsigned char uv1 = (uv & 0xff00) >> 8;
+        unsigned char uv2 = (uv & 0x00ff);
+        unsigned char* buf1 = Frame->buf + Frame->offsets[1];
+        unsigned char* buf2 = Frame->buf + Frame->offsets[2];
+        for (int row = 0; row < uv_height; ++row)
+        {
+            for (int col = 0; col < Frame->pitches[1]; col += 2)
+            {
+                buf1[col]     = buf2[col]     = uv1;
+                buf1[col + 1] = buf2[col + 1] = uv2;
+            }
+            buf1 += Frame->pitches[1];
+            buf2 += Frame->pitches[2];
+        }
+    }
+    else if (FMT_NV12 == Frame->codec)
+    {
+        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        memset(Frame->buf + Frame->offsets[1], uv & 0xff, static_cast<size_t>(Frame->pitches[1] * uv_height));
+    }
+    else if (FormatIsNV12(Frame->codec))
+    {
+        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        unsigned char uv1 = (uv & 0xff00) >> 8;
+        unsigned char uv2 = (uv & 0x00ff);
+        unsigned char* buf = Frame->buf + Frame->offsets[1];
+        for (int row = 0; row < uv_height; ++row)
+        {
+            for (int col = 0; col < Frame->pitches[1]; col += 4)
+            {
+                buf[col]     = buf[col + 2] = uv1;
+                buf[col + 1] = buf[col + 3] = uv2;
+            }
+            buf += Frame->pitches[1];
+        }
+    }
+}
+
 bool MythVideoFrame::CopyFrame(VideoFrame *To, VideoFrame *From)
 {
     // Sanity checks
@@ -117,7 +146,7 @@ bool MythVideoFrame::CopyFrame(VideoFrame *To, VideoFrame *From)
         return false;
     }
 
-    if (From->codec == FMT_NONE || format_is_hw(From->codec))
+    if (From->codec == FMT_NONE || HardwareFormat(From->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frame format");
         return false;

@@ -2741,7 +2741,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
-    const VideoFrameTypeVec* supported = decoder->GetPlayer()->DirectRenderFormats();
+    const VideoFrameTypes* supported = decoder->GetPlayer()->DirectRenderFormats();
     auto foundIt = std::find(supported->cbegin(), supported->cend(), type);
     if (foundIt == supported->end())
     {
@@ -5137,7 +5137,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         if (!frame)
             return false;
 
-        clear_vf(frame);
+        MythVideoFrame::Clear(frame);
         frame->dummy = true;
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
         m_parent->DeLimboFrame(frame);

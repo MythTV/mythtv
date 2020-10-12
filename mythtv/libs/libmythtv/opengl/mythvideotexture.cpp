@@ -69,7 +69,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL
     OpenGLLocker locker(Context);
 
     // Hardware frames
-    if (format_is_hw(Type))
+    if (MythVideoFrame::HardwareFormat(Type))
         return CreateHardwareTextures(Context, Type, Format, Sizes, Target);
 
     return CreateSoftwareTextures(Context, Type, Format, Sizes, Target);

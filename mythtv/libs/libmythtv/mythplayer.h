@@ -227,7 +227,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool PrevAngle(void) { return false; }
 
     // Decoder stuff..
-    const VideoFrameTypeVec* DirectRenderFormats(void);
+    const VideoFrameTypes* DirectRenderFormats(void);
     VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void DeLimboFrame(VideoFrame *frame);
