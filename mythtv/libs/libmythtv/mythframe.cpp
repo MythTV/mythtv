@@ -148,7 +148,7 @@ bool MythVideoFrame::CopyFrame(VideoFrame *To, VideoFrame *From)
     // and both have buffers reported to satisfy a minimal size.
 
     // Copy data
-    uint count = planes(From->codec);
+    uint count = GetNumPlanes(From->codec);
     for (uint plane = 0; plane < count; plane++)
     {
         CopyPlane(To->buf + To->offsets[plane], To->pitches[plane],

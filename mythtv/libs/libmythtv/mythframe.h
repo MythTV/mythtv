@@ -118,6 +118,50 @@ class MTV_PUBLIC MythVideoFrame
         }
         return 8;
     }
+
+    static inline uint GetNumPlanes(VideoFrameType Type)
+    {
+        switch (Type)
+        {
+            case FMT_YV12:
+            case FMT_YUV420P9:
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P14:
+            case FMT_YUV420P16:
+            case FMT_YUV422P:
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+            case FMT_YUV444P:
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16: return 3;
+            case FMT_P010:
+            case FMT_P016:
+            case FMT_NV12:      return 2;
+            case FMT_YUY2:
+            case FMT_BGRA:
+            case FMT_ARGB32:
+            case FMT_RGB24:
+            case FMT_RGB32:
+            case FMT_RGBA32:    return 1;
+            case FMT_NONE:
+            case FMT_VDPAU:
+            case FMT_VAAPI:
+            case FMT_DXVA2:
+            case FMT_MEDIACODEC:
+            case FMT_NVDEC:
+            case FMT_MMAL:
+            case FMT_DRMPRIME:
+            case FMT_VTB:       return 0;
+        }
+        return 0;
+    }
 };
 
 static inline bool format_is_hw(VideoFrameType Type)
@@ -566,50 +610,6 @@ static inline void clear_vf(VideoFrame *vf)
             buf += vf->pitches[1];
         }
     }
-}
-
-static inline uint planes(VideoFrameType Type)
-{
-    switch (Type)
-    {
-        case FMT_YV12:
-        case FMT_YUV420P9:
-        case FMT_YUV420P10:
-        case FMT_YUV420P12:
-        case FMT_YUV420P14:
-        case FMT_YUV420P16:
-        case FMT_YUV422P:
-        case FMT_YUV422P9:
-        case FMT_YUV422P10:
-        case FMT_YUV422P12:
-        case FMT_YUV422P14:
-        case FMT_YUV422P16:
-        case FMT_YUV444P:
-        case FMT_YUV444P9:
-        case FMT_YUV444P10:
-        case FMT_YUV444P12:
-        case FMT_YUV444P14:
-        case FMT_YUV444P16: return 3;
-        case FMT_P010:
-        case FMT_P016:
-        case FMT_NV12:      return 2;
-        case FMT_YUY2:
-        case FMT_BGRA:
-        case FMT_ARGB32:
-        case FMT_RGB24:
-        case FMT_RGB32:
-        case FMT_RGBA32:    return 1;
-        case FMT_NONE:
-        case FMT_VDPAU:
-        case FMT_VAAPI:
-        case FMT_DXVA2:
-        case FMT_MEDIACODEC:
-        case FMT_NVDEC:
-        case FMT_MMAL:
-        case FMT_DRMPRIME:
-        case FMT_VTB:       return 0;
-    }
-    return 0;
 }
 
 #endif

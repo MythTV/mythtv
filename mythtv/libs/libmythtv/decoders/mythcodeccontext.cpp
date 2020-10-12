@@ -626,7 +626,7 @@ bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
             {
                 // Retrieve the picture directly into the VideoFrame Buffer
                 temp->format = best;
-                uint max = planes(Frame->codec);
+                uint max = MythVideoFrame::GetNumPlanes(Frame->codec);
                 for (uint i = 0; i < 3; i++)
                 {
                     temp->data[i]     = (i < max) ? (Frame->buf + Frame->offsets[i]) : nullptr;

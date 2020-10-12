@@ -241,7 +241,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Sca
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_openglRender->GetMaxTextureUnits();
     uint refstocreate = ((deinterlacer == DEINT_HIGH) && CreateReferences) ? 2 : 0;
-    int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
+    int totaltextures = static_cast<int>(MythVideoFrame::GetNumPlanes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
         m_fallbackDeinterlacer = deinterlacer;
@@ -398,7 +398,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 
         // 'expand' calls to sampleYUV for multiple planes
         // do this before we add the samplers
-        int count = static_cast<int>(planes(m_outputType));
+        int count = static_cast<int>(MythVideoFrame::GetNumPlanes(m_outputType));
         for (int i = (kernel ? 2 : 0); (i >= 0) && count; i--)
         {
             QString find = QString("s_texture%1").arg(i);

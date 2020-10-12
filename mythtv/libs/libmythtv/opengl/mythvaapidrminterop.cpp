@@ -302,10 +302,10 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id,
     }
     else
     {
-        if (numplanes != planes(format))
+        if (numplanes != MythVideoFrame::GetNumPlanes(format))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
-                .arg(numplanes).arg(planes(format)));
+                .arg(numplanes).arg(MythVideoFrame::GetNumPlanes(format)));
         }
         else
         {

@@ -90,7 +90,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRend
 {
     std::vector<MythVideoTexture*> result;
 
-    uint count = planes(Format);
+    uint count = MythVideoFrame::GetNumPlanes(Format);
     if (count < 1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid hardware frame format");
@@ -138,7 +138,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRend
 {
     std::vector<MythVideoTexture*> result;
 
-    uint count = planes(Format);
+    uint count = MythVideoFrame::GetNumPlanes(Format);
     if (count < 1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid software frame format");
@@ -295,7 +295,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
         return;
     }
 
-    uint count = planes(Textures[0]->m_frameFormat);
+    uint count = MythVideoFrame::GetNumPlanes(Textures[0]->m_frameFormat);
     if (!count || (count != Textures.size()))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid software frame type");

@@ -255,7 +255,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
     }
 
     // Copy AVFrame back to VideoFrame
-    uint count = planes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
     {
         MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
@@ -455,7 +455,7 @@ void MythDeinterlacer::OneField(VideoFrame *Frame, FrameScanType Scan)
     // Fake the frame height and stride to simulate a single field
     m_frame->height = Frame->height >> 1;
     m_frame->interlaced_frame = 0;
-    uint nbplanes = planes(m_inputType);
+    uint nbplanes = MythVideoFrame::GetNumPlanes(m_inputType);
     for (uint i = 0; i < nbplanes; i++)
     {
         if (!topfield)
@@ -659,7 +659,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
 
     bool hidepth = ColorDepth(src->codec) > 8;
     bool top = second ? !m_topFirst : m_topFirst;
-    uint count = planes(src->codec);
+    uint count = MythVideoFrame::GetNumPlanes(src->codec);
     for (uint plane = 0; plane < count; plane++)
     {
         int  height  = height_for_plane(src->codec, src->height, plane);

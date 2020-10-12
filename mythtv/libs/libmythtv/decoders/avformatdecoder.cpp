@@ -2776,7 +2776,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     }
 
     frame->colorshifted = false;
-    uint max = planes(frame->codec);
+    uint max = MythVideoFrame::GetNumPlanes(frame->codec);
     for (uint i = 0; i < 3; i++)
     {
         pic->data[i]     = (i < max) ? (frame->buf + frame->offsets[i]) : nullptr;

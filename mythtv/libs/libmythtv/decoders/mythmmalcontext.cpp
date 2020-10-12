@@ -191,7 +191,7 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFr
             return false;
 
     // Copy data
-    uint count = planes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
     {
         MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane],

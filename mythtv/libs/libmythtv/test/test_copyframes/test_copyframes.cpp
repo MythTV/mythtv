@@ -92,7 +92,7 @@ static uint64_t FillRandom(VideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
-    uint count = planes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
     {
         int width = pitch_for_plane(Frame->codec, Frame->width, plane);
@@ -112,7 +112,7 @@ static uint64_t GetSum(const VideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
-    uint count = planes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
     {
         int width = pitch_for_plane(Frame->codec, Frame->width, plane);

@@ -136,7 +136,7 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
     OpenGLLocker locker(m_context);
 
     VideoFrameType format = FMT_YV12;
-    uint count = planes(format);
+    uint count = MythVideoFrame::GetNumPlanes(format);
 
     if (m_openglTextures.isEmpty())
     {
