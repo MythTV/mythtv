@@ -1025,7 +1025,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     }
 
     // Software buffers
-    size_t bufsize = GetBufferSize(Type, Width, Height);
+    size_t bufsize = MythVideoFrame::GetBufferSize(Type, Width, Height);
     for (uint i = 0; i < Size(); i++)
     {
         unsigned char *data = MythVideoFrame::GetAlignedBuffer(bufsize);
@@ -1070,7 +1070,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
 
     // Find the frame
     VideoFrameType old = Frame->codec;
-    size_t size = GetBufferSize(Type, Width, Height);
+    size_t size = MythVideoFrame::GetBufferSize(Type, Width, Height);
     unsigned char *buf = Frame->buf;
     bool newbuf = false;
     if ((Frame->size != static_cast<int>(size)) || !buf)

@@ -65,7 +65,7 @@ void TestCopyFrames::TestInvalidBuffers()
     init(&dummy2, FMT_YV12, nullptr, 720, 576, 0);
     QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
 
-    size_t size1 = GetBufferSize(FMT_YV12, 720, 576);
+    size_t size1 = MythVideoFrame::GetBufferSize(FMT_YV12, 720, 576);
     unsigned char dummy = '0';
     unsigned char * buf1 = &dummy;
     unsigned char * buf2 = &dummy;
@@ -212,7 +212,7 @@ void TestCopyFrames::TestCopy()
 
     auto getdefaultframe = [](VideoFrameType T, int W, int H, int A)
     {
-        size_t size = GetBufferSize(T, W, H, A);
+        size_t size = MythVideoFrame::GetBufferSize(T, W, H, A);
         VideoFrame* frame = new VideoFrame;
         init(frame, T, MythVideoFrame::GetAlignedBufferZero(size), W, H, static_cast<int>(size), 1.0, 1.0, A);
         return frame;

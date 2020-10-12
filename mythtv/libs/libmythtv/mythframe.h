@@ -617,27 +617,6 @@ static inline int bitsperpixel(VideoFrameType Type)
     return 8;
 }
 
-static inline size_t GetBufferSize(VideoFrameType Type, int Width, int Height,
-                                   int Aligned = MYTH_WIDTH_ALIGNMENT)
-{
-    int  type_bpp = bitsperpixel(Type);
-    int bpp = type_bpp / 4; /* bits per pixel div common factor */
-    int bpb =  8 / 4; /* bits per byte div common factor */
-
-    // make sure all our pitches are a multiple of 16 bytes
-    // as U and V channels are half the size of Y channel
-    // This allow for SSE/HW accelerated code on all planes
-    // If the buffer sizes are not 32 bytes aligned, adjust.
-    // old versions of MythTV allowed people to set invalid
-    // dimensions for MPEG-4 capture, no need to segfault..
-    int adj_w = Aligned ? ((Width  + Aligned - 1) & ~(Aligned - 1)) : Width;
-    int adj_h = (Height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT - 1);
-
-    // Calculate rounding as necessary.
-    int remainder = (adj_w * adj_h * bpp) % bpb;
-    return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
-}
-
 class MTV_PUBLIC MythVideoFrame
 {
   public:
@@ -649,6 +628,7 @@ class MTV_PUBLIC MythVideoFrame
     static uint8_t* GetAlignedBuffer(size_t Size);
     static uint8_t* GetAlignedBufferZero(size_t Size);
     static uint8_t* CreateBuffer(VideoFrameType Type, int Width, int Height);
+    static size_t   GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
 };
 
 #endif

@@ -208,7 +208,7 @@ int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
     pic->linesize[0] = frame->pitches[0];
     pic->linesize[1] = frame->pitches[1];
     pic->linesize[2] = frame->pitches[2];
-    return static_cast<int>(GetBufferSize(frame->codec, frame->width, frame->height));
+    return static_cast<int>(MythVideoFrame::GetBufferSize(frame->codec, frame->width, frame->height));
 }
 
 class MythAVCopyPrivate

@@ -240,6 +240,24 @@ QString MythVideoFrame::FormatDescription(VideoFrameType Type)
     return "?";
 }
 
+size_t MythVideoFrame::GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned)
+{
+    // bits per pixel div common factor
+    int bpp = bitsperpixel(Type) / 4;
+    // bits per byte div common factor
+    int bpb =  8 / 4;
+
+    // Align height and width. We always align height to 16 rows and the *default*
+    // width alignment is 64bytes, which allows SIMD operations on subsampled
+    // planes (i.e. 32byte alignment)
+    int adj_w = Aligned ? ((Width  + Aligned - 1) & ~(Aligned - 1)) : Width;
+    int adj_h = (Height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT - 1);
+
+    // Calculate rounding as necessary.
+    int remainder = (adj_w * adj_h * bpp) % bpb;
+    return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
+}
+
 uint8_t *MythVideoFrame::GetAlignedBuffer(size_t Size)
 {
     return static_cast<uint8_t*>(av_malloc(Size + 64));

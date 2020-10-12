@@ -869,11 +869,11 @@ int Transcode::TranscodeFile(const QString &inputname,
             // 1080i/p video is actually 1088 because of the 16x16 blocks so
             // we have to fudge the output size here.  nuvexport knows how to handle
             // this and as of right now it is the only app that uses the fifo ability.
-            newSize = GetBufferSize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
+            newSize = MythVideoFrame::GetBufferSize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
         }
         else
         {
-            newSize = GetBufferSize(FMT_YV12, newWidth, newHeight);
+            newSize = MythVideoFrame::GetBufferSize(FMT_YV12, newWidth, newHeight);
         }
         unsigned char *newFrame = MythVideoFrame::GetAlignedBuffer(newSize);
         if (!newFrame)
