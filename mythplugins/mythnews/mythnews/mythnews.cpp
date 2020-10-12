@@ -9,7 +9,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QTimer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrl>
 
 // MythTV headers
@@ -708,30 +708,29 @@ QString MythNews::cleanText(const QString &text)
     result.replace("&#39;", "'");    // Apostrophe
 
     // Replace paragraph and break HTML with newlines
-    if( result.contains(QRegExp("</(p|P)>")) )
+    if( result.contains(QRegularExpression("</(p|P)>")) )
     {
-        result.replace( QRegExp("<(p|P)>"), "");
-        result.replace( QRegExp("</(p|P)>"), "\n\n");
+        result.replace( QRegularExpression("<(p|P)>"), "");
+        result.replace( QRegularExpression("</(p|P)>"), "\n\n");
     }
     else
     {
-        result.replace( QRegExp("<(p|P)>"), "\n\n");
-        result.replace( QRegExp("</(p|P)>"), "");
+        result.replace( QRegularExpression("<(p|P)>"), "\n\n");
+        result.replace( QRegularExpression("</(p|P)>"), "");
     }
-    result.replace( QRegExp("<(br|BR|)/>"), "\n");
-    result.replace( QRegExp("<(br|BR|)>"), "\n");
+    result.replace( QRegularExpression("<(br|BR|)/>"), "\n");
+    result.replace( QRegularExpression("<(br|BR|)>"), "\n");
     // These are done instead of simplifyWhitespace
     // because that function also strips out newlines
     // Replace tab characters with nothing
-    result.replace( QRegExp("\t"), "");
+    result.replace( QRegularExpression("\t"), "");
     // Replace double space with single
-    result.replace( QRegExp("  "), "");
+    result.replace( QRegularExpression("  "), "");
     // Replace whitespace at beginning of lines with newline
-    result.replace( QRegExp("\n "), "\n");
+    result.replace( QRegularExpression("\n "), "\n");
     // Remove any remaining HTML tags
-    QRegExp removeHTML(QRegExp("</?.+>"));
-    removeHTML.setMinimal(true);
-    result.remove((const QRegExp&) removeHTML);
+    QRegularExpression removeHTML(QRegularExpression("</?.+>"));
+    result.remove((const QRegularExpression&) removeHTML);
     result = result.trimmed();
 
     return result;
