@@ -1065,7 +1065,8 @@ bool Scheduler::FindNextConflict(
     const RecordingInfo *p,
     RecConstIter      &iter,
     OpenEndType        openEnd,
-    uint              *paffinity) const
+    uint              *paffinity,
+    bool              ignoreinput) const
 {
     uint affinity = 0;
     for ( ; iter != cardlist.end(); ++iter)
@@ -1082,7 +1083,7 @@ bool Scheduler::FindNextConflict(
         if (debugConflicts)
             msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
-        if (p->GetInputID() != q->GetInputID())
+        if (p->GetInputID() != q->GetInputID() && !ignoreinput)
         {
             const vector <uint> &conflicting_inputs =
                 m_sinputInfoMap[p->GetInputID()].m_conflictingInputs;
@@ -1715,7 +1716,8 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
     RecConstIter i = m_recList.begin();
-    for (; FindNextConflict(m_recList, pginfo, i); ++i)
+    for (; FindNextConflict(m_recList, pginfo, i, openEndNever,
+                            nullptr, true); ++i)
     {
         const RecordingInfo *p = *i;
         retlist->push_back(new RecordingInfo(*p));

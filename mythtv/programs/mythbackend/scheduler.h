@@ -158,7 +158,8 @@ class Scheduler : public MThread, public MythScheduler
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
                           OpenEndType openEnd = openEndNever,
-                          uint *paffinity = nullptr) const;
+                          uint *paffinity = nullptr,
+                          bool ignoreinput = false) const;
     const RecordingInfo *FindConflict(const RecordingInfo *p,
                                       OpenEndType openEnd = openEndNever,
                                       uint *affinity = nullptr,
